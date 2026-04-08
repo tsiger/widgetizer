@@ -2,7 +2,7 @@
   "name": "About",
   "slug": "about",
   "widgets": {
-    "hero": {
+    "intro": {
       "type": "banner",
       "settings": {
         "image": "",
@@ -12,11 +12,11 @@
         "vertical_alignment": "center",
         "overlay_color": "#1a2332a6",
         "color_scheme": "highlight",
-        "top_spacing": "none",
+        "top_spacing": "auto",
         "bottom_spacing": "none"
       },
       "blocks": {
-        "hero-heading": {
+        "intro-heading": {
           "type": "heading",
           "settings": {
             "text": "About the Firm",
@@ -24,7 +24,7 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": ["intro-heading"]
     },
     "story": {
       "type": "image-text",
@@ -62,7 +62,7 @@
         "story-text-2": {
           "type": "text",
           "settings": {
-            "text": "<p>We invest in technology and talent so our clients get proactive advice — not just year-end reports. Every engagement starts with understanding your business, not your ledger.</p>",
+            "text": "<p>We invest in technology and talent so our clients get proactive advice - not just year-end reports. Every engagement starts with understanding your business, not your ledger.</p>",
             "size": "base"
           }
         }
@@ -260,8 +260,8 @@
       "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "story", "stats", "team", "faq", "cta"],
+  "widgetsOrder": ["intro", "story", "stats", "team", "faq", "cta"],
   "id": "about",
   "created": "2026-04-08T12:00:00.000Z",
-  "updated": "2026-04-08T12:00:00.000Z"
+  "updated": "2026-04-08T16:45:00.000Z"
 }

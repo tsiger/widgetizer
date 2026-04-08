@@ -1,0 +1,36 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "\u00a9 2026 Greenfield Landscaping. All rights reserved.",
+    "color_scheme": "highlight"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Greenfield",
+        "text": "<p>Design, installation, and maintenance for residential and commercial landscapes across Greater Portland.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>(503) 555-0147</p><p>hello@greenfieldpdx.com</p><p>2740 SE Division St<br>Portland, OR 97202</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Pages"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

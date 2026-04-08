@@ -1,0 +1,378 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "slideshow",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "center",
+        "autoplay": true,
+        "autoplay_speed": 6000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "42 Beacon St — Beacon Hill",
+            "heading_size": "5xl",
+            "text_content": "$3,200,000 · 4 Bed · 3.5 Bath · 3,400 sqft",
+            "text_size": "lg",
+            "button_link": {
+              "text": "View Property",
+              "href": "properties.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#1f1a17a6",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "185 Commonwealth Ave — Back Bay",
+            "heading_size": "5xl",
+            "text_content": "$2,850,000 · 3 Bed · 2.5 Bath · 2,800 sqft",
+            "text_size": "lg",
+            "button_link": {
+              "text": "View Property",
+              "href": "properties.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#1f1a17a6",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-3": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "7 Rutland Square — South End",
+            "heading_size": "5xl",
+            "text_content": "$1,975,000 · 3 Bed · 2 Bath · 2,200 sqft",
+            "text_size": "lg",
+            "button_link": {
+              "text": "View Property",
+              "href": "properties.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#1f1a17a6",
+            "color_scheme": "highlight"
+          }
+        }
+      },
+      "blocksOrder": ["slide-1", "slide-2", "slide-3"]
+    },
+    "trust": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "md",
+        "icon_shape": "rounded",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "trophy",
+            "title": "15+ Years Experience",
+            "text": "Serving Greater Boston"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "home",
+            "title": "200+ Homes Sold",
+            "text": "And counting"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "chart-bar",
+            "title": "$250M+ in Sales",
+            "text": "Career volume"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "5-Star Reviews",
+            "text": "Across all platforms"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "listings": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "On the Market",
+        "title": "Featured Properties",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "prop-1": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Beacon Hill",
+            "title": "42 Beacon St",
+            "description": "<p>4 Bed · 3.5 Bath · 3,400 sqft<br><strong>$3,200,000</strong></p>",
+            "button_link": {
+              "text": "View Property",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        },
+        "prop-2": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "South End",
+            "title": "7 Rutland Square",
+            "description": "<p>3 Bed · 2 Bath · 2,200 sqft<br><strong>$1,975,000</strong></p>",
+            "button_link": {
+              "text": "View Property",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        },
+        "prop-3": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Cambridge",
+            "title": "18 Brattle St",
+            "description": "<p>5 Bed · 4 Bath · 4,100 sqft<br><strong>$4,500,000</strong></p>",
+            "button_link": {
+              "text": "View Property",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["prop-1", "prop-2", "prop-3"]
+    },
+    "agent": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "agent-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>YOUR AGENT</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "agent-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Sarah Caldwell",
+            "size": "3xl"
+          }
+        },
+        "agent-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>With over 15 years in Boston real estate, Sarah combines deep neighborhood knowledge with a hands-on approach to every transaction. Whether you're buying your first home or selling a family estate, she treats every deal like it's her own.</p>",
+            "size": "base"
+          }
+        },
+        "agent-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About Sarah",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["agent-eyebrow", "agent-heading", "agent-text", "agent-button"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client Stories",
+        "title": "What Buyers & Sellers Say",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Sarah found us our dream home in Beacon Hill after three other agents told us it was impossible in our budget. Her off-market connections made all the difference.",
+            "avatar": "",
+            "name": "Daniel & Maria K.",
+            "title": "Buyers, Beacon Hill",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We sold 12% above asking in just 9 days. Sarah's staging recommendations and pricing strategy were spot on. We couldn't be happier.",
+            "avatar": "",
+            "name": "Robert H.",
+            "title": "Seller, Back Bay",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "As first-time buyers, we were nervous about every step. Sarah walked us through everything with patience and expertise. She genuinely cares.",
+            "avatar": "",
+            "name": "Jessica T.",
+            "title": "Buyer, Somerville",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "buyer_seller": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "Whether You're Buying or Selling",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "card-1": {
+          "type": "card",
+          "settings": {
+            "icon": "home",
+            "title": "First-Time Buyers",
+            "description": "<p>Step-by-step guidance from pre-approval to closing day. We make the process simple and transparent.</p>",
+            "button_link": {
+              "text": "Buyer's Guide",
+              "href": "guides.html",
+              "target": "_self"
+            }
+          }
+        },
+        "card-2": {
+          "type": "card",
+          "settings": {
+            "icon": "tag",
+            "title": "Ready to Sell",
+            "description": "<p>Strategic pricing, professional staging, and marketing that maximizes your home's value and minimizes time on market.</p>",
+            "button_link": {
+              "text": "Seller's Guide",
+              "href": "guides.html",
+              "target": "_self"
+            }
+          }
+        },
+        "card-3": {
+          "type": "card",
+          "settings": {
+            "icon": "growth",
+            "title": "Property Investors",
+            "description": "<p>Market analysis, portfolio strategy, and deal sourcing for investors looking to build wealth through Boston real estate.</p>",
+            "button_link": {
+              "text": "Let's Talk",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["card-1", "card-2", "card-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Make Your Move?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Free market analysis for your home.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "trust", "listings", "agent", "testimonials", "buyer_seller", "cta"],
+  "id": "index",
+  "created": "2026-04-08T16:00:00.000Z",
+  "updated": "2026-04-08T16:00:00.000Z"
+}

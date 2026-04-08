@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Pipeworks",
+    "contactDetailsLine1": "24/7 Emergency: (555) 847-3200",
+    "contactDetailsLine2": "Serving Greater Portland",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Get a Quote",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard"
+  }
+}

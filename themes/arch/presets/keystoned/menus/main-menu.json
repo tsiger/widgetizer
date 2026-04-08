@@ -1,0 +1,11 @@
+{
+  "id": "main-menu",
+  "name": "Main Menu",
+  "items": [
+    { "label": "Properties", "link": "properties.html", "items": [] },
+    { "label": "Neighborhoods", "link": "neighborhoods.html", "items": [] },
+    { "label": "Buyers & Sellers", "link": "guides.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}

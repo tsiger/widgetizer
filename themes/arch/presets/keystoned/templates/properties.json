@@ -1,0 +1,204 @@
+{
+  "name": "Properties",
+  "slug": "properties",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1f1a1700",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Properties",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Current listings and recently sold homes.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "listings": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "Currently Available",
+        "title": "Featured Listings",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "text_display": "always",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "prop-1": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "42 Beacon St, Beacon Hill",
+            "description": "4 Bed · 3.5 Bath · 3,400 sqft — $3,200,000",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "prop-2": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "185 Commonwealth Ave, Back Bay",
+            "description": "3 Bed · 2.5 Bath · 2,800 sqft — $2,850,000",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "prop-3": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "7 Rutland Square, South End",
+            "description": "3 Bed · 2 Bath · 2,200 sqft — $1,975,000",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "prop-4": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "18 Brattle St, Cambridge",
+            "description": "5 Bed · 4 Bath · 4,100 sqft — $4,500,000",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "prop-5": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "340 Harvard St, Brookline",
+            "description": "4 Bed · 3 Bath · 3,000 sqft — $2,400,000",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "prop-6": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "52 Pearl St, Somerville",
+            "description": "3 Bed · 2 Bath · 1,800 sqft — $1,150,000",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        }
+      },
+      "blocksOrder": ["prop-1", "prop-2", "prop-3", "prop-4", "prop-5", "prop-6"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Track Record",
+        "title": "Recent Results",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "200",
+            "suffix": "+",
+            "label": "Homes Sold",
+            "description": ""
+          }
+        },
+        "fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "1.2",
+            "suffix": "M",
+            "label": "Average Sale Price",
+            "description": ""
+          }
+        },
+        "fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "98",
+            "suffix": "%",
+            "label": "Asking Price Achieved",
+            "description": ""
+          }
+        },
+        "fig-4": {
+          "type": "figure",
+          "settings": {
+            "number": "14",
+            "suffix": "",
+            "label": "Avg. Days on Market",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Don't See What You're Looking For?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We have access to off-market listings.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact Sarah",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "listings", "stats", "cta"],
+  "id": "properties",
+  "created": "2026-04-08T16:00:00.000Z",
+  "updated": "2026-04-08T16:00:00.000Z"
+}

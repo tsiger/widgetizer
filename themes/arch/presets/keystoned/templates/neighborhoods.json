@@ -1,0 +1,247 @@
+{
+  "name": "Neighborhoods",
+  "slug": "neighborhoods",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1f1a1700",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Neighborhoods",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Explore the communities we know best.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "areas": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "center",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "area-1": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Beacon Hill",
+            "description": "<p>Historic Federal-style row houses, gaslit streets, and a tight-knit community minutes from the Common. Median home price: $1.8M.</p>",
+            "button_link": {
+              "text": "Explore",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        },
+        "area-2": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Back Bay",
+            "description": "<p>Grand Victorian brownstones along tree-lined Commonwealth Avenue. World-class shopping on Newbury Street. Median: $2.4M.</p>",
+            "button_link": {
+              "text": "Explore",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        },
+        "area-3": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "South End",
+            "description": "<p>Boston's most vibrant dining and arts scene, with beautifully restored Victorian row houses. Median: $1.4M.</p>",
+            "button_link": {
+              "text": "Explore",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        },
+        "area-4": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Cambridge",
+            "description": "<p>Home to Harvard and MIT, with a rich mix of academic charm, independent shops, and excellent schools. Median: $1.6M.</p>",
+            "button_link": {
+              "text": "Explore",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        },
+        "area-5": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Brookline",
+            "description": "<p>Family-friendly suburb with top-rated schools, beautiful parks, and easy access to downtown Boston. Median: $1.3M.</p>",
+            "button_link": {
+              "text": "Explore",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        },
+        "area-6": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Somerville",
+            "description": "<p>Creative, walkable, and rapidly evolving. A favorite for young professionals and investors alike. Median: $850K.</p>",
+            "button_link": {
+              "text": "Explore",
+              "href": "properties.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["area-1", "area-2", "area-3", "area-4", "area-5", "area-6"]
+    },
+    "expertise": {
+      "type": "image-callout",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "exp-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Local Knowledge Makes the Difference",
+            "size": "3xl"
+          }
+        },
+        "exp-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>After 15 years selling homes across Greater Boston, Sarah knows the nuances that data alone can't capture — which blocks flood, which streets the city is about to invest in, and which schools are on the rise.</p>",
+            "size": "base"
+          }
+        },
+        "exp-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ School district and zoning expertise\n+ Off-market and pre-listing access\n+ Neighborhood-specific pricing strategy"
+          }
+        },
+        "exp-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About Sarah",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["exp-heading", "exp-text", "exp-features", "exp-button"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "",
+        "title": "From Our Neighbors",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Sarah knew the South End market inside and out. She found us a place we never would have seen on Zillow — an off-market gem two blocks from our favorite restaurant.",
+            "avatar": "",
+            "name": "Emily & James W.",
+            "title": "Buyers, South End",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Her pricing strategy for our Brookline home was perfect. We had three offers over asking within the first weekend. She really understands the local market.",
+            "avatar": "",
+            "name": "Patricia M.",
+            "title": "Seller, Brookline",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Considering a Move?",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Free Consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "areas", "expertise", "testimonials", "cta"],
+  "id": "neighborhoods",
+  "created": "2026-04-08T16:00:00.000Z",
+  "updated": "2026-04-08T16:00:00.000Z"
+}

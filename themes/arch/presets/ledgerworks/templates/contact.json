@@ -2,7 +2,7 @@
   "name": "Contact",
   "slug": "contact",
   "widgets": {
-    "hero": {
+    "intro": {
       "type": "banner",
       "settings": {
         "image": "",
@@ -12,48 +12,23 @@
         "vertical_alignment": "center",
         "overlay_color": "#1a233200",
         "color_scheme": "standard-accent",
-        "top_spacing": "none",
+        "top_spacing": "auto",
         "bottom_spacing": "none"
       },
       "blocks": {
-        "hero-heading": {
+        "intro-heading": {
           "type": "heading",
           "settings": {
             "text": "Contact",
             "size": "3xl"
           }
         },
-        "hero-text": {
-          "type": "text",
-          "settings": {
-            "text": "<p>We'd love to hear from you.</p>",
-            "size": "base",
-            "muted": true
-          }
-        }
-      },
-      "blocksOrder": ["hero-heading", "hero-text"]
-    },
-    "intro": {
-      "type": "rich-text",
-      "settings": {
-        "text_alignment": "center",
-        "content_width": "narrow",
-        "color_scheme": "standard"
-      },
-      "blocks": {
-        "intro-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Get in Touch",
-            "size": "2xl"
-          }
-        },
         "intro-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Whether you're looking for a new accountant, have questions about our services, or want to schedule your free consultation, we're here to help. Reach out and we'll get back to you within one business day.</p>",
-            "size": "base"
+            "text": "<p>Tell us what kind of accounting or advisory support you need and we'll point you in the right direction.</p>",
+            "size": "base",
+            "muted": true
           }
         }
       },
@@ -83,7 +58,7 @@
           "type": "info",
           "settings": {
             "title": "Office Hours",
-            "text": "<p>Monday — Friday: 8:30 AM – 5:30 PM<br>Saturday: By appointment<br>Sunday: Closed</p>"
+            "text": "<p>Monday - Friday: 8:30 AM - 5:30 PM<br>Saturday: By appointment<br>Sunday: Closed</p>"
           }
         },
         "info-social": {
@@ -131,15 +106,15 @@
           "type": "item",
           "settings": {
             "question": "When should I start tax planning?",
-            "answer": "<p>The best time is at the start of your fiscal year. The second best time is now. Tax planning is most effective when we have months — not weeks — to implement strategies. Contact us anytime to get started.</p>"
+            "answer": "<p>The best time is at the start of your fiscal year. The second best time is now. Tax planning is most effective when we have months - not weeks - to implement strategies. Contact us anytime to get started.</p>"
           }
         }
       },
       "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
     }
   },
-  "widgetsOrder": ["hero", "intro", "location", "faq"],
+  "widgetsOrder": ["intro", "location", "faq"],
   "id": "contact",
   "created": "2026-04-08T12:00:00.000Z",
-  "updated": "2026-04-08T12:00:00.000Z"
+  "updated": "2026-04-08T16:45:00.000Z"
 }

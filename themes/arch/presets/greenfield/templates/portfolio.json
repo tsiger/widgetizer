@@ -1,0 +1,168 @@
+{
+  "name": "Portfolio",
+  "slug": "portfolio",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1a2e1a00",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Portfolio",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A selection of recent residential and commercial projects.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "gallery": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "text_display": "always",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "proj-1": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Modern Courtyard — Pearl District",
+            "description": "Minimalist courtyard with clean-lined planters, ornamental grasses, and a recirculating water feature.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-2": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Full Backyard Redesign — Alberta Arts",
+            "description": "Multi-level deck, stone patio, fire pit, and lush border plantings on a 5,000 sqft residential lot.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-3": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Patio & Fire Pit — Lake Oswego",
+            "description": "Flagstone patio with integrated seating wall, gas fire pit, and low-voltage landscape lighting.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-4": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Native Plant Garden — Sellwood",
+            "description": "Pacific Northwest native species garden replacing a high-maintenance lawn. Ferns, salal, and Oregon grape.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-5": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Commercial Entry — Lloyd District",
+            "description": "Professional landscape for a 4-story office building. Boxwood hedges, ornamental trees, and seasonal color beds.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-6": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Retaining Wall & Terracing — West Hills",
+            "description": "Engineered natural stone retaining wall system with tiered planting beds on a steep hillside property.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        }
+      },
+      "blocksOrder": ["proj-1", "proj-2", "proj-3", "proj-4", "proj-5", "proj-6"]
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Transformation",
+        "title": "Overgrown to Oasis",
+        "description": "",
+        "heading_alignment": "center",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Before",
+        "after_label": "After",
+        "orientation": "horizontal",
+        "initial_position": 40,
+        "show_labels": true,
+        "color_scheme": "highlight"
+      }
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have a Project in Mind?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'd love to see your space.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule a Visit",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "gallery", "before_after", "cta"],
+  "id": "portfolio",
+  "created": "2026-04-08T20:00:00.000Z",
+  "updated": "2026-04-08T20:00:00.000Z"
+}

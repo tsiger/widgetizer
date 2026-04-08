@@ -1,0 +1,197 @@
+{
+  "name": "Projects",
+  "slug": "projects",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1a1a1a00",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Projects",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A look at recent work across plumbing and electrical.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "gallery": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "text_display": "always",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "proj-1": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Complete Bathroom Remodel — Pearl District",
+            "description": "Full plumbing rough-in and fixture installation for a luxury master bathroom renovation.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-2": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Electrical Panel Upgrade — Lake Oswego",
+            "description": "100-amp to 200-amp panel upgrade for a 1960s ranch home, bringing it up to modern code.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-3": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Emergency Pipe Repair — Sellwood",
+            "description": "Midnight call for a burst copper pipe in a finished basement. On-site in 45 minutes, repaired in under two hours.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-4": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Kitchen Plumbing Renovation — Hawthorne",
+            "description": "New supply lines, garbage disposal, and dishwasher hookup as part of a full kitchen remodel.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-5": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Whole-Home Rewiring — Alberta Arts",
+            "description": "Replaced knob-and-tube wiring throughout a 1920s craftsman with modern romex and a new 200-amp service.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        },
+        "proj-6": {
+          "type": "project",
+          "settings": {
+            "image": "",
+            "title": "Water Heater Replacement — Beaverton",
+            "description": "Swapped a failing 40-gallon tank for a Rinnai tankless unit. Endless hot water, lower energy bills.",
+            "link": { "text": "", "href": "", "target": "_self" }
+          }
+        }
+      },
+      "blocksOrder": ["proj-1", "proj-2", "proj-3", "proj-4", "proj-5", "proj-6"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client Reviews",
+        "title": "Straight From Our Customers",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "They rewired our entire 1920s house and you'd never know the walls were opened up. Clean work, on schedule, and the crew was a pleasure to have around.",
+            "avatar": "",
+            "name": "Sandra & Mike T.",
+            "title": "Whole-home rewire, Alberta Arts",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "The bathroom remodel plumbing was flawless. They coordinated perfectly with our contractor and everything was ready ahead of schedule.",
+            "avatar": "",
+            "name": "David L.",
+            "title": "Bathroom remodel, Pearl District",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Fastest emergency response I've ever experienced. The plumber knew exactly what to do, fixed the leak, and even helped us file the insurance claim. Above and beyond.",
+            "avatar": "",
+            "name": "Rachel K.",
+            "title": "Emergency repair, Sellwood",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have a Project in Mind?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Free estimates, no obligation.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a Quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "gallery", "testimonials", "cta"],
+  "id": "projects",
+  "created": "2026-04-08T18:00:00.000Z",
+  "updated": "2026-04-08T18:00:00.000Z"
+}

@@ -3,8 +3,9 @@
   "name": "Footer Menu",
   "items": [
     { "label": "Home", "link": "index.html", "items": [] },
-    { "label": "Services", "link": "services.html", "items": [] },
-    { "label": "Industries", "link": "work.html", "items": [] },
+    { "label": "Properties", "link": "properties.html", "items": [] },
+    { "label": "Neighborhoods", "link": "neighborhoods.html", "items": [] },
+    { "label": "Buyers & Sellers", "link": "guides.html", "items": [] },
     { "label": "About", "link": "about.html", "items": [] },
     { "label": "Contact", "link": "contact.html", "items": [] }
   ]

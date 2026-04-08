@@ -2,7 +2,7 @@
   "name": "Services",
   "slug": "services",
   "widgets": {
-    "hero": {
+    "intro": {
       "type": "banner",
       "settings": {
         "image": "",
@@ -12,27 +12,27 @@
         "vertical_alignment": "center",
         "overlay_color": "#1a233200",
         "color_scheme": "standard-accent",
-        "top_spacing": "none",
+        "top_spacing": "auto",
         "bottom_spacing": "none"
       },
       "blocks": {
-        "hero-heading": {
+        "intro-heading": {
           "type": "heading",
           "settings": {
             "text": "Services",
             "size": "3xl"
           }
         },
-        "hero-text": {
+        "intro-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Comprehensive financial services tailored to your business.</p>",
+            "text": "<p>Accounting, tax, and advisory support tailored to your stage of growth.</p>",
             "size": "base",
             "muted": true
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": ["intro-heading", "intro-text"]
     },
     "services_grid": {
       "type": "card-grid",
@@ -59,7 +59,7 @@
             "description": "<p>Federal, state, and local tax preparation for businesses and individuals. Year-round planning to minimize liability and maximize deductions.</p>",
             "button_link": {
               "text": "Learn More",
-              "href": "#",
+              "href": "contact.html",
               "target": "_self"
             }
           }
@@ -73,7 +73,7 @@
             "description": "<p>Accurate monthly bookkeeping, payroll processing, and accounts management. Cloud-based systems with real-time financial visibility.</p>",
             "button_link": {
               "text": "Learn More",
-              "href": "#",
+              "href": "contact.html",
               "target": "_self"
             }
           }
@@ -87,7 +87,7 @@
             "description": "<p>Independent audits, reviews, and compilations that satisfy lenders, investors, and regulatory requirements.</p>",
             "button_link": {
               "text": "Learn More",
-              "href": "#",
+              "href": "contact.html",
               "target": "_self"
             }
           }
@@ -101,7 +101,7 @@
             "description": "<p>Growth planning, cash flow forecasting, and operational analysis. Data-driven guidance for your next stage of business.</p>",
             "button_link": {
               "text": "Learn More",
-              "href": "#",
+              "href": "contact.html",
               "target": "_self"
             }
           }
@@ -115,7 +115,7 @@
             "description": "<p>Fractional CFO support for growing companies that need executive-level financial leadership without the full-time cost.</p>",
             "button_link": {
               "text": "Learn More",
-              "href": "#",
+              "href": "contact.html",
               "target": "_self"
             }
           }
@@ -129,13 +129,122 @@
             "description": "<p>Individual tax returns, retirement planning, and estate tax strategy for business owners and high-net-worth individuals.</p>",
             "button_link": {
               "text": "Learn More",
-              "href": "#",
+              "href": "contact.html",
               "target": "_self"
             }
           }
         }
       },
       "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4", "svc-5", "svc-6"]
+    },
+    "fit": {
+      "type": "content-switcher",
+      "settings": {
+        "eyebrow": "Where We Fit Best",
+        "title": "Choose the Type of Support You Need",
+        "description": "Use the switcher to see the kinds of services we typically provide for each client profile.",
+        "heading_alignment": "center",
+        "switcher_type": "toggle",
+        "option_1_label": "Individuals",
+        "option_2_label": "Businesses",
+        "option_3_label": "",
+        "columns": 3,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "individual-1": {
+          "type": "item",
+          "settings": {
+            "title": "Annual Tax Filing",
+            "text": "<p>Personal returns for business owners, households with multiple income streams, and clients with investment complexity.</p>",
+            "image": "",
+            "price": "From seasonal support",
+            "link": {
+              "text": "Ask About Tax Prep",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "target_option": "1"
+          }
+        },
+        "individual-2": {
+          "type": "item",
+          "settings": {
+            "title": "Year-Round Tax Strategy",
+            "text": "<p>Quarterly planning, estimated payment guidance, and proactive strategy for owners who want fewer surprises.</p>",
+            "image": "",
+            "price": "Ongoing advisory",
+            "link": {
+              "text": "Talk Strategy",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "target_option": "1"
+          }
+        },
+        "individual-3": {
+          "type": "item",
+          "settings": {
+            "title": "Estate & Retirement Planning",
+            "text": "<p>Coordination with attorneys and advisors to help clients protect wealth and prepare for major life transitions.</p>",
+            "image": "",
+            "price": "Custom scope",
+            "link": {
+              "text": "Start a Conversation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "target_option": "1"
+          }
+        },
+        "business-1": {
+          "type": "item",
+          "settings": {
+            "title": "Core Monthly Accounting",
+            "text": "<p>Bookkeeping, reconciliations, payroll coordination, and financial reporting for owners who need clean, current books.</p>",
+            "image": "",
+            "price": "Monthly retainer",
+            "link": {
+              "text": "Explore Monthly Support",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "target_option": "2"
+          }
+        },
+        "business-2": {
+          "type": "item",
+          "settings": {
+            "title": "Growth Advisory",
+            "text": "<p>Cash flow planning, KPI reporting, and strategic support for teams hiring, expanding locations, or improving margins.</p>",
+            "image": "",
+            "price": "Advisory retainer",
+            "link": {
+              "text": "See If It's a Fit",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "target_option": "2"
+          }
+        },
+        "business-3": {
+          "type": "item",
+          "settings": {
+            "title": "Fractional CFO",
+            "text": "<p>Executive-level financial leadership for companies that need forecasting, board-ready reporting, and deeper strategic guidance.</p>",
+            "image": "",
+            "price": "Custom engagement",
+            "link": {
+              "text": "Request a CFO Consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "target_option": "2"
+          }
+        }
+      },
+      "blocksOrder": ["individual-1", "individual-2", "individual-3", "business-1", "business-2", "business-3"]
     },
     "process": {
       "type": "numbered-cards",
@@ -148,7 +257,7 @@
         "columns_desktop": 4,
         "card_layout": "flat",
         "alignment": "center",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard"
       },
       "blocks": {
         "step-1": {
@@ -211,7 +320,7 @@
         "approach-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Most firms file your taxes once a year and call it done. We take a different approach — monthly check-ins, quarterly projections, and continuous optimization so there are never surprises at year-end.</p>",
+            "text": "<p>Most firms file your taxes once a year and call it done. We take a different approach - monthly check-ins, quarterly projections, and continuous optimization so there are never surprises at year-end.</p>",
             "size": "base"
           }
         },
@@ -254,8 +363,8 @@
       "blocksOrder": ["cta-heading", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "services_grid", "process", "approach", "cta"],
+  "widgetsOrder": ["intro", "services_grid", "fit", "process", "approach", "cta"],
   "id": "services",
   "created": "2026-04-08T12:00:00.000Z",
-  "updated": "2026-04-08T12:00:00.000Z"
+  "updated": "2026-04-08T16:45:00.000Z"
 }

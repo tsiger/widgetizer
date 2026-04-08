@@ -1,0 +1,228 @@
+{
+  "name": "Buyers & Sellers",
+  "slug": "guides",
+  "widgets": {
+    "intro": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>GUIDES</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Buying or Selling — We've Got You Covered",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact Sarah",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "position": "left"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Whether this is your first home or your fifth, every transaction is different. Sarah provides personalized guidance for buyers and sellers at every stage — from initial search to closing day and beyond.</p>",
+            "size": "base",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-button", "intro-text"]
+    },
+    "buyers": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "buyers-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FOR BUYERS</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "buyers-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Find Your Next Home",
+            "size": "3xl"
+          }
+        },
+        "buyers-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From narrowing your wish list to negotiating the best price, Sarah is with you at every step. She'll help you understand the market, avoid costly mistakes, and find a home that truly fits your life.</p>",
+            "size": "base"
+          }
+        },
+        "buyers-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Personalized property search\n+ Negotiation strategy\n+ Home inspection coordination\n+ Closing support from offer to keys"
+          }
+        }
+      },
+      "blocksOrder": ["buyers-eyebrow", "buyers-heading", "buyers-text", "buyers-features"]
+    },
+    "sellers": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "sellers-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FOR SELLERS</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "sellers-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Sell With Confidence",
+            "size": "3xl"
+          }
+        },
+        "sellers-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Selling a home is one of the biggest financial decisions you'll make. Sarah's data-driven pricing strategy, professional staging advice, and targeted marketing consistently deliver above-market results.</p>",
+            "size": "base"
+          }
+        },
+        "sellers-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Comparative market analysis\n+ Professional staging & photography\n+ Strategic pricing & marketing\n+ Open house management"
+          }
+        }
+      },
+      "blocksOrder": ["sellers-eyebrow", "sellers-heading", "sellers-text", "sellers-features"]
+    },
+    "process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "How It Works",
+        "title": "From First Call to Closing Day",
+        "description": "",
+        "heading_alignment": "center",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Consultation",
+            "description": "<p>We start with a conversation about your goals, timeline, and budget. Whether buying or selling, this meeting sets the foundation for everything that follows.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Strategy",
+            "description": "<p>For buyers: a targeted search plan. For sellers: a pricing and marketing strategy. Either way, you'll have a clear roadmap before we take the next step.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Execute",
+            "description": "<p>We tour properties, coordinate showings, negotiate offers, and handle the paperwork. Sarah manages every detail so you don't have to.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "image": "",
+            "title": "Close",
+            "description": "<p>From inspection to financing to the final walkthrough, we navigate the closing process and hand you the keys — or the check.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's Start the Conversation",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>No pressure. Just honest answers.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["intro", "buyers", "sellers", "process", "cta"],
+  "id": "guides",
+  "created": "2026-04-08T16:00:00.000Z",
+  "updated": "2026-04-08T16:00:00.000Z"
+}

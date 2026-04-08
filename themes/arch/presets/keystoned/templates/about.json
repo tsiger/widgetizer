@@ -1,0 +1,247 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "highlight",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>MEET SARAH</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Real Estate Is Personal",
+            "size": "3xl"
+          }
+        },
+        "story-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Sarah Caldwell didn't start in real estate. After a decade in urban planning, she realized the part she loved most was helping people find the right place to call home. She got her license in 2009 and hasn't looked back.</p>",
+            "size": "base"
+          }
+        },
+        "story-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fifteen years and over 200 transactions later, Sarah's approach hasn't changed: listen carefully, know the market deeply, and treat every client's home search — or home sale — like it's the most important one. Because to them, it is.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "15",
+            "suffix": "+",
+            "label": "Years in Real Estate",
+            "description": ""
+          }
+        },
+        "fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "200",
+            "suffix": "+",
+            "label": "Homes Closed",
+            "description": ""
+          }
+        },
+        "fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "250",
+            "suffix": "M+",
+            "label": "Total Sales Volume",
+            "description": ""
+          }
+        },
+        "fig-4": {
+          "type": "figure",
+          "settings": {
+            "number": "98",
+            "suffix": "%",
+            "label": "Client Satisfaction",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+    },
+    "testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 5000,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Sarah made selling our family home of 30 years feel manageable. She handled everything with grace and got us a price we never expected. We're so grateful.",
+            "avatar": "",
+            "name": "Margaret & Paul D.",
+            "title": "Sellers, Beacon Hill",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We looked at 40 homes before finding the right one. Sarah never rushed us, never pushed, and was there for every single showing. That patience is rare.",
+            "avatar": "",
+            "name": "Michael T.",
+            "title": "Buyer, Cambridge",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "As an investor, I need an agent who understands numbers. Sarah's market analysis is sharp and her deal-sourcing is the best I've worked with in Boston.",
+            "avatar": "",
+            "name": "Anthony R.",
+            "title": "Investor, Multiple properties",
+            "rating": "5"
+          }
+        },
+        "review-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "First-time buyers with a million questions. Sarah answered every one and made the entire process feel less scary. We'd recommend her to anyone.",
+            "avatar": "",
+            "name": "Priya & James L.",
+            "title": "Buyers, Somerville",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3", "review-4"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Common Questions",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What areas do you cover?",
+            "answer": "<p>I specialize in Boston's core neighborhoods — Beacon Hill, Back Bay, South End, and the Seaport — as well as Cambridge, Brookline, and Somerville. I also work with clients throughout the Greater Boston area on a case-by-case basis.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work with first-time buyers?",
+            "answer": "<p>Absolutely. A large part of my practice is guiding first-time buyers through every step — from pre-approval to closing. I'll make sure you understand the process and feel confident at every stage.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "How do you determine the right listing price?",
+            "answer": "<p>I prepare a detailed comparative market analysis (CMA) that looks at recent sales, active competition, market trends, and your home's unique features. Pricing correctly from day one is the single most important factor in a successful sale.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What are your fees?",
+            "answer": "<p>My commission structure is competitive and transparent. I'll walk you through exactly how it works during our first meeting. For buyers, my services come at no direct cost to you — the seller typically pays both agents' commissions.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "How quickly can we get started?",
+            "answer": "<p>I can usually schedule an initial consultation within 24-48 hours. If you're ready to buy, I recommend getting pre-approved first — I can connect you with trusted lenders who make the process fast and painless.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's Work Together",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your first consultation is always free.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["story", "stats", "testimonials", "faq", "cta"],
+  "id": "about",
+  "created": "2026-04-08T16:00:00.000Z",
+  "updated": "2026-04-08T16:00:00.000Z"
+}

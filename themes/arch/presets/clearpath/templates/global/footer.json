@@ -1,0 +1,36 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "\u00a9 2026 Clearpath Consulting. All rights reserved.",
+    "color_scheme": "highlight"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Clearpath",
+        "text": "<p>Strategy and transformation consulting for ambitious businesses.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>hello@clearpathconsulting.com</p><p>200 State St, 12th Floor<br>Boston, MA 02109</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Pages"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

@@ -8,7 +8,8 @@
         "image": "",
         "image_position": "right",
         "color_scheme": "standard",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -46,6 +47,54 @@
       },
       "blocksOrder": ["hero-heading", "hero-text", "hero-buttons"]
     },
+    "trust": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "md",
+        "icon_shape": "rounded",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "CPA-Led Team",
+            "text": "Experienced accountants and advisors guiding every engagement."
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "repeat",
+            "title": "Year-Round Support",
+            "text": "Planning and reporting that continue long after tax season."
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "device-desktop-analytics",
+            "title": "Cloud Accounting",
+            "text": "Real-time reporting and modern tools that keep you in the loop."
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "clock-hour-3",
+            "title": "Fast Response",
+            "text": "Clear answers within one business day for active clients."
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
     "stats": {
       "type": "key-figures",
       "settings": {
@@ -57,7 +106,8 @@
         "columns_desktop": 4,
         "card_layout": "flat",
         "animate": true,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-accent",
+        "top_spacing": "none"
       },
       "blocks": {
         "fig-1": {
@@ -308,8 +358,8 @@
       "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "stats", "services", "why_us", "testimonials", "cta"],
+  "widgetsOrder": ["hero", "trust", "stats", "services", "why_us", "testimonials", "cta"],
   "id": "index",
   "created": "2026-04-08T12:00:00.000Z",
-  "updated": "2026-04-08T12:00:00.000Z"
+  "updated": "2026-04-08T16:30:00.000Z"
 }

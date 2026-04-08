@@ -1,0 +1,164 @@
+{
+  "name": "Areas We Serve",
+  "slug": "areas",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1a1a1a00",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Areas We Serve",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fast, reliable service across Greater Portland.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "areas": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "Service Area",
+        "title": "Where We Work",
+        "description": "We provide same-day plumbing and electrical service to homes and businesses across the Portland metro area and surrounding communities.",
+        "heading_alignment": "left",
+        "content_position": "left",
+        "show_divider": true,
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "area-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "location",
+            "title": "Portland Metro",
+            "description": "<p>Inner SE, NE, NW, SW, Pearl District, and downtown Portland. Our home base and fastest response times.</p>"
+          }
+        },
+        "area-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "location",
+            "title": "East Side",
+            "description": "<p>Gresham, Milwaukie, Clackamas, Happy Valley, and Oregon City. Full service coverage with same-day availability.</p>"
+          }
+        },
+        "area-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "location",
+            "title": "West Side",
+            "description": "<p>Beaverton, Tigard, Lake Oswego, West Linn, and Tualatin. Quick access via Highway 217 and I-5.</p>"
+          }
+        },
+        "area-4": {
+          "type": "feature",
+          "settings": {
+            "icon": "location",
+            "title": "North",
+            "description": "<p>St Johns, Cathedral Park, and Vancouver WA. Cross-river service with Oregon and Washington licensing.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["area-1", "area-2", "area-3", "area-4"]
+    },
+    "response": {
+      "type": "image-callout",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "resp-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Same-Day Service, Every Day",
+            "size": "3xl"
+          }
+        },
+        "resp-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>When something breaks, you can't wait until next week. That's why we staff our team to handle same-day requests for both emergencies and scheduled work — no overtime charges for evenings.</p>",
+            "size": "base"
+          }
+        },
+        "resp-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Average 60-minute emergency response\n+ Same-day appointments for non-emergencies\n+ Saturday service available\n+ No overtime charges for evenings"
+          }
+        },
+        "resp-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call Now",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["resp-heading", "resp-text", "resp-features", "resp-button"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "In Our Service Area?",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a Quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "areas", "response", "cta"],
+  "id": "areas",
+  "created": "2026-04-08T18:00:00.000Z",
+  "updated": "2026-04-08T18:00:00.000Z"
+}

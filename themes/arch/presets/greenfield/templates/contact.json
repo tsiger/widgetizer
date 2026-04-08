@@ -1,0 +1,120 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1a2e1a00",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Contact",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ready to start? Let's talk about your space.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "location": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Visit Us",
+        "description": "",
+        "heading_alignment": "left",
+        "address": "2740 SE Division St, Portland, OR 97202",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.8!2d-122.635!3d45.505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s2740+SE+Division+St!5e0!3m2!1sen!2sus",
+        "directions_link": {
+          "text": "Get Directions",
+          "href": "https://maps.google.com/?q=2740+SE+Division+St+Portland+OR+97202",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "info-hours": {
+          "type": "info",
+          "settings": {
+            "title": "Office & Yard Hours",
+            "text": "<p>Monday — Friday: 7:00 AM – 5:00 PM<br>Saturday: 8:00 AM – 1:00 PM<br>Site visits by appointment</p>"
+          }
+        },
+        "info-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["info-hours", "info-social"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Before You Call",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What should I prepare for a consultation?",
+            "answer": "<p>Have a rough idea of what you'd like to change and your budget range. Photos of your space and any inspiration images are helpful. We'll handle the rest — measuring, soil assessment, and design ideas are all part of our free consultation.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How much does a typical project cost?",
+            "answer": "<p>Small planting projects start around $2,000. A typical residential design + installation runs $8,000–$25,000 depending on scope. Hardscape-heavy projects can run higher. We always provide a detailed quote before starting.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work through winter?",
+            "answer": "<p>Yes. Hardscaping, drainage work, and tree care happen year-round. Planting is best in spring and fall, but we plan winter projects so everything is ready to install when the season turns.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What's included in a maintenance plan?",
+            "answer": "<p>Plans are customized, but typically include mowing, edging, pruning, weeding, fertilization, seasonal cleanup, and irrigation adjustments. We check in monthly and adjust the plan as your landscape matures.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
+    }
+  },
+  "widgetsOrder": ["hero", "location", "faq"],
+  "id": "contact",
+  "created": "2026-04-08T20:00:00.000Z",
+  "updated": "2026-04-08T20:00:00.000Z"
+}

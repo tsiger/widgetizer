@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Clearpath",
+    "contactDetailsLine1": "",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book a Call",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": true,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard"
+  }
+}

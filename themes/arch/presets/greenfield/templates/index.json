@@ -1,0 +1,347 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "slideshow",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "center",
+        "autoplay": true,
+        "autoplay_speed": 7000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "Custom Landscapes That Last",
+            "heading_size": "5xl",
+            "text_content": "Design, installation, and year-round care for residential and commercial properties.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "See Our Work",
+              "href": "portfolio.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#1a2e1a80",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "From Bare Dirt to Backyard Retreat",
+            "heading_size": "5xl",
+            "text_content": "Complete landscape transformations — patios, plantings, lawns, and more.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Our Services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#1a2e1a80",
+            "color_scheme": "highlight"
+          }
+        },
+        "slide-3": {
+          "type": "slide",
+          "settings": {
+            "image": "",
+            "heading_text": "Portland's Trusted Landscapers",
+            "heading_size": "5xl",
+            "text_content": "Licensed, insured, and growing Portland's landscapes since 2004.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Free Estimate",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#1a2e1a80",
+            "color_scheme": "highlight"
+          }
+        }
+      },
+      "blocksOrder": ["slide-1", "slide-2", "slide-3"]
+    },
+    "trust": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "md",
+        "icon_shape": "rounded",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Licensed & Insured",
+            "text": "OR CCB #198765"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "20+ Years Experience",
+            "text": "Serving Greater Portland"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "5-Star Rated",
+            "text": "100+ reviews"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "Certified Arborists",
+            "text": "ISA certified team"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "services": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "What We Do",
+        "title": "Our Services",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "box",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "svc-1": {
+          "type": "card",
+          "settings": {
+            "icon": "plant",
+            "title": "Landscape Design",
+            "description": "<p>Custom plans tailored to your property, style, and budget. From concept sketches to detailed planting guides.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-2": {
+          "type": "card",
+          "settings": {
+            "icon": "fence",
+            "title": "Hardscaping",
+            "description": "<p>Patios, retaining walls, walkways, fire pits, and outdoor living spaces built to last through Pacific Northwest weather.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-3": {
+          "type": "card",
+          "settings": {
+            "icon": "tree",
+            "title": "Tree & Lawn Care",
+            "description": "<p>Pruning, lawn installation, sodding, aeration, and ongoing maintenance to keep your property green year-round.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-4": {
+          "type": "card",
+          "settings": {
+            "icon": "snowflake",
+            "title": "Seasonal Services",
+            "description": "<p>Spring cleanup, fall leaf removal, winter prep, and seasonal planting rotations. We keep your landscape sharp all year.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4"]
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Transformations",
+        "title": "See the Difference",
+        "description": "",
+        "heading_alignment": "center",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Before",
+        "after_label": "After",
+        "orientation": "horizontal",
+        "initial_position": 30,
+        "show_labels": true,
+        "color_scheme": "standard-accent"
+      }
+    },
+    "about_teaser": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>ABOUT GREENFIELD</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Rooted in Portland Since 2004",
+            "size": "3xl"
+          }
+        },
+        "about-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What started as a one-truck operation has grown into a full-service landscape company with a team of designers, installers, and arborists. We know Portland's soil, climate, and native plants — and we put that knowledge into every project.</p>",
+            "size": "base"
+          }
+        },
+        "about-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About Us",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-text", "about-button"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client Stories",
+        "title": "What Homeowners Say",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "They turned our overgrown backyard into an actual outdoor living space. The patio, plantings, and lighting are exactly what we dreamed of. Worth every penny.",
+            "avatar": "",
+            "name": "Lisa & Mark D.",
+            "title": "Backyard redesign, Alberta Arts",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Greenfield designed a native plant garden that's beautiful AND low-maintenance. Two years in and it practically takes care of itself. They really know Portland plants.",
+            "avatar": "",
+            "name": "Joan P.",
+            "title": "Native garden, Sellwood",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Our commercial property looks incredible since the landscaping upgrade. Multiple tenants have commented on the improvement. Professional crew, always on schedule.",
+            "avatar": "",
+            "name": "Robert A.",
+            "title": "Commercial landscape, Lloyd District",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Transform Your Outdoor Space?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Free estimates for all projects.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a Free Estimate",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "trust", "services", "before_after", "about_teaser", "testimonials", "cta"],
+  "id": "index",
+  "created": "2026-04-08T20:00:00.000Z",
+  "updated": "2026-04-08T20:00:00.000Z"
+}

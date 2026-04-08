@@ -1,8 +1,8 @@
 {
-  "name": "Our Work",
+  "name": "Industries",
   "slug": "work",
   "widgets": {
-    "hero": {
+    "intro": {
       "type": "banner",
       "settings": {
         "image": "",
@@ -12,27 +12,27 @@
         "vertical_alignment": "center",
         "overlay_color": "#1a233200",
         "color_scheme": "standard-accent",
-        "top_spacing": "none",
+        "top_spacing": "auto",
         "bottom_spacing": "none"
       },
       "blocks": {
-        "hero-heading": {
+        "intro-heading": {
           "type": "heading",
           "settings": {
-            "text": "Our Work",
+            "text": "Industries",
             "size": "3xl"
           }
         },
-        "hero-text": {
+        "intro-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Industries and clients we serve.</p>",
+            "text": "<p>Industry-aware tax, reporting, and advisory support for businesses with real operational complexity.</p>",
             "size": "base",
             "muted": true
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": ["intro-heading", "intro-text"]
     },
     "logos": {
       "type": "logo-cloud",
@@ -105,7 +105,7 @@
           "settings": {
             "image": "",
             "title": "Technology Startups",
-            "description": "<p>R&D tax credits, equity compensation accounting, and financial modeling for venture-backed companies.</p>"
+            "description": "<p>R&amp;D tax credits, equity compensation accounting, and financial modeling for venture-backed companies.</p>"
           }
         },
         "ind-2": {
@@ -187,7 +187,7 @@
         "review-3": {
           "type": "quote",
           "settings": {
-            "quote": "As a nonprofit, we need accountants who understand grant compliance. Ledgerworks handles it all flawlessly — our board couldn't be happier.",
+            "quote": "As a nonprofit, we need accountants who understand grant compliance. Ledgerworks handles it all flawlessly - our board couldn't be happier.",
             "avatar": "",
             "name": "Patricia Holmes",
             "title": "Executive Director, Atlas Nonprofit",
@@ -235,8 +235,8 @@
       "blocksOrder": ["closing-heading", "closing-text", "closing-button"]
     }
   },
-  "widgetsOrder": ["hero", "logos", "industries", "testimonials", "closing"],
+  "widgetsOrder": ["intro", "logos", "industries", "testimonials", "closing"],
   "id": "work",
   "created": "2026-04-08T12:00:00.000Z",
-  "updated": "2026-04-08T12:00:00.000Z"
+  "updated": "2026-04-08T16:45:00.000Z"
 }

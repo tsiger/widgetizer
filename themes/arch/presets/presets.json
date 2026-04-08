@@ -61,6 +61,26 @@
       "id": "ledgerworks",
       "name": "Ledgerworks",
       "description": "Accountant"
+    },
+    {
+      "id": "clearpath",
+      "name": "Clearpath",
+      "description": "Consultant"
+    },
+    {
+      "id": "keystoned",
+      "name": "Keystoned",
+      "description": "Real estate agent"
+    },
+    {
+      "id": "pipeworks",
+      "name": "Pipeworks",
+      "description": "Plumber / Electrician"
+    },
+    {
+      "id": "greenfield",
+      "name": "Greenfield",
+      "description": "Landscaping"
     }
   ]
 }
