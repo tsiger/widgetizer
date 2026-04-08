@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, FolderOpen, Palette, Settings2 } from "lucide-react";
+import useThemeUpdateStore from "../../stores/themeUpdateStore";
 
 export default function AdminMenu({ activeProject }) {
   const { t } = useTranslation();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
+  const updateCount = useThemeUpdateStore((state) => state.updateCount);
+  const fetchUpdateCount = useThemeUpdateStore((state) => state.fetchUpdateCount);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -31,10 +34,22 @@ export default function AdminMenu({ activeProject }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!activeProject) return;
+    fetchUpdateCount();
+  }, [activeProject?.id, fetchUpdateCount]);
+
+  useEffect(() => {
+    if (!activeProject || !isOpen) return;
+    fetchUpdateCount();
+  }, [activeProject, isOpen, fetchUpdateCount]);
+
   const isProjectsActive = location.pathname.startsWith("/projects");
   const isThemesActive = location.pathname.startsWith("/themes");
   const isAppSettingsActive = location.pathname.startsWith("/app-settings");
   const isMenuActive = isProjectsActive || isThemesActive || isAppSettingsActive;
+  const hasThemeUpdates = !!activeProject && updateCount > 0;
+  const badgeLabel = updateCount > 99 ? "99+" : String(updateCount);
 
   const buttonClass = `inline-flex h-10 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition-colors ${
     isMenuActive || isOpen
@@ -51,11 +66,15 @@ export default function AdminMenu({ activeProject }) {
           : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
     }`;
 
+  const badgeClass =
+    "inline-flex min-w-5 items-center justify-center rounded-full bg-pink-600 px-1.5 py-0.5 text-xs font-semibold leading-none text-white";
+
   return (
     <div className="relative shrink-0" ref={menuRef}>
       <button type="button" className={buttonClass} onClick={() => setIsOpen((open) => !open)} aria-haspopup="menu" aria-expanded={isOpen}>
         <Settings2 size={16} />
         <span>{t("navigation.admin")}</span>
+        {hasThemeUpdates && <span className={badgeClass}>{badgeLabel}</span>}
         <ChevronDown size={16} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
@@ -70,6 +89,7 @@ export default function AdminMenu({ activeProject }) {
             <Link to="/themes" className={itemClass(isThemesActive)} onClick={() => setIsOpen(false)}>
               <Palette size={16} />
               <span>{t("navigation.themes")}</span>
+              {hasThemeUpdates && <span className={`ml-auto ${badgeClass}`}>{badgeLabel}</span>}
             </Link>
           ) : (
             <div className={itemClass(false, true)} aria-disabled="true">

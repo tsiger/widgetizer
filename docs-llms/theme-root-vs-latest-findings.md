@@ -31,37 +31,26 @@ These flows already treat `latest/` as the live runtime source:
 
 This is the correct direction if the runtime installed theme is supposed to represent the user's currently available theme version.
 
-## Confirmed Inconsistencies
+## Cleanup Result
 
-### 1. `getTheme()` still reads root `theme.json`
+The previously deferred inconsistencies have now been normalized:
 
-`server/controllers/themeController.js`
+- `getTheme()` reads `theme.json` from `getThemeSourceDir()`
+- `getThemeWidgets()` reads widget schemas from `path.join(getThemeSourceDir(), "widgets")`
 
-- `getTheme()` uses `getThemeJsonPath(id)`
-- that points at the runtime theme root, not `getThemeSourceDir()`
+That means single-theme metadata and theme-level widget inspection now use the same installed snapshot contract as:
 
-Impact:
-
-- single-theme reads can disagree with `getAllThemes()`
-- when `latest/` exists, theme metadata/version can be stale in endpoints that use `getTheme()`
-
-### 2. `getThemeWidgets()` still reads root `widgets/`
-
-`server/controllers/themeController.js`
-
-- `getThemeWidgets()` uses `getThemeWidgetsDir(id)`
-- that reads the runtime theme root widgets, not `latest/widgets/`
-
-Impact:
-
-- theme-level widget inspection can ignore update-delivered widget/schema changes
-- theme APIs can disagree with the actual installed snapshot that project creation and updates use
+- `getAllThemes()`
+- `getThemeTemplates()`
+- `getThemePresets()`
+- `resolvePresetPaths()`
+- project creation and theme updates
 
 ## Docs Mismatch
 
-`docs-llms/core-themes.md` currently says `buildLatestSnapshot()` excludes `presets/` from the snapshot.
+`docs-llms/core-themes.md` previously said `buildLatestSnapshot()` excludes `presets/` from the snapshot.
 
-That is not true in code:
+That was not true in code:
 
 - the snapshot excludes `updates/` and `latest/`
 - `presets/` is included in `latest/`
@@ -87,18 +76,16 @@ That creates avoidable confusion around:
 
 ## Current Conclusion
 
-The architecture points toward this rule:
+The architecture now follows this rule consistently:
 
 - if an operation needs the current installed runtime theme, it should read via `getThemeSourceDir()`
 - if an operation is specifically about seed/runtime-root management internals, it can read the root directly
 
-The main remaining cleanup after locales is to normalize theme-level reads around that rule.
+Theme-level runtime reads that represent the installed theme now resolve through `getThemeSourceDir()`. Direct runtime-root reads should be reserved for storage/management internals only.
 
-## Deferred Scope
+## Remaining Watchpoint
 
-After locales are resolved, revisit:
+If future theme-level endpoints are added, use the same rule:
 
-1. `getTheme()` source selection
-2. `getThemeWidgets()` source selection
-3. docs describing what `latest/` contains
-4. any other theme-level endpoint that should consistently mean "current installed theme"
+1. current installed theme view → `getThemeSourceDir()`
+2. runtime-root management internals → direct root helpers if truly needed

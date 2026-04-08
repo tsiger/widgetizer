@@ -654,6 +654,21 @@ describe("getTheme", () => {
     assert.equal(res._json.version, "1.5.0");
   });
 
+  it("returns theme.json from latest/ when snapshot exists", async () => {
+    const latestDir = getThemeLatestDir("get-single-theme");
+    await fs.ensureDir(latestDir);
+    await fs.writeJson(path.join(latestDir, "theme.json"), {
+      name: "Get Test Latest",
+      version: "1.6.0",
+      author: "Test Author",
+    });
+
+    const res = await callController(getTheme, { params: { id: "get-single-theme" } });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.name, "Get Test Latest");
+    assert.equal(res._json.version, "1.6.0");
+  });
+
   it("returns 404 for nonexistent theme", async () => {
     const res = await callController(getTheme, { params: { id: "ghost-theme" } });
     assert.equal(res._status, 404);
@@ -681,6 +696,28 @@ describe("getThemeWidgets", () => {
     const res = await callController(getThemeWidgets, { params: { id: "widgets-test-theme" } });
     assert.equal(res._status, 200);
     assert.equal(res._json.length, 3);
+    assert.ok(!res._json.find((w) => w.type === "global"), "global/ should be excluded");
+  });
+
+  it("returns widget schemas from latest/ when snapshot exists", async () => {
+    const latestWidgetsDir = path.join(getThemeLatestDir("widgets-test-theme"), "widgets");
+    await fs.ensureDir(path.join(latestWidgetsDir, "updated-widget"));
+    await fs.writeJson(path.join(latestWidgetsDir, "updated-widget", "schema.json"), {
+      type: "updated-widget",
+      displayName: "Updated Widget",
+    });
+    await fs.ensureDir(path.join(latestWidgetsDir, "global"));
+    await fs.writeJson(path.join(latestWidgetsDir, "global", "schema.json"), { type: "global" });
+    await fs.writeJson(path.join(getThemeLatestDir("widgets-test-theme"), "theme.json"), {
+      name: "Widgets Test Theme",
+      version: "2.0.0",
+      author: "Test Author",
+    });
+
+    const res = await callController(getThemeWidgets, { params: { id: "widgets-test-theme" } });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.length, 1);
+    assert.equal(res._json[0].type, "updated-widget");
     assert.ok(!res._json.find((w) => w.type === "global"), "global/ should be excluded");
   });
 

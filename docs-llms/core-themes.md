@@ -200,12 +200,14 @@ The backend handles the logic for listing themes, processing uploads, and managi
      - Must contain `theme.json`
      - `theme.json` version must match folder name
   4. Layering files from each version in order (last wins)
-  5. Excluding `presets/` directory from the snapshot
+  5. Excluding only versioning directories like `updates/` and `latest/` from the snapshot
   6. Writing composed result to `latest/`
 
 - `getThemeSourceDir(themeId)`: Returns the path to use for reading theme files:
   - Returns `latest/` if it exists
   - Otherwise returns base theme directory
+
+- `getTheme(themeId)` / `getThemeWidgets(themeId)`: Read from `getThemeSourceDir(themeId)`, so theme metadata and widget schemas reflect the currently installed runtime snapshot rather than the older runtime root when `latest/` exists.
 
 - `themeHasPendingUpdates(themeId)`: Checks if newest version in `updates/` is newer than current source version.
 

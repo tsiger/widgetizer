@@ -669,7 +669,8 @@ export async function getAllThemes(req, res) {
 export async function getTheme(req, res) {
   try {
     const { id } = req.params;
-    const themeJsonPath = getThemeJsonPath(id);
+    const sourceDir = await getThemeSourceDir(id);
+    const themeJsonPath = path.join(sourceDir, "theme.json");
     const themeData = await fs.readFile(themeJsonPath, "utf8");
     res.json(JSON.parse(themeData));
   } catch {
@@ -686,7 +687,8 @@ export async function getTheme(req, res) {
 export async function getThemeWidgets(req, res) {
   try {
     const { id } = req.params;
-    const widgetsDir = getThemeWidgetsDir(id);
+    const sourceDir = await getThemeSourceDir(id);
+    const widgetsDir = path.join(sourceDir, "widgets");
     const entries = await fs.readdir(widgetsDir, { withFileTypes: true });
 
     const widgetsList = await Promise.all(
