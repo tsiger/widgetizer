@@ -350,6 +350,9 @@
             "circle": "Circle"
           }
         },
+        "image": {
+          "label": "Background image"
+        },
         "overlay_color": {
           "label": "Overlay color",
           "description": "Applies only if there is a background image."
