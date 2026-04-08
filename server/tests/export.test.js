@@ -1307,6 +1307,25 @@ describe("exportProject with markdown", () => {
     assert.ok(indexMd.includes("source_url:"), "Should have source_url section");
   });
 
+  it("HTML contains <link rel=alternate> pointing to the markdown file with absolute URL", async () => {
+    const rawDir = readExportHistory(PROJECT_ID)[0].outputDir;
+    const exportDir = path.isAbsolute(rawDir) ? rawDir : path.join(PUBLISH_DIR, rawDir);
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes('rel="alternate"'), "Should have alternate link tag");
+    assert.ok(html.includes('type="text/markdown"'), "Should specify text/markdown type");
+    assert.ok(
+      html.includes(`href="${SITE_URL}/index.md"`) || html.includes(`href="${SITE_URL}index.md"`),
+      "Should use absolute URL when siteUrl is set",
+    );
+  });
+
+  it("about.html alternate link points to about.md", async () => {
+    const rawDir = readExportHistory(PROJECT_ID)[0].outputDir;
+    const exportDir = path.isAbsolute(rawDir) ? rawDir : path.join(PUBLISH_DIR, rawDir);
+    const html = await fs.readFile(path.join(exportDir, "about.html"), "utf8");
+    assert.ok(html.includes('href="') && html.includes("about.md"), "Should reference about.md");
+  });
+
   it("does not generate .md files when exportMarkdown is false (default)", async () => {
     await cleanExportHistory();
     const res = await callController(exportProject, {
@@ -1316,6 +1335,13 @@ describe("exportProject with markdown", () => {
     const exportDir = res._json.outputDir;
     const indexMdPath = path.join(exportDir, "index.md");
     assert.ok(!(await fs.pathExists(indexMdPath)), "No .md files without exportMarkdown flag");
+  });
+
+  it("HTML does not contain alternate link when exportMarkdown is false", async () => {
+    const rawDir = readExportHistory(PROJECT_ID)[0].outputDir;
+    const exportDir = path.isAbsolute(rawDir) ? rawDir : path.join(PUBLISH_DIR, rawDir);
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(!html.includes('type="text/markdown"'), "No markdown link tag without exportMarkdown");
   });
 });
 

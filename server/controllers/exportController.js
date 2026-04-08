@@ -236,6 +236,14 @@ export async function exportProjectToDir(projectId, options = {}) {
     }
     // --- End of new SEO file generation ---
 
+    let validSiteUrl = false;
+    if (siteUrl && siteUrl.trim() !== "") {
+      try {
+        new URL(siteUrl);
+        validSiteUrl = true;
+      } catch { /* invalid URL */ }
+    }
+
     const headerData = await readGlobalWidgetData(projectFolderName, "header");
     const footerData = await readGlobalWidgetData(projectFolderName, "footer");
 
@@ -369,6 +377,18 @@ Per aspera ad astra
       // Determine output filename (e.g., index.html for homepage, slug.html otherwise)
       const outputFilename = pageData.id === "index" || pageData.id === "home" ? "index.html" : `${pageData.id}.html`;
       const outputFilePath = path.join(outputDir, outputFilename);
+
+      // Inject markdown alternate link into <head> when markdown export is enabled
+      if (exportMarkdown) {
+        const mdFilename = pageData.id === "index" || pageData.id === "home" ? "index.md" : `${pageData.id}.md`;
+        let mdHref = mdFilename;
+        if (validSiteUrl) {
+          try {
+            mdHref = new URL(mdFilename, siteUrl).href;
+          } catch { /* fall back to relative */ }
+        }
+        processedHtml = processedHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
+      }
 
       // Write the processed (and potentially formatted) HTML file
       await fs.outputFile(outputFilePath, processedHtml);
