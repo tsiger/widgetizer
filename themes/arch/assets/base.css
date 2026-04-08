@@ -2453,13 +2453,18 @@ b {
         padding-block: 1rem;
         padding-inline: var(--space-md);
         font-size: calc(var(--font-size-sm) * var(--body-scale));
-        border-radius: var(--radius-sm);
+        border-radius: var(--radius-button);
         transition: background-color 0.2s;
 
         &:hover {
           background-color: var(--bg-secondary);
           color: var(--text-content);
         }
+      }
+
+      &.is-active > a {
+        background-color: var(--bg-secondary);
+        color: var(--text-content);
       }
 
       & .submenu-toggle {
@@ -2521,12 +2526,16 @@ b {
           padding-block: 1.2rem;
           padding-inline: var(--space-md);
           font-size: calc(var(--font-size-sm) * var(--body-scale));
-          border-radius: var(--radius-sm);
+          border-radius: var(--radius-button);
           transition: background-color 0.2s;
 
           &:hover {
             background-color: var(--bg-secondary);
           }
+        }
+
+        &.is-active > a {
+          background-color: var(--bg-secondary);
         }
 
         &.has-submenu {
