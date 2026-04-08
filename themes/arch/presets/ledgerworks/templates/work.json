@@ -1,0 +1,242 @@
+{
+  "name": "Our Work",
+  "slug": "work",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1a233200",
+        "color_scheme": "standard-accent",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Work",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Industries and clients we serve.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "logos": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Trusted By",
+        "title": "Clients Who Count on Us",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 5,
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "logo-1": {
+          "type": "logo",
+          "settings": {
+            "image": "",
+            "name": "Relay Software"
+          }
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {
+            "image": "",
+            "name": "Beacon Health"
+          }
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {
+            "image": "",
+            "name": "Ortiz Properties"
+          }
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {
+            "image": "",
+            "name": "GreenLeaf Organics"
+          }
+        },
+        "logo-5": {
+          "type": "logo",
+          "settings": {
+            "image": "",
+            "name": "Atlas Nonprofit"
+          }
+        }
+      },
+      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5"]
+    },
+    "industries": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Industries",
+        "title": "Sectors We Specialize In",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "center",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-accent"
+      },
+      "blocks": {
+        "ind-1": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Technology Startups",
+            "description": "<p>R&D tax credits, equity compensation accounting, and financial modeling for venture-backed companies.</p>"
+          }
+        },
+        "ind-2": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Healthcare Practices",
+            "description": "<p>Revenue cycle management, compliance reporting, and practice valuation for medical professionals.</p>"
+          }
+        },
+        "ind-3": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Real Estate",
+            "description": "<p>1031 exchanges, cost segregation studies, and portfolio accounting for investors and developers.</p>"
+          }
+        },
+        "ind-4": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Professional Services",
+            "description": "<p>Partner compensation modeling, project profitability analysis, and multi-entity consolidation.</p>"
+          }
+        },
+        "ind-5": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "E-Commerce",
+            "description": "<p>Multi-state sales tax compliance, inventory accounting, and marketplace seller reporting.</p>"
+          }
+        },
+        "ind-6": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "title": "Nonprofit Organizations",
+            "description": "<p>Grant accounting, Form 990 preparation, and financial reporting for boards and donors.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["ind-1", "ind-2", "ind-3", "ind-4", "ind-5", "ind-6"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client Stories",
+        "title": "What Our Clients Say",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Switching to Ledgerworks was the best business decision we made last year. Our books are clean, our taxes are optimized, and we actually understand our financials now.",
+            "avatar": "",
+            "name": "Amanda Chen",
+            "title": "CTO, Relay Software",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "They found deductions our previous accountant missed for three years running. The ROI on their services paid for itself in the first quarter.",
+            "avatar": "",
+            "name": "David Ramirez",
+            "title": "Owner, Ortiz Properties",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "As a nonprofit, we need accountants who understand grant compliance. Ledgerworks handles it all flawlessly — our board couldn't be happier.",
+            "avatar": "",
+            "name": "Patricia Holmes",
+            "title": "Executive Director, Atlas Nonprofit",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "closing": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "narrow",
+        "color_scheme": "highlight"
+      },
+      "blocks": {
+        "closing-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your Business Is Unique",
+            "size": "2xl"
+          }
+        },
+        "closing-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Let's build a financial strategy that fits.</p>",
+            "size": "lg"
+          }
+        },
+        "closing-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get Started",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["closing-heading", "closing-text", "closing-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "logos", "industries", "testimonials", "closing"],
+  "id": "work",
+  "created": "2026-04-08T12:00:00.000Z",
+  "updated": "2026-04-08T12:00:00.000Z"
+}

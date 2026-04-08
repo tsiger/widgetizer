@@ -1,0 +1,36 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "\u00a9 2026 Ledgerworks CPA. All rights reserved.",
+    "color_scheme": "highlight"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Ledgerworks",
+        "text": "<p>Modern accounting and advisory services for businesses and individuals.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>(555) 740-2200</p><p>hello@ledgerworks.com</p><p>85 Commerce St, Suite 400<br>Boston, MA 02109</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Pages"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Connect"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

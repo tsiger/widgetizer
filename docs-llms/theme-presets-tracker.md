@@ -15,7 +15,7 @@
 | 7 | brightside | Brightside | Dentist | Home, Services, New Patients, About, Smile Gallery, Contact | done |
 | 8 | ironform | Ironform | Personal Trainer | Home, Programs, Transformations, About, Contact | done |
 | 9 | greystone | Greystone | Lawyer / Law Firm | Home, Services, Work, About, Contact | done |
-| 10 | ledgerworks | Ledgerworks | Accountant | Home, Services, Work, About, Contact | pending |
+| 10 | ledgerworks | Ledgerworks | Accountant | Home, Services, Work, About, Contact | done |
 | 11 | clearpath | Clearpath | Consultant | Home, Services, Work, About, Contact | pending |
 | 12 | keystoned | Keystoned | Real Estate Agent | Home, Services, Work, About, Contact | pending |
 | 13 | pipeworks | Pipeworks | Plumber / Electrician | Home, Services, Work, About, Contact | pending |
