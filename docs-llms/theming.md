@@ -343,7 +343,7 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 - `{{ header }}`: Renders the global header widget
 - `{{ main_content }}`: The insertion point for page content (widgets)
 - `{{ footer }}`: Renders the global footer widget
-- `{{ body_class }}`: Dynamic CSS classes for the body element
+- `{{ body_class }}`: Dynamic CSS classes for the body element (page slugs are prefixed with `page-`, e.g., `page-about`)
 
 ### Available Template Variables (Layout Only)
 
@@ -352,7 +352,7 @@ The `layout.liquid` template has access to additional objects that individual wi
 - `{{ header }}`: Rendered header content
 - `{{ main_content }}`: Rendered main page content
 - `{{ footer }}`: Rendered footer content
-- `{{ body_class }}`: Dynamic CSS classes for the body element
+- `{{ body_class }}`: Dynamic CSS classes for the body element (page slugs are prefixed with `page-`, e.g., `page-about`)
 - `{{ page.* }}`: Current page data
 - `{{ project.* }}`: Project information
 - `{{ theme.* }}`: Global theme settings
@@ -1714,11 +1714,14 @@ Alternatively, access theme settings directly in your Liquid templates:
 
 ### Dynamic Body Classes
 
-The `{{ body_class }}` variable provides contextual CSS classes:
+The `{{ body_class }}` variable provides contextual CSS classes. Page slugs are prefixed with `page-` to avoid collisions with theme class names (e.g., `page-about`, `page-services`).
 
-- Page type classes
-- Template-specific classes
-- Custom classes based on settings
+- `page-{slug}` class for the current page
+- Additional classes based on settings (e.g., `transparent-header`)
+
+### Active Menu Items
+
+The core `menu.liquid` snippet automatically adds an `is-active` class to `<li>` elements whose link matches the current page, and sets `aria-current="page"` on the corresponding `<a>`. Theme authors can style `.is-active` to highlight the current page in navigation menus.
 
 ### SEO Integration
 

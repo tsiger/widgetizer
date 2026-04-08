@@ -10,32 +10,35 @@ Params:
   class_link: Classes for a elements
   class_submenu: Classes for submenu ul elements
   class_has_submenu: Classes for items with submenus
+Globals (via LiquidJS globals):
+  pageSlug: Current page slug used to mark active menu items with "is-active"
 {%- endcomment -%}
 
 {%- if menu.items.size > 0 -%}
+  {%- assign current_href = pageSlug | append: '.html' -%}
   {%- unless skip_nav -%}
     <nav class="{{ class_nav }}"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}>
   {%- endunless -%}
     <ul class="{{ class_list }}">
       {%- for item in menu.items -%}
-        <li class="{{ class_item }}{% if item.items.size > 0 %} {{ class_has_submenu }}{% endif %}">
-          <a href="{{ item.link }}" class="{{ class_link }}">
+        <li class="{{ class_item }}{% if item.items.size > 0 %} {{ class_has_submenu }}{% endif %}{% if item.link == current_href %} is-active{% endif %}">
+          <a href="{{ item.link }}" class="{{ class_link }}"{% if item.link == current_href %} aria-current="page"{% endif %}>
             {{ item.label }}
           </a>
 
           {%- if item.items.size > 0 -%}
             <ul class="{{ class_submenu }}">
               {%- for subitem in item.items -%}
-                <li class="{{ class_item }}{% if subitem.items.size > 0 %} {{ class_has_submenu }}{% endif %}">
-                  <a href="{{ subitem.link }}" class="{{ class_link }}">
+                <li class="{{ class_item }}{% if subitem.items.size > 0 %} {{ class_has_submenu }}{% endif %}{% if subitem.link == current_href %} is-active{% endif %}">
+                  <a href="{{ subitem.link }}" class="{{ class_link }}"{% if subitem.link == current_href %} aria-current="page"{% endif %}>
                     {{ subitem.label }}
                   </a>
 
                   {%- if subitem.items.size > 0 -%}
                     <ul class="{{ class_submenu }}">
                       {%- for subsubitem in subitem.items -%}
-                        <li class="{{ class_item }}">
-                          <a href="{{ subsubitem.link }}" class="{{ class_link }}">
+                        <li class="{{ class_item }}{% if subsubitem.link == current_href %} is-active{% endif %}">
+                          <a href="{{ subsubitem.link }}" class="{{ class_link }}"{% if subsubitem.link == current_href %} aria-current="page"{% endif %}>
                             {{ subsubitem.label }}
                           </a>
                         </li>

@@ -765,7 +765,8 @@ async function renderPageLayout(
     const projectData = await getProjectData(projectId);
 
     // 4. Add page-specific context with separated content sections
-    const bodyClasses = [pageData?.slug || "", contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
+    const pageSlugClass = pageData?.slug ? `page-${pageData.slug}` : "";
+    const bodyClasses = [pageSlugClass, contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
     const renderContext = {
       ...baseContext,
       header: contentSections.headerContent || "",

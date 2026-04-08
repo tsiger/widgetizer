@@ -686,7 +686,7 @@ describe("renderPageLayout", () => {
       null,
     );
 
-    assert.ok(html.includes('class="about-us"'));
+    assert.ok(html.includes('class="page-about-us"'));
   });
 
   it("renders SEO tags via {% seo %} in layout", async () => {

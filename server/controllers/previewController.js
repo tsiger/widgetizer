@@ -64,6 +64,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
     themeSettingsRaw: rawThemeSettings,
     enqueuedStyles: new Map(),
     enqueuedScripts: new Map(),
+    pageSlug: pageData.slug || "",
   };
 
   let headerContent = "";

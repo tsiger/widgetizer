@@ -111,9 +111,15 @@ The layout has access to rendered content placeholders:
 - `{{ header }}`
 - `{{ main_content }}`
 - `{{ footer }}`
-- `{{ body_class }}`
+- `{{ body_class }}` (page slugs are prefixed with `page-`, e.g., `page-about`)
 
 These are not available inside widget templates.
+
+### Global Variables (Available Everywhere)
+
+The following globals are available in all templates, including inside `{% render %}` snippets:
+
+- `pageSlug` — The current page slug (e.g., `about`, `contact`). Used by the core `menu.liquid` snippet to mark active menu items with the `is-active` class.
 
 # Practical Guidance
 

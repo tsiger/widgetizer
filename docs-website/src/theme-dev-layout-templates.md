@@ -31,7 +31,7 @@ Your layout must include:
 
 ### Body Class
 
-`{{ body_class }}` provides contextual classes (page type, template, settings) and should be applied to `<body>`.
+`{{ body_class }}` provides contextual classes and should be applied to `<body>`. Page slugs are prefixed with `page-` to avoid collisions with theme class names (e.g., `page-about`, `page-services`).
 
 # Page Templates (templates/\*.json)
 

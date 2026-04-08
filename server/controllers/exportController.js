@@ -279,6 +279,7 @@ export async function exportProjectToDir(projectId, options = {}) {
         enqueuedStyles: new Map(),
         enqueuedScripts: new Map(),
         exportVersion: version, // For cache busting
+        pageSlug: pageData.slug || "",
       };
 
       // Render header if exists (for each page to capture enqueued assets)
