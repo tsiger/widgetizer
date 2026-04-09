@@ -597,10 +597,12 @@ Design mode detection is injected by `previewController.js` as an inline `<scrip
 
 Manages widget operations:
 
-- `addWidget()`, `removeWidget()`, `duplicateWidget()`
+- `addWidget()`, `deleteWidget()`, `duplicateWidget()`
 - `reorderWidgets()`, `updateWidgetSettings()`
 - `addBlock()`, `deleteBlock()`, `reorderBlocks()`, `updateBlockSettings()`, `duplicateBlock()`
 - Block operations work on both page widgets and global widgets (header/footer) via internal helpers: `isGlobalWidgetId()`, `getWidgetData()`, `setWidgetData()`
+- The store now uses extracted pure helpers for ordered insert/remove behavior, default widget/block payload building, cloning, and next-selection fallback so widget and block flows stay aligned.
+- `updateWidgetSettings()` now uses the same targeted nested-patch style as block setting updates instead of deep-cloning the full page object on every change.
 - Selection state: `selectedWidgetId`, `selectedBlockId`, `selectedGlobalWidgetId`
 - Hover state: `hoveredWidgetId`, `hoveredBlockId`
 - Modification tracking: `modifiedWidgets`, `structureModified`

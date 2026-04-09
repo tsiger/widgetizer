@@ -14,6 +14,9 @@ This file combines the first-release readiness checklist with the post-`v1` back
 - Theme settings are now centralized in a dedicated `themeStore` that is the canonical owner of per-project theme data. The Settings page and page editor both read/write through this shared store. The editor keeps a thin proxy snapshot in `pageStore` for undo/redo only. The save flow delegates to `themeStore.saveSettings()` so server-side corrections are handled consistently. Project-switch and load-failure paths clear stale data and invalidate in-flight requests.
 - Frontend async protection now has a small shared request-gate primitive, and the export flow uses it instead of one-off stale booleans.
 - `getAllProjects()` and `getAllThemes()` now use lightweight cached query wrappers with TTLs, request deduplication, mutation-driven invalidation, and protection against stale in-flight responses repopulating cache after invalidation.
+- Form pages now share a small `useGuardedFormPage()` abstraction on top of `useFormNavigationGuard()`, which removes repeated dirty-title wiring and one-shot intentional-navigation bypass logic across add/edit/settings flows.
+- List and destructive-action surfaces now share a small `useConfirmationAction()` helper, reducing repeated confirmation-modal wiring across project, page, menu, theme, and export-history screens.
+- `widgetStore` now uses extracted pure helpers for ordered insert/remove logic, default payload construction, cloning, and selection fallback, reducing duplication between widget and block operations while keeping editor behavior stable.
 - Recent hardening around project resolution, API error semantics, theme metadata lookups, and media usage persistence reduces the risk that the first Electron release is blocked by architecture alone.
 
 ## `v1` Release Gate
@@ -48,20 +51,11 @@ This file combines the first-release readiness checklist with the post-`v1` back
 
 ### Ordered backlog
 
-1. Build a form-page abstraction around `useFormNavigationGuard()`
-Reduce repeated form-page boilerplate such as `skipGuardRef`, dirty-state guards, and shared save/cancel flow handling.
-
-2. Refactor widget/block operations in `src/stores/widgetStore.js`
-Extract shared helpers for add/remove/duplicate/reorder flows so widget and block logic stops diverging.
-
-3. Add a higher-level semver/update-status helper
+1. Add a higher-level semver/update-status helper
 Wrap repeated version comparison logic in a single helper such as `getUpdateStatus(projectVersion, themeVersion)`.
 
-4. Keep slug and ID generation fully disciplined
+2. Keep slug and ID generation fully disciplined
 Continue routing all new slug and identifier creation paths through `generateUniqueSlug()` to avoid regressions.
 
-5. Consider a higher-level list-page pattern for confirmation flows
-`useConfirmationModal()` already removed the main duplication, but list pages may still benefit from a more unified delete/action pattern.
-
-6. Prepare for a future TypeScript migration
+3. Prepare for a future TypeScript migration
 Define shared response/domain types, tighten object-shape consistency, and keep expanding JSDoc coverage before any TS conversion begins.

@@ -5,13 +5,25 @@ import { getActiveProjectId } from "../lib/activeProjectId";
 import usePageStore from "./pageStore";
 import useAutoSave from "./saveStore";
 import { hasReachedMaxBlocks } from "../utils/blockLimits";
+import {
+  insertIdAtPosition,
+  insertIdAfter,
+  removeIdFromOrder,
+  getNextSelectedId,
+  buildDefaultSettings,
+  buildDefaultWidget,
+  cloneBlock,
+  cloneWidgetWithNewBlockIds,
+} from "./widgetStoreHelpers";
 
 export { hasReachedMaxBlocks };
 
+// ---------------------------------------------------------------------------
+// Widget data access helpers
+// ---------------------------------------------------------------------------
+
 /**
  * Check if a widgetId refers to a global widget (header or footer).
- * @param {string} widgetId
- * @returns {boolean}
  */
 function isGlobalWidgetId(widgetId) {
   return widgetId === "header" || widgetId === "footer";
@@ -19,8 +31,6 @@ function isGlobalWidgetId(widgetId) {
 
 /**
  * Get widget data regardless of whether it's a page widget or global widget.
- * @param {string} widgetId - Widget ID or global widget type ("header"/"footer")
- * @returns {{ widget: Object|null, isGlobal: boolean }}
  */
 function getWidgetData(widgetId) {
   const pageStore = usePageStore.getState();
@@ -33,9 +43,6 @@ function getWidgetData(widgetId) {
 
 /**
  * Persist an updated widget back to the correct store location.
- * @param {string} widgetId
- * @param {Object} updatedWidget
- * @param {boolean} isGlobal
  */
 function setWidgetData(widgetId, updatedWidget, isGlobal) {
   const pageStore = usePageStore.getState();
@@ -53,41 +60,60 @@ function setWidgetData(widgetId, updatedWidget, isGlobal) {
   }
 }
 
-/**
- * Zustand store for managing widget operations in the page editor.
- * Handles widget schemas, selection state, and CRUD operations for widgets and blocks.
- *
- * @typedef {Object} WidgetStore
- * @property {Object<string, Object>} schemas - Map of widget type to schema definition
- * @property {string|null} selectedWidgetId - ID of the currently selected widget
- * @property {string|null} selectedBlockId - ID of the currently selected block within a widget
- * @property {string|null} selectedGlobalWidgetId - ID of selected global widget ('header' or 'footer')
- * @property {string|null} selectedThemeGroup - Key of the selected theme settings group
- * @property {string|null} hoveredWidgetId - ID of the widget being hovered over
- * @property {string|null} hoveredBlockId - ID of the block being hovered over
- * @property {boolean} loading - Whether widget schemas are being loaded
- * @property {string|null} error - Error message if schema loading failed
- * @property {Function} loadSchemas - Fetch widget schemas from the server
- * @property {Function} setSelectedWidgetId - Select a page widget (clears other selections)
- * @property {Function} setSelectedBlockId - Select a block within the current widget
- * @property {Function} setSelectedGlobalWidgetId - Select a global widget (clears other selections)
- * @property {Function} setSelectedThemeGroup - Select a theme settings group (clears other selections)
- * @property {Function} setHoveredWidget - Set hover state for widget/block highlighting
- * @property {Function} resetSelection - Clear all selection and hover states
- * @property {Function} generateWidgetId - Generate a unique widget ID
- * @property {Function} generateBlockId - Generate a unique block ID
- * @property {Function} addWidget - Add a new widget at a specified position
- * @property {Function} duplicateWidget - Create a copy of an existing widget
- * @property {Function} deleteWidget - Remove a widget from the page
- * @property {Function} updateWidgetSettings - Update a setting value for a widget
- * @property {Function} updateGlobalWidgetSettings - Update a setting for a global widget
- * @property {Function} reorderWidgets - Change the order of widgets on the page
- * @property {Function} addBlock - Add a new block to a widget
- * @property {Function} reorderBlocks - Change the order of blocks within a widget
- * @property {Function} deleteBlock - Remove a block from a widget
- * @property {Function} updateBlockSettings - Update a setting value for a block
- * @property {Function} duplicateBlock - Create a copy of an existing block
- */
+// ---------------------------------------------------------------------------
+// Autosave signaling
+// ---------------------------------------------------------------------------
+
+function markStructureChanged() {
+  useAutoSave.getState().setStructureModified(true);
+}
+
+function markWidgetContentChanged(widgetId, isGlobal) {
+  if (isGlobal) {
+    useAutoSave.getState().markWidgetModified(widgetId);
+  } else {
+    useAutoSave.getState().setStructureModified(true);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Selection state helpers
+// ---------------------------------------------------------------------------
+
+function getWidgetSelectionState(widgetId) {
+  return {
+    selectedWidgetId: widgetId,
+    selectedBlockId: null,
+    selectedGlobalWidgetId: null,
+    selectedThemeGroup: null,
+  };
+}
+
+function getGlobalWidgetSelectionState(widgetId) {
+  return {
+    selectedGlobalWidgetId: widgetId,
+    selectedWidgetId: null,
+    selectedBlockId: null,
+    selectedThemeGroup: null,
+  };
+}
+
+function getThemeGroupSelectionState(groupKey) {
+  return {
+    selectedThemeGroup: groupKey,
+    selectedWidgetId: null,
+    selectedBlockId: null,
+    selectedGlobalWidgetId: null,
+  };
+}
+
+function getClearedHoverState() {
+  return { hoveredWidgetId: null, hoveredBlockId: null };
+}
+
+// ---------------------------------------------------------------------------
+// Store
+// ---------------------------------------------------------------------------
 
 const useWidgetStore = create((set, get) => ({
   // State
@@ -119,77 +145,37 @@ const useWidgetStore = create((set, get) => ({
     }
   },
 
-  setSelectedWidgetId: (id) => {
-    set({
-      selectedWidgetId: id,
-      selectedBlockId: null,
-      selectedGlobalWidgetId: null,
-      selectedThemeGroup: null,
-    });
-  },
-
-  setSelectedBlockId: (blockId) => {
-    set({ selectedBlockId: blockId });
-  },
-
-  setSelectedGlobalWidgetId: (id) => {
-    set({
-      selectedGlobalWidgetId: id,
-      selectedWidgetId: null,
-      selectedBlockId: null,
-      selectedThemeGroup: null,
-    });
-  },
-
-  setSelectedThemeGroup: (groupKey) => {
-    set({
-      selectedThemeGroup: groupKey,
-      selectedWidgetId: null,
-      selectedBlockId: null,
-      selectedGlobalWidgetId: null,
-    });
-  },
+  setSelectedWidgetId: (id) => set(getWidgetSelectionState(id)),
+  setSelectedBlockId: (blockId) => set({ selectedBlockId: blockId }),
+  setSelectedGlobalWidgetId: (id) => set(getGlobalWidgetSelectionState(id)),
+  setSelectedThemeGroup: (groupKey) => set(getThemeGroupSelectionState(groupKey)),
 
   setHoveredWidget: (widgetId, blockId = null) => {
-    set({
-      hoveredWidgetId: widgetId,
-      hoveredBlockId: blockId,
-    });
+    set({ hoveredWidgetId: widgetId, hoveredBlockId: blockId });
   },
 
   resetSelection: () => {
     set({
-      selectedWidgetId: null,
-      selectedBlockId: null,
-      selectedGlobalWidgetId: null,
-      selectedThemeGroup: null,
-      hoveredWidgetId: null,
-      hoveredBlockId: null,
+      ...getWidgetSelectionState(null),
+      ...getClearedHoverState(),
     });
   },
 
   resetForProjectChange: () => {
     set({
       schemas: {},
-      selectedWidgetId: null,
-      selectedBlockId: null,
-      selectedGlobalWidgetId: null,
-      selectedThemeGroup: null,
-      hoveredWidgetId: null,
-      hoveredBlockId: null,
+      ...getWidgetSelectionState(null),
+      ...getClearedHoverState(),
       loadedProjectId: getActiveProjectId(),
       loading: false,
       error: null,
     });
   },
 
-  generateWidgetId: () => {
-    return `widget_${uuidv4()}`;
-  },
+  generateWidgetId: () => `widget_${uuidv4()}`,
+  generateBlockId: () => `block_${uuidv4()}`,
 
-  generateBlockId: () => {
-    return `block_${uuidv4()}`;
-  },
+  // --- Widget CRUD ---
 
   addWidget: (widgetType, position) => {
     const { schemas } = get();
@@ -198,83 +184,18 @@ const useWidgetStore = create((set, get) => ({
 
     if (!page || !schemas[widgetType]) return null;
 
-    const schema = schemas[widgetType];
-    const defaultSettings = {};
-
-    if (Array.isArray(schema.settings)) {
-      schema.settings.forEach((setting) => {
-        defaultSettings[setting.id] = setting.default;
-      });
-    }
-
-    // Process default blocks if defined in schema
-    const blocks = {};
-    const blocksOrder = [];
-
-    if (Array.isArray(schema.defaultBlocks)) {
-      schema.defaultBlocks.forEach((defaultBlock) => {
-        const blockId = get().generateBlockId();
-
-        // Get block schema for this block type to apply defaults
-        const blockSchema = schema.blocks?.find((b) => b.type === defaultBlock.type);
-
-        // Start with defaults from block schema
-        const blockSettings = {};
-        if (blockSchema && Array.isArray(blockSchema.settings)) {
-          blockSchema.settings.forEach((setting) => {
-            if (setting.default !== undefined) {
-              blockSettings[setting.id] = setting.default;
-            }
-          });
-        }
-
-        // Override with values from defaultBlocks
-        if (defaultBlock.settings) {
-          Object.assign(blockSettings, defaultBlock.settings);
-        }
-
-        blocks[blockId] = {
-          type: defaultBlock.type,
-          settings: blockSettings,
-        };
-        blocksOrder.push(blockId);
-      });
-    }
-
     const newWidgetId = get().generateWidgetId();
-    const newWidget = {
-      type: widgetType,
-      settings: defaultSettings,
-      blocks,
-      blocksOrder,
-    };
-
+    const newWidget = buildDefaultWidget(schemas[widgetType], widgetType, () => get().generateBlockId());
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
-    const newWidgetsOrder = [...currentOrder];
-
-    if (position >= newWidgetsOrder.length) {
-      newWidgetsOrder.push(newWidgetId);
-    } else {
-      newWidgetsOrder.splice(position, 0, newWidgetId);
-    }
 
     pageStore.setPage({
       ...page,
-      widgets: {
-        ...page.widgets,
-        [newWidgetId]: newWidget,
-      },
-      widgetsOrder: newWidgetsOrder,
+      widgets: { ...page.widgets, [newWidgetId]: newWidget },
+      widgetsOrder: insertIdAtPosition(currentOrder, newWidgetId, position),
     });
 
-    // Clear other selection states and select the new widget (same as setSelectedWidgetId)
-    set({
-      selectedWidgetId: newWidgetId,
-      selectedBlockId: null,
-      selectedGlobalWidgetId: null,
-      selectedThemeGroup: null,
-    });
-    useAutoSave.getState().setStructureModified(true);
+    set(getWidgetSelectionState(newWidgetId));
+    markStructureChanged();
     return newWidgetId;
   },
 
@@ -284,56 +205,18 @@ const useWidgetStore = create((set, get) => ({
 
     if (!page || !page.widgets[widgetId]) return null;
 
-    const originalWidget = page.widgets[widgetId];
-
-    const newBlocks = {};
-    const newBlocksOrder = [];
-
-    if (originalWidget.blocks) {
-      originalWidget.blocksOrder?.forEach((oldBlockId) => {
-        const newBlockId = get().generateBlockId();
-        newBlocks[newBlockId] = { ...originalWidget.blocks[oldBlockId] };
-        newBlocksOrder.push(newBlockId);
-      });
-    }
-
     const newWidgetId = get().generateWidgetId();
-    const newWidget = {
-      ...JSON.parse(JSON.stringify(originalWidget)),
-      blocks: newBlocks,
-      blocksOrder: newBlocksOrder,
-    };
-
+    const newWidget = cloneWidgetWithNewBlockIds(page.widgets[widgetId], () => get().generateBlockId());
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
-    const originalIndex = currentOrder.indexOf(widgetId);
-
-    const newWidgetsOrder = [...currentOrder];
-    if (originalIndex !== -1) {
-      newWidgetsOrder.splice(originalIndex + 1, 0, newWidgetId);
-    } else {
-      newWidgetsOrder.push(newWidgetId); // Fallback to add at the end
-    }
 
     pageStore.setPage({
       ...page,
-      widgets: {
-        ...page.widgets,
-        [newWidgetId]: newWidget,
-      },
-      widgetsOrder: newWidgetsOrder,
+      widgets: { ...page.widgets, [newWidgetId]: newWidget },
+      widgetsOrder: insertIdAfter(currentOrder, widgetId, newWidgetId),
     });
 
-    // Select the new widget, clear other selection + hover state, and mark changes for auto-save
-    set({
-      selectedWidgetId: newWidgetId,
-      selectedBlockId: null,
-      selectedGlobalWidgetId: null,
-      selectedThemeGroup: null,
-      hoveredWidgetId: null,
-      hoveredBlockId: null,
-    });
-    useAutoSave.getState().setStructureModified(true);
-
+    set({ ...getWidgetSelectionState(newWidgetId), ...getClearedHoverState() });
+    markStructureChanged();
     return newWidgetId;
   },
 
@@ -344,79 +227,59 @@ const useWidgetStore = create((set, get) => ({
 
     if (!page || !widgetId) return;
 
-    // eslint-disable-next-line no-unused-vars
-    const { [widgetId]: deletedWidget, ...remainingWidgets } = page.widgets;
-
+    const { [widgetId]: _, ...remainingWidgets } = page.widgets;
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
-    const newWidgetsOrder = currentOrder.filter((id) => id !== widgetId);
+    const newOrder = removeIdFromOrder(currentOrder, widgetId);
 
     pageStore.setPage({
       ...page,
       widgets: remainingWidgets,
-      widgetsOrder: newWidgetsOrder,
+      widgetsOrder: newOrder,
     });
 
-    useAutoSave.getState().setStructureModified(true);
+    markStructureChanged();
 
     if (selectedWidgetId === widgetId) {
-      const deletedIndex = currentOrder.indexOf(widgetId);
-      // Prefer previous widget; if none (was first), take next; if none (was only), null
-      let nextWidgetId = null;
-      if (newWidgetsOrder.length > 0) {
-        if (deletedIndex > 0) {
-          nextWidgetId = newWidgetsOrder[deletedIndex - 1];
-        } else {
-          nextWidgetId = newWidgetsOrder[0];
-        }
-      }
-      set({
-        selectedWidgetId: nextWidgetId,
-        selectedBlockId: null,
-        hoveredWidgetId: null,
-        hoveredBlockId: null,
-      });
+      const nextId = getNextSelectedId(currentOrder, widgetId);
+      set({ selectedWidgetId: nextId, selectedBlockId: null, ...getClearedHoverState() });
     }
   },
 
   updateWidgetSettings: (widgetId, settingId, value) => {
     const pageStore = usePageStore.getState();
     const { page } = pageStore;
+    if (!page || !widgetId || !page.widgets?.[widgetId]) return;
 
-    if (!page || !widgetId) return;
-
-    const updatedPage = JSON.parse(JSON.stringify(page));
-    if (!updatedPage.widgets[widgetId]) return;
-
-    if (!updatedPage.widgets[widgetId].settings) {
-      updatedPage.widgets[widgetId].settings = {};
-    }
-
-    updatedPage.widgets[widgetId].settings[settingId] = value;
-    pageStore.setPage(updatedPage);
+    pageStore.setPage({
+      ...page,
+      widgets: {
+        ...page.widgets,
+        [widgetId]: {
+          ...page.widgets[widgetId],
+          settings: {
+            ...(page.widgets[widgetId].settings || {}),
+            [settingId]: value,
+          },
+        },
+      },
+    });
   },
 
   updateGlobalWidgetSettings: (widgetType, settingId, value) => {
     const pageStore = usePageStore.getState();
-
     if (widgetType !== "header" && widgetType !== "footer") return;
 
-    const { globalWidgets } = pageStore;
-    const currentWidget = globalWidgets[widgetType];
-
+    const currentWidget = pageStore.globalWidgets[widgetType];
     if (!currentWidget) return;
 
-    const updatedSettings = {
-      ...currentWidget.settings,
-      [settingId]: value,
-    };
-
-    pageStore.updateGlobalWidget(widgetType, { settings: updatedSettings });
+    pageStore.updateGlobalWidget(widgetType, {
+      settings: { ...currentWidget.settings, [settingId]: value },
+    });
   },
 
   reorderWidgets: (newOrder) => {
     const pageStore = usePageStore.getState();
     const { page } = pageStore;
-
     if (!page) return;
 
     const reorderedWidgets = {};
@@ -426,187 +289,121 @@ const useWidgetStore = create((set, get) => ({
       }
     });
 
-    pageStore.setPage({
-      ...page,
-      widgets: reorderedWidgets,
-      widgetsOrder: newOrder,
-    });
-
-    useAutoSave.getState().setStructureModified(true);
+    pageStore.setPage({ ...page, widgets: reorderedWidgets, widgetsOrder: newOrder });
+    markStructureChanged();
   },
+
+  // --- Block CRUD ---
 
   addBlock: (widgetId, blockType, position = null) => {
     const { schemas } = get();
     const { widget, isGlobal } = getWidgetData(widgetId);
-
     if (!widget) return null;
 
     const widgetSchema = schemas[widget.type];
-
     if (hasReachedMaxBlocks(widget, widgetSchema)) return null;
 
-    const blockSchema = widgetSchema.blocks?.find((block) => block.type === blockType);
-
+    const blockSchema = widgetSchema.blocks?.find((b) => b.type === blockType);
     if (!blockSchema) return null;
 
     const blockId = get().generateBlockId();
+    const newBlock = { type: blockType, settings: buildDefaultSettings(blockSchema.settings) };
+    const currentOrder = widget.blocksOrder || [];
 
-    const defaultSettings = {};
-    if (Array.isArray(blockSchema.settings)) {
-      blockSchema.settings.forEach((setting) => {
-        defaultSettings[setting.id] = setting.default;
-      });
-    }
+    const newOrder =
+      position === null || position === "add" || position >= currentOrder.length
+        ? [...currentOrder, blockId]
+        : insertIdAtPosition(currentOrder, blockId, position);
 
-    const newBlock = {
-      type: blockType,
-      settings: defaultSettings,
-    };
-
-    // Handle positional insertion
-    const currentBlocksOrder = widget.blocksOrder || [];
-    let newBlocksOrder;
-
-    if (position === null || position === "add" || position >= currentBlocksOrder.length) {
-      // Add to the end (default behavior)
-      newBlocksOrder = [...currentBlocksOrder, blockId];
-    } else {
-      // Insert at specific position
-      newBlocksOrder = [...currentBlocksOrder];
-      newBlocksOrder.splice(position, 0, blockId);
-    }
-
-    const updatedWidget = {
-      ...widget,
-      blocks: {
-        ...(widget.blocks || {}),
-        [blockId]: newBlock,
+    setWidgetData(
+      widgetId,
+      {
+        ...widget,
+        blocks: { ...(widget.blocks || {}), [blockId]: newBlock },
+        blocksOrder: newOrder,
       },
-      blocksOrder: newBlocksOrder,
-    };
+      isGlobal,
+    );
 
-    setWidgetData(widgetId, updatedWidget, isGlobal);
     return blockId;
   },
 
-  reorderBlocks: (widgetId, newOrder) => {
+  duplicateBlock: (widgetId, blockId) => {
     const { widget, isGlobal } = getWidgetData(widgetId);
+    if (!widget || !widget.blocks?.[blockId]) return null;
 
-    if (!widget) return;
+    const { schemas } = get();
+    if (hasReachedMaxBlocks(widget, schemas[widget.type])) return null;
 
-    const updatedWidget = {
-      ...widget,
-      blocksOrder: newOrder,
-    };
+    const newBlockId = get().generateBlockId();
+    const newBlock = cloneBlock(widget.blocks[blockId]);
 
-    setWidgetData(widgetId, updatedWidget, isGlobal);
+    setWidgetData(
+      widgetId,
+      {
+        ...widget,
+        blocks: { ...widget.blocks, [newBlockId]: newBlock },
+        blocksOrder: insertIdAfter(widget.blocksOrder || [], blockId, newBlockId),
+      },
+      isGlobal,
+    );
 
-    if (isGlobal) {
-      useAutoSave.getState().markWidgetModified(widgetId);
-    } else {
-      useAutoSave.getState().setStructureModified(true);
-    }
+    return newBlockId;
   },
 
   deleteBlock: (widgetId, blockId) => {
     const { selectedBlockId } = get();
     const { widget, isGlobal } = getWidgetData(widgetId);
-
     if (!widget) return;
 
-    const currentBlocksOrder = widget.blocksOrder || [];
+    const currentOrder = widget.blocksOrder || [];
+    const { [blockId]: _, ...remainingBlocks } = widget.blocks || {};
 
-    // eslint-disable-next-line no-unused-vars
-    const { [blockId]: deletedBlock, ...remainingBlocks } = widget.blocks || {};
-    const updatedBlocksOrder = currentBlocksOrder.filter((id) => id !== blockId);
-
-    const updatedWidget = {
-      ...widget,
-      blocks: remainingBlocks,
-      blocksOrder: updatedBlocksOrder,
-    };
-
-    setWidgetData(widgetId, updatedWidget, isGlobal);
+    setWidgetData(
+      widgetId,
+      {
+        ...widget,
+        blocks: remainingBlocks,
+        blocksOrder: removeIdFromOrder(currentOrder, blockId),
+      },
+      isGlobal,
+    );
 
     if (selectedBlockId === blockId) {
-      const deletedIndex = currentBlocksOrder.indexOf(blockId);
-      // Prefer previous block; if none (was first), take next; if none (was only), null
-      let nextBlockId = null;
-      if (updatedBlocksOrder.length > 0) {
-        if (deletedIndex > 0) {
-          nextBlockId = updatedBlocksOrder[deletedIndex - 1];
-        } else {
-          nextBlockId = updatedBlocksOrder[0];
-        }
-      }
-      set({
-        selectedBlockId: nextBlockId,
-        hoveredBlockId: null,
-      });
+      const nextId = getNextSelectedId(currentOrder, blockId);
+      set({ selectedBlockId: nextId, hoveredBlockId: null });
     }
+  },
+
+  reorderBlocks: (widgetId, newOrder) => {
+    const { widget, isGlobal } = getWidgetData(widgetId);
+    if (!widget) return;
+
+    setWidgetData(widgetId, { ...widget, blocksOrder: newOrder }, isGlobal);
+    markWidgetContentChanged(widgetId, isGlobal);
   },
 
   updateBlockSettings: (widgetId, blockId, settingId, value) => {
     const { widget, isGlobal } = getWidgetData(widgetId);
+    if (!widget || !widget.blocks?.[blockId]) return;
 
-    if (!widget) return;
-    if (!widget.blocks?.[blockId]) return;
-
-    const updatedBlock = {
-      ...widget.blocks[blockId],
-      settings: {
-        ...widget.blocks[blockId].settings,
-        [settingId]: value,
+    setWidgetData(
+      widgetId,
+      {
+        ...widget,
+        blocks: {
+          ...widget.blocks,
+          [blockId]: {
+            ...widget.blocks[blockId],
+            settings: {
+              ...widget.blocks[blockId].settings,
+              [settingId]: value,
+            },
+          },
+        },
       },
-    };
-
-    const updatedWidget = {
-      ...widget,
-      blocks: {
-        ...widget.blocks,
-        [blockId]: updatedBlock,
-      },
-    };
-
-    setWidgetData(widgetId, updatedWidget, isGlobal);
-  },
-
-  duplicateBlock: (widgetId, blockId) => {
-    const { widget, isGlobal } = getWidgetData(widgetId);
-
-    if (!widget) return null;
-
-    const { schemas } = get();
-    const widgetSchema = schemas[widget.type];
-    if (hasReachedMaxBlocks(widget, widgetSchema)) return null;
-
-    if (!widget.blocks || !widget.blocks[blockId]) return null;
-
-    const originalBlock = widget.blocks[blockId];
-    const newBlockId = get().generateBlockId();
-
-    const newBlock = JSON.parse(JSON.stringify(originalBlock));
-
-    const blockIndex = widget.blocksOrder.indexOf(blockId);
-    const newBlocksOrder = [...(widget.blocksOrder || [])];
-
-    if (blockIndex !== -1) {
-      newBlocksOrder.splice(blockIndex + 1, 0, newBlockId);
-    } else {
-      newBlocksOrder.push(newBlockId);
-    }
-
-    const updatedWidget = {
-      ...widget,
-      blocks: {
-        ...widget.blocks,
-        [newBlockId]: newBlock,
-      },
-      blocksOrder: newBlocksOrder,
-    };
-
-    setWidgetData(widgetId, updatedWidget, isGlobal);
-    return newBlockId;
+      isGlobal,
+    );
   },
 }));
 
