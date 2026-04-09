@@ -38,8 +38,20 @@ const useThemeStore = create((set, get) => ({
       return;
     }
 
+    const isProjectChange = get().loadedProjectId !== resolvedProjectId;
     const nextLoadId = get().activeLoadId + 1;
-    set({ activeLoadId: nextLoadId, loading: true, error: null });
+    set({
+      activeLoadId: nextLoadId,
+      loading: true,
+      error: null,
+      ...(isProjectChange
+        ? {
+            settings: null,
+            originalSettings: null,
+            loadedProjectId: resolvedProjectId,
+          }
+        : {}),
+    });
 
     try {
       const settings = await getThemeSettings(resolvedProjectId);

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import ProjectPickerLayout from "./components/layout/ProjectPickerLayout";
@@ -27,7 +27,12 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import RequireActiveProject from "./components/layout/RequireActiveProject";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 import useProjectStore from "./stores/projectStore";
+import useThemeStore from "./stores/themeStore";
+import useWidgetStore from "./stores/widgetStore";
+import useAutoSave from "./stores/saveStore";
+import usePageStore from "./stores/pageStore";
 import { registerProjectStore } from "./lib/activeProjectId";
+import { handleActiveProjectChange } from "./lib/projectSwitchCoordinator";
 import "./i18n";
 
 // Register project store for apiFetch X-Project-Id header injection.
@@ -149,10 +154,25 @@ function AppWithToast() {
 }
 
 function App() {
+  const activeProjectId = useProjectStore((state) => state.activeProject?.id);
+  const prevProjectIdRef = useRef(activeProjectId);
+
   // Bootstrap stores on mount
   useEffect(() => {
     useProjectStore.getState().fetchActiveProject();
   }, []);
+
+  useEffect(() => {
+    handleActiveProjectChange({
+      prevProjectId: prevProjectIdRef.current,
+      nextProjectId: activeProjectId,
+      themeStore: useThemeStore,
+      widgetStore: useWidgetStore,
+      autoSaveStore: useAutoSave,
+      pageStore: usePageStore,
+    });
+    prevProjectIdRef.current = activeProjectId;
+  }, [activeProjectId]);
 
   return (
     <ErrorBoundary>

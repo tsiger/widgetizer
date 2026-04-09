@@ -248,6 +248,26 @@ describe("themeStore", () => {
   // --------------------------------------------------------------------------
 
   describe("project-switch coordination", () => {
+    it("clears stale settings immediately when loading a different project", async () => {
+      seedSettings();
+
+      let resolveLoad;
+      getThemeSettings.mockImplementationOnce(
+        () => new Promise((resolve) => { resolveLoad = resolve; }),
+      );
+
+      const loadPromise = useThemeStore.getState().loadSettings("project-b");
+
+      const stateWhileLoading = useThemeStore.getState();
+      expect(stateWhileLoading.loading).toBe(true);
+      expect(stateWhileLoading.loadedProjectId).toBe("project-b");
+      expect(stateWhileLoading.settings).toBeNull();
+      expect(stateWhileLoading.originalSettings).toBeNull();
+
+      resolveLoad({ settings: { global: { colors: [{ id: "c1", value: "#bbb" }] } } });
+      await loadPromise;
+    });
+
     it("switching projects mid-load drops the first project's response", async () => {
       let resolveA;
       const dataA = { settings: { global: { colors: [{ id: "c1", value: "#aaa" }] } } };
