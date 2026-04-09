@@ -8,7 +8,6 @@ import {
   CirclePlus,
   Copy,
   Download,
-  Upload,
   ArrowUpCircle,
   MoreVertical,
 } from "lucide-react";
@@ -225,12 +224,9 @@ export default function Projects() {
           <FolderOpen size={52} className="mb-4 text-slate-400" />
           <h2 className="text-xl font-semibold text-slate-900">{t("projects.emptyTitle")}</h2>
           <p className="mt-2 max-w-xl text-slate-600">{t("projects.noProjects")}</p>
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6">
             <Button onClick={() => navigate(projectsAddHref)} icon={<CirclePlus size={18} />}>
               {t("projects.newProject")}
-            </Button>
-            <Button variant="secondary" onClick={() => setImportModalOpen(true)} icon={<Download size={18} />}>
-              {t("projects.import")}
             </Button>
           </div>
         </div>
@@ -349,8 +345,8 @@ export default function Projects() {
                             disabled={isExporting}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white`}
                           >
-                            <Upload size={14} />
-                            {isExporting ? t("projects.actions.exporting", "Exporting project...") : t("projects.actions.export")}
+                            <Download size={14} />
+                            {isExporting ? t("projects.actions.exporting", "Downloading...") : t("projects.actions.export")}
                           </button>
                           <div className="my-1 border-t border-slate-200" />
                           <button

@@ -235,23 +235,22 @@
       "edit": "Edit project",
       "editDetails": "Project details",
       "duplicate": "Duplicate project",
-      "export": "Export project",
+      "export": "Download backup",
       "delete": "Delete project",
       "cannotDeleteActive": "Cannot delete active project"
     },
-    "import": "Import Project",
-    "export": "Export Project",
+    "import": "Import Backup",
     "importModal": {
-      "title": "Import Project",
-      "description": "Upload a project ZIP file exported from Widgetizer. The project will be imported with a new ID and can be used immediately.",
-      "uploadTitle": "Drop project ZIP file here",
-      "uploadDescription": "Select a project export ZIP file to import",
+      "title": "Import Backup",
+      "description": "Upload a project backup ZIP file previously downloaded from Widgetizer. The project will be imported with a new ID and can be used immediately.",
+      "uploadTitle": "Drop backup ZIP file here",
+      "uploadDescription": "Select a project backup ZIP file to import",
       "maxSize": "Maximum file size: {{max}}MB",
       "invalidFileType": "Please select a valid ZIP file",
       "noFileSelected": "Please select a file to import",
       "fileTooLarge": "File size ({{size}}MB) exceeds the maximum allowed size of {{max}}MB. Please reduce the project size or increase the limit in Settings.",
-      "importButton": "Import Project",
-      "importError": "Failed to import project"
+      "importButton": "Import Backup",
+      "importError": "Failed to import backup"
     },
     "toasts": {
       "deleteSuccess": "Project \"{{name}}\" was deleted successfully",
@@ -261,11 +260,11 @@
       "setActiveError": "Failed to set active project",
       "duplicateSuccess": "Project duplicated successfully",
       "duplicateError": "Failed to duplicate project",
-      "exportSuccess": "Project exported successfully",
-      "exportError": "Failed to export project",
-      "exportInProgress": "Exporting project... This may take a moment for large projects.",
+      "exportSuccess": "Backup downloaded successfully",
+      "exportError": "Failed to download backup",
+      "exportInProgress": "Preparing backup... This may take a moment for large projects.",
       "importSuccess": "Project \"{{name}}\" imported successfully",
-      "importError": "Failed to import project"
+      "importError": "Failed to import backup"
     },
     "deleteModal": {
       "title": "Delete Project",
@@ -517,7 +516,7 @@
     "creator": {
       "title": "Create New Export",
       "description": "Click the button below to generate a static HTML version of your site for export. Each export is assigned a version number for easy tracking.",
-      "exportButton": "Export Project",
+      "exportButton": "Export Site",
       "exporting": "Exporting...",
       "successTitle": "Export version {{version}} created successfully!",
       "successCreated": "Created: {{date}}"
