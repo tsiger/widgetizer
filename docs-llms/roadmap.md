@@ -11,6 +11,7 @@ This file combines the first-release readiness checklist with the post-`v1` back
 - Theme source resolution and theme metadata reads were tightened up with shared helpers plus cache invalidation, reducing repeated filesystem reads in project/theme listing and update-check flows.
 - Media usage tracking is now coupled more closely to page persistence, and structural flows such as create, duplicate, import, and theme-update apply trigger refresh paths so usage data is less likely to drift.
 - Date formatting now goes through a shared `useFormatDate()` hook in the main list/history surfaces, so components no longer repeat the same app-settings wiring around `formatDate()`.
+- Theme settings are now centralized in a dedicated `themeStore` that is the canonical owner of per-project theme data. The Settings page and page editor both read/write through this shared store. The editor keeps a thin proxy snapshot in `pageStore` for undo/redo only. The save flow delegates to `themeStore.saveSettings()` so server-side corrections are handled consistently. Project-switch and load-failure paths clear stale data and invalidate in-flight requests.
 - Recent hardening around project resolution, API error semantics, theme metadata lookups, and media usage persistence reduces the risk that the first Electron release is blocked by architecture alone.
 
 ## `v1` Release Gate
@@ -58,17 +59,14 @@ Extract shared helpers for add/remove/duplicate/reorder flows so widget and bloc
 4. Add a shared stale-async / project-switch helper
 Standardize the guard pattern used around settings, export, and editor async flows so late responses cannot overwrite state after the active project changes.
 
-5. Centralize theme settings in a dedicated shared store
-Reduce redundant loads and duplicate state handling between the editor, settings UI, and preview pipeline.
-
-6. Add a higher-level semver/update-status helper
+5. Add a higher-level semver/update-status helper
 Wrap repeated version comparison logic in a single helper such as `getUpdateStatus(projectVersion, themeVersion)`.
 
-7. Keep slug and ID generation fully disciplined
+6. Keep slug and ID generation fully disciplined
 Continue routing all new slug and identifier creation paths through `generateUniqueSlug()` to avoid regressions.
 
-8. Consider a higher-level list-page pattern for confirmation flows
+7. Consider a higher-level list-page pattern for confirmation flows
 `useConfirmationModal()` already removed the main duplication, but list pages may still benefit from a more unified delete/action pattern.
 
-9. Prepare for a future TypeScript migration
+8. Prepare for a future TypeScript migration
 Define shared response/domain types, tighten object-shape consistency, and keep expanding JSDoc coverage before any TS conversion begins.
