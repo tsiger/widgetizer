@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
@@ -12,7 +12,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { getPage, updatePage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function PagesEdit() {
   const { t } = useTranslation();
@@ -23,17 +23,13 @@ export default function PagesEdit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const isNavigatingAfterSaveRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Add navigation guard - bypass when navigating after successful save
-  useFormNavigationGuard(isDirty, isNavigatingAfterSaveRef);
+  const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   useEffect(() => {
-    // Reset navigation skip ref when page changes
-    isNavigatingAfterSaveRef.current = false;
     if (!activeProject?.id) {
       setPage(null);
       setLoading(false);
@@ -68,10 +64,9 @@ export default function PagesEdit() {
 
       if (result.success) {
         const savedName = result.data?.name || formData.name;
-        // Set ref BEFORE navigation to bypass guard (refs update synchronously)
+        // Navigate with guard bypass if the slug changed
         if (formData.slug !== id) {
-          isNavigatingAfterSaveRef.current = true;
-          navigate(`/pages/${formData.slug}/edit`, { replace: true });
+          navigateSafely(`/pages/${formData.slug}/edit`, { replace: true });
           showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: savedName }), "success");
         } else {
           showToast(t("pagesEdit.toasts.updateSuccess", { name: savedName }), "success");
@@ -108,15 +103,8 @@ export default function PagesEdit() {
       </PageLayout>
     );
 
-  const pageTitle = (
-    <span className="flex items-center gap-2">
-      {t("pagesEdit.title")}
-      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-    </span>
-  );
-
   return (
-    <PageLayout title={pageTitle}>
+    <PageLayout title={getDirtyTitle(t("pagesEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/pages")} icon={<ChevronLeft size={18} />}>
@@ -131,10 +119,7 @@ export default function PagesEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("pagesEdit.saveChanges")}
-          onCancel={() => {
-            isNavigatingAfterSaveRef.current = true; // Bypass guard for intentional cancel
-            navigate("/pages");
-          }}
+          onCancel={() => navigateSafely("/pages")}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

@@ -5,13 +5,12 @@ import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus, Mor
 import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import { usePageSelection } from "../hooks/usePageSelection";
-import useConfirmationModal from "../hooks/useConfirmationModal";
+import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
-import ConfirmationModal from "../components/ui/ConfirmationModal";
 import Table from "../components/ui/Table";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -54,7 +53,7 @@ export default function Pages() {
     navigate("/pages/add");
   };
 
-  const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
+  const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
   useEffect(() => {
     if (!activeProject?.id) {
@@ -105,7 +104,7 @@ export default function Pages() {
   };
 
   const handleDeletePage = (pageId, pageName) => {
-    openModal({
+    confirm({
       title: t("pages.deleteModal.title"),
       message: t("pages.deleteModal.message", { name: pageName }),
       confirmText: t("pages.deleteModal.confirm"),
@@ -117,7 +116,7 @@ export default function Pages() {
 
   const handleBulkDelete = () => {
     const selectedCount = selectedPages.length;
-    openModal({
+    confirm({
       title: t("pages.deleteModal.titleBulk"),
       message: t("pages.deleteModal.messageBulk", { count: selectedCount }),
       confirmText: t("pages.deleteModal.confirmBulk", { count: selectedCount }),
@@ -370,16 +369,7 @@ export default function Pages() {
         </div>
       )}
 
-      <ConfirmationModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onConfirm={handleConfirm}
-        title={modalState.title}
-        message={modalState.message}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        variant={modalState.variant}
-      />
+      {confirmationModal}
     </PageLayout>
   );
 }

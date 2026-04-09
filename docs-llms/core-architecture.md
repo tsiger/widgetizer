@@ -58,6 +58,8 @@ This admin-vs-site split is the main architectural consequence of the recent wor
 | `toggleThemeUpdates(id, enabled)` | PUT | `/api/projects/:id/theme-updates` |
 | `applyThemeUpdate(id)`    | POST   | `/api/projects/:id/theme-updates/apply`  |
 
+`getAllProjects()` is a lightweight cached query wrapper with a short TTL, in-flight request deduplication, and mutation-driven invalidation. Successful project writes, including `applyThemeUpdate(id)`, invalidate that cache so follow-up reads see fresh `themeVersion` and update-status metadata.
+
 ### Server Controller (`server/controllers/projectController.js`)
 
 | Function                    | Purpose                                                    |
@@ -344,6 +346,8 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 | `toggleThemeUpdates(projectId)` | Toggle project `receiveThemeUpdates` |
 | `mergeThemeSettings()`        | Merge user + new theme.json settings  |
 | `applyThemeUpdate(projectId)` | Apply update to project               |
+
+When a project theme update is applied successfully, the frontend invalidates the cached projects list before any follow-up `getAllProjects()` read. That keeps project-level theme metadata aligned with the filesystem and database update that `themeUpdateService` just completed.
 
 ### Store (`src/stores/themeUpdateStore.js`)
 

@@ -9,7 +9,7 @@ import { SettingsPanel } from "../components/settings";
 import useToastStore from "../stores/toastStore";
 import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ export default function Settings() {
   const hasChanges = useThemeStore((s) => s.hasUnsavedThemeChanges());
   const { loadSettings, updateThemeSetting, resetThemeSettings, saveSettings } = useThemeStore.getState();
 
-  useFormNavigationGuard(hasChanges);
+  const { getDirtyTitle } = useGuardedFormPage(hasChanges);
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
@@ -106,12 +106,7 @@ export default function Settings() {
 
   return (
     <PageLayout
-      title={
-        <span className="flex items-center gap-2">
-          {t("themeSettings.title")}
-          {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-        </span>
-      }
+      title={getDirtyTitle(t("themeSettings.title"))}
       additionalButtons={
         <Button onClick={handleCancel} variant="secondary" disabled={!hasChanges}>
           {t("common.reset")}

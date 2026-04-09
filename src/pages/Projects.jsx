@@ -33,8 +33,7 @@ import {
 import { sortItemsByCopyName } from "../utils/copyNameSort";
 import { resolveWorkspaceDestination } from "../utils/projectNavigation";
 
-import ConfirmationModal from "../components/ui/ConfirmationModal";
-import useConfirmationModal from "../hooks/useConfirmationModal";
+import useConfirmationAction from "../hooks/useConfirmationAction";
 import ProjectImportModal from "../components/projects/ProjectImportModal";
 
 export default function Projects() {
@@ -70,7 +69,7 @@ export default function Projects() {
     }
   };
 
-  const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
+  const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
   useEffect(() => {
     loadProjects();
@@ -116,7 +115,7 @@ export default function Projects() {
       return;
     }
 
-    openModal({
+    confirm({
       title: t("projects.deleteModal.title"),
       message: t("projects.deleteModal.message", { name }),
       confirmText: t("projects.deleteModal.confirm"),
@@ -377,16 +376,7 @@ export default function Projects() {
         </div>
       )}
 
-      <ConfirmationModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onConfirm={handleConfirm}
-        title={modalState.title}
-        message={modalState.message}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        variant={modalState.variant}
-      />
+      {confirmationModal}
 
       <ProjectImportModal
         isOpen={importModalOpen}

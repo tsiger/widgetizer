@@ -1,5 +1,4 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -8,19 +7,16 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { createPage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function PagesAdd() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
 
-  // Add navigation guard with skip ref for intentional navigation
-  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
+  const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -35,9 +31,7 @@ export default function PagesAdd() {
         invalidateMediaCache(activeProject.id);
       }
 
-      // Redirect to list after successful creation
-      skipNavigationGuardRef.current = true;
-      navigate("/pages");
+      navigateSafely("/pages");
       return true;
     } catch (err) {
       showToast(err.message || t("pagesAdd.toasts.createError"), "error");
@@ -47,23 +41,13 @@ export default function PagesAdd() {
     }
   };
 
-  const pageTitle = (
-    <span className="flex items-center gap-2">
-      {t("pagesAdd.title")}
-      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-    </span>
-  );
-
   return (
-    <PageLayout title={pageTitle}>
+    <PageLayout title={getDirtyTitle(t("pagesAdd.title"))}>
       <PageForm
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("pagesAdd.create")}
-        onCancel={() => {
-          skipNavigationGuardRef.current = true;
-          navigate("/pages");
-        }}
+        onCancel={() => navigateSafely("/pages")}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
       />

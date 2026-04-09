@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, RefreshCw } from "lucide-react";
@@ -18,7 +18,7 @@ import {
   applyThemeUpdate,
 } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function ProjectsEdit() {
   const { t } = useTranslation();
@@ -31,14 +31,12 @@ export default function ProjectsEdit() {
   const [isDirty, setIsDirty] = useState(false);
   const [updateStatus, setUpdateStatus] = useState(null);
   const [isApplyingUpdate, setIsApplyingUpdate] = useState(false);
-  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const setActiveProject = useProjectStore((state) => state.setActiveProject);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Add navigation guard with skip ref for intentional navigation
-  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
+  const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   useEffect(() => {
     loadProject();
@@ -141,15 +139,8 @@ export default function ProjectsEdit() {
 
   if (!project) return <PageLayout title={t("projectsEdit.title")}>{t("projectsEdit.notFound")}</PageLayout>;
 
-  const pageTitle = (
-    <span className="flex items-center gap-2">
-      {t("projectsEdit.title")}
-      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-    </span>
-  );
-
   return (
-    <PageLayout title={pageTitle}>
+    <PageLayout title={getDirtyTitle(t("projectsEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/projects")} icon={<ChevronLeft size={18} />}>
@@ -200,10 +191,7 @@ export default function ProjectsEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("projectsEdit.saveChanges")}
-          onCancel={() => {
-            skipNavigationGuardRef.current = true;
-            navigate("/projects");
-          }}
+          onCancel={() => navigateSafely("/projects")}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

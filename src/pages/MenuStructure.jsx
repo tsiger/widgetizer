@@ -11,7 +11,7 @@ import { getMenu, updateMenu } from "../queries/menuManager";
 
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function MenuStructure() {
   const { t } = useTranslation();
@@ -26,8 +26,7 @@ export default function MenuStructure() {
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Add navigation guard for unsaved changes
-  useFormNavigationGuard(isDirty);
+  const { getDirtyTitle } = useGuardedFormPage(isDirty);
 
   // Helper to check if menu has changed
   const checkIfDirty = (currentMenu) => {
@@ -162,12 +161,7 @@ export default function MenuStructure() {
 
   return (
     <PageLayout
-      title={
-        <span className="flex items-center gap-2">
-          {menu.name}
-          {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-        </span>
-      }
+      title={getDirtyTitle(menu.name)}
       description={t("menuStructure.description")}
       additionalButtons={
         <Button variant="secondary" onClick={() => navigate("/menus")}>

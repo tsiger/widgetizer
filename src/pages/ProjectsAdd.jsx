@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -7,16 +7,14 @@ import ProjectForm from "../components/projects/ProjectForm.jsx";
 import useToastStore from "../stores/toastStore";
 import { createProject, setActiveProject } from "../queries/projectManager";
 import useProjectStore from "../stores/projectStore";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { resolveWorkspaceDestination } from "../utils/projectNavigation";
 
 export default function ProjectsAdd() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
@@ -25,8 +23,7 @@ export default function ProjectsAdd() {
     ? `/projects?next=${encodeURIComponent(searchParams.get("next"))}`
     : "/projects";
 
-  // Add navigation guard with skip ref
-  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
+  const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -37,8 +34,7 @@ export default function ProjectsAdd() {
       await fetchActiveProject();
       showToast(t("projectsAdd.toasts.createActiveSuccess", { name: newProject.name }), "success");
 
-      skipNavigationGuardRef.current = true;
-      navigate(workspaceDestination);
+      navigateSafely(workspaceDestination);
       return true;
     } catch (err) {
       showToast(err.message || t("projectsAdd.toasts.createError"), "error");
@@ -48,23 +44,13 @@ export default function ProjectsAdd() {
     }
   };
 
-  const pageTitle = (
-    <span className="flex items-center gap-2">
-      {t("projectsAdd.title")}
-      {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-    </span>
-  );
-
   return (
-    <PageLayout title={pageTitle}>
+    <PageLayout title={getDirtyTitle(t("projectsAdd.title"))}>
       <ProjectForm
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("projectsAdd.create")}
-        onCancel={() => {
-          skipNavigationGuardRef.current = true;
-          navigate(projectsListHref);
-        }}
+        onCancel={() => navigateSafely(projectsListHref)}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
       />

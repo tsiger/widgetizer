@@ -19,6 +19,7 @@ import {
 
 import useToastStore from "../stores/toastStore";
 import useThemeUpdateStore from "../stores/themeUpdateStore";
+import useConfirmationAction from "../hooks/useConfirmationAction";
 import useAppSettings from "../hooks/useAppSettings";
 import FileUploader from "../components/ui/FileUploader";
 import { showRejectedFiles, showUploadOutcome } from "../utils/uploadFeedback";
@@ -269,19 +270,9 @@ export default function Themes() {
     [showToast, t, fetchThemes, fetchUpdateCount],
   );
 
-  const handleDeleteTheme = useCallback(
-    async (themeId, themeName) => {
-      if (
-        !window.confirm(
-          t("themes.delete.confirmMessage", {
-            themeName,
-            defaultValue: `Are you sure you want to delete "${themeName}"? This action cannot be undone.`,
-          }),
-        )
-      ) {
-        return;
-      }
-
+  const handleDeleteThemeConfirmed = useCallback(
+    async (data) => {
+      const { themeId, themeName } = data;
       try {
         await deleteTheme(themeId);
         showToast(
@@ -308,6 +299,25 @@ export default function Themes() {
       }
     },
     [showToast, t, fetchThemes],
+  );
+
+  const { confirm: confirmDeleteTheme, confirmationModal } = useConfirmationAction(handleDeleteThemeConfirmed);
+
+  const handleDeleteTheme = useCallback(
+    (themeId, themeName) => {
+      confirmDeleteTheme({
+        title: t("themes.delete.confirmTitle", { defaultValue: "Delete Theme" }),
+        message: t("themes.delete.confirmMessage", {
+          themeName,
+          defaultValue: `Are you sure you want to delete "${themeName}"? This action cannot be undone.`,
+        }),
+        confirmText: t("themes.delete.confirmButton", { defaultValue: "Delete" }),
+        cancelText: t("common.cancel", { defaultValue: "Cancel" }),
+        variant: "danger",
+        data: { themeId, themeName },
+      });
+    },
+    [confirmDeleteTheme, t],
   );
 
   const onThemeDrop = useCallback(
@@ -403,6 +413,8 @@ export default function Themes() {
       ) : (
         <EmptyState title={t("themes.emptyTitle")} description={t("themes.emptyDesc")} />
       )}
+
+      {confirmationModal}
     </PageLayout>
   );
 }

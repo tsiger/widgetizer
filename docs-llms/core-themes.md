@@ -266,6 +266,7 @@ Handles applying theme updates to projects:
 4. Adds new menus (preserves existing)
 5. Adds new templates (preserves existing)
 6. Updates project's `themeVersion` metadata
+7. Invalidates the frontend's cached projects list so project surfaces immediately reflect the new version/update state
 
 ## 4. Sidebar Badge
 

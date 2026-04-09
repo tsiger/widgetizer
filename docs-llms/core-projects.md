@@ -46,7 +46,7 @@ Data fetching and backend communication are handled by utility functions in `src
 
 This file contains functions that make API calls to the backend:
 
-- `getAllProjects()`: Fetches a list of all projects.
+- `getAllProjects()`: Fetches a list of all projects via a lightweight cached wrapper with request deduplication and mutation-driven invalidation.
 - `createProject(formData)`: Creates a new project.
 - `updateProject(id, formData)`: Updates an existing project.
 - `deleteProject(id)`: Deletes a project.
@@ -90,7 +90,7 @@ If a user navigates to any site-workspace route without an active project select
 
 ### 2. Listing and Managing Projects
 
-1.  **Data Fetching**: When `Projects.jsx` loads, it calls `getAllProjects()` to fetch and display a list of all projects in a table.
+1.  **Data Fetching**: When `Projects.jsx` loads, it calls `getAllProjects()` to fetch and display a list of all projects in a table. The query uses a short-lived global cache so repeat visits can reuse recent results, while successful project mutations invalidate the cache.
 2.  **Localization**: The page is fully localized with translated headers, action labels, toast messages, and empty states.
 3.  **Open Project / Set Active**: Clicking the project name opens that project. If it is not already active, `Projects.jsx` first calls `setActiveProject(id)`, refreshes `projectStore`, shows a success toast, and then navigates into the workspace destination (`/pages` by default, or preserved `next`).
 4.  **Visual Status**: The active project shows an "Active" badge. The theme column can also show a theme-update indicator when `hasThemeUpdate` is true.
@@ -141,7 +141,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 ### 5. Editing a Project
 
 1.  **Navigation**: From the project list, clicking the "Edit" icon navigates the user to `/projects/edit/:id`.
-2.  **Data Fetching**: `ProjectsEdit.jsx` loads. In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form.
+2.  **Data Fetching**: `ProjectsEdit.jsx` loads. In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form. Because that list query is cached, successful project mutations invalidate it so the editor reload path sees fresh project metadata instead of stale list data.
 3.  **Navigation Guard**: `useFormNavigationGuard` is integrated to prevent accidental navigation with unsaved changes.
 4.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
@@ -163,7 +163,8 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 8.  **State Updates**:
     - **Active Project Sync**: If the edited project is currently active, the global store is updated using `getActiveProject()` and `setActiveProject()` to maintain proper state
     - **Windows Compatibility**: Project directory renaming uses a copy + remove approach for better Windows file system compatibility
-9.  **Feedback**: Localized success toast notifications show the completion status, and navigation buttons allow returning to the project list.
+9.  **Theme Update Apply Sync**: When the user applies a theme update from this screen, `applyThemeUpdate(id)` invalidates the cached projects list before `loadProject()` re-reads it. That keeps `themeVersion` and update-status metadata in sync immediately after the update.
+10. **Feedback**: Localized success toast notifications show the completion status, and navigation buttons allow returning to the project list.
 
 ---
 

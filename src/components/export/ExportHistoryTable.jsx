@@ -3,9 +3,8 @@ import { useTranslation } from "react-i18next";
 import { IconButton } from "../ui/Button";
 import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../queries/exportManager";
 import useToastStore from "../../stores/toastStore";
-import useConfirmationModal from "../../hooks/useConfirmationModal";
+import useConfirmationAction from "../../hooks/useConfirmationAction";
 import useFormatDate from "../../hooks/useFormatDate";
-import ConfirmationModal from "../ui/ConfirmationModal";
 import Table from "../ui/Table";
 import Badge from "../ui/Badge";
 import { Loader2, ExternalLink, Trash2, Calendar, Download, Package, MoreVertical } from "lucide-react";
@@ -57,7 +56,7 @@ export default function ExportHistoryTable({
     }
   };
 
-  const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
+  const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
   const handleViewExport = async (exportRecord) => {
     try {
@@ -92,7 +91,7 @@ export default function ExportHistoryTable({
   };
 
   const openDeleteConfirmation = (exportRecord) => {
-    openModal({
+    confirm({
       title: t("exportSite.history.deleteModal.title"),
       message: t("exportSite.history.deleteModal.message", { version: exportRecord.version }),
       confirmText: t("exportSite.history.deleteModal.confirm"),
@@ -220,16 +219,7 @@ export default function ExportHistoryTable({
         )}
       </section>
 
-      <ConfirmationModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onConfirm={handleConfirm}
-        title={modalState.title}
-        message={modalState.message}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        variant={modalState.variant}
-      />
+      {confirmationModal}
     </>
   );
 }

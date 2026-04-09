@@ -3,7 +3,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner.jsx";
 import Button from "../components/ui/Button.jsx";
 import AppSettingsPanel from "../components/settings/AppSettingsPanel.jsx";
 import useAppSettings from "../hooks/useAppSettings.js";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -18,8 +18,7 @@ export default function AppSettings() {
   const { settings, loading, isSaving, hasChanges, schema, handleInputChange, handleSave, handleCancel } =
     useAppSettings();
 
-  // Add navigation guard
-  useFormNavigationGuard(hasChanges);
+  const { getDirtyTitle } = useGuardedFormPage(hasChanges);
 
   useEffect(() => {
     let isCancelled = false;
@@ -86,12 +85,7 @@ export default function AppSettings() {
 
   return (
     <PageLayout
-      title={
-        <span className="flex items-center gap-2">
-          {t("navigation.appSettings")}
-          {hasChanges && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-        </span>
-      }
+      title={getDirtyTitle(t("navigation.appSettings"))}
     >
       <>
         {/* App Settings panel */}

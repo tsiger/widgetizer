@@ -7,8 +7,7 @@ import PageLayout from "../components/layout/PageLayout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Table from "../components/ui/Table";
 import Button, { IconButton } from "../components/ui/Button";
-import ConfirmationModal from "../components/ui/ConfirmationModal";
-import useConfirmationModal from "../hooks/useConfirmationModal";
+import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
 
 import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
@@ -95,10 +94,10 @@ export default function Menus() {
     }
   };
 
-  const { modalState, openModal, closeModal, handleConfirm } = useConfirmationModal(handleDelete);
+  const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
   const openDeleteConfirmation = (id, name) => {
-    openModal({
+    confirm({
       title: t("menus.deleteModal.title"),
       message: t("menus.deleteModal.message", { name }),
       confirmText: t("menus.deleteModal.confirm"),
@@ -240,16 +239,7 @@ export default function Menus() {
         </div>
       )}
 
-      <ConfirmationModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        onConfirm={handleConfirm}
-        title={modalState.title}
-        message={modalState.message}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        variant={modalState.variant}
-      />
+      {confirmationModal}
     </PageLayout>
   );
 }

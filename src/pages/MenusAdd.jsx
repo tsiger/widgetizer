@@ -1,24 +1,20 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuForm from "../components/menus/MenuForm";
 import useToastStore from "../stores/toastStore";
 import { createMenu } from "../queries/menuManager";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function MenusAdd() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
 
-  // Add navigation guard with skip ref
-  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
+  const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -27,9 +23,7 @@ export default function MenusAdd() {
       const newMenu = await createMenu(formData);
       showToast(t("menusAdd.toasts.createSuccess", { name: newMenu.name }), "success");
 
-      // Redirect to structure editor after successful creation
-      skipNavigationGuardRef.current = true;
-      navigate(`/menus/${newMenu.id}/structure`);
+      navigateSafely(`/menus/${newMenu.id}/structure`);
       return true;
     } catch (err) {
       showToast(err.message || t("menusAdd.toasts.createError"), "error");
@@ -40,22 +34,12 @@ export default function MenusAdd() {
   };
 
   return (
-    <PageLayout
-      title={
-        <span className="flex items-center gap-2">
-          {t("menusAdd.title")}
-          {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-        </span>
-      }
-    >
+    <PageLayout title={getDirtyTitle(t("menusAdd.title"))}>
       <MenuForm
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("menusAdd.create")}
-        onCancel={() => {
-          skipNavigationGuardRef.current = true;
-          navigate("/menus");
-        }}
+        onCancel={() => navigateSafely("/menus")}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
       />

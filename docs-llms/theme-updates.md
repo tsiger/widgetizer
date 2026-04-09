@@ -278,6 +278,7 @@ After the theme is updated:
 3. User clicks "Apply Theme Update" (or similar action)
 4. System copies updated files, merges settings
 5. Project's `themeVersion` is updated
+6. Frontend invalidates the cached projects list so refreshed project reads immediately show the new version and cleared update badge
 
 ## Version Validation
 

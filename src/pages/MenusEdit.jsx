@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
@@ -11,7 +11,7 @@ import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { getMenu, updateMenu } from "../queries/menuManager";
-import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
+import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function MenusEdit() {
   const { t } = useTranslation();
@@ -22,13 +22,11 @@ export default function MenusEdit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessActions, setShowSuccessActions] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const skipNavigationGuardRef = useRef(false);
 
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Add navigation guard with skip ref
-  useFormNavigationGuard(isDirty, skipNavigationGuardRef);
+  const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   useEffect(() => {
     if (!activeProject?.id) {
@@ -66,7 +64,7 @@ export default function MenusEdit() {
       setMenu(updatedMenu);
       showToast(t("menusEdit.toasts.updateSuccess", { name: updatedMenu.name }), "success");
       setShowSuccessActions(true);
-      setIsDirty(false); // Reset dirty state after successful save
+      setIsDirty(false);
       return true;
     } catch (err) {
       showToast(err.message || t("menusEdit.toasts.updateError"), "error");
@@ -86,14 +84,7 @@ export default function MenusEdit() {
   if (!menu) return <PageLayout title={t("menusEdit.title")}>{t("menusEdit.notFound")}</PageLayout>;
 
   return (
-    <PageLayout
-      title={
-        <span className="flex items-center gap-2">
-          {t("menusEdit.title")}
-          {isDirty && <span className="w-2 h-2 bg-pink-500 rounded-full" />}
-        </span>
-      }
-    >
+    <PageLayout title={getDirtyTitle(t("menusEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
           <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>
@@ -108,10 +99,7 @@ export default function MenusEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("menusEdit.saveChanges")}
-          onCancel={() => {
-            skipNavigationGuardRef.current = true;
-            navigate("/menus");
-          }}
+          onCancel={() => navigateSafely("/menus")}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />
