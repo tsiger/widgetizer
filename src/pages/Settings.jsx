@@ -23,17 +23,14 @@ export default function Settings() {
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
+  // The project-scoped boundary in RequireActiveProject remounts this
+  // component on project switch. The loadedProjectId check preserves
+  // in-flight drafts when navigating Settings -> Editor -> Settings
+  // within the same project.
   useEffect(() => {
-    if (!activeProject?.id) {
-      useThemeStore.getState().resetForProjectChange();
-      return;
-    }
-
-    // Only reload if the store is for a different project (or empty).
-    // This preserves in-flight drafts when navigating back from the editor.
     const { loadedProjectId } = useThemeStore.getState();
-    if (loadedProjectId !== activeProject.id) {
-      loadSettings(activeProject.id);
+    if (loadedProjectId !== activeProject?.id) {
+      loadSettings(activeProject?.id);
     }
   }, [activeProject?.id, loadSettings]);
 

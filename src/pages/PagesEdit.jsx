@@ -25,21 +25,15 @@ export default function PagesEdit() {
   const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   useEffect(() => {
-    if (!activeProject?.id) {
-      setPage(null);
-      setLoading(false);
-      return;
-    }
     setPage(null);
     setLoading(true);
     loadPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, activeProject?.id]);
+  }, [id]);
 
   const loadPage = async () => {
     try {

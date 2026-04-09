@@ -469,5 +469,33 @@ describe("saveStore (useAutoSave)", () => {
       expect(mockThemeStoreState.saveSettings).not.toHaveBeenCalled();
       expect(useAutoSave.getState().isSaving).toBe(false);
     });
+
+    it("preserves modification flags when save is aborted by project mismatch", async () => {
+      seedPageStore();
+      usePageStore.setState({ loadedProjectId: "other-project" });
+      useAutoSave.getState().markWidgetModified("w-1");
+      useAutoSave.getState().setThemeSettingsModified(true);
+      useAutoSave.getState().setStructureModified(true);
+
+      await useAutoSave.getState().save();
+
+      // Flags should NOT be cleared — the save was aborted, edits are preserved
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(1);
+      expect(useAutoSave.getState().themeSettingsModified).toBe(true);
+      expect(useAutoSave.getState().structureModified).toBe(true);
+    });
+
+    it("stops auto-save timer when project mismatch is detected", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      useAutoSave.getState().resetAutoSaveTimer();
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
+
+      usePageStore.setState({ loadedProjectId: "other-project" });
+      await useAutoSave.getState().save();
+
+      // Auto-save should be stopped to prevent repeated failed save attempts
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+    });
   });
 });

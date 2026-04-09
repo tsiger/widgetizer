@@ -10,7 +10,6 @@ import Button from "../components/ui/Button";
 import { getMenu, updateMenu } from "../queries/menuManager";
 
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function MenuStructure() {
@@ -24,7 +23,6 @@ export default function MenuStructure() {
   const initialMenuRef = useRef(null);
   const isInitializedRef = useRef(false);
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   const { getDirtyTitle } = useGuardedFormPage(isDirty);
 
@@ -83,19 +81,12 @@ export default function MenuStructure() {
 
   // Load menu data
   useEffect(() => {
-    if (!activeProject?.id) {
-      setMenu(null);
-      setLoading(false);
-      setIsDirty(false);
-      return;
-    }
-
     async function loadMenu() {
       try {
         setLoading(true);
         const data = await getMenu(id);
         setMenu(data);
-        initialMenuRef.current = JSON.parse(JSON.stringify(data)); // Deep clone for comparison
+        initialMenuRef.current = JSON.parse(JSON.stringify(data));
         isInitializedRef.current = false;
         setIsDirty(false);
       } catch (err) {
@@ -106,7 +97,7 @@ export default function MenuStructure() {
     }
 
     loadMenu();
-  }, [id, activeProject?.id, showToast, t]);
+  }, [id, showToast, t]);
 
   // Save menu
   const handleSave = async () => {

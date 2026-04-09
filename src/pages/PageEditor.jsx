@@ -40,12 +40,11 @@ export default function PageEditor() {
   // Add navigation guard
   useNavigationGuard();
 
-  // Load initial data
+  // Load initial data — the project-scoped boundary in RequireActiveProject
+  // remounts this component on project switch, so no manual reset is needed.
   useEffect(() => {
     const pageId = searchParams.get("pageId");
-    // Always call loadPage, even with null pageId - it handles the null case properly
     usePageStore.getState().loadPage(pageId);
-    useWidgetStore.getState().resetForProjectChange();
     if (activeProject?.id) {
       useWidgetStore.getState().loadSchemas();
     }

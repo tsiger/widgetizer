@@ -11,7 +11,7 @@ The app now has two main shells plus a root redirect:
 - `/` is handled by `src/pages/HomeRedirect.jsx`. It redirects to `/pages` when an active project exists, otherwise to `/projects`.
 - The **admin shell** uses `src/components/layout/ProjectPickerLayout.jsx` for `/projects`, `/themes`, and `/app-settings`. It can be used without an active project.
 - The **site workspace shell** uses `src/components/layout/Layout.jsx` for `/pages`, `/menus`, `/media`, `/settings`, and `/export-site`.
-- All site workspace routes are wrapped by `src/components/layout/RequireActiveProject.jsx`. If no active project exists, the user is redirected to `/projects`.
+- All site workspace routes are wrapped by `src/components/layout/RequireActiveProject.jsx`. If no active project exists, the user is redirected to `/projects`. When the active project changes, the same boundary resets project-scoped singleton stores and keys the workspace outlet by project ID so the route subtree remounts cleanly.
 
 This admin-vs-site split is the main architectural consequence of the recent workspaces merge.
 
@@ -30,7 +30,7 @@ This admin-vs-site split is the main architectural consequence of the recent wor
 - `src/components/layout/AdminMenu.jsx` - Dropdown entrypoint for project/theme/app-settings navigation
 - `src/pages/HomeRedirect.jsx` - Chooses `/projects` vs `/pages` at app root
 - `src/utils/projectNavigation.js` - Resolves preserved `next` query params back into workspace destinations
-- `src/components/layout/RequireActiveProject.jsx` - Route guard for site-workspace routes; redirects to `/projects` when no active project exists
+- `src/components/layout/RequireActiveProject.jsx` - Route guard plus project-switch boundary for site-workspace routes; redirects to `/projects` when no active project exists, resets project-scoped stores on active-project changes, and remounts the workspace subtree
 
 ### Route Structure
 
@@ -744,4 +744,4 @@ Save button / Auto-save timer
 | `resetForProjectChange()`                        | Clear state and invalidate in-flight loads |
 | `reset()`                                        | Clear all state                            |
 
-**Used by:** Settings page as the canonical owner, plus the page editor/save flow. `pageStore` keeps only a snapshot proxy for undo/redo.
+**Used by:** Settings page as the canonical owner, plus the page editor/save flow. `pageStore` keeps only a snapshot proxy for undo/redo. Project switches are coordinated from `RequireActiveProject`, which calls the relevant store reset actions before remounting the workspace subtree.

@@ -86,7 +86,7 @@ This file contains functions that make API calls to the backend:
 
 ### 1b. Access Without an Active Project
 
-If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no longer a separate "No Active Project" empty-state screen in the route guard.
+If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no longer a separate "No Active Project" empty-state screen in the route guard. The same component also acts as the centralized project-switch boundary for site-workspace routes: when the active project changes, it resets project-scoped stores and remounts the workspace subtree with a project-keyed outlet.
 
 ### 2. Listing and Managing Projects
 
@@ -174,7 +174,7 @@ When the user switches projects, the app must ensure no data from the previous p
 
 ### How switching works
 
-`openProjectWorkspace()` in `Projects.jsx` calls `PUT /api/projects/active/:id` to set the new active project in SQLite, refreshes the Zustand store via `fetchActiveProject()`, then navigates to `/pages`. This causes route-level components to remount.
+`openProjectWorkspace()` in `Projects.jsx` calls `PUT /api/projects/active/:id` to set the new active project in SQLite, refreshes the Zustand store via `fetchActiveProject()`, then navigates to `/pages`. `RequireActiveProject` observes the active-project change, resets the project-scoped frontend stores, and remounts the site-workspace subtree with a project-keyed outlet.
 
 ### Server-side protection
 
@@ -182,11 +182,12 @@ When the user switches projects, the app must ensure no data from the previous p
 
 ### Client-side protection
 
-- **All project-scoped screens** (Pages, Settings, PageEditor, PagePreview, PagesEdit, MenusEdit, MenuStructure, Export) include `activeProject?.id` in their effect dependency arrays so they reload on project change
+- **RequireActiveProject** is the central project-switch boundary for site-workspace routes. It clears singleton frontend stores on active-project changes and keys the route outlet by project ID so project-owned components remount cleanly.
 - **pageStore** uses an `activeLoadId` counter to discard stale async loads. Tracks `loadedProjectId` so `saveStore` can compare before saving.
-- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` plus `resetForProjectChange()` to drop stale loads and clear project-specific state on switches.
-- **widgetStore** resets schemas and selection via `resetForProjectChange()` and reads the project ID internally via `getActiveProjectId()`
-- **Settings.jsx** now reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but load ownership lives in the store
+- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by the shared route boundary on real project switches.
+- **widgetStore** resets schemas and selection via `resetForProjectChange()`, reads the project ID internally via `getActiveProjectId()`, and now relies on the shared route boundary rather than page-local reset calls.
+- **saveStore** preserves edits when a stale save is rejected with `PROJECT_MISMATCH`, stops auto-save retries, and is reset centrally on project switches by the shared route boundary.
+- **Settings.jsx** reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but project-switch reset ownership now lives in the route boundary rather than the page component.
 - **useExportState / ExportCreator** guard history loads and export completion against project changes mid-flight
 
 ### Known limitation

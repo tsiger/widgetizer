@@ -144,11 +144,13 @@ Prevents data from one project being shown, saved, previewed, or exported agains
 
 - `apiFetch` auto-injects `X-Project-Id` from the Zustand project store on every request
 - `saveStore` does a proactive check comparing `loadedProjectId` against the active project before initiating any save
+- `RequireActiveProject` is the frontend project-switch boundary for site-workspace routes: it resets project-scoped singleton stores when the active project changes and remounts the workspace subtree with a project-keyed outlet
 
 **Client-side (stale-response guards):**
 
 - `pageStore` uses an `activeLoadId` counter to discard late async responses from superseded loads
-- `themeStore` owns theme-settings load protection via `activeLoadId` and `resetForProjectChange()`, while `Settings.jsx` still guards save completion against project switches
+- `themeStore` owns theme-settings load protection via `activeLoadId`; its `resetForProjectChange()` action is triggered centrally by `RequireActiveProject`, while `Settings.jsx` still guards save completion against project switches
+- `widgetStore` and `saveStore` are also reset centrally by `RequireActiveProject` so singleton store state cannot leak across project switches
 - `useExportState` and `ExportCreator` guard `loadExportHistory` and export completion against project changes mid-flight
 
 ---

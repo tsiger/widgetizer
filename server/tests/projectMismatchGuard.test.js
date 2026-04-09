@@ -213,6 +213,48 @@ describe("resolveActiveProject — mismatch guard", () => {
     assert.ok(req.activeProject, "req.activeProject should be set");
   });
 
+  it("PATCH with mismatched X-Project-Id returns 409", async () => {
+    const req = mockReq({ method: "PATCH", headers: { "x-project-id": OTHER_PROJECT_ID } });
+    const res = mockRes();
+    let nextCalled = false;
+
+    await resolveActiveProject(req, res, () => { nextCalled = true; });
+
+    assert.ok(!nextCalled);
+    assert.equal(res._status, 409);
+    assert.equal(res._json.code, "PROJECT_MISMATCH");
+  });
+
+  it("preserves structured PROJECT_MISMATCH payload shape", async () => {
+    const req = mockReq({ method: "POST", headers: { "x-project-id": OTHER_PROJECT_ID } });
+    const res = mockRes();
+
+    await resolveActiveProject(req, res, () => {});
+
+    // Verify the full payload shape that frontend guards depend on
+    assert.equal(res._json.code, "PROJECT_MISMATCH");
+    assert.equal(typeof res._json.error, "string");
+    assert.equal(typeof res._json.message, "string");
+  });
+
+  it("returns 404 when active project ID exists but project record is missing", async () => {
+    const original = await projectRepo.readProjectsData();
+    // Set activeProjectId to a UUID that has no matching project record
+    await projectRepo.writeProjectsData({ projects: [], activeProjectId: "ghost-uuid" });
+
+    const req = mockReq({ method: "GET" });
+    const res = mockRes();
+    let nextCalled = false;
+
+    await resolveActiveProject(req, res, () => { nextCalled = true; });
+
+    assert.ok(!nextCalled);
+    assert.equal(res._status, 404);
+
+    // Restore
+    await projectRepo.writeProjectsData(original);
+  });
+
   it("returns 404 when no active project is set", async () => {
     const original = await projectRepo.readProjectsData();
     await projectRepo.writeProjectsData({ ...original, activeProjectId: null });

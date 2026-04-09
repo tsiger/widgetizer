@@ -44,9 +44,9 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 ### Loading a Page
 
 1.  The `PageEditor` mounts and reads the `pageId` from the URL search parameters.
-2.  A `useEffect` hook, dependent on the `pageId` and an `activeProject`, triggers the data loading functions from the relevant stores.
+2.  A `useEffect` hook, dependent on the `pageId` and the current active-project identity, triggers the data loading functions from the relevant stores. Project switches are also handled one level higher by `RequireActiveProject`, which resets project-scoped singleton stores and remounts the workspace subtree.
 3.  It calls `usePageStore.getState().loadPage(pageId)` to fetch the page structure.
-4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo.
+4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. The editor no longer performs its own explicit project-switch store reset; that reset is coordinated by `RequireActiveProject`.
 5.  While data is being fetched, `LoadingSpinner` components are displayed to inform the user.
 
 ### Editing a Widget

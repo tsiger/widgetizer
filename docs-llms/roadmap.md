@@ -50,9 +50,17 @@ That means:
 
 If there is still time before release, the most valuable remaining work is:
 
-1. Expand regression coverage specifically around project switching and stale async completions.
-2. Add a small project-scoped boundary so project switches remount or reset more project-owned UI centrally.
-3. Consolidate more project-switch cleanup into one orchestration path instead of relying on scattered component/store resets.
+1. Finish and verify the project-switch hardening work:
+   - stale async completions
+   - project-scoped reset behavior
+   - editor/settings/preview save-safety during active project changes
+2. Add temporary dev-only debugging aids if they help close release confidence faster:
+   - a state inspector/sidebar for the main frontend stores
+   - lightweight event logging around project switches, loads, and saves
+3. Spend the remaining time on manual release-focused QA instead of more architecture work:
+   - project switching under stress
+   - real import/export
+   - packaged Electron first-run and upgrade checks
 
 ## Save For After `v1`
 

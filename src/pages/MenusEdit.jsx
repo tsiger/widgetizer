@@ -9,7 +9,6 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
-import useProjectStore from "../stores/projectStore";
 import { getMenu, updateMenu } from "../queries/menuManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
@@ -24,21 +23,15 @@ export default function MenusEdit() {
   const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
-  const activeProject = useProjectStore((state) => state.activeProject);
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   useEffect(() => {
-    if (!activeProject?.id) {
-      setMenu(null);
-      setLoading(false);
-      return;
-    }
     setMenu(null);
     setLoading(true);
     loadMenu();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, activeProject?.id]);
+  }, [id]);
 
   const loadMenu = async () => {
     try {
