@@ -1,6 +1,25 @@
 import { apiFetch, apiFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import { uploadFormData } from "../lib/uploadRequest";
 
+// ---------------------------------------------------------------------------
+// Lightweight cache for getAllProjects() — single entry, not project-keyed.
+// Mirrors the pattern in mediaManager.js but for a global list query.
+// A version counter ensures in-flight fetches started before an invalidation
+// cannot write stale data back into the cache.
+// ---------------------------------------------------------------------------
+let projectsListCache = { data: null, timestamp: 0, promise: null, version: 0 };
+const CACHE_DURATION = 30000; // 30 seconds
+
+/**
+ * Invalidate the projects list cache.
+ * Called automatically by mutation functions after successful writes.
+ * Bumps the version so any in-flight fetch from before the invalidation
+ * is dropped when it resolves.
+ */
+export function invalidateProjectsListCache() {
+  projectsListCache = { data: null, timestamp: 0, promise: null, version: projectsListCache.version + 1 };
+}
+
 /**
  * @typedef {Object} Project
  * @property {string} id - Unique project identifier
@@ -23,13 +42,51 @@ import { uploadFormData } from "../lib/uploadRequest";
  */
 
 /**
- * Fetch all projects from the API.
+ * Fetch all projects from the API with caching and request deduplication.
+ * @param {{ forceRefresh?: boolean }} [options]
  * @returns {Promise<Project[]>} Array of project objects
  * @throws {Error} If the API request fails
  */
-export async function getAllProjects() {
+export async function getAllProjects({ forceRefresh } = {}) {
+  const now = Date.now();
+
+  // Return cached data if valid
+  if (!forceRefresh && projectsListCache.data && now - projectsListCache.timestamp < CACHE_DURATION) {
+    return projectsListCache.data;
+  }
+
+  // Deduplicate: if a fetch is already in flight, share it
+  if (projectsListCache.promise) {
+    try {
+      return await projectsListCache.promise;
+    } catch {
+      // Cached promise failed — fall through to retry below
+    }
+  }
+
+  // Capture version before the async fetch so we can detect mid-flight invalidation
+  const versionAtStart = projectsListCache.version;
+
+  const fetchPromise = (async () => {
+    try {
+      const data = await apiFetchJson("/api/projects", {}, { fallbackMessage: "Failed to get projects" });
+      // Only populate cache if no invalidation occurred since this fetch started
+      if (projectsListCache.version === versionAtStart) {
+        projectsListCache = { data, timestamp: Date.now(), promise: null, version: versionAtStart };
+      }
+      return data;
+    } catch (error) {
+      if (projectsListCache.version === versionAtStart) {
+        projectsListCache = { ...projectsListCache, promise: null };
+      }
+      throw error;
+    }
+  })();
+
+  projectsListCache = { ...projectsListCache, promise: fetchPromise };
+
   try {
-    return await apiFetchJson("/api/projects", {}, { fallbackMessage: "Failed to get projects" });
+    return await fetchPromise;
   } catch (error) {
     rethrowQueryError(error, "Failed to get projects");
   }
@@ -59,13 +116,15 @@ export async function getActiveProject() {
  */
 export async function createProject(projectData) {
   try {
-    return await apiFetchJson("/api/projects", {
+    const result = await apiFetchJson("/api/projects", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(projectData),
     }, { fallbackMessage: "Failed to create project" });
+    invalidateProjectsListCache();
+    return result;
   } catch (error) {
     rethrowQueryError(error, "Failed to create project");
   }
@@ -99,13 +158,15 @@ export async function setActiveProject(projectId) {
  */
 export async function updateProject(projectId, updates) {
   try {
-    return await apiFetchJson(`/api/projects/${projectId}`, {
+    const result = await apiFetchJson(`/api/projects/${projectId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(updates),
     }, { fallbackMessage: "Failed to update project" });
+    invalidateProjectsListCache();
+    return result;
   } catch (error) {
     rethrowQueryError(error, "Failed to update project");
   }
@@ -119,9 +180,11 @@ export async function updateProject(projectId, updates) {
  */
 export async function deleteProject(projectId) {
   try {
-    return await apiFetchJson(`/api/projects/${projectId}`, {
+    const result = await apiFetchJson(`/api/projects/${projectId}`, {
       method: "DELETE",
     }, { fallbackMessage: "Failed to delete project" });
+    invalidateProjectsListCache();
+    return result;
   } catch (error) {
     rethrowQueryError(error, "Failed to delete project");
   }
@@ -135,9 +198,11 @@ export async function deleteProject(projectId) {
  */
 export async function duplicateProject(projectId) {
   try {
-    return await apiFetchJson(`/api/projects/${projectId}/duplicate`, {
+    const result = await apiFetchJson(`/api/projects/${projectId}/duplicate`, {
       method: "POST",
     }, { fallbackMessage: "Failed to duplicate project" });
+    invalidateProjectsListCache();
+    return result;
   } catch (error) {
     console.error("Error duplicating project:", error);
     rethrowQueryError(error, "Failed to duplicate project");
@@ -205,6 +270,7 @@ export async function importProject(file, optionsOrProgress) {
     const response = await uploadFormData("/api/projects/import", formData, { onProgress, signal });
     const data = response.data || {};
 
+    invalidateProjectsListCache();
     return {
       ...data,
       processedFiles: data?.id ? [data] : [],
@@ -276,9 +342,12 @@ export async function toggleThemeUpdates(projectId, enabled) {
  */
 export async function applyThemeUpdate(projectId) {
   try {
-    return await apiFetchJson(`/api/projects/${projectId}/theme-updates/apply`, {
+    const result = await apiFetchJson(`/api/projects/${projectId}/theme-updates/apply`, {
       method: "POST",
     }, { fallbackMessage: "Failed to apply theme update" });
+    // Theme updates change project metadata (themeVersion), so invalidate the list
+    invalidateProjectsListCache();
+    return result;
   } catch (error) {
     rethrowQueryError(error, "Failed to apply theme update");
   }

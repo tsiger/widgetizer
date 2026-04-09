@@ -148,7 +148,7 @@ Prevents data from one project being shown, saved, previewed, or exported agains
 **Client-side (stale-response guards):**
 
 - `pageStore` uses an `activeLoadId` counter to discard late async responses from superseded loads
-- `Settings.jsx` load and save paths use stale-closure guards to drop responses if the project changed during the async operation
+- `themeStore` owns theme-settings load protection via `activeLoadId` and `resetForProjectChange()`, while `Settings.jsx` still guards save completion against project switches
 - `useExportState` and `ExportCreator` guard `loadExportHistory` and export completion against project changes mid-flight
 
 ---

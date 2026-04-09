@@ -334,6 +334,25 @@ Provides comprehensive state management for application-wide settings including 
 
 Used by `AppSettings.jsx` page for managing system-wide configuration that affects all projects and users.
 
+### `useFormatDate` Hook (`src/hooks/useFormatDate.js`)
+
+Formats dates using the current app-level date format from `useAppSettings()`.
+
+#### Purpose
+
+Removes repeated `useAppSettings()` wiring from list/history surfaces that only need to format timestamps for display. The low-level formatting logic still lives in `src/utils/dateFormatter.js`, while this hook provides the app-aware format string and a memoized formatter function.
+
+#### API Reference
+
+**Returns:**
+
+- `dateFormat` (string): The active app-level date format, falling back to `DEFAULT_DATE_FORMAT`
+- `formatDate(date)` (function): Formats a `Date`, ISO string, or timestamp using the current app setting
+
+#### Used In
+
+- Main list/history surfaces such as `Projects.jsx`, `Pages.jsx`, `Menus.jsx`, `ExportHistoryTable.jsx`, and media list rows
+
 ## Theme Locale Hook
 
 ### `useThemeLocale` Hook (`src/hooks/useThemeLocale.js`)

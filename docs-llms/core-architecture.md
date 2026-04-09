@@ -97,7 +97,8 @@ This admin-vs-site split is the main architectural consequence of the recent wor
 
 - `server/utils/semver.js` - `isNewerVersion()` for theme update checks
 - `src/utils/slugUtils.js` - `formatSlug()` for folder name generation
-- `src/utils/dateFormatter.js` - `formatDate()` for display
+- `src/utils/dateFormatter.js` - low-level `formatDate()` implementation
+- `src/hooks/useFormatDate.js` - app-aware date formatting hook for UI display
 
 ---
 
@@ -569,24 +570,22 @@ Design mode detection is injected by `previewController.js` as an inline `<scrip
 
 ### Store (`src/stores/pageStore.js`)
 
-| State                   | Purpose                    |
-| ----------------------- | -------------------------- |
-| `page`                  | Current page data          |
-| `originalPage`          | Saved state for comparison |
-| `globalWidgets`         | Header/footer widgets      |
-| `themeSettings`         | Theme settings             |
-| `originalThemeSettings` | Saved theme settings       |
+| State                   | Purpose                                                  |
+| ----------------------- | -------------------------------------------------------- |
+| `page`                  | Current page data                                        |
+| `originalPage`          | Saved state for comparison                               |
+| `globalWidgets`         | Header/footer widgets                                    |
+| `themeSettingsSnapshot` | Thin theme snapshot used only for editor undo/redo state |
 
-| Action                     | Purpose                     |
-| -------------------------- | --------------------------- |
-| `loadPage(id)`             | Load page, globals, theme   |
-| `loadGlobalWidgets()`      | Fetch header/footer         |
-| `loadThemeSettings()`      | Fetch theme settings        |
-| `setPage(page)`            | Update page state           |
-| `updateGlobalWidget()`     | Update header/footer        |
-| `updateThemeSetting()`     | Update single theme setting |
-| `resetPage()`              | Reset to original           |
-| `hasUnsavedThemeChanges()` | Check for changes           |
+| Action                         | Purpose                                                          |
+| ------------------------------ | ---------------------------------------------------------------- |
+| `loadPage(id)`                 | Load page data, globals, and the canonical theme-store snapshot  |
+| `loadGlobalWidgets()`          | Fetch header/footer                                              |
+| `setPage(page)`                | Update page state                                                |
+| `updateGlobalWidget()`         | Update header/footer                                             |
+| `updateThemeSetting()`         | Forward theme change to `themeStore` and record a history snapshot |
+| `syncThemeStoreFromSnapshot()` | Push restored undo/redo snapshot back to `themeStore`            |
+| `resetPage()`                  | Reset to original                                                |
 
 **Undo/Redo:** Uses `zundo` temporal middleware (50 state limit)
 
@@ -618,7 +617,8 @@ Auto-save and save state:
 PageEditor → pageStore.loadPage(id)
   ├→ getPage(id) → page data
   ├→ loadGlobalWidgets() → header/footer
-  └→ loadThemeSettings() → theme settings
+  └→ themeStore.loadSettings() → canonical theme settings
+      └→ pageStore captures themeSettingsSnapshot for zundo
 → widgetStore.loadSchemas()
 → PreviewPanel.fetchPreview() → initial HTML
 ```
@@ -642,7 +642,7 @@ Save button / Auto-save timer
   ├→ savePageContent()
   ├→ saveGlobalWidget("header")
   ├→ saveGlobalWidget("footer")
-  └→ saveThemeSettings()
+  └→ themeStore.saveSettings()
 → Update original states
 → Clear modification flags
 ```
@@ -656,7 +656,7 @@ Save button / Auto-save timer
 | File                         | Functions                  |
 | ---------------------------- | -------------------------- |
 | `src/utils/slugUtils.js`     | `formatSlug()`             |
-| `src/utils/dateFormatter.js` | `formatDate()`             |
+| `src/utils/dateFormatter.js` | low-level `formatDate()`   |
 | `src/config.js`              | `API_URL()`, `MEDIA_TYPES` (image extensions) |
 
 ### Backend
@@ -678,6 +678,7 @@ Save button / Auto-save timer
 | ------------------------ | --------------------------------------- | ------------------------------------- |
 | `useAppSettings`         | App settings with caching               | Media, Pages, Projects, Export        |
 | `useConfirmationModal`   | Confirmation modal state                | Pages, Menus, Media, Projects, Export |
+| `useFormatDate`          | App-aware date formatting               | Main list/history surfaces            |
 | `useFormNavigationGuard` | Prevent navigation with unsaved changes | All forms                             |
 | `useThemeLocale`         | Fetches the active project's theme locale JSON, provides `tTheme()` resolver for `tTheme:`-prefixed i18n keys | Editor components (SettingsPanel, ThemeSelector, PreviewPanel, BlockList, etc.) |
 | `useToastStore`          | Toast notifications                     | All pages                             |
@@ -690,7 +691,7 @@ Save button / Auto-save timer
 | `toastStore`       | Toast notification state             |
 | `themeUpdateStore` | Theme update count                   |
 | `iconsStore`       | Per-project icon set caching         |
-| `themeStore`       | Theme settings state (Settings page) |
+| `themeStore`       | Canonical per-project theme settings state (Settings + Page Editor) |
 
 ### Shared Navigation Behavior
 
@@ -720,12 +721,16 @@ Save button / Auto-save timer
 | `originalSettings`                               | Settings at load time for change detection |
 | `loading`                                        | Loading state                              |
 | `error`                                          | Error message if loading failed            |
+| `loadedProjectId`                                | Project currently represented by the store |
+| `activeLoadId`                                   | Stale-load guard for superseded requests   |
 | `loadSettings()`                                 | Fetch theme settings from server           |
+| `saveSettings()`                                 | Save via canonical path, including warning-driven reloads |
 | `setSettings(settings)`                          | Update settings object                     |
 | `updateThemeSetting(groupKey, settingId, value)` | Update single setting                      |
 | `resetThemeSettings()`                           | Revert to original state                   |
 | `hasUnsavedThemeChanges()`                       | Check if settings differ from original     |
 | `markThemeSettingsSaved()`                       | Update original after save                 |
+| `resetForProjectChange()`                        | Clear state and invalidate in-flight loads |
 | `reset()`                                        | Clear all state                            |
 
-**Used by:** Settings page for global theme configuration management.
+**Used by:** Settings page as the canonical owner, plus the page editor/save flow. `pageStore` keeps only a snapshot proxy for undo/redo.

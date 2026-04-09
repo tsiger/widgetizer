@@ -183,8 +183,9 @@ When the user switches projects, the app must ensure no data from the previous p
 
 - **All project-scoped screens** (Pages, Settings, PageEditor, PagePreview, PagesEdit, MenusEdit, MenuStructure, Export) include `activeProject?.id` in their effect dependency arrays so they reload on project change
 - **pageStore** uses an `activeLoadId` counter to discard stale async loads. Tracks `loadedProjectId` so `saveStore` can compare before saving.
+- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` plus `resetForProjectChange()` to drop stale loads and clear project-specific state on switches.
 - **widgetStore** resets schemas and selection via `resetForProjectChange()` and reads the project ID internally via `getActiveProjectId()`
-- **Settings.jsx** guards both load and save paths with stale-closure checks
+- **Settings.jsx** now reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but load ownership lives in the store
 - **useExportState / ExportCreator** guard history loads and export completion against project changes mid-flight
 
 ### Known limitation

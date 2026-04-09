@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
 
 vi.mock("../../lib/uploadRequest", () => ({
   uploadFormData: vi.fn(),
@@ -83,5 +83,112 @@ describe("projectManager importProject", () => {
       expect.any(FormData),
       { onProgress: undefined, signal },
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getAllProjects caching
+// ---------------------------------------------------------------------------
+
+describe("projectManager getAllProjects caching", () => {
+  let apiFetchJson;
+  let getAllProjects;
+  let invalidateProjectsListCache;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ apiFetchJson } = await import("../../lib/apiFetch"));
+    ({ getAllProjects, invalidateProjectsListCache } = await import("../projectManager"));
+    apiFetchJson.mockReset();
+  });
+
+  afterEach(() => {
+    // Always invalidate so cache doesn't leak between tests
+    invalidateProjectsListCache();
+  });
+
+  it("returns cached data on a second call within TTL", async () => {
+    const projects = [{ id: "p1", name: "One" }];
+    apiFetchJson.mockResolvedValue(projects);
+
+    const first = await getAllProjects();
+    const second = await getAllProjects();
+
+    expect(first).toEqual(projects);
+    expect(second).toEqual(projects);
+    expect(apiFetchJson).toHaveBeenCalledTimes(1);
+  });
+
+  it("concurrent calls share one in-flight request", async () => {
+    const projects = [{ id: "p1", name: "One" }];
+    apiFetchJson.mockResolvedValue(projects);
+
+    const [a, b] = await Promise.all([getAllProjects(), getAllProjects()]);
+
+    expect(a).toEqual(projects);
+    expect(b).toEqual(projects);
+    expect(apiFetchJson).toHaveBeenCalledTimes(1);
+  });
+
+  it("failed request does not poison future retries", async () => {
+    apiFetchJson.mockRejectedValueOnce(new Error("network"));
+    apiFetchJson.mockResolvedValueOnce([{ id: "p1" }]);
+
+    await expect(getAllProjects()).rejects.toThrow();
+    const result = await getAllProjects();
+
+    expect(result).toEqual([{ id: "p1" }]);
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it("invalidation forces the next call to refetch", async () => {
+    apiFetchJson.mockResolvedValue([{ id: "p1" }]);
+
+    await getAllProjects();
+    expect(apiFetchJson).toHaveBeenCalledTimes(1);
+
+    invalidateProjectsListCache();
+    await getAllProjects();
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it("forceRefresh bypasses valid cache", async () => {
+    apiFetchJson.mockResolvedValue([{ id: "p1" }]);
+
+    await getAllProjects();
+    await getAllProjects({ forceRefresh: true });
+
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it("mid-flight invalidation prevents stale data from repopulating cache", async () => {
+    let resolveFirst;
+    const staleData = [{ id: "p-stale", name: "Stale" }];
+    const freshData = [{ id: "p-fresh", name: "Fresh" }];
+
+    // First call: slow, will resolve with stale data
+    apiFetchJson.mockImplementationOnce(
+      () => new Promise((resolve) => { resolveFirst = resolve; }),
+    );
+
+    const firstPromise = getAllProjects();
+
+    // Invalidate while the first fetch is in-flight (simulates a mutation)
+    invalidateProjectsListCache();
+
+    // Second call: fast, returns fresh data
+    apiFetchJson.mockResolvedValueOnce(freshData);
+    const secondResult = await getAllProjects();
+    expect(secondResult).toEqual(freshData);
+
+    // Now the slow first fetch resolves with stale data
+    resolveFirst(staleData);
+    await firstPromise;
+
+    // The cache should still serve fresh data, not the stale response
+    const thirdResult = await getAllProjects();
+    expect(thirdResult).toEqual(freshData);
+    // Only 2 API calls: the slow one + the fresh one (third hit cache)
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
   });
 });

@@ -3,6 +3,22 @@ import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
 import { getActiveProjectId } from "../lib/activeProjectId";
 import { uploadFormData } from "../lib/uploadRequest";
 
+// ---------------------------------------------------------------------------
+// Lightweight cache for getAllThemes() — single entry (themes are global).
+// A version counter ensures in-flight fetches started before an invalidation
+// cannot write stale data back into the cache.
+// ---------------------------------------------------------------------------
+let themesListCache = { data: null, timestamp: 0, promise: null, version: 0 };
+const THEMES_CACHE_DURATION = 30000; // 30 seconds
+
+/**
+ * Invalidate the themes list cache.
+ * Called automatically by mutation functions after successful writes.
+ */
+export function invalidateThemesListCache() {
+  themesListCache = { data: null, timestamp: 0, promise: null, version: themesListCache.version + 1 };
+}
+
 /**
  * @typedef {Object} Theme
  * @property {string} id - Unique theme identifier
@@ -47,9 +63,50 @@ import { uploadFormData } from "../lib/uploadRequest";
  * @returns {Promise<Theme[]>} Array of theme objects
  * @throws {Error} If the API request fails
  */
-export async function getAllThemes() {
+/**
+ * Fetch all available themes with caching and request deduplication.
+ * @param {{ forceRefresh?: boolean }} [options]
+ * @returns {Promise<Theme[]>} Array of theme objects
+ * @throws {Error} If the API request fails
+ */
+export async function getAllThemes({ forceRefresh } = {}) {
+  const now = Date.now();
+
+  if (!forceRefresh && themesListCache.data && now - themesListCache.timestamp < THEMES_CACHE_DURATION) {
+    return themesListCache.data;
+  }
+
+  if (themesListCache.promise) {
+    try {
+      return await themesListCache.promise;
+    } catch {
+      // Cached promise failed — fall through to retry
+    }
+  }
+
+  // Capture version before the async fetch so we can detect mid-flight invalidation
+  const versionAtStart = themesListCache.version;
+
+  const fetchPromise = (async () => {
+    try {
+      const data = await apiFetchJson("/api/themes", {}, { fallbackMessage: "Failed to get themes" });
+      // Only populate cache if no invalidation occurred since this fetch started
+      if (themesListCache.version === versionAtStart) {
+        themesListCache = { data, timestamp: Date.now(), promise: null, version: versionAtStart };
+      }
+      return data;
+    } catch (error) {
+      if (themesListCache.version === versionAtStart) {
+        themesListCache = { ...themesListCache, promise: null };
+      }
+      throw error;
+    }
+  })();
+
+  themesListCache = { ...themesListCache, promise: fetchPromise };
+
   try {
-    return await apiFetchJson("/api/themes", {}, { fallbackMessage: "Failed to get themes" });
+    return await fetchPromise;
   } catch (error) {
     console.error("Error getting themes:", error);
     rethrowQueryError(error, "Failed to get themes");
@@ -178,6 +235,7 @@ export async function uploadThemeZip(zipFile, onProgress) {
     const response = await uploadFormData("/api/themes/upload", formData, { onProgress });
     const data = response.data || {};
 
+    invalidateThemesListCache();
     return {
       ...data,
       processedFiles: data.theme ? [data.theme] : [],
@@ -236,9 +294,11 @@ export async function getThemeUpdateCount() {
  */
 export async function updateTheme(themeId) {
   try {
-    return await apiFetchJson(`/api/themes/${themeId}/update`, {
+    const result = await apiFetchJson(`/api/themes/${themeId}/update`, {
       method: "POST",
     }, { fallbackMessage: "Failed to update theme" });
+    invalidateThemesListCache();
+    return result;
   } catch (error) {
     console.error("Error updating theme:", error);
     rethrowQueryError(error, "Failed to update theme");
@@ -254,9 +314,11 @@ export async function updateTheme(themeId) {
  */
 export async function deleteTheme(themeId) {
   try {
-    return await apiFetchJson(`/api/themes/${themeId}`, {
+    const result = await apiFetchJson(`/api/themes/${themeId}`, {
       method: "DELETE",
     }, { fallbackMessage: "Failed to delete theme" });
+    invalidateThemesListCache();
+    return result;
   } catch (error) {
     console.error("Error deleting theme:", error);
     rethrowQueryError(error, "Failed to delete theme");

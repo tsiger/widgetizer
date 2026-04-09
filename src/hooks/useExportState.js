@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getExportHistory } from "../queries/exportManager";
+import { createAsyncRequestGate } from "../lib/asyncRequestGate";
 import useProjectStore from "../stores/projectStore";
 import useToastStore from "../stores/toastStore";
 
@@ -17,14 +18,6 @@ import useToastStore from "../stores/toastStore";
  *   maxVersionsToKeep: number,
  *   loadExportHistory: (projectId: string) => Promise<void>
  * }} Export state and actions
- * @property {Object|null} activeProject - The currently active project
- * @property {Object|null} lastExport - The most recent export details
- * @property {Function} setLastExport - Update the last export state
- * @property {Array} exportHistory - List of previous exports for the project
- * @property {Function} setExportHistory - Update the export history list
- * @property {boolean} loadingHistory - Whether export history is being loaded
- * @property {number} maxVersionsToKeep - Maximum number of export versions to retain
- * @property {Function} loadExportHistory - Fetch export history for a given project ID
  */
 export default function useExportState() {
   const [lastExport, setLastExport] = useState(null);
@@ -34,6 +27,10 @@ export default function useExportState() {
 
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
+
+  // Gate for the effect-driven initial load — start/invalidate replaces the
+  // closure `stale` boolean so late responses are safely dropped.
+  const gateRef = useRef(createAsyncRequestGate());
 
   // Load export history — guards against stale responses when called
   // after an export completes and the active project has changed since.
@@ -52,9 +49,7 @@ export default function useExportState() {
     } catch (error) {
       if (useProjectStore.getState().activeProject?.id !== projectId) return;
       console.error("Failed to load export history:", error);
-      // Don't show toast for this as it's not critical
     } finally {
-      // Only clear loading if this request is still relevant to the active project
       if (useProjectStore.getState().activeProject?.id === projectId) {
         setLoadingHistory(false);
       }
@@ -69,28 +64,29 @@ export default function useExportState() {
       return;
     }
 
-    let stale = false;
+    const gate = gateRef.current;
+    const token = gate.start();
     const projectId = activeProject.id;
 
     setLoadingHistory(true);
     getExportHistory(projectId)
       .then((result) => {
-        if (stale) return;
+        if (!gate.isCurrent(token)) return;
         setExportHistory(result.exports || []);
         if (result.maxVersionsToKeep) {
           setMaxVersionsToKeep(result.maxVersionsToKeep);
         }
       })
       .catch((err) => {
-        if (stale) return;
+        if (!gate.isCurrent(token)) return;
         console.error("Failed to fetch export history:", err);
         showToast("Could not load active project details.", "error");
       })
       .finally(() => {
-        if (!stale) setLoadingHistory(false);
+        if (gate.isCurrent(token)) setLoadingHistory(false);
       });
 
-    return () => { stale = true; };
+    return () => gate.invalidate();
   }, [activeProject?.id, showToast]);
 
   return {

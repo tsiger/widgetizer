@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../lib/uploadRequest", () => ({
   uploadFormData: vi.fn(),
@@ -101,5 +101,105 @@ describe("themeManager saveThemeSettings", () => {
       status: 409,
       data: { code: "PROJECT_MISMATCH" },
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getAllThemes caching
+// ---------------------------------------------------------------------------
+
+describe("themeManager getAllThemes caching", () => {
+  let apiFetchJson;
+  let getAllThemes;
+  let invalidateThemesListCache;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ apiFetchJson } = await import("../../lib/apiFetch"));
+    ({ getAllThemes, invalidateThemesListCache } = await import("../themeManager"));
+    apiFetchJson.mockReset();
+  });
+
+  afterEach(() => {
+    invalidateThemesListCache();
+  });
+
+  it("returns cached data on a second call within TTL", async () => {
+    const themes = [{ id: "arch", name: "Arch" }];
+    apiFetchJson.mockResolvedValue(themes);
+
+    const first = await getAllThemes();
+    const second = await getAllThemes();
+
+    expect(first).toEqual(themes);
+    expect(second).toEqual(themes);
+    expect(apiFetchJson).toHaveBeenCalledTimes(1);
+  });
+
+  it("concurrent calls share one in-flight request", async () => {
+    const themes = [{ id: "arch", name: "Arch" }];
+    apiFetchJson.mockResolvedValue(themes);
+
+    const [a, b] = await Promise.all([getAllThemes(), getAllThemes()]);
+
+    expect(a).toEqual(themes);
+    expect(b).toEqual(themes);
+    expect(apiFetchJson).toHaveBeenCalledTimes(1);
+  });
+
+  it("failed request does not poison future retries", async () => {
+    apiFetchJson.mockRejectedValueOnce(new Error("network"));
+    apiFetchJson.mockResolvedValueOnce([{ id: "arch" }]);
+
+    await expect(getAllThemes()).rejects.toThrow();
+    const result = await getAllThemes();
+
+    expect(result).toEqual([{ id: "arch" }]);
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it("invalidation forces the next call to refetch", async () => {
+    apiFetchJson.mockResolvedValue([{ id: "arch" }]);
+
+    await getAllThemes();
+    expect(apiFetchJson).toHaveBeenCalledTimes(1);
+
+    invalidateThemesListCache();
+    await getAllThemes();
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it("forceRefresh bypasses valid cache", async () => {
+    apiFetchJson.mockResolvedValue([{ id: "arch" }]);
+
+    await getAllThemes();
+    await getAllThemes({ forceRefresh: true });
+
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it("mid-flight invalidation prevents stale data from repopulating cache", async () => {
+    let resolveFirst;
+    const staleData = [{ id: "stale-theme" }];
+    const freshData = [{ id: "fresh-theme" }];
+
+    apiFetchJson.mockImplementationOnce(
+      () => new Promise((resolve) => { resolveFirst = resolve; }),
+    );
+
+    const firstPromise = getAllThemes();
+
+    invalidateThemesListCache();
+
+    apiFetchJson.mockResolvedValueOnce(freshData);
+    const secondResult = await getAllThemes();
+    expect(secondResult).toEqual(freshData);
+
+    resolveFirst(staleData);
+    await firstPromise;
+
+    const thirdResult = await getAllThemes();
+    expect(thirdResult).toEqual(freshData);
+    expect(apiFetchJson).toHaveBeenCalledTimes(2);
   });
 });

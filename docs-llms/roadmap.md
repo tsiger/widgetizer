@@ -12,6 +12,8 @@ This file combines the first-release readiness checklist with the post-`v1` back
 - Media usage tracking is now coupled more closely to page persistence, and structural flows such as create, duplicate, import, and theme-update apply trigger refresh paths so usage data is less likely to drift.
 - Date formatting now goes through a shared `useFormatDate()` hook in the main list/history surfaces, so components no longer repeat the same app-settings wiring around `formatDate()`.
 - Theme settings are now centralized in a dedicated `themeStore` that is the canonical owner of per-project theme data. The Settings page and page editor both read/write through this shared store. The editor keeps a thin proxy snapshot in `pageStore` for undo/redo only. The save flow delegates to `themeStore.saveSettings()` so server-side corrections are handled consistently. Project-switch and load-failure paths clear stale data and invalidate in-flight requests.
+- Frontend async protection now has a small shared request-gate primitive, and the export flow uses it instead of one-off stale booleans.
+- `getAllProjects()` and `getAllThemes()` now use lightweight cached query wrappers with TTLs, request deduplication, mutation-driven invalidation, and protection against stale in-flight responses repopulating cache after invalidation.
 - Recent hardening around project resolution, API error semantics, theme metadata lookups, and media usage persistence reduces the risk that the first Electron release is blocked by architecture alone.
 
 ## `v1` Release Gate
@@ -41,32 +43,25 @@ This file combines the first-release readiness checklist with the post-`v1` back
 
 - Introduce a proper project-scoped boundary so a project switch remounts or resets project-owned UI more centrally.
 - Consolidate project-switch cleanup into a single orchestration layer instead of scattered component/store fixes.
-- Standardize async request protection with one shared pattern instead of ad hoc stale guards, even though several high-risk paths already have targeted protections now.
 - Expand regression coverage specifically around project switching and stale async completions.
 - Consider moving more project-scoped fetching/caching to a stronger central data layer if that still feels painful after release.
 
 ### Ordered backlog
 
-1. Frontend query caching for `getAllProjects()` and `getAllThemes()`
-Add lightweight caching and invalidation for the project/theme list queries, following the same project-switch safety rules used elsewhere.
-
-2. Build a form-page abstraction around `useFormNavigationGuard()`
+1. Build a form-page abstraction around `useFormNavigationGuard()`
 Reduce repeated form-page boilerplate such as `skipGuardRef`, dirty-state guards, and shared save/cancel flow handling.
 
-3. Refactor widget/block operations in `src/stores/widgetStore.js`
+2. Refactor widget/block operations in `src/stores/widgetStore.js`
 Extract shared helpers for add/remove/duplicate/reorder flows so widget and block logic stops diverging.
 
-4. Add a shared stale-async / project-switch helper
-Standardize the guard pattern used around settings, export, and editor async flows so late responses cannot overwrite state after the active project changes.
-
-5. Add a higher-level semver/update-status helper
+3. Add a higher-level semver/update-status helper
 Wrap repeated version comparison logic in a single helper such as `getUpdateStatus(projectVersion, themeVersion)`.
 
-6. Keep slug and ID generation fully disciplined
+4. Keep slug and ID generation fully disciplined
 Continue routing all new slug and identifier creation paths through `generateUniqueSlug()` to avoid regressions.
 
-7. Consider a higher-level list-page pattern for confirmation flows
+5. Consider a higher-level list-page pattern for confirmation flows
 `useConfirmationModal()` already removed the main duplication, but list pages may still benefit from a more unified delete/action pattern.
 
-8. Prepare for a future TypeScript migration
+6. Prepare for a future TypeScript migration
 Define shared response/domain types, tighten object-shape consistency, and keep expanding JSDoc coverage before any TS conversion begins.

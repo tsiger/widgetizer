@@ -35,7 +35,8 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 - **`useProjectStore`**: Manages the currently active project. The editor requires an active project to know which database or context to load the page from.
 - **`usePageStore`**: Responsible for fetching and holding the core page data itself, including its name and the top-level list of widgets it contains.
 - **`useWidgetStore`**: Manages all state related to widgets. This includes loading the available widget schemas, tracking the currently selected widget/block, and handling all actions for manipulating widgets and blocks (add, delete, update settings, reorder, etc.).
-- **`usePageStore`**: Also holds `themeSettings` and `globalWidgets` used by the editor and preview pipeline, in addition to the current page data itself.
+- **`useThemeStore`**: Canonical owner of theme settings for the active project. Both the Settings page and the editor read/write through this store.
+- **`usePageStore`**: Also holds `globalWidgets` plus a thin `themeSettingsSnapshot` used only so theme edits participate in the editor's unified undo/redo history.
 - **`saveStore.js`** (exported as `useAutoSave`): A critical store that manages the saving mechanism. It tracks whether there are unsaved changes and performs automatic background saves, reducing the need for constant manual saving.
 
 ## Core Workflows
@@ -45,7 +46,7 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 1.  The `PageEditor` mounts and reads the `pageId` from the URL search parameters.
 2.  A `useEffect` hook, dependent on the `pageId` and an `activeProject`, triggers the data loading functions from the relevant stores.
 3.  It calls `usePageStore.getState().loadPage(pageId)` to fetch the page structure.
-4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()` and the page-store loading actions that fetch theme/global data needed by the editor and preview.
+4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo.
 5.  While data is being fetched, `LoadingSpinner` components are displayed to inform the user.
 
 ### Editing a Widget
@@ -94,7 +95,7 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 The editor is designed to save changes automatically, providing a seamless user experience.
 
 1.  Most actions that alter page data—such as editing a setting, adding a widget, or reordering the list—also call a corresponding function on the `useAutoSave` store (e.g., `markWidgetModified`, `setStructureModified`).
-2.  These functions set an internal `hasUnsavedChanges` flag to `true`, which is reflected in the `EditorTopBar` UI (e.g., the "Save" button becomes enabled). The system also performs deep comparison between current and original states to ensure the flag correctly reflects changes after undo/redo operations.
+2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations.
 3.  The `useAutoSave` store implements a **debounced auto-save** strategy. Instead of a fixed interval, a 60-second timer is reset on every modification. This ensures that auto-saving only occurs after a period of inactivity, providing a smoother experience.
 4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar` (or use the `Ctrl+S` / `Cmd+S` shortcut), which directly invokes the `save()` action.
 
@@ -102,11 +103,11 @@ The editor is designed to save changes automatically, providing a seamless user 
 
 The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zustand temporal state management).
 
-- **Implementation**: The `usePageStore` is wrapped with `temporal` middleware to track changes to the page content.
+- **Implementation**: The `usePageStore` is wrapped with `temporal` middleware to track page content, global widgets, and a theme snapshot.
 - **Tracked Data**:
   - `page`: All widget settings and top-level page metadata.
   - `globalWidgets`: Changes to the header and footer widgets.
-  - `themeSettings`: Theme-wide settings (only when edited within the Page Editor).
+  - `themeSettingsSnapshot`: Theme-wide settings snapshot stored only for editor history; undo/redo pushes the restored snapshot back into `themeStore`.
 - **UI Controls**: The `EditorTopBar` includes Undo and Redo buttons that reflect the current history state.
 - **Keyboard Shortcuts**:
   - `Ctrl+Z` (or `Cmd+Z`): Undo
