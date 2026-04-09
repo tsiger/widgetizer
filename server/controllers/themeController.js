@@ -8,7 +8,6 @@ import {
   getThemesDir,
   getThemeDir,
   getThemeJsonPath,
-  getThemeWidgetsDir,
   getThemeUpdatesDir,
   getThemeLatestDir,
   getThemeVersionDir,

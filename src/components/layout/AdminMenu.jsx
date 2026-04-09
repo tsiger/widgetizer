@@ -35,14 +35,14 @@ export default function AdminMenu({ activeProject }) {
   }, []);
 
   useEffect(() => {
-    if (!activeProject) return;
+    if (!activeProject?.id) return;
     fetchUpdateCount();
   }, [activeProject?.id, fetchUpdateCount]);
 
   useEffect(() => {
-    if (!activeProject || !isOpen) return;
+    if (!activeProject?.id || !isOpen) return;
     fetchUpdateCount();
-  }, [activeProject, isOpen, fetchUpdateCount]);
+  }, [activeProject?.id, isOpen, fetchUpdateCount]);
 
   const isProjectsActive = location.pathname.startsWith("/projects");
   const isThemesActive = location.pathname.startsWith("/themes");

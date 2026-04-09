@@ -187,7 +187,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
     setPreviewSrc(null);
     setError(null);
     setInitialLoadComplete(false);
-    setLoading(Boolean(page));
+    setLoading(Boolean(page?.id));
   }, [activeProject?.id, page?.id, runtimeMode]);
 
   // Detect structural changes during render (before child effects fire).
