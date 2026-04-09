@@ -13,7 +13,7 @@ This architecture decouples the project's identity from its filesystem represent
 
 ### 1. Stable Identity (Project ID)
 
-- Generated once using `uuid.v4()` during project creation
+- Generated once using `randomUUID()` during project creation
 - Never changes throughout the project's lifetime
 - Used for:
   - API endpoints (`/api/projects/:projectId`)
@@ -23,7 +23,7 @@ This architecture decouples the project's identity from its filesystem represent
 
 ### 2. Mutable Filesystem Path (Project FolderName)
 
-- Generated from the project name using `slugify()`
+- Generated from the project name using the shared backend slug helper path (`generateUniqueSlug()` / `sanitizeSlug()`)
 - Can change when the project is renamed
 - Stored as `project.folderName` in the SQLite `projects` table
 - Used for:
@@ -40,13 +40,14 @@ This architecture decouples the project's identity from its filesystem represent
 - `createProject()`: Generates both UUID and folderName
 - `updateProject()`: Handles folderName changes and directory renaming
 - `duplicateProject()`: Creates new UUID but derives folderName from name
+- `importProject()`: Generates a unique folderName through the same shared uniqueness helper path
 
 **Pattern:**
 
 ```javascript
 const newProject = {
-  id: uuidv4(), // Stable UUID
-  folderName: slugify(name), // Filesystem identifier
+  id: randomUUID(), // Stable UUID
+  folderName: await generateUniqueSlug(name, existsCheck), // Filesystem identifier
   name,
   // ...
 };

@@ -1,61 +1,72 @@
 # Roadmap
 
-This file combines the first-release readiness checklist with the post-`v1` backlog.
+This file now focuses on the remaining release decisions rather than preserving the full history of completed cleanup work.
 
-## Current Position
+## `v1` Verdict
 
-### Already improved
+Widgetizer looks good enough to release from an architecture and code-health perspective.
 
-- Active-project enforcement is now much stronger: project-scoped backend routes use shared resolution/mismatch handling, frontend requests auto-attach the active project ID, and structured `PROJECT_MISMATCH` responses are preserved instead of being flattened away.
-- Frontend query modules now share one response/error-handling path, which keeps validation errors, import/upload error payloads, and project-mismatch metadata intact across the app.
-- Theme source resolution and theme metadata reads were tightened up with shared helpers plus cache invalidation, reducing repeated filesystem reads in project/theme listing and update-check flows.
-- Media usage tracking is now coupled more closely to page persistence, and structural flows such as create, duplicate, import, and theme-update apply trigger refresh paths so usage data is less likely to drift.
-- Date formatting now goes through a shared `useFormatDate()` hook in the main list/history surfaces, so components no longer repeat the same app-settings wiring around `formatDate()`.
-- Theme settings are now centralized in a dedicated `themeStore` that is the canonical owner of per-project theme data. The Settings page and page editor both read/write through this shared store. The editor keeps a thin proxy snapshot in `pageStore` for undo/redo only. The save flow delegates to `themeStore.saveSettings()` so server-side corrections are handled consistently. Project-switch and load-failure paths clear stale data and invalidate in-flight requests.
-- Frontend async protection now has a small shared request-gate primitive, and the export flow uses it instead of one-off stale booleans.
-- `getAllProjects()` and `getAllThemes()` now use lightweight cached query wrappers with TTLs, request deduplication, mutation-driven invalidation, and protection against stale in-flight responses repopulating cache after invalidation.
-- Form pages now share a small `useGuardedFormPage()` abstraction on top of `useFormNavigationGuard()`, which removes repeated dirty-title wiring and one-shot intentional-navigation bypass logic across add/edit/settings flows.
-- List and destructive-action surfaces now share a small `useConfirmationAction()` helper, reducing repeated confirmation-modal wiring across project, page, menu, theme, and export-history screens.
-- `widgetStore` now uses extracted pure helpers for ordered insert/remove logic, default payload construction, cloning, and selection fallback, reducing duplication between widget and block operations while keeping editor behavior stable.
-- Recent hardening around project resolution, API error semantics, theme metadata lookups, and media usage persistence reduces the risk that the first Electron release is blocked by architecture alone.
+The remaining risk is mostly verification risk, not "we still need another major refactor" risk.
 
-## `v1` Release Gate
+That means:
 
-### Must verify before release
+- **Architecture verdict:** good enough for `v1`
+- **Release verdict:** ship after a focused manual validation pass
+- **Not worth doing before `v1`:** another broad structural cleanup just because there is time
 
-- Even with the newer active-project protections, verify that project switching cannot show, save, preview, export, or otherwise operate on data from the wrong project.
-- Manually test the highest-risk flows while switching projects mid-action: page editor, theme settings, preview, media, export, and any autosave behavior.
+## Must Verify Before Release
+
+- Verify that project switching cannot show, save, preview, export, or otherwise operate on data from the wrong project.
+- Manually test the highest-risk flows while switching projects mid-action:
+  - page editor
+  - theme settings
+  - preview
+  - media
+  - export
+  - any autosave behavior
 - Make sure import/export works on real projects, not just happy-path local test data.
-- Verify packaged Electron startup on a clean machine: first launch, data directory creation, default project behavior, and recovery when local app data already exists.
-- Test upgrade safety for local users: opening an older local project, importing an older exported project, and preserving data/settings across app version changes.
+- Verify packaged Electron startup on a clean machine:
+  - first launch
+  - data directory creation
+  - default project behavior
+  - recovery when local app data already exists
+- Test upgrade safety for local users:
+  - opening an older local project
+  - importing an older exported project
+  - preserving data/settings across app version changes
 - Make sure the installer/update path is predictable on the target OSes you plan to support first, especially Windows if that is the primary release target.
 - Add a short "known limitations" section to the README if any project-switch edge cases, import caveats, or platform-specific issues still exist.
 
-### Good enough to ship
+## Good Enough To Ship
 
 - Current folder structure and app boundaries are good enough for public release.
-- Hybrid storage choice is reasonable and understandable for contributors.
-- Theme system is ambitious but coherent enough for others to explore and extend.
+- Hybrid storage is a reasonable and understandable choice for contributors.
+- The theme system is ambitious but coherent enough for others to explore and extend.
 - Existing docs and tests are already above the bar for many first open-source desktop releases.
 - Localized fixes are acceptable for `v1` as long as behavior is stable and data is safe.
-- For a single-user local desktop app, lack of centralized project-switch orchestration is more of a maintainability problem than a release blocker.
+- For a single-user local desktop app, the remaining lack of fully centralized project-switch orchestration is more of a maintainability problem than a release blocker.
 
-## Post-`v1` Roadmap
+## Best Use Of Extra Time
 
-### `v1.1` direction
+If there is still time before release, the most valuable remaining work is:
 
-- Introduce a proper project-scoped boundary so a project switch remounts or resets project-owned UI more centrally.
-- Consolidate project-switch cleanup into a single orchestration layer instead of scattered component/store fixes.
-- Expand regression coverage specifically around project switching and stale async completions.
-- Consider moving more project-scoped fetching/caching to a stronger central data layer if that still feels painful after release.
+1. Expand regression coverage specifically around project switching and stale async completions.
+2. Add a small project-scoped boundary so project switches remount or reset more project-owned UI centrally.
+3. Consolidate more project-switch cleanup into one orchestration path instead of relying on scattered component/store resets.
 
-### Ordered backlog
+## Save For After `v1`
 
-1. Add a higher-level semver/update-status helper
-Wrap repeated version comparison logic in a single helper such as `getUpdateStatus(projectVersion, themeVersion)`.
+- Moving more project-scoped fetching/caching to a stronger central data layer, if project-scoped state still feels painful after release.
+- Any broader architectural cleanup that does not directly improve release safety.
 
-2. Keep slug and ID generation fully disciplined
-Continue routing all new slug and identifier creation paths through `generateUniqueSlug()` to avoid regressions.
+## Deferred TypeScript Prep
 
-3. Prepare for a future TypeScript migration
-Define shared response/domain types, tighten object-shape consistency, and keep expanding JSDoc coverage before any TS conversion begins.
+TypeScript preparation is intentionally not active right now.
+
+If it comes back later, start with:
+
+- defining shared response/domain types
+- tightening object-shape consistency across controllers, queries, and stores
+- expanding useful JSDoc coverage
+
+Do not start with a direct conversion push.

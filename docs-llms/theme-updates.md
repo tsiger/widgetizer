@@ -342,6 +342,7 @@ Projects track theme update information:
 - `server/controllers/themeController.js` - Theme CRUD and snapshot building
 - `server/services/themeUpdateService.js` - Project update logic and settings merge
 - `server/utils/semver.js` - Version parsing and comparison
+- `server/utils/updateStatus.js` - Shared update-status shaping on top of semver comparison
 
 ---
 

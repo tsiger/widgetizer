@@ -10,7 +10,7 @@ import {
   getProjectMenusDir,
   getThemeDir,
 } from "../config.js";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -194,7 +194,7 @@ export async function createProject(req, res) {
     }
 
     const newProject = {
-      id: uuidv4(), // ✅ Generate stable UUID
+      id: randomUUID(), // ✅ Generate stable UUID
       folderName, // Folder identifier
       name,
       description,
@@ -218,7 +218,7 @@ export async function createProject(req, res) {
           ...template,
           ...(template.type !== "header" && template.type !== "footer"
             ? {
-                uuid: uuidv4(),
+                uuid: randomUUID(),
                 id: slug,
                 slug,
                 created: new Date().toISOString(),
@@ -455,7 +455,7 @@ export async function duplicateProject(req, res) {
     // Create the new project metadata
     const newProject = {
       ...originalProject,
-      id: uuidv4(),
+      id: randomUUID(),
       folderName: newFolderName,
       slug: undefined,
       name: newName,
@@ -499,7 +499,7 @@ export async function duplicateProject(req, res) {
       if (originalMedia.files && originalMedia.files.length > 0) {
         // Regenerate media file IDs to avoid UNIQUE constraint conflicts
         for (const file of originalMedia.files) {
-          file.id = uuidv4();
+          file.id = randomUUID();
         }
         mediaRepo.writeMediaData(newProject.id, originalMedia);
       }
@@ -908,21 +908,13 @@ export async function importProject(req, res) {
       });
     }
 
-    // Generate unique folderName (checking DB and existing directories)
-    let folderName = await generateUniqueSlug(manifest.project.name, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
-
-    // Also check if directory already exists and generate unique name if needed
-    let projectDir = getProjectDir(folderName);
-    let counter = 1;
-    while (await fs.pathExists(projectDir)) {
-      const baseFolderName = folderName;
-      folderName = `${baseFolderName}-${counter}`;
-      projectDir = getProjectDir(folderName);
-      counter++;
-      if (counter > 1000) {
-        throw new Error("Unable to generate unique folder name after 1000 attempts");
-      }
-    }
+    // Generate unique folderName (checking both DB metadata and filesystem)
+    const folderName = await generateUniqueSlug(
+      manifest.project.name,
+      async (slug) => projectRepo.projectFolderExists(slug, null) || await fs.pathExists(getProjectDir(slug)),
+      { fallback: "project" },
+    );
+    const projectDir = getProjectDir(folderName);
 
     // Create temporary extraction directory
     const tempDir = path.join(DATA_DIR, "temp", `import-${Date.now()}`);
@@ -956,7 +948,7 @@ export async function importProject(req, res) {
 
       // Create new project object (but don't add to projects.json yet)
       newProject = {
-        id: uuidv4(),
+        id: randomUUID(),
         folderName,
         name: manifest.project.name,
         description: manifest.project.description || "",
@@ -1006,7 +998,7 @@ export async function importProject(req, res) {
             // Regenerate media file IDs to avoid UNIQUE constraint conflicts
             // (the original project may still exist in the database)
             for (const file of mediaData.files) {
-              file.id = uuidv4();
+              file.id = randomUUID();
             }
             mediaRepo.writeMediaData(newProject.id, mediaData);
           }

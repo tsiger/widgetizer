@@ -1,12 +1,11 @@
 import fs from "fs-extra";
-import slugify from "slugify";
 import { randomUUID } from "crypto";
 import { getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
 import path from "path";
 import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
 import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
-import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 
 
@@ -191,10 +190,9 @@ export async function updatePage(req, res) {
         (slug) => fs.pathExists(getPagePath(projectFolderName, slug)),
       );
     } else {
-      // Sanitize the provided slug if it exists
-      desiredNewSlug = slugify(desiredNewSlug, { lower: true, strict: true });
+      // Sanitize the provided slug through the shared helper
+      desiredNewSlug = sanitizeSlug(desiredNewSlug);
       if (!desiredNewSlug) {
-        // Handle case where slug becomes empty after slugify
         return res
           .status(400)
           .json({ error: "Invalid slug provided. Slug cannot be empty or contain only invalid characters." });

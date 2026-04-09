@@ -97,7 +97,8 @@ This admin-vs-site split is the main architectural consequence of the recent wor
 
 ### Utils Used
 
-- `server/utils/semver.js` - `isNewerVersion()` for theme update checks
+- `server/utils/semver.js` - low-level semver parsing/comparison helpers
+- `server/utils/updateStatus.js` - higher-level update-status helpers such as `getUpdateStatus()` / `hasAvailableUpdate()` for theme/project update checks
 - `src/utils/slugUtils.js` - `formatSlug()` for folder name generation
 - `src/utils/dateFormatter.js` - low-level `formatDate()` implementation
 - `src/hooks/useFormatDate.js` - app-aware date formatting hook for UI display
@@ -163,6 +164,7 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 
 ### Internal Helpers
 
+- `sanitizeSlug(value, fallback?)` - Normalize backend slug input with one shared rule set
 - `generateUniqueSlug(baseName, existsCheck, options)` - Generate unique slug
 - `listProjectPagesData(projectFolderName)` - List and read all page files
 
@@ -366,6 +368,9 @@ When a project theme update is applied successfully, the frontend invalidates th
   - `isNewerVersion()` - Check if newer
   - `sortVersions()` - Sort ascending
   - `getLatestVersion()` - Get latest from array
+- `server/utils/updateStatus.js`:
+  - `getUpdateStatus()` - Derive richer update-status objects from current/available versions
+  - `hasAvailableUpdate()` - Lightweight boolean check for project/theme update availability
 - `server/utils/themeHelpers.js`:
   - `preprocessThemeSettings()` - Transform settings for access
 - `scripts/validate-theme-locales.js` + `validate-theme-locales-helpers.js`:

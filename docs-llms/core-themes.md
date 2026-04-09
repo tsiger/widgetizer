@@ -220,6 +220,11 @@ The backend handles the logic for listing themes, processing uploads, and managi
 - `getLatestVersion(versions)`: Returns highest version
 - `isNewerVersion(current, candidate)`: Checks if candidate > current
 
+### Update Status Helpers (`server/utils/updateStatus.js`)
+
+- `getUpdateStatus(currentVersion, availableVersion)`: Builds a richer update-status object on top of semver utilities
+- `hasAvailableUpdate(currentVersion, availableVersion)`: Lightweight boolean check used by project/theme update listing paths
+
 ### Theme Update Service (`server/services/themeUpdateService.js`)
 
 Handles applying theme updates to projects:

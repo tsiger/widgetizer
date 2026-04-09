@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import { getProjectPagesDir, getProjectMenusDir } from "../config.js";
 
 // ---------------------------------------------------------------------------
@@ -174,7 +174,7 @@ export async function enrichNewProjectReferences(projectFolderName) {
           const enrichedMenu = {
             ...menu,
             id: menuSlug,
-            uuid: menu.uuid || uuidv4(),
+            uuid: menu.uuid || randomUUID(),
             items: enrichedItems,
             created: new Date().toISOString(),
             updated: new Date().toISOString(),
@@ -264,7 +264,7 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     if (page.type === "header" || page.type === "footer") continue;
 
     const oldUuid = page.uuid;
-    const newUuid = uuidv4();
+    const newUuid = randomUUID();
     oldToNewUuid.set(oldUuid, newUuid);
 
     page.uuid = newUuid;
@@ -282,11 +282,11 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
       const menu = JSON.parse(content);
 
       if (menu.uuid) {
-        const newMenuUuid = uuidv4();
+        const newMenuUuid = randomUUID();
         oldToNewMenuUuid.set(menu.uuid, newMenuUuid);
         menu.uuid = newMenuUuid;
       } else {
-        menu.uuid = uuidv4();
+        menu.uuid = randomUUID();
       }
 
       menu.items = processMenuItems(menu.items, (item) => {

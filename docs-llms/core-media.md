@@ -300,7 +300,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 - **File Upload (`multer` + `uploadProjectMedia`)**:
   1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (`data/projects/{folderName}/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the size limit (`media.maxFileSizeMB`).
-  3.  For each valid file, it generates a unique ID (`uuidv4`).
+  3.  For each valid file, it generates a unique persistent media ID (currently still using UUID-format values; this path is being normalized with the rest of the backend identifier cleanup).
   4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.
   5.  If the file is an image (not an SVG), it uses the `sharp` library to:
       - Read the original `width` and `height`.
