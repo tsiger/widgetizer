@@ -323,6 +323,15 @@ export default function DebugStatePanel() {
     }
   };
 
+  const handleShowToastVariants = () => {
+    const { showToast, clearToasts } = useToastStore.getState();
+    clearToasts();
+    showToast("Success toast preview", "success", { duration: null, id: "debug-toast-success" });
+    showToast("Error toast preview", "error", { duration: null, id: "debug-toast-error" });
+    showToast("Warning toast preview", "warning", { duration: null, id: "debug-toast-warning" });
+    showToast("Info toast preview", "info", { duration: null, id: "debug-toast-info" });
+  };
+
   if (!isOpen) {
     return (
       <button
@@ -345,6 +354,13 @@ export default function DebugStatePanel() {
           <p className="mt-1 text-[11px] text-slate-400">Ctrl+Shift+D toggles this panel.</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleShowToastVariants}
+            className="inline-flex items-center gap-1 rounded border border-slate-700 px-2 py-1 text-[11px] font-medium text-slate-200 hover:bg-slate-900"
+          >
+            Demo Toasts
+          </button>
           <button
             type="button"
             onClick={handleCopySnapshot}

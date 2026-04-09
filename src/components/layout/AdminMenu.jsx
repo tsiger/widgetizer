@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, FolderOpen, Palette, Settings2 } from "lucide-react";
+import { ChevronDown, FolderOpen, Palette, Pencil, Settings2 } from "lucide-react";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
 
 export default function AdminMenu({ activeProject }) {
@@ -44,6 +44,7 @@ export default function AdminMenu({ activeProject }) {
     fetchUpdateCount();
   }, [activeProject?.id, isOpen, fetchUpdateCount]);
 
+  const isProjectDetailsActive = activeProject && location.pathname === `/projects/edit/${activeProject.id}`;
   const isProjectsActive = location.pathname.startsWith("/projects");
   const isThemesActive = location.pathname.startsWith("/themes");
   const isAppSettingsActive = location.pathname.startsWith("/app-settings");
@@ -80,6 +81,20 @@ export default function AdminMenu({ activeProject }) {
 
       {isOpen && (
         <div className="absolute right-0 top-full z-30 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 shadow-xl">
+          {activeProject && (
+            <>
+              <Link
+                to={`/projects/edit/${activeProject.id}`}
+                className={itemClass(isProjectDetailsActive)}
+                onClick={() => setIsOpen(false)}
+              >
+                <Pencil size={16} />
+                <span>{t("navigation.projectDetails", "Project details")}</span>
+              </Link>
+              <div className="my-1 border-t border-slate-200" />
+            </>
+          )}
+
           <Link to="/projects" className={itemClass(isProjectsActive)} onClick={() => setIsOpen(false)}>
             <FolderOpen size={16} />
             <span>{t("navigation.projects")}</span>
