@@ -10,6 +10,7 @@ import PreviewPanel from "../components/pageEditor/PreviewPanel";
 import { isStandalonePreviewNavigationUrl } from "../utils/previewLinkUtils";
 
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import DebugStatePanel from "../components/dev/DebugStatePanel";
 
 export default function PagePreview() {
   const { t } = useTranslation();
@@ -64,6 +65,7 @@ export default function PagePreview() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <DebugStatePanel />
       <div className="bg-white border-b border-slate-200 p-2 flex items-center justify-center">
         <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
           <button

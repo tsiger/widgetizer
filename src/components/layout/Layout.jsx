@@ -4,6 +4,7 @@ import AdminMenu from "./AdminMenu";
 import { Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
+import DebugStatePanel from "../dev/DebugStatePanel";
 
 export default function Layout() {
   const { t } = useTranslation();
@@ -14,6 +15,7 @@ export default function Layout() {
   return (
     <div className="flex h-screen overflow-hidden">
       {!isPageEditor && <Sidebar />}
+      <DebugStatePanel />
 
       <div
         className={`relative z-30 flex flex-1 flex-col ${

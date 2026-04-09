@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import AdminMenu from "./AdminMenu";
 import useProjectStore from "../../stores/projectStore";
+import DebugStatePanel from "../dev/DebugStatePanel";
 
 export default function ProjectPickerLayout() {
   const { t } = useTranslation();
@@ -10,6 +11,7 @@ export default function ProjectPickerLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-900">
+      <DebugStatePanel />
       <div className="relative z-30 flex flex-1 flex-col bg-slate-900">
         <header className="flex items-start justify-between px-[18px] pb-0 pt-[18px] text-white">
           <div className="flex min-w-0 items-start gap-3 md:gap-4">
