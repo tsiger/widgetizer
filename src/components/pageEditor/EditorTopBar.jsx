@@ -150,7 +150,7 @@ export default function EditorTopBar({
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate("/pages")}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-sm text-sm hover:bg-slate-100 text-slate-600 hover:text-slate-800"
+          className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
           title={t("pageEditor.toolbar.backToPages")}
         >
           <ArrowLeft size={18} />
