@@ -352,6 +352,13 @@ export async function exportProjectToDir(projectId, options = {}) {
         console.warn(`Could not format HTML for ${pageData.id}.html: ${formatResult.error}. Writing unformatted HTML.`);
       }
 
+      // Rewrite any remaining /uploads/ storage paths to their published asset locations.
+      // Dedicated tags ({% image %}) already use the publish-mode base path, but generic
+      // link fields store the raw storage path which needs rewriting here.
+      processedHtml = processedHtml
+        .replaceAll("/uploads/images/", "assets/images/")
+        .replaceAll("/uploads/files/", "assets/files/");
+
       // Validate HTML (only when developer mode is enabled)
       if (devModeEnabled) {
         const validation = await validateHtml(processedHtml, pageData.id);
@@ -580,7 +587,54 @@ Per aspera ad astra
         console.error("Error in fallback image copying:", fallbackError);
       }
     }
-    // --- End Copy ---
+    // --- End Image Copy ---
+
+    // --- Copy Used File Assets (PDFs, etc.) ---
+    try {
+      const { readMediaFile: readMediaForFiles } = await import("../services/mediaService.js");
+      const mediaDataForFiles = await readMediaForFiles(projectId);
+
+      if (mediaDataForFiles && mediaDataForFiles.files) {
+        const usedFiles = mediaDataForFiles.files.filter(
+          (file) => file.usedIn && file.usedIn.length > 0 && file.path.startsWith("/uploads/files/"),
+        );
+
+        let fileCopiedCount = 0;
+
+        for (const fileAsset of usedFiles) {
+          const sourceFilePath = path.join(projectDir, fileAsset.path.replace(/^\//, ""));
+          const targetFilePath = path.join(outputDir, "assets", "files", path.basename(fileAsset.path));
+
+          try {
+            if (await fs.pathExists(sourceFilePath)) {
+              await fs.ensureDir(path.dirname(targetFilePath));
+              await fs.copy(sourceFilePath, targetFilePath);
+              fileCopiedCount++;
+            }
+          } catch (copyError) {
+            console.error(`Error copying file asset ${fileAsset.filename}:`, copyError);
+          }
+        }
+
+        if (fileCopiedCount > 0) {
+          console.log(`Export: Copied ${fileCopiedCount} used file asset(s) to assets/files/`);
+        }
+      }
+    } catch (fileMediaError) {
+      console.error("Error copying file assets for export:", fileMediaError);
+      // Fallback to copying all files if tracking fails
+      const projectFilesDir = path.join(projectDir, "uploads", "files");
+      try {
+        if (await fs.pathExists(projectFilesDir)) {
+          const outputFilesDir = path.join(outputDir, "assets", "files");
+          await fs.copy(projectFilesDir, outputFilesDir);
+          console.log("Fallback: Copied all file assets due to tracking error");
+        }
+      } catch (fallbackError) {
+        console.error("Error in fallback file asset copying:", fallbackError);
+      }
+    }
+    // --- End File Asset Copy ---
 
     // Write manifest.json with export metadata
     const manifest = {

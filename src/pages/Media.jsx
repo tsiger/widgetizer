@@ -20,7 +20,7 @@ import useMediaMetadata from "../hooks/useMediaMetadata";
 import useAppSettings from "../hooks/useAppSettings";
 import { getAllPages } from "../queries/pageManager";
 import { showRejectedFiles } from "../utils/uploadFeedback";
-import { IMAGE_ACCEPT, mapDropzoneRejections } from "../utils/uploadValidation";
+import { MEDIA_ACCEPT, mapDropzoneRejections } from "../utils/uploadValidation";
 
 export default function Media() {
   const { t } = useTranslation();
@@ -56,12 +56,18 @@ export default function Media() {
     setFiles: mediaState.setFiles,
   });
 
-  // Handle file view - open lightbox for images
+  // Handle file view - open lightbox for images, new tab for files
   const handleFileView = (file) => {
-    const imageIndex = imageFiles.findIndex((f) => f.id === file.id);
-    if (imageIndex !== -1) {
-      setLightboxImageIndex(imageIndex);
-      setLightboxOpen(true);
+    if (file.type?.startsWith("image/")) {
+      const imageIndex = imageFiles.findIndex((f) => f.id === file.id);
+      if (imageIndex !== -1) {
+        setLightboxImageIndex(imageIndex);
+        setLightboxOpen(true);
+      }
+    } else {
+      // Open non-image files in a new tab
+      const fileUrl = API_URL(`/api/media/projects/${mediaState.activeProject?.id}/media/${file.id}`);
+      window.open(fileUrl, "_blank");
     }
   };
 
@@ -81,6 +87,13 @@ export default function Media() {
   const handleLightboxClose = () => {
     setLightboxOpen(false);
     setLightboxImageIndex(-1);
+  };
+
+  const handleCopyUrl = (file) => {
+    if (file.path) {
+      navigator.clipboard.writeText(file.path);
+      mediaState.showToast(t("media.urlCopied"), "success");
+    }
   };
 
   const handleUploaderReject = (fileRejections) => {
@@ -143,12 +156,12 @@ export default function Media() {
         onReject={handleUploaderReject}
         uploading={mediaUpload.uploading}
         uploadProgress={mediaUpload.uploadProgress}
-        accept={IMAGE_ACCEPT}
+        accept={MEDIA_ACCEPT}
         multiple={true}
         maxSize={maxSizeMB * 1024 * 1024}
         title={t("media.uploader.title")}
         description={t("media.uploader.description")}
-        maxSizeText={`${t("components.mediaUploader.supportedImages")} - ${maxSizeMB}MB max`}
+        maxSizeText={`${t("components.mediaUploader.supportedFormats")} - ${maxSizeMB}MB max`}
       />
 
       {mediaState.files.length > 0 && (
@@ -173,6 +186,7 @@ export default function Media() {
               onFileDelete={mediaSelection.openDeleteConfirmation}
               onFileView={handleFileView}
               onFileEdit={mediaMetadata.handleEditMetadata}
+              onCopyUrl={handleCopyUrl}
               activeProject={mediaState.activeProject}
               usageTitleMap={usageTitleMap}
             />
@@ -185,6 +199,7 @@ export default function Media() {
               onFileDelete={mediaSelection.openDeleteConfirmation}
               onFileView={handleFileView}
               onFileEdit={mediaMetadata.handleEditMetadata}
+              onCopyUrl={handleCopyUrl}
               activeProject={mediaState.activeProject}
               usageTitleMap={usageTitleMap}
             />

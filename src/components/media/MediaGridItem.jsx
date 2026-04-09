@@ -1,4 +1,4 @@
-import { Check, Search, Trash2, Image, Edit2 } from "lucide-react";
+import { Check, Search, Trash2, Edit2, FileText, Copy } from "lucide-react";
 import { API_URL } from "../../config";
 import Tooltip from "../ui/Tooltip";
 
@@ -9,6 +9,7 @@ export default function MediaGridItem({
   onDelete,
   onView,
   onEdit,
+  onCopyUrl,
   activeProject,
   usageTitleMap = {},
 }) {
@@ -54,7 +55,12 @@ export default function MediaGridItem({
             className={`w-full h-full object-contain ${file.type === "image/svg+xml" ? "p-2" : ""}`}
           />
         ) : (
-          <Image className="text-slate-400" size={48} />
+          <div className="flex flex-col items-center gap-1">
+            <FileText className="text-slate-400" size={48} />
+            <span className="text-xs font-medium text-slate-500 uppercase">
+              {file.filename?.split(".").pop()}
+            </span>
+          </div>
         )}
       </div>
       <div className="p-2 text-sm truncate" title={file.metadata?.title || file.filename}>
@@ -112,13 +118,25 @@ export default function MediaGridItem({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onEdit();
+            onCopyUrl();
           }}
           className="p-2 bg-white rounded-full hover:bg-slate-100 transition-colors"
-          title="Edit metadata"
+          title="Copy URL"
         >
-          <Edit2 size={16} className="text-slate-600" />
+          <Copy size={16} className="text-slate-600" />
         </button>
+        {file.type?.startsWith("image/") && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            className="p-2 bg-white rounded-full hover:bg-slate-100 transition-colors"
+            title="Edit metadata"
+          >
+            <Edit2 size={16} className="text-slate-600" />
+          </button>
+        )}
         {!isInUse && (
           <button
             onClick={(e) => {

@@ -121,7 +121,8 @@
       "save": "Save Changes",
       "saving": "Saving...",
       "types": {
-        "image": "Image"
+        "image": "Image",
+        "file": "File"
       }
     }
   },
@@ -155,13 +156,16 @@
       "refreshUsageTitle": "Refresh Usage Tracking",
       "searchPlaceholder": "Search media...",
       "all": "All",
-      "images": "Images"
+      "images": "Images",
+      "files": "Files"
     },
     "mediaUploader": {
       "dropActive": "Drop the files here...",
       "dropInactive": "Drag and drop images here or",
       "selectFiles": "Select Files",
       "supportedImages": "Images: JPG, PNG, GIF, WebP, SVG",
+      "supportedFiles": "Files: PDF",
+      "supportedFormats": "Images: JPG, PNG, GIF, WebP, SVG | Files: PDF",
       "uploading": "Uploading..."
     },
     "fileUploader": {
@@ -170,6 +174,15 @@
       "clickOrDrop": "Click to upload or drag and drop",
       "browseFiles": "Browse Files",
       "uploading": "Uploading..."
+    },
+    "fileInput": {
+      "uploadSuccess": "File uploaded successfully.",
+      "uploadFailed": "Upload failed.",
+      "selectFileOnly": "Please select a file, not an image.",
+      "remove": "Remove file",
+      "uploading": "Uploading...",
+      "importNew": "Upload a file",
+      "browseLibrary": "Choose from library"
     },
     "mediaSelector": {
       "title": "Select Media",
@@ -564,9 +577,10 @@
     "loading": "Loading media files...",
     "emptyTitle": "No media files yet",
     "emptyDesc": "Upload some files using the uploader above.",
+    "urlCopied": "URL copied to clipboard",
     "uploader": {
       "title": "Upload Media",
-      "description": "Drag and drop images to upload them to your project library"
+      "description": "Drag and drop files to upload them to your project library"
     }
   },
   "themeSettings": {

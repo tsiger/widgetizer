@@ -215,6 +215,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[core-file-assets.md](core-file-assets.md)** - File Assets Architecture
+
+**Purpose**: Architecture proposal for extending the Media Library to support downloadable project files, starting with PDF support **When to use**:
+
+- Planning support for reusable downloadable business documents
+- Designing Media Library support for images vs files
+- Defining file-selection patterns for widget/theme settings
+- Aligning usage tracking and export behavior for non-image assets
+
+**Key topics**: file assets, PDF-first rollout, media-library filter model, copy URL workflow, dedicated file input direction, usage tracking expectations, export expectations, extensible allowlist strategy
+
+---
+
 ## 🛠️ Theme & Content Distribution
 
 ### **[core-themes.md](core-themes.md)** - Theme Management Interface

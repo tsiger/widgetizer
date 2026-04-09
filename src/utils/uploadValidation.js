@@ -1,5 +1,7 @@
 export const IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
 
+export const FILE_MIME_TYPES = ["application/pdf"];
+
 export const ZIP_MIME_TYPES = ["application/zip", "application/x-zip-compressed"];
 
 export const IMAGE_ACCEPT = {
@@ -8,6 +10,16 @@ export const IMAGE_ACCEPT = {
   "image/gif": [".gif"],
   "image/webp": [".webp"],
   "image/svg+xml": [".svg"],
+};
+
+export const FILE_ACCEPT = {
+  "application/pdf": [".pdf"],
+};
+
+/** Combined accept object for the main Media Library uploader (images + files). */
+export const MEDIA_ACCEPT = {
+  ...IMAGE_ACCEPT,
+  ...FILE_ACCEPT,
 };
 
 export const ZIP_ACCEPT = {

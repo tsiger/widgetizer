@@ -730,3 +730,179 @@ describe("Concurrent updates (race-condition safety)", () => {
     assert.equal(logo.usedIn.length, 2);
   });
 });
+
+// ============================================================================
+// File asset usage tracking (images + files, including link objects)
+// ============================================================================
+
+const FILE1 = "file-1";
+
+describe("File asset usage tracking", () => {
+  function mediaFilesWithPdf() {
+    return [
+      ...defaultMediaFiles(),
+      {
+        id: FILE1,
+        filename: "brochure.pdf",
+        path: "/uploads/files/brochure.pdf",
+        type: "application/pdf",
+        usedIn: [],
+      },
+    ];
+  }
+
+  beforeEach(async () => {
+    await seedMediaJson(mediaFilesWithPdf());
+  });
+
+  it("tracks file asset used in a widget setting", async () => {
+    const pageData = {
+      widgets: {
+        widget_1: {
+          settings: { download: "/uploads/files/brochure.pdf" },
+        },
+      },
+    };
+    const result = await updatePageMediaUsage(PROJECT_ID, "home", pageData);
+    assert.ok(result.mediaPaths.includes("/uploads/files/brochure.pdf"));
+
+    const media = await readMediaJson();
+    const pdf = media.files.find((f) => f.id === FILE1);
+    assert.deepEqual(pdf.usedIn, ["home"]);
+  });
+
+  it("tracks file asset inside a link object (copy-URL-to-link workflow)", async () => {
+    const pageData = {
+      widgets: {
+        widget_1: {
+          settings: {
+            link: {
+              text: "Download Brochure",
+              href: "/uploads/files/brochure.pdf",
+              target: "_blank",
+            },
+          },
+        },
+      },
+    };
+    const result = await updatePageMediaUsage(PROJECT_ID, "resources", pageData);
+    assert.ok(result.mediaPaths.includes("/uploads/files/brochure.pdf"));
+
+    const media = await readMediaJson();
+    const pdf = media.files.find((f) => f.id === FILE1);
+    assert.deepEqual(pdf.usedIn, ["resources"]);
+  });
+
+  it("tracks image inside a link object href", async () => {
+    const pageData = {
+      widgets: {
+        widget_1: {
+          settings: {
+            link: {
+              text: "View Photo",
+              href: "/uploads/images/hero.jpg",
+              target: "_self",
+            },
+          },
+        },
+      },
+    };
+    const result = await updatePageMediaUsage(PROJECT_ID, "gallery", pageData);
+    assert.ok(result.mediaPaths.includes("/uploads/images/hero.jpg"));
+
+    const media = await readMediaJson();
+    const hero = media.files.find((f) => f.id === IMG1);
+    assert.deepEqual(hero.usedIn, ["gallery"]);
+  });
+
+  it("tracks file asset inside a block-level link object", async () => {
+    const pageData = {
+      widgets: {
+        widget_1: {
+          settings: {},
+          blocks: {
+            block_1: {
+              settings: {
+                button: {
+                  text: "Get PDF",
+                  href: "/uploads/files/brochure.pdf",
+                  target: "_blank",
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+    await updatePageMediaUsage(PROJECT_ID, "docs", pageData);
+
+    const media = await readMediaJson();
+    const pdf = media.files.find((f) => f.id === FILE1);
+    assert.deepEqual(pdf.usedIn, ["docs"]);
+  });
+
+  it("tracks file asset in global widget link object", async () => {
+    const headerData = {
+      settings: {
+        cta_link: {
+          text: "Download",
+          href: "/uploads/files/brochure.pdf",
+          target: "_blank",
+        },
+      },
+    };
+    await updateGlobalWidgetMediaUsage(PROJECT_ID, "header", headerData);
+
+    const media = await readMediaJson();
+    const pdf = media.files.find((f) => f.id === FILE1);
+    assert.deepEqual(pdf.usedIn, ["global:header"]);
+  });
+
+  it("ignores non-media strings inside link objects", async () => {
+    const pageData = {
+      widgets: {
+        widget_1: {
+          settings: {
+            link: {
+              text: "External Link",
+              href: "https://example.com",
+              target: "_blank",
+            },
+          },
+        },
+      },
+    };
+    const result = await updatePageMediaUsage(PROJECT_ID, "home", pageData);
+    assert.deepEqual(result.mediaPaths, []);
+  });
+
+  it("removes stale file usage when link is updated", async () => {
+    // First save — links to PDF
+    await updatePageMediaUsage(PROJECT_ID, "home", {
+      widgets: {
+        w1: {
+          settings: {
+            link: { href: "/uploads/files/brochure.pdf", text: "Download" },
+          },
+        },
+      },
+    });
+
+    const media1 = await readMediaJson();
+    assert.deepEqual(media1.files.find((f) => f.id === FILE1).usedIn, ["home"]);
+
+    // Second save — link changed to external URL
+    await updatePageMediaUsage(PROJECT_ID, "home", {
+      widgets: {
+        w1: {
+          settings: {
+            link: { href: "https://example.com", text: "Visit" },
+          },
+        },
+      },
+    });
+
+    const media2 = await readMediaJson();
+    assert.deepEqual(media2.files.find((f) => f.id === FILE1).usedIn, []);
+  });
+});

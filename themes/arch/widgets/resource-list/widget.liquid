@@ -1,0 +1,159 @@
+{% assign has_image = false %}
+{% if widget.settings.image != blank %}
+  {% assign has_image = true %}
+{% endif %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-resource-list widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if has_image and widget.settings.image_position == 'right' %} layout-image-right{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="resource-list"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .resource-list-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-3xl);
+      }
+
+      & .resource-list-image {
+        width: 100%;
+
+        & img {
+          width: 100%;
+          height: auto;
+          display: block;
+          border: var(--border-width-thin) solid var(--border-color);
+          border-radius: var(--radius-lg);
+        }
+      }
+
+      & .resource-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      & .resource-item {
+        padding: var(--space-lg);
+        background-color: var(--bg-primary);
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-sm);
+      }
+
+      &.color-scheme-standard-secondary,
+      &.color-scheme-highlight-secondary {
+        & .resource-item {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      & .resource-item-title {
+        margin: 0;
+      }
+
+      & .resource-item-description {
+        margin-top: var(--space-xs);
+      }
+
+      & .resource-item-action {
+        margin-top: var(--space-sm);
+      }
+
+      @media (min-width: 990px) {
+        & .resource-list-wrapper.has-image {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+          gap: var(--space-3xl);
+        }
+
+        &.layout-image-right .resource-list-wrapper.has-image {
+          direction: rtl;
+        }
+
+        &.layout-image-right .resource-list-wrapper.has-image > * {
+          direction: ltr;
+        }
+
+        & .resource-list-image {
+          position: sticky;
+          top: var(--space-2xl);
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content{% unless has_image %} widget-content-md{% endunless %}">
+      <div class="resource-list-wrapper{% if has_image %} has-image{% endif %}">
+        {% if has_image %}
+          <div class="resource-list-image reveal reveal-fade">
+            {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '(max-width: 989px) 100vw, (max-width: 1420px) 50vw, 710px' %}
+          </div>
+        {% endif %}
+
+        <ul class="resource-items">
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            {% if block.type == 'resource' %}
+              <li class="resource-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+                <div class="resource-item-content">
+                  {% if block.settings.title != blank %}
+                    <h3 class="resource-item-title w-title t-lg t-heading-font" data-setting="title">{{ block.settings.title }}</h3>
+                  {% endif %}
+                  {% if block.settings.description != blank %}
+                    <p class="resource-item-description w-body t-sm t-muted" data-setting="description">{{ block.settings.description }}</p>
+                  {% endif %}
+                  {% if block.settings.file != blank %}
+                    {% assign file_filename = block.settings.file | split: '/' | last %}
+                    {% assign file_url = filePath | append: '/' | append: file_filename %}
+                    <div class="resource-item-action">
+                      <a
+                        href="{{ file_url }}"
+                        class="widget-button widget-button-secondary widget-button-small"
+                        target="_blank"
+                        rel="noopener"
+                        data-setting="file"
+                      >
+                        {{ block.settings.button_label | default: 'Download' }}
+                      </a>
+                    </div>
+                  {% endif %}
+                </div>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

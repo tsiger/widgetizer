@@ -83,6 +83,7 @@ export default function MediaToolbar({
         >
           <option value="all">{t("components.mediaToolbar.all")}</option>
           <option value="image">{t("components.mediaToolbar.images")}</option>
+          <option value="file">{t("components.mediaToolbar.files")}</option>
         </select>
       </div>
     </div>

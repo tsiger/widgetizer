@@ -1,6 +1,6 @@
 import Tooltip from "../../components/ui/Tooltip";
 import { IconButton } from "../ui/Button";
-import { Image, Search, Trash2, Check, Edit2, MoreVertical } from "lucide-react";
+import { Search, Trash2, Check, Edit2, MoreVertical, FileText, Copy } from "lucide-react";
 import { API_URL } from "../../config";
 import useFormatDate from "../../hooks/useFormatDate";
 
@@ -11,6 +11,7 @@ export default function MediaListItem({
   onDelete,
   onView,
   onEdit,
+  onCopyUrl,
   activeProject,
   usageTitleMap = {},
   openMenu = false,
@@ -89,14 +90,18 @@ export default function MediaListItem({
               className={`w-full h-full object-contain rounded ${file.type === "image/svg+xml" ? "p-1" : ""}`}
             />
           ) : (
-            <Image className="text-slate-400" size={24} />
+            <FileText className="text-slate-400" size={24} />
           )}
         </div>
       </td>
       <td className={`${cellClass} max-w-xs truncate`} title={file.metadata?.title || file.filename}>
-        <button type="button" onClick={onEdit} className="truncate text-left hover:text-pink-600 transition-colors">
-          {file.metadata?.title || file.filename}
-        </button>
+        {file.type?.startsWith("image/") ? (
+          <button type="button" onClick={onEdit} className="truncate text-left hover:text-pink-600 transition-colors">
+            {file.metadata?.title || file.filename}
+          </button>
+        ) : (
+          <span className="truncate">{file.filename}</span>
+        )}
       </td>
       <td className={cellClass}>{formatFileSize(file.size)}</td>
       <td className={cellClass}>{file.width && file.height ? `${file.width}×${file.height}` : "-"}</td>
@@ -150,10 +155,16 @@ export default function MediaListItem({
                 <Search size={14} />
                 View
               </button>
-              <button type="button" onClick={() => { onMenuClose(); onEdit(); }} className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}>
-                <Edit2 size={14} />
-                Edit metadata
+              <button type="button" onClick={() => { onMenuClose(); onCopyUrl(); }} className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}>
+                <Copy size={14} />
+                Copy URL
               </button>
+              {file.type?.startsWith("image/") && (
+                <button type="button" onClick={() => { onMenuClose(); onEdit(); }} className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}>
+                  <Edit2 size={14} />
+                  Edit metadata
+                </button>
+              )}
               {!isInUse && (
                 <>
                   <div className="my-1 border-t border-slate-200" />

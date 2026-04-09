@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { X, Search } from "lucide-react";
+import { X, Search, FileText } from "lucide-react";
 import { API_URL } from "../../config";
 import { getProjectMedia } from "../../queries/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -10,7 +10,7 @@ import useMediaUpload from "../../hooks/useMediaUpload";
 import useAppSettings from "../../hooks/useAppSettings";
 import useToastStore from "../../stores/toastStore";
 import { showRejectedFiles } from "../../utils/uploadFeedback";
-import { IMAGE_ACCEPT, mapDropzoneRejections } from "../../utils/uploadValidation";
+import { IMAGE_ACCEPT, FILE_ACCEPT, mapDropzoneRejections } from "../../utils/uploadValidation";
 
 export default function MediaSelectorDrawer({ visible, onClose, onSelect, activeProject, filterType = "all" }) {
   const { t } = useTranslation();
@@ -72,6 +72,9 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
 
       if (filterType === "image") {
         return matchesSearch && file.type && file.type.startsWith("image/");
+      }
+      if (filterType === "file") {
+        return matchesSearch && file.type && !file.type.startsWith("image/");
       }
 
       return matchesSearch;
@@ -144,11 +147,11 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
               onReject={handleUploaderReject}
               uploading={uploading}
               uploadProgress={uploadProgress}
-              accept={IMAGE_ACCEPT}
+              accept={filterType === "file" ? FILE_ACCEPT : IMAGE_ACCEPT}
               multiple={true}
               maxSize={maxSizeMB * 1024 * 1024}
               title={t("components.mediaSelector.upload")}
-              maxSizeText={`${t("components.mediaUploader.supportedImages")} - ${maxSizeMB}MB max`}
+              maxSizeText={`${filterType === "file" ? t("components.mediaUploader.supportedFiles") : t("components.mediaUploader.supportedImages")} - ${maxSizeMB}MB max`}
             />
           </div>
         </div>
@@ -177,11 +180,20 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
                     onClick={() => onSelect(file)}
                   >
                     <div className="aspect-square relative bg-slate-100 flex items-center justify-center rounded-t-sm overflow-hidden">
-                      <img
-                        src={API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail || file.path}`)}
-                        alt={file.metadata?.alt || ""}
-                        className="max-w-full max-h-full object-contain"
-                      />
+                      {file.type?.startsWith("image/") ? (
+                        <img
+                          src={API_URL(`/api/media/projects/${activeProject.id}${file.thumbnail || file.path}`)}
+                          alt={file.metadata?.alt || ""}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-1">
+                          <FileText className="text-slate-400" size={32} />
+                          <span className="text-xs font-medium text-slate-500 uppercase">
+                            {file.filename?.split(".").pop()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="p-2">
                       <p className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-[11px] leading-4 text-slate-700">

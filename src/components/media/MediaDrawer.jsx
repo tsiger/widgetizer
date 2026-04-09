@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { X } from "lucide-react";
+import { X, FileText } from "lucide-react";
 import Button from "../ui/Button";
 import { API_URL } from "../../config";
 
@@ -85,7 +85,8 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       ? API_URL(`/api/media/projects/${activeProject.id}/media/${selectedFile.id}`)
       : null;
 
-  const getMediaTypeLabel = () => t("forms.media.types.image");
+  const isImage = selectedFile?.type?.startsWith("image/");
+  const getMediaTypeLabel = () => isImage ? t("forms.media.types.image") : t("forms.media.types.file");
 
   return (
     <div
@@ -117,7 +118,13 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           {/* Preview section */}
           {fileUrl && (
             <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex flex-col items-center justify-center gap-2">
-              <img src={fileUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
+              {isImage ? (
+                <img src={fileUrl} alt="Preview" className="max-h-40 max-w-full object-contain rounded-sm" />
+              ) : (
+                <div className="py-4">
+                  <FileText className="text-slate-400" size={48} />
+                </div>
+              )}
               {(selectedFile.filename || selectedFile.originalName) && (
                 <p className="text-xs text-slate-500 truncate max-w-full" title={selectedFile.filename || selectedFile.originalName}>
                   {selectedFile.filename || selectedFile.originalName}

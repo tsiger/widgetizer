@@ -1,0 +1,212 @@
+{
+  "type": "resource-list",
+  "displayName": "Resource List",
+  "aliases": [
+    "downloads",
+    "documents",
+    "file list",
+    "pdf list",
+    "download section"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
+      "default": "Resources"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label",
+      "default": "Downloads & Documents"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label",
+      "default": "Browse our collection of useful resources and documents."
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.options.left"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.options.center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "image",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "tTheme:global.widgets.settings.image_position.label",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "tTheme:global.widgets.settings.image_position.options.left"
+        },
+        {
+          "value": "right",
+          "label": "tTheme:global.widgets.settings.image_position.options.right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "id": "widget_header",
+      "label": "Widget"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "resource",
+      "displayName": "Resource",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Document Title"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "A brief description of this resource."
+        },
+        {
+          "type": "file",
+          "id": "file",
+          "label": "File"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Label",
+          "default": "Download"
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "resource",
+      "settings": {
+        "title": "Product Brochure",
+        "description": "Overview of our products and services.",
+        "file": "",
+        "button_label": "Download PDF"
+      }
+    },
+    {
+      "type": "resource",
+      "settings": {
+        "title": "Getting Started Guide",
+        "description": "Everything you need to get up and running.",
+        "file": "",
+        "button_label": "Download PDF"
+      }
+    },
+    {
+      "type": "resource",
+      "settings": {
+        "title": "Price List",
+        "description": "Current pricing for all our services.",
+        "file": "",
+        "button_label": "Download PDF"
+      }
+    }
+  ]
+}

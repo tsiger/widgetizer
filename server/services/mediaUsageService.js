@@ -7,8 +7,46 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 const THEME_SETTINGS_USAGE_ID = "global:theme-settings";
 
+/** Upload path prefixes recognised as tracked media assets. */
+const UPLOAD_PREFIXES = ["/uploads/images/", "/uploads/files/"];
+
+/** Check whether a string value is a tracked media upload path. */
+function isMediaPath(value) {
+  return typeof value === "string" && UPLOAD_PREFIXES.some((prefix) => value.startsWith(prefix));
+}
+
 /**
- * Extract all media paths (images) from page content.
+ * Recursively collect media paths from a value.
+ * Handles strings, plain objects (e.g. link settings with href), and arrays.
+ */
+function collectMediaPaths(value, mediaPaths) {
+  if (typeof value === "string") {
+    if (isMediaPath(value)) mediaPaths.add(value);
+  } else if (value && typeof value === "object" && !Array.isArray(value)) {
+    for (const v of Object.values(value)) {
+      collectMediaPaths(v, mediaPaths);
+    }
+  } else if (Array.isArray(value)) {
+    for (const item of value) {
+      collectMediaPaths(item, mediaPaths);
+    }
+  }
+}
+
+/** Normalise a potentially relative upload path to its absolute form. */
+function normalizeMediaPath(value) {
+  if (typeof value !== "string") return null;
+  for (const prefix of UPLOAD_PREFIXES) {
+    if (value.startsWith(prefix)) return value;
+    // Handle relative paths without leading slash
+    const rel = prefix.slice(1); // "uploads/images/"
+    if (value.startsWith(rel)) return "/" + value;
+  }
+  return null;
+}
+
+/**
+ * Extract all media paths from page content.
  * Scans all widget settings and block settings for upload paths.
  * @param {object} pageData - Page data object containing widgets
  * @returns {string[]} Array of unique media paths found (e.g., '/uploads/images/photo.jpg')
@@ -18,25 +56,18 @@ function extractMediaPathsFromPage(pageData) {
 
   // Check SEO social media image (og_image)
   if (pageData.seo?.og_image && typeof pageData.seo.og_image === "string") {
-    const ogImage = pageData.seo.og_image;
-    // Handle both absolute paths (/uploads/...) and relative paths (uploads/...)
-    if (ogImage.startsWith("/uploads/images/")) {
-      mediaPaths.add(ogImage);
-    } else if (ogImage.startsWith("uploads/images/")) {
-      mediaPaths.add("/" + ogImage);
-    }
+    const normalized = normalizeMediaPath(pageData.seo.og_image);
+    if (normalized) mediaPaths.add(normalized);
   }
 
   if (!pageData.widgets) return Array.from(mediaPaths);
 
-  // Helper function to extract media from settings object
+  // Helper function to extract media from settings object (recurses into objects like link settings)
   function extractFromSettings(settings) {
     if (!settings) return;
 
     Object.values(settings).forEach((value) => {
-      if (typeof value === "string" && value.startsWith("/uploads/images/")) {
-        mediaPaths.add(value);
-      }
+      collectMediaPaths(value, mediaPaths);
     });
   }
 
@@ -68,9 +99,7 @@ function extractMediaPathsFromGlobalWidget(widgetData) {
     if (!settings) return;
 
     Object.values(settings).forEach((value) => {
-      if (typeof value === "string" && value.startsWith("/uploads/images/")) {
-        mediaPaths.add(value);
-      }
+      collectMediaPaths(value, mediaPaths);
     });
   }
 
@@ -100,12 +129,8 @@ function extractMediaPathsFromThemeSettings(themeData) {
   if (!globalSettings || typeof globalSettings !== "object") return Array.from(mediaPaths);
 
   function addIfMediaPath(value) {
-    if (typeof value !== "string") return;
-    if (value.startsWith("/uploads/images/")) {
-      mediaPaths.add(value);
-    } else if (value.startsWith("uploads/images/")) {
-      mediaPaths.add("/" + value);
-    }
+    const normalized = normalizeMediaPath(value);
+    if (normalized) mediaPaths.add(normalized);
   }
 
   Object.values(globalSettings).forEach((items) => {

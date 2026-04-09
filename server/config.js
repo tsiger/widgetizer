@@ -81,6 +81,7 @@ export const getProjectThemeJsonPath = (projectId) =>
 // Project Media paths
 export const getProjectUploadsDir = (projectId) => path.join(getProjectDir(projectId), "uploads");
 export const getProjectImagesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "images");
+export const getProjectFilesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "files");
 export const getImagePath = (projectId, filename) =>
   path.join(getProjectImagesDir(projectId), filename);
 
@@ -88,9 +89,15 @@ export const getImagePath = (projectId, filename) =>
 export { getMediaCategory };
 
 /**
- * Resolve the upload directory for a given project.
+ * Resolve the upload directory for a given project and media category.
+ * @param {string} projectFolderName
+ * @param {string} [mimeType] - MIME type used to determine the target subdirectory
  */
-export function getMediaDir(projectFolderName) {
+export function getMediaDir(projectFolderName, mimeType) {
+  const category = getMediaCategory(mimeType);
+  if (category === "file") {
+    return getProjectFilesDir(projectFolderName);
+  }
   return getProjectImagesDir(projectFolderName);
 }
 

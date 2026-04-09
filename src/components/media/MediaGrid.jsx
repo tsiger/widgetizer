@@ -8,6 +8,7 @@ export default function MediaGrid({
   onFileDelete,
   onFileView,
   onFileEdit,
+  onCopyUrl,
   activeProject,
   usageTitleMap,
 }) {
@@ -32,6 +33,7 @@ export default function MediaGrid({
           onDelete={() => onFileDelete(file.id, file.originalName)}
           onView={() => onFileView(file)}
           onEdit={() => onFileEdit(file)}
+          onCopyUrl={() => onCopyUrl(file)}
           activeProject={activeProject}
           usageTitleMap={usageTitleMap}
         />

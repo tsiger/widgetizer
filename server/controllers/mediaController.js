@@ -9,11 +9,10 @@ import DOMPurify from "isomorphic-dompurify";
 import {
   getProjectDir,
   getProjectImagesDir,
-  getImagePath,
   getThemeJsonPath,
   getMediaDir,
 } from "../config.js";
-import { ALLOWED_MIME_TYPES, getContentType } from "../utils/mimeTypes.js";
+import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
@@ -184,7 +183,7 @@ const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only images are allowed."), false);
+    cb(new Error("Invalid file type. Supported types: images and PDF."), false);
   }
 };
 
@@ -285,7 +284,9 @@ export async function uploadProjectMedia(req, res) {
 
         // --- File is within size limit, proceed with processing ---
         const fileId = uuidv4();
-        const uploadPath = `/uploads/images/${file.filename}`;
+        const category = getMediaCategory(file.mimetype);
+        const uploadSubdir = category === "file" ? "files" : "images";
+        const uploadPath = `/uploads/${uploadSubdir}/${file.filename}`;
 
         const fileInfo = {
           id: fileId,
@@ -597,10 +598,13 @@ export async function serveProjectMedia(req, res) {
 
     let filePath;
 
-    // If we have a filename directly, use it
+    // If we have a filename directly, resolve path from the route
     if (filename) {
       const projectFolderName = await getProjectFolderName(projectId);
-      filePath = getImagePath(projectFolderName, filename);
+      // Determine subdirectory from the request path (uploads/images/ or uploads/files/)
+      const isFilesRoute = req.path && req.path.includes("/uploads/files/");
+      const subdir = isFilesRoute ? "files" : "images";
+      filePath = path.join(getProjectDir(projectFolderName), "uploads", subdir, filename);
     }
     // Otherwise, look up the file by ID
     else if (fileId) {

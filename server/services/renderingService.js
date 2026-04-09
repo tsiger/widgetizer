@@ -343,6 +343,10 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   const imageBasePath =
     renderMode === "publish" ? "assets/images" : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
 
+  // Determine file base path based on render mode (for PDF and other file assets)
+  const fileBasePath =
+    renderMode === "publish" ? "assets/files" : `${apiUrl}/api/media/projects/${projectId}/uploads/files`;
+
   const siteIconSrc = processedThemeSettings?.general?.favicon || "";
 
   // Load media metadata and create a useful map
@@ -466,6 +470,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     mediaFiles,
     globals,
     imagePath: imageBasePath,
+    filePath: fileBasePath,
     site_icons: globals.siteIcons || buildRuntimeSiteIcons(siteIconSrc, mediaFiles, imageBasePath),
   };
 }

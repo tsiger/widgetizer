@@ -105,4 +105,16 @@ router.get(
   },
 );
 
+// Serve file assets directly from uploads/files
+router.get(
+  "/projects/:projectId/uploads/files/:filename",
+  [param("projectId").notEmpty(), param("filename").notEmpty()],
+  validateRequest,
+  (req, res) => {
+    const { filename } = req.params;
+    req.params.filename = filename;
+    serveProjectMedia(req, res);
+  },
+);
+
 export default router;

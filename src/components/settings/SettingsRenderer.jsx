@@ -11,6 +11,7 @@ import {
   SelectInput,
   CheckboxInput,
   RadioInput,
+  FileInput,
   FontPickerInput,
   MenuSelectInput,
   ImageInput,
@@ -102,6 +103,8 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
         const imageSize = size || (compact ? "narrow" : "full");
         return <ImageInput {...inputProps} size={imageSize} />;
       }
+      case "file":
+        return <FileInput {...inputProps} />;
       case "link":
         return <LinkInput {...inputProps} setting={setting} />;
       case "youtube":

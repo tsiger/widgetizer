@@ -281,6 +281,27 @@ before(async () => {
     );
   }
 
+  // A minimal link widget that renders an <a> tag — used to test export path rewriting.
+  const coreLinkDir = path.join(CORE_WIDGETS_DIR, "core-link");
+  if (!(await fs.pathExists(coreLinkDir))) {
+    await fs.ensureDir(coreLinkDir);
+    await fs.writeFile(
+      path.join(coreLinkDir, "schema.json"),
+      JSON.stringify({
+        type: "core-link",
+        displayName: "Link",
+        settings: [
+          { type: "text", id: "href", label: "URL", default: "#" },
+          { type: "text", id: "text", label: "Text", default: "Link" },
+        ],
+      }),
+    );
+    await fs.writeFile(
+      path.join(coreLinkDir, "widget.liquid"),
+      `<a href="{{ widget.settings.href }}">{{ widget.settings.text }}</a>`,
+    );
+  }
+
   // -----------------------------------------------------------
   // 6. Pages
   // -----------------------------------------------------------
@@ -303,8 +324,15 @@ before(async () => {
             type: "core-spacer",
             settings: { height: 60 },
           },
+          "link-1": {
+            type: "core-link",
+            settings: {
+              href: "/uploads/files/brochure.pdf",
+              text: "Download Brochure",
+            },
+          },
         },
-        widgetsOrder: ["spacer-1"],
+        widgetsOrder: ["spacer-1", "link-1"],
         created: "2025-01-01T00:00:00.000Z",
         updated: "2025-06-01T00:00:00.000Z",
       },
@@ -398,6 +426,11 @@ before(async () => {
   await fs.writeFile(path.join(uploadsDir, "images", "inline.jpg"), "fake-inline-data");
   await fs.writeFile(path.join(uploadsDir, "images", "inline-medium.jpg"), "fake-inline-medium");
   await fs.writeFile(path.join(uploadsDir, "images", "unused.png"), "fake-png-data");
+
+  // Dummy file assets (PDFs)
+  await fs.ensureDir(path.join(uploadsDir, "files"));
+  await fs.writeFile(path.join(uploadsDir, "files", "brochure.pdf"), "fake-pdf-data");
+  await fs.writeFile(path.join(uploadsDir, "files", "unused-doc.pdf"), "fake-unused-pdf");
   await fs.writeFile(
     path.join(uploadsDir, "images", "site-icon.svg"),
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#de1877"/><circle cx="256" cy="256" r="128" fill="#ffffff"/></svg>',
@@ -464,6 +497,20 @@ before(async () => {
         width: 512,
         height: 512,
         usedIn: [],
+      },
+      {
+        id: "file-1",
+        filename: "brochure.pdf",
+        path: "/uploads/files/brochure.pdf",
+        type: "application/pdf",
+        usedIn: ["index"], // used on the homepage
+      },
+      {
+        id: "file-2",
+        filename: "unused-doc.pdf",
+        path: "/uploads/files/unused-doc.pdf",
+        type: "application/pdf",
+        usedIn: [], // not used anywhere
       },
     ],
   });
@@ -1469,5 +1516,56 @@ describe("export failure recording", () => {
     const data2 = await projectRepo.readProjectsData();
     data2.projects = data2.projects.filter((p) => p.id !== badId);
     await projectRepo.writeProjectsData(data2);
+  });
+});
+
+// ========================================================================
+// File asset export support
+// ========================================================================
+
+describe("file asset export", () => {
+  before(async () => {
+    await cleanExportHistory();
+
+    // Run a fresh export so we have output to inspect
+    await callController(exportProject, {
+      params: { projectId: PROJECT_ID },
+    });
+  });
+
+  it("copies used file assets to assets/files/", async () => {
+    const exportDir = await getLatestExportDir();
+    const pdfPath = path.join(exportDir, "assets", "files", "brochure.pdf");
+    assert.ok(await fs.pathExists(pdfPath), "Used PDF should be copied to assets/files/");
+    const content = await fs.readFile(pdfPath, "utf8");
+    assert.equal(content, "fake-pdf-data", "PDF content should match the source file");
+  });
+
+  it("skips unused file assets", async () => {
+    const exportDir = await getLatestExportDir();
+    const unusedPath = path.join(exportDir, "assets", "files", "unused-doc.pdf");
+    assert.ok(!(await fs.pathExists(unusedPath)), "Unused PDF should NOT be copied to export");
+  });
+
+  it("rewrites /uploads/files/ paths to assets/files/ in exported HTML", async () => {
+    const exportDir = await getLatestExportDir();
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(
+      html.includes('href="assets/files/brochure.pdf"'),
+      "Exported HTML should rewrite /uploads/files/ to assets/files/",
+    );
+    assert.ok(
+      !html.includes("/uploads/files/"),
+      "Exported HTML should not contain raw /uploads/files/ storage paths",
+    );
+  });
+
+  it("rewrites /uploads/images/ paths to assets/images/ in exported HTML", async () => {
+    const exportDir = await getLatestExportDir();
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(
+      !html.includes("/uploads/images/"),
+      "Exported HTML should not contain raw /uploads/images/ storage paths",
+    );
   });
 });

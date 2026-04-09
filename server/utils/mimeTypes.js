@@ -15,6 +15,7 @@ const CONTENT_TYPES = {
   ".html": "text/html",
   ".css": "text/css",
   ".js": "application/javascript",
+  ".pdf": "application/pdf",
 
   // Images
   ".png": "image/png",
@@ -45,13 +46,14 @@ export function getContentType(ext, fallback = "application/octet-stream") {
 // Upload validation
 // ---------------------------------------------------------------------------
 
-/** MIME types accepted for media uploads (images). */
+/** MIME types accepted for media uploads. */
 export const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",
   "image/webp",
   "image/svg+xml",
+  "application/pdf",
 ];
 
 /** MIME types that indicate a ZIP archive (used for theme / project imports). */
@@ -67,8 +69,11 @@ export const ZIP_MIME_TYPES = [
 /**
  * Classify a MIME type into a media category.
  * @param {string} mimeType
- * @returns {"image"}
+ * @returns {"image" | "file"}
  */
-export function getMediaCategory() {
-  return "image";
+export function getMediaCategory(mimeType) {
+  if (mimeType && mimeType.startsWith("image/")) {
+    return "image";
+  }
+  return "file";
 }
