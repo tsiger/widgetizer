@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { savePageContent } from "../queries/pageManager";
 import { saveGlobalWidget } from "../queries/previewManager";
-import { saveThemeSettings } from "../queries/themeManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import usePageStore from "./pageStore";
 import useThemeStore from "./themeStore";
@@ -12,24 +11,6 @@ import useToastStore from "./toastStore";
  * Zustand store for managing auto-save functionality in the page editor.
  * Tracks modified widgets, structure changes, and theme settings modifications.
  * Provides both manual and automatic (60-second debounced) saving capabilities.
- *
- * @typedef {Object} AutoSaveStore
- * @property {boolean} isSaving - Whether a manual save is in progress
- * @property {boolean} isAutoSaving - Whether an auto-save is in progress
- * @property {Date|null} lastSaved - Timestamp of the last successful save
- * @property {Set<string>} modifiedWidgets - Set of widget IDs that have been modified
- * @property {boolean} structureModified - Whether page structure (widget order) has changed
- * @property {boolean} themeSettingsModified - Whether theme settings have changed
- * @property {number|null} autoSaveInterval - Timer ID for the auto-save debounce
- * @property {Function} hasUnsavedChanges - Check if there are any unsaved changes
- * @property {Function} markWidgetModified - Mark a widget as having unsaved changes
- * @property {Function} markWidgetUnmodified - Remove a widget from the modified set
- * @property {Function} setStructureModified - Set whether structure has changed
- * @property {Function} setThemeSettingsModified - Set whether theme settings have changed
- * @property {Function} save - Save all pending changes (manual or auto)
- * @property {Function} resetAutoSaveTimer - Reset the 60-second auto-save timer
- * @property {Function} stopAutoSave - Cancel any pending auto-save
- * @property {Function} reset - Clear all save state and stop auto-save
  */
 
 const useAutoSave = create((set, get) => ({
@@ -53,17 +34,14 @@ const useAutoSave = create((set, get) => ({
 
     // Check if page state differs from saved state (catches undo/redo changes)
     const pageStore = usePageStore.getState();
-    const { page, originalPage, themeSettings, originalThemeSettings } = pageStore;
+    const { page, originalPage } = pageStore;
 
     if (page && originalPage && JSON.stringify(page) !== JSON.stringify(originalPage)) {
       return true;
     }
 
-    if (
-      themeSettings &&
-      originalThemeSettings &&
-      JSON.stringify(themeSettings) !== JSON.stringify(originalThemeSettings)
-    ) {
+    // Check theme settings via themeStore (canonical owner)
+    if (useThemeStore.getState().hasUnsavedThemeChanges()) {
       return true;
     }
 
@@ -103,8 +81,9 @@ const useAutoSave = create((set, get) => ({
   save: async (isAuto = false) => {
     const { modifiedWidgets, structureModified, themeSettingsModified, hasUnsavedChanges } = get();
     const pageStore = usePageStore.getState();
-    const { page, globalWidgets, themeSettings } = pageStore;
+    const { page, globalWidgets } = pageStore;
     const themeStore = useThemeStore.getState();
+    const themeSettings = themeStore.settings;
 
     if (!hasUnsavedChanges()) return;
 
@@ -125,8 +104,6 @@ const useAutoSave = create((set, get) => ({
       }
 
       // Phase 1: mismatch-guarded writes (page content + global widgets)
-      // These go through resolveActiveProject middleware or saveGlobalWidget's
-      // inline guard, which return 409 if the active project has changed.
       const guardedPromises = [];
 
       if (globalWidgets.header && modifiedWidgets.has("header")) {
@@ -137,7 +114,6 @@ const useAutoSave = create((set, get) => ({
         guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer));
       }
 
-      // Filter out global widget IDs - they are saved separately via saveGlobalWidget
       const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
       const hasPageDiff =
         page && pageStore.originalPage ? JSON.stringify(page) !== JSON.stringify(pageStore.originalPage) : false;
@@ -147,10 +123,11 @@ const useAutoSave = create((set, get) => ({
 
       await Promise.all(guardedPromises);
 
-      // Phase 2: theme settings (uses explicit projectId, no mismatch guard)
-      // Only runs if phase 1 succeeded — prevents partial save
-      if (themeSettingsModified && themeSettings && activeProject) {
-        await saveThemeSettings(activeProject.id, themeSettings);
+      // Phase 2: theme settings via themeStore's canonical save path.
+      // This handles warning/correction reloads from the server automatically.
+      const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
+      if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
+        await useThemeStore.getState().saveSettings(activeProject.id);
       }
 
       // Invalidate media cache since page saves update media usage tracking
@@ -167,14 +144,6 @@ const useAutoSave = create((set, get) => ({
 
       if (page) {
         pageStore.setOriginalPage(page);
-      }
-
-      // Mark theme settings as saved in pageStore and sync to themeStore
-      if (themeSettingsModified && themeSettings) {
-        pageStore.markThemeSettingsSaved();
-        // Sync to themeStore so Settings page sees the changes
-        themeStore.setSettings(themeSettings);
-        themeStore.markThemeSettingsSaved();
       }
     } catch (err) {
       if (err.code === "PROJECT_MISMATCH") {

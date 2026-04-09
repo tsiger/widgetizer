@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Settings, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
-import usePageStore from "../../stores/pageStore";
+import useThemeStore from "../../stores/themeStore";
 import useWidgetStore from "../../stores/widgetStore";
 
 export default function ThemeSelector() {
@@ -10,7 +10,9 @@ export default function ThemeSelector() {
   const { tTheme } = useThemeLocale();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { themeSettings: settings, originalThemeSettings: originalSettings, hasUnsavedThemeChanges } = usePageStore();
+  const settings = useThemeStore((s) => s.settings);
+  const originalSettings = useThemeStore((s) => s.originalSettings);
+  const hasUnsavedThemeChanges = useThemeStore((s) => s.hasUnsavedThemeChanges);
   const { selectedThemeGroup, setSelectedThemeGroup } = useWidgetStore();
 
   const themeGroups = settings?.settings?.global

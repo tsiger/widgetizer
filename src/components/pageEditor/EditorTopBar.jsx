@@ -43,12 +43,16 @@ export default function EditorTopBar({
     const { pastStates, undo } = usePageStore.temporal.getState();
     if (pastStates.length > 0 && pastStates[pastStates.length - 1]?.page) {
       undo();
+      // Push the restored theme snapshot back to themeStore (canonical owner)
+      usePageStore.getState().syncThemeStoreFromSnapshot();
     }
   }, []);
 
   const safeRedo = useCallback(() => {
     const { redo } = usePageStore.temporal.getState();
     redo();
+    // Push the restored theme snapshot back to themeStore (canonical owner)
+    usePageStore.getState().syncThemeStoreFromSnapshot();
   }, []);
 
   useEffect(() => {

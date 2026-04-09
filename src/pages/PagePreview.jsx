@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Monitor, Smartphone } from "lucide-react";
 
 import usePageStore from "../stores/pageStore";
+import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import PreviewPanel from "../components/pageEditor/PreviewPanel";
 import { isStandalonePreviewNavigationUrl } from "../utils/previewLinkUtils";
@@ -17,7 +18,8 @@ export default function PagePreview() {
   const [previewMode, setPreviewMode] = useState(() => localStorage.getItem("editorPreviewMode") || "desktop");
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  const { page, loading, error, loadPage, themeSettings } = usePageStore();
+  const { page, loading, error, loadPage } = usePageStore();
+  const themeSettings = useThemeStore((s) => s.settings);
 
   // Load initial data from stores
   useEffect(() => {

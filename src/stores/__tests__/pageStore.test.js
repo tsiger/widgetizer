@@ -14,10 +14,27 @@ vi.mock("../../lib/activeProjectId", () => ({
   getActiveProjectId: vi.fn(() => "project-a"),
 }));
 
+// Mock themeStore — pageStore's updateThemeSetting proxy forwards to it
+const mockThemeStoreState = {
+  settings: null,
+  originalSettings: null,
+  loadSettings: vi.fn().mockResolvedValue(undefined),
+  setSettings: vi.fn(),
+  updateThemeSetting: vi.fn(),
+  hasUnsavedThemeChanges: vi.fn(() => false),
+  markThemeSettingsSaved: vi.fn(),
+  resetForProjectChange: vi.fn(),
+};
+
+vi.mock("../themeStore", () => ({
+  default: {
+    getState: () => mockThemeStoreState,
+  },
+}));
+
 const { default: usePageStore } = await import("../pageStore");
 const { getPage } = await import("../../queries/pageManager");
 const { getGlobalWidgets } = await import("../../queries/previewManager");
-const { getThemeSettings } = await import("../../queries/themeManager");
 const { getActiveProjectId } = await import("../../lib/activeProjectId");
 
 // ---------------------------------------------------------------------------
@@ -30,8 +47,7 @@ function resetStore() {
     page: null,
     originalPage: null,
     globalWidgets: { header: null, footer: null },
-    themeSettings: null,
-    originalThemeSettings: null,
+    themeSettingsSnapshot: null,
     loadedProjectId: null,
     activeLoadId: 0,
     loading: true,
@@ -60,7 +76,7 @@ function seedPage() {
   return page;
 }
 
-/** Seed theme settings */
+/** Seed theme settings (via themeStore mock + pageStore snapshot) */
 function seedThemeSettings() {
   const settings = {
     settings: {
@@ -76,9 +92,13 @@ function seedThemeSettings() {
     },
   };
 
+  // Set up the themeStore mock with settings
+  mockThemeStoreState.settings = JSON.parse(JSON.stringify(settings));
+  mockThemeStoreState.originalSettings = JSON.parse(JSON.stringify(settings));
+
+  // Also set the pageStore snapshot for undo tracking
   usePageStore.setState({
-    themeSettings: JSON.parse(JSON.stringify(settings)),
-    originalThemeSettings: JSON.parse(JSON.stringify(settings)),
+    themeSettingsSnapshot: JSON.parse(JSON.stringify(settings)),
   });
 
   return settings;
@@ -124,9 +144,19 @@ describe("pageStore", () => {
   beforeEach(() => {
     getPage.mockReset();
     getGlobalWidgets.mockReset();
-    getThemeSettings.mockReset();
     getActiveProjectId.mockReset();
     getActiveProjectId.mockImplementation(() => "project-a");
+
+    // Reset themeStore mock state
+    mockThemeStoreState.settings = null;
+    mockThemeStoreState.originalSettings = null;
+    mockThemeStoreState.loadSettings.mockReset().mockResolvedValue(undefined);
+    mockThemeStoreState.setSettings.mockReset();
+    mockThemeStoreState.updateThemeSetting.mockReset();
+    mockThemeStoreState.hasUnsavedThemeChanges.mockReset().mockReturnValue(false);
+    mockThemeStoreState.markThemeSettingsSaved.mockReset();
+    mockThemeStoreState.resetForProjectChange.mockReset();
+
     resetStore();
   });
 
@@ -149,121 +179,57 @@ describe("pageStore", () => {
   });
 
   // --------------------------------------------------------------------------
-  // updateThemeSetting
+  // updateThemeSetting (proxy)
   // --------------------------------------------------------------------------
 
   describe("updateThemeSetting", () => {
-    it("updates a setting value within a group", () => {
+    it("forwards the mutation to themeStore and records a snapshot", () => {
+      seedPage();
       seedThemeSettings();
+
+      // After the proxy call, themeStore.updateThemeSetting should have been called
+      // and themeStore.settings will reflect the update (via mock).
+      const updatedSettings = JSON.parse(JSON.stringify(mockThemeStoreState.settings));
+      updatedSettings.settings.global.colors[0].value = "#0000ff";
+      mockThemeStoreState.settings = updatedSettings;
+
       usePageStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
 
-      const colors = usePageStore.getState().themeSettings.settings.global.colors;
-      const primary = colors.find((s) => s.id === "primary_color");
-      expect(primary.value).toBe("#0000ff");
+      expect(mockThemeStoreState.updateThemeSetting).toHaveBeenCalledWith("colors", "primary_color", "#0000ff");
+      // The snapshot should reflect the updated themeStore settings
+      expect(usePageStore.getState().themeSettingsSnapshot).toEqual(updatedSettings);
     });
 
-    it("does not affect other settings in the same group", () => {
-      seedThemeSettings();
-      usePageStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
-
-      const colors = usePageStore.getState().themeSettings.settings.global.colors;
-      const secondary = colors.find((s) => s.id === "secondary_color");
-      expect(secondary.value).toBe("#00ff00");
-    });
-
-    it("does not affect other groups", () => {
-      seedThemeSettings();
-      usePageStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
-
-      const typography = usePageStore.getState().themeSettings.settings.global.typography;
-      expect(typography[0].value).toBe("Inter");
-    });
-
-    it("is a no-op for a non-existent group", () => {
-      seedThemeSettings();
-      const before = JSON.stringify(usePageStore.getState().themeSettings);
-      usePageStore.getState().updateThemeSetting("nonexistent", "foo", "bar");
-      expect(JSON.stringify(usePageStore.getState().themeSettings)).toBe(before);
-    });
-
-    it("is a no-op for a non-existent setting ID within a valid group", () => {
-      seedThemeSettings();
-      usePageStore.getState().updateThemeSetting("colors", "nonexistent", "#aaa");
-
-      // The existing settings should be unchanged
-      const colors = usePageStore.getState().themeSettings.settings.global.colors;
-      expect(colors.find((s) => s.id === "primary_color").value).toBe("#ff0000");
-    });
-
-    it("is a no-op when themeSettings is null", () => {
-      // Store starts with themeSettings: null — should not throw
+    it("is a no-op when themeStore settings are null", () => {
+      mockThemeStoreState.settings = null;
       expect(() => {
         usePageStore.getState().updateThemeSetting("colors", "primary_color", "#000");
       }).not.toThrow();
     });
-
-    it("produces a deep copy (does not mutate original)", () => {
-      seedThemeSettings();
-      const before = usePageStore.getState().originalThemeSettings;
-      usePageStore.getState().updateThemeSetting("colors", "primary_color", "#0000ff");
-
-      const originalPrimary = before.settings.global.colors.find((s) => s.id === "primary_color");
-      expect(originalPrimary.value).toBe("#ff0000");
-    });
   });
 
   // --------------------------------------------------------------------------
-  // hasUnsavedThemeChanges
+  // syncThemeStoreFromSnapshot
   // --------------------------------------------------------------------------
 
-  describe("hasUnsavedThemeChanges", () => {
-    it("returns false when theme settings match original", () => {
-      seedThemeSettings();
-      expect(usePageStore.getState().hasUnsavedThemeChanges()).toBe(false);
+  describe("syncThemeStoreFromSnapshot", () => {
+    it("pushes snapshot to themeStore", () => {
+      const snapshot = { settings: { global: { colors: [{ id: "c1", value: "#abc" }] } } };
+      usePageStore.setState({ themeSettingsSnapshot: snapshot });
+
+      usePageStore.getState().syncThemeStoreFromSnapshot();
+
+      expect(mockThemeStoreState.setSettings).toHaveBeenCalled();
+      const arg = mockThemeStoreState.setSettings.mock.calls[0][0];
+      expect(arg).toEqual(snapshot);
+      // Should be a deep copy, not the same reference
+      expect(arg).not.toBe(snapshot);
     });
 
-    it("returns true after a theme setting is changed", () => {
-      seedThemeSettings();
-      usePageStore.getState().updateThemeSetting("colors", "primary_color", "#changed");
-      expect(usePageStore.getState().hasUnsavedThemeChanges()).toBe(true);
-    });
-
-    it("returns false when themeSettings is null", () => {
-      expect(usePageStore.getState().hasUnsavedThemeChanges()).toBe(false);
-    });
-
-    it("returns false when originalThemeSettings is null", () => {
-      usePageStore.setState({ themeSettings: { settings: {} }, originalThemeSettings: null });
-      expect(usePageStore.getState().hasUnsavedThemeChanges()).toBe(false);
-    });
-  });
-
-  // --------------------------------------------------------------------------
-  // markThemeSettingsSaved
-  // --------------------------------------------------------------------------
-
-  describe("markThemeSettingsSaved", () => {
-    it("syncs originalThemeSettings to current themeSettings", () => {
-      seedThemeSettings();
-      usePageStore.getState().updateThemeSetting("colors", "primary_color", "#saved");
-      expect(usePageStore.getState().hasUnsavedThemeChanges()).toBe(true);
-
-      usePageStore.getState().markThemeSettingsSaved();
-      expect(usePageStore.getState().hasUnsavedThemeChanges()).toBe(false);
-    });
-
-    it("creates a deep copy so future edits do not affect original", () => {
-      seedThemeSettings();
-      usePageStore.getState().updateThemeSetting("colors", "primary_color", "#saved");
-      usePageStore.getState().markThemeSettingsSaved();
-
-      // Now change again — should show unsaved
-      usePageStore.getState().updateThemeSetting("colors", "primary_color", "#changed-again");
-      expect(usePageStore.getState().hasUnsavedThemeChanges()).toBe(true);
-    });
-
-    it("is a no-op when themeSettings is null", () => {
-      expect(() => usePageStore.getState().markThemeSettingsSaved()).not.toThrow();
+    it("is a no-op when snapshot is null", () => {
+      usePageStore.setState({ themeSettingsSnapshot: null });
+      usePageStore.getState().syncThemeStoreFromSnapshot();
+      expect(mockThemeStoreState.setSettings).not.toHaveBeenCalled();
     });
   });
 
@@ -362,8 +328,7 @@ describe("pageStore", () => {
       expect(state.page).toBeNull();
       expect(state.originalPage).toBeNull();
       expect(state.globalWidgets).toEqual({ header: null, footer: null });
-      expect(state.themeSettings).toBeNull();
-      expect(state.originalThemeSettings).toBeNull();
+      expect(state.themeSettingsSnapshot).toBeNull();
       expect(state.loadedProjectId).toBeNull();
       expect(state.loading).toBe(false);
       expect(state.error).toBeNull();
@@ -371,7 +336,7 @@ describe("pageStore", () => {
   });
 
   describe("loadPage", () => {
-    it("loads page, globals, and theme settings for the requested project", async () => {
+    it("loads page and globals, delegates theme loading to themeStore", async () => {
       getPage.mockResolvedValue({
         id: "page-1",
         title: "Loaded Page",
@@ -385,19 +350,25 @@ describe("pageStore", () => {
         header: { settings: { logo: "logo.png" }, blocks: {}, blocksOrder: [] },
         footer: null,
       });
-      getThemeSettings.mockResolvedValue({
+
+      // After loadSettings, themeStore will have settings
+      const themeData = {
         settings: { global: { colors: [{ id: "primary", value: "#000" }] } },
+      };
+      mockThemeStoreState.loadSettings.mockImplementation(async () => {
+        mockThemeStoreState.settings = themeData;
       });
 
       await usePageStore.getState().loadPage("page-1");
 
       const state = usePageStore.getState();
       expect(getGlobalWidgets).toHaveBeenCalled();
-      expect(getThemeSettings).toHaveBeenCalled();
+      expect(mockThemeStoreState.loadSettings).toHaveBeenCalledWith("project-a");
       expect(state.loadedProjectId).toBe("project-a");
       expect(Object.keys(state.page.widgets)).toEqual(["w-1"]);
       expect(state.globalWidgets.header.type).toBe("header");
-      expect(state.themeSettings.settings.global.colors[0].id).toBe("primary");
+      // The snapshot should reflect what themeStore loaded
+      expect(state.themeSettingsSnapshot).toEqual(themeData);
     });
 
     it("clears stale state when the load fails", async () => {
@@ -412,7 +383,7 @@ describe("pageStore", () => {
       const state = usePageStore.getState();
       expect(state.page).toBeNull();
       expect(state.globalWidgets).toEqual({ header: null, footer: null });
-      expect(state.themeSettings).toBeNull();
+      expect(state.themeSettingsSnapshot).toBeNull();
       expect(state.loadedProjectId).toBe("project-b");
       expect(state.error).toBe("boom");
     });
@@ -425,7 +396,6 @@ describe("pageStore", () => {
       const pageRequest = createDeferred();
       getPage.mockReturnValue(pageRequest.promise);
       getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
-      getThemeSettings.mockResolvedValue({ settings: { global: {} } });
 
       const loadPromise = usePageStore.getState().loadPage("page-2");
 
@@ -435,8 +405,7 @@ describe("pageStore", () => {
       expect(interimState.page).toBeNull();
       expect(interimState.originalPage).toBeNull();
       expect(interimState.globalWidgets).toEqual({ header: null, footer: null });
-      expect(interimState.themeSettings).toBeNull();
-      expect(interimState.originalThemeSettings).toBeNull();
+      expect(interimState.themeSettingsSnapshot).toBeNull();
       expect(interimState.loadedProjectId).toBe("project-a");
 
       pageRequest.resolve({
@@ -457,9 +426,6 @@ describe("pageStore", () => {
         .mockImplementationOnce(() => firstPageRequest.promise)
         .mockImplementationOnce(() => secondPageRequest.promise);
       getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
-      getThemeSettings.mockResolvedValue({
-        settings: { global: { colors: [{ id: "primary", value: "#000" }] } },
-      });
       getActiveProjectId
         .mockImplementationOnce(() => "project-a")
         .mockImplementationOnce(() => "project-b")
@@ -488,6 +454,86 @@ describe("pageStore", () => {
       expect(state.loadedProjectId).toBe("project-b");
       expect(state.page.id).toBe("page-b");
       expect(state.page.title).toBe("Page B");
+    });
+
+    it("preserves an unsaved theme draft when themeStore already has data for the same project", async () => {
+      // Simulate: user edited theme settings on Settings page for project-a,
+      // then navigated to the editor for the same project.
+      const draftSettings = {
+        settings: { global: { colors: [{ id: "primary", value: "#draft" }] } },
+      };
+      mockThemeStoreState.settings = draftSettings;
+      mockThemeStoreState.loadedProjectId = "project-a";
+
+      getPage.mockResolvedValue({
+        id: "page-1",
+        title: "Page",
+        widgets: {},
+        widgetsOrder: [],
+      });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+
+      await usePageStore.getState().loadPage("page-1");
+
+      // themeStore.loadSettings should NOT have been called — draft preserved
+      expect(mockThemeStoreState.loadSettings).not.toHaveBeenCalled();
+      // The snapshot should reflect the existing draft
+      expect(usePageStore.getState().themeSettingsSnapshot).toEqual(draftSettings);
+    });
+
+    it("retries theme load for the same project after a previous failure", async () => {
+      // Simulate: a previous load for project-a failed, leaving loadedProjectId
+      // set but settings null. The next loadPage for the same project must retry.
+      mockThemeStoreState.settings = null;
+      mockThemeStoreState.loadedProjectId = "project-a";
+
+      const freshTheme = {
+        settings: { global: { colors: [{ id: "primary", value: "#retried" }] } },
+      };
+      mockThemeStoreState.loadSettings.mockImplementation(async () => {
+        mockThemeStoreState.settings = freshTheme;
+      });
+
+      getPage.mockResolvedValue({
+        id: "page-1",
+        title: "Page",
+        widgets: {},
+        widgetsOrder: [],
+      });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+
+      await usePageStore.getState().loadPage("page-1");
+
+      // Must have retried since settings was null
+      expect(mockThemeStoreState.loadSettings).toHaveBeenCalledWith("project-a");
+      expect(usePageStore.getState().themeSettingsSnapshot).toEqual(freshTheme);
+    });
+
+    it("refetches theme settings when themeStore has data for a different project", async () => {
+      // themeStore has data for project-a, but we're loading a page for project-b
+      mockThemeStoreState.settings = { settings: { global: {} } };
+      mockThemeStoreState.loadedProjectId = "project-a";
+
+      getActiveProjectId.mockReturnValue("project-b");
+      getPage.mockResolvedValue({
+        id: "page-1",
+        title: "Page",
+        widgets: {},
+        widgetsOrder: [],
+      });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+      const freshTheme = {
+        settings: { global: { colors: [{ id: "primary", value: "#fresh" }] } },
+      };
+      mockThemeStoreState.loadSettings.mockImplementation(async () => {
+        mockThemeStoreState.settings = freshTheme;
+        mockThemeStoreState.loadedProjectId = "project-b";
+      });
+
+      await usePageStore.getState().loadPage("page-1");
+
+      expect(mockThemeStoreState.loadSettings).toHaveBeenCalledWith("project-b");
+      expect(usePageStore.getState().themeSettingsSnapshot).toEqual(freshTheme);
     });
   });
 

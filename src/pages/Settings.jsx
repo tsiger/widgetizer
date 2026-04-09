@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -7,18 +7,17 @@ import Button from "../components/ui/Button";
 import { SettingsPanel } from "../components/settings";
 
 import useToastStore from "../stores/toastStore";
-
-import { getThemeSettings, saveThemeSettings } from "../queries/themeManager";
-import { invalidateMediaCache } from "../queries/mediaManager";
+import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 export default function Settings() {
   const { t } = useTranslation();
-  const [themeData, setThemeData] = useState(null);
-  const [originalData, setOriginalData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [hasChanges, setHasChanges] = useState(false);
+
+  const settings = useThemeStore((s) => s.settings);
+  const loading = useThemeStore((s) => s.loading);
+  const hasChanges = useThemeStore((s) => s.hasUnsavedThemeChanges());
+  const { loadSettings, updateThemeSetting, resetThemeSettings, saveSettings } = useThemeStore.getState();
 
   useFormNavigationGuard(hasChanges);
   const showToast = useToastStore((state) => state.showToast);
@@ -26,50 +25,24 @@ export default function Settings() {
 
   useEffect(() => {
     if (!activeProject?.id) {
-      setThemeData(null);
-      setOriginalData(null);
-      setHasChanges(false);
-      setLoading(false);
+      useThemeStore.getState().resetForProjectChange();
       return;
     }
 
-    let stale = false;
-
-    const loadThemeSettings = async () => {
-      try {
-        setLoading(true);
-        setThemeData(null);
-        setOriginalData(null);
-        setHasChanges(false);
-        const data = await getThemeSettings(activeProject.id);
-        if (stale) return;
-        setThemeData(data);
-        setOriginalData(JSON.parse(JSON.stringify(data))); // Deep copy for comparison
-      } catch (error) {
-        if (stale) return;
-        console.error("Failed to load theme settings:", error);
-        showToast(t("themeSettings.toasts.loadError"), "error");
-      } finally {
-        if (!stale) setLoading(false);
-      }
-    };
-
-    loadThemeSettings();
-    return () => { stale = true; };
-  }, [activeProject?.id, showToast, t]);
-
-  useEffect(() => {
-    if (themeData && originalData) {
-      setHasChanges(JSON.stringify(themeData) !== JSON.stringify(originalData));
+    // Only reload if the store is for a different project (or empty).
+    // This preserves in-flight drafts when navigating back from the editor.
+    const { loadedProjectId } = useThemeStore.getState();
+    if (loadedProjectId !== activeProject.id) {
+      loadSettings(activeProject.id);
     }
-  }, [themeData, originalData]);
+  }, [activeProject?.id, loadSettings]);
 
   /**
-   * Converts nested settings structure to a flat object of values
-   * This is needed for the SettingsPanel component which expects a flat values object
+   * Converts nested settings structure to a flat object of values.
+   * Needed for the SettingsPanel component which expects a flat values object.
    */
   const extractSettingsValues = (data) => {
-    if (!data || !data.settings || !data.settings.global) return {};
+    if (!data?.settings?.global) return {};
 
     const values = {};
     const { global } = data.settings;
@@ -83,57 +56,35 @@ export default function Settings() {
     return values;
   };
 
-  /**
-   * Updates a single setting value in the theme data state
-   * Called when user changes a setting in the UI
-   */
   const handleSettingChange = (id, value) => {
-    if (!themeData) return;
+    if (!settings) return;
 
-    setThemeData((prevData) => {
-      const newData = { ...prevData };
-      const { global } = newData.settings;
-
-      Object.keys(global).forEach((groupKey) => {
-        const settingIndex = global[groupKey].findIndex((s) => s.id === id);
-        if (settingIndex !== -1) {
-          global[groupKey][settingIndex].value = value;
-        }
-      });
-
-      return newData;
-    });
+    // Find which group this setting belongs to
+    const { global } = settings.settings;
+    for (const groupKey of Object.keys(global)) {
+      const settingIndex = global[groupKey].findIndex((s) => s.id === id);
+      if (settingIndex !== -1) {
+        updateThemeSetting(groupKey, id, value);
+        return;
+      }
+    }
   };
 
-  /**
-   * Saves all theme settings to the server
-   * Displays success/error notifications
-   */
   const handleSave = async () => {
     const projectAtSaveStart = useProjectStore.getState().activeProject;
     if (!projectAtSaveStart?.id) return;
 
     try {
-      const result = await saveThemeSettings(projectAtSaveStart.id, themeData);
+      const result = await saveSettings(projectAtSaveStart.id);
 
       // Drop the response if the active project changed during the save
       if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
 
-      if (result.warnings?.length) {
-        // Refetch to show the corrected values in the UI
-        const freshData = await getThemeSettings(projectAtSaveStart.id);
-        if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
-        setThemeData(freshData);
-        setOriginalData(JSON.parse(JSON.stringify(freshData)));
-        setHasChanges(false);
+      if (result?.warnings?.length) {
         showToast(result.warnings.join(" "), "warning");
       } else {
-        setOriginalData(JSON.parse(JSON.stringify(themeData)));
-        setHasChanges(false);
         showToast(t("themeSettings.toasts.saveSuccess"), "success");
       }
-      // Invalidate media cache so usage (e.g. favicon) is reflected immediately
-      invalidateMediaCache(projectAtSaveStart.id);
     } catch (error) {
       if (useProjectStore.getState().activeProject?.id !== projectAtSaveStart.id) return;
       console.error("Failed to save theme settings:", error);
@@ -142,8 +93,7 @@ export default function Settings() {
   };
 
   const handleCancel = () => {
-    setThemeData(JSON.parse(JSON.stringify(originalData)));
-    setHasChanges(false);
+    resetThemeSettings();
   };
 
   if (loading) {
@@ -169,7 +119,7 @@ export default function Settings() {
       }
       buttonProps={{
         onClick: handleSave,
-        disabled: loading || !themeData || !hasChanges,
+        disabled: loading || !settings || !hasChanges,
         variant: hasChanges ? "dark" : "primary",
         children: (
           <>
@@ -182,10 +132,10 @@ export default function Settings() {
       <>
         {/* Settings panel container */}
         <div className="bg-white border border-t-0 border-slate-200">
-          {themeData ? (
+          {settings ? (
             <SettingsPanel
-              schema={themeData.settings.global}
-              values={extractSettingsValues(themeData)}
+              schema={settings.settings.global}
+              values={extractSettingsValues(settings)}
               onChange={handleSettingChange}
             />
           ) : (
@@ -199,7 +149,7 @@ export default function Settings() {
           </Button>
           <Button
             onClick={handleSave}
-            disabled={loading || !themeData || !hasChanges}
+            disabled={loading || !settings || !hasChanges}
             variant={hasChanges ? "dark" : "primary"}
           >
             {t("common.save")}

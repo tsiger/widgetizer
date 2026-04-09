@@ -16,12 +16,23 @@ vi.mock("../../queries/themeManager", () => ({
 vi.mock("../../queries/mediaManager", () => ({
   invalidateMediaCache: vi.fn(),
 }));
+
+const mockThemeStoreState = {
+  settings: null,
+  originalSettings: null,
+  loadedProjectId: null,
+  setSettings: vi.fn(),
+  markThemeSettingsSaved: vi.fn(),
+  hasUnsavedThemeChanges: vi.fn(() => false),
+  loadSettings: vi.fn().mockResolvedValue(undefined),
+  saveSettings: vi.fn().mockResolvedValue({}),
+  updateThemeSetting: vi.fn(),
+  resetForProjectChange: vi.fn(),
+};
+
 vi.mock("../themeStore", () => ({
   default: {
-    getState: () => ({
-      setSettings: vi.fn(),
-      markThemeSettingsSaved: vi.fn(),
-    }),
+    getState: () => mockThemeStoreState,
   },
 }));
 vi.mock("../projectStore", () => ({
@@ -38,7 +49,6 @@ vi.mock("../../lib/activeProjectId", () => ({
 const { default: useAutoSave } = await import("../saveStore");
 const { default: usePageStore } = await import("../pageStore");
 const { savePageContent } = await import("../../queries/pageManager");
-const { saveThemeSettings } = await import("../../queries/themeManager");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -51,13 +61,21 @@ function resetStores() {
     page: null,
     originalPage: null,
     globalWidgets: { header: null, footer: null },
-    themeSettings: null,
-    originalThemeSettings: null,
+    themeSettingsSnapshot: null,
     loadedProjectId: null,
     activeLoadId: 0,
     loading: false,
     error: null,
   });
+
+  // Reset themeStore mock
+  mockThemeStoreState.settings = null;
+  mockThemeStoreState.originalSettings = null;
+  mockThemeStoreState.loadedProjectId = null;
+  mockThemeStoreState.setSettings.mockReset();
+  mockThemeStoreState.markThemeSettingsSaved.mockReset();
+  mockThemeStoreState.hasUnsavedThemeChanges.mockReset().mockReturnValue(false);
+  mockThemeStoreState.saveSettings.mockReset().mockResolvedValue({});
 }
 
 function seedPageStore() {
@@ -256,19 +274,11 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
     });
 
-    it("detects theme settings drift", () => {
-      const settings = {
-        settings: { global: { colors: [{ id: "c1", value: "#000" }] } },
-      };
-      usePageStore.setState({
-        themeSettings: JSON.parse(JSON.stringify(settings)),
-        originalThemeSettings: JSON.parse(JSON.stringify(settings)),
-      });
+    it("detects theme settings drift via themeStore", () => {
+      seedPageStore();
 
-      // Modify themeSettings without flagging
-      const modified = JSON.parse(JSON.stringify(settings));
-      modified.settings.global.colors[0].value = "#fff";
-      usePageStore.setState({ themeSettings: modified });
+      // Simulate themeStore reporting unsaved changes
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
 
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
     });
@@ -420,18 +430,31 @@ describe("saveStore (useAutoSave)", () => {
       expect(usePageStore.getState().originalPage.title).toBe("Modified");
     });
 
-    it("passes store-cached project ID to saveThemeSettings", async () => {
+    it("delegates theme save to themeStore.saveSettings", async () => {
       seedPageStore();
       const themeSettings = {
         settings: { global: { colors: [{ id: "c1", value: "#000" }] } },
       };
-      usePageStore.setState({ themeSettings });
+      mockThemeStoreState.settings = themeSettings;
       useAutoSave.getState().setThemeSettingsModified(true);
 
       await useAutoSave.getState().save();
 
-      // The mock projectStore returns activeProject.id = "test-project"
-      expect(saveThemeSettings).toHaveBeenCalledWith("test-project", themeSettings);
+      // Should call the canonical save path, not the raw API function
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalledWith("test-project");
+    });
+
+    it("saves theme settings when themeStore reports drift even without explicit flag", async () => {
+      seedPageStore();
+      mockThemeStoreState.settings = {
+        settings: { global: { colors: [{ id: "c1", value: "#drifted" }] } },
+      };
+      // themeSettingsModified is false, but themeStore has drift (e.g. from undo)
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+
+      await useAutoSave.getState().save();
+
+      expect(mockThemeStoreState.saveSettings).toHaveBeenCalledWith("test-project");
     });
 
     it("aborts before saving when the loaded page belongs to another project", async () => {
@@ -443,7 +466,7 @@ describe("saveStore (useAutoSave)", () => {
       await useAutoSave.getState().save();
 
       expect(savePageContent).not.toHaveBeenCalled();
-      expect(saveThemeSettings).not.toHaveBeenCalled();
+      expect(mockThemeStoreState.saveSettings).not.toHaveBeenCalled();
       expect(useAutoSave.getState().isSaving).toBe(false);
     });
   });

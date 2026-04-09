@@ -10,6 +10,7 @@ import ThemeSelector from "../components/pageEditor/ThemeSelector";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 import usePageStore from "../stores/pageStore";
+import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
@@ -23,7 +24,8 @@ export default function PageEditor() {
   const previewIframeRef = useRef(null);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  const { page, loading, error, themeSettings } = usePageStore();
+  const { page, loading, error } = usePageStore();
+  const themeSettings = useThemeStore((s) => s.settings);
   const {
     schemas: widgetSchemas,
     selectedWidgetId,
