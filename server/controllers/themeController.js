@@ -17,7 +17,8 @@ import {
 import { getAllProjects, getProjectById } from "../db/repositories/projectRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
-import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
+import { sortVersions, getLatestVersion, isValidVersion } from "../utils/semver.js";
+import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
@@ -702,7 +703,7 @@ export async function getAllThemes(req, res) {
           }
 
           // Check if theme has pending updates
-          const hasPendingUpdate = latestVersion && isNewerVersion(theme.version, latestVersion);
+          const hasPendingUpdate = hasAvailableUpdate(theme.version, latestVersion);
           const projectsUsingTheme = projects
             .filter((project) => project.theme === themeId)
             .map((project) => ({ id: project.id, name: project.name }));
@@ -866,10 +867,9 @@ export async function themeHasPendingUpdates(themeId) {
 
     // Get current source version (from latest/ if exists, otherwise base)
     const { theme } = await readThemeSourceMetadata(themeId);
-    const currentVersion = theme.version;
 
     // Has pending updates if newest version is newer than current
-    return isNewerVersion(currentVersion, newestVersion);
+    return hasAvailableUpdate(theme.version, newestVersion);
   } catch {
     return false;
   }

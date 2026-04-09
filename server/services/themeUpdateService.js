@@ -11,7 +11,7 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/themeController.js";
 import { refreshMediaUsageAfterStructuralChange } from "./mediaUsageService.js";
-import { isNewerVersion } from "../utils/semver.js";
+import { getUpdateStatus } from "../utils/updateStatus.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
 /**
@@ -35,7 +35,6 @@ export async function checkForUpdates(projectId) {
   }
 
   const themeName = project.theme;
-  const currentVersion = project.themeVersion;
 
   // Get the theme's current source version (from latest/ or base theme.json)
   // This is the version that was last built/published, NOT all available versions
@@ -47,20 +46,12 @@ export async function checkForUpdates(projectId) {
     // Theme doesn't exist or can't be read
   }
 
-  if (!currentVersion || !sourceVersion) {
-    return {
-      hasUpdate: false,
-      currentVersion: currentVersion || "unknown",
-      latestVersion: sourceVersion || "unknown",
-    };
-  }
-
-  const hasUpdate = isNewerVersion(currentVersion, sourceVersion);
+  const status = getUpdateStatus(project.themeVersion, sourceVersion);
 
   return {
-    hasUpdate,
-    currentVersion,
-    latestVersion: sourceVersion,
+    hasUpdate: status.hasUpdate && project.receiveThemeUpdates,
+    currentVersion: status.currentVersionLabel,
+    latestVersion: status.latestVersionLabel,
   };
 }
 

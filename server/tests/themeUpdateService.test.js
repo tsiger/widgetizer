@@ -160,6 +160,7 @@ async function createProject(themeVersion) {
         name: "Update Service Test",
         theme: THEME_NAME,
         themeVersion,
+        receiveThemeUpdates: true,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       },
@@ -252,6 +253,32 @@ describe("checkForUpdates", () => {
     const result = await checkForUpdates(PROJECT_ID);
     assert.equal(result.hasUpdate, false);
     assert.equal(result.currentVersion, "1.0.0");
+    assert.equal(result.latestVersion, "1.0.0");
+  });
+
+  it("returns false when update is available but receiveThemeUpdates is disabled", async () => {
+    await createTheme("1.0.0");
+    // Create project at older version but with updates disabled
+    await projectRepo.writeProjectsData({
+      projects: [
+        {
+          id: PROJECT_ID,
+          folderName: PROJECT_FOLDER,
+          name: "Update Service Test",
+          theme: THEME_NAME,
+          themeVersion: "0.9.0",
+          receiveThemeUpdates: false,
+          created: new Date().toISOString(),
+          updated: new Date().toISOString(),
+        },
+      ],
+      activeProjectId: PROJECT_ID,
+    });
+
+    const result = await checkForUpdates(PROJECT_ID);
+    assert.equal(result.hasUpdate, false);
+    // Versions should still be reported even when updates are disabled
+    assert.equal(result.currentVersion, "0.9.0");
     assert.equal(result.latestVersion, "1.0.0");
   });
 

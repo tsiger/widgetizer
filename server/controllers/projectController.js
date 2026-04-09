@@ -12,7 +12,7 @@ import {
 } from "../config.js";
 import { v4 as uuidv4 } from "uuid";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
-import { isNewerVersion } from "../utils/semver.js";
+import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
@@ -62,13 +62,9 @@ export async function getAllProjects(req, res) {
             const { theme: themeData } = await getThemeMetadata(project.theme);
             themeName = themeData.name || project.theme;
 
-            // Check for updates - compare project version against theme's current source version
-            // (from latest/ snapshot or base), NOT against all available versions
             // Only flag updates if the project has opted in via receiveThemeUpdates
-            if (project.receiveThemeUpdates && project.themeVersion && themeData.version) {
-              if (isNewerVersion(project.themeVersion, themeData.version)) {
-                hasThemeUpdate = true;
-              }
+            if (project.receiveThemeUpdates) {
+              hasThemeUpdate = hasAvailableUpdate(project.themeVersion, themeData.version);
             }
           } catch {
             // If theme doesn't exist or can't be read, use folder ID as fallback
