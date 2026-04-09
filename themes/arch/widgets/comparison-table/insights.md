@@ -13,7 +13,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 | `description` | Any text | Supporting paragraph below the headline |
 | `heading_alignment` | `left`, `center` (default) | Controls whether the eyebrow/title/description block is centered or left-aligned |
 | `feature_column_label` | Any text (default "Features") | Header text for the first (feature-name) column |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Background and accent treatment for the entire section; non-standard schemes add padded container styling and override `--widget-bg-color` |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and accent treatment for the entire section; non-standard schemes add padded container styling and override `--widget-bg-color` |
 | `top_spacing` | `auto`, `none` | Removes the default top margin when set to `none`; useful for stacking sections flush |
 | `bottom_spacing` | `auto`, `none` | Removes the default bottom margin when set to `none` |
 
@@ -33,7 +33,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 ### 1. SaaS Pricing Comparison
 
 - **Columns:** 3 (Free / Pro / Enterprise)
-- **Settings:** `eyebrow` = "Pricing", `title` = "Find Your Plan", `heading_alignment` = center, `color_scheme` = standard-accent, featured on Pro column with badge "Most Popular"
+- **Settings:** `eyebrow` = "Pricing", `title` = "Find Your Plan", `heading_alignment` = center, `color_scheme` = standard-secondary, featured on Pro column with badge "Most Popular"
 - **Features:** 8-10 rows mixing boolean checks (SSO, API Access) with text values (storage limits, seat counts)
 - **Good for:** Software companies, digital tools, subscription services
 - **Industries:** SaaS, developer tools, productivity apps
@@ -57,7 +57,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 ### 4. Membership Levels
 
 - **Columns:** 3 (Individual / Family / Corporate)
-- **Settings:** `eyebrow` = "Membership", `title` = "Choose Your Level", `heading_alignment` = center, `color_scheme` = highlight-accent, featured on Family column with badge "Best Value"
+- **Settings:** `eyebrow` = "Membership", `title` = "Choose Your Level", `heading_alignment` = center, `color_scheme` = highlight-secondary, featured on Family column with badge "Best Value"
 - **Features:** 6-8 rows mixing booleans (Guest Passes, Pool Access) with text ("2 classes/week" vs "Unlimited")
 - **Good for:** Gyms, clubs, coworking spaces, community organizations
 - **Industries:** Fitness, wellness, coworking, nonprofits
@@ -65,7 +65,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 ### 5. Venue or Rental Packages
 
 - **Columns:** 3 (Basic / Deluxe / All-Inclusive)
-- **Settings:** `title` = "Event Packages", `heading_alignment` = center, `color_scheme` = standard-accent, featured on Deluxe with badge "Popular"
+- **Settings:** `title` = "Event Packages", `heading_alignment` = center, `color_scheme` = standard-secondary, featured on Deluxe with badge "Popular"
 - **Features:** 6-8 rows with text values for capacity, hours included, catering options, and booleans for add-ons (DJ, Photography, Setup/Cleanup)
 - **Good for:** Event venues, wedding barns, conference centers, vacation rentals
 - **Industries:** Hospitality, events, tourism

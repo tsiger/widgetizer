@@ -17,7 +17,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 | `icon_style` | `plain` / `outline` / `filled` | Changes icon rendering: bare icon, outlined container, or solid-filled container |
 | `icon_size` | `sm` / `md` / `lg` / `xl` | Scales the icon; `xl` default gives the icons visual weight as anchor points |
 | `icon_shape` | `sharp` / `rounded` / `circle` | Container corner style when using outline or filled icon styles |
-| `color_scheme` | `standard` / `standard-accent` / `highlight` / `highlight-accent` | Background and text treatment; non-standard schemes add section padding and a visible background color |
+| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Background and text treatment; non-standard schemes add section padding and a visible background color |
 | `top_spacing` | `auto` / `none` | Removes top padding when `none`, useful for stacking sections tightly |
 | `bottom_spacing` | `auto` / `none` | Removes bottom padding when `none` |
 
@@ -55,7 +55,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 3. Why Choose Us (Differentiators)
 
-**Settings:** `heading_alignment: left`, `content_position: right`, `show_divider: false`, `icon_style: plain`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard-accent`
+**Settings:** `heading_alignment: left`, `content_position: right`, `show_divider: false`, `icon_style: plain`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard-secondary`
 **Blocks:** 3-4 features (e.g., 24/7 Support, No Contracts, Local Team, Certified Experts)
 
 **Good for:** A compact trust-building section near the bottom of a homepage where the heading asks a question and the features answer it.
@@ -75,7 +75,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 5. Location or Department Highlights
 
-**Settings:** `heading_alignment: center`, `content_position: right`, `show_divider: true`, `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: highlight-accent`
+**Settings:** `heading_alignment: center`, `content_position: right`, `show_divider: true`, `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: highlight-secondary`
 **Blocks:** 3 features (e.g., Downtown Office, Westside Clinic, Mobile Unit)
 
 **Good for:** Multi-location businesses that need to convey where they operate with a brief note about each location's specialties or hours.

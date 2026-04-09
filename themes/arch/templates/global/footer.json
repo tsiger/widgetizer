@@ -2,7 +2,7 @@
   "type": "footer",
   "settings": {
     "copyright": "Built with Widgetizer",
-    "color_scheme": "standard"
+    "color_scheme": "standard-primary"
   },
   "blocks": {},
   "blocksOrder": []

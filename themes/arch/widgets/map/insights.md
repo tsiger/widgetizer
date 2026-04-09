@@ -18,7 +18,7 @@ Embeddable Google Maps section with optional address bar, directions link, and a
 | `height` | `small` (300px), `medium` (450px), `large` (600px) | Controls iframe/placeholder height |
 | `show_address` | `true` / `false` | Toggles the address + pin icon row beneath the map |
 | `sidebar_position` | `left`, `right` | Puts the info/social sidebar on the chosen side; grid flips from 7fr/3fr to 3fr/7fr |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Changes background and container styling; non-standard schemes add padded container |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Changes background and container styling; non-standard schemes add padded container |
 | `top_spacing` | `auto`, `none` | Removes top section padding when set to `none` -- useful for stacking with adjacent widgets |
 | `bottom_spacing` | `auto`, `none` | Removes bottom section padding when set to `none` |
 
@@ -75,7 +75,7 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 | `eyebrow` | (empty) |
 | `height` | `small` |
 | `show_address` | `false` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `bottom_spacing` | `none` |
 | Blocks | None |
 
@@ -106,7 +106,7 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 | `heading_alignment` | `left` |
 | `height` | `large` |
 | `sidebar_position` | `left` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 | Blocks | Info: Business name + tagline in richtext. Info: Full address + phone. Social block. |
 
 **Good for:** Making the location section feel like a branded destination rather than a utility. The left sidebar draws the eye before the map.
@@ -139,7 +139,7 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 | `heading_alignment` | `left` |
 | `height` | `medium` |
 | `sidebar_position` | `right` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `show_address` | `true` |
 | Blocks | Info: "Office Hours" with weekday availability. Info: "Appointments" with booking instructions or link in richtext. |
 
@@ -152,7 +152,7 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 
 - **Stack multiple info blocks deliberately.** The sidebar is the real differentiator over a plain embed. Use it to answer the questions people actually have before visiting: parking, transit, accessibility, hours, dress code.
 - **Kill the headline when the context is obvious.** If the map sits on a page already titled "Contact" or "Visit," remove the title and eyebrow to avoid redundancy. The `small` height + `none` bottom spacing makes this feel integrated rather than sectioned off.
-- **Pair color schemes with intent.** Use `highlight` or `highlight-accent` when the map is a standalone destination section. Keep `standard` when it sits among other content-heavy widgets so it does not fight for attention.
+- **Pair color schemes with intent.** Use `highlight-primary` or `highlight-secondary` when the map is a standalone destination section. Keep `standard-primary` when it sits among other content-heavy widgets so it does not fight for attention.
 - **Left sidebar is underused.** Most sites default to right. Flipping to `left` breaks the expected scan pattern and gives the contact details more prominence, which is valuable for businesses where the visit itself is the conversion (studios, showrooms, clinics).
 - **The directions link earns its space.** A direct Google Maps link with pre-filled destination saves mobile visitors a copy-paste step. Always fill it in rather than relying on the embed's built-in controls, which are small on phones.
 - **Use the social block sparingly.** It works well as the last sidebar item to cap off the contact info, but if the footer already has social icons, doubling up adds clutter without value.

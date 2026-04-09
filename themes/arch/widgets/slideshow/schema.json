@@ -273,23 +273,23 @@
           "type": "select",
           "id": "color_scheme",
           "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.label",
-          "default": "highlight",
+          "default": "highlight-primary",
           "options": [
             {
-              "value": "standard",
-              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.standard"
+              "value": "standard-primary",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.standard_primary"
             },
             {
-              "value": "standard-accent",
-              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.standard_accent"
+              "value": "standard-secondary",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.standard_secondary"
             },
             {
-              "value": "highlight",
-              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.highlight"
+              "value": "highlight-primary",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.highlight_primary"
             },
             {
-              "value": "highlight-accent",
-              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.highlight_accent"
+              "value": "highlight-secondary",
+              "label": "tTheme:slideshow.blocks.slide.settings.color_scheme.options.highlight_secondary"
             }
           ]
         }
@@ -300,7 +300,7 @@
     {
       "type": "slide",
       "settings": {
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "heading_text": "Your First Slide",
         "heading_size": "5xl",
         "text_content": "Add your content here",
@@ -316,7 +316,7 @@
     {
       "type": "slide",
       "settings": {
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "heading_text": "Your Second Slide",
         "heading_size": "5xl",
         "text_content": "Add your content here",

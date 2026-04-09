@@ -6,7 +6,7 @@
       "type": "image-text",
       "settings": {
         "image_position": "right",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "about-eyebrow": {
@@ -70,7 +70,7 @@
         "columns_desktop": 3,
         "layout": "cards",
         "animate": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "impact-1": {
@@ -110,7 +110,7 @@
         "title": "Meet the team",
         "description": "Senior operators and strategists who lead every engagement.",
         "columns_desktop": 3,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "profile-1": {
@@ -148,7 +148,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true
       },
       "blocks": {

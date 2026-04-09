@@ -14,7 +14,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 | `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description block |
 | `layout` | `grid` (default), `carousel` | Grid shows all plans at once; carousel adds prev/next arrows and horizontal scrolling |
 | `columns_desktop` | 2 -- 5 (default 3) | Number of columns on desktop; controls card width proportionally |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | `standard` = no background. `accent` variants give cards a secondary background. `highlight` variants add visible card borders. |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` = no background. `accent` variants give cards a secondary background. `highlight-primary` variants add visible card borders. |
 | `top_spacing` | `auto`, `none` | Removes top section padding when set to `none` |
 | `bottom_spacing` | `auto`, `none` | Removes bottom section padding when set to `none` |
 
@@ -38,7 +38,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 ### 1. Classic Three-Tier SaaS
 
 - **Plans:** 3 blocks -- Free / Pro / Enterprise
-- **Settings:** `layout: grid`, `columns_desktop: 3`, `heading_alignment: center`, `color_scheme: standard-accent`
+- **Settings:** `layout: grid`, `columns_desktop: 3`, `heading_alignment: center`, `color_scheme: standard-secondary`
 - **Featured:** Middle plan (Pro)
 - **Good for:** The universal pricing page pattern visitors already understand. The featured middle plan exploits the decoy effect.
 - **Industries:** SaaS tools, email marketing platforms, project management apps, web hosting
@@ -62,7 +62,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 ### 4. Scrollable Plan Carousel
 
 - **Plans:** 5 blocks -- various named plans
-- **Settings:** `layout: carousel`, `columns_desktop: 3`, `heading_alignment: center`, `color_scheme: standard-accent`
+- **Settings:** `layout: carousel`, `columns_desktop: 3`, `heading_alignment: center`, `color_scheme: standard-secondary`
 - **Featured:** One plan to anchor attention as users scroll
 - **Good for:** Businesses with many plan variants that would crowd a grid. Carousel keeps the section compact and invites exploration.
 - **Industries:** Managed hosting, co-working spaces, insurance brokers, car wash memberships
@@ -70,7 +70,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 ### 5. Freemium Funnel
 
 - **Plans:** 3 blocks -- Free / Growth / Scale
-- **Settings:** `layout: grid`, `columns_desktop: 3`, `heading_alignment: center`, `color_scheme: highlight-accent`
+- **Settings:** `layout: grid`, `columns_desktop: 3`, `heading_alignment: center`, `color_scheme: highlight-secondary`
 - **Featured:** Growth (mid-tier)
 - **Feature trick:** Use `-` prefix on the Free plan to show X icons for unavailable features (e.g. "- Priority Support"), and `+` on paid plans for checks. This creates a strong visual contrast that sells the upgrade.
 - **Good for:** Products that need a generous free tier to build a user base while nudging toward paid.
@@ -105,7 +105,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 
 - **Match column count to plan count.** Three plans in three columns is clean. Four plans in three columns leaves a lonely orphan on row two. If you have four plans, use `columns_desktop: 4` or switch to carousel.
 
-- **Pair color schemes with page context.** Use `standard` when the pricing section sits between other colored sections and needs breathing room. Use `highlight-accent` when pricing is the hero section and needs to own the page.
+- **Pair color schemes with page context.** Use `standard-primary` when the pricing section sits between other colored sections and needs breathing room. Use `highlight-secondary` when pricing is the hero section and needs to own the page.
 
 - **Drop the section title when pricing is the whole page.** If you have a dedicated /pricing route, consider leaving `title` blank. The plan cards become h2 elements automatically, improving both hierarchy and visual weight.
 

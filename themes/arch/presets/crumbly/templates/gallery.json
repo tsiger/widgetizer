@@ -7,7 +7,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -36,7 +36,7 @@
         "title": "Our Bakes",
         "heading_alignment": "center",
         "gap": "var(--space-md)",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "bento-hero": {
@@ -107,7 +107,7 @@
         "columns_desktop": 3,
         "staggered": true,
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "space-1": {
@@ -155,7 +155,7 @@
         "eyebrow": "Coming Up",
         "title": "Classes & Events",
         "heading_alignment": "center",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "event-1": {

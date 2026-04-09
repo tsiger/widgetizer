@@ -7,7 +7,7 @@
       "settings": {
         "text_alignment": "center",
         "content_width": "medium",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "intro-heading": {
@@ -36,7 +36,7 @@
         "height": "medium",
         "show_address": true,
         "sidebar_position": "right",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "info-1": {
@@ -65,7 +65,7 @@
         "week_start_day": "1",
         "sidebar_position": "right",
         "note": "Closed on major holidays",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "day-1": {
@@ -128,7 +128,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": false,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "faq-1": {

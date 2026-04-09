@@ -9,7 +9,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 | image | Image upload | The background image filling the left or right half; uses a placeholder landscape if empty |
 | overlay_color | Any color with alpha | Tints or darkens the image half -- useful for ensuring contrast or adding mood (e.g. semi-transparent black for cinematic feel, brand color at 30% for tinting) |
 | image_position | `left` (default), `right` | Swaps which side the photo appears on; `right` reverses the flex direction on desktop |
-| color_scheme | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls the background/text palette of the content half; non-standard schemes add a `has-highlight-background` class that tints the content area |
+| color_scheme | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls the background/text palette of the content half; non-standard schemes add a `has-highlight-background` class that tints the content area |
 | top_spacing | `auto` (default), `none` | Removes the default top margin when set to `none` -- useful for placing the hero flush against the header |
 | bottom_spacing | `auto` (default), `none` | Removes the default bottom margin when set to `none` -- lets the next section butt up directly against the hero |
 
@@ -44,7 +44,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 
 **3. "The Benefit Breakdown" (service overview)**
 - image_position: left
-- color_scheme: standard-accent
+- color_scheme: standard-secondary
 - overlay_color: none
 - Blocks: text (sm, muted, uppercase: "Why Choose Us") > heading (2xl) > features ("+ Same-day appointments\n+ Board-certified specialists\n+ Family-friendly office\n+ Insurance accepted") > button (primary medium "Schedule a Visit")
 - Good for: Highlighting service advantages with scannable checkmarks alongside a friendly team photo
@@ -61,7 +61,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 
 **5. "The Trust Builder" (about page)**
 - image_position: left
-- color_scheme: highlight-accent
+- color_scheme: highlight-secondary
 - overlay_color: rgba(0,0,0,0.2)
 - Blocks: heading (2xl) > text (base: two-sentence bio or mission) > features ("+ 20 years of experience\n+ 500+ projects completed\n+ Award-winning team") > button (primary "Meet the Team" + secondary "Our Process")
 - Good for: About or credentials section that combines narrative with proof points
@@ -78,7 +78,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 
 **7. "The Warm Introduction" (services or menu page)**
 - image_position: left
-- color_scheme: standard-accent
+- color_scheme: standard-secondary
 - overlay_color: rgba(0,0,0,0.1)
 - Blocks: text (sm, muted: "Our Services") > heading (3xl) > text (base: short paragraph describing the service philosophy) > button (secondary medium "View Full Menu")
 - Good for: Top-of-page orientation section that sets context before detailed content below
@@ -95,7 +95,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 ## Differentiation tips
 
 - Alternate `image_position` between `left` and `right` when using multiple split-hero instances on the same page to create a zigzag visual rhythm and avoid a monotonous layout.
-- Vary `color_scheme` across instances -- pair a `standard` hero at the top with a `highlight` or `highlight-accent` one further down the page to create clear visual section breaks.
+- Vary `color_scheme` across instances -- pair a `standard-primary` hero at the top with a `highlight-primary` or `highlight-secondary` one further down the page to create clear visual section breaks.
 - Change the block composition rather than just the text: one instance might use heading + text + button, while the next uses heading + features + button. Avoid repeating the same block stack verbatim.
 - Use `overlay_color` strategically and sparingly -- reserve dark overlays for atmospheric or cinematic sections and leave others clean. If every hero has the same overlay it flattens the page.
 - Scale heading sizes intentionally: the primary page hero might use 4xl-6xl, while a secondary split-hero deeper on the page should drop to 2xl-3xl to maintain clear hierarchy.

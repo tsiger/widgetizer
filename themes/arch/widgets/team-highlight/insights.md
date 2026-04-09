@@ -15,7 +15,7 @@ A split-layout team section with a sticky intro column (eyebrow, headline, descr
 | `signature_image` | Image upload | Displays below the intro text (max-width 18 rem) — great for a founder's handwritten signature or a small brand mark |
 | `columns_desktop` | **2** / 3 / 4 (range) | Number of member columns on desktop (mobile always collapses to 2) |
 | `image_ratio` | **`portrait`** (3:4) / `square` (1:1) / `auto` (natural) | Crop shape for every member photo; portrait feels editorial, square feels modern, auto preserves originals |
-| `color_scheme` | **`standard`** / `standard-accent` / `highlight` / `highlight-accent` | Background and text color palette; highlight variants add a padded container background |
+| `color_scheme` | **`standard-primary`** / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Background and text color palette; highlight variants add a padded container background |
 | `top_spacing` | **`auto`** / `none` | Removes default top padding so the widget can butt up against the section above |
 | `bottom_spacing` | **`auto`** / `none` | Removes default bottom padding |
 
@@ -85,7 +85,7 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | `columns_desktop` | 2 |
 | `image_ratio` | portrait |
 | `heading_alignment` | left |
-| `color_scheme` | highlight-accent |
+| `color_scheme` | highlight-secondary |
 | `eyebrow` | "The People Behind the Work" |
 | Blocks | 3-4 members, each with a link to a personal bio page |
 
@@ -119,7 +119,7 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | `columns_desktop` | 3 |
 | `image_ratio` | portrait |
 | `heading_alignment` | left |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `eyebrow` | "Advisory Board" |
 | Blocks | 3-6 members, each linked to a LinkedIn profile (new tab) |
 
@@ -156,6 +156,6 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 
 - **Control density with columns.** Two columns feel spacious and premium. Three columns are the workhorse layout for 6-9 people. Four columns pack in large teams but shrink photos — pair with square crops so faces stay readable at smaller sizes.
 
-- **Use color scheme to create contrast.** If the sections above and below are on a standard background, switching this widget to `highlight` or `highlight-accent` visually separates the team from surrounding content and draws the eye.
+- **Use color scheme to create contrast.** If the sections above and below are on a standard background, switching this widget to `highlight-primary` or `highlight-secondary` visually separates the team from surrounding content and draws the eye.
 
 - **Remove spacing to stack sections.** Set `top_spacing` or `bottom_spacing` to `none` when you want this widget to flow seamlessly into an adjacent section that shares the same color scheme — useful for building a cohesive "about" page sequence.

@@ -16,7 +16,7 @@ Animated statistics strip that counts up numbers on scroll, used to build instan
 | `columns_desktop` | 2 -- 5 | Number of columns on desktop; mobile always stacks. 4 is the sweet spot for most sites; 2 gives each stat more breathing room |
 | `card_layout` | `box`, `flat` | Box adds padding and (depending on color scheme) a background/border to each card; flat removes all card chrome for a minimal look |
 | `animate` | true / false | Enables the odometer count-up animation on scroll. Respects prefers-reduced-motion. Resets and replays when scrolled out and back in |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Standard uses page background; accent adds secondary background to cards; highlight inverts to the theme highlight palette; highlight-accent combines both |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses page background; accent adds secondary background to cards; highlight inverts to the theme highlight palette; highlight-secondary combines both |
 | `top_spacing` | `auto`, `none` | Removes top padding so the widget can butt against the section above it |
 | `bottom_spacing` | `auto`, `none` | Removes bottom padding for the same purpose |
 
@@ -51,7 +51,7 @@ Animated statistics strip that counts up numbers on scroll, used to build instan
 
 ### 3. Scrolling Social Proof
 
-**Settings:** 6-8 figures, carousel layout, 4 columns, box card layout, standard-accent color scheme, animate on.
+**Settings:** 6-8 figures, carousel layout, 4 columns, box card layout, standard-secondary color scheme, animate on.
 **Blocks:** Mix of achievement stats like Certifications / 5-Star Reviews / Repeat Customers / Awards Won / Countries Served / Team Members.
 **Good for:** Service pages where you have more proof points than a grid can comfortably fit without shrinking the numbers.
 **Industries:** E-commerce stores, travel agencies, fitness studios, event companies.
@@ -65,7 +65,7 @@ Animated statistics strip that counts up numbers on scroll, used to build instan
 
 ### 5. Highlighted Hero Stats
 
-**Settings:** 3 figures, grid, 3 columns, box card layout, highlight-accent color scheme, heading alignment center, animate on. Use a punchy title like "Why Choose Us" with no description to keep it tight.
+**Settings:** 3 figures, grid, 3 columns, box card layout, highlight-secondary color scheme, heading alignment center, animate on. Use a punchy title like "Why Choose Us" with no description to keep it tight.
 **Blocks:** Response Time ("< 1" suffix "hr") / Uptime ("99.9" suffix "%") / Customers ("2,500" suffix "+").
 **Good for:** Placing directly below a hero or CTA section on a tech or service homepage, using the highlight background to create visual separation.
 **Industries:** IT services, hosting companies, SaaS products, managed service providers.
@@ -79,7 +79,7 @@ Animated statistics strip that counts up numbers on scroll, used to build instan
 
 ### 7. Before-and-After Comparison
 
-**Settings:** 4 figures, grid, 4 columns, box card layout, standard-accent color scheme, heading alignment center, animate on. Title: "The Results Speak". Use the description field on each block to explain what the number means.
+**Settings:** 4 figures, grid, 4 columns, box card layout, standard-secondary color scheme, heading alignment center, animate on. Title: "The Results Speak". Use the description field on each block to explain what the number means.
 **Blocks:** Weight Lost ("1,200" suffix "lbs") with description "Total client results" / Sessions Completed / Retention Rate / Client Satisfaction.
 **Good for:** Results-oriented pages where each number needs a short explanation to land properly.
 **Industries:** Gyms, coaching businesses, weight loss clinics, tutoring services, marketing agencies reporting ROI.

@@ -21,7 +21,7 @@ A flexible icon-plus-text card grid for showcasing services, features, or value 
 | `icon_style` | `plain` (default), `outline`, `filled` | Plain shows the raw icon. Outline adds a border ring. Filled places the icon on a solid background circle/shape. |
 | `icon_size` | `sm`, `md`, `lg` (default), `xl` | Scales the icon from subtle to dominant. |
 | `icon_shape` | `sharp`, `rounded`, `circle` (default) | Controls the corner radius of the outline/filled icon container. Only visible when icon_style is outline or filled. |
-| `color_scheme` | `standard` (default), `standard-accent`, `highlight`, `highlight-accent` | Standard uses the page background. Highlight inverts to the theme's contrast palette. Accent variants add a secondary background or border to each card for extra separation. |
+| `color_scheme` | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses the page background. Highlight inverts to the theme's contrast palette. Accent variants add a secondary background or border to each card for extra separation. |
 | `top_spacing` | `auto` (default), `none` | Removes top padding so the widget sits flush against the section above. |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding so the widget sits flush against the section below. |
 
@@ -51,7 +51,7 @@ A flexible icon-plus-text card grid for showcasing services, features, or value 
 | `icon_style` | filled |
 | `icon_size` | lg |
 | `icon_shape` | circle |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | Cards | 3 or 6 |
 
 **Good for:** The main "What We Do" section on a homepage.
@@ -125,7 +125,7 @@ A flexible icon-plus-text card grid for showcasing services, features, or value 
 | `icon_style` | outline |
 | `icon_size` | xl |
 | `icon_shape` | circle |
-| `color_scheme` | highlight-accent |
+| `color_scheme` | highlight-secondary |
 | Cards | 4 (use subtitle for "Step 1", "Step 2", etc.) |
 
 **Good for:** Visualising a numbered process such as "How It Works" or an onboarding flow.
@@ -143,7 +143,7 @@ A flexible icon-plus-text card grid for showcasing services, features, or value 
 | `icon_style` | filled |
 | `icon_size` | lg |
 | `icon_shape` | sharp |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | Cards | 2 |
 
 **Good for:** A focused comparison or two primary offerings displayed side-by-side with generous whitespace.
@@ -175,5 +175,5 @@ A flexible icon-plus-text card grid for showcasing services, features, or value 
 - **The featured-image split is underused.** It turns a generic grid into something that feels custom-designed. Pair it with only 4 cards (2x2) so the layout stays balanced.
 - **Carousel is best above 5 cards.** Below that threshold, a standard grid is easier to scan. Carousel shines when you want to pack 8+ items without vertical scroll.
 - **Subtract before you add.** Leave subtitle blank if the title is self-explanatory. Remove button_link if there is no dedicated page to link to. Every empty field tightens the card and improves readability.
-- **Color scheme stacking matters.** If the section above uses `highlight`, set this widget to `standard` (or vice versa) so there is a clear visual break. Avoid placing two `highlight` widgets back-to-back.
+- **Color scheme stacking matters.** If the section above uses `highlight-primary`, set this widget to `standard-primary` (or vice versa) so there is a clear visual break. Avoid placing two `highlight-primary` widgets back-to-back.
 - **Use `top_spacing: none` or `bottom_spacing: none`** to visually merge this widget with an adjacent section that shares the same color scheme, creating a seamless content flow.

@@ -7,7 +7,7 @@
       "settings": {
         "height": "medium",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true
       },
       "blocks": {
@@ -64,7 +64,7 @@
         "title": "What we deliver",
         "description": "Practical, high-impact engagements tailored to your business.",
         "columns_desktop": 3,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "service-1": {
@@ -161,7 +161,7 @@
         "title": "How our engagements run",
         "description": "Clear milestones and regular checkpoints for accountability.",
         "layout": "vertical",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "step-1": {
@@ -212,7 +212,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true
       },
       "blocks": {

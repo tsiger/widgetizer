@@ -15,7 +15,7 @@ Embed a single YouTube or Vimeo video with an optional headline section, configu
 | `video_url` | YouTube or Vimeo URL | Parsed into an embed iframe; invalid URLs show a placeholder message instead |
 | `video_title` | Any text (default: "Video") | Sets the iframe `title` attribute for accessibility / screen readers |
 | `aspect_ratio` | `16 / 9` (default), `4 / 3`, `21:9`, `1 / 1` | Changes the padding-based aspect box: 56.25%, 75%, 42.86%, or 100% respectively |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Swaps background/text color palette; non-standard schemes add container padding and set `--widget-bg-color` |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Swaps background/text color palette; non-standard schemes add container padding and set `--widget-bg-color` |
 | `top_spacing` | `auto` (default), `none` | Removes the top section margin when set to `none`; useful for stacking widgets tightly |
 | `bottom_spacing` | `auto` (default), `none` | Removes the bottom section margin when set to `none` |
 
@@ -42,7 +42,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `description` | One sentence summarizing the product |
 | `heading_alignment` | `center` |
 | `aspect_ratio` | `16 / 9` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `top_spacing` | `none` |
 
 **Good for:** Landing pages where the video is the primary conversion driver, placed directly below the hero banner.
@@ -58,7 +58,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `title` | _(blank)_ |
 | `description` | _(blank)_ |
 | `aspect_ratio` | `21:9` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `top_spacing` | `none` |
 | `bottom_spacing` | `none` |
 
@@ -76,7 +76,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `description` | Brief intro about the company culture or mission |
 | `heading_alignment` | `left` |
 | `aspect_ratio` | `16 / 9` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 **Good for:** About pages where a founder video or team introduction sits alongside other content sections. Left alignment keeps it conversational rather than ceremonial.
 **Industries:** Professional services, agencies, local businesses, nonprofits.
@@ -92,7 +92,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `description` | "Watch this 3-minute walkthrough to set up your account." |
 | `heading_alignment` | `center` |
 | `aspect_ratio` | `4 / 3` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 
 **Good for:** Support or documentation pages. The 4:3 ratio suits screencast-style content where the extra vertical space shows more of the UI being demonstrated.
 **Industries:** Software, education platforms, membership sites.
@@ -108,7 +108,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `description` | _(blank)_ |
 | `heading_alignment` | `center` |
 | `aspect_ratio` | `16 / 9` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 
 **Good for:** Homepage or dedicated testimonials page. The accent color scheme makes the section stand out as a trust-building block between feature descriptions.
 **Industries:** Home services, fitness studios, real estate, dental/medical practices.
@@ -124,7 +124,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `description` | _(blank)_ |
 | `heading_alignment` | `center` |
 | `aspect_ratio` | `1 / 1` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 **Good for:** Embedding repurposed social-media-style clips (Instagram Reels exported to YouTube, behind-the-scenes shorts). The square ratio matches the social media feel and works well on narrow screens.
 **Industries:** Retail shops, food trucks, salons, personal brands.
@@ -140,7 +140,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `description` | "Highlights from our biggest fundraising event yet." |
 | `heading_alignment` | `center` |
 | `aspect_ratio` | `16 / 9` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 | `bottom_spacing` | `none` |
 
 **Good for:** Event pages or blog posts where the video recap sits at the top, followed immediately by a gallery or details section with no gap.
@@ -160,6 +160,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 
 - **Collapse spacing to create grouped sections.** Set `bottom_spacing` to `none` on the video widget and `top_spacing` to `none` on the widget below it to visually tie them together (e.g., video + CTA, video + text summary).
 
-- **Color schemes create section rhythm.** Alternating between `standard` and `highlight` as you scroll down a page prevents visual monotony. Reserve `highlight-accent` for the single most important video on the page.
+- **Color schemes create section rhythm.** Alternating between `standard-primary` and `highlight-primary` as you scroll down a page prevents visual monotony. Reserve `highlight-secondary` for the single most important video on the page.
 
 - **Always fill in `video_title`.** It is the only accessibility label on the iframe. "Video" tells a screen reader nothing. "2-Minute Product Demo" or "Chef Marco's Kitchen Tour" tells them everything.

@@ -13,7 +13,7 @@ A vertically stacked, zero-padded numbered list of services with optional divide
 | `description` | Any text | Supporting paragraph below the headline; useful for a one-liner about your approach |
 | `heading_alignment` | `left` / `center` (default) | Left-aligns the header block for editorial layouts; center for symmetrical pages |
 | `show_dividers` | `true` (default) / `false` | Toggles thin horizontal rules between items and a top border on the list; turning off gives a cleaner, more minimal look |
-| `color_scheme` | `standard` / `standard-accent` / `highlight` / `highlight-accent` | Controls background and text palette; accent variants add subtle color contrast, highlight variants use a bold background fill |
+| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Controls background and text palette; accent variants add subtle color contrast, highlight variants use a bold background fill |
 | `top_spacing` | `auto` (default) / `none` | Removes the default top padding when set to none; useful for stacking tightly against a hero or another full-bleed section |
 | `bottom_spacing` | `auto` (default) / `none` | Same as above for the bottom edge |
 
@@ -59,16 +59,16 @@ Removing links hides the arrow buttons entirely, and turning off dividers create
 ### 4. Bold Services Highlight
 
 - **Blocks:** 3-4 service blocks
-- **Settings:** `heading_alignment: center`, `show_dividers: true`, `color_scheme: highlight-accent`, `top_spacing: none`, `bottom_spacing: none`
+- **Settings:** `heading_alignment: center`, `show_dividers: true`, `color_scheme: highlight-secondary`, `top_spacing: none`, `bottom_spacing: none`
 - **Good for:** A visually distinct band that breaks up a long page with a contrasting background
 - **Industries:** Marketing agencies, SaaS companies, fitness studios
 
-Use `highlight-accent` to make the section pop against standard white sections above and below. Remove spacing on both ends so it reads as a full-bleed stripe.
+Use `highlight-secondary` to make the section pop against standard white sections above and below. Remove spacing on both ends so it reads as a full-bleed stripe.
 
 ### 5. Single Focus Service + Upsells
 
 - **Blocks:** 1 primary block (detailed description), 2-3 shorter blocks
-- **Settings:** `heading_alignment: left`, `show_dividers: true`, `color_scheme: standard-accent`, `eyebrow: "How We Help"`
+- **Settings:** `heading_alignment: left`, `show_dividers: true`, `color_scheme: standard-secondary`, `eyebrow: "How We Help"`
 - **Good for:** A landing page for one main service with related add-ons listed below
 - **Industries:** Dental clinics, home remodeling contractors, tutoring services
 

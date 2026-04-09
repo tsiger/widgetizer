@@ -15,7 +15,7 @@ Social-proof section that displays customer quotes in a grid or carousel, with o
 | `layout` | `grid` (default), `carousel` | Grid shows all cards at once with staggered reveal animations; carousel adds prev/next navigation and horizontal scrolling |
 | `columns_desktop` | 2 -- 5 (default: 4) | Number of columns on desktop; mobile collapses automatically |
 | `card_layout` | `box` (default), `flat` | Box gives each card a bordered, padded container; flat removes the card chrome for a more editorial look |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Standard uses the default page background; highlight swaps to theme highlight colors; accent variants tint individual cards with `--bg-secondary` |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses the default page background; highlight swaps to theme highlight colors; accent variants tint individual cards with `--bg-secondary` |
 | `top_spacing` | `auto` (default), `none` | Removes top padding so the section can sit flush against the previous widget |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding for flush stacking with the next widget |
 
@@ -42,7 +42,7 @@ Social-proof section that displays customer quotes in a grid or carousel, with o
 | `layout` | grid |
 | `columns_desktop` | 3 |
 | `card_layout` | box |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `heading_alignment` | center |
 
 **Good for:** Homepage social proof that needs to feel substantial without overwhelming.
@@ -91,14 +91,14 @@ Use 2-4 longer quotes without star ratings. Skip avatars for a cleaner editorial
 | `layout` | grid |
 | `columns_desktop` | 3 |
 | `card_layout` | box |
-| `color_scheme` | highlight-accent |
+| `color_scheme` | highlight-secondary |
 | `heading_alignment` | center |
 | `top_spacing` | none |
 | `bottom_spacing` | none |
 
 **Good for:** A bold, colored band sandwiched between two standard-background sections for visual contrast.
 **Industries:** Fitness studios, event companies, creative agencies.
-Stack 3 quotes in a single row. Every card gets an avatar. The highlight-accent scheme makes the entire strip pop against neighboring white sections.
+Stack 3 quotes in a single row. Every card gets an avatar. The highlight-secondary scheme makes the entire strip pop against neighboring white sections.
 
 ---
 
@@ -125,7 +125,7 @@ Add 4-5 quotes with avatars and titles. The carousel at 2 columns gives each quo
 | `layout` | grid |
 | `columns_desktop` | 5 |
 | `card_layout` | flat |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `heading_alignment` | center |
 | `rating` (on blocks) | 5 on all |
 

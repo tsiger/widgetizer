@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#0f1d2e80",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -33,7 +33,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "welcome-heading": {
@@ -78,7 +78,7 @@
         "eyebrow": "Your First Visit",
         "title": "Step by Step",
         "heading_alignment": "center",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "step-1": {
@@ -125,7 +125,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": false,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "faq-1": {
@@ -177,7 +177,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

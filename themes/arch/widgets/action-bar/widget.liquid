@@ -5,7 +5,7 @@
   data-widget-type="action-bar"
   {% if widget.settings.image != blank %}
     style="background-image: url('{% image src: widget.settings.image, size: 'large', output: 'url' %}'); --widget-overlay-color: {{ widget.settings.overlay_color | default: '#0a1e38bf' }}; --widget-overlay-opacity: 1;"
-  {% elsif widget.settings.color_scheme != 'standard' %}
+  {% elsif widget.settings.color_scheme != 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endif %}
 >
@@ -50,7 +50,7 @@
     }
   </style>
 
-  <div class="widget-container {% if widget.settings.image != blank or widget.settings.color_scheme != 'standard' %}widget-container-padded{% endif %}">
+  <div class="widget-container {% if widget.settings.image != blank or widget.settings.color_scheme != 'standard-primary' %}widget-container-padded{% endif %}">
     <div class="action-bar-inner">
       <div class="action-bar-content">
         {% for blockId in widget.blocksOrder %}

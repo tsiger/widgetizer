@@ -18,7 +18,7 @@ A responsive grid of image-plus-text cards with optional carousel mode, suited f
 | `alignment` | `start` (default), `center` | Left-aligns or centers the text and button inside each card. |
 | `image_position` | `top` (default), `bottom` | Places the card image above or below the text content. |
 | `aspect_ratio` | `auto`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Controls the crop shape of card images. Square for headshots, portrait for product shots, wide for landscapes. |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Standard uses page background. Accent variants add `bg-secondary` to cards and borders. Highlight variants add section-level padding and contrast. |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses page background. Accent variants add `bg-secondary` to cards and borders. Highlight variants add section-level padding and contrast. |
 | `top_spacing` | `auto` (default), `none` | Removes the top padding of the section when set to none, useful for butting sections together. |
 | `bottom_spacing` | `auto` (default), `none` | Same as above for bottom padding. |
 
@@ -47,7 +47,7 @@ A responsive grid of image-plus-text cards with optional carousel mode, suited f
 | `alignment` | center |
 | `image_position` | top |
 | `aspect_ratio` | 4/3 |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `heading_alignment` | center |
 
 **Good for:** Primary services page section where each card links to a dedicated service page.
@@ -101,7 +101,7 @@ Load 6-10 cards and let users swipe through. Works well when you have more items
 | `alignment` | center |
 | `image_position` | top |
 | `aspect_ratio` | auto |
-| `color_scheme` | highlight-accent |
+| `color_scheme` | highlight-secondary |
 | `heading_alignment` | center |
 
 Leave the card `image` blank. Use `subtitle` for the plan name, `title` for the price, and `description` for a bullet list of features. Button becomes "Choose Plan".
@@ -158,7 +158,7 @@ Put the quote in `description`, the person's name in `title`, and their role or 
 | `alignment` | start |
 | `image_position` | top |
 | `aspect_ratio` | 3/2 |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `heading_alignment` | center |
 
 Use a storefront photo as the image, the city or neighborhood as `title`, address and hours in `description`, and "Get Directions" as the button linking to Google Maps.

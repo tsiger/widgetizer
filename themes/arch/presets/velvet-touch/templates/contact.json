@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#2a202480",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -33,7 +33,7 @@
         "image_position": "left",
         "text_position": "flex-start",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "contact-heading": {
@@ -84,7 +84,7 @@
         "height": "medium",
         "show_address": true,
         "sidebar_position": "right",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "info-hours": {
@@ -110,7 +110,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": false,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "faq-1": {

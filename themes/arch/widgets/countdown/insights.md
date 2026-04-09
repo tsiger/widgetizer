@@ -17,7 +17,7 @@ A time-based countdown section that ticks toward a target date, displaying days/
 | `button` | Link object (text + href + optional target) | CTA button below the timer; hidden when text is blank |
 | `show_seconds` | `true` (default) / `false` | Adds or removes the seconds column and its separator |
 | `style` | `cards` (default), `minimal` | Cards: bordered rounded boxes per unit. Minimal: larger bare numbers separated by colons |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls background and card fill; accent variants give cards a secondary background |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and card fill; accent variants give cards a secondary background |
 | `top_spacing` | `auto` (default), `none` | Removes top section padding so the widget can sit flush against the section above |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom section padding for the same flush effect downward |
 
@@ -39,7 +39,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `title` | "We're Opening Our Doors" |
 | `description` | "Join us for the ribbon cutting -- refreshments, live music, and exclusive day-one deals." |
 | `style` | `cards` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `button` | "Get Directions" linking to Google Maps |
 | `show_seconds` | `false` |
 | `heading_alignment` | `center` |
@@ -57,7 +57,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `title` | "Summer Flash Sale" |
 | `description` | (blank) |
 | `style` | `minimal` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `button` | "Shop Now" linking to product catalog |
 | `show_seconds` | `true` |
 | `top_spacing` | `none` |
@@ -77,7 +77,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `title` | "Annual Fundraiser Gala" |
 | `description` | "Register before the deadline to lock in discounted tickets." |
 | `style` | `cards` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `button` | "Reserve Your Seat" linking to registration form |
 | `show_seconds` | `false` |
 | `heading_alignment` | `center` |
@@ -95,7 +95,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `title` | "Something New Is Brewing" |
 | `description` | "Sign up to be the first to know." |
 | `style` | `minimal` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 | `button` | "Join the Waitlist" linking to email signup |
 | `show_seconds` | `true` |
 | `heading_alignment` | `center` |
@@ -114,7 +114,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `title` | "Holiday Menu Available Soon" |
 | `description` | (blank) |
 | `style` | `cards` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `button` | "See the Full Menu" linking to menu page |
 | `show_seconds` | `false` |
 | `heading_alignment` | `left` |
@@ -132,7 +132,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `title` | "We'll Be Back Shortly" |
 | `description` | "We're upgrading our systems. Everything will be back to normal soon." |
 | `style` | `minimal` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `button` | "Check Status" linking to status page |
 | `show_seconds` | `true` |
 | `heading_alignment` | `center` |
@@ -149,6 +149,6 @@ This widget has no configurable blocks. All content is controlled through top-le
 - **Use `minimal` style for inline urgency and `cards` style for standalone sections.** Minimal works best sandwiched between other content with spacing set to `none` on both ends. Cards command their own visual block and benefit from a highlight color scheme.
 - **Turn off seconds for dates more than a week out.** Watching seconds tick on a 30-day countdown feels meaningless. Save the seconds column for last-48-hours urgency where every tick matters.
 - **Write expired messages that drive action, not just announce completion.** "The wait is over!" is fine, but "Doors are open -- walk in today!" or "Sale ended -- join the list for the next one" keeps the widget useful after zero.
-- **Combine `highlight-accent` with `cards` for maximum visual weight.** The secondary background fill on the cards creates strong contrast, making the digits pop. Use this when the countdown is the hero of the page, not a supporting element.
+- **Combine `highlight-secondary` with `cards` for maximum visual weight.** The secondary background fill on the cards creates strong contrast, making the digits pop. Use this when the countdown is the hero of the page, not a supporting element.
 - **Left-align when the countdown sits beside other left-aligned content** (text blocks, feature lists). Center-align when it occupies a full-width standalone section. Mixing alignment with surrounding content looks unintentional.
 - **Set a meaningful `expired_message` and `button` combination.** After the countdown ends, the widget stays on the page. A dead timer with no next step wastes prime screen space. Always pair the expiry state with a redirect or follow-up action.

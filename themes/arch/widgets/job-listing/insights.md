@@ -15,7 +15,7 @@ A filterable careers section that displays open positions as stacked cards with 
 | `description` | Any text (default blank) | Subtext paragraph below the headline |
 | `heading_alignment` | `left`, `center` (default) | Controls whether the header block and filter buttons align left or center |
 | `show_filters` | `true` (default), `false` | Toggles the department filter button bar; departments are auto-extracted from blocks |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | `standard` = transparent bg, no card borders. `standard-accent` = cards get a secondary bg fill + border. `highlight` = section-level colored bg + card borders. `highlight-accent` = colored bg + filled cards + borders |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` = transparent bg, no card borders. `standard-secondary` = cards get a secondary bg fill + border. `highlight-primary` = section-level colored bg + card borders. `highlight-secondary` = colored bg + filled cards + borders |
 | `top_spacing` | `auto` (default), `none` | Removes the default top padding when set to `none` |
 | `bottom_spacing` | `auto` (default), `none` | Removes the default bottom padding when set to `none` |
 
@@ -40,7 +40,7 @@ A filterable careers section that displays open positions as stacked cards with 
 
 ### 2. Department-Filtered Tech Board
 
-- **Settings:** eyebrow "Careers", title "Open Positions", description "Find your next role with us.", heading_alignment center, show_filters true, color_scheme standard-accent
+- **Settings:** eyebrow "Careers", title "Open Positions", description "Find your next role with us.", heading_alignment center, show_filters true, color_scheme standard-secondary
 - **Blocks:** 6-10 job blocks across 3-4 departments (Engineering, Design, Marketing, Operations)
 - **Good for:** Growing startups or mid-size companies that need visitors to quickly narrow by team
 - **Industries:** SaaS companies, tech startups, digital agencies
@@ -61,14 +61,14 @@ A filterable careers section that displays open positions as stacked cards with 
 
 ### 5. Multi-Location Franchise Hiring
 
-- **Settings:** eyebrow blank, title "Positions Near You", description blank, heading_alignment left, show_filters true, color_scheme highlight-accent
+- **Settings:** eyebrow blank, title "Positions Near You", description blank, heading_alignment left, show_filters true, color_scheme highlight-secondary
 - **Blocks:** 6-8 job blocks with varied locations (city names) and departments like Service, Management, Warehouse
 - **Good for:** Businesses with multiple physical locations that want visitors to scan by department and see where roles are
 - **Industries:** Restaurant chains, fitness studios, retail franchises, cleaning services
 
 ### 6. Contract & Freelance Opportunities Board
 
-- **Settings:** eyebrow "Freelance With Us", title "Current Projects", description "We partner with independent contractors for specific engagements.", heading_alignment center, show_filters false, color_scheme standard-accent
+- **Settings:** eyebrow "Freelance With Us", title "Current Projects", description "We partner with independent contractors for specific engagements.", heading_alignment center, show_filters false, color_scheme standard-secondary
 - **Blocks:** 3-5 job blocks, type set to contract, locations set to "Remote"
 - **Good for:** Agencies or consultancies that cycle through project-based contractors and want a public roster
 - **Industries:** Creative agencies, consulting firms, event production companies
@@ -88,6 +88,6 @@ A filterable careers section that displays open positions as stacked cards with 
 - **Link apply buttons to real destinations.** Point `apply_link` to a Google Form, Typeform, BambooHR page, or a mailto link. A dead "#" link undermines credibility instantly.
 - **Pair with a hero or rich-text widget above.** A job listing on its own can feel transactional. Adding a short culture statement, team photo, or benefits summary above it gives candidates a reason to scroll down.
 - **Turn off filters when you have fewer than four positions.** Filter buttons with only one or two departments add clutter without utility. Let the cards speak for themselves.
-- **Use the highlight color schemes to make the section pop on long pages.** On a homepage where the careers block sits between other standard-background sections, switching to `highlight` or `highlight-accent` creates a clear visual break that draws eyes to your openings.
+- **Use the highlight color schemes to make the section pop on long pages.** On a homepage where the careers block sits between other standard-background sections, switching to `highlight-primary` or `highlight-secondary` creates a clear visual break that draws eyes to your openings.
 - **Keep location values consistent.** If one card says "NYC" and another says "New York, NY", the listing looks sloppy. Pick a format and stick to it across all blocks.
 - **Leverage the eyebrow for urgency.** Swap the default "Join Our Team" for something time-sensitive like "Hiring This Month" or "3 Roles Open" to create a sense of immediacy.

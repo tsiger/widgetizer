@@ -14,7 +14,7 @@ Circular-photo people grid with name, role, specialty, bio, and social links -- 
 | `heading_alignment` | `center` (default), `left` | Centers or left-aligns the entire header block |
 | `columns_desktop` | `2` - `5` (default `3`) | Number of columns in the grid on desktop; directly controls density |
 | `layout` | `grid` (default), `carousel` | Grid shows all cards at once; carousel adds prev/next buttons and horizontal scrolling |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls background and text color pairing for the whole section |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text color pairing for the whole section |
 | `top_spacing` | `auto` (default), `none` | Removes top padding when set to `none`; useful for stacking sections flush |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to `none` |
 
@@ -40,7 +40,7 @@ Circular-photo people grid with name, role, specialty, bio, and social links -- 
 | `columns_desktop` | `3` |
 | `layout` | `grid` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 Fill each profile with photo, name, role, and a one-sentence bio. Add LinkedIn for professional credibility.
 
@@ -58,7 +58,7 @@ Fill each profile with photo, name, role, and a one-sentence bio. Add LinkedIn f
 | `columns_desktop` | `3` |
 | `layout` | `grid` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 
 Use the `specialty` field for cuisine focus (e.g., "Italian & Mediterranean"). Keep bios short and personality-driven. Add Instagram links for food content.
 
@@ -76,7 +76,7 @@ Use the `specialty` field for cuisine focus (e.g., "Italian & Mediterranean"). K
 | `columns_desktop` | `3` |
 | `layout` | `carousel` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 
 Best when you have 6+ profiles. Carousel keeps the section compact while letting visitors browse. Use `specialty` for certifications or focus areas. Link YouTube or TikTok for instructors who create content.
 
@@ -94,7 +94,7 @@ Best when you have 6+ profiles. Carousel keeps the section compact while letting
 | `columns_desktop` | `2` |
 | `layout` | `grid` |
 | `heading_alignment` | `left` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 Two columns give each leader more horizontal space, making bios easier to read. Use longer bios here (2-3 sentences). Add LinkedIn and email for direct contact. Skip `specialty` and use `role` for the full title.
 
@@ -112,7 +112,7 @@ Two columns give each leader more horizontal space, making bios easier to read. 
 | `columns_desktop` | `4` |
 | `layout` | `grid` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 
 High column count works when bios are omitted and you lean on photo + name + specialty. Use `specialty` for services ("Color Specialist", "Balayage & Extensions"). Link Instagram so clients can see portfolios.
 
@@ -130,7 +130,7 @@ High column count works when bios are omitted and you lean on photo + name + spe
 | `columns_desktop` | `5` |
 | `layout` | `grid` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 Maximum density. Drop bios entirely; use only photo, name, and role ("Senior Agent", "Buyer Specialist"). Add email and Facebook links. Works well on a dedicated "Agents" page rather than as a homepage section.
 
@@ -149,7 +149,7 @@ Maximum density. Drop bios entirely; use only photo, name, and role ("Senior Age
 | `columns_desktop` | `3` |
 | `layout` | `carousel` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 
 Use the `description` field to set a vibe ("A collective of designers, developers, and dreamers"). Populate multiple social links per person -- Instagram, Bluesky, GitHub -- to show each person's creative presence. The highlight background separates this section visually from portfolio work above or below.
 
@@ -164,6 +164,6 @@ Use the `description` field to set a vibe ("A collective of designers, developer
 - **Specialty vs. Role:** Use `role` for the job title and `specialty` for what makes the person unique. A dentist's role is "Orthodontist" but their specialty might be "Invisalign & Early Intervention." This two-line approach adds depth without extra UI.
 - **Carousel vs. Grid decision:** Use carousel only when you have more profiles than columns (e.g., 7+ people with 3 columns). A carousel with exactly 3 items and 3 columns has no scrolling and just adds useless navigation buttons.
 - **Social link restraint:** One or two social links per person looks intentional. Five or more looks cluttered and the circular icons start competing with the profile photo. Pick the platform where each person is most active.
-- **Color scheme pairing:** Use `highlight` or `highlight-accent` when the profile grid sits between two `standard` sections -- it creates a visual break that draws attention to the people. Avoid highlight when adjacent sections already use it.
+- **Color scheme pairing:** Use `highlight-primary` or `highlight-secondary` when the profile grid sits between two `standard-primary` sections -- it creates a visual break that draws attention to the people. Avoid highlight when adjacent sections already use it.
 - **Empty bio strategy:** It is perfectly fine to skip bios for large teams (5+ columns). The widget gracefully collapses the space. But if one person has a bio, give everyone a bio -- inconsistency looks like some people matter more than others.
 - **Left-aligned headers** work better when the profile grid follows a text-heavy section (like a mission statement). Center alignment is the safer default and works on standalone about pages.

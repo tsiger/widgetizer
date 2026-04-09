@@ -13,7 +13,7 @@ Displays a row of linked social-media icons pulled from the global theme social 
 | **description** | Any text (default "Stay connected with us on social media.") | Supporting paragraph beneath the headline. Leave blank to hide. |
 | **heading_alignment** | `center` (default), `left` | Controls text alignment of the header block *and* icon row alignment (`center` vs `flex-start`). |
 | **icon_size** | Range 1.6 -- 4.8 rem, step 0.2 (default 2.4) | Sets the SVG icon dimension. The clickable box is always icon_size + 1.6 rem, so at default the tap target is 4 rem square. |
-| **color_scheme** | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Background and text treatment. `standard` has no padded container; all other schemes add padding and set `--widget-bg-color`. |
+| **color_scheme** | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text treatment. `standard-primary` has no padded container; all other schemes add padding and set `--widget-bg-color`. |
 | **top_spacing** | `auto` (default), `none` | Removes the top section margin when set to `none`. Handy for stacking directly below another widget. |
 | **bottom_spacing** | `auto` (default), `none` | Removes the bottom section margin when set to `none`. |
 
@@ -74,7 +74,7 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | description | *(blank)* |
 | heading_alignment | left |
 | icon_size | 2.4 |
-| color_scheme | standard-accent |
+| color_scheme | standard-secondary |
 | top_spacing | auto |
 | bottom_spacing | auto |
 
@@ -112,7 +112,7 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | description | Tag us in your photos for a chance to be featured. |
 | heading_alignment | center |
 | icon_size | 4.0 |
-| color_scheme | highlight-accent |
+| color_scheme | highlight-secondary |
 | top_spacing | auto |
 | bottom_spacing | auto |
 
@@ -146,6 +146,6 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 - **The icons themselves are not configured here.** All platform URLs come from the global theme social settings. This means every social-icons widget instance (and the footer snippet) share the same links. If a client only fills in Instagram and Facebook, every instance shows exactly those two icons -- no per-widget override is possible.
 - **Pair with a CTA or embed for stronger conversion.** The widget shows icons but does not embed a feed. Placing it directly after an image gallery or testimonials section creates a natural "see more on our socials" moment.
 - **Use icon_size intentionally.** Smaller sizes (1.6--2.0) say "these links exist"; larger sizes (3.2--4.8) say "this is important, click here." Match the size to the role the section plays on the page.
-- **Color scheme stacking matters.** Two adjacent `highlight` widgets look like one merged block. Alternate between `standard` and `highlight` (or use spacing overrides) to keep sections visually distinct.
+- **Color scheme stacking matters.** Two adjacent `highlight-primary` widgets look like one merged block. Alternate between `standard-primary` and `highlight-primary` (or use spacing overrides) to keep sections visually distinct.
 - **Heading alignment affects the icon row too.** Setting `left` alignment shifts both the text and the icons to the start. This is easy to overlook and can look odd if only one or two icons are present -- centered alignment tends to work better with fewer platforms.
 - **The email link gets special treatment.** Unlike the other platforms, the mail URL is automatically prefixed with `mailto:` if the user forgets to include it. This is the only icon that opens a native app rather than a browser tab.

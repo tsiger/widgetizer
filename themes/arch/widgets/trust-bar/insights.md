@@ -13,7 +13,7 @@ A horizontal strip of icon-plus-text items that communicates key selling points,
 | `icon_shape` | `sharp` / `rounded` / `circle` (default) | Shape of the icon container when using outline or filled style. Sharp feels corporate, rounded feels modern, circle feels friendly. |
 | `alignment` | `left` (default) / `centered` | Left keeps icon and text side-by-side; centered stacks icon above text. Centered needs short titles to look clean. |
 | `show_dividers` | `true` (default) / `false` | Draws vertical border lines between items on desktop. Dividers add visual structure; removing them creates a more open, airy feel. |
-| `color_scheme` | `standard` / `standard-accent` / `highlight` / `highlight-accent` | Standard inherits page background; highlight swaps to the alternate background. Accent variants shift text or icon colors for contrast. |
+| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Standard inherits page background; highlight swaps to the alternate background. Accent variants shift text or icon colors for contrast. |
 | `top_spacing` | `auto` / `none` | Controls gap above the widget. Set to none when butting the bar directly against a hero or header. |
 | `bottom_spacing` | `auto` / `none` | Controls gap below the widget. Set to none when the next section should feel visually connected. |
 
@@ -46,14 +46,14 @@ A horizontal strip of icon-plus-text items that communicates key selling points,
 ### 3. Centered Icon Showcase
 
 - **Items:** 4-5 (e.g., "Organic Ingredients," "Cruelty-Free," "Eco Packaging," "Handmade," "Family Owned")
-- **Settings:** `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `alignment: centered`, `show_dividers: false`, `color_scheme: standard-accent`
+- **Settings:** `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `alignment: centered`, `show_dividers: false`, `color_scheme: standard-secondary`
 - **Good for:** A standalone values section on an About page or midway through a long landing page.
 - **Industries:** Skincare, food producers, wellness brands, artisan goods.
 
 ### 4. Minimal Dark Highlight Band
 
 - **Items:** 3 (e.g., "Award-Winning Design," "Published in Arch Digest," "50+ Projects Completed")
-- **Settings:** `icon_style: plain`, `icon_size: md`, `icon_shape: rounded`, `alignment: left`, `show_dividers: false`, `color_scheme: highlight-accent`, `top_spacing: none`, `bottom_spacing: none`
+- **Settings:** `icon_style: plain`, `icon_size: md`, `icon_shape: rounded`, `alignment: left`, `show_dividers: false`, `color_scheme: highlight-secondary`, `top_spacing: none`, `bottom_spacing: none`
 - **Good for:** A full-width accent band that breaks up two light sections with a bold, confident statement.
 - **Industries:** Architecture firms, interior designers, photography studios.
 

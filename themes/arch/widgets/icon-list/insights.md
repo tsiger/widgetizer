@@ -17,7 +17,7 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 | `icon_style` | **`plain`**, `outline`, `filled` | Plain is minimal (icon only), outline adds a border ring, filled puts the icon on a solid background shape |
 | `icon_size` | `sm`, `md`, `lg`, **`xl`** | Controls icon dimensions. Smaller sizes suit dense grids (6--8 cols); larger sizes suit hero-style feature callouts (2--3 cols) |
 | `icon_shape` | `sharp`, `rounded`, **`circle`** | Shape of the outline/filled container. Sharp = square corners, rounded = soft corners, circle = pill/circle |
-| `color_scheme` | **`standard`**, `standard-accent`, `highlight`, `highlight-accent` | Standard uses page background; highlight flips to contrast background. Accent variants tint the section for visual separation |
+| `color_scheme` | **`standard-primary`**, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses page background; highlight flips to contrast background. Accent variants tint the section for visual separation |
 | `top_spacing` | **`auto`**, `none` | Remove top padding to stack flush against the previous widget |
 | `bottom_spacing` | **`auto`**, `none` | Remove bottom padding to stack flush against the next widget |
 
@@ -34,43 +34,43 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 ## Layout Recipes
 
 ### 1. Hotel Amenities Banner
-- **Settings**: layout `grid`, columns_desktop `6`, icon_style `plain`, icon_size `lg`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight`
+- **Settings**: layout `grid`, columns_desktop `6`, icon_style `plain`, icon_size `lg`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-primary`
 - **Blocks**: 6--12 items, title only (no description) — Wi-Fi, Parking, Pool, Gym, Spa, Pet Friendly
 - **Good for**: Communicating included amenities quickly without reading
 - **Industries**: Hotels, resorts, vacation rentals, Airbnb-style listings
 
 ### 2. Core Services Showcase
-- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `rounded`, heading_alignment `left`, color_scheme `standard`
+- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `rounded`, heading_alignment `left`, color_scheme `standard-primary`
 - **Blocks**: 3--6 items with both title and description — e.g., "Web Design / Custom sites built for your brand"
 - **Good for**: Homepage services section where each service needs a short explanation
 - **Industries**: Agencies, freelancers, consultants, IT service providers
 
 ### 3. Why Choose Us — Trust Strip
-- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `md`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-accent`
+- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `md`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-secondary`
 - **Blocks**: 4 items, title only — "Free Shipping", "24/7 Support", "Money-Back Guarantee", "Secure Checkout"
 - **Good for**: Trust-building strip placed between hero and product listings
 - **Industries**: E-commerce, online retail, subscription boxes
 
 ### 4. Treatment Menu (Carousel)
-- **Settings**: layout `carousel`, columns_desktop `4`, icon_style `plain`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-accent`
+- **Settings**: layout `carousel`, columns_desktop `4`, icon_style `plain`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-secondary`
 - **Blocks**: 8--12 items with title and short description — "Deep Tissue / 60 min session", "Hot Stone / Relaxation therapy"
 - **Good for**: Browsable service menus that exceed comfortable grid display
 - **Industries**: Spas, salons, wellness studios, dental clinics
 
 ### 5. Tech Specs / Features Grid
-- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `lg`, icon_shape `sharp`, heading_alignment `left`, color_scheme `standard`
+- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `lg`, icon_shape `sharp`, heading_alignment `left`, color_scheme `standard-primary`
 - **Blocks**: 8 items with title and description — "API Access / RESTful endpoints", "99.9% Uptime / SLA guaranteed"
 - **Good for**: SaaS feature pages or product specification sections
 - **Industries**: Software companies, tech startups, B2B platforms
 
 ### 6. Facilities at a Glance (Dense Grid)
-- **Settings**: layout `grid`, columns_desktop `8`, icon_style `plain`, icon_size `sm`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight`
+- **Settings**: layout `grid`, columns_desktop `8`, icon_style `plain`, icon_size `sm`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-primary`
 - **Blocks**: 8--16 items, title only — compact pictogram strip
 - **Good for**: Space-efficient listing where quantity matters more than detail (event venues, coworking spaces)
 - **Industries**: Conference centers, coworking spaces, campgrounds, community centers
 
 ### 7. Process Steps
-- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-accent`
+- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-secondary`
 - **Blocks**: 3 items with title and description — "1. Consult / Tell us your vision", "2. Design / We craft the plan", "3. Build / We bring it to life"
 - **Good for**: Explaining a simple workflow or engagement process
 - **Industries**: Contractors, architects, wedding planners, custom manufacturers
@@ -83,5 +83,5 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 - **Filled + sharp** creates a bold, modern, "tech product" feel. **Plain + circle** feels lighter and more hospitality-oriented. Match icon_style and icon_shape to the brand personality.
 - **Carousel layout** is not just for overflow. Even with 4 items, carousel adds interactivity and draws attention. Use it when the icon list is the primary content of a section, not a supporting element.
 - **Column count drives information density.** 2--3 columns with xl icons works as a hero-adjacent feature callout. 6--8 columns with sm icons works as a compact amenities bar. Avoid mid-range (4--5 columns) with sm icons — the items feel lost in whitespace.
-- **Color scheme layering**: Alternate between `standard` and `highlight` across consecutive widgets to create visual rhythm on long pages. Use accent variants when the icon list sits between two same-background widgets and needs separation without a hard break.
+- **Color scheme layering**: Alternate between `standard-primary` and `highlight-primary` across consecutive widgets to create visual rhythm on long pages. Use accent variants when the icon list sits between two same-background widgets and needs separation without a hard break.
 - **Eyebrow text** is underused. Adding a short eyebrow like "Everything Included" or "Our Process" above the headline gives the section editorial polish and helps with scan-reading on mobile.

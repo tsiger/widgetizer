@@ -33,7 +33,7 @@
             "button_style_2": "secondary",
             "button_size": "medium",
             "overlay_color": "#2e1f2ecc",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-2": {
@@ -51,7 +51,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#2e1f2ecc",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         }
       },
@@ -65,7 +65,7 @@
         "icon_style": "plain",
         "icon_size": "md",
         "icon_shape": "rounded",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "trust-1": {
@@ -101,7 +101,7 @@
         "eyebrow": "What We Bake",
         "title": "From the Oven to Your Table",
         "heading_alignment": "center",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "panel-1": {
@@ -159,7 +159,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "cake-heading": {
@@ -201,7 +201,7 @@
       "type": "testimonial-hero",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "quote-text": {
@@ -239,7 +239,7 @@
         "columns_desktop": 4,
         "aspect_ratio": "1 / 1",
         "text_display": "hover",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "bake-1": {
@@ -277,7 +277,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

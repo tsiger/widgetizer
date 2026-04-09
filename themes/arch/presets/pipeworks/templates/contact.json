@@ -14,7 +14,7 @@
         "icon_style": "filled",
         "icon_size": "lg",
         "icon_shape": "rounded",
-        "color_scheme": "standard-accent",
+        "color_scheme": "standard-secondary",
         "top_spacing": "auto"
       },
       "blocks": {
@@ -62,7 +62,7 @@
         "height": "medium",
         "show_address": true,
         "sidebar_position": "right",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "info-hours": {
@@ -89,7 +89,7 @@
         "style": "separated",
         "allow_multiple": true,
         "sidebar_position": "right",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "faq-1": {

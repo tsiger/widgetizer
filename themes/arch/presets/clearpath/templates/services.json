@@ -7,7 +7,7 @@
       "settings": {
         "balance": "left-heavy",
         "sticky_column": "none",
-        "color_scheme": "standard-accent",
+        "color_scheme": "standard-secondary",
         "top_spacing": "none"
       },
       "blocks": {
@@ -51,7 +51,7 @@
         "alignment": "start",
         "image_position": "top",
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "svc-1": {
@@ -148,7 +148,7 @@
         "title": "Our Engagement Model",
         "description": "",
         "heading_alignment": "center",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "step-1": {
@@ -191,7 +191,7 @@
       "settings": {
         "image": "",
         "image_position": "left",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "callout-heading": {
@@ -233,7 +233,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

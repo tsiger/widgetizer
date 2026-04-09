@@ -13,7 +13,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 | `description` | Any text | Subtitle paragraph below the headline |
 | `heading_alignment` | `left`, `center` | Left-aligns the eyebrow/title/description block or keeps them centered |
 | `layout` | `vertical`, `horizontal`, `centered` | Vertical: single-column list with a connecting line on the left. Horizontal: items in a row with a top connecting line (kicks in at 990px+). Centered: alternating left-right items split by a center line (990px+) |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Standard uses no extra background; accent and highlight variants swap background and add container padding |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses no extra background; accent and highlight variants swap background and add container padding |
 | `top_spacing` | `auto`, `none` | Removes the default top padding when set to none; useful for stacking sections tightly |
 | `bottom_spacing` | `auto`, `none` | Removes the default bottom padding when set to none |
 
@@ -31,7 +31,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 
 ### 1. Agency Project Process
 
-- **Layout:** `vertical` | **Heading alignment:** `center` | **Color scheme:** `standard`
+- **Layout:** `vertical` | **Heading alignment:** `center` | **Color scheme:** `standard-primary`
 - **Blocks:** 4-5 items (Discovery, Design, Development, Testing, Launch)
 - **Use date for:** Phase 1, Phase 2, etc. | **Use duration for:** Week ranges
 - **Use features for:** Deliverables with `+` prefixes for check icons
@@ -40,7 +40,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 
 ### 2. Company History / Milestones
 
-- **Layout:** `centered` | **Heading alignment:** `center` | **Color scheme:** `highlight`
+- **Layout:** `centered` | **Heading alignment:** `center` | **Color scheme:** `highlight-primary`
 - **Blocks:** 5-8 items spanning key years
 - **Use date for:** Years (2015, 2018, 2021...) | **Leave duration empty**
 - **Use description for:** Rich text with the story of each milestone
@@ -50,7 +50,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 
 ### 3. Service Onboarding Steps
 
-- **Layout:** `horizontal` | **Heading alignment:** `center` | **Color scheme:** `standard-accent`
+- **Layout:** `horizontal` | **Heading alignment:** `center` | **Color scheme:** `standard-secondary`
 - **Blocks:** 3-4 items (Book, Prepare, Execute, Follow-up)
 - **Use date for:** Step 1, Step 2, etc. | **Leave duration empty**
 - **Use features for:** Short bullet points of what the client does at each step
@@ -59,7 +59,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 
 ### 4. Product Roadmap / Upcoming Features
 
-- **Layout:** `vertical` | **Heading alignment:** `left` | **Color scheme:** `standard`
+- **Layout:** `vertical` | **Heading alignment:** `left` | **Color scheme:** `standard-primary`
 - **Blocks:** 4-6 items for upcoming quarters
 - **Use date for:** Q1 2026, Q2 2026, etc. | **Use duration for:** Estimated month
 - **Use features for:** Planned features with `+` (confirmed) and `-` (cut/deferred)
@@ -69,7 +69,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 
 ### 5. Event Schedule / Day-of Agenda
 
-- **Layout:** `vertical` | **Heading alignment:** `left` | **Color scheme:** `highlight-accent`
+- **Layout:** `vertical` | **Heading alignment:** `left` | **Color scheme:** `highlight-secondary`
 - **Blocks:** 5-8 items for time slots
 - **Use date for:** Times (9:00 AM, 10:30 AM...) | **Use duration for:** Duration (45 min, 1 hr)
 - **Use title for:** Session or activity name
@@ -80,7 +80,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 
 ### 6. Manufacturing / Order Fulfillment Pipeline
 
-- **Layout:** `horizontal` | **Heading alignment:** `center` | **Color scheme:** `highlight`
+- **Layout:** `horizontal` | **Heading alignment:** `center` | **Color scheme:** `highlight-primary`
 - **Blocks:** 3-4 items (Order Received, In Production, Quality Check, Shipped)
 - **Use date for:** Step labels | **Use duration for:** Typical turnaround time
 - **Use features for:** What happens at each stage with `+` prefixes
@@ -89,7 +89,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 
 ### 7. Educational Course Outline
 
-- **Layout:** `centered` | **Heading alignment:** `center` | **Color scheme:** `standard-accent`
+- **Layout:** `centered` | **Heading alignment:** `center` | **Color scheme:** `standard-secondary`
 - **Blocks:** 4-6 modules
 - **Use date for:** Module 1, Module 2, etc. | **Use duration for:** Estimated hours
 - **Use title for:** Module name
@@ -107,5 +107,5 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 - **The features textarea is the secret weapon.** Most timeline widgets only offer a title and description. The newline-separated feature list with optional `+`/`-` icon prefixes lets you build scannable checklists inside each step without touching rich text.
 - **Date and duration serve double duty.** They are free-text fields, not restricted to actual dates. Use them for phase labels, step numbers, cost tiers, difficulty levels, or any short metadata pair that helps visitors orient themselves.
 - **Combine heading_alignment left with layout vertical for a documentation feel.** Left-aligned headings with a vertical timeline reads like a structured guide rather than a marketing section, which suits professional services and technical audiences.
-- **Use color_scheme highlight or highlight-accent to visually separate the timeline from surrounding content.** This is especially effective when the timeline sits between two standard-background widgets and needs to stand out as a distinct narrative block.
+- **Use color_scheme highlight or highlight-secondary to visually separate the timeline from surrounding content.** This is especially effective when the timeline sits between two standard-background widgets and needs to stand out as a distinct narrative block.
 - **Each marker auto-numbers sequentially.** You do not need to manually enter numbers anywhere; the numbered circles update automatically when items are reordered or added. This makes the widget low-maintenance for clients who edit their own sites.

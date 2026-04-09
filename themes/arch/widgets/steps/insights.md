@@ -12,7 +12,7 @@ A numbered, zigzag timeline that pairs an image with a title, rich-text descript
 | `title` | Any text (default "How It Works") | Main section headline; renders as `h1` when widget is first on the page, `h2` otherwise |
 | `description` | Any text (blank by default) | Subtitle paragraph below the headline |
 | `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description header block |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls background and text palette for the entire section. Non-standard schemes add a padded container and override `--widget-bg-color` |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text palette for the entire section. Non-standard schemes add a padded container and override `--widget-bg-color` |
 | `top_spacing` | `auto` (default), `none` | Removes top padding when set to `none`; useful for butting the widget directly against the section above |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to `none` |
 
@@ -37,7 +37,7 @@ A numbered, zigzag timeline that pairs an image with a title, rich-text descript
 
 ### 2. Portfolio Process Walkthrough — 4 Steps With Photos
 
-**Settings:** eyebrow "Our Process", title "From Concept to Completion", heading_alignment left, color_scheme standard-accent
+**Settings:** eyebrow "Our Process", title "From Concept to Completion", heading_alignment left, color_scheme standard-secondary
 **Blocks:** 4 steps each with a project photo (sketch, 3D render, construction, finished room), descriptive titles, and one-paragraph descriptions.
 **Good for:** Showcasing a creative or construction workflow where visuals prove credibility.
 **Industries:** Architects, interior designers, renovation contractors, landscapers.
@@ -58,14 +58,14 @@ A numbered, zigzag timeline that pairs an image with a title, rich-text descript
 
 ### 5. Highlighted FAQ Alternative — 5 Short Steps
 
-**Settings:** title "What to Expect", heading_alignment left, color_scheme highlight-accent, top_spacing none
+**Settings:** title "What to Expect", heading_alignment left, color_scheme highlight-secondary, top_spacing none
 **Blocks:** 5 steps with concise titles (Book, Prepare, Arrive, Experience, Follow-Up) and two-sentence descriptions; no images, no buttons.
 **Good for:** Reducing pre-visit anxiety by spelling out the customer journey in detail.
 **Industries:** Medical offices, spas, legal consultations, auto repair shops.
 
 ### 6. Product Manufacturing Story — 6 Steps With Photos
 
-**Settings:** eyebrow "Craftsmanship", title "How Your Order Is Made", heading_alignment center, color_scheme standard-accent
+**Settings:** eyebrow "Craftsmanship", title "How Your Order Is Made", heading_alignment center, color_scheme standard-secondary
 **Blocks:** 6 steps each with a workshop/factory photo and a short paragraph (Source materials, Cut & shape, Assemble, Finish, Quality check, Ship).
 **Good for:** Artisan or DTC brands that want to justify premium pricing through transparency.
 **Industries:** Custom furniture makers, jewelry designers, specialty food producers, craft breweries.
@@ -87,4 +87,4 @@ A numbered, zigzag timeline that pairs an image with a title, rich-text descript
 - **Pair eyebrow + left alignment for editorial feel.** Center alignment reads as corporate; left-aligned with an eyebrow like "Our Approach" feels more personal and editorial, which suits studios and boutique agencies.
 - **Use buttons sparingly.** One or two CTAs across the entire step sequence (typically on the first and last step) guide without overwhelming. Putting a button on every step dilutes urgency.
 - **Collapse spacing to chain sections.** Set top_spacing or bottom_spacing to none when placing the steps widget directly below a hero or above a CTA banner to create a seamless visual flow.
-- **Color scheme as a section divider.** Switching to highlight or highlight-accent makes the steps section feel like a distinct band on the page, which helps break up long one-column layouts without adding extra widgets.
+- **Color scheme as a section divider.** Switching to highlight or highlight-secondary makes the steps section feel like a distinct band on the page, which helps break up long one-column layouts without adding extra widgets.

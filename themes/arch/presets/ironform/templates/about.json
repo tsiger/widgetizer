@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#141414a0",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -33,7 +33,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "story-eyebrow": {
@@ -77,7 +77,7 @@
         "icon_shape": "sharp",
         "alignment": "centered",
         "show_dividers": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cred-1": {
@@ -118,7 +118,7 @@
         "columns_desktop": 4,
         "staggered": false,
         "aspect_ratio": "1 / 1",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "img-1": {
@@ -184,7 +184,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

@@ -19,7 +19,7 @@
       "settings": {
         "text_alignment": "center",
         "content_width": "medium",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "intro-heading": {
@@ -46,7 +46,7 @@
         "title": "Three Reasons to Stay",
         "heading_alignment": "center",
         "columns_desktop": 4,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "checker-1": {
@@ -97,7 +97,7 @@
         "title": "From the Bar",
         "heading_alignment": "center",
         "layout": "single-column",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "drink-1": {
@@ -139,7 +139,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "space-heading": {
@@ -181,7 +181,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

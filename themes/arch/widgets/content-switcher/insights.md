@@ -18,7 +18,7 @@ Tabbed or toggle-based card grid that lets visitors flip between 2-3 groups of i
 | `option_3_label` | Text | Label for the third button. Only visible when `switcher_type` is `tabs`. |
 | `columns` | 2 -- 5 (default 3) | Number of card columns on desktop. Cards stack on mobile regardless. |
 | `aspect_ratio` | `auto`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Constrains card image proportions. Use `auto` when cards have no images or images vary. |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | **standard** = transparent background, no card border. **standard-accent** = transparent background + card gets a secondary bg and border. **highlight** = full-width background + card border. **highlight-accent** = full-width bg + card secondary bg and border. |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | **standard** = transparent background, no card border. **standard-secondary** = transparent background + card gets a secondary bg and border. **highlight** = full-width background + card border. **highlight-secondary** = full-width bg + card secondary bg and border. |
 | `top_spacing` | `auto` (default), `none` | Remove top section padding to butt up against the widget above. |
 | `bottom_spacing` | `auto` (default), `none` | Remove bottom section padding. |
 
@@ -43,7 +43,7 @@ Tabbed or toggle-based card grid that lets visitors flip between 2-3 groups of i
 | `option_2_label` | Yearly |
 | `columns` | 3 |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `aspect_ratio` | `auto` |
 
 Create 3 item blocks per option (6 total). Use `price` for dollar amounts and `text` for feature summaries. Add "Get Started" / "Contact Sales" links.
@@ -63,7 +63,7 @@ Create 3 item blocks per option (6 total). Use `price` for dollar amounts and `t
 | `option_3_label` | Industrial |
 | `columns` | 3 |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 | `aspect_ratio` | `auto` |
 
 Each tab shows a different audience's service lineup. Use `text` richtext for bullet-pointed scope descriptions and `link` for "Request a Quote."
@@ -82,7 +82,7 @@ Each tab shows a different audience's service lineup. Use `text` richtext for bu
 | `option_2_label` | After |
 | `columns` | 2 |
 | `heading_alignment` | `left` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `aspect_ratio` | `3/2` |
 
 Pair images across both options so the same project appears in the same grid position. Use `title` for the project name and leave `price` blank.
@@ -102,7 +102,7 @@ Pair images across both options so the same project appears in the same grid pos
 | `option_3_label` | Catering |
 | `columns` | 4 |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `aspect_ratio` | `1/1` |
 
 Use `image` for dish photos, `title` for the dish name, `price` for the price, and `text` for a short description. Link to an online ordering page.
@@ -121,7 +121,7 @@ Use `image` for dish photos, `title` for the dish name, `price` for the price, a
 | `option_2_label` | For Teams |
 | `columns` | 2 |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `aspect_ratio` | `auto` |
 
 Two cards per option. Keep it tight -- one entry-level, one premium. Use `text` for feature lists and `price` for per-seat or flat-rate pricing.
@@ -141,7 +141,7 @@ Two cards per option. Keep it tight -- one entry-level, one premium. Use `text` 
 | `option_3_label` | Northshore |
 | `columns` | 3 |
 | `heading_alignment` | `left` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 | `aspect_ratio` | `4/3` |
 
 Each tab shows the services or classes available at a specific location. Use `image` for location/facility photos and `link` for booking.
@@ -160,7 +160,7 @@ Each tab shows the services or classes available at a specific location. Use `im
 | `option_2_label` | Shop Cats |
 | `columns` | 4 |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `aspect_ratio` | `1/1` |
 
 Product images with titles and prices. Link each card to a product detail page or external shop. No richtext needed -- keep cards visual and scannable.
@@ -177,5 +177,5 @@ Product images with titles and prices. Link each card to a product detail page o
 - **Price is optional but prominent.** When `price` is present it dominates the card visually. If you are not showing prices (e.g., a portfolio or catalog), leave the field blank and the layout adjusts cleanly.
 - **Pair this widget with a FAQ below it.** Pricing and service comparison sections naturally generate questions. A FAQ widget directly underneath (with `top_spacing: none` on the FAQ) creates a seamless flow.
 - **Left-align for editorial pages, center for landing pages.** Left-aligned headers with a toggle feel like part of a content page. Centered headers with accent cards feel like a standalone pricing section.
-- **Use `highlight-accent` to make the section feel like a self-contained module.** The background color plus card borders create strong visual separation from surrounding content -- useful when the switcher lives mid-page between other widgets.
+- **Use `highlight-secondary` to make the section feel like a self-contained module.** The background color plus card borders create strong visual separation from surrounding content -- useful when the switcher lives mid-page between other widgets.
 - **Keep column count proportional to content.** 2 columns for comparison pairs, 3 for classic pricing tiers, 4-5 for lightweight catalog grids with images. Avoid 5 columns if cards contain long text -- it gets cramped.

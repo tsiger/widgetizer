@@ -31,7 +31,7 @@
             },
             "button_style_2": "secondary",
             "button_size": "medium",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-2": {
@@ -54,7 +54,7 @@
             },
             "button_style_2": "secondary",
             "button_size": "medium",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         }
       },
@@ -67,7 +67,7 @@
         "title": "Consulting that scales with you",
         "description": "Advising fast-moving companies across operations, growth, and transformation.",
         "columns_desktop": 6,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "logo-1": {
@@ -118,7 +118,7 @@
         "columns_desktop": 4,
         "layout": "cards",
         "animate": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "figure-1": {
@@ -164,7 +164,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "eyebrow-text": {
@@ -220,7 +220,7 @@
         "title": "What we help with",
         "description": "Focused consulting services for leadership teams that want clarity and momentum.",
         "columns_desktop": 4,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "service-1": {
@@ -289,7 +289,7 @@
         "title": "A focused, collaborative process",
         "description": "We keep the scope tight, the outcomes clear, and the team aligned.",
         "layout": "centered",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "phase-1": {
@@ -342,7 +342,7 @@
         "title": "Leaders who chose Arch",
         "description": "Practical guidance, measurable impact.",
         "columns_desktop": 3,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "quote-1": {
@@ -380,7 +380,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true
       },
       "blocks": {

@@ -11,7 +11,7 @@
 {% assign first_block = widget.blocks[widget.blocksOrder.first] %}
 <section
   id="{{ widget.id }}"
-  class="widget widget-slideshow widget-{{ widget.id }} color-scheme-{{ first_block.settings.color_scheme | default: 'highlight' }}{% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
+  class="widget widget-slideshow widget-{{ widget.id }} color-scheme-{{ first_block.settings.color_scheme | default: 'highlight-primary' }}{% unless widget.settings.fullwidth %} slideshow-constrained{% endunless %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="slideshow"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -33,7 +33,7 @@
         class="slideshow-slide widget {{ height_class }} {% if block.settings.image != blank %}has-bg-image has-overlay{% endif %} color-scheme-{{ block.settings.color_scheme }}{% if isFirst %} is-active{% endif %}"
         {% if block.settings.image != blank %}
           style="background-image: url('{% image src: block.settings.image, size: 'large', output: 'url' %}'); --widget-overlay-color: {{ block.settings.overlay_color | default: '#0a1e38bf' }}; --widget-overlay-opacity: 1;"
-        {% elsif block.settings.color_scheme != 'standard' %}
+        {% elsif block.settings.color_scheme != 'standard-primary' %}
           style="--widget-bg-color: var(--bg-primary);"
         {% endif %}
         data-block-id="{{ blockId }}"

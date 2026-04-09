@@ -3,7 +3,7 @@
   class="widget widget-footer widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="footer"
-  style="{% unless widget.settings.color_scheme == 'standard' %}--widget-bg-color: var(--bg-primary);{% endunless %}{% if widget.settings.copyright == blank %} padding-block: 8rem;{% endif %}"
+  style="{% unless widget.settings.color_scheme == 'standard-primary' %}--widget-bg-color: var(--bg-primary);{% endunless %}{% if widget.settings.copyright == blank %} padding-block: 8rem;{% endif %}"
 >
   <div class="widget-container footer-content">
     <div class="widget-grid" style="--grid-cols-desktop: 5; --grid-gap: var(--space-3xl);">

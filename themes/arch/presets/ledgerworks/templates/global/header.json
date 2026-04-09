@@ -15,6 +15,6 @@
     "full_width": true,
     "sticky": false,
     "transparent_on_hero": false,
-    "color_scheme": "highlight"
+    "color_scheme": "highlight-primary"
   }
 }

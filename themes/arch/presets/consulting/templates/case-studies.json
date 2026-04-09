@@ -7,7 +7,7 @@
       "settings": {
         "height": "medium",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true
       },
       "blocks": {
@@ -65,7 +65,7 @@
         "description": "A sample of engagements across strategy, operations, and growth.",
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "project-1": {
@@ -114,7 +114,7 @@
         "title": "What leaders say",
         "description": "Outcomes backed by real teams.",
         "columns_desktop": 2,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "case-quote-1": {
@@ -143,7 +143,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true
       },
       "blocks": {

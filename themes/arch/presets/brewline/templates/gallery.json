@@ -7,7 +7,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -38,7 +38,7 @@
         "layout": "carousel",
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "img-1": {
@@ -88,7 +88,7 @@
         "heading_alignment": "center",
         "columns_desktop": 3,
         "gap": "medium",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "space-1": {
@@ -140,7 +140,7 @@
       "type": "image-text",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "comm-heading": {

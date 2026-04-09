@@ -13,7 +13,7 @@ Tabbed content section that pairs clickable text tabs with a large swappable ima
 | `description` | Any text | Subheading paragraph below the title — sets expectations for what the tabs cover |
 | `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description block; left suits editorial layouts |
 | `image_position` | `left` (default), `right` | Which side the image panel sits on desktop; flips the active-tab accent bar direction too |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls background and text palette; accent/highlight variants add padded container with themed background |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text palette; accent/highlight variants add padded container with themed background |
 | `top_spacing` | `auto` (default), `none` | Removes top padding — useful when stacking directly below a hero or same-color section |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding — useful when butting up against a CTA or same-color section |
 
@@ -45,7 +45,7 @@ Tabbed content section that pairs clickable text tabs with a large swappable ima
 
 ### 3. Product Feature Deep-Dive (5 tabs, image left, accent scheme)
 
-- **Settings:** `heading_alignment: center`, `image_position: left`, `color_scheme: standard-accent`, eyebrow "Platform", title "Built for Your Workflow"
+- **Settings:** `heading_alignment: center`, `image_position: left`, `color_scheme: standard-secondary`, eyebrow "Platform", title "Built for Your Workflow"
 - **Tabs:** One feature per tab with a screenshot or product photo and a short richtext description including a bold benefit line.
 - **Good for:** SaaS landing pages or product pages where each feature deserves its own visual.
 - **Industries:** Software companies, app developers, tech startups.
@@ -57,9 +57,9 @@ Tabbed content section that pairs clickable text tabs with a large swappable ima
 - **Good for:** Letting visitors virtually walk through a physical space before booking or visiting.
 - **Industries:** Restaurants, event venues, coworking spaces, salons, fitness studios.
 
-### 5. Team/Role Spotlight (3-4 tabs, image left, highlight-accent)
+### 5. Team/Role Spotlight (3-4 tabs, image left, highlight-secondary)
 
-- **Settings:** `heading_alignment: center`, `image_position: left`, `color_scheme: highlight-accent`, eyebrow "Our Team", title "Meet the Experts"
+- **Settings:** `heading_alignment: center`, `image_position: left`, `color_scheme: highlight-secondary`, eyebrow "Our Team", title "Meet the Experts"
 - **Tabs:** One per team member or department with a portrait photo, their role as the tab title, and a short bio in the description.
 - **Good for:** Putting faces to the business on an About page without a separate team grid widget.
 - **Industries:** Medical practices, law offices, consulting firms, real estate agencies.
@@ -73,7 +73,7 @@ Tabbed content section that pairs clickable text tabs with a large swappable ima
 
 ### 7. Case Study Sampler (3 tabs, image left, left-aligned header)
 
-- **Settings:** `heading_alignment: left`, `image_position: left`, `color_scheme: standard-accent`, eyebrow "Results", title "Recent Projects"
+- **Settings:** `heading_alignment: left`, `image_position: left`, `color_scheme: standard-secondary`, eyebrow "Results", title "Recent Projects"
 - **Tabs:** One per project with a result photo and a richtext description that includes a bold metric ("40% increase in foot traffic").
 - **Good for:** Building credibility on a homepage or services page without a dedicated portfolio section.
 - **Industries:** Marketing agencies, photographers, contractors, architects.

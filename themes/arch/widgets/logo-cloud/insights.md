@@ -14,7 +14,7 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | `heading_alignment` | `center` (default), `left` | Centers or left-aligns the entire header block |
 | `layout` | `grid` (default), `carousel` | Static equal-column grid vs. horizontally scrollable carousel with prev/next arrows |
 | `columns_desktop` | 2 -- 8 (default: 6) | Number of columns on desktop; in carousel mode this sets visible slides per view |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls background and border palette; non-standard schemes add padded container and override `--widget-bg-color` |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and border palette; non-standard schemes add padded container and override `--widget-bg-color` |
 | `top_spacing` | `auto` (default), `none` | Removes the top section padding when set to `none` |
 | `bottom_spacing` | `auto` (default), `none` | Removes the bottom section padding when set to `none` |
 
@@ -90,7 +90,7 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | eyebrow | As Seen In |
 | title | _(leave blank)_ |
 | description | _(leave blank)_ |
-| color_scheme | standard-accent |
+| color_scheme | standard-secondary |
 | top_spacing | none |
 
 **Good for:** A slim press-mention strip placed right under a hero or testimonial section. Keeping title and description blank lets the logos speak for themselves.
@@ -124,7 +124,7 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | heading_alignment | center |
 | eyebrow | _(leave blank)_ |
 | title | Proud Member |
-| color_scheme | highlight-accent |
+| color_scheme | highlight-secondary |
 
 **Good for:** Displaying just 2 important association or membership logos at large size with high visual weight (e.g., on an About page).
 **Industries:** Law firms, accounting practices, dental offices.
@@ -152,7 +152,7 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 
 - **Grayscale-to-color hover effect is built in.** Every logo image starts desaturated and faded; it becomes full-color on hover. This keeps the section visually calm and draws the eye only on interaction -- no extra CSS needed.
 - **Grid vs. carousel is a content-volume decision.** Use grid when you have up to roughly 8 logos and want them all visible at once. Switch to carousel when the count exceeds one row's worth so the page doesn't stretch.
-- **Pair `highlight` color schemes with minimal text.** The contrasting background already draws attention. A short eyebrow plus logos (no title, no description) is often more effective than adding a headline.
+- **Pair `highlight-primary` color schemes with minimal text.** The contrasting background already draws attention. A short eyebrow plus logos (no title, no description) is often more effective than adding a headline.
 - **Use the `link` setting sparingly.** Linking every logo to an external site can send visitors away from your page. Reserve links for strategic partners or required attribution; leave the rest unlinked.
 - **Collapse spacing to glue sections together.** Setting `top_spacing` or `bottom_spacing` to `none` lets you visually attach the logo cloud to an adjacent hero, CTA, or testimonial widget for a seamless flow.
 - **Column count signals importance.** Fewer columns (2-3) with large logos feel premium and exclusive. More columns (6-8) with smaller logos communicate broad adoption. Choose based on the story you want to tell.

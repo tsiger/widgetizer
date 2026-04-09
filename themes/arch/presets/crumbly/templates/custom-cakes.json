@@ -7,7 +7,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -39,7 +39,7 @@
         "columns_desktop": 4,
         "card_layout": "flat",
         "alignment": "center",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "step-1": {
@@ -80,7 +80,7 @@
         "title": "Choose Your Cake",
         "heading_alignment": "center",
         "feature_column_label": "Details",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "col-small": {
@@ -173,7 +173,7 @@
         "layout": "carousel",
         "columns_desktop": 3,
         "aspect_ratio": "3 / 4",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "cake-img-1": {
@@ -219,7 +219,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

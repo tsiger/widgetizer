@@ -21,7 +21,7 @@ Interactive before/after image slider that lets visitors drag a handle to reveal
 | `orientation` | `horizontal`, `vertical` | Horizontal splits left/right (16:9 aspect). Vertical splits top/bottom (9:16 aspect, narrower max-width) |
 | `initial_position` | 0 -- 100 % (step 5, default 50) | Where the divider sits on load; 0 = all "before" visible, 100 = all "after" visible |
 | `show_labels` | true / false (default true) | Toggles the floating Before/After badges inside the image |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Background and container treatment; non-standard schemes add padded container and swap background color |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and container treatment; non-standard schemes add padded container and swap background color |
 | `top_spacing` | `auto`, `none` | Removes default top margin when set to none; useful for stacking sections flush |
 | `bottom_spacing` | `auto`, `none` | Removes default bottom margin when set to none |
 
@@ -79,7 +79,7 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `show_labels` | true |
 | `before_label` | Day 1 |
 | `after_label` | Week 8 |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `eyebrow` | Real Results |
 
 **Good for:** Portrait-oriented photos where a top-to-bottom reveal feels natural, such as face or body shots.
@@ -116,7 +116,7 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `show_labels` | true |
 | `before_label` | Before Cleaning |
 | `after_label` | After Cleaning |
-| `color_scheme` | highlight-accent |
+| `color_scheme` | highlight-secondary |
 | `title` | *(leave blank)* |
 | `top_spacing` | none |
 | `bottom_spacing` | none |
@@ -136,7 +136,7 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `show_labels` | true |
 | `before_label` | Original |
 | `after_label` | Redesigned |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `eyebrow` | Case Study |
 | `title` | Living Room Reimagined |
 | `description` | A full redesign completed in under three weeks. |
@@ -174,7 +174,7 @@ This widget has **no blocks**. All content is configured through top-level setti
 
 4. **Strip the header for visual punch.** When the slider sits between two content-heavy sections, leaving the title, eyebrow, and description blank creates a breathing space that draws attention purely through interaction.
 
-5. **Pair color schemes with intent.** Use `highlight` or `highlight-accent` when the slider is the hero of the page (services page, case study). Use `standard` when it is one proof point among many, so it does not compete with surrounding sections.
+5. **Pair color schemes with intent.** Use `highlight-primary` or `highlight-secondary` when the slider is the hero of the page (services page, case study). Use `standard-primary` when it is one proof point among many, so it does not compete with surrounding sections.
 
 6. **Match spacing to neighbors.** Set `top_spacing` or `bottom_spacing` to `none` when the widget sits directly above or below another section with its own colored background, avoiding a double-gap that breaks visual flow.
 

@@ -70,23 +70,23 @@
       "type": "select",
       "id": "color_scheme",
       "label": "tTheme:global.widgets.settings.color_scheme.label",
-      "default": "standard",
+      "default": "standard-primary",
       "options": [
         {
-          "value": "standard",
-          "label": "tTheme:global.widgets.settings.color_scheme.options.standard"
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
         },
         {
-          "value": "standard-accent",
-          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_accent"
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
         },
         {
-          "value": "highlight",
-          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight"
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
         },
         {
-          "value": "highlight-accent",
-          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_accent"
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
         }
       ]
     },

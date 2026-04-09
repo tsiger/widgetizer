@@ -15,7 +15,7 @@ An alternating grid of image tiles and text/CTA cards that creates a visually dy
 | `description` | Any text | Subheading paragraph below the title — sets expectations for the grid below |
 | `heading_alignment` | `left`, `center` (default) | Controls whether the header block is centered or left-aligned; left works better when the grid itself is asymmetric |
 | `columns_desktop` | 2 -- 4 (default: 4) | Number of grid columns on desktop; fewer columns = larger tiles, more visual weight per card |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | `standard`: no extra background or border. `standard-accent`: secondary background on content tiles. `highlight` and `highlight-accent`: add a border to tiles plus padded container; accent variants swap content tile background to secondary color |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary`: no extra background or border. `standard-secondary`: secondary background on content tiles. `highlight-primary` and `highlight-secondary`: add a border to tiles plus padded container; accent variants swap content tile background to secondary color |
 | `top_spacing` | `auto`, `none` | Remove top padding to butt this section against the one above it |
 | `bottom_spacing` | `auto`, `none` | Remove bottom padding to butt this section against the one below it |
 
@@ -35,7 +35,7 @@ An alternating grid of image tiles and text/CTA cards that creates a visually dy
 
 Alternate text cards and image cards in a 4-column layout so the pattern forms a true checkerboard: text, image, text, image on the first row, then image, text, image, text on the second.
 
-- **Settings**: `columns_desktop: 4`, `color_scheme: standard-accent`, `heading_alignment: center`
+- **Settings**: `columns_desktop: 4`, `color_scheme: standard-secondary`, `heading_alignment: center`
 - **Blocks**: 8 cards — odd positions get title + description + "Learn More" button; even positions get a photo
 - **Good for**: Service overview pages where each service needs a brief explanation and a supporting photo
 - **Industries**: Landscaping, cleaning companies, home renovation, dental practices
@@ -62,7 +62,7 @@ Heavy on images with only a couple of text cards sprinkled in. Feels like a cura
 
 Three rows of alternating content, creating a long-scroll storytelling section. Each row pairs a photo with a narrative block.
 
-- **Settings**: `columns_desktop: 2`, `color_scheme: highlight-accent`, `top_spacing: none`, `bottom_spacing: none`
+- **Settings**: `columns_desktop: 2`, `color_scheme: highlight-secondary`, `top_spacing: none`, `bottom_spacing: none`
 - **Blocks**: 6 cards — rows alternate image-left/text-right and text-left/image-right
 - **Good for**: "How it works" or process explanation sections, step-by-step guides
 - **Industries**: SaaS onboarding pages, fitness studios, meal-prep services, consulting firms
@@ -71,7 +71,7 @@ Three rows of alternating content, creating a long-scroll storytelling section. 
 
 All text, no images. Four content tiles in a single row, each with a title, a one-liner description, and a CTA button. Clean and scannable.
 
-- **Settings**: `columns_desktop: 4`, `color_scheme: standard-accent`, `heading_alignment: center`, `title: "Why Choose Us"`
+- **Settings**: `columns_desktop: 4`, `color_scheme: standard-secondary`, `heading_alignment: center`, `title: "Why Choose Us"`
 - **Blocks**: 4 cards, all without images — each gets a punchy title (e.g., "Fast Turnaround"), 1-sentence description, and button
 - **Good for**: Value propositions, competitive differentiators, pricing tier previews
 - **Industries**: Agencies, IT support, accountants, real estate agents
@@ -104,7 +104,7 @@ The smallest useful configuration: one image and one content block side by side.
 
 - **Column count changes the personality**: 2 columns reads editorial and premium. 3 columns is balanced and versatile. 4 columns feels energetic and information-dense. Match the column count to the brand tone.
 
-- **Accent color schemes on content tiles**: The `standard-accent` and `highlight-accent` schemes give content tiles a distinct background color, which strengthens the visual contrast between image and text tiles. Use these when images have varied brightness levels and you need the text tiles to hold their own.
+- **Accent color schemes on content tiles**: The `standard-secondary` and `highlight-secondary` schemes give content tiles a distinct background color, which strengthens the visual contrast between image and text tiles. Use these when images have varied brightness levels and you need the text tiles to hold their own.
 
 - **Spacing collapse for full-bleed sections**: Set `top_spacing: none` and `bottom_spacing: none` when stacking the checkerboard directly against a hero or another full-width section. This eliminates gaps and creates a seamless visual flow.
 

@@ -1,7 +1,7 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-type-checkerboard widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
-  {% unless widget.settings.color_scheme == 'standard' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
+  {% unless widget.settings.color_scheme == 'standard-primary' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="checkerboard"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -55,16 +55,16 @@
         align-self: flex-start;
       }
 
-      &.color-scheme-standard-accent,
-      &.color-scheme-highlight-accent {
+      &.color-scheme-standard-secondary,
+      &.color-scheme-highlight-secondary {
         & .checkerboard-item-content {
           background-color: var(--bg-secondary);
         }
       }
 
-      &.color-scheme-standard-accent,
-      &.color-scheme-highlight,
-      &.color-scheme-highlight-accent {
+      &.color-scheme-standard-secondary,
+      &.color-scheme-highlight-primary,
+      &.color-scheme-highlight-secondary {
         & .checkerboard-item {
           border: var(--border-width-thin) solid var(--border-color);
         }
@@ -78,7 +78,7 @@
     }
   </style>
 
-  <div class="widget-container{% unless widget.settings.color_scheme == 'standard' %} widget-container-padded{% endunless %}">
+  <div class="widget-container{% unless widget.settings.color_scheme == 'standard-primary' %} widget-container-padded{% endunless %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
         {% assign header_delay = 0 %}

@@ -34,7 +34,7 @@
             "button_style_2": "secondary",
             "button_size": "medium",
             "overlay_color": "#141414cc",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-2": {
@@ -53,7 +53,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#141414cc",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-3": {
@@ -72,7 +72,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#141414cc",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         }
       },
@@ -100,7 +100,7 @@
         "icon_shape": "sharp",
         "alignment": "centered",
         "show_dividers": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "stat-1": {
@@ -147,7 +147,7 @@
         "alignment": "center",
         "image_position": "top",
         "aspect_ratio": "3 / 4",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "prog-1": {
@@ -209,7 +209,7 @@
         "orientation": "vertical",
         "initial_position": 40,
         "show_labels": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       }
     },
     "testimonials": {
@@ -222,7 +222,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "review-1": {
@@ -262,7 +262,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

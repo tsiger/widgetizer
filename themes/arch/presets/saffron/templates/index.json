@@ -8,7 +8,7 @@
         "height": "large",
         "alignment": "center",
         "overlay_color": "#1a1c2bcc",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -53,7 +53,7 @@
       "settings": {
         "balance": "equal",
         "sticky_column": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "intro-eyebrow": {
@@ -106,7 +106,7 @@
         "description": "A taste of what's on our menu this season — crafted daily with the freshest local ingredients.",
         "heading_alignment": "center",
         "layout": "single-column",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "dish-1": {
@@ -148,7 +148,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "right",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "exp-heading": {
@@ -195,7 +195,7 @@
         "columns_desktop": 3,
         "layout": "grid",
         "card_layout": "flat",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "quote-1": {
@@ -232,7 +232,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

@@ -7,7 +7,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -33,7 +33,7 @@
       "type": "image-text",
       "settings": {
         "image_position": "right",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "founders-eyebrow": {
@@ -78,7 +78,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "phil-heading": {
@@ -112,7 +112,7 @@
         "layout": "grid",
         "card_layout": "flat",
         "animate": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "figure-1": {
@@ -158,7 +158,7 @@
         "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "profile-1": {
@@ -195,7 +195,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

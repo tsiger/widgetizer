@@ -266,7 +266,7 @@ img {
    3.1 Standard (default)
    -------------------------------------------------------------------------- */
 
-.color-scheme-standard {
+.color-scheme-standard-primary {
   --text-heading: var(--colors-standard_text_heading, #0f172a);
   --text-content: var(--colors-standard_text_content, #1f2937);
   --text-muted: var(--colors-standard_text_muted, #6b7280);
@@ -282,7 +282,7 @@ img {
    3.2 Highlight (emphasis)
    -------------------------------------------------------------------------- */
 
-.color-scheme-highlight {
+.color-scheme-highlight-primary {
   --text-heading: var(--colors-highlight_text_heading, #ffffff);
   --text-content: var(--colors-highlight_text_content, #eaf3fc);
   --text-muted: var(--colors-highlight_text_muted, #64748b);
@@ -298,7 +298,7 @@ img {
    3.3 Standard Accent (subtle emphasis — swaps bg_primary ↔ bg_secondary)
    -------------------------------------------------------------------------- */
 
-.color-scheme-standard-accent {
+.color-scheme-standard-secondary {
   --text-heading: var(--colors-standard_text_heading, #0f172a);
   --text-content: var(--colors-standard_text_content, #1f2937);
   --text-muted: var(--colors-standard_text_muted, #6b7280);
@@ -314,7 +314,7 @@ img {
    3.4 Highlight Accent (subtle dark emphasis — swaps bg_primary ↔ bg_secondary)
    -------------------------------------------------------------------------- */
 
-.color-scheme-highlight-accent {
+.color-scheme-highlight-secondary {
   --text-heading: var(--colors-highlight_text_heading, #ffffff);
   --text-content: var(--colors-highlight_text_content, #eaf3fc);
   --text-muted: var(--colors-highlight_text_muted, #64748b);

@@ -11,7 +11,7 @@
         "alignment": "start",
         "vertical_alignment": "end",
         "overlay_color": "#2c242099",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none"
       },
       "blocks": {
@@ -78,7 +78,7 @@
       "settings": {
         "text_alignment": "center",
         "content_width": "medium",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "intro-heading": {
@@ -124,7 +124,7 @@
         "icon_style": "plain",
         "icon_size": "lg",
         "icon_shape": "circle",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "class-1": {
@@ -215,7 +215,7 @@
         "image_position": "left",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "studio-eyebrow": {
@@ -262,7 +262,7 @@
         "eyebrow": "New Here?",
         "title": "Getting Started Is Easy",
         "heading_alignment": "center",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "step-1": {
@@ -300,7 +300,7 @@
         "icon_shape": "circle",
         "alignment": "centered",
         "show_dividers": true,
-        "color_scheme": "standard-accent",
+        "color_scheme": "standard-secondary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"
       },
@@ -336,7 +336,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"
       },

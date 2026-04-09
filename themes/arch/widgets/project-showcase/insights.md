@@ -13,7 +13,7 @@ Image-forward portfolio grid (or carousel) with hover-reveal text overlay, built
 | `columns_desktop` | `2` -- `5` | Number of columns on desktop viewports; fewer columns = larger cards with more visual impact |
 | `aspect_ratio` | `auto`, `contain`, `1/1`, `4/3`, `3/2`, `3/4`, `16/9` | Determines image crop shape. `auto` uses the natural image ratio; `contain` fits the full image inside a fixed-height container; portrait (`3/4`) is unusual and attention-grabbing |
 | `text_display` | `hover`, `always` | `hover` keeps cards image-only until mouseover reveals the gradient overlay with title and description; `always` shows the overlay permanently |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Background treatment for the entire section. Standard uses the default page background; highlight and accent variants pull from theme color variables |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background treatment for the entire section. Standard uses the default page background; highlight and accent variants pull from theme color variables |
 | `top_spacing` | `auto`, `none` | Removes top padding so the widget can butt up against the section above it |
 | `bottom_spacing` | `auto`, `none` | Removes bottom padding for the same edge-to-edge stacking effect |
 
@@ -38,7 +38,7 @@ Image-forward portfolio grid (or carousel) with hover-reveal text overlay, built
 | `aspect_ratio` | `3/2` |
 | `text_display` | `hover` |
 | `heading_alignment` | `left` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 Large, cinematic cards that let the photography do the talking. Hover-reveal keeps the grid clean. Two columns give each project room to breathe.
 
@@ -56,7 +56,7 @@ Large, cinematic cards that let the photography do the talking. Hover-reveal kee
 | `aspect_ratio` | `1/1` |
 | `text_display` | `hover` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 
 Square thumbnails on a dark (highlight) background create an Instagram-style grid that feels familiar to visual audiences. Three columns balances density with detail.
 
@@ -74,7 +74,7 @@ Square thumbnails on a dark (highlight) background create an Instagram-style gri
 | `aspect_ratio` | `16/9` |
 | `text_display` | `always` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 Wide cinematic ratio works well for before/after shots of renovations or landscaping jobs. Carousel lets you load many projects without overwhelming the page. Always-visible text ensures project names are readable without interaction.
 
@@ -92,9 +92,9 @@ Wide cinematic ratio works well for before/after shots of renovations or landsca
 | `aspect_ratio` | `4/3` |
 | `text_display` | `always` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 
-The 4:3 ratio suits food photography and venue shots. Always-on overlay text labels each dish, event space, or catering package. The highlight-accent scheme adds warmth against a rich background.
+The 4:3 ratio suits food photography and venue shots. Always-on overlay text labels each dish, event space, or catering package. The highlight-secondary scheme adds warmth against a rich background.
 
 **Good for:** Restaurants, caterers, event venues, hotels, bakeries.
 **Industries:** Hospitality, food service, event planning, tourism.
@@ -110,7 +110,7 @@ The 4:3 ratio suits food photography and venue shots. Always-on overlay text lab
 | `aspect_ratio` | `4/3` |
 | `text_display` | `hover` |
 | `heading_alignment` | `left` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 
 Clean, professional grid with left-aligned heading that matches a typical tech-company layout. Link each card to a dedicated case-study page. Hover-reveal keeps the interface minimal. Use the description field for short outcome lines like "40% conversion lift."
 
@@ -128,7 +128,7 @@ Clean, professional grid with left-aligned heading that matches a typical tech-c
 | `aspect_ratio` | `3/4` |
 | `text_display` | `hover` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 
 Portrait ratio is perfect for hair, makeup, and fashion shots where the subject is vertical. Four visible columns create a dense lookbook feel that invites swiping. Hover-reveal keeps the focus on the imagery.
 
@@ -146,7 +146,7 @@ Portrait ratio is perfect for hair, makeup, and fashion shots where the subject 
 | `aspect_ratio` | `1/1` |
 | `text_display` | `always` |
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `top_spacing` | `none` |
 | `bottom_spacing` | `none` |
 
@@ -169,6 +169,6 @@ Dense four-column square grid creates an impactful wall of faces, events, and ou
 
 - **Use the highlight color scheme when the section sits between two standard sections.** The background contrast creates a natural visual break and draws the eye to the portfolio, which is usually the most persuasive section on a small business site.
 
-- **Remove spacing (`none`) when stacking this widget directly below a full-width hero.** The seamless transition from hero image into project grid feels intentional and modern. Combine with `highlight` to make the portfolio section feel like a continuation of the hero rather than a separate block.
+- **Remove spacing (`none`) when stacking this widget directly below a full-width hero.** The seamless transition from hero image into project grid feels intentional and modern. Combine with `highlight-primary` to make the portfolio section feel like a continuation of the hero rather than a separate block.
 
 - **Keep descriptions short -- six to ten words max.** The overlay text area is compact by design. Long descriptions get clipped or crowd the card. Treat the description as a subtitle ("Complete kitchen renovation in Oak Park") rather than a paragraph.

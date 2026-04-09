@@ -12,7 +12,7 @@ A structured footer/contact section that displays business information, hours, n
 | `title` | Any text | Main `<h2>` headline for the section. Hidden when blank. |
 | `description` | Any text | Supporting paragraph below the headline. Hidden when blank. |
 | `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description group. Left feels editorial; center feels formal. |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls background and text palette. `standard` has no padded container; the other three add `widget-container-padded` and set `--widget-bg-color`. Use highlight schemes to visually separate contact from surrounding content. |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text palette. `standard-primary` has no padded container; the other three add `widget-container-padded` and set `--widget-bg-color`. Use highlight schemes to visually separate contact from surrounding content. |
 | `top_spacing` | `auto` (default), `none` | Removes the top section padding when set to `none`. Useful for stacking directly beneath another widget. |
 | `bottom_spacing` | `auto` (default), `none` | Removes the bottom section padding when set to `none`. Useful when this is the very last section on the page. |
 
@@ -36,7 +36,7 @@ A structured footer/contact section that displays business information, hours, n
 | Setting / Block | Value |
 |---|---|
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | Block 1 — info | Title: restaurant name. Text: one-line tagline + full address. |
 | Block 2 — text_block | Title: "Hours". Text: weekday and weekend hours. |
 | Block 3 — menu_block | Title: "Explore". Menu: footer menu linking to Menu, Reservations, Private Events. |
@@ -52,7 +52,7 @@ A structured footer/contact section that displays business information, hours, n
 | Setting / Block | Value |
 |---|---|
 | `heading_alignment` | `left` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `eyebrow` | "Contact" |
 | `title` | blank |
 | Block 1 — info | Title: firm name. Text: street address, phone, email. |
@@ -69,7 +69,7 @@ A structured footer/contact section that displays business information, hours, n
 | Setting / Block | Value |
 |---|---|
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `title` | "Visit Us" |
 | Block 1 — info | Title: shop name. Text: address + a short brand statement. |
 | Block 2 — text_block | Title: "Store Hours". Text: daily hours with holiday note. |
@@ -85,7 +85,7 @@ A structured footer/contact section that displays business information, hours, n
 | Setting / Block | Value |
 |---|---|
 | `heading_alignment` | `left` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 | `eyebrow` | "Let's Talk" |
 | `title` | "Start a Project" |
 | `description` | Brief CTA sentence inviting inquiries. |
@@ -103,7 +103,7 @@ A structured footer/contact section that displays business information, hours, n
 | Setting / Block | Value |
 |---|---|
 | `heading_alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `title` | "Reach Out" |
 | Block 1 — info | Title: practice name. Text: address, phone, "New patients welcome." |
 | Block 2 — text_block | Title: "Hours". Text: weekday and Saturday hours, "Closed Sunday." |
@@ -120,7 +120,7 @@ A structured footer/contact section that displays business information, hours, n
 | Setting / Block | Value |
 |---|---|
 | `heading_alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `eyebrow` | "Get Involved" |
 | `title` | organization name |
 | Block 1 — info | Title: blank. Text: mission statement (2-3 sentences). |
@@ -138,7 +138,7 @@ A structured footer/contact section that displays business information, hours, n
 | Setting / Block | Value |
 |---|---|
 | `heading_alignment` | `left` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `title` | "Contact Us" |
 | Block 1 — info | Title: company name. Text: service area description, phone, email. |
 | Block 2 — text_block | Title: "Availability". Text: "Mon-Sat 7am-6pm. Emergency calls accepted 24/7." |
@@ -154,7 +154,7 @@ A structured footer/contact section that displays business information, hours, n
 - **Lead with the info block.** It spans two columns and uses the heading font at XL size, making it the natural place for the business name and identity statement. Treat it as a mini brand moment, not just an address dump.
 - **Use richtext strategically in text_block.** Hours with `<p>` per line are scannable. You can also embed a short "Closed on public holidays" note or a link to a booking page.
 - **Keep the menu shallow.** The widget hides submenus by CSS, so assign a dedicated flat menu (e.g. "footer-menu") rather than reusing the main navigation. Five to seven links is the sweet spot.
-- **Pick color_scheme to create contrast.** If the section above is standard background, switching to `highlight` or `highlight-accent` here draws the eye down and signals "this is the end of the page, here's how to reach us."
+- **Pick color_scheme to create contrast.** If the section above is standard background, switching to `highlight-primary` or `highlight-secondary` here draws the eye down and signals "this is the end of the page, here's how to reach us."
 - **Omit the heading group for footers.** When the widget lives in the global footer, leaving eyebrow/title/description blank produces a cleaner result that feels structural rather than promotional.
 - **Use heading_alignment left for editorial sites** and center for hospitality or event-driven brands. Left alignment pairs well with dropping the eyebrow and letting the info block title serve as the primary anchor.
 - **Three blocks is often enough.** Not every site needs all four slots. A trades business with no social presence is better off with info + hours + services than adding an empty social block.

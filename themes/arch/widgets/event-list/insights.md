@@ -12,7 +12,7 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 | `title` | Any text (default "Upcoming Events") | Section headline; renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise |
 | `description` | Any text (blank by default) | Paragraph below the headline for context or a short invitation |
 | `heading_alignment` | `left`, `center` (default) | Left-aligns the header block for editorial layouts; center works for standalone sections |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | **standard** -- no card background or border. **standard-accent** -- adds secondary background + border to each card. **highlight** -- tinted section background + card border. **highlight-accent** -- tinted section background + secondary card fill + border |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | **standard** -- no card background or border. **standard-secondary** -- adds secondary background + border to each card. **highlight** -- tinted section background + card border. **highlight-secondary** -- tinted section background + secondary card fill + border |
 | `top_spacing` | `auto`, `none` | Removes top padding so the widget can sit flush against the section above it |
 | `bottom_spacing` | `auto`, `none` | Removes bottom padding so the widget can sit flush against the section below it |
 
@@ -35,13 +35,13 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 - **Industries**: Professional services, nonprofits, community organizations
 
 ### 2. Workshop Schedule with Accent Cards
-- **Settings**: eyebrow "Workshops", title "Hands-On Sessions", heading_alignment left, color_scheme standard-accent
+- **Settings**: eyebrow "Workshops", title "Hands-On Sessions", heading_alignment left, color_scheme standard-secondary
 - **Blocks**: 4-6 events, each with a description paragraph explaining what attendees will learn and a "Reserve a Spot" button
 - **Good for**: Highlighting educational or training events where the description copy matters
 - **Industries**: Fitness studios, cooking schools, coworking spaces, continuing education
 
 ### 3. Highlighted Concert / Performance Calendar
-- **Settings**: eyebrow "Live Music", title "What's On", heading_alignment center, color_scheme highlight-accent, top_spacing none (placed directly below a hero)
+- **Settings**: eyebrow "Live Music", title "What's On", heading_alignment center, color_scheme highlight-secondary, top_spacing none (placed directly below a hero)
 - **Blocks**: 5-8 events, location set to venue + time, button text "Get Tickets"
 - **Good for**: Venues that rotate acts frequently and want a bold, attention-grabbing listing
 - **Industries**: Bars, music venues, theaters, cultural centers
@@ -59,13 +59,13 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 - **Industries**: Real estate brokerages, private schools, wedding venues, senior living communities
 
 ### 6. Multi-Day Conference Breakdown
-- **Settings**: title "Conference Agenda", heading_alignment left, color_scheme standard-accent
+- **Settings**: title "Conference Agenda", heading_alignment left, color_scheme standard-secondary
 - **Blocks**: 6-8 events spanning different days, descriptions summarizing each session, buttons linking to speaker bios or session detail pages
 - **Good for**: A single-page rundown of a multi-day program
 - **Industries**: Tech conferences, trade shows, academic symposiums
 
 ### 7. Fundraiser Gala Timeline
-- **Settings**: eyebrow "Annual Gala", title blank (rely on a hero above), heading_alignment left, color_scheme highlight-accent, top_spacing none
+- **Settings**: eyebrow "Annual Gala", title blank (rely on a hero above), heading_alignment left, color_scheme highlight-secondary, top_spacing none
 - **Blocks**: 3-4 events representing gala milestones (Cocktail Hour, Dinner, Auction, After-Party), descriptions painting the scene, button text "Buy Table"
 - **Good for**: Giving donors a vivid sense of the evening's flow
 - **Industries**: Nonprofits, foundations, alumni associations, charities
@@ -80,4 +80,4 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 - **Location doubles as context.** The location field is free text -- use it for "Online" vs. a city name, or append a time ("Brooklyn, NY -- 7 PM"). This single line often answers the two biggest questions visitors have: where and when.
 - **Rich-text descriptions are optional power.** For simple listings, skip the description entirely for a tighter layout. For events that need selling (workshops, galas), use a one- or two-sentence pitch in the description to drive registrations.
 - **Button text signals intent.** "Register Now," "Get Tickets," "RSVP," and "Learn More" set very different expectations. Match the button label to the action visitors will actually take on the linked page.
-- **Color-scheme accent variants add card separation.** On pages with lots of content sections, switching to standard-accent or highlight-accent gives each event card a visible boundary, preventing the list from blending into surrounding widgets.
+- **Color-scheme accent variants add card separation.** On pages with lots of content sections, switching to standard-secondary or highlight-secondary gives each event card a visible boundary, preventing the list from blending into surrounding widgets.

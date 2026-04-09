@@ -4,7 +4,7 @@
 <section
   id="{{ widget.id }}"
   class="widget widget-type-key-figures widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.layout == 'carousel' %} layout-carousel{% endif %}{% if widget.settings.card_layout == 'flat' %} card-layout-flat{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
-  {% unless widget.settings.color_scheme == 'standard' %}
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}
   data-widget-id="{{ widget.id }}"
@@ -76,16 +76,16 @@
         }
       }
 
-      &:not(.card-layout-flat).color-scheme-standard-accent,
-      &:not(.card-layout-flat).color-scheme-highlight-accent {
+      &:not(.card-layout-flat).color-scheme-standard-secondary,
+      &:not(.card-layout-flat).color-scheme-highlight-secondary {
         & .widget-card {
           background-color: var(--bg-secondary);
         }
       }
 
-      &:not(.card-layout-flat).color-scheme-standard-accent,
-      &:not(.card-layout-flat).color-scheme-highlight,
-      &:not(.card-layout-flat).color-scheme-highlight-accent {
+      &:not(.card-layout-flat).color-scheme-standard-secondary,
+      &:not(.card-layout-flat).color-scheme-highlight-primary,
+      &:not(.card-layout-flat).color-scheme-highlight-secondary {
         & .widget-card {
           border: var(--border-width-thin) solid var(--border-color);
         }
@@ -105,7 +105,7 @@
     }
   </style>
 
-  <div class="widget-container {% unless widget.settings.color_scheme == 'standard' %}widget-container-padded{% endunless %}">
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
     {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
       <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
         {% assign header_delay = 0 %}

@@ -2,7 +2,7 @@
   "type": "footer",
   "settings": {
     "copyright": "© 2026 Brightside Dental. All rights reserved.",
-    "color_scheme": "highlight"
+    "color_scheme": "highlight-primary"
   },
   "blocks": {
     "logo_text_1": {

@@ -28,7 +28,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#1f1a17a6",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-2": {
@@ -47,7 +47,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#1f1a17a6",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-3": {
@@ -66,7 +66,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#1f1a17a6",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         }
       },
@@ -80,7 +80,7 @@
         "icon_shape": "rounded",
         "alignment": "left",
         "show_dividers": true,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "trust-1": {
@@ -131,7 +131,7 @@
         "alignment": "start",
         "image_position": "top",
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "prop-1": {
@@ -186,7 +186,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "agent-eyebrow": {
@@ -237,7 +237,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "review-1": {
@@ -287,7 +287,7 @@
         "icon_style": "outline",
         "icon_size": "lg",
         "icon_shape": "circle",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "card-1": {
@@ -336,7 +336,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

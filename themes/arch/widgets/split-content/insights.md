@@ -8,7 +8,7 @@ Two-column freeform layout. Every block has a `position: left | right` setting, 
 |---------|--------|---------------|
 | `balance` | `left-heavy` (70/30), `equal` (50/50), `right-heavy` (30/70) | Controls column width ratio |
 | `sticky_column` | `none`, `left`, `right` | Pins one column while the other scrolls — great when one side has a lot of content |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Background/text color palette |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background/text color palette |
 
 ## Available blocks (all have `position: left | right`)
 

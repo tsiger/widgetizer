@@ -6,7 +6,7 @@
       "type": "split-hero",
       "settings": {
         "image_position": "right",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -64,7 +64,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "intro-heading": {
@@ -110,7 +110,7 @@
         "description": "Whether you're a black coffee purist or a lavender latte adventurer, we've got something for you.",
         "heading_alignment": "center",
         "image_position": "left",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "tab-1": {
@@ -149,7 +149,7 @@
       "settings": {
         "autoplay": true,
         "autoplay_speed": 6000,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "quote-1": {
@@ -186,7 +186,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

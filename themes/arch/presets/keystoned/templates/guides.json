@@ -7,7 +7,7 @@
       "settings": {
         "balance": "left-heavy",
         "sticky_column": "none",
-        "color_scheme": "standard-accent",
+        "color_scheme": "standard-secondary",
         "top_spacing": "none"
       },
       "blocks": {
@@ -60,7 +60,7 @@
         "image_position": "left",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "buyers-eyebrow": {
@@ -102,7 +102,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "sellers-eyebrow": {
@@ -144,7 +144,7 @@
         "title": "From First Call to Closing Day",
         "description": "",
         "heading_alignment": "center",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "step-1": {
@@ -186,7 +186,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

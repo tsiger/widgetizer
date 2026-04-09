@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#141414a0",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -33,7 +33,7 @@
         "image_position": "left",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "str-eyebrow": {
@@ -87,7 +87,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "fl-eyebrow": {
@@ -141,7 +141,7 @@
         "image_position": "left",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "co-eyebrow": {
@@ -198,14 +198,14 @@
         "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         "video_title": "Ironform Training Session",
         "aspect_ratio": "16 / 9",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       }
     },
     "cta": {
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

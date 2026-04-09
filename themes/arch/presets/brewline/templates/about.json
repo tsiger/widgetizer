@@ -7,7 +7,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -33,7 +33,7 @@
       "type": "image-text",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "origin-eyebrow": {
@@ -69,7 +69,7 @@
         "title": "How We Brew",
         "description": "Every cup of Brewline coffee follows the same journey — from farm to your hands.",
         "heading_alignment": "center",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "step-1": {
@@ -111,7 +111,7 @@
         "layout": "grid",
         "card_layout": "flat",
         "animate": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "figure-1": {
@@ -158,7 +158,7 @@
         "heading_alignment": "center",
         "image_ratio": "square",
         "columns_desktop": 4,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "member-1": {
@@ -196,7 +196,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

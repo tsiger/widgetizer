@@ -250,10 +250,10 @@
         "color_scheme": {
           "label": "Color Scheme",
           "options": {
-            "standard": "Standard",
-            "standard_accent": "Standard Accent",
-            "highlight": "Highlight",
-            "highlight_accent": "Highlight Accent"
+            "standard_primary": "Standard Primary",
+            "standard_secondary": "Standard Secondary",
+            "highlight_primary": "Highlight Primary",
+            "highlight_secondary": "Highlight Secondary"
           }
         },
         "top_spacing": {
@@ -1284,10 +1284,10 @@
         "label": "Content color scheme",
         "options": {
           "none": "None",
-          "standard": "Standard",
-          "standard_accent": "Standard Accent",
-          "highlight": "Highlight",
-          "highlight_accent": "Highlight Accent"
+          "standard_primary": "Standard Primary",
+          "standard_secondary": "Standard Secondary",
+          "highlight_primary": "Highlight Primary",
+          "highlight_secondary": "Highlight Secondary"
         }
       }
     }
@@ -1767,10 +1767,10 @@
           "color_scheme": {
             "label": "Color Scheme",
             "options": {
-              "standard": "Standard",
-              "standard_accent": "Standard Accent",
-              "highlight": "Highlight",
-              "highlight_accent": "Highlight Accent"
+              "standard_primary": "Standard Primary",
+              "standard_secondary": "Standard Secondary",
+              "highlight_primary": "Highlight Primary",
+              "highlight_secondary": "Highlight Secondary"
             }
           }
         }

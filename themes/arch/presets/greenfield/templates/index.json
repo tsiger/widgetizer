@@ -28,7 +28,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#1a2e1a80",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-2": {
@@ -47,7 +47,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#1a2e1a80",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         },
         "slide-3": {
@@ -66,7 +66,7 @@
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#1a2e1a80",
-            "color_scheme": "highlight"
+            "color_scheme": "highlight-primary"
           }
         }
       },
@@ -80,7 +80,7 @@
         "icon_shape": "rounded",
         "alignment": "left",
         "show_dividers": true,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "trust-1": {
@@ -132,7 +132,7 @@
         "icon_style": "filled",
         "icon_size": "lg",
         "icon_shape": "circle",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "svc-1": {
@@ -204,7 +204,7 @@
         "orientation": "horizontal",
         "initial_position": 30,
         "show_labels": true,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       }
     },
     "about_teaser": {
@@ -214,7 +214,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "about-eyebrow": {
@@ -265,7 +265,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "flat",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "review-1": {
@@ -305,7 +305,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

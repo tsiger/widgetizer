@@ -8,10 +8,10 @@ Configurable multi-column footer with logo, text, navigation, and social blocks 
 
 | Setting | Values | Visual Effect |
 |---|---|---|
-| `color_scheme` | `standard` | Uses the page's default background; footer blends into the page naturally |
-| | `standard-accent` | Default background with accent-tinted text and link colors |
-| | `highlight` (default) | Switches to `--bg-primary` fill, creating a strong contrast band at the bottom of the page |
-| | `highlight-accent` | `--bg-primary` fill combined with accent colors; the most visually prominent option |
+| `color_scheme` | `standard-primary` | Uses the page's default background; footer blends into the page naturally |
+| | `standard-secondary` | Default background with accent-tinted text and link colors |
+| | `highlight-primary` (default) | Switches to `--bg-primary` fill, creating a strong contrast band at the bottom of the page |
+| | `highlight-secondary` | `--bg-primary` fill combined with accent colors; the most visually prominent option |
 | `copyright` | Any text / blank | When filled, renders a copyright line below the columns and adds bottom padding. When blank, the footer collapses to an 8 rem block of columns only |
 
 ---
@@ -47,7 +47,7 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 |---|---|
 | logo_text (wide richtext blurb) | social_block |
 
-- **Settings:** `color_scheme: highlight-accent`, copyright filled, logo_width 200 px, logo_text richtext with a two-sentence mission statement
+- **Settings:** `color_scheme: highlight-secondary`, copyright filled, logo_width 200 px, logo_text richtext with a two-sentence mission statement
 - **Good for:** Creative studios and personal brands where the footer reinforces identity more than navigation
 - **Industries:** Design agencies, photographers, freelance portfolios, artists
 
@@ -57,7 +57,7 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 |---|---|---|
 | logo_text | text_block ("Hours") | text_block ("Visit Us") |
 
-- **Settings:** `color_scheme: standard-accent`, copyright filled. First text_block lists weekday and weekend hours. Second text_block has address, phone, and email. No menu or social blocks
+- **Settings:** `color_scheme: standard-secondary`, copyright filled. First text_block lists weekday and weekend hours. Second text_block has address, phone, and email. No menu or social blocks
 - **Good for:** Brick-and-mortar businesses where visitors primarily need location and availability info
 - **Industries:** Restaurants, hair salons, auto repair shops, veterinary clinics
 
@@ -87,7 +87,7 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 |---|---|---|
 | logo_text | text_block ("Newsletter / Join Us" blurb) | social_block |
 
-- **Settings:** `color_scheme: highlight-accent`, copyright filled. text_block richtext includes a CTA sentence and an email link. social_block title "Connect With Us"
+- **Settings:** `color_scheme: highlight-secondary`, copyright filled. text_block richtext includes a CTA sentence and an email link. social_block title "Connect With Us"
 - **Good for:** Organizations that want the footer to drive community engagement rather than just close the page
 - **Industries:** Nonprofits, churches, local clubs, coworking spaces, fitness studios
 
@@ -95,10 +95,10 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 
 ## Differentiation Tips
 
-- **Color scheme is the single biggest mood lever.** `highlight` and `highlight-accent` create a strong visual endpoint. `standard` makes the footer nearly invisible, useful when the last content section already has a dark background.
+- **Color scheme is the single biggest mood lever.** `highlight-primary` and `highlight-secondary` create a strong visual endpoint. `standard-primary` makes the footer nearly invisible, useful when the last content section already has a dark background.
 - **Omit the copyright text to get a compact footer.** When copyright is blank the widget switches to a symmetric 8 rem padding block. This works well for sites that handle legal text elsewhere or want a tidier bottom edge.
 - **Use two text_blocks instead of one when contact info is complex.** Splitting hours and address into separate columns improves scannability on desktop and stacks cleanly on mobile.
 - **Logo width matters more than people expect.** A 50 px logo keeps the column compact and text-dominant; 200+ px turns the column into a visual brand anchor. Match the size to the footer's role: navigation-focused footers want a smaller logo, brand-focused footers want a larger one.
 - **The social_block pulls icons globally.** You cannot show different social icons per page. If a client needs platform-specific links (e.g., Yelp for a restaurant but Behance for a portfolio), configure the global theme social settings to include all relevant platforms.
 - **Menu blocks hide submenus intentionally.** The footer renders a flat list. If the client's sitemap is deep, create a dedicated shallow menu specifically for the footer rather than reusing the header's nested menu.
-- **Pair `highlight-accent` with a single logo_text block for maximum brand impact.** The accent tint plus a large logo creates a footer that reads as a signature rather than a utility bar.
+- **Pair `highlight-secondary` with a single logo_text block for maximum brand impact.** The accent tint plus a large logo creates a footer that reads as a signature rather than a utility bar.

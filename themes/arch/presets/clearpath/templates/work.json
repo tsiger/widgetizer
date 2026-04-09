@@ -7,7 +7,7 @@
       "settings": {
         "image": "",
         "image_position": "right",
-        "color_scheme": "standard-accent",
+        "color_scheme": "standard-secondary",
         "top_spacing": "none"
       },
       "blocks": {
@@ -40,7 +40,7 @@
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",
         "text_display": "hover",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "case-1": {
@@ -109,7 +109,7 @@
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 5,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "logo-1": {
@@ -145,7 +145,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "review-1": {
@@ -186,7 +186,7 @@
       "settings": {
         "text_alignment": "center",
         "content_width": "narrow",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "closing-heading": {

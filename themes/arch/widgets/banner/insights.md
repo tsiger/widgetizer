@@ -12,7 +12,7 @@ Full-width hero section with a background image, color overlay, and stacked cont
 | `alignment` | `center`, `start` | Horizontal text alignment. `center` produces a classic centered hero; `start` left-aligns everything, giving a more editorial feel |
 | `vertical_alignment` | `start`, `center`, `end` | Pushes content to the top, middle, or bottom of the banner — only meaningful when `height` is not `auto` |
 | `overlay_color` | any color with alpha | Tint layer between background image and content. Default is a dark navy at ~75% opacity. Adjust hue and alpha to match brand or create mood |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Background/text palette when no image is set. `highlight` variants produce strong contrast backgrounds |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background/text palette when no image is set. `highlight-primary` variants produce strong contrast backgrounds |
 | `top_spacing` | `auto`, `none` | Removes top margin — essential when the banner is the first widget and should sit flush under a transparent header |
 | `bottom_spacing` | `auto`, `none` | Removes bottom margin — useful when the next section should visually "touch" the banner |
 
@@ -46,7 +46,7 @@ Full-width hero section with a background image, color overlay, and stacked cont
 - Industries: Law firm, architecture studio, financial advisor, consulting agency
 
 **3. "Compact color-block hero" (no photo)**
-- Height: `auto`, Fullwidth: `false`, Color scheme: `highlight-accent`, Alignment: `center`
+- Height: `auto`, Fullwidth: `false`, Color scheme: `highlight-secondary`, Alignment: `center`
 - No image — relies entirely on the color scheme for visual interest
 - Blocks: icon (filled, lg, circle) -> heading (5xl) -> text (base) -> button (primary + secondary, small)
 - Good for: Interior pages, landing pages for specific services, or sites that lack professional photography
@@ -74,7 +74,7 @@ Full-width hero section with a background image, color overlay, and stacked cont
 - Industries: Photographer, design studio, boutique hotel, jewelry brand, fashion label
 
 **7. "Step preview hero"**
-- Height: `auto`, Fullwidth: `false`, Color scheme: `standard-accent`, Alignment: `center`
+- Height: `auto`, Fullwidth: `false`, Color scheme: `standard-secondary`, Alignment: `center`
 - No image — contained card style with rounded corners
 - Blocks: text (sm, uppercase) as eyebrow "How It Works" -> heading (5xl) -> numbered-item ("Schedule", "We Visit", "Enjoy Results", all medium/circle) -> button (primary "Schedule Now")
 - Good for: Immediately showing the customer journey in three easy steps, reducing friction before they even scroll
@@ -96,4 +96,4 @@ Full-width hero section with a background image, color overlay, and stacked cont
 - **Change up the overlay color, not just the opacity.** A warm brown overlay creates a completely different mood from the default navy. Tint the overlay toward the brand's accent color for variety.
 - **Lean on different block combinations.** The default heading + text + button combo is reliable, but rating + heading or image (logo) + heading or numbered-items + button feel like entirely different widgets even though the underlying structure is the same.
 - **Swap the eyebrow and heading order.** Placing a small uppercase text block above the heading (eyebrow pattern) versus placing descriptive text below (subtitle pattern) creates two distinct visual rhythms from the same two blocks.
-- **Use the no-image color-scheme variants intentionally.** A `highlight-accent` banner with no photo, paired with fullwidth: false, reads as a callout card rather than a hero — excellent for breaking up long pages without needing more photography.
+- **Use the no-image color-scheme variants intentionally.** A `highlight-secondary` banner with no photo, paired with fullwidth: false, reads as a callout card rather than a hero — excellent for breaking up long pages without needing more photography.

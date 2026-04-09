@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#1a2332a6",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "auto",
         "bottom_spacing": "none"
       },
@@ -33,7 +33,7 @@
         "image_position": "left",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "story-eyebrow": {
@@ -80,7 +80,7 @@
         "columns_desktop": 4,
         "card_layout": "flat",
         "animate": true,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "fig-1": {
@@ -131,7 +131,7 @@
         "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "member-1": {
@@ -180,7 +180,7 @@
         "style": "separated",
         "allow_multiple": true,
         "sidebar_position": "right",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "faq-1": {
@@ -225,7 +225,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

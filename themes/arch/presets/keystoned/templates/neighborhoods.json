@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#1f1a1700",
-        "color_scheme": "standard-accent",
+        "color_scheme": "standard-secondary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -47,7 +47,7 @@
         "alignment": "center",
         "image_position": "top",
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "area-1": {
@@ -136,7 +136,7 @@
       "settings": {
         "image": "",
         "image_position": "left",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "exp-heading": {
@@ -184,7 +184,7 @@
         "layout": "grid",
         "columns_desktop": 2,
         "card_layout": "flat",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "review-1": {
@@ -214,7 +214,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

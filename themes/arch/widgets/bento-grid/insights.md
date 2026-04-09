@@ -13,7 +13,7 @@ A flexible tiled grid for showcasing features, services, or highlights in an asy
 | `description` | Any text | Supporting paragraph below the headline |
 | `heading_alignment` | `left`, `center` (default) | Controls whether the section header block sits left-aligned or centered above the grid |
 | `gap` | `0`, `--space-sm`, `--space-md` (default), `--space-lg`, `--space-xl` | Gutter size between tiles; `0` gives a seamless mosaic, larger values add breathing room |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Section-level palette; highlight schemes swap background/foreground for contrast sections |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Section-level palette; highlight schemes swap background/foreground for contrast sections |
 | `top_spacing` | `auto` (default), `none` | Removes the default top margin so sections can sit flush against the previous widget |
 | `bottom_spacing` | `auto` (default), `none` | Removes the default bottom margin for flush stacking with the next widget |
 

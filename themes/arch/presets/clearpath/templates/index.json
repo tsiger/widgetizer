@@ -7,7 +7,7 @@
       "settings": {
         "image": "",
         "image_position": "right",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none"
       },
       "blocks": {
@@ -57,7 +57,7 @@
         "columns_desktop": 4,
         "card_layout": "flat",
         "animate": true,
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "fig-1": {
@@ -113,7 +113,7 @@
         "icon_style": "outline",
         "icon_size": "lg",
         "icon_shape": "circle",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "svc-1": {
@@ -165,7 +165,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "about-eyebrow": {
@@ -216,7 +216,7 @@
         "layout": "grid",
         "columns_desktop": 2,
         "card_layout": "flat",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "review-1": {
@@ -246,7 +246,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

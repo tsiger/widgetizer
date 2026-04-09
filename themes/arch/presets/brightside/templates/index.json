@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#0f1d2ecc",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none"
       },
       "blocks": {
@@ -64,7 +64,7 @@
         "icon_shape": "circle",
         "alignment": "left",
         "show_dividers": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "trust-1": {
@@ -116,7 +116,7 @@
         "icon_style": "outline",
         "icon_size": "xl",
         "icon_shape": "circle",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "svc-1": {
@@ -214,7 +214,7 @@
         "orientation": "horizontal",
         "initial_position": 30,
         "show_labels": true,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       }
     },
     "about_teaser": {
@@ -224,7 +224,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "about-eyebrow": {
@@ -275,7 +275,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "flat",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "review-1": {
@@ -315,7 +315,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

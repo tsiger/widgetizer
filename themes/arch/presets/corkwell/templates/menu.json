@@ -8,7 +8,7 @@
         "height": "small",
         "alignment": "center",
         "overlay_color": "#151e22cc",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -37,7 +37,7 @@
         "title": "Cocktails",
         "heading_alignment": "left",
         "layout": "single-column",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "cocktail-1": {
@@ -104,7 +104,7 @@
         "option_3_label": "Orange & Natural",
         "columns": 2,
         "aspect_ratio": "auto",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "wine-1": {
@@ -171,7 +171,7 @@
         "title": "Small Plates",
         "heading_alignment": "left",
         "layout": "two-column",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "plate-1": {
@@ -232,7 +232,7 @@
         "title": "Cheese & Sweets",
         "heading_alignment": "left",
         "layout": "single-column",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "dessert-1": {
@@ -266,7 +266,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

@@ -12,7 +12,7 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 | `title` | Any text, default "Our Work" | Main section headline; renders as `<h1>` when widget is first on the page |
 | `description` | Any text (optional) | Supporting paragraph below the headline |
 | `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description block |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls section background and text contrast; non-standard schemes add padded container and override `--widget-bg-color` |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls section background and text contrast; non-standard schemes add padded container and override `--widget-bg-color` |
 | `top_spacing` | `auto` (default), `none` | Removes top padding when set to `none` -- useful for stacking widgets edge-to-edge |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to `none` |
 
@@ -55,7 +55,7 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 ### 4. Team or Expertise Spotlight (4-6 panels)
 
 - **Panels:** 4-6, each a team member or area of expertise
-- **Settings:** `eyebrow` = "Meet the Team", `title` = "Our Experts", `heading_alignment` = center, `color_scheme` = standard-accent
+- **Settings:** `eyebrow` = "Meet the Team", `title` = "Our Experts", `heading_alignment` = center, `color_scheme` = standard-secondary
 - **Panel content:** Professional headshot, name as title, role or specialty as subtitle, "Read Bio" button
 - **Good for:** Building trust by putting faces to the business
 - **Industries:** Law firms, medical practices, consulting agencies, real estate teams
@@ -71,7 +71,7 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 ### 6. Menu or Product Categories (3-5 panels)
 
 - **Panels:** 3-5, one per category
-- **Settings:** `title` = "Explore Our Menu", `heading_alignment` = center, `color_scheme` = highlight-accent
+- **Settings:** `title` = "Explore Our Menu", `heading_alignment` = center, `color_scheme` = highlight-secondary
 - **Panel content:** Appetizing category photo, category name as title (e.g., "Wood-Fired Pizzas"), brief descriptor as subtitle, "View Menu" button
 - **Good for:** Giving visitors a visual entry point into a product catalog or menu
 - **Industries:** Restaurants, bakeries, florists, boutique retailers, craft breweries
@@ -93,6 +93,6 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 - **Write short, punchy titles.** The overlay text sits on a gradient over the image -- long titles compete with the photo. Aim for 2-4 words.
 - **Use subtitles to add context, not repeat the title.** Good: title "Kitchen Remodel", subtitle "Westlake, Austin". Bad: title "Kitchen Remodel", subtitle "A Beautiful Kitchen Remodel".
 - **Choose images with a clear subject and some negative space at the bottom** so the gradient overlay and text remain readable.
-- **Pair with `highlight` or `highlight-accent` color scheme** when the section sits between two standard-background widgets -- the contrast creates a visual break that keeps visitors scrolling.
+- **Pair with `highlight-primary` or `highlight-secondary` color scheme** when the section sits between two standard-background widgets -- the contrast creates a visual break that keeps visitors scrolling.
 - **Remove spacing (`top_spacing` = none) when stacking below a hero widget** to create a seamless visual flow from the hero into the panels.
 - **Every panel should have a CTA button.** The whole point of expanding a panel is to invite the next click -- don't leave visitors at a dead end.

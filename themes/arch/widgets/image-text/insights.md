@@ -11,8 +11,8 @@ A side-by-side split layout that pairs a single image with a flexible stack of c
 | `image` | Any uploaded image | The hero visual occupying 50% width on desktop, full width on mobile |
 | `image_position` | `left` (default), `right` | Swaps which side the image sits on; `right` reverses the flexbox direction |
 | `text_position` | `flex-start`, `center` (default), `flex-end` | Vertically aligns the text column to the top, middle, or bottom of the image |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Background and text colors for the entire widget section |
-| `content_color_scheme` | `none` (default), `standard`, `standard-accent`, `highlight`, `highlight-accent` | When set to anything other than `none`, gives the text column its own padded, rounded background panel. On desktop, the image and text panel stretch edge-to-edge with no gap and squared-off corners, creating a magazine-style card |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text colors for the entire widget section |
+| `content_color_scheme` | `none` (default), `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | When set to anything other than `none`, gives the text column its own padded, rounded background panel. On desktop, the image and text panel stretch edge-to-edge with no gap and squared-off corners, creating a magazine-style card |
 | `top_spacing` | `auto` (default), `none` | Removes the top margin so the widget can butt against the section above |
 | `bottom_spacing` | `auto` (default), `none` | Removes the bottom margin so the widget can butt against the section below |
 
@@ -43,7 +43,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 |---------|-------|
 | `image_position` | `right` |
 | `text_position` | `center` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `content_color_scheme` | `none` |
 | Blocks | text (muted, sm, uppercase) as eyebrow "Our Story" > heading (2xl) > text (base) > button (secondary, "Meet the Team") |
 
@@ -58,7 +58,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 |---------|-------|
 | `image_position` | `left` |
 | `text_position` | `center` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | `content_color_scheme` | `none` |
 | Blocks | icon (filled, md, circle) > heading (3xl) > text (base) > features (+ lines) > button (primary "Get Started" + secondary "Learn More") |
 
@@ -73,8 +73,8 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 |---------|-------|
 | `image_position` | `left` |
 | `text_position` | `center` |
-| `color_scheme` | `highlight` |
-| `content_color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-primary` |
+| `content_color_scheme` | `highlight-secondary` |
 | Blocks | rating (5) > heading (xl) as pull-quote > text (base, muted) as attribution > image (width 15%) as client logo |
 
 **Good for:** Featured review, case study teaser, customer spotlight.
@@ -88,7 +88,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 |---------|-------|
 | `image_position` | `right` |
 | `text_position` | `flex-start` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `content_color_scheme` | `none` |
 | Blocks | text (muted, sm, uppercase) "How It Works" > heading (2xl) > numbered-item x3 (medium, circle) > button (primary, "Book Now") |
 
@@ -103,8 +103,8 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 |---------|-------|
 | `image_position` | `left` |
 | `text_position` | `flex-end` |
-| `color_scheme` | `standard` |
-| `content_color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-primary` |
+| `content_color_scheme` | `standard-secondary` |
 | Blocks | text (sm, muted, uppercase) as category label > heading (2xl) > text (base) describing the project > button (secondary, "View Project") |
 
 **Good for:** Architecture portfolio pieces, photography projects, interior design case studies.
@@ -118,7 +118,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 |---------|-------|
 | `image_position` | `right` |
 | `text_position` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | `content_color_scheme` | `none` |
 | Blocks | icon (outline, lg, rounded) > heading (3xl) > text (lg) as value proposition > features (+ and - lines comparing included vs. not included) > button (primary, xlarge, "Get a Quote") |
 
@@ -133,8 +133,8 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 |---------|-------|
 | `image_position` | `left` |
 | `text_position` | `center` |
-| `color_scheme` | `standard` |
-| `content_color_scheme` | `highlight` |
+| `color_scheme` | `standard-primary` |
+| `content_color_scheme` | `highlight-primary` |
 | `top_spacing` | `none` |
 | Blocks | heading (2xl) > text (base) with event details > features (+ lines for what's included) > button (primary "Register Now" + secondary "See Schedule") |
 

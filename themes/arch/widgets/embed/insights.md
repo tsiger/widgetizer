@@ -17,7 +17,7 @@ A flexible container for injecting raw HTML, iframes, or third-party embed codes
 | `code` | Raw HTML / iframe / embed snippet | The actual embedded content; rendered unescaped inside the embed wrapper |
 | `max_width` | `narrow`, `medium`, `wide`, `fullwidth` | Controls horizontal spread of the content area (maps to `widget-content-sm/md/lg` or no cap) |
 | `alignment` | `start`, `center`, `end` | Positions the embed block horizontally within its container via flexbox alignment |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Changes background and text color palette; non-standard schemes add padded container |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Changes background and text color palette; non-standard schemes add padded container |
 | `top_spacing` | `auto`, `none` | Removes default top padding when set to `none`; useful for stacking widgets tightly |
 | `bottom_spacing` | `auto`, `none` | Removes default bottom padding when set to `none`; useful for stacking widgets tightly |
 
@@ -102,7 +102,7 @@ This widget has no blocks. All content is controlled through settings alone.
 | `code` | Instagram or Facebook feed embed (e.g., Elfsight, Smash Balloon, or native embed) |
 | `max_width` | wide |
 | `alignment` | center |
-| `color_scheme` | standard-accent |
+| `color_scheme` | standard-secondary |
 | `top_spacing` | auto |
 | `bottom_spacing` | auto |
 
@@ -122,7 +122,7 @@ This widget has no blocks. All content is controlled through settings alone.
 | `code` | Google Reviews or Yelp widget embed |
 | `max_width` | narrow |
 | `alignment` | center |
-| `color_scheme` | highlight-accent |
+| `color_scheme` | highlight-secondary |
 | `top_spacing` | auto |
 | `bottom_spacing` | auto |
 
@@ -157,5 +157,5 @@ This widget has no blocks. All content is controlled through settings alone.
 - **Match max_width to the embed's natural aspect ratio.** A narrow Calendly widget looks lost at fullwidth. A panoramic Google Map looks cramped at narrow. Let the content dictate the container.
 - **Use `heading_alignment: left` for utilitarian embeds.** Maps, forms, and booking tools feel more grounded with left-aligned headers. Save center alignment for showcase content like videos and social feeds.
 - **Stack spacing intentionally.** Set `top_spacing: none` when the embed sits directly below a hero or another full-bleed widget to avoid a double-gap. Use `bottom_spacing: none` when a CTA section follows immediately.
-- **Lean on color_scheme to create visual separation.** A `highlight` or `highlight-accent` background makes an embed section feel like a distinct zone rather than just another block of content. This is especially effective for booking and payment embeds where you want the visitor to pause and take action.
+- **Lean on color_scheme to create visual separation.** A `highlight-primary` or `highlight-secondary` background makes an embed section feel like a distinct zone rather than just another block of content. This is especially effective for booking and payment embeds where you want the visitor to pause and take action.
 - **Keep the code field clean.** Paste only the embed snippet itself. Wrapping it in extra divs or inline styles beyond what the provider gives you often fights the widget's own responsive handling.

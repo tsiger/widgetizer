@@ -27,7 +27,7 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 | | `button_style` / `button_style_2` (`primary`, `secondary`) | Visual weight of each button. Primary is filled/solid; secondary is outline/ghost. |
 | | `button_size` (`small`, `medium`, `large`, `xlarge`) | Shared size for both buttons. |
 | | `overlay_color` (color with alpha) | Tints the background image. Default is a deep navy at ~75% opacity (`#0a1e38bf`). Changing hue or reducing opacity dramatically shifts mood. |
-| | `color_scheme` (`standard`, `standard-accent`, `highlight`, `highlight-accent`) | Drives the overall palette for the slide -- backgrounds, text colors, and button colors all follow the scheme. Each slide can use a different scheme. |
+| | `color_scheme` (`standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary`) | Drives the overall palette for the slide -- backgrounds, text colors, and button colors all follow the scheme. Each slide can use a different scheme. |
 
 ## Layout recipes
 
@@ -35,13 +35,13 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 - 1 slide, height `large`, fullwidth `true`, alignment `center`
 - heading_size `7xl`, text_size `lg`, single primary button `large`
 - Dark overlay (`#000000aa`) over a high-contrast photograph
-- color_scheme `highlight`
+- color_scheme `highlight-primary`
 - Good for: Immediate brand statement. Works for architecture firms, law offices, luxury spas, boutique hotels.
 
 **2. "Dual-CTA storefront" (product launch)**
 - 2 slides, height `medium`, fullwidth `true`, alignment `center`, autoplay `true`, speed `6000`
 - Each slide: heading_size `5xl`, both buttons active (primary "Shop Now" + secondary "Learn More"), button_size `medium`
-- Slide 1 highlight scheme, Slide 2 highlight-accent for variety
+- Slide 1 highlight scheme, Slide 2 highlight-secondary for variety
 - Good for: Promoting two key offers simultaneously. Retail shops, bakeries, florists, online stores.
 
 **3. "Left-aligned editorial" (services overview)**
@@ -54,7 +54,7 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 - 2--3 slides, height `small`, fullwidth `false` (constrained), alignment `center`
 - heading_size `2xl`, text_size `sm`, text_uppercase `true`, no body text or very short tagline
 - Single primary button `small`
-- No background images -- rely on color_scheme `standard-accent` and `highlight-accent` alternating
+- No background images -- rely on color_scheme `standard-secondary` and `highlight-secondary` alternating
 - autoplay `true`, speed `4000` for quick rotation
 - Good for: Time-sensitive promos, event countdowns, seasonal notices. Restaurants, fitness studios, salons, event venues.
 
@@ -67,7 +67,7 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 
 **6. "Text-forward brand pitch" (no images)**
 - 2 slides, height `medium`, fullwidth `true`, alignment `center`
-- No background images; alternate between `highlight` and `standard-accent` color schemes for contrast
+- No background images; alternate between `highlight-primary` and `standard-secondary` color schemes for contrast
 - heading_size `8xl`, text_size `lg`, single primary button `xlarge`
 - Good for: Startups or service businesses without strong photography. SaaS landing pages, tutoring services, freelance developers, cleaning companies.
 
@@ -83,14 +83,14 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 - heading_size `9xl` (maximum impact), text_content as a short one-liner, text_size `sm`, text_muted `true`, text_uppercase `true`
 - Single secondary button `medium` for understated elegance
 - Dark background image with heavy overlay (`#0a1e38e0`)
-- color_scheme `highlight`
+- color_scheme `highlight-primary`
 - Good for: High-end professional presence where restraint signals quality. Architects, private wealth advisors, fine dining restaurants, bespoke tailors.
 
 ## Differentiation tips
 
 - Vary the **height** setting across presets -- do not default everything to `large`. A `small` slideshow above a content-heavy page feels very different from a `large` full-bleed hero.
 - Alternate **alignment** between `center` and `start` across different page presets. Left-aligned text creates an editorial feel that immediately distinguishes one preset from another.
-- Use **image-free slides** in at least one preset. Relying on color schemes alone (especially `standard-accent` or `highlight-accent`) produces a graphic, modern look that stands apart from photo-heavy banners.
+- Use **image-free slides** in at least one preset. Relying on color schemes alone (especially `standard-secondary` or `highlight-secondary`) produces a graphic, modern look that stands apart from photo-heavy banners.
 - Change the **number of slides** deliberately. A single-slide hero with no navigation arrows is a completely different component psychologically than a 5-slide auto-rotating carousel.
 - Exploit the **overlay_color** setting beyond the default navy. A warm overlay (`#3b1a00a0`) over a food photo evokes a very different mood than a cool overlay (`#001a33b0`) over a cityscape. Adjust the alpha channel to control how much of the image shows through.
 - Mix **button configurations**: some presets should have no buttons (visual-only), some one button, some two. Varying button_style (primary vs secondary) and button_size (small vs xlarge) also prevents visual repetition.

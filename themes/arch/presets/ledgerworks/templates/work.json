@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#1a233200",
-        "color_scheme": "standard-accent",
+        "color_scheme": "standard-secondary",
         "top_spacing": "auto",
         "bottom_spacing": "none"
       },
@@ -43,7 +43,7 @@
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 5,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "logo-1": {
@@ -97,7 +97,7 @@
         "alignment": "center",
         "image_position": "top",
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "ind-1": {
@@ -161,7 +161,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "review-1": {
@@ -202,7 +202,7 @@
       "settings": {
         "text_alignment": "center",
         "content_width": "narrow",
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "closing-heading": {

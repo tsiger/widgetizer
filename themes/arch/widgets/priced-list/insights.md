@@ -13,7 +13,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 | `description` | Any text | Paragraph below the heading; useful for disclaimers or seasonal notes |
 | `heading_alignment` | `center` (default), `left` | Centers the header block or pins it to the left edge |
 | `layout` | `single-column` (default), `two-column` | One stacked list vs. a side-by-side grid (splits at 750 px) |
-| `color_scheme` | `standard`, `standard-accent`, `highlight`, `highlight-accent` | Controls background and text color palette; non-standard schemes add padded container and custom bg |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text color palette; non-standard schemes add padded container and custom bg |
 | `top_spacing` | `auto` (default), `none` | Normal top margin or flush against the widget above |
 | `bottom_spacing` | `auto` (default), `none` | Normal bottom margin or flush against the widget below |
 
@@ -33,7 +33,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 
 - **Layout:** `single-column`
 - **Heading alignment:** `center`
-- **Color scheme:** `standard`
+- **Color scheme:** `standard-primary`
 - **Eyebrow:** category name (e.g., "Mains", "Desserts")
 - **Items:** 6-10 per section, no images, short descriptions
 - **Good for:** Restaurants, cafes, bistros, wine bars
@@ -44,7 +44,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 
 - **Layout:** `two-column`
 - **Heading alignment:** `left`
-- **Color scheme:** `highlight`
+- **Color scheme:** `highlight-primary`
 - **Eyebrow:** "Our Services"
 - **Items:** 8-12, no images, brief descriptions noting duration (e.g., "60 min")
 - **Good for:** Hair salons, nail studios, spas, massage therapists
@@ -55,7 +55,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 
 - **Layout:** `single-column`
 - **Heading alignment:** `left`
-- **Color scheme:** `standard-accent`
+- **Color scheme:** `standard-secondary`
 - **Eyebrow:** "Pricing"
 - **Items:** 5-8, no images, description explains what is included
 - **Good for:** Auto mechanics, detailing shops, tire centers
@@ -66,7 +66,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 
 - **Layout:** `two-column`
 - **Heading alignment:** `center`
-- **Color scheme:** `standard`
+- **Color scheme:** `standard-primary`
 - **Eyebrow:** "Fresh Daily"
 - **Items:** 6-8, each with a thumbnail image
 - **Good for:** Bakeries, patisseries, ice cream shops, deli counters
@@ -77,7 +77,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 
 - **Layout:** `single-column`
 - **Heading alignment:** `left`
-- **Color scheme:** `highlight-accent`
+- **Color scheme:** `highlight-secondary`
 - **Eyebrow:** "Packages"
 - **Items:** 3-5, no images, richtext descriptions with bullet lists of deliverables
 - **Good for:** Freelance designers, copywriters, consultants, marketing agencies
@@ -88,7 +88,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 
 - **Layout:** `two-column`
 - **Heading alignment:** `center`
-- **Color scheme:** `highlight`
+- **Color scheme:** `highlight-primary`
 - **Eyebrow:** "Spaces"
 - **Items:** 4-6, with images of each room or area
 - **Good for:** Event venues, coworking spaces, photography studios, community centers
@@ -99,7 +99,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 
 - **Layout:** `single-column`
 - **Heading alignment:** `center`
-- **Color scheme:** `standard`
+- **Color scheme:** `standard-primary`
 - **Eyebrow:** "Grooming"
 - **Items:** 4-6, no images, descriptions note breed-size tiers
 - **Good for:** Pet groomers, doggy daycares, boarding facilities, veterinary add-on services
@@ -111,7 +111,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 ## Differentiation Tips
 
 - **Stack for depth.** Multiple priced-list widgets with collapsed spacing (`top_spacing: none` on the lower widget, `bottom_spacing: none` on the upper) read as a single long menu with distinct sections — much better than one massive list.
-- **Alternate color schemes.** When stacking, alternate between `standard` and `highlight` (or their accent variants) to give each category its own visual band without needing extra divider widgets.
+- **Alternate color schemes.** When stacking, alternate between `standard-primary` and `highlight-primary` (or their accent variants) to give each category its own visual band without needing extra divider widgets.
 - **Two-column for density, single-column for scanning.** If visitors are likely browsing quickly (restaurant, salon), two-column packs more items above the fold. If they need to read descriptions carefully (consulting packages, venue details), stick with single-column.
 - **Images are optional per item.** You can mix items with and without images in the same list. Use images only for hero items or best-sellers to draw the eye without slowing down the rest of the list.
 - **Price field is freeform.** It is a plain text field, not a number. Take advantage of this: "Market price", "Free", "$20-$35", "from $99/mo" all work and are sometimes more useful than a flat number.

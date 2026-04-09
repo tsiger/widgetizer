@@ -7,7 +7,7 @@
       "settings": {
         "text_alignment": "center",
         "content_width": "medium",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "intro-heading": {
@@ -35,7 +35,7 @@
         "height": "medium",
         "show_address": true,
         "sidebar_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "info-1": {
@@ -66,7 +66,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "right",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "custom-heading": {

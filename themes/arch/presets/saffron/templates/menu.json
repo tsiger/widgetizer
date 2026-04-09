@@ -7,7 +7,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -36,7 +36,7 @@
         "title": "Starters",
         "heading_alignment": "left",
         "layout": "single-column",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "starter-1": {
@@ -89,7 +89,7 @@
         "title": "Entrées",
         "heading_alignment": "left",
         "layout": "two-column",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "main-1": {
@@ -166,7 +166,7 @@
         "title": "Desserts",
         "heading_alignment": "left",
         "layout": "single-column",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "dessert-1": {
@@ -208,7 +208,7 @@
       "type": "image-text",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "drinks-eyebrow": {
@@ -253,7 +253,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": true,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

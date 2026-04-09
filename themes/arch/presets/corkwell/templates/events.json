@@ -8,7 +8,7 @@
         "height": "small",
         "alignment": "center",
         "overlay_color": "#151e22cc",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -46,7 +46,7 @@
           "href": "contact.html",
           "target": "_self"
         },
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       }
     },
     "regulars": {
@@ -60,7 +60,7 @@
         "icon_style": "outline",
         "icon_size": "xl",
         "icon_shape": "rounded",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "event-1": {
@@ -94,7 +94,7 @@
       "type": "image-callout",
       "settings": {
         "image_position": "right",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "hire-heading": {
@@ -136,7 +136,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

@@ -18,7 +18,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | 2 -- 5 (default 4) | Number of columns on desktop; fewer columns = wider cards with more breathing room |
 | `card_layout` | `box` / `flat` | Box renders cards with a background fill and border (on accent/highlight schemes); flat removes the card container for a cleaner, minimal look |
 | `alignment` | `start` / `center` | Aligns the number, title, and description inside each card to the left edge or center |
-| `color_scheme` | `standard` / `standard-accent` / `highlight` / `highlight-accent` | Standard uses the default page background; accent adds a secondary fill to cards; highlight inverts the section background; highlight-accent combines both |
+| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Standard uses the default page background; accent adds a secondary fill to cards; highlight inverts the section background; highlight-secondary combines both |
 | `top_spacing` | `auto` / `none` | Removes top padding so the widget can sit flush against the section above |
 | `bottom_spacing` | `auto` / `none` | Removes bottom padding for flush stacking with the section below |
 
@@ -43,7 +43,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | `4` |
 | `card_layout` | `box` |
 | `alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | Blocks | 4 steps |
 
 **Good for:** Explaining how you work with clients from inquiry to delivery. The center alignment and boxed cards give each step equal weight.
@@ -60,7 +60,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | `3` |
 | `card_layout` | `flat` |
 | `alignment` | `center` |
-| `color_scheme` | `highlight` |
+| `color_scheme` | `highlight-primary` |
 | Blocks | 3 steps |
 
 **Good for:** A bold, attention-grabbing band across the page that walks visitors through a simple 3-phase journey. The highlight background sets it apart from surrounding sections.
@@ -77,7 +77,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | `5` |
 | `card_layout` | `flat` |
 | `alignment` | `start` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | Blocks | 5 steps |
 
 **Good for:** Compact, left-aligned timeline for detailed onboarding or enrollment processes where each step is brief.
@@ -94,7 +94,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | `2` |
 | `card_layout` | `box` |
 | `alignment` | `start` |
-| `color_scheme` | `highlight-accent` |
+| `color_scheme` | `highlight-secondary` |
 | Blocks | 4 steps |
 
 **Good for:** When each step needs a longer description (paragraph or bulleted list inside the richtext). Two wide columns give the text room to breathe.
@@ -111,7 +111,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | `3` |
 | `card_layout` | `box` |
 | `alignment` | `center` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | Blocks | 6+ steps |
 
 **Good for:** Longer processes that would crowd the page as a grid. The carousel lets visitors swipe through at their own pace without overwhelming them.
@@ -128,7 +128,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | `4` |
 | `card_layout` | `flat` |
 | `alignment` | `start` |
-| `color_scheme` | `standard` |
+| `color_scheme` | `standard-primary` |
 | Blocks | 4 steps |
 
 **Good for:** Understated "how it works" section that blends into the page without heavy card styling. The large numbers do the visual work on their own.
@@ -145,7 +145,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `columns_desktop` | `3` |
 | `card_layout` | `box` |
 | `alignment` | `start` |
-| `color_scheme` | `standard-accent` |
+| `color_scheme` | `standard-secondary` |
 | `top_spacing` | `none` |
 | Blocks | 3 steps |
 
@@ -159,7 +159,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 - **Numbers are the hero.** The zero-padded numbers (01, 02 ...) are styled at the largest heading scale. Keep step titles short so the numbers stay dominant and scannable.
 - **Flat vs. box is a bigger decision than it looks.** Box cards create visual separation and work well over highlight backgrounds. Flat cards feel editorial and let whitespace do the heavy lifting -- choose flat when the surrounding page already has strong structure.
 - **Use the carousel only when you truly have many steps.** For 3-4 steps, grid is almost always better. Switch to carousel at 5+ steps or when you want to avoid visual overwhelm on mobile.
-- **Pair color schemes with adjacent sections.** A `highlight` numbered-cards widget sandwiched between two `standard` sections creates a natural focal point. Avoid stacking two highlight sections back to back.
+- **Pair color schemes with adjacent sections.** A `highlight-primary` numbered-cards widget sandwiched between two `standard-primary` sections creates a natural focal point. Avoid stacking two highlight sections back to back.
 - **Richtext descriptions unlock more than plain text.** Because the description field supports rich text, you can embed short bulleted lists, bold key terms, or inline links inside each step -- useful for steps that need a bit more detail without a separate FAQ.
 - **Heading alignment should match the page rhythm.** If the rest of the page uses left-aligned headers, keep `heading_alignment` on `left` for consistency. Reserve center alignment for standalone, symmetrical sections.
 - **Two columns for depth, four or five for scanning.** If each step is a single sentence, go wide (4-5 cols). If steps contain a paragraph of explanation, drop to 2-3 columns so line lengths stay comfortable.

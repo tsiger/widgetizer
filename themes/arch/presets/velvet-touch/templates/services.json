@@ -11,7 +11,7 @@
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#2a202480",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -39,7 +39,7 @@
         "alignment": "center",
         "image_position": "top",
         "aspect_ratio": "3 / 4",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "card-1": {
@@ -137,7 +137,7 @@
         "icon_shape": "circle",
         "alignment": "centered",
         "show_dividers": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "why-1": {
@@ -174,7 +174,7 @@
         "image_position": "right",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "process-eyebrow": {
@@ -253,7 +253,7 @@
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 3,
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "plan-1": {
@@ -308,7 +308,7 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

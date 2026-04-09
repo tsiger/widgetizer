@@ -7,7 +7,7 @@
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight",
+        "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none"
       },
@@ -36,7 +36,7 @@
         "title": "Bread & Sourdough",
         "heading_alignment": "left",
         "layout": "single-column",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "bread-1": {
@@ -89,7 +89,7 @@
         "title": "Pastries & Viennoiserie",
         "heading_alignment": "left",
         "layout": "two-column",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "pastry-1": {
@@ -150,7 +150,7 @@
         "title": "Cakes & Tarts",
         "heading_alignment": "left",
         "layout": "single-column",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "cake-1": {
@@ -195,7 +195,7 @@
         "title": "Cookies & Bars",
         "heading_alignment": "left",
         "layout": "two-column",
-        "color_scheme": "standard-accent"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "cookie-1": {
@@ -237,7 +237,7 @@
       "type": "image-text",
       "settings": {
         "image_position": "left",
-        "color_scheme": "standard"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "custom-eyebrow": {
