@@ -1,0 +1,131 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#2c2420b3",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get in Touch",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'd love to hear about your space. Every project starts with a conversation.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "location": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Visit the Studio",
+        "description": "",
+        "heading_alignment": "left",
+        "address": "218 NW Everett St, Suite 4, Portland, OR 97209",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2795.2!2d-122.674!3d45.525!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s218+NW+Everett+St!5e0!3m2!1sen!2sus",
+        "directions_link": {
+          "text": "Get Directions",
+          "href": "https://maps.google.com/?q=218+NW+Everett+St+Portland+OR+97209",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info-hours": {
+          "type": "info",
+          "settings": {
+            "title": "Studio Hours",
+            "text": "<p>Monday \u2013 Friday: 9:00 AM \u2013 5:00 PM<br>Saturday: By appointment<br>Sunday: Closed</p>"
+          }
+        },
+        "info-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["info-hours", "info-social"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Before Your Consultation",
+        "description": "",
+        "heading_alignment": "left",
+        "style": "connected",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What should I prepare for our first meeting?",
+            "answer": "<p>Bring photos of your space, any inspiration images you've saved (Pinterest boards are great), and a rough idea of your budget and timeline. We'll handle the rest \u2014 measuring, assessing, and creative direction are all part of the consultation.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Is the initial consultation free?",
+            "answer": "<p>Yes. Your first meeting \u2014 whether at our studio or your home \u2014 is complimentary and typically lasts about an hour. We'll discuss your vision, walk through the space, and outline next steps if it's a good fit.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "How far in advance should I book?",
+            "answer": "<p>We recommend reaching out 2-3 months before your ideal start date. We take on a limited number of projects each quarter, and popular seasons (spring and fall) fill up quickly.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can we meet virtually?",
+            "answer": "<p>Absolutely. For clients outside the Portland area or those who prefer it, we offer video consultations. The experience is the same \u2014 just bring your photos and inspiration to the call.</p>"
+          }
+        },
+        "sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Book a Consultation",
+            "text": "<p>(503) 555-0182<br>hello@hueandco.com<br><br>We respond within one business day.</p>"
+          }
+        },
+        "sidebar-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "sidebar-info", "sidebar-social"]
+    }
+  },
+  "widgetsOrder": ["hero", "location", "faq"],
+  "id": "contact",
+  "created": "2026-04-10T18:00:00.000Z",
+  "updated": "2026-04-10T18:00:00.000Z"
+}

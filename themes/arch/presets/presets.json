@@ -81,6 +81,16 @@
       "id": "greenfield",
       "name": "Greenfield",
       "description": "Landscaping"
+    },
+    {
+      "id": "sparkhaus",
+      "name": "Sparkhaus",
+      "description": "Cleaning service"
+    },
+    {
+      "id": "hue-and-co",
+      "name": "Hue & Co",
+      "description": "Interior designer"
     }
   ]
 }

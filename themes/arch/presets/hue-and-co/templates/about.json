@@ -1,0 +1,231 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "story": {
+      "type": "split-hero",
+      "settings": {
+        "image": "",
+        "overlay_color": "",
+        "image_position": "left",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About Hue &amp; Co</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Designed Around You",
+            "size": "4xl"
+          }
+        },
+        "story-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Hue & Co was founded in 2014 by Adriana Reyes, a designer who believed that great interiors should feel effortless — not decorated, but deeply considered. What started as a solo practice working from a Sellwood apartment is now a team of four, based in a sunlit studio on NW Everett.</p><p>We design residential and commercial spaces across Portland and beyond, always starting with the people who will live and work in them. No two projects look alike because no two clients are alike.</p>",
+            "size": "base"
+          }
+        },
+        "story-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the Team",
+              "href": "#team",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text", "story-button"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Studio",
+        "title": "Meet the Team",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "member-1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Adriana Reyes",
+            "role": "Founder & Creative Director",
+            "specialty": "Residential, Color Theory",
+            "bio": "Adriana founded Hue & Co after a decade in residential architecture. She leads every project's creative direction and has a particular obsession with natural light and color."
+          }
+        },
+        "member-2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Clara Ngo",
+            "role": "Senior Designer",
+            "specialty": "Commercial, Styling",
+            "bio": "Clara manages our commercial projects and brings a background in visual merchandising. She's the one making sure every shelf, surface, and sightline is just right."
+          }
+        },
+        "member-3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Jonah West",
+            "role": "Design Assistant & Procurement",
+            "specialty": "Sourcing, Vendor Relations",
+            "bio": "Jonah handles procurement and vendor coordination. If it exists, he can find it — and probably negotiate a better price. He keeps every project on budget and on schedule."
+          }
+        }
+      },
+      "blocksOrder": ["member-1", "member-2", "member-3"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "150",
+            "suffix": "+",
+            "label": "Projects Completed",
+            "description": ""
+          }
+        },
+        "fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "",
+            "label": "Years in Business",
+            "description": ""
+          }
+        },
+        "fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "4",
+            "suffix": "",
+            "label": "Design Awards",
+            "description": ""
+          }
+        },
+        "fig-4": {
+          "type": "figure",
+          "settings": {
+            "number": "30",
+            "suffix": "+",
+            "label": "Brand Partners",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+    },
+    "philosophy": {
+      "type": "image-callout",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "phil-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Design Philosophy",
+            "size": "3xl"
+          }
+        },
+        "phil-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We believe a well-designed space should look beautiful and feel right. Every material, color, and piece of furniture should earn its place — not because it's trendy, but because it serves the people who use the room.</p>",
+            "size": "base"
+          }
+        },
+        "phil-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Function before aesthetics — beautiful spaces that work\n+ Natural materials and honest textures\n+ Color as a design tool, not decoration\n+ Locally sourced whenever possible"
+          }
+        }
+      },
+      "blocksOrder": ["phil-heading", "phil-text", "phil-features"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "About the Studio",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Where is your studio located?",
+            "answer": "<p>We're based at 218 NW Everett St, Suite 4, in Portland's Pearl District. Our studio is open by appointment and we welcome visits from prospective and current clients.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work outside Portland?",
+            "answer": "<p>Yes. While most of our work is in the Portland metro area, we take on select projects throughout Oregon and Washington. Travel fees may apply for locations outside a 30-mile radius.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "What sets Hue & Co apart?",
+            "answer": "<p>We're a small studio by choice. Every project gets the creative director's direct involvement from start to finish. We don't hand off to junior designers or outsource. The person you meet at the consultation is the person designing your space.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Are you accepting new clients?",
+            "answer": "<p>We take on a limited number of projects each quarter to ensure every client gets our full attention. We recommend reaching out 2-3 months before your ideal start date. Contact us for current availability.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
+    }
+  },
+  "widgetsOrder": ["story", "team", "stats", "philosophy", "faq"],
+  "id": "about",
+  "created": "2026-04-10T18:00:00.000Z",
+  "updated": "2026-04-10T18:00:00.000Z"
+}

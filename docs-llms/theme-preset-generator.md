@@ -394,17 +394,103 @@ Always set `action-bar` to `fullwidth: false`. Never use `fullwidth: true` — i
 
 The `contact-details` widget serves nearly the same purpose as the global footer. Never place it as the last widget on the Contact page — the footer renders right below it. Instead end with a map, accordion FAQ, image-callout, testimonial, or action-bar.
 
+### Page openers: use the right widget for the job
+
+The first widget on a page sets the tone. Not every widget works as a page opener. Choose based on what the widget was designed to do:
+
+**Good page openers (designed to introduce a page):**
+
+| Widget | When to use as opener |
+|--------|-----------------------|
+| `banner` | Full-width hero with background image/overlay. Best with `highlight` scheme for seamless header fusion. Use `height: "small"` for inner pages, `"medium"` or `"large"` for homepages |
+| `split-hero` | Image + text side by side. Strong for About/story pages with a founder photo |
+| `slideshow` | Rotating hero slides. Homepage only |
+| `video-popup` | Video-centric hero. Homepage or portfolio page |
+| `rich-text` | Clean title + subtitle intro. Use with `highlight` scheme + `top_spacing: "none"` for a colored header band, or with `standard-secondary` for a subtle intro. Good for variety when you want to break the "every page starts with banner" pattern |
+
+**Bad page openers (mid-page widgets, not designed to lead):**
+
+| Widget | Why it fails as opener |
+|--------|----------------------|
+| `image-callout` | Overlapping card design — looks lost floating at the top with no content above it to contrast against |
+| `image-text` | Side-by-side layout needs context first; works as a second or third widget |
+| `features-split` | A detail widget, not an intro |
+| `icon-card-grid` | A content grid, not a page header |
+| `checkerboard` | Content layout, needs an intro above it |
+| `contact-details` | Information widget, not a page intro |
+
+**Critical rule for `top_spacing: "none"` on openers:** Only use `top_spacing: "none"` when the opener has a **visible contrasting background** — a `highlight` color scheme, a background image, or an overlay. Setting `top_spacing: "none"` on a `standard-primary` (white) widget does nothing visually because the header background and the widget background are the same color. It just removes padding for no reason.
+
 ### Don't use 5 pages for every preset
 
 Some businesses need different page counts. Consider: a restaurant could have a Reservations page, a developer could have a Blog page, a hotel could have individual Room detail pages. The page structure should serve the business, not a template.
 
-### Collapse spacing between header and background heroes
+### Widget spacing: `auto`, `small`, and `none`
 
-When the first widget on a page has a visible background (image, overlay, or non-standard color scheme like `highlight`), set `top_spacing: "none"` so there's no gap between the header and the hero. When two adjacent widgets both have backgrounds (e.g., hero → scrolling-text marquee), set `bottom_spacing: "none"` on the first and `top_spacing: "none"` on the second so they're seamless.
+Every section widget supports `top_spacing` and `bottom_spacing` with three values:
+
+| Value | Effect | When to use |
+|-------|--------|-------------|
+| `auto` | Full section padding (default) | Most widgets — normal content separation |
+| `small` | Reduced padding, still visible | Widgets that should feel **connected** to the previous/next section but still have breathing room |
+| `none` | Zero padding | Widgets that should be **fused** to an adjacent section with no gap at all |
+
+**Rules:**
+
+1. **Hero `top_spacing: "none"` — always.** When the first widget on a page has a visible background (image, overlay, or highlight color scheme), set `top_spacing: "none"` so there's no gap between the header and the hero.
+
+2. **Lightweight bars after heroes → `top_spacing: "small"`.** When a compact widget like `trust-bar`, `scrolling-text`, `logo-cloud`, or `key-figures` immediately follows a hero, use `top_spacing: "small"` (not `"none"`). This keeps them visually connected to the hero without feeling crammed against it. `"none"` fuses them completely, which only looks right when both sections share the same background color.
+
+3. **Fusing same-background sections → `"none"`.** When two adjacent widgets share the same color scheme (e.g., both `highlight-primary`), use `bottom_spacing: "none"` on the first and `top_spacing: "none"` on the second for a seamless block.
+
+4. **Inner page banners → `bottom_spacing: "none"` or `"small"`.** Small banners on inner pages (Services, About, Contact) often look better with `bottom_spacing: "none"` or `"small"` to tighten the transition into the first content section.
+
+5. **Don't overuse `"none"`.** If every widget has `top_spacing: "none"`, the page loses visual rhythm. Reserve `"none"` for intentional fusions. Use `"small"` when you want closeness without collision.
+
+### Accordion: use the sidebar
+
+The accordion widget supports `info` and `social` sidebar blocks that turn it from a single FAQ column into a 70/30 layout with contextual information beside the questions. **This feature is dramatically underused** — most presets create bare FAQ lists with no sidebar.
+
+**When to add sidebar blocks:**
+- **Contact page FAQ** — Add an `info` block with "Still Have Questions?" + phone/email/hours, and a `social` block. This is the most natural fit: users scanning FAQs who don't find their answer get an immediate escalation path right there.
+- **Services page FAQ** — Add an `info` block with a booking nudge: "Ready to Book?" + phone/email. Turns a passive FAQ into a conversion opportunity.
+- **About page FAQ** — Can use a lighter sidebar: a single `info` block with founding date, location, or a company fact.
+
+**When sidebar is unnecessary:**
+- Very short accordions (2-3 items) where the sidebar would dwarf the content
+- Situations where a `contact-details` widget or `map` widget already sits directly above or below
+
+**Sidebar positioning:**
+- `sidebar_position: "right"` (default) — FAQ on left, info on right. Most common layout.
+- `sidebar_position: "left"` — Info on left, FAQ on right. Good when the sidebar content is the primary reference (e.g., business hours/address on a contact page).
+
+**Heading alignment:** When using a sidebar, `heading_alignment: "left"` usually looks better than `"center"` because the layout is already asymmetric.
+
+At least **one accordion per preset** should use sidebar blocks to showcase this feature.
 
 ### Don't use numbered-service-list for opening hours
 
 The `numbered-service-list` widget auto-numbers items (01, 02, 03), implying a ranked or sequential list. Opening hours are categories, not steps. Use `card-grid` instead for a few time blocks (e.g., 3 cards: Weeknight Dinner, Weekend Dinner, Sunday). Use `schedule-table` only for businesses with daily varying schedules (gyms, studios). Reserve `numbered-service-list` for things that genuinely benefit from numbering: service tiers, process steps, capabilities.
+
+### Card grids: don't put buttons on every card
+
+`icon-card-grid` and `card-grid` both support an optional `button_link` on each card block. The `button_link` field should be **omitted entirely** when cards don't need individual CTAs — not set to empty strings or placeholder hrefs.
+
+**When to include buttons:**
+- The card links to a **dedicated page** unique to that card (e.g., a property listing, a specific program page, a case study)
+- There's a clear **action** tied to each card individually (e.g., "Book This Class", "Get a Quote" per service with distinct quote flows)
+
+**When to omit buttons:**
+- The cards are a **preview of a Services page** that's already in the main navigation — adding "Learn More" to each card is redundant since the whole section already communicates "here are our services" and the user can navigate via the nav bar
+- The cards display **values, features, or USPs** — informational content with no individual destination
+- The cards are **non-linkable content** like hours, industries served, or stats
+- All buttons would point to the **same page** (e.g., 4 cards all linking to `services.html`) — a single CTA below the section is cleaner
+
+A homepage services preview with 4 icon-card-grid cards all pointing to `services.html` with "Learn More" is noise. Either omit the buttons entirely and let the section heading/nav do the work, or add a single button on just one card or use a separate CTA section below.
+
+### Use settings for formatting, not inline HTML
+
+When a text block has `uppercase`, `muted`, or `size` settings, use them — don't bake the formatting into the HTML string. Write `"text": "<p>Our Process</p>"` with `"uppercase": true`, not `"text": "<p>OUR PROCESS</p>"`. The setting applies CSS text-transform; hardcoding uppercase in the content means the user can't toggle it off in the editor.
 
 ### Don't fall into widget sequence patterns
 
@@ -416,7 +502,102 @@ Two restaurants or two professional services presets should NOT look like variat
 
 ---
 
-## 8. Differentiation Checklist
+## 8. Widget Diversity
+
+The Arch theme has **50 section widgets**. The point of presets is to show what the theme can do across industries. If every preset uses the same 10 widgets, the other 40 might as well not exist. This section exists to fix that.
+
+### Current usage tiers (after 16 built presets)
+
+**Overused — use sparingly, find alternatives:**
+
+| Widget | Uses | Problem |
+|--------|------|---------|
+| `banner` | 67 | Every page starts with one. Use `split-hero`, `rich-text`, `video-popup`, `slideshow`, or `testimonial-hero` as alternatives |
+| `action-bar` | 57 | Ends almost every page. Skip it sometimes — not every page needs a CTA strip. A strong final content section can close a page |
+| `image-text` | 50 | Default "about" / "story" / "why us" widget. Use `split-content`, `image-callout`, `checkerboard`, or `bento-grid` instead |
+| `accordion` | 22 | Every preset has 2-3. Consider whether FAQs are really needed on every page, or if a `split-content` or `features-split` could serve the same purpose |
+| `testimonials` | 16 | Use `testimonial-slider` or `testimonial-hero` for variety |
+
+**Underused — actively seek opportunities to use:**
+
+| Widget | Uses | Natural fits |
+|--------|------|-------------|
+| `sliding-panels` | 2 | Room types (hotel), service categories, project details, location spotlights |
+| `bento-grid` | 1 | Portfolios, feature showcases, asymmetric content layouts, agency/creative homepages |
+| `content-switcher` | 2 | Residential/Commercial toggle, Individual/Business tabs, Before/After portfolio, pricing toggle |
+| `checkerboard` | 2 | Service breakdowns, alternating image+text grids, magazine-style layouts |
+| `image-tabs` | 2 | Multi-room/multi-service exploration, product categories, package details |
+| `icon-list` | 2 | Hotel amenities, facility features, service includes, tech specs |
+| `scrolling-text` | 3 | Brand energy strip, tagline marquee, announcement band — works between sections as a visual break |
+| `masonry-gallery` | 2 | Photo portfolios, mixed-media galleries, tattoo work, interior design projects |
+| `schedule-table` | 2 | Business hours with sidebar, clinic schedules, class timetables |
+| `team-highlight` | 1 | Founder spotlight, small teams (2-4 people), leadership with sticky intro |
+| `testimonial-hero` | 1 | Flagship client spotlight, founder endorsement, single powerful quote with portrait |
+| `video-popup` | 1 | Hero with play button, behind-the-scenes, brand story, facility tour |
+| `video-embed` | 1 | Showreel, tutorial, testimonial video, process walkthrough |
+| `countdown` | 1 | Grand opening, seasonal promotion, event registration deadline |
+| `event-list` | 1 | Workshops, classes, seasonal events, open houses |
+| `comparison-table` | 1 | Plan comparison, service tier features, product specs |
+| `pricing` | 1 | Service packages, membership tiers, lesson rates |
+| `logo-cloud` | 3 | Client logos, partner badges, certifications, "as seen in" press |
+| `contact-details` | 1 | Contact pages (but not as last widget — see footer duplication rule) |
+| `split-content` | 5 | Two-column freeform, sticky sidebar, stats + narrative, dual features |
+| `timeline` | 5 | Company history, project process, onboarding flow, event schedule |
+| `split-hero` | 4 | Alternative to banner for About pages, story-driven heroes, founder intros |
+
+**Never used — find a home for each:**
+
+| Widget | Uses | Where it should appear |
+|--------|------|----------------------|
+| `image-hotspots` | 0 | Hotel room features, restaurant floor plan, product details, campus tour, salon stations |
+| `numbered-service-list` | 0 | Ranked service list, capability showcase, process overview — use for services that benefit from visual numbering |
+| `social-icons` | 0 | Standalone social strip on About or Contact pages, community callout section |
+| `image` | 0 | Full-bleed section divider, standalone hero photo, promo banner |
+| `embed` | 0 | Booking calendar embed, social feed, review widget, payment form |
+| `job-listing` | 0 | Careers page for larger businesses (agency, dental practice, hotel) |
+| `resource-list` | 0 | Downloads page, resource library, document center |
+
+### Widget-to-industry mapping for remaining presets
+
+Each remaining preset must introduce underused widgets that fit its industry. Do not default to banner + image-text + card-grid + testimonials + accordion + action-bar. Read the `insights.md` for each widget below before planning.
+
+| Preset | Industry | Must-use underused widgets | Why |
+|--------|----------|---------------------------|-----|
+| **hue-and-co** | Interior Designer | `sliding-panels` (room showcases), `bento-grid` (portfolio), `image-hotspots` (design details), `masonry-gallery` (project photos) | Visual portfolio industry — needs asymmetric, image-heavy layouts |
+| **framelight** | Photographer | `masonry-gallery` (portfolio — the obvious choice), `video-embed` (behind-the-scenes reel), `testimonial-hero` (client spotlight), `image` (full-bleed hero photo) | Photography demands gallery-forward design, not card grids |
+| **inkwell** | Tattoo Studio | `masonry-gallery` (tattoo portfolio), `scrolling-text` (brand energy), `video-embed` (artist at work), `sliding-panels` (tattoo styles) | Edgy, visual-first — needs energy widgets, not corporate layouts |
+| **pixelcraft** | Graphic Designer | `bento-grid` (portfolio showcase), `logo-cloud` (client logos), `sliding-panels` (case studies), `numbered-service-list` (capabilities) | Creative agency needs to demonstrate layout sophistication |
+| **formline** | Architecture Firm | `sliding-panels` (project deep-dives), `timeline` (project phases), `bento-grid` (portfolio), `comparison-slider` (before/after) | Architecture = process + visual showcase |
+| **petalry** | Flower Shop | `priced-list` (bouquet menu), `countdown` (Valentine's/Mother's Day), `event-list` (workshops), `gallery` (arrangements) | Seasonal business with priced items and events |
+| **pawlish** | Pet Grooming | `priced-list` (grooming rates), `comparison-table` (grooming packages), `schedule-table` (hours), `icon-list` (services included) | Service business with clear pricing tiers and schedules |
+| **torque** | Auto Repair | `numbered-service-list` (services), `pricing` (maintenance packages), `schedule-table` (shop hours), `icon-list` (specialties) | Trades business with structured service lists and pricing |
+| **noteworthy** | Tutoring / Music Lessons | `pricing` (lesson packages), `schedule-table` (availability), `event-list` (recitals/exams), `content-switcher` (kids/adults) | Education with pricing tiers, schedules, and audience segments |
+| **little-oaks** | Daycare / Preschool | `schedule-table` (daily routine), `event-list` (school events), `team-highlight` (teachers with sticky intro), `image-hotspots` (campus tour), `icon-list` (facilities) | Parent-facing — trust through transparency (team, schedule, facilities) |
+| **tailside** | Veterinarian | `team-highlight` (vets with credentials), `schedule-table` (clinic hours), `pricing` (checkup packages), `icon-list` (services) | Medical practice with structured hours, team credibility, and service packages |
+| **codebase** | Developer / Agency | `bento-grid` (portfolio), `logo-cloud` (clients), `comparison-table` (pricing tiers), `timeline` (process), `numbered-service-list` (capabilities), `embed` (GitHub/calendar) | Tech-forward — should look like it was built by developers |
+| **uplink** | IT Support | `pricing` (support plans), `comparison-table` (plan comparison), `icon-list` (services), `content-switcher` (business/residential) | Service tiers and plan comparisons are the core differentiator |
+| **everafter** | Wedding Planner | `timeline` (planning milestones), `masonry-gallery` (wedding photos), `testimonial-hero` (couple spotlight), `countdown` (wedding day), `event-list` (upcoming weddings/open houses) | Emotional, milestone-driven — timeline and gallery are essential |
+| **hearthstone** | Hotel / B&B | `image-hotspots` (room features), `sliding-panels` (room types), `icon-list` (amenities), `schedule-table` (check-in/breakfast hours), `event-list` (local attractions) | Hospitality = rooms + amenities + local info |
+
+### Diversity rules
+
+1. **Each preset must use at least 2 widgets from the "underused" or "never used" lists.** Not as filler — they must serve the content naturally.
+
+2. **No two consecutive presets should share the same homepage hero widget.** Alternate between `banner`, `split-hero`, `slideshow`, `video-popup`, `testimonial-hero`, and `rich-text` (with highlight scheme).
+
+3. **Not every page needs an `action-bar` at the bottom.** Some pages can end with a `testimonial-slider`, `comparison-slider`, `map`, or `accordion` (with sidebar). Ending with a CTA strip is fine but shouldn't be automatic.
+
+4. **Replace `image-text` with alternatives** at least half the time. `split-content`, `checkerboard`, `image-callout`, and `bento-grid` all serve similar purposes with different visual signatures.
+
+5. **Use `testimonial-slider` or `testimonial-hero` instead of `testimonials`** in at least half of remaining presets. The grid testimonials widget is overrepresented.
+
+6. **Homepage service previews don't need to be `icon-card-grid`.** Consider `sliding-panels`, `checkerboard`, `bento-grid`, `numbered-service-list`, or `image-tabs` as alternatives depending on the business type.
+
+7. **Read the `insights.md` for every underused widget you plan to use.** The recipes there are specific and field-tested. Don't invent a layout when a proven recipe exists.
+
+---
+
+## 9. Differentiation Checklist
 
 Before finalizing any preset, verify:
 
@@ -439,9 +620,16 @@ Before finalizing any preset, verify:
 **Pages & Widgets:**
 - [ ] Page count and names fit the business (not forced into exactly 5)
 - [ ] Widget selection varies — not the same sequence as other presets
-- [ ] Hero widget type varies across presets (banner, split-hero, slideshow, video-popup)
-- [ ] Action bars mix fullwidth and contained
+- [ ] Hero widget type varies across presets (banner, split-hero, slideshow, video-popup, testimonial-hero, rich-text)
 - [ ] Contact page doesn't duplicate the footer
+- [ ] At least 2 widgets from the "underused" or "never used" tiers in Section 8
+- [ ] Not every page ends with `action-bar` — at least one page ends differently
+- [ ] At least one `accordion` uses sidebar blocks (info/social)
+- [ ] Homepage services section uses something other than `icon-card-grid` if the previous preset already used it
+- [ ] Card grids only have `button_link` when cards link to unique individual destinations
+- [ ] Page openers match the "good openers" list — no mid-page widgets used as first section
+- [ ] `top_spacing: "none"` only used on widgets with visible contrasting backgrounds
+- [ ] Spacing uses all three values (`auto`, `small`, `none`) appropriately — not just `none` everywhere
 
 **Schema Validity:**
 - [ ] Every setting key exists in the corresponding widget's `schema.json`

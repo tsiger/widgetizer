@@ -1,0 +1,37 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "\u00a9 2026 Sparkhaus Cleaning Co. All rights reserved.",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Sparkhaus",
+        "text": "<p>Professional cleaning services for homes and businesses. Licensed, bonded, and insured.</p>"
+      }
+    },
+    "contact": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>(555) 718-2200<br>hello@sparkhaus.co<br>Mon\u2013Fri: 7am\u20136pm<br>Sat: 8am\u20132pm</p>"
+      }
+    },
+    "links": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Quick Links",
+        "menu": "footer-menu"
+      }
+    },
+    "social": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  },
+  "blocksOrder": ["logo", "contact", "links", "social"]
+}

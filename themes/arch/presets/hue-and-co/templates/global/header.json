@@ -1,0 +1,21 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Hue & Co",
+    "contactDetailsLine1": "",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "headerNavigation": "main-menu",
+    "center_nav": true,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book a Consultation",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "secondary",
+    "full_width": true,
+    "sticky": false,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Sparkhaus",
+    "contactDetailsLine1": "Call us: (555) 718-2200",
+    "contactDetailsLine2": "",
+    "contact_position": "menu",
+    "headerNavigation": "main-menu",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Get a Quote",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

@@ -14,11 +14,11 @@
 
 | Page | Slug | Purpose |
 |------|------|---------|
-| Home | `index` | Hero with value prop, trust signals, services preview, process, testimonials, CTA |
-| Services | `services` | Detailed service breakdown with visual cards |
-| Work | `work` | Before/after results, client testimonials |
-| About | `about` | Story, team, values, FAQ |
-| Contact | `contact` | Contact details, service area map, booking CTA |
+| Home | `index` | Hero with value prop, trust signals, services preview, before/after, stats, process, testimonials, CTA |
+| Services | `services` | Detailed service breakdown with visual cards and interactive tabs |
+| Work | `work` | Before/after comparison slider, project showcase, client testimonials |
+| About | `about` | Story (image-callout opener — no banner), team, values, FAQ |
+| Contact | `contact` | Contact details, service area map, booking FAQ |
 
 ---
 
@@ -109,7 +109,7 @@ A cool, clinical palette built around teal — suggests cleanliness and freshnes
 ```json
 {
   "settings": {
-    "copyright": "\u00a9 2026 Sparkhaus Cleaning Co. All rights reserved.",
+    "copyright": "© 2026 Sparkhaus Cleaning Co. All rights reserved.",
     "color_scheme": "highlight-primary"
   },
   "blocks": {
@@ -124,7 +124,7 @@ A cool, clinical palette built around teal — suggests cleanliness and freshnes
       "type": "text_block",
       "settings": {
         "title": "Contact",
-        "text": "<p>(555) 718-2200<br>hello@sparkhaus.co<br>Mon\u2013Fri: 7am\u20136pm<br>Sat: 8am\u20132pm</p>"
+        "text": "<p>(555) 718-2200<br>hello@sparkhaus.co<br>Mon–Fri: 7am–6pm<br>Sat: 8am–2pm</p>"
       }
     },
     "links": {
@@ -153,50 +153,60 @@ A cool, clinical palette built around teal — suggests cleanliness and freshnes
 
 | # | Widget | Type | Color Scheme | Key Details |
 |---|--------|------|-------------|-------------|
-| 1 | Hero Banner | `banner` | highlight-primary | Medium height, overlay, transparent header support. Heading + text + CTA button. `top_spacing: none` |
-| 2 | Trust Bar | `trust-bar` | standard-secondary | 4 items: Licensed & Insured, Eco-Friendly Products, Satisfaction Guaranteed, Same-Day Booking. Filled icons, centered. `top_spacing: none` |
+| 1 | Hero Banner | `banner` | highlight-primary | Medium height, overlay, left-aligned, transparent header support. Heading + text + dual CTA buttons. `top_spacing: none` |
+| 2 | Trust Bar | `trust-bar` | standard-secondary | 4 items: Licensed & Insured, Eco-Friendly Products, Satisfaction Guaranteed, Same-Day Booking. Filled icons, sharp shape, centered. `top_spacing: none` |
 | 3 | Services Preview | `icon-card-grid` | standard-primary | 4 cards, box layout, 4 columns. Residential, Commercial, Deep Clean, Move-In/Out |
-| 4 | How It Works | `steps` | standard-secondary | 4 steps: Book Online, We Arrive On Time, Detailed Clean, Walk-Through Check |
-| 5 | Image Callout | `image-callout` | standard-primary | Image right, "Why Choose Sparkhaus?" with features list |
-| 6 | Testimonials | `testimonial-slider` | highlight-primary | 4 quotes with ratings, autoplay |
-| 7 | CTA | `action-bar` | highlight-primary | "Ready for a Spotless Space?" with booking button. No background image |
+| 4 | Before/After | `comparison-slider` | standard-secondary | Before/after cleaning transformation. Horizontal, 35% initial position. Industry-perfect widget. |
+| 5 | Key Figures | `key-figures` | highlight-primary | 4 stats: 2,500+ Homes, 4.9★ Rating, 98% Rebooking, 8+ Years. Animated, flat layout |
+| 6 | How It Works | `numbered-cards` | standard-primary | 4 steps: Book Online, We Arrive On Time, Detailed Clean, Walk-Through Check. Flat layout |
+| 7 | Testimonials | `testimonial-slider` | standard-secondary | 4 quotes with ratings, autoplay 6s |
+| 8 | CTA | `action-bar` | highlight-primary | "Ready for a Spotless Space?" with booking button. No background image |
+
+**Differentiation from original plan:** Replaced `steps` with `comparison-slider` + `key-figures` + `numbered-cards`. The comparison-slider is the star widget for a cleaning company (before/after transformations). Key-figures add social proof by numbers. Numbered-cards replaces steps for variety across presets.
 
 ### Services (`services`)
 
 | # | Widget | Type | Color Scheme | Key Details |
 |---|--------|------|-------------|-------------|
-| 1 | Page Banner | `banner` | highlight-primary | Small height, "Our Services" heading. `top_spacing: none` |
+| 1 | Page Banner | `banner` | standard-secondary | Small height, no overlay, "Our Services" heading. `top_spacing: none` |
 | 2 | Service Cards | `checkerboard` | standard-primary | 4 cards, 2 columns: Residential, Commercial, Deep Clean, Move-In/Out with images |
-| 3 | What's Included | `features-split` | standard-secondary | Left heading, 6 feature items with icons: Kitchens, Bathrooms, Living Areas, Bedrooms, Windows, Floors |
+| 3 | What's Included | `image-tabs` | standard-secondary | 3 tabs: Kitchens & Dining, Bathrooms, Living Areas & Bedrooms. Interactive exploration with images |
 | 4 | Pricing Note | `image-callout` | standard-primary | Image left, "Transparent Pricing" + features list + CTA |
-| 5 | FAQ | `accordion` | standard-primary | 5 items about services, products, scheduling. Connected style, left-aligned |
+| 5 | FAQ | `accordion` | standard-secondary | 5 items about products, scheduling, deep cleans. Connected style, left-aligned |
+
+**Differentiation from original plan:** Replaced `features-split` with `image-tabs` for interactive service exploration — users can click through rooms to see what's included with corresponding images, rather than a static list.
 
 ### Work (`work`)
 
 | # | Widget | Type | Color Scheme | Key Details |
 |---|--------|------|-------------|-------------|
-| 1 | Page Banner | `banner` | highlight-primary | Small height, "Our Work" heading. `top_spacing: none` |
-| 2 | Results | `card-grid` | standard-primary | 6 cards, 3 columns, box layout. Before/after project cards with descriptions |
-| 3 | Testimonials | `testimonial-slider` | standard-secondary | 4 quotes, autoplay |
-| 4 | CTA | `action-bar` | highlight-primary | "See What We Can Do for You" |
+| 1 | Page Banner | `banner` | highlight-primary | Small height, "Our Work" heading with subtitle. `top_spacing: none` |
+| 2 | Before/After | `comparison-slider` | standard-primary | Horizontal comparison slider — the centerpiece of the work page |
+| 3 | Project Gallery | `project-showcase` | standard-secondary | 6 projects, 3 columns, 4:3 ratio, text always visible. Hover overlays for engagement |
+| 4 | Testimonials | `testimonial-slider` | standard-primary | 4 quotes, autoplay, diverse client types |
+| 5 | CTA | `action-bar` | highlight-primary | "See What We Can Do for Your Space" |
+
+**Differentiation from original plan:** Replaced `card-grid` with `comparison-slider` + `project-showcase`. The comparison-slider is the visual hero of the work page (before/after cleaning), while project-showcase provides richer hover interactions than a basic card grid.
 
 ### About (`about`)
 
 | # | Widget | Type | Color Scheme | Key Details |
 |---|--------|------|-------------|-------------|
-| 1 | Page Banner | `banner` | highlight-primary | Small height, "About Sparkhaus". `top_spacing: none` |
-| 2 | Our Story | `image-callout` | standard-primary | Image left, company story with button |
-| 3 | Team | `profile-grid` | standard-secondary | 3 profiles, 3 columns |
-| 4 | Values | `icon-card-grid` | standard-primary | 3 cards, flat layout, 3 columns: Reliability, Quality, Sustainability |
-| 5 | FAQ | `accordion` | standard-primary | 4 items about the company, hiring, insurance. Separated style |
+| 1 | Our Story | `image-callout` | standard-primary | Image left, company story with features list. **No banner** — breaks the repetitive pattern of every page starting with a small banner. `top_spacing: none` |
+| 2 | Team | `profile-grid` | standard-secondary | 3 profiles, 3 columns: Founder, Commercial Manager, Residential Team Lead |
+| 3 | Values | `icon-card-grid` | standard-primary | 3 cards, flat layout, 3 columns: Reliability, Quality, Sustainability |
+| 4 | FAQ | `accordion` | standard-secondary | 4 items about the company, hiring, insurance. Separated style |
+| 5 | CTA | `action-bar` | highlight-primary | "Work With a Team That Cares" |
+
+**Differentiation from original plan:** Removed the small banner — About page now opens directly with `image-callout` (the company story), creating a more immersive introduction and breaking the pattern of every inner page starting identically.
 
 ### Contact (`contact`)
 
 | # | Widget | Type | Color Scheme | Key Details |
 |---|--------|------|-------------|-------------|
-| 1 | Page Banner | `banner` | highlight-primary | Small height, "Get in Touch". `top_spacing: none` |
+| 1 | Page Banner | `banner` | standard-secondary | Small height, no overlay, "Get in Touch". `top_spacing: none` |
 | 2 | Contact Info | `contact-details` | standard-primary | 3 blocks: info (address, phone, email), hours (text_block), social |
-| 3 | Service Area Map | `map` | standard-secondary | Google Maps embed with sidebar info block |
+| 3 | Service Area Map | `map` | standard-secondary | Google Maps embed with sidebar showing service area info |
 | 4 | FAQ | `accordion` | standard-primary | 4 items about booking, cancellation, payment. Connected style |
 
 ---
@@ -204,7 +214,6 @@ A cool, clinical palette built around teal — suggests cleanliness and freshnes
 ## Menus
 
 **main-menu.json:**
-- Home → `index.html`
 - Services → `services.html`
 - Our Work → `work.html`
 - About → `about.html`
@@ -222,22 +231,36 @@ A cool, clinical palette built around teal — suggests cleanliness and freshnes
 
 | Widget Type | Count |
 |------------|-------|
-| `banner` | 5 (1 hero + 4 inner pages) |
+| `banner` | 4 (1 hero + 3 inner pages) |
 | `trust-bar` | 1 |
 | `icon-card-grid` | 2 |
-| `steps` | 1 |
-| `image-callout` | 3 |
+| `comparison-slider` | 2 |
+| `key-figures` | 1 |
+| `numbered-cards` | 1 |
+| `image-tabs` | 1 |
 | `testimonial-slider` | 2 |
-| `action-bar` | 2 |
+| `action-bar` | 3 |
 | `checkerboard` | 1 |
-| `features-split` | 1 |
+| `image-callout` | 2 |
 | `accordion` | 3 |
-| `card-grid` | 1 |
+| `project-showcase` | 1 |
 | `profile-grid` | 1 |
 | `contact-details` | 1 |
 | `map` | 1 |
 
-**13 unique widget types across 5 pages.**
+**16 unique widget types across 5 pages.**
+
+---
+
+## Improvements Over Original Plan
+
+1. **`comparison-slider` (x2)** — A cleaning company's most compelling visual proof. Used on both the home page and work page for before/after transformations.
+2. **`key-figures`** — Social proof by numbers (2,500+ homes, 4.9★ rating, 98% rebooking). Builds trust immediately.
+3. **`numbered-cards`** — Replaces `steps` for the process section. Provides visual variety across presets (steps is overused).
+4. **`project-showcase`** — Replaces `card-grid` on the work page. Hover overlays and better visual hierarchy for portfolio content.
+5. **`image-tabs`** — Replaces `features-split` on the services page. Interactive exploration of room-by-room cleaning with images.
+6. **About page opens with `image-callout`** — No banner. Breaks the monotonous pattern of every inner page starting with a small banner.
+7. **Home page has 8 widgets** instead of 7 — the extra widget (key-figures) adds a social proof layer that was completely missing.
 
 ---
 
