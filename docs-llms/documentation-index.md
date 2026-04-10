@@ -211,20 +211,20 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Managing media library interfaces
 - Understanding usage tracking and deletion protection
 
-**Key topics**: File storage, metadata management, upload workflows, thumbnail generation, bulk operations, usage tracking, deletion protection
+**Key topics**: File storage (images and file assets), metadata management, upload workflows, thumbnail generation, bulk operations, usage tracking (with recursive link scanning), deletion protection, file setting input, Copy URL
 
 ---
 
 ### **[core-file-assets.md](core-file-assets.md)** - File Assets Architecture
 
-**Purpose**: Architecture proposal for extending the Media Library to support downloadable project files, starting with PDF support **When to use**:
+**Purpose**: Architecture and product decisions for file asset support (PDF uploads, file setting type, export handling). Implemented. **When to use**:
 
-- Planning support for reusable downloadable business documents
-- Designing Media Library support for images vs files
-- Defining file-selection patterns for widget/theme settings
-- Aligning usage tracking and export behavior for non-image assets
+- Understanding why file assets were designed as a Media Library extension
+- Reviewing confirmed product decisions (filter model, URL strategy, file input design)
+- Planning future file type expansion (allowlist strategy)
+- Understanding the relationship between file assets, usage tracking, and export
 
-**Key topics**: file assets, PDF-first rollout, media-library filter model, copy URL workflow, dedicated file input direction, usage tracking expectations, export expectations, extensible allowlist strategy
+**Key topics**: file assets, PDF-first rollout, media-library filter model, copy URL workflow, dedicated FileInput component, `file` setting type, usage tracking for files, export path rewriting, extensible allowlist strategy
 
 ---
 

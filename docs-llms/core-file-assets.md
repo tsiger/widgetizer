@@ -379,9 +379,26 @@ This approach:
 
 ---
 
+## 16. Implementation Status
+
+V1 is **implemented**. Key deliverables:
+
+- PDF uploads routed to `uploads/files/` via `getMediaCategory()` — no image processing applied
+- Media Library filter: `All`, `Images`, `Files` with `FileText` icons and extension badges for non-images
+- Copy URL action on all media items (copies the storage path)
+- `FileInput` component (`src/components/settings/inputs/FileInput.jsx`) registered as `type: "file"` in `SettingsRenderer`
+- `MediaSelectorDrawer` supports `filterType="file"` with file-appropriate upload accept types
+- Usage tracking recurses into nested objects (link settings) and matches both `/uploads/images/` and `/uploads/files/` paths
+- Export copies used file assets to `assets/files/` and rewrites `/uploads/files/` paths in rendered HTML
+- Rendering service provides `filePath` context variable for widget templates
+- Arch theme: `resource-list` widget uses the `file` setting type
+- Shared `media.maxFileSizeMB` upload limit (no separate file limit in V1)
+
+---
+
 **See also:**
 
-- [core-media.md](core-media.md) - Existing media library architecture
-- [core-export.md](core-export.md) - Static export expectations and asset copying
-- [theming-setting-types.md](theming-setting-types.md) - Current setting/input patterns for theme and widget schemas
+- [core-media.md](core-media.md) - Media library architecture (updated for file assets)
+- [core-export.md](core-export.md) - Static export with file asset copying and path rewriting
+- [theming-setting-types.md](theming-setting-types.md) - Setting types including the `file` type
 - [core-page-editor.md](core-page-editor.md) - Editor-side setting selection and asset usage patterns

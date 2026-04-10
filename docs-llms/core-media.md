@@ -10,6 +10,8 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 
 - **Location**: Uploaded files are physically stored on the server's filesystem, scoped per project:
 - **Images**: `data/projects/{folderName}/uploads/images/`
+- **Files** (PDFs, etc.): `data/projects/{folderName}/uploads/files/`
+- **Routing**: The `getMediaDir(projectFolderName, mimeType)` function uses `getMediaCategory()` to route uploads to the correct subdirectory — `images/` for image MIME types, `files/` for everything else (currently PDF).
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original using `-{size}` suffixes (e.g., `photo-thumb.jpg`, `photo-small.jpg`).
 - **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. Public delivery then falls back to the best available size or the original only when no `large` variant exists.
@@ -97,6 +99,23 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
         "medium": { "path": "/uploads/images/my-awesome-picture-medium.jpg", "width": 1024, "height": 768 }
         // Note: "large" size omitted if disabled in settings
       }
+    },
+    {
+      "id": "d2e3f4a5-b6c7-4d8e-9f0a-1b2c3d4e5f6a",
+      "filename": "brochure.pdf",
+      "originalName": "Company Brochure.pdf",
+      "type": "application/pdf",
+      "size": 245760,
+      "uploaded": "2024-03-15T14:30:00.000Z",
+      "path": "/uploads/files/brochure.pdf",
+      "metadata": {
+        "alt": "",
+        "title": ""
+      },
+      "width": null,
+      "height": null,
+      "usedIn": ["home"],
+      "sizes": {}
     }
   ]
 }
@@ -116,7 +135,8 @@ The media library automatically tracks which pages and global widgets are using 
   - **Global widgets** (header/footer) are saved or updated (scans settings for media paths)
 - **Delete Protection**: Files with a non-empty `usedIn` array cannot be deleted
 - **Manual Refresh**: Users can manually refresh usage tracking to recalculate all relationships
-- **Media Types Tracked**: Images are tracked across pages and global widgets
+- **Media Types Tracked**: Images and file assets (PDFs) are tracked across pages, global widgets, and theme settings
+- **Recursive Scanning**: The usage scanner recurses into nested objects (e.g. link settings with `{ href: "/uploads/files/brochure.pdf", ... }`) so media paths inside link fields are tracked for deletion protection and export
 
 ### Media Type Configuration
 
@@ -125,13 +145,14 @@ The system uses centralized configuration for media types and MIME handling on b
 **Frontend** (`src/config.js`):
 - `MEDIA_TYPES` defines allowed file extensions for the upload UI:
   - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
+  - `file`: `.pdf`
 
 **Backend** (`server/utils/mimeTypes.js`):
 All server-side MIME definitions live in a single module:
-- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`)
+- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`)
 - `ZIP_MIME_TYPES` — MIME types for ZIP archive validation (`application/zip`, `application/x-zip-compressed`), used by project import and theme upload
-- `getContentType(ext)` — resolves a file extension (e.g. `".png"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
-- `getMediaCategory(mimeType)` — classifies a MIME type as `"image"` (re-exported from `server/config.js` for backward compatibility)
+- `getContentType(ext)` — resolves a file extension (e.g. `".png"`, `".pdf"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
+- `getMediaCategory(mimeType)` — classifies a MIME type into an asset category: returns `"image"` for image MIME types, `"file"` for everything else (currently PDF). Used by `getMediaDir()` to route uploads to the correct subdirectory.
 
 This ensures consistency across all server code — upload validation, file serving, and export content-type resolution all use the same definitions.
 
@@ -160,7 +181,7 @@ Manages core media state and data loading:
 - **State Management**: Files list, loading states, view mode, search filtering
 - **Data Loading**: Fetches project media on mount using `getProjectMedia`
 - **View Persistence**: Saves view mode preference to localStorage
-- **Type Filtering**: Supports filtering the media list by type (`all`, `image`)
+- **Type Filtering**: Supports filtering the media list by type (`all`, `image`, `file`)
 - **Search Filtering**: Real-time filename filtering
 - **Usage Refresh**: Manual usage tracking refresh functionality
 
@@ -216,9 +237,10 @@ A specialized drawer component that allows users to browse and select existing m
 
 - **Direct Upload**: Includes an "Upload" button that triggers the OS file dialog, allowing users to add new files directly while browsing.
 - **Search Bar**: Integrated search functionality to quickly find files by name.
-- **File Type Filtering**: Supports filtering by file type (`image` or `all`). The filter can be pre-set via props.
+- **File Type Filtering**: Supports filtering by file type (`image`, `file`, or `all`). The filter can be pre-set via props. Upload accept types adjust automatically based on the active filter.
 - **Visual Indicators**:
   - **Images**: Displays the actual image thumbnail.
+  - **Files**: Displays a file icon with the extension badge.
 - **Keyboard Navigation**: Escape key support for closing the drawer
 - **Background Scroll Prevention**: Prevents body scrolling when drawer is open
 
@@ -227,6 +249,7 @@ A specialized drawer component that allows users to browse and select existing m
 The `MediaSelectorDrawer` is integrated into:
 
 - **`ImageInput`**: Browse for existing images when setting image widget properties or theme-level image settings like favicons
+- **`FileInput`**: Browse for existing file assets (PDFs) when setting file widget properties
 - **`PageForm`**: Select featured images for pages
 
 #### `ImageInput` Modes (`src/components/settings/inputs/ImageInput.jsx`)
@@ -242,7 +265,24 @@ The image setting input supports two presentation modes:
 - `onClose`: Function called when drawer should be closed
 - `onSelect`: Function called with selected file object
 - `activeProject`: Current project object for loading media
-- `filterType`: String to filter files (`'image'` or `'all'`)
+- `filterType`: String to filter files (`'image'`, `'file'`, or `'all'`)
+
+#### `FileInput` Component (`src/components/settings/inputs/FileInput.jsx`)
+
+A filename-oriented setting input for selecting uploaded file assets (PDFs). Modeled after `ImageInput` but without image-specific features like preview thumbnails or metadata editing.
+
+**Key Features:**
+
+- **Upload**: Triggers OS file dialog accepting only file types (PDF)
+- **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"`
+- **Selected State**: Displays filename, extension badge, and a clear button
+- **No image preview**: Shows a file icon instead of a thumbnail
+
+**Props Interface:**
+
+- `id`: Setting identifier
+- `value`: Current file path string (e.g. `/uploads/files/brochure.pdf`)
+- `onChange`: Callback receiving the selected file path
 
 ### UI Improvements
 
@@ -286,6 +326,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 | `POST` | `/api/media/projects/:projectId/refresh-usage` |  | `refreshMediaUsage` | Manually refreshes usage tracking for all media files in the project. |
 | `GET` | `/api/media/projects/:projectId/media/:fileId` |  | `serveProjectMedia` | Serves a media file by metadata ID. |
 | `GET` | `/api/media/projects/:projectId/uploads/images/:filename` |  | `serveProjectMedia` | Serves an image file by filename. |
+| `GET` | `/api/media/projects/:projectId/uploads/files/:filename` |  | `serveProjectMedia` | Serves a file asset by filename. |
 
 **Identifier contract:** `:projectId` is always the project UUID in API routes. The backend resolves it to `folderName` for filesystem paths. If the UUID cannot be resolved, the request fails (no fallback directories are created). Errors use standardized codes (for example `PROJECT_NOT_FOUND`, `PROJECT_DIR_MISSING`) to keep responses consistent.
 
@@ -298,11 +339,12 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
   // Returns only enabled sizes with their width and quality settings
   ```
 - **File Upload (`multer` + `uploadProjectMedia`)**:
-  1.  The `multer` middleware is configured first. It intercepts the request, saves the uploaded files to the correct project directory (`data/projects/{folderName}/uploads/images/`) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
+  1.  The `multer` middleware is configured first. It intercepts the request, routes each file to the correct project subdirectory based on `getMediaCategory()` (`uploads/images/` for images, `uploads/files/` for PDFs) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
   2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the size limit (`media.maxFileSizeMB`).
   3.  For each valid file, it generates a unique persistent media ID (currently still using UUID-format values; this path is being normalized with the rest of the backend identifier cleanup).
   4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.
-  5.  If the file is an image (not an SVG), it uses the `sharp` library to:
+  5.  **Non-image files** (PDFs) skip all image processing — no resizing, no dimensions extraction. They are stored with `width: null`, `height: null`, and an empty `sizes: {}` object.
+  6.  If the file is an image (not an SVG), it uses the `sharp` library to:
       - Read the original `width` and `height`.
       - **Dynamically load** the current image processing settings from App Settings
       - Generate **only the enabled** image sizes with the configured quality setting
@@ -326,8 +368,8 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 
 The media usage tracking is handled by a dedicated service that provides automated tracking of which pages and global widgets use which media files:
 
-- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates `usedIn` in SQLite. First removes the page from all existing usage links, then adds it to files that are actually referenced.
-- **`updateGlobalWidgetMediaUsage(projectId, globalId, widgetData)`**: Scans a global widget (header/footer) for media references and updates the `usedIn` arrays. Works the same way as page tracking but for global widgets.
+- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates `usedIn` in SQLite. First removes the page from all existing usage links, then adds it to files that are actually referenced. Recursively inspects nested objects (e.g. link settings) so media paths inside `href` values are detected.
+- **`updateGlobalWidgetMediaUsage(projectId, globalId, widgetData)`**: Scans a global widget (header/footer) for media references and updates the `usedIn` arrays. Works the same way as page tracking but for global widgets. Also recurses into nested objects.
 - **`removePageFromMediaUsage(projectId, pageId)`**: Removes a page from all media files' `usedIn` arrays when the page is deleted.
 - **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages and global widgets use it.
 - **`refreshAllMediaUsage(projectId)`**: Scans all pages and global widgets in a project and rebuilds the complete usage tracking data.
@@ -341,7 +383,7 @@ The media usage tracking is handled by a dedicated service that provides automat
 **Integration with Global Widget Operations:**
 
 - **Header/Footer Save**: Automatically triggers usage tracking updates for media used in global widgets
-- This ensures images used in the header logo, footer, etc. are protected from deletion
+- This ensures images and file assets used in the header logo, footer, etc. are protected from deletion
 
 ## Security Considerations
 
@@ -353,4 +395,5 @@ All API endpoints described in this document are protected by input validation a
 
 - [App Settings](core-appSettings.md) - Configure image processing and upload limits
 - [Export System](core-export.md) - How media usage tracking optimizes exports
+- [File Assets Architecture](core-file-assets.md) - Architecture and product decisions for file asset support
 - [Custom Hooks](core-hooks.md) - Media management hooks documentation

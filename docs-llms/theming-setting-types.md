@@ -396,6 +396,59 @@ An image uploader that includes a preview, the ability to replace the image, and
 }
 ```
 
+### File
+
+A file asset selector for downloadable documents (currently PDF). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
+
+**Features:**
+
+- **Upload**: Direct file upload from the OS file picker (accepts PDF)
+- **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets
+- **Selected State**: Displays filename and extension badge with a clear button
+- **No Metadata Editing**: File assets do not have alt text or title metadata
+
+```json
+{
+  "id": "download_file",
+  "type": "file",
+  "label": "Download File"
+}
+```
+
+**Widget Example (resource list):**
+
+```json
+{
+  "type": "resource",
+  "displayName": "Resource",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Document Title"
+    },
+    {
+      "type": "file",
+      "id": "file",
+      "label": "File"
+    }
+  ]
+}
+```
+
+**Template Usage:**
+
+File paths are resolved using the `filePath` context variable (set by the rendering service), which points to the correct base path in both preview and publish modes:
+
+```liquid
+{% assign file_filename = block.settings.file | split: '/' | last %}
+{% assign file_url = filePath | append: '/' | append: file_filename %}
+<a href="{{ file_url }}" target="_blank" rel="noopener">Download</a>
+```
+
+Alternatively, users can copy a file URL from the Media Library and paste it into any generic link field. The export controller rewrites `/uploads/files/` paths to `assets/files/` in the exported HTML.
+
 ### YouTube
 
 A specialized input for YouTube videos. It allows users to paste a YouTube URL or Video ID and configure embed options.

@@ -20,7 +20,7 @@
 | 12 | keystoned | Keystoned | Real Estate Agent | Home, Properties, Neighborhoods, Buyers & Sellers, About, Contact | done |
 | 13 | pipeworks | Pipeworks | Plumber / Electrician | Home, Services, Projects, Areas We Serve, About, Contact | done |
 | 14 | greenfield | Greenfield | Landscaping | Home, Services, Portfolio, About, Contact | done |
-| 15 | sparkhaus | Sparkhaus | Cleaning Service | Home, Services, Work, About, Contact | pending |
+| 15 | sparkhaus | Sparkhaus | Cleaning Service | Home, Services, Work, About, Contact | done |
 | 16 | hue-and-co | Hue & Co | Interior Designer | Home, Services, Portfolio, About, Contact | pending |
 | 17 | framelight | Framelight | Photographer | Home, Services, Portfolio, About, Contact | pending |
 | 18 | inkwell | Inkwell | Tattoo Studio | Home, Services, Portfolio, About, Contact | pending |

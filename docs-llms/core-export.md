@@ -132,6 +132,10 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
       - Issues include line numbers, column positions, rule IDs, and source code snippets
       - A comprehensive `__export__issues.html` report is generated if any issues are found
       - The report provides a visual, developer-friendly interface showing all validation issues
+    - **Asset Path Rewriting**: After formatting, any remaining raw storage paths in the HTML are rewritten to their published locations. This catches media paths that were pasted into generic link fields (e.g. a button href containing `/uploads/files/brochure.pdf`):
+      - `/uploads/images/` is rewritten to `assets/images/`
+      - `/uploads/files/` is rewritten to `assets/files/`
+      - Dedicated tags like `{% image %}` already resolve paths via context variables, so this step is a safety net for generic link fields.
     - The formatted (and potentially validated) HTML is saved as a file in the output directory (e.g., `about-us.html`). If a page's slug is "home" or "index", it is saved as `index.html`.
 
 8.  **Optional Markdown export** (when `exportMarkdown` is true in request body):
@@ -157,6 +161,11 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
         - Images are copied to `assets/images/` (not `uploads/images/`)
         - Falls back to copying all images if media tracking fails
       - **Export Optimization**: Logs how many images were copied vs. skipped, often reducing export size significantly
+      - **File Asset Copying**: Uses the same usage-based approach for non-image file assets (PDFs):
+        - Reads media metadata and filters files where `path` starts with `/uploads/files/` and `usedIn` is non-empty
+        - Copies used files to `assets/files/` in the export output
+        - No size variants to process (files have no generated sizes)
+        - Falls back to copying all files from `uploads/files/` if tracking fails
 
 10. **Write Export Metadata Files**:
     - Each static export directory receives a root **`manifest.json`** metadata file describing the export itself (`generator`, `widgetizerVersion`, `themeId`, `themeVersion`, `exportVersion`, `exportedAt`, `projectName`).
