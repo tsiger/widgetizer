@@ -1,58 +1,204 @@
-# Theme Preset Generator Guide
+# Arch Theme Preset Generator Guide
 
-Complete reference for building Arch theme presets. Every preset must showcase the theme's features through diverse, schema-valid configurations. This document defines the process, rules, and reference material for generating presets.
+Working guide for building high-quality presets for the Arch theme.
+
+This document exists to help generate presets that:
+
+- feel native to Arch
+- are structurally valid
+- use the real widget/icon/font systems
+- translate each industry into a distinct site strategy
+- avoid becoming photocopies with different photos
+
+Use this guide together with:
+
+- [theme-design-system.md](theme-design-system.md)
+- [theme-presets-tracker.md](theme-presets-tracker.md) for preset ids and status only
+- `themes/arch/theme.json`
+- widget `schema.json` files
+- widget `insights.md` files
+- [arch-icons-list.txt](arch-icons-list.txt)
+- [arch-fonts-list.csv](arch-fonts-list.csv)
 
 ---
 
-## 0. Generation Workflow
+## 1. What A Preset Is
 
-Each preset is built in three phases. All plan and image files live in `docs-llms/preset-plans/`.
+A preset is not just:
 
-### Phase 1: Plan (`{preset-id}.md`)
+- a color palette
+- a set of placeholder images
+- a different sequence of widgets
 
-Write a detailed plan document covering:
+A preset is an **industry translation of Arch**.
 
-- **Identity** — Name, industry, personality description (2-3 sentences establishing the brand voice)
-- **preset.json settings** — Full color palette (all 18 tokens with rationale), typography (heading + body font with exact stacks/weights from `fonts.json`), style settings (`corner_style`, `spacing_density`, `button_shape`)
-- **Header config** — Complete header JSON with all settings. Note what makes it distinct from other presets
-- **Footer config** — Footer settings and block plan
-- **Pages** — Table per page listing every widget in order: widget name, type, color scheme, and key configuration details (content, layout choices, block count, etc.)
-- **Menus** — Which pages appear in `main-menu.json` and `footer-menu.json`
-- **Widget usage summary** — Count of unique widget types and how many times each is used
-- **Header differentiation notes** — What combination of header settings makes this preset unique
+That means each preset should answer:
 
-The plan file is the single source of truth — Phase 3 builds directly from it.
+- What does this business need to communicate first?
+- What kind of trust does this industry need?
+- What should feel premium, calm, energetic, clinical, playful, or direct?
+- What page types actually matter?
+- What should be image-led, text-led, process-led, or conversion-led?
 
-### Phase 2: Images (`{preset-id}-images.json`)
+The goal is not "use different widgets." The goal is "make the preset feel like the right website for that industry, using Arch's system."
 
-Write a JSON array listing every image the preset needs. Each entry:
+### 1.1 Tracker order is not design input
 
-```json
-{
-  "file": "home-hero.jpg",
-  "width": 1920,
-  "height": 1080,
-  "prompt": "Description for image generation — scene, lighting, angle, mood, style direction."
-}
-```
+The preset tracker is a workflow tool.
 
-Guidelines:
-- Hero images are typically `1920×1080` (large) or `1920×600` (small banner heroes)
-- Content images (image-text, image-callout, etc.) are typically `800×600`
-- Portrait/team photos are typically `400×400`
-- Gallery/masonry images vary — use aspect ratios that suit the layout (square, portrait, landscape mix)
-- Prompts should be specific about scene, lighting, angle, mood, and styling. End with a photography style note (e.g., "Editorial food photography, warm tones")
-- Include "No people" when appropriate, or describe people generically without names/identities
-- Every image referenced in the plan must have a corresponding entry
+Use it only for:
+
+- preset id
+- title
+- industry label
+- completion status
+
+Do not use:
+
+- the previous preset
+- the next preset
+- list position
+- "neighboring" presets
+- tracker order
+
+as reasons to choose:
+
+- opener type
+- header style
+- page structure
+- widget sequence
+- palette
+- typography
+
+Each preset must be generated from:
+
+- this document
+- Arch's design system
+- widget schemas and widget insights
+- the target industry's strategy and content needs
+
+If two presets later feel too close, that is a catalog review issue to fix afterward. It is not a reason to derive one preset from another during generation.
+
+---
+
+## 2. Arch Mental Model
+
+Before choosing widgets, understand the 3 systems that define Arch.
+
+### 2.1 Surface hierarchy
+
+Arch has 4 color schemes:
+
+- `standard-primary`
+- `standard-secondary`
+- `highlight-primary`
+- `highlight-secondary`
+
+These are not just "light" and "dark."
+
+They define **section priority** and **surface emphasis**:
+
+- `standard-primary`: default page flow
+- `standard-secondary`: softer alternate surface for banding
+- `highlight-primary`: strongest emphasis surface
+- `highlight-secondary`: alternate emphasis surface
+
+Pick color schemes based on section priority, not as decoration.
+
+### 2.2 Vertical rhythm
+
+Every section widget supports:
+
+- `auto`
+- `small`
+- `none`
+
+These are relational spacing controls:
+
+- `auto`: use the theme rhythm defined by Arch
+- `small`: use a reduced version of that rhythm
+- `none`: intentionally fuse this widget with the section above or below
+
+Do not think in raw CSS values. Presets should think in **section relationships**, not `padding: 147px`.
+
+### 2.3 Container behavior
+
+This is critical.
+
+Arch does not space every widget the same way internally.
+
+- Standard widgets typically use margin-based vertical spacing
+- Filled-background widgets use padded containers so the background fills the vertical rhythm
+
+This means spacing overrides on a filled section do not behave the same way visually as spacing overrides on a plain section.
+
+**Important consequence:**
+
+- `top_spacing: "none"` on a filled widget removes top padding inside the colored band
+- `bottom_spacing: "none"` on a filled widget removes bottom padding inside the colored band
+
+So spacing choices must be made with the widget's surface behavior in mind.
+
+### 2.4 Transparent header is a separate system
+
+Header transparency is not part of the spacing system.
+
+- `transparent_on_hero` is a header overlay behavior
+- it only works with supported opener widgets
+- it should not be used as the reason for unrelated spacing decisions
+
+Treat:
+
+- section rhythm
+- section fusion
+- header transparency
+
+as 3 separate decisions.
+
+---
+
+## 3. Preset Workflow
+
+Each preset is built in three phases. All planning files live in `docs-llms/preset-plans/`.
+
+### Phase 1: Plan
+
+Create `docs-llms/preset-plans/{preset-id}.md`
+
+This plan is the single source of truth. It must include:
+
+- Identity
+- Industry translation
+- Sitemap rationale
+- `preset.json` settings
+- Header configuration
+- Footer configuration
+- Page strategy
+- Page-by-page widget plan
+- Menus
+- Widget usage summary
+- Differentiation notes
+
+### Phase 2: Images
+
+Create `docs-llms/preset-plans/{preset-id}-images.json`
+
+Every referenced image in the plan must appear here with:
+
+- file name
+- width
+- height
+- prompt
 
 ### Phase 3: Build
 
-Create the actual preset files from the plan:
+Create:
 
-```
+```text
 themes/arch/presets/{preset-id}/
-  preset.json           # Settings overrides from plan
-  templates/            # Page JSON files
+  preset.json
+  screenshot.png
+  templates/
     index.json
     about.json
     contact.json
@@ -65,575 +211,530 @@ themes/arch/presets/{preset-id}/
     footer-menu.json
 ```
 
-Follow the plan exactly. Validate every setting key and value against widget schemas (see Section 6).
+Then update:
 
-### Progress tracking
-
-Track preset status in `docs-llms/theme-presets-tracker.md`. Update the Status column as presets move through the phases.
-
----
-
-## 1. Pre-Generation Process
-
-Before writing any preset files, complete these steps in order:
-
-### Step 1: Read the global settings schema
-
-Read `themes/arch/theme.json` to know every setting that can be overridden in `preset.json`. The overridable categories are:
-
-- **Colors** (18 tokens) — 9 standard + 9 highlight
-- **Typography** — `heading_font`, `body_font` (font_picker), `heading_scale`, `body_scale` (range 80-120)
-- **Style** — `corner_style`, `spacing_density`, `button_shape`
-
-### Step 2: Read the header and footer schemas
-
-Read `themes/arch/widgets/global/header/schema.json` and `themes/arch/widgets/global/footer/schema.json`. Plan a **unique header configuration** for each preset. The header has 15 settings — use them. See Section 4 for the full header reference.
-
-### Step 3: Read the widget index
-
-Consult the widget index (Section 5) to select widgets for each page. Read the `insights.md` for every widget you plan to use to pick distinct layout recipes. Read the `schema.json` for every widget you plan to use to ensure you use correct setting keys and valid values.
-
-### Step 4: Plan page structure
-
-Decide which pages this business needs. The standard set is 5 pages but presets can have more or fewer depending on the industry. A restaurant might need a Reservations page. A developer might have a Blog page. A hotel might have individual room pages.
-
-### Step 5: Design the color palette from scratch
-
-Do not start from a category template. Each preset gets a unique palette. Two restaurants can have completely different color identities — one could be deep navy + gold, another could be terracotta + cream. See Section 2.
-
-### Step 6: Validate every setting against the schema
-
-Before finalizing any JSON file, verify:
-- Every setting key exists in the widget's `schema.json`
-- Every setting value is valid for its type (select options, range bounds, correct object shapes for `link` and `font_picker` types)
-- Block type names match the schema's block definitions
-- Block setting keys match the block's settings in the schema
+- `themes/arch/presets/presets.json`
+- `docs-llms/theme-presets-tracker.md`
 
 ---
 
-## 2. Color System
+## 4. Required Pre-Generation Reading
 
-### Architecture
+Before planning any preset, read these in order:
 
-Two palettes (Standard and Highlight), each with 9 tokens. Four color schemes available to widgets:
+### 4.1 Global settings schema
 
-| Scheme | Surface | Purpose |
-|--------|---------|---------|
-| `standard` | Light | Default — white/light background, dark text |
-| `standard-accent` | Light alt | Swaps bg_primary ↔ bg_secondary for banding |
-| `highlight` | Dark | Emphasis — dark background, light text |
-| `highlight-accent` | Dark alt | Swaps highlight backgrounds |
+Read:
 
-### Token Reference
+- `themes/arch/theme.json`
 
-**Standard palette** (base defaults from `theme.json`):
+This defines:
 
-| Token | Role | Default |
-|-------|------|---------|
-| `standard_bg_primary` | Page background | `#ffffff` |
-| `standard_bg_secondary` | Alt background | `#f8fafc` |
-| `standard_text_heading` | Headings | `#0f172a` |
-| `standard_text_content` | Body text | `#334155` |
-| `standard_text_muted` | Secondary text | `#6b7280` |
-| `standard_border_color` | Borders/dividers | `#e2e8f0` |
-| `standard_accent` | Buttons, links | `#0f172a` |
-| `standard_accent_text` | Text on accent bg | `#ffffff` |
-| `standard_rating_star` | Star fill | `#fbbf24` |
+- 18 color tokens
+- typography settings
+- style settings
 
-**Highlight palette** (base defaults from `theme.json`):
+### 4.2 Header and footer schemas
 
-| Token | Role | Default |
-|-------|------|---------|
-| `highlight_bg_primary` | Dark background | `#0f172a` |
-| `highlight_bg_secondary` | Darker alt bg | `#020617` |
-| `highlight_text_heading` | Headings on dark | `#ffffff` |
-| `highlight_text_content` | Body on dark | `#cbd5e1` |
-| `highlight_text_muted` | Secondary on dark | `#94a3b8` |
-| `highlight_border_color` | Borders on dark | `#334155` |
-| `highlight_accent` | Buttons on dark | `#ffffff` |
-| `highlight_accent_text` | Text on dark accent | `#0f172a` |
-| `highlight_rating_star` | Stars on dark | `#fbbf24` |
+Read:
 
-### Palette Design Rules
+- `themes/arch/widgets/global/header/schema.json`
+- `themes/arch/widgets/global/footer/schema.json`
 
-- Every preset overrides **all 18 color tokens** for maximum distinctiveness
-- No two presets share the same accent hue — even within the same industry category
-- Highlight palettes should have personality — not just "generic dark navy"
-- Validate WCAG AA contrast: 4.5:1 for body text, 3:1 for large text, 4.5:1 for accent_text on accent
+Every preset needs a distinct header strategy, not just different copy.
 
----
+### 4.3 Exact icon list
 
-## 3. Typography & Style
+Before choosing any icon, read:
 
-### Font Settings
+- [arch-icons-list.txt](arch-icons-list.txt)
 
-```json
-"heading_font": { "stack": "\"Playfair Display\", serif", "weight": 700 },
-"body_font": { "stack": "\"Inter\", sans-serif", "weight": 400 }
-```
+This file is exported from:
 
-The `stack` must exactly match a font's stack string from `src/core/config/fonts.json`. The `weight` must be one of that font's `availableWeights`.
+- `themes/arch/assets/icons.json`
 
-Additional typography settings available:
-- `heading_scale` — range 80-120, default 100. Scales heading sizes up or down.
-- `body_scale` — range 80-120, default 100. Scales body text sizes up or down.
+Never guess icon names. If the icon is not in the list, do not use it.
 
-### Style Settings
+### 4.4 Exact font list
 
-| Setting | Values | Default | Visual effect |
-|---------|--------|---------|---------------|
-| `corner_style` | `sharp`, `slightly-rounded`, `rounded` | `sharp` | Border-radius on cards, images, inputs |
-| `spacing_density` | `compact`, `default`, `airy` | `default` | Section padding and card spacing multiplier |
-| `button_shape` | `auto`, `pill`, `sharp` | `auto` | `auto` follows corner_style; `pill` = fully rounded; `sharp` = square |
+Before choosing any font, read:
 
-### Font Pairing Strategies
+- [arch-fonts-list.csv](arch-fonts-list.csv)
 
-**Serif heading + Sans body** — Creates hierarchy through contrast. Most versatile.
-**Sans heading + Sans body** — Modern/clean. Use different families or weight contrast.
-**Display heading + Sans body** — High personality. Keep body very neutral.
-**Same family, different weights** — Harmonious, minimalist.
+This file is exported from:
 
-### Font Library
+- `src/core/config/fonts.json`
 
-250 Google Fonts + 3 system stacks available in `src/core/config/fonts.json`. Organized by category:
-- **Serif** (39 fonts) — Playfair Display, Fraunces, Cormorant Garamond, Lora, Merriweather, etc.
-- **Sans-serif** (171 fonts) — Inter, DM Sans, Montserrat, Poppins, Oswald, Work Sans, etc.
-- **Display** (27 fonts) — Abril Fatface, Alfa Slab One, Comfortaa, Righteous, etc.
-- **Monospace** (13 fonts) — Fira Code, JetBrains Mono, IBM Plex Mono, etc.
+Never guess:
 
-Read `fonts.json` to verify exact stack strings and available weights before using any font.
+- font names
+- stack strings
+- available weights
+
+Use exact values from the CSV.
+
+### 4.5 Widget schemas and insights
+
+For every widget you plan to use:
+
+1. read its `schema.json`
+2. read its `insights.md`
+
+Schema is the source of truth for:
+
+- setting ids
+- valid values
+- block types
+- block setting ids
+
+Insights should guide:
+
+- role on page
+- spacing behavior
+- opener suitability
+- natural adjacent widgets
+- failure modes
+
+If an insight file is weak, the schema still governs validity.
 
 ---
 
-## 4. Header Configuration
+## 5. Industry Translation Before Widget Selection
 
-The header is one of the most visible differentiators between presets. **Every preset must configure a distinct header.** Do not use the same header settings across presets.
+Do not start by picking widgets.
 
-### Header Settings Reference (from schema.json)
+Start by filling out this strategy frame in the plan:
 
-| Setting ID | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `logoText` | text | `"Arch"` | Business name displayed as text logo. **Always set this to the preset's business name.** |
-| `logoMaxWidth` | range | `150` | Logo image max width (50-300px) |
-| `contactDetailsLine1` | text | `"Call us: (555) 203-9844"` | First contact line (phone, email, etc.) |
-| `contactDetailsLine2` | text | `"1450 Market St, Suite 200"` | Second contact line (address, hours, etc.) |
-| `contact_position` | select | `"logo"` | **Values: `"logo"` or `"menu"`**. `logo` = next to logo area, `menu` = in the navigation bar area |
-| `headerNavigation` | menu | `"main-menu"` | Which menu to use for navigation |
-| `center_nav` | checkbox | `false` | Centers the navigation links |
-| `ctaButtonLink` | link | `{"href":"contact.html","text":"Get in touch","target":"_self"}` | CTA button — must be a link object with `href`, `text`, `target` |
-| `ctaButtonStyle` | select | `"secondary"` | **Values: `"primary"` or `"secondary"`** |
-| `full_width` | checkbox | `true` | Edge-to-edge header vs contained |
-| `sticky` | checkbox | `false` | Header sticks on scroll |
-| `transparent_on_hero` | checkbox | `false` | Header overlays the hero widget (requires hero with `supportsTransparentHeader`) |
-| `color_scheme` | select | `"standard"` | **Values: `"standard"`, `"standard-accent"`, `"highlight"`, `"highlight-accent"`** |
+### Identity frame
 
-### Header Variation Ideas
+- **Business name**
+- **Industry**
+- **Brand personality**
+- **Primary conversion**
+- **Trust mechanism**
+- **Emotional tone**
+- **Image style**
+- **Content density**
+- **What should feel strongest on the homepage**
 
-Mix these across presets:
-- **Contact bar + logo**: `contact_position: "logo"`, both contact lines filled — professional services
-- **Contact in nav**: `contact_position: "menu"` — puts contact info in the navigation area
-- **No contact details**: Leave `contactDetailsLine1` and `contactDetailsLine2` empty — clean minimal look
-- **Centered nav**: `center_nav: true` — editorial, fashion, creative feel
-- **Sticky**: `sticky: true` — always-visible navigation for long pages
-- **Transparent on hero**: `transparent_on_hero: true` — header overlays the hero image for immersive effect
-- **Dark header**: `color_scheme: "highlight"` — bar/restaurant moody vibe
-- **Primary CTA**: `ctaButtonStyle: "primary"` — bold button that stands out
-- **Contained header**: `full_width: false` — header content doesn't stretch edge to edge
+### Examples
 
----
+Photographer:
 
-## 5. Widget Index
+- conversion: inquiry / availability check
+- trust: portfolio quality, emotional tone, client voice
+- tone: cinematic, personal, editorial
+- image style: dominant
 
-50 page widgets + 2 global widgets. Each has `schema.json` (exact settings/blocks reference) and `insights.md` (creative recipes) in `themes/arch/widgets/{name}/`.
+Tattoo studio:
 
-**CRITICAL: Before using any widget, read its `schema.json` to get the exact setting IDs, value types, and block definitions. The `insights.md` provides creative direction but the schema is the source of truth for valid JSON.**
+- conversion: booking consult
+- trust: artist style clarity, hygiene confidence, work examples
+- tone: identity-driven, bold, subcultural
+- image style: dominant but more aggressive than photography
 
-### Heroes & Banners
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Banner | `banner` | Full-width bg image, overlay, stacked blocks. Heights: auto/small/medium/large |
-| Split Hero | `split-hero` | 50/50 image + content. Image position: left/right |
-| Slideshow | `slideshow` | Rotating slides (max 5), autoplay. Per-slide color schemes |
-| Video Popup | `video-popup` | Background image + play button → lightbox modal |
-| Testimonial Hero | `testimonial-hero` | Split layout with portrait + quote + optional logo |
+Architecture firm:
 
-### Content & Text
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Rich Text | `rich-text` | Stacked heading/text/button. Alignment + width control |
-| Split Content | `split-content` | Two-column freeform. Balance: left-heavy/equal/right-heavy. Sticky column option |
-| Image | `image` | Single image, fullwidth toggle, optional link |
-| Embed | `embed` | Raw HTML/iframe. Max width control |
-| Scrolling Text | `scrolling-text` | Infinite marquee strip. Speed, rotation, custom colors |
+- conversion: consultation
+- trust: process rigor, built work, expertise
+- tone: refined, structural, intentional
+- image style: important, but process matters more than for a photographer
 
-### Image & Media
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Image Text | `image-text` | Side-by-side image + content blocks. Image position, text position, content_color_scheme |
-| Image Callout | `image-callout` | Image with overlapping content card |
-| Gallery | `gallery` | Grid or carousel. Staggered option, aspect ratio, lightbox |
-| Masonry Gallery | `masonry-gallery` | Pinterest-style stagger. Titles + categories + lightbox |
-| Image Tabs | `image-tabs` | Tabbed image switcher with descriptions |
-| Image Hotspots | `image-hotspots` | Interactive pins on an image with tooltips |
-| Video Embed | `video-embed` | YouTube/Vimeo embed. Aspect ratio options |
-
-### Cards & Grids
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Card Grid | `card-grid` | Image cards. Grid/carousel, box/flat, columns 2-4 |
-| Icon Card Grid | `icon-card-grid` | Icon-led cards. Grid/carousel, featured image mode |
-| Bento Grid | `bento-grid` | Asymmetric grid with col_span/row_span per item |
-| Numbered Cards | `numbered-cards` | Auto-numbered step cards. Grid/carousel |
-| Checkerboard | `checkerboard` | Alternating image + text tiles in a grid |
-
-### Lists & Data
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Priced List | `priced-list` | Name + description + price. Single/two-column. Optional thumbnails |
-| Numbered Service List | `numbered-service-list` | Zero-padded numbered list with optional dividers + links |
-| Icon List | `icon-list` | Icon + title + description grid. 2-8 columns |
-| Logo Cloud | `logo-cloud` | Client/partner logos. Grid/carousel, grayscale hover |
-| Contact Details | `contact-details` | Multi-column contact info, hours, links, social. Max 4 blocks |
-| Social Icons | `social-icons` | Social media icon row from global settings |
-
-### People
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Profile Grid | `profile-grid` | Circular photos + bio + social links. Grid/carousel |
-| Team Highlight | `team-highlight` | Sticky intro sidebar + member grid. Portrait/square/auto ratio |
-| Job Listing | `job-listing` | Filterable job cards with department/location/type |
-
-### Testimonials & Trust
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Testimonials | `testimonials` | Quote cards. Grid/carousel, box/flat, star ratings |
-| Testimonial Slider | `testimonial-slider` | Single-quote carousel. Autoplay, star ratings |
-| Trust Bar | `trust-bar` | Horizontal icon + text strip. Dividers, icon styling |
-
-### Process & Timeline
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Steps | `steps` | Zigzag timeline with images. Max 8 steps |
-| Timeline | `timeline` | Vertical/horizontal/centered. Date + duration + features |
-| Numbered Cards | `numbered-cards` | (also works as process widget) |
-
-### Features & Showcase
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Features Split | `features-split` | Two-column: heading area + icon feature list. Optional divider |
-| Sliding Panels | `sliding-panels` | Expandable panels with images. Max 6 |
-| Project Showcase | `project-showcase` | Image grid with hover overlay. Aspect ratio control |
-
-### Comparison & Pricing
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Pricing | `pricing` | Plan cards with features, price, CTA. Featured flag |
-| Comparison Table | `comparison-table` | Column-based feature comparison. Yes/no → icons |
-| Content Switcher | `content-switcher` | Toggle/tabs switching between card groups |
-| Comparison Slider | `comparison-slider` | Before/after image slider. Horizontal/vertical |
-
-### Interactive
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Accordion | `accordion` | Expandable items. Sidebar option for info/social blocks |
-| Map | `map` | Google Maps embed + address sidebar with info blocks |
-| Schedule Table | `schedule-table` | Weekly hours table. Today highlighting. Sidebar option |
-| Countdown | `countdown` | Date countdown. Cards/minimal style |
-| Action Bar | `action-bar` | Horizontal CTA strip. Heading + text + buttons. Max 4 blocks |
-| Event List | `event-list` | Date-badge event cards with location + CTA |
-
-### Global
-| Widget | Type | Key differentiator |
-|--------|------|--------------------|
-| Header | `header` | See Section 4 for full reference |
-| Footer | `footer` | 4-block grid: logo_text, text_block, menu_block, social_block |
+This step is mandatory because many industries share widgets but not **site logic**.
 
 ---
 
-## 6. JSON Schema Validation Rules
+## 6. Page Purpose System
 
-### Setting Types
+Do not force every preset into the same generic 5-page site.
 
-| Schema type | JSON value format | Example |
-|-------------|-------------------|---------|
-| `text` | string | `"Saffron Restaurant"` |
-| `textarea` | string (newlines with `\n`) | `"+ Feature 1\n+ Feature 2"` |
-| `richtext` | HTML string | `"<p>Paragraph text</p>"` |
-| `select` | string (must match an `options[].value`) | `"left"`, `"highlight"` |
-| `checkbox` | boolean | `true`, `false` |
-| `range` | number (within min/max, respecting step) | `150` |
-| `color` | hex string | `"#c4540a"` |
-| `image` | string (path or empty) | `""` |
-| `link` | object with `href`, `text`, `target` | `{"href":"contact.html","text":"Book Now","target":"_self"}` |
-| `font_picker` | object with `stack`, `weight` | `{"stack":"\"Inter\", sans-serif","weight":400}` |
-| `icon` | string (icon name) | `"star"`, `"heart"`, `"calendar"` |
-| `menu` | string (menu ID) | `"main-menu"` |
-| `code` | string | `""` |
+Each page must have a job.
 
-### Common Validation Errors to Avoid
+### 6.1 Sitemap rule
 
-- **Inventing setting keys.** Every key must exist as an `id` in the widget's schema.json settings or block settings. Never guess — read the schema.
-- **Wrong select values.** Select fields have a fixed list of valid `options[].value` entries. E.g., `contact_position` only accepts `"logo"` or `"menu"` — not `"top"`, `"none"`, `"bottom"`.
-- **Wrong link format.** Link settings require `{"href": "...", "text": "...", "target": "_self"}`, not flat strings like `"cta_link": "contact.html"`.
-- **Wrong block type names.** Block types must match the `type` field in the schema's blocks array. E.g., `"plan"` not `"pricing-plan"`.
-- **Block settings that belong to the widget.** Some settings exist at widget level, not block level. Check where each setting is defined in the schema.
+The sitemap must be chosen to represent the industry as clearly and convincingly as possible.
 
----
+The goal is to prove that Arch can serve this niche well, using the smallest set of pages that fully supports the business.
 
-## 7. Common Mistakes
+That means:
 
-### Headers must be unique per preset
+- do not default to the same 5 pages out of habit
+- do not create extra pages just to appear different
+- do not rename pages cosmetically without changing their job
 
-The header is the first thing users see. Every preset should configure a distinct header using the full range of available settings — logo text, contact details, contact position, centered nav, CTA style, sticky behavior, transparency, color scheme, and full-width toggle. See Section 4.
+Instead, compose the sitemap around what the business actually needs to show:
 
-### Action Bar: never use fullwidth
+- offers
+- proof
+- process
+- booking flow
+- categories
+- collections
+- programs
+- areas served
+- FAQs
+- policies
+- reservations
+- rooms
+- artists
+- property types
+- case studies
 
-Always set `action-bar` to `fullwidth: false`. Never use `fullwidth: true` — it doesn't look good.
+Every page should earn its place.
 
-### Contact page: don't duplicate the footer
+If a page does not strengthen the industry's story, trust, or conversion flow, do not include it.
 
-The `contact-details` widget serves nearly the same purpose as the global footer. Never place it as the last widget on the Contact page — the footer renders right below it. Instead end with a map, accordion FAQ, image-callout, testimonial, or action-bar.
+If the niche genuinely needs a specific page type to feel complete, include it even if that means not using the familiar default set.
 
-### Page openers: use the right widget for the job
+### Common page jobs
 
-The first widget on a page sets the tone. Not every widget works as a page opener. Choose based on what the widget was designed to do:
+- **Home**: establish voice, trust, and conversion direction
+- **Services**: explain the offer and structure it clearly
+- **Portfolio / Work**: show evidence and category breadth
+- **About**: explain point of view, process, team, or story
+- **Contact**: reduce friction and answer final booking questions
 
-**Good page openers (designed to introduce a page):**
+### Rule
 
-| Widget | When to use as opener |
-|--------|-----------------------|
-| `banner` | Full-width hero with background image/overlay. Best with `highlight` scheme for seamless header fusion. Use `height: "small"` for inner pages, `"medium"` or `"large"` for homepages |
-| `split-hero` | Image + text side by side. Strong for About/story pages with a founder photo |
-| `slideshow` | Rotating hero slides. Homepage only |
-| `video-popup` | Video-centric hero. Homepage or portfolio page |
-| `rich-text` | Clean title + subtitle intro. Use with `highlight` scheme + `top_spacing: "none"` for a colored header band, or with `standard-secondary` for a subtle intro. Good for variety when you want to break the "every page starts with banner" pattern |
+Page structure should follow the industry, not a template habit.
 
-**Bad page openers (mid-page widgets, not designed to lead):**
+When deciding the sitemap, ask:
 
-| Widget | Why it fails as opener |
-|--------|----------------------|
-| `image-callout` | Overlapping card design — looks lost floating at the top with no content above it to contrast against |
-| `image-text` | Side-by-side layout needs context first; works as a second or third widget |
-| `features-split` | A detail widget, not an intro |
-| `icon-card-grid` | A content grid, not a page header |
-| `checkerboard` | Content layout, needs an intro above it |
-| `contact-details` | Information widget, not a page intro |
+- What would a real customer expect to find on this type of business site?
+- What pages are necessary to prove credibility in this niche?
+- What pages help the conversion path feel complete and natural?
+- What page set best demonstrates Arch's range for this industry without padding the site?
 
-**Critical rule for `top_spacing: "none"` on openers:** Only use `top_spacing: "none"` when the opener has a **visible contrasting background** — a `highlight` color scheme, a background image, or an overlay. Setting `top_spacing: "none"` on a `standard-primary` (white) widget does nothing visually because the header background and the widget background are the same color. It just removes padding for no reason.
+If a business needs:
 
-### Don't use 5 pages for every preset
+- rooms
+- classes
+- programs
+- menu
+- reservations
+- properties
+- neighborhoods
+- work categories
 
-Some businesses need different page counts. Consider: a restaurant could have a Reservations page, a developer could have a Blog page, a hotel could have individual Room detail pages. The page structure should serve the business, not a template.
+then build those pages.
 
-### Widget spacing: `auto`, `small`, and `none`
+If a business does not need:
 
-Every section widget supports `top_spacing` and `bottom_spacing` with three values:
+- Services
+- Work
+- About
+- Contact
 
-| Value | Effect | When to use |
-|-------|--------|-------------|
-| `auto` | Full section padding (default) | Most widgets — normal content separation |
-| `small` | Reduced padding, still visible | Widgets that should feel **connected** to the previous/next section but still have breathing room |
-| `none` | Zero padding | Widgets that should be **fused** to an adjacent section with no gap at all |
-
-**Rules:**
-
-1. **Hero `top_spacing: "none"` — always.** When the first widget on a page has a visible background (image, overlay, or highlight color scheme), set `top_spacing: "none"` so there's no gap between the header and the hero.
-
-2. **Lightweight bars after heroes → `top_spacing: "small"`.** When a compact widget like `trust-bar`, `scrolling-text`, `logo-cloud`, or `key-figures` immediately follows a hero, use `top_spacing: "small"` (not `"none"`). This keeps them visually connected to the hero without feeling crammed against it. `"none"` fuses them completely, which only looks right when both sections share the same background color.
-
-3. **Fusing same-background sections → `"none"`.** When two adjacent widgets share the same color scheme (e.g., both `highlight-primary`), use `bottom_spacing: "none"` on the first and `top_spacing: "none"` on the second for a seamless block.
-
-4. **Inner page banners → `bottom_spacing: "none"` or `"small"`.** Small banners on inner pages (Services, About, Contact) often look better with `bottom_spacing: "none"` or `"small"` to tighten the transition into the first content section.
-
-5. **Don't overuse `"none"`.** If every widget has `top_spacing: "none"`, the page loses visual rhythm. Reserve `"none"` for intentional fusions. Use `"small"` when you want closeness without collision.
-
-### Accordion: use the sidebar
-
-The accordion widget supports `info` and `social` sidebar blocks that turn it from a single FAQ column into a 70/30 layout with contextual information beside the questions. **This feature is dramatically underused** — most presets create bare FAQ lists with no sidebar.
-
-**When to add sidebar blocks:**
-- **Contact page FAQ** — Add an `info` block with "Still Have Questions?" + phone/email/hours, and a `social` block. This is the most natural fit: users scanning FAQs who don't find their answer get an immediate escalation path right there.
-- **Services page FAQ** — Add an `info` block with a booking nudge: "Ready to Book?" + phone/email. Turns a passive FAQ into a conversion opportunity.
-- **About page FAQ** — Can use a lighter sidebar: a single `info` block with founding date, location, or a company fact.
-
-**When sidebar is unnecessary:**
-- Very short accordions (2-3 items) where the sidebar would dwarf the content
-- Situations where a `contact-details` widget or `map` widget already sits directly above or below
-
-**Sidebar positioning:**
-- `sidebar_position: "right"` (default) — FAQ on left, info on right. Most common layout.
-- `sidebar_position: "left"` — Info on left, FAQ on right. Good when the sidebar content is the primary reference (e.g., business hours/address on a contact page).
-
-**Heading alignment:** When using a sidebar, `heading_alignment: "left"` usually looks better than `"center"` because the layout is already asymmetric.
-
-At least **one accordion per preset** should use sidebar blocks to showcase this feature.
-
-### Don't use numbered-service-list for opening hours
-
-The `numbered-service-list` widget auto-numbers items (01, 02, 03), implying a ranked or sequential list. Opening hours are categories, not steps. Use `card-grid` instead for a few time blocks (e.g., 3 cards: Weeknight Dinner, Weekend Dinner, Sunday). Use `schedule-table` only for businesses with daily varying schedules (gyms, studios). Reserve `numbered-service-list` for things that genuinely benefit from numbering: service tiers, process steps, capabilities.
-
-### Card grids: don't put buttons on every card
-
-`icon-card-grid` and `card-grid` both support an optional `button_link` on each card block. The `button_link` field should be **omitted entirely** when cards don't need individual CTAs — not set to empty strings or placeholder hrefs.
-
-**When to include buttons:**
-- The card links to a **dedicated page** unique to that card (e.g., a property listing, a specific program page, a case study)
-- There's a clear **action** tied to each card individually (e.g., "Book This Class", "Get a Quote" per service with distinct quote flows)
-
-**When to omit buttons:**
-- The cards are a **preview of a Services page** that's already in the main navigation — adding "Learn More" to each card is redundant since the whole section already communicates "here are our services" and the user can navigate via the nav bar
-- The cards display **values, features, or USPs** — informational content with no individual destination
-- The cards are **non-linkable content** like hours, industries served, or stats
-- All buttons would point to the **same page** (e.g., 4 cards all linking to `services.html`) — a single CTA below the section is cleaner
-
-A homepage services preview with 4 icon-card-grid cards all pointing to `services.html` with "Learn More" is noise. Either omit the buttons entirely and let the section heading/nav do the work, or add a single button on just one card or use a separate CTA section below.
-
-### Use settings for formatting, not inline HTML
-
-When a text block has `uppercase`, `muted`, or `size` settings, use them — don't bake the formatting into the HTML string. Write `"text": "<p>Our Process</p>"` with `"uppercase": true`, not `"text": "<p>OUR PROCESS</p>"`. The setting applies CSS text-transform; hardcoding uppercase in the content means the user can't toggle it off in the editor.
-
-### Don't fall into widget sequence patterns
-
-If every Home page follows banner → trust-bar → image-text → cards → testimonials → action-bar, they'll all feel identical regardless of color scheme. Vary the widget selection, order, and density per page.
-
-### Each preset must have a unique color identity
-
-Two restaurants or two professional services presets should NOT look like variations of the same palette. Design each color scheme from scratch, independent of industry category.
+as separate pages, do not force them in just because they are common.
 
 ---
 
-## 8. Widget Diversity
+## 7. Color, Typography, And Style Rules
 
-The Arch theme has **50 section widgets**. The point of presets is to show what the theme can do across industries. If every preset uses the same 10 widgets, the other 40 might as well not exist. This section exists to fix that.
+### 7.1 Colors
 
-### Current usage tiers (after 16 built presets)
+Every preset must override all 18 color tokens.
 
-**Overused — use sparingly, find alternatives:**
+Rules:
 
-| Widget | Uses | Problem |
-|--------|------|---------|
-| `banner` | 67 | Every page starts with one. Use `split-hero`, `rich-text`, `video-popup`, `slideshow`, or `testimonial-hero` as alternatives |
-| `action-bar` | 57 | Ends almost every page. Skip it sometimes — not every page needs a CTA strip. A strong final content section can close a page |
-| `image-text` | 50 | Default "about" / "story" / "why us" widget. Use `split-content`, `image-callout`, `checkerboard`, or `bento-grid` instead |
-| `accordion` | 22 | Every preset has 2-3. Consider whether FAQs are really needed on every page, or if a `split-content` or `features-split` could serve the same purpose |
-| `testimonials` | 16 | Use `testimonial-slider` or `testimonial-hero` for variety |
+- accent hue must feel intentional for the brand world
+- highlight palette must feel intentional, not generic dark navy
+- standard and highlight palettes should belong to the same brand world
+- contrast must remain usable
 
-**Underused — actively seek opportunities to use:**
+### 7.2 Typography
 
-| Widget | Uses | Natural fits |
-|--------|------|-------------|
-| `sliding-panels` | 2 | Room types (hotel), service categories, project details, location spotlights |
-| `bento-grid` | 1 | Portfolios, feature showcases, asymmetric content layouts, agency/creative homepages |
-| `content-switcher` | 2 | Residential/Commercial toggle, Individual/Business tabs, Before/After portfolio, pricing toggle |
-| `checkerboard` | 2 | Service breakdowns, alternating image+text grids, magazine-style layouts |
-| `image-tabs` | 2 | Multi-room/multi-service exploration, product categories, package details |
-| `icon-list` | 2 | Hotel amenities, facility features, service includes, tech specs |
-| `scrolling-text` | 3 | Brand energy strip, tagline marquee, announcement band — works between sections as a visual break |
-| `masonry-gallery` | 2 | Photo portfolios, mixed-media galleries, tattoo work, interior design projects |
-| `schedule-table` | 2 | Business hours with sidebar, clinic schedules, class timetables |
-| `team-highlight` | 1 | Founder spotlight, small teams (2-4 people), leadership with sticky intro |
-| `testimonial-hero` | 1 | Flagship client spotlight, founder endorsement, single powerful quote with portrait |
-| `video-popup` | 1 | Hero with play button, behind-the-scenes, brand story, facility tour |
-| `video-embed` | 1 | Showreel, tutorial, testimonial video, process walkthrough |
-| `countdown` | 1 | Grand opening, seasonal promotion, event registration deadline |
-| `event-list` | 1 | Workshops, classes, seasonal events, open houses |
-| `comparison-table` | 1 | Plan comparison, service tier features, product specs |
-| `pricing` | 1 | Service packages, membership tiers, lesson rates |
-| `logo-cloud` | 3 | Client logos, partner badges, certifications, "as seen in" press |
-| `contact-details` | 1 | Contact pages (but not as last widget — see footer duplication rule) |
-| `split-content` | 5 | Two-column freeform, sticky sidebar, stats + narrative, dual features |
-| `timeline` | 5 | Company history, project process, onboarding flow, event schedule |
-| `split-hero` | 4 | Alternative to banner for About pages, story-driven heroes, founder intros |
+Rules:
 
-**Never used — find a home for each:**
+- use exact stacks from [arch-fonts-list.csv](arch-fonts-list.csv)
+- use only available weights
+- heading/body pairings should reinforce the industry
+- do not reuse the same pairings by habit; choose them from the preset's own strategy
 
-| Widget | Uses | Where it should appear |
-|--------|------|----------------------|
-| `image-hotspots` | 0 | Hotel room features, restaurant floor plan, product details, campus tour, salon stations |
-| `numbered-service-list` | 0 | Ranked service list, capability showcase, process overview — use for services that benefit from visual numbering |
-| `social-icons` | 0 | Standalone social strip on About or Contact pages, community callout section |
-| `image` | 0 | Full-bleed section divider, standalone hero photo, promo banner |
-| `embed` | 0 | Booking calendar embed, social feed, review widget, payment form |
-| `job-listing` | 0 | Careers page for larger businesses (agency, dental practice, hotel) |
-| `resource-list` | 0 | Downloads page, resource library, document center |
+### 7.3 Style settings
 
-### Widget-to-industry mapping for remaining presets
+These are part of the preset's identity:
 
-Each remaining preset must introduce underused widgets that fit its industry. Do not default to banner + image-text + card-grid + testimonials + accordion + action-bar. Read the `insights.md` for each widget below before planning.
+- `corner_style`
+- `spacing_density`
+- `button_shape`
 
-| Preset | Industry | Must-use underused widgets | Why |
-|--------|----------|---------------------------|-----|
-| **hue-and-co** | Interior Designer | `sliding-panels` (room showcases), `bento-grid` (portfolio), `image-hotspots` (design details), `masonry-gallery` (project photos) | Visual portfolio industry — needs asymmetric, image-heavy layouts |
-| **framelight** | Photographer | `masonry-gallery` (portfolio — the obvious choice), `video-embed` (behind-the-scenes reel), `testimonial-hero` (client spotlight), `image` (full-bleed hero photo) | Photography demands gallery-forward design, not card grids |
-| **inkwell** | Tattoo Studio | `masonry-gallery` (tattoo portfolio), `scrolling-text` (brand energy), `video-embed` (artist at work), `sliding-panels` (tattoo styles) | Edgy, visual-first — needs energy widgets, not corporate layouts |
-| **pixelcraft** | Graphic Designer | `bento-grid` (portfolio showcase), `logo-cloud` (client logos), `sliding-panels` (case studies), `numbered-service-list` (capabilities) | Creative agency needs to demonstrate layout sophistication |
-| **formline** | Architecture Firm | `sliding-panels` (project deep-dives), `timeline` (project phases), `bento-grid` (portfolio), `comparison-slider` (before/after) | Architecture = process + visual showcase |
-| **petalry** | Flower Shop | `priced-list` (bouquet menu), `countdown` (Valentine's/Mother's Day), `event-list` (workshops), `gallery` (arrangements) | Seasonal business with priced items and events |
-| **pawlish** | Pet Grooming | `priced-list` (grooming rates), `comparison-table` (grooming packages), `schedule-table` (hours), `icon-list` (services included) | Service business with clear pricing tiers and schedules |
-| **torque** | Auto Repair | `numbered-service-list` (services), `pricing` (maintenance packages), `schedule-table` (shop hours), `icon-list` (specialties) | Trades business with structured service lists and pricing |
-| **noteworthy** | Tutoring / Music Lessons | `pricing` (lesson packages), `schedule-table` (availability), `event-list` (recitals/exams), `content-switcher` (kids/adults) | Education with pricing tiers, schedules, and audience segments |
-| **little-oaks** | Daycare / Preschool | `schedule-table` (daily routine), `event-list` (school events), `team-highlight` (teachers with sticky intro), `image-hotspots` (campus tour), `icon-list` (facilities) | Parent-facing — trust through transparency (team, schedule, facilities) |
-| **tailside** | Veterinarian | `team-highlight` (vets with credentials), `schedule-table` (clinic hours), `pricing` (checkup packages), `icon-list` (services) | Medical practice with structured hours, team credibility, and service packages |
-| **codebase** | Developer / Agency | `bento-grid` (portfolio), `logo-cloud` (clients), `comparison-table` (pricing tiers), `timeline` (process), `numbered-service-list` (capabilities), `embed` (GitHub/calendar) | Tech-forward — should look like it was built by developers |
-| **uplink** | IT Support | `pricing` (support plans), `comparison-table` (plan comparison), `icon-list` (services), `content-switcher` (business/residential) | Service tiers and plan comparisons are the core differentiator |
-| **everafter** | Wedding Planner | `timeline` (planning milestones), `masonry-gallery` (wedding photos), `testimonial-hero` (couple spotlight), `countdown` (wedding day), `event-list` (upcoming weddings/open houses) | Emotional, milestone-driven — timeline and gallery are essential |
-| **hearthstone** | Hotel / B&B | `image-hotspots` (room features), `sliding-panels` (room types), `icon-list` (amenities), `schedule-table` (check-in/breakfast hours), `event-list` (local attractions) | Hospitality = rooms + amenities + local info |
-
-### Diversity rules
-
-1. **Each preset must use at least 2 widgets from the "underused" or "never used" lists.** Not as filler — they must serve the content naturally.
-
-2. **No two consecutive presets should share the same homepage hero widget.** Alternate between `banner`, `split-hero`, `slideshow`, `video-popup`, `testimonial-hero`, and `rich-text` (with highlight scheme).
-
-3. **Not every page needs an `action-bar` at the bottom.** Some pages can end with a `testimonial-slider`, `comparison-slider`, `map`, or `accordion` (with sidebar). Ending with a CTA strip is fine but shouldn't be automatic.
-
-4. **Replace `image-text` with alternatives** at least half the time. `split-content`, `checkerboard`, `image-callout`, and `bento-grid` all serve similar purposes with different visual signatures.
-
-5. **Use `testimonial-slider` or `testimonial-hero` instead of `testimonials`** in at least half of remaining presets. The grid testimonials widget is overrepresented.
-
-6. **Homepage service previews don't need to be `icon-card-grid`.** Consider `sliding-panels`, `checkerboard`, `bento-grid`, `numbered-service-list`, or `image-tabs` as alternatives depending on the business type.
-
-7. **Read the `insights.md` for every underused widget you plan to use.** The recipes there are specific and field-tested. Don't invent a layout when a proven recipe exists.
+Do not treat them as defaults. They help separate presets even before content loads.
 
 ---
 
-## 9. Differentiation Checklist
+## 8. Spacing Rules
 
-Before finalizing any preset, verify:
+This section replaces hero-based shorthand thinking.
 
-**Colors & Style:**
-- [ ] All 18 color tokens are overridden
-- [ ] Accent color is unique across all presets (no shared hue)
-- [ ] Highlight palette has a distinct mood (not generic dark navy)
-- [ ] Style settings (`corner_style`, `spacing_density`, `button_shape`) vary from neighboring presets
-- [ ] Contrast ratios pass WCAG AA
+### 8.1 Meaning of each value
 
-**Typography:**
-- [ ] Heading font differs from other presets in the same category
-- [ ] Body font is genuinely readable at 16px
-- [ ] Font stacks and weights match `fonts.json` exactly
+| Value | Meaning |
+|-------|---------|
+| `auto` | Use Arch's default vertical rhythm |
+| `small` | Use reduced rhythm for tighter but still separate sections |
+| `none` | Remove separation to intentionally combine adjacent widgets |
 
-**Header:**
-- [ ] `logoText` is set to the business name
-- [ ] Header configuration is distinct (contact position, CTA, sticky, transparent, color scheme, centered nav, full width)
+### 8.2 Core rules
 
-**Pages & Widgets:**
-- [ ] Page count and names fit the business (not forced into exactly 5)
-- [ ] Widget selection varies — not the same sequence as other presets
-- [ ] Hero widget type varies across presets (banner, split-hero, slideshow, video-popup, testimonial-hero, rich-text)
-- [ ] Contact page doesn't duplicate the footer
-- [ ] At least 2 widgets from the "underused" or "never used" tiers in Section 8
-- [ ] Not every page ends with `action-bar` — at least one page ends differently
-- [ ] At least one `accordion` uses sidebar blocks (info/social)
-- [ ] Homepage services section uses something other than `icon-card-grid` if the previous preset already used it
-- [ ] Card grids only have `button_link` when cards link to unique individual destinations
-- [ ] Page openers match the "good openers" list — no mid-page widgets used as first section
-- [ ] `top_spacing: "none"` only used on widgets with visible contrasting backgrounds
-- [ ] Spacing uses all three values (`auto`, `small`, `none`) appropriately — not just `none` everywhere
+1. `auto` is the default.
 
-**Schema Validity:**
-- [ ] Every setting key exists in the corresponding widget's `schema.json`
-- [ ] Every select value matches a valid `options[].value`
-- [ ] Link settings use the correct `{href, text, target}` object format
-- [ ] Block types match the schema's block definitions
-- [ ] No widget-level settings placed inside blocks (or vice versa)
+2. Use `small` for compact sections that do not need full spacing.
+   Common fits:
+   - `trust-bar`
+   - `scrolling-text`
+   - `logo-cloud`
+   - `key-figures`
+   - other lightweight bridge sections
+
+3. Use `none` only when adjacent widgets are meant to read as one composition.
+   Common fits:
+   - text intro + fullwidth image
+   - filled band + continuation section
+   - image/media section intentionally fused to the next/previous section
+
+4. Do not use `none` just because:
+   - the widget is first on the page
+   - the widget uses a highlight scheme
+   - the section is a "hero"
+
+5. On filled widgets, `none` removes internal padding from the colored band.
+   This is a stronger move than simply removing external whitespace.
+
+6. Transparent header logic is separate from spacing logic.
+
+### 8.3 Practical test
+
+Before using `small` or `none`, ask:
+
+- What is this widget trying to relate to?
+- Should it feel separate, close, or fused?
+- Is this a plain section or a padded filled-background section?
+
+If you cannot answer that, use `auto`.
+
+---
+
+## 9. Widget Selection Rules
+
+Widgets should be chosen for page purpose and industry fit, not just variety.
+
+### 9.1 Every chosen widget must answer:
+
+- Why is this widget right for this page?
+- Why is it right for this industry?
+- What content does it unlock that another widget would not?
+- What adjacent widgets does it naturally pair with?
+
+### 9.2 Avoid defaulting to the same sequence
+
+If multiple presets keep falling into:
+
+- opener
+- services grid
+- about image-text
+- testimonials
+- CTA strip
+
+then the presets are not differentiated enough.
+
+### 9.3 Use composition patterns, not isolated widgets
+
+Think in combinations like:
+
+- editorial intro + fullwidth image
+- proof section + gallery
+- process section + pricing
+- portfolio wall + soft CTA
+- map + FAQ sidebar
+- media section + client quote
+
+Presets are built from section relationships, not widget inventory alone.
+
+---
+
+## 10. Widget Insights: What They Must Contain
+
+Each widget `insights.md` should eventually answer these questions clearly:
+
+- **Role on page**
+- **Best used for**
+- **Usually bad for**
+- **Opener suitability**
+- **Spacing behavior**
+- **Natural adjacent widgets**
+- **Industry fits**
+- **Common failure modes**
+- **Replacement patterns**
+
+For preset generation, prioritize widgets whose insights explain:
+
+- what kind of opener they make
+- how they interact with adjacent sections
+- what content burden they require
+
+If a widget insight file does not explain this well, improve the insight file.
+
+---
+
+## 11. Icons And Fonts: Non-Negotiable Rules
+
+### Icons
+
+Use only icon ids listed in:
+
+- [arch-icons-list.txt](arch-icons-list.txt)
+
+Rules:
+
+- never guess icon names
+- never assume common names like `quote`, `rocket`, `briefcase`, etc. exist
+- verify every icon before writing JSON
+
+### Fonts
+
+Use only font stacks and weights listed in:
+
+- [arch-fonts-list.csv](arch-fonts-list.csv)
+
+Rules:
+
+- never guess stack strings
+- never guess weights
+- use exact values from the CSV
+
+---
+
+## 12. Preset Differentiation Rules
+
+Each preset must be distinct in more than color.
+
+Track and vary:
+
+- homepage opener type
+- homepage composition pattern
+- services-section pattern
+- proof pattern
+- closing pattern
+- header pattern
+- accent family
+- font pairing family
+
+Choose these from the preset's own identity and industry strategy.
+
+Do not choose them by reacting to:
+
+- the previous preset
+- the next preset
+- nearby tracker entries
+- what was just generated in the last run
+
+### Anti-photocopy rule
+
+Different photos alone do not make a different preset.
+
+Use the design axes above to make the preset internally specific and intentional.
+
+If a later catalog review finds two presets converging too much, revise the weaker one after that review. Do not use list order or "neighboring preset" logic during initial generation.
+
+---
+
+## 13. Arch-Specific Industry Mapping
+
+Use underused widgets where they naturally fit the industry.
+
+Examples:
+
+- **Photographer**: `masonry-gallery`, `video-embed`, `testimonial-hero`, `image`
+- **Tattoo Studio**: `masonry-gallery`, `scrolling-text`, `video-embed`, `sliding-panels`
+- **Graphic Designer**: `bento-grid`, `logo-cloud`, `sliding-panels`, `numbered-service-list`
+- **Architecture Firm**: `sliding-panels`, `timeline`, `bento-grid`, `comparison-slider`
+- **Flower Shop**: `priced-list`, `countdown`, `event-list`, `gallery`
+
+Do not use an underused widget as filler. It still has to fit the page's job.
+
+---
+
+## 14. Validation Rules
+
+Before finalizing any preset, verify all of the following.
+
+### Design validation
+
+- [ ] The preset feels like the target industry, not a generic business site
+- [ ] The sitemap fits the industry instead of defaulting to a habitual page set
+- [ ] Every page has a clear job and earns its place
+- [ ] The homepage communicates the business clearly in the first fold
+- [ ] Trust is built using the right mechanism for the industry
+- [ ] The preset uses Arch's surface hierarchy intentionally
+- [ ] The preset uses Arch's spacing system relationally, not mechanically
+
+### Differentiation validation
+
+- [ ] The preset is not a generic reuse pattern with different images
+- [ ] The opener type follows the industry strategy and page purpose
+- [ ] The section flow is meaningfully distinct within the preset's own logic
+- [ ] Header strategy is chosen intentionally for this preset
+- [ ] Typography and palette feel distinct and industry-appropriate
+
+### Spacing validation
+
+- [ ] `auto` is used by default
+- [ ] Every `small` is justified by section compactness
+- [ ] Every `none` is justified by intentional widget fusion
+- [ ] Filled/background sections using `none` still look balanced
+- [ ] Transparent header decisions are not being confused with spacing decisions
+
+### Widget validation
+
+- [ ] Every widget fits the page purpose
+- [ ] At least 2 underused widgets are used naturally when appropriate
+- [ ] At least one accordion uses sidebar blocks when accordion appears
+- [ ] Card grids only use per-card buttons when cards truly need unique destinations
+
+### Schema validation
+
+- [ ] Every setting key exists in the widget schema
+- [ ] Every select value is valid
+- [ ] Every link uses `{ href, text, target }`
+- [ ] Every block type name is valid
+- [ ] Icons are verified against [arch-icons-list.txt](arch-icons-list.txt)
+- [ ] Fonts are verified against [arch-fonts-list.csv](arch-fonts-list.csv)
+
+---
+
+## 15. Deliverables Checklist
+
+For every preset, deliver:
+
+- `docs-llms/preset-plans/{preset-id}.md`
+- `docs-llms/preset-plans/{preset-id}-images.json`
+- `themes/arch/presets/{preset-id}/preset.json`
+- `themes/arch/presets/{preset-id}/screenshot.png`
+- `themes/arch/presets/{preset-id}/templates/...`
+- `themes/arch/presets/{preset-id}/menus/...`
+- registry update in `themes/arch/presets/presets.json`
+- status update in `docs-llms/theme-presets-tracker.md`
+
+---
+
+## 16. Final Principle
+
+Arch presets should feel like:
+
+- one coherent visual system
+- translated into different industries
+- with different trust patterns, page structures, rhythms, and proof strategies
+
+They should not feel like:
+
+- one template with swapped images
+- one widget sequence in different colors
+- one business site wearing different costumes
+
+When in doubt:
+
+- return to industry translation
+- return to Arch's surface and rhythm systems
+- verify against real icons and real fonts
+- choose composition deliberately

@@ -4,44 +4,35 @@
 
 ## Presets
 
-| # | ID | Name | Industry | Pages | Status |
-|---|-----|------|----------|-------|--------|
-| 1 | saffron | Saffron | Restaurant | Home, Menu, Gallery, About, Contact, Reservations | done |
-| 2 | brewline | Brewline | Cafe / Coffee Shop | Home, Menu, Gallery, About, Contact | done |
-| 3 | crumbly | Crumbly | Bakery | Home, Menu, Custom Cakes, Gallery, About, Contact | done |
-| 4 | corkwell | Corkwell | Bar / Wine Bar | Home, Menu, Events, Gallery, About, Contact | done |
-| 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | Home, Classes, Schedule, About, Gallery, Contact | done |
-| 6 | velvet-touch | Velvet Touch | Spa / Massage | Home, Services, Treatments, About, Gallery, Contact | done |
-| 7 | brightside | Brightside | Dentist | Home, Services, New Patients, About, Smile Gallery, Contact | done |
-| 8 | ironform | Ironform | Personal Trainer | Home, Programs, Transformations, About, Contact | done |
-| 9 | greystone | Greystone | Lawyer / Law Firm | Home, Services, Work, About, Contact | done |
-| 10 | ledgerworks | Ledgerworks | Accountant | Home, Services, Work, About, Contact | done |
-| 11 | clearpath | Clearpath | Consultant | Home, Services, Work, About, Contact | done |
-| 12 | keystoned | Keystoned | Real Estate Agent | Home, Properties, Neighborhoods, Buyers & Sellers, About, Contact | done |
-| 13 | pipeworks | Pipeworks | Plumber / Electrician | Home, Services, Projects, Areas We Serve, About, Contact | done |
-| 14 | greenfield | Greenfield | Landscaping | Home, Services, Portfolio, About, Contact | done |
-| 15 | sparkhaus | Sparkhaus | Cleaning Service | Home, Services, Work, About, Contact | done |
-| 16 | hue-and-co | Hue & Co | Interior Designer | Home, Services, Portfolio, About, Contact | done |
-| 17 | framelight | Framelight | Photographer | Home, Services, Portfolio, About, Contact | pending |
-| 18 | inkwell | Inkwell | Tattoo Studio | Home, Services, Portfolio, About, Contact | pending |
-| 19 | pixelcraft | Pixelcraft | Graphic Designer | Home, Services, Portfolio, About, Contact | pending |
-| 20 | formline | Formline | Architecture Firm | Home, Services, Portfolio, About, Contact | pending |
-| 21 | petalry | Petalry | Flower Shop | Home, Menu, Gallery, About, Contact | pending |
-| 22 | pawlish | Pawlish | Pet Grooming | Home, Services, Work, About, Contact | pending |
-| 23 | torque | Torque | Auto Repair | Home, Services, Work, About, Contact | pending |
-| 24 | noteworthy | Noteworthy | Tutoring / Music Lessons | Home, Services, Work, About, Contact | pending |
-| 25 | little-oaks | Little Oaks | Daycare / Preschool | Home, Programs, Gallery, About, Contact | pending |
-| 26 | tailside | Tailside | Veterinarian | Home, Services, Work, About, Contact | pending |
-| 27 | codebase | Codebase | Freelance Developer / Agency | Home, Services, Work, About, Contact | pending |
-| 28 | uplink | Uplink | IT Support | Home, Services, Work, About, Contact | pending |
-| 29 | everafter | Everafter | Wedding Planner | Home, Services, Portfolio, About, Contact | pending |
-| 30 | hearthstone | Hearthstone | Hotel / B&B | Home, Services, Rooms, About, Contact | pending |
-
-## Page Name Variations
-
-Most presets use the standard **Home, Services, Work, About, Contact**. Variations by category:
-
-- **Food & Drink** (#1-4, #21): **Menu** instead of Services, **Gallery** instead of Work
-- **Creative professionals** (#16-20, #29): **Portfolio** instead of Work
-- **Daycare** (#25): **Programs** instead of Services, **Gallery** instead of Work
-- **Hotel / B&B** (#30): **Rooms** instead of Work
+| # | ID | Name | Industry | Status |
+|---|-----|------|----------|--------|
+| 1 | saffron | Saffron | Restaurant | done |
+| 2 | brewline | Brewline | Cafe / Coffee Shop | done |
+| 3 | crumbly | Crumbly | Bakery | done |
+| 4 | corkwell | Corkwell | Bar / Wine Bar | done |
+| 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | done |
+| 6 | velvet-touch | Velvet Touch | Spa / Massage | done |
+| 7 | brightside | Brightside | Dentist | done |
+| 8 | ironform | Ironform | Personal Trainer | done |
+| 9 | greystone | Greystone | Lawyer / Law Firm | done |
+| 10 | ledgerworks | Ledgerworks | Accountant | done |
+| 11 | clearpath | Clearpath | Consultant | done |
+| 12 | keystoned | Keystoned | Real Estate Agent | done |
+| 13 | pipeworks | Pipeworks | Plumber / Electrician | done |
+| 14 | greenfield | Greenfield | Landscaping | done |
+| 15 | sparkhaus | Sparkhaus | Cleaning Service | done |
+| 16 | hue-and-co | Hue & Co | Interior Designer | done |
+| 17 | framelight | Framelight | Photographer | done |
+| 18 | inkwell | Inkwell | Tattoo Studio | done |
+| 19 | pixelcraft | Pixelcraft | Graphic Designer | done |
+| 20 | formline | Formline | Architecture Firm | done |
+| 21 | petalry | Petalry | Flower Shop | done |
+| 22 | pawlish | Pawlish | Pet Grooming | done |
+| 23 | torque | Torque | Auto Repair | done |
+| 24 | noteworthy | Noteworthy | Tutoring / Music Lessons | done |
+| 25 | little-oaks | Little Oaks | Daycare / Preschool | done |
+| 26 | tailside | Tailside | Veterinarian | done |
+| 27 | codebase | Codebase | Freelance Developer / Agency | pending |
+| 28 | uplink | Uplink | IT Support | pending |
+| 29 | everafter | Everafter | Wedding Planner | pending |
+| 30 | hearthstone | Hearthstone | Hotel / B&B | pending |

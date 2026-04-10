@@ -1,0 +1,125 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery",
+            "size": "4xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A collection of bouquets, arrangements, and event florals from our studio.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text"]
+    },
+    "arrangements": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "Our Work",
+        "title": "Seasonal Arrangements",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": true,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "img-1": { "type": "image", "settings": { "image": "", "caption": "Spring hand-tied" } },
+        "img-2": { "type": "image", "settings": { "image": "", "caption": "Garden mix vase" } },
+        "img-3": { "type": "image", "settings": { "image": "", "caption": "Dried wildflower bunch" } },
+        "img-4": { "type": "image", "settings": { "image": "", "caption": "Summer centerpiece" } },
+        "img-5": { "type": "image", "settings": { "image": "", "caption": "Autumn tones" } },
+        "img-6": { "type": "image", "settings": { "image": "", "caption": "Classic wrapped" } },
+        "img-7": { "type": "image", "settings": { "image": "", "caption": "Petite posy" } },
+        "img-8": { "type": "image", "settings": { "image": "", "caption": "Statement arrangement" } },
+        "img-9": { "type": "image", "settings": { "image": "", "caption": "Holiday wreath" } },
+        "img-10": { "type": "image", "settings": { "image": "", "caption": "Table runner" } },
+        "img-11": { "type": "image", "settings": { "image": "", "caption": "Window box" } },
+        "img-12": { "type": "image", "settings": { "image": "", "caption": "Sympathy arrangement" } }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6", "img-7", "img-8", "img-9", "img-10", "img-11", "img-12"]
+    },
+    "weddings": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "Weddings",
+        "title": "Bridal & Event Florals",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "staggered": false,
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "img-1": { "type": "image", "settings": { "image": "", "caption": "Bridal bouquet" } },
+        "img-2": { "type": "image", "settings": { "image": "", "caption": "Reception table" } },
+        "img-3": { "type": "image", "settings": { "image": "", "caption": "Ceremony arch" } },
+        "img-4": { "type": "image", "settings": { "image": "", "caption": "Boutonniere" } },
+        "img-5": { "type": "image", "settings": { "image": "", "caption": "Bridesmaid bouquets" } },
+        "img-6": { "type": "image", "settings": { "image": "", "caption": "Aisle arrangement" } },
+        "img-7": { "type": "image", "settings": { "image": "", "caption": "Cake flowers" } },
+        "img-8": { "type": "image", "settings": { "image": "", "caption": "Sweetheart table" } }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6", "img-7", "img-8"]
+    },
+    "testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 6000,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Our wedding flowers were beyond anything we imagined. Every table, every bouquet \u2014 pure magic.",
+            "name": "Claire & Noah",
+            "title": "Wedding, October 2025",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Petalry transformed our venue. The floral installations were the highlight of the entire event.",
+            "name": "Akiko Tanaka",
+            "title": "Corporate Gala",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "They really listened to what we wanted and brought it to life with flowers we didn\u2019t even know existed.",
+            "name": "Priya & Sam",
+            "title": "Wedding, May 2025",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    }
+  },
+  "widgetsOrder": ["intro", "arrangements", "weddings", "testimonials"]
+}

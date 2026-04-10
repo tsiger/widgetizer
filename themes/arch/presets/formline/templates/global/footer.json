@@ -1,0 +1,37 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "\u00a9 2026 Formline Architecture. All rights reserved.",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Formline",
+        "text": "<p>Architecture and design for residential, commercial, and cultural projects.</p>"
+      }
+    },
+    "contact": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>(555) 340-2100<br>studio@formline.co<br>85 West Jackson Blvd, Suite 400<br>Chicago, IL 60604</p>"
+      }
+    },
+    "links": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Navigation",
+        "menu": "footer-menu"
+      }
+    },
+    "social": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  },
+  "blocksOrder": ["logo", "contact", "links", "social"]
+}

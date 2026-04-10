@@ -1,0 +1,298 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "banner": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0f1a24bf",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Services",
+            "size": "4xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Professional grooming for dogs and cats of all breeds and sizes.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text"]
+    },
+    "dog-grooming": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Dogs",
+        "title": "Dog Grooming",
+        "description": "Prices vary by breed, coat condition, and behavior. Call for a quote on breeds not listed.",
+        "heading_alignment": "center",
+        "layout": "two-column",
+        "color_scheme": "standard-primary",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "small-bath": {
+          "type": "item",
+          "settings": {
+            "name": "Small Dog Bath & Brush",
+            "description": "<p>Up to 20 lbs. Shampoo, conditioner, blow-dry, brush, ears, nails.</p>",
+            "price": "$35"
+          }
+        },
+        "small-full": {
+          "type": "item",
+          "settings": {
+            "name": "Small Dog Full Groom",
+            "description": "<p>Up to 20 lbs. Bath & Brush plus breed-specific haircut and styling.</p>",
+            "price": "$55"
+          }
+        },
+        "medium-bath": {
+          "type": "item",
+          "settings": {
+            "name": "Medium Dog Bath & Brush",
+            "description": "<p>21\u201350 lbs. Shampoo, conditioner, blow-dry, brush, ears, nails.</p>",
+            "price": "$45"
+          }
+        },
+        "medium-full": {
+          "type": "item",
+          "settings": {
+            "name": "Medium Dog Full Groom",
+            "description": "<p>21\u201350 lbs. Bath & Brush plus breed-specific haircut and styling.</p>",
+            "price": "$65"
+          }
+        },
+        "large-full": {
+          "type": "item",
+          "settings": {
+            "name": "Large Dog Full Groom",
+            "description": "<p>51+ lbs. Full service groom including bath, cut, blow-dry, ears, nails.</p>",
+            "price": "$85"
+          }
+        }
+      },
+      "blocksOrder": ["small-bath", "small-full", "medium-bath", "medium-full", "large-full"]
+    },
+    "cat-grooming": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Cats",
+        "title": "Cat Grooming",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "single-column",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "bath": {
+          "type": "item",
+          "settings": {
+            "name": "Cat Bath & Brush",
+            "description": "<p>Gentle shampoo, blow-dry, brushout, ear cleaning, and nail trim.</p>",
+            "price": "$45"
+          }
+        },
+        "full": {
+          "type": "item",
+          "settings": {
+            "name": "Cat Full Groom",
+            "description": "<p>Bath & Brush plus sanitary trim, belly shave, or full body trim as needed.</p>",
+            "price": "$65"
+          }
+        },
+        "lion": {
+          "type": "item",
+          "settings": {
+            "name": "Lion Cut",
+            "description": "<p>Full body shave with mane, tail pom, and leg boots left intact. Popular for long-haired breeds.</p>",
+            "price": "$75"
+          }
+        }
+      },
+      "blocksOrder": ["bath", "full", "lion"]
+    },
+    "included": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "Every Visit Includes",
+        "title": "What\u2019s Included",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "ears": {
+          "type": "item",
+          "settings": {
+            "icon": "ear",
+            "title": "Ear Cleaning",
+            "description": "Gentle cleaning and inspection with every groom"
+          }
+        },
+        "nails": {
+          "type": "item",
+          "settings": {
+            "icon": "cut",
+            "title": "Nail Trimming",
+            "description": "Trimmed and filed for comfort and safety"
+          }
+        },
+        "teeth": {
+          "type": "item",
+          "settings": {
+            "icon": "dental",
+            "title": "Teeth Brushing",
+            "description": "Freshens breath and supports dental health"
+          }
+        },
+        "glands": {
+          "type": "item",
+          "settings": {
+            "icon": "checkup-list",
+            "title": "Gland Expression",
+            "description": "External anal gland expression on request"
+          }
+        },
+        "facial": {
+          "type": "item",
+          "settings": {
+            "icon": "sparkles",
+            "title": "Blueberry Facial",
+            "description": "Brightens and freshens the face area"
+          }
+        },
+        "deshed": {
+          "type": "item",
+          "settings": {
+            "icon": "wind",
+            "title": "De-Shedding",
+            "description": "Reduces loose fur and keeps coats healthy"
+          }
+        }
+      },
+      "blocksOrder": ["ears", "nails", "teeth", "glands", "facial", "deshed"]
+    },
+    "process": {
+      "type": "numbered-cards",
+      "settings": {
+        "eyebrow": "How It Works",
+        "title": "The Grooming Process",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Check In",
+            "description": "<p>Drop off your pet and let us know about any special needs, sensitivities, or style preferences.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Bath & Dry",
+            "description": "<p>A thorough wash with organic shampoo and conditioner, followed by a gentle blow-dry.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Style & Finish",
+            "description": "<p>Breed-appropriate cut and styling, plus ear cleaning, nail trim, and finishing touches.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Happy Pickup",
+            "description": "<p>We\u2019ll text you when your pet is ready. Pick up a fresh, happy, great-smelling companion.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Common Questions",
+        "description": "",
+        "heading_alignment": "left",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "right",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Questions?",
+            "text": "<p>(555) 926-3400<br>hello@pawlish.co<br><br>We\u2019re happy to help you choose the right service.</p>"
+          }
+        },
+        "q1": {
+          "type": "item",
+          "settings": {
+            "question": "How do I book an appointment?",
+            "answer": "<p>Call us or stop by the salon. We recommend booking 3\u20135 days in advance, especially for weekends. Walk-ins are welcome on a first-come basis when slots are available.</p>"
+          }
+        },
+        "q2": {
+          "type": "item",
+          "settings": {
+            "question": "What should I bring to my pet\u2019s first visit?",
+            "answer": "<p>Bring vaccination records (rabies and DHPP for dogs, rabies and FVRCP for cats). Let us know about any skin conditions, allergies, or behavioral concerns.</p>"
+          }
+        },
+        "q3": {
+          "type": "item",
+          "settings": {
+            "question": "My pet is nervous around groomers. Can you help?",
+            "answer": "<p>Absolutely. Our groomers are trained in fear-free handling techniques. We work at your pet\u2019s pace, take breaks when needed, and never force anything.</p>"
+          }
+        },
+        "q4": {
+          "type": "item",
+          "settings": {
+            "question": "How long does a grooming session take?",
+            "answer": "<p>A bath and brush typically takes 1\u20131.5 hours. A full groom takes 2\u20133 hours depending on breed, coat condition, and temperament. We\u2019ll give you a time estimate at check-in.</p>"
+          }
+        },
+        "q5": {
+          "type": "item",
+          "settings": {
+            "question": "What products do you use?",
+            "answer": "<p>We use organic, hypoallergenic shampoos and conditioners. If your pet has specific skin needs, we carry medicated options and can work with your vet\u2019s recommendations.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sidebar-info", "q1", "q2", "q3", "q4", "q5"]
+    }
+  },
+  "widgetsOrder": ["banner", "dog-grooming", "cat-grooming", "included", "process", "faq"]
+}

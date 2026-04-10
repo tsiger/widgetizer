@@ -1,0 +1,127 @@
+{
+  "name": "Tuition",
+  "slug": "tuition",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#16653466",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Tuition & fees",
+            "size": "3xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Rates effective August 2026. Sibling discount applies to the oldest child\u2019s tuition.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "plans": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Weekly rates",
+        "title": "Choose your schedule",
+        "description": "Registration fee $150 annually. Supplies and field trips included.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "p1": {
+          "type": "plan",
+          "settings": {
+            "title": "Part-time",
+            "price": "$285",
+            "period": "/ week",
+            "features": "+ Three full days\n+ Core curriculum\n+ Snacks & lunch\n+ Parent app",
+            "button_link": {
+              "text": "Join waitlist",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "p2": {
+          "type": "plan",
+          "settings": {
+            "title": "Full-time",
+            "price": "$365",
+            "period": "/ week",
+            "features": "+ Five days 7:30\u20135:30\n+ All specials\n+ Camera access\n+ Portfolio storage",
+            "button_link": {
+              "text": "Join waitlist",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "p3": {
+          "type": "plan",
+          "settings": {
+            "title": "Infant suite",
+            "price": "$410",
+            "period": "/ week",
+            "features": "+ Primary caregiver pair\n+ Formula storage\n+ Sleep room audio\n+ Cloth diaper friendly",
+            "button_link": {
+              "text": "Join waitlist",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["p1", "p2", "p3"]
+    },
+    "note": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "head": {
+          "type": "heading",
+          "settings": {
+            "text": "Financial assistance",
+            "size": "2xl"
+          }
+        },
+        "txt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We accept Wisconsin Shares and can provide documentation for dependent-care FSA plans. Ask about sliding-scale scholarships during your tour.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["head", "txt"]
+    }
+  },
+  "widgetsOrder": ["hero", "plans", "note"],
+  "id": "tuition",
+  "created": "2026-04-10T16:00:00.000Z",
+  "updated": "2026-04-10T16:00:00.000Z"
+}

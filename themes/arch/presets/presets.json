@@ -91,6 +91,56 @@
       "id": "hue-and-co",
       "name": "Hue & Co",
       "description": "Interior designer"
+    },
+    {
+      "id": "framelight",
+      "name": "Framelight",
+      "description": "Photographer"
+    },
+    {
+      "id": "inkwell",
+      "name": "Inkwell",
+      "description": "Tattoo studio"
+    },
+    {
+      "id": "pixelcraft",
+      "name": "Pixelcraft",
+      "description": "Graphic designer"
+    },
+    {
+      "id": "formline",
+      "name": "Formline",
+      "description": "Architecture firm"
+    },
+    {
+      "id": "petalry",
+      "name": "Petalry",
+      "description": "Flower shop"
+    },
+    {
+      "id": "pawlish",
+      "name": "Pawlish",
+      "description": "Pet grooming"
+    },
+    {
+      "id": "torque",
+      "name": "Torque",
+      "description": "Auto repair"
+    },
+    {
+      "id": "noteworthy",
+      "name": "Noteworthy",
+      "description": "Tutoring / music lessons"
+    },
+    {
+      "id": "little-oaks",
+      "name": "Little Oaks",
+      "description": "Daycare / preschool"
+    },
+    {
+      "id": "tailside",
+      "name": "Tailside",
+      "description": "Veterinarian"
     }
   ]
 }

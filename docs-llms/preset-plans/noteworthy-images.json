@@ -1,0 +1,44 @@
+[
+  {
+    "file": "home-hero-banner.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Bright music and tutoring studio lobby, upright piano, bookshelves, warm afternoon light through tall windows, diverse teen student with teacher blurred in background, no logos or readable text, editorial photography"
+  },
+  {
+    "file": "image-tab-academic.jpg",
+    "width": 1200,
+    "height": 900,
+    "prompt": "Close-up of open textbook, highlighter, and handwritten study plan on wooden desk, cozy study room, soft bokeh, no readable text"
+  },
+  {
+    "file": "image-tab-music.jpg",
+    "width": 1200,
+    "height": 900,
+    "prompt": "Piano keys and sheet music on stand, shallow depth of field, warm tungsten light, classical music education mood, no logos"
+  },
+  {
+    "file": "lessons-card-math.jpg",
+    "width": 800,
+    "height": 450,
+    "prompt": "Student working on math problems in notebook with calculator, candid, encouraging atmosphere, no readable equations"
+  },
+  {
+    "file": "lessons-card-english.jpg",
+    "width": 800,
+    "height": 450,
+    "prompt": "Teen reading paperback novel at desk with sticky notes, soft natural light, cozy academic vibe"
+  },
+  {
+    "file": "about-hero.jpg",
+    "width": 1920,
+    "height": 640,
+    "prompt": "Historic schoolhouse brick building entrance with small Noteworthy-style banner area blank, Evanston-like tree-lined street, golden hour"
+  },
+  {
+    "file": "about-story.jpg",
+    "width": 1400,
+    "height": 1000,
+    "prompt": "Teachers collaborating over sheet music and lesson plans at round table, professional but friendly, diverse group, no readable text"
+  }
+]

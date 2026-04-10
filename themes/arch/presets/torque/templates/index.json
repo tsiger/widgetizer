@@ -1,0 +1,361 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image": "",
+        "overlay_color": "",
+        "image_position": "right",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Diagnostics first. Repairs done right.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>ASE-certified techs, OEM-quality parts, and estimates you can trust. From daily drivers to commercial fleets serving the Valley.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Same-day appointments when available\n+ Digital inspections with photos\n+ 36-month / 36k-mile warranty on qualifying work"
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book service",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Browse services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text", "hero-features", "hero-buttons"]
+    },
+    "ticker": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Brakes  \u00b7  Oil & filters  \u00b7  Engine & transmission  \u00b7  Tires & alignment  \u00b7  Fleet PM programs  \u00b7  Hybrid & EV service",
+        "separator": "\u00b7",
+        "speed": 10,
+        "rotate": 0,
+        "font_size": "md",
+        "bg_color": "#000000",
+        "text_color": "#fafafa",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      }
+    },
+    "trust": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "md",
+        "icon_shape": "rounded",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "ASE Certified",
+            "text": "Master techs on staff"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Warranty",
+            "text": "Parts & labor coverage"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "gauge",
+            "title": "Digital inspections",
+            "text": "See what we see"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "4.9 average",
+            "text": "800+ local reviews"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "audiences": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "Who we serve",
+        "title": "One shop. Two lanes.",
+        "description": "Whether you commute across town or run a delivery fleet, we keep vehicles safe, compliant, and on the road.",
+        "heading_alignment": "center",
+        "content_position": "left",
+        "show_divider": true,
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "seg-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "car",
+            "title": "Personal vehicles",
+            "description": "<p>Brakes, engines, tires, A/C, and manufacturer-scheduled maintenance. Clear recommendations\u2014no pressure, no mystery fees.</p>"
+          }
+        },
+        "seg-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Fleet & commercial",
+            "description": "<p>PM schedules, DOT prep, priority bay windows, and consolidated billing. One partner for vans, box trucks, and work pickups.</p>"
+          }
+        },
+        "seg-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "charging-pile",
+            "title": "Hybrids & EVs",
+            "description": "<p>High-voltage safety, battery health checks, and software-aware service. We service modern drivetrains without guesswork.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["seg-1", "seg-2", "seg-3"]
+    },
+    "process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "Your visit",
+        "title": "How a Torque appointment works",
+        "description": "Predictable steps so you always know what happens next.",
+        "heading_alignment": "center",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Check-in & intake",
+            "description": "<p>Tell us symptoms or fleet unit numbers. We capture mileage, pull history, and note any warning lights.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Inspection & diagnosis",
+            "description": "<p>Road-test if needed, scan modules, and document findings with photos. You approve work before we turn a wrench.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Repair with OEM-quality parts",
+            "description": "<p>Technicians follow manufacturer procedures. Fluids, filters, and hardware meet or exceed spec.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Quality check & pickup",
+            "description": "<p>Post-repair scan, torque specs verified, and a written summary for your records. Fleet clients get batch invoices.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "comparison": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Proof",
+        "title": "Clean work. Clear documentation.",
+        "description": "Every vehicle leaves with photos, measurements, and notes\u2014so you understand what was done and why.",
+        "heading_alignment": "center",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Typical quick shop",
+        "after_label": "Torque standard",
+        "orientation": "horizontal",
+        "initial_position": 45,
+        "show_labels": true,
+        "color_scheme": "standard-primary"
+      }
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "22",
+            "suffix": "+",
+            "label": "Years in business",
+            "description": ""
+          }
+        },
+        "fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "14",
+            "suffix": "",
+            "label": "Service bays",
+            "description": ""
+          }
+        },
+        "fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "35",
+            "suffix": "k+",
+            "label": "Vehicles serviced",
+            "description": ""
+          }
+        },
+        "fig-4": {
+          "type": "figure",
+          "settings": {
+            "number": "120",
+            "suffix": "+",
+            "label": "Fleet units on PM",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Drivers & fleet managers",
+        "title": "What people say",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "They showed me photos of a worn bushing I never would have caught. Price matched the estimate and the truck drives like new.",
+            "avatar": "",
+            "name": "Marcus T.",
+            "title": "2019 F-150 owner",
+            "rating": "5"
+          }
+        },
+        "q-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We run twelve vans out of this shop. PM reminders, digital invoices, and they never upsell fluff our routes do not need.",
+            "avatar": "",
+            "name": "Elena V.",
+            "title": "Operations, Valley Courier Co.",
+            "rating": "5"
+          }
+        },
+        "q-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Hybrid system warning light had me worried. They isolated a bad cell pack sensor in an hour and had us back the same day.",
+            "avatar": "",
+            "name": "Priya N.",
+            "title": "Toyota Prius",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["q-1", "q-2", "q-3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to book?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call or request a slot online\u2014we will confirm same day when possible.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact Torque",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero", "ticker", "trust", "audiences", "process", "comparison", "stats", "reviews", "cta"],
+  "id": "index",
+  "created": "2026-04-10T12:00:00.000Z",
+  "updated": "2026-04-10T12:00:00.000Z"
+}

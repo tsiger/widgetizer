@@ -1,0 +1,136 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "wide",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Start a project</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "If the business is growing, the brand should be able to keep up.",
+            "size": "5xl"
+          }
+        },
+        "copy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pixelcraft is best for founders and small teams who need a tighter visual system, sharper launch assets, or clearer rollout design before the next product, opening, or campaign.</p>",
+            "size": "lg",
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "copy"]
+    },
+    "details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "Studio details",
+        "title": "Practical info before you reach out",
+        "description": "A few notes on fit, availability, and how projects usually begin.",
+        "heading_alignment": "left",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info": {
+          "type": "info",
+          "settings": {
+            "title": "Pixelcraft",
+            "text": "<p>Independent graphic design studio focused on identity systems, campaign design, and launch-ready assets for small businesses.</p>"
+          }
+        },
+        "fit": {
+          "type": "text_block",
+          "settings": {
+            "title": "Best Fit",
+            "text": "<p>Founder-led brands<br>Product launches<br>Hospitality and retail businesses<br>Cultural campaigns</p>"
+          }
+        },
+        "availability": {
+          "type": "text_block",
+          "settings": {
+            "title": "Availability",
+            "text": "<p>Booking 3-6 weeks ahead for full systems.<br>Smaller launch support can sometimes begin sooner.</p>"
+          }
+        },
+        "social": {
+          "type": "social_block",
+          "settings": {
+            "title": "Follow"
+          }
+        }
+      },
+      "blocksOrder": ["info", "fit", "availability", "social"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Project FAQ",
+        "title": "Common questions before kickoff",
+        "description": "A quick way to understand timelines, scope, and how collaboration usually works.",
+        "heading_alignment": "left",
+        "style": "connected",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "item-1": {
+          "type": "item",
+          "settings": {
+            "question": "What kinds of projects are the best fit?",
+            "answer": "<p>The best projects have a clear business need behind them: a launch, a repositioning, a new product line, or a brand that has outgrown improvised visuals.</p>"
+          }
+        },
+        "item-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you only design logos?",
+            "answer": "<p>No. Pixelcraft works on systems. A logo can be part of the work, but the goal is usually a stronger visual framework plus the assets needed to use it well.</p>"
+          }
+        },
+        "item-3": {
+          "type": "item",
+          "settings": {
+            "question": "How long does a project usually take?",
+            "answer": "<p>Focused launch support can move quickly. Full identity systems usually take several weeks, depending on how many rollout assets and review rounds are involved.</p>"
+          }
+        },
+        "item-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can you work with an existing website or team?",
+            "answer": "<p>Yes. Many projects involve clarifying the visual system first, then handing clean direction and assets to an internal team or web partner.</p>"
+          }
+        },
+        "info": {
+          "type": "info",
+          "settings": {
+            "title": "Before you write",
+            "text": "<p>Typical projects start around $2,500 for focused launch support and scale upward for full identity systems.</p><p>It helps to share your timeline, business type, and what currently feels unclear or inconsistent.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["item-1", "item-2", "item-3", "item-4", "info"]
+    }
+  },
+  "widgetsOrder": ["intro", "details", "faq"],
+  "id": "contact",
+  "created": "2026-04-10T18:40:00.000Z",
+  "updated": "2026-04-10T21:05:00.000Z"
+}

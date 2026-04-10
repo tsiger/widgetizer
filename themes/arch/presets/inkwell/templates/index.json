@@ -1,0 +1,356 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0a0606cc",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your Story, Our Ink",
+            "size": "6xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Custom tattoo art crafted with precision and passion. Every piece tells a story.</p>",
+            "size": "lg"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a Consultation",
+              "target": "_self"
+            },
+            "link_2": {
+              "href": "portfolio.html",
+              "text": "View Portfolio",
+              "target": "_self"
+            },
+            "style": "primary",
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text", "button"]
+    },
+    "energy-strip": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Custom Ink \u2022 Fine Line \u2022 Blackwork \u2022 Color Realism",
+        "separator": "\u2605",
+        "speed": 10,
+        "rotate": -3,
+        "font_size": "lg",
+        "bg_color": "#9b1b30",
+        "text_color": "#ffffff",
+        "top_spacing": "small",
+        "bottom_spacing": "none"
+      }
+    },
+    "tattoo-styles": {
+      "type": "sliding-panels",
+      "settings": {
+        "eyebrow": "Our Specialties",
+        "title": "Tattoo Styles",
+        "description": "",
+        "heading_alignment": "left",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fine-line": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Fine Line",
+            "subtitle": "Delicate, detailed linework for subtle and elegant pieces",
+            "button_link": {
+              "href": "services.html",
+              "text": "Explore Style",
+              "target": "_self"
+            }
+          }
+        },
+        "blackwork": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Blackwork",
+            "subtitle": "Bold black ink designs from geometric to illustrative",
+            "button_link": {
+              "href": "services.html",
+              "text": "Explore Style",
+              "target": "_self"
+            }
+          }
+        },
+        "color-realism": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Color Realism",
+            "subtitle": "Photorealistic pieces with rich, vibrant color palettes",
+            "button_link": {
+              "href": "services.html",
+              "text": "Explore Style",
+              "target": "_self"
+            }
+          }
+        },
+        "japanese": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Japanese",
+            "subtitle": "Traditional irezumi-inspired motifs and flowing compositions",
+            "button_link": {
+              "href": "services.html",
+              "text": "Explore Style",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["fine-line", "blackwork", "color-realism", "japanese"]
+    },
+    "client-spotlight": {
+      "type": "testimonial-hero",
+      "settings": {
+        "author_image": "",
+        "image_position": "right",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I came in with a rough idea and walked out with a piece that means everything to me. The attention to detail and patience through the whole process was incredible.</p>",
+            "size": "lg"
+          }
+        },
+        "name": {
+          "type": "heading",
+          "settings": {
+            "text": "Marcus Rivera",
+            "size": "xl"
+          }
+        },
+        "title": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Custom Sleeve Client</p>",
+            "size": "sm",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote", "name", "title"]
+    },
+    "portfolio-preview": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "Portfolio",
+        "title": "Recent Work",
+        "description": "",
+        "heading_alignment": "left",
+        "columns_desktop": 4,
+        "gap": "small",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "item-1": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        },
+        "item-2": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        },
+        "item-3": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        },
+        "item-4": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        },
+        "item-5": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        },
+        "item-6": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        },
+        "item-7": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        },
+        "item-8": {
+          "type": "item",
+          "settings": {
+            "image": "",
+            "title": "",
+            "category": ""
+          }
+        }
+      },
+      "blocksOrder": ["item-1", "item-2", "item-3", "item-4", "item-5", "item-6", "item-7", "item-8"]
+    },
+    "video": {
+      "type": "video-embed",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "video_title": "Tattoo artist at work in the Inkwell studio",
+        "aspect_ratio": "21:9",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 5000,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Best tattoo experience I've ever had. The custom design process was collaborative and the result exceeded my expectations.",
+            "name": "Sarah Chen",
+            "title": "Fine Line Piece",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Incredible attention to detail on my geometric sleeve. The studio is immaculate and the vibe is welcoming from the moment you walk in.",
+            "name": "David Okafor",
+            "title": "Geometric Sleeve",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "They turned my rough sketch into a stunning piece of art. Professional, patient, and genuinely passionate about their craft.",
+            "name": "Elena Vasquez",
+            "title": "Color Realism Portrait",
+            "rating": "5"
+          }
+        },
+        "quote-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "Flew in from out of state specifically for Inkwell. Worth every mile. The Japanese-style back piece is a masterwork.",
+            "name": "James Whitfield",
+            "title": "Japanese Back Piece",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3", "quote-4"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Get Inked?",
+            "size": "3xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every great tattoo starts with a conversation. Book your free consultation today.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a Consultation",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text", "button"]
+    }
+  },
+  "widgetsOrder": ["hero", "energy-strip", "tattoo-styles", "client-spotlight", "portfolio-preview", "video", "testimonials", "cta"]
+}

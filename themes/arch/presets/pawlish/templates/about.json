@@ -1,0 +1,191 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image": "",
+        "overlay_color": "rgba(0,0,0,0.15)",
+        "image_position": "left",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Since 2020</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Every Pet Deserves to Feel Great",
+            "size": "3xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pawlish started because we believed grooming should be a positive experience for every pet \u2014 not something to dread. We\u2019re certified in fear-free handling, use only organic products, and treat every animal that comes through our doors like family.</p>",
+            "size": "base"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a Grooming",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "text", "button"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Team",
+        "title": "Meet Our Groomers",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "owner": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Casey Morgan",
+            "role": "Owner & Lead Groomer",
+            "specialty": "Poodles, Doodles, Terriers",
+            "bio": "Certified master groomer with 10 years of experience. Casey founded Pawlish after working in veterinary clinics and seeing how stressful grooming was for most pets.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "senior": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Jordan Lee",
+            "role": "Senior Groomer",
+            "specialty": "Large breeds, De-matting",
+            "bio": "Specializes in large breed dogs and coat rehabilitation. Fear-free certified and incredibly patient with anxious pets.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "junior": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Mia Santos",
+            "role": "Groomer & Cat Specialist",
+            "specialty": "Cats, Small breeds",
+            "bio": "Our dedicated cat groomer. Trained in feline-specific handling and the only groomer in Madison certified for cat lion cuts.",
+            "instagram": "https://instagram.com"
+          }
+        }
+      },
+      "blocksOrder": ["owner", "senior", "junior"]
+    },
+    "safety": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "Your Pet\u2019s Safety",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "certified": {
+          "type": "card",
+          "settings": {
+            "icon": "certificate",
+            "title": "Fear-Free Certified",
+            "description": "<p>All our groomers are trained in fear-free handling. We work at your pet\u2019s pace and never force anything.</p>"
+          }
+        },
+        "organic": {
+          "type": "card",
+          "settings": {
+            "icon": "leaf",
+            "title": "Organic Products",
+            "description": "<p>We use only organic, hypoallergenic shampoos and conditioners. Safe for sensitive skin and the environment.</p>"
+          }
+        },
+        "clean": {
+          "type": "card",
+          "settings": {
+            "icon": "shield",
+            "title": "Clean Facility",
+            "description": "<p>Our salon is cleaned and sanitized between every appointment. Vaccination records required for all pets.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["certified", "organic", "clean"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "About the Salon",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "connected",
+        "allow_multiple": false,
+        "sidebar_position": "right",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "q1": {
+          "type": "item",
+          "settings": {
+            "question": "What certifications do your groomers hold?",
+            "answer": "<p>All groomers are certified through the National Dog Groomers Association of America (NDGAA) and trained in Fear Free\u00ae handling. Casey holds a Certified Master Groomer designation.</p>"
+          }
+        },
+        "q2": {
+          "type": "item",
+          "settings": {
+            "question": "What products do you use?",
+            "answer": "<p>We use organic, cruelty-free, hypoallergenic products. Our core line is plant-based and free from parabens, sulfates, and artificial fragrances. We also carry medicated options for pets with skin conditions.</p>"
+          }
+        },
+        "q3": {
+          "type": "item",
+          "settings": {
+            "question": "Is your facility climate-controlled?",
+            "answer": "<p>Yes. The salon is fully climate-controlled year-round and uses HEPA filtration. Each grooming station has its own ventilation and drying area.</p>"
+          }
+        },
+        "q4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you groom puppies and kittens?",
+            "answer": "<p>Yes! We recommend starting grooming early to help pets get comfortable with the process. Puppies and kittens must have their first round of vaccinations before visiting.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["q1", "q2", "q3", "q4"]
+    }
+  },
+  "widgetsOrder": ["hero", "team", "safety", "faq"]
+}

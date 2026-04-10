@@ -1,0 +1,265 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "banner": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#1c1917b3",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What We Do",
+            "size": "4xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Full-service architecture for residential, commercial, and adaptive reuse projects.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text"]
+    },
+    "project-types": {
+      "type": "sliding-panels",
+      "settings": {
+        "eyebrow": "Services",
+        "title": "Project Types",
+        "description": "",
+        "heading_alignment": "left",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "residential": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "New Build Residential",
+            "subtitle": "Custom homes designed around how you live",
+            "button_link": {
+              "href": "portfolio.html",
+              "text": "Learn More",
+              "target": "_self"
+            }
+          }
+        },
+        "commercial": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Commercial & Workplace",
+            "subtitle": "Offices, retail, and mixed-use projects",
+            "button_link": {
+              "href": "portfolio.html",
+              "text": "Learn More",
+              "target": "_self"
+            }
+          }
+        },
+        "adaptive": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Adaptive Reuse",
+            "subtitle": "Transforming existing structures for new purposes",
+            "button_link": {
+              "href": "portfolio.html",
+              "text": "Learn More",
+              "target": "_self"
+            }
+          }
+        },
+        "interiors": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Interior Architecture",
+            "subtitle": "Space planning, materials, and built-in elements",
+            "button_link": {
+              "href": "portfolio.html",
+              "text": "Learn More",
+              "target": "_self"
+            }
+          }
+        },
+        "feasibility": {
+          "type": "panel",
+          "settings": {
+            "image": "",
+            "title": "Feasibility Studies",
+            "subtitle": "Site analysis, zoning review, and project viability",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Learn More",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["residential", "commercial", "adaptive", "interiors", "feasibility"]
+    },
+    "design-process": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "",
+        "title": "Our Design Process",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "centered",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 1",
+            "duration": "2\u20134 weeks",
+            "title": "Discovery",
+            "features": "+ Initial consultation\n+ Site visit and documentation\n+ Program and budget development",
+            "description": "<p>We begin every project by listening. Site visits, client interviews, and research establish the foundation for design.</p>"
+          }
+        },
+        "step-2": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 2",
+            "duration": "3\u20136 weeks",
+            "title": "Schematic Design",
+            "features": "+ Concept development\n+ Massing studies\n+ Preliminary floor plans",
+            "description": "<p>Broad design ideas take shape. We explore options through sketches, diagrams, and early 3D models.</p>"
+          }
+        },
+        "step-3": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 3",
+            "duration": "4\u20138 weeks",
+            "title": "Design Development",
+            "features": "+ Material selections\n+ Detailed floor plans\n+ 3D renderings",
+            "description": "<p>The design is refined with specific materials, systems, and details. Renderings bring the vision to life.</p>"
+          }
+        },
+        "step-4": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 4",
+            "duration": "6\u201310 weeks",
+            "title": "Construction Documents",
+            "features": "+ Full drawing sets\n+ Engineering coordination\n+ Specifications",
+            "description": "<p>Technical documents are produced for bidding, permitting, and construction.</p>"
+          }
+        },
+        "step-5": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 5",
+            "duration": "2\u20134 weeks",
+            "title": "Permitting",
+            "features": "+ Zoning review\n+ Building department submissions\n+ Approval coordination",
+            "description": "<p>We navigate the approval process with the municipality on your behalf.</p>"
+          }
+        },
+        "step-6": {
+          "type": "item",
+          "settings": {
+            "date": "Phase 6",
+            "duration": "Varies",
+            "title": "Construction Administration",
+            "features": "+ Contractor coordination\n+ Site observations\n+ Punch list and closeout",
+            "description": "<p>We remain involved through construction to ensure the built work matches the design intent.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4", "step-5", "step-6"]
+    },
+    "before-after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Case Study",
+        "title": "Lakewood Residence Transformation",
+        "description": "A 1960s ranch home reimagined as a modern family residence with an open plan, new facade, and rear addition.",
+        "heading_alignment": "left",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Existing",
+        "after_label": "Completed",
+        "orientation": "horizontal",
+        "initial_position": 35,
+        "show_labels": true,
+        "color_scheme": "standard-secondary"
+      }
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Common Questions",
+        "description": "",
+        "heading_alignment": "left",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "right",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Ready to Start?",
+            "text": "<p>(555) 340-2100<br>studio@formline.co<br><br>We offer free initial consultations for all project types.</p>"
+          }
+        },
+        "q1": {
+          "type": "item",
+          "settings": {
+            "question": "What is your typical project scope?",
+            "answer": "<p>We work on projects ranging from kitchen renovations to ground-up commercial buildings. Most of our residential work falls between 1,500 and 6,000 square feet. Commercial projects vary widely.</p>"
+          }
+        },
+        "q2": {
+          "type": "item",
+          "settings": {
+            "question": "How are your fees structured?",
+            "answer": "<p>Most projects are billed as a percentage of construction cost, typically 8\u201315% depending on scope and complexity. We also offer fixed-fee arrangements for smaller projects and feasibility studies.</p>"
+          }
+        },
+        "q3": {
+          "type": "item",
+          "settings": {
+            "question": "How long does a typical project take?",
+            "answer": "<p>A residential project typically takes 9\u201318 months from first meeting to move-in. Design takes 3\u20136 months, permitting 1\u20133 months, and construction 6\u201312 months depending on scope.</p>"
+          }
+        },
+        "q4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you handle sustainable design?",
+            "answer": "<p>Sustainability is built into our process, not treated as an add-on. We design for energy efficiency, natural light, durable materials, and long-term performance on every project.</p>"
+          }
+        },
+        "q5": {
+          "type": "item",
+          "settings": {
+            "question": "Can you help with permits and zoning?",
+            "answer": "<p>Yes. We handle all permit submissions and zoning review as part of our standard services. We have extensive experience navigating Chicago's approval process.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sidebar-info", "q1", "q2", "q3", "q4", "q5"]
+    }
+  },
+  "widgetsOrder": ["banner", "project-types", "design-process", "before-after", "faq"]
+}

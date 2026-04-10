@@ -1,0 +1,21 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Pawlish",
+    "contactDetailsLine1": "(555) 926-3400",
+    "contactDetailsLine2": "",
+    "contact_position": "menu",
+    "headerNavigation": "main-menu",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book a Grooming",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-primary"
+  }
+}

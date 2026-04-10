@@ -1,0 +1,345 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#1e1b4bb3",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>TUTORING & MUSIC \u2014 EVANSTON</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Confidence at school. Joy at the keyboard.",
+            "size": "6xl"
+          }
+        },
+        "sub": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One-on-one math, writing, and test prep\u2014plus piano, strings, and voice\u2014with teachers who meet students where they are.</p>",
+            "size": "lg"
+          }
+        },
+        "buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a trial lesson",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "View programs",
+              "href": "lessons.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "sub", "buttons"]
+    },
+    "marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Algebra to AP Calculus  \u00b7  Reading & writing  \u00b7  SAT & ACT  \u00b7  Piano & theory  \u00b7  Violin & cello  \u00b7  Voice & audition prep",
+        "separator": "\u00b7",
+        "speed": 9,
+        "rotate": 0,
+        "font_size": "md",
+        "bg_color": "#1e1b4b",
+        "text_color": "#e0e7ff",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      }
+    },
+    "tracks": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Programs",
+        "title": "What we teach",
+        "description": "Choose a focus\u2014or combine tutoring and music in one weekly plan.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "c1": {
+          "type": "card",
+          "settings": {
+            "icon": "book",
+            "title": "Academic tutoring",
+            "description": "<p>Grades 3\u201312 math, English, and sciences; honors and AP support; study skills and organization coaching.</p>",
+            "button_link": {
+              "text": "See subjects",
+              "href": "lessons.html",
+              "target": "_self"
+            }
+          }
+        },
+        "c2": {
+          "type": "card",
+          "settings": {
+            "icon": "piano",
+            "title": "Piano & keys",
+            "description": "<p>Beginners through advanced repertoire, theory, and ABRSM prep\u2014classical, jazz, and contemporary styles.</p>",
+            "button_link": {
+              "text": "See instruments",
+              "href": "lessons.html",
+              "target": "_self"
+            }
+          }
+        },
+        "c3": {
+          "type": "card",
+          "settings": {
+            "icon": "music",
+            "title": "Strings & voice",
+            "description": "<p>Violin, viola, cello, guitar, and voice. Recital opportunities twice a year in our small performance hall.</p>",
+            "button_link": {
+              "text": "See instruments",
+              "href": "lessons.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["c1", "c2", "c3"]
+    },
+    "spotlight": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "Inside a session",
+        "title": "How we work with families",
+        "description": "Transparent goals, weekly notes, and practice plans you can actually follow at home.",
+        "heading_alignment": "center",
+        "image_position": "left",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "tab-1": {
+          "type": "tab",
+          "settings": {
+            "title": "Goal setting",
+            "description": "<p>We start with a short family intake: grades, learning style, and what \u201cprogress\u201d looks like for you. Lessons are paced to build momentum without burnout.</p>",
+            "image": ""
+          }
+        },
+        "tab-2": {
+          "type": "tab",
+          "settings": {
+            "title": "Practice that sticks",
+            "description": "<p>Students leave with a written plan: specific exercises, time targets, and links to recordings when helpful. Parents get a one-minute recap after each lesson.</p>",
+            "image": ""
+          }
+        },
+        "tab-3": {
+          "type": "tab",
+          "settings": {
+            "title": "Perform & celebrate",
+            "description": "<p>Recitals and mock exams are optional but encouraged. We rehearse stage presence and nerves\u2014whether it is a Bach prelude or a timed math section.</p>",
+            "image": ""
+          }
+        }
+      },
+      "blocksOrder": ["tab-1", "tab-2", "tab-3"]
+    },
+    "pathway": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "Getting started",
+        "title": "From first call to first recital",
+        "description": "",
+        "heading_alignment": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "Trial lesson",
+            "description": "<p>Meet your teacher, tour the studio, and try a 30-minute session at a reduced rate.</p>"
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "Personal plan",
+            "description": "<p>We agree on weekly length, materials, and milestones\u2014aligned with school calendars or exam dates.</p>"
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "Weekly rhythm",
+            "description": "<p>Same time slot when possible. Makeup credits for illness with 24-hour notice.</p>"
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "title": "Check-ins & showcases",
+            "description": "<p>Progress reports each term; recitals and mock tests when you are ready to share the work.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["s1", "s2", "s3", "s4"]
+    },
+    "quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "logo": "",
+        "author_image": "",
+        "image_position": "right",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "qtext": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our daughter was dreading algebra; six weeks later she volunteered to help a friend. Her piano teacher balances rigor with patience\u2014she actually practices without us nagging.</p>",
+            "size": "lg"
+          }
+        },
+        "qname": {
+          "type": "heading",
+          "settings": {
+            "text": "Nina & David K.",
+            "size": "xl"
+          }
+        },
+        "qrole": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Parents of a 7th grader</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["qtext", "qname", "qrole"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "f1": {
+          "type": "figure",
+          "settings": {
+            "number": "18",
+            "suffix": "",
+            "label": "Years in Evanston",
+            "description": ""
+          }
+        },
+        "f2": {
+          "type": "figure",
+          "settings": {
+            "number": "32",
+            "suffix": "",
+            "label": "Teaching artists",
+            "description": ""
+          }
+        },
+        "f3": {
+          "type": "figure",
+          "settings": {
+            "number": "650",
+            "suffix": "+",
+            "label": "Active students",
+            "description": ""
+          }
+        },
+        "f4": {
+          "type": "figure",
+          "settings": {
+            "number": "94",
+            "suffix": "%",
+            "label": "Families who renew",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["f1", "f2", "f3", "f4"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to hear your student play\u2014or watch math click?",
+            "size": "2xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Trial lessons book two weeks out on average.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "b": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Schedule a trial",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["h", "t", "b"]
+    }
+  },
+  "widgetsOrder": ["hero", "marquee", "tracks", "spotlight", "pathway", "quote", "stats", "cta"],
+  "id": "index",
+  "created": "2026-04-10T14:00:00.000Z",
+  "updated": "2026-04-10T14:00:00.000Z"
+}

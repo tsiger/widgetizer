@@ -1,0 +1,197 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1e3a8a99",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Contact & hours",
+            "size": "4xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Appointments, refills, and emergency routing\u2014choose the right line below.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "Tailside Veterinary Hospital",
+        "title": "Reach us",
+        "description": "",
+        "heading_alignment": "left",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info-1": {
+          "type": "info",
+          "settings": {
+            "title": "Hospital",
+            "text": "<p>2200 Waterside Dr<br>Raleigh, NC 27603</p>"
+          }
+        },
+        "hours": {
+          "type": "text_block",
+          "settings": {
+            "title": "Phone lines",
+            "text": "<p><strong>Appointments:</strong> (555) 428-9100</p><p><strong>Emergency:</strong> (555) 428-9111</p><p><strong>Refills text:</strong> (555) 428-9102</p>"
+          }
+        },
+        "menu-1": {
+          "type": "menu_block",
+          "settings": {
+            "title": "Quick links"
+          }
+        },
+        "social-1": {
+          "type": "social_block",
+          "settings": {
+            "title": "Follow"
+          }
+        }
+      },
+      "blocksOrder": ["info-1", "hours", "menu-1", "social-1"]
+    },
+    "location": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Location",
+        "description": "",
+        "heading_alignment": "left",
+        "address": "2200 Waterside Dr, Raleigh, NC 27603",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3256.0!2d-78.64!3d35.76!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDQ1JzM2LjAiTiA3OMKwMzgnMjQuMCJX!5e0!3m2!1sen!2sus",
+        "directions_link": {
+          "text": "Directions",
+          "href": "https://maps.google.com/?q=2200+Waterside+Dr+Raleigh+NC+27603",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "info-p": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Surface lot with accessible spaces near the emergency entrance.</p>"
+          }
+        },
+        "info-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["info-p", "info-social"]
+    },
+    "schedule": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "Lobby hours",
+        "title": "When we see patients",
+        "description": "Emergency entrance is always staffed; call ahead for critical arrivals when possible.",
+        "heading_alignment": "left",
+        "note": "Holiday hours posted two weeks in advance.",
+        "sidebar_position": "right",
+        "week_start_day": "1",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "mon": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "7:00 AM \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "tue": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "7:00 AM \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "wed": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "7:00 AM \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "thu": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "7:00 AM \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "fri": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "7:00 AM \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "sat": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "8:00 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "sun": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "9:00 AM \u2013 5:00 PM",
+            "closed": false
+          }
+        },
+        "side-info": {
+          "type": "info",
+          "settings": {
+            "title": "After hours",
+            "text": "<p>Emergency team on-site 24/7. Walk-ins triaged by severity.</p>"
+          }
+        },
+        "side-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "side-info", "side-social"]
+    }
+  },
+  "widgetsOrder": ["hero", "details", "location", "schedule"],
+  "id": "contact",
+  "created": "2026-04-10T18:00:00.000Z",
+  "updated": "2026-04-10T18:00:00.000Z"
+}

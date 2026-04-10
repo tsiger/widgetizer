@@ -1,0 +1,38 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "(c) 2026 Pixelcraft Studio. All rights reserved.",
+    "color_scheme": "highlight-secondary"
+  },
+  "blocks": {
+    "studio": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Pixelcraft",
+        "logo_width": 120,
+        "text": "<p>Graphic design for founders and small businesses that need a usable brand system, not disconnected visuals.</p>"
+      }
+    },
+    "contact": {
+      "type": "text_block",
+      "settings": {
+        "title": "Studio",
+        "text": "<p>Seattle, WA<br>Remote for North America and Europe<br><br>hello@pixelcraft.studio</p>"
+      }
+    },
+    "links": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Navigate",
+        "menu": "footer-menu"
+      }
+    },
+    "social": {
+      "type": "social_block",
+      "settings": {
+        "title": "Elsewhere"
+      }
+    }
+  },
+  "blocksOrder": ["studio", "contact", "links", "social"]
+}

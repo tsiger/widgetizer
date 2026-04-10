@@ -1,0 +1,198 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image": "",
+        "overlay_color": "rgba(0,0,0,0.25)",
+        "image_position": "left",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Est. 2018</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Art on Skin",
+            "size": "3xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inkwell started as a single chair in a shared space. Today we're a dedicated studio with three artists, but the mission hasn't changed: every tattoo should be a one-of-a-kind piece of art. We don't do flash walls or walk-in specials. We do consultations, custom designs, and work we're proud to sign.</p>",
+            "size": "base"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a Consultation",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "text", "button"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Artists",
+        "title": "Meet the Team",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "artist-1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Alex Reyes",
+            "role": "Lead Artist & Founder",
+            "specialty": "Blackwork, Japanese",
+            "bio": "12 years of experience. Trained under traditional Japanese masters in Osaka. Specializes in large-scale compositions and bold black ink.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "artist-2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Jordan Kimura",
+            "role": "Resident Artist",
+            "specialty": "Fine Line, Botanical",
+            "bio": "Known for intricate botanical work and delicate single-needle pieces. Brings a fine art background to every design.",
+            "instagram": "https://instagram.com"
+          }
+        },
+        "artist-3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Nico Stavros",
+            "role": "Resident Artist",
+            "specialty": "Color Realism, Portraits",
+            "bio": "Photorealism specialist with an eye for color theory. Former painter turned tattoo artist. Known for lifelike portraits.",
+            "instagram": "https://instagram.com"
+          }
+        }
+      },
+      "blocksOrder": ["artist-1", "artist-2", "artist-3"]
+    },
+    "values": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "",
+        "title": "What We Stand For",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "artistry": {
+          "type": "card",
+          "settings": {
+            "icon": "sparkles",
+            "title": "Artistry First",
+            "description": "<p>Every tattoo is a custom piece designed specifically for you. No flash, no copies, no shortcuts.</p>"
+          }
+        },
+        "safety": {
+          "type": "card",
+          "settings": {
+            "icon": "shield",
+            "title": "Clean & Safe",
+            "description": "<p>Hospital-grade sterilization, single-use needles, and licensed artists. Your safety is non-negotiable.</p>"
+          }
+        },
+        "vision": {
+          "type": "card",
+          "settings": {
+            "icon": "eye",
+            "title": "Your Vision",
+            "description": "<p>We listen first, design second. The consultation process ensures the final piece is exactly what you imagined.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["artistry", "safety", "vision"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "About the Studio",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "right",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "q1": {
+          "type": "item",
+          "settings": {
+            "question": "Do you accept walk-ins?",
+            "answer": "<p>We're an appointment-only studio. This lets us give every client the time and attention their piece deserves. Book a free consultation to get started.</p>"
+          }
+        },
+        "q2": {
+          "type": "item",
+          "settings": {
+            "question": "What's the minimum age for a tattoo?",
+            "answer": "<p>You must be 18 or older with valid government-issued photo ID. We do not tattoo minors under any circumstances, even with parental consent.</p>"
+          }
+        },
+        "q3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you require a deposit?",
+            "answer": "<p>Yes. A non-refundable deposit is required to secure your appointment. The deposit amount varies by project size and is applied toward the final cost of your tattoo.</p>"
+          }
+        },
+        "q4": {
+          "type": "item",
+          "settings": {
+            "question": "Can I see my design before the appointment?",
+            "answer": "<p>We share the custom design with you before your session so there's time for revisions. We want you to be completely confident in the design before any ink hits skin.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["q1", "q2", "q3", "q4"]
+    }
+  },
+  "widgetsOrder": ["hero", "team", "values", "faq"]
+}

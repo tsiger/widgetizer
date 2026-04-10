@@ -1,0 +1,32 @@
+[
+  {
+    "file": "home-hero.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Modern daycare exterior with oak trees, natural wood play structure, bright Wisconsin morning light, families walking toward entrance, no logos or readable text, editorial photography"
+  },
+  {
+    "file": "philosophy-indoor.jpg",
+    "width": 1400,
+    "height": 1000,
+    "prompt": "Reggio-inspired preschool classroom, loose parts on low tables, child-height windows, plants, soft natural colors, no children faces identifiable, no text"
+  },
+  {
+    "file": "programs-willow.jpg",
+    "width": 800,
+    "height": 450,
+    "prompt": "Calm infant room with cribs and soft lighting, mobile above, sanitized aesthetic, stock photo style, no logos"
+  },
+  {
+    "file": "programs-maple.jpg",
+    "width": 800,
+    "height": 450,
+    "prompt": "Toddler classroom climbing loft and sensory bins, colorful but not cluttered, photorealistic"
+  },
+  {
+    "file": "about-campus.jpg",
+    "width": 1400,
+    "height": 900,
+    "prompt": "Outdoor natural playground with climbing logs and mud kitchen, children blurred in background, safety mulch, golden hour"
+  }
+]

@@ -1,0 +1,135 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#09090b99",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Built in Phoenix. Trusted on the road.",
+            "size": "3xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Torque started as a three-bay neighborhood shop and grew by word of mouth\u2014honest estimates, clean work, and techs who explain the \u201cwhy\u201d behind every line item.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "e": {
+          "type": "text",
+          "settings": {
+            "text": "<p>OUR STORY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "head": {
+          "type": "heading",
+          "settings": {
+            "text": "Independent shop. Dealership-grade discipline.",
+            "size": "3xl"
+          }
+        },
+        "txt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We invest in factory scan tools, ADAS calibration partners, and continuous ASE training. That means accurate diagnostics without throwing parts at a problem\u2014and repairs that last.</p><p>Today we operate fourteen bays, a dedicated fleet coordinator, and a hybrid/EV lane with isolated high-voltage procedures.</p>",
+            "size": "base"
+          }
+        },
+        "btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact the shop",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["e", "head", "txt", "btn"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Leadership",
+        "title": "Technicians you will talk to",
+        "description": "Certifications listed are representative; full roster available in-shop.",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "p1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Jordan Reyes",
+            "role": "Shop foreman",
+            "specialty": "ASE Master Automobile",
+            "bio": "Former dealership lead tech; focuses on drivability and electrical gremlins."
+          }
+        },
+        "p2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Sam Okonkwo",
+            "role": "Fleet coordinator",
+            "specialty": "Commercial PM programs",
+            "bio": "Builds PM calendars for courier and HVAC fleets across Maricopa County."
+          }
+        },
+        "p3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Alyssa Park",
+            "role": "Hybrid & EV lead",
+            "specialty": "ASE L3 Hybrid / EV",
+            "bio": "Trains staff on HV safety and battery health testing protocols."
+          }
+        }
+      },
+      "blocksOrder": ["p1", "p2", "p3"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "team"],
+  "id": "about",
+  "created": "2026-04-10T12:00:00.000Z",
+  "updated": "2026-04-10T12:00:00.000Z"
+}

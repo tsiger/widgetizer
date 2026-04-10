@@ -1,0 +1,202 @@
+{
+  "name": "Programs",
+  "slug": "programs",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#14532d8c",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Programs by age",
+            "size": "3xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every classroom team includes a lead teacher with early childhood credentials and a dedicated aide.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "rooms": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Classrooms",
+        "title": "What each suite includes",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "box",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "16 / 9",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "r1": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Infants",
+            "title": "Willow room",
+            "description": "<p>Separate sleep room with sound machines, bottle-prep kitchen visible to parents, and daily TummyTime lab notes.</p>",
+            "button_link": {
+              "text": "Ask about openings",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "r2": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Toddlers",
+            "title": "Maple room",
+            "description": "<p>Loft climbing, art easels at toddler height, and potty-training partnership with color-coded communication logs.</p>",
+            "button_link": {
+              "text": "Ask about openings",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "r3": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Preschool",
+            "title": "Cedar studio",
+            "description": "<p>Loose-parts math, story acting, and a light table for pre-writing. Weekly library cart rotation.</p>",
+            "button_link": {
+              "text": "Ask about openings",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "r4": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Pre-K",
+            "title": "Oak hall",
+            "description": "<p>Kindergarten readiness portfolios, journaling, and STEM Fridays with visiting scientists.</p>",
+            "button_link": {
+              "text": "Ask about openings",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["r1", "r2", "r3", "r4"]
+    },
+    "rhythm": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "Sample day",
+        "title": "Rhythm families feel",
+        "description": "Schedules flex for weather and moods\u2014this is a typical flow.",
+        "heading_alignment": "center",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "Arrival & connection",
+            "description": "<p>Greeting at the classroom door, hand washing, and a calm table invitation within five minutes.</p>"
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "Exploration blocks",
+            "description": "<p>90-minute uninterrupted play with teacher scaffolding\u2014outdoors whenever possible.</p>"
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "Nourishment",
+            "description": "<p>Family-style lunch and snacks prepared on-site; allergies tracked on tablets at every meal.</p>"
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "title": "Rest & reflection",
+            "description": "<p>Quiet story, nap or rest bags, then afternoon studio specials (music, Spanish, yoga).</p>"
+          }
+        }
+      },
+      "blocksOrder": ["s1", "s2", "s3", "s4"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Program questions",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "a1": {
+          "type": "item",
+          "settings": {
+            "question": "What is your sick policy?",
+            "answer": "<p>We follow Wisconsin child care exclusion guidelines. Temperatures 100.4\u00b0F+ require 24 hours fever-free before return.</p>"
+          }
+        },
+        "a2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer part-time?",
+            "answer": "<p>Three-day blocks for toddlers and preschool; infants require full-time enrollment due to continuity of care.</p>"
+          }
+        },
+        "a3": {
+          "type": "item",
+          "settings": {
+            "question": "How do cameras work?",
+            "answer": "<p>Live feeds are classroom-wide only, password protected, and disabled during nap and changing routines.</p>"
+          }
+        },
+        "side": {
+          "type": "info",
+          "settings": {
+            "title": "Want the full handbook?",
+            "text": "<p>Request a PDF after your tour or email <strong>hello@littleoaks.example</strong>.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["a1", "a2", "a3", "side"]
+    }
+  },
+  "widgetsOrder": ["hero", "rooms", "rhythm", "faq"],
+  "id": "programs",
+  "created": "2026-04-10T16:00:00.000Z",
+  "updated": "2026-04-10T16:00:00.000Z"
+}

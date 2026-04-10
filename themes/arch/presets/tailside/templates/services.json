@@ -1,0 +1,193 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1e3a8a80",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Medical & surgical services",
+            "size": "3xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Diagnostics and treatment plans tailored to species, age, and lifestyle.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "list": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "Clinical offerings",
+        "title": "What we provide",
+        "description": "Not sure where to start? Call triage and we will route you to the right department.",
+        "heading_alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "s1": {
+          "type": "service",
+          "settings": {
+            "title": "Preventive & wellness",
+            "description": "<p>Vaccination schedules, parasite prevention, senior panels, and nutrition consults with body-condition scoring.</p>",
+            "link": {
+              "text": "Schedule",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "s2": {
+          "type": "service",
+          "settings": {
+            "title": "Dental & oral surgery",
+            "description": "<p>Full-mouth radiographs, extractions, and oronasal fistula repair with multimodal pain control.</p>",
+            "link": {
+              "text": "Schedule",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "s3": {
+          "type": "service",
+          "settings": {
+            "title": "Soft-tissue & orthopedic surgery",
+            "description": "<p>Spay/neuter to TPLO and fracture repair; board-certified surgeons on call for complex cases.</p>",
+            "link": {
+              "text": "Schedule",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "s4": {
+          "type": "service",
+          "settings": {
+            "title": "Internal medicine",
+            "description": "<p>Endocrine disease, GI workups, immune-mediated conditions, and chronic pain pathways.</p>",
+            "link": {
+              "text": "Schedule",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "s5": {
+          "type": "service",
+          "settings": {
+            "title": "Urgent & emergency",
+            "description": "<p>Triage, oxygen, blood products, and overnight hospitalization with continuous monitoring.</p>",
+            "link": {
+              "text": "Emergency line",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "s6": {
+          "type": "service",
+          "settings": {
+            "title": "Exotics & pocket pets",
+            "description": "<p>Rabbits, guinea pigs, reptiles, and birds by appointment with dedicated handling protocols.</p>",
+            "link": {
+              "text": "Schedule",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["s1", "s2", "s3", "s4", "s5", "s6"]
+    },
+    "compare": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Dental health",
+        "title": "Why we radiograph every tooth",
+        "description": "Hidden disease lives below the gumline\u2014visual exams alone miss most pathology.",
+        "heading_alignment": "center",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Surface exam",
+        "after_label": "X-ray guided",
+        "orientation": "horizontal",
+        "initial_position": 50,
+        "show_labels": true,
+        "color_scheme": "standard-secondary"
+      }
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Service FAQs",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "a1": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need a referral?",
+            "answer": "<p>Primary care is open to all new patients. Specialist referrals can come from your current vet or from our doctors after exam.</p>"
+          }
+        },
+        "a2": {
+          "type": "item",
+          "settings": {
+            "question": "What if I cannot pay upfront?",
+            "answer": "<p>We accept CareCredit and Scratch Pay; estimates are provided before non-emergency procedures.</p>"
+          }
+        },
+        "a3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you see wildlife?",
+            "answer": "<p>We coordinate with licensed rehabilitators for injured wildlife; call before bringing animals to the lobby.</p>"
+          }
+        },
+        "side": {
+          "type": "info",
+          "settings": {
+            "title": "Prescription refills",
+            "text": "<p>Use the portal or text <strong>REFILL</strong> to (555) 428-9102. Allow 24 hours.</p>"
+          }
+        },
+        "soc": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["a1", "a2", "a3", "side", "soc"]
+    }
+  },
+  "widgetsOrder": ["hero", "list", "compare", "faq"],
+  "id": "services",
+  "created": "2026-04-10T18:00:00.000Z",
+  "updated": "2026-04-10T18:00:00.000Z"
+}

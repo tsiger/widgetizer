@@ -1,0 +1,243 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#09090b80",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Services & maintenance",
+            "size": "3xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From fluid services to major drivetrain work\u2014scoped, priced, and completed to spec.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["hero-heading", "hero-text"]
+    },
+    "service_list": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "What we fix",
+        "title": "Core repair categories",
+        "description": "Tap through for scope; every job starts with inspection and your approval.",
+        "heading_alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "svc-1": {
+          "type": "service",
+          "settings": {
+            "title": "Brakes & chassis",
+            "description": "<p>Pads, rotors, calipers, lines, and ABS diagnostics. We measure runout and recommend only what safety demands.</p>",
+            "link": {
+              "text": "Book brake check",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-2": {
+          "type": "service",
+          "settings": {
+            "title": "Engine & cooling",
+            "description": "<p>Check engine lights, overheating, water pumps, head gaskets, and performance issues. Scans, leak tests, and compression when needed.</p>",
+            "link": {
+              "text": "Schedule engine diag",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-3": {
+          "type": "service",
+          "settings": {
+            "title": "Transmission & driveline",
+            "description": "<p>Fluid exchanges, valve body concerns, CV axles, differentials, and transfer cases\u2014with road tests to verify shifts.</p>",
+            "link": {
+              "text": "Discuss transmission",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-4": {
+          "type": "service",
+          "settings": {
+            "title": "Tires & alignment",
+            "description": "<p>Mounting, balancing, rotation, and four-wheel alignments. We match OEM specs to protect tire life and handling.</p>",
+            "link": {
+              "text": "Tire quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-5": {
+          "type": "service",
+          "settings": {
+            "title": "Electrical & hybrid/EV",
+            "description": "<p>Charging faults, 12V systems, HV isolation, and battery health checks performed with proper PPE and tooling.</p>",
+            "link": {
+              "text": "Book EV service",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-6": {
+          "type": "service",
+          "settings": {
+            "title": "A/C & climate",
+            "description": "<p>Leak detection, compressor replacement, and recharge to manufacturer refrigerant type. Comfort without cutting corners.</p>",
+            "link": {
+              "text": "A/C inspection",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4", "svc-5", "svc-6"]
+    },
+    "packages": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Maintenance",
+        "title": "Popular service packages",
+        "description": "Bundled pricing for common intervals\u2014final total confirmed after inspection.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "plan-1": {
+          "type": "plan",
+          "settings": {
+            "title": "Daily driver",
+            "price": "$129",
+            "period": "starting",
+            "features": "+ Synthetic oil & filter\n+ Multi-point inspection\n+ Top-off fluids\n+ Tire rotation",
+            "button_link": {
+              "text": "Book package",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "plan-2": {
+          "type": "plan",
+          "settings": {
+            "title": "Brake confidence",
+            "price": "$349",
+            "period": "starting",
+            "features": "+ Front pad & rotor service\n+ Hardware & lubrication\n+ Brake fluid test\n+ Road test",
+            "button_link": {
+              "text": "Book package",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "plan-3": {
+          "type": "plan",
+          "settings": {
+            "title": "Fleet PM slot",
+            "price": "Custom",
+            "period": "per vehicle",
+            "features": "+ Scheduled PM windows\n+ Digital inspections\n+ Batch invoicing\n+ Priority bay access",
+            "button_link": {
+              "text": "Talk to fleet desk",
+              "href": "fleet.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["plan-1", "plan-2", "plan-3"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "title": "Before you drop off",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer loaner vehicles or a shuttle?",
+            "answer": "<p>We partner with a local rental agency for discounted day rates and can provide a shuttle within a 10-mile radius when scheduled in advance.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How long does a typical diagnosis take?",
+            "answer": "<p>Most driveability concerns are diagnosed within 1\u20132 hours. Complex intermittent issues may require overnight monitoring; we will update you before additional time is billed.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "What warranties do you provide?",
+            "answer": "<p>Qualifying repairs include a 36-month / 36,000-mile nationwide parts and labor warranty on most components. Wear items like brakes and tires follow manufacturer prorated coverage.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can I supply my own parts?",
+            "answer": "<p>For liability and warranty reasons we install OEM-quality or OE parts we source. Exceptions are reviewed case-by-case for fleet accounts with approved vendors.</p>"
+          }
+        },
+        "side-info": {
+          "type": "info",
+          "settings": {
+            "title": "Fleet desk",
+            "text": "<p>Email <strong>fleet@torqueauto.example</strong> with VINs and PM intervals. We respond within one business day.</p>"
+          }
+        },
+        "side-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "side-info", "side-social"]
+    }
+  },
+  "widgetsOrder": ["hero", "service_list", "packages", "faq"],
+  "id": "services",
+  "created": "2026-04-10T12:00:00.000Z",
+  "updated": "2026-04-10T12:00:00.000Z"
+}

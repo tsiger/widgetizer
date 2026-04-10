@@ -1,0 +1,310 @@
+{
+  "name": "Lessons",
+  "slug": "lessons",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1e1b4b80",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Lessons & subjects",
+            "size": "3xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>In-studio lessons at our Maple Street schoolhouse; online options for academic subjects.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "subjects": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Academics",
+        "title": "Tutoring tracks",
+        "description": "Sessions are 45 or 60 minutes unless noted. We match you with a specialist for your level.",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "box",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "16 / 9",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "g1": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Math",
+            "title": "Arithmetic through AP Calculus",
+            "description": "<p>Concept-first explanations, error-pattern review, and calculator fluency for exams. Small-group option for peers in the same course.</p>",
+            "button_link": {
+              "text": "Request a match",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "g2": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "English",
+            "title": "Reading, writing & rhetoric",
+            "description": "<p>Essay coaching, grammar confidence, and close reading strategies for middle school through AP Lit.</p>",
+            "button_link": {
+              "text": "Request a match",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "g3": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Test prep",
+            "title": "SAT, ACT & SSAT",
+            "description": "<p>Diagnostic baseline, pacing drills, and section-specific tactics. Full practice tests proctored on-site monthly.</p>",
+            "button_link": {
+              "text": "See pricing",
+              "href": "pricing.html",
+              "target": "_self"
+            }
+          }
+        },
+        "g4": {
+          "type": "card",
+          "settings": {
+            "image": "",
+            "subtitle": "Sciences",
+            "title": "Bio, chem & physics",
+            "description": "<p>Lab-report coaching, honors support, and AP exam strategies with teachers who have classroom experience.</p>",
+            "button_link": {
+              "text": "Request a match",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["g1", "g2", "g3", "g4"]
+    },
+    "music": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Music",
+        "title": "Instruments & voice",
+        "description": "",
+        "heading_alignment": "left",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "start",
+        "icon_style": "outline",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "m1": {
+          "type": "card",
+          "settings": {
+            "icon": "piano",
+            "title": "Piano",
+            "description": "<p>Classical, jazz, and pop; sight-reading and theory integrated weekly.</p>",
+            "button_link": {
+              "text": "Book trial",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "m2": {
+          "type": "card",
+          "settings": {
+            "icon": "music",
+            "title": "Strings",
+            "description": "<p>Violin, viola, cello, and upright bass\u2014Suzuki-inspired for beginners, conservatory track available.</p>",
+            "button_link": {
+              "text": "Book trial",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "m3": {
+          "type": "card",
+          "settings": {
+            "icon": "microphone",
+            "title": "Voice",
+            "description": "<p>Musical theater, classical, and audition coaching. Piano tracks provided for rehearsal.</p>",
+            "button_link": {
+              "text": "Book trial",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["m1", "m2", "m3"]
+    },
+    "hours": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "Studio",
+        "title": "Lesson week at a glance",
+        "description": "Peak slots fill quickly after school; morning homeschool blocks available.",
+        "heading_alignment": "left",
+        "note": "Holiday closures follow District 65 calendar. Online academic sessions can flex outside these hours.",
+        "sidebar_position": "right",
+        "week_start_day": "1",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "mon": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "3:00 \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "tue": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "3:00 \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "wed": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "3:00 \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "thu": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "3:00 \u2013 8:00 PM",
+            "closed": false
+          }
+        },
+        "fri": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "3:00 \u2013 6:30 PM",
+            "closed": false
+          }
+        },
+        "sat": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "9:00 AM \u2013 2:00 PM",
+            "closed": false
+          }
+        },
+        "sun": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "By appointment",
+            "closed": false
+          }
+        },
+        "side-info": {
+          "type": "info",
+          "settings": {
+            "title": "Need a custom schedule?",
+            "text": "<p>Split siblings across instruments, or pair 30 minutes of math with 30 minutes of piano back-to-back. Ask when you book.</p>"
+          }
+        },
+        "side-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "side-info", "side-social"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Lesson FAQs",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "a1": {
+          "type": "item",
+          "settings": {
+            "question": "What ages do you accept?",
+            "answer": "<p>Most students begin between ages 6 and 18; we also coach adults returning to an instrument or preparing for graduate exams.</p>"
+          }
+        },
+        "a2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer online lessons?",
+            "answer": "<p>Academic tutoring and music theory work well online. Piano and strings are in-person for beginners; intermediate students may add occasional remote coachings.</p>"
+          }
+        },
+        "a3": {
+          "type": "item",
+          "settings": {
+            "question": "Can siblings share a time block?",
+            "answer": "<p>Yes\u2014we can stack 30-minute lessons in a single hour with two teachers when rooms allow.</p>"
+          }
+        },
+        "a4": {
+          "type": "item",
+          "settings": {
+            "question": "What if we need to miss a week?",
+            "answer": "<p>One makeup credit per semester for 24-hour notice cancellations; unused credits do not roll year to year.</p>"
+          }
+        },
+        "side-info": {
+          "type": "info",
+          "settings": {
+            "title": "Still deciding?",
+            "text": "<p>Email <strong>hello@noteworthy.studio</strong> with your goals and we will suggest a teacher fit before you pay.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["a1", "a2", "a3", "a4", "side-info"]
+    }
+  },
+  "widgetsOrder": ["hero", "subjects", "music", "hours", "faq"],
+  "id": "lessons",
+  "created": "2026-04-10T14:00:00.000Z",
+  "updated": "2026-04-10T14:00:00.000Z"
+}

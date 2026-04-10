@@ -1,0 +1,31 @@
+{
+  "id": "main-menu",
+  "name": "Main Menu",
+  "items": [
+    {
+      "label": "Shop",
+      "link": "shop.html",
+      "items": []
+    },
+    {
+      "label": "Gallery",
+      "link": "gallery.html",
+      "items": []
+    },
+    {
+      "label": "Workshops",
+      "link": "workshops.html",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "about.html",
+      "items": []
+    },
+    {
+      "label": "Contact",
+      "link": "contact.html",
+      "items": []
+    }
+  ]
+}

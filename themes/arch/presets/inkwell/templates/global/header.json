@@ -1,0 +1,21 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Inkwell",
+    "contactDetailsLine1": "",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "headerNavigation": "main-menu",
+    "center_nav": true,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book a Consultation",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "highlight-primary"
+  }
+}

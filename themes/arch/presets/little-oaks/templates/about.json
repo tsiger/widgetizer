@@ -1,0 +1,135 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#14532d8c",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Rooted in Madison",
+            "size": "3xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Founded by two teachers who wanted a forest-adjacent campus where kids could climb real trees.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "e": {
+          "type": "text",
+          "settings": {
+            "text": "<p>OUR STORY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "head": {
+          "type": "heading",
+          "settings": {
+            "text": "Small enough to know every family.",
+            "size": "3xl"
+          }
+        },
+        "body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Little Oaks started in a renovated church annex with twelve children. Today we serve 140 families but cap enrollment so directors can greet parents by name every morning.</p><p>We are employee-owned: teachers rotate onto a governance council that votes on curriculum purchases and benefits.</p>",
+            "size": "base"
+          }
+        },
+        "btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See licensing",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["e", "head", "body", "btn"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Leadership",
+        "title": "Directors you will meet on day one",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "p1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Avery Collins",
+            "role": "Executive director",
+            "specialty": "M.Ed. Early Childhood",
+            "bio": "Former Head Start coach; leads accreditation visits and coach-the-coach weeks for teachers."
+          }
+        },
+        "p2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Morgan Ellis",
+            "role": "Pedagogy director",
+            "specialty": "Reggio study group alum",
+            "bio": "Designs studio provocations and mentors new leads through their first 90 days."
+          }
+        },
+        "p3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Rosa M\u00e9ndez",
+            "role": "Family partnerships",
+            "specialty": "Bilingual family engagement",
+            "bio": "Runs parent caf\u00e9s, interpreter scheduling, and kindergarten transition nights."
+          }
+        }
+      },
+      "blocksOrder": ["p1", "p2", "p3"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "team"],
+  "id": "about",
+  "created": "2026-04-10T16:00:00.000Z",
+  "updated": "2026-04-10T16:00:00.000Z"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "main-menu",
+  "name": "Main Menu",
+  "items": [
+    { "label": "Programs", "link": "programs.html", "items": [] },
+    { "label": "Tuition", "link": "tuition.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}

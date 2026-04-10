@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Little Oaks",
+    "contactDetailsLine1": "(555) 317-4400",
+    "contactDetailsLine2": "Madison, WI",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Schedule a tour",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-primary"
+  }
+}

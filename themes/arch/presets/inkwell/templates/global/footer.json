@@ -1,0 +1,37 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "\u00a9 2026 Inkwell Tattoo Studio. All rights reserved.",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Inkwell",
+        "text": "<p>Custom tattoo art. By appointment only.</p>"
+      }
+    },
+    "hours": {
+      "type": "text_block",
+      "settings": {
+        "title": "Studio Hours",
+        "text": "<p>Tue\u2013Sat: 11am\u20138pm<br>Sun\u2013Mon: Closed<br>Consultations by appointment</p>"
+      }
+    },
+    "links": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore",
+        "menu": "footer-menu"
+      }
+    },
+    "social": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Us"
+      }
+    }
+  },
+  "blocksOrder": ["logo", "hours", "links", "social"]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "file": "split-hero-right.jpg",
+    "width": 1600,
+    "height": 1200,
+    "prompt": "Professional automotive repair shop interior, vehicle on hydraulic lift, clean well-lit bay, modern equipment, neutral concrete floor, safety orange accent on tool cabinets, photorealistic, no logos or readable text"
+  },
+  {
+    "file": "comparison-before.jpg",
+    "width": 1600,
+    "height": 1000,
+    "prompt": "Cluttered messy mechanic clipboard and vague handwritten car repair notes, dim garage lighting, moody, photorealistic, no readable text"
+  },
+  {
+    "file": "comparison-after.jpg",
+    "width": 1600,
+    "height": 1000,
+    "prompt": "Clean digital tablet showing vehicle inspection photos and checklist on a workshop bench, bright even lighting, professional auto shop, photorealistic, no readable text"
+  },
+  {
+    "file": "services-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Wide shot of auto service bays with lifts, organized tool boards, dramatic but natural light, industrial aesthetic, no people, no logos"
+  },
+  {
+    "file": "fleet-hero.jpg",
+    "width": 1920,
+    "height": 800,
+    "prompt": "White commercial delivery vans parked in a row outside a modern industrial building, golden hour, Arizona desert sky subtle, photorealistic, no logos"
+  },
+  {
+    "file": "fleet-story.jpg",
+    "width": 1400,
+    "height": 1000,
+    "prompt": "Fleet manager and technician reviewing a tablet next to a commercial van with open hood, professional, photorealistic, no readable text on documents"
+  },
+  {
+    "file": "about-hero.jpg",
+    "width": 1920,
+    "height": 600,
+    "prompt": "Auto shop reception counter with clean lobby, ASE certificates blurred on wall, welcoming industrial interior, photorealistic, no readable text"
+  },
+  {
+    "file": "about-story.jpg",
+    "width": 1400,
+    "height": 1000,
+    "prompt": "Technician using diagnostic scan tool connected to car in clean bay, focus on hands and tool, photorealistic, no logos"
+  }
+]

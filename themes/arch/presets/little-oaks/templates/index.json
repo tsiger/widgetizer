@@ -1,0 +1,378 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#14532db3",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "e": {
+          "type": "text",
+          "settings": {
+            "text": "<p>INFANTS \u00b7 TODDLERS \u00b7 PRESCHOOL \u00b7 PRE-K</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Where little ones grow tall.",
+            "size": "6xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Licensed ratios, outdoor classrooms, and teachers who document the small wins. Serving families in Madison since 2006.</p>",
+            "size": "lg"
+          }
+        },
+        "b": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a tour",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See programs",
+              "href": "programs.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["e", "h", "t", "b"]
+    },
+    "marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Outdoor play  \u00b7  Reggio-inspired studios  \u00b7  Farm-to-table snacks  \u00b7  Live camera check-ins  \u00b7  Sibling priority",
+        "separator": "\u00b7",
+        "speed": 8,
+        "rotate": 0,
+        "font_size": "md",
+        "bg_color": "#166534",
+        "text_color": "#ecfdf5",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      }
+    },
+    "trust": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "md",
+        "icon_shape": "rounded",
+        "alignment": "left",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "State licensed",
+            "text": "DCF #123456"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "lock",
+            "title": "Secure entry",
+            "text": "Single point check-in"
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "users",
+            "title": "Low ratios",
+            "text": "At or below state max"
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "4.9 parent rating",
+            "text": "Google & Care.com"
+          }
+        }
+      },
+      "blocksOrder": ["t1", "t2", "t3", "t4"]
+    },
+    "programs": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Age groups",
+        "title": "A classroom for every stage",
+        "description": "Each suite has observation windows, diapering stations, and materials scaled to developmental milestones.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "c1": {
+          "type": "card",
+          "settings": {
+            "icon": "baby-carriage",
+            "title": "Infants (6 wks\u201315 mo)",
+            "description": "<p>Primary caregiving pairs, tummy-time labs, and sensory gardens. Max 8 babies with 3 teachers.</p>",
+            "button_link": {
+              "text": "Program details",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "c2": {
+          "type": "card",
+          "settings": {
+            "icon": "trees",
+            "title": "Toddlers & twos",
+            "description": "<p>Language bursts, potty partnership, and outdoor mud kitchen days. Bilingual story time optional.</p>",
+            "button_link": {
+              "text": "Program details",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        },
+        "c3": {
+          "type": "card",
+          "settings": {
+            "icon": "school",
+            "title": "Preschool & pre-K",
+            "description": "<p>Project-based literacy, early STEM, and kindergarten readiness portfolios you keep forever.</p>",
+            "button_link": {
+              "text": "Program details",
+              "href": "programs.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["c1", "c2", "c3"]
+    },
+    "philosophy": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>OUR APPROACH</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "head": {
+          "type": "heading",
+          "settings": {
+            "text": "Play is the work of childhood.",
+            "size": "3xl"
+          }
+        },
+        "body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We document learning through photos and learning stories\u2014not worksheets. Teachers train yearly in conscious discipline and outdoor risk benefits.</p>",
+            "size": "base"
+          }
+        },
+        "btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the team",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "head", "body", "btn"]
+    },
+    "tours": {
+      "type": "event-list",
+      "settings": {
+        "eyebrow": "Visit us",
+        "title": "Upcoming tour mornings",
+        "description": "Saturday tours include coffee on the porch and 20 minutes on the playscape with your child.",
+        "heading_alignment": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "ev1": {
+          "type": "event",
+          "settings": {
+            "day": "12",
+            "month": "Apr",
+            "title": "Spring open house",
+            "location": "Little Oaks campus \u00b7 9:00 AM",
+            "description": "<p>Meet directors, see classrooms, and grab a waitlist packet.</p>",
+            "button_link": {
+              "text": "RSVP",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "ev2": {
+          "type": "event",
+          "settings": {
+            "day": "26",
+            "month": "Apr",
+            "title": "Infant suite spotlight",
+            "location": "Little Oaks campus \u00b7 10:30 AM",
+            "description": "<p>Small-group tour focused on feeding and nap rhythms.</p>",
+            "button_link": {
+              "text": "RSVP",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "ev3": {
+          "type": "event",
+          "settings": {
+            "day": "10",
+            "month": "May",
+            "title": "Pre-K readiness night",
+            "location": "Little Oaks campus \u00b7 6:00 PM",
+            "description": "<p>For parents of four-year-olds heading to kindergarten.</p>",
+            "button_link": {
+              "text": "RSVP",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["ev1", "ev2", "ev3"]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Families",
+        "title": "What parents notice first",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "q1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The daily photos are specific\u2014not generic. I see exactly how she negotiated the climbing structure and shared trucks. That transparency sold us.",
+            "avatar": "",
+            "name": "Imani L.",
+            "title": "Toddler parent",
+            "rating": "5"
+          }
+        },
+        "q2": {
+          "type": "quote",
+          "settings": {
+            "quote": "They handled food allergies with a color-coded kitchen we could tour. Our pediatrician was impressed by the outdoor time logs.",
+            "avatar": "",
+            "name": "Chris & Dana P.",
+            "title": "Infant parents",
+            "rating": "5"
+          }
+        },
+        "q3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Our son ran into kindergarten reading confidently. The pre-K teachers looped in his elementary teacher without us asking.",
+            "avatar": "",
+            "name": "Rosa M.",
+            "title": "Alumni parent",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["q1", "q2", "q3"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "ch": {
+          "type": "heading",
+          "settings": {
+            "text": "Spots open for fall",
+            "size": "2xl"
+          }
+        },
+        "ct": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Waitlist families get sibling priority and installment plans.</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cb": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check tuition",
+              "href": "tuition.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["ch", "ct", "cb"]
+    }
+  },
+  "widgetsOrder": ["hero", "marquee", "trust", "programs", "philosophy", "tours", "reviews", "cta"],
+  "id": "index",
+  "created": "2026-04-10T16:00:00.000Z",
+  "updated": "2026-04-10T16:00:00.000Z"
+}

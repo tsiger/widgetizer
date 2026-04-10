@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Torque",
+    "contactDetailsLine1": "Service: (555) 441-9090",
+    "contactDetailsLine2": "2840 Industrial Blvd, Phoenix, AZ",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book service",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-primary"
+  }
+}

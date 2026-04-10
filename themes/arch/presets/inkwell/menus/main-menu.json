@@ -1,0 +1,26 @@
+{
+  "id": "main-menu",
+  "name": "Main Menu",
+  "items": [
+    {
+      "label": "Services",
+      "link": "services.html",
+      "items": []
+    },
+    {
+      "label": "Portfolio",
+      "link": "portfolio.html",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "about.html",
+      "items": []
+    },
+    {
+      "label": "Contact",
+      "link": "contact.html",
+      "items": []
+    }
+  ]
+}

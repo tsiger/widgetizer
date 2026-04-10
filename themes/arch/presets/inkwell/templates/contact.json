@@ -1,0 +1,161 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get in Touch",
+            "size": "4xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ready to start your next piece? Reach out for a free consultation. We'll discuss your ideas, answer questions, and find the right artist for your project.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text"]
+    },
+    "contact-info": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "info": {
+          "type": "info",
+          "settings": {
+            "title": "Inkwell Tattoo Studio",
+            "text": "<p>742 Ashland Avenue, Studio 3<br>Portland, OR 97214<br><br>(555) 482-0099<br>hello@inkwelltattoo.co</p>"
+          }
+        },
+        "hours": {
+          "type": "text_block",
+          "settings": {
+            "title": "Studio Hours",
+            "text": "<p>Tuesday\u2013Saturday: 11am\u20138pm<br>Sunday\u2013Monday: Closed<br><br>Consultations by appointment only</p>"
+          }
+        },
+        "social": {
+          "type": "social_block",
+          "settings": {
+            "title": "Follow Our Work"
+          }
+        }
+      },
+      "blocksOrder": ["info", "hours", "social"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Booking",
+        "title": "Common Questions",
+        "description": "",
+        "heading_alignment": "left",
+        "style": "connected",
+        "allow_multiple": false,
+        "sidebar_position": "left",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Ready to Book?",
+            "text": "<p>(555) 482-0099<br>hello@inkwelltattoo.co<br><br>DM us on Instagram with your ideas and we'll get back to you within 24 hours.</p>"
+          }
+        },
+        "q1": {
+          "type": "item",
+          "settings": {
+            "question": "How do I book an appointment?",
+            "answer": "<p>Call us, email, or DM us on Instagram with your tattoo idea, preferred placement, and approximate size. We'll schedule a free consultation to discuss your project in detail.</p>"
+          }
+        },
+        "q2": {
+          "type": "item",
+          "settings": {
+            "question": "How much does a tattoo cost?",
+            "answer": "<p>Pricing depends on size, complexity, placement, and style. Small pieces start around $150. Larger custom work is quoted on an hourly basis during your consultation.</p>"
+          }
+        },
+        "q3": {
+          "type": "item",
+          "settings": {
+            "question": "What's your cancellation policy?",
+            "answer": "<p>We require 48 hours notice for cancellations or rescheduling. Late cancellations or no-shows forfeit the deposit. We understand life happens\u2014just communicate with us.</p>"
+          }
+        },
+        "q4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you tattoo over scars or old tattoos?",
+            "answer": "<p>Yes, we do cover-ups and scar coverage. These projects require an in-person consultation so we can assess the area and discuss realistic expectations.</p>"
+          }
+        },
+        "q5": {
+          "type": "item",
+          "settings": {
+            "question": "Can I bring someone with me?",
+            "answer": "<p>You're welcome to bring one guest for moral support. Our studio space is limited, so we ask that children and large groups stay home.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sidebar-info", "q1", "q2", "q3", "q4", "q5"]
+    },
+    "map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Find Us",
+        "description": "",
+        "heading_alignment": "left",
+        "address": "742 Ashland Avenue, Portland, OR 97214",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2795.5!2d-122.6368!3d45.5122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDXCsDMwJzQ0LjAiTiAxMjLCsDM4JzEyLjUiVw!5e0!3m2!1sen!2sus!4v1234567890",
+        "directions_link": {
+          "href": "https://maps.google.com",
+          "text": "Get Directions",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "parking": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Free street parking on Ashland Ave. Paid lot available on SE Division, one block north.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["parking"]
+    }
+  },
+  "widgetsOrder": ["intro", "contact-info", "faq", "map"]
+}

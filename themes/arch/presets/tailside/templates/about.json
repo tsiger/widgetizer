@@ -1,0 +1,135 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#17255499",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Our team",
+            "size": "3xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Collaborative medicine with clear communication at every step.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "story": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "e": {
+          "type": "text",
+          "settings": {
+            "text": "<p>HOSPITAL STORY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "head": {
+          "type": "heading",
+          "settings": {
+            "text": "Built for complex cases\u2014without losing neighborhood warmth.",
+            "size": "3xl"
+          }
+        },
+        "body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tailside opened when three emergency vets wanted a place that could keep critical patients on-site instead of shipping them across town. Today we pair urgent care with long-term relationship medicine.</p>",
+            "size": "base"
+          }
+        },
+        "btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["e", "head", "body", "btn"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Leadership",
+        "title": "Medical directors",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "p1": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Dr. Priya Nair, DVM",
+            "role": "Medical director",
+            "specialty": "DACVIM (Small Animal Internal Medicine)",
+            "bio": "Oversees chronic disease pathways and intern mentorship; former NC State faculty."
+          }
+        },
+        "p2": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Dr. Luis Ortega, DVM",
+            "role": "Surgery director",
+            "specialty": "DACVS",
+            "bio": "TPLO, thoracic, and minimally invasive procedures with rehab partnership."
+          }
+        },
+        "p3": {
+          "type": "profile",
+          "settings": {
+            "photo": "",
+            "name": "Dr. Hannah Cole, DVM",
+            "role": "Emergency director",
+            "specialty": "DACVECC",
+            "bio": "Runs triage protocols and blood bank; lectures on toxin management regionally."
+          }
+        }
+      },
+      "blocksOrder": ["p1", "p2", "p3"]
+    }
+  },
+  "widgetsOrder": ["hero", "story", "team"],
+  "id": "about",
+  "created": "2026-04-10T18:00:00.000Z",
+  "updated": "2026-04-10T18:00:00.000Z"
+}

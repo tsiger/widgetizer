@@ -1,0 +1,285 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image": "",
+        "image_position": "right",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Professional Pet Grooming</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Happy Pets, Happy People",
+            "size": "4xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Expert grooming for dogs and cats of all breeds and sizes. Gentle handling, organic products, and a stress-free experience every visit.</p>",
+            "size": "base"
+          }
+        },
+        "buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a Grooming",
+              "target": "_self"
+            },
+            "link_2": {
+              "href": "services.html",
+              "text": "Our Services",
+              "target": "_self"
+            },
+            "style": "primary",
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "text", "buttons"]
+    },
+    "trust": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "alignment": "centered",
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "small"
+      },
+      "blocks": {
+        "certified": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "Certified Groomers",
+            "text": "Trained and experienced"
+          }
+        },
+        "gentle": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Fear-Free Handling",
+            "text": "Gentle, patient approach"
+          }
+        },
+        "breeds": {
+          "type": "item",
+          "settings": {
+            "icon": "paw",
+            "title": "All Breeds Welcome",
+            "text": "Dogs and cats of every size"
+          }
+        },
+        "products": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Organic Products",
+            "text": "Safe, natural shampoos"
+          }
+        }
+      },
+      "blocksOrder": ["certified", "gentle", "breeds", "products"]
+    },
+    "services": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "What We Do",
+        "title": "Our Services",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "bath": {
+          "type": "card",
+          "settings": {
+            "icon": "bath",
+            "title": "Bath & Brush",
+            "description": "<p>Shampoo, conditioner, blow-dry, and brushout. Includes ear cleaning and nail trim.</p>"
+          }
+        },
+        "full": {
+          "type": "card",
+          "settings": {
+            "icon": "scissors",
+            "title": "Full Groom",
+            "description": "<p>Everything in Bath & Brush plus a breed-specific haircut and styling.</p>"
+          }
+        },
+        "spa": {
+          "type": "card",
+          "settings": {
+            "icon": "sparkles",
+            "title": "Spa Package",
+            "description": "<p>The works \u2014 full groom plus blueberry facial, teeth brushing, and paw balm.</p>"
+          }
+        },
+        "cat": {
+          "type": "card",
+          "settings": {
+            "icon": "cat",
+            "title": "Cat Grooming",
+            "description": "<p>Gentle grooming for cats including bath, brush, nail trim, and lion cut options.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["bath", "full", "spa", "cat"]
+    },
+    "before-after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "See the Difference",
+        "title": "Grooming Transformations",
+        "description": "",
+        "heading_alignment": "center",
+        "before_image": "",
+        "after_image": "",
+        "before_label": "Before",
+        "after_label": "After",
+        "orientation": "horizontal",
+        "initial_position": 30,
+        "show_labels": true,
+        "color_scheme": "standard-primary"
+      }
+    },
+    "testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 5000,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "My anxious rescue dog actually enjoys going to Pawlish. The groomers are so patient and gentle. He comes home looking and smelling amazing.",
+            "name": "Sarah Mitchell",
+            "title": "Rescue dog owner",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Best groomer in Madison, hands down. They know exactly how to handle my goldendoodle's coat and he always looks fantastic.",
+            "name": "James Park",
+            "title": "Goldendoodle owner",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "I was nervous about getting my cat groomed but the team was incredible. She came back calm and beautifully groomed.",
+            "name": "Lisa Chen",
+            "title": "Cat owner",
+            "rating": "5"
+          }
+        },
+        "quote-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "We've tried every groomer in the area and Pawlish is the only one our dog doesn't resist. The difference is night and day.",
+            "name": "Tom & Maria Hernandez",
+            "title": "French bulldog owners",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3", "quote-4"]
+    },
+    "gallery-preview": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "Our Work",
+        "title": "Fresh & Fluffy",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "staggered": false,
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "img-1": { "type": "image", "settings": { "image": "", "caption": "Golden retriever" } },
+        "img-2": { "type": "image", "settings": { "image": "", "caption": "Poodle cut" } },
+        "img-3": { "type": "image", "settings": { "image": "", "caption": "Shih Tzu" } },
+        "img-4": { "type": "image", "settings": { "image": "", "caption": "Persian cat" } },
+        "img-5": { "type": "image", "settings": { "image": "", "caption": "Labradoodle" } },
+        "img-6": { "type": "image", "settings": { "image": "", "caption": "Yorkshire terrier" } },
+        "img-7": { "type": "image", "settings": { "image": "", "caption": "Maine coon" } },
+        "img-8": { "type": "image", "settings": { "image": "", "caption": "Cockapoo" } }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6", "img-7", "img-8"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready for a Fresh Look?",
+            "size": "3xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book your pet\u2019s next grooming appointment today.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a Grooming",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text", "button"]
+    }
+  },
+  "widgetsOrder": ["hero", "trust", "services", "before-after", "testimonials", "gallery-preview", "cta"]
+}

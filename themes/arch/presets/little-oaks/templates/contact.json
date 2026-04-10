@@ -1,0 +1,197 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#14532d99",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "text": "Visit Little Oaks",
+            "size": "4xl"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tours take about 45 minutes. Evening phone consults available for working parents.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["h", "t"]
+    },
+    "details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "Get in touch",
+        "title": "We reply same day",
+        "description": "",
+        "heading_alignment": "left",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info-1": {
+          "type": "info",
+          "settings": {
+            "title": "Campus",
+            "text": "<p>88 Oak Lane<br>Madison, WI 53703</p>"
+          }
+        },
+        "hours": {
+          "type": "text_block",
+          "settings": {
+            "title": "Office hours",
+            "text": "<p>(555) 317-4400<br>hello@littleoaks.example</p><p>Mon\u2013Fri 7:30 AM \u2013 6:00 PM</p>"
+          }
+        },
+        "menu-1": {
+          "type": "menu_block",
+          "settings": {
+            "title": "Quick links"
+          }
+        },
+        "social-1": {
+          "type": "social_block",
+          "settings": {
+            "title": "Community"
+          }
+        }
+      },
+      "blocksOrder": ["info-1", "hours", "menu-1", "social-1"]
+    },
+    "location": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Map",
+        "description": "",
+        "heading_alignment": "left",
+        "address": "88 Oak Lane, Madison, WI 53703",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2918.0!2d-89.4!3d43.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDA0JzEyLjAiTiA4OcKwMjQnMDAuMCJX!5e0!3m2!1sen!2sus",
+        "directions_link": {
+          "text": "Open in Google Maps",
+          "href": "https://maps.google.com/?q=88+Oak+Lane+Madison+WI+53703",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "right",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "info-park": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Visitor spots in front of the oak tree; street parking on weekends.</p>"
+          }
+        },
+        "info-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["info-park", "info-social"]
+    },
+    "schedule": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "Front desk",
+        "title": "Best times to call",
+        "description": "For urgent matters outside these hours, use the parent app messaging line.",
+        "heading_alignment": "left",
+        "note": "Closed on major federal holidays.",
+        "sidebar_position": "right",
+        "week_start_day": "1",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "mon": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "7:30 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "tue": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "7:30 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "wed": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "7:30 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "thu": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "7:30 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "fri": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "7:30 AM \u2013 6:00 PM",
+            "closed": false
+          }
+        },
+        "sat": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "Tours only",
+            "closed": false
+          }
+        },
+        "sun": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "",
+            "closed": true
+          }
+        },
+        "side-info": {
+          "type": "info",
+          "settings": {
+            "title": "Need a same-week tour?",
+            "text": "<p>Text <strong>(555) 317-4401</strong> with your child\u2019s birth date and preferred program.</p>"
+          }
+        },
+        "side-social": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "side-info", "side-social"]
+    }
+  },
+  "widgetsOrder": ["hero", "details", "location", "schedule"],
+  "id": "contact",
+  "created": "2026-04-10T16:00:00.000Z",
+  "updated": "2026-04-10T16:00:00.000Z"
+}
