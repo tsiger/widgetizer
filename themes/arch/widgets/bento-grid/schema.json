@@ -169,7 +169,7 @@
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:bento_grid.blocks.item.settings.image.label"
+          "label": "tTheme:global.widgets.settings.background_image.label"
         },
         {
           "type": "link",

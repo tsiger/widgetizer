@@ -16,7 +16,7 @@
     {
       "type": "image",
       "id": "image",
-      "label": "tTheme:split_hero.settings.image.label"
+      "label": "tTheme:global.widgets.settings.image.label"
     },
     {
       "type": "color",

@@ -351,6 +351,9 @@
           }
         },
         "image": {
+          "label": "Image"
+        },
+        "background_image": {
           "label": "Background image"
         },
         "overlay_color": {
@@ -698,9 +701,6 @@
   "banner": {
     "name": "Banner",
     "settings": {
-      "image": {
-        "label": "Background image"
-      },
       "height": {
         "label": "Height",
         "options": {
@@ -760,9 +760,6 @@
           },
           "text": {
             "label": "Text"
-          },
-          "image": {
-            "label": "Photo (optional)"
           }
         }
       }
@@ -777,11 +774,7 @@
     },
     "blocks": {
       "card": {
-        "settings": {
-          "image": {
-            "label": "Image"
-          }
-        }
+        "settings": {}
       }
     }
   },
@@ -791,9 +784,6 @@
       "card": {
         "name": "Card",
         "settings": {
-          "image": {
-            "label": "Image"
-          },
           "title": {
             "label": "Heading"
           },
@@ -924,9 +914,6 @@
           },
           "text": {
             "label": "Text"
-          },
-          "image": {
-            "label": "Photo (optional)"
           },
           "layout_header": {
             "label": "Layout"
@@ -1072,9 +1059,6 @@
       "image": {
         "name": "Image",
         "settings": {
-          "image": {
-            "label": "Image"
-          },
           "caption": {
             "label": "Caption"
           }
@@ -1202,9 +1186,6 @@
       "link": {
         "description": "Optional link when image is clicked."
       },
-      "image": {
-        "label": "Background image"
-      },
       "fullwidth": {
         "description": "Display image at full browser width."
       }
@@ -1213,20 +1194,13 @@
   },
   "image_callout": {
     "name": "Image Callout",
-    "settings": {
-      "image": {
-        "label": "Background image"
-      }
-    }
+    "settings": {}
   },
   "image_hotspots": {
     "name": "Image Hotspots",
     "settings": {
       "image_alt": {
         "label": "Image alt text"
-      },
-      "image": {
-        "label": "Background image"
       }
     },
     "blocks": {
@@ -1263,9 +1237,6 @@
           },
           "description": {
             "label": "Tab description"
-          },
-          "image": {
-            "label": "Background image"
           }
         }
       }
@@ -1274,9 +1245,6 @@
   "image_text": {
     "name": "Image + Text",
     "settings": {
-      "image": {
-        "label": "Background image"
-      },
       "text_position": {
         "label": "Text vertical position"
       },
@@ -1368,9 +1336,6 @@
       "logo": {
         "name": "Logo",
         "settings": {
-          "image": {
-            "label": "Logo Image"
-          },
           "name": {
             "label": "Company Name"
           }
@@ -1411,9 +1376,6 @@
         "settings": {
           "category": {
             "label": "Category"
-          },
-          "image": {
-            "label": "Photo (optional)"
           },
           "title": {
             "label": "Heading"
@@ -1489,9 +1451,6 @@
           },
           "price": {
             "label": "Price"
-          },
-          "image": {
-            "label": "Photo (optional)"
           },
           "description": {
             "label": "Subheading"
@@ -1617,9 +1576,6 @@
       "project": {
         "name": "Project",
         "settings": {
-          "image": {
-            "label": "Project Image"
-          },
           "title": {
             "label": "Project Title"
           },
@@ -1687,9 +1643,6 @@
       "panel": {
         "name": "Panel",
         "settings": {
-          "image": {
-            "label": "Image"
-          },
           "title": {
             "label": "Heading"
           },
@@ -1723,9 +1676,6 @@
       "slide": {
         "name": "Slide",
         "settings": {
-          "image": {
-            "label": "Background image"
-          },
           "heading_text": {
             "label": "Heading Text"
           },
@@ -1865,11 +1815,7 @@
   },
   "split_hero": {
     "name": "Split Hero",
-    "settings": {
-      "image": {
-        "label": "Background image"
-      }
-    }
+    "settings": {}
   },
   "steps": {
     "name": "Steps",
@@ -1877,9 +1823,6 @@
       "step": {
         "name": "Step",
         "settings": {
-          "image": {
-            "label": "Image"
-          },
           "title": {
             "label": "Heading"
           },
@@ -1995,9 +1938,6 @@
   "video_popup": {
     "name": "Video Popup",
     "settings": {
-      "image": {
-        "label": "Background image"
-      },
       "video_header": {
         "label": "Video"
       },

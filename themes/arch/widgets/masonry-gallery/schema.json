@@ -158,7 +158,7 @@
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:masonry_gallery.blocks.item.settings.image.label"
+          "label": "tTheme:global.widgets.settings.image.label"
         },
         {
           "type": "text",

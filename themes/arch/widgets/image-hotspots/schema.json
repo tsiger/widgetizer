@@ -48,7 +48,7 @@
     {
       "type": "image",
       "id": "image",
-      "label": "tTheme:image_hotspots.settings.image.label"
+      "label": "tTheme:global.widgets.settings.background_image.label"
     },
     {
       "type": "text",

@@ -51,7 +51,7 @@
     {
       "type": "image",
       "id": "image",
-      "label": "Image"
+      "label": "tTheme:global.widgets.settings.image.label"
     },
     {
       "type": "select",

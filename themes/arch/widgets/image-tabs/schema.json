@@ -155,7 +155,7 @@
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:image_tabs.blocks.tab.settings.image.label"
+          "label": "tTheme:global.widgets.settings.image.label"
         }
       ]
     }

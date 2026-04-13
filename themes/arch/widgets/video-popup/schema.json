@@ -12,7 +12,7 @@
     {
       "type": "image",
       "id": "image",
-      "label": "tTheme:video_popup.settings.image.label"
+      "label": "tTheme:global.widgets.settings.background_image.label"
     },
     {
       "type": "header",

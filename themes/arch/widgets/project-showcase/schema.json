@@ -207,7 +207,7 @@
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:project_showcase.blocks.project.settings.image.label"
+          "label": "tTheme:global.widgets.settings.image.label"
         },
         {
           "type": "text",

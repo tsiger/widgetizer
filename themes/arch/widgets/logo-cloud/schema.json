@@ -178,7 +178,7 @@
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:logo_cloud.blocks.logo.settings.image.label"
+          "label": "tTheme:global.widgets.settings.image.label"
         },
         {
           "type": "text",

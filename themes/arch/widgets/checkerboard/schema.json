@@ -138,7 +138,7 @@
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:checkerboard.blocks.card.settings.image.label"
+          "label": "tTheme:global.widgets.settings.image.label"
         },
         {
           "type": "text",

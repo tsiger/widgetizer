@@ -16,7 +16,7 @@
     {
       "type": "image",
       "id": "image",
-      "label": "tTheme:image_callout.settings.image.label"
+      "label": "tTheme:global.widgets.settings.image.label"
     },
     {
       "type": "header",

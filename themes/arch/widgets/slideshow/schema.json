@@ -91,7 +91,15 @@
         {
           "type": "image",
           "id": "image",
-          "label": "tTheme:slideshow.blocks.slide.settings.image.label"
+          "label": "tTheme:global.widgets.settings.background_image.label"
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "tTheme:global.widgets.settings.overlay_color.label",
+          "default": "#0a1e38bf",
+          "allow_alpha": true,
+          "description": "tTheme:global.widgets.settings.overlay_color.description"
         },
         {
           "type": "text",
@@ -260,14 +268,6 @@
               "label": "tTheme:global.widgets.settings.button_size.options.xlarge"
             }
           ]
-        },
-        {
-          "type": "color",
-          "id": "overlay_color",
-          "label": "tTheme:global.widgets.settings.overlay_color.label",
-          "default": "#0a1e38bf",
-          "allow_alpha": true,
-          "description": "tTheme:global.widgets.settings.overlay_color.description"
         },
         {
           "type": "select",
