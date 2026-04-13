@@ -33,7 +33,7 @@
         "address": "247 Elm Street, Brooklyn, NY 11201",
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "left",
+        "sidebar_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {

@@ -11,7 +11,7 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 | `eyebrow` | Any text | Small label above the headline, adds a reveal-up animation step |
 | `title` | Any text (default "Our Process") | Main section headline; renders as h1 when the widget is first on the page, h2 otherwise |
 | `description` | Any text | Subtitle paragraph below the headline |
-| `heading_alignment` | `left`, `center` | Left-aligns the eyebrow/title/description block or keeps them centered |
+| `heading_alignment` | `start`, `center` | Left-aligns the eyebrow/title/description block or keeps them centered |
 | `layout` | `vertical`, `horizontal`, `centered` | Vertical: single-column list with a connecting line on the left. Horizontal: items in a row with a top connecting line (kicks in at 990px+). Centered: alternating left-right items split by a center line (990px+) |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses no extra background; accent and highlight variants swap background and add container padding |
 | `top_spacing` | `auto`, `none` | Removes the default top padding when set to none; useful for stacking sections tightly |
@@ -106,6 +106,6 @@ A sequential, numbered-step widget for presenting processes, histories, and road
 - **Centered layout creates visual rhythm on long pages.** The alternating left-right pattern breaks monotony and works well between full-width hero or gallery widgets. It naturally draws the eye downward.
 - **The features textarea is the secret weapon.** Most timeline widgets only offer a title and description. The newline-separated feature list with optional `+`/`-` icon prefixes lets you build scannable checklists inside each step without touching rich text.
 - **Date and duration serve double duty.** They are free-text fields, not restricted to actual dates. Use them for phase labels, step numbers, cost tiers, difficulty levels, or any short metadata pair that helps visitors orient themselves.
-- **Combine heading_alignment left with layout vertical for a documentation feel.** Left-aligned headings with a vertical timeline reads like a structured guide rather than a marketing section, which suits professional services and technical audiences.
+- **Combine heading_alignment start with layout vertical for a documentation feel.** Left-aligned headings with a vertical timeline reads like a structured guide rather than a marketing section, which suits professional services and technical audiences.
 - **Use color_scheme highlight or highlight-secondary to visually separate the timeline from surrounding content.** This is especially effective when the timeline sits between two standard-background widgets and needs to stand out as a distinct narrative block.
 - **Each marker auto-numbers sequentially.** You do not need to manually enter numbers anywhere; the numbered circles update automatically when items are reordered or added. This makes the widget low-maintenance for clients who edit their own sites.

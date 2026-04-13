@@ -11,7 +11,7 @@ Embed a single YouTube or Vimeo video with an optional headline section, configu
 | `eyebrow` | Any text (blank by default) | Small label above the headline; adds a reveal-up animation step |
 | `title` | Any text (default: "Watch the Video") | Main heading above the video; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text (blank by default) | Supporting paragraph below the title |
-| `heading_alignment` | `center` (default), `left` | Controls whether the eyebrow/title/description block is centered or left-aligned |
+| `heading_alignment` | `start` | Controls whether the eyebrow/title/description block is centered or left-aligned |
 | `video_url` | YouTube or Vimeo URL | Parsed into an embed iframe; invalid URLs show a placeholder message instead |
 | `video_title` | Any text (default: "Video") | Sets the iframe `title` attribute for accessibility / screen readers |
 | `aspect_ratio` | `16 / 9` (default), `4 / 3`, `21:9`, `1 / 1` | Changes the padding-based aspect box: 56.25%, 75%, 42.86%, or 100% respectively |
@@ -74,7 +74,7 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `eyebrow` | "Our Story" |
 | `title` | "Meet the Team" |
 | `description` | Brief intro about the company culture or mission |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `aspect_ratio` | `16 / 9` |
 | `color_scheme` | `standard-primary` |
 

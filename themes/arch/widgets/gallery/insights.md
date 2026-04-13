@@ -9,7 +9,7 @@ Responsive image gallery with grid or carousel layout, lightbox viewing, optiona
 | eyebrow | Any text (optional) | Small label above the title, adds editorial context |
 | title | Any text (default: "Project Gallery") | Section heading; renders as h1 if first widget on page, h2 otherwise |
 | description | Any text (optional) | Paragraph below the title, sets expectations for the gallery |
-| heading_alignment | `left`, `center` (default) | Left-aligns the header block for editorial layouts or centers it for showcase pages |
+| heading_alignment` | `start`, `center` (default) | Left-aligns the header block for editorial layouts or centers it for showcase pages |
 | layout | `grid` (default), `carousel` | Grid shows all images at once in a responsive grid; carousel displays a horizontal scrollable strip with prev/next arrows |
 | columns_desktop | 2 -- 5 (default 4) | Number of columns on desktop; fewer columns mean larger thumbnails and more visual weight per image |
 | staggered | true / false (default false) | Even-numbered cards drop down by a large vertical offset, creating a masonry-like rhythm; only visible at 750px+ |
@@ -27,7 +27,7 @@ Responsive image gallery with grid or carousel layout, lightbox viewing, optiona
 ## Layout recipes
 
 **1. "Portfolio Wall" (creative professional)**
-Settings: layout `grid`, columns_desktop `3`, aspect_ratio `4/3`, staggered `true`, heading_alignment `left`, color_scheme `standard-primary`.
+Settings: layout `grid`, columns_desktop `3`, aspect_ratio `4/3`, staggered `true`, heading_alignment` | `start`, color_scheme `standard-primary`.
 Blocks: 6--9 project photos with captions naming each project.
 Good for: photographers, architects, interior designers, illustrators.
 Industries: architecture, photography, design studios, art galleries.
@@ -45,7 +45,7 @@ Good for: seasonal launches, catalog browsing, lifestyle product display.
 Industries: fashion, jewelry, ceramics, furniture, food products.
 
 **4. "Team at Work" (company culture)**
-Settings: layout `grid`, columns_desktop `3`, aspect_ratio `16/9`, staggered `false`, heading_alignment `left`, color_scheme `standard-secondary`.
+Settings: layout `grid`, columns_desktop `3`, aspect_ratio `16/9`, staggered `false`, heading_alignment` | `start`, color_scheme `standard-secondary`.
 Blocks: 6 candid workplace or event photos, captions optional.
 Good for: about-us pages, recruitment landing pages, company culture sections.
 Industries: tech startups, agencies, co-working spaces, nonprofits.
@@ -57,7 +57,7 @@ Good for: hero-adjacent storytelling, event recaps, travel highlights.
 Industries: hospitality, event venues, tourism, real estate.
 
 **6. "Mosaic Feature" (editorial/blog)**
-Settings: layout `grid`, columns_desktop `4`, aspect_ratio `auto`, staggered `true`, heading_alignment `left`.
+Settings: layout `grid`, columns_desktop `4`, aspect_ratio `auto`, staggered `true`, heading_alignment` | `start`.
 Blocks: 8+ images of varying native proportions; captions describe each scene.
 Good for: mixed-media storytelling where image proportions differ naturally.
 Industries: food blogs, travel writers, lifestyle brands, wedding planners.

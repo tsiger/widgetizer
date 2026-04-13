@@ -6,7 +6,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-secondary",
         "top_spacing": "none"
       },
@@ -35,7 +35,7 @@
         "eyebrow": "",
         "title": "",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",

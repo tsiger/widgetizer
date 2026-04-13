@@ -11,8 +11,8 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 | `eyebrow` | Any text | Small label above the headline; leave blank to hide entirely |
 | `title` | Any text | Main headline; renders as `h1` when widget is first on the page, `h2` otherwise |
 | `description` | Any text | Supporting paragraph below the headline |
-| `heading_alignment` | `left` / `center` | Controls whether the eyebrow-title-description block aligns left or centers within its column |
-| `content_position` | `left` / `right` | Determines which column holds the heading block; the feature list takes the opposite side. On `right`, the divider border flips to the right edge of the list |
+| `heading_alignment` | `start` / `center` | Controls whether the eyebrow-title-description block aligns left or centers within its column |
+| `content_position` | `start` / `end` | Determines which column holds the heading block; the feature list takes the opposite side. On `right`, the divider border flips to the right edge of the list |
 | `show_divider` | on / off | Toggles a thin vertical border on the feature-list side, adding a clean editorial separation between the two columns |
 | `icon_style` | `plain` / `outline` / `filled` | Changes icon rendering: bare icon, outlined container, or solid-filled container |
 | `icon_size` | `sm` / `md` / `lg` / `xl` | Scales the icon; `xl` default gives the icons visual weight as anchor points |
@@ -35,7 +35,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 1. Market Segments Overview
 
-**Settings:** `heading_alignment: left`, `content_position: left`, `show_divider: true`, `icon_style: filled`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: standard`
+**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: standard`
 **Blocks:** 3 features (e.g., Individuals, Small Business, Enterprise)
 
 **Good for:** Communicating that the business serves distinct customer types, each with tailored value.
@@ -45,7 +45,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 2. Core Services Breakdown
 
-**Settings:** `heading_alignment: center`, `content_position: left`, `show_divider: true`, `icon_style: outline`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: highlight`
+**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: outline`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: highlight`
 **Blocks:** 4 features (e.g., Design, Development, Marketing, Support)
 
 **Good for:** A services page where the heading side carries a strong value proposition and the list side enumerates what the business actually delivers.
@@ -55,7 +55,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 3. Why Choose Us (Differentiators)
 
-**Settings:** `heading_alignment: left`, `content_position: right`, `show_divider: false`, `icon_style: plain`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard-secondary`
+**Settings:** `heading_alignment: start`, `content_position: end`, `show_divider: false`, `icon_style: plain`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard-secondary`
 **Blocks:** 3-4 features (e.g., 24/7 Support, No Contracts, Local Team, Certified Experts)
 
 **Good for:** A compact trust-building section near the bottom of a homepage where the heading asks a question and the features answer it.
@@ -65,7 +65,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 4. Process Steps
 
-**Settings:** `heading_alignment: left`, `content_position: left`, `show_divider: true`, `icon_style: filled`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard`
+**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard`
 **Blocks:** 3-5 features using numbered or sequential icons (e.g., clipboard, wrench, check-circle)
 
 **Good for:** Explaining a linear workflow so the visitor knows what to expect after contacting the business. The vertical divider line reinforces the sequential nature.
@@ -75,7 +75,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 5. Location or Department Highlights
 
-**Settings:** `heading_alignment: center`, `content_position: right`, `show_divider: true`, `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: highlight-secondary`
+**Settings:** `heading_alignment: center`, `content_position: end`, `show_divider: true`, `icon_style: outline`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: highlight-secondary`
 **Blocks:** 3 features (e.g., Downtown Office, Westside Clinic, Mobile Unit)
 
 **Good for:** Multi-location businesses that need to convey where they operate with a brief note about each location's specialties or hours.
@@ -85,7 +85,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 6. Product Tier Comparison (Lightweight)
 
-**Settings:** `heading_alignment: left`, `content_position: left`, `show_divider: false`, `icon_style: filled`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: standard`
+**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: false`, `icon_style: filled`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: standard`
 **Blocks:** 3 features (e.g., Starter, Professional, Premium) with brief descriptions of what each includes
 
 **Good for:** A softer alternative to a full pricing table when the business wants to outline tiers without showing prices publicly.
@@ -95,7 +95,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ### 7. Audience-Specific Value Props
 
-**Settings:** `heading_alignment: center`, `content_position: left`, `show_divider: true`, `icon_style: plain`, `icon_size: lg`, `icon_shape: circle`, `color_scheme: highlight`
+**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: plain`, `icon_size: lg`, `icon_shape: circle`, `color_scheme: highlight`
 **Blocks:** 2-3 features (e.g., For Parents, For Teachers, For Administrators)
 
 **Good for:** Quickly segmenting messaging when a single product serves multiple user groups with different pain points.
@@ -105,7 +105,7 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ## Differentiation Tips
 
-- **Flip the content position** to break visual monotony when stacking multiple sections. If the section above has a left-aligned image or heading, set `content_position: right` on features-split so the eye moves in a Z-pattern down the page.
+- **Flip the content position** to break visual monotony when stacking multiple sections. If the section above has a left-aligned image or heading, set `content_position: end` on features-split so the eye moves in a Z-pattern down the page.
 
 - **Use the divider strategically.** Enable it when features represent a sequential process or distinct categories. Disable it when the features are loosely related benefits and you want a softer, less structured feel.
 

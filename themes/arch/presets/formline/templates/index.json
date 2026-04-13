@@ -65,7 +65,7 @@
         "eyebrow": "Selected Work",
         "title": "Recent Projects",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -184,7 +184,7 @@
         "eyebrow": "By the Numbers",
         "title": "Built Work",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "gap": "var(--space-md)",
         "color_scheme": "highlight-primary"
       },

@@ -40,7 +40,7 @@
         "eyebrow": "",
         "title": "",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "columns_desktop": 2,
         "color_scheme": "standard-primary"
       },
@@ -106,8 +106,8 @@
         "eyebrow": "What's Included",
         "title": "Every Clean, Covered",
         "description": "",
-        "heading_alignment": "left",
-        "image_position": "right",
+        "heading_alignment": "start",
+        "image_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -142,7 +142,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -187,10 +187,10 @@
         "eyebrow": "",
         "title": "Service Questions",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "connected",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

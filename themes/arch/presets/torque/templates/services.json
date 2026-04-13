@@ -40,7 +40,7 @@
         "eyebrow": "What we fix",
         "title": "Core repair categories",
         "description": "Tap through for scope; every job starts with inspection and your approval.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "show_dividers": true,
         "color_scheme": "standard-primary"
       },
@@ -189,7 +189,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

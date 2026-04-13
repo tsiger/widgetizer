@@ -11,7 +11,7 @@ A vertically stacked, zero-padded numbered list of services with optional divide
 | `eyebrow` | Any text | Small label above the headline; adds a contextual cue like "What We Do" or "Our Process" |
 | `title` | Any text (default: "Our Services") | Main section headline; when this is the first widget on the page it renders as `<h1>` |
 | `description` | Any text | Supporting paragraph below the headline; useful for a one-liner about your approach |
-| `heading_alignment` | `left` / `center` (default) | Left-aligns the header block for editorial layouts; center for symmetrical pages |
+| `heading_alignment` | `start` / `center` (default) | Left-aligns the header block for editorial layouts; center for symmetrical pages |
 | `show_dividers` | `true` (default) / `false` | Toggles thin horizontal rules between items and a top border on the list; turning off gives a cleaner, more minimal look |
 | `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Controls background and text palette; accent variants add subtle color contrast, highlight variants use a bold background fill |
 | `top_spacing` | `auto` (default) / `none` | Removes the default top padding when set to none; useful for stacking tightly against a hero or another full-bleed section |
@@ -41,7 +41,7 @@ Keep titles short (2-3 words) and descriptions to one sentence. The numbered for
 ### 2. Capabilities Deep-Dive (5-7 items)
 
 - **Blocks:** 5-7 service blocks
-- **Settings:** `heading_alignment: left`, `show_dividers: true`, `color_scheme: standard`, `eyebrow: "Capabilities"`
+- **Settings:** `heading_alignment: start`, `show_dividers: true`, `color_scheme: standard`, `eyebrow: "Capabilities"`
 - **Good for:** A dedicated services page where visitors drill into individual offerings
 - **Industries:** Architecture studios, engineering firms, IT managed services
 
@@ -68,7 +68,7 @@ Use `highlight-secondary` to make the section pop against standard white section
 ### 5. Single Focus Service + Upsells
 
 - **Blocks:** 1 primary block (detailed description), 2-3 shorter blocks
-- **Settings:** `heading_alignment: left`, `show_dividers: true`, `color_scheme: standard-secondary`, `eyebrow: "How We Help"`
+- **Settings:** `heading_alignment: start`, `show_dividers: true`, `color_scheme: standard-secondary`, `eyebrow: "How We Help"`
 - **Good for:** A landing page for one main service with related add-ons listed below
 - **Industries:** Dental clinics, home remodeling contractors, tutoring services
 
@@ -77,7 +77,7 @@ Write a rich, multi-sentence description for the first block and keep the rest b
 ### 6. Compact Footer Services
 
 - **Blocks:** 4-6 service blocks with short titles, no descriptions
-- **Settings:** `heading_alignment: left`, `show_dividers: true`, `color_scheme: highlight`, `bottom_spacing: none`
+- **Settings:** `heading_alignment: start`, `show_dividers: true`, `color_scheme: highlight`, `bottom_spacing: none`
 - **Good for:** A quick navigation list near the bottom of a homepage before the actual footer
 - **Industries:** Multi-location clinics, cleaning companies, property management
 

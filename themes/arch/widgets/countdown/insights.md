@@ -11,7 +11,7 @@ A time-based countdown section that ticks toward a target date, displaying days/
 | `eyebrow` | Any text (blank by default) | Small label above the headline -- adds context like "Limited Time" or "Grand Opening" |
 | `title` | Any text (default "Coming Soon") | Main headline rendered as h1 (first widget) or h2 |
 | `description` | Any text (blank by default) | Paragraph below the headline for extra detail |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the entire block including the timer digits |
+| `heading_alignment` | `start` | Centers or left-aligns the entire block including the timer digits |
 | `target_date` | Datetime string, e.g. `2027-01-01 00:00` | The moment the counter reaches zero |
 | `expired_message` | Any text (default "The wait is over!") | Accent-colored message that replaces the digits once the target passes |
 | `button` | Link object (text + href + optional target) | CTA button below the timer; hidden when text is blank |
@@ -62,7 +62,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `show_seconds` | `true` |
 | `top_spacing` | `none` |
 | `bottom_spacing` | `none` |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 
 **Good for:** Short-duration promotions where the ticking seconds create real urgency.
 **Industries:** E-commerce, boutiques, online course creators, SaaS with limited-time pricing.
@@ -117,7 +117,7 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `color_scheme` | `highlight-primary` |
 | `button` | "See the Full Menu" linking to menu page |
 | `show_seconds` | `false` |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 
 **Good for:** Seasonal rotations where you want repeat visitors checking back.
 **Industries:** Restaurants, bakeries, cafes, catering companies, florists.

@@ -39,7 +39,7 @@
         "eyebrow": "Our Work",
         "title": "Custom Tattoo Art",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "columns_desktop": 4,
         "gap": "small",
         "color_scheme": "standard-primary",
@@ -165,7 +165,7 @@
       "type": "testimonial-hero",
       "settings": {
         "author_image": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"

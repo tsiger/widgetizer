@@ -40,7 +40,7 @@
         "eyebrow": "Currently Available",
         "title": "Featured Listings",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",

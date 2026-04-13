@@ -11,7 +11,7 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 | `eyebrow` | Any text / blank | Small label above the headline. Adds context or category framing ("Our Showroom", "How It Works"). Leave blank to hide. |
 | `title` | Any text (default "Interactive Image") | Main headline rendered as `<h1>` on the first widget of a page, `<h2>` otherwise. Blank hides the entire header row if description and eyebrow are also empty. |
 | `description` | Any text / blank | Supporting paragraph beneath the headline. Good for a one-sentence setup ("Tap any pin to learn more"). |
-| `heading_alignment` | `left` / `center` (default) | Left-aligns the header block for editorial layouts; center keeps it balanced above the image. |
+| `heading_alignment` | `start` / `center` (default) | Left-aligns the header block for editorial layouts; center keeps it balanced above the image. |
 | `image` | Image upload / blank | The base photo all hotspots sit on. Rendered at full container width with responsive srcset. Falls back to a landscape placeholder when empty. |
 | `image_alt` | Any text (default "Interactive image with hotspots") | Alt text for the base image. Important for accessibility and SEO. |
 | `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Controls the section background and overall palette. `standard-primary` has no extra padding; the other three add padded container treatment and override `--widget-bg-color`. |
@@ -32,7 +32,7 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 
 ### 1. Product Feature Callouts
 
-- **Settings**: 4-6 hotspots on a hero product photo. `heading_alignment: left`, eyebrow "Product Details", `color_scheme: standard`.
+- **Settings**: 4-6 hotspots on a hero product photo. `heading_alignment: start`, eyebrow "Product Details", `color_scheme: standard`.
 - **Hotspot strategy**: Pin each key feature (material, button, screen, strap) at its physical location. Short title + 1-sentence description + link to specs page.
 - **Good for**: E-commerce product pages, Kickstarter-style landing sections.
 - **Industries**: Consumer electronics, fashion accessories, sporting goods, furniture.
@@ -46,7 +46,7 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 
 ### 3. Before/After Explainer
 
-- **Settings**: 2-3 hotspots on a single "after" photo. `heading_alignment: left`, eyebrow "The Transformation", `color_scheme: standard-secondary`.
+- **Settings**: 2-3 hotspots on a single "after" photo. `heading_alignment: start`, eyebrow "The Transformation", `color_scheme: standard-secondary`.
 - **Hotspot strategy**: Pinpoint specific changes (new countertop, replaced windows, landscaping). Description explains the upgrade and materials used.
 - **Good for**: Portfolio case studies, renovation showcases.
 - **Industries**: Home remodeling, landscaping, auto detailing, salon makeovers.
@@ -67,7 +67,7 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 
 ### 6. Anatomy of a Service
 
-- **Settings**: 3-4 hotspots on an infographic-style image or process photo. `heading_alignment: left`, title "What's Included", `color_scheme: standard-secondary`.
+- **Settings**: 3-4 hotspots on an infographic-style image or process photo. `heading_alignment: start`, title "What's Included", `color_scheme: standard-secondary`.
 - **Hotspot strategy**: Each pin represents a phase or deliverable (consultation, design mockup, installation, follow-up). Descriptions set expectations and timelines.
 - **Good for**: Service overview pages, pricing sections.
 - **Industries**: Web agencies, HVAC contractors, cleaning services, photography studios.

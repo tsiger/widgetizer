@@ -11,7 +11,7 @@ Circular-photo people grid with name, role, specialty, bio, and social links -- 
 | `eyebrow` | any text | Small label above the headline ("Our Team", "Leadership", etc.) |
 | `title` | any text | Main section headline; first widget on page renders as `<h1>` |
 | `description` | any text | Paragraph below the headline for context |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the entire header block |
+| `heading_alignment` | `start` | Centers or left-aligns the entire header block |
 | `columns_desktop` | `2` - `5` (default `3`) | Number of columns in the grid on desktop; directly controls density |
 | `layout` | `grid` (default), `carousel` | Grid shows all cards at once; carousel adds prev/next buttons and horizontal scrolling |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text color pairing for the whole section |
@@ -93,7 +93,7 @@ Best when you have 6+ profiles. Carousel keeps the section compact while letting
 | `title` | "Guided by Experience" |
 | `columns_desktop` | `2` |
 | `layout` | `grid` |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `color_scheme` | `standard-primary` |
 
 Two columns give each leader more horizontal space, making bios easier to read. Use longer bios here (2-3 sentences). Add LinkedIn and email for direct contact. Skip `specialty` and use `role` for the full title.

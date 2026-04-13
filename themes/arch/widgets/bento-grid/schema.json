@@ -32,12 +32,12 @@
       "default": "center",
       "options": [
         {
-          "value": "left",
-          "label": "tTheme:global.widgets.settings.options.left"
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
         },
         {
           "value": "center",
-          "label": "tTheme:global.widgets.settings.options.center"
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         }
       ]
     },
@@ -172,6 +172,14 @@
           "label": "tTheme:global.widgets.settings.background_image.label"
         },
         {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "tTheme:global.widgets.settings.overlay_color.label",
+          "default": "#0a1e38bf",
+          "allow_alpha": true,
+          "description": "tTheme:global.widgets.settings.overlay_color.description"
+        },
+        {
           "type": "link",
           "id": "link",
           "label": "tTheme:global.widgets.settings.link.label",
@@ -209,14 +217,6 @@
           "type": "color",
           "id": "background_color",
           "label": "tTheme:bento_grid.blocks.item.settings.background_color.label"
-        },
-        {
-          "type": "color",
-          "id": "overlay_color",
-          "label": "tTheme:global.widgets.settings.overlay_color.label",
-          "default": "#0a1e38bf",
-          "allow_alpha": true,
-          "description": "tTheme:global.widgets.settings.overlay_color.description"
         },
         {
           "type": "select",

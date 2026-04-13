@@ -6,7 +6,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
         "color_scheme": "highlight-primary",
@@ -98,8 +98,8 @@
         "eyebrow": "How We Think",
         "title": "Our Principles",
         "description": "",
-        "heading_alignment": "left",
-        "content_position": "left",
+        "heading_alignment": "start",
+        "content_position": "start",
         "show_divider": true,
         "icon_style": "outline",
         "icon_size": "lg",
@@ -199,7 +199,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

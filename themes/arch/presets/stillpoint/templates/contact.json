@@ -30,7 +30,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "text_position": "flex-end",
         "content_color_scheme": "none",
         "color_scheme": "standard-primary"
@@ -78,12 +78,12 @@
         "eyebrow": "",
         "title": "Find the Studio",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "address": "82 Willow Street, Brooklyn, NY 11201",
         "embed_url": "",
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

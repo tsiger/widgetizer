@@ -11,7 +11,7 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | `eyebrow` | Any text (default: "Trusted By") | Small label above the headline; omit to remove |
 | `title` | Any text | Main headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text (optional) | Supporting paragraph beneath the headline |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the entire header block |
+| `heading_alignment` | `start` | Centers or left-aligns the entire header block |
 | `layout` | `grid` (default), `carousel` | Static equal-column grid vs. horizontally scrollable carousel with prev/next arrows |
 | `columns_desktop` | 2 -- 8 (default: 6) | Number of columns on desktop; in carousel mode this sets visible slides per view |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and border palette; non-standard schemes add padded container and override `--widget-bg-color` |
@@ -104,7 +104,7 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 |---------|-------|
 | layout | grid |
 | columns_desktop | 4 |
-| heading_alignment | left |
+| heading_alignment | start |
 | eyebrow | Our Suppliers |
 | title | We work with the best brands |
 | description | All products are sourced from authorized distributors. |

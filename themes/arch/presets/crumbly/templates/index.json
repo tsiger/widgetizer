@@ -158,7 +158,7 @@
     "cake_teaser": {
       "type": "image-callout",
       "settings": {
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -200,7 +200,7 @@
     "testimonial": {
       "type": "testimonial-hero",
       "settings": {
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {

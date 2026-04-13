@@ -55,7 +55,7 @@
         "eyebrow": "Core services",
         "title": "A small menu of high-leverage engagements",
         "description": "Each offer is designed to help a business make clearer visual decisions without buying more process than it needs.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "show_dividers": true,
         "color_scheme": "standard-primary"
       },
@@ -117,7 +117,7 @@
         "eyebrow": "What the system needs to do",
         "title": "Design choices should hold up across actual business touchpoints",
         "description": "The studio is less interested in one perfect mockup than in building a system that survives real use.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "gap": "var(--space-md)",
         "color_scheme": "standard-secondary"
       },

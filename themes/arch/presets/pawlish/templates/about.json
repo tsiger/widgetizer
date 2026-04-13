@@ -7,7 +7,7 @@
       "settings": {
         "image": "",
         "overlay_color": "rgba(0,0,0,0.15)",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "highlight-primary",
         "top_spacing": "none"
       },
@@ -151,7 +151,7 @@
         "heading_alignment": "center",
         "style": "connected",
         "allow_multiple": false,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "highlight-primary"
       },
       "blocks": {

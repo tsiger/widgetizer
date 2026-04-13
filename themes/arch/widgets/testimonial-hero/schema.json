@@ -31,15 +31,15 @@
       "type": "select",
       "id": "image_position",
       "label": "tTheme:global.widgets.settings.image_position.label",
-      "default": "right",
+      "default": "end",
       "options": [
         {
-          "value": "left",
-          "label": "tTheme:global.widgets.settings.image_position.options.left"
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.image_position.options.start"
         },
         {
-          "value": "right",
-          "label": "tTheme:global.widgets.settings.image_position.options.right"
+          "value": "end",
+          "label": "tTheme:global.widgets.settings.image_position.options.end"
         }
       ]
     },

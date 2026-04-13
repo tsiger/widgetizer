@@ -11,7 +11,7 @@ Tabbed or toggle-based card grid that lets visitors flip between 2-3 groups of i
 | `eyebrow` | Any text | Small label above the headline (e.g., "Pricing", "Our Plans"). Omit to hide. |
 | `title` | Any text | Section headline. Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. |
 | `description` | Any text | Paragraph below the headline providing context. Omit to hide. |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the header block **and** the switcher buttons. Left alignment gives a more editorial feel. |
+| `heading_alignment` | `start` | Centers or left-aligns the header block **and** the switcher buttons. Left alignment gives a more editorial feel. |
 | `switcher_type` | `toggle` (default), `tabs` | **Toggle** shows exactly 2 options. **Tabs** unlocks a third option button, allowing 3 content groups. |
 | `option_1_label` | Text | Label for the first switcher button (e.g., "Monthly"). Leave blank to hide the entire first tab and its panel. |
 | `option_2_label` | Text | Label for the second button (e.g., "Yearly"). |
@@ -81,7 +81,7 @@ Each tab shows a different audience's service lineup. Use `text` richtext for bu
 | `option_1_label` | Before |
 | `option_2_label` | After |
 | `columns` | 2 |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `color_scheme` | `standard-primary` |
 | `aspect_ratio` | `3/2` |
 
@@ -140,7 +140,7 @@ Two cards per option. Keep it tight -- one entry-level, one premium. Use `text` 
 | `option_2_label` | Westside |
 | `option_3_label` | Northshore |
 | `columns` | 3 |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `color_scheme` | `highlight-secondary` |
 | `aspect_ratio` | `4/3` |
 

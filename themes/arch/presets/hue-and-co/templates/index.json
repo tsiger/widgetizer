@@ -157,7 +157,7 @@
       "settings": {
         "logo": "",
         "author_image": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -232,7 +232,7 @@
         "eyebrow": "Portfolio",
         "title": "Featured Work",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "gap": "var(--space-md)",
         "color_scheme": "standard-secondary"
       },

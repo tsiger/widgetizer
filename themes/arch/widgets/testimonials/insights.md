@@ -11,7 +11,7 @@ Social-proof section that displays customer quotes in a grid or carousel, with o
 | `eyebrow` | Any text (blank by default) | Small label above the headline, useful for phrases like "Don't take our word for it" |
 | `title` | Any text (default: "What Our Customers Say") | Section headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text (blank by default) | Subtext paragraph below the headline |
-| `heading_alignment` | `left`, `center` (default) | Left-aligns the header block or centers it; left works better when paired with asymmetric layouts |
+| `heading_alignment` | `start`, `center` (default) | Left-aligns the header block or centers it; left works better when paired with asymmetric layouts |
 | `layout` | `grid` (default), `carousel` | Grid shows all cards at once with staggered reveal animations; carousel adds prev/next navigation and horizontal scrolling |
 | `columns_desktop` | 2 -- 5 (default: 4) | Number of columns on desktop; mobile collapses automatically |
 | `card_layout` | `box` (default), `flat` | Box gives each card a bordered, padded container; flat removes the card chrome for a more editorial look |
@@ -75,7 +75,7 @@ Load 6-8 short quotes (one sentence each) and let the carousel handle overflow. 
 | `columns_desktop` | 2 |
 | `card_layout` | flat |
 | `color_scheme` | highlight |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `eyebrow` | "Client Stories" |
 
 **Good for:** Portfolio or case-study pages where longer, story-driven quotes feel natural.
@@ -143,7 +143,7 @@ Use 5 very short quotes (one sentence). Drop avatars. The five columns of five-s
 | `columns_desktop` | 2 |
 | `card_layout` | box |
 | `color_scheme` | highlight |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `eyebrow` | "Trusted By Leaders" |
 | `rating` (on blocks) | (blank -- hidden) |
 

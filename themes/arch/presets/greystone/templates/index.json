@@ -50,7 +50,7 @@
         "icon_style": "filled",
         "icon_size": "lg",
         "icon_shape": "sharp",
-        "alignment": "left",
+        "alignment": "start",
         "show_dividers": true,
         "color_scheme": "standard-secondary"
       },
@@ -96,8 +96,8 @@
         "eyebrow": "What We Do",
         "title": "Practice Areas",
         "description": "We bring decades of courtroom experience and negotiation skill to every matter we handle. Our attorneys combine deep legal knowledge with a practical, results-driven approach.",
-        "heading_alignment": "left",
-        "content_position": "left",
+        "heading_alignment": "start",
+        "content_position": "start",
         "show_divider": true,
         "icon_style": "filled",
         "icon_size": "lg",
@@ -144,7 +144,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
         "color_scheme": "standard-primary"

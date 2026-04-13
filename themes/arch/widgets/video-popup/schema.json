@@ -15,6 +15,14 @@
       "label": "tTheme:global.widgets.settings.background_image.label"
     },
     {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "tTheme:global.widgets.settings.overlay_color.label",
+      "default": "#0a1e38bf",
+      "allow_alpha": true,
+      "description": "tTheme:video_popup.settings.overlay_color.description"
+    },
+    {
       "type": "header",
       "id": "video_header",
       "label": "tTheme:video_popup.settings.video_header.label"
@@ -35,14 +43,6 @@
       "type": "header",
       "id": "display_header",
       "label": "tTheme:global.widgets.settings.display_header.label"
-    },
-    {
-      "type": "color",
-      "id": "overlay_color",
-      "label": "tTheme:global.widgets.settings.overlay_color.label",
-      "default": "#0a1e38bf",
-      "allow_alpha": true,
-      "description": "tTheme:video_popup.settings.overlay_color.description"
     },
     {
       "type": "select",

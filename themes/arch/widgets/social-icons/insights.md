@@ -11,7 +11,7 @@ Displays a row of linked social-media icons pulled from the global theme social 
 | **eyebrow** | Any text (blank by default) | Small label above the headline; adds a reveal-up animation step. Useful for phrases like "Stay in Touch" or "Join the Community". |
 | **title** | Any text (default "Follow Us") | Main headline. Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. Leave blank to hide. |
 | **description** | Any text (default "Stay connected with us on social media.") | Supporting paragraph beneath the headline. Leave blank to hide. |
-| **heading_alignment** | `center` (default), `left` | Controls text alignment of the header block *and* icon row alignment (`center` vs `flex-start`). |
+| **heading_alignment` | `start` | Controls text alignment of the header block *and* icon row alignment (`center` vs `flex-start`). |
 | **icon_size** | Range 1.6 -- 4.8 rem, step 0.2 (default 2.4) | Sets the SVG icon dimension. The clickable box is always icon_size + 1.6 rem, so at default the tap target is 4 rem square. |
 | **color_scheme** | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text treatment. `standard-primary` has no padded container; all other schemes add padding and set `--widget-bg-color`. |
 | **top_spacing** | `auto` (default), `none` | Removes the top section margin when set to `none`. Handy for stacking directly below another widget. |
@@ -72,7 +72,7 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | eyebrow | *(blank)* |
 | title | Connect With Us |
 | description | *(blank)* |
-| heading_alignment | left |
+| heading_alignment | start |
 | icon_size | 2.4 |
 | color_scheme | standard-secondary |
 | top_spacing | auto |
@@ -91,7 +91,7 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | eyebrow | *(blank)* |
 | title | Find Us Online |
 | description | *(blank)* |
-| heading_alignment | left |
+| heading_alignment | start |
 | icon_size | 1.8 |
 | color_scheme | standard |
 | top_spacing | none |

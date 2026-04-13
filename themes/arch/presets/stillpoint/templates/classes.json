@@ -136,8 +136,8 @@
         "eyebrow": "First Time?",
         "title": "What to Expect",
         "description": "",
-        "heading_alignment": "left",
-        "content_position": "left",
+        "heading_alignment": "start",
+        "content_position": "start",
         "show_divider": true,
         "icon_style": "plain",
         "icon_size": "lg",
@@ -229,7 +229,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
         "color_scheme": "standard-primary"

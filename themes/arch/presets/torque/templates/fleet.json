@@ -55,7 +55,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
         "color_scheme": "standard-primary"
@@ -105,7 +105,7 @@
         "eyebrow": "Program",
         "title": "What you get",
         "description": "Built for dispatchers, owners, and drivers who need clarity without shop jargon.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 2,
         "icon_style": "filled",

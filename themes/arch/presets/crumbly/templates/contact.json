@@ -34,7 +34,7 @@
         "address": "58 Maple Avenue, Asheville, NC 28801",
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "left",
+        "sidebar_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -65,7 +65,7 @@
     "custom_orders": {
       "type": "image-callout",
       "settings": {
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

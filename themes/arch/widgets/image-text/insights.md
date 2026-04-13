@@ -9,7 +9,7 @@ A side-by-side split layout that pairs a single image with a flexible stack of c
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `image` | Any uploaded image | The hero visual occupying 50% width on desktop, full width on mobile |
-| `image_position` | `left` (default), `right` | Swaps which side the image sits on; `right` reverses the flexbox direction |
+| `image_position` | `start` (default), `end` | Swaps which side the image sits on; `right` reverses the flexbox direction |
 | `text_position` | `flex-start`, `center` (default), `flex-end` | Vertically aligns the text column to the top, middle, or bottom of the image |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text colors for the entire widget section |
 | `content_color_scheme` | `none` (default), `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | When set to anything other than `none`, gives the text column its own padded, rounded background panel. On desktop, the image and text panel stretch edge-to-edge with no gap and squared-off corners, creating a magazine-style card |
@@ -56,7 +56,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 
 | Setting | Value |
 |---------|-------|
-| `image_position` | `left` |
+| `image_position` | `start` |
 | `text_position` | `center` |
 | `color_scheme` | `standard-primary` |
 | `content_color_scheme` | `none` |
@@ -71,7 +71,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 
 | Setting | Value |
 |---------|-------|
-| `image_position` | `left` |
+| `image_position` | `start` |
 | `text_position` | `center` |
 | `color_scheme` | `highlight-primary` |
 | `content_color_scheme` | `highlight-secondary` |
@@ -101,7 +101,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 
 | Setting | Value |
 |---------|-------|
-| `image_position` | `left` |
+| `image_position` | `start` |
 | `text_position` | `flex-end` |
 | `color_scheme` | `standard-primary` |
 | `content_color_scheme` | `standard-secondary` |
@@ -131,7 +131,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 
 | Setting | Value |
 |---------|-------|
-| `image_position` | `left` |
+| `image_position` | `start` |
 | `text_position` | `center` |
 | `color_scheme` | `standard-primary` |
 | `content_color_scheme` | `highlight-primary` |
@@ -145,7 +145,7 @@ Blocks are stacked vertically inside the text column. Mix and order freely.
 
 ## Differentiation Tips
 
-- **Alternate image sides when stacking multiple image-text widgets.** Place the first with `image_position: left`, the next with `right`, and so on. This creates a zigzag rhythm that keeps long pages from feeling monotonous.
+- **Alternate image sides when stacking multiple image-text widgets.** Place the first with `image_position: start`, the next with `right`, and so on. This creates a zigzag rhythm that keeps long pages from feeling monotonous.
 
 - **Use `content_color_scheme` for visual weight.** Setting it to a value other than `none` turns the text column into a distinct card panel. This is the widget's most unique visual mode -- on desktop the image and panel lock together edge-to-edge with no gap and no border-radius, producing a magazine-spread look that most split-layout widgets cannot replicate.
 

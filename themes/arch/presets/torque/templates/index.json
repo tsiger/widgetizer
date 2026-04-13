@@ -7,7 +7,7 @@
       "settings": {
         "image": "",
         "overlay_color": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
@@ -74,7 +74,7 @@
         "icon_style": "filled",
         "icon_size": "md",
         "icon_shape": "rounded",
-        "alignment": "left",
+        "alignment": "start",
         "show_dividers": true,
         "color_scheme": "standard-secondary",
         "top_spacing": "small",
@@ -123,7 +123,7 @@
         "title": "One shop. Two lanes.",
         "description": "Whether you commute across town or run a delivery fleet, we keep vehicles safe, compliant, and on the road.",
         "heading_alignment": "center",
-        "content_position": "left",
+        "content_position": "start",
         "show_divider": true,
         "icon_style": "filled",
         "icon_size": "lg",

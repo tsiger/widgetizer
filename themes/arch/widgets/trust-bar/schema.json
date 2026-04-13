@@ -81,16 +81,16 @@
     {
       "type": "select",
       "id": "alignment",
-      "label": "tTheme:trust_bar.settings.alignment.label",
-      "default": "left",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "start",
       "options": [
         {
-          "value": "left",
-          "label": "tTheme:global.widgets.settings.options.left"
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
         },
         {
-          "value": "centered",
-          "label": "tTheme:global.widgets.settings.options.center"
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         }
       ]
     },

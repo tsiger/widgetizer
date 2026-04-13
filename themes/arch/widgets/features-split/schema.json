@@ -34,12 +34,12 @@
       "default": "center",
       "options": [
         {
-          "value": "left",
-          "label": "tTheme:global.widgets.settings.options.left"
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
         },
         {
           "value": "center",
-          "label": "tTheme:global.widgets.settings.options.center"
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         }
       ]
     },
@@ -52,15 +52,15 @@
       "type": "select",
       "id": "content_position",
       "label": "tTheme:features_split.settings.content_position.label",
-      "default": "left",
+      "default": "start",
       "options": [
         {
-          "value": "left",
-          "label": "tTheme:global.widgets.settings.options.left"
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.options.start"
         },
         {
-          "value": "right",
-          "label": "tTheme:global.widgets.settings.options.right"
+          "value": "end",
+          "label": "tTheme:global.widgets.settings.options.end"
         }
       ]
     },

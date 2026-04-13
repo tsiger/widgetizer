@@ -8,7 +8,7 @@ Image-forward portfolio grid (or carousel) with hover-reveal text overlay, built
 
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
-| `heading_alignment` | `left`, `center` | Controls whether the eyebrow/title/description block sits flush-left or centered above the grid |
+| `heading_alignment` | `start`, `center` | Controls whether the eyebrow/title/description block sits flush-left or centered above the grid |
 | `layout` | `grid`, `carousel` | Grid shows all items at once in a responsive multi-column layout; carousel displays a swipeable strip with prev/next buttons |
 | `columns_desktop` | `2` -- `5` | Number of columns on desktop viewports; fewer columns = larger cards with more visual impact |
 | `aspect_ratio` | `auto`, `contain`, `1/1`, `4/3`, `3/2`, `3/4`, `16/9` | Determines image crop shape. `auto` uses the natural image ratio; `contain` fits the full image inside a fixed-height container; portrait (`3/4`) is unusual and attention-grabbing |
@@ -37,7 +37,7 @@ Image-forward portfolio grid (or carousel) with hover-reveal text overlay, built
 | `columns_desktop` | `2` |
 | `aspect_ratio` | `3/2` |
 | `text_display` | `hover` |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `color_scheme` | `standard-primary` |
 
 Large, cinematic cards that let the photography do the talking. Hover-reveal keeps the grid clean. Two columns give each project room to breathe.
@@ -109,7 +109,7 @@ The 4:3 ratio suits food photography and venue shots. Always-on overlay text lab
 | `columns_desktop` | `3` |
 | `aspect_ratio` | `4/3` |
 | `text_display` | `hover` |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `color_scheme` | `standard-primary` |
 
 Clean, professional grid with left-aligned heading that matches a typical tech-company layout. Link each card to a dedicated case-study page. Hover-reveal keeps the interface minimal. Use the description field for short outcome lines like "40% conversion lift."

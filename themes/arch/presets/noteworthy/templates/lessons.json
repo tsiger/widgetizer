@@ -40,7 +40,7 @@
         "eyebrow": "Academics",
         "title": "Tutoring tracks",
         "description": "Sessions are 45 or 60 minutes unless noted. We match you with a specialist for your level.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 2,
         "card_layout": "box",
@@ -115,7 +115,7 @@
         "eyebrow": "Music",
         "title": "Instruments & voice",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "flat",
@@ -174,9 +174,9 @@
         "eyebrow": "Studio",
         "title": "Lesson week at a glance",
         "description": "Peak slots fill quickly after school; morning homeschool blocks available.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "note": "Holiday closures follow District 65 calendar. Online academic sessions can flex outside these hours.",
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "week_start_day": "1",
         "color_scheme": "standard-primary"
       },
@@ -260,7 +260,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

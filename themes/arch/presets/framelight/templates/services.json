@@ -75,7 +75,7 @@
         "eyebrow": "Collections",
         "title": "Signature Packages",
         "description": "Flexible coverage for portraits, brand work, and multi-day celebrations.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 3,
         "color_scheme": "standard-primary"
@@ -135,7 +135,7 @@
         "eyebrow": "Behind the Camera",
         "title": "A calm set makes better images",
         "description": "A short reel from recent portrait and brand sessions.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "video_url": "https://www.youtube.com/watch?v=2PuFyjAs7JA",
         "video_title": "Framelight behind-the-scenes reel",
         "aspect_ratio": "21:9",

@@ -32,7 +32,7 @@
     "founders_story": {
       "type": "image-text",
       "settings": {
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -77,7 +77,7 @@
     "philosophy": {
       "type": "image-callout",
       "settings": {
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

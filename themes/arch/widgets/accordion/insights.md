@@ -11,10 +11,10 @@ Collapsible question-and-answer sections with optional sidebar, two visual style
 | `eyebrow` | Any text (default: "Support") | Small label above the headline; omit to remove |
 | `title` | Any text (default: "Frequently Asked Questions") | Main section heading (renders as h1 if first widget on page, h2 otherwise) |
 | `description` | Any text | Subtitle paragraph below the headline |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the entire header block |
+| `heading_alignment` | `start` | Centers or left-aligns the entire header block |
 | `style` | `separated` (default), `connected` | Separated: individual rounded cards with gaps. Connected: single bordered container, items divided by hairlines |
 | `allow_multiple` | `false` (default), `true` | When off, opening one item closes others. When on, any number can stay open simultaneously |
-| `sidebar_position` | `right` (default), `left` | Places the info/social sidebar on the right or left of the accordion list (only visible when info or social blocks exist) |
+| `sidebar_position` | `end` (default), `start` | Places the info/social sidebar on the right or left of the accordion list (only visible when info or social blocks exist) |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard: transparent background. Accent variants: items get secondary background. Highlight: themed section background with padding |
 | `top_spacing` | `auto` (default), `none` | Removes top padding when set to none — useful for stacking sections tightly |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to none |
@@ -42,14 +42,14 @@ Collapsible question-and-answer sections with optional sidebar, two visual style
 
 ### 2. Support Hub with Contact Sidebar
 
-- **Settings:** style `separated`, heading alignment `left`, sidebar_position `right`, color_scheme `standard-secondary`
+- **Settings:** style `separated`, heading alignment `start`, sidebar_position `end`, color_scheme `standard-secondary`
 - **Blocks:** 5-8 item blocks + 1 info block ("Still need help?" with email/phone) + 1 social block
 - **Good for:** Support pages that funnel unanswered questions to a human
 - **Industries:** Professional services, agencies, dental/medical offices
 
 ### 3. Compact Policy Section
 
-- **Settings:** style `connected`, heading alignment `left`, allow_multiple `true`, color_scheme `standard-primary`, bottom_spacing `none`
+- **Settings:** style `connected`, heading alignment `start`, allow_multiple `true`, color_scheme `standard-primary`, bottom_spacing `none`
 - **Blocks:** 3-5 item blocks covering shipping, returns, warranty, etc. No sidebar.
 - **Good for:** Embedding below a product page or checkout flow so buyers can self-serve policy questions without leaving the page
 - **Industries:** E-commerce, handmade goods, retail
@@ -63,7 +63,7 @@ Collapsible question-and-answer sections with optional sidebar, two visual style
 
 ### 5. Onboarding / Getting Started
 
-- **Settings:** style `connected`, heading alignment `left`, allow_multiple `true`, color_scheme `standard-secondary`, eyebrow "Getting Started"
+- **Settings:** style `connected`, heading alignment `start`, allow_multiple `true`, color_scheme `standard-secondary`, eyebrow "Getting Started"
 - **Blocks:** 4-6 item blocks covering sequential steps + 1 info block linking to a video tutorial or help docs
 - **Good for:** Post-signup pages or knowledge bases walking new users through setup
 - **Industries:** SaaS, online courses, membership sites
@@ -77,7 +77,7 @@ Collapsible question-and-answer sections with optional sidebar, two visual style
 
 ### 7. Location / Hours Info Panel
 
-- **Settings:** style `connected`, heading alignment `left`, sidebar_position `left`, color_scheme `standard-primary`
+- **Settings:** style `connected`, heading alignment `start`, sidebar_position `start`, color_scheme `standard-primary`
 - **Blocks:** 1 info block (address, phone, email) + 1 social block on the left sidebar; 3-5 item blocks on the right covering parking, accessibility, appointment policies
 - **Good for:** Contact or location pages for businesses with physical premises
 - **Industries:** Restaurants, salons, clinics, co-working spaces

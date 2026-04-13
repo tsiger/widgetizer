@@ -73,7 +73,7 @@
         "eyebrow": "What I Photograph",
         "title": "Sessions Built Around the Story",
         "description": "From intimate portraits to multi-day celebrations, every session is paced for natural moments and clean direction.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-secondary",
         "top_spacing": "small"
       },
@@ -138,7 +138,7 @@
       "settings": {
         "logo": "",
         "author_image": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "highlight-secondary"
       },
       "blocks": {
@@ -174,7 +174,7 @@
         "eyebrow": "Selected Work",
         "title": "A portfolio with room to breathe",
         "description": "A quick look at recent weddings, portraits, editorials, and brand commissions.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "columns_desktop": 4,
         "gap": "small",
         "color_scheme": "standard-primary"

@@ -30,7 +30,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "text_position": "flex-start",
         "content_color_scheme": "none",
         "color_scheme": "standard-primary"
@@ -80,7 +80,7 @@
         "description": "",
         "heading_alignment": "center",
         "note": "Emergency appointments available outside regular hours",
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "week_start_day": "1",
         "color_scheme": "standard-secondary"
       },
@@ -151,12 +151,12 @@
         "eyebrow": "",
         "title": "Find Us",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "address": "320 Park Avenue, Suite 4B, New York, NY 10022",
         "embed_url": "",
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

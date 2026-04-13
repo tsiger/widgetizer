@@ -40,8 +40,8 @@
         "eyebrow": "Service Area",
         "title": "Where We Work",
         "description": "We provide same-day plumbing and electrical service to homes and businesses across the Portland metro area and surrounding communities.",
-        "heading_alignment": "left",
-        "content_position": "left",
+        "heading_alignment": "start",
+        "content_position": "start",
         "show_divider": true,
         "icon_style": "filled",
         "icon_size": "lg",
@@ -88,7 +88,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "highlight-primary"
       },
       "blocks": {

@@ -11,7 +11,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 | `eyebrow` | Any text | Small label above the headline; adds a category/context cue (e.g. "Pricing", "Plans") |
 | `title` | Any text (default "Compare Our Plans") | Main headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text | Supporting paragraph below the headline |
-| `heading_alignment` | `left`, `center` (default) | Controls whether the eyebrow/title/description block is centered or left-aligned |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block is centered or left-aligned |
 | `feature_column_label` | Any text (default "Features") | Header text for the first (feature-name) column |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and accent treatment for the entire section; non-standard schemes add padded container styling and override `--widget-bg-color` |
 | `top_spacing` | `auto`, `none` | Removes the default top margin when set to `none`; useful for stacking sections flush |
@@ -41,7 +41,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 ### 2. Service Tier Breakdown
 
 - **Columns:** 2 (Standard / Premium)
-- **Settings:** `eyebrow` = "Our Services", `title` = "What's Included", `heading_alignment` = left, `color_scheme` = standard, featured on Premium column with badge "Full Service"
+- **Settings:** `eyebrow` = "Our Services", `title` = "What's Included", `heading_alignment` = start, `color_scheme` = standard, featured on Premium column with badge "Full Service"
 - **Features:** 6-8 rows, mostly boolean (Initial Consultation, Monthly Reports, Dedicated Account Manager) with a couple of text entries ("Response within 48h" vs "Same-day response")
 - **Good for:** Agencies, consultants, law firms, accounting practices
 - **Industries:** Professional services, marketing agencies, legal
@@ -49,7 +49,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 ### 3. Product Spec Sheet
 
 - **Columns:** 3-4 (product models or package sizes)
-- **Settings:** No eyebrow, `title` = "Technical Specifications", `feature_column_label` = "Specs", `heading_alignment` = left, `color_scheme` = highlight, no featured column, no CTAs
+- **Settings:** No eyebrow, `title` = "Technical Specifications", `feature_column_label` = "Specs", `heading_alignment` = start, `color_scheme` = highlight, no featured column, no CTAs
 - **Features:** 10-12 rows, almost entirely text values (dimensions, weight, wattage, material, warranty period)
 - **Good for:** Manufacturers, hardware retailers, equipment suppliers
 - **Industries:** Electronics, industrial equipment, home appliances
@@ -73,7 +73,7 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 ### 6. Competitor Comparison
 
 - **Columns:** 2-3 (Our Product / Competitor A / Competitor B)
-- **Settings:** `title` = "Why Choose Us", `feature_column_label` = "What Matters", `heading_alignment` = left, `color_scheme` = standard, featured on the first "Our Product" column with badge "Us"
+- **Settings:** `title` = "Why Choose Us", `feature_column_label` = "What Matters", `heading_alignment` = start, `color_scheme` = standard, featured on the first "Our Product" column with badge "Us"
 - **Features:** 5-7 rows focused on differentiators, mixing booleans and short text; lean heavily on checks for your column and crosses for competitors
 - **Good for:** Landing pages, sales enablement, competitive positioning
 - **Industries:** Any B2B or B2C business in a competitive market
@@ -97,4 +97,4 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 - **Pair with a pricing widget above.** The comparison table works best when visitors already know the price points. Place a pricing-cards widget first for the headline numbers, then follow with this widget for the detailed breakdown.
 - **Write the feature label as a benefit.** "Priority Support" beats "Support Level". Visitors scan the first column quickly -- benefit-oriented labels do the selling before they even look right.
 - **Leverage the first-column label.** Changing `feature_column_label` from the default "Features" to something domain-specific ("What You Get", "Specs", "Included Services") frames the entire table and signals what kind of comparison this is.
-- **Use `heading_alignment: left` for technical audiences.** Centered headings feel natural for pricing pages aimed at general consumers. Left-aligned headings read more like a data sheet, which engineers and procurement teams prefer.
+- **Use `heading_alignment: start` for technical audiences.** Centered headings feel natural for pricing pages aimed at general consumers. Left-aligned headings read more like a data sheet, which engineers and procurement teams prefer.

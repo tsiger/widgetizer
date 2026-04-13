@@ -11,7 +11,7 @@ A flexible icon-plus-text card grid for showcasing services, features, or value 
 | `eyebrow` | Any text | Small label above the main headline (e.g. "Our Services"). Leave blank to hide. |
 | `title` | Any text | Primary section headline. Renders as `<h1>` when the widget is first on the page, `<h2>` otherwise. |
 | `description` | Any text | Subheading paragraph below the title. Useful for a one-sentence value statement. |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description header block. Left works better when a featured image is present. |
+| `heading_alignment` | `start` | Centers or left-aligns the eyebrow/title/description header block. Left works better when a featured image is present. |
 | `featured_image` | Image or blank | Adds a large photo beside the card grid in a 50/50 split layout. Forces grid to 2 columns. |
 | `featured_image_position` | `start` (default), `end` | Places the featured image on the left or right of the card grid. |
 | `layout` | `grid` (default), `carousel` | Grid shows all cards at once; carousel makes them horizontally scrollable with prev/next buttons. |
@@ -101,7 +101,7 @@ A flexible icon-plus-text card grid for showcasing services, features, or value 
 |---------|-------|
 | `featured_image` | (upload a relevant photo) |
 | `featured_image_position` | start |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `card_layout` | flat |
 | `alignment` | start |
 | `icon_style` | filled |

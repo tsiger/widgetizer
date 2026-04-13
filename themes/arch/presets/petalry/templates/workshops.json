@@ -39,7 +39,7 @@
         "eyebrow": "What\u2019s Coming",
         "title": "Upcoming Workshops",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {

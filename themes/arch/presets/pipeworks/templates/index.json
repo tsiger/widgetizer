@@ -62,7 +62,7 @@
         "icon_style": "filled",
         "icon_size": "md",
         "icon_shape": "rounded",
-        "alignment": "left",
+        "alignment": "start",
         "show_dividers": true,
         "color_scheme": "standard-secondary"
       },
@@ -165,7 +165,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
         "color_scheme": "standard-primary"

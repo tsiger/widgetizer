@@ -13,7 +13,7 @@ Interactive before/after image slider that lets visitors drag a handle to reveal
 | `eyebrow` | Any text (blank by default) | Small label above the headline; adds context like "Our Work" or "Results" |
 | `title` | Any text (default: "See the Transformation") | Main headline above the slider |
 | `description` | Any text (blank by default) | Supporting paragraph below the headline |
-| `heading_alignment` | `left`, `center` | Controls whether the eyebrow/title/description block is centered or left-aligned |
+| `heading_alignment` | `start`, `center` | Controls whether the eyebrow/title/description block is centered or left-aligned |
 | `before_image` | Image reference | The image shown on the left (horizontal) or bottom (vertical) side |
 | `after_image` | Image reference | The image shown on the right (horizontal) or top (vertical) side |
 | `before_label` | Any text (default: "Before") | Overlay badge on the before side of the slider |
@@ -57,7 +57,7 @@ This widget has **no blocks**. All content is configured through top-level setti
 | Parameter | Value |
 |---|---|
 | `orientation` | horizontal |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `initial_position` | 25 |
 | `show_labels` | true |
 | `before_label` | Damaged |
@@ -131,7 +131,7 @@ This widget has **no blocks**. All content is configured through top-level setti
 | Parameter | Value |
 |---|---|
 | `orientation` | horizontal |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `initial_position` | 40 |
 | `show_labels` | true |
 | `before_label` | Original |
@@ -151,7 +151,7 @@ This widget has **no blocks**. All content is configured through top-level setti
 | Parameter | Value |
 |---|---|
 | `orientation` | vertical |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `initial_position` | 50 |
 | `show_labels` | true |
 | `before_label` | v1.0 |

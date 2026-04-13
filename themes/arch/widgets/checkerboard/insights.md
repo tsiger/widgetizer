@@ -13,7 +13,7 @@ An alternating grid of image tiles and text/CTA cards that creates a visually dy
 | `eyebrow` | Any text | Small label above the headline — adds context or category framing |
 | `title` | Any text (default: "What We Do") | Main section headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text | Subheading paragraph below the title — sets expectations for the grid below |
-| `heading_alignment` | `left`, `center` (default) | Controls whether the header block is centered or left-aligned; left works better when the grid itself is asymmetric |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the header block is centered or left-aligned; left works better when the grid itself is asymmetric |
 | `columns_desktop` | 2 -- 4 (default: 4) | Number of grid columns on desktop; fewer columns = larger tiles, more visual weight per card |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary`: no extra background or border. `standard-secondary`: secondary background on content tiles. `highlight-primary` and `highlight-secondary`: add a border to tiles plus padded container; accent variants swap content tile background to secondary color |
 | `top_spacing` | `auto`, `none` | Remove top padding to butt this section against the one above it |
@@ -44,7 +44,7 @@ Alternate text cards and image cards in a 4-column layout so the pattern forms a
 
 Large tiles that give each service or product substantial real estate. Two rows of two, alternating image and content.
 
-- **Settings**: `columns_desktop: 2`, `color_scheme: highlight`, `heading_alignment: left`, `eyebrow: "Our Specialties"`
+- **Settings**: `columns_desktop: 2`, `color_scheme: highlight`, `heading_alignment: start`, `eyebrow: "Our Specialties"`
 - **Blocks**: 4 cards — card 1: content with title + rich description; card 2: image; card 3: image; card 4: content
 - **Good for**: Landing pages or about pages where you want fewer, more impactful items
 - **Industries**: Architecture firms, interior designers, boutique hotels, law firms
@@ -89,7 +89,7 @@ Seven image tiles and one text card placed strategically (e.g., position 4 or 5)
 
 The smallest useful configuration: one image and one content block side by side. Functions almost like a split hero.
 
-- **Settings**: `columns_desktop: 2`, `color_scheme: highlight`, `heading_alignment: left`, `eyebrow: "Featured"`, `title: ""`
+- **Settings**: `columns_desktop: 2`, `color_scheme: highlight`, `heading_alignment: start`, `eyebrow: "Featured"`, `title: ""`
 - **Blocks**: 2 cards — one image, one content card with title + description + button
 - **Good for**: Highlighting a single service, announcement, or seasonal promotion
 - **Industries**: Any small business running a seasonal special or featuring a flagship service

@@ -33,7 +33,7 @@
     "story": {
       "type": "image-text",
       "settings": {
-        "image_position": "right",
+        "image_position": "end",
         "text_position": "center",
         "color_scheme": "standard-primary"
       },
@@ -140,7 +140,7 @@
     "sourcing": {
       "type": "image-text",
       "settings": {
-        "image_position": "left",
+        "image_position": "start",
         "text_position": "center",
         "color_scheme": "standard-secondary"
       },

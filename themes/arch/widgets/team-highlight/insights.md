@@ -11,7 +11,7 @@ A split-layout team section with a sticky intro column (eyebrow, headline, descr
 | `eyebrow` | Any text (default "Meet Our Team") | Small label above the headline; omit to tighten the intro stack |
 | `title` | Any text (default "Our leaders") | Main headline; renders as `h1` when the widget is first on the page, `h2` otherwise |
 | `description` | Textarea (default provided) | Supporting paragraph below the headline |
-| `heading_alignment` | `left` / **`center`** | Controls whether the intro text block is left-aligned or centered |
+| `heading_alignment` | `start` / **`center`** | Controls whether the intro text block is left-aligned or centered |
 | `signature_image` | Image upload | Displays below the intro text (max-width 18 rem) — great for a founder's handwritten signature or a small brand mark |
 | `columns_desktop` | **2** / 3 / 4 (range) | Number of member columns on desktop (mobile always collapses to 2) |
 | `image_ratio` | **`portrait`** (3:4) / `square` (1:1) / `auto` (natural) | Crop shape for every member photo; portrait feels editorial, square feels modern, auto preserves originals |
@@ -39,7 +39,7 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 |-----------|-------|
 | `columns_desktop` | 2 |
 | `image_ratio` | portrait |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `signature_image` | Founder's handwritten signature |
 | Blocks | 2 members |
 
@@ -69,7 +69,7 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 |-----------|-------|
 | `columns_desktop` | 4 |
 | `image_ratio` | square |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `color_scheme` | standard |
 | Blocks | 8-12 members |
 
@@ -84,7 +84,7 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 |-----------|-------|
 | `columns_desktop` | 2 |
 | `image_ratio` | portrait |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `color_scheme` | highlight-secondary |
 | `eyebrow` | "The People Behind the Work" |
 | Blocks | 3-4 members, each with a link to a personal bio page |
@@ -118,7 +118,7 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 |-----------|-------|
 | `columns_desktop` | 3 |
 | `image_ratio` | portrait |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `color_scheme` | standard-secondary |
 | `eyebrow` | "Advisory Board" |
 | Blocks | 3-6 members, each linked to a LinkedIn profile (new tab) |
@@ -134,7 +134,7 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 |-----------|-------|
 | `columns_desktop` | 2 |
 | `image_ratio` | auto |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `signature_image` | Signature or small logo |
 | `description` | A personal founder statement |
 | Blocks | 1 member |

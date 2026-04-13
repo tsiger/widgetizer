@@ -34,7 +34,7 @@
       "settings": {
         "eyebrow": "The Foundation",
         "title": "Bread & Sourdough",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "single-column",
         "color_scheme": "standard-primary"
       },
@@ -87,7 +87,7 @@
       "settings": {
         "eyebrow": "Morning Favorites",
         "title": "Pastries & Viennoiserie",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "two-column",
         "color_scheme": "standard-secondary"
       },
@@ -148,7 +148,7 @@
       "settings": {
         "eyebrow": "Celebrations",
         "title": "Cakes & Tarts",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "single-column",
         "color_scheme": "standard-primary"
       },
@@ -193,7 +193,7 @@
       "settings": {
         "eyebrow": "Sweet Treats",
         "title": "Cookies & Bars",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "two-column",
         "color_scheme": "standard-secondary"
       },
@@ -236,7 +236,7 @@
     "custom_cta": {
       "type": "image-text",
       "settings": {
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {

@@ -11,7 +11,7 @@ Animated statistics strip that counts up numbers on scroll, used to build instan
 | `eyebrow` | Any text | Small label above the headline, adds context like "Our Track Record" |
 | `title` | Any text (default "By The Numbers") | Section headline; rendered as h1 when the widget is first on the page, h2 otherwise |
 | `description` | Any text | Paragraph below the headline for framing the stats |
-| `heading_alignment` | `left`, `center` | Controls whether the header block sits flush-left or centered; left works better when the widget follows a text-heavy section |
+| `heading_alignment` | `start`, `center` | Controls whether the header block sits flush-left or centered; left works better when the widget follows a text-heavy section |
 | `layout` | `grid`, `carousel` | Grid shows all figures at once; carousel adds prev/next arrows and swipeable track, better when you have 5+ figures |
 | `columns_desktop` | 2 -- 5 | Number of columns on desktop; mobile always stacks. 4 is the sweet spot for most sites; 2 gives each stat more breathing room |
 | `card_layout` | `box`, `flat` | Box adds padding and (depending on color scheme) a background/border to each card; flat removes all card chrome for a minimal look |
@@ -44,7 +44,7 @@ Animated statistics strip that counts up numbers on scroll, used to build instan
 
 ### 2. Impact Dashboard
 
-**Settings:** 3 figures, grid, 3 columns, box card layout, highlight color scheme, heading alignment left, animate on. Set eyebrow to something like "Our Impact" and add a description paragraph.
+**Settings:** 3 figures, grid, 3 columns, box card layout, highlight color scheme, heading alignment start, animate on. Set eyebrow to something like "Our Impact" and add a description paragraph.
 **Blocks:** Homes Sold / Average Days on Market / Total Sales Volume.
 **Good for:** A dedicated results section on a landing page where the numbers themselves are the selling point.
 **Industries:** Real estate agencies, nonprofits reporting outcomes, SaaS companies showing growth metrics.
@@ -58,7 +58,7 @@ Animated statistics strip that counts up numbers on scroll, used to build instan
 
 ### 4. Minimal Duo
 
-**Settings:** 2 figures, grid, 2 columns, flat card layout, standard color scheme, heading alignment left, animate on. Remove spacing top/bottom (set both to none) so it sits tight between content sections.
+**Settings:** 2 figures, grid, 2 columns, flat card layout, standard color scheme, heading alignment start, animate on. Remove spacing top/bottom (set both to none) so it sits tight between content sections.
 **Blocks:** Two high-impact numbers, e.g. "15+ Years Experience" and "3,000+ Clients".
 **Good for:** About pages or sidebar-style callouts where you want a quick credibility bump without a full stats section.
 **Industries:** Freelancers, solo practitioners, boutique agencies, personal brand sites.

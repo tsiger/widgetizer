@@ -241,10 +241,10 @@
         "eyebrow": "",
         "title": "Common Questions",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "separated",
         "allow_multiple": false,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

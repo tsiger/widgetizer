@@ -40,7 +40,7 @@
         "eyebrow": "Classrooms",
         "title": "What each suite includes",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 2,
         "card_layout": "box",
@@ -159,7 +159,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

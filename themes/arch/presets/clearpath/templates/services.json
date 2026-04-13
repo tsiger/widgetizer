@@ -44,7 +44,7 @@
         "eyebrow": "",
         "title": "",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
@@ -190,7 +190,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "highlight-primary"
       },
       "blocks": {

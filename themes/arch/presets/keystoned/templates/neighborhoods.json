@@ -135,7 +135,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "highlight-primary"
       },
       "blocks": {

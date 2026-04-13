@@ -295,8 +295,8 @@
         "image_position": {
           "label": "Image position",
           "options": {
-            "left": "Left",
-            "right": "Right"
+            "start": "Start",
+            "end": "End"
           }
         },
         "aspect_ratio": {
@@ -315,7 +315,7 @@
         "alignment": {
           "label": "Alignment",
           "options": {
-            "start": "Left",
+            "start": "Start",
             "center": "Center"
           }
         },
@@ -390,13 +390,13 @@
           }
         },
         "options": {
+          "start": "Start",
+          "end": "End",
           "left": "Left",
           "right": "Right",
           "top": "Top",
           "bottom": "Bottom",
           "center": "Center",
-          "start": "Start",
-          "end": "End",
           "none": "None"
         },
         "sidebar_position": {

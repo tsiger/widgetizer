@@ -11,7 +11,7 @@ A flexible tiled grid for showcasing features, services, or highlights in an asy
 | `eyebrow` | Any text | Small label above the headline; adds context or category framing |
 | `title` | Any text (default: "Feature Spotlight") | Section headline; renders as `h1` when the widget is first on the page, `h2` otherwise |
 | `description` | Any text | Supporting paragraph below the headline |
-| `heading_alignment` | `left`, `center` (default) | Controls whether the section header block sits left-aligned or centered above the grid |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the section header block sits left-aligned or centered above the grid |
 | `gap` | `0`, `--space-sm`, `--space-md` (default), `--space-lg`, `--space-xl` | Gutter size between tiles; `0` gives a seamless mosaic, larger values add breathing room |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Section-level palette; highlight schemes swap background/foreground for contrast sections |
 | `top_spacing` | `auto` (default), `none` | Removes the default top margin so sections can sit flush against the previous widget |
@@ -121,7 +121,7 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 - **Mix image tiles with flat-color tiles.** A grid where every tile has a background image becomes noisy. Alternate between photo tiles (with overlay + light text) and solid-color tiles (dark text) to create visual rhythm.
 - **Use col_span 3 + 1 sparingly.** A 3:1 ratio draws the eye hard to the left; reserve it for a single hero moment per page, not repeated in every section.
 - **Let gap do the work.** Setting gap to `0` with border-free image tiles produces a magazine-style mosaic that feels premium. Setting it to `--space-lg` or `--space-xl` feels open and editorial.
-- **Pair with heading_alignment left** when the grid follows a narrative flow (top-to-bottom reading). Use center alignment when tiles are more of an unordered showcase.
+- **Pair with heading_alignment start** when the grid follows a narrative flow (top-to-bottom reading). Use center alignment when tiles are more of an unordered showcase.
 - **Keep overlay colors intentional.** The default overlay `#0a1e38bf` is a deep navy at 75% opacity. Swap it for a brand color at 60-70% opacity to tint photos toward your palette without losing legibility.
 - **Link every tile or none.** Mixing linked and non-linked tiles confuses visitors about what is clickable. If only some tiles need links, give all tiles a consistent hover state by using background colors or images on every tile.
 - **Use row_span 2 to anchor the grid.** A single tall tile (col_span 2, row_span 2) surrounded by smaller tiles creates a natural focal point. Without it, the grid can feel like a flat, undifferentiated checkerboard.

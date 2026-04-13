@@ -139,7 +139,7 @@
         "title": "How we work with families",
         "description": "Transparent goals, weekly notes, and practice plans you can actually follow at home.",
         "heading_alignment": "center",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -216,7 +216,7 @@
       "settings": {
         "logo": "",
         "author_image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "highlight-secondary"
       },
       "blocks": {

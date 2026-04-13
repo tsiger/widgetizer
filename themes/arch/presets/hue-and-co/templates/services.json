@@ -166,7 +166,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -211,10 +211,10 @@
         "eyebrow": "",
         "title": "Common Questions",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "connected",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

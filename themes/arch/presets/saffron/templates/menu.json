@@ -34,7 +34,7 @@
       "settings": {
         "eyebrow": "To Begin",
         "title": "Starters",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "single-column",
         "color_scheme": "standard-primary"
       },
@@ -87,7 +87,7 @@
       "settings": {
         "eyebrow": "Main Course",
         "title": "Entrées",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "two-column",
         "color_scheme": "standard-secondary"
       },
@@ -164,7 +164,7 @@
       "settings": {
         "eyebrow": "To Finish",
         "title": "Desserts",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "single-column",
         "color_scheme": "standard-primary"
       },
@@ -207,7 +207,7 @@
     "drinks_section": {
       "type": "image-text",
       "settings": {
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {

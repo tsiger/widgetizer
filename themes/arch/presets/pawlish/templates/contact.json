@@ -39,9 +39,9 @@
         "eyebrow": "By Appointment",
         "title": "Grooming Hours",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "note": "Last appointment at 4pm. Walk-ins welcome when slots are available.",
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "week_start_day": "1",
         "color_scheme": "standard-primary"
       },
@@ -121,10 +121,10 @@
         "eyebrow": "Booking",
         "title": "Appointment Questions",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "separated",
         "allow_multiple": false,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -179,7 +179,7 @@
         "eyebrow": "",
         "title": "Find Us",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "address": "210 Birch Lane, Madison, WI 53703",
         "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2916.5!2d-89.4012!3d43.0731!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDA0JzIzLjIiTiA4OcKwMjQnMDQuMyJX!5e0!3m2!1sen!2sus!4v1234567890",
         "directions_link": {
@@ -189,7 +189,7 @@
         },
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

@@ -11,7 +11,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 | `eyebrow` | Any text (blank by default) | Small label above the headline, useful for anchoring context like "Simple Pricing" or "No Hidden Fees" |
 | `title` | Any text | Section headline rendered as h1 (first widget on page) or h2 |
 | `description` | Any text | Subtitle paragraph below the headline |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description block |
+| `heading_alignment` | `start` | Centers or left-aligns the eyebrow/title/description block |
 | `layout` | `grid` (default), `carousel` | Grid shows all plans at once; carousel adds prev/next arrows and horizontal scrolling |
 | `columns_desktop` | 2 -- 5 (default 3) | Number of columns on desktop; controls card width proportionally |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` = no background. `accent` variants give cards a secondary background. `highlight-primary` variants add visible card borders. |
@@ -54,7 +54,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 ### 3. Service-Level Menu
 
 - **Plans:** 4 blocks -- Bronze / Silver / Gold / Platinum
-- **Settings:** `layout: grid`, `columns_desktop: 4`, `heading_alignment: left`, `color_scheme: standard`, `eyebrow: "Our Packages"`
+- **Settings:** `layout: grid`, `columns_desktop: 4`, `heading_alignment: start`, `color_scheme: standard`, `eyebrow: "Our Packages"`
 - **Featured:** Gold (the tier most clients should land on)
 - **Good for:** Service businesses that bundle different scopes of work. Feature lists become checklists of deliverables.
 - **Industries:** Digital agencies, cleaning companies, landscaping, photography packages, wedding planners
@@ -79,7 +79,7 @@ Responsive pricing-plan cards with feature lists, per-plan CTAs, and an optional
 ### 6. One-Time Purchase Packages
 
 - **Plans:** 3 blocks -- "Basic Site" / "Business Site" / "E-Commerce Site"
-- **Settings:** `layout: grid`, `columns_desktop: 3`, `heading_alignment: left`, `color_scheme: standard`
+- **Settings:** `layout: grid`, `columns_desktop: 3`, `heading_alignment: start`, `color_scheme: standard`
 - **Period field:** Use "one-time" or "starting at" instead of "per month"
 - **Featured:** The middle option
 - **Good for:** Freelancers and agencies selling fixed-price deliverables rather than subscriptions.

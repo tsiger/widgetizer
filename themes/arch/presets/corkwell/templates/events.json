@@ -93,7 +93,7 @@
     "private_hire": {
       "type": "image-callout",
       "settings": {
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

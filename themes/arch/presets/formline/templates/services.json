@@ -39,7 +39,7 @@
         "eyebrow": "Services",
         "title": "Project Types",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -191,7 +191,7 @@
         "eyebrow": "Case Study",
         "title": "Lakewood Residence Transformation",
         "description": "A 1960s ranch home reimagined as a modern family residence with an open plan, new facade, and rear addition.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "before_image": "",
         "after_image": "",
         "before_label": "Existing",
@@ -208,10 +208,10 @@
         "eyebrow": "",
         "title": "Common Questions",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "separated",
         "allow_multiple": false,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

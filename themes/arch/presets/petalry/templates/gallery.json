@@ -34,7 +34,7 @@
         "eyebrow": "Our Work",
         "title": "Seasonal Arrangements",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "grid",
         "columns_desktop": 3,
         "staggered": true,

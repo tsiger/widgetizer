@@ -163,7 +163,7 @@
     "enterprise_callout": {
       "type": "image-callout",
       "settings": {
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {

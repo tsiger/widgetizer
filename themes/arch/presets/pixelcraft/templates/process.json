@@ -43,7 +43,7 @@
         "eyebrow": "Engagement roadmap",
         "title": "Five phases from audit to rollout",
         "description": "The exact timeline changes by scope, but the decision-making rhythm stays consistent.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "vertical",
         "color_scheme": "standard-secondary"
       },

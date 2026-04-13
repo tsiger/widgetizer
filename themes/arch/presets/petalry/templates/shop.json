@@ -147,7 +147,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -192,10 +192,10 @@
         "eyebrow": "",
         "title": "Ordering Information",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "connected",
         "allow_multiple": false,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

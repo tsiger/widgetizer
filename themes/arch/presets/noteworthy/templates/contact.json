@@ -39,7 +39,7 @@
         "eyebrow": "Noteworthy Studio",
         "title": "Visit or write",
         "description": "Street parking on Maple; metered spots on Church St.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -78,7 +78,7 @@
         "eyebrow": "",
         "title": "Map",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "address": "412 Maple Street, Evanston, IL 60201",
         "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2969.0!2d-87.68!3d42.04!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDLCsDAyJzI0LjAiTiA4N8KwNDAnNDguMCJX!5e0!3m2!1sen!2sus",
         "directions_link": {
@@ -88,7 +88,7 @@
         },
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -115,7 +115,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

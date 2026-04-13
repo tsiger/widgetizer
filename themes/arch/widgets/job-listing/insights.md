@@ -13,7 +13,7 @@ A filterable careers section that displays open positions as stacked cards with 
 | `eyebrow` | Any text (default "Join Our Team") | Small label above the headline; omit to hide |
 | `title` | Any text (default "Open Positions") | Section headline; renders as `h1` when the widget is the first on the page, `h2` otherwise |
 | `description` | Any text (default blank) | Subtext paragraph below the headline |
-| `heading_alignment` | `left`, `center` (default) | Controls whether the header block and filter buttons align left or center |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the header block and filter buttons align left or center |
 | `show_filters` | `true` (default), `false` | Toggles the department filter button bar; departments are auto-extracted from blocks |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` = transparent bg, no card borders. `standard-secondary` = cards get a secondary bg fill + border. `highlight-primary` = section-level colored bg + card borders. `highlight-secondary` = colored bg + filled cards + borders |
 | `top_spacing` | `auto` (default), `none` | Removes the default top padding when set to `none` |
@@ -47,7 +47,7 @@ A filterable careers section that displays open positions as stacked cards with 
 
 ### 3. Highlighted Single-Department Banner
 
-- **Settings:** eyebrow "Now Hiring", title "Join Our Kitchen Team", description blank, heading_alignment left, show_filters false, color_scheme highlight
+- **Settings:** eyebrow "Now Hiring", title "Join Our Kitchen Team", description blank, heading_alignment start, show_filters false, color_scheme highlight
 - **Blocks:** 2-4 job blocks all in the same department, mix of full-time and part-time
 - **Good for:** A prominent "we're hiring" band embedded on a homepage rather than a dedicated careers page
 - **Industries:** Restaurants, cafes, retail stores, salons
@@ -61,7 +61,7 @@ A filterable careers section that displays open positions as stacked cards with 
 
 ### 5. Multi-Location Franchise Hiring
 
-- **Settings:** eyebrow blank, title "Positions Near You", description blank, heading_alignment left, show_filters true, color_scheme highlight-secondary
+- **Settings:** eyebrow blank, title "Positions Near You", description blank, heading_alignment start, show_filters true, color_scheme highlight-secondary
 - **Blocks:** 6-8 job blocks with varied locations (city names) and departments like Service, Management, Warehouse
 - **Good for:** Businesses with multiple physical locations that want visitors to scan by department and see where roles are
 - **Industries:** Restaurant chains, fitness studios, retail franchises, cleaning services
@@ -75,7 +75,7 @@ A filterable careers section that displays open positions as stacked cards with 
 
 ### 7. Compact Footer-Adjacent Hiring Strip
 
-- **Settings:** eyebrow blank, title "Join Us", description blank, heading_alignment left, show_filters false, color_scheme highlight, top_spacing none, bottom_spacing none
+- **Settings:** eyebrow blank, title "Join Us", description blank, heading_alignment start, show_filters false, color_scheme highlight, top_spacing none, bottom_spacing none
 - **Blocks:** 1-2 job blocks
 - **Good for:** A tight, attention-grabbing strip placed just above the footer to catch visitors before they leave
 - **Industries:** Any small business with one or two urgent openings

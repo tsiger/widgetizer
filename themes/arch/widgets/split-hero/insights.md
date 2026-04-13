@@ -8,7 +8,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 |---------|--------|---------------|
 | image | Image upload | The background image filling the left or right half; uses a placeholder landscape if empty |
 | overlay_color | Any color with alpha | Tints or darkens the image half -- useful for ensuring contrast or adding mood (e.g. semi-transparent black for cinematic feel, brand color at 30% for tinting) |
-| image_position | `left` (default), `right` | Swaps which side the photo appears on; `right` reverses the flex direction on desktop |
+| image_position | `start` (default), `end` | Swaps which side the photo appears on; `right` reverses the flex direction on desktop |
 | color_scheme | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls the background/text palette of the content half; non-standard schemes add a `has-highlight-background` class that tints the content area |
 | top_spacing | `auto` (default), `none` | Removes the default top margin when set to `none` -- useful for placing the hero flush against the header |
 | bottom_spacing | `auto` (default), `none` | Removes the default bottom margin when set to `none` -- lets the next section butt up directly against the hero |
@@ -25,7 +25,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 ## Layout recipes
 
 **1. "The Bold Welcome" (homepage hero)**
-- image_position: left
+- image_position: start
 - color_scheme: standard
 - overlay_color: none
 - top_spacing: none, bottom_spacing: auto
@@ -34,7 +34,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 - Industries: photography studios, architecture firms, interior designers, creative agencies
 
 **2. "The Dark Cinematic" (brand story section)**
-- image_position: right
+- image_position: end
 - color_scheme: highlight
 - overlay_color: rgba(0,0,0,0.35)
 - top_spacing: auto, bottom_spacing: auto
@@ -43,7 +43,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 - Industries: boutique hotels, wineries, luxury spas, fine dining restaurants
 
 **3. "The Benefit Breakdown" (service overview)**
-- image_position: left
+- image_position: start
 - color_scheme: standard-secondary
 - overlay_color: none
 - Blocks: text (sm, muted, uppercase: "Why Choose Us") > heading (2xl) > features ("+ Same-day appointments\n+ Board-certified specialists\n+ Family-friendly office\n+ Insurance accepted") > button (primary medium "Schedule a Visit")
@@ -51,7 +51,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 - Industries: dental practices, veterinary clinics, physiotherapy offices, family medicine
 
 **4. "The Minimal Invite" (event or launch)**
-- image_position: right
+- image_position: end
 - color_scheme: standard
 - overlay_color: rgba(255,255,255,0.15)
 - top_spacing: none, bottom_spacing: none
@@ -60,7 +60,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 - Industries: event planners, galleries, fashion boutiques, product launch pages
 
 **5. "The Trust Builder" (about page)**
-- image_position: left
+- image_position: start
 - color_scheme: highlight-secondary
 - overlay_color: rgba(0,0,0,0.2)
 - Blocks: heading (2xl) > text (base: two-sentence bio or mission) > features ("+ 20 years of experience\n+ 500+ projects completed\n+ Award-winning team") > button (primary "Meet the Team" + secondary "Our Process")
@@ -68,7 +68,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 - Industries: law firms, accounting firms, construction companies, consulting agencies
 
 **6. "The Quick Pitch" (landing page above the fold)**
-- image_position: right
+- image_position: end
 - color_scheme: standard
 - overlay_color: none
 - top_spacing: none, bottom_spacing: none
@@ -77,7 +77,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 - Industries: SaaS products, online course creators, subscription services, app landing pages
 
 **7. "The Warm Introduction" (services or menu page)**
-- image_position: left
+- image_position: start
 - color_scheme: standard-secondary
 - overlay_color: rgba(0,0,0,0.1)
 - Blocks: text (sm, muted: "Our Services") > heading (3xl) > text (base: short paragraph describing the service philosophy) > button (secondary medium "View Full Menu")
@@ -85,7 +85,7 @@ A full-width, two-column hero section that pairs a large background image (50%) 
 - Industries: restaurants, bakeries, catering companies, coffee shops, florists
 
 **8. "The Comparison Closer" (pricing or packages page)**
-- image_position: right
+- image_position: end
 - color_scheme: highlight
 - overlay_color: none
 - Blocks: text (sm, uppercase, muted: "What's Included") > heading (2xl) > features ("+ Unlimited revisions\n+ Dedicated project manager\n+ 30-day money-back guarantee\n- No hidden fees\n- No long-term contracts") > button (primary large "Choose Your Plan")

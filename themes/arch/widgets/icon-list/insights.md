@@ -11,7 +11,7 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 | `eyebrow` | any text | Small label above the headline — adds context like "What We Offer" or "Included With Every Stay" |
 | `title` | any text | Section headline (renders as `<h1>` when first widget on page, `<h2>` otherwise) |
 | `description` | any text | Supporting paragraph below the headline |
-| `heading_alignment` | `left`, **`center`** | Left-aligns the header block for editorial feel; center (default) is formal and symmetrical |
+| `heading_alignment` | `start`, **`center`** | Left-aligns the header block for editorial feel; center (default) is formal and symmetrical |
 | `layout` | **`grid`**, `carousel` | Grid shows all items at once; carousel adds prev/next navigation and horizontal scrolling |
 | `columns_desktop` | 2 -- 8 (default **4**) | Number of columns at 1200 px+. Lower values = larger icons with more breathing room; higher values = dense, scannable lists |
 | `icon_style` | **`plain`**, `outline`, `filled` | Plain is minimal (icon only), outline adds a border ring, filled puts the icon on a solid background shape |
@@ -40,7 +40,7 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 - **Industries**: Hotels, resorts, vacation rentals, Airbnb-style listings
 
 ### 2. Core Services Showcase
-- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `rounded`, heading_alignment `left`, color_scheme `standard-primary`
+- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `rounded`, heading_alignment` | `start`, color_scheme `standard-primary`
 - **Blocks**: 3--6 items with both title and description — e.g., "Web Design / Custom sites built for your brand"
 - **Good for**: Homepage services section where each service needs a short explanation
 - **Industries**: Agencies, freelancers, consultants, IT service providers
@@ -58,7 +58,7 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 - **Industries**: Spas, salons, wellness studios, dental clinics
 
 ### 5. Tech Specs / Features Grid
-- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `lg`, icon_shape `sharp`, heading_alignment `left`, color_scheme `standard-primary`
+- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `lg`, icon_shape `sharp`, heading_alignment` | `start`, color_scheme `standard-primary`
 - **Blocks**: 8 items with title and description — "API Access / RESTful endpoints", "99.9% Uptime / SLA guaranteed"
 - **Good for**: SaaS feature pages or product specification sections
 - **Industries**: Software companies, tech startups, B2B platforms

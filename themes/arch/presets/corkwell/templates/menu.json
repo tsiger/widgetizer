@@ -35,7 +35,7 @@
       "settings": {
         "eyebrow": "The Bar",
         "title": "Cocktails",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "single-column",
         "color_scheme": "standard-primary"
       },
@@ -169,7 +169,7 @@
       "settings": {
         "eyebrow": "The Kitchen",
         "title": "Small Plates",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "two-column",
         "color_scheme": "standard-primary"
       },
@@ -230,7 +230,7 @@
       "settings": {
         "eyebrow": "To Finish",
         "title": "Cheese & Sweets",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "single-column",
         "color_scheme": "standard-secondary"
       },

@@ -43,7 +43,7 @@
         "eyebrow": "Studio details",
         "title": "Practical info before you reach out",
         "description": "A few notes on fit, availability, and how projects usually begin.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -83,10 +83,10 @@
         "eyebrow": "Project FAQ",
         "title": "Common questions before kickoff",
         "description": "A quick way to understand timelines, scope, and how collaboration usually works.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "connected",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

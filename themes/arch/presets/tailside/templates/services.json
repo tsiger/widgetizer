@@ -40,7 +40,7 @@
         "eyebrow": "Clinical offerings",
         "title": "What we provide",
         "description": "Not sure where to start? Call triage and we will route you to the right department.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "show_dividers": true,
         "color_scheme": "standard-primary"
       },
@@ -146,7 +146,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

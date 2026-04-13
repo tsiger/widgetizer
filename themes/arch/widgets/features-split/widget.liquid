@@ -61,7 +61,7 @@
           align-items: start;
         }
 
-        {% if widget.settings.content_position == 'right' %}
+        {% if widget.settings.content_position == 'end' %}
         & .features-split-content {
           order: 2;
         }
@@ -92,7 +92,7 @@
   <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
     <div class="features-split-grid">
       <div class="features-split-content">
-        <div class="widget-header{% if widget.settings.heading_alignment == 'left' %} widget-header--align-start{% endif %}">
+        <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
           {% assign content_delay = 0 %}
           {% if widget.settings.eyebrow != blank %}
             <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ content_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>

@@ -34,7 +34,7 @@
         "address": "88 Vine Street, Brooklyn, NY 11201",
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

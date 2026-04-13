@@ -11,7 +11,7 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 | `eyebrow` | Any text (blank by default) | Small label above the headline, useful for "What's On" or "Save the Date" framing |
 | `title` | Any text (default "Upcoming Events") | Section headline; renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise |
 | `description` | Any text (blank by default) | Paragraph below the headline for context or a short invitation |
-| `heading_alignment` | `left`, `center` (default) | Left-aligns the header block for editorial layouts; center works for standalone sections |
+| `heading_alignment` | `start`, `center` (default) | Left-aligns the header block for editorial layouts; center works for standalone sections |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | **standard** -- no card background or border. **standard-secondary** -- adds secondary background + border to each card. **highlight** -- tinted section background + card border. **highlight-secondary** -- tinted section background + secondary card fill + border |
 | `top_spacing` | `auto`, `none` | Removes top padding so the widget can sit flush against the section above it |
 | `bottom_spacing` | `auto`, `none` | Removes bottom padding so the widget can sit flush against the section below it |
@@ -35,7 +35,7 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 - **Industries**: Professional services, nonprofits, community organizations
 
 ### 2. Workshop Schedule with Accent Cards
-- **Settings**: eyebrow "Workshops", title "Hands-On Sessions", heading_alignment left, color_scheme standard-secondary
+- **Settings**: eyebrow "Workshops", title "Hands-On Sessions", heading_alignment start, color_scheme standard-secondary
 - **Blocks**: 4-6 events, each with a description paragraph explaining what attendees will learn and a "Reserve a Spot" button
 - **Good for**: Highlighting educational or training events where the description copy matters
 - **Industries**: Fitness studios, cooking schools, coworking spaces, continuing education
@@ -47,7 +47,7 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 - **Industries**: Bars, music venues, theaters, cultural centers
 
 ### 4. Minimal Agenda (No Descriptions)
-- **Settings**: title "Schedule", heading_alignment left, color_scheme standard
+- **Settings**: title "Schedule", heading_alignment start, color_scheme standard
 - **Blocks**: 3-5 events with day/month, title, and location only -- leave description and button_link blank
 - **Good for**: A clean at-a-glance schedule where visitors just need dates, names, and places
 - **Industries**: Conferences, meetup groups, religious organizations
@@ -59,13 +59,13 @@ A date-driven list of upcoming events, each shown as a card with a prominent day
 - **Industries**: Real estate brokerages, private schools, wedding venues, senior living communities
 
 ### 6. Multi-Day Conference Breakdown
-- **Settings**: title "Conference Agenda", heading_alignment left, color_scheme standard-secondary
+- **Settings**: title "Conference Agenda", heading_alignment start, color_scheme standard-secondary
 - **Blocks**: 6-8 events spanning different days, descriptions summarizing each session, buttons linking to speaker bios or session detail pages
 - **Good for**: A single-page rundown of a multi-day program
 - **Industries**: Tech conferences, trade shows, academic symposiums
 
 ### 7. Fundraiser Gala Timeline
-- **Settings**: eyebrow "Annual Gala", title blank (rely on a hero above), heading_alignment left, color_scheme highlight-secondary, top_spacing none
+- **Settings**: eyebrow "Annual Gala", title blank (rely on a hero above), heading_alignment start, color_scheme highlight-secondary, top_spacing none
 - **Blocks**: 3-4 events representing gala milestones (Cocktail Hour, Dinner, Auction, After-Party), descriptions painting the scene, button text "Buy Table"
 - **Good for**: Giving donors a vivid sense of the evening's flow
 - **Industries**: Nonprofits, foundations, alumni associations, charities

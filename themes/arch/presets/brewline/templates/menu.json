@@ -34,7 +34,7 @@
       "settings": {
         "eyebrow": "The Good Stuff",
         "title": "Coffee & Espresso",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "two-column",
         "color_scheme": "standard-primary"
       },
@@ -111,7 +111,7 @@
       "settings": {
         "eyebrow": "Limited Time",
         "title": "Seasonal Specials",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "single-column",
         "color_scheme": "standard-secondary"
       },
@@ -148,7 +148,7 @@
       "settings": {
         "eyebrow": "Baked Fresh Daily",
         "title": "Pastries & Bites",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "layout": "two-column",
         "color_scheme": "standard-primary"
       },
@@ -207,7 +207,7 @@
     "retail": {
       "type": "image-text",
       "settings": {
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

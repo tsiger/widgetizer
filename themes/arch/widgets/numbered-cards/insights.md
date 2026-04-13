@@ -13,7 +13,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 | `eyebrow` | any text | Small label above the headline, useful for category tags like "How It Works" or "Our Approach" |
 | `title` | any text (default "Our Process") | Main section headline; renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise |
 | `description` | any text | Subtitle paragraph below the headline for additional context |
-| `heading_alignment` | `left` / `center` | Controls whether the eyebrow, title, and description align left or center; left is better for asymmetric layouts |
+| `heading_alignment` | `start` / `center` | Controls whether the eyebrow, title, and description align left or center; left is better for asymmetric layouts |
 | `layout` | `grid` / `carousel` | Grid shows all cards at once; carousel adds prev/next navigation and reveals cards in a swipeable track |
 | `columns_desktop` | 2 -- 5 (default 4) | Number of columns on desktop; fewer columns = wider cards with more breathing room |
 | `card_layout` | `box` / `flat` | Box renders cards with a background fill and border (on accent/highlight schemes); flat removes the card container for a cleaner, minimal look |
@@ -72,7 +72,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 
 | Setting | Value |
 |---------|-------|
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `layout` | `grid` |
 | `columns_desktop` | `5` |
 | `card_layout` | `flat` |
@@ -89,7 +89,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 
 | Setting | Value |
 |---------|-------|
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `layout` | `grid` |
 | `columns_desktop` | `2` |
 | `card_layout` | `box` |
@@ -140,7 +140,7 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 
 | Setting | Value |
 |---------|-------|
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `layout` | `grid` |
 | `columns_desktop` | `3` |
 | `card_layout` | `box` |
@@ -161,5 +161,5 @@ Displays a sequence of numbered steps or phases as zero-padded cards (01, 02, 03
 - **Use the carousel only when you truly have many steps.** For 3-4 steps, grid is almost always better. Switch to carousel at 5+ steps or when you want to avoid visual overwhelm on mobile.
 - **Pair color schemes with adjacent sections.** A `highlight-primary` numbered-cards widget sandwiched between two `standard-primary` sections creates a natural focal point. Avoid stacking two highlight sections back to back.
 - **Richtext descriptions unlock more than plain text.** Because the description field supports rich text, you can embed short bulleted lists, bold key terms, or inline links inside each step -- useful for steps that need a bit more detail without a separate FAQ.
-- **Heading alignment should match the page rhythm.** If the rest of the page uses left-aligned headers, keep `heading_alignment` on `left` for consistency. Reserve center alignment for standalone, symmetrical sections.
+- **Heading alignment should match the page rhythm.** If the rest of the page uses left-aligned headers, keep `heading_alignment` | `start` for consistency. Reserve center alignment for standalone, symmetrical sections.
 - **Two columns for depth, four or five for scanning.** If each step is a single sentence, go wide (4-5 cols). If steps contain a paragraph of explanation, drop to 2-3 columns so line lengths stay comfortable.

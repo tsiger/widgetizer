@@ -9,7 +9,7 @@ A split-layout section that overlaps a large image with a bordered content card,
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `image` | Any uploaded image | The hero-sized photo or illustration that fills the image half; sets the emotional tone of the entire section |
-| `image_position` | `left` (default), `right` | Controls whether the image sits on the left with content overlapping from the right, or vice versa. Alternating position between consecutive image-callout widgets creates a zigzag rhythm down the page |
+| `image_position` | `start` (default), `end` | Controls whether the image sits on the left with content overlapping from the right, or vice versa. Alternating position between consecutive image-callout widgets creates a zigzag rhythm down the page |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` keeps a transparent outer wrapper (content blends with page background). The other three add a padded, colored container behind the entire widget, making it read as a distinct band on the page |
 | `top_spacing` | `auto` (default), `none` | `none` removes top padding so the widget butts directly against the section above — useful when stacking two image-callouts or following a full-width hero |
 | `bottom_spacing` | `auto` (default), `none` | Same behaviour for bottom edge; set both to `none` on consecutive callouts for a seamless editorial scroll |

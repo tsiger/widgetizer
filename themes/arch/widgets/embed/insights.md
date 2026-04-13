@@ -13,7 +13,7 @@ A flexible container for injecting raw HTML, iframes, or third-party embed codes
 | `eyebrow` | Any text (blank by default) | Small label above the title; adds a subtle category or context tag above the embed |
 | `title` | Any text (default "Watch Our Video") | Large headline rendered as `<h1>` when widget is first on page, `<h2>` otherwise |
 | `description` | Any text (default placeholder sentence) | Supporting paragraph below the title, sets expectation for the embedded content |
-| `heading_alignment` | `left`, `center` | Shifts eyebrow/title/description to the left edge or centers them above the embed |
+| `heading_alignment` | `start`, `center` | Shifts eyebrow/title/description to the left edge or centers them above the embed |
 | `code` | Raw HTML / iframe / embed snippet | The actual embedded content; rendered unescaped inside the embed wrapper |
 | `max_width` | `narrow`, `medium`, `wide`, `fullwidth` | Controls horizontal spread of the content area (maps to `widget-content-sm/md/lg` or no cap) |
 | `alignment` | `start`, `center`, `end` | Positions the embed block horizontally within its container via flexbox alignment |
@@ -78,7 +78,7 @@ This widget has no blocks. All content is controlled through settings alone.
 | `eyebrow` | "Visit Us" |
 | `title` | "Our Location" |
 | `description` | "123 Main St, Portland, OR" |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 | `code` | Google Maps iframe (fixed height, 100% width) |
 | `max_width` | fullwidth |
 | `alignment` | start |
@@ -155,7 +155,7 @@ This widget has no blocks. All content is controlled through settings alone.
 
 - **Drop the default title.** The default "Watch Our Video" screams template. Replace it with something specific to the business or remove it entirely if the embed is self-explanatory.
 - **Match max_width to the embed's natural aspect ratio.** A narrow Calendly widget looks lost at fullwidth. A panoramic Google Map looks cramped at narrow. Let the content dictate the container.
-- **Use `heading_alignment: left` for utilitarian embeds.** Maps, forms, and booking tools feel more grounded with left-aligned headers. Save center alignment for showcase content like videos and social feeds.
+- **Use `heading_alignment: start` for utilitarian embeds.** Maps, forms, and booking tools feel more grounded with left-aligned headers. Save center alignment for showcase content like videos and social feeds.
 - **Stack spacing intentionally.** Set `top_spacing: none` when the embed sits directly below a hero or another full-bleed widget to avoid a double-gap. Use `bottom_spacing: none` when a CTA section follows immediately.
 - **Lean on color_scheme to create visual separation.** A `highlight-primary` or `highlight-secondary` background makes an embed section feel like a distinct zone rather than just another block of content. This is especially effective for booking and payment embeds where you want the visitor to pause and take action.
 - **Keep the code field clean.** Paste only the embed snippet itself. Wrapping it in extra divs or inline styles beyond what the provider gives you often fights the widget's own responsive handling.

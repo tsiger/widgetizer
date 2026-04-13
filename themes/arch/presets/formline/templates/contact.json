@@ -39,7 +39,7 @@
         "eyebrow": "",
         "title": "",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -72,10 +72,10 @@
         "eyebrow": "Working With Us",
         "title": "Engagement Questions",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "separated",
         "allow_multiple": false,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -130,7 +130,7 @@
         "eyebrow": "",
         "title": "Find Us",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "address": "85 West Jackson Blvd, Suite 400, Chicago, IL 60604",
         "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2970.5!2d-87.6342!3d41.8781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDUyJzQxLjIiTiA4N8KwMzgnMDMuMSJX!5e0!3m2!1sen!2sus!4v1234567890",
         "directions_link": {
@@ -140,7 +140,7 @@
         },
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {

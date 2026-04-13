@@ -34,12 +34,12 @@
       "default": "center",
       "options": [
         {
-          "value": "left",
-          "label": "tTheme:global.widgets.settings.options.left"
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
         },
         {
           "value": "center",
-          "label": "tTheme:global.widgets.settings.options.center"
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         }
       ]
     },
@@ -57,15 +57,15 @@
       "type": "select",
       "id": "image_position",
       "label": "tTheme:global.widgets.settings.image_position.label",
-      "default": "left",
+      "default": "start",
       "options": [
         {
-          "value": "left",
-          "label": "tTheme:global.widgets.settings.image_position.options.left"
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.image_position.options.start"
         },
         {
-          "value": "right",
-          "label": "tTheme:global.widgets.settings.image_position.options.right"
+          "value": "end",
+          "label": "tTheme:global.widgets.settings.image_position.options.end"
         }
       ]
     },

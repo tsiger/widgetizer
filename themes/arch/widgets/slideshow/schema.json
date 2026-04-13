@@ -52,12 +52,12 @@
       "default": "center",
       "options": [
         {
-          "value": "center",
-          "label": "tTheme:global.widgets.settings.alignment.options.center"
-        },
-        {
           "value": "start",
           "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
         }
       ]
     },

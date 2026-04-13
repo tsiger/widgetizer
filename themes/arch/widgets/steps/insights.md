@@ -11,7 +11,7 @@ A numbered, zigzag timeline that pairs an image with a title, rich-text descript
 | `eyebrow` | Any text (blank by default) | Small label above the headline; adds a category or context tag to the section |
 | `title` | Any text (default "How It Works") | Main section headline; renders as `h1` when widget is first on the page, `h2` otherwise |
 | `description` | Any text (blank by default) | Subtitle paragraph below the headline |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description header block |
+| `heading_alignment` | `start` | Centers or left-aligns the eyebrow/title/description header block |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text palette for the entire section. Non-standard schemes add a padded container and override `--widget-bg-color` |
 | `top_spacing` | `auto` (default), `none` | Removes top padding when set to `none`; useful for butting the widget directly against the section above |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to `none` |
@@ -37,7 +37,7 @@ A numbered, zigzag timeline that pairs an image with a title, rich-text descript
 
 ### 2. Portfolio Process Walkthrough — 4 Steps With Photos
 
-**Settings:** eyebrow "Our Process", title "From Concept to Completion", heading_alignment left, color_scheme standard-secondary
+**Settings:** eyebrow "Our Process", title "From Concept to Completion", heading_alignment start, color_scheme standard-secondary
 **Blocks:** 4 steps each with a project photo (sketch, 3D render, construction, finished room), descriptive titles, and one-paragraph descriptions.
 **Good for:** Showcasing a creative or construction workflow where visuals prove credibility.
 **Industries:** Architects, interior designers, renovation contractors, landscapers.
@@ -58,7 +58,7 @@ A numbered, zigzag timeline that pairs an image with a title, rich-text descript
 
 ### 5. Highlighted FAQ Alternative — 5 Short Steps
 
-**Settings:** title "What to Expect", heading_alignment left, color_scheme highlight-secondary, top_spacing none
+**Settings:** title "What to Expect", heading_alignment start, color_scheme highlight-secondary, top_spacing none
 **Blocks:** 5 steps with concise titles (Book, Prepare, Arrive, Experience, Follow-Up) and two-sentence descriptions; no images, no buttons.
 **Good for:** Reducing pre-visit anxiety by spelling out the customer journey in detail.
 **Industries:** Medical offices, spas, legal consultations, auto repair shops.

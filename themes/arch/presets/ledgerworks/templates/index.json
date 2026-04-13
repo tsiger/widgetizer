@@ -6,7 +6,7 @@
       "type": "split-hero",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
@@ -53,7 +53,7 @@
         "icon_style": "outline",
         "icon_size": "md",
         "icon_shape": "rounded",
-        "alignment": "left",
+        "alignment": "start",
         "show_dividers": true,
         "color_scheme": "standard-secondary",
         "top_spacing": "none",

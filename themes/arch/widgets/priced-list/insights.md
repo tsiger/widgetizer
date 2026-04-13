@@ -11,7 +11,7 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 | `eyebrow` | Any text (default: "Starters") | Small label above the headline; sets category context |
 | `title` | Any text (default: "Appetizers") | Main heading for the section; first widget on page renders as h1 |
 | `description` | Any text | Paragraph below the heading; useful for disclaimers or seasonal notes |
-| `heading_alignment` | `center` (default), `left` | Centers the header block or pins it to the left edge |
+| `heading_alignment` | `start` | Centers the header block or pins it to the left edge |
 | `layout` | `single-column` (default), `two-column` | One stacked list vs. a side-by-side grid (splits at 750 px) |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text color palette; non-standard schemes add padded container and custom bg |
 | `top_spacing` | `auto` (default), `none` | Normal top margin or flush against the widget above |

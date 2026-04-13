@@ -35,7 +35,7 @@
         "eyebrow": "",
         "title": "",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "columns_desktop": 3,
         "gap": "medium",
         "color_scheme": "standard-primary"

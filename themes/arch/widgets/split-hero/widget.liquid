@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-split-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% unless widget.settings.color_scheme == 'standard-primary' %} has-highlight-background{% endunless %}{% if widget.settings.image_position == 'right' %} layout-image-right{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  class="widget widget-split-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% unless widget.settings.color_scheme == 'standard-primary' %} has-highlight-background{% endunless %}{% if widget.settings.image_position == 'end' %} layout-image-end{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="split-hero"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -82,7 +82,7 @@
         }
 
         /* Image right variant */
-        &.layout-image-right .split-hero-wrapper {
+        &.layout-image-end .split-hero-wrapper {
           flex-direction: row-reverse;
         }
       }

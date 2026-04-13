@@ -11,13 +11,13 @@ Embeddable Google Maps section with optional address bar, directions link, and a
 | `eyebrow` | Any text | Small label above the headline, useful for "Our Location" or "Visit Us" |
 | `title` | Any text (default: "Find Us") | Section headline, rendered as `<h1>` when first widget on page, `<h2>` otherwise |
 | `description` | Any text | Subtext paragraph below the headline |
-| `heading_alignment` | `left`, `center` | Left-aligns or centers the eyebrow/title/description block |
+| `heading_alignment` | `start`, `center` | Left-aligns or centers the eyebrow/title/description block |
 | `address` | Any text (default: "123 Main Street, New York, NY 10001") | Displayed below the map with a pin icon; also used in the iframe title attribute |
 | `embed_url` | Google Maps embed URL | The actual map iframe source; if empty, a placeholder with instructions is shown |
 | `directions_link` | Link object (text + href + target) | "Get Directions" style link shown next to the address |
 | `height` | `small` (300px), `medium` (450px), `large` (600px) | Controls iframe/placeholder height |
 | `show_address` | `true` / `false` | Toggles the address + pin icon row beneath the map |
-| `sidebar_position` | `left`, `right` | Puts the info/social sidebar on the chosen side; grid flips from 7fr/3fr to 3fr/7fr |
+| `sidebar_position` | `start`, `end` | Puts the info/social sidebar on the chosen side; grid flips from 7fr/3fr to 3fr/7fr |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Changes background and container styling; non-standard schemes add padded container |
 | `top_spacing` | `auto`, `none` | Removes top section padding when set to `none` -- useful for stacking with adjacent widgets |
 | `bottom_spacing` | `auto`, `none` | Removes bottom section padding when set to `none` |
@@ -56,7 +56,7 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 
 | Setting | Value |
 |---------|-------|
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `height` | `large` |
 | `sidebar_position` | `right` |
 | `show_address` | `true` |
@@ -89,7 +89,7 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 | Setting | Value |
 |---------|-------|
 | `eyebrow` | "Visit Our Studio" |
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `height` | `medium` |
 | `sidebar_position` | `right` |
 | Blocks | Info: "Studio Hours". Info: "Parking". Info: "Accessibility". Social block. |
@@ -103,9 +103,9 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 
 | Setting | Value |
 |---------|-------|
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `height` | `large` |
-| `sidebar_position` | `left` |
+| `sidebar_position` | `start` |
 | `color_scheme` | `highlight-secondary` |
 | Blocks | Info: Business name + tagline in richtext. Info: Full address + phone. Social block. |
 
@@ -136,7 +136,7 @@ Default configuration ships with one **info** block ("Need Help?" / email addres
 
 | Setting | Value |
 |---------|-------|
-| `heading_alignment` | `left` |
+| `heading_alignment` | `start` |
 | `height` | `medium` |
 | `sidebar_position` | `right` |
 | `color_scheme` | `standard-secondary` |

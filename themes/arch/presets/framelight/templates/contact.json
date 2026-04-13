@@ -57,7 +57,7 @@
         "eyebrow": "",
         "title": "Studio & Travel",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "address": "1410 Western Ave, Studio 5, Seattle, WA 98101",
         "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2689.358057850826!2d-122.34614212327475!3d47.60793867118461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x54906ab2a5b0d4c3%3A0x6e2d489d5dd1d9f7!2sWestern%20Ave%2C%20Seattle%2C%20WA!5e0!3m2!1sen!2sus!4v1712772000000",
         "directions_link": {
@@ -67,7 +67,7 @@
         },
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "left",
+        "sidebar_position": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -94,10 +94,10 @@
         "eyebrow": "",
         "title": "Booking Questions",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "style": "connected",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

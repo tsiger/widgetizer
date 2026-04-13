@@ -32,7 +32,7 @@
     "origin": {
       "type": "image-text",
       "settings": {
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -68,7 +68,7 @@
         "eyebrow": "What We Believe",
         "title": "The Crumbly Way",
         "heading_alignment": "center",
-        "content_position": "right",
+        "content_position": "end",
         "show_divider": true,
         "icon_style": "outline",
         "icon_size": "lg",

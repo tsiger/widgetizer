@@ -11,7 +11,7 @@ A responsive grid of image-plus-text cards with optional carousel mode, suited f
 | `eyebrow` | Any text | Small label above the headline (e.g. "Our Services"). Leave blank to hide. |
 | `title` | Any text | Main section headline. Renders as `<h1>` when the widget is first on the page, `<h2>` otherwise. |
 | `description` | Any text | Supporting paragraph below the headline. Leave blank to hide. |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description header block. |
+| `heading_alignment` | `start` | Centers or left-aligns the eyebrow/title/description header block. |
 | `layout` | `grid` (default), `carousel` | Grid shows all cards at once; carousel adds prev/next navigation and horizontal scrolling. |
 | `columns_desktop` | 2 -- 5 (default 4) | Number of columns on desktop. Cards stack to fewer columns on smaller breakpoints automatically. |
 | `card_layout` | `box` (default), `flat` | Box gives cards a contained look with background/border treatment. Flat removes the card container for a more open feel. |
@@ -121,7 +121,7 @@ Leave the card `image` blank. Use `subtitle` for the plan name, `title` for the 
 | `image_position` | top |
 | `aspect_ratio` | 1/1 |
 | `color_scheme` | standard |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 
 Use `subtitle` for step numbers ("01", "02", "03", "04"), `title` for the step name, and a one-sentence `description`. Hide the button.
 
@@ -140,7 +140,7 @@ Use `subtitle` for step numbers ("01", "02", "03", "04"), `title` for the step n
 | `image_position` | bottom |
 | `aspect_ratio` | 1/1 |
 | `color_scheme` | highlight |
-| `heading_alignment` | left |
+| `heading_alignment` | start |
 
 Put the quote in `description`, the person's name in `title`, and their role or company in `subtitle`. The portrait photo at the bottom grounds each testimonial.
 

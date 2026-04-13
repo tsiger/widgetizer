@@ -71,7 +71,7 @@
         "eyebrow": "Our Specialties",
         "title": "Tattoo Styles",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"
@@ -136,7 +136,7 @@
       "type": "testimonial-hero",
       "settings": {
         "author_image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"
@@ -173,7 +173,7 @@
         "eyebrow": "Portfolio",
         "title": "Recent Work",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "columns_desktop": 4,
         "gap": "small",
         "color_scheme": "standard-secondary",

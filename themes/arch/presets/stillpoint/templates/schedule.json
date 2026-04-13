@@ -132,7 +132,7 @@
       "type": "image-text",
       "settings": {
         "image": "",
-        "image_position": "left",
+        "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
         "color_scheme": "standard-secondary"

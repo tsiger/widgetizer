@@ -11,7 +11,7 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 | `eyebrow` | Any text (optional) | Small label above the headline, adds context like "Portfolio" or "What We Do" |
 | `title` | Any text, default "Our Work" | Main section headline; renders as `<h1>` when widget is first on the page |
 | `description` | Any text (optional) | Supporting paragraph below the headline |
-| `heading_alignment` | `center` (default), `left` | Centers or left-aligns the eyebrow/title/description block |
+| `heading_alignment` | `start` | Centers or left-aligns the eyebrow/title/description block |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls section background and text contrast; non-standard schemes add padded container and override `--widget-bg-color` |
 | `top_spacing` | `auto` (default), `none` | Removes top padding when set to `none` -- useful for stacking widgets edge-to-edge |
 | `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to `none` |
@@ -31,7 +31,7 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 ### 1. Service Showcase (3 panels)
 
 - **Panels:** 3, each representing a core service
-- **Settings:** `eyebrow` = "What We Do", `title` = "Our Services", `heading_alignment` = left, `color_scheme` = standard
+- **Settings:** `eyebrow` = "What We Do", `title` = "Our Services", `heading_alignment` = start, `color_scheme` = standard
 - **Panel content:** Service photo + service name as title, one-liner as subtitle, "Learn More" button linking to service page
 - **Good for:** Letting visitors quickly scan your top offerings with strong imagery
 - **Industries:** Landscaping, home remodeling, cleaning companies, salons
@@ -63,7 +63,7 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 ### 5. Before/After Transformations (4 panels)
 
 - **Panels:** 4 projects, each showing the "after" result
-- **Settings:** `title` = "Transformations", `description` = "See what's possible.", `heading_alignment` = left, `color_scheme` = standard
+- **Settings:** `title` = "Transformations", `description` = "See what's possible.", `heading_alignment` = start, `color_scheme` = standard
 - **Panel content:** Dramatic after photo, project label as title, scope description as subtitle (e.g., "Full kitchen renovation"), "See Details" button
 - **Good for:** Businesses where visual transformation is the selling point
 - **Industries:** Contractors, auto detailers, lawn care, painters, organizers

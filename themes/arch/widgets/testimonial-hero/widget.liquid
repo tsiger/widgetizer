@@ -1,6 +1,6 @@
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-testimonial-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'left' %}layout-image-left{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  class="widget widget-type-testimonial-hero widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'start' %}layout-image-start{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   {% unless widget.settings.color_scheme == 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}
@@ -65,7 +65,7 @@
         }
 
         /* Image left variant */
-        &.layout-image-left .testimonial-hero-wrapper {
+        &.layout-image-start .testimonial-hero-wrapper {
           & .testimonial-content {
             order: 2;
           }

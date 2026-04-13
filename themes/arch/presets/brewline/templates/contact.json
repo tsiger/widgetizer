@@ -35,7 +35,7 @@
         "heading_alignment": "center",
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -63,7 +63,7 @@
         "title": "When We're Open",
         "heading_alignment": "center",
         "week_start_day": "1",
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "note": "Closed on major holidays",
         "color_scheme": "standard-secondary"
       },

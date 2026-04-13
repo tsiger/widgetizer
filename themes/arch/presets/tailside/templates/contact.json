@@ -39,7 +39,7 @@
         "eyebrow": "Tailside Veterinary Hospital",
         "title": "Reach us",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -78,7 +78,7 @@
         "eyebrow": "",
         "title": "Location",
         "description": "",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "address": "2200 Waterside Dr, Raleigh, NC 27603",
         "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3256.0!2d-78.64!3d35.76!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDQ1JzM2LjAiTiA3OMKwMzgnMjQuMCJX!5e0!3m2!1sen!2sus",
         "directions_link": {
@@ -88,7 +88,7 @@
         },
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -112,9 +112,9 @@
         "eyebrow": "Lobby hours",
         "title": "When we see patients",
         "description": "Emergency entrance is always staffed; call ahead for critical arrivals when possible.",
-        "heading_alignment": "left",
+        "heading_alignment": "start",
         "note": "Holiday hours posted two weeks in advance.",
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "week_start_day": "1",
         "color_scheme": "standard-primary"
       },

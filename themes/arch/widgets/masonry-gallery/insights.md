@@ -11,7 +11,7 @@ Pinterest-style staggered image grid with optional titles, categories, and a bui
 | `eyebrow` | Any text (optional) | Small label above the headline — useful for section context like "Portfolio" or "Latest Projects" |
 | `title` | Any text (default "Our Work") | Main headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text | Supporting paragraph beneath the headline |
-| `heading_alignment` | `left`, `center` (default) | Left-aligns the header block for an editorial feel, or centers it for a classic portfolio look |
+| `heading_alignment` | `start`, `center` (default) | Left-aligns the header block for an editorial feel, or centers it for a classic portfolio look |
 | `columns_desktop` | 2 -- 5 (default 3) | Number of masonry columns on desktop; fewer columns = larger images, more columns = denser grid |
 | `gap` | `small`, `medium` (default), `large` | Spacing between cards; small produces a tight mosaic, large gives each image breathing room |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and card styling; accent variants add a secondary background and border to each card |
@@ -31,7 +31,7 @@ Pinterest-style staggered image grid with optional titles, categories, and a bui
 ## Layout Recipes
 
 ### 1. Tight Portfolio Wall
-- **Settings**: 4 columns, gap small, heading_alignment left, color_scheme standard
+- **Settings**: 4 columns, gap small, heading_alignment start, color_scheme standard
 - **Blocks**: 8--12 items, image-only (no titles or categories)
 - **Good for**: Photographers, illustrators, tattoo artists who want maximum visual density
 - **Industries**: Photography studios, creative agencies, tattoo parlors
@@ -43,7 +43,7 @@ Pinterest-style staggered image grid with optional titles, categories, and a bui
 - **Industries**: Architecture firms, interior designers, landscape contractors, renovation companies
 
 ### 3. Two-Column Editorial
-- **Settings**: 2 columns, gap large, heading_alignment left, eyebrow set (e.g., "Selected Work")
+- **Settings**: 2 columns, gap large, heading_alignment start, eyebrow set (e.g., "Selected Work")
 - **Blocks**: 4--6 items with title only (no category)
 - **Good for**: Premium or minimal brands that want each piece to feel significant
 - **Industries**: Boutique design studios, luxury home builders, fine art galleries
@@ -55,7 +55,7 @@ Pinterest-style staggered image grid with optional titles, categories, and a bui
 - **Industries**: Event planners, florists, fashion boutiques, wedding venues
 
 ### 5. Before-and-After Gallery
-- **Settings**: 2 columns, gap medium, heading_alignment left, color_scheme standard-secondary
+- **Settings**: 2 columns, gap medium, heading_alignment start, color_scheme standard-secondary
 - **Blocks**: 6--8 items alternating before/after shots, title describing the project, category as "Before" or "After"
 - **Good for**: Demonstrating transformations where side-by-side comparison drives conversions
 - **Industries**: Home remodelers, auto detailers, landscapers, dental cosmetics

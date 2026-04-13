@@ -7,7 +7,7 @@
       "settings": {
         "image": "",
         "overlay_color": "",
-        "image_position": "left",
+        "image_position": "start",
         "color_scheme": "standard-primary",
         "top_spacing": "none"
       },
@@ -152,7 +152,7 @@
       "type": "image-callout",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -188,7 +188,7 @@
         "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": true,
-        "sidebar_position": "right",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

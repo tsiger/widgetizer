@@ -6,7 +6,7 @@
       "type": "split-hero",
       "settings": {
         "image": "",
-        "image_position": "right",
+        "image_position": "end",
         "color_scheme": "standard-secondary",
         "top_spacing": "none"
       },
