@@ -2078,6 +2078,19 @@ b {
   /* Reset inherited .widget base styles */
   background-color: var(--widget-bg-color, transparent);
   background-image: none;
+  --header-nav-top-link-color: var(--text-content);
+  --header-nav-top-link-hover-color: var(--text-heading);
+  --header-nav-top-link-hover-bg: var(--bg-secondary);
+  --header-nav-top-link-hover-indicator: transparent;
+  --header-nav-top-link-active-color: var(--header-nav-top-link-hover-color);
+  --header-nav-top-link-active-bg: var(--header-nav-top-link-hover-bg);
+  --header-nav-top-link-active-indicator: transparent;
+  --header-nav-row-link-color: var(--text-content);
+  --header-nav-row-hover-color: var(--text-heading);
+  --header-nav-row-hover-bg: var(--bg-secondary);
+  --header-nav-row-active-color: var(--header-nav-row-hover-color);
+  --header-nav-row-active-bg: var(--header-nav-row-hover-bg);
+  --header-nav-row-active-indicator: transparent;
 
   position: relative;
   padding-block: var(--space-md);
@@ -2123,9 +2136,16 @@ b {
     background-color: transparent;
     border-block-end-color: transparent;
     color: var(--colors-highlight_text_heading, #fff);
+    --header-nav-top-link-color: var(--colors-highlight_text_content, #fff);
+    --header-nav-top-link-hover-color: var(--colors-highlight_text_heading, #fff);
+    --header-nav-top-link-hover-bg: rgb(255 255 255 / 0.08);
+    --header-nav-top-link-hover-indicator: transparent;
+    --header-nav-top-link-active-color: var(--header-nav-top-link-hover-color);
+    --header-nav-top-link-active-bg: var(--header-nav-top-link-hover-bg);
+    --header-nav-top-link-active-indicator: transparent;
 
-    & a,
-    & button,
+    & .header-logo,
+    & .menu-toggle,
     & .header-contact-line {
       color: var(--colors-highlight_text_content, #fff);
     }
@@ -2155,9 +2175,16 @@ b {
       border-block-end-color: transparent;
       box-shadow: none;
       color: var(--colors-highlight_text_heading, #fff);
+      --header-nav-top-link-color: var(--colors-highlight_text_content, #fff);
+      --header-nav-top-link-hover-color: var(--colors-highlight_text_heading, #fff);
+      --header-nav-top-link-hover-bg: rgb(255 255 255 / 0.08);
+      --header-nav-top-link-hover-indicator: transparent;
+      --header-nav-top-link-active-color: var(--header-nav-top-link-hover-color);
+      --header-nav-top-link-active-bg: var(--header-nav-top-link-hover-bg);
+      --header-nav-top-link-active-indicator: transparent;
 
-      & a,
-      & button,
+      & .header-logo,
+      & .menu-toggle,
       & .header-contact-line {
         color: var(--colors-highlight_text_content, #fff);
       }
@@ -2340,17 +2367,37 @@ b {
       padding-block: 1.4rem;
       padding-inline: 0;
       text-decoration: none;
-      color: var(--text-content);
+      color: var(--header-nav-row-link-color);
       font-weight: var(--typography-body_font-weight, 400);
       font-size: calc(var(--font-size-lg) * var(--body-scale));
       background: transparent;
       border: none;
+      border-radius: var(--radius-sm);
       text-align: start;
       cursor: pointer;
-      transition: color 0.2s;
+      box-shadow: inset 0 0 0 0 transparent;
+      transition:
+        color 0.2s,
+        background-color 0.2s,
+        box-shadow 0.2s;
 
-      &:hover {
-        color: var(--text-muted);
+      &:hover,
+      &:focus-visible {
+        color: var(--header-nav-row-hover-color);
+        background-color: var(--header-nav-row-hover-bg);
+      }
+    }
+
+    &.is-active > a,
+    & > a[aria-current="page"] {
+      color: var(--header-nav-row-active-color);
+      background-color: var(--header-nav-row-active-bg);
+      box-shadow: inset 0.2rem 0 0 var(--header-nav-row-active-indicator);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--header-nav-row-active-color);
+        background-color: var(--header-nav-row-active-bg);
       }
     }
 
@@ -2444,6 +2491,20 @@ b {
 
   /* Mobile contact details responsive */
   @media (max-width: 989px) {
+    .transparent-header &:not(.header-sticky) .header-nav,
+    .transparent-header &.header-sticky:not(.header-scrolled) .header-nav {
+      color: var(--text-content);
+
+      & .nav-close-title,
+      & .nav-close-btn,
+      & .nav-item > a,
+      & .nav-item > button:not(.submenu-toggle),
+      & .submenu-toggle,
+      & .header-contact-line {
+        color: inherit;
+      }
+    }
+
     & .header-contact {
       display: none;
     }
@@ -2501,17 +2562,31 @@ b {
         padding-inline: var(--space-md);
         font-size: calc(var(--font-size-sm) * var(--body-scale));
         border-radius: var(--radius-button);
-        transition: background-color 0.2s;
+        color: var(--header-nav-top-link-color);
+        box-shadow: none;
+        transition:
+          background-color 0.2s,
+          color 0.2s;
 
-        &:hover {
-          background-color: var(--bg-secondary);
-          color: var(--text-content);
+        &:hover,
+        &:focus-visible {
+          background-color: var(--header-nav-top-link-hover-bg);
+          color: var(--header-nav-top-link-hover-color);
         }
       }
 
-      &.is-active > a {
-        background-color: var(--bg-secondary);
-        color: var(--text-content);
+      &.is-active > a,
+      & > a[aria-current="page"] {
+        background-color: var(--header-nav-top-link-active-bg);
+        color: var(--header-nav-top-link-active-color);
+        box-shadow: none;
+
+        &:hover,
+        &:focus-visible {
+          background-color: var(--header-nav-top-link-active-bg);
+          color: var(--header-nav-top-link-active-color);
+          box-shadow: none;
+        }
       }
 
       & .submenu-toggle {
@@ -2573,16 +2648,33 @@ b {
           padding-block: 1.2rem;
           padding-inline: var(--space-md);
           font-size: calc(var(--font-size-sm) * var(--body-scale));
-          border-radius: var(--radius-button);
-          transition: background-color 0.2s;
+          border-radius: 0;
+          color: var(--header-nav-row-link-color);
+          box-shadow: inset 0 0 0 0 transparent;
+          transition:
+            background-color 0.2s,
+            color 0.2s,
+            box-shadow 0.2s;
 
-          &:hover {
-            background-color: var(--bg-secondary);
+          &:hover,
+          &:focus-visible {
+            background-color: var(--header-nav-row-hover-bg);
+            color: var(--header-nav-row-hover-color);
           }
         }
 
-        &.is-active > a {
-          background-color: var(--bg-secondary);
+        &.is-active > a,
+        & > a[aria-current="page"] {
+          background-color: var(--header-nav-row-active-bg);
+          color: var(--header-nav-row-active-color);
+          box-shadow: inset 0.2rem 0 0 var(--header-nav-row-active-indicator);
+
+          &:hover,
+          &:focus-visible {
+            background-color: var(--header-nav-row-active-bg);
+            color: var(--header-nav-row-active-color);
+            box-shadow: inset 0.2rem 0 0 var(--header-nav-row-active-indicator);
+          }
         }
 
         &.has-submenu {
