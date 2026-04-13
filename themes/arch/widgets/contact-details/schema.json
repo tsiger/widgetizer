@@ -48,6 +48,31 @@
     },
     {
       "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "first-featured",
+      "options": [
+        {
+          "value": "first-featured",
+          "label": "tTheme:contact_details.settings.layout.options.first_featured"
+        },
+        {
+          "value": "last-featured",
+          "label": "tTheme:contact_details.settings.layout.options.last_featured"
+        },
+        {
+          "value": "equal",
+          "label": "tTheme:contact_details.settings.layout.options.equal"
+        }
+      ]
+    },
+    {
+      "type": "header",
       "id": "widget_header",
       "label": "Widget"
     },

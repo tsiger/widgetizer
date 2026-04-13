@@ -2807,10 +2807,6 @@ b {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-
-    &:first-child {
-      grid-column: span 2;
-    }
   }
 
   & .footer-logo {

@@ -875,7 +875,16 @@
     }
   },
   "contact_details": {
-    "name": "Contact Details"
+    "name": "Contact Details",
+    "settings": {
+      "layout": {
+        "options": {
+          "first_featured": "First featured",
+          "last_featured": "Last featured",
+          "equal": "Equal"
+        }
+      }
+    }
   },
   "content_switcher": {
     "name": "Content Switcher",
