@@ -1,1 +1,0 @@
-{"type":"core-link","displayName":"Link","settings":[{"type":"text","id":"href","label":"URL","default":"#"},{"type":"text","id":"text","label":"Text","default":"Link"}]}

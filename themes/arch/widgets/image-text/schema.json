@@ -520,6 +520,40 @@
       ]
     },
     {
+      "type": "countdown",
+      "displayName": "tTheme:global.widgets.blocks.countdown.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "target_date",
+          "label": "tTheme:countdown.settings.target_date.label",
+          "default": "2027-01-01 00:00"
+        },
+        {
+          "type": "text",
+          "id": "expired_message",
+          "label": "tTheme:countdown.settings.expired_message.label",
+          "default": "The wait is over!"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_seconds",
+          "label": "tTheme:countdown.settings.show_seconds.label",
+          "default": true
+        }
+      ]
+    },
+    {
       "type": "button",
       "displayName": "tTheme:global.widgets.blocks.button.name",
       "settings": [

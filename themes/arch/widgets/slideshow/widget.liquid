@@ -38,8 +38,8 @@
         {% endif %}
         data-block-id="{{ blockId }}"
       >
-        <div class="widget-container {% if widget.settings.height == 'auto' %}widget-container-padded{% endif %}">
-          <div class="widget-content widget-content-lg {% if widget.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
+        <div class="widget-container {% if widget.settings.height == 'auto' %}widget-container-padded{% endif %}" style="justify-content: {{ block.settings.vertical_alignment | default: 'center' }};">
+          <div class="widget-content widget-content-lg {% if block.settings.alignment == 'center' %}widget-content-align-center{% else %}widget-content-align-start{% endif %}">
             {% if block.settings.heading_text != blank %}
               {% assign size_class = 't-' | append: block.settings.heading_size %}
               {% if widget.index == 1 and forloop.first %}

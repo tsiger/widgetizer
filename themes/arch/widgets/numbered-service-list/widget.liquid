@@ -99,7 +99,7 @@
 
       @media (min-width: 750px) {
         & .service-row {
-          grid-template-columns: 10rem minmax(18rem, 32rem) minmax(0, 1fr) 7rem;
+          grid-template-columns: {% if widget.settings.show_numbers %}10rem {% endif %}minmax(18rem, 32rem) minmax(0, 1fr) 7rem;
           gap: var(--space-xl);
           align-items: center;
           padding-block: var(--space-2xl);
@@ -171,7 +171,9 @@
             {% else %}
               <div class="service-row">
             {% endif %}
-                <div class="service-number">{{ step_number }}</div>
+                {% if widget.settings.show_numbers %}
+                  <div class="service-number">{{ step_number }}</div>
+                {% endif %}
 
                 <div class="service-title-wrap">
                   {% if block.settings.title != blank %}

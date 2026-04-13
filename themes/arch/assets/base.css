@@ -53,6 +53,7 @@
       7.4 Icons
       7.5 Feature Lists
       7.6 Block Items
+      7.7 Countdown
 
    8. GLOBAL COMPONENTS
       8.1 Site Header
@@ -1069,7 +1070,7 @@ b {
 }
 
 .widget.card-layout-flat .widget-card-grid.widget-grid {
-  --grid-gap: var(--space-2xl);
+  --grid-gap-auto: max(var(--space-sm), calc(var(--space-2xl) - (var(--grid-cols-desktop, 3) - 2) * var(--space-xs)));
 }
 
 /* Icon Card Grid — Featured Image Split Layout */
@@ -2016,6 +2017,52 @@ b {
   & svg {
     width: 100%;
     height: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7.7 Countdown
+   -------------------------------------------------------------------------- */
+
+.countdown-timer {
+  display: inline-flex;
+  gap: var(--space-md);
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: auto;
+}
+
+.countdown-number {
+  font-size: calc(var(--font-size-4xl) * var(--heading-scale));
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-heading);
+}
+
+.countdown-separator {
+  align-self: flex-start;
+  padding-block-start: var(--space-sm);
+}
+
+.countdown-label {
+  letter-spacing: 0.05em;
+}
+
+.countdown-expired {
+  margin-block: var(--space-xl);
+}
+
+@media (max-width: 749px) {
+  .countdown-timer {
+    gap: var(--space-sm);
+  }
+
+  .countdown-number {
+    font-size: calc(var(--font-size-2xl) * var(--heading-scale));
   }
 }
 

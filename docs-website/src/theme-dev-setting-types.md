@@ -240,6 +240,19 @@ In Liquid templates, output directly (it's already HTML):
 }
 ```
 
+Optional properties:
+
+- `hide_text` (boolean): When `true`, hides the link text input and only shows the URL and target fields. Useful when the link wraps an image, icon, or other element that doesn't need separate link text.
+
+```json
+{
+  "id": "link",
+  "type": "link",
+  "label": "Link",
+  "hide_text": true
+}
+```
+
 **`icon`** — Icon picker tied to your theme icon set.
 
 ```json

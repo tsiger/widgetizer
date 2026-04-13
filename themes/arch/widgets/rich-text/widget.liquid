@@ -1,3 +1,14 @@
+{% assign has_countdown = false %}
+{% for blockId in widget.blocksOrder %}
+  {% assign block = widget.blocks[blockId] %}
+  {% if block.type == 'countdown' %}
+    {% assign has_countdown = true %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+{% if has_countdown %}
+  {% enqueue_script src: "countdown.js", defer: true, theme: true %}
+{% endif %}
 <section
   id="{{ widget.id }}"
   class="widget widget-rich-text widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.image != blank %} has-bg-image has-overlay{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
@@ -33,6 +44,34 @@
             {% if block.settings.muted %}{% assign style_class = style_class | append: ' t-muted' %}{% endif %}
             <div class="w-body w-rte {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
               {{ block.settings.text | raw }}
+            </div>
+          {% when 'countdown' %}
+            <div class="countdown-timer reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}"
+              data-target="{{ block.settings.target_date }}"
+              data-expired-message="{{ block.settings.expired_message }}"
+              data-show-seconds="{{ block.settings.show_seconds }}"
+            >
+              <div class="countdown-unit">
+                <span class="countdown-number" data-unit="days">00</span>
+                <span class="countdown-label w-meta t-sm">Days</span>
+              </div>
+              <span class="countdown-separator t-4xl t-muted">:</span>
+              <div class="countdown-unit">
+                <span class="countdown-number" data-unit="hours">00</span>
+                <span class="countdown-label w-meta t-sm">Hours</span>
+              </div>
+              <span class="countdown-separator t-4xl t-muted">:</span>
+              <div class="countdown-unit">
+                <span class="countdown-number" data-unit="minutes">00</span>
+                <span class="countdown-label w-meta t-sm">Minutes</span>
+              </div>
+              {% if block.settings.show_seconds %}
+                <span class="countdown-separator t-4xl t-muted">:</span>
+                <div class="countdown-unit">
+                  <span class="countdown-number" data-unit="seconds">00</span>
+                  <span class="countdown-label w-meta t-sm">Seconds</span>
+                </div>
+              {% endif %}
             </div>
           {% when 'button' %}
             {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}

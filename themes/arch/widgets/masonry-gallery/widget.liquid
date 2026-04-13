@@ -116,7 +116,7 @@
               {% endif %}
             {% endif %}
             {% if block.settings.title != blank or block.settings.category != blank %}
-              <div class="widget-card-content">
+              <div class="widget-card-content{% if widget.settings.alignment == 'center' %} widget-content-align-center{% endif %}">
                 {% if block.settings.title != blank %}
                   <{{ item_heading_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 {% endif %}

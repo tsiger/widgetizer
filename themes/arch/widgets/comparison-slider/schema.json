@@ -74,6 +74,22 @@
     },
     {
       "type": "select",
+      "id": "content_width",
+      "label": "tTheme:global.widgets.settings.content_width.label",
+      "default": "wide",
+      "options": [
+        {
+          "value": "wide",
+          "label": "tTheme:global.widgets.settings.content_width.options.wide"
+        },
+        {
+          "value": "fullwidth",
+          "label": "tTheme:global.widgets.settings.content_width.options.fullwidth"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "orientation",
       "label": "tTheme:comparison_slider.settings.orientation.label",
       "default": "horizontal",

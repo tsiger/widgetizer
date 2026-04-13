@@ -47,6 +47,48 @@
       "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
+      "type": "select",
+      "id": "image_style",
+      "label": "tTheme:profile_grid.settings.image_style.label",
+      "description": "tTheme:profile_grid.settings.image_style.description",
+      "default": "circle",
+      "options": [
+        {
+          "value": "circle",
+          "label": "tTheme:profile_grid.settings.image_style.options.circle"
+        },
+        {
+          "value": "full",
+          "label": "tTheme:profile_grid.settings.image_style.options.full"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "tTheme:global.widgets.settings.aspect_ratio.label",
+      "description": "tTheme:profile_grid.settings.aspect_ratio.description",
+      "default": "3 / 4",
+      "options": [
+        {
+          "value": "1 / 1",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1"
+        },
+        {
+          "value": "4 / 3",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3"
+        },
+        {
+          "value": "3 / 2",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 2"
+        },
+        {
+          "value": "3 / 4",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 4"
+        }
+      ]
+    },
+    {
       "type": "range",
       "id": "columns_desktop",
       "label": "tTheme:global.widgets.settings.columns_desktop.label",

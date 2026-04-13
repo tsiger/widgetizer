@@ -46,22 +46,6 @@
       "default": true
     },
     {
-      "type": "select",
-      "id": "alignment",
-      "label": "tTheme:global.widgets.settings.alignment.label",
-      "default": "center",
-      "options": [
-        {
-          "value": "start",
-          "label": "tTheme:global.widgets.settings.alignment.options.start"
-        },
-        {
-          "value": "center",
-          "label": "tTheme:global.widgets.settings.alignment.options.center"
-        }
-      ]
-    },
-    {
       "type": "checkbox",
       "id": "autoplay",
       "label": "tTheme:slideshow.settings.autoplay.label",
@@ -132,6 +116,42 @@
           "type": "header",
           "id": "display_header",
           "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "tTheme:global.widgets.settings.alignment.label",
+          "default": "center",
+          "options": [
+            {
+              "value": "start",
+              "label": "tTheme:global.widgets.settings.alignment.options.start"
+            },
+            {
+              "value": "center",
+              "label": "tTheme:global.widgets.settings.alignment.options.center"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "vertical_alignment",
+          "label": "tTheme:banner.settings.vertical_alignment.label",
+          "default": "center",
+          "options": [
+            {
+              "value": "start",
+              "label": "tTheme:global.widgets.settings.options.top"
+            },
+            {
+              "value": "center",
+              "label": "tTheme:global.widgets.settings.options.center"
+            },
+            {
+              "value": "end",
+              "label": "tTheme:global.widgets.settings.options.bottom"
+            }
+          ]
         },
         {
           "type": "select",
@@ -305,6 +325,8 @@
         "heading_size": "5xl",
         "text_content": "Add your content here",
         "text_size": "lg",
+        "alignment": "center",
+        "vertical_alignment": "center",
         "button_link": {
           "text": "Learn More",
           "href": "#",
@@ -321,6 +343,8 @@
         "heading_size": "5xl",
         "text_content": "Add your content here",
         "text_size": "lg",
+        "alignment": "center",
+        "vertical_alignment": "center",
         "button_link": {
           "text": "Shop Now",
           "href": "#",

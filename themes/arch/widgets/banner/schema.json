@@ -62,6 +62,26 @@
     },
     {
       "type": "select",
+      "id": "content_width",
+      "label": "tTheme:global.widgets.settings.content_width.label",
+      "default": "wide",
+      "options": [
+        {
+          "value": "narrow",
+          "label": "tTheme:global.widgets.settings.content_width.options.narrow"
+        },
+        {
+          "value": "medium",
+          "label": "tTheme:global.widgets.settings.content_width.options.medium"
+        },
+        {
+          "value": "wide",
+          "label": "tTheme:global.widgets.settings.content_width.options.wide"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "alignment",
       "label": "tTheme:global.widgets.settings.alignment.label",
       "default": "center",
@@ -525,6 +545,40 @@
               "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.circle"
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "countdown",
+      "displayName": "tTheme:global.widgets.blocks.countdown.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "target_date",
+          "label": "tTheme:countdown.settings.target_date.label",
+          "default": "2027-01-01 00:00"
+        },
+        {
+          "type": "text",
+          "id": "expired_message",
+          "label": "tTheme:countdown.settings.expired_message.label",
+          "default": "The wait is over!"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_seconds",
+          "label": "tTheme:countdown.settings.show_seconds.label",
+          "default": true
         }
       ]
     },

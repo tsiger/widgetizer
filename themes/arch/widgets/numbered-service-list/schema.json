@@ -47,6 +47,12 @@
     },
     {
       "type": "checkbox",
+      "id": "show_numbers",
+      "label": "tTheme:numbered_service_list.settings.show_numbers.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
       "id": "show_dividers",
       "label": "tTheme:numbered_service_list.settings.show_dividers.label",
       "default": true
@@ -147,6 +153,7 @@
           "type": "link",
           "id": "link",
           "label": "tTheme:global.widgets.settings.link.label",
+          "hide_text": true,
           "default": {
             "text": "Learn More",
             "href": "#",

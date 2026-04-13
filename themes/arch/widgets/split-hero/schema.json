@@ -119,6 +119,67 @@
   ],
   "blocks": [
     {
+      "type": "rating",
+      "displayName": "tTheme:global.widgets.blocks.rating.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "select",
+          "id": "rating",
+          "label": "tTheme:global.widgets.blocks.rating.settings.rating.label",
+          "options": [
+            {
+              "value": "5",
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.5"
+            },
+            {
+              "value": "4",
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.4"
+            },
+            {
+              "value": "3",
+              "label": "tTheme:global.widgets.blocks.rating.settings.rating.options.3"
+            }
+          ],
+          "default": "5"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "displayName": "tTheme:global.widgets.blocks.image.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "image",
+          "id": "image",
+          "label": "tTheme:global.widgets.blocks.image.settings.image.label"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "label": "tTheme:global.widgets.blocks.image.settings.width.label",
+          "default": 20,
+          "min": 5,
+          "max": 100,
+          "step": 5
+        }
+      ]
+    },
+    {
       "type": "heading",
       "displayName": "tTheme:global.widgets.blocks.heading.name",
       "settings": [
@@ -257,6 +318,198 @@
           "label": "tTheme:global.widgets.blocks.features.settings.features.label",
           "description": "tTheme:global.widgets.blocks.features.settings.features.description",
           "default": "+ Feature 1\n+ Feature 2\n+ Feature 3"
+        }
+      ]
+    },
+    {
+      "type": "icon",
+      "displayName": "tTheme:global.widgets.blocks.icon.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "icon",
+          "id": "icon",
+          "label": "tTheme:global.widgets.blocks.icon.settings.icon.label",
+          "default": "star"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "tTheme:global.widgets.blocks.icon.settings.style.label",
+          "default": "plain",
+          "options": [
+            {
+              "value": "plain",
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.plain"
+            },
+            {
+              "value": "outline",
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.outline"
+            },
+            {
+              "value": "filled",
+              "label": "tTheme:global.widgets.blocks.icon.settings.style.options.filled"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "tTheme:global.widgets.blocks.icon.settings.size.label",
+          "default": "md",
+          "options": [
+            {
+              "value": "sm",
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.sm"
+            },
+            {
+              "value": "md",
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.md"
+            },
+            {
+              "value": "lg",
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.lg"
+            },
+            {
+              "value": "xl",
+              "label": "tTheme:global.widgets.blocks.icon.settings.size.options.xl"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "shape",
+          "label": "tTheme:global.widgets.blocks.icon.settings.shape.label",
+          "default": "circle",
+          "options": [
+            {
+              "value": "sharp",
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.sharp"
+            },
+            {
+              "value": "rounded",
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.rounded"
+            },
+            {
+              "value": "circle",
+              "label": "tTheme:global.widgets.blocks.icon.settings.shape.options.circle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "numbered-item",
+      "displayName": "tTheme:global.widgets.blocks.numbered_item.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.title.label",
+          "default": "Feature Title"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.description.label",
+          "default": "A short description of this feature."
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.label",
+          "default": "medium",
+          "options": [
+            {
+              "value": "small",
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.small"
+            },
+            {
+              "value": "medium",
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.medium"
+            },
+            {
+              "value": "large",
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.large"
+            },
+            {
+              "value": "xlarge",
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.size.options.xlarge"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "shape",
+          "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.label",
+          "default": "circle",
+          "options": [
+            {
+              "value": "sharp",
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.sharp"
+            },
+            {
+              "value": "rounded",
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.rounded"
+            },
+            {
+              "value": "circle",
+              "label": "tTheme:global.widgets.blocks.numbered_item.settings.shape.options.circle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "countdown",
+      "displayName": "tTheme:global.widgets.blocks.countdown.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "text",
+          "id": "target_date",
+          "label": "tTheme:countdown.settings.target_date.label",
+          "default": "2027-01-01 00:00"
+        },
+        {
+          "type": "text",
+          "id": "expired_message",
+          "label": "tTheme:countdown.settings.expired_message.label",
+          "default": "The wait is over!"
+        },
+        {
+          "type": "header",
+          "id": "display_header",
+          "label": "tTheme:global.widgets.settings.display_header.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_seconds",
+          "label": "tTheme:countdown.settings.show_seconds.label",
+          "default": true
         }
       ]
     },

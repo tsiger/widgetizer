@@ -48,6 +48,22 @@
     },
     {
       "type": "select",
+      "id": "card_layout",
+      "label": "tTheme:global.widgets.settings.card_layout.label",
+      "default": "flat",
+      "options": [
+        {
+          "value": "box",
+          "label": "tTheme:global.widgets.settings.card_layout.options.box"
+        },
+        {
+          "value": "flat",
+          "label": "tTheme:global.widgets.settings.card_layout.options.flat"
+        }
+      ]
+    },
+    {
+      "type": "select",
       "id": "layout",
       "label": "tTheme:global.widgets.settings.layout.label",
       "default": "grid",

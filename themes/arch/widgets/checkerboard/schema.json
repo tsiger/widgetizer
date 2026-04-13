@@ -182,7 +182,8 @@
       "type": "card",
       "settings": {
         "title": "",
-        "description": ""
+        "description": "",
+        "button_link": {}
       }
     },
     {
@@ -201,14 +202,16 @@
       "type": "card",
       "settings": {
         "title": "",
-        "description": ""
+        "description": "",
+        "button_link": {}
       }
     },
     {
       "type": "card",
       "settings": {
         "title": "",
-        "description": ""
+        "description": "",
+        "button_link": {}
       }
     },
     {
@@ -227,7 +230,8 @@
       "type": "card",
       "settings": {
         "title": "",
-        "description": ""
+        "description": "",
+        "button_link": {}
       }
     },
     {

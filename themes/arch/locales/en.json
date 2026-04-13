@@ -319,6 +319,15 @@
             "center": "Center"
           }
         },
+        "content_width": {
+          "label": "Content width",
+          "options": {
+            "narrow": "Narrow",
+            "medium": "Medium",
+            "wide": "Wide",
+            "fullwidth": "Fullwidth"
+          }
+        },
         "video_url": {
           "label": "Video URL (YouTube or Vimeo)"
         },
@@ -635,6 +644,9 @@
               "description": "Start a line with + for a checkmark or - for a cross."
             }
           }
+        },
+        "countdown": {
+          "name": "Countdown"
         },
         "numbered_item": {
           "name": "Numbered Item",
@@ -1426,6 +1438,9 @@
       }
     },
     "settings": {
+      "show_numbers": {
+        "label": "Show numbers"
+      },
       "show_dividers": {
         "label": "Show dividers"
       }
@@ -1487,6 +1502,19 @@
   },
   "profile_grid": {
     "name": "Profile Grid",
+    "settings": {
+      "image_style": {
+        "label": "Image style",
+        "description": "Circle displays a small round avatar. Full displays the image at full width within the card.",
+        "options": {
+          "circle": "Circle",
+          "full": "Full"
+        }
+      },
+      "aspect_ratio": {
+        "description": "Applies only when image style is set to Full."
+      }
+    },
     "blocks": {
       "profile": {
         "name": "Team Member",
@@ -1594,15 +1622,6 @@
     "settings": {
       "text_alignment": {
         "label": "Text alignment"
-      },
-      "content_width": {
-        "label": "Content width",
-        "options": {
-          "narrow": "Narrow",
-          "medium": "Medium",
-          "wide": "Wide",
-          "fullwidth": "Fullwidth"
-        }
       }
     }
   },

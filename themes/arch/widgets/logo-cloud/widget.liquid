@@ -3,7 +3,7 @@
 {% endif %}
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-logo-cloud widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  class="widget widget-type-logo-cloud widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.card_layout == 'flat' %} card-layout-flat{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   {% unless widget.settings.color_scheme == 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}
@@ -21,6 +21,16 @@
         justify-items: center;
       }
 
+      & .logo-grid.widget-grid {
+        --grid-gap: var(--space-md);
+      }
+
+      @media (min-width: 990px) {
+        & .logo-grid.widget-grid {
+          --grid-gap: var(--space-lg);
+        }
+      }
+
       & .logo-item {
         width: 100%;
         display: flex;
@@ -32,6 +42,14 @@
         border-radius: var(--radius-sm);
         min-height: 11rem;
         overflow: hidden;
+      }
+
+      &.card-layout-flat .logo-item {
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        min-height: auto;
       }
 
       & .logo-link,
@@ -66,13 +84,13 @@
       }
 
       @media (min-width: 750px) {
-        & .logo-item {
+        &:not(.card-layout-flat) .logo-item {
           min-height: 12rem;
         }
       }
 
       @media (min-width: 990px) {
-        & .logo-item {
+        &:not(.card-layout-flat) .logo-item {
           min-height: 13rem;
         }
       }

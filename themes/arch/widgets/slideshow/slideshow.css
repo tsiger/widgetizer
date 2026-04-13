@@ -39,6 +39,12 @@
       padding-inline: 0;
     }
 
+    & .widget-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
     /* Hero/Slideshow spacing hierarchy */
     & .w-eyebrow {
       margin-block-end: var(--space-md);

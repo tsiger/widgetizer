@@ -3,10 +3,12 @@
 {% endif %}
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-profile-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
-  {% unless widget.settings.color_scheme == 'standard-primary' %}
+  class="widget widget-type-profile-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} image-style-{{ widget.settings.image_style }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% if widget.settings.image_style == 'full' %}
+    style="--card-image-ratio: {{ widget.settings.aspect_ratio | default: '3 / 4' }};{% unless widget.settings.color_scheme == 'standard-primary' %}--widget-bg-color: var(--bg-primary);{% endunless %}"
+  {% elsif widget.settings.color_scheme != 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
-  {% endunless %}
+  {% endif %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="profile-grid"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
@@ -21,8 +23,9 @@
         text-align: center;
       }
 
-      & .profile-image {
-        width: 16rem; /* 160px */
+      /* Circle image style (default) */
+      &.image-style-circle .profile-image {
+        width: 16rem;
         height: 16rem;
         border-radius: 50%;
         object-fit: cover;
@@ -30,16 +33,15 @@
         border: var(--border-width-medium) solid var(--border-color);
       }
 
-      & .profile-image-placeholder {
-        width: 16rem;
-        height: 16rem;
-        border-radius: 50%;
-        background: var(--bg-secondary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-block-end: var(--space-md);
-        border: var(--border-width-medium) solid var(--border-color);
+      /* Full image style */
+      &.image-style-full .profile-image {
+        width: 100%;
+        height: auto;
+        aspect-ratio: var(--card-image-ratio, 3 / 4);
+        object-fit: cover;
+        display: block;
+        border-radius: var(--radius-md);
+        margin-block-end: var(--space-lg);
       }
 
       & .profile-name {
@@ -138,9 +140,11 @@
               {% assign block = widget.blocks[blockId] %}
               <li class="profile-card carousel-item" data-block-id="{{ blockId }}">
                 {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
-                  {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '160px', class: 'profile-image' %}
-                {% else %}
-                  <div class="profile-image-placeholder t-4xl t-muted" style="background-image: url({% placeholder_image aspect: 'square', output: 'url' %}); background-size: cover; background-position: center;"></div>
+                  {% if widget.settings.image_style == 'full' %}
+                    {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '(max-width: 749px) 50vw, 300px', class: 'profile-image' %}
+                  {% else %}
+                    {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '160px', class: 'profile-image' %}
+                  {% endif %}
                 {% endif %}
 
                 {% if block.settings.name != blank %}

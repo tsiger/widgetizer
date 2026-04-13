@@ -58,6 +58,11 @@
       "default": "The wait is over!"
     },
     {
+      "type": "richtext",
+      "id": "text",
+      "label": "tTheme:global.widgets.blocks.text.settings.text.label"
+    },
+    {
       "type": "link",
       "id": "button",
       "label": "tTheme:countdown.settings.button.label"
