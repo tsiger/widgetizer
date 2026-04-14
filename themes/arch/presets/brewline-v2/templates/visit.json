@@ -1,0 +1,234 @@
+{
+  "name": "Visit",
+  "slug": "visit",
+  "widgets": {
+    "visit_intro": {
+      "type": "banner",
+      "settings": {
+        "image": "visit-hero.jpg",
+        "overlay_color": "#241a1499",
+        "height": "medium",
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "visit-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Find the window seat, then order at the bar.",
+            "size": "5xl"
+          }
+        },
+        "visit-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Everything you need before you head over: hours, address, neighborhood notes, and the quickest way to get here.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "visit-heading",
+        "visit-text"
+      ]
+    },
+    "visit_details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "Visit Brewline",
+        "title": "A practical quick view before you leave home.",
+        "heading_alignment": "start",
+        "layout": "first-featured",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "info-primary": {
+          "type": "info",
+          "settings": {
+            "title": "Brewline",
+            "text": "<p>214 Dean Street<br>Brooklyn, NY 11217</p><p>(718) 555-0188<br>hello@brewlinecoffee.com</p>"
+          }
+        },
+        "hours-block": {
+          "type": "text_block",
+          "settings": {
+            "title": "Hours",
+            "text": "<p>Mon-Fri: 7 AM - 5 PM<br>Sat-Sun: 8 AM - 5 PM</p><p>Most laptop seating opens after 10 AM.</p>"
+          }
+        },
+        "links-block": {
+          "type": "menu_block",
+          "settings": {
+            "title": "Quick Links",
+            "menu": "footer-menu"
+          }
+        },
+        "social-block": {
+          "type": "social_block",
+          "settings": {
+            "title": "Follow Along"
+          }
+        }
+      },
+      "blocksOrder": [
+        "info-primary",
+        "hours-block",
+        "links-block",
+        "social-block"
+      ]
+    },
+    "location_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Location",
+        "title": "Right where the neighborhood starts to slow down.",
+        "description": "A short walk from the subway and easy to spot once you are on the block.",
+        "heading_alignment": "start",
+        "address": "214 Dean Street, Brooklyn, NY 11217",
+        "embed_url": "https://www.google.com/maps?q=214+Dean+Street,+Brooklyn,+NY+11217&z=15&output=embed",
+        "directions_link": {
+          "href": "https://maps.google.com/?q=214+Dean+Street,+Brooklyn,+NY+11217",
+          "text": "Get Directions",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "transit-info": {
+          "type": "info",
+          "settings": {
+            "title": "Transit",
+            "text": "<p>A short walk from Borough Hall and Jay Street-MetroTech. Easy for a quick stop before work or after errands.</p>"
+          }
+        },
+        "parking-info": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Street parking is possible but unpredictable. If you are driving, plan a few extra minutes and expect a short walk.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "transit-info",
+        "parking-info"
+      ]
+    },
+    "visit_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before You Drop In",
+        "title": "A few useful details.",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": true,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "faq-laptops": {
+          "type": "item",
+          "settings": {
+            "question": "Can I work from the cafe?",
+            "answer": "<p>Yes, especially after the early-morning rush. We keep the room laptop-friendly, but tables turn faster before 10 AM.</p>"
+          }
+        },
+        "faq-seating": {
+          "type": "item",
+          "settings": {
+            "question": "Do you have indoor seating?",
+            "answer": "<p>Yes. Window seats, bar seating, and a few small tables make up the room. It is a real neighborhood cafe, so space is cozy rather than oversized.</p>"
+          }
+        },
+        "faq-beans": {
+          "type": "item",
+          "settings": {
+            "question": "Can I buy beans to take home?",
+            "answer": "<p>Always. We keep a short shelf of house blends and rotating small-batch coffees, and we can grind them to match your brewer.</p>"
+          }
+        },
+        "faq-dogs": {
+          "type": "item",
+          "settings": {
+            "question": "Are dogs allowed?",
+            "answer": "<p>Leashed dogs are welcome outside. Service animals are welcome indoors.</p>"
+          }
+        },
+        "faq-groups": {
+          "type": "item",
+          "settings": {
+            "question": "Can I bring a group?",
+            "answer": "<p>Small groups are fine, but the room works best in twos and threes. If you are planning something larger, call ahead first.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "faq-laptops",
+        "faq-seating",
+        "faq-beans",
+        "faq-dogs",
+        "faq-groups"
+      ]
+    },
+    "visit_close": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "visit-close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "See what's pouring before you head out.",
+            "size": "2xl"
+          }
+        },
+        "visit-close-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The menu changes just enough to be worth checking. The room stays exactly as inviting as you hope.</p>",
+            "size": "base"
+          }
+        },
+        "visit-close-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "menu.html",
+              "text": "See the Menu",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "tel:+17185550188",
+              "text": "Call Us",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "visit-close-heading",
+        "visit-close-text",
+        "visit-close-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "visit_intro",
+    "visit_details",
+    "location_map",
+    "visit_faq",
+    "visit_close"
+  ],
+  "id": "visit",
+  "created": "2026-04-14T12:00:00.000Z",
+  "updated": "2026-04-14T12:00:00.000Z"
+}

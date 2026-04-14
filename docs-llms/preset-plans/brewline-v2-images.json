@@ -1,0 +1,80 @@
+[
+  {
+    "file": "home-hero.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "Neighborhood coffee bar interior in downtown Brooklyn, warm morning daylight through front windows, espresso machine and bar counter visible, a few wooden tables and stools, oat and walnut tones, shot from eye level with the counter on one side and seating depth behind it, calm editorial cafe photography, no visible logos or text, not rustic, not overly staged"
+  },
+  {
+    "file": "home-grid-counter.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Close view of an espresso bar in service, barista hands pulling a shot, ceramic cups stacked beside a polished machine, warm daylight, clean contemporary cafe interior, simple composition readable at card size, no visible logos or text"
+  },
+  {
+    "file": "home-grid-pastries.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Pastry case inside a warm neighborhood coffee shop, croissants and seasonal pastries arranged neatly behind glass, soft natural light, shallow depth of field, contemporary styling, no chalkboard clutter, no visible logos or text"
+  },
+  {
+    "file": "home-grid-beans.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Shelf of neatly arranged coffee bean bags and brew tools inside a modern local cafe, warm neutral palette, simple readable composition, daylight, editorial retail photography, no visible logos or text"
+  },
+  {
+    "file": "home-divider.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Wide atmospheric shot across a coffee bar seating area during late morning, cups on tables, warm daylight and soft shadows, depth through the room, editorial interior photography, grounded and inviting, no visible logos or text"
+  },
+  {
+    "file": "menu-hero.jpg",
+    "width": 1920,
+    "height": 960,
+    "prompt": "Coffee service moment, barista pouring milk into a ceramic cup beside a pastry plate on a stone counter, warm daylight, close editorial food photography, refined but casual, no visible logos or text"
+  },
+  {
+    "file": "menu-beans.jpg",
+    "width": 960,
+    "height": 720,
+    "prompt": "Coffee bean bags and loose beans on a counter beside a hand grinder and ceramic dripper, warm neutral palette, daylight from one side, contemporary artisanal coffee photography, no rustic props, no visible logos or text"
+  },
+  {
+    "file": "story-hero.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "Small-batch coffee roasting scene inside a clean modern roastery, roaster machine and cooling tray visible, warm industrial daylight, one person in soft focus working, editorial process photography, no visible logos or text"
+  },
+  {
+    "file": "story-roaster.jpg",
+    "width": 960,
+    "height": 720,
+    "prompt": "Hands pouring roasted coffee beans from a metal scoop into a bag on a wooden counter, warm daylight, close-up process shot, tactile and real, shallow depth of field, no visible logos or text"
+  },
+  {
+    "file": "story-step-source.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Green coffee beans in burlap-lined trays on a tasting table, cupping spoons and notes nearby, soft daylight, clean editorial process photo, no rustic costume styling, no visible logos or text"
+  },
+  {
+    "file": "story-step-roast.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Coffee roasting drum and cooling tray mid-process, beans visible, warm industrial interior light, crisp process-focused composition, no visible logos or text"
+  },
+  {
+    "file": "story-step-brew.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Pour-over coffee being brewed into a ceramic server on a cafe bar, steam visible, calm daylight, precise hands, clean contemporary coffee photography, no visible logos or text"
+  },
+  {
+    "file": "visit-hero.jpg",
+    "width": 1920,
+    "height": 960,
+    "prompt": "Corner coffee shop storefront in Brooklyn during soft morning light, large front windows, warm glow inside, a bench and a few plants outside, welcoming but not trendy-overdesigned, editorial exterior photography, no visible logos or text"
+  }
+]

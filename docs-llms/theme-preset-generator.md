@@ -12,6 +12,7 @@ This document exists to help generate presets that:
 
 Use this guide together with:
 
+- [theme-preset-file-format.md](theme-preset-file-format.md) — JSON file structures for all preset files (pages, header, footer, menus, preset.json)
 - [theme-design-system.md](theme-design-system.md)
 - [theme-presets-tracker.md](theme-presets-tracker.md) for preset ids and status only
 - `themes/arch/theme.json`
@@ -331,6 +332,8 @@ Every referenced image in the plan must appear here with:
 
 ### Phase 3: Build
 
+Use [theme-preset-file-format.md](theme-preset-file-format.md) as the structural reference for all JSON files below.
+
 Create:
 
 ```text
@@ -382,12 +385,30 @@ After Phase 0 is complete and you know which widgets the preset will use, read e
 
 Do this for every widget in the plan. If an insight file is weak, the schema still governs validity.
 
-### 5.3 Non-negotiable rules
+### 5.3 Before Phase 3 (file structure)
+
+Read [theme-preset-file-format.md](theme-preset-file-format.md) before writing any JSON files. It documents:
+
+- page template format (widgets object, blocks object, ordering arrays)
+- header and footer template format
+- menu file format
+- link object format
+- what fields to include and what to omit (no UUIDs, no pageUuid)
+
+### 5.4 Non-negotiable rules
 
 Never guess:
 
 - icon names — verify every icon against [arch-icons-list.txt](arch-icons-list.txt)
 - font stacks or weights — use exact values from [arch-fonts-list.csv](arch-fonts-list.csv)
+
+Never use `<br>` in widget text — anywhere. Not in `heading` block text, not in richtext bodies, not in footer text blocks, not in accordion answers, not in map info blocks, not in any text-bearing field. This rule is absolute.
+
+- **Headings:** write a single line. Let the renderer wrap. If a heading is too long, rewrite it shorter — never insert `<br>` to control where it breaks.
+- **Richtext:** for hours, addresses, phone + email, multi-line lists, anything that needs distinct lines — use separate `<p>` paragraphs. One line per `<p>`. Never `<br>` inside a `<p>`.
+- Before finalizing any preset, grep the preset directory for `<br>` and remove every instance.
+
+Hard-coded line breaks override the type system, look broken on different viewports, and substitute manual typesetting for a job the renderer should do.
 
 ---
 

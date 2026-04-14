@@ -1,0 +1,188 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "id": "contact",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z",
+  "widgets": {
+    "contact_intro": {
+      "type": "banner",
+      "settings": {
+        "fullwidth": true,
+        "height": "small",
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Find us</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "title": {
+          "type": "heading",
+          "settings": {
+            "text": "Visit the room",
+            "size": "5xl"
+          }
+        },
+        "subtitle": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Two blocks from the Classon Avenue G.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "title", "subtitle"]
+    },
+    "location": {
+      "type": "map",
+      "settings": {
+        "address": "247 Elm Street, Brooklyn, NY 11238",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.8!2d-73.9636!3d40.6782!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQwJzQxLjUiTiA3M8KwNTcnNDguOSJX!5e0!3m2!1sen!2sus!4v1700000000000",
+        "directions_link": "https://maps.google.com/?q=247+Elm+Street+Brooklyn+NY",
+        "height": "large",
+        "show_address": true,
+        "sidebar_position": "end",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "info-hours": {
+          "type": "info",
+          "settings": {
+            "title": "Hours",
+            "text": "<p>Tue – Sat, 5:30 – 11 pm</p><p>Sun, 11 am – 3 pm and 5:30 – 9 pm</p><p>Closed Mondays</p>"
+          }
+        },
+        "info-transit": {
+          "type": "info",
+          "settings": {
+            "title": "Transit &amp; parking",
+            "text": "<p>G to Classon Avenue, two blocks south. B48 bus stops at the corner.</p><p>Bike racks on Elm Street. Street parking is easier after 7 pm.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-hours", "info-transit"]
+    },
+    "getting_here": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Getting here",
+        "eyebrow_uppercase": true,
+        "title": "Practical details",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "detail-transit": {
+          "type": "item",
+          "settings": {
+            "question": "Public transit",
+            "answer": "<p>The G train at Classon Avenue is the closest stop. From the A/C at Clinton–Washington, it's a ten-minute walk east. The B48 bus stops at the corner of Elm and Franklin.</p>"
+          }
+        },
+        "detail-parking": {
+          "type": "item",
+          "settings": {
+            "question": "Parking",
+            "answer": "<p>We don't have a dedicated lot. Street parking is metered until 7 pm and free after. A paid garage is available two blocks north on Washington Avenue.</p>"
+          }
+        },
+        "detail-accessibility": {
+          "type": "item",
+          "settings": {
+            "question": "Accessibility",
+            "answer": "<p>The entrance and dining room are step-free. An accessible bathroom is on the main floor. If you have specific needs, please let us know when booking so we can seat you appropriately.</p>"
+          }
+        },
+        "detail-drinks": {
+          "type": "item",
+          "settings": {
+            "question": "A drink before dinner",
+            "answer": "<p>The bar at The Long Goodbye, two doors down, is our favorite spot for an aperitif. They know to send you over at your reservation time.</p>"
+          }
+        },
+        "detail-bikes": {
+          "type": "item",
+          "settings": {
+            "question": "What to do with bikes",
+            "answer": "<p>There are five bike racks directly outside. We do not store bikes inside the dining room — but the block is well-lit and the racks are covered by our camera.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "detail-transit",
+        "detail-parking",
+        "detail-accessibility",
+        "detail-drinks",
+        "detail-bikes"
+      ]
+    },
+    "contact_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Hungry already?",
+            "size": "3xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book a table or take a look at this week's menu.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "reservations.html",
+              "text": "Reserve a Table",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "menu.html",
+              "text": "See the menu",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text", "cta"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "location", "getting_here", "contact_cta"]
+}

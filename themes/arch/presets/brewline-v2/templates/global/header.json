@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Brewline",
+    "contactDetailsLine1": "(718) 555-0188",
+    "contactDetailsLine2": "214 Dean Street, Brooklyn",
+    "contact_position": "menu",
+    "headerNavigation": "main-menu",
+    "ctaButtonLink": {
+      "href": "visit.html",
+      "text": "Plan Your Visit",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-primary"
+  }
+}

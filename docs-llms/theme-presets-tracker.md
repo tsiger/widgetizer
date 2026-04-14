@@ -1,6 +1,6 @@
 # Arch Theme Presets Tracker
 
-30 presets for the Arch theme. Each preset needs: `preset.json` (settings overrides), `templates/`, `menus/`, `screenshot.png`.
+32 presets for the Arch theme. Each preset needs: `preset.json` (settings overrides), `templates/`, `menus/`, `screenshot.png`.
 
 ## Presets
 
@@ -36,3 +36,5 @@
 | 28 | uplink | Uplink | IT Support | pending |
 | 29 | everafter | Everafter | Wedding Planner | pending |
 | 30 | hearthstone | Hearthstone | Hotel / B&B | pending |
+| 31 | saffron-v2 | Saffron v2 | Restaurant (alternate to #1) | done |
+| 32 | brewline-v2 | Brewline v2 | Cafe / Coffee Shop (alternate to #2) | done |

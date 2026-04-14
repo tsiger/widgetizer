@@ -1,0 +1,333 @@
+{
+  "name": "Menu",
+  "slug": "menu",
+  "widgets": {
+    "menu_intro": {
+      "type": "banner",
+      "settings": {
+        "image": "menu-hero.jpg",
+        "overlay_color": "#241a14a6",
+        "height": "medium",
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "menu-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Coffee, pastries, and a few reasons to stay a little longer.",
+            "size": "5xl"
+          }
+        },
+        "menu-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Built for everyday ordering: classics first, house specials second, and a short list of things worth taking home.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "menu-heading",
+        "menu-text"
+      ]
+    },
+    "coffee_list": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Coffee & Espresso",
+        "title": "The daily lineup",
+        "heading_alignment": "start",
+        "layout": "two-column",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "item-espresso": {
+          "type": "item",
+          "settings": {
+            "name": "Espresso",
+            "description": "<p>Our rotating house shot, served bright and balanced.</p>",
+            "price": "$4"
+          }
+        },
+        "item-macchiato": {
+          "type": "item",
+          "settings": {
+            "name": "Macchiato",
+            "description": "<p>Espresso marked with just enough milk to soften the edge.</p>",
+            "price": "$4.50"
+          }
+        },
+        "item-cappuccino": {
+          "type": "item",
+          "settings": {
+            "name": "Cappuccino",
+            "description": "<p>Equal parts espresso, milk, and foam in a ceramic cup.</p>",
+            "price": "$5"
+          }
+        },
+        "item-flat-white": {
+          "type": "item",
+          "settings": {
+            "name": "Flat White",
+            "description": "<p>Silky milk and a slightly punchier ratio for slower mornings.</p>",
+            "price": "$5.50"
+          }
+        },
+        "item-drip": {
+          "type": "item",
+          "settings": {
+            "name": "Drip Coffee",
+            "description": "<p>Fresh batch brew with a rotating single-origin option.</p>",
+            "price": "$4.25"
+          }
+        },
+        "item-pour-over": {
+          "type": "item",
+          "settings": {
+            "name": "Pour-Over",
+            "description": "<p>Brewed to order for a cleaner, slower cup.</p>",
+            "price": "$6.50"
+          }
+        }
+      },
+      "blocksOrder": [
+        "item-espresso",
+        "item-macchiato",
+        "item-cappuccino",
+        "item-flat-white",
+        "item-drip",
+        "item-pour-over"
+      ]
+    },
+    "seasonal_list": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Seasonal Specials",
+        "title": "What's pouring right now",
+        "description": "A short house list that changes with the weather and whatever we are excited to dial in.",
+        "heading_alignment": "start",
+        "layout": "single-column",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "item-maple-latte": {
+          "type": "item",
+          "settings": {
+            "name": "Maple Oat Latte",
+            "description": "<p>Double espresso with oat milk, dark maple, and a pinch of sea salt.</p>",
+            "price": "$6.75"
+          }
+        },
+        "item-orange-tonic": {
+          "type": "item",
+          "settings": {
+            "name": "Orange Espresso Tonic",
+            "description": "<p>Citrus-bright, sparkling, and sharp enough for the afternoon slump.</p>",
+            "price": "$6"
+          }
+        },
+        "item-mocha": {
+          "type": "item",
+          "settings": {
+            "name": "House Mocha",
+            "description": "<p>Made with dark chocolate ganache instead of syrup.</p>",
+            "price": "$6.50"
+          }
+        }
+      },
+      "blocksOrder": [
+        "item-maple-latte",
+        "item-orange-tonic",
+        "item-mocha"
+      ]
+    },
+    "beans_feature": {
+      "type": "image-text",
+      "settings": {
+        "image": "menu-beans.jpg",
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "beans-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Take-Home Bags</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "beans-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Good coffee should keep working after you leave.",
+            "size": "3xl"
+          }
+        },
+        "beans-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We keep a short shelf of rotating roasts with simple tasting notes and brew guidance. Enough detail to help, never enough to perform expertise at you.</p>",
+            "size": "base"
+          }
+        },
+        "beans-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Rotating single-origin and blend bags\n+ Whole bean or ground for your brewer\n+ Staff picks and simple brew guidance"
+          }
+        },
+        "beans-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "story.html",
+              "text": "Our Roast Story",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "beans-eyebrow",
+        "beans-heading",
+        "beans-text",
+        "beans-features",
+        "beans-button"
+      ]
+    },
+    "pastry_list": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Pastries & To-Go",
+        "title": "A short food list, done well",
+        "heading_alignment": "start",
+        "layout": "two-column",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "item-croissant": {
+          "type": "item",
+          "settings": {
+            "name": "Butter Croissant",
+            "description": "<p>Flaky, crisp, and actually buttery.</p>",
+            "price": "$4.75"
+          }
+        },
+        "item-morning-bun": {
+          "type": "item",
+          "settings": {
+            "name": "Morning Bun",
+            "description": "<p>Cinnamon sugar, laminated dough, and a little orange zest.</p>",
+            "price": "$5.25"
+          }
+        },
+        "item-banana": {
+          "type": "item",
+          "settings": {
+            "name": "Walnut Banana Bread",
+            "description": "<p>Toasted by request and surprisingly good with espresso.</p>",
+            "price": "$5"
+          }
+        },
+        "item-yogurt": {
+          "type": "item",
+          "settings": {
+            "name": "Granola Yogurt Cup",
+            "description": "<p>Greek yogurt, toasted oats, and seasonal fruit.</p>",
+            "price": "$6.50"
+          }
+        },
+        "item-house-blend": {
+          "type": "item",
+          "settings": {
+            "name": "House Blend Beans",
+            "description": "<p>12 oz bag for balanced daily brewing.</p>",
+            "price": "$19"
+          }
+        },
+        "item-single-origin": {
+          "type": "item",
+          "settings": {
+            "name": "Single-Origin Bag",
+            "description": "<p>Rotating small-batch release. Ask what's fresh.</p>",
+            "price": "$22"
+          }
+        }
+      },
+      "blocksOrder": [
+        "item-croissant",
+        "item-morning-bun",
+        "item-banana",
+        "item-yogurt",
+        "item-house-blend",
+        "item-single-origin"
+      ]
+    },
+    "menu_close": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Heading over soon?",
+            "size": "2xl"
+          }
+        },
+        "close-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Check today's hours, get the address, or give us a call before you head out.</p>",
+            "size": "base"
+          }
+        },
+        "close-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "visit.html",
+              "text": "Plan Your Visit",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "tel:+17185550188",
+              "text": "Call Us",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "close-heading",
+        "close-text",
+        "close-buttons"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "menu_intro",
+    "coffee_list",
+    "seasonal_list",
+    "beans_feature",
+    "pastry_list",
+    "menu_close"
+  ],
+  "id": "menu",
+  "created": "2026-04-14T12:00:00.000Z",
+  "updated": "2026-04-14T12:00:00.000Z"
+}

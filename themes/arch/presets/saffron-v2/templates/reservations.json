@@ -1,0 +1,276 @@
+{
+  "name": "Reservations",
+  "slug": "reservations",
+  "id": "reservations",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z",
+  "widgets": {
+    "reservations_intro": {
+      "type": "banner",
+      "settings": {
+        "fullwidth": true,
+        "height": "small",
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Reservations</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "title": {
+          "type": "heading",
+          "settings": {
+            "text": "Book a table",
+            "size": "5xl"
+          }
+        },
+        "subtitle": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tuesday through Sunday. We seat parties up to six in the main room.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "title", "subtitle"]
+    },
+    "booking": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "left-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Online</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "left-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Reserve online",
+            "size": "2xl",
+            "position": "left"
+          }
+        },
+        "left-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our booking is handled by Resy. Tap below to check availability for dinner service, Tuesday through Sunday.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "left"
+          }
+        },
+        "left-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "https://resy.com/",
+              "text": "Check availability",
+              "target": "_blank"
+            },
+            "style": "primary",
+            "size": "large",
+            "position": "left"
+          }
+        },
+        "right-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>By phone or email</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "right-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Prefer to call?",
+            "size": "2xl",
+            "position": "right"
+          }
+        },
+        "right-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We answer the phone from 3 pm each service day. For parties of seven or more, please email us directly.</p><p><strong>(718) 555-0142</strong></p><p>hello@saffron-brooklyn.com</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "right-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "tel:+17185550142",
+              "text": "Call us",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "large",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "left-eyebrow",
+        "left-heading",
+        "left-text",
+        "left-button",
+        "right-eyebrow",
+        "right-heading",
+        "right-text",
+        "right-button"
+      ]
+    },
+    "policies": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you visit",
+        "eyebrow_uppercase": true,
+        "title": "Good to know",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "policy-cancellation": {
+          "type": "item",
+          "settings": {
+            "question": "Cancellation policy",
+            "answer": "<p>We ask for 24 hours' notice for cancellations. Same-day cancellations and no-shows are charged $25 per guest. Plans change — if you need to adjust your reservation, please call us and we'll do our best to help.</p>"
+          }
+        },
+        "policy-dress": {
+          "type": "item",
+          "settings": {
+            "question": "Dress code",
+            "answer": "<p>Smart casual. The room is warm and softly lit, not formal. Wear what you'd wear to a friend's dinner party.</p>"
+          }
+        },
+        "policy-late": {
+          "type": "item",
+          "settings": {
+            "question": "Arriving late",
+            "answer": "<p>We hold tables for fifteen minutes past your reservation. If you're running later than that, please call so we can reseat you if a table is available.</p>"
+          }
+        },
+        "policy-dietary": {
+          "type": "item",
+          "settings": {
+            "question": "Dietary restrictions and allergies",
+            "answer": "<p>The kitchen accommodates most allergies and dietary preferences with a day's notice. Please note restrictions when booking so we can plan the menu around them.</p>"
+          }
+        },
+        "policy-children": {
+          "type": "item",
+          "settings": {
+            "question": "Children",
+            "answer": "<p>Well-behaved children are welcome. We have two high chairs, and the kitchen will happily prepare a simpler plate for younger guests.</p>"
+          }
+        },
+        "policy-large-parties": {
+          "type": "item",
+          "settings": {
+            "question": "Large parties",
+            "answer": "<p>The main room seats up to six per table. For parties of seven or more, please email hello@saffron-brooklyn.com to arrange a semi-private booking.</p>"
+          }
+        },
+        "policy-private": {
+          "type": "item",
+          "settings": {
+            "question": "Private dining",
+            "answer": "<p>A semi-private table of ten is available Tuesday through Thursday. A set menu is required. Email us to discuss dates and budget.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "policy-cancellation",
+        "policy-dress",
+        "policy-late",
+        "policy-dietary",
+        "policy-children",
+        "policy-large-parties",
+        "policy-private"
+      ]
+    },
+    "reservations_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Still deciding?",
+            "size": "3xl"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Read the menu, or call and we'll help you pick a night.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "menu.html",
+              "text": "See the menu",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "tel:+17185550142",
+              "text": "Call (718) 555-0142",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["heading", "text", "cta"]
+    }
+  },
+  "widgetsOrder": ["reservations_intro", "booking", "policies", "reservations_cta"]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "footer-menu",
+  "name": "Footer Menu",
+  "items": [
+    { "label": "Menu", "link": "menu.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Reservations", "link": "reservations.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}
