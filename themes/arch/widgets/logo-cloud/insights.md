@@ -9,14 +9,17 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `eyebrow` | Any text (default: "Trusted By") | Small label above the headline; omit to remove |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text | Main headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text (optional) | Supporting paragraph beneath the headline |
-| `heading_alignment` | `start` | Centers or left-aligns the entire header block |
+| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the entire header block |
+| `card_layout` | `flat` (default), `box` | Flat removes card borders for a clean look; box adds a bordered card container around each logo |
 | `layout` | `grid` (default), `carousel` | Static equal-column grid vs. horizontally scrollable carousel with prev/next arrows |
 | `columns_desktop` | 2 -- 8 (default: 6) | Number of columns on desktop; in carousel mode this sets visible slides per view |
+| `aspect_ratio` | `auto` (default), `4 / 3`, `3 / 2`, `1 / 1` | Controls the aspect ratio of logo cards; auto lets each image determine its own height |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and border palette; non-standard schemes add padded container and override `--widget-bg-color` |
-| `top_spacing` | `auto` (default), `none` | Removes the top section padding when set to `none` |
-| `bottom_spacing` | `auto` (default), `none` | Removes the bottom section padding when set to `none` |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -39,10 +42,9 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | heading_alignment | center |
 | eyebrow | Trusted By |
 | title | Companies that rely on us |
-| color_scheme | standard |
+| color_scheme | standard-primary |
 
 **Good for:** Homepage social-proof section immediately below the hero.
-**Industries:** SaaS, marketing agencies, IT services.
 
 ---
 
@@ -55,12 +57,11 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | heading_alignment | center |
 | eyebrow | Our Partners |
 | title | _(leave blank)_ |
-| color_scheme | standard |
+| color_scheme | standard-primary |
 | top_spacing | none |
 | bottom_spacing | none |
 
 **Good for:** Compact trust bar between two content-heavy sections; works well when you have 10+ logos and don't want to overwhelm the page.
-**Industries:** Real estate brokerages, franchise businesses, event planners.
 
 ---
 
@@ -73,10 +74,9 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | heading_alignment | center |
 | eyebrow | Certifications |
 | title | Licensed & Insured |
-| color_scheme | highlight |
+| color_scheme | highlight-primary |
 
 **Good for:** Showing 3-4 certification or association badges (BBB, chamber of commerce, trade license) on a contrasting background to make them pop.
-**Industries:** Home services (HVAC, plumbing, electrical), contractors, cleaning companies.
 
 ---
 
@@ -94,7 +94,6 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | top_spacing | none |
 
 **Good for:** A slim press-mention strip placed right under a hero or testimonial section. Keeping title and description blank lets the logos speak for themselves.
-**Industries:** Consumer products, restaurants, fitness studios, local boutiques featured in media.
 
 ---
 
@@ -108,10 +107,9 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | eyebrow | Our Suppliers |
 | title | We work with the best brands |
 | description | All products are sourced from authorized distributors. |
-| color_scheme | standard |
+| color_scheme | standard-primary |
 
 **Good for:** Product or service pages where you want to explain the relationship with the brands you carry, not just flash logos.
-**Industries:** Auto parts shops, building supply stores, veterinary clinics (pet food brands).
 
 ---
 
@@ -127,24 +125,22 @@ Displays a grid or carousel of partner/client logos with optional heading, build
 | color_scheme | highlight-secondary |
 
 **Good for:** Displaying just 2 important association or membership logos at large size with high visual weight (e.g., on an About page).
-**Industries:** Law firms, accounting practices, dental offices.
 
 ---
 
-### 7. "Integration Partners" -- Wide Carousel with Copy
+### 7. "Brand Partners" -- Wide Carousel with Copy
 
 | Setting | Value |
 |---------|-------|
 | layout | carousel |
 | columns_desktop | 5 |
 | heading_alignment | center |
-| eyebrow | Integrations |
-| title | Connects with the tools you already use |
-| description | Seamless data sync with your favorite platforms. |
-| color_scheme | standard |
+| eyebrow | Brands We Carry |
+| title | Products from names you trust |
+| description | We stock and service all major brands. |
+| color_scheme | standard-primary |
 
 **Good for:** A feature-rich integrations section on a product or pricing page where the logo count is large (12+) and you want to keep vertical space tight.
-**Industries:** SaaS platforms, CRMs, e-commerce tools, payment processors.
 
 ---
 

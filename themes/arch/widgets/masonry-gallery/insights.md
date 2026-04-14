@@ -9,14 +9,16 @@ Pinterest-style staggered image grid with optional titles, categories, and a bui
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (optional) | Small label above the headline — useful for section context like "Portfolio" or "Latest Projects" |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Our Work") | Main headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text | Supporting paragraph beneath the headline |
 | `heading_alignment` | `start`, `center` (default) | Left-aligns the header block for an editorial feel, or centers it for a classic portfolio look |
+| `alignment` | `start` (default), `center` | Controls text alignment within the card captions area |
 | `columns_desktop` | 2 -- 5 (default 3) | Number of masonry columns on desktop; fewer columns = larger images, more columns = denser grid |
 | `gap` | `small`, `medium` (default), `large` | Spacing between cards; small produces a tight mosaic, large gives each image breathing room |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and card styling; accent variants add a secondary background and border to each card |
-| `top_spacing` | `auto` (default), `none` | Removes top padding so the widget can sit flush against the section above |
-| `bottom_spacing` | `auto` (default), `none` | Removes bottom padding for seamless stacking with the next section |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -31,46 +33,39 @@ Pinterest-style staggered image grid with optional titles, categories, and a bui
 ## Layout Recipes
 
 ### 1. Tight Portfolio Wall
-- **Settings**: 4 columns, gap small, heading_alignment start, color_scheme standard
+- **Settings**: 4 columns, gap small, heading_alignment start, color_scheme standard-primary
 - **Blocks**: 8--12 items, image-only (no titles or categories)
 - **Good for**: Photographers, illustrators, tattoo artists who want maximum visual density
-- **Industries**: Photography studios, creative agencies, tattoo parlors
 
 ### 2. Project Showcase with Labels
 - **Settings**: 3 columns, gap medium, heading_alignment center, color_scheme standard-secondary
 - **Blocks**: 6--9 items, each with image + title + category
 - **Good for**: Presenting completed projects with context, making work browsable by type
-- **Industries**: Architecture firms, interior designers, landscape contractors, renovation companies
 
 ### 3. Two-Column Editorial
 - **Settings**: 2 columns, gap large, heading_alignment start, eyebrow set (e.g., "Selected Work")
 - **Blocks**: 4--6 items with title only (no category)
 - **Good for**: Premium or minimal brands that want each piece to feel significant
-- **Industries**: Boutique design studios, luxury home builders, fine art galleries
 
 ### 4. Dense Inspiration Board
-- **Settings**: 5 columns, gap small, heading_alignment center, color_scheme highlight
+- **Settings**: 5 columns, gap small, heading_alignment center, color_scheme highlight-primary
 - **Blocks**: 10--15 items, image-only
 - **Good for**: Mood boards, material libraries, or visual reference collections
-- **Industries**: Event planners, florists, fashion boutiques, wedding venues
 
 ### 5. Before-and-After Gallery
 - **Settings**: 2 columns, gap medium, heading_alignment start, color_scheme standard-secondary
 - **Blocks**: 6--8 items alternating before/after shots, title describing the project, category as "Before" or "After"
 - **Good for**: Demonstrating transformations where side-by-side comparison drives conversions
-- **Industries**: Home remodelers, auto detailers, landscapers, dental cosmetics
 
 ### 6. Menu or Product Visual Grid
 - **Settings**: 3 columns, gap medium, heading_alignment center, color_scheme highlight-secondary
 - **Blocks**: 6--12 items with image + title (dish or product name) + category (price or product line)
 - **Good for**: Restaurants showcasing dishes, bakeries showing their range, retailers highlighting featured products
-- **Industries**: Restaurants, bakeries, specialty retail, craft breweries
 
 ### 7. Team or Culture Wall
 - **Settings**: 4 columns, gap large, heading_alignment center, title "Our Team" or "Life at [Company]"
 - **Blocks**: 8--12 items, image + title (person name or moment), category (role or event)
 - **Good for**: Humanizing a brand by showing real people and behind-the-scenes moments
-- **Industries**: Any small business wanting to build trust -- salons, gyms, veterinary clinics, coworking spaces
 
 ---
 

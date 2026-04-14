@@ -9,13 +9,14 @@ Displays a row of linked social-media icons pulled from the global theme social 
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | **eyebrow** | Any text (blank by default) | Small label above the headline; adds a reveal-up animation step. Useful for phrases like "Stay in Touch" or "Join the Community". |
+| **eyebrow_uppercase** | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment. |
 | **title** | Any text (default "Follow Us") | Main headline. Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. Leave blank to hide. |
 | **description** | Any text (default "Stay connected with us on social media.") | Supporting paragraph beneath the headline. Leave blank to hide. |
-| **heading_alignment` | `start` | Controls text alignment of the header block *and* icon row alignment (`center` vs `flex-start`). |
+| **heading_alignment** | `start`, `center` (default) | Controls text alignment of the header block *and* icon row alignment (`center` vs `flex-start`). |
 | **icon_size** | Range 1.6 -- 4.8 rem, step 0.2 (default 2.4) | Sets the SVG icon dimension. The clickable box is always icon_size + 1.6 rem, so at default the tap target is 4 rem square. |
 | **color_scheme** | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text treatment. `standard-primary` has no padded container; all other schemes add padding and set `--widget-bg-color`. |
-| **top_spacing** | `auto` (default), `none` | Removes the top section margin when set to `none`. Handy for stacking directly below another widget. |
-| **bottom_spacing** | `auto` (default), `none` | Removes the bottom section margin when set to `none`. |
+| **top_spacing** | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking. |
+| **bottom_spacing** | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking. |
 
 ---
 
@@ -36,13 +37,11 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | eyebrow | *(blank)* |
 | heading_alignment | center |
 | icon_size | 2.0 |
-| color_scheme | standard |
+| color_scheme | standard-primary |
 | top_spacing | none |
 | bottom_spacing | none |
 
 **Good for:** A compact icon row at the very bottom of a page (or just above the footer) where the surrounding context already explains what the icons are. No heading means zero vertical overhead.
-
-**Industries:** Any business that already has a strong footer and just needs quick social links -- restaurants, retail shops, freelancers.
 
 ---
 
@@ -55,13 +54,11 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | description | Follow along for project updates, behind-the-scenes, and more. |
 | heading_alignment | center |
 | icon_size | 3.2 |
-| color_scheme | highlight |
+| color_scheme | highlight-primary |
 | top_spacing | auto |
 | bottom_spacing | auto |
 
 **Good for:** A prominent, full-width social section that acts as a secondary CTA. The highlight background makes it visually distinct from surrounding content, and the larger icons invite clicking.
-
-**Industries:** Creative studios, artists, content creators, community-driven brands.
 
 ---
 
@@ -78,9 +75,7 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | top_spacing | auto |
 | bottom_spacing | auto |
 
-**Good for:** Corporate or consultancy sites where centered text feels too casual. Left-alignment pairs well with two-column page layouts and keeps the section feeling editorial. The accent scheme provides a subtle tint without being loud.
-
-**Industries:** Law firms, financial advisors, B2B consultancies, architecture firms.
+**Good for:** Corporate or consultancy sites where centered text feels too casual. Left-alignment pairs well with two-column page layouts and keeps the section feeling editorial. The secondary scheme provides a subtle tint without being loud.
 
 ---
 
@@ -93,13 +88,11 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | description | *(blank)* |
 | heading_alignment | start |
 | icon_size | 1.8 |
-| color_scheme | standard |
+| color_scheme | standard-primary |
 | top_spacing | none |
 | bottom_spacing | auto |
 
 **Good for:** Placing immediately below a Contact Details or Map widget. Removing the top spacing makes it feel like a continuation of the contact block. Small icons keep it secondary to the phone/email/address information above.
-
-**Industries:** Local services (plumbers, electricians, salons), medical practices, real estate agents.
 
 ---
 
@@ -118,8 +111,6 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 
 **Good for:** Lifestyle and retail brands that treat social media as a primary revenue channel. Oversized icons, bold background, and a UGC prompt all encourage engagement. Works best mid-page between a gallery and a testimonials widget.
 
-**Industries:** Fashion boutiques, coffee shops, fitness studios, DTC e-commerce brands.
-
 ---
 
 ### 6. Minimal Sign-Off
@@ -131,13 +122,11 @@ This widget has **no blocks**. The icons are generated automatically from whiche
 | description | Stay connected with us on social media. |
 | heading_alignment | center |
 | icon_size | 2.4 |
-| color_scheme | standard |
+| color_scheme | standard-primary |
 | top_spacing | auto |
 | bottom_spacing | none |
 
 **Good for:** A quiet ending to a single-page site. No headline keeps the tone modest; the description does just enough to explain the icons. Removing bottom spacing lets it sit flush against the footer.
-
-**Industries:** Personal portfolios, photographers, freelance developers, wedding planners.
 
 ---
 

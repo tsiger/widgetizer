@@ -8,17 +8,15 @@ Configurable multi-column footer with logo, text, navigation, and social blocks 
 
 | Setting | Values | Visual Effect |
 |---|---|---|
-| `color_scheme` | `standard-primary` | Uses the page's default background; footer blends into the page naturally |
-| | `standard-secondary` | Default background with accent-tinted text and link colors |
-| | `highlight-primary` (default) | Switches to `--bg-primary` fill, creating a strong contrast band at the bottom of the page |
-| | `highlight-secondary` | `--bg-primary` fill combined with accent colors; the most visually prominent option |
-| `copyright` | Any text / blank | When filled, renders a copyright line below the columns and adds bottom padding. When blank, the footer collapses to an 8 rem block of columns only |
+| `copyright` | Any text / blank | When filled, renders a copyright line below the columns and adds bottom padding. When blank, the footer collapses to a compact block of columns only |
+| `layout` | `first-featured` (default), `last-featured`, `equal` | Controls column sizing. `first-featured` makes the first block span wider; `last-featured` makes the last block wider; `equal` gives all blocks the same width. Use `first-featured` when the logo/brand block leads; `last-featured` when you want social or a CTA to dominate |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary` (default), `highlight-secondary` | `standard-primary` uses the page's default background so the footer blends in. `highlight-primary` creates a strong contrast band at the bottom. `highlight-secondary` is the most visually prominent option |
 
 ---
 
 ## Available Blocks
 
-Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-desktop: 5`) with generous `--space-3xl` gaps.
+Up to **4 blocks** can be added. Column sizing is controlled by the `layout` setting (`first-featured` / `last-featured` / `equal`).
 
 | Block Type | Key Settings | Notes |
 |---|---|---|
@@ -37,9 +35,8 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 |---|---|---|---|
 | logo_text | text_block | menu_block | social_block |
 
-- **Settings:** `color_scheme: highlight`, copyright filled, logo_width ~100 px, text_block title "Contact", menu_block title "Quick Links", social_block title "Follow Us"
+- **Settings:** `color_scheme: highlight-primary`, copyright filled, logo_width ~100 px, text_block title "Contact", menu_block title "Quick Links", social_block title "Follow Us"
 - **Good for:** Businesses that need a professional, balanced footer covering branding, contact details, navigation, and social presence in one row
-- **Industries:** Law firms, accounting practices, consulting agencies, dental offices
 
 ### 2. Brand-Forward Minimal
 
@@ -49,7 +46,6 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 
 - **Settings:** `color_scheme: highlight-secondary`, copyright filled, logo_width 200 px, logo_text richtext with a two-sentence mission statement
 - **Good for:** Creative studios and personal brands where the footer reinforces identity more than navigation
-- **Industries:** Design agencies, photographers, freelance portfolios, artists
 
 ### 3. Contact-Heavy Service Footer
 
@@ -59,7 +55,6 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 
 - **Settings:** `color_scheme: standard-secondary`, copyright filled. First text_block lists weekday and weekend hours. Second text_block has address, phone, and email. No menu or social blocks
 - **Good for:** Brick-and-mortar businesses where visitors primarily need location and availability info
-- **Industries:** Restaurants, hair salons, auto repair shops, veterinary clinics
 
 ### 4. Navigation-Dense Footer
 
@@ -67,9 +62,8 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 |---|---|---|---|
 | logo_text | menu_block ("Services") | menu_block ("Company") | social_block |
 
-- **Settings:** `color_scheme: highlight`, copyright filled, two separate menu_block instances pointing at different menus (e.g., `services-menu` and `company-menu`)
+- **Settings:** `color_scheme: highlight-primary`, copyright filled, two separate menu_block instances pointing at different menus (e.g., `services-menu` and `company-menu`)
 - **Good for:** Sites with many pages where the footer doubles as a secondary sitemap
-- **Industries:** SaaS products, multi-location businesses, real estate agencies, educational institutions
 
 ### 5. Minimalist Single-Line
 
@@ -77,9 +71,8 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 |---|
 | logo_text |
 
-- **Settings:** `color_scheme: standard`, copyright filled with the legal line, logo_text only (no richtext body), logo_width kept small (~80 px)
-- **Good for:** Landing pages or single-page sites that want a quiet, unobtrusive footer
-- **Industries:** Event pages, product launches, coming-soon sites, personal resumes
+- **Settings:** `color_scheme: standard-primary`, copyright filled with the legal line, logo_text only (no richtext body), logo_width kept small (~80 px)
+- **Good for:** Sites that want a quiet, unobtrusive footer that stays out of the way
 
 ### 6. Community and Social Hub
 
@@ -89,7 +82,6 @@ Up to **4 blocks** can be added. They share a 5-column grid (`--grid-cols-deskto
 
 - **Settings:** `color_scheme: highlight-secondary`, copyright filled. text_block richtext includes a CTA sentence and an email link. social_block title "Connect With Us"
 - **Good for:** Organizations that want the footer to drive community engagement rather than just close the page
-- **Industries:** Nonprofits, churches, local clubs, coworking spaces, fitness studios
 
 ---
 

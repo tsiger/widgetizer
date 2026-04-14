@@ -17,8 +17,8 @@ An infinite-scroll marquee strip that repeats a short phrase across the viewport
 | **font_size** | sm / md / lg / xl (default: md) | Maps to CSS custom-property tiers from base up to 3xl. xl dominates the viewport. |
 | **bg_color** | Color with alpha (default: #1e3a8a, deep blue) | Strip background. Alpha support means you can make it semi-transparent over the section behind it. |
 | **text_color** | Color (default: #ffffff) | Color for both the text and the separator. |
-| **top_spacing** | auto / none (default: auto) | Controls padding above the strip wrapper. "none" lets it sit flush against the previous section. |
-| **bottom_spacing** | auto / none (default: auto) | Controls padding below the strip wrapper. "none" lets the next section sit flush. |
+| **top_spacing** | auto (default) / small / none | Controls padding above the strip wrapper. small reduces spacing for tighter rhythm; none removes it entirely for flush stacking. |
+| **bottom_spacing** | auto (default) / small / none | Controls padding below the strip wrapper. small reduces spacing for tighter rhythm; none removes it entirely for flush stacking. |
 
 ---
 
@@ -46,8 +46,6 @@ This widget has **no blocks**. All content is controlled through the top-level s
 
 **Good for:** Placing between a hero section and the services grid to announce availability without a full banner. The slight angle adds energy without overwhelming the layout.
 
-**Industries:** Freelance designers, consultants, law firms, therapists.
-
 ---
 
 ### 2. Bold Sale Takeover
@@ -65,8 +63,6 @@ This widget has **no blocks**. All content is controlled through the top-level s
 | bottom_spacing | none |
 
 **Good for:** Inserting at the very top of the page as a full-width urgency banner. Zero rotation and large text make it scan like a news ticker. High speed keeps the eye moving.
-
-**Industries:** Retail shops, boutiques, e-commerce storefronts, seasonal businesses.
 
 ---
 
@@ -86,8 +82,6 @@ This widget has **no blocks**. All content is controlled through the top-level s
 
 **Good for:** A quiet, textural divider between content sections. The slow speed and small text make it feel ambient rather than promotional. Semi-transparent background lets it blend into the page.
 
-**Industries:** Artisan bakeries, craft studios, specialty coffee roasters, handmade goods shops.
-
 ---
 
 ### 4. Diagonal Event Countdown
@@ -105,8 +99,6 @@ This widget has **no blocks**. All content is controlled through the top-level s
 | bottom_spacing | none |
 
 **Good for:** Placed above the footer or between the about section and a contact form to build anticipation for a specific date. The black-and-gold contrast draws the eye. Default rotation gives it the "caution tape" energy that signals something is happening.
-
-**Industries:** Restaurants, fitness studios, salons, new retail locations, event venues.
 
 ---
 
@@ -126,8 +118,6 @@ This widget has **no blocks**. All content is controlled through the top-level s
 
 **Good for:** Positioned just before a testimonials or reviews section to prime the visitor with a social-proof headline. The positive rotation (tilting upward left-to-right) gives a subtle optimistic feel.
 
-**Industries:** Home services (plumbers, electricians, cleaners), dentists, auto repair shops, pet groomers.
-
 ---
 
 ### 6. Minimalist Horizontal Rule
@@ -145,8 +135,6 @@ This widget has **no blocks**. All content is controlled through the top-level s
 | bottom_spacing | none |
 
 **Good for:** Replacing a plain `<hr>` between portfolio pieces or long-form content sections. At very slow speed and small size, it functions almost like a decorative border rather than a headline. Works best when the page already has strong visual content and just needs gentle separation.
-
-**Industries:** Photographers, architects, interior designers, creative agencies.
 
 ---
 

@@ -9,13 +9,14 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text | Small label above the headline; adds a category/context cue (e.g. "Pricing", "Plans") |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Compare Our Plans") | Main headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text | Supporting paragraph below the headline |
 | `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block is centered or left-aligned |
 | `feature_column_label` | Any text (default "Features") | Header text for the first (feature-name) column |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and accent treatment for the entire section; non-standard schemes add padded container styling and override `--widget-bg-color` |
-| `top_spacing` | `auto`, `none` | Removes the default top margin when set to `none`; useful for stacking sections flush |
-| `bottom_spacing` | `auto`, `none` | Removes the default bottom margin when set to `none` |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -30,29 +31,26 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 
 ## Layout Recipes
 
-### 1. SaaS Pricing Comparison
+### 1. Cleaning Service Packages
 
-- **Columns:** 3 (Free / Pro / Enterprise)
-- **Settings:** `eyebrow` = "Pricing", `title` = "Find Your Plan", `heading_alignment` = center, `color_scheme` = standard-secondary, featured on Pro column with badge "Most Popular"
-- **Features:** 8-10 rows mixing boolean checks (SSO, API Access) with text values (storage limits, seat counts)
-- **Good for:** Software companies, digital tools, subscription services
-- **Industries:** SaaS, developer tools, productivity apps
+- **Columns:** 3 (Basic / Deep Clean / Move-In/Out)
+- **Settings:** `eyebrow` = "Packages", `title` = "What's Included", `heading_alignment` = center, `color_scheme` = standard-secondary, featured on Deep Clean column with badge "Most Popular"
+- **Features:** 6-8 rows mixing booleans (Kitchen Deep Clean, Inside Appliances, Baseboards & Blinds) with text values ("Up to 2 bathrooms" vs "Unlimited")
+- **Good for:** Helping customers pick the right level of service at a glance
 
 ### 2. Service Tier Breakdown
 
 - **Columns:** 2 (Standard / Premium)
-- **Settings:** `eyebrow` = "Our Services", `title` = "What's Included", `heading_alignment` = start, `color_scheme` = standard, featured on Premium column with badge "Full Service"
+- **Settings:** `eyebrow` = "Our Services", `title` = "What's Included", `heading_alignment` = start, `color_scheme` = standard-primary, featured on Premium column with badge "Full Service"
 - **Features:** 6-8 rows, mostly boolean (Initial Consultation, Monthly Reports, Dedicated Account Manager) with a couple of text entries ("Response within 48h" vs "Same-day response")
 - **Good for:** Agencies, consultants, law firms, accounting practices
-- **Industries:** Professional services, marketing agencies, legal
 
-### 3. Product Spec Sheet
+### 3. Auto Repair Service Comparison
 
-- **Columns:** 3-4 (product models or package sizes)
-- **Settings:** No eyebrow, `title` = "Technical Specifications", `feature_column_label` = "Specs", `heading_alignment` = start, `color_scheme` = highlight, no featured column, no CTAs
-- **Features:** 10-12 rows, almost entirely text values (dimensions, weight, wattage, material, warranty period)
-- **Good for:** Manufacturers, hardware retailers, equipment suppliers
-- **Industries:** Electronics, industrial equipment, home appliances
+- **Columns:** 3 (Oil Change / Full Service / Major Service)
+- **Settings:** No eyebrow, `title` = "Service Comparison", `feature_column_label` = "What's Covered", `heading_alignment` = start, `color_scheme` = highlight-primary, no featured column
+- **Features:** 6-8 rows mixing booleans (Tire Rotation, Brake Inspection, Fluid Top-Up) with text values ("Synthetic blend" vs "Full synthetic", "30-point" vs "60-point inspection")
+- **Good for:** Clearly communicating what each service level covers so customers know what they're paying for
 
 ### 4. Membership Levels
 
@@ -60,7 +58,6 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 - **Settings:** `eyebrow` = "Membership", `title` = "Choose Your Level", `heading_alignment` = center, `color_scheme` = highlight-secondary, featured on Family column with badge "Best Value"
 - **Features:** 6-8 rows mixing booleans (Guest Passes, Pool Access) with text ("2 classes/week" vs "Unlimited")
 - **Good for:** Gyms, clubs, coworking spaces, community organizations
-- **Industries:** Fitness, wellness, coworking, nonprofits
 
 ### 5. Venue or Rental Packages
 
@@ -68,23 +65,20 @@ Side-by-side feature comparison rendered as a full-width responsive table with o
 - **Settings:** `title` = "Event Packages", `heading_alignment` = center, `color_scheme` = standard-secondary, featured on Deluxe with badge "Popular"
 - **Features:** 6-8 rows with text values for capacity, hours included, catering options, and booleans for add-ons (DJ, Photography, Setup/Cleanup)
 - **Good for:** Event venues, wedding barns, conference centers, vacation rentals
-- **Industries:** Hospitality, events, tourism
 
-### 6. Competitor Comparison
+### 6. Grooming or Spa Packages
 
-- **Columns:** 2-3 (Our Product / Competitor A / Competitor B)
-- **Settings:** `title` = "Why Choose Us", `feature_column_label` = "What Matters", `heading_alignment` = start, `color_scheme` = standard, featured on the first "Our Product" column with badge "Us"
-- **Features:** 5-7 rows focused on differentiators, mixing booleans and short text; lean heavily on checks for your column and crosses for competitors
-- **Good for:** Landing pages, sales enablement, competitive positioning
-- **Industries:** Any B2B or B2C business in a competitive market
+- **Columns:** 3 (Express / Full Groom / Luxury)
+- **Settings:** `eyebrow` = "Packages", `title` = "Compare Treatments", `heading_alignment` = center, `color_scheme` = standard-primary, featured on Full Groom with badge "Most Popular"
+- **Features:** 6-8 rows mixing booleans (Bath, Nail Trim, Teeth Brushing, De-Shedding) with text values ("30 min" vs "60 min", "Basic shampoo" vs "Premium coat treatment")
+- **Good for:** Helping customers choose the right package without calling to ask
 
 ### 7. Course or Training Matrix
 
 - **Columns:** 3 (Beginner / Intermediate / Advanced)
-- **Settings:** `eyebrow` = "Programs", `title` = "Course Comparison", `heading_alignment` = center, `color_scheme` = highlight, no featured column, link text set to "Enroll Now" on each
+- **Settings:** `eyebrow` = "Programs", `title` = "Course Comparison", `heading_alignment` = center, `color_scheme` = highlight-primary, no featured column, link text set to "Enroll Now" on each
 - **Features:** 7-9 rows with text values for duration, class size, and certification level alongside booleans for features like 1-on-1 mentorship or job placement assistance
 - **Good for:** Online course platforms, trade schools, tutoring centers, bootcamps
-- **Industries:** Education, professional training, e-learning
 
 ---
 

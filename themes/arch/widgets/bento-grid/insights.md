@@ -9,13 +9,14 @@ A flexible tiled grid for showcasing features, services, or highlights in an asy
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `eyebrow` | Any text | Small label above the headline; adds context or category framing |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default: "Feature Spotlight") | Section headline; renders as `h1` when the widget is first on the page, `h2` otherwise |
 | `description` | Any text | Supporting paragraph below the headline |
 | `heading_alignment` | `start`, `center` (default) | Controls whether the section header block sits left-aligned or centered above the grid |
 | `gap` | `0`, `--space-sm`, `--space-md` (default), `--space-lg`, `--space-xl` | Gutter size between tiles; `0` gives a seamless mosaic, larger values add breathing room |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Section-level palette; highlight schemes swap background/foreground for contrast sections |
-| `top_spacing` | `auto` (default), `none` | Removes the default top margin so sections can sit flush against the previous widget |
-| `bottom_spacing` | `auto` (default), `none` | Removes the default bottom margin for flush stacking with the next widget |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -40,7 +41,6 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 | Detail B | 2 | 1 | Flat color tile, dark text |
 
 **Good for:** Announcing a flagship product, seasonal promotion, or new location opening.
-**Industries:** Retail, restaurants, real estate agencies.
 
 ### 2. Equal Quarters
 
@@ -52,7 +52,6 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 | Service D | 2 | 1 | |
 
 **Good for:** Presenting core service categories at a glance with no single item dominating.
-**Industries:** Consulting firms, dental practices, cleaning companies.
 
 ### 3. Wide Banner + Three Cards
 
@@ -64,7 +63,6 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 | Card C | 2 | 1 | Slightly wider card for longer copy |
 
 **Good for:** A portfolio intro or event announcement followed by quick-hit details.
-**Industries:** Photography studios, event planners, coworking spaces.
 
 ### 4. Feature Matrix (6 tiles)
 
@@ -78,7 +76,6 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 | Tile 6 | 1 | 1 | Compact feature |
 
 **Good for:** SaaS-style feature breakdowns or a "Why choose us" section.
-**Industries:** Software companies, digital agencies, fitness studios listing class types.
 
 ### 5. Asymmetric Storytelling
 
@@ -89,7 +86,6 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 | Stat B | 1 | 1 | Key number or award |
 
 **Good for:** "About us" sections that lead with a strong visual and pair it with proof points.
-**Industries:** Architecture firms, contractors, nonprofits.
 
 ### 6. Content Dashboard
 
@@ -102,7 +98,6 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 | Secondary D | 1 | 1 | Colored tile linking to fifth article |
 
 **Good for:** A curated content hub on a homepage, replacing a traditional blog roll.
-**Industries:** Marketing agencies, law firms, health clinics with resource libraries.
 
 ### 7. Minimal Duo
 
@@ -112,7 +107,6 @@ The grid is 4 columns on desktop and collapses to a single column on mobile. Eve
 | Right | 2 | 1 | Flat colored tile with copy |
 
 **Good for:** A simple before/after, problem/solution, or two-service split.
-**Industries:** Interior designers, personal trainers, tutoring services.
 
 ---
 

@@ -9,6 +9,7 @@ A split-layout team section with a sticky intro column (eyebrow, headline, descr
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `eyebrow` | Any text (default "Meet Our Team") | Small label above the headline; omit to tighten the intro stack |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Our leaders") | Main headline; renders as `h1` when the widget is first on the page, `h2` otherwise |
 | `description` | Textarea (default provided) | Supporting paragraph below the headline |
 | `heading_alignment` | `start` / **`center`** | Controls whether the intro text block is left-aligned or centered |
@@ -16,8 +17,8 @@ A split-layout team section with a sticky intro column (eyebrow, headline, descr
 | `columns_desktop` | **2** / 3 / 4 (range) | Number of member columns on desktop (mobile always collapses to 2) |
 | `image_ratio` | **`portrait`** (3:4) / `square` (1:1) / `auto` (natural) | Crop shape for every member photo; portrait feels editorial, square feels modern, auto preserves originals |
 | `color_scheme` | **`standard-primary`** / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Background and text color palette; highlight variants add a padded container background |
-| `top_spacing` | **`auto`** / `none` | Removes default top padding so the widget can butt up against the section above |
-| `bottom_spacing` | **`auto`** / `none` | Removes default bottom padding |
+| `top_spacing` | **`auto`** (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | **`auto`** (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -25,7 +26,7 @@ A split-layout team section with a sticky intro column (eyebrow, headline, descr
 
 | Block Type | Key Settings | Notes |
 |------------|-------------|-------|
-| `member` | `photo` (image), `name` (text), `role` (text), `link` (URL + new-tab toggle) | Each block is one team member card. Photo hover-scales on linked cards; name color shifts to the accent on hover. Heading level auto-adjusts (`h3` when a widget title exists, `h2` when it does not). |
+| `member` | `photo` (image), `name` (text, default "John Doe"), `role` (text, default "Team Member"), `link` (URL + new-tab toggle) | Each block is one team member card. Photo hover-scales on linked cards; name color shifts to the accent on hover. Heading level auto-adjusts (`h3` when a widget title exists, `h2` when it does not). |
 
 Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to fill a 2-column grid without looking empty.
 
@@ -44,7 +45,6 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | Blocks | 2 members |
 
 **Good for:** Co-founder story, husband-and-wife businesses, small studios.
-**Industries:** Architecture firms, law partnerships, craft breweries, boutique agencies.
 
 ---
 
@@ -55,11 +55,10 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | `columns_desktop` | 3 |
 | `image_ratio` | square |
 | `heading_alignment` | center |
-| `color_scheme` | highlight |
+| `color_scheme` | highlight-primary |
 | Blocks | 6 members |
 
 **Good for:** Mid-size companies that want to show depth without overwhelming the page.
-**Industries:** SaaS startups, marketing agencies, financial advisory firms.
 
 ---
 
@@ -70,11 +69,10 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | `columns_desktop` | 4 |
 | `image_ratio` | square |
 | `heading_alignment` | start |
-| `color_scheme` | standard |
+| `color_scheme` | standard-primary |
 | Blocks | 8-12 members |
 
 **Good for:** Showing the entire team when headcount is a selling point (trust signal).
-**Industries:** Dental practices, real estate brokerages, consulting firms, veterinary clinics.
 
 ---
 
@@ -90,7 +88,6 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | Blocks | 3-4 members, each with a link to a personal bio page |
 
 **Good for:** Creative businesses that want a magazine-feel introduction to key people.
-**Industries:** Photography studios, design agencies, fashion brands, restaurants (chef profiles).
 
 ---
 
@@ -108,7 +105,6 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | Blocks | 4 members, no links |
 
 **Good for:** A compact, no-frills team section near the footer — just faces, names, and roles.
-**Industries:** Accounting firms, IT service providers, small nonprofits.
 
 ---
 
@@ -124,7 +120,6 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | Blocks | 3-6 members, each linked to a LinkedIn profile (new tab) |
 
 **Good for:** Startups and nonprofits that want to showcase credibility through advisors or board members.
-**Industries:** Tech startups, venture-backed companies, charitable foundations, educational institutions.
 
 ---
 
@@ -140,7 +135,6 @@ Default blocks ship with 4 members (CEO, CMO, CTO, Head of Design) — enough to
 | Blocks | 1 member |
 
 **Good for:** Solopreneurs and personal brands where a single large portrait next to a personal message creates an intimate feel.
-**Industries:** Freelance consultants, personal coaches, solo attorneys, independent financial planners.
 
 ---
 

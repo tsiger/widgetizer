@@ -9,14 +9,17 @@ Circular-photo people grid with name, role, specialty, bio, and social links -- 
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `eyebrow` | any text | Small label above the headline ("Our Team", "Leadership", etc.) |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | any text | Main section headline; first widget on page renders as `<h1>` |
 | `description` | any text | Paragraph below the headline for context |
-| `heading_alignment` | `start` | Centers or left-aligns the entire header block |
+| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the entire header block |
+| `image_style` | `circle` (default), `full` | Circle crops photos into round headshots; full shows the complete image |
+| `aspect_ratio` | `1 / 1`, `4 / 3`, `3 / 2`, `3 / 4` (default) | Controls the photo aspect ratio; only applies when `image_style` is `full` |
 | `columns_desktop` | `2` - `5` (default `3`) | Number of columns in the grid on desktop; directly controls density |
 | `layout` | `grid` (default), `carousel` | Grid shows all cards at once; carousel adds prev/next buttons and horizontal scrolling |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text color pairing for the whole section |
-| `top_spacing` | `auto` (default), `none` | Removes top padding when set to `none`; useful for stacking sections flush |
-| `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to `none` |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -45,7 +48,6 @@ Circular-photo people grid with name, role, specialty, bio, and social links -- 
 Fill each profile with photo, name, role, and a one-sentence bio. Add LinkedIn for professional credibility.
 
 **Good for:** About pages, company overview sections.
-**Industries:** Consulting firms, agencies, law offices, accounting practices.
 
 ---
 
@@ -63,7 +65,6 @@ Fill each profile with photo, name, role, and a one-sentence bio. Add LinkedIn f
 Use the `specialty` field for cuisine focus (e.g., "Italian & Mediterranean"). Keep bios short and personality-driven. Add Instagram links for food content.
 
 **Good for:** Chef introductions, kitchen team showcases.
-**Industries:** Restaurants, catering companies, food trucks, bakeries.
 
 ---
 
@@ -81,7 +82,6 @@ Use the `specialty` field for cuisine focus (e.g., "Italian & Mediterranean"). K
 Best when you have 6+ profiles. Carousel keeps the section compact while letting visitors browse. Use `specialty` for certifications or focus areas. Link YouTube or TikTok for instructors who create content.
 
 **Good for:** Course catalogs, gym trainer pages, workshop facilitator lists.
-**Industries:** Fitness studios, yoga centers, music schools, tutoring services, coding bootcamps.
 
 ---
 
@@ -99,7 +99,6 @@ Best when you have 6+ profiles. Carousel keeps the section compact while letting
 Two columns give each leader more horizontal space, making bios easier to read. Use longer bios here (2-3 sentences). Add LinkedIn and email for direct contact. Skip `specialty` and use `role` for the full title.
 
 **Good for:** Executive team sections, board of directors pages.
-**Industries:** Startups, nonprofits, financial services, healthcare practices.
 
 ---
 
@@ -117,7 +116,6 @@ Two columns give each leader more horizontal space, making bios easier to read. 
 High column count works when bios are omitted and you lean on photo + name + specialty. Use `specialty` for services ("Color Specialist", "Balayage & Extensions"). Link Instagram so clients can see portfolios.
 
 **Good for:** Staff booking pages, stylist directories.
-**Industries:** Hair salons, spas, nail studios, tattoo shops, barbershops.
 
 ---
 
@@ -135,7 +133,6 @@ High column count works when bios are omitted and you lean on photo + name + spe
 Maximum density. Drop bios entirely; use only photo, name, and role ("Senior Agent", "Buyer Specialist"). Add email and Facebook links. Works well on a dedicated "Agents" page rather than as a homepage section.
 
 **Good for:** Large team directories where scanning matters more than reading.
-**Industries:** Real estate brokerages, insurance agencies, car dealerships.
 
 ---
 
@@ -154,7 +151,6 @@ Maximum density. Drop bios entirely; use only photo, name, and role ("Senior Age
 Use the `description` field to set a vibe ("A collective of designers, developers, and dreamers"). Populate multiple social links per person -- Instagram, Bluesky, GitHub -- to show each person's creative presence. The highlight background separates this section visually from portfolio work above or below.
 
 **Good for:** Agency about sections, freelance collective pages.
-**Industries:** Design studios, development agencies, photography collectives, architecture firms.
 
 ---
 

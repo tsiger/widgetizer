@@ -9,15 +9,16 @@ Embed a single YouTube or Vimeo video with an optional headline section, configu
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (blank by default) | Small label above the headline; adds a reveal-up animation step |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default: "Watch the Video") | Main heading above the video; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
 | `description` | Any text (blank by default) | Supporting paragraph below the title |
-| `heading_alignment` | `start` | Controls whether the eyebrow/title/description block is centered or left-aligned |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block is centered or left-aligned |
 | `video_url` | YouTube or Vimeo URL | Parsed into an embed iframe; invalid URLs show a placeholder message instead |
 | `video_title` | Any text (default: "Video") | Sets the iframe `title` attribute for accessibility / screen readers |
 | `aspect_ratio` | `16 / 9` (default), `4 / 3`, `21:9`, `1 / 1` | Changes the padding-based aspect box: 56.25%, 75%, 42.86%, or 100% respectively |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Swaps background/text color palette; non-standard schemes add container padding and set `--widget-bg-color` |
-| `top_spacing` | `auto` (default), `none` | Removes the top section margin when set to `none`; useful for stacking widgets tightly |
-| `bottom_spacing` | `auto` (default), `none` | Removes the bottom section margin when set to `none` |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -46,7 +47,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `top_spacing` | `none` |
 
 **Good for:** Landing pages where the video is the primary conversion driver, placed directly below the hero banner.
-**Industries:** SaaS, online courses, mobile apps.
 
 ---
 
@@ -63,7 +63,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `bottom_spacing` | `none` |
 
 **Good for:** Full-width, letterbox-style video that acts as a visual break between text-heavy sections. The ultra-wide ratio feels filmic and immersive.
-**Industries:** Architecture, photography studios, restaurants, hotels.
 
 ---
 
@@ -79,7 +78,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `color_scheme` | `standard-primary` |
 
 **Good for:** About pages where a founder video or team introduction sits alongside other content sections. Left alignment keeps it conversational rather than ceremonial.
-**Industries:** Professional services, agencies, local businesses, nonprofits.
 
 ---
 
@@ -95,7 +93,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `color_scheme` | `standard-secondary` |
 
 **Good for:** Support or documentation pages. The 4:3 ratio suits screencast-style content where the extra vertical space shows more of the UI being demonstrated.
-**Industries:** Software, education platforms, membership sites.
 
 ---
 
@@ -111,7 +108,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `color_scheme` | `highlight-secondary` |
 
 **Good for:** Homepage or dedicated testimonials page. The accent color scheme makes the section stand out as a trust-building block between feature descriptions.
-**Industries:** Home services, fitness studios, real estate, dental/medical practices.
 
 ---
 
@@ -127,7 +123,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `color_scheme` | `standard-primary` |
 
 **Good for:** Embedding repurposed social-media-style clips (Instagram Reels exported to YouTube, behind-the-scenes shorts). The square ratio matches the social media feel and works well on narrow screens.
-**Industries:** Retail shops, food trucks, salons, personal brands.
 
 ---
 
@@ -144,7 +139,6 @@ This widget has **no inner blocks**. It is a single-video embed with a fixed hea
 | `bottom_spacing` | `none` |
 
 **Good for:** Event pages or blog posts where the video recap sits at the top, followed immediately by a gallery or details section with no gap.
-**Industries:** Nonprofits, event venues, community organizations, schools.
 
 ---
 

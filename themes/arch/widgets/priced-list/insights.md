@@ -9,13 +9,14 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (default: "Starters") | Small label above the headline; sets category context |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default: "Appetizers") | Main heading for the section; first widget on page renders as h1 |
 | `description` | Any text | Paragraph below the heading; useful for disclaimers or seasonal notes |
-| `heading_alignment` | `start` | Centers the header block or pins it to the left edge |
+| `heading_alignment` | `start`, `center` (default) | Centers the header block or pins it to the left edge |
 | `layout` | `single-column` (default), `two-column` | One stacked list vs. a side-by-side grid (splits at 750 px) |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text color palette; non-standard schemes add padded container and custom bg |
-| `top_spacing` | `auto` (default), `none` | Normal top margin or flush against the widget above |
-| `bottom_spacing` | `auto` (default), `none` | Normal bottom margin or flush against the widget below |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -37,29 +38,26 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 - **Eyebrow:** category name (e.g., "Mains", "Desserts")
 - **Items:** 6-10 per section, no images, short descriptions
 - **Good for:** Restaurants, cafes, bistros, wine bars
-- **Industries:** Food and beverage
 - **Tip:** Stack multiple priced-list widgets with different eyebrows and `top_spacing: none` / `bottom_spacing: none` between them to build a full multi-course menu on one page.
 
 ### 2. Salon / Spa Service Menu
 
 - **Layout:** `two-column`
-- **Heading alignment:** `left`
+- **Heading alignment:** `start`
 - **Color scheme:** `highlight-primary`
 - **Eyebrow:** "Our Services"
 - **Items:** 8-12, no images, brief descriptions noting duration (e.g., "60 min")
 - **Good for:** Hair salons, nail studios, spas, massage therapists
-- **Industries:** Beauty and wellness
 - **Tip:** Use the price field for "from $XX" ranges when service pricing varies by length or complexity.
 
 ### 3. Auto Shop Rate Card
 
 - **Layout:** `single-column`
-- **Heading alignment:** `left`
+- **Heading alignment:** `start`
 - **Color scheme:** `standard-secondary`
 - **Eyebrow:** "Pricing"
 - **Items:** 5-8, no images, description explains what is included
 - **Good for:** Auto mechanics, detailing shops, tire centers
-- **Industries:** Automotive services
 - **Tip:** Put disclaimers like "prices may vary by vehicle" in the widget description field rather than repeating them per item.
 
 ### 4. Bakery Showcase
@@ -70,18 +68,16 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 - **Eyebrow:** "Fresh Daily"
 - **Items:** 6-8, each with a thumbnail image
 - **Good for:** Bakeries, patisseries, ice cream shops, deli counters
-- **Industries:** Food retail
 - **Tip:** The 80 px thumbnail works best with tightly cropped, well-lit product shots. Two-column layout keeps the page compact even with images.
 
 ### 5. Freelancer / Agency Packages
 
 - **Layout:** `single-column`
-- **Heading alignment:** `left`
+- **Heading alignment:** `start`
 - **Color scheme:** `highlight-secondary`
 - **Eyebrow:** "Packages"
 - **Items:** 3-5, no images, richtext descriptions with bullet lists of deliverables
-- **Good for:** Freelance designers, copywriters, consultants, marketing agencies
-- **Industries:** Professional services
+- **Good for:** Freelance designers, copywriters, consultants, bookkeepers
 - **Tip:** Use richtext descriptions to add a short bulleted list of what each package includes. Keep item names punchy ("Starter", "Growth", "Premium").
 
 ### 6. Venue Rental Options
@@ -92,7 +88,6 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 - **Eyebrow:** "Spaces"
 - **Items:** 4-6, with images of each room or area
 - **Good for:** Event venues, coworking spaces, photography studios, community centers
-- **Industries:** Hospitality, real estate
 - **Tip:** Include capacity or square footage in the description and use the price field for per-hour or per-day rates (e.g., "$150/hr").
 
 ### 7. Pet Grooming or Daycare Rates
@@ -103,7 +98,6 @@ A line-item list pairing names, descriptions, and prices — the digital equival
 - **Eyebrow:** "Grooming"
 - **Items:** 4-6, no images, descriptions note breed-size tiers
 - **Good for:** Pet groomers, doggy daycares, boarding facilities, veterinary add-on services
-- **Industries:** Pet care
 - **Tip:** Use separate priced-list widgets for each animal category (Dogs, Cats) stacked with no spacing between them.
 
 ---

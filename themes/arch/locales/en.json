@@ -1938,9 +1938,6 @@
   "trust_bar": {
     "name": "Trust Bar",
     "settings": {
-      "alignment": {
-        "label": "Alignment"
-      },
       "show_dividers": {
         "label": "Show dividers"
       }

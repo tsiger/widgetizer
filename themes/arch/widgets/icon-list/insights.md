@@ -9,6 +9,7 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | any text | Small label above the headline — adds context like "What We Offer" or "Included With Every Stay" |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | any text | Section headline (renders as `<h1>` when first widget on page, `<h2>` otherwise) |
 | `description` | any text | Supporting paragraph below the headline |
 | `heading_alignment` | `start`, **`center`** | Left-aligns the header block for editorial feel; center (default) is formal and symmetrical |
@@ -18,8 +19,8 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 | `icon_size` | `sm`, `md`, `lg`, **`xl`** | Controls icon dimensions. Smaller sizes suit dense grids (6--8 cols); larger sizes suit hero-style feature callouts (2--3 cols) |
 | `icon_shape` | `sharp`, `rounded`, **`circle`** | Shape of the outline/filled container. Sharp = square corners, rounded = soft corners, circle = pill/circle |
 | `color_scheme` | **`standard-primary`**, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard uses page background; highlight flips to contrast background. Accent variants tint the section for visual separation |
-| `top_spacing` | **`auto`**, `none` | Remove top padding to stack flush against the previous widget |
-| `bottom_spacing` | **`auto`**, `none` | Remove bottom padding to stack flush against the next widget |
+| `top_spacing` | **`auto`**, `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | **`auto`**, `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -37,43 +38,36 @@ A grid or carousel of icon+label items used to communicate features, amenities, 
 - **Settings**: layout `grid`, columns_desktop `6`, icon_style `plain`, icon_size `lg`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-primary`
 - **Blocks**: 6--12 items, title only (no description) — Wi-Fi, Parking, Pool, Gym, Spa, Pet Friendly
 - **Good for**: Communicating included amenities quickly without reading
-- **Industries**: Hotels, resorts, vacation rentals, Airbnb-style listings
 
 ### 2. Core Services Showcase
-- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `rounded`, heading_alignment` | `start`, color_scheme `standard-primary`
-- **Blocks**: 3--6 items with both title and description — e.g., "Web Design / Custom sites built for your brand"
+- **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `rounded`, heading_alignment `start`, color_scheme `standard-primary`
+- **Blocks**: 3--6 items with both title and description — e.g., "Deep Cleaning / Thorough top-to-bottom clean for your home"
 - **Good for**: Homepage services section where each service needs a short explanation
-- **Industries**: Agencies, freelancers, consultants, IT service providers
 
 ### 3. Why Choose Us — Trust Strip
 - **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `md`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-secondary`
-- **Blocks**: 4 items, title only — "Free Shipping", "24/7 Support", "Money-Back Guarantee", "Secure Checkout"
-- **Good for**: Trust-building strip placed between hero and product listings
-- **Industries**: E-commerce, online retail, subscription boxes
+- **Blocks**: 4 items, title only — "Licensed & Insured", "Free Estimates", "Same-Day Service", "Satisfaction Guaranteed"
+- **Good for**: Trust-building strip placed between hero and content sections
 
 ### 4. Treatment Menu (Carousel)
 - **Settings**: layout `carousel`, columns_desktop `4`, icon_style `plain`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-secondary`
 - **Blocks**: 8--12 items with title and short description — "Deep Tissue / 60 min session", "Hot Stone / Relaxation therapy"
 - **Good for**: Browsable service menus that exceed comfortable grid display
-- **Industries**: Spas, salons, wellness studios, dental clinics
 
-### 5. Tech Specs / Features Grid
-- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `lg`, icon_shape `sharp`, heading_alignment` | `start`, color_scheme `standard-primary`
-- **Blocks**: 8 items with title and description — "API Access / RESTful endpoints", "99.9% Uptime / SLA guaranteed"
-- **Good for**: SaaS feature pages or product specification sections
-- **Industries**: Software companies, tech startups, B2B platforms
+### 5. What's Included — Service Breakdown
+- **Settings**: layout `grid`, columns_desktop `4`, icon_style `outline`, icon_size `lg`, icon_shape `sharp`, heading_alignment `start`, color_scheme `standard-primary`
+- **Blocks**: 8 items with title and description — "Initial Consultation / We assess your needs", "Detailed Quote / Transparent pricing upfront"
+- **Good for**: Detailing what a service package includes so customers know exactly what they're getting
 
 ### 6. Facilities at a Glance (Dense Grid)
 - **Settings**: layout `grid`, columns_desktop `8`, icon_style `plain`, icon_size `sm`, icon_shape `circle`, heading_alignment `center`, color_scheme `highlight-primary`
 - **Blocks**: 8--16 items, title only — compact pictogram strip
 - **Good for**: Space-efficient listing where quantity matters more than detail (event venues, coworking spaces)
-- **Industries**: Conference centers, coworking spaces, campgrounds, community centers
 
 ### 7. Process Steps
 - **Settings**: layout `grid`, columns_desktop `3`, icon_style `filled`, icon_size `xl`, icon_shape `circle`, heading_alignment `center`, color_scheme `standard-secondary`
 - **Blocks**: 3 items with title and description — "1. Consult / Tell us your vision", "2. Design / We craft the plan", "3. Build / We bring it to life"
 - **Good for**: Explaining a simple workflow or engagement process
-- **Industries**: Contractors, architects, wedding planners, custom manufacturers
 
 ---
 

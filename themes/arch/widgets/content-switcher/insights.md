@@ -9,9 +9,10 @@ Tabbed or toggle-based card grid that lets visitors flip between 2-3 groups of i
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `eyebrow` | Any text | Small label above the headline (e.g., "Pricing", "Our Plans"). Omit to hide. |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text | Section headline. Renders as `<h1>` when the widget is the first on the page, `<h2>` otherwise. |
 | `description` | Any text | Paragraph below the headline providing context. Omit to hide. |
-| `heading_alignment` | `start` | Centers or left-aligns the header block **and** the switcher buttons. Left alignment gives a more editorial feel. |
+| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the header block **and** the switcher buttons. Left alignment gives a more editorial feel. |
 | `switcher_type` | `toggle` (default), `tabs` | **Toggle** shows exactly 2 options. **Tabs** unlocks a third option button, allowing 3 content groups. |
 | `option_1_label` | Text | Label for the first switcher button (e.g., "Monthly"). Leave blank to hide the entire first tab and its panel. |
 | `option_2_label` | Text | Label for the second button (e.g., "Yearly"). |
@@ -19,8 +20,8 @@ Tabbed or toggle-based card grid that lets visitors flip between 2-3 groups of i
 | `columns` | 2 -- 5 (default 3) | Number of card columns on desktop. Cards stack on mobile regardless. |
 | `aspect_ratio` | `auto`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Constrains card image proportions. Use `auto` when cards have no images or images vary. |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | **standard** = transparent background, no card border. **standard-secondary** = transparent background + card gets a secondary bg and border. **highlight** = full-width background + card border. **highlight-secondary** = full-width bg + card secondary bg and border. |
-| `top_spacing` | `auto` (default), `none` | Remove top section padding to butt up against the widget above. |
-| `bottom_spacing` | `auto` (default), `none` | Remove bottom section padding. |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -34,22 +35,21 @@ Tabbed or toggle-based card grid that lets visitors flip between 2-3 groups of i
 
 ## Layout Recipes
 
-### 1. Monthly / Yearly Pricing Toggle
+### 1. Membership / Class Pass Pricing Toggle
 
 | Setting | Value |
 |---------|-------|
 | `switcher_type` | `toggle` |
 | `option_1_label` | Monthly |
-| `option_2_label` | Yearly |
+| `option_2_label` | Class Pack |
 | `columns` | 3 |
 | `heading_alignment` | `center` |
 | `color_scheme` | `standard-secondary` |
 | `aspect_ratio` | `auto` |
 
-Create 3 item blocks per option (6 total). Use `price` for dollar amounts and `text` for feature summaries. Add "Get Started" / "Contact Sales" links.
+Create 3 item blocks per option (6 total). Use `price` for dollar amounts and `text` for what's included. Add "Sign Up" links.
 
-**Good for:** SaaS landing pages, membership sites, subscription boxes.
-**Industries:** Software, fitness studios, co-working spaces, online education.
+**Good for:** Businesses with recurring memberships and drop-in alternatives.
 
 ---
 
@@ -69,7 +69,6 @@ Create 3 item blocks per option (6 total). Use `price` for dollar amounts and `t
 Each tab shows a different audience's service lineup. Use `text` richtext for bullet-pointed scope descriptions and `link` for "Request a Quote."
 
 **Good for:** Service businesses that serve multiple market segments from one page.
-**Industries:** Cleaning companies, landscaping, electrical contractors, pest control.
 
 ---
 
@@ -88,7 +87,6 @@ Each tab shows a different audience's service lineup. Use `text` richtext for bu
 Pair images across both options so the same project appears in the same grid position. Use `title` for the project name and leave `price` blank.
 
 **Good for:** Transformation-driven businesses that need to show results visually.
-**Industries:** Home renovation, auto detailing, interior design, dental/cosmetic clinics.
 
 ---
 
@@ -108,26 +106,24 @@ Pair images across both options so the same project appears in the same grid pos
 Use `image` for dish photos, `title` for the dish name, `price` for the price, and `text` for a short description. Link to an online ordering page.
 
 **Good for:** Restaurants and food businesses with distinct service formats.
-**Industries:** Restaurants, bakeries, food trucks, caterers.
 
 ---
 
-### 5. Individuals / Teams Comparison
+### 5. Adults / Kids Service Split
 
 | Setting | Value |
 |---------|-------|
 | `switcher_type` | `toggle` |
-| `option_1_label` | For Individuals |
-| `option_2_label` | For Teams |
-| `columns` | 2 |
+| `option_1_label` | Adults |
+| `option_2_label` | Kids |
+| `columns` | 3 |
 | `heading_alignment` | `center` |
 | `color_scheme` | `standard-secondary` |
 | `aspect_ratio` | `auto` |
 
-Two cards per option. Keep it tight -- one entry-level, one premium. Use `text` for feature lists and `price` for per-seat or flat-rate pricing.
+Each tab shows services tailored to the audience. Use `price` for per-session or package pricing and `text` for what's included.
 
-**Good for:** Products or services with clearly different individual vs. team offerings.
-**Industries:** Software tools, coaching services, co-working memberships, insurance brokers.
+**Good for:** Businesses that serve both adults and children with different offerings or pricing.
 
 ---
 
@@ -147,7 +143,6 @@ Two cards per option. Keep it tight -- one entry-level, one premium. Use `text` 
 Each tab shows the services or classes available at a specific location. Use `image` for location/facility photos and `link` for booking.
 
 **Good for:** Multi-location businesses where offerings differ by branch.
-**Industries:** Gyms, salons, veterinary clinics, tutoring centers.
 
 ---
 
@@ -166,7 +161,6 @@ Each tab shows the services or classes available at a specific location. Use `im
 Product images with titles and prices. Link each card to a product detail page or external shop. No richtext needed -- keep cards visual and scannable.
 
 **Good for:** Small retailers or makers who have a natural two-way product split.
-**Industries:** Pet stores, gift shops, artisan goods, plant nurseries.
 
 ---
 

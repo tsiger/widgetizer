@@ -11,6 +11,7 @@ Interactive before/after image slider that lets visitors drag a handle to reveal
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (blank by default) | Small label above the headline; adds context like "Our Work" or "Results" |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default: "See the Transformation") | Main headline above the slider |
 | `description` | Any text (blank by default) | Supporting paragraph below the headline |
 | `heading_alignment` | `start`, `center` | Controls whether the eyebrow/title/description block is centered or left-aligned |
@@ -18,12 +19,13 @@ Interactive before/after image slider that lets visitors drag a handle to reveal
 | `after_image` | Image reference | The image shown on the right (horizontal) or top (vertical) side |
 | `before_label` | Any text (default: "Before") | Overlay badge on the before side of the slider |
 | `after_label` | Any text (default: "After") | Overlay badge on the after side of the slider |
+| `content_width` | `wide` (default), `fullwidth` | Controls the max-width of the slider container. `wide` keeps it within the standard content width; `fullwidth` stretches it edge-to-edge |
 | `orientation` | `horizontal`, `vertical` | Horizontal splits left/right (16:9 aspect). Vertical splits top/bottom (9:16 aspect, narrower max-width) |
 | `initial_position` | 0 -- 100 % (step 5, default 50) | Where the divider sits on load; 0 = all "before" visible, 100 = all "after" visible |
 | `show_labels` | true / false (default true) | Toggles the floating Before/After badges inside the image |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and container treatment; non-standard schemes add padded container and swap background color |
-| `top_spacing` | `auto`, `none` | Removes default top margin when set to none; useful for stacking sections flush |
-| `bottom_spacing` | `auto`, `none` | Removes default bottom margin when set to none |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -43,12 +45,11 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `heading_alignment` | center |
 | `initial_position` | 50 |
 | `show_labels` | true |
-| `color_scheme` | standard |
+| `color_scheme` | standard-primary |
 | `eyebrow` | Our Work |
 | `title` | See the Transformation |
 
 **Good for:** Showcasing a single flagship project front and center.
-**Industries:** Renovation contractors, painters, landscapers, pressure washing services.
 
 ---
 
@@ -62,10 +63,9 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `show_labels` | true |
 | `before_label` | Damaged |
 | `after_label` | Restored |
-| `color_scheme` | highlight |
+| `color_scheme` | highlight-primary |
 
 **Good for:** Drawing the eye to the "after" result by starting the slider mostly on the before side, so the dramatic improvement is the first thing visitors notice.
-**Industries:** Auto body shops, furniture restoration, electronics repair, art conservation.
 
 ---
 
@@ -83,7 +83,6 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `eyebrow` | Real Results |
 
 **Good for:** Portrait-oriented photos where a top-to-bottom reveal feels natural, such as face or body shots.
-**Industries:** Med spas, dermatology clinics, hair salons, cosmetic dentistry.
 
 ---
 
@@ -97,12 +96,11 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `show_labels` | true |
 | `before_label` | Winter |
 | `after_label` | Summer |
-| `color_scheme` | standard |
+| `color_scheme` | standard-primary |
 | `title` | Year-Round Curb Appeal |
 | `description` | Drag to see the difference a full-service landscape plan makes. |
 
 **Good for:** Showing the same property across seasons to emphasize ongoing maintenance value. Starting at 70 % lets the "summer" side dominate on load.
-**Industries:** Landscaping companies, lawn care, property management, real estate staging.
 
 ---
 
@@ -122,7 +120,6 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `bottom_spacing` | none |
 
 **Good for:** A full-bleed visual break between text-heavy sections. Removing the headline and spacing lets the image speak for itself.
-**Industries:** Pressure washing, carpet cleaning, commercial janitorial, pool services.
 
 ---
 
@@ -142,25 +139,25 @@ This widget has **no blocks**. All content is configured through top-level setti
 | `description` | A full redesign completed in under three weeks. |
 
 **Good for:** Telling a mini story with eyebrow, title, and description that gives context before the visitor interacts with the slider.
-**Industries:** Interior designers, home stagers, kitchen/bath remodelers, architects.
 
 ---
 
-### 7. Technical / Engineering Comparison
+### 7. Dental / Smile Makeover
 
 | Parameter | Value |
 |---|---|
-| `orientation` | vertical |
-| `heading_alignment` | start |
-| `initial_position` | 50 |
+| `orientation` | horizontal |
+| `heading_alignment` | center |
+| `initial_position` | 40 |
 | `show_labels` | true |
-| `before_label` | v1.0 |
-| `after_label` | v2.0 |
-| `color_scheme` | highlight |
-| `title` | Interface Evolution |
+| `before_label` | Before Treatment |
+| `after_label` | Your New Smile |
+| `color_scheme` | standard-secondary |
+| `eyebrow` | Patient Results |
+| `title` | Smile Transformations |
+| `content_width` | wide |
 
-**Good for:** Comparing two versions of a UI, blueprint, or technical drawing where vertical orientation matches the natural scroll direction of the content.
-**Industries:** SaaS products, app developers, engineering firms, 3D visualization studios.
+**Good for:** Showing treatment outcomes where the result speaks louder than any copy. Starting at 40% lets the "after" side dominate on load.
 
 ---
 

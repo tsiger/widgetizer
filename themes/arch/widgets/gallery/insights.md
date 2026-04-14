@@ -6,17 +6,18 @@ Responsive image gallery with grid or carousel layout, lightbox viewing, optiona
 
 | Setting | Values | Visual effect |
 |---|---|---|
-| eyebrow | Any text (optional) | Small label above the title, adds editorial context |
-| title | Any text (default: "Project Gallery") | Section heading; renders as h1 if first widget on page, h2 otherwise |
-| description | Any text (optional) | Paragraph below the title, sets expectations for the gallery |
-| heading_alignment` | `start`, `center` (default) | Left-aligns the header block for editorial layouts or centers it for showcase pages |
-| layout | `grid` (default), `carousel` | Grid shows all images at once in a responsive grid; carousel displays a horizontal scrollable strip with prev/next arrows |
-| columns_desktop | 2 -- 5 (default 4) | Number of columns on desktop; fewer columns mean larger thumbnails and more visual weight per image |
-| staggered | true / false (default false) | Even-numbered cards drop down by a large vertical offset, creating a masonry-like rhythm; only visible at 750px+ |
-| aspect_ratio | `auto`, `contain`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Controls thumbnail cropping. Auto uses native proportions, contain fits the full image inside a fixed height, fixed ratios crop to uniform cards |
-| color_scheme | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | Switches the section background and text colors using theme palette variables |
-| top_spacing | `auto` (default), `none` | Removes top padding so the gallery can sit flush against the section above it |
-| bottom_spacing | `auto` (default), `none` | Removes bottom padding so the gallery can sit flush against the section below it |
+| `eyebrow` | Any text (optional) | Small label above the title, adds editorial context |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
+| `title` | Any text (default "Project Gallery") | Section heading; renders as h1 if first widget on page, h2 otherwise |
+| `description` | Any text (optional) | Paragraph below the title, sets expectations for the gallery |
+| `heading_alignment` | `start`, `center` (default) | Left-aligns the header block for editorial layouts or centers it for showcase pages |
+| `layout` | `grid` (default), `carousel` | Grid shows all images at once in a responsive grid; carousel displays a horizontal scrollable strip with prev/next arrows |
+| `columns_desktop` | 2 -- 5 (default 4) | Number of columns on desktop; fewer columns mean larger thumbnails and more visual weight per image |
+| `staggered` | `true` / `false` (default) | Even-numbered cards drop down by a large vertical offset, creating a masonry-like rhythm; only visible at 750px+ |
+| `aspect_ratio` | `auto`, `contain`, `1/1`, `4/3` (default), `3/2`, `3/4`, `16/9` | Controls thumbnail cropping. Auto uses native proportions, contain fits the full image inside a fixed height, fixed ratios crop to uniform cards |
+| `color_scheme` | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | Switches the section background and text colors using theme palette variables |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ## Available blocks
 
@@ -27,46 +28,39 @@ Responsive image gallery with grid or carousel layout, lightbox viewing, optiona
 ## Layout recipes
 
 **1. "Portfolio Wall" (creative professional)**
-Settings: layout `grid`, columns_desktop `3`, aspect_ratio `4/3`, staggered `true`, heading_alignment` | `start`, color_scheme `standard-primary`.
+Settings: layout `grid`, columns_desktop `3`, aspect_ratio `4/3`, staggered `true`, heading_alignment `start`, color_scheme `standard-primary`.
 Blocks: 6--9 project photos with captions naming each project.
 Good for: photographers, architects, interior designers, illustrators.
-Industries: architecture, photography, design studios, art galleries.
 
 **2. "Before & After Strip" (service showcase)**
 Settings: layout `carousel`, columns_desktop `2`, aspect_ratio `3/2`, staggered `false`, heading_alignment `center`.
 Blocks: 6--8 images alternating before/after shots, captions labeling each ("Kitchen -- Before", "Kitchen -- After").
 Good for: showing transformation results without overwhelming the page.
-Industries: home renovation, landscaping, auto detailing, salon/barber.
 
 **3. "Product Lookbook" (retail/e-commerce)**
 Settings: layout `grid`, columns_desktop `4`, aspect_ratio `1/1`, staggered `false`, color_scheme `highlight-primary`, heading_alignment `center`, eyebrow "New Collection".
 Blocks: 8 square product shots, captions with product names.
 Good for: seasonal launches, catalog browsing, lifestyle product display.
-Industries: fashion, jewelry, ceramics, furniture, food products.
 
 **4. "Team at Work" (company culture)**
-Settings: layout `grid`, columns_desktop `3`, aspect_ratio `16/9`, staggered `false`, heading_alignment` | `start`, color_scheme `standard-secondary`.
+Settings: layout `grid`, columns_desktop `3`, aspect_ratio `16/9`, staggered `false`, heading_alignment `start`, color_scheme `standard-secondary`.
 Blocks: 6 candid workplace or event photos, captions optional.
-Good for: about-us pages, recruitment landing pages, company culture sections.
-Industries: tech startups, agencies, co-working spaces, nonprofits.
+Good for: about-us pages where showing the team and workspace builds trust.
 
 **5. "Full-Width Cinema Reel" (visual impact)**
 Settings: layout `carousel`, columns_desktop `2`, aspect_ratio `16/9`, staggered `false`, top_spacing `none`, bottom_spacing `none`, color_scheme `highlight-primary`.
 Blocks: 5--7 wide cinematic images, short captions.
 Good for: hero-adjacent storytelling, event recaps, travel highlights.
-Industries: hospitality, event venues, tourism, real estate.
 
 **6. "Mosaic Feature" (editorial/blog)**
-Settings: layout `grid`, columns_desktop `4`, aspect_ratio `auto`, staggered `true`, heading_alignment` | `start`.
+Settings: layout `grid`, columns_desktop `4`, aspect_ratio `auto`, staggered `true`, heading_alignment `start`.
 Blocks: 8+ images of varying native proportions; captions describe each scene.
 Good for: mixed-media storytelling where image proportions differ naturally.
-Industries: food blogs, travel writers, lifestyle brands, wedding planners.
 
 **7. "Minimal Proof" (service-based landing page)**
 Settings: layout `grid`, columns_desktop `5`, aspect_ratio `1/1`, staggered `false`, heading_alignment `center`, eyebrow "Our Work", color_scheme `standard-primary`.
 Blocks: 5 images, no captions.
 Good for: a compact trust strip that shows volume of work without taking up much vertical space.
-Industries: cleaning services, pest control, handyman, lawn care.
 
 ## Differentiation tips
 

@@ -8,14 +8,15 @@ Image-forward portfolio grid (or carousel) with hover-reveal text overlay, built
 
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
-| `heading_alignment` | `start`, `center` | Controls whether the eyebrow/title/description block sits flush-left or centered above the grid |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block sits flush-left or centered above the grid |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `layout` | `grid`, `carousel` | Grid shows all items at once in a responsive multi-column layout; carousel displays a swipeable strip with prev/next buttons |
 | `columns_desktop` | `2` -- `5` | Number of columns on desktop viewports; fewer columns = larger cards with more visual impact |
 | `aspect_ratio` | `auto`, `contain`, `1/1`, `4/3`, `3/2`, `3/4`, `16/9` | Determines image crop shape. `auto` uses the natural image ratio; `contain` fits the full image inside a fixed-height container; portrait (`3/4`) is unusual and attention-grabbing |
 | `text_display` | `hover`, `always` | `hover` keeps cards image-only until mouseover reveals the gradient overlay with title and description; `always` shows the overlay permanently |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background treatment for the entire section. Standard uses the default page background; highlight and accent variants pull from theme color variables |
-| `top_spacing` | `auto`, `none` | Removes top padding so the widget can butt up against the section above it |
-| `bottom_spacing` | `auto`, `none` | Removes bottom padding for the same edge-to-edge stacking effect |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -43,11 +44,10 @@ Image-forward portfolio grid (or carousel) with hover-reveal text overlay, built
 Large, cinematic cards that let the photography do the talking. Hover-reveal keeps the grid clean. Two columns give each project room to breathe.
 
 **Good for:** Architecture firms, interior designers, landscape architects, construction companies.
-**Industries:** Architecture, real estate, construction, home staging.
 
 ---
 
-### 2. Photography / Creative Agency Mosaic
+### 2. Photography / Visual Arts Mosaic
 
 | Setting | Value |
 |---------|-------|
@@ -60,8 +60,7 @@ Large, cinematic cards that let the photography do the talking. Hover-reveal kee
 
 Square thumbnails on a dark (highlight) background create an Instagram-style grid that feels familiar to visual audiences. Three columns balances density with detail.
 
-**Good for:** Photographers, videographers, creative agencies, tattoo artists.
-**Industries:** Photography, film production, design studios, visual arts.
+**Good for:** Photographers, videographers, tattoo artists, florists.
 
 ---
 
@@ -79,7 +78,6 @@ Square thumbnails on a dark (highlight) background create an Instagram-style gri
 Wide cinematic ratio works well for before/after shots of renovations or landscaping jobs. Carousel lets you load many projects without overwhelming the page. Always-visible text ensures project names are readable without interaction.
 
 **Good for:** General contractors, landscapers, painters, flooring installers.
-**Industries:** Home services, renovation, landscaping, property maintenance.
 
 ---
 
@@ -97,11 +95,10 @@ Wide cinematic ratio works well for before/after shots of renovations or landsca
 The 4:3 ratio suits food photography and venue shots. Always-on overlay text labels each dish, event space, or catering package. The highlight-secondary scheme adds warmth against a rich background.
 
 **Good for:** Restaurants, caterers, event venues, hotels, bakeries.
-**Industries:** Hospitality, food service, event planning, tourism.
 
 ---
 
-### 5. Web / App Development Case Studies
+### 5. Contractor / Tradesperson Project Gallery
 
 | Setting | Value |
 |---------|-------|
@@ -112,10 +109,9 @@ The 4:3 ratio suits food photography and venue shots. Always-on overlay text lab
 | `heading_alignment` | `start` |
 | `color_scheme` | `standard-primary` |
 
-Clean, professional grid with left-aligned heading that matches a typical tech-company layout. Link each card to a dedicated case-study page. Hover-reveal keeps the interface minimal. Use the description field for short outcome lines like "40% conversion lift."
+Clean, professional grid with left-aligned heading that communicates reliability. Link each card to a dedicated project page. Hover-reveal keeps the interface minimal. Use the description field for short outcome lines like "Full bathroom remodel in 10 days."
 
-**Good for:** Web agencies, software studios, freelance developers, digital consultancies.
-**Industries:** Technology, SaaS, digital marketing, IT services.
+**Good for:** Electricians, plumbers, roofers, custom cabinet makers, pool installers.
 
 ---
 
@@ -133,7 +129,6 @@ Clean, professional grid with left-aligned heading that matches a typical tech-c
 Portrait ratio is perfect for hair, makeup, and fashion shots where the subject is vertical. Four visible columns create a dense lookbook feel that invites swiping. Hover-reveal keeps the focus on the imagery.
 
 **Good for:** Hair salons, barbershops, nail studios, makeup artists, fashion boutiques.
-**Industries:** Beauty, fashion, personal care, wellness.
 
 ---
 
@@ -153,7 +148,6 @@ Portrait ratio is perfect for hair, makeup, and fashion shots where the subject 
 Dense four-column square grid creates an impactful wall of faces, events, and outcomes. Always-visible overlay makes every project title scannable without interaction, which matters for accessibility. Edge-to-edge spacing lets this section act as a bold visual divider.
 
 **Good for:** Nonprofits, schools, community organizations, churches, municipal departments.
-**Industries:** Civic, education, philanthropy, social services.
 
 ---
 

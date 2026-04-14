@@ -11,13 +11,14 @@ A filterable careers section that displays open positions as stacked cards with 
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (default "Join Our Team") | Small label above the headline; omit to hide |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Open Positions") | Section headline; renders as `h1` when the widget is the first on the page, `h2` otherwise |
 | `description` | Any text (default blank) | Subtext paragraph below the headline |
 | `heading_alignment` | `start`, `center` (default) | Controls whether the header block and filter buttons align left or center |
 | `show_filters` | `true` (default), `false` | Toggles the department filter button bar; departments are auto-extracted from blocks |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary` = transparent bg, no card borders. `standard-secondary` = cards get a secondary bg fill + border. `highlight-primary` = section-level colored bg + card borders. `highlight-secondary` = colored bg + filled cards + borders |
-| `top_spacing` | `auto` (default), `none` | Removes the default top padding when set to `none` |
-| `bottom_spacing` | `auto` (default), `none` | Removes the default bottom padding when set to `none` |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -33,52 +34,45 @@ A filterable careers section that displays open positions as stacked cards with 
 
 ### 1. Minimal Careers Page
 
-- **Settings:** eyebrow blank, title "We're Hiring", description blank, heading_alignment center, show_filters false, color_scheme standard
+- **Settings:** eyebrow blank, title "We're Hiring", description blank, heading_alignment center, show_filters false, color_scheme standard-primary
 - **Blocks:** 2-3 job blocks
 - **Good for:** Small teams with only a handful of roles who want a clean, no-frills listing
-- **Industries:** Freelance studios, boutique agencies, independent shops
 
-### 2. Department-Filtered Tech Board
+### 2. Department-Filtered Careers Board
 
 - **Settings:** eyebrow "Careers", title "Open Positions", description "Find your next role with us.", heading_alignment center, show_filters true, color_scheme standard-secondary
-- **Blocks:** 6-10 job blocks across 3-4 departments (Engineering, Design, Marketing, Operations)
-- **Good for:** Growing startups or mid-size companies that need visitors to quickly narrow by team
-- **Industries:** SaaS companies, tech startups, digital agencies
+- **Blocks:** 6-10 job blocks across 3-4 departments (Front of House, Kitchen, Management, Events)
+- **Good for:** Growing businesses with multiple departments that need visitors to quickly narrow by team
 
 ### 3. Highlighted Single-Department Banner
 
-- **Settings:** eyebrow "Now Hiring", title "Join Our Kitchen Team", description blank, heading_alignment start, show_filters false, color_scheme highlight
+- **Settings:** eyebrow "Now Hiring", title "Join Our Kitchen Team", description blank, heading_alignment start, show_filters false, color_scheme highlight-primary
 - **Blocks:** 2-4 job blocks all in the same department, mix of full-time and part-time
 - **Good for:** A prominent "we're hiring" band embedded on a homepage rather than a dedicated careers page
-- **Industries:** Restaurants, cafes, retail stores, salons
 
 ### 4. Internship & Entry-Level Showcase
 
-- **Settings:** eyebrow "Start Here", title "Internship & Early-Career Openings", description "Kickstart your career with hands-on experience.", heading_alignment center, show_filters true, color_scheme standard
-- **Blocks:** 4-6 job blocks, type set to internship or full-time, departments like Editorial, Research, Development
+- **Settings:** eyebrow "Start Here", title "Internship & Early-Career Openings", description "Kickstart your career with hands-on experience.", heading_alignment center, show_filters true, color_scheme standard-primary
+- **Blocks:** 4-6 job blocks, type set to internship or full-time, departments like Styling, Reception, Training
 - **Good for:** Organizations that recruit junior talent seasonally and want a dedicated landing section
-- **Industries:** Media companies, nonprofits, universities, law firms
 
 ### 5. Multi-Location Franchise Hiring
 
 - **Settings:** eyebrow blank, title "Positions Near You", description blank, heading_alignment start, show_filters true, color_scheme highlight-secondary
 - **Blocks:** 6-8 job blocks with varied locations (city names) and departments like Service, Management, Warehouse
 - **Good for:** Businesses with multiple physical locations that want visitors to scan by department and see where roles are
-- **Industries:** Restaurant chains, fitness studios, retail franchises, cleaning services
 
 ### 6. Contract & Freelance Opportunities Board
 
 - **Settings:** eyebrow "Freelance With Us", title "Current Projects", description "We partner with independent contractors for specific engagements.", heading_alignment center, show_filters false, color_scheme standard-secondary
 - **Blocks:** 3-5 job blocks, type set to contract, locations set to "Remote"
-- **Good for:** Agencies or consultancies that cycle through project-based contractors and want a public roster
-- **Industries:** Creative agencies, consulting firms, event production companies
+- **Good for:** Businesses that cycle through project-based contractors and want a public roster
 
 ### 7. Compact Footer-Adjacent Hiring Strip
 
-- **Settings:** eyebrow blank, title "Join Us", description blank, heading_alignment start, show_filters false, color_scheme highlight, top_spacing none, bottom_spacing none
+- **Settings:** eyebrow blank, title "Join Us", description blank, heading_alignment start, show_filters false, color_scheme highlight-primary, top_spacing none, bottom_spacing none
 - **Blocks:** 1-2 job blocks
 - **Good for:** A tight, attention-grabbing strip placed just above the footer to catch visitors before they leave
-- **Industries:** Any small business with one or two urgent openings
 
 ---
 

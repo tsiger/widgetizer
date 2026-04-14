@@ -9,14 +9,15 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `eyebrow` | Any text / blank | Small label above the headline. Adds context or category framing ("Our Showroom", "How It Works"). Leave blank to hide. |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Interactive Image") | Main headline rendered as `<h1>` on the first widget of a page, `<h2>` otherwise. Blank hides the entire header row if description and eyebrow are also empty. |
 | `description` | Any text / blank | Supporting paragraph beneath the headline. Good for a one-sentence setup ("Tap any pin to learn more"). |
 | `heading_alignment` | `start` / `center` (default) | Left-aligns the header block for editorial layouts; center keeps it balanced above the image. |
 | `image` | Image upload / blank | The base photo all hotspots sit on. Rendered at full container width with responsive srcset. Falls back to a landscape placeholder when empty. |
 | `image_alt` | Any text (default "Interactive image with hotspots") | Alt text for the base image. Important for accessibility and SEO. |
 | `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Controls the section background and overall palette. `standard-primary` has no extra padding; the other three add padded container treatment and override `--widget-bg-color`. |
-| `top_spacing` | `auto` / `none` | `auto` uses theme default top margin; `none` removes it so the widget can butt directly against its neighbor. |
-| `bottom_spacing` | `auto` / `none` | Same as above for the bottom edge. |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -30,54 +31,47 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 
 ## Layout Recipes
 
-### 1. Product Feature Callouts
+### 1. Showroom / Product Feature Callouts
 
-- **Settings**: 4-6 hotspots on a hero product photo. `heading_alignment: start`, eyebrow "Product Details", `color_scheme: standard`.
-- **Hotspot strategy**: Pin each key feature (material, button, screen, strap) at its physical location. Short title + 1-sentence description + link to specs page.
-- **Good for**: E-commerce product pages, Kickstarter-style landing sections.
-- **Industries**: Consumer electronics, fashion accessories, sporting goods, furniture.
+- **Settings**: 4-6 hotspots on a product or workspace photo. `heading_alignment: start`, eyebrow "Product Details", `color_scheme: standard-primary`.
+- **Hotspot strategy**: Pin each key feature (material, finish, component) at its physical location. Short title + 1-sentence description + optional link to a detail page.
+- **Good for**: Highlighting craftsmanship details or product features on a single hero photo.
 
 ### 2. Floor Plan / Venue Tour
 
-- **Settings**: 5-8 hotspots on an overhead floor-plan image or wide interior photo. `heading_alignment: center`, title "Explore Our Space", `color_scheme: highlight`.
+- **Settings**: 5-8 hotspots on an overhead floor-plan image or wide interior photo. `heading_alignment: center`, title "Explore Our Space", `color_scheme: highlight-primary`.
 - **Hotspot strategy**: Mark key areas (reception, lounge, kitchen, patio). Description includes capacity or amenities. Link each to a gallery or booking page.
 - **Good for**: Event venues, coworking spaces, real-estate listings.
-- **Industries**: Hospitality, commercial real estate, wedding venues, restaurants.
 
 ### 3. Before/After Explainer
 
 - **Settings**: 2-3 hotspots on a single "after" photo. `heading_alignment: start`, eyebrow "The Transformation", `color_scheme: standard-secondary`.
 - **Hotspot strategy**: Pinpoint specific changes (new countertop, replaced windows, landscaping). Description explains the upgrade and materials used.
 - **Good for**: Portfolio case studies, renovation showcases.
-- **Industries**: Home remodeling, landscaping, auto detailing, salon makeovers.
 
 ### 4. Team / Office Culture Snapshot
 
-- **Settings**: 3-5 hotspots on a team group photo or office panorama. `heading_alignment: center`, title "Meet the Team", `color_scheme: standard`.
-- **Hotspot strategy**: Pin individuals or areas (design corner, coffee bar). Title is the person's name or area name; description is a fun fact or role summary. Link to a full bio page.
-- **Good for**: About pages, recruitment landing pages.
-- **Industries**: Agencies, startups, law firms, dental practices.
+- **Settings**: 3-5 hotspots on a team group photo or office panorama. `heading_alignment: center`, title "Meet the Team", `color_scheme: standard-primary`.
+- **Hotspot strategy**: Pin individuals or areas (treatment room, reception). Title is the person's name or area name; description is a fun fact or role summary. Link to a full bio page.
+- **Good for**: About pages where you want an interactive way to introduce the team or workspace.
 
 ### 5. Menu / Dish Highlights
 
 - **Settings**: 4-6 hotspots on a beautifully plated spread or table scene. `heading_alignment: center`, eyebrow "Chef's Selection", `color_scheme: highlight-secondary`, `top_spacing: none` (to pair tightly with a hero above).
 - **Hotspot strategy**: Tag each dish. Description includes key ingredients and dietary info. Link to the full menu or online ordering.
 - **Good for**: Restaurant homepages, catering brochures, food-truck sites.
-- **Industries**: Restaurants, bakeries, catering companies, meal-kit services.
 
 ### 6. Anatomy of a Service
 
 - **Settings**: 3-4 hotspots on an infographic-style image or process photo. `heading_alignment: start`, title "What's Included", `color_scheme: standard-secondary`.
 - **Hotspot strategy**: Each pin represents a phase or deliverable (consultation, design mockup, installation, follow-up). Descriptions set expectations and timelines.
 - **Good for**: Service overview pages, pricing sections.
-- **Industries**: Web agencies, HVAC contractors, cleaning services, photography studios.
 
-### 7. Campus / Property Map
+### 7. Property / Grounds Map
 
-- **Settings**: 6-8 hotspots on a campus aerial or illustrated map. `heading_alignment: center`, title "Find Your Way", `color_scheme: highlight`.
-- **Hotspot strategy**: Mark buildings, parking, entrances, amenities. Descriptions include hours or quick directions. Links go to individual department pages.
-- **Good for**: Universities, resorts, large retail complexes, hospitals.
-- **Industries**: Education, healthcare, hospitality, amusement parks.
+- **Settings**: 6-8 hotspots on an aerial photo or illustrated site map. `heading_alignment: center`, title "Find Your Way", `color_scheme: highlight-primary`.
+- **Hotspot strategy**: Mark key areas (parking, entrance, garden, pool, barn). Descriptions include hours or quick directions. Links go to detail pages or booking.
+- **Good for**: Multi-area properties where visitors need to orient themselves before arriving.
 
 ---
 

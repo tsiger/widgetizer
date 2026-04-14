@@ -8,9 +8,8 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 |---------|--------|---------------|
 | height | `auto`, `small`, `medium`, `large` | Controls the vertical size of the slideshow container. `auto` adds internal padding instead of a fixed height; `small`/`medium`/`large` apply preset height classes for increasingly dramatic hero presence. |
 | fullwidth | `true` / `false` | When true (default), the slideshow spans edge-to-edge. When false, the slideshow is constrained to the site's content width with visible margins. |
-| alignment | `center`, `start` | Positions headline, body text, and buttons. `center` creates a classic hero feel; `start` left-aligns everything for an editorial or portfolio look. |
-| autoplay | `true` / `false` | Enables automatic slide rotation. When off, visitors must use arrows or dots to navigate. |
-| autoplay_speed | `3000`--`10000` ms (step 1000) | Duration each slide is visible before advancing. Lower values create energy; higher values give visitors time to read longer copy. |
+| autoplay | `true` (default) / `false` | Enables automatic slide rotation. When off, visitors must use arrows or dots to navigate. |
+| autoplay_speed | `3000`--`10000` ms (step 1000, default `5000`) | Duration each slide is visible before advancing. Lower values create energy; higher values give visitors time to read longer copy. |
 
 ## Available blocks
 
@@ -18,9 +17,11 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 |-------|-------------|-------|
 | **slide** (max 5) | `image` -- background photo | When present, adds `has-bg-image` and `has-overlay` classes; the overlay color is layered on top. Without an image the slide uses its color scheme background. |
 | | `heading_text` | Main headline. Rendered as `<h1>` on the very first slide of the first widget on the page, `<h2>` otherwise -- important for SEO. |
-| | `heading_size` (`lg` -- `9xl`) | Tailwind-scale type sizing. Smaller sizes work for informational slides; `5xl`+ for bold hero statements. |
+| | `heading_size` (`lg` -- `9xl`, default `5xl`) | Tailwind-scale type sizing. Smaller sizes work for informational slides; `5xl`+ for bold hero statements. |
+| | `alignment` (`start`, `center` (default)) | Positions headline, body text, and buttons per slide. `center` creates a classic hero feel; `start` left-aligns everything for an editorial or portfolio look. |
+| | `vertical_alignment` (`start`, `center` (default), `end`) | Vertically positions the slide content within the container -- top, middle, or bottom. |
 | | `text_content` | Supporting paragraph beneath the headline. |
-| | `text_size` (`sm`, `base`, `lg`) | Controls body text prominence. |
+| | `text_size` (`sm`, `base`, `lg` (default)) | Controls body text prominence. |
 | | `text_uppercase` | Applies uppercase transform -- useful for short taglines or category labels. |
 | | `text_muted` | Reduces text opacity for a softer, less dominant subheading. |
 | | `button_link` / `button_link_2` | Primary and optional secondary CTA. Each link has `text`, `href`, and `target`. |
@@ -41,14 +42,14 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 **2. "Dual-CTA storefront" (product launch)**
 - 2 slides, height `medium`, fullwidth `true`, alignment `center`, autoplay `true`, speed `6000`
 - Each slide: heading_size `5xl`, both buttons active (primary "Shop Now" + secondary "Learn More"), button_size `medium`
-- Slide 1 highlight scheme, Slide 2 highlight-secondary for variety
+- Slide 1 `highlight-primary`, Slide 2 `highlight-secondary` for variety
 - Good for: Promoting two key offers simultaneously. Retail shops, bakeries, florists, online stores.
 
 **3. "Left-aligned editorial" (services overview)**
 - 3 slides, height `medium`, fullwidth `true`, alignment `start`
 - heading_size `4xl`, text_size `lg`, text_muted `true`, single secondary button `medium`
 - Lighter overlay (`#00000040`) to let photography show through
-- Good for: Professional services that want to feel approachable, not salesy. Consultancies, accounting firms, marketing agencies, dental clinics.
+- Good for: Professional services that want to feel approachable, not salesy. Consultancies, accounting firms, veterinary clinics, dental clinics.
 
 **4. "Compact announcement bar" (promotions / events)**
 - 2--3 slides, height `small`, fullwidth `false` (constrained), alignment `center`
@@ -69,7 +70,7 @@ Full-width rotating banner carousel with up to 5 slides, each supporting a backg
 - 2 slides, height `medium`, fullwidth `true`, alignment `center`
 - No background images; alternate between `highlight-primary` and `standard-secondary` color schemes for contrast
 - heading_size `8xl`, text_size `lg`, single primary button `xlarge`
-- Good for: Startups or service businesses without strong photography. SaaS landing pages, tutoring services, freelance developers, cleaning companies.
+- Good for: Service businesses without strong photography. Tutoring services, cleaning companies, bookkeeping firms, mobile notaries.
 
 **7. "Seasonal campaign rotator" (multi-offer)**
 - 5 slides (max), height `medium`, fullwidth `true`, alignment `center`, autoplay `true`, speed `5000`

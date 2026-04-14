@@ -51,7 +51,6 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 | `color_scheme` | `standard-primary` |
 
 **Good for:** Businesses where customers call before buying. Keeping the phone number visible next to the logo puts it front and center on every page.
-**Industries:** Plumbing, HVAC, landscaping, cleaning services, auto repair.
 
 ---
 
@@ -72,7 +71,6 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 | `color_scheme` | `standard-primary` |
 
 **Good for:** Image-driven sites where the hero photograph needs to bleed to the top of the page. The header floats transparently over the hero, then solidifies on scroll thanks to sticky mode.
-**Industries:** Hotels, restaurants, photography studios, event venues, real estate agencies.
 
 ---
 
@@ -92,7 +90,6 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 | `color_scheme` | `standard-primary` |
 
 **Good for:** Content-first layouts where the navigation is a lightweight wayfinding tool, not a sales channel. Centered nav gives a magazine-style balance.
-**Industries:** Blogs, personal brands, design portfolios, boutique agencies, nonprofits.
 
 ---
 
@@ -112,7 +109,6 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 | `color_scheme` | `highlight-primary` |
 
 **Good for:** Lead-generation sites that need the CTA visible at all times. The highlight color scheme makes the header itself an attention-grabbing bar, and sticky keeps it locked on screen.
-**Industries:** SaaS landing pages, insurance quotes, tutoring, fitness memberships, dental practices.
 
 ---
 
@@ -132,7 +128,6 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 | `color_scheme` | `standard-primary` |
 
 **Good for:** Professional services where credibility comes from restraint. No contact banner, no color drama -- just a clean logo, tidy navigation, and a quiet CTA.
-**Industries:** Law firms, accounting firms, architecture studios, consulting, financial advisors.
 
 ---
 
@@ -152,7 +147,6 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 | `color_scheme` | `standard-secondary` |
 
 **Good for:** Established local businesses that want to lead with trust signals -- years in business, physical address. The accent color scheme adds warmth without being loud.
-**Industries:** Roofing, general contractors, family dentistry, veterinary clinics, local bakeries.
 
 ---
 
@@ -171,7 +165,6 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 | `color_scheme` | `standard-primary` |
 
 **Good for:** The absolute minimum: a text-only name and centered nav with no button, no contact info. Keeps the focus squarely on the work.
-**Industries:** Freelance designers, illustrators, photographers, writers, artists.
 
 ---
 

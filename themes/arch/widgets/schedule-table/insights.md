@@ -9,15 +9,16 @@ A two-column schedule widget that pairs a day/hours table with an optional sideb
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (blank by default) | Small label above the headline; adds a category/context line |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Opening Hours") | Main headline; renders as h1 when the widget is first on the page, h2 otherwise |
 | `description` | Any text (blank by default) | Paragraph beneath the headline for extra context |
-| `heading_alignment` | `start`, `center` | Controls whether the eyebrow/title/description block is left-aligned or centered |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow/title/description block is left-aligned or centered |
 | `note` | Any text (default "We are closed on public holidays") | Small muted footnote displayed below the last schedule row |
-| `sidebar_position` | `start`, `end` | Places the info/social sidebar on the chosen side; uses CSS grid reordering |
-| `week_start_day` | `0` (Sunday), `1` (Monday) | Determines which day block maps to index 0 for the "is-today" highlight calculation |
+| `sidebar_position` | `start`, `end` (default) | Places the info/social sidebar on the chosen side; uses CSS grid reordering |
+| `week_start_day` | `0` (Sunday), `1` (Monday, default) | Determines which day block maps to index 0 for the "is-today" highlight calculation |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text theming; non-standard schemes add padded container and custom bg |
-| `top_spacing` | `auto`, `none` | Removes top section padding when set to none; useful for stacking against an adjacent widget |
-| `bottom_spacing` | `auto`, `none` | Removes bottom section padding when set to none |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ---
 
@@ -36,51 +37,44 @@ A two-column schedule widget that pairs a day/hours table with an optional sideb
 ### 1. Classic Business Hours
 
 - **Blocks:** 7 day blocks (Mon-Sun), 1 info block ("Contact Us" with phone + email)
-- **Settings:** `heading_alignment: center`, `sidebar_position: end`, `color_scheme: standard`, `week_start_day: 1`
+- **Settings:** `heading_alignment: center`, `sidebar_position: end`, `color_scheme: standard-primary`, `week_start_day: 1`
 - **Good for:** The default setup. A clean, scannable hours table with contact details on the side.
-- **Industries:** Retail shops, offices, medical clinics, banks, government offices
 
 ### 2. Restaurant Split-Shift Hours
 
 - **Blocks:** 7 day blocks with split hours (e.g. "11:30 AM - 2:30 PM / 5:00 PM - 10:00 PM"), 1 info block ("Reservations" with phone number and a booking link in richtext)
-- **Settings:** `heading_alignment: start`, `sidebar_position: end`, `color_scheme: highlight`, `note: "Kitchen closes 30 minutes before closing"`, `title: "Hours & Reservations"`
+- **Settings:** `heading_alignment: start`, `sidebar_position: end`, `color_scheme: highlight-primary`, `note: "Kitchen closes 30 minutes before closing"`, `title: "Hours & Reservations"`
 - **Good for:** Restaurants that have lunch and dinner services with a gap in between.
-- **Industries:** Restaurants, bistros, wine bars, tapas bars
 
 ### 3. Weekend-Focused Venue
 
 - **Blocks:** 5 day blocks (Wed-Sun only; Mon-Tue omitted or marked closed), 1 info block ("Location" with address), 1 social block
 - **Settings:** `heading_alignment: center`, `sidebar_position: start`, `color_scheme: standard-secondary`, `week_start_day: 0`, `eyebrow: "Plan Your Visit"`, `title: "We're Open"`
 - **Good for:** Venues that only operate part of the week and want to emphasize open days rather than listing five closed ones.
-- **Industries:** Galleries, museums, event venues, farmers markets, breweries
 
 ### 4. Gym / Fitness Studio
 
 - **Blocks:** 7 day blocks with early-open hours (e.g. "5:30 AM - 10:00 PM"), 1 info block ("Front Desk" with phone), 1 info block ("Class Schedule" with a richtext link to a PDF or separate page)
 - **Settings:** `heading_alignment: start`, `sidebar_position: end`, `color_scheme: highlight-secondary`, `title: "Gym Hours"`, `note: "Staffed hours may differ -- see front desk"`
 - **Good for:** Facilities where access hours differ from staffed hours, with sidebar used for secondary info links.
-- **Industries:** Gyms, yoga studios, climbing gyms, community recreation centers
 
 ### 5. Seasonal / Holiday-Aware Shop
 
 - **Blocks:** 7 day blocks, 1 info block ("Holiday Hours" with richtext listing upcoming exceptions like Christmas Eve, New Year)
-- **Settings:** `heading_alignment: center`, `sidebar_position: end`, `color_scheme: standard`, `note: "Hours may change during public holidays -- see sidebar"`, `title: "Store Hours"`
+- **Settings:** `heading_alignment: center`, `sidebar_position: end`, `color_scheme: standard-primary`, `note: "Hours may change during public holidays -- see sidebar"`, `title: "Store Hours"`
 - **Good for:** Shops that need to communicate both regular and exception hours without cluttering the main table.
-- **Industries:** Retail, gift shops, garden centers, hardware stores
 
 ### 6. Professional Services -- Appointment Only
 
 - **Blocks:** 5 day blocks (Mon-Fri), Saturday and Sunday marked closed, 1 info block ("Book an Appointment" with richtext containing a phone number, email, and a booking-link CTA)
 - **Settings:** `heading_alignment: start`, `sidebar_position: end`, `color_scheme: standard-secondary`, `title: "Office Hours"`, `eyebrow: "By Appointment"`, `note: "Walk-ins welcome Mon-Wed only"`
 - **Good for:** Services where availability and booking info matter more than a simple open/closed status.
-- **Industries:** Law firms, dental offices, accountants, therapists, consultants
 
 ### 7. Cafe with Social Presence
 
 - **Blocks:** 7 day blocks, 1 info block ("Find Us" with address and a short richtext blurb), 1 social block
-- **Settings:** `heading_alignment: center`, `sidebar_position: start`, `color_scheme: highlight`, `title: "When We're Brewing"`, `note: ""`
+- **Settings:** `heading_alignment: center`, `sidebar_position: start`, `color_scheme: highlight-primary`, `title: "When We're Brewing"`, `note: ""`
 - **Good for:** Small cafes that lean on social media for daily specials and want their social links prominent alongside hours.
-- **Industries:** Coffee shops, bakeries, juice bars, ice cream shops
 
 ---
 

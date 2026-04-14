@@ -9,6 +9,7 @@ Collapsible question-and-answer sections with optional sidebar, two visual style
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (default: "Support") | Small label above the headline; omit to remove |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default: "Frequently Asked Questions") | Main section heading (renders as h1 if first widget on page, h2 otherwise) |
 | `description` | Any text | Subtitle paragraph below the headline |
 | `heading_alignment` | `start` | Centers or left-aligns the entire header block |
@@ -16,8 +17,8 @@ Collapsible question-and-answer sections with optional sidebar, two visual style
 | `allow_multiple` | `false` (default), `true` | When off, opening one item closes others. When on, any number can stay open simultaneously |
 | `sidebar_position` | `end` (default), `start` | Places the info/social sidebar on the right or left of the accordion list (only visible when info or social blocks exist) |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Standard: transparent background. Accent variants: items get secondary background. Highlight: themed section background with padding |
-| `top_spacing` | `auto` (default), `none` | Removes top padding when set to none — useful for stacking sections tightly |
-| `bottom_spacing` | `auto` (default), `none` | Removes bottom padding when set to none |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for stacking sections flush |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -38,49 +39,42 @@ Collapsible question-and-answer sections with optional sidebar, two visual style
 - **Settings:** style `separated`, heading alignment `center`, allow_multiple `false`, color_scheme `standard-primary`
 - **Blocks:** 6-10 item blocks, no sidebar blocks
 - **Good for:** Dedicated FAQ pages where visitors scan for one specific answer
-- **Industries:** SaaS, e-commerce, subscription services
 
 ### 2. Support Hub with Contact Sidebar
 
 - **Settings:** style `separated`, heading alignment `start`, sidebar_position `end`, color_scheme `standard-secondary`
 - **Blocks:** 5-8 item blocks + 1 info block ("Still need help?" with email/phone) + 1 social block
 - **Good for:** Support pages that funnel unanswered questions to a human
-- **Industries:** Professional services, agencies, dental/medical offices
 
 ### 3. Compact Policy Section
 
 - **Settings:** style `connected`, heading alignment `start`, allow_multiple `true`, color_scheme `standard-primary`, bottom_spacing `none`
 - **Blocks:** 3-5 item blocks covering shipping, returns, warranty, etc. No sidebar.
 - **Good for:** Embedding below a product page or checkout flow so buyers can self-serve policy questions without leaving the page
-- **Industries:** E-commerce, handmade goods, retail
 
 ### 4. Service Breakdown
 
 - **Settings:** style `separated`, heading alignment `center`, allow_multiple `false`, color_scheme `highlight-primary`
 - **Blocks:** 4-6 item blocks, each question being a service name ("What does a full kitchen remodel include?"), answers detailing scope and pricing notes
 - **Good for:** Service pages where each accordion item explains one offering in depth
-- **Industries:** Contractors, cleaning companies, landscapers, event planners
 
 ### 5. Onboarding / Getting Started
 
 - **Settings:** style `connected`, heading alignment `start`, allow_multiple `true`, color_scheme `standard-secondary`, eyebrow "Getting Started"
 - **Blocks:** 4-6 item blocks covering sequential steps + 1 info block linking to a video tutorial or help docs
 - **Good for:** Post-signup pages or knowledge bases walking new users through setup
-- **Industries:** SaaS, online courses, membership sites
 
 ### 6. Pre-Sale Objection Handler
 
 - **Settings:** style `separated`, heading alignment `center`, allow_multiple `false`, color_scheme `highlight-secondary`
 - **Blocks:** 4-6 item blocks with questions like "Is this right for beginners?" and "What if it doesn't work for me?" No sidebar.
 - **Good for:** Landing pages directly above or below a pricing section to overcome purchase hesitation
-- **Industries:** Coaches, fitness programs, online education, consultants
 
 ### 7. Location / Hours Info Panel
 
 - **Settings:** style `connected`, heading alignment `start`, sidebar_position `start`, color_scheme `standard-primary`
 - **Blocks:** 1 info block (address, phone, email) + 1 social block on the left sidebar; 3-5 item blocks on the right covering parking, accessibility, appointment policies
 - **Good for:** Contact or location pages for businesses with physical premises
-- **Industries:** Restaurants, salons, clinics, co-working spaces
 
 ---
 

@@ -9,12 +9,14 @@ A structured footer/contact section that displays business information, hours, n
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text | Small label above the headline (e.g. "Get in Touch"). Hidden when blank. |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text | Main `<h2>` headline for the section. Hidden when blank. |
 | `description` | Any text | Supporting paragraph below the headline. Hidden when blank. |
-| `heading_alignment` | `start` | Centers or left-aligns the eyebrow/title/description group. Left feels editorial; center feels formal. |
+| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the eyebrow/title/description group. Left feels editorial; center feels formal. |
+| `layout` | `first-featured` (default), `last-featured`, `equal` | Controls column sizing. `first-featured` makes the first block span wider (2 columns); `last-featured` makes the last block wider; `equal` gives all blocks the same width. Use `first-featured` when the info block leads; `last-featured` when you want social or a CTA to dominate |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and text palette. `standard-primary` has no padded container; the other three add `widget-container-padded` and set `--widget-bg-color`. Use highlight schemes to visually separate contact from surrounding content. |
-| `top_spacing` | `auto` (default), `none` | Removes the top section padding when set to `none`. Useful for stacking directly beneath another widget. |
-| `bottom_spacing` | `auto` (default), `none` | Removes the bottom section padding when set to `none`. Useful when this is the very last section on the page. |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -22,7 +24,7 @@ A structured footer/contact section that displays business information, hours, n
 
 | Block Type | Key Settings | Notes |
 |---|---|---|
-| `info` | `title` (text), `text` (richtext) | The "hero" block of the widget. Its first-child CSS rule makes it span 2 grid columns, giving it more room. Best for the business name plus a short blurb or address. |
+| `info` | `title` (text), `text` (richtext) | Best used as the first block with `layout: first-featured` — it gets extra width (spans 2 grid columns). Good for the business name plus a short blurb or address. With `layout: equal` it sizes the same as other blocks. |
 | `text_block` | `title` (text), `text` (richtext) | General-purpose column. Richtext lets you list hours, directions, or any formatted snippet. Can be used more than once for separate topics (Hours, Location, etc.). |
 | `menu_block` | `title` (text), `menu` (menu reference, default `footer-menu`) | Renders a flat link list from a site menu. Submenu items are hidden by CSS, so keep the chosen menu one level deep. Good for legal links, service pages, or quick navigation. |
 | `social_block` | `title` (text) | Pulls social icons from `theme.social` settings. No per-block URL config; icons are managed at the theme level. Always left-aligned within the column. |
@@ -43,7 +45,6 @@ A structured footer/contact section that displays business information, hours, n
 | Block 4 — social_block | Title: "Follow Us" |
 
 **Good for:** Restaurants, cafes, bars, bakeries.
-**Industries:** Hospitality, food & beverage.
 
 ---
 
@@ -60,7 +61,6 @@ A structured footer/contact section that displays business information, hours, n
 | Block 3 — menu_block | Title: "Quick Links". Menu: About, Services, Careers, Privacy Policy. |
 
 **Good for:** Law firms, accounting firms, consultancies.
-**Industries:** Professional services, B2B.
 
 ---
 
@@ -76,7 +76,6 @@ A structured footer/contact section that displays business information, hours, n
 | Block 3 — social_block | Title: "Stay Connected" |
 
 **Good for:** Boutiques, gift shops, home goods stores.
-**Industries:** Retail, e-commerce with a physical location.
 
 ---
 
@@ -94,7 +93,6 @@ A structured footer/contact section that displays business information, hours, n
 | Block 3 — social_block | Title: "Follow" |
 
 **Good for:** Design studios, marketing agencies, freelancers.
-**Industries:** Creative services, tech, media.
 
 ---
 
@@ -111,7 +109,6 @@ A structured footer/contact section that displays business information, hours, n
 | Block 4 — menu_block | Title: "Resources". Menu: links to Forms, Insurance, FAQ. |
 
 **Good for:** Dental offices, physiotherapy clinics, veterinary practices.
-**Industries:** Healthcare, wellness.
 
 ---
 
@@ -129,7 +126,6 @@ A structured footer/contact section that displays business information, hours, n
 | Block 4 — social_block | Title: "Connect" |
 
 **Good for:** Nonprofits, churches, community centers, clubs.
-**Industries:** Civic, nonprofit, education.
 
 ---
 
@@ -145,7 +141,6 @@ A structured footer/contact section that displays business information, hours, n
 | Block 3 — menu_block | Title: "Services". Menu: links to Plumbing, Electrical, HVAC, etc. |
 
 **Good for:** Plumbers, electricians, landscapers, cleaning services.
-**Industries:** Trades, home services.
 
 ---
 
@@ -158,3 +153,4 @@ A structured footer/contact section that displays business information, hours, n
 - **Omit the heading group for footers.** When the widget lives in the global footer, leaving eyebrow/title/description blank produces a cleaner result that feels structural rather than promotional.
 - **Use heading_alignment start for editorial sites** and center for hospitality or event-driven brands. Left alignment pairs well with dropping the eyebrow and letting the info block title serve as the primary anchor.
 - **Three blocks is often enough.** Not every site needs all four slots. A trades business with no social presence is better off with info + hours + services than adding an empty social block.
+- **Never place contact-details as the last widget on a page right above the footer.** The global footer already carries address, hours, links, and social icons. Stacking contact-details immediately above it creates visual and informational redundancy — the visitor sees the same content twice. Instead, end pages with an action-bar CTA, testimonial, or other conversion widget and let the footer handle the contact details. If you need contact info mid-page, place this widget earlier in the flow where it serves as a section, not a footer duplicate.

@@ -11,8 +11,8 @@ A single responsive image with optional link wrapping, full-width bleed support,
 | **image** | Any uploaded image | The displayed photo or graphic. Falls back to a placeholder silhouette when empty. |
 | **link** | URL + optional `_blank` target | Wraps the image in an anchor. On hover the image fades to 90 % opacity, signaling clickability. |
 | **fullwidth** | `true` / `false` (default false) | **Off:** image is capped at `--container-max-width` with `border-radius: var(--radius-lg)` rounded corners, centered on the page. **On:** image bleeds edge-to-edge with no rounding and no max-width constraint. |
-| **top_spacing** | `auto` (default) / `none` | `auto` uses the theme's standard section gap above the widget. `none` collapses it to zero -- useful for butting images directly against the section above. |
-| **bottom_spacing** | `auto` (default) / `none` | Same as top_spacing but for the gap below the widget. |
+| **top_spacing** | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| **bottom_spacing** | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -34,7 +34,6 @@ None. This widget has no repeatable block slots -- it renders exactly one image 
 | link | (empty) |
 
 **Good for:** Landing pages that need an immersive first impression right below the header.
-**Industries:** Hotels and resorts, architecture studios, event venues, real estate agencies.
 **Tip:** Pair with a preceding "Hero" or "Banner" text widget and remove spacing on both so the photo feels continuous with the headline.
 
 ### 2. Contained Portfolio Showcase
@@ -47,7 +46,6 @@ None. This widget has no repeatable block slots -- it renders exactly one image 
 | link | (empty) |
 
 **Good for:** Displaying a single standout project photo between text sections -- the rounded corners and centered max-width keep it feeling editorial rather than raw.
-**Industries:** Photography studios, interior designers, landscaping companies, artisan bakeries.
 **Tip:** Stack several of these between Richtext widgets to build a case-study page that reads like a magazine feature.
 
 ### 3. Clickable Promo Banner
@@ -60,7 +58,6 @@ None. This widget has no repeatable block slots -- it renders exactly one image 
 | link | `/specials` or external URL, target `_blank` for external |
 
 **Good for:** Seasonal sale banners, event announcements, or sponsor graphics that need to link out.
-**Industries:** Retail shops, restaurants (holiday menus), fitness studios (class sign-ups), auto detailers.
 **Tip:** Design the image itself with a clear call-to-action baked in (e.g., "Book Now -- Spring Special"). The subtle hover opacity shift tells visitors it is clickable without needing a separate button.
 
 ### 4. Tight Image + Text Stack
@@ -73,7 +70,6 @@ None. This widget has no repeatable block slots -- it renders exactly one image 
 | link | (empty) |
 
 **Good for:** Sandwiching a photo tightly between a heading widget above and a paragraph widget below, creating a compact content card feel within the page flow.
-**Industries:** Coffee roasters (bean origin photos), salons (before/after), dog groomers, florists.
 **Tip:** Removing both spacings lets the rounded image sit snugly against neighboring widgets -- visually groups the trio as one cohesive block.
 
 ### 5. Full-Bleed Section Divider
@@ -86,7 +82,6 @@ None. This widget has no repeatable block slots -- it renders exactly one image 
 | link | (empty) |
 
 **Good for:** Breaking up long pages with a dramatic full-width photograph that acts as a visual breather between content sections.
-**Industries:** Wineries, spas, coworking spaces, wedding planners.
 **Tip:** Use a wide-aspect landscape image (at least 4:1 ratio) so it reads as a cinematic strip rather than a towering block. The standard auto spacing above and below keeps it from colliding with adjacent text.
 
 ### 6. Linked Logo or Partner Badge (Contained)
@@ -99,7 +94,6 @@ None. This widget has no repeatable block slots -- it renders exactly one image 
 | link | Partner or certification URL, target `_blank` |
 
 **Good for:** Displaying a single certification badge, award logo, or partner emblem that links to the issuing organization.
-**Industries:** Contractors (licensed/insured badges), dental offices (ADA member), organic farms (USDA certification), law firms (bar association).
 **Tip:** The contained mode with rounded corners gives the badge a polished card-like presentation. For multiple logos, use a gallery or columns widget instead.
 
 ---

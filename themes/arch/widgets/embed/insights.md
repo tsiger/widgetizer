@@ -11,15 +11,16 @@ A flexible container for injecting raw HTML, iframes, or third-party embed codes
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (blank by default) | Small label above the title; adds a subtle category or context tag above the embed |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Watch Our Video") | Large headline rendered as `<h1>` when widget is first on page, `<h2>` otherwise |
 | `description` | Any text (default placeholder sentence) | Supporting paragraph below the title, sets expectation for the embedded content |
-| `heading_alignment` | `start`, `center` | Shifts eyebrow/title/description to the left edge or centers them above the embed |
+| `heading_alignment` | `start`, `center` (default) | Shifts eyebrow/title/description to the left edge or centers them above the embed |
 | `code` | Raw HTML / iframe / embed snippet | The actual embedded content; rendered unescaped inside the embed wrapper |
 | `max_width` | `narrow`, `medium`, `wide`, `fullwidth` | Controls horizontal spread of the content area (maps to `widget-content-sm/md/lg` or no cap) |
 | `alignment` | `start`, `center`, `end` | Positions the embed block horizontally within its container via flexbox alignment |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Changes background and text color palette; non-standard schemes add padded container |
-| `top_spacing` | `auto`, `none` | Removes default top padding when set to `none`; useful for stacking widgets tightly |
-| `bottom_spacing` | `auto`, `none` | Removes default bottom padding when set to `none`; useful for stacking widgets tightly |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -42,12 +43,11 @@ This widget has no blocks. All content is controlled through settings alone.
 | `code` | YouTube or Vimeo iframe |
 | `max_width` | wide |
 | `alignment` | center |
-| `color_scheme` | standard |
+| `color_scheme` | standard-primary |
 | `top_spacing` | auto |
 | `bottom_spacing` | auto |
 
 **Good for:** Above-the-fold product or brand video that immediately shows the business in motion.
-**Industries:** Woodworking shops, renovation contractors, custom fabricators, artisan bakeries.
 
 ---
 
@@ -62,12 +62,11 @@ This widget has no blocks. All content is controlled through settings alone.
 | `code` | Calendly / Acuity inline embed |
 | `max_width` | medium |
 | `alignment` | center |
-| `color_scheme` | highlight |
+| `color_scheme` | highlight-primary |
 | `top_spacing` | auto |
 | `bottom_spacing` | auto |
 
 **Good for:** Dedicated scheduling section on a services page so visitors can book without leaving the site.
-**Industries:** Hair salons, dental offices, personal trainers, consultants, photography studios.
 
 ---
 
@@ -82,12 +81,11 @@ This widget has no blocks. All content is controlled through settings alone.
 | `code` | Google Maps iframe (fixed height, 100% width) |
 | `max_width` | fullwidth |
 | `alignment` | start |
-| `color_scheme` | standard |
+| `color_scheme` | standard-primary |
 | `top_spacing` | none |
 | `bottom_spacing` | none |
 
 **Good for:** Contact or footer area where the map spans the full width and the heading sits left-aligned like an address block.
-**Industries:** Restaurants, retail stores, auto repair shops, real estate offices.
 
 ---
 
@@ -107,7 +105,6 @@ This widget has no blocks. All content is controlled through settings alone.
 | `bottom_spacing` | auto |
 
 **Good for:** A social media gallery section that keeps the site feeling current without manual updates.
-**Industries:** Florists, event planners, fitness studios, boutique clothing shops, food trucks.
 
 ---
 
@@ -127,7 +124,6 @@ This widget has no blocks. All content is controlled through settings alone.
 | `bottom_spacing` | auto |
 
 **Good for:** A focused, trust-building section that pulls live reviews from a third-party platform.
-**Industries:** Plumbers, electricians, cleaning services, accountants, veterinary clinics.
 
 ---
 
@@ -142,12 +138,11 @@ This widget has no blocks. All content is controlled through settings alone.
 | `code` | Stripe Payment Links iframe or PayPal donate button embed |
 | `max_width` | narrow |
 | `alignment` | center |
-| `color_scheme` | highlight |
+| `color_scheme` | highlight-primary |
 | `top_spacing` | auto |
 | `bottom_spacing` | auto |
 
 **Good for:** A contained, centered payment form that feels intentional rather than bolted on.
-**Industries:** Nonprofits, churches, community organizations, youth sports leagues, animal shelters.
 
 ---
 

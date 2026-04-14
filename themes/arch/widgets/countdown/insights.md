@@ -9,17 +9,19 @@ A time-based countdown section that ticks toward a target date, displaying days/
 | Setting | Values | Visual Effect |
 |---|---|---|
 | `eyebrow` | Any text (blank by default) | Small label above the headline -- adds context like "Limited Time" or "Grand Opening" |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text (default "Coming Soon") | Main headline rendered as h1 (first widget) or h2 |
 | `description` | Any text (blank by default) | Paragraph below the headline for extra detail |
-| `heading_alignment` | `start` | Centers or left-aligns the entire block including the timer digits |
+| `heading_alignment` | `start`, `center` (default) | Centers or left-aligns the entire block including the timer digits |
 | `target_date` | Datetime string, e.g. `2027-01-01 00:00` | The moment the counter reaches zero |
 | `expired_message` | Any text (default "The wait is over!") | Accent-colored message that replaces the digits once the target passes |
+| `text` | Richtext (blank by default) | Additional richtext content below the timer and above the button. Good for extra details, terms, or a short promotional message |
 | `button` | Link object (text + href + optional target) | CTA button below the timer; hidden when text is blank |
 | `show_seconds` | `true` (default) / `false` | Adds or removes the seconds column and its separator |
 | `style` | `cards` (default), `minimal` | Cards: bordered rounded boxes per unit. Minimal: larger bare numbers separated by colons |
 | `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Controls background and card fill; accent variants give cards a secondary background |
-| `top_spacing` | `auto` (default), `none` | Removes top section padding so the widget can sit flush against the section above |
-| `bottom_spacing` | `auto` (default), `none` | Removes bottom section padding for the same flush effect downward |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -45,27 +47,25 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `heading_alignment` | `center` |
 
 **Good for:** Building anticipation for a physical location launch.
-**Industries:** Restaurants, retail shops, fitness studios, salons, co-working spaces.
 
 ---
 
-### 2. Flash Sale Urgency Strip
+### 2. Limited-Time Promotion Strip
 
 | Setting | Value |
 |---|---|
-| `eyebrow` | "Ends Tonight" |
-| `title` | "Summer Flash Sale" |
+| `eyebrow` | "Ends This Weekend" |
+| `title` | "20% Off All Services" |
 | `description` | (blank) |
 | `style` | `minimal` |
 | `color_scheme` | `standard-secondary` |
-| `button` | "Shop Now" linking to product catalog |
+| `button` | "Book Now" linking to contact/booking page |
 | `show_seconds` | `true` |
 | `top_spacing` | `none` |
 | `bottom_spacing` | `none` |
 | `heading_alignment` | `start` |
 
-**Good for:** Short-duration promotions where the ticking seconds create real urgency.
-**Industries:** E-commerce, boutiques, online course creators, SaaS with limited-time pricing.
+**Good for:** Short-duration promotions where the ticking clock creates real urgency.
 
 ---
 
@@ -83,26 +83,24 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `heading_alignment` | `center` |
 
 **Good for:** Driving early registrations by making the cutoff date tangible.
-**Industries:** Nonprofits, conferences, community organizations, wedding planners.
 
 ---
 
-### 4. Product / Service Launch Teaser
+### 4. New Service or Location Launch
 
 | Setting | Value |
 |---|---|
-| `eyebrow` | (blank) |
-| `title` | "Something New Is Brewing" |
-| `description` | "Sign up to be the first to know." |
+| `eyebrow` | "Coming Soon" |
+| `title` | "New Location in Westside" |
+| `description` | "We're expanding. Be the first to book at our new studio." |
 | `style` | `minimal` |
 | `color_scheme` | `highlight-secondary` |
-| `button` | "Join the Waitlist" linking to email signup |
-| `show_seconds` | `true` |
+| `button` | "Get Notified" linking to contact page |
+| `show_seconds` | `false` |
 | `heading_alignment` | `center` |
-| `expired_message` | "It's here -- check it out!" |
+| `expired_message` | "We're open -- book your first visit!" |
 
-**Good for:** Pre-launch hype pages where the countdown doubles as an email capture moment.
-**Industries:** Craft breweries, tech startups, skincare brands, indie game studios.
+**Good for:** Building anticipation for a new location, service, or menu launch.
 
 ---
 
@@ -120,26 +118,24 @@ This widget has no configurable blocks. All content is controlled through top-le
 | `heading_alignment` | `start` |
 
 **Good for:** Seasonal rotations where you want repeat visitors checking back.
-**Industries:** Restaurants, bakeries, cafes, catering companies, florists.
 
 ---
 
-### 6. Maintenance / Downtime Notice
+### 6. Class or Workshop Registration Deadline
 
 | Setting | Value |
 |---|---|
-| `eyebrow` | "Scheduled Maintenance" |
-| `title` | "We'll Be Back Shortly" |
-| `description` | "We're upgrading our systems. Everything will be back to normal soon." |
-| `style` | `minimal` |
+| `eyebrow` | "Spots Limited" |
+| `title` | "Fall Workshop Series" |
+| `description` | "Registration closes when the timer hits zero. Reserve your spot today." |
+| `style` | `cards` |
 | `color_scheme` | `standard-primary` |
-| `button` | "Check Status" linking to status page |
-| `show_seconds` | `true` |
+| `button` | "Register Now" linking to booking page |
+| `show_seconds` | `false` |
 | `heading_alignment` | `center` |
-| `expired_message` | "We're back online!" |
+| `expired_message` | "Registration is closed — join the waitlist for the next session." |
 
-**Good for:** Temporary holding pages during planned downtime that keep visitors informed instead of confused.
-**Industries:** Any service-based business, SaaS platforms, booking sites, membership portals.
+**Good for:** Driving enrollment for classes, workshops, or seasonal programs with a firm cutoff.
 
 ---
 

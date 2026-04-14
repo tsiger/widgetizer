@@ -9,17 +9,18 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 | Setting | Values | Visual Effect |
 |---------|--------|---------------|
 | `eyebrow` | Any text | Small label above the headline; leave blank to hide entirely |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
 | `title` | Any text | Main headline; renders as `h1` when widget is first on the page, `h2` otherwise |
 | `description` | Any text | Supporting paragraph below the headline |
-| `heading_alignment` | `start` / `center` | Controls whether the eyebrow-title-description block aligns left or centers within its column |
-| `content_position` | `start` / `end` | Determines which column holds the heading block; the feature list takes the opposite side. On `right`, the divider border flips to the right edge of the list |
-| `show_divider` | on / off | Toggles a thin vertical border on the feature-list side, adding a clean editorial separation between the two columns |
-| `icon_style` | `plain` / `outline` / `filled` | Changes icon rendering: bare icon, outlined container, or solid-filled container |
-| `icon_size` | `sm` / `md` / `lg` / `xl` | Scales the icon; `xl` default gives the icons visual weight as anchor points |
-| `icon_shape` | `sharp` / `rounded` / `circle` | Container corner style when using outline or filled icon styles |
-| `color_scheme` | `standard-primary` / `standard-secondary` / `highlight-primary` / `highlight-secondary` | Background and text treatment; non-standard schemes add section padding and a visible background color |
-| `top_spacing` | `auto` / `none` | Removes top padding when `none`, useful for stacking sections tightly |
-| `bottom_spacing` | `auto` / `none` | Removes bottom padding when `none` |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the eyebrow-title-description block aligns left or centers within its column |
+| `content_position` | `start` (default), `end` | Determines which column holds the heading block; the feature list takes the opposite side. When set to `end`, the divider border flips to the right edge of the list |
+| `show_divider` | `true` (default) / `false` | Toggles a thin vertical border on the feature-list side, adding a clean editorial separation between the two columns |
+| `icon_style` | `plain` (default), `outline`, `filled` | Changes icon rendering: bare icon, outlined container, or solid-filled container |
+| `icon_size` | `sm`, `md`, `lg`, `xl` (default) | Scales the icon; `xl` default gives the icons visual weight as anchor points |
+| `icon_shape` | `sharp`, `rounded`, `circle` (default) | Container corner style when using outline or filled icon styles |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | Background and text treatment; non-standard schemes add section padding and a visible background color |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
 
 ---
 
@@ -33,23 +34,21 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 ## Layout Recipes
 
-### 1. Market Segments Overview
+### 1. Who We Serve
 
-**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: standard`
-**Blocks:** 3 features (e.g., Individuals, Small Business, Enterprise)
+**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: xl`, `icon_shape: circle`, `color_scheme: standard-primary`
+**Blocks:** 3 features (e.g., Homeowners, Property Managers, Commercial Buildings)
 
 **Good for:** Communicating that the business serves distinct customer types, each with tailored value.
-**Industries:** B2B SaaS, consulting firms, insurance agencies, managed IT services.
 
 ---
 
 ### 2. Core Services Breakdown
 
-**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: outline`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: highlight`
-**Blocks:** 4 features (e.g., Design, Development, Marketing, Support)
+**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: outline`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: highlight-primary`
+**Blocks:** 4 features (e.g., Cuts & Color, Extensions, Treatments, Bridal)
 
 **Good for:** A services page where the heading side carries a strong value proposition and the list side enumerates what the business actually delivers.
-**Industries:** Digital agencies, architecture studios, engineering consultancies, freelance professionals.
 
 ---
 
@@ -59,17 +58,15 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 **Blocks:** 3-4 features (e.g., 24/7 Support, No Contracts, Local Team, Certified Experts)
 
 **Good for:** A compact trust-building section near the bottom of a homepage where the heading asks a question and the features answer it.
-**Industries:** Home services (plumbing, HVAC, electrical), auto repair shops, cleaning companies, pest control.
 
 ---
 
 ### 4. Process Steps
 
-**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard`
+**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: true`, `icon_style: filled`, `icon_size: md`, `icon_shape: sharp`, `color_scheme: standard-primary`
 **Blocks:** 3-5 features using numbered or sequential icons (e.g., clipboard, wrench, check-circle)
 
 **Good for:** Explaining a linear workflow so the visitor knows what to expect after contacting the business. The vertical divider line reinforces the sequential nature.
-**Industries:** Law firms, accounting practices, custom fabrication, home renovation contractors.
 
 ---
 
@@ -79,27 +76,24 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 **Blocks:** 3 features (e.g., Downtown Office, Westside Clinic, Mobile Unit)
 
 **Good for:** Multi-location businesses that need to convey where they operate with a brief note about each location's specialties or hours.
-**Industries:** Dental practices, veterinary clinics, fitness studios, real estate brokerages.
 
 ---
 
-### 6. Product Tier Comparison (Lightweight)
+### 6. Membership Tiers Overview
 
-**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: false`, `icon_style: filled`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: standard`
-**Blocks:** 3 features (e.g., Starter, Professional, Premium) with brief descriptions of what each includes
+**Settings:** `heading_alignment: start`, `content_position: start`, `show_divider: false`, `icon_style: filled`, `icon_size: lg`, `icon_shape: rounded`, `color_scheme: standard-primary`
+**Blocks:** 3 features (e.g., Drop-In, Monthly, Unlimited) with brief descriptions of what each includes
 
 **Good for:** A softer alternative to a full pricing table when the business wants to outline tiers without showing prices publicly.
-**Industries:** SaaS products, subscription box services, membership-based gyms, co-working spaces.
 
 ---
 
 ### 7. Audience-Specific Value Props
 
-**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: plain`, `icon_size: lg`, `icon_shape: circle`, `color_scheme: highlight`
-**Blocks:** 2-3 features (e.g., For Parents, For Teachers, For Administrators)
+**Settings:** `heading_alignment: center`, `content_position: start`, `show_divider: true`, `icon_style: plain`, `icon_size: lg`, `icon_shape: circle`, `color_scheme: highlight-primary`
+**Blocks:** 2-3 features (e.g., For Adults, For Kids, For Seniors)
 
-**Good for:** Quickly segmenting messaging when a single product serves multiple user groups with different pain points.
-**Industries:** EdTech, childcare centers, non-profits, community organizations, healthcare platforms.
+**Good for:** Quickly segmenting messaging when a single business serves multiple audience groups with different needs.
 
 ---
 

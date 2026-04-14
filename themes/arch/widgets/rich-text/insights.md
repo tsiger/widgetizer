@@ -9,8 +9,10 @@ Flexible text content section that stacks headings, body copy, and call-to-actio
 | text_alignment | `start` (default), `center`, `end` | Aligns the entire content column left, center, or right within the section |
 | content_width | `narrow`, `medium` (default), `wide`, `fullwidth` | Controls the max-width of the text column; narrow creates a focused reading lane, fullwidth spans the entire container |
 | color_scheme | `standard-primary` (default), `standard-secondary`, `highlight-primary`, `highlight-secondary` | Swaps background and text colors; non-standard schemes add padded container backgrounds via `--widget-bg-color` |
-| top_spacing | `auto` (default), `none` | Removes the top padding/margin when set to none; useful for stacking sections edge-to-edge |
-| bottom_spacing | `auto` (default), `none` | Removes the bottom padding/margin when set to none; pairs with top_spacing for seamless color-band transitions |
+| image | image upload | Optional background image for the section |
+| overlay_color | color with alpha (default `#0a1e38bf`) | Tints the background image with a semi-transparent overlay for text readability |
+| top_spacing | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| bottom_spacing | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
 
 ## Available blocks
 
@@ -18,6 +20,7 @@ Flexible text content section that stacks headings, body copy, and call-to-actio
 |---|---|---|
 | heading | `text` (plain string), `size` (lg through 9xl, default 2xl) | Renders as `<h1>` when the widget is first on the page (index 1), otherwise `<h2>`; auto-escaped, no HTML allowed |
 | text | `text` (richtext/HTML), `size` (sm, base, lg), `uppercase` (bool), `muted` (bool) | Output uses `| raw` so DOMPurify-sanitized HTML is rendered; muted reduces opacity, uppercase transforms casing |
+| countdown | `target_date` (text, default "2027-01-01 00:00"), `expired_message` (text), `show_seconds` (bool, default true) | Displays a live countdown timer to the target date; shows the expired message once the date passes |
 | button | `link` + `link_2` (text, href, target), `style` / `style_2` (primary, secondary), `size` (small, medium, large, xlarge) | Supports up to two side-by-side buttons; either link can be left blank to show a single CTA; size applies to both buttons equally |
 
 ## Layout recipes
@@ -26,43 +29,36 @@ Flexible text content section that stacks headings, body copy, and call-to-actio
 Settings: text_alignment `center`, content_width `medium`, color_scheme `highlight-primary`.
 Blocks: heading (size 5xl or 6xl) + text (size lg) + button (primary "Get Started" + secondary "Learn More", size large).
 Good for: making a strong first impression with a concise value proposition.
-Industries: SaaS landing pages, creative agencies, tech startups.
 
 **2. "About us narrative" (about page or mid-page story section)**
 Settings: text_alignment `start`, content_width `narrow`, color_scheme `standard-primary`.
 Blocks: heading (size 2xl) + text (size base, muted off) + text (size base, muted on for a secondary paragraph).
 Good for: longer readable prose where a narrow measure improves line length and readability.
-Industries: law firms, consulting practices, nonprofits, architecture studios.
 
 **3. "Announcement banner" (promotions, seasonal notices)**
 Settings: text_alignment `center`, content_width `wide`, color_scheme `highlight-secondary`, top_spacing `none`, bottom_spacing `none`.
 Blocks: heading (size xl) + text (size sm, uppercase on) + button (primary, size small).
 Good for: a compact, eye-catching color band that interrupts the page flow to highlight a time-sensitive offer.
-Industries: retail shops, restaurants, event venues, salons.
 
 **4. "Policy / legal text" (terms, privacy, refund pages)**
 Settings: text_alignment `start`, content_width `medium`, color_scheme `standard-primary`.
 Blocks: heading (size 2xl) + multiple text blocks (size base, muted off) stacked sequentially.
 Good for: long-form structured content that needs clear hierarchy without visual distraction.
-Industries: e-commerce, healthcare clinics, financial advisors, any business with compliance pages.
 
 **5. "Centered mission statement" (nonprofit or brand manifesto)**
 Settings: text_alignment `center`, content_width `narrow`, color_scheme `standard-secondary`.
 Blocks: heading (size 3xl) + text (size lg, muted on).
 Good for: a single impactful sentence or short paragraph that communicates purpose; the accent background adds subtle visual separation.
-Industries: nonprofits, churches, environmental orgs, community foundations.
 
 **6. "CTA strip" (conversion section between content blocks)**
 Settings: text_alignment `center`, content_width `medium`, color_scheme `highlight-primary`, top_spacing `none`, bottom_spacing `none`.
 Blocks: heading (size xl) + button (primary, size xlarge).
 Good for: a punchy call-to-action that sits between two other sections and drives clicks without paragraph text.
-Industries: gyms, online courses, subscription boxes, freelance portfolios.
 
 **7. "Feature explainer intro" (top of a features or services page)**
 Settings: text_alignment `start`, content_width `wide`, color_scheme `standard-primary`.
 Blocks: heading (size 3xl) + text (size lg) + button (secondary "View All Services", size medium).
 Good for: setting context before a grid of feature cards or service tiles below; the wide width gives breathing room alongside sidebars.
-Industries: IT services, marketing agencies, home improvement contractors, dental practices.
 
 ## Differentiation tips
 

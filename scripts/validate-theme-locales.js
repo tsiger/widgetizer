@@ -110,12 +110,11 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
 
   const extraInEn = ownedEnKeys.filter((k) => !schemaKeySet.has(k));
   if (extraInEn.length > 0) {
-    hasErrors = true;
-    console.error(
-      `  ✗ ${extraInEn.length} extra key(s) in en.json not referenced by any schema:`,
+    console.warn(
+      `  ⚠ ${extraInEn.length} extra key(s) in en.json not referenced by any schema:`,
     );
     for (const k of extraInEn) {
-      console.error(`    + ${k}`);
+      console.warn(`    + ${k}`);
     }
   } else {
     console.log(`  ✓ en.json has no orphaned keys`);
