@@ -1,0 +1,231 @@
+{
+  "name": "Pricing",
+  "slug": "pricing",
+  "widgets": {
+    "pricing_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "pricing-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Membership Plans",
+            "size": "6xl"
+          }
+        },
+        "pricing-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Simple pricing, no hidden fees. Every membership includes full facility access and group classes.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["pricing-heading", "pricing-text"]
+    },
+    "membership_plans": {
+      "type": "pricing",
+      "settings": {
+        "title": "Choose Your Plan",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "plan-1": {
+          "type": "plan",
+          "settings": {
+            "title": "Day Pass",
+            "price": "$15",
+            "period": "per visit",
+            "features": "+Full facility access\n+All group classes\n+Locker room & showers\n-Personal training sessions\n-Nutrition coaching",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Buy a Pass",
+              "target": "_self"
+            }
+          }
+        },
+        "plan-2": {
+          "type": "plan",
+          "settings": {
+            "title": "Monthly",
+            "price": "$79",
+            "period": "per month",
+            "features": "+Full facility access\n+All group classes\n+Locker room & showers\n+1 personal training session\n+Monthly progress check-in",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Start Free Trial",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "plan-3": {
+          "type": "plan",
+          "settings": {
+            "title": "Annual",
+            "price": "$59",
+            "period": "per month, billed yearly",
+            "features": "+Full facility access\n+All group classes\n+Locker room & showers\n+2 personal training sessions/month\n+Nutrition coaching included",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Start Free Trial",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["plan-1", "plan-2", "plan-3"]
+    },
+    "membership_perks": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Included",
+        "eyebrow_uppercase": true,
+        "title": "Every Membership Includes",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "perk-1": {
+          "type": "card",
+          "settings": {
+            "icon": "barbell",
+            "title": "Full Equipment Access",
+            "description": "<p>Free weights, machines, cardio, Olympic platforms, and functional training areas.</p>"
+          }
+        },
+        "perk-2": {
+          "type": "card",
+          "settings": {
+            "icon": "users-group",
+            "title": "Unlimited Classes",
+            "description": "<p>Drop into any group class on the schedule at no extra cost.</p>"
+          }
+        },
+        "perk-3": {
+          "type": "card",
+          "settings": {
+            "icon": "device-mobile",
+            "title": "Member App",
+            "description": "<p>Book classes, track workouts, and manage your membership from your phone.</p>"
+          }
+        },
+        "perk-4": {
+          "type": "card",
+          "settings": {
+            "icon": "parking",
+            "title": "Free Parking",
+            "description": "<p>Dedicated member parking right at the front door.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["perk-1", "perk-2", "perk-3", "perk-4"]
+    },
+    "pricing_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "eyebrow_uppercase": true,
+        "title": "Common Questions",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "How does the free trial work?",
+            "answer": "<p>Your first session is completely free with no commitment. Just show up, train with us, and see if Olympic is the right fit. No credit card required.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Can I cancel my membership anytime?",
+            "answer": "<p>Monthly memberships can be cancelled with 30 days notice. No cancellation fees, no hassle. Annual memberships are billed upfront and are non-refundable after the first 30 days.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need to book classes in advance?",
+            "answer": "<p>We recommend booking through the member app to guarantee your spot, especially for popular evening classes. Walk-ins are welcome if space is available.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Is personal training included?",
+            "answer": "<p>Monthly members receive one personal training session per month. Annual members get two sessions per month. Additional sessions can be purchased separately.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer student or family discounts?",
+            "answer": "<p>Yes. We offer a 15% student discount with valid ID and family plans for households of two or more. Contact us for details.</p>"
+          }
+        },
+        "faq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still have questions?",
+            "text": "<p>Call us at (555) 738-0200 or drop by the gym. We are happy to show you around and answer anything in person.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-sidebar"]
+    },
+    "pricing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Start Your Free Trial Today",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Get Started",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["pricing_hero", "membership_plans", "membership_perks", "pricing_faq", "pricing_cta"],
+  "id": "pricing",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
+}

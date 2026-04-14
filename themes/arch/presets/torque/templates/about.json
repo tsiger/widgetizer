@@ -2,134 +2,169 @@
   "name": "About",
   "slug": "about",
   "widgets": {
-    "hero": {
-      "type": "banner",
+    "about_intro": {
+      "type": "split-hero",
       "settings": {
-        "image": "",
-        "height": "small",
-        "fullwidth": true,
-        "alignment": "center",
-        "vertical_alignment": "center",
-        "overlay_color": "#09090b99",
-        "color_scheme": "standard-secondary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
-      },
-      "blocks": {
-        "h": {
-          "type": "heading",
-          "settings": {
-            "text": "Built in Phoenix. Trusted on the road.",
-            "size": "3xl"
-          }
-        },
-        "t": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Torque started as a three-bay neighborhood shop and grew by word of mouth\u2014honest estimates, clean work, and techs who explain the \u201cwhy\u201d behind every line item.</p>",
-            "size": "base",
-            "muted": true
-          }
-        }
-      },
-      "blocksOrder": ["h", "t"]
-    },
-    "story": {
-      "type": "image-text",
-      "settings": {
-        "image": "",
         "image_position": "end",
-        "text_position": "center",
-        "content_color_scheme": "none",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
       },
       "blocks": {
-        "e": {
+        "about-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "<p>OUR STORY</p>",
+            "text": "<p>About Torque</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
           }
         },
-        "head": {
+        "about-heading": {
           "type": "heading",
           "settings": {
-            "text": "Independent shop. Dealership-grade discipline.",
+            "text": "Diagnostics First. Always.",
             "size": "3xl"
           }
         },
-        "txt": {
+        "about-text": {
           "type": "text",
           "settings": {
-            "text": "<p>We invest in factory scan tools, ADAS calibration partners, and continuous ASE training. That means accurate diagnostics without throwing parts at a problem\u2014and repairs that last.</p><p>Today we operate fourteen bays, a dedicated fleet coordinator, and a hybrid/EV lane with isolated high-voltage procedures.</p>",
+            "text": "<p>Torque started in 2008 with a simple idea: show customers what's actually wrong with their car before selling them a fix. We built our shop around transparency, documentation, and doing the job right the first time. Eighteen years later, that same principle drives every repair.</p>",
             "size": "base"
           }
         },
-        "btn": {
-          "type": "button",
+        "about-features": {
+          "type": "features",
           "settings": {
-            "link": {
-              "text": "Contact the shop",
-              "href": "contact.html",
-              "target": "_self"
-            },
-            "style": "secondary",
-            "size": "medium"
+            "features": "+ ASE-certified since day one\n+ Digital inspection reports on every vehicle\n+ No commission-based service advisors"
           }
         }
       },
-      "blocksOrder": ["e", "head", "txt", "btn"]
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-text", "about-features"]
     },
     "team": {
       "type": "profile-grid",
       "settings": {
-        "eyebrow": "Leadership",
-        "title": "Technicians you will talk to",
-        "description": "Certifications listed are representative; full roster available in-shop.",
+        "eyebrow": "Our Team",
+        "title": "Meet the Crew",
+        "description": "",
         "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3 / 4",
         "columns_desktop": 3,
         "layout": "grid",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
-        "p1": {
+        "profile-1": {
           "type": "profile",
           "settings": {
-            "photo": "",
-            "name": "Jordan Reyes",
-            "role": "Shop foreman",
-            "specialty": "ASE Master Automobile",
-            "bio": "Former dealership lead tech; focuses on drivability and electrical gremlins."
+            "name": "Mike Harmon",
+            "role": "Owner & Lead Technician",
+            "specialty": "ASE Master Certified",
+            "bio": "18 years of experience. Started Torque to prove auto repair can be honest and transparent."
           }
         },
-        "p2": {
+        "profile-2": {
           "type": "profile",
           "settings": {
-            "photo": "",
-            "name": "Sam Okonkwo",
-            "role": "Fleet coordinator",
-            "specialty": "Commercial PM programs",
-            "bio": "Builds PM calendars for courier and HVAC fleets across Maricopa County."
+            "name": "Carlos Reyes",
+            "role": "Senior Technician",
+            "specialty": "Diagnostics & Electrical",
+            "bio": "Factory-trained on European imports. The one who finds the problems nobody else can."
           }
         },
-        "p3": {
+        "profile-3": {
           "type": "profile",
           "settings": {
-            "photo": "",
-            "name": "Alyssa Park",
-            "role": "Hybrid & EV lead",
-            "specialty": "ASE L3 Hybrid / EV",
-            "bio": "Trains staff on HV safety and battery health testing protocols."
+            "name": "Jen Nakamura",
+            "role": "Service Advisor & Fleet Manager",
+            "specialty": "Fleet Programs",
+            "bio": "Your single point of contact for fleet accounts. Keeps 200+ vehicles on schedule."
           }
         }
       },
-      "blocksOrder": ["p1", "p2", "p3"]
+      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+    },
+    "values": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "Our Values",
+        "title": "What We Stand For",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "item",
+          "settings": {
+            "icon": "eye",
+            "title": "Transparency"
+          }
+        },
+        "value-2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Integrity"
+          }
+        },
+        "value-3": {
+          "type": "item",
+          "settings": {
+            "icon": "gauge",
+            "title": "Precision"
+          }
+        },
+        "value-4": {
+          "type": "item",
+          "settings": {
+            "icon": "users",
+            "title": "Community"
+          }
+        }
+      },
+      "blocksOrder": ["value-1", "value-2", "value-3", "value-4"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "about-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "See the Difference for Yourself",
+            "size": "2xl"
+          }
+        },
+        "about-cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Your First Visit",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["about-cta-heading", "about-cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "story", "team"],
+  "widgetsOrder": ["about_intro", "team", "values", "about_cta"],
   "id": "about",
-  "created": "2026-04-10T12:00:00.000Z",
-  "updated": "2026-04-10T12:00:00.000Z"
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
 }

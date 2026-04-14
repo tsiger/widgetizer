@@ -1,0 +1,146 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "contact-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get In Touch",
+            "size": "6xl"
+          }
+        },
+        "contact-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Have a project in mind? Tell us about it. We respond to every inquiry within 24 hours.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["contact-heading", "contact-text"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Working Together",
+        "eyebrow_uppercase": true,
+        "title": "What to Expect",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What does a typical project look like?",
+            "answer": "<p>Most projects run 8 to 16 weeks from kickoff to launch. We start with a discovery phase to define scope and priorities, move into design and prototyping, then build and deploy incrementally. You see working software every week, not just at the end.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How much does a project cost?",
+            "answer": "<p>Project budgets typically range from $15,000 to $80,000 depending on scope and complexity. We scope every project individually and provide a detailed estimate before any work begins. No surprises.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer ongoing support?",
+            "answer": "<p>Yes. After launch, we offer retainer-based support for maintenance, monitoring, bug fixes, and feature development. Most of our clients stay on a monthly retainer because products are never truly finished.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What is your availability?",
+            "answer": "<p>We take on 2 to 3 projects per quarter to ensure each client gets senior-level attention. If our schedule is full, we will let you know upfront and can discuss timeline options.</p>"
+          }
+        },
+        "faq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Reach Us Directly",
+            "text": "<p>hello@codebase.dev</p><p>(555) 912-3400</p><p>We respond within 24 hours on business days.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-sidebar"]
+    },
+    "location_map": {
+      "type": "map",
+      "settings": {
+        "title": "Where We Are",
+        "heading_alignment": "start",
+        "address": "712 NW Couch Street, Portland, OR 97209",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "map-info": {
+          "type": "info",
+          "settings": {
+            "title": "Studio Hours",
+            "text": "<p>Monday\u2013Friday: 9 AM \u2013 6 PM</p><p>We are also available for video calls across time zones.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["map-info"]
+    },
+    "contact_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to start?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Drop us a line. No pitch deck required.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "mailto:hello@codebase.dev",
+              "text": "Send an Email",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["contact_hero", "contact_faq", "location_map", "contact_cta"],
+  "id": "contact",
+  "created": "2026-04-14T12:00:00.000Z",
+  "updated": "2026-04-14T12:00:00.000Z"
+}

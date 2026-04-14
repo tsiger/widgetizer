@@ -2,201 +2,251 @@
   "name": "Programs",
   "slug": "programs",
   "widgets": {
-    "hero": {
+    "programs_hero": {
       "type": "banner",
       "settings": {
-        "image": "",
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
+        "content_width": "medium",
         "alignment": "center",
-        "vertical_alignment": "center",
-        "overlay_color": "#14532d8c",
-        "color_scheme": "highlight-primary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
-        "h": {
+        "programs-heading": {
           "type": "heading",
           "settings": {
-            "text": "Programs by age",
-            "size": "3xl"
+            "text": "Our Programs",
+            "size": "6xl"
           }
         },
-        "t": {
+        "programs-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Every classroom team includes a lead teacher with early childhood credentials and a dedicated aide.</p>",
-            "size": "base",
-            "muted": true
+            "text": "<p>Age-appropriate learning designed around how children actually grow. Every program balances structure with play, curiosity with care.</p>",
+            "size": "lg"
           }
         }
       },
-      "blocksOrder": ["h", "t"]
+      "blocksOrder": ["programs-heading", "programs-text"]
     },
-    "rooms": {
-      "type": "card-grid",
+    "programs_grid": {
+      "type": "checkerboard",
       "settings": {
-        "eyebrow": "Classrooms",
-        "title": "What each suite includes",
-        "description": "",
-        "heading_alignment": "start",
-        "layout": "grid",
+        "eyebrow": "By Age Group",
+        "eyebrow_uppercase": true,
+        "title": "What Each Program Looks Like",
+        "heading_alignment": "center",
         "columns_desktop": 2,
-        "card_layout": "box",
-        "alignment": "start",
-        "image_position": "top",
-        "aspect_ratio": "16 / 9",
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "r1": {
+        "tile-1": {
           "type": "card",
           "settings": {
-            "image": "",
-            "subtitle": "Infants",
-            "title": "Willow room",
-            "description": "<p>Separate sleep room with sound machines, bottle-prep kitchen visible to parents, and daily TummyTime lab notes.</p>",
-            "button_link": {
-              "text": "Ask about openings",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "title": "Infants (6 weeks \u2013 12 months)",
+            "description": "<p>Gentle sensory exploration, tummy time, and one-on-one bonding. Dedicated caregivers follow each baby's natural schedule for feeding, napping, and play. A calm, secure space that helps infants build trust and attachment.</p>"
           }
         },
-        "r2": {
+        "tile-2": {
           "type": "card",
           "settings": {
-            "image": "",
-            "subtitle": "Toddlers",
-            "title": "Maple room",
-            "description": "<p>Loft climbing, art easels at toddler height, and potty-training partnership with color-coded communication logs.</p>",
-            "button_link": {
-              "text": "Ask about openings",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "title": ""
           }
         },
-        "r3": {
+        "tile-3": {
           "type": "card",
           "settings": {
-            "image": "",
-            "subtitle": "Preschool",
-            "title": "Cedar studio",
-            "description": "<p>Loose-parts math, story acting, and a light table for pre-writing. Weekly library cart rotation.</p>",
-            "button_link": {
-              "text": "Ask about openings",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "title": ""
           }
         },
-        "r4": {
+        "tile-4": {
           "type": "card",
           "settings": {
-            "image": "",
-            "subtitle": "Pre-K",
-            "title": "Oak hall",
-            "description": "<p>Kindergarten readiness portfolios, journaling, and STEM Fridays with visiting scientists.</p>",
-            "button_link": {
-              "text": "Ask about openings",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "title": "Toddlers (1 \u2013 2 years)",
+            "description": "<p>Active discovery through music, movement, art, and early language. Structured routines build confidence and independence while giving toddlers the freedom to explore at their own pace. Small group sizes ensure every child is seen.</p>"
+          }
+        },
+        "tile-5": {
+          "type": "card",
+          "settings": {
+            "title": "Preschool (3 \u2013 4 years)",
+            "description": "<p>Play-based learning in literacy, math, science, and social skills. Daily circle time, creative projects, and outdoor exploration. Children learn to share, collaborate, and express themselves in a supportive environment.</p>"
+          }
+        },
+        "tile-6": {
+          "type": "card",
+          "settings": {
+            "title": ""
+          }
+        },
+        "tile-7": {
+          "type": "card",
+          "settings": {
+            "title": ""
+          }
+        },
+        "tile-8": {
+          "type": "card",
+          "settings": {
+            "title": "Pre-K (4 \u2013 5 years)",
+            "description": "<p>Kindergarten readiness through structured academics, problem-solving, and collaborative projects. Children practice letters, numbers, and early reading while developing the social and emotional skills they need to thrive in school.</p>"
           }
         }
       },
-      "blocksOrder": ["r1", "r2", "r3", "r4"]
+      "blocksOrder": ["tile-1", "tile-2", "tile-3", "tile-4", "tile-5", "tile-6", "tile-7", "tile-8"]
     },
-    "rhythm": {
-      "type": "steps",
+    "daily_schedule": {
+      "type": "schedule-table",
       "settings": {
-        "eyebrow": "Sample day",
-        "title": "Rhythm families feel",
-        "description": "Schedules flex for weather and moods\u2014this is a typical flow.",
-        "heading_alignment": "center",
+        "eyebrow": "A Typical Day",
+        "eyebrow_uppercase": true,
+        "title": "Sample Daily Schedule",
+        "description": "Each day follows a consistent rhythm of learning, play, meals, and rest. Here is what a typical preschool day looks like.",
+        "heading_alignment": "start",
+        "note": "Infant and toddler schedules follow each child's individual routine.",
+        "sidebar_position": "end",
+        "week_start_day": 1,
         "color_scheme": "standard-secondary"
       },
       "blocks": {
-        "s1": {
-          "type": "step",
+        "time-1": {
+          "type": "day",
           "settings": {
-            "title": "Arrival & connection",
-            "description": "<p>Greeting at the classroom door, hand washing, and a calm table invitation within five minutes.</p>"
+            "day": "7:00 \u2013 8:30 AM",
+            "hours": "Arrival and free play"
           }
         },
-        "s2": {
-          "type": "step",
+        "time-2": {
+          "type": "day",
           "settings": {
-            "title": "Exploration blocks",
-            "description": "<p>90-minute uninterrupted play with teacher scaffolding\u2014outdoors whenever possible.</p>"
+            "day": "8:30 \u2013 9:00 AM",
+            "hours": "Breakfast"
           }
         },
-        "s3": {
-          "type": "step",
+        "time-3": {
+          "type": "day",
           "settings": {
-            "title": "Nourishment",
-            "description": "<p>Family-style lunch and snacks prepared on-site; allergies tracked on tablets at every meal.</p>"
+            "day": "9:00 \u2013 10:30 AM",
+            "hours": "Circle time and guided learning"
           }
         },
-        "s4": {
-          "type": "step",
+        "time-4": {
+          "type": "day",
           "settings": {
-            "title": "Rest & reflection",
-            "description": "<p>Quiet story, nap or rest bags, then afternoon studio specials (music, Spanish, yoga).</p>"
+            "day": "10:30 \u2013 11:30 AM",
+            "hours": "Outdoor play and nature exploration"
+          }
+        },
+        "time-5": {
+          "type": "day",
+          "settings": {
+            "day": "11:30 AM \u2013 12:00 PM",
+            "hours": "Lunch"
+          }
+        },
+        "time-6": {
+          "type": "day",
+          "settings": {
+            "day": "12:00 \u2013 2:00 PM",
+            "hours": "Rest and quiet time"
+          }
+        },
+        "time-7": {
+          "type": "day",
+          "settings": {
+            "day": "2:00 \u2013 3:30 PM",
+            "hours": "Art, music, and creative projects"
+          }
+        },
+        "time-8": {
+          "type": "day",
+          "settings": {
+            "day": "3:30 \u2013 6:00 PM",
+            "hours": "Snack, outdoor play, and pickup"
+          }
+        },
+        "schedule-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Meals Included",
+            "text": "<p>Breakfast, lunch, and afternoon snack are provided daily. All meals are nut-free and we accommodate common dietary needs.</p>"
           }
         }
       },
-      "blocksOrder": ["s1", "s2", "s3", "s4"]
+      "blocksOrder": ["time-1", "time-2", "time-3", "time-4", "time-5", "time-6", "time-7", "time-8", "schedule-sidebar"]
     },
-    "faq": {
-      "type": "accordion",
+    "outdoor_section": {
+      "type": "image-text",
       "settings": {
-        "eyebrow": "",
-        "title": "Program questions",
-        "description": "",
-        "heading_alignment": "center",
-        "style": "separated",
-        "allow_multiple": true,
-        "sidebar_position": "end",
+        "image_position": "end",
+        "text_position": "center",
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "a1": {
-          "type": "item",
+        "outdoor-eyebrow": {
+          "type": "text",
           "settings": {
-            "question": "What is your sick policy?",
-            "answer": "<p>We follow Wisconsin child care exclusion guidelines. Temperatures 100.4\u00b0F+ require 24 hours fever-free before return.</p>"
+            "text": "<p>Beyond the Classroom</p>",
+            "size": "sm",
+            "uppercase": true
           }
         },
-        "a2": {
-          "type": "item",
+        "outdoor-heading": {
+          "type": "heading",
           "settings": {
-            "question": "Do you offer part-time?",
-            "answer": "<p>Three-day blocks for toddlers and preschool; infants require full-time enrollment due to continuity of care.</p>"
+            "text": "Learning Grows Outside Too",
+            "size": "4xl"
           }
         },
-        "a3": {
-          "type": "item",
+        "outdoor-text": {
+          "type": "text",
           "settings": {
-            "question": "How do cameras work?",
-            "answer": "<p>Live feeds are classroom-wide only, password protected, and disabled during nap and changing routines.</p>"
-          }
-        },
-        "side": {
-          "type": "info",
-          "settings": {
-            "title": "Want the full handbook?",
-            "text": "<p>Request a PDF after your tour or email <strong>hello@littleoaks.example</strong>.</p>"
+            "text": "<p>Our outdoor space includes a fenced play area, a small garden where children plant and tend vegetables, and natural materials for open-ended exploration. Every age group spends time outside daily, building physical skills and connecting with nature.</p>",
+            "size": "base"
           }
         }
       },
-      "blocksOrder": ["a1", "a2", "a3", "side"]
+      "blocksOrder": ["outdoor-eyebrow", "outdoor-heading", "outdoor-text"]
+    },
+    "programs_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "See our programs in person",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book a tour and visit the classrooms your child would be in.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Schedule a Tour",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "rooms", "rhythm", "faq"],
+  "widgetsOrder": ["programs_hero", "programs_grid", "daily_schedule", "outdoor_section", "programs_cta"],
   "id": "programs",
-  "created": "2026-04-10T16:00:00.000Z",
-  "updated": "2026-04-10T16:00:00.000Z"
+  "created": "2026-04-14T14:00:00.000Z",
+  "updated": "2026-04-14T14:00:00.000Z"
 }

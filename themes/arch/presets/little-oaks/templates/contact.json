@@ -2,196 +2,144 @@
   "name": "Contact",
   "slug": "contact",
   "widgets": {
-    "hero": {
+    "contact_hero": {
       "type": "banner",
       "settings": {
-        "image": "",
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
+        "content_width": "medium",
         "alignment": "center",
-        "vertical_alignment": "center",
-        "overlay_color": "#14532d99",
-        "color_scheme": "highlight-primary",
-        "top_spacing": "none",
-        "bottom_spacing": "small"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
-        "h": {
+        "contact-heading": {
           "type": "heading",
           "settings": {
             "text": "Visit Little Oaks",
-            "size": "4xl"
+            "size": "6xl"
           }
         },
-        "t": {
+        "contact-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Tours take about 45 minutes. Evening phone consults available for working parents.</p>",
-            "size": "base"
+            "text": "<p>We would love to meet your family. Schedule a tour or stop by during open hours to see our classrooms in action.</p>",
+            "size": "lg"
           }
         }
       },
-      "blocksOrder": ["h", "t"]
+      "blocksOrder": ["contact-heading", "contact-text"]
     },
-    "details": {
-      "type": "contact-details",
-      "settings": {
-        "eyebrow": "Get in touch",
-        "title": "We reply same day",
-        "description": "",
-        "heading_alignment": "start",
-        "color_scheme": "standard-primary"
-      },
-      "blocks": {
-        "info-1": {
-          "type": "info",
-          "settings": {
-            "title": "Campus",
-            "text": "<p>88 Oak Lane<br>Madison, WI 53703</p>"
-          }
-        },
-        "hours": {
-          "type": "text_block",
-          "settings": {
-            "title": "Office hours",
-            "text": "<p>(555) 317-4400<br>hello@littleoaks.example</p><p>Mon\u2013Fri 7:30 AM \u2013 6:00 PM</p>"
-          }
-        },
-        "menu-1": {
-          "type": "menu_block",
-          "settings": {
-            "title": "Quick links"
-          }
-        },
-        "social-1": {
-          "type": "social_block",
-          "settings": {
-            "title": "Community"
-          }
-        }
-      },
-      "blocksOrder": ["info-1", "hours", "menu-1", "social-1"]
-    },
-    "location": {
+    "location_map": {
       "type": "map",
       "settings": {
-        "eyebrow": "",
-        "title": "Map",
-        "description": "",
+        "title": "Find Us",
         "heading_alignment": "start",
-        "address": "88 Oak Lane, Madison, WI 53703",
-        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2918.0!2d-89.4!3d43.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDA0JzEyLjAiTiA4OcKwMjQnMDAuMCJX!5e0!3m2!1sen!2sus",
-        "directions_link": {
-          "text": "Open in Google Maps",
-          "href": "https://maps.google.com/?q=88+Oak+Lane+Madison+WI+53703",
-          "target": "_blank"
-        },
+        "address": "140 Maple Lane, Asheville, NC 28801",
         "height": "medium",
         "show_address": true,
         "sidebar_position": "end",
-        "color_scheme": "standard-secondary"
-      },
-      "blocks": {
-        "info-park": {
-          "type": "info",
-          "settings": {
-            "title": "Parking",
-            "text": "<p>Visitor spots in front of the oak tree; street parking on weekends.</p>"
-          }
-        },
-        "info-social": {
-          "type": "social",
-          "settings": {}
-        }
-      },
-      "blocksOrder": ["info-park", "info-social"]
-    },
-    "schedule": {
-      "type": "schedule-table",
-      "settings": {
-        "eyebrow": "Front desk",
-        "title": "Best times to call",
-        "description": "For urgent matters outside these hours, use the parent app messaging line.",
-        "heading_alignment": "start",
-        "note": "Closed on major federal holidays.",
-        "sidebar_position": "end",
-        "week_start_day": "1",
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "mon": {
-          "type": "day",
-          "settings": {
-            "day": "Monday",
-            "hours": "7:30 AM \u2013 6:00 PM",
-            "closed": false
-          }
-        },
-        "tue": {
-          "type": "day",
-          "settings": {
-            "day": "Tuesday",
-            "hours": "7:30 AM \u2013 6:00 PM",
-            "closed": false
-          }
-        },
-        "wed": {
-          "type": "day",
-          "settings": {
-            "day": "Wednesday",
-            "hours": "7:30 AM \u2013 6:00 PM",
-            "closed": false
-          }
-        },
-        "thu": {
-          "type": "day",
-          "settings": {
-            "day": "Thursday",
-            "hours": "7:30 AM \u2013 6:00 PM",
-            "closed": false
-          }
-        },
-        "fri": {
-          "type": "day",
-          "settings": {
-            "day": "Friday",
-            "hours": "7:30 AM \u2013 6:00 PM",
-            "closed": false
-          }
-        },
-        "sat": {
-          "type": "day",
-          "settings": {
-            "day": "Saturday",
-            "hours": "Tours only",
-            "closed": false
-          }
-        },
-        "sun": {
-          "type": "day",
-          "settings": {
-            "day": "Sunday",
-            "hours": "",
-            "closed": true
-          }
-        },
-        "side-info": {
+        "map-hours": {
           "type": "info",
           "settings": {
-            "title": "Need a same-week tour?",
-            "text": "<p>Text <strong>(555) 317-4401</strong> with your child\u2019s birth date and preferred program.</p>"
+            "title": "Hours",
+            "text": "<p>Monday\u2013Friday: 7 AM \u2013 6 PM</p><p>Saturday\u2013Sunday: Closed</p>"
           }
         },
-        "side-social": {
-          "type": "social",
-          "settings": {}
+        "map-visit": {
+          "type": "info",
+          "settings": {
+            "title": "Visiting",
+            "text": "<p>Tours are available Monday through Friday by appointment.</p><p>Free parking is available in the lot behind the building.</p>"
+          }
         }
       },
-      "blocksOrder": ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "side-info", "side-social"]
+      "blocksOrder": ["map-hours", "map-visit"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "First Visit",
+        "eyebrow_uppercase": true,
+        "title": "Before You Come In",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "What happens during a tour?",
+            "answer": "<p>We walk you through each classroom, introduce you to the teachers, and explain our curriculum and daily routine. Tours usually last about 30 minutes. Your child is welcome to come along.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How far in advance should I inquire?",
+            "answer": "<p>We recommend reaching out at least 2 to 3 months before your preferred start date, especially for infant spots. Some age groups fill quickly and maintain waitlists.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Can I observe a class before enrolling?",
+            "answer": "<p>Yes. After your initial tour, you are welcome to schedule a classroom observation during regular hours to see how a typical day unfolds.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What do I need to bring on my child's first day?",
+            "answer": "<p>We provide a welcome checklist after enrollment. Generally, you will need a change of clothes, a comfort item if your child uses one, and any necessary medications with written instructions.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
+    },
+    "contact_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Schedule your tour today",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call (555) 482-3100 or send us a message. We respond within one business day.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "mailto:hello@littleoaks.com",
+              "text": "Send a Message",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "details", "location", "schedule"],
+  "widgetsOrder": ["contact_hero", "location_map", "contact_faq", "contact_cta"],
   "id": "contact",
-  "created": "2026-04-10T16:00:00.000Z",
-  "updated": "2026-04-10T16:00:00.000Z"
+  "created": "2026-04-14T14:00:00.000Z",
+  "updated": "2026-04-14T14:00:00.000Z"
 }

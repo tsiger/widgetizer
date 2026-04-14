@@ -1,0 +1,124 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_info": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get in Touch",
+            "size": "4xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>(503) 555-0142</p><p>support@uplinkpdx.com</p><p>Monday \u2013 Friday: 8 AM \u2013 6 PM</p><p>Saturday: 9 AM \u2013 1 PM</p>",
+            "size": "base"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call Now",
+              "href": "tel:+15035550142",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text", "intro-button"]
+    },
+    "location_map": {
+      "type": "map",
+      "settings": {
+        "address": "2847 SE Hawthorne Blvd, Portland, OR 97214",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "map-info": {
+          "type": "info",
+          "settings": {
+            "title": "Service Area",
+            "text": "<p>Portland metro including Beaverton, Lake Oswego, Tigard, Hillsboro, and Gresham.</p><p>On-site visits throughout the metro area. Remote support available statewide.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["map-info"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "title": "Common Questions",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Emergency?",
+            "text": "<p>Managed clients with a priority plan can reach us 24/7 at (503) 555-0142.</p>"
+          }
+        },
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "title": "How fast can you get here?",
+            "text": "<p>For managed clients, remote support begins within 15 minutes during business hours. On-site visits are typically same-day. Break-fix clients are scheduled based on availability, usually within 24 hours.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "title": "What does managed IT cost?",
+            "text": "<p>Plans start at $99 per user per month and include monitoring, help desk, security, and backups. We scope every plan to the client — no two are exactly alike. Call us for a quote.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "title": "Do you support Mac and Linux?",
+            "text": "<p>Yes. Our team supports Windows, macOS, and common Linux distributions. Most of our managed clients run Windows, but we handle mixed environments regularly.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "title": "What happens if something breaks after hours?",
+            "text": "<p>Managed clients with a priority support plan have access to our emergency line 24/7. Break-fix clients are served during regular business hours, Monday through Friday.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "title": "Do you work with home offices?",
+            "text": "<p>Yes. We support remote workers, freelancers, and anyone who works from home and needs reliable IT. Same services, same response time, same team.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sidebar-info", "faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+    }
+  },
+  "widgetsOrder": ["contact_info", "location_map", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
+}

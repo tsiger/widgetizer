@@ -1,0 +1,19 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Codebase",
+    "contactDetailsLine1": "hello@codebase.dev",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Start a Project",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-primary"
+  }
+}

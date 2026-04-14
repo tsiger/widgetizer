@@ -1,0 +1,137 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1c1710b0",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "banner-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Story",
+            "size": "5xl"
+          }
+        },
+        "banner-text": {
+          "type": "text",
+          "settings": {
+            "text": "A 130-year-old house with a second life.",
+            "size": "lg",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["banner-heading", "banner-text"]
+    },
+    "property_story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Built in 1896, Reimagined for Today",
+            "size": "3xl"
+          }
+        },
+        "story-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The house was built as a family estate at the end of the nineteenth century, and it spent most of the twentieth century as a private home. When we found it in 2019, the bones were extraordinary — crown molding, wide-plank oak floors, a stone fireplace in every room, and windows that frame the valley like paintings.</p><p>We spent two years restoring what was already beautiful and adding what the house needed to welcome guests. New plumbing, modern bathrooms, a professional kitchen. But the original staircase, the hand-turned hardware, and the tower room with its panoramic view — those stayed exactly as they were.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-heading", "story-text"]
+    },
+    "hosts": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "hosts-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Meet Clara and James",
+            "size": "3xl"
+          }
+        },
+        "hosts-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We left Brooklyn in 2018 looking for a slower pace and a project that meant something. When we walked through the front door of this house for the first time, we knew we had found both.</p><p>Clara runs the kitchen and the garden. James handles the restoration work and the guests. Between us, we keep the place the way we would want to find it if we were the ones checking in — clean, warm, thoughtful, and honest about what it is: a beautiful old house that we are happy to share.</p>",
+            "size": "base"
+          }
+        },
+        "hosts-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get in Touch",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hosts-heading", "hosts-text", "hosts-button"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come Stay With Us",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'd love to show you around.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a Room",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["about_banner", "property_story", "hosts", "about_cta"],
+  "id": "about",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
+}

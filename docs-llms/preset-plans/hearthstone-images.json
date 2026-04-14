@@ -1,0 +1,164 @@
+[
+  {
+    "file": "hero-exterior.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Restored 1890s manor house exterior at golden hour, Hudson Valley countryside, warm evening light hitting stone and clapboard facade, wrap-around porch with wooden chairs, mature trees framing the building, manicured lawn in foreground, blue sky with warm clouds, shot from a slight distance to show the full property, warm color temperature, no people, no visible signage or text"
+  },
+  {
+    "file": "hero-suite.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Boutique hotel suite interior, king bed with white linen and layered neutral throws, tall windows with natural light streaming in, wide-plank hardwood floors, antique nightstand with fresh flowers, soft neutral palette with warm wood tones, gentle morning light, shot from the foot of the bed looking toward the windows, warm and inviting atmosphere, no people"
+  },
+  {
+    "file": "hero-breakfast.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Elegant breakfast table in a bright dining room, morning sunlight through tall windows, white tablecloth with fresh pastries, farm eggs, fruit bowl, coffee service, wildflowers in a ceramic vase, wooden chairs, warm and inviting atmosphere, overhead angle showing the spread, soft natural light, warm color temperature, no people"
+  },
+  {
+    "file": "welcome-property.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "Side view of a restored manor house porch and garden, wooden rocking chairs on the porch, climbing roses on a trellis, stone path leading to a garden gate, soft afternoon light, warm tones, shallow depth of field on foreground flowers, no people, portrait orientation"
+  },
+  {
+    "file": "room-garden.jpg",
+    "width": 960,
+    "height": 720,
+    "prompt": "Cozy hotel room with queen bed, white linens, soft green accent pillows, large window overlooking a garden, morning light, simple antique furniture, fresh flowers on a side table, warm wood floors, calm and restful atmosphere, shot from corner showing bed and window view, no people"
+  },
+  {
+    "file": "room-linden.jpg",
+    "width": 960,
+    "height": 720,
+    "prompt": "Spacious boutique hotel suite with king bed, white and cream linens, stone fireplace with a low fire, leather armchair nearby, tall ceilings with exposed beams, warm evening light from table lamps, rich warm wood tones, luxurious but not ostentatious, shot from a wide angle showing the full room, no people"
+  },
+  {
+    "file": "room-orchard.jpg",
+    "width": 960,
+    "height": 720,
+    "prompt": "Bright twin-bed hotel room, two single beds with white linens and light blue accents, large window with sheer curtains showing orchard trees outside, simple white walls, antique wooden dresser, morning sunlight, cheerful and airy atmosphere, shot from doorway showing the full room, no people"
+  },
+  {
+    "file": "room-tower.jpg",
+    "width": 960,
+    "height": 720,
+    "prompt": "Dramatic tower room in a historic manor house, king bed with white linens, panoramic windows on three sides showing rolling countryside, high ceiling with a circular window above, warm wood paneling, reading nook by the window with cushions, warm afternoon light, refined and special atmosphere, no people"
+  },
+  {
+    "file": "local-valley.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "Hudson Valley landscape view from a hilltop, rolling green fields, distant mountains, scattered farmhouses and barns, winding country road, golden afternoon light, warm late-summer atmosphere, no people, portrait orientation, lush and inviting countryside"
+  },
+  {
+    "file": "banner-rooms.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Close-up detail of a boutique hotel room, focus on crisp white linen pillows on a bed with a wooden headboard, soft morning light from the side, fresh lavender sprig on the pillow, warm wood tones in background, shallow depth of field, intimate and tactile, no people"
+  },
+  {
+    "file": "banner-experience.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Morning scene in a manor house garden, dewy lawn, wrought-iron garden furniture with a coffee cup and open book, flowering borders in soft pastels, warm morning sunlight through trees, peaceful and inviting atmosphere, shot from low angle across the garden table, no people"
+  },
+  {
+    "file": "banner-about.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Historic manor house front door and entrance, heavy wooden door slightly open, stone steps with potted ferns, brass door handle detail, warm light from inside visible through the doorway, welcoming and storied atmosphere, shot straight on from the path, no people"
+  },
+  {
+    "file": "breakfast-detail.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "Close-up of a plated breakfast dish in a bright dining room, poached eggs on sourdough toast with fresh herbs, ceramic plate on a linen placemat, coffee cup nearby, soft morning light, warm and appetizing, overhead angle, no people, portrait orientation"
+  },
+  {
+    "file": "gallery-exterior-garden.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Manor house rear garden in full bloom, flowering borders along stone paths, wooden bench under a large oak tree, the house visible in the background, warm afternoon light, lush and maintained, landscape orientation, no people"
+  },
+  {
+    "file": "gallery-common-room.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Cozy common room in a boutique hotel, stone fireplace with a mantel displaying vintage books and candles, leather sofa and armchairs, warm rug on wood floors, table lamps casting warm light, evening atmosphere, refined but comfortable, no people"
+  },
+  {
+    "file": "gallery-hallway.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Long hallway in a restored manor house, wide-plank wood floors, white walls with simple framed botanical prints, antique console table with a vase of fresh flowers, natural light from a window at the end of the hall, warm and peaceful, no people"
+  },
+  {
+    "file": "gallery-bathroom.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Boutique hotel bathroom, freestanding clawfoot bathtub, white subway tile walls, brass fixtures, natural stone floor, window with frosted glass letting in soft light, folded white towels on a wooden stool, locally made soap and bath products, warm and luxurious, no people"
+  },
+  {
+    "file": "gallery-porch.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Wrap-around porch of a historic manor house, wooden rocking chairs in a row, morning coffee service on a small table, countryside view through porch columns, soft morning light, warm and inviting, shot from one end of the porch showing depth, no people"
+  },
+  {
+    "file": "gallery-garden-detail.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Close-up of garden details, a weathered stone birdbath surrounded by lavender and climbing roses, warm afternoon light, soft bokeh background showing the manor house, peaceful and detailed, no people"
+  },
+  {
+    "file": "gallery-dining-room.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Bright breakfast dining room in a manor house, long wooden table set for breakfast, white china and linen napkins, wildflowers centerpiece, tall windows with sheer curtains, warm morning light flooding the space, elegant but relaxed, no people"
+  },
+  {
+    "file": "gallery-evening.jpg",
+    "width": 1200,
+    "height": 800,
+    "prompt": "Manor house exterior at dusk, warm light glowing from windows, string lights on the porch, garden silhouetted against a deep blue twilight sky, peaceful and magical evening atmosphere, shot from the garden looking toward the house, no people"
+  },
+  {
+    "file": "about-house.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "Architectural detail of a restored 1890s manor house, original crown molding and ceiling medallion, restored hardwood staircase banister with warm patina, natural light from a nearby window, warm wood tones, showing the craftsmanship and history of the building, no people, portrait orientation"
+  },
+  {
+    "file": "about-hosts.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "Environmental portrait of a couple in their 40s standing on the porch of a manor house, casual but refined clothing, warm smiles, natural light, the house visible behind them, approachable and genuine, warm color temperature, portrait orientation"
+  },
+  {
+    "file": "room-garden-card.jpg",
+    "width": 960,
+    "height": 640,
+    "prompt": "Garden Room in a boutique hotel, wide angle showing queen bed with white linen and sage green throw, large window overlooking a garden, bedside table with fresh flowers, warm morning light, cozy and inviting, showing the full room from the doorway, no people"
+  },
+  {
+    "file": "room-linden-card.jpg",
+    "width": 960,
+    "height": 640,
+    "prompt": "Linden Suite in a boutique hotel, wide angle showing king bed with cream linens, lit stone fireplace, leather reading chair with a throw blanket, exposed ceiling beams, warm evening lamp light, luxurious and intimate, showing the full room, no people"
+  },
+  {
+    "file": "room-orchard-card.jpg",
+    "width": 960,
+    "height": 640,
+    "prompt": "Orchard Room in a boutique hotel, twin beds with white and light blue linens, wide window showing apple trees, small writing desk with a lamp, bright and cheerful, morning light, showing the full room, no people"
+  },
+  {
+    "file": "room-tower-card.jpg",
+    "width": 960,
+    "height": 640,
+    "prompt": "Tower Room in a boutique hotel, king bed, panoramic windows with countryside view, reading nook with cushions, high ornamental ceiling, afternoon golden light, the most special room in the house, showing the full room, no people"
+  }
+]

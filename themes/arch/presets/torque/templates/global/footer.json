@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "\u00a9 2026 Torque Auto Repair. ASE-certified technicians. All rights reserved.",
+    "copyright": "\u00a9 2026 Torque Auto Repair. All rights reserved.",
     "color_scheme": "highlight-primary"
   },
   "blocks": {
@@ -9,26 +9,26 @@
       "type": "logo_text",
       "settings": {
         "logo_text": "Torque",
-        "text": "<p>Full-service auto repair and fleet maintenance. Honest diagnostics, clear estimates, and work backed by a nationwide parts warranty.</p>"
+        "text": "<p>Full-service auto repair and fleet maintenance. ASE-certified technicians serving Mesa and the East Valley.</p>"
       }
     },
     "text_block_1": {
       "type": "text_block",
       "settings": {
-        "title": "Shop line",
-        "text": "<p>(555) 441-9090</p><p>Mon\u2013Fri 7:00\u20136:00 \u00b7 Sat 8:00\u20132:00</p><p>service@torqueauto.example</p>"
+        "title": "Shop Hours",
+        "text": "<p>Mon \u2013 Fri: 7:00 AM \u2013 6:00 PM</p><p>Saturday: 8:00 AM \u2013 2:00 PM</p><p>Sunday: Closed</p>"
       }
     },
     "menu_block_1": {
       "type": "menu_block",
       "settings": {
-        "title": "Navigate"
+        "title": "Quick Links"
       }
     },
     "social_block_1": {
       "type": "social_block",
       "settings": {
-        "title": "Connect"
+        "title": "Follow Us"
       }
     }
   },

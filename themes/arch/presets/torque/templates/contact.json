@@ -2,82 +2,116 @@
   "name": "Contact",
   "slug": "contact",
   "widgets": {
-    "details": {
+    "contact_info": {
       "type": "contact-details",
       "settings": {
-        "eyebrow": "Torque Auto Repair",
-        "title": "Book or call",
-        "description": "Same-day appointments when capacity allows. After-hours drop box available.",
-        "heading_alignment": "start",
-        "color_scheme": "standard-secondary"
+        "eyebrow": "Get in Touch",
+        "title": "Book Your Service",
+        "description": "Call us, stop by, or use the form below to schedule an appointment.",
+        "heading_alignment": "center",
+        "layout": "equal",
+        "color_scheme": "standard-primary"
       },
       "blocks": {
-        "info-1": {
+        "info-main": {
           "type": "info",
           "settings": {
-            "title": "Visit",
-            "text": "<p>2840 Industrial Blvd<br>Phoenix, AZ 85040</p>"
+            "title": "Torque Auto Repair",
+            "text": "<p>4820 Industrial Blvd</p><p>Mesa, AZ 85210</p><p>(555) 729-4100</p><p>service@torqueauto.com</p>"
           }
         },
-        "hours": {
+        "info-hours": {
           "type": "text_block",
           "settings": {
-            "title": "Hours",
-            "text": "<p>Monday \u2013 Friday: 7:00 AM \u2013 6:00 PM<br>Saturday: 8:00 AM \u2013 2:00 PM<br>Sunday: Closed</p><p>Fleet hotline returns calls within 30 minutes on business days.</p>"
+            "title": "Shop Hours",
+            "text": "<p>Monday \u2013 Friday: 7:00 AM \u2013 6:00 PM</p><p>Saturday: 8:00 AM \u2013 2:00 PM</p><p>Sunday: Closed</p>"
           }
         },
-        "menu-1": {
+        "info-links": {
           "type": "menu_block",
           "settings": {
-            "title": "Quick links"
-          }
-        },
-        "social-1": {
-          "type": "social_block",
-          "settings": {
-            "title": "Follow"
+            "title": "Quick Links"
           }
         }
       },
-      "blocksOrder": ["info-1", "hours", "menu-1", "social-1"]
+      "blocksOrder": ["info-main", "info-hours", "info-links"]
     },
-    "location": {
+    "contact_map": {
       "type": "map",
       "settings": {
-        "eyebrow": "",
-        "title": "Find the shop",
-        "description": "",
-        "heading_alignment": "start",
-        "address": "2840 Industrial Blvd, Phoenix, AZ 85040",
-        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3330.0!2d-112.06!3d33.42!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDI1JzEyLjAiTiAxMTLCsDAzJzM2LjAiVw!5e0!3m2!1sen!2sus",
-        "directions_link": {
-          "text": "Open in Google Maps",
-          "href": "https://maps.google.com/?q=2840+Industrial+Blvd+Phoenix+AZ+85040",
-          "target": "_blank"
-        },
+        "title": "Find Our Shop",
+        "heading_alignment": "center",
+        "address": "4820 Industrial Blvd, Mesa, AZ 85210",
         "height": "medium",
         "show_address": true,
         "sidebar_position": "end",
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "info-phone": {
+        "map-info": {
           "type": "info",
           "settings": {
-            "title": "Phone & email",
-            "text": "<p><strong>Service:</strong> (555) 441-9090</p><p><strong>General:</strong> hello@torqueauto.example</p><p><strong>Fleet:</strong> fleet@torqueauto.example</p>"
+            "title": "Directions",
+            "text": "<p>Located on Industrial Blvd between Main St and Broadway, one block east of the 101 freeway. Look for the red awning.</p>"
           }
-        },
-        "info-social": {
-          "type": "social",
-          "settings": {}
         }
       },
-      "blocksOrder": ["info-phone", "info-social"]
+      "blocksOrder": ["map-info"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Before Your Visit",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "cq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need an appointment?",
+            "answer": "<p>Appointments are recommended but not required. Walk-ins are welcome for quick services like oil changes. For diagnostics or larger repairs, booking ahead ensures faster service.</p>"
+          }
+        },
+        "cq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Can I drop my car off before you open?",
+            "answer": "<p>Yes. We have a secure early drop-off area with a key drop box. Leave your keys and a note describing the issue, and we'll contact you once we've had a look.</p>"
+          }
+        },
+        "cq-3": {
+          "type": "item",
+          "settings": {
+            "question": "What payment methods do you accept?",
+            "answer": "<p>We accept cash, all major credit and debit cards, and offer financing options for larger repairs. Fleet accounts can be set up with net-30 terms.</p>"
+          }
+        },
+        "cq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer towing?",
+            "answer": "<p>We can coordinate towing through our local partners. Call us and we'll arrange a tow directly to our shop.</p>"
+          }
+        },
+        "sidebar-contact": {
+          "type": "info",
+          "settings": {
+            "title": "Call Us",
+            "text": "<p>(555) 729-4100</p><p>service@torqueauto.com</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cq-1", "cq-2", "cq-3", "cq-4", "sidebar-contact"]
     }
   },
-  "widgetsOrder": ["details", "location"],
+  "widgetsOrder": ["contact_info", "contact_map", "contact_faq"],
   "id": "contact",
-  "created": "2026-04-10T12:00:00.000Z",
-  "updated": "2026-04-10T12:00:00.000Z"
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
 }

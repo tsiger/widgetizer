@@ -2,377 +2,329 @@
   "name": "Home",
   "slug": "index",
   "widgets": {
-    "hero": {
-      "type": "banner",
+    "hero_split": {
+      "type": "split-hero",
       "settings": {
-        "image": "",
-        "height": "large",
-        "fullwidth": true,
-        "alignment": "start",
-        "vertical_alignment": "center",
-        "overlay_color": "#14532db3",
-        "color_scheme": "highlight-primary",
-        "top_spacing": "none"
+        "image_position": "end",
+        "color_scheme": "standard-primary"
       },
       "blocks": {
-        "e": {
+        "hero-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "<p>INFANTS \u00b7 TODDLERS \u00b7 PRESCHOOL \u00b7 PRE-K</p>",
+            "text": "<p>Daycare & Preschool in Asheville</p>",
             "size": "sm",
-            "uppercase": true,
-            "muted": true
+            "uppercase": true
           }
         },
-        "h": {
+        "hero-heading": {
           "type": "heading",
           "settings": {
-            "text": "Where little ones grow tall.",
+            "text": "Where Little Ones Learn, Play, and Grow",
             "size": "6xl"
           }
         },
-        "t": {
+        "hero-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Licensed ratios, outdoor classrooms, and teachers who document the small wins. Serving families in Madison since 2006.</p>",
+            "text": "<p>A warm, nurturing environment for children ages 6 weeks to 5 years. Play-based learning, qualified teachers, and a community that feels like family.</p>",
             "size": "lg"
           }
         },
-        "b": {
+        "hero-button": {
           "type": "button",
           "settings": {
             "link": {
-              "text": "Book a tour",
               "href": "contact.html",
+              "text": "Schedule a Tour",
               "target": "_self"
             },
             "style": "primary",
+            "size": "large",
             "link_2": {
-              "text": "See programs",
               "href": "programs.html",
+              "text": "Our Programs",
               "target": "_self"
             },
-            "style_2": "secondary",
-            "size": "large"
+            "style_2": "secondary"
           }
         }
       },
-      "blocksOrder": ["e", "h", "t", "b"]
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
     },
-    "marquee": {
-      "type": "scrolling-text",
-      "settings": {
-        "text": "Outdoor play  \u00b7  Reggio-inspired studios  \u00b7  Farm-to-table snacks  \u00b7  Live camera check-ins  \u00b7  Sibling priority",
-        "separator": "\u00b7",
-        "speed": 8,
-        "rotate": 0,
-        "font_size": "md",
-        "bg_color": "#166534",
-        "text_color": "#ecfdf5",
-        "top_spacing": "none",
-        "bottom_spacing": "small"
-      }
-    },
-    "trust": {
+    "credentials_strip": {
       "type": "trust-bar",
       "settings": {
         "icon_style": "filled",
-        "icon_size": "md",
+        "icon_size": "lg",
         "icon_shape": "rounded",
-        "alignment": "start",
+        "alignment": "center",
         "show_dividers": true,
         "color_scheme": "standard-secondary",
         "top_spacing": "small",
         "bottom_spacing": "small"
       },
       "blocks": {
-        "t1": {
+        "trust-1": {
           "type": "item",
           "settings": {
             "icon": "certificate",
-            "title": "State licensed",
-            "text": "DCF #123456"
+            "title": "State Licensed",
+            "text": "Fully licensed and inspected"
           }
         },
-        "t2": {
+        "trust-2": {
           "type": "item",
           "settings": {
-            "icon": "lock",
-            "title": "Secure entry",
-            "text": "Single point check-in"
+            "icon": "heart",
+            "title": "Low Ratios",
+            "text": "Small groups, personal attention"
           }
         },
-        "t3": {
+        "trust-3": {
           "type": "item",
           "settings": {
-            "icon": "users",
-            "title": "Low ratios",
-            "text": "At or below state max"
+            "icon": "school-bell",
+            "title": "Qualified Teachers",
+            "text": "Degree-holding early educators"
           }
         },
-        "t4": {
+        "trust-4": {
           "type": "item",
           "settings": {
-            "icon": "star",
-            "title": "4.9 parent rating",
-            "text": "Google & Care.com"
+            "icon": "plant",
+            "title": "Outdoor Learning",
+            "text": "Garden and nature play daily"
           }
         }
       },
-      "blocksOrder": ["t1", "t2", "t3", "t4"]
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
     },
-    "programs": {
-      "type": "icon-card-grid",
+    "programs_overview": {
+      "type": "card-grid",
       "settings": {
-        "eyebrow": "Age groups",
-        "title": "A classroom for every stage",
-        "description": "Each suite has observation windows, diapering stations, and materials scaled to developmental milestones.",
+        "eyebrow": "Programs",
+        "eyebrow_uppercase": true,
+        "title": "Programs by Age Group",
+        "description": "Each program is designed for a specific stage of development, with age-appropriate curriculum and caring, qualified teachers.",
         "heading_alignment": "center",
         "layout": "grid",
-        "columns_desktop": 3,
-        "card_layout": "flat",
-        "alignment": "center",
-        "icon_style": "filled",
-        "icon_size": "lg",
-        "icon_shape": "rounded",
+        "columns_desktop": 4,
+        "card_layout": "box",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4:3",
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "c1": {
+        "program-1": {
           "type": "card",
           "settings": {
-            "icon": "baby-carriage",
-            "title": "Infants (6 wks\u201315 mo)",
-            "description": "<p>Primary caregiving pairs, tummy-time labs, and sensory gardens. Max 8 babies with 3 teachers.</p>",
-            "button_link": {
-              "text": "Program details",
-              "href": "programs.html",
-              "target": "_self"
-            }
+            "title": "Infants",
+            "subtitle": "6 weeks \u2013 12 months",
+            "description": "<p>A gentle, secure environment where babies explore through sensory play, tummy time, and one-on-one bonding with dedicated caregivers.</p>"
           }
         },
-        "c2": {
+        "program-2": {
           "type": "card",
           "settings": {
-            "icon": "trees",
-            "title": "Toddlers & twos",
-            "description": "<p>Language bursts, potty partnership, and outdoor mud kitchen days. Bilingual story time optional.</p>",
-            "button_link": {
-              "text": "Program details",
-              "href": "programs.html",
-              "target": "_self"
-            }
+            "title": "Toddlers",
+            "subtitle": "1 \u2013 2 years",
+            "description": "<p>Active discovery through music, movement, art, and early language. Structured routines that build confidence and independence.</p>"
           }
         },
-        "c3": {
+        "program-3": {
           "type": "card",
           "settings": {
-            "icon": "school",
-            "title": "Preschool & pre-K",
-            "description": "<p>Project-based literacy, early STEM, and kindergarten readiness portfolios you keep forever.</p>",
-            "button_link": {
-              "text": "Program details",
-              "href": "programs.html",
-              "target": "_self"
-            }
+            "title": "Preschool",
+            "subtitle": "3 \u2013 4 years",
+            "description": "<p>Play-based learning in literacy, math, science, and social skills. Circle time, creative projects, and outdoor exploration every day.</p>"
+          }
+        },
+        "program-4": {
+          "type": "card",
+          "settings": {
+            "title": "Pre-K",
+            "subtitle": "4 \u2013 5 years",
+            "description": "<p>Kindergarten readiness with structured academics, problem-solving, and collaborative projects that build school-ready skills.</p>"
           }
         }
       },
-      "blocksOrder": ["c1", "c2", "c3"]
+      "blocksOrder": ["program-1", "program-2", "program-3", "program-4"]
     },
-    "philosophy": {
+    "philosophy_section": {
       "type": "image-text",
       "settings": {
-        "image": "",
-        "image_position": "end",
+        "image_position": "start",
         "text_position": "center",
-        "content_color_scheme": "none",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
-        "eyebrow": {
+        "philosophy-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "<p>OUR APPROACH</p>",
+            "text": "<p>Our Approach</p>",
             "size": "sm",
-            "uppercase": true,
-            "muted": true
+            "uppercase": true
           }
         },
-        "head": {
+        "philosophy-heading": {
           "type": "heading",
           "settings": {
-            "text": "Play is the work of childhood.",
-            "size": "3xl"
+            "text": "Learning Through Play",
+            "size": "4xl"
           }
         },
-        "body": {
+        "philosophy-text": {
           "type": "text",
           "settings": {
-            "text": "<p>We document learning through photos and learning stories\u2014not worksheets. Teachers train yearly in conscious discipline and outdoor risk benefits.</p>",
+            "text": "<p>We believe children learn best when they are curious, engaged, and having fun. Our play-based curriculum is grounded in early childhood development research and guided by teachers who understand that every child grows at their own pace.</p>",
             "size": "base"
           }
         },
-        "btn": {
+        "philosophy-button": {
           "type": "button",
           "settings": {
             "link": {
-              "text": "Meet the team",
               "href": "about.html",
+              "text": "Our Philosophy",
               "target": "_self"
             },
             "style": "secondary",
-            "size": "medium"
+            "size": "large"
           }
         }
       },
-      "blocksOrder": ["eyebrow", "head", "body", "btn"]
+      "blocksOrder": ["philosophy-eyebrow", "philosophy-heading", "philosophy-text", "philosophy-button"]
     },
-    "tours": {
-      "type": "event-list",
+    "stats_section": {
+      "type": "key-figures",
       "settings": {
-        "eyebrow": "Visit us",
-        "title": "Upcoming tour mornings",
-        "description": "Saturday tours include coffee on the porch and 20 minutes on the playscape with your child.",
         "heading_alignment": "center",
-        "color_scheme": "standard-primary"
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
-        "ev1": {
-          "type": "event",
+        "stat-1": {
+          "type": "figure",
           "settings": {
-            "day": "12",
-            "month": "Apr",
-            "title": "Spring open house",
-            "location": "Little Oaks campus \u00b7 9:00 AM",
-            "description": "<p>Meet directors, see classrooms, and grab a waitlist packet.</p>",
-            "button_link": {
-              "text": "RSVP",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "number": "15",
+            "label": "Years of Care"
           }
         },
-        "ev2": {
-          "type": "event",
+        "stat-2": {
+          "type": "figure",
           "settings": {
-            "day": "26",
-            "month": "Apr",
-            "title": "Infant suite spotlight",
-            "location": "Little Oaks campus \u00b7 10:30 AM",
-            "description": "<p>Small-group tour focused on feeding and nap rhythms.</p>",
-            "button_link": {
-              "text": "RSVP",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "number": "12",
+            "label": "Caring Teachers"
           }
         },
-        "ev3": {
-          "type": "event",
+        "stat-3": {
+          "type": "figure",
           "settings": {
-            "day": "10",
-            "month": "May",
-            "title": "Pre-K readiness night",
-            "location": "Little Oaks campus \u00b7 6:00 PM",
-            "description": "<p>For parents of four-year-olds heading to kindergarten.</p>",
-            "button_link": {
-              "text": "RSVP",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "number": "120",
+            "suffix": "+",
+            "label": "Happy Families"
+          }
+        },
+        "stat-4": {
+          "type": "figure",
+          "settings": {
+            "number": "4",
+            "suffix": ":1",
+            "label": "Child-to-Teacher Ratio"
           }
         }
       },
-      "blocksOrder": ["ev1", "ev2", "ev3"]
+      "blocksOrder": ["stat-1", "stat-2", "stat-3", "stat-4"]
     },
-    "reviews": {
+    "parent_reviews": {
       "type": "testimonials",
       "settings": {
-        "eyebrow": "Families",
-        "title": "What parents notice first",
-        "description": "",
+        "eyebrow": "From Our Families",
+        "eyebrow_uppercase": true,
+        "title": "What Parents Say",
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
-        "color_scheme": "standard-secondary"
-      },
-      "blocks": {
-        "q1": {
-          "type": "quote",
-          "settings": {
-            "quote": "The daily photos are specific\u2014not generic. I see exactly how she negotiated the climbing structure and shared trucks. That transparency sold us.",
-            "avatar": "",
-            "name": "Imani L.",
-            "title": "Toddler parent",
-            "rating": "5"
-          }
-        },
-        "q2": {
-          "type": "quote",
-          "settings": {
-            "quote": "They handled food allergies with a color-coded kitchen we could tour. Our pediatrician was impressed by the outdoor time logs.",
-            "avatar": "",
-            "name": "Chris & Dana P.",
-            "title": "Infant parents",
-            "rating": "5"
-          }
-        },
-        "q3": {
-          "type": "quote",
-          "settings": {
-            "quote": "Our son ran into kindergarten reading confidently. The pre-K teachers looped in his elementary teacher without us asking.",
-            "avatar": "",
-            "name": "Rosa M.",
-            "title": "Alumni parent",
-            "rating": "5"
-          }
-        }
-      },
-      "blocksOrder": ["q1", "q2", "q3"]
-    },
-    "cta": {
-      "type": "action-bar",
-      "settings": {
-        "fullwidth": false,
         "color_scheme": "highlight-primary"
       },
       "blocks": {
-        "ch": {
-          "type": "heading",
+        "review-1": {
+          "type": "quote",
           "settings": {
-            "text": "Spots open for fall",
-            "size": "2xl"
+            "quote": "Dropping off my daughter was the hardest thing I have ever done. Within a week, she was running to the door every morning. The teachers at Little Oaks made her feel safe from day one.",
+            "name": "Jessica Morales",
+            "title": "Parent of a 3-year-old",
+            "rating": "5"
           }
         },
-        "ct": {
-          "type": "text",
+        "review-2": {
+          "type": "quote",
           "settings": {
-            "text": "<p>Waitlist families get sibling priority and installment plans.</p>",
-            "size": "sm",
-            "uppercase": true,
-            "muted": true
+            "quote": "Both of our boys went through Little Oaks. The structure, the outdoor time, the way they handle transitions between age groups \u2014 it is thoughtful and consistent. We could not have asked for better care.",
+            "name": "Michael and Sarah Dunn",
+            "title": "Parents of two graduates",
+            "rating": "5"
           }
         },
-        "cb": {
-          "type": "button",
+        "review-3": {
+          "type": "quote",
           "settings": {
-            "link": {
-              "text": "Check tuition",
-              "href": "tuition.html",
-              "target": "_self"
-            },
-            "style": "primary",
-            "size": "medium"
+            "quote": "My son started in the infant room and is now in Pre-K. He reads, counts, and has best friends he has known since he was a baby. Little Oaks is not just childcare \u2014 it is a community.",
+            "name": "Angela Park",
+            "title": "Parent of a 5-year-old",
+            "rating": "5"
           }
         }
       },
-      "blocksOrder": ["ch", "ct", "cb"]
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "tour_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come See Us",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The best way to know if Little Oaks is right for your family is to visit. We would love to show you around.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Schedule a Tour",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "marquee", "trust", "programs", "philosophy", "tours", "reviews", "cta"],
+  "widgetsOrder": ["hero_split", "credentials_strip", "programs_overview", "philosophy_section", "stats_section", "parent_reviews", "tour_cta"],
   "id": "index",
-  "created": "2026-04-10T16:00:00.000Z",
-  "updated": "2026-04-10T16:00:00.000Z"
+  "created": "2026-04-14T14:00:00.000Z",
+  "updated": "2026-04-14T14:00:00.000Z"
 }

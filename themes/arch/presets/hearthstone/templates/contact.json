@@ -1,0 +1,130 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get in Touch",
+            "size": "4xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>142 Old Post Road, Rhinebeck, NY 12572</p><p>(845) 555-0178</p><p>hello@hearthstonehouse.com</p>",
+            "size": "base"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call Us",
+              "href": "tel:+18455550178",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text", "intro-button"]
+    },
+    "location_map": {
+      "type": "map",
+      "settings": {
+        "address": "142 Old Post Road, Rhinebeck, NY 12572",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "map-info": {
+          "type": "info",
+          "settings": {
+            "title": "Questions?",
+            "text": "<p>(845) 555-0178</p><p>hello@hearthstonehouse.com</p>"
+          }
+        },
+        "map-social": {
+          "type": "social",
+          "settings": {
+            "title": "Follow Us"
+          }
+        }
+      },
+      "blocksOrder": ["map-info", "map-social"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "title": "Before You Book",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Check-in & Check-out",
+            "text": "<p>Check-in: 3:00 PM</p><p>Check-out: 11:00 AM</p><p>Early check-in and late check-out available on request.</p>"
+          }
+        },
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "title": "What is included in the room rate?",
+            "text": "<p>Every room includes a full breakfast each morning, high-speed Wi-Fi, free on-site parking, and access to the gardens and common areas. Bath products are locally made and refreshed daily.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "title": "Do you allow pets?",
+            "text": "<p>Small dogs are welcome in the Garden Room and the Orchard Room for an additional fee of $35 per night. Please let us know when booking so we can prepare the room.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "title": "What is your cancellation policy?",
+            "text": "<p>Cancellations made more than 48 hours before check-in receive a full refund. Cancellations within 48 hours are charged 50% of the first night's rate. No-shows are charged the full first night.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "title": "Is the property accessible?",
+            "text": "<p>The Garden Room and the Orchard Room are on the ground floor with step-free access from the parking area. The common areas, dining room, and garden are all accessible. Please contact us with specific needs and we will do our best to accommodate.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "title": "Can we host a small event?",
+            "text": "<p>We welcome small gatherings of up to 30 guests. The garden is a beautiful setting for ceremonies and celebrations. Contact us to discuss availability and arrangements.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sidebar-info", "faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "location_map", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
+}

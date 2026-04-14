@@ -5,45 +5,52 @@
     "hero": {
       "type": "split-hero",
       "settings": {
-        "image": "",
-        "overlay_color": "",
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "auto"
       },
       "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>ASE-Certified Auto Repair</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
         "hero-heading": {
           "type": "heading",
           "settings": {
-            "text": "Diagnostics first. Repairs done right.",
+            "text": "Honest Repairs. Transparent Pricing. Every Time.",
             "size": "5xl"
           }
         },
         "hero-text": {
           "type": "text",
           "settings": {
-            "text": "<p>ASE-certified techs, OEM-quality parts, and estimates you can trust. From daily drivers to commercial fleets serving the Valley.</p>",
-            "size": "lg"
+            "text": "<p>Full-service auto repair for everyday drivers and commercial fleets. We diagnose first, explain clearly, and never sell work you don't need.</p>",
+            "size": "base"
           }
         },
         "hero-features": {
           "type": "features",
           "settings": {
-            "features": "+ Same-day appointments when available\n+ Digital inspections with photos\n+ 36-month / 36k-mile warranty on qualifying work"
+            "features": "+ ASE-Certified Technicians\n+ Digital Inspection Reports\n+ 24-Month Warranty on Parts & Labor"
           }
         },
         "hero-buttons": {
           "type": "button",
           "settings": {
             "link": {
-              "text": "Book service",
+              "text": "Book Service",
               "href": "contact.html",
               "target": "_self"
             },
             "style": "primary",
             "link_2": {
-              "text": "Browse services",
+              "text": "Our Services",
               "href": "services.html",
               "target": "_self"
             },
@@ -52,20 +59,20 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text", "hero-features", "hero-buttons"]
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-features", "hero-buttons"]
     },
-    "ticker": {
+    "scrolling_ticker": {
       "type": "scrolling-text",
       "settings": {
-        "text": "Brakes  \u00b7  Oil & filters  \u00b7  Engine & transmission  \u00b7  Tires & alignment  \u00b7  Fleet PM programs  \u00b7  Hybrid & EV service",
-        "separator": "\u00b7",
-        "speed": 10,
+        "text": "Oil Changes \u2022 Brake Repair \u2022 Engine Diagnostics \u2022 Transmission \u2022 A/C Service \u2022 Tires \u2022 Fleet Maintenance",
+        "separator": "\u2605",
+        "speed": 8,
         "rotate": 0,
         "font_size": "md",
-        "bg_color": "#000000",
-        "text_color": "#fafafa",
+        "bg_color": "#b91c1c",
+        "text_color": "#ffffff",
         "top_spacing": "none",
-        "bottom_spacing": "small"
+        "bottom_spacing": "none"
       }
     },
     "trust": {
@@ -86,42 +93,42 @@
           "settings": {
             "icon": "certificate",
             "title": "ASE Certified",
-            "text": "Master techs on staff"
+            "text": "Factory-trained technicians"
           }
         },
         "trust-2": {
           "type": "item",
           "settings": {
             "icon": "shield",
-            "title": "Warranty",
-            "text": "Parts & labor coverage"
+            "title": "24-Month Warranty",
+            "text": "Parts and labor guaranteed"
           }
         },
         "trust-3": {
           "type": "item",
           "settings": {
-            "icon": "gauge",
-            "title": "Digital inspections",
-            "text": "See what we see"
+            "icon": "file-text",
+            "title": "Digital Inspections",
+            "text": "Photos and notes sent to your phone"
           }
         },
         "trust-4": {
           "type": "item",
           "settings": {
             "icon": "star",
-            "title": "4.9 average",
-            "text": "800+ local reviews"
+            "title": "4.9-Star Rated",
+            "text": "300+ verified reviews"
           }
         }
       },
       "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
     },
-    "audiences": {
+    "audience_split": {
       "type": "features-split",
       "settings": {
-        "eyebrow": "Who we serve",
-        "title": "One shop. Two lanes.",
-        "description": "Whether you commute across town or run a delivery fleet, we keep vehicles safe, compliant, and on the road.",
+        "eyebrow": "Who We Serve",
+        "title": "Everyday Drivers and Commercial Fleets",
+        "description": "Whether you need a brake job on your family car or a preventive maintenance program for a fleet of 50 vans, Torque has you covered.",
         "heading_alignment": "center",
         "content_position": "start",
         "show_divider": true,
@@ -131,39 +138,39 @@
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "seg-1": {
+        "segment-retail": {
           "type": "feature",
           "settings": {
-            "icon": "car",
-            "title": "Personal vehicles",
-            "description": "<p>Brakes, engines, tires, A/C, and manufacturer-scheduled maintenance. Clear recommendations\u2014no pressure, no mystery fees.</p>"
+            "icon": "car-garage",
+            "title": "Personal Vehicles",
+            "description": "<p>Scheduled maintenance, brake repair, diagnostics, A/C service, tires, and more. We work on all makes and models.</p>"
           }
         },
-        "seg-2": {
+        "segment-fleet": {
           "type": "feature",
           "settings": {
-            "icon": "truck",
-            "title": "Fleet & commercial",
-            "description": "<p>PM schedules, DOT prep, priority bay windows, and consolidated billing. One partner for vans, box trucks, and work pickups.</p>"
+            "icon": "truck-delivery",
+            "title": "Fleet & Commercial",
+            "description": "<p>Preventive maintenance programs, priority scheduling, consolidated invoicing, and DOT-compliant inspections for work vehicles.</p>"
           }
         },
-        "seg-3": {
+        "segment-hybrid": {
           "type": "feature",
           "settings": {
-            "icon": "charging-pile",
-            "title": "Hybrids & EVs",
-            "description": "<p>High-voltage safety, battery health checks, and software-aware service. We service modern drivetrains without guesswork.</p>"
+            "icon": "engine",
+            "title": "Specialty & Performance",
+            "description": "<p>Hybrid and EV service, diesel repair, and performance upgrades. Factory-level diagnostics for European and Asian imports.</p>"
           }
         }
       },
-      "blocksOrder": ["seg-1", "seg-2", "seg-3"]
+      "blocksOrder": ["segment-retail", "segment-fleet", "segment-hybrid"]
     },
     "process": {
       "type": "steps",
       "settings": {
-        "eyebrow": "Your visit",
-        "title": "How a Torque appointment works",
-        "description": "Predictable steps so you always know what happens next.",
+        "eyebrow": "How It Works",
+        "title": "Your Visit, Start to Finish",
+        "description": "No surprises. We walk you through every step before any work begins.",
         "heading_alignment": "center",
         "color_scheme": "standard-secondary"
       },
@@ -171,29 +178,29 @@
         "step-1": {
           "type": "step",
           "settings": {
-            "title": "Check-in & intake",
-            "description": "<p>Tell us symptoms or fleet unit numbers. We capture mileage, pull history, and note any warning lights.</p>"
+            "title": "Drop Off or Schedule Online",
+            "description": "<p>Book your appointment online or call us. Early drop-off is available before we open.</p>"
           }
         },
         "step-2": {
           "type": "step",
           "settings": {
-            "title": "Inspection & diagnosis",
-            "description": "<p>Road-test if needed, scan modules, and document findings with photos. You approve work before we turn a wrench.</p>"
+            "title": "Digital Multi-Point Inspection",
+            "description": "<p>Every vehicle gets a thorough inspection. We send photos and findings to your phone so you can see exactly what we see.</p>"
           }
         },
         "step-3": {
           "type": "step",
           "settings": {
-            "title": "Repair with OEM-quality parts",
-            "description": "<p>Technicians follow manufacturer procedures. Fluids, filters, and hardware meet or exceed spec.</p>"
+            "title": "Approval Before We Start",
+            "description": "<p>You review the estimate and approve the work. No surprises, no pressure, no upselling.</p>"
           }
         },
         "step-4": {
           "type": "step",
           "settings": {
-            "title": "Quality check & pickup",
-            "description": "<p>Post-repair scan, torque specs verified, and a written summary for your records. Fleet clients get batch invoices.</p>"
+            "title": "Pick Up and Go",
+            "description": "<p>We notify you when your vehicle is ready. Every repair is backed by our 24-month warranty.</p>"
           }
         }
       },
@@ -202,16 +209,15 @@
     "comparison": {
       "type": "comparison-slider",
       "settings": {
-        "eyebrow": "Proof",
-        "title": "Clean work. Clear documentation.",
-        "description": "Every vehicle leaves with photos, measurements, and notes\u2014so you understand what was done and why.",
+        "eyebrow": "The Torque Difference",
+        "title": "Quick Lube vs. Full-Service Shop",
+        "description": "See what sets a proper inspection-first repair shop apart from a rushed oil-change chain.",
         "heading_alignment": "center",
-        "before_image": "",
-        "after_image": "",
-        "before_label": "Typical quick shop",
-        "after_label": "Torque standard",
+        "before_label": "Quick Lube",
+        "after_label": "Torque Standard",
+        "content_width": "wide",
         "orientation": "horizontal",
-        "initial_position": 45,
+        "initial_position": 50,
         "show_labels": true,
         "color_scheme": "standard-primary"
       }
@@ -233,47 +239,47 @@
         "fig-1": {
           "type": "figure",
           "settings": {
-            "number": "22",
+            "number": "12,000",
             "suffix": "+",
-            "label": "Years in business",
+            "label": "Vehicles Serviced",
             "description": ""
           }
         },
         "fig-2": {
           "type": "figure",
           "settings": {
-            "number": "14",
+            "number": "18",
             "suffix": "",
-            "label": "Service bays",
+            "label": "Years in Business",
             "description": ""
           }
         },
         "fig-3": {
           "type": "figure",
           "settings": {
-            "number": "35",
-            "suffix": "k+",
-            "label": "Vehicles serviced",
+            "number": "4.9",
+            "suffix": "",
+            "label": "Star Rating",
             "description": ""
           }
         },
         "fig-4": {
           "type": "figure",
           "settings": {
-            "number": "120",
-            "suffix": "+",
-            "label": "Fleet units on PM",
+            "number": "24",
+            "suffix": " mo",
+            "label": "Warranty on Repairs",
             "description": ""
           }
         }
       },
       "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
     },
-    "reviews": {
+    "testimonials": {
       "type": "testimonials",
       "settings": {
-        "eyebrow": "Drivers & fleet managers",
-        "title": "What people say",
+        "eyebrow": "Reviews",
+        "title": "What Our Customers Say",
         "description": "",
         "heading_alignment": "center",
         "layout": "grid",
@@ -282,38 +288,35 @@
         "color_scheme": "standard-secondary"
       },
       "blocks": {
-        "q-1": {
+        "review-1": {
           "type": "quote",
           "settings": {
-            "quote": "They showed me photos of a worn bushing I never would have caught. Price matched the estimate and the truck drives like new.",
-            "avatar": "",
-            "name": "Marcus T.",
-            "title": "2019 F-150 owner",
+            "quote": "They sent me photos of everything wrong with my brakes before doing any work. First shop that's ever done that. Fair price, done same day.",
+            "name": "Maria G.",
+            "title": "Brake repair, Mesa",
             "rating": "5"
           }
         },
-        "q-2": {
+        "review-2": {
           "type": "quote",
           "settings": {
-            "quote": "We run twelve vans out of this shop. PM reminders, digital invoices, and they never upsell fluff our routes do not need.",
-            "avatar": "",
-            "name": "Elena V.",
-            "title": "Operations, Valley Courier Co.",
+            "quote": "We switched our entire delivery fleet to Torque last year. Their PM program has cut our unplanned downtime by half. Invoicing is clean and on time.",
+            "name": "Dave K.",
+            "title": "Fleet manager, Gilbert",
             "rating": "5"
           }
         },
-        "q-3": {
+        "review-3": {
           "type": "quote",
           "settings": {
-            "quote": "Hybrid system warning light had me worried. They isolated a bad cell pack sensor in an hour and had us back the same day.",
-            "avatar": "",
-            "name": "Priya N.",
-            "title": "Toyota Prius",
+            "quote": "Brought my Audi in expecting to get quoted for a fortune. They diagnosed a sensor issue and saved me $1,200 over the dealership estimate. Honest shop.",
+            "name": "Ryan T.",
+            "title": "Engine diagnostics, Chandler",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["q-1", "q-2", "q-3"]
+      "blocksOrder": ["review-1", "review-2", "review-3"]
     },
     "cta": {
       "type": "action-bar",
@@ -325,16 +328,15 @@
         "cta-heading": {
           "type": "heading",
           "settings": {
-            "text": "Ready to book?",
+            "text": "Ready to Schedule Your Service?",
             "size": "2xl"
           }
         },
         "cta-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Call or request a slot online\u2014we will confirm same day when possible.</p>",
-            "size": "sm",
-            "uppercase": true,
+            "text": "<p>Same-day appointments available. Call or book online.</p>",
+            "size": "base",
             "muted": true
           }
         },
@@ -342,11 +344,17 @@
           "type": "button",
           "settings": {
             "link": {
-              "text": "Contact Torque",
+              "text": "Book Service",
               "href": "contact.html",
               "target": "_self"
             },
             "style": "primary",
+            "link_2": {
+              "text": "Call (555) 729-4100",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
             "size": "medium"
           }
         }
@@ -354,8 +362,8 @@
       "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "ticker", "trust", "audiences", "process", "comparison", "stats", "reviews", "cta"],
+  "widgetsOrder": ["hero", "scrolling_ticker", "trust", "audience_split", "process", "comparison", "stats", "testimonials", "cta"],
   "id": "index",
-  "created": "2026-04-10T12:00:00.000Z",
-  "updated": "2026-04-10T12:00:00.000Z"
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
 }

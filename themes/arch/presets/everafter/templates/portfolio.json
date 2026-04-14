@@ -1,0 +1,189 @@
+{
+  "name": "Portfolio",
+  "slug": "portfolio",
+  "widgets": {
+    "portfolio_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": false,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "standard-primary",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "intro-icon": {
+          "type": "icon",
+          "settings": {
+            "icon": "sparkles",
+            "style": "outline",
+            "size": "lg",
+            "shape": "circle"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Moments worth returning to",
+            "size": "4xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A closer look at the atmosphere, emotion, and design details that shape the weekends we help produce.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-icon",
+        "intro-heading",
+        "intro-text"
+      ]
+    },
+    "portfolio_gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "Real Weddings",
+        "eyebrow_uppercase": true,
+        "title": "Editorial, candid, and celebration-filled",
+        "description": "A portrait-led gallery that shows both the visual language and the emotional rhythm of the day.",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "staggered": true,
+        "aspect_ratio": "3 / 4",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "portfolio-01": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-01.jpg",
+            "caption": "Historic Charleston portrait"
+          }
+        },
+        "portfolio-02": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-02.jpg",
+            "caption": "Reception at dusk"
+          }
+        },
+        "portfolio-03": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-03.jpg",
+            "caption": "Cocktail hour joy"
+          }
+        },
+        "portfolio-04": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-04.jpg",
+            "caption": "Cake detail"
+          }
+        },
+        "portfolio-05": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-05.jpg",
+            "caption": "Destination ceremony"
+          }
+        },
+        "portfolio-06": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-06.jpg",
+            "caption": "Getting ready"
+          }
+        },
+        "portfolio-07": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-07.jpg",
+            "caption": "Escort display"
+          }
+        },
+        "portfolio-08": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-08.jpg",
+            "caption": "First dance"
+          }
+        },
+        "portfolio-09": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-09.jpg",
+            "caption": "Welcome dinner"
+          }
+        },
+        "portfolio-10": {
+          "type": "image",
+          "settings": {
+            "image": "portfolio-10.jpg",
+            "caption": "Late-night celebration"
+          }
+        }
+      },
+      "blocksOrder": [
+        "portfolio-01",
+        "portfolio-02",
+        "portfolio-03",
+        "portfolio-04",
+        "portfolio-05",
+        "portfolio-06",
+        "portfolio-07",
+        "portfolio-08",
+        "portfolio-09",
+        "portfolio-10"
+      ]
+    },
+    "portfolio_cta": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Planning a celebration with this same balance of beauty and ease?",
+            "size": "xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Start Your Inquiry",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "portfolio_intro",
+    "portfolio_gallery",
+    "portfolio_cta"
+  ],
+  "id": "portfolio",
+  "created": "2026-04-14T20:30:00.000Z",
+  "updated": "2026-04-14T20:30:00.000Z"
+}

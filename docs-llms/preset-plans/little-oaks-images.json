@@ -1,32 +1,100 @@
-[
-  {
-    "file": "home-hero.jpg",
-    "width": 1920,
-    "height": 1080,
-    "prompt": "Modern daycare exterior with oak trees, natural wood play structure, bright Wisconsin morning light, families walking toward entrance, no logos or readable text, editorial photography"
-  },
-  {
-    "file": "philosophy-indoor.jpg",
-    "width": 1400,
-    "height": 1000,
-    "prompt": "Reggio-inspired preschool classroom, loose parts on low tables, child-height windows, plants, soft natural colors, no children faces identifiable, no text"
-  },
-  {
-    "file": "programs-willow.jpg",
-    "width": 800,
-    "height": 450,
-    "prompt": "Calm infant room with cribs and soft lighting, mobile above, sanitized aesthetic, stock photo style, no logos"
-  },
-  {
-    "file": "programs-maple.jpg",
-    "width": 800,
-    "height": 450,
-    "prompt": "Toddler classroom climbing loft and sensory bins, colorful but not cluttered, photorealistic"
-  },
-  {
-    "file": "about-campus.jpg",
-    "width": 1400,
-    "height": 900,
-    "prompt": "Outdoor natural playground with climbing logs and mud kitchen, children blurred in background, safety mulch, golden hour"
-  }
-]
+{
+  "images": [
+    {
+      "file": "hero-children-playing.jpg",
+      "width": 960,
+      "height": 720,
+      "prompt": "Three young children (ages 3-4) playing with wooden building blocks on a soft rug in a bright, clean preschool classroom, natural sunlight streaming through large windows, warm pastel-toned walls, low shelving with organized toys in background, joyful and focused expressions, warm color temperature, shot at child height level, no visible logos or text"
+    },
+    {
+      "file": "infant-room.jpg",
+      "width": 800,
+      "height": 600,
+      "prompt": "Clean bright infant care room in a daycare center, a caregiver gently holding a baby while another infant plays on a soft mat, natural light from windows, calming pastel colors, organized cribs and changing station in background, warm and safe atmosphere, shot at adult standing height, no visible logos or text"
+    },
+    {
+      "file": "toddler-room.jpg",
+      "width": 800,
+      "height": 600,
+      "prompt": "Bright toddler classroom in a preschool, two toddlers (age 1-2) seated at a low table doing finger painting with a teacher guiding them, colorful artwork on walls, natural light, organized toy shelves, joyful messy creative play, warm tones, no visible logos or text"
+    },
+    {
+      "file": "preschool-class.jpg",
+      "width": 800,
+      "height": 600,
+      "prompt": "Preschool classroom circle time, a female teacher reading a picture book to a small group of children (ages 3-4) seated on a colorful rug, bright natural light, educational posters and artwork on walls, engaged curious faces, warm and nurturing atmosphere, no visible logos or text"
+    },
+    {
+      "file": "pre-k-class.jpg",
+      "width": 800,
+      "height": 600,
+      "prompt": "Pre-kindergarten classroom, children (age 4-5) at low desks working on letter-writing worksheets, a male teacher helping one child, bright organized space with alphabet display and nature corner, natural light, focused learning atmosphere with warmth, no visible logos or text"
+    },
+    {
+      "file": "outdoor-play.jpg",
+      "width": 960,
+      "height": 720,
+      "prompt": "Children playing in a fenced outdoor playground at a preschool, wooden climbing structure, sandbox, a garden bed with small plants, green grass, blue sky, children running and laughing, teachers supervising nearby, warm natural daylight, safe enclosed environment, no visible logos or text"
+    },
+    {
+      "file": "teaching-philosophy.jpg",
+      "width": 960,
+      "height": 720,
+      "prompt": "Close-up of a child's hands planting a small seedling in a pot with soil, teacher's hands gently guiding, natural outdoor light, wooden table with gardening tools, warm tones, shallow depth of field, represents growth and hands-on learning, no visible logos or text"
+    },
+    {
+      "file": "story-founding.jpg",
+      "width": 960,
+      "height": 720,
+      "prompt": "Bright and welcoming exterior of a small neighborhood preschool building, single-story with a covered porch, wooden fence, mature oak tree in front yard casting dappled shade, flower beds and small garden, warm afternoon sunlight, inviting and homey not institutional, no readable signage"
+    },
+    {
+      "file": "staff-1.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Professional headshot of a female preschool director in her 40s, warm smile, wearing a soft cardigan, clean bright classroom background slightly blurred, natural window light, approachable and trustworthy expression, square crop chest up, warm tones, no logos"
+    },
+    {
+      "file": "staff-2.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Professional headshot of a female preschool teacher in her late 20s, friendly open smile, wearing a simple top, bright classroom background slightly blurred, natural window light, warm and caring expression, square crop chest up, warm tones, no logos"
+    },
+    {
+      "file": "staff-3.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Professional headshot of a male preschool teacher in his 30s, gentle confident smile, wearing a casual button-up shirt, bright classroom background slightly blurred, natural window light, approachable expression, square crop chest up, warm tones, no logos"
+    },
+    {
+      "file": "staff-4.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Professional headshot of a female infant care specialist in her 30s, warm nurturing smile, wearing a soft-colored top, clean nursery background slightly blurred, natural window light, calm and reassuring expression, square crop chest up, warm tones, no logos"
+    },
+    {
+      "file": "checkerboard-art.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Close-up of a child's colorful finger painting on white paper, abstract flowers and suns in bright primary colors, paint-covered small fingers visible at edge of frame, white table surface, natural light, joyful creative expression, square crop, no text"
+    },
+    {
+      "file": "checkerboard-reading.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Two children (age 4) lying on their stomachs on a soft rug looking at a picture book together, natural light from side window, bookshelves in background, quiet focused moment, warm tones, square crop, no text or logos"
+    },
+    {
+      "file": "checkerboard-blocks.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Overhead view of wooden unit blocks arranged into a structure by a child, colorful geometric shapes on a light wood floor, small hands placing the final piece, warm natural light, simple and tactile, square crop, no text"
+    },
+    {
+      "file": "checkerboard-garden.jpg",
+      "width": 800,
+      "height": 800,
+      "prompt": "Young child (age 3) watering a small plant with a tiny watering can in a preschool garden bed, sunlight catching water droplets, green plants and soil visible, warm natural outdoor light, nurturing and intentional moment, square crop, no text"
+    }
+  ]
+}

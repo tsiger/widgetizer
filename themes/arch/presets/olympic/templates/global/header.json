@@ -1,0 +1,19 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Olympic",
+    "contactDetailsLine1": "(555) 738-0200",
+    "contactDetailsLine2": "420 Iron Street, Portland",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "pricing.html",
+      "text": "Start Free Trial",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

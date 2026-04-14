@@ -323,12 +323,16 @@ This plan is the single source of truth. It must begin with the Phase 0 brief an
 
 Create `docs-llms/preset-plans/{preset-id}-images.json`
 
-Every referenced image in the plan must appear here with:
+This file is a **prompt library for future image generation** — it describes the images that would complete the preset visually. It is not referenced by and has no effect on the preset template files.
+
+Every image entry must include:
 
 - file name
 - width
 - height
 - prompt
+
+**Critical rule:** Never put image file references in preset template JSON files. Widgets that accept images (banner, image-text, card-grid cards, profile-grid photos, steps, etc.) must omit the image setting entirely. The widget will render its built-in placeholder or empty state. Images are added by the user after project creation.
 
 ### Phase 3: Build
 
@@ -396,6 +400,8 @@ Read [theme-preset-file-format.md](theme-preset-file-format.md) before writing a
 - what fields to include and what to omit (no UUIDs, no pageUuid)
 
 ### 5.4 Non-negotiable rules
+
+Never use image file references in preset template JSON files. Omit image/photo settings entirely — widgets render their built-in placeholder or empty state. See §11 for the full rule.
 
 Never guess:
 
@@ -661,80 +667,46 @@ Use `none` only when two adjacent widgets are meant to read as a single fused co
 
 ---
 
-## 11. Image Strategy
+## 11. Image Rules
 
-Images are not decoration. They are the single strongest signal of whether a preset feels like a real business or a template.
+### 11.1 No images in preset templates
 
-### 11.1 Relationship to Phase 0
+Preset template JSON files must **never** contain image file references. This rule is absolute — it applies to every widget type, every image setting, every block with a photo field.
 
-Image decisions flow directly from the industry strategy brief:
+When a widget has an `image`, `photo`, or similar setting:
 
-- **Brand personality** governs mood, lighting, and color temperature. A warm and approachable bakery needs soft natural light. A bold tattoo studio needs high-contrast, moody shots. A clinical dental practice needs bright, clean, professional imagery.
-- **Content posture** governs image density. An image-led preset (photographer, interior designer) needs more images and higher visual quality than a process-led preset (accountant, cleaning company) where text and structure carry the site.
-- **No-go patterns** apply to images too. If the brief says "not overly corporate," the images should not look like stock photos of people in suits shaking hands.
+- **Omit the setting entirely.** Do not set it to an empty string. Do not set it to a placeholder filename. Just leave it out of the JSON.
+- The widget will render its built-in placeholder or empty state. This is the correct behavior for presets.
 
-### 11.2 Style consistency
+Widgets that commonly accept images and must have their image settings omitted:
 
-Every image in a preset must feel like it belongs to the same business. Establish a dominant visual family and stay within it:
+- `banner`, `split-hero`, `slideshow` — widget-level `image` setting
+- `image-text`, `image-callout`, `image-tabs` — widget-level `image` setting
+- `image` — widget-level `image` setting
+- `card-grid`, `checkerboard`, `content-switcher`, `bento-grid`, `sliding-panels` — per-card `image` in blocks
+- `profile-grid`, `team-highlight` — per-profile `photo` in blocks
+- `steps`, `resource-list` — per-item `image` in blocks
+- `image-hotspots` — widget-level `image` setting
+- `comparison-slider` — `before_image` / `after_image` settings
+- `gallery`, `masonry-gallery`, `project-showcase` — per-item `image` in blocks
 
-- **Color temperature.** Choose a dominant temperature — warm, cool, or neutral — and keep most images there. Controlled variation is fine (a cool-toned exterior among warm interiors), but the overall set should read as one palette, not a random mix.
-- **Lighting style.** Pick a primary lighting approach — natural light, studio-lit, or moody ambient — and use it for the majority of images. An occasional shift (e.g., one evening exterior in a mostly daylit set) is acceptable if it serves the content.
-- **Subject treatment.** If food shots are overhead flat-lays, keep them all overhead. If portraits are environmental, keep them all environmental. This consistency matters more than lighting or temperature because it is the most visible to visitors.
-- **Environment.** If the space looks modern, every interior shot should feel modern. One rustic image in an otherwise contemporary set breaks the illusion.
+Users add their own images after project creation. Presets provide structure, content, and design — not imagery.
 
-The goal is a coherent visual identity, not literal sameness. A restaurant preset might use warm daylight for food shots and warm evening light for ambiance shots — that is controlled variation within a family. What breaks coherence is mixing unrelated styles without reason.
+### 11.2 Why
 
-### 11.3 What different widgets expect
+Image file references in preset templates break when:
 
-Not every widget uses images the same way. This table covers the most common cases — for any widget not listed, check its `insights.md` for image guidance.
+- the image files do not exist in the project's uploads directory
+- the preset is applied to a new project (images are never copied)
+- the preset is previewed before image generation
 
-| Widget type | Image role | Guidance |
-|---|---|---|
-| Hero widgets (banner, split-hero, slideshow, video-popup) | Full-bleed or half-screen, first impression | Highest quality. Must set the mood immediately. Landscape orientation, generous resolution. |
-| Image-text, image-callout, image-tabs | Supporting visual paired with text | Should illustrate the adjacent content specifically, not just look nice. Landscape or slightly wide. |
-| Image widget (standalone) | Full-width editorial or atmospheric image | High quality, cinematic. Treated as a visual break or statement moment on the page. Not the same as inline image blocks inside other widgets. |
-| Gallery, masonry-gallery, project-showcase | Portfolio / collection display | Need variety within consistency — different subjects but same photographic style. Mix of landscape and portrait is fine for masonry. |
-| Profile-grid, team-highlight | Headshots or environmental portraits | Consistent framing, consistent background treatment. All studio or all on-location — not mixed. |
-| Card-grid, bento-grid, sliding-panels | Card-level imagery | Smaller display size, so subjects should be simple and readable at thumbnail scale. Avoid busy compositions. |
-| Checkerboard, content-switcher | Alternating image/content cards | Similar to card-level imagery but displayed larger. Subjects should be distinct per card while sharing the same photographic style. |
-| Steps, resource-list | Optional per-item images | Not every item needs an image. When used, keep them simple and consistent — icons or small photos, not hero-quality shots. |
-| Image-hotspots | Base photo with overlay pins | One high-quality image that is clear enough to read with pins on top. Avoid busy or dark images that compete with the hotspot markers. |
-| Comparison-slider | Matched before/after pair | Two images with identical framing, angle, and lighting conditions. The only difference should be the subject matter (before vs after). |
-| Split-content | Inline column images | Smaller, intentional placements. Accent images (details, textures, close-ups) work better than full scenes. |
-| Icon-card-grid, features-split, trust-bar | No images (icons instead) | Do not generate images for these widgets. |
+Broken image references produce visible errors (broken image icons, empty containers with incorrect aspect ratios, broken hero layouts) that make the preset look defective. Omitting images entirely produces clean placeholder states that the user understands and can fill.
 
-### 11.4 Dimensions
+### 11.3 The images JSON is a prompt library
 
-Use dimensions that match how the widget renders:
+The `{preset-id}-images.json` file in `docs-llms/preset-plans/` is a **reference document for future image generation**. It describes the images that would complete the preset visually but has no connection to the template files.
 
-- **Hero / full-bleed (banner, slideshow, video-popup)**: 1920×1080 or 1920×960 (16:9 or wider)
-- **Standalone image widget**: 1920×1080 (16:9) for full-width; 1200×800 (3:2) if contained
-- **Split-hero / image-text (half-width)**: 960×1080 or 960×720 (portrait or 4:3)
-- **Gallery / portfolio items**: 1200×800 (3:2 landscape) or 800×1200 (2:3 portrait for masonry)
-- **Card images (card-grid, checkerboard, content-switcher)**: 800×600 (4:3)
-- **Headshots**: 800×800 (square) or 800×1000 (slight portrait)
-- **Slideshow slides**: 1920×1080 (16:9)
-- **Image-hotspots base image**: 1920×1080 (16:9 landscape, needs room for pins)
-- **Comparison-slider pair**: 1200×800 each (identical dimensions, 3:2)
-- **Inline column images (split-content image block)**: 600×400 or smaller
-
-These are starting points. The exact crop depends on the widget's aspect ratio settings if available.
-
-### 11.5 Image count
-
-A typical 4-6 page preset needs roughly:
-
-- 2-4 hero/opener images
-- 4-8 section-level images (image-text, callouts, tabs)
-- 6-12 gallery/portfolio images (if applicable)
-- 3-6 headshots (if team/profile widgets are used)
-- 2-4 accent/detail images
-
-Total range: **15-30 images** for a full preset. Image-led presets (photographer, restaurant, interior designer) will be at the high end. Text/process-led presets (accountant, lawyer, cleaning company) will be at the low end.
-
-### 11.6 Prompt writing
-
-Every image prompt in `{preset-id}-images.json` should specify:
+Every image prompt should specify:
 
 1. **Subject** — what is in the image
 2. **Setting** — where it is (environment, location type)
@@ -742,9 +714,15 @@ Every image prompt in `{preset-id}-images.json` should specify:
 4. **Composition** — framing, angle, depth of field
 5. **What to avoid** — anything that contradicts the preset's no-go patterns
 
-Bad prompt: "restaurant interior"
+### 11.4 Validation
 
-Good prompt: "Modern Mediterranean restaurant interior, warm evening lighting, marble-topped tables with linen napkins, olive branch centerpieces, shot from a low angle across the dining room showing depth, soft bokeh on background diners, warm color temperature, no visible logos or text"
+Before finalizing any preset, grep the preset's template directory for common image file extensions:
+
+```
+grep -r "\.jpg\|\.png\|\.jpeg\|\.webp" themes/arch/presets/{preset-id}/templates/
+```
+
+If any matches are found in image/photo settings, remove them.
 
 ---
 
@@ -924,6 +902,11 @@ Before finalizing any preset, verify all of the following.
 - [ ] At least 2 underused widgets are used naturally when appropriate
 - [ ] At least one accordion uses sidebar blocks when accordion appears
 - [ ] Card grids only use per-card buttons when cards truly need unique destinations
+
+### Image validation
+
+- [ ] No image file references exist in any template JSON (grep for `.jpg`, `.png`, `.jpeg`, `.webp`)
+- [ ] Image/photo settings are omitted entirely, not set to empty strings
 
 ### Schema validation
 

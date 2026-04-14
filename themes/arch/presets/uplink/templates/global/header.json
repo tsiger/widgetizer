@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Uplink",
+    "contactDetailsLine1": "(503) 555-0142",
+    "contactDetailsLine2": "",
+    "contact_position": "header",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Get Help Now",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "highlight-primary"
+  }
+}

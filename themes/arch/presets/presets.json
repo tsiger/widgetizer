@@ -151,6 +151,31 @@
       "id": "tailside",
       "name": "Tailside",
       "description": "Veterinarian"
+    },
+    {
+      "id": "everafter",
+      "name": "Everafter",
+      "description": "Wedding planner"
+    },
+    {
+      "id": "hearthstone",
+      "name": "Hearthstone",
+      "description": "Hotel / B&B"
+    },
+    {
+      "id": "uplink",
+      "name": "Uplink",
+      "description": "IT Support"
+    },
+    {
+      "id": "olympic",
+      "name": "Olympic",
+      "description": "Gym"
+    },
+    {
+      "id": "codebase",
+      "name": "Codebase",
+      "description": "Freelance developer / agency"
     }
   ]
 }

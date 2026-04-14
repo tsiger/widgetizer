@@ -1,0 +1,317 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Web Development Studio</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We build digital products that work",
+            "size": "7xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Strategy, design, and development for startups and growing businesses. From first prototype to production scale.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Start a Project",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large",
+            "link_2": {
+              "href": "work.html",
+              "text": "See Our Work",
+              "target": "_self"
+            },
+            "style_2": "secondary"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+    },
+    "client_logos": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Trusted By",
+        "eyebrow_uppercase": true,
+        "title": "",
+        "heading_alignment": "center",
+        "card_layout": "flat",
+        "layout": "grid",
+        "columns_desktop": 5,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "logo-1": {
+          "type": "logo",
+          "settings": {
+            "name": "Meridian Health"
+          }
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {
+            "name": "Volta Finance"
+          }
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {
+            "name": "Canopy Education"
+          }
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {
+            "name": "Basecamp Retail"
+          }
+        },
+        "logo-5": {
+          "type": "logo",
+          "settings": {
+            "name": "Northwind SaaS"
+          }
+        }
+      },
+      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5"]
+    },
+    "services_list": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "What We Do",
+        "eyebrow_uppercase": true,
+        "title": "Services",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "service-1": {
+          "type": "service",
+          "settings": {
+            "title": "Web Applications",
+            "description": "<p>Full-stack web applications built with modern frameworks. From internal tools to customer-facing platforms, we handle the architecture, development, and deployment.</p>"
+          }
+        },
+        "service-2": {
+          "type": "service",
+          "settings": {
+            "title": "E-Commerce",
+            "description": "<p>Custom storefronts and commerce platforms. Product catalogs, checkout flows, payment integration, and inventory management tailored to your business model.</p>"
+          }
+        },
+        "service-3": {
+          "type": "service",
+          "settings": {
+            "title": "API Development",
+            "description": "<p>RESTful and GraphQL APIs that connect your systems. Third-party integrations, data pipelines, and backend services built for reliability and scale.</p>"
+          }
+        },
+        "service-4": {
+          "type": "service",
+          "settings": {
+            "title": "UI/UX Design",
+            "description": "<p>Interface design rooted in user research. Wireframes, prototypes, and production-ready designs that translate business goals into intuitive experiences.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["service-1", "service-2", "service-3", "service-4"]
+    },
+    "featured_work": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "Selected Work",
+        "eyebrow_uppercase": true,
+        "title": "Recent Projects",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "text_display": "hover",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "project-1": {
+          "type": "project",
+          "settings": {
+            "title": "Meridian Health Platform",
+            "description": "Patient portal and telehealth platform",
+            "link": {
+              "href": "work.html",
+              "text": "View Project",
+              "target": "_self"
+            }
+          }
+        },
+        "project-2": {
+          "type": "project",
+          "settings": {
+            "title": "Volta Finance Dashboard",
+            "description": "Real-time analytics for portfolio management",
+            "link": {
+              "href": "work.html",
+              "text": "View Project",
+              "target": "_self"
+            }
+          }
+        },
+        "project-3": {
+          "type": "project",
+          "settings": {
+            "title": "Canopy Learning",
+            "description": "Course marketplace and student management",
+            "link": {
+              "href": "work.html",
+              "text": "View Project",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["project-1", "project-2", "project-3"]
+    },
+    "client_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "quote-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Codebase took our vague product idea and turned it into a working platform in three months. They challenged our assumptions, simplified our architecture, and delivered something our users actually love. We have worked with agencies before, but never with this level of technical depth and care.</p>",
+            "size": "lg"
+          }
+        },
+        "quote-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Sarah Chen",
+            "size": "lg"
+          }
+        },
+        "quote-title": {
+          "type": "text",
+          "settings": {
+            "text": "<p>CTO, Meridian Health</p>",
+            "size": "sm",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote-text", "quote-name", "quote-title"]
+    },
+    "process_overview": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "How We Work",
+        "eyebrow_uppercase": true,
+        "title": "Our Process",
+        "heading_alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Discovery",
+            "description": "<p>We start with your goals, not our assumptions. We map the problem space, define requirements, and align on scope before writing a single line of code.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Design & Prototype",
+            "description": "<p>Wireframes and interactive prototypes you can test with real users. We iterate on the interface until the experience feels right.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Build & Ship",
+            "description": "<p>Clean, tested, production-grade code. We deploy incrementally so you see progress every week, not just at the end.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Support & Scale",
+            "description": "<p>After launch, we monitor performance, fix issues, and iterate on features. We stick around because products are never finished.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "inquiry_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have a project in mind?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us what you are building. We will get back to you within 24 hours.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Start a Project",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero_banner", "client_logos", "services_list", "featured_work", "client_quote", "process_overview", "inquiry_cta"],
+  "id": "index",
+  "created": "2026-04-14T12:00:00.000Z",
+  "updated": "2026-04-14T12:00:00.000Z"
+}

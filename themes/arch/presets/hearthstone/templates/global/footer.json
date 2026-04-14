@@ -1,0 +1,36 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "\u00a9 2026 Hearthstone. All rights reserved.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A boutique guesthouse in the Hudson Valley. Ten rooms, morning light, and a place to slow down.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Visit",
+        "text": "<p>142 Old Post Road</p><p>Rhinebeck, NY 12572</p><p>(845) 555-0178</p><p>hello@hearthstonehouse.com</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

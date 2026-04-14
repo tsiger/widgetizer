@@ -1,0 +1,128 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "narrow",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Planning that feels personal, polished, and grounded",
+            "size": "4xl"
+          }
+        },
+        "about-text-01": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Everafter was built for couples who want thoughtful guidance, a strong design point of view, and a planning experience that never feels louder than the celebration itself.</p>",
+            "size": "lg"
+          }
+        },
+        "about-text-02": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We believe the most memorable weekends feel effortless to the people attending them. That ease is never accidental. It comes from careful structure, clear communication, and design choices that belong to the couple rather than the planner.</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": [
+        "about-heading",
+        "about-text-01",
+        "about-text-02"
+      ]
+    },
+    "founder_team": {
+      "type": "team-highlight",
+      "settings": {
+        "eyebrow": "Meet the Team",
+        "eyebrow_uppercase": true,
+        "title": "The people behind Everafter",
+        "description": "A small studio with a calm planning style, a strong visual eye, and deep care for how the weekend actually feels for the people inside it.",
+        "heading_alignment": "start",
+        "columns_desktop": 2,
+        "image_ratio": "portrait",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "member-elena": {
+          "type": "member",
+          "settings": {
+            "photo": "team-elena-hart.jpg",
+            "name": "Elena Hart",
+            "role": "Founder and Lead Planner"
+          }
+        },
+        "member-mara": {
+          "type": "member",
+          "settings": {
+            "photo": "team-mara-james.jpg",
+            "name": "Mara James",
+            "role": "Design and Production Director"
+          }
+        }
+      },
+      "blocksOrder": [
+        "member-elena",
+        "member-mara"
+      ]
+    },
+    "about_values": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "narrow",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "values-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What our clients feel when working with us",
+            "size": "2xl"
+          }
+        },
+        "values-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Calm instead of rushed. Guided instead of overwhelmed. Celebratory without losing the structure that keeps everyone present and cared for.</p><p>That is the standard we bring to every wedding we take on.</p>",
+            "size": "base"
+          }
+        },
+        "values-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Inquire about your date",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "values-heading",
+        "values-text",
+        "values-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "about_intro",
+    "founder_team",
+    "about_values"
+  ],
+  "id": "about",
+  "created": "2026-04-14T20:30:00.000Z",
+  "updated": "2026-04-14T20:30:00.000Z"
+}

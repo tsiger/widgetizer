@@ -1,0 +1,329 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_banner": {
+      "type": "banner",
+      "settings": {
+        "overlay_color": "#0a0a0abf",
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Portland's Training Facility</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Train Harder. Get Stronger.",
+            "size": "8xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Expert coaching, world-class equipment, and a community that holds you accountable. Your goals start here.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "pricing.html",
+              "text": "Start Free Trial",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large",
+            "link_2": {
+              "href": "classes.html",
+              "text": "View Classes",
+              "target": "_self"
+            },
+            "style_2": "secondary"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+    },
+    "trust_strip": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "Certified Trainers",
+            "text": "Every coach fully accredited"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "clock-24",
+            "title": "Open 7 Days",
+            "text": "Early mornings to late nights"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "users-group",
+            "title": "All Levels Welcome",
+            "text": "Beginner to advanced"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Free First Session",
+            "text": "No commitment required"
+          }
+        }
+      },
+      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+    },
+    "programs_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Programs",
+        "eyebrow_uppercase": true,
+        "title": "Train Your Way",
+        "description": "From heavy lifting to high-intensity conditioning, we have a program for every goal.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4:3",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "program-1": {
+          "type": "card",
+          "settings": {
+            "title": "Strength Training",
+            "description": "<p>Build raw power with barbell programs, progressive overload coaching, and structured periodization.</p>"
+          }
+        },
+        "program-2": {
+          "type": "card",
+          "settings": {
+            "title": "HIIT",
+            "description": "<p>High-intensity intervals that torch calories and build endurance. 45-minute classes, maximum output.</p>"
+          }
+        },
+        "program-3": {
+          "type": "card",
+          "settings": {
+            "title": "Boxing",
+            "description": "<p>Technical striking, heavy bag work, and conditioning drills. No experience needed.</p>"
+          }
+        },
+        "program-4": {
+          "type": "card",
+          "settings": {
+            "title": "Yoga & Mobility",
+            "description": "<p>Restore, stretch, and move better. Essential recovery for hard-training athletes.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["program-1", "program-2", "program-3", "program-4"]
+    },
+    "facility_split": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "facility-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Space</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "facility-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Built for Results",
+            "size": "5xl"
+          }
+        },
+        "facility-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>12,000 square feet of dedicated training space. Olympic lifting platforms, competition-grade racks, a full cardio floor, and a dedicated studio for classes. Every piece of equipment chosen for performance, not aesthetics.</p>",
+            "size": "base"
+          }
+        },
+        "facility-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "about.html",
+              "text": "Learn More",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["facility-eyebrow", "facility-heading", "facility-text", "facility-button"]
+    },
+    "stats_section": {
+      "type": "key-figures",
+      "settings": {
+        "title": "Olympic By The Numbers",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "stat-1": {
+          "type": "figure",
+          "settings": {
+            "number": "1200",
+            "suffix": "+",
+            "label": "Active Members"
+          }
+        },
+        "stat-2": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": "+",
+            "label": "Classes Per Week"
+          }
+        },
+        "stat-3": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "label": "Expert Trainers"
+          }
+        },
+        "stat-4": {
+          "type": "figure",
+          "settings": {
+            "number": "8",
+            "label": "Years Strong"
+          }
+        }
+      },
+      "blocksOrder": ["stat-1", "stat-2", "stat-3", "stat-4"]
+    },
+    "member_reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Member Stories",
+        "eyebrow_uppercase": true,
+        "title": "Real People. Real Results.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "text": "I tried three gyms before Olympic. The difference is the coaching. They actually watch your form, adjust your programming, and care about your progress. Down 30 pounds and deadlifting more than I ever thought possible.",
+            "name": "Marcus Chen",
+            "title": "Member for 2 years",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "text": "The HIIT classes are no joke. I was nervous walking in as a complete beginner, but the trainers scaled everything for me. Six months later, I'm keeping up with the advanced group.",
+            "name": "Rachel Torres",
+            "title": "Member for 6 months",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "text": "Best gym community in Portland. Everyone is focused but friendly. The early morning crew keeps me accountable five days a week. This place changed my routine and my life.",
+            "name": "David Okafor",
+            "title": "Member for 3 years",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2", "review-3"]
+    },
+    "trial_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your First Session Is Free",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>No contracts. No pressure. Just come train.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "pricing.html",
+              "text": "Start Free Trial",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero_banner", "trust_strip", "programs_grid", "facility_split", "stats_section", "member_reviews", "trial_cta"],
+  "id": "index",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "file": "hero-tech.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "IT technician working at a desk in a small modern office, multiple monitors showing diagnostic software, clean workspace with network cables and tools organized nearby, bright overhead lighting, professional and capable atmosphere, mid-30s person focused on the screen, shot from behind and slightly to the side showing the workspace and monitors, natural colors, no logos or text on screens"
+  },
+  {
+    "file": "banner-services.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Close-up of hands typing on a laptop keyboard in a bright office environment, server rack slightly blurred in the background, clean and professional, blue-white color temperature, shallow depth of field, no visible logos or branding, technical but approachable atmosphere"
+  },
+  {
+    "file": "banner-about.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Small IT support team of four people standing in front of a service van in a parking lot, casual professional clothing with branded polo shirts, carrying laptop bags and tool cases, bright daylight, friendly and competent group portrait, suburban commercial area in background, warm but not oversaturated, no visible text on van or clothing"
+  },
+  {
+    "file": "about-team.jpg",
+    "width": 960,
+    "height": 1080,
+    "prompt": "IT technician installing a network switch in a small office server closet, cable management visible, bright work light illuminating the space, focused and competent, wearing a clean polo shirt, tools on a shelf nearby, portrait orientation, professional but not corporate, natural lighting mixed with work light"
+  }
+]

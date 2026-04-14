@@ -2,12 +2,12 @@
   "type": "header",
   "settings": {
     "logoText": "Torque",
-    "contactDetailsLine1": "Service: (555) 441-9090",
-    "contactDetailsLine2": "2840 Industrial Blvd, Phoenix, AZ",
+    "contactDetailsLine1": "(555) 729-4100",
+    "contactDetailsLine2": "4820 Industrial Blvd, Mesa",
     "contact_position": "logo",
     "ctaButtonLink": {
       "href": "contact.html",
-      "text": "Book service",
+      "text": "Book Service",
       "target": "_self"
     },
     "ctaButtonStyle": "primary",

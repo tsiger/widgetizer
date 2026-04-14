@@ -46,5 +46,47 @@
     "width": 1400,
     "height": 1000,
     "prompt": "Technician using diagnostic scan tool connected to car in clean bay, focus on hands and tool, photorealistic, no logos"
+  },
+  {
+    "file": "step-dropoff.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Customer handing car keys to a service advisor at a clean reception counter in an auto shop, clipboard and computer visible, warm welcoming interaction, professional setting, no logos"
+  },
+  {
+    "file": "step-inspection.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Mechanic performing a multi-point vehicle inspection underneath a car on a lift, digital tablet in hand for documentation, well-lit service bay, professional thorough feel, no logos"
+  },
+  {
+    "file": "step-repair.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Technician performing brake work on a car, close-up showing clean hands and proper tools with brake rotor visible, focused skilled work, good workshop lighting, no logos"
+  },
+  {
+    "file": "step-pickup.jpg",
+    "width": 800,
+    "height": 600,
+    "prompt": "Customer receiving car keys back at the service counter, service advisor explaining paperwork, clean bright lobby area, satisfied relieved mood, no logos"
+  },
+  {
+    "file": "owner-portrait.jpg",
+    "width": 600,
+    "height": 800,
+    "prompt": "Portrait of an auto shop owner in their 40s wearing a clean work shirt, standing in front of the shop, arms crossed confident smile, blurred shop interior background, professional headshot quality with natural lighting, no logos"
+  },
+  {
+    "file": "tech-portrait-1.jpg",
+    "width": 600,
+    "height": 800,
+    "prompt": "Portrait of a young male auto technician in a dark navy uniform standing next to a tool chest, professional friendly expression, workshop background slightly blurred, natural lighting, no logos"
+  },
+  {
+    "file": "tech-portrait-2.jpg",
+    "width": 600,
+    "height": 800,
+    "prompt": "Portrait of a female auto technician in her 30s wearing a clean work uniform holding a diagnostic tablet, confident approachable expression, service bay background well-lit, no logos"
   }
 ]

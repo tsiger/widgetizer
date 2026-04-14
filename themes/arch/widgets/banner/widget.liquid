@@ -49,6 +49,11 @@
       flex: 1;
     }
 
+    .widget-{{ widget.id }} .widget-icon-block-center {
+      display: flex;
+      justify-content: center;
+    }
+
 @media (max-width: 749px) {
       .widget-{{ widget.id }} {
         padding-inline: var(--space-md);
@@ -137,7 +142,7 @@
               </ul>
             {% endif %}
           {% when 'icon' %}
-            <div class="reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+            <div class="reveal reveal-up{% if widget.settings.alignment == 'center' %} widget-icon-block-center{% endif %}" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.icon != blank %}
                 {% render 'icon', icon: block.settings.icon, class: 'w-icon', style: block.settings.style, size: block.settings.size, shape: block.settings.shape %}
               {% endif %}

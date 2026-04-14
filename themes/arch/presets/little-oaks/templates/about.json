@@ -2,134 +2,242 @@
   "name": "About",
   "slug": "about",
   "widgets": {
-    "hero": {
+    "about_hero": {
       "type": "banner",
       "settings": {
-        "image": "",
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
+        "content_width": "medium",
         "alignment": "center",
-        "vertical_alignment": "center",
-        "overlay_color": "#14532d8c",
-        "color_scheme": "highlight-primary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
-        "h": {
+        "about-heading": {
           "type": "heading",
           "settings": {
-            "text": "Rooted in Madison",
-            "size": "3xl"
+            "text": "About Little Oaks",
+            "size": "6xl"
           }
         },
-        "t": {
+        "about-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Founded by two teachers who wanted a forest-adjacent campus where kids could climb real trees.</p>",
-            "size": "base",
-            "muted": true
+            "text": "<p>A place built around one simple idea: every child deserves to feel safe, seen, and excited to learn.</p>",
+            "size": "lg"
           }
         }
       },
-      "blocksOrder": ["h", "t"]
+      "blocksOrder": ["about-heading", "about-text"]
     },
-    "story": {
+    "story_section": {
       "type": "image-text",
       "settings": {
-        "image": "",
         "image_position": "start",
         "text_position": "center",
-        "content_color_scheme": "none",
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "e": {
+        "story-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "<p>OUR STORY</p>",
+            "text": "<p>Our Story</p>",
             "size": "sm",
-            "uppercase": true,
-            "muted": true
+            "uppercase": true
           }
         },
-        "head": {
+        "story-heading": {
           "type": "heading",
           "settings": {
-            "text": "Small enough to know every family.",
-            "size": "3xl"
+            "text": "Started by Parents, Run by Educators",
+            "size": "4xl"
           }
         },
-        "body": {
+        "story-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Little Oaks started in a renovated church annex with twelve children. Today we serve 140 families but cap enrollment so directors can greet parents by name every morning.</p><p>We are employee-owned: teachers rotate onto a governance council that votes on curriculum purchases and benefits.</p>",
+            "text": "<p>Little Oaks was founded in 2011 by two parents who could not find a daycare that matched what they wanted for their own children: small groups, qualified teachers, real outdoor time, and a curriculum built around how children actually develop. What started as a single classroom with eight children has grown into a learning center serving over 120 families in Asheville.</p>",
             "size": "base"
-          }
-        },
-        "btn": {
-          "type": "button",
-          "settings": {
-            "link": {
-              "text": "See licensing",
-              "href": "contact.html",
-              "target": "_self"
-            },
-            "style": "secondary",
-            "size": "medium"
           }
         }
       },
-      "blocksOrder": ["e", "head", "body", "btn"]
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text"]
     },
-    "team": {
-      "type": "profile-grid",
+    "values_grid": {
+      "type": "icon-card-grid",
       "settings": {
-        "eyebrow": "Leadership",
-        "title": "Directors you will meet on day one",
-        "description": "",
+        "eyebrow": "What We Believe",
+        "eyebrow_uppercase": true,
+        "title": "Our Values",
         "heading_alignment": "center",
-        "columns_desktop": 3,
         "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
-        "p1": {
-          "type": "profile",
+        "value-1": {
+          "type": "card",
           "settings": {
-            "photo": "",
-            "name": "Avery Collins",
-            "role": "Executive director",
-            "specialty": "M.Ed. Early Childhood",
-            "bio": "Former Head Start coach; leads accreditation visits and coach-the-coach weeks for teachers."
+            "icon": "heart",
+            "title": "Nurturing Care",
+            "description": "<p>Every child is known by name, temperament, and what makes them light up. Our teachers build relationships before they build lesson plans.</p>"
           }
         },
-        "p2": {
-          "type": "profile",
+        "value-2": {
+          "type": "card",
           "settings": {
-            "photo": "",
-            "name": "Morgan Ellis",
-            "role": "Pedagogy director",
-            "specialty": "Reggio study group alum",
-            "bio": "Designs studio provocations and mentors new leads through their first 90 days."
+            "icon": "puzzle",
+            "title": "Play-Based Learning",
+            "description": "<p>Children learn best through exploration and discovery. Our curriculum is structured around play, not worksheets.</p>"
           }
         },
-        "p3": {
-          "type": "profile",
+        "value-3": {
+          "type": "card",
           "settings": {
-            "photo": "",
-            "name": "Rosa M\u00e9ndez",
-            "role": "Family partnerships",
-            "specialty": "Bilingual family engagement",
-            "bio": "Runs parent caf\u00e9s, interpreter scheduling, and kindergarten transition nights."
+            "icon": "shield",
+            "title": "Safety First",
+            "description": "<p>Licensed, inspected, and staffed above state requirements. Background checks, CPR certification, and secure entry on every door.</p>"
+          }
+        },
+        "value-4": {
+          "type": "card",
+          "settings": {
+            "icon": "friends",
+            "title": "Community",
+            "description": "<p>Families are part of Little Oaks, not just clients. We host parent events, share daily updates, and build lasting relationships.</p>"
           }
         }
       },
-      "blocksOrder": ["p1", "p2", "p3"]
+      "blocksOrder": ["value-1", "value-2", "value-3", "value-4"]
+    },
+    "staff_grid": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Our Teachers",
+        "eyebrow_uppercase": true,
+        "title": "Meet the Team",
+        "description": "Every teacher at Little Oaks holds a degree in early childhood education and brings years of hands-on classroom experience.",
+        "heading_alignment": "center",
+        "image_style": "circle",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "staff-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Claire Whitfield",
+            "role": "Director",
+            "specialty": "Early Childhood Education",
+            "bio": "M.Ed. in Early Childhood Development. 18 years in childcare. Co-founded Little Oaks because she believed Asheville needed a better option for families."
+          }
+        },
+        "staff-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Rosa Gutierrez",
+            "role": "Lead Preschool Teacher",
+            "specialty": "Literacy & Language",
+            "bio": "B.A. in Early Education. 10 years of preschool teaching. Brings music, storytelling, and bilingual learning into every day."
+          }
+        },
+        "staff-3": {
+          "type": "profile",
+          "settings": {
+            "name": "David Kowalski",
+            "role": "Toddler Room Lead",
+            "specialty": "Sensory & Movement",
+            "bio": "B.S. in Child Development. 7 years with toddlers. Believes in messy play, outdoor time, and letting children move at their own speed."
+          }
+        },
+        "staff-4": {
+          "type": "profile",
+          "settings": {
+            "name": "Aisha Thompson",
+            "role": "Infant Care Specialist",
+            "specialty": "Infant Development",
+            "bio": "Certified Infant Care Specialist. 9 years caring for the youngest children. Calm, patient, and deeply attentive to each baby's cues."
+          }
+        }
+      },
+      "blocksOrder": ["staff-1", "staff-2", "staff-3", "staff-4"]
+    },
+    "about_reviews": {
+      "type": "testimonials",
+      "settings": {
+        "title": "From Our Families",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The teachers know my son better than I expected. They notice when he is having a hard day and they know exactly how to help him through it. That kind of care is rare.",
+            "name": "Laura Chen",
+            "title": "Parent of a 2-year-old",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We toured five daycares before Little Oaks. The moment we walked in, we knew. The space felt warm, the kids were engaged, and the teachers were genuinely present. Our daughter started the following week.",
+            "name": "Marcus and Tanya Hayes",
+            "title": "Parents of a 4-year-old",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come meet our team",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>See the classrooms, meet the teachers, and ask us anything.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Schedule a Tour",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "story", "team"],
+  "widgetsOrder": ["about_hero", "story_section", "values_grid", "staff_grid", "about_reviews", "about_cta"],
   "id": "about",
-  "created": "2026-04-10T16:00:00.000Z",
-  "updated": "2026-04-10T16:00:00.000Z"
+  "created": "2026-04-14T14:00:00.000Z",
+  "updated": "2026-04-14T14:00:00.000Z"
 }

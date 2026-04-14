@@ -1,6 +1,6 @@
 # Arch Theme Presets Tracker
 
-32 presets for the Arch theme. Each preset needs: `preset.json` (settings overrides), `templates/`, `menus/`, `screenshot.png`.
+33 presets for the Arch theme. Each preset needs: `preset.json` (settings overrides), `templates/`, `menus/`, `screenshot.png`.
 
 ## Presets
 
@@ -29,12 +29,13 @@
 | 21 | petalry | Petalry | Flower Shop | done |
 | 22 | pawlish | Pawlish | Pet Grooming | done |
 | 23 | torque | Torque | Auto Repair | done |
-| 24 | noteworthy | Noteworthy | Tutoring / Music Lessons | done |
+| 24 | noteworthy | Noteworthy | Tutoring / Music Lessons | pending |
 | 25 | little-oaks | Little Oaks | Daycare / Preschool | done |
 | 26 | tailside | Tailside | Veterinarian | done |
-| 27 | codebase | Codebase | Freelance Developer / Agency | pending |
-| 28 | uplink | Uplink | IT Support | pending |
-| 29 | everafter | Everafter | Wedding Planner | pending |
-| 30 | hearthstone | Hearthstone | Hotel / B&B | pending |
+| 27 | codebase | Codebase | Freelance Developer / Agency | done |
+| 28 | uplink | Uplink | IT Support | done |
+| 29 | everafter | Everafter | Wedding Planner | done |
+| 30 | hearthstone | Hearthstone | Hotel / B&B | done |
 | 31 | saffron-v2 | Saffron v2 | Restaurant (alternate to #1) | done |
 | 32 | brewline-v2 | Brewline v2 | Cafe / Coffee Shop (alternate to #2) | done |
+| 33 | olympic | Olympic | Gym | done |

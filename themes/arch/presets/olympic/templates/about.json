@@ -1,0 +1,227 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_hero": {
+      "type": "banner",
+      "settings": {
+        "overlay_color": "#0a0a0abf",
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "About Olympic",
+            "size": "6xl"
+          }
+        },
+        "about-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Eight years of building Portland's strongest community, one session at a time.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["about-heading", "about-text"]
+    },
+    "story_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Story</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Started With a Barbell and a Vision",
+            "size": "5xl"
+          }
+        },
+        "story-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Olympic was founded in 2018 by two trainers who believed Portland deserved a gym built around coaching, not cardio machines. We started with 3,000 square feet and a handful of members. Today we train over a thousand athletes across six programs, but the mission has not changed: build a place where people get genuinely stronger, together.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text"]
+    },
+    "values_process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "What We Stand For",
+        "eyebrow_uppercase": true,
+        "title": "Our Values",
+        "heading_alignment": "center",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "step",
+          "settings": {
+            "title": "Community First",
+            "description": "<p>Training is better together. We build genuine connections between members because accountability and camaraderie drive results that motivation alone cannot sustain.</p>"
+          }
+        },
+        "value-2": {
+          "type": "step",
+          "settings": {
+            "title": "Discipline Over Hype",
+            "description": "<p>No gimmicks, no shortcuts. We believe in progressive overload, consistent effort, and smart programming. The basics work when you commit to them.</p>"
+          }
+        },
+        "value-3": {
+          "type": "step",
+          "settings": {
+            "title": "Results You Can Measure",
+            "description": "<p>Every program is structured around measurable progress. We track, we adjust, and we celebrate when our members hit milestones they once thought impossible.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["value-1", "value-2", "value-3"]
+    },
+    "trainers_grid": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The Team",
+        "eyebrow_uppercase": true,
+        "title": "Meet Our Coaches",
+        "description": "Every Olympic trainer holds nationally recognized certifications and brings years of hands-on coaching experience.",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "1:1",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "trainer-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Jason Reeves",
+            "role": "Head Coach",
+            "specialty": "Strength & Conditioning",
+            "bio": "CSCS certified with 12 years of coaching. Former collegiate powerlifter. Specializes in barbell programming and athletic performance."
+          }
+        },
+        "trainer-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Maya Santos",
+            "role": "HIIT & Boxing Coach",
+            "specialty": "High-Intensity Training",
+            "bio": "NASM certified personal trainer and amateur boxing competitor. Runs Olympic's most popular HIIT and boxing classes."
+          }
+        },
+        "trainer-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Tom Eriksen",
+            "role": "CrossFit Coach",
+            "specialty": "Functional Fitness",
+            "bio": "CrossFit Level 3 trainer and USAW Sports Performance Coach. Competed in regional CrossFit events for six consecutive years."
+          }
+        },
+        "trainer-4": {
+          "type": "profile",
+          "settings": {
+            "name": "Priya Anand",
+            "role": "Yoga & Mobility Coach",
+            "specialty": "Recovery & Movement",
+            "bio": "RYT-500 certified yoga instructor with a background in physical therapy. Designs mobility programs for strength athletes."
+          }
+        }
+      },
+      "blocksOrder": ["trainer-1", "trainer-2", "trainer-3", "trainer-4"]
+    },
+    "about_reviews": {
+      "type": "testimonials",
+      "settings": {
+        "title": "What Members Say",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "text": "The trainers here genuinely care. Jason rebuilt my entire squat program after I came back from a knee injury, and now I'm stronger than before. You cannot get that at a chain gym.",
+            "name": "Alex Petrov",
+            "title": "Member for 4 years",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "text": "I joined for the boxing classes and stayed for the community. Priya's yoga sessions have done more for my recovery than years of foam rolling. Every coach here is the real deal.",
+            "name": "Nina Westbrook",
+            "title": "Member for 1 year",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["review-1", "review-2"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come Train With Us",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your first session is on us. See what real coaching feels like.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "pricing.html",
+              "text": "Start Free Trial",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["about_hero", "story_section", "values_process", "trainers_grid", "about_reviews", "about_cta"],
+  "id": "about",
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
+}

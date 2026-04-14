@@ -2,179 +2,190 @@
   "name": "Fleet",
   "slug": "fleet",
   "widgets": {
-    "hero": {
-      "type": "banner",
+    "fleet_hero": {
+      "type": "split-hero",
       "settings": {
-        "image": "",
-        "height": "medium",
-        "fullwidth": true,
-        "alignment": "start",
-        "vertical_alignment": "center",
-        "overlay_color": "#000000b3",
+        "image_position": "start",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "auto"
       },
       "blocks": {
-        "hero-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Fleet maintenance that keeps routes moving",
-            "size": "4xl"
-          }
-        },
-        "hero-text": {
+        "fleet-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "<p>Scheduled PM, digital inspections, and consolidated billing for vans, box trucks, and work pickups across the Phoenix metro.</p>",
-            "size": "base"
-          }
-        },
-        "hero-buttons": {
-          "type": "button",
-          "settings": {
-            "link": {
-              "text": "Contact fleet desk",
-              "href": "contact.html",
-              "target": "_self"
-            },
-            "style": "primary",
-            "link_2": {
-              "text": "View services",
-              "href": "services.html",
-              "target": "_self"
-            },
-            "style_2": "secondary",
-            "size": "medium"
-          }
-        }
-      },
-      "blocksOrder": ["hero-heading", "hero-text", "hero-buttons"]
-    },
-    "story": {
-      "type": "image-text",
-      "settings": {
-        "image": "",
-        "image_position": "start",
-        "text_position": "center",
-        "content_color_scheme": "none",
-        "color_scheme": "standard-primary"
-      },
-      "blocks": {
-        "eyebrow": {
-          "type": "text",
-          "settings": {
-            "text": "<p>WHY FLEETS CHOOSE TORQUE</p>",
+            "text": "<p>Fleet Services</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
           }
         },
-        "heading": {
+        "fleet-heading": {
           "type": "heading",
           "settings": {
-            "text": "Predictable uptime, not surprise invoices",
-            "size": "3xl"
+            "text": "Keep Your Fleet on the Road",
+            "size": "4xl"
           }
         },
-        "body": {
+        "fleet-text": {
           "type": "text",
           "settings": {
-            "text": "<p>We align PM intervals to your duty cycles, DOT windows, and manufacturer requirements. Drivers get clear punch lists; your office gets one invoice per cycle with per-unit detail.</p>",
+            "text": "<p>Preventive maintenance programs, priority scheduling, and consolidated billing designed for businesses that depend on their vehicles.</p>",
             "size": "base"
           }
         },
-        "btn": {
+        "fleet-button": {
           "type": "button",
           "settings": {
             "link": {
-              "text": "Start a fleet review",
+              "text": "Get a Fleet Quote",
               "href": "contact.html",
               "target": "_self"
             },
-            "style": "secondary",
+            "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["eyebrow", "heading", "body", "btn"]
+      "blocksOrder": ["fleet-eyebrow", "fleet-heading", "fleet-text", "fleet-button"]
     },
-    "benefits": {
+    "fleet_benefits": {
       "type": "icon-list",
       "settings": {
-        "eyebrow": "Program",
-        "title": "What you get",
-        "description": "Built for dispatchers, owners, and drivers who need clarity without shop jargon.",
-        "heading_alignment": "start",
+        "eyebrow": "Fleet Program",
+        "title": "Built for Businesses",
+        "description": "",
+        "heading_alignment": "center",
         "layout": "grid",
-        "columns_desktop": 2,
+        "columns_desktop": 3,
         "icon_style": "filled",
         "icon_size": "lg",
         "icon_shape": "rounded",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
-        "b-1": {
+        "benefit-1": {
           "type": "item",
           "settings": {
             "icon": "calendar",
-            "title": "Reserved bay windows",
-            "description": "Book recurring PM slots so trucks are not stuck in line behind retail traffic."
+            "title": "Preventive Maintenance Programs",
+            "description": "Custom PM schedules based on mileage, usage, and manufacturer specs"
           }
         },
-        "b-2": {
+        "benefit-2": {
           "type": "item",
           "settings": {
-            "icon": "clipboard-list",
-            "title": "Inspection packets",
-            "description": "Photo-backed reports per unit, emailed to your ops inbox after every visit."
+            "icon": "clock",
+            "title": "Priority Scheduling",
+            "description": "Fleet vehicles jump the queue to minimize your downtime"
           }
         },
-        "b-3": {
+        "benefit-3": {
           "type": "item",
           "settings": {
-            "icon": "receipt",
-            "title": "Consolidated billing",
-            "description": "One statement per cycle with PO references and cost codes your AP team can import."
+            "icon": "file-text",
+            "title": "Consolidated Invoicing",
+            "description": "One monthly statement for all vehicles, organized by unit"
           }
         },
-        "b-4": {
+        "benefit-4": {
           "type": "item",
           "settings": {
-            "icon": "truck",
-            "title": "DOT-minded checks",
-            "description": "Steer tires, brakes, and lights verified before long-haul seasons and audits."
+            "icon": "checklist",
+            "title": "DOT Inspection Prep",
+            "description": "Pre-inspection checks and documentation for commercial compliance"
+          }
+        },
+        "benefit-5": {
+          "type": "item",
+          "settings": {
+            "icon": "phone-call",
+            "title": "Dedicated Fleet Advisor",
+            "description": "A single point of contact for all your fleet service needs"
+          }
+        },
+        "benefit-6": {
+          "type": "item",
+          "settings": {
+            "icon": "truck-delivery",
+            "title": "Emergency Tow Coordination",
+            "description": "Breakdowns happen; we coordinate towing and fast-track repairs"
           }
         }
       },
-      "blocksOrder": ["b-1", "b-2", "b-3", "b-4"]
+      "blocksOrder": ["benefit-1", "benefit-2", "benefit-3", "benefit-4", "benefit-5", "benefit-6"]
     },
-    "cta": {
+    "fleet_stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "animate": true,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "fleet-fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "200",
+            "suffix": "+",
+            "label": "Fleet Vehicles Managed",
+            "description": ""
+          }
+        },
+        "fleet-fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "50",
+            "suffix": "%",
+            "label": "Less Unplanned Downtime",
+            "description": "Avg client improvement in year one"
+          }
+        },
+        "fleet-fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "Same",
+            "suffix": " Day",
+            "label": "Priority Turnaround",
+            "description": "For most routine services"
+          }
+        }
+      },
+      "blocksOrder": ["fleet-fig-1", "fleet-fig-2", "fleet-fig-3"]
+    },
+    "fleet_cta": {
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
         "color_scheme": "highlight-primary"
       },
       "blocks": {
-        "cta-h": {
+        "fleet-cta-heading": {
           "type": "heading",
           "settings": {
-            "text": "Need a fleet walkthrough?",
+            "text": "Let's Build Your Fleet Program",
             "size": "2xl"
           }
         },
-        "cta-t": {
+        "fleet-cta-text": {
           "type": "text",
           "settings": {
-            "text": "<p>Send your roster and we will propose PM windows and pricing tiers.</p>",
-            "size": "base"
+            "text": "<p>Tell us about your fleet size and vehicle types. We'll put together a custom maintenance plan.</p>",
+            "size": "base",
+            "muted": true
           }
         },
-        "cta-b": {
+        "fleet-cta-button": {
           "type": "button",
           "settings": {
             "link": {
-              "text": "Email fleet@torqueauto.example",
+              "text": "Request a Fleet Quote",
               "href": "contact.html",
               "target": "_self"
             },
@@ -183,11 +194,11 @@
           }
         }
       },
-      "blocksOrder": ["cta-h", "cta-t", "cta-b"]
+      "blocksOrder": ["fleet-cta-heading", "fleet-cta-text", "fleet-cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "story", "benefits", "cta"],
+  "widgetsOrder": ["fleet_hero", "fleet_benefits", "fleet_stats", "fleet_cta"],
   "id": "fleet",
-  "created": "2026-04-10T12:00:00.000Z",
-  "updated": "2026-04-10T12:00:00.000Z"
+  "created": "2026-04-14T10:00:00.000Z",
+  "updated": "2026-04-14T10:00:00.000Z"
 }

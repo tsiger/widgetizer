@@ -1,0 +1,237 @@
+{
+  "name": "Work",
+  "slug": "work",
+  "widgets": {
+    "work_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "work-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Work",
+            "size": "6xl"
+          }
+        },
+        "work-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A selection of projects we have shipped. Each one started as a problem someone needed solved.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["work-heading", "work-text"]
+    },
+    "portfolio_grid": {
+      "type": "project-showcase",
+      "settings": {
+        "title": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "text_display": "hover",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "project-1": {
+          "type": "project",
+          "settings": {
+            "title": "Meridian Health",
+            "description": "Patient portal and telehealth platform"
+          }
+        },
+        "project-2": {
+          "type": "project",
+          "settings": {
+            "title": "Volta Finance",
+            "description": "Real-time portfolio analytics dashboard"
+          }
+        },
+        "project-3": {
+          "type": "project",
+          "settings": {
+            "title": "Canopy Learning",
+            "description": "Course marketplace and student management"
+          }
+        },
+        "project-4": {
+          "type": "project",
+          "settings": {
+            "title": "Basecamp Retail",
+            "description": "Multi-location inventory and POS system"
+          }
+        },
+        "project-5": {
+          "type": "project",
+          "settings": {
+            "title": "Northwind Analytics",
+            "description": "SaaS reporting and data visualization"
+          }
+        },
+        "project-6": {
+          "type": "project",
+          "settings": {
+            "title": "Fern & Moss",
+            "description": "E-commerce platform for artisan goods"
+          }
+        }
+      },
+      "blocksOrder": ["project-1", "project-2", "project-3", "project-4", "project-5", "project-6"]
+    },
+    "case_study": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "Case Study",
+        "eyebrow_uppercase": true,
+        "title": "Meridian Health Platform",
+        "description": "How we built a HIPAA-compliant telehealth platform that handles 10,000+ appointments per month.",
+        "heading_alignment": "start",
+        "gap": "var(--space-md)",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "bento-1": {
+          "type": "item",
+          "settings": {
+            "title": "The Challenge",
+            "text": "Meridian needed to move from phone-based scheduling to a fully digital patient experience. The existing system could not handle telehealth, insurance verification, or patient records in one place.",
+            "col_span": 2,
+            "row_span": 1,
+            "text_color": "dark",
+            "alignment": "start"
+          }
+        },
+        "bento-2": {
+          "type": "item",
+          "settings": {
+            "title": "10,000+",
+            "text": "Monthly appointments processed through the platform",
+            "col_span": 1,
+            "row_span": 1,
+            "background_color": "#2563eb",
+            "text_color": "light",
+            "alignment": "start"
+          }
+        },
+        "bento-3": {
+          "type": "item",
+          "settings": {
+            "title": "98%",
+            "text": "Patient satisfaction rating after launch",
+            "col_span": 1,
+            "row_span": 1,
+            "background_color": "#18181b",
+            "text_color": "light",
+            "alignment": "start"
+          }
+        },
+        "bento-4": {
+          "type": "item",
+          "settings": {
+            "title": "Our Solution",
+            "text": "We built a React frontend with a Node.js backend, integrated with existing EHR systems via HL7 FHIR APIs. Video consultations, automated scheduling, and patient messaging in a single platform.",
+            "col_span": 2,
+            "row_span": 1,
+            "text_color": "dark",
+            "alignment": "start"
+          }
+        },
+        "bento-5": {
+          "type": "item",
+          "settings": {
+            "title": "12 weeks",
+            "text": "From kickoff to production launch",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "dark",
+            "alignment": "start"
+          }
+        },
+        "bento-6": {
+          "type": "item",
+          "settings": {
+            "title": "3 integrations",
+            "text": "EHR, insurance verification, and payment processing connected via APIs",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "dark",
+            "alignment": "start"
+          }
+        }
+      },
+      "blocksOrder": ["bento-1", "bento-2", "bento-3", "bento-4", "bento-5", "bento-6"]
+    },
+    "work_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "quote-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We went from zero to ten thousand appointments a month in under a year. Codebase did not just build the platform, they helped us rethink how we deliver care. The system they built is now central to everything we do.</p>",
+            "size": "lg"
+          }
+        },
+        "quote-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Dr. Lisa Nguyen",
+            "size": "lg"
+          }
+        },
+        "quote-title": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Chief Medical Officer, Meridian Health</p>",
+            "size": "sm",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote-text", "quote-name", "quote-title"]
+    },
+    "work_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's build something together",
+            "size": "3xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Start a Project",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["work_hero", "portfolio_grid", "case_study", "work_quote", "work_cta"],
+  "id": "work",
+  "created": "2026-04-14T12:00:00.000Z",
+  "updated": "2026-04-14T12:00:00.000Z"
+}
