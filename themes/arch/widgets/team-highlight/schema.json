@@ -16,6 +16,12 @@
       "default": "Meet Our Team"
     },
     {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": false
+    },
+    {
       "type": "text",
       "id": "title",
       "label": "tTheme:global.widgets.settings.title.label",

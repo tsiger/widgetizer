@@ -241,6 +241,9 @@
         "eyebrow": {
           "label": "Eyebrow text"
         },
+        "eyebrow_uppercase": {
+          "label": "Uppercase"
+        },
         "title": {
           "label": "Heading"
         },

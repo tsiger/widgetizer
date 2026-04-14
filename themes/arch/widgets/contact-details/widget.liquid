@@ -54,7 +54,7 @@
     {% if widget.settings.eyebrow != blank or widget.settings.title != blank or widget.settings.description != blank %}
       <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
         {% if widget.settings.eyebrow != blank %}
-          <p class="w-eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</p>
+          <p class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</p>
         {% endif %}
         {% if widget.settings.title != blank %}
           <h2 class="w-headline" data-setting="title">{{ widget.settings.title }}</h2>

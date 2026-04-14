@@ -208,7 +208,7 @@
         <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
           {% assign header_delay = 0 %}
           {% if widget.settings.eyebrow != blank %}
-            <span class="w-eyebrow reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+            <span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
             {% assign header_delay = header_delay | plus: 1 %}
           {% endif %}
           {% if widget.settings.title != blank %}
