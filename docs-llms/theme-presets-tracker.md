@@ -6,21 +6,21 @@
 
 | # | ID | Name | Industry | Status |
 |---|-----|------|----------|--------|
-| 1 | saffron | Saffron | Restaurant | done |
-| 2 | brewline | Brewline | Cafe / Coffee Shop | done |
-| 3 | crumbly | Crumbly | Bakery | done |
-| 4 | corkwell | Corkwell | Bar / Wine Bar | done |
-| 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | done |
-| 6 | velvet-touch | Velvet Touch | Spa / Massage | done |
-| 7 | brightside | Brightside | Dentist | done |
-| 8 | ironform | Ironform | Personal Trainer | done |
-| 9 | greystone | Greystone | Lawyer / Law Firm | done |
-| 10 | ledgerworks | Ledgerworks | Accountant | done |
-| 11 | clearpath | Clearpath | Consultant | done |
-| 12 | keystoned | Keystoned | Real Estate Agent | done |
-| 13 | pipeworks | Pipeworks | Plumber / Electrician | done |
-| 14 | greenfield | Greenfield | Landscaping | done |
-| 15 | sparkhaus | Sparkhaus | Cleaning Service | done |
+| 1 | saffron | Saffron | Restaurant | done | images done
+| 2 | brewline | Brewline | Cafe / Coffee Shop | done | images done
+| 3 | crumbly | Crumbly | Bakery | done | images done
+| 4 | corkwell | Corkwell | Bar / Wine Bar | done | images done
+| 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | done | images done
+| 6 | velvet-touch | Velvet Touch | Spa / Massage | done | images done
+| 7 | brightside | Brightside | Dentist | done | images done
+| 8 | ironform | Ironform | Personal Trainer | done | NEEDS PROMPTS
+| 9 | greystone | Greystone | Lawyer / Law Firm | done | images done
+| 10 | ledgerworks | Ledgerworks | Accountant | done | images done
+| 11 | clearpath | Clearpath | Consultant | done | NEEDS REGEN
+| 12 | keystoned | Keystoned | Real Estate Agent | done | images done
+| 13 | pipeworks | Pipeworks | Plumber / Electrician | done | NEEDS REGEN
+| 14 | greenfield | Greenfield | Landscaping | done | images done
+| 15 | sparkhaus | Sparkhaus | Cleaning Service | done | NEEDS PROMPTS
 | 16 | hue-and-co | Hue & Co | Interior Designer | done |
 | 17 | framelight | Framelight | Photographer | done |
 | 18 | inkwell | Inkwell | Tattoo Studio | done |
