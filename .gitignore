@@ -26,3 +26,5 @@ logs/
 .claude/
 .electron-home/
 themes/widgetizer/
+temp/
+temp-webp/

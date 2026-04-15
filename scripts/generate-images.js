@@ -1,0 +1,151 @@
+import dotenv from "dotenv";
+import { fal } from "@fal-ai/client";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
+
+dotenv.config({ path: path.join(ROOT, ".env") });
+
+const CONCURRENCY = 2;
+const MODEL = "fal-ai/flux-2-pro";
+
+function usage() {
+  console.log(`
+Usage: node scripts/generate-images.js <plan.json> <output-folder>
+
+  plan.json       JSON file with an array of image specs (see docs-llms/preset-plans/)
+  output-folder   Directory to write generated images into (created if missing)
+
+Each entry in the JSON array must have:
+  file    – output filename (e.g. "hero.jpg")
+  width   – desired width in pixels
+  height  – desired height in pixels
+  prompt  – text prompt for FLUX 2 Pro
+
+Environment:
+  FAL_KEY – fal.ai API key (set in .env or export directly)
+`);
+  process.exit(1);
+}
+
+function formatDuration(ms) {
+  const secs = Math.round(ms / 1000);
+  return secs < 60 ? `${secs}s` : `${Math.floor(secs / 60)}m ${secs % 60}s`;
+}
+
+async function downloadImage(url, dest) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Download failed: ${res.status} ${res.statusText}`);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  await writeFile(dest, buffer);
+}
+
+async function generateOne(entry, outputDir, index, total) {
+  const { file, width, height, prompt } = entry;
+  const ext = path.extname(file).replace(".", "").toLowerCase();
+  const outputFormat = ext === "png" ? "png" : "jpeg";
+  const dest = path.join(outputDir, file);
+
+  if (existsSync(dest)) {
+    console.log(`  [${index + 1}/${total}] ⏭  ${file} (already exists, skipping)`);
+    return { file, skipped: true };
+  }
+
+  console.log(`  [${index + 1}/${total}] 🎨 ${file} (${width}×${height}) ...`);
+  const start = Date.now();
+
+  const result = await fal.subscribe(MODEL, {
+    input: {
+      prompt,
+      image_size: { width, height },
+      output_format: outputFormat,
+    },
+    logs: false,
+  });
+
+  const imageUrl = result.data.images[0].url;
+  await downloadImage(imageUrl, dest);
+
+  const elapsed = formatDuration(Date.now() - start);
+  console.log(`  [${index + 1}/${total}] ✅ ${file} (${elapsed})`);
+  return { file, skipped: false, elapsed };
+}
+
+async function run() {
+  const [planPath, outputDir] = process.argv.slice(2);
+  if (!planPath || !outputDir) usage();
+
+  if (!process.env.FAL_KEY) {
+    console.error("Error: FAL_KEY is not set. Add it to .env or export it.");
+    process.exit(1);
+  }
+
+  fal.config({ credentials: process.env.FAL_KEY });
+
+  const resolvedPlan = path.resolve(ROOT, planPath);
+  const resolvedOutput = path.resolve(ROOT, outputDir);
+
+  let entries;
+  try {
+    const raw = await readFile(resolvedPlan, "utf-8");
+    const parsed = JSON.parse(raw);
+    entries = Array.isArray(parsed) ? parsed : parsed.images;
+  } catch (err) {
+    console.error(`Error reading plan: ${err.message}`);
+    process.exit(1);
+  }
+
+  if (!Array.isArray(entries) || entries.length === 0) {
+    console.error("Plan file must contain a JSON array or an object with an \"images\" array.");
+    process.exit(1);
+  }
+
+  for (const [i, entry] of entries.entries()) {
+    for (const key of ["file", "width", "height", "prompt"]) {
+      if (!entry[key]) {
+        console.error(`Entry ${i + 1} is missing required field "${key}".`);
+        process.exit(1);
+      }
+    }
+  }
+
+  await mkdir(resolvedOutput, { recursive: true });
+
+  console.log(`\nPlan:   ${resolvedPlan}`);
+  console.log(`Output: ${resolvedOutput}`);
+  console.log(`Images: ${entries.length} (concurrency: ${CONCURRENCY})\n`);
+
+  const totalStart = Date.now();
+  let generated = 0;
+  let skipped = 0;
+  const errors = [];
+
+  // Process in batches of CONCURRENCY
+  for (let i = 0; i < entries.length; i += CONCURRENCY) {
+    const batch = entries.slice(i, i + CONCURRENCY);
+    const results = await Promise.allSettled(
+      batch.map((entry, j) => generateOne(entry, resolvedOutput, i + j, entries.length))
+    );
+
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        if (result.value.skipped) skipped++;
+        else generated++;
+      } else {
+        errors.push(result.reason);
+        console.error(`  ❌ ${result.reason.message}`);
+      }
+    }
+  }
+
+  const totalElapsed = formatDuration(Date.now() - totalStart);
+  console.log(`\nDone in ${totalElapsed}: ${generated} generated, ${skipped} skipped, ${errors.length} failed.`);
+
+  if (errors.length > 0) process.exit(1);
+}
+
+run();
