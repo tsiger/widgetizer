@@ -10,7 +10,7 @@
         "overlay_color": "#151e22cc",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "auto"
       },
       "blocks": {
         "hero-heading": {
@@ -35,11 +35,12 @@
       "settings": {
         "eyebrow": "Coming Up",
         "title": "Spring Natural Wine Tasting",
-        "description": "An evening exploring 12 natural wines from small European producers. Tickets include all pours and a cheese plate.",
+        "description": "",
+        "text": "<p>An evening exploring 12 natural wines from small European producers. Tickets include all pours and a cheese plate.</p>",
         "heading_alignment": "center",
         "target_date": "2027-06-15 19:00",
         "expired_message": "This event has passed. Follow us for the next one.",
-        "show_seconds": false,
+        "show_seconds": true,
         "style": "cards",
         "button": {
           "text": "Reserve a Spot",

@@ -41,7 +41,8 @@
     {
       "id": "corkwell",
       "name": "Corkwell",
-      "description": "Wine bar"
+      "description": "Wine bar",
+      "liveDemo": "https://widgetizer.org/demos/corkwell/"
     },
     {
       "id": "stillpoint",

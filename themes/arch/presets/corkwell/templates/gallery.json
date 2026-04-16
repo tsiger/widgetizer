@@ -10,7 +10,7 @@
         "overlay_color": "#151e22cc",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "auto"
       },
       "blocks": {
         "hero-heading": {

@@ -28,6 +28,7 @@
     },
     "corner_style": "sharp",
     "spacing_density": "compact",
-    "button_shape": "sharp"
+    "button_shape": "sharp",
+    "enable_reveal_animations": true
   }
 }
