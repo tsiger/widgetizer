@@ -2270,7 +2270,8 @@ b {
     height: 4.4rem;
     padding: 0;
     background: transparent;
-    border: none;
+    border: var(--border-width-medium) double currentColor;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     color: var(--text-content);
 
