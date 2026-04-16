@@ -260,7 +260,7 @@ export default function ProjectForm({
                       <img
                         src={getPresetScreenshotUrl(selectedTheme, preset.id, preset.hasScreenshot)}
                         alt={preset.name}
-                        className="w-full aspect-video object-cover"
+                        className="w-full aspect-square object-cover"
                       />
                     </button>
                     <p className="mt-2 text-center text-base font-medium leading-tight">{preset.name}</p>

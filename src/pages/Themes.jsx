@@ -172,7 +172,7 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
                   <img
                     src={getPresetScreenshotUrl(theme.id, preset.id, preset.hasScreenshot)}
                     alt={`${preset.name} preset`}
-                    className="w-full aspect-video object-cover"
+                    className="w-full aspect-square object-cover"
                   />
                 </div>
                 <p className="mt-2 text-center text-sm font-medium text-slate-800">{preset.name}</p>

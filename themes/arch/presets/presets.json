@@ -25,7 +25,8 @@
     {
       "id": "brewline",
       "name": "Brewline",
-      "description": "Coffee shop"
+      "description": "Coffee shop",
+      "liveDemo": "https://widgetizer.org/demos/brewline"
     },
     {
       "id": "brewline-v2",
