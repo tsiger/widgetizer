@@ -51,7 +51,7 @@
       "settings": {
         "text": "Freshly Roasted  ·  Single Origin  ·  Pour Over  ·  Espresso  ·  Cold Brew  ·  House-Made Pastries",
         "separator": "·",
-        "speed": 8,
+        "speed": 3,
         "rotate": 0,
         "font_size": "md",
         "bg_color": "#2d6a4f",
@@ -133,16 +133,9 @@
             "title": "Cold Brew",
             "description": "<p>Steeped for 20 hours. Smooth, bold, and naturally sweet — no bitterness in sight. Served over ice, on tap. Our most popular order when the temperature climbs above 70°F.</p>"
           }
-        },
-        "tab-4": {
-          "type": "tab",
-          "settings": {
-            "title": "Seasonal Specials",
-            "description": "<p>From oat milk matcha to spiced honey lattes — our rotating menu follows the seasons. We collaborate with local producers for syrups and flavors you won't find anywhere else in town.</p>"
-          }
         }
       },
-      "blocksOrder": ["tab-1", "tab-2", "tab-3", "tab-4"]
+      "blocksOrder": ["tab-1", "tab-2", "tab-3"]
     },
     "testimonials": {
       "type": "testimonial-slider",
@@ -186,7 +179,9 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {

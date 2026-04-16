@@ -7,7 +7,7 @@
 | # | ID | Name | Industry | Status |
 |---|-----|------|----------|--------|
 | 1 | saffron | Saffron | Restaurant | done | images done
-| 2 | brewline | Brewline | Cafe / Coffee Shop | done | images done
+| 2 | brewline | Brewline | Cafe / Coffee Shop | complete | images done, meta done, settings ported, demo live
 | 3 | crumbly | Crumbly | Bakery | done | images done
 | 4 | corkwell | Corkwell | Bar / Wine Bar | done | images done
 | 5 | stillpoint | Stillpoint | Yoga / Pilates Studio | done | images done

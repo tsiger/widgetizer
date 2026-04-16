@@ -9,7 +9,8 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -86,6 +87,7 @@
         "eyebrow": "The Space",
         "title": "Where the Magic Happens",
         "heading_alignment": "center",
+        "alignment": "center",
         "columns_desktop": 3,
         "gap": "medium",
         "color_scheme": "standard-secondary"

@@ -2,19 +2,19 @@
   "type": "header",
   "settings": {
     "logoText": "Brewline",
-    "contactDetailsLine1": "",
-    "contactDetailsLine2": "",
-    "contact_position": "logo",
+    "contactDetailsLine1": "Quick order",
+    "contactDetailsLine2": "+30 210 123 4567",
+    "contact_position": "menu",
     "ctaButtonLink": {
       "href": "menu.html",
       "text": "View Menu",
       "target": "_self"
     },
-    "ctaButtonStyle": "secondary",
+    "ctaButtonStyle": "primary",
     "center_nav": true,
     "full_width": true,
-    "sticky": false,
-    "transparent_on_hero": false,
+    "sticky": true,
+    "transparent_on_hero": true,
     "color_scheme": "standard-primary"
   }
 }

@@ -9,7 +9,8 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -253,13 +254,15 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
           "type": "heading",
           "settings": {
-            "text": "See You Tomorrow Morning",
+            "text": "See You Tomorrow Morning?",
             "size": "2xl"
           }
         },

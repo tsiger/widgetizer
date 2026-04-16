@@ -2,13 +2,15 @@
   "type": "footer",
   "settings": {
     "copyright": "© 2026 Brewline Coffee. All rights reserved.",
-    "color_scheme": "highlight-primary"
+    "color_scheme": "highlight-secondary",
+    "layout": "equal"
   },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
-        "text": "<p>Specialty coffee roasted in-house, served with care. A neighborhood cafe for those who appreciate the craft behind every cup.</p>"
+        "text": "<p>Specialty coffee roasted in-house, served with care. A neighborhood cafe for those who appreciate the craft behind every cup.</p>",
+        "logo_width": 160
       }
     },
     "text_block_1": {

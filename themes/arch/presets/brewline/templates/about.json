@@ -9,7 +9,8 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-heading": {
@@ -155,7 +156,7 @@
         "eyebrow": "The Crew",
         "title": "Meet the People Behind the Counter",
         "description": "A small team with big passion for great coffee.",
-        "heading_alignment": "center",
+        "heading_alignment": "start",
         "image_ratio": "square",
         "columns_desktop": 4,
         "color_scheme": "standard-secondary"
@@ -196,7 +197,9 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
