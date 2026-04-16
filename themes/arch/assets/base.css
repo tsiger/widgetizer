@@ -2365,7 +2365,7 @@ b {
       align-items: center;
       width: 100%;
       padding-block: 1.4rem;
-      padding-inline: 0;
+      padding-inline: var(--space-sm);
       text-decoration: none;
       color: var(--header-nav-row-link-color);
       font-weight: var(--typography-body_font-weight, 400);
@@ -2502,6 +2502,18 @@ b {
       & .submenu-toggle,
       & .header-contact-line {
         color: inherit;
+      }
+
+      & .widget-button-primary {
+        background-color: var(--accent);
+        color: var(--accent-text);
+        border-color: var(--accent);
+      }
+
+      & .widget-button-secondary {
+        background-color: transparent;
+        color: var(--text-content);
+        border-color: var(--accent);
       }
     }
 
