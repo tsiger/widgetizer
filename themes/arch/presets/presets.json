@@ -56,7 +56,8 @@
     {
       "id": "brightside",
       "name": "Brightside",
-      "description": "Dental practice"
+      "description": "Dental practice",
+      "liveDemo": "https://widgetizer.org/demos/brightside/"
     },
     {
       "id": "ironform",

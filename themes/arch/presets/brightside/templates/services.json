@@ -15,16 +15,8 @@
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
-      "blocks": {
-        "hero-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Our Services",
-            "size": "4xl"
-          }
-        }
-      },
-      "blocksOrder": ["hero-heading"]
+      "blocks": {},
+      "blocksOrder": []
     },
     "overview": {
       "type": "icon-card-grid",
@@ -50,8 +42,8 @@
             "title": "Checkups & Cleaning",
             "description": "<p>Regular exams with digital X-rays, professional cleaning, and early detection of cavities, gum disease, and oral health issues. The foundation of a healthy smile.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -63,8 +55,8 @@
             "title": "Teeth Whitening",
             "description": "<p>Professional-grade whitening that's faster and more effective than over-the-counter options. In-office treatment takes about an hour, or use our custom take-home trays.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -72,12 +64,12 @@
         "svc-3": {
           "type": "card",
           "settings": {
-            "icon": "plus-circle",
+            "icon": "package-import",
             "title": "Dental Implants",
             "description": "<p>Titanium implants that fuse with your jawbone for a permanent, natural-feeling tooth replacement. We handle the full process from consultation to final restoration.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -85,12 +77,12 @@
         "svc-4": {
           "type": "card",
           "settings": {
-            "icon": "align-left",
+            "icon": "keyframe-align-vertical",
             "title": "Invisalign",
             "description": "<p>Custom clear aligners that gradually straighten your teeth without the look or feel of traditional braces. We're a certified Invisalign provider with hundreds of completed cases.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -102,8 +94,8 @@
             "title": "Crowns & Bridges",
             "description": "<p>Custom porcelain restorations designed to match your natural teeth. Repair cracks, strengthen weakened teeth, or bridge gaps with lasting results.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -111,12 +103,12 @@
         "svc-6": {
           "type": "card",
           "settings": {
-            "icon": "zap",
+            "icon": "lifebuoy",
             "title": "Emergency Care",
             "description": "<p>Severe pain, a broken tooth, or a knocked-out tooth can't wait. We reserve same-day slots for dental emergencies — call us and we'll get you in.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -248,7 +240,9 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {

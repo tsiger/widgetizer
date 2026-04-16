@@ -30,6 +30,7 @@
     "body_scale": 100,
     "corner_style": "sharp",
     "spacing_density": "default",
-    "button_shape": "pill"
+    "button_shape": "pill",
+    "enable_reveal_animations": true
   }
 }

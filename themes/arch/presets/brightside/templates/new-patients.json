@@ -15,16 +15,8 @@
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
-      "blocks": {
-        "hero-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "New Patients",
-            "size": "4xl"
-          }
-        }
-      },
-      "blocksOrder": ["hero-heading"]
+      "blocks": {},
+      "blocksOrder": []
     },
     "welcome": {
       "type": "image-text",
@@ -177,7 +169,9 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {

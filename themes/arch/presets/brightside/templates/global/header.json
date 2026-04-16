@@ -13,6 +13,7 @@
     "ctaButtonStyle": "primary",
     "center_nav": false,
     "full_width": false,
+    "logoMaxWidth": 170,
     "sticky": false,
     "transparent_on_hero": false,
     "color_scheme": "highlight-secondary"

@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "overlay_color": "#0f1d2ecc",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none"
+        "top_spacing": "auto",
+        "content_width": "narrow"
       },
       "blocks": {
         "hero-rating": {
@@ -25,7 +26,7 @@
           "type": "heading",
           "settings": {
             "text": "Your Smile, Our Priority",
-            "size": "5xl"
+            "size": "6xl"
           }
         },
         "hero-text": {
@@ -60,11 +61,13 @@
       "type": "trust-bar",
       "settings": {
         "icon_style": "filled",
-        "icon_size": "md",
+        "icon_size": "lg",
         "icon_shape": "circle",
         "alignment": "start",
         "show_dividers": true,
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "trust-1": {
@@ -126,8 +129,8 @@
             "title": "Checkups & Cleaning",
             "description": "<p>Routine exams, professional cleaning, and preventive care to keep your teeth and gums healthy for life.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -139,8 +142,8 @@
             "title": "Teeth Whitening",
             "description": "<p>Professional in-office and take-home whitening treatments for a brighter, more confident smile.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -152,8 +155,8 @@
             "title": "Dental Implants",
             "description": "<p>Permanent tooth replacement that looks, feels, and functions like natural teeth. Restored confidence.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -165,8 +168,8 @@
             "title": "Invisalign",
             "description": "<p>Clear aligners that straighten your teeth discreetly. No metal brackets, no wires — just results.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -178,8 +181,8 @@
             "title": "Crowns & Bridges",
             "description": "<p>Custom-crafted restorations that repair damaged teeth and fill gaps with natural-looking results.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -191,8 +194,8 @@
             "title": "Emergency Care",
             "description": "<p>Toothache, broken tooth, or dental trauma? We offer same-day emergency appointments when you need us most.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -212,8 +215,9 @@
         "before_label": "Before",
         "after_label": "After",
         "orientation": "horizontal",
-        "initial_position": 30,
+        "initial_position": 25,
         "show_labels": true,
+        "content_width": "wide",
         "color_scheme": "standard-primary"
       }
     },
@@ -230,9 +234,9 @@
         "about-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "<p>MEET DR. ELENA RHODES</p>",
+            "text": "<p>Meet Dr. Elena Rhodes</p>",
             "size": "sm",
-            "uppercase": true,
+            "uppercase": false,
             "muted": true
           }
         },
@@ -315,7 +319,9 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
