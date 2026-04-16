@@ -9,7 +9,9 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "auto",
+        "content_width": "narrow",
+        "vertical_alignment": "end"
       },
       "blocks": {
         "hero-heading": {

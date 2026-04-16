@@ -88,7 +88,7 @@
           "settings": {
             "link": {
               "text": "Email Us About a Cake",
-              "href": "mailto:cakes@crumblybakery.com",
+              "href": "mailto:cakes@example.com",
               "target": "_self"
             },
             "style": "primary",

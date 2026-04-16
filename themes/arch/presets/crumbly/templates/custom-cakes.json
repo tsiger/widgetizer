@@ -9,7 +9,9 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "auto",
+        "content_width": "narrow",
+        "vertical_alignment": "end"
       },
       "blocks": {
         "hero-heading": {
@@ -205,15 +207,9 @@
           "settings": {
             "caption": "Lemon drizzle celebration cake"
           }
-        },
-        "cake-img-6": {
-          "type": "image",
-          "settings": {
-            "caption": "Geometric fondant anniversary cake"
-          }
         }
       },
-      "blocksOrder": ["cake-img-1", "cake-img-2", "cake-img-3", "cake-img-4", "cake-img-5", "cake-img-6"]
+      "blocksOrder": ["cake-img-1", "cake-img-2", "cake-img-3", "cake-img-4", "cake-img-5"]
     },
     "cakes_cta": {
       "type": "action-bar",

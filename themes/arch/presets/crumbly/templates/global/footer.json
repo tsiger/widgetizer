@@ -2,13 +2,15 @@
   "type": "footer",
   "settings": {
     "copyright": "© 2026 Crumbly Bakery. All rights reserved.",
-    "color_scheme": "highlight-primary"
+    "color_scheme": "highlight-primary",
+    "layout": "equal"
   },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
-        "text": "<p>A neighborhood bakery where everything is made from scratch, every single morning. Real ingredients, no shortcuts, just the good stuff.</p>"
+        "text": "<p>A neighborhood bakery where everything is made from scratch, every single morning. Real ingredients, no shortcuts, just the good stuff.</p>",
+        "logo_width": 180
       }
     },
     "text_block_1": {

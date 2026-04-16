@@ -63,9 +63,11 @@
         "alignment": "centered",
         "show_dividers": true,
         "icon_style": "plain",
-        "icon_size": "md",
+        "icon_size": "lg",
         "icon_shape": "rounded",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "trust-1": {

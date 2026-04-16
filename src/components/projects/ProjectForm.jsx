@@ -264,6 +264,9 @@ export default function ProjectForm({
                       />
                     </button>
                     <p className="mt-2 text-center text-base font-medium leading-tight">{preset.name}</p>
+                    {preset.description && (
+                      <p className="text-center text-xs text-slate-500">{preset.description}</p>
+                    )}
                     {preset.liveDemo && (
                       <a
                         href={preset.liveDemo}

@@ -12,7 +12,7 @@
 | 4 | clearpath | Clearpath | Consultant | done | NEEDS REGEN
 | 5 | codebase | Codebase | Freelance Developer / Agency | done |
 | 6 | corkwell | Corkwell | Bar / Wine Bar | complete | images done, meta done, settings ported, demo live
-| 7 | crumbly | Crumbly | Bakery | done | images done
+| 7 | crumbly | Crumbly | Bakery | complete | images done, meta done, settings ported, demo live
 | 8 | everafter | Everafter | Wedding Planner | done |
 | 9 | formline | Formline | Architecture Firm | done |
 | 10 | framelight | Framelight | Photographer | done |
