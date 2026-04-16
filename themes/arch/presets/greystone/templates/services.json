@@ -6,14 +6,14 @@
       "type": "banner",
       "settings": {
         "image": "",
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
         "alignment": "center",
         "vertical_alignment": "center",
-        "overlay_color": "#1c191700",
-        "color_scheme": "standard-secondary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "overlay_color": "#241810c9",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "hero-heading": {
@@ -32,7 +32,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "services_grid": {
       "type": "card-grid",
@@ -47,7 +50,8 @@
         "alignment": "start",
         "image_position": "top",
         "aspect_ratio": "4 / 3",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "top_spacing": "none"
       },
       "blocks": {
         "svc-1": {
@@ -58,8 +62,8 @@
             "title": "Business Litigation",
             "description": "<p>Contract disputes, partnership conflicts, fraud claims, and commercial torts. We represent businesses and individuals in state and federal courts with strategic, results-oriented advocacy.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "#",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -72,8 +76,8 @@
             "title": "Estate Planning",
             "description": "<p>Wills, revocable and irrevocable trusts, powers of attorney, and probate administration. We help you protect your assets and provide for your family's future.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "#",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -86,8 +90,8 @@
             "title": "Real Estate Law",
             "description": "<p>Residential and commercial transactions, title disputes, zoning matters, and landlord-tenant issues. Thorough representation from due diligence through closing.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "#",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -100,8 +104,8 @@
             "title": "Family Law",
             "description": "<p>Divorce, child custody, spousal support, and prenuptial agreements. Discreet, compassionate counsel for families navigating difficult transitions.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "#",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -114,8 +118,8 @@
             "title": "Employment Law",
             "description": "<p>Wrongful termination, discrimination, harassment, and wage disputes. We represent employees and employers in negotiations, mediations, and litigation.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "#",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -128,14 +132,21 @@
             "title": "Personal Injury",
             "description": "<p>Motor vehicle accidents, premises liability, and medical malpractice. We fight for fair compensation so you can focus on recovery.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "#",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4", "svc-5", "svc-6"]
+      "blocksOrder": [
+        "svc-1",
+        "svc-2",
+        "svc-3",
+        "svc-4",
+        "svc-5",
+        "svc-6"
+      ]
     },
     "why_greystone": {
       "type": "image-text",
@@ -177,7 +188,12 @@
           }
         }
       },
-      "blocksOrder": ["why-eyebrow", "why-heading", "why-text", "why-features"]
+      "blocksOrder": [
+        "why-eyebrow",
+        "why-heading",
+        "why-text",
+        "why-features"
+      ]
     },
     "process": {
       "type": "numbered-cards",
@@ -222,7 +238,12 @@
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -251,10 +272,19 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "services_grid", "why_greystone", "process", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "services_grid",
+    "why_greystone",
+    "process",
+    "cta"
+  ],
   "id": "services",
   "created": "2026-04-08T10:00:00.000Z",
   "updated": "2026-04-08T10:00:00.000Z"

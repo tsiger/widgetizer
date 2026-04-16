@@ -2,10 +2,25 @@
   "id": "footer-menu",
   "name": "Footer Menu",
   "items": [
-    { "label": "Home", "link": "index.html", "items": [] },
-    { "label": "Practice Areas", "link": "services.html", "items": [] },
-    { "label": "Case Results", "link": "work.html", "items": [] },
-    { "label": "About", "link": "about.html", "items": [] },
-    { "label": "Contact", "link": "contact.html", "items": [] }
+    {
+      "label": "Home",
+      "link": "index.html",
+      "items": []
+    },
+    {
+      "label": "Practice Areas",
+      "link": "services.html",
+      "items": []
+    },
+    {
+      "label": "Case Results",
+      "link": "work.html",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "about.html",
+      "items": []
+    }
   ]
 }

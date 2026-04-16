@@ -1,8 +1,9 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "\u00a9 2026 Greystone Law. All rights reserved.",
-    "color_scheme": "highlight-secondary"
+    "copyright": "© 2026 Greystone Law. All rights reserved.",
+    "color_scheme": "highlight-secondary",
+    "layout": "equal"
   },
   "blocks": {
     "logo_text_1": {
@@ -32,5 +33,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

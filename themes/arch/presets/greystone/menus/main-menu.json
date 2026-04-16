@@ -2,9 +2,20 @@
   "id": "main-menu",
   "name": "Main Menu",
   "items": [
-    { "label": "Practice Areas", "link": "services.html", "items": [] },
-    { "label": "Case Results", "link": "work.html", "items": [] },
-    { "label": "About", "link": "about.html", "items": [] },
-    { "label": "Contact", "link": "contact.html", "items": [] }
+    {
+      "label": "Practice Areas",
+      "link": "services.html",
+      "items": []
+    },
+    {
+      "label": "Case Results",
+      "link": "work.html",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "about.html",
+      "items": []
+    }
   ]
 }

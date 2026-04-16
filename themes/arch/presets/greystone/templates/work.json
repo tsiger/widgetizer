@@ -6,14 +6,14 @@
       "type": "banner",
       "settings": {
         "image": "",
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
         "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#1c191700",
-        "color_scheme": "standard-secondary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "hero-heading": {
@@ -32,7 +32,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "showcase": {
       "type": "project-showcase",
@@ -45,7 +48,8 @@
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",
         "text_display": "hover",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "top_spacing": "none"
       },
       "blocks": {
         "case-1": {
@@ -127,7 +131,14 @@
           }
         }
       },
-      "blocksOrder": ["case-1", "case-2", "case-3", "case-4", "case-5", "case-6"]
+      "blocksOrder": [
+        "case-1",
+        "case-2",
+        "case-3",
+        "case-4",
+        "case-5",
+        "case-6"
+      ]
     },
     "testimonials": {
       "type": "testimonials",
@@ -173,13 +184,17 @@
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2", "review-3"]
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
     },
     "closing": {
       "type": "rich-text",
       "settings": {
         "text_alignment": "center",
-        "content_width": "narrow",
+        "content_width": "medium",
         "color_scheme": "highlight-primary"
       },
       "blocks": {
@@ -210,7 +225,11 @@
           }
         }
       },
-      "blocksOrder": ["closing-heading", "closing-text", "closing-button"]
+      "blocksOrder": [
+        "closing-heading",
+        "closing-text",
+        "closing-button"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -263,10 +282,21 @@
           }
         }
       },
-      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+      "blocksOrder": [
+        "fig-1",
+        "fig-2",
+        "fig-3",
+        "fig-4"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "stats", "showcase", "testimonials", "closing"],
+  "widgetsOrder": [
+    "hero",
+    "showcase",
+    "stats",
+    "testimonials",
+    "closing"
+  ],
   "id": "work",
   "created": "2026-04-08T10:00:00.000Z",
   "updated": "2026-04-08T10:00:00.000Z"

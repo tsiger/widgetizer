@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "overlay_color": "#1c1917a6",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "content_width": "medium"
       },
       "blocks": {
         "hero-heading": {
@@ -42,7 +43,11 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text", "hero-button"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
     },
     "trust_strip": {
       "type": "trust-bar",
@@ -52,7 +57,9 @@
         "icon_shape": "sharp",
         "alignment": "start",
         "show_dividers": true,
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "trust-1": {
@@ -88,7 +95,12 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
     },
     "practice_areas": {
       "type": "features-split",
@@ -138,7 +150,12 @@
           }
         }
       },
-      "blocksOrder": ["pa-1", "pa-2", "pa-3", "pa-4"]
+      "blocksOrder": [
+        "pa-1",
+        "pa-2",
+        "pa-3",
+        "pa-4"
+      ]
     },
     "about_teaser": {
       "type": "image-text",
@@ -186,7 +203,12 @@
           }
         }
       },
-      "blocksOrder": ["about-eyebrow", "about-heading", "about-text", "about-button"]
+      "blocksOrder": [
+        "about-eyebrow",
+        "about-heading",
+        "about-text",
+        "about-button"
+      ]
     },
     "testimonials": {
       "type": "testimonials",
@@ -222,7 +244,10 @@
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2"]
+      "blocksOrder": [
+        "review-1",
+        "review-2"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -260,7 +285,11 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -313,10 +342,23 @@
           }
         }
       },
-      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+      "blocksOrder": [
+        "fig-1",
+        "fig-2",
+        "fig-3",
+        "fig-4"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "trust_strip", "practice_areas", "stats", "about_teaser", "testimonials", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "trust_strip",
+    "practice_areas",
+    "stats",
+    "about_teaser",
+    "testimonials",
+    "cta"
+  ],
   "id": "index",
   "created": "2026-04-08T10:00:00.000Z",
   "updated": "2026-04-08T10:00:00.000Z"
