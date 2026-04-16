@@ -27,7 +27,7 @@
             },
             "button_style": "primary",
             "button_size": "medium",
-            "overlay_color": "#1a2e1a80",
+            "overlay_color": "#050e0594",
             "color_scheme": "highlight-primary"
           }
         },
@@ -46,7 +46,7 @@
             },
             "button_style": "primary",
             "button_size": "medium",
-            "overlay_color": "#1a2e1a80",
+            "overlay_color": "#050e0594",
             "color_scheme": "highlight-primary"
           }
         },
@@ -65,22 +65,24 @@
             },
             "button_style": "primary",
             "button_size": "medium",
-            "overlay_color": "#1a2e1a80",
+            "overlay_color": "#050e0594",
             "color_scheme": "highlight-primary"
           }
         }
       },
-      "blocksOrder": ["slide-1", "slide-2", "slide-3"]
+      "blocksOrder": ["slide-2", "slide-1", "slide-3"]
     },
     "trust": {
       "type": "trust-bar",
       "settings": {
         "icon_style": "filled",
-        "icon_size": "md",
+        "icon_size": "lg",
         "icon_shape": "rounded",
         "alignment": "start",
         "show_dividers": true,
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "trust-1": {
@@ -142,8 +144,8 @@
             "title": "Landscape Design",
             "description": "<p>Custom plans tailored to your property, style, and budget. From concept sketches to detailed planting guides.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -155,8 +157,8 @@
             "title": "Hardscaping",
             "description": "<p>Patios, retaining walls, walkways, fire pits, and outdoor living spaces built to last through Pacific Northwest weather.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -168,8 +170,8 @@
             "title": "Tree & Lawn Care",
             "description": "<p>Pruning, lawn installation, sodding, aeration, and ongoing maintenance to keep your property green year-round.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -181,8 +183,8 @@
             "title": "Seasonal Services",
             "description": "<p>Spring cleanup, fall leaf removal, winter prep, and seasonal planting rotations. We keep your landscape sharp all year.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "services.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -220,7 +222,7 @@
         "about-eyebrow": {
           "type": "text",
           "settings": {
-            "text": "<p>ABOUT GREENFIELD</p>",
+            "text": "<p>About Greenfield</p>",
             "size": "sm",
             "uppercase": true,
             "muted": true
@@ -265,7 +267,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "flat",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "review-1": {
@@ -319,8 +321,8 @@
           "type": "text",
           "settings": {
             "text": "<p>Free estimates for all projects.</p>",
-            "size": "sm",
-            "uppercase": true,
+            "size": "base",
+            "uppercase": false,
             "muted": true
           }
         },

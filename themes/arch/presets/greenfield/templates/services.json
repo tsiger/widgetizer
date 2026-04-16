@@ -10,8 +10,8 @@
         "fullwidth": true,
         "alignment": "center",
         "vertical_alignment": "center",
-        "overlay_color": "#1a2e1a00",
-        "color_scheme": "standard-secondary",
+        "overlay_color": "#091509a6",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -58,8 +58,8 @@
             "title": "Landscape Design",
             "description": "<p>Custom plans created by our in-house designer. We start with your vision and create detailed layouts, plant selections, and 3D renderings before breaking ground.</p>",
             "button_link": {
-              "text": "Get a Quote",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -72,8 +72,8 @@
             "title": "Patio & Hardscaping",
             "description": "<p>Stone patios, retaining walls, fire pits, walkways, and outdoor kitchens. Engineered to handle Portland's rain and built to last decades.</p>",
             "button_link": {
-              "text": "Get a Quote",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -86,8 +86,8 @@
             "title": "Lawn Installation & Sodding",
             "description": "<p>New lawn seeding, sod installation, and complete soil preparation. We match grass varieties to your sun exposure and usage patterns.</p>",
             "button_link": {
-              "text": "Get a Quote",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -100,8 +100,8 @@
             "title": "Tree & Shrub Care",
             "description": "<p>Pruning, shaping, disease treatment, and removal by ISA-certified arborists. We keep your trees healthy and your property safe.</p>",
             "button_link": {
-              "text": "Get a Quote",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -114,8 +114,8 @@
             "title": "Seasonal Cleanup",
             "description": "<p>Spring prep, fall leaf removal, winter mulching, and storm cleanup. Keep your landscape sharp through every Pacific Northwest season.</p>",
             "button_link": {
-              "text": "Get a Quote",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -128,8 +128,8 @@
             "title": "Irrigation Systems",
             "description": "<p>Sprinkler design, installation, and seasonal maintenance. Efficient watering systems that save water and keep everything green.</p>",
             "button_link": {
-              "text": "Get a Quote",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }

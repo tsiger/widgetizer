@@ -12,8 +12,8 @@
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,
-    "full_width": true,
-    "sticky": false,
+    "full_width": false,
+    "sticky": true,
     "transparent_on_hero": true,
     "color_scheme": "standard-primary"
   }

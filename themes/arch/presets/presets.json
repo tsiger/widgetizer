@@ -63,7 +63,8 @@
     {
       "id": "greenfield",
       "name": "Greenfield",
-      "description": "Landscaping"
+      "description": "Landscaping",
+      "liveDemo": "https://widgetizer.org/demos/greenfield/"
     },
     {
       "id": "greystone",

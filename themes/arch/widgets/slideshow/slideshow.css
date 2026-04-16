@@ -161,7 +161,7 @@
 }
 
 /* Make slideshow heroes extend behind transparent headers like banner does */
-.transparent-header .main-content > &:first-child {
+.transparent-header .main-content > .widget-slideshow:first-child {
   padding-block-start: 0;
   background-color: transparent;
 

@@ -2,7 +2,7 @@
   "type": "footer",
   "settings": {
     "copyright": "\u00a9 2026 Greenfield Landscaping. All rights reserved.",
-    "color_scheme": "highlight-primary"
+    "color_scheme": "highlight-secondary"
   },
   "blocks": {
     "logo_text_1": {

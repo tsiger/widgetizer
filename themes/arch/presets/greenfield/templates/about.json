@@ -10,7 +10,7 @@
         "fullwidth": true,
         "alignment": "center",
         "vertical_alignment": "center",
-        "overlay_color": "#1a2e1a99",
+        "overlay_color": "#0c190cc2",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
@@ -78,6 +78,8 @@
         "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
+        "image_style": "full",
+        "aspect_ratio": "1 / 1",
         "color_scheme": "standard-secondary"
       },
       "blocks": {

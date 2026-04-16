@@ -16,7 +16,7 @@
 | 8 | everafter | Everafter | Wedding Planner | done |
 | 9 | formline | Formline | Architecture Firm | done |
 | 10 | framelight | Framelight | Photographer | done |
-| 11 | greenfield | Greenfield | Landscaping | done | images done
+| 11 | greenfield | Greenfield | Landscaping | complete | images done, meta done, settings ported, demo live
 | 12 | greystone | Greystone | Lawyer / Law Firm | done | images done
 | 13 | hearthstone | Hearthstone | Hotel / B&B | done |
 | 14 | hue-and-co | Hue & Co | Interior Designer | done |
