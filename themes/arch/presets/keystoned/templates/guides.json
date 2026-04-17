@@ -2,57 +2,6 @@
   "name": "Buyers & Sellers",
   "slug": "guides",
   "widgets": {
-    "intro": {
-      "type": "split-content",
-      "settings": {
-        "balance": "left-heavy",
-        "sticky_column": "none",
-        "color_scheme": "standard-secondary",
-        "top_spacing": "none"
-      },
-      "blocks": {
-        "intro-eyebrow": {
-          "type": "text",
-          "settings": {
-            "text": "<p>GUIDES</p>",
-            "size": "sm",
-            "uppercase": true,
-            "muted": true,
-            "position": "left"
-          }
-        },
-        "intro-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Buying or Selling — We've Got You Covered",
-            "size": "4xl",
-            "position": "left"
-          }
-        },
-        "intro-button": {
-          "type": "button",
-          "settings": {
-            "link": {
-              "text": "Contact Sarah",
-              "href": "contact.html",
-              "target": "_self"
-            },
-            "style": "primary",
-            "size": "medium",
-            "position": "left"
-          }
-        },
-        "intro-text": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Whether this is your first home or your fifth, every transaction is different. Sarah provides personalized guidance for buyers and sellers at every stage — from initial search to closing day and beyond.</p>",
-            "size": "base",
-            "position": "right"
-          }
-        }
-      },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-button", "intro-text"]
-    },
     "buyers": {
       "type": "image-text",
       "settings": {
@@ -221,7 +170,7 @@
       "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["intro", "buyers", "sellers", "process", "cta"],
+  "widgetsOrder": ["buyers", "sellers", "process", "cta"],
   "id": "guides",
   "created": "2026-04-08T16:00:00.000Z",
   "updated": "2026-04-08T16:00:00.000Z"

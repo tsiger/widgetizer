@@ -10,8 +10,8 @@
         "fullwidth": true,
         "alignment": "center",
         "vertical_alignment": "center",
-        "overlay_color": "#1f1a1700",
-        "color_scheme": "standard-secondary",
+        "overlay_color": "#1f1a17c2",
+        "color_scheme": "highlight-primary",
         "top_spacing": "none",
         "bottom_spacing": "none"
       },
@@ -57,8 +57,8 @@
             "title": "Beacon Hill",
             "description": "<p>Historic Federal-style row houses, gaslit streets, and a tight-knit community minutes from the Common. Median home price: $1.8M.</p>",
             "button_link": {
-              "text": "Explore",
-              "href": "properties.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -70,8 +70,8 @@
             "title": "Back Bay",
             "description": "<p>Grand Victorian brownstones along tree-lined Commonwealth Avenue. World-class shopping on Newbury Street. Median: $2.4M.</p>",
             "button_link": {
-              "text": "Explore",
-              "href": "properties.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -83,8 +83,8 @@
             "title": "South End",
             "description": "<p>Boston's most vibrant dining and arts scene, with beautifully restored Victorian row houses. Median: $1.4M.</p>",
             "button_link": {
-              "text": "Explore",
-              "href": "properties.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -96,8 +96,8 @@
             "title": "Cambridge",
             "description": "<p>Home to Harvard and MIT, with a rich mix of academic charm, independent shops, and excellent schools. Median: $1.6M.</p>",
             "button_link": {
-              "text": "Explore",
-              "href": "properties.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -109,8 +109,8 @@
             "title": "Brookline",
             "description": "<p>Family-friendly suburb with top-rated schools, beautiful parks, and easy access to downtown Boston. Median: $1.3M.</p>",
             "button_link": {
-              "text": "Explore",
-              "href": "properties.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -122,8 +122,8 @@
             "title": "Somerville",
             "description": "<p>Creative, walkable, and rapidly evolving. A favorite for young professionals and investors alike. Median: $850K.</p>",
             "button_link": {
-              "text": "Explore",
-              "href": "properties.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }

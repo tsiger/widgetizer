@@ -90,7 +90,8 @@
     {
       "id": "keystoned",
       "name": "Keystoned",
-      "description": "Real estate agent"
+      "description": "Real estate agent",
+      "liveDemo": "https://widgetizer.org/demos/keystoned/"
     },
     {
       "id": "ledgerworks",

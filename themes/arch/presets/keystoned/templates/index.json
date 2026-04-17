@@ -76,11 +76,13 @@
       "type": "trust-bar",
       "settings": {
         "icon_style": "filled",
-        "icon_size": "md",
+        "icon_size": "lg",
         "icon_shape": "rounded",
         "alignment": "start",
         "show_dividers": true,
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "trust-1": {
@@ -287,7 +289,7 @@
         "icon_style": "outline",
         "icon_size": "lg",
         "icon_shape": "circle",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "card-1": {
@@ -297,8 +299,8 @@
             "title": "First-Time Buyers",
             "description": "<p>Step-by-step guidance from pre-approval to closing day. We make the process simple and transparent.</p>",
             "button_link": {
-              "text": "Buyer's Guide",
-              "href": "guides.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -310,8 +312,8 @@
             "title": "Ready to Sell",
             "description": "<p>Strategic pricing, professional staging, and marketing that maximizes your home's value and minimizes time on market.</p>",
             "button_link": {
-              "text": "Seller's Guide",
-              "href": "guides.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -323,8 +325,8 @@
             "title": "Property Investors",
             "description": "<p>Market analysis, portfolio strategy, and deal sourcing for investors looking to build wealth through Boston real estate.</p>",
             "button_link": {
-              "text": "Let's Talk",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }

@@ -15,7 +15,7 @@
         "icon_size": "lg",
         "icon_shape": "rounded",
         "color_scheme": "standard-secondary",
-        "top_spacing": "none"
+        "top_spacing": "auto"
       },
       "blocks": {
         "type-1": {
@@ -53,10 +53,10 @@
         "description": "",
         "heading_alignment": "start",
         "address": "84 Charles St, Boston, MA 02114",
-        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2948.4!2d-71.070!3d42.359!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s84+Charles+St!5e0!3m2!1sen!2sus",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.183!2d-73.9856644!3d40.7484405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1700000000000",
         "directions_link": {
           "text": "Get Directions",
-          "href": "https://maps.google.com/?q=84+Charles+St+Boston+MA+02114",
+          "href": "#",
           "target": "_blank"
         },
         "height": "medium",

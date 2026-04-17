@@ -10,7 +10,7 @@
         "text_position": "center",
         "content_color_scheme": "none",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none"
+        "top_spacing": "auto"
       },
       "blocks": {
         "story-eyebrow": {
@@ -57,7 +57,9 @@
         "columns_desktop": 4,
         "card_layout": "flat",
         "animate": true,
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "fig-1": {

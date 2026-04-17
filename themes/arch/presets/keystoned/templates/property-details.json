@@ -1,0 +1,447 @@
+{
+  "name": "Property Details",
+  "slug": "property-details",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "",
+        "height": "medium",
+        "fullwidth": true,
+        "alignment": "start",
+        "vertical_alignment": "end",
+        "overlay_color": "#1f1a1799",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto",
+        "content_width": "wide"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Beacon Hill · For Sale</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "42 Beacon Street",
+            "size": "5xl"
+          }
+        },
+        "hero-price": {
+          "type": "text",
+          "settings": {
+            "text": "<p>$3,200,000</p>",
+            "size": "2xl"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-price"
+      ]
+    },
+    "specs": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "display_header": false,
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": false,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "spec-beds": {
+          "type": "figure",
+          "settings": {
+            "number": "4",
+            "suffix": "",
+            "label": "Bedrooms",
+            "description": ""
+          }
+        },
+        "spec-baths": {
+          "type": "figure",
+          "settings": {
+            "number": "3.5",
+            "suffix": "",
+            "label": "Bathrooms",
+            "description": ""
+          }
+        },
+        "spec-sqft": {
+          "type": "figure",
+          "settings": {
+            "number": "3,400",
+            "suffix": "",
+            "label": "Square Feet",
+            "description": ""
+          }
+        },
+        "spec-year": {
+          "type": "figure",
+          "settings": {
+            "number": "1892",
+            "suffix": "",
+            "label": "Year Built",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": [
+        "spec-beds",
+        "spec-baths",
+        "spec-sqft",
+        "spec-year"
+      ]
+    },
+    "overview": {
+      "type": "image-text",
+      "settings": {
+        "image": "",
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "overview-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About This Home</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "overview-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A Beacon Hill Townhouse with Timeless Character",
+            "size": "3xl"
+          }
+        },
+        "overview-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Set on one of Boston's most storied streets, this four-story townhouse balances period craftsmanship with considered modern updates. Original hardwoods, three working fireplaces, and a private south-facing garden are paired with a renovated chef's kitchen, updated mechanical systems, and a finished lower level.</p>",
+            "size": "base"
+          }
+        },
+        "overview-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The upper floor is given over to a full primary suite with a dressing room and spa bath. Walk to the Common, Charles Street shops, and the Red Line in minutes.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": [
+        "overview-eyebrow",
+        "overview-heading",
+        "overview-text",
+        "overview-text-2"
+      ]
+    },
+    "gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "",
+        "title": "Gallery",
+        "description": "",
+        "heading_alignment": "start",
+        "display_header": true,
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": false,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Living room with fireplace"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Chef's kitchen"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Primary bedroom"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Primary bath"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Dining room"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "caption": "Private garden"
+          }
+        }
+      },
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6"
+      ]
+    },
+    "features": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Features",
+        "eyebrow_uppercase": true,
+        "title": "What Makes This Home",
+        "description": "",
+        "heading_alignment": "start",
+        "display_header": true,
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "start",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "square-rounded",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "feat-1": {
+          "type": "card",
+          "settings": {
+            "icon": "flame",
+            "subtitle": "",
+            "title": "Three Fireplaces",
+            "description": "<p>Working wood-burning fireplaces in the living room, library, and primary suite — all recently inspected.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "feat-2": {
+          "type": "card",
+          "settings": {
+            "icon": "snowflake",
+            "subtitle": "",
+            "title": "Central Air",
+            "description": "<p>High-efficiency zoned HVAC installed in 2022, with smart thermostats on every floor.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "feat-3": {
+          "type": "card",
+          "settings": {
+            "icon": "car-garage",
+            "subtitle": "",
+            "title": "Deeded Parking",
+            "description": "<p>Rare on Beacon Hill — one deeded off-street space conveys with the property.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "feat-4": {
+          "type": "card",
+          "settings": {
+            "icon": "tree",
+            "subtitle": "",
+            "title": "Private Garden",
+            "description": "<p>A fenced south-facing garden with mature plantings, irrigation, and a bluestone patio.</p>",
+            "button_link": {
+              "href": "#",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "feat-5": {
+          "type": "card",
+          "settings": {
+            "icon": "stairs",
+            "subtitle": "",
+            "title": "Original Details",
+            "description": "<p>Period moldings, wide-plank pine floors, and restored transom windows throughout.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "feat-6": {
+          "type": "card",
+          "settings": {
+            "icon": "shield",
+            "subtitle": "",
+            "title": "Updated Systems",
+            "description": "<p>New roof, electrical, plumbing, and exterior repointing completed within the last five years.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "feat-1",
+        "feat-2",
+        "feat-3",
+        "feat-4",
+        "feat-5",
+        "feat-6"
+      ]
+    },
+    "location": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "The Neighborhood",
+        "description": "",
+        "heading_alignment": "start",
+        "address": "42 Beacon Street, Boston, MA 02108",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.183!2d-73.9856644!3d40.7484405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1700000000000",
+        "directions_link": {
+          "text": "Get Directions",
+          "href": "#",
+          "target": "_blank"
+        },
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info-walk": {
+          "type": "info",
+          "settings": {
+            "title": "Walkability",
+            "text": "<p>Walk Score 98 — a walker's paradise. Daily errands do not require a car.</p>"
+          }
+        },
+        "info-nearby": {
+          "type": "info",
+          "settings": {
+            "title": "Nearby",
+            "text": "<p>Boston Common · 3 min walk</p><p>Charles/MGH (Red Line) · 6 min walk</p><p>Whole Foods (Charles St) · 5 min walk</p>"
+          }
+        },
+        "info-schools": {
+          "type": "info",
+          "settings": {
+            "title": "Schools",
+            "text": "<p>Advent School · K-6</p><p>Boston Latin Academy · 7-12</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "info-walk",
+        "info-nearby",
+        "info-schools"
+      ]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Schedule a Private Showing",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Private tours by appointment — weekday evenings and weekends.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Request a Showing",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call Sarah",
+              "href": "tel:+16175550189",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "specs",
+    "overview",
+    "gallery",
+    "features",
+    "location",
+    "cta"
+  ],
+  "id": "property-details",
+  "created": "2026-04-17T10:00:00.000Z",
+  "updated": "2026-04-17T10:00:00.000Z"
+}
