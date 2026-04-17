@@ -36,7 +36,7 @@
         "layout": "grid",
         "columns_desktop": 4,
         "staggered": false,
-        "aspect_ratio": "auto",
+        "aspect_ratio": "1 / 1",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -131,7 +131,9 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {

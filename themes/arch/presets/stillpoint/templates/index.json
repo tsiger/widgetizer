@@ -66,7 +66,7 @@
         "separator": "·",
         "speed": 4,
         "rotate": 0,
-        "font_size": "lg",
+        "font_size": "sm",
         "bg_color": "#c4724e",
         "text_color": "#ffffff",
         "top_spacing": "none",
@@ -134,8 +134,8 @@
             "title": "Vinyasa Flow",
             "description": "<p>Dynamic, breath-led sequences that build heat and focus. Move through poses with intention and find your rhythm.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "classes.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -147,8 +147,8 @@
             "title": "Hatha",
             "description": "<p>Slower-paced practice with longer holds. Build strength and alignment through foundational postures and conscious breathing.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "classes.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -160,8 +160,8 @@
             "title": "Yin",
             "description": "<p>Deep, passive stretches held for minutes at a time. Release tension in connective tissue and cultivate stillness.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "classes.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -173,8 +173,8 @@
             "title": "Pilates Mat",
             "description": "<p>Core-centered movement that strengthens from the inside out. Controlled, precise exercises for posture and stability.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "classes.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -186,8 +186,8 @@
             "title": "Prenatal",
             "description": "<p>Gentle, supportive practice designed for expecting mothers. Ease discomfort, build strength, and prepare for birth.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "classes.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -199,8 +199,8 @@
             "title": "Meditation",
             "description": "<p>Guided sitting practice to quiet the mind and deepen awareness. No experience needed — just show up and breathe.</p>",
             "button_link": {
-              "text": "Learn More",
-              "href": "classes.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -301,8 +301,8 @@
         "alignment": "centered",
         "show_dividers": true,
         "color_scheme": "standard-secondary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "stat-1": {
@@ -337,8 +337,8 @@
       "settings": {
         "fullwidth": false,
         "color_scheme": "highlight-primary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {

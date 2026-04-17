@@ -56,8 +56,8 @@
             "title": "Vinyasa Flow",
             "description": "<p>Dynamic, breath-led sequences that build heat, endurance, and focus. Expect sun salutations, standing flows, and creative transitions. Intermediate pace with modifications offered for all levels.</p>",
             "button_link": {
-              "text": "View Schedule",
-              "href": "schedule.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -69,8 +69,8 @@
             "title": "Hatha",
             "description": "<p>A slower-paced practice with longer holds in each posture. Build strength, alignment, and body awareness through foundational poses and conscious breathing. Perfect for beginners and experienced practitioners alike.</p>",
             "button_link": {
-              "text": "View Schedule",
-              "href": "schedule.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -82,8 +82,8 @@
             "title": "Yin",
             "description": "<p>Deep, passive stretches held for three to five minutes at a time. Release tension stored in connective tissue, calm the nervous system, and cultivate a meditative stillness. Mostly floor-based and deeply restorative.</p>",
             "button_link": {
-              "text": "View Schedule",
-              "href": "schedule.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -95,8 +95,8 @@
             "title": "Pilates Mat",
             "description": "<p>Core-centered movement that strengthens from the inside out. Controlled, precise exercises improve posture, stability, and body control. No equipment needed — just a mat and your focus.</p>",
             "button_link": {
-              "text": "View Schedule",
-              "href": "schedule.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -108,8 +108,8 @@
             "title": "Prenatal",
             "description": "<p>Gentle, supportive practice designed for expecting mothers at any trimester. Ease discomfort, build strength for labor, and connect with your changing body in a safe, nurturing environment.</p>",
             "button_link": {
-              "text": "View Schedule",
-              "href": "schedule.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -121,8 +121,8 @@
             "title": "Meditation",
             "description": "<p>Guided sitting practice to quiet the mind and deepen self-awareness. Sessions include breath work, body scans, and mindfulness techniques. No experience needed — just show up and breathe.</p>",
             "button_link": {
-              "text": "View Schedule",
-              "href": "schedule.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }

@@ -2,14 +2,16 @@
   "type": "footer",
   "settings": {
     "copyright": "© 2026 Stillpoint Yoga Studio. All rights reserved.",
-    "color_scheme": "highlight-primary"
+    "color_scheme": "highlight-secondary",
+    "layout": "equal"
   },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
         "logo_text": "Stillpoint",
-        "text": "<p>Find your center. A neighborhood yoga and pilates studio offering classes for every body and every level.</p>"
+        "text": "<p>Find your center. A neighborhood yoga and pilates studio offering classes for every body and every level.</p>",
+        "logo_width": 170
       }
     },
     "text_block_1": {
@@ -32,5 +34,5 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": ["text_block_1", "menu_block_1", "social_block_1", "logo_text_1"]
 }
