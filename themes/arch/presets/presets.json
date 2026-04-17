@@ -13,11 +13,6 @@
       "liveDemo": "https://widgetizer.org/demos/brewline"
     },
     {
-      "id": "brewline-v2",
-      "name": "Brewline v2",
-      "description": "Coffee shop"
-    },
-    {
       "id": "brightside",
       "name": "Brightside",
       "description": "Dental practice",
@@ -69,7 +64,8 @@
     {
       "id": "greystone",
       "name": "Greystone",
-      "description": "Law firm"
+      "description": "Law firm",
+      "liveDemo": "https://widgetizer.org/demos/greystone/"
     },
     {
       "id": "hearthstone",
@@ -139,11 +135,6 @@
     {
       "id": "saffron",
       "name": "Saffron",
-      "description": "Restaurant"
-    },
-    {
-      "id": "saffron-v2",
-      "name": "Saffron v2",
       "description": "Restaurant"
     },
     {

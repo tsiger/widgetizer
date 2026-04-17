@@ -6,9 +6,9 @@
       "type": "banner",
       "settings": {
         "image": "",
-        "height": "large",
+        "height": "medium",
         "fullwidth": true,
-        "alignment": "start",
+        "alignment": "center",
         "vertical_alignment": "center",
         "overlay_color": "#1c1917a6",
         "color_scheme": "highlight-primary",
