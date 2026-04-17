@@ -35,6 +35,7 @@
         "eyebrow": "The Food",
         "title": "From Our Kitchen",
         "heading_alignment": "center",
+        "alignment": "center",
         "columns_desktop": 3,
         "gap": "medium",
         "color_scheme": "standard-primary"

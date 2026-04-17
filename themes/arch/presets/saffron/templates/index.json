@@ -81,22 +81,9 @@
             "size": "base",
             "position": "right"
           }
-        },
-        "intro-button": {
-          "type": "button",
-          "settings": {
-            "link": {
-              "text": "About Us",
-              "href": "about.html",
-              "target": "_self"
-            },
-            "style": "secondary",
-            "size": "medium",
-            "position": "right"
-          }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text", "intro-button"]
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text"]
     },
     "featured_dishes": {
       "type": "priced-list",
@@ -195,7 +182,7 @@
         "columns_desktop": 3,
         "layout": "grid",
         "card_layout": "flat",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "quote-1": {

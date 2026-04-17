@@ -158,7 +158,9 @@
         "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
-        "color_scheme": "standard-primary"
+        "image_style": "full",
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "profile-1": {

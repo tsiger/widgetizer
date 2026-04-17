@@ -208,7 +208,7 @@
       "type": "image-text",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "drinks-eyebrow": {
@@ -252,7 +252,7 @@
     "menu_cta": {
       "type": "action-bar",
       "settings": {
-        "fullwidth": true,
+        "fullwidth": false,
         "color_scheme": "highlight-primary"
       },
       "blocks": {

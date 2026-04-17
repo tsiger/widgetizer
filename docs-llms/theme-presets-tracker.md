@@ -30,9 +30,9 @@
 | 22 | petalry | Petalry | Flower Shop | done |
 | 23 | pipeworks | Pipeworks | Plumber / Electrician | done | NEEDS REGEN
 | 24 | pixelcraft | Pixelcraft | Graphic Designer | done |
-| 25 | saffron | Saffron | Restaurant | done | images done
+| 25 | saffron | Saffron | Restaurant | complete | images done, meta done, settings ported, demo live
 | 26 | sparkhaus | Sparkhaus | Cleaning Service | done | NEEDS PROMPTS
-| 27 | stillpoint | Stillpoint | Yoga / Pilates Studio | done | images done
+| 27 | stillpoint | Stillpoint | Yoga / Pilates Studio | complete | images done, meta done, settings ported, demo live
 | 28 | tailside | Tailside | Veterinarian | done |
 | 29 | torque | Torque | Auto Repair | done |
 | 30 | uplink | Uplink | IT Support | done |

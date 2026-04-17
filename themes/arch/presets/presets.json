@@ -136,7 +136,8 @@
     {
       "id": "saffron",
       "name": "Saffron",
-      "description": "Restaurant"
+      "description": "Restaurant",
+      "liveDemo": "https://widgetizer.org/demos/saffron/"
     },
     {
       "id": "sparkhaus",
@@ -146,7 +147,8 @@
     {
       "id": "stillpoint",
       "name": "Stillpoint",
-      "description": "Yoga studio"
+      "description": "Yoga studio",
+      "liveDemo": "https://widgetizer.org/demos/stillpoint/"
     },
     {
       "id": "consulting",

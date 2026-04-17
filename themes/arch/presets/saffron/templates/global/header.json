@@ -4,7 +4,9 @@
     "logoText": "Saffron",
     "contactDetailsLine1": "(555) 234-5678",
     "contactDetailsLine2": "247 Elm Street, Brooklyn",
-    "contact_position": "logo",
+    "contact_position": "menu",
+    "logoMaxWidth": 130,
+    "center_nav": true,
     "ctaButtonLink": {
       "href": "reservations.html",
       "text": "Reserve a Table",
