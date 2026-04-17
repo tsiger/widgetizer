@@ -64,7 +64,7 @@
         "eyebrow": "First Visit",
         "eyebrow_uppercase": true,
         "title": "Before You Come In",
-        "heading_alignment": "start",
+        "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": false,
         "color_scheme": "standard-secondary"
@@ -104,7 +104,9 @@
     "contact_cta": {
       "type": "action-bar",
       "settings": {
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
@@ -131,7 +133,7 @@
               "target": "_self"
             },
             "style": "primary",
-            "size": "large"
+            "size": "medium"
           }
         }
       },

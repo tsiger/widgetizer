@@ -6,7 +6,9 @@
       "type": "split-hero",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -40,7 +42,7 @@
               "target": "_self"
             },
             "style": "primary",
-            "size": "large",
+            "size": "medium",
             "link_2": {
               "href": "programs.html",
               "text": "Our Programs",
@@ -191,7 +193,7 @@
               "target": "_self"
             },
             "style": "secondary",
-            "size": "large"
+            "size": "medium"
           }
         }
       },
@@ -253,7 +255,7 @@
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "standard-primary"
       },
       "blocks": {
         "review-1": {
@@ -289,7 +291,9 @@
     "tour_cta": {
       "type": "action-bar",
       "settings": {
-        "color_scheme": "highlight-secondary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
@@ -316,7 +320,7 @@
               "target": "_self"
             },
             "style": "primary",
-            "size": "large"
+            "size": "medium"
           }
         }
       },

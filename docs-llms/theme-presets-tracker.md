@@ -23,7 +23,7 @@
 | 15 | ironform | Ironform | Personal Trainer | done | NEEDS PROMPTS
 | 16 | keystoned | Keystoned | Real Estate Agent | complete | images done, meta done, settings ported, property-details template added, demo live
 | 17 | ledgerworks | Ledgerworks | Accountant | done | NEEEDS REGEN
-| 18 | little-oaks | Little Oaks | Daycare / Preschool | done |
+| 18 | little-oaks | Little Oaks | Daycare / Preschool | complete | images done, meta done, settings ported, demo live
 | 19 | noteworthy | Noteworthy | Tutoring / Music Lessons | pending |
 | 20 | olympic | Olympic | Gym | done |
 | 21 | pawlish | Pawlish | Pet Grooming | done |

@@ -101,7 +101,8 @@
     {
       "id": "little-oaks",
       "name": "Little Oaks",
-      "description": "Daycare / preschool"
+      "description": "Daycare / preschool",
+      "liveDemo": "https://widgetizer.org/demos/little-oaks/"
     },
     {
       "id": "noteworthy",

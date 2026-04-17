@@ -5,6 +5,7 @@
     "contactDetailsLine1": "(555) 482-3100",
     "contactDetailsLine2": "140 Maple Lane, Asheville",
     "contact_position": "logo",
+    "logoMaxWidth": 160,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Schedule a Tour",

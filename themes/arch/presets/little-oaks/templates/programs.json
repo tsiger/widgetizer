@@ -36,7 +36,7 @@
         "eyebrow_uppercase": true,
         "title": "What Each Program Looks Like",
         "heading_alignment": "center",
-        "columns_desktop": 2,
+        "columns_desktop": 4,
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -93,7 +93,7 @@
           }
         }
       },
-      "blocksOrder": ["tile-1", "tile-2", "tile-3", "tile-4", "tile-5", "tile-6", "tile-7", "tile-8"]
+      "blocksOrder": ["tile-1", "tile-2", "tile-4", "tile-3", "tile-6", "tile-5", "tile-7", "tile-8"]
     },
     "daily_schedule": {
       "type": "schedule-table",
@@ -211,7 +211,9 @@
     "programs_cta": {
       "type": "action-bar",
       "settings": {
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
@@ -238,7 +240,7 @@
               "target": "_self"
             },
             "style": "primary",
-            "size": "large"
+            "size": "medium"
           }
         }
       },
