@@ -2020,5 +2020,104 @@
         }
       }
     }
+  },
+  "class_schedule": {
+    "name": "Class schedule",
+    "empty": "No classes scheduled.",
+    "settings": {
+      "note": {
+        "label": "Footer note",
+        "description": "Optional disclaimer shown below the schedule (e.g. holiday hours, booking info)."
+      },
+      "layout": {
+        "label": "Layout",
+        "options": {
+          "tabs": "Tabs (day switcher)",
+          "accordion": "Accordion (collapsible days)",
+          "list": "List (all days visible)"
+        }
+      },
+      "week_start_day": {
+        "label": "Week starts on",
+        "options": {
+          "monday": "Monday",
+          "sunday": "Sunday"
+        }
+      },
+      "default_day": {
+        "label": "Default active day",
+        "description": "'Today' auto-selects based on the visitor's current day (tabs layout only).",
+        "options": {
+          "today": "Today (auto)"
+        }
+      },
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "hide_empty_days": {
+        "label": "Hide days with no classes"
+      },
+      "show_time": {
+        "label": "Show class time"
+      },
+      "show_duration": {
+        "label": "Show class duration"
+      },
+      "show_instructor": {
+        "label": "Show instructor name"
+      },
+      "show_level": {
+        "label": "Show difficulty level badge"
+      },
+      "show_description": {
+        "label": "Show class description"
+      },
+      "show_book_button": {
+        "label": "Show book button"
+      }
+    },
+    "blocks": {
+      "class": {
+        "name": "Class",
+        "settings": {
+          "day": {
+            "label": "Day of week"
+          },
+          "time": {
+            "label": "Start time"
+          },
+          "duration": {
+            "label": "Duration"
+          },
+          "title": {
+            "label": "Class name"
+          },
+          "instructor": {
+            "label": "Instructor"
+          },
+          "level": {
+            "label": "Difficulty level",
+            "options": {
+              "all_levels": "All levels",
+              "beginner": "Beginner",
+              "intermediate": "Intermediate",
+              "advanced": "Advanced"
+            }
+          },
+          "description": {
+            "label": "Short description"
+          },
+          "book_link": {
+            "label": "Book / reserve link"
+          }
+        }
+      }
+    }
   }
 }

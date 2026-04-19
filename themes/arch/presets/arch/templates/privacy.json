@@ -6,7 +6,7 @@
       "type": "rich-text",
       "settings": {
         "text_alignment": "start",
-        "content_width": "md"
+        "content_width": "fullwidth"
       },
       "blocks": {
         "privacy-title": {

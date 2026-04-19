@@ -67,6 +67,7 @@
         "title": "Consulting that scales with you",
         "description": "Advising fast-moving companies across operations, growth, and transformation.",
         "columns_desktop": 6,
+        "card_layout": "flat",
         "color_scheme": "standard-primary"
       },
       "blocks": {

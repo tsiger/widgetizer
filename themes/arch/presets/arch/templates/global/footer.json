@@ -1,6 +1,9 @@
 {
   "type": "footer",
-  "settings": {},
+  "settings": {
+    "layout": "equal",
+    "color_scheme": "highlight-secondary"
+  },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",

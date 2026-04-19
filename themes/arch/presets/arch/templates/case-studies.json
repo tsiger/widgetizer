@@ -65,6 +65,7 @@
         "description": "A sample of engagements across strategy, operations, and growth.",
         "columns_desktop": 3,
         "aspect_ratio": "4 / 3",
+        "text_display": "always",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -87,7 +88,7 @@
             "description": "Standardized delivery workflows and cut cycle time.",
             "link": {
               "text": "Read case study",
-              "href": "case-study-momentum-ops.html",
+              "href": "case-study-atlas-growth.html",
               "target": "_self"
             }
           }
@@ -99,7 +100,7 @@
             "description": "Launched a new service line across three regions.",
             "link": {
               "text": "Read case study",
-              "href": "case-study-regency-entry.html",
+              "href": "case-study-atlas-growth.html",
               "target": "_self"
             }
           }

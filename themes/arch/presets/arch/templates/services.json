@@ -58,12 +58,21 @@
       "blocksOrder": ["services-eyebrow", "services-heading", "services-text", "services-buttons"]
     },
     "services_grid": {
-      "type": "card-grid",
+      "type": "icon-card-grid",
       "settings": {
         "eyebrow": "Capabilities",
+        "eyebrow_uppercase": false,
         "title": "What we deliver",
         "description": "Practical, high-impact engagements tailored to your business.",
+        "heading_alignment": "center",
+        "featured_image_position": "start",
+        "layout": "grid",
         "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "circle",
         "color_scheme": "standard-primary"
       },
       "blocks": {
@@ -72,13 +81,13 @@
           "settings": {
             "subtitle": "Strategy",
             "title": "Strategic Planning",
-            "description": "Vision, priorities, and a measurable roadmap.",
+            "description": "<p>Beautiful, responsive websites that engage and convert visitors.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             },
-            "icon": "target"
+            "icon": "globe"
           }
         },
         "service-2": {
@@ -86,13 +95,13 @@
           "settings": {
             "subtitle": "Operations",
             "title": "Operating Model",
-            "description": "Structure teams and workflows for scale.",
+            "description": "<p>Custom web applications built with modern technologies.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             },
-            "icon": "chess-knight"
+            "icon": "terminal"
           }
         },
         "service-3": {
@@ -100,13 +109,13 @@
           "settings": {
             "subtitle": "Growth",
             "title": "Go-to-Market",
-            "description": "Positioning, pricing, and pipeline design.",
+            "description": "<p>Strategies that drive traffic and grow your business.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             },
-            "icon": "chart-covariate"
+            "icon": "target"
           }
         },
         "service-4": {
@@ -114,13 +123,13 @@
           "settings": {
             "subtitle": "Transformation",
             "title": "Digital Enablement",
-            "description": "Modern systems that unlock efficiency and insight.",
+            "description": "<p>24/7 dedicated support to help you succeed.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             },
-            "icon": "contrast-2"
+            "icon": "headset"
           }
         },
         "service-5": {
@@ -128,13 +137,13 @@
           "settings": {
             "subtitle": "Leadership",
             "title": "Executive Alignment",
-            "description": "Facilitation and decision support for leaders.",
+            "description": "<p>Powerful insights to make informed decisions.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             },
-            "icon": "keyframe-align-center"
+            "icon": "graph"
           }
         },
         "service-6": {
@@ -142,13 +151,13 @@
           "settings": {
             "subtitle": "Analytics",
             "title": "Performance Metrics",
-            "description": "Dashboards and KPIs that drive action.",
+            "description": "<p>Card description text goes here.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             },
-            "icon": "chart-arrows-vertical"
+            "icon": "world"
           }
         }
       },
