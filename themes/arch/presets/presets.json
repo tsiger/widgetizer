@@ -118,7 +118,8 @@
     {
       "id": "olympic",
       "name": "Olympic",
-      "description": "Gym"
+      "description": "Gym",
+      "liveDemo": "https://widgetizer.org/demos/olympic/"
     },
     {
       "id": "pawlish",

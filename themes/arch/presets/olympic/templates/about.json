@@ -159,7 +159,7 @@
         "layout": "grid",
         "columns_desktop": 2,
         "card_layout": "flat",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "review-1": {
@@ -186,7 +186,7 @@
     "about_cta": {
       "type": "action-bar",
       "settings": {
-        "color_scheme": "highlight-secondary"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "cta-heading": {

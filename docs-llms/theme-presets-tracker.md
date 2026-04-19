@@ -26,7 +26,7 @@
 | 18 | ledgerworks | Ledgerworks | Accountant | done | NEEEDS REGEN
 | 19 | little-oaks | Little Oaks | Daycare / Preschool | complete | images done, meta done, settings ported, demo live
 | 20 | noteworthy | Noteworthy | Tutoring / Music Lessons | pending |
-| 21 | olympic | Olympic | Gym | done |
+| 21 | olympic | Olympic | Gym | complete | images done, meta done, settings ported, class-schedule widget added, demo live
 | 22 | pawlish | Pawlish | Pet Grooming | done |
 | 23 | petalry | Petalry | Flower Shop | done |
 | 24 | pipeworks | Pipeworks | Plumber / Electrician | done | NEEDS REGEN

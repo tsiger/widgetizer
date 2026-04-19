@@ -172,13 +172,13 @@
       "type": "checkbox",
       "id": "show_level",
       "label": "tTheme:class_schedule.settings.show_level.label",
-      "default": false
+      "default": true
     },
     {
       "type": "checkbox",
       "id": "show_description",
       "label": "tTheme:class_schedule.settings.show_description.label",
-      "default": false
+      "default": true
     },
     {
       "type": "checkbox",

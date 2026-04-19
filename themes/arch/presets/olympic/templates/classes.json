@@ -37,6 +37,7 @@
         "eyebrow_uppercase": true,
         "title": "What We Offer",
         "heading_alignment": "center",
+        "featured_image_position": "start",
         "layout": "grid",
         "columns_desktop": 3,
         "card_layout": "box",
@@ -99,76 +100,61 @@
       "blocksOrder": ["class-1", "class-2", "class-3", "class-4", "class-5", "class-6"]
     },
     "weekly_schedule": {
-      "type": "schedule-table",
+      "type": "class-schedule",
       "settings": {
         "eyebrow": "Schedule",
         "eyebrow_uppercase": true,
         "title": "Weekly Class Timetable",
         "heading_alignment": "start",
-        "note": "Schedule may vary on public holidays. Drop-ins welcome for all classes.",
-        "sidebar_position": "end",
-        "week_start_day": 1,
+        "note": "Schedule may vary on public holidays. Drop-ins welcome for all classes. All classes are 45–60 minutes. Arrive 10 minutes early for your first class. Equipment provided — just bring water and a towel.",
+        "layout": "tabs",
+        "week_start_day": "monday",
+        "default_day": "today",
+        "hide_empty_days": false,
+        "show_time": true,
+        "show_duration": true,
+        "show_instructor": true,
+        "show_level": true,
+        "show_description": true,
+        "show_book_button": true,
         "color_scheme": "standard-secondary"
       },
       "blocks": {
-        "day-mon": {
-          "type": "day",
-          "settings": {
-            "day": "Monday",
-            "hours": "6 AM Strength | 12 PM HIIT | 5:30 PM Boxing | 7 PM Yoga"
-          }
-        },
-        "day-tue": {
-          "type": "day",
-          "settings": {
-            "day": "Tuesday",
-            "hours": "6 AM HIIT | 12 PM Strength | 5:30 PM CrossFit | 7 PM Strength"
-          }
-        },
-        "day-wed": {
-          "type": "day",
-          "settings": {
-            "day": "Wednesday",
-            "hours": "6 AM Strength | 12 PM Boxing | 5:30 PM HIIT | 7 PM Yoga"
-          }
-        },
-        "day-thu": {
-          "type": "day",
-          "settings": {
-            "day": "Thursday",
-            "hours": "6 AM HIIT | 12 PM Strength | 5:30 PM Boxing | 7 PM CrossFit"
-          }
-        },
-        "day-fri": {
-          "type": "day",
-          "settings": {
-            "day": "Friday",
-            "hours": "6 AM Strength | 12 PM HIIT | 5:30 PM CrossFit | 7 PM Open Gym"
-          }
-        },
-        "day-sat": {
-          "type": "day",
-          "settings": {
-            "day": "Saturday",
-            "hours": "8 AM CrossFit | 10 AM Yoga | 12 PM Open Gym"
-          }
-        },
-        "day-sun": {
-          "type": "day",
-          "settings": {
-            "day": "Sunday",
-            "hours": "9 AM Yoga | 11 AM Open Gym"
-          }
-        },
-        "schedule-info": {
-          "type": "info",
-          "settings": {
-            "title": "Class Info",
-            "text": "<p>All classes are 45\u201360 minutes.</p><p>Arrive 10 minutes early for your first class.</p><p>Equipment provided. Just bring water and a towel.</p>"
-          }
-        }
+        "mon-1": { "type": "class", "settings": { "day": "monday", "time": "6:00 AM", "duration": "60 min", "title": "Strength Training", "level": "all-levels" } },
+        "mon-2": { "type": "class", "settings": { "day": "monday", "time": "12:00 PM", "duration": "45 min", "title": "HIIT", "level": "all-levels" } },
+        "mon-3": { "type": "class", "settings": { "day": "monday", "time": "5:30 PM", "duration": "60 min", "title": "Boxing", "level": "all-levels" } },
+        "mon-4": { "type": "class", "settings": { "day": "monday", "time": "7:00 PM", "duration": "60 min", "title": "Yoga & Mobility", "level": "all-levels" } },
+        "tue-1": { "type": "class", "settings": { "day": "tuesday", "time": "6:00 AM", "duration": "45 min", "title": "HIIT", "level": "intermediate" } },
+        "tue-2": { "type": "class", "settings": { "day": "tuesday", "time": "12:00 PM", "duration": "60 min", "title": "Strength Training", "level": "all-levels" } },
+        "tue-3": { "type": "class", "settings": { "day": "tuesday", "time": "5:30 PM", "duration": "60 min", "title": "CrossFit", "level": "intermediate" } },
+        "tue-4": { "type": "class", "settings": { "day": "tuesday", "time": "7:00 PM", "duration": "60 min", "title": "Strength Training", "level": "all-levels" } },
+        "wed-1": { "type": "class", "settings": { "day": "wednesday", "time": "6:00 AM", "duration": "60 min", "title": "Strength Training", "level": "all-levels" } },
+        "wed-2": { "type": "class", "settings": { "day": "wednesday", "time": "12:00 PM", "duration": "60 min", "title": "Boxing", "level": "beginner" } },
+        "wed-3": { "type": "class", "settings": { "day": "wednesday", "time": "5:30 PM", "duration": "45 min", "title": "HIIT", "level": "intermediate" } },
+        "wed-4": { "type": "class", "settings": { "day": "wednesday", "time": "7:00 PM", "duration": "60 min", "title": "Yoga & Mobility", "level": "all-levels" } },
+        "thu-1": { "type": "class", "settings": { "day": "thursday", "time": "6:00 AM", "duration": "45 min", "title": "HIIT", "level": "intermediate" } },
+        "thu-2": { "type": "class", "settings": { "day": "thursday", "time": "12:00 PM", "duration": "60 min", "title": "Strength Training", "level": "all-levels" } },
+        "thu-3": { "type": "class", "settings": { "day": "thursday", "time": "5:30 PM", "duration": "60 min", "title": "Boxing", "level": "beginner" } },
+        "thu-4": { "type": "class", "settings": { "day": "thursday", "time": "7:00 PM", "duration": "60 min", "title": "CrossFit", "level": "intermediate" } },
+        "fri-1": { "type": "class", "settings": { "day": "friday", "time": "6:00 AM", "duration": "60 min", "title": "Strength Training", "level": "all-levels" } },
+        "fri-2": { "type": "class", "settings": { "day": "friday", "time": "12:00 PM", "duration": "45 min", "title": "HIIT", "level": "intermediate" } },
+        "fri-3": { "type": "class", "settings": { "day": "friday", "time": "5:30 PM", "duration": "60 min", "title": "CrossFit", "level": "intermediate" } },
+        "fri-4": { "type": "class", "settings": { "day": "friday", "time": "7:00 PM", "duration": "90 min", "title": "Open Gym", "level": "all-levels" } },
+        "sat-1": { "type": "class", "settings": { "day": "saturday", "time": "8:00 AM", "duration": "60 min", "title": "CrossFit", "level": "intermediate" } },
+        "sat-2": { "type": "class", "settings": { "day": "saturday", "time": "10:00 AM", "duration": "60 min", "title": "Yoga & Mobility", "level": "all-levels" } },
+        "sat-3": { "type": "class", "settings": { "day": "saturday", "time": "12:00 PM", "duration": "90 min", "title": "Open Gym", "level": "all-levels" } },
+        "sun-1": { "type": "class", "settings": { "day": "sunday", "time": "9:00 AM", "duration": "60 min", "title": "Yoga & Mobility", "level": "all-levels" } },
+        "sun-2": { "type": "class", "settings": { "day": "sunday", "time": "11:00 AM", "duration": "90 min", "title": "Open Gym", "level": "all-levels" } }
       },
-      "blocksOrder": ["day-mon", "day-tue", "day-wed", "day-thu", "day-fri", "day-sat", "day-sun", "schedule-info"]
+      "blocksOrder": [
+        "mon-1","mon-2","mon-3","mon-4",
+        "tue-1","tue-2","tue-3","tue-4",
+        "wed-1","wed-2","wed-3","wed-4",
+        "thu-1","thu-2","thu-3","thu-4",
+        "fri-1","fri-2","fri-3","fri-4",
+        "sat-1","sat-2","sat-3",
+        "sun-1","sun-2"
+      ]
     },
     "coaching_split": {
       "type": "image-text",

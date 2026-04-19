@@ -8,7 +8,7 @@
         "overlay_color": "#0a0a0abf",
         "height": "large",
         "fullwidth": true,
-        "content_width": "medium",
+        "content_width": "wide",
         "alignment": "start",
         "color_scheme": "highlight-primary"
       },
@@ -25,7 +25,7 @@
           "type": "heading",
           "settings": {
             "text": "Train Harder. Get Stronger.",
-            "size": "8xl"
+            "size": "9xl"
           }
         },
         "hero-text": {
@@ -60,7 +60,7 @@
       "type": "trust-bar",
       "settings": {
         "icon_style": "plain",
-        "icon_size": "lg",
+        "icon_size": "xl",
         "icon_shape": "sharp",
         "alignment": "center",
         "show_dividers": true,
@@ -73,7 +73,7 @@
           "type": "item",
           "settings": {
             "icon": "certificate",
-            "title": "Certified Trainers",
+            "title": "CERTIFIED TRAINERS",
             "text": "Every coach fully accredited"
           }
         },
@@ -81,7 +81,7 @@
           "type": "item",
           "settings": {
             "icon": "clock-24",
-            "title": "Open 7 Days",
+            "title": "OPEN 7 DAYS",
             "text": "Early mornings to late nights"
           }
         },
@@ -89,7 +89,7 @@
           "type": "item",
           "settings": {
             "icon": "users-group",
-            "title": "All Levels Welcome",
+            "title": "ALL LEVELS WELCOME",
             "text": "Beginner to advanced"
           }
         },
@@ -97,7 +97,7 @@
           "type": "item",
           "settings": {
             "icon": "star",
-            "title": "Free First Session",
+            "title": "FREE FIRST SESSION",
             "text": "No commitment required"
           }
         }

@@ -64,7 +64,7 @@
         "eyebrow": "First Visit",
         "eyebrow_uppercase": true,
         "title": "Before You Come In",
-        "heading_alignment": "start",
+        "heading_alignment": "center",
         "style": "separated",
         "allow_multiple": false,
         "color_scheme": "standard-secondary"
