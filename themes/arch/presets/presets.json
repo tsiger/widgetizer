@@ -25,16 +25,6 @@
       "liveDemo": "https://widgetizer.org/demos/brightside/"
     },
     {
-      "id": "clearpath",
-      "name": "Clearpath",
-      "description": "Consultant"
-    },
-    {
-      "id": "codebase",
-      "name": "Codebase",
-      "description": "Freelance developer / agency"
-    },
-    {
       "id": "corkwell",
       "name": "Corkwell",
       "description": "Wine bar",
@@ -45,21 +35,6 @@
       "name": "Crumbly",
       "description": "Bakery",
       "liveDemo": "https://widgetizer.org/demos/crumbly/"
-    },
-    {
-      "id": "everafter",
-      "name": "Everafter",
-      "description": "Wedding planner"
-    },
-    {
-      "id": "formline",
-      "name": "Formline",
-      "description": "Architecture firm"
-    },
-    {
-      "id": "framelight",
-      "name": "Framelight",
-      "description": "Photographer"
     },
     {
       "id": "greenfield",
@@ -74,35 +49,10 @@
       "liveDemo": "https://widgetizer.org/demos/greystone/"
     },
     {
-      "id": "hearthstone",
-      "name": "Hearthstone",
-      "description": "Hotel / B&B"
-    },
-    {
-      "id": "hue-and-co",
-      "name": "Hue & Co",
-      "description": "Interior designer"
-    },
-    {
-      "id": "inkwell",
-      "name": "Inkwell",
-      "description": "Tattoo studio"
-    },
-    {
-      "id": "ironform",
-      "name": "Ironform",
-      "description": "Personal trainer"
-    },
-    {
       "id": "keystoned",
       "name": "Keystoned",
       "description": "Real estate agent",
       "liveDemo": "https://widgetizer.org/demos/keystoned/"
-    },
-    {
-      "id": "ledgerworks",
-      "name": "Ledgerworks",
-      "description": "Accountant"
     },
     {
       "id": "little-oaks",
@@ -111,35 +61,10 @@
       "liveDemo": "https://widgetizer.org/demos/little-oaks/"
     },
     {
-      "id": "noteworthy",
-      "name": "Noteworthy",
-      "description": "Tutoring / music lessons"
-    },
-    {
       "id": "olympic",
       "name": "Olympic",
       "description": "Gym",
       "liveDemo": "https://widgetizer.org/demos/olympic/"
-    },
-    {
-      "id": "pawlish",
-      "name": "Pawlish",
-      "description": "Pet grooming"
-    },
-    {
-      "id": "petalry",
-      "name": "Petalry",
-      "description": "Flower shop"
-    },
-    {
-      "id": "pipeworks",
-      "name": "Pipeworks",
-      "description": "Plumber / Electrician"
-    },
-    {
-      "id": "pixelcraft",
-      "name": "Pixelcraft",
-      "description": "Graphic designer"
     },
     {
       "id": "saffron",
@@ -148,30 +73,10 @@
       "liveDemo": "https://widgetizer.org/demos/saffron/"
     },
     {
-      "id": "sparkhaus",
-      "name": "Sparkhaus",
-      "description": "Cleaning service"
-    },
-    {
       "id": "stillpoint",
       "name": "Stillpoint",
       "description": "Yoga studio",
       "liveDemo": "https://widgetizer.org/demos/stillpoint/"
-    },
-    {
-      "id": "tailside",
-      "name": "Tailside",
-      "description": "Veterinarian"
-    },
-    {
-      "id": "torque",
-      "name": "Torque",
-      "description": "Auto repair"
-    },
-    {
-      "id": "uplink",
-      "name": "Uplink",
-      "description": "IT Support"
     },
     {
       "id": "velvet-touch",
