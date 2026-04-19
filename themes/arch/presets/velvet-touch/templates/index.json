@@ -8,7 +8,8 @@
         "image": "",
         "image_position": "start",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -63,7 +64,9 @@
         "icon_shape": "rounded",
         "alignment": "start",
         "show_dividers": true,
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "trust-1": {
@@ -216,7 +219,7 @@
       "settings": {
         "autoplay": true,
         "autoplay_speed": 6000,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "quote-1": {
@@ -251,43 +254,6 @@
         }
       },
       "blocksOrder": ["quote-1", "quote-2", "quote-3"]
-    },
-    "gift_cards": {
-      "type": "rich-text",
-      "settings": {
-        "text_alignment": "center",
-        "content_width": "medium",
-        "color_scheme": "standard-secondary"
-      },
-      "blocks": {
-        "gift-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "The Gift of Rest",
-            "size": "3xl"
-          }
-        },
-        "gift-text": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Treat someone you love to a Velvet Touch experience. Gift cards available in any amount.</p>",
-            "size": "base"
-          }
-        },
-        "gift-button": {
-          "type": "button",
-          "settings": {
-            "link": {
-              "text": "Buy a Gift Card",
-              "href": "contact.html",
-              "target": "_self"
-            },
-            "style": "primary",
-            "size": "medium"
-          }
-        }
-      },
-      "blocksOrder": ["gift-heading", "gift-text", "gift-button"]
     },
     "cta": {
       "type": "action-bar",
@@ -327,7 +293,7 @@
       "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
     }
   },
-  "widgetsOrder": ["hero", "trust_strip", "treatments", "about_teaser", "testimonials", "gift_cards", "cta"],
+  "widgetsOrder": ["hero", "trust_strip", "treatments", "about_teaser", "testimonials", "cta"],
   "id": "index",
   "created": "2026-04-07T10:00:00.000Z",
   "updated": "2026-04-07T10:00:00.000Z"

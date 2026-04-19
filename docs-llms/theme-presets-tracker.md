@@ -37,4 +37,4 @@
 | 29 | tailside | Tailside | Veterinarian | done |
 | 30 | torque | Torque | Auto Repair | done |
 | 31 | uplink | Uplink | IT Support | done |
-| 32 | velvet-touch | Velvet Touch | Spa / Massage | done | images done
+| 32 | velvet-touch | Velvet Touch | Spa / Massage | complete | images done, meta done, settings ported, demo live

@@ -50,8 +50,8 @@
             "title": "Swedish Massage",
             "description": "<p>Gentle, flowing strokes to ease tension and promote deep relaxation. Our most popular treatment for first-time visitors.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -64,8 +64,8 @@
             "title": "Deep Tissue",
             "description": "<p>Targeted pressure to release chronic muscle tension. Ideal for athletes, desk workers, and anyone carrying deep-seated stress.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -78,8 +78,8 @@
             "title": "Hot Stone",
             "description": "<p>Heated basalt stones placed along the body's meridians, combined with flowing massage technique. Deeply warming and restorative.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -92,8 +92,8 @@
             "title": "Signature Facial",
             "description": "<p>A custom facial tailored to your skin's needs. Cleansing, exfoliation, extractions, mask, and hydration using organic products.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -106,8 +106,8 @@
             "title": "Body Scrub",
             "description": "<p>Full-body exfoliation with natural sugar and essential oils. Leaves skin luminous, soft, and deeply nourished.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -120,8 +120,8 @@
             "title": "Couples Retreat",
             "description": "<p>Side-by-side massages in our private couples suite with ambient lighting and a complimentary champagne toast.</p>",
             "button_link": {
-              "text": "Book Now",
-              "href": "contact.html",
+              "text": "",
+              "href": "",
               "target": "_self"
             }
           }
@@ -137,7 +137,9 @@
         "icon_shape": "circle",
         "alignment": "centered",
         "show_dividers": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "why-1": {

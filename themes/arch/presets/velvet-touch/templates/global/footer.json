@@ -2,13 +2,15 @@
   "type": "footer",
   "settings": {
     "copyright": "© 2026 Velvet Touch Day Spa. All rights reserved.",
-    "color_scheme": "highlight-primary"
+    "layout": "equal",
+    "color_scheme": "highlight-secondary"
   },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
         "logo_text": "Velvet Touch",
+        "logo_width": 160,
         "text": "<p>A boutique day spa offering massage therapy, facials, and body treatments in an intimate, luxurious setting.</p>"
       }
     },
