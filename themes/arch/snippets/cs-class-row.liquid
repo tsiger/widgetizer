@@ -1,0 +1,62 @@
+{% comment %}
+  Renders a single class row for the class-schedule widget.
+  Required variables:
+    - block       : the class block (type: 'class')
+    - blockId     : block instance id
+    - widget      : the widget (for settings toggles)
+{% endcomment %}
+<div class="cs-class" data-block-id="{{ blockId }}">
+  <div class="cs-class-time">
+    {% if widget.settings.show_time %}
+      <span class="cs-class-time-value t-base" data-setting="time">{{ block.settings.time }}</span>
+      {% if widget.settings.show_duration and block.settings.duration != blank %}
+        <span class="w-meta t-xs" data-setting="duration">{{ block.settings.duration }}</span>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="cs-class-main">
+    {% if block.settings.title != blank %}
+      <p class="w-title t-lg" data-setting="title">{{ block.settings.title }}</p>
+    {% endif %}
+
+    {% assign show_instructor = widget.settings.show_instructor %}
+    {% assign has_instructor = false %}
+    {% if show_instructor and block.settings.instructor != blank %}{% assign has_instructor = true %}{% endif %}
+
+    {% assign show_level = widget.settings.show_level %}
+    {% assign has_level = false %}
+    {% if show_level and block.settings.level != blank and block.settings.level != 'all-levels' %}{% assign has_level = true %}{% endif %}
+
+    {% if has_instructor or has_level %}
+      <div class="cs-class-meta w-meta">
+        {% if has_instructor %}
+          <span data-setting="instructor">{{ block.settings.instructor }}</span>
+        {% endif %}
+        {% if has_instructor and has_level %}
+          <span class="cs-dot" aria-hidden="true"></span>
+        {% endif %}
+        {% if has_level %}
+          <span class="cs-level-badge cs-level-{{ block.settings.level }} w-label t-xs" data-setting="level">{{ block.settings.level | replace: '-', ' ' | capitalize }}</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if widget.settings.show_description and block.settings.description != blank %}
+      <p class="w-body t-sm" data-setting="description">{{ block.settings.description }}</p>
+    {% endif %}
+  </div>
+
+  {% if widget.settings.show_book_button and block.settings.book_link.text != blank %}
+    <div class="cs-class-action">
+      <a
+        href="{{ block.settings.book_link.href | default: '#' }}"
+        class="widget-button widget-button-small widget-button-secondary"
+        data-setting="book_link"
+        {% if block.settings.book_link.target == '_blank' %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >
+        {{ block.settings.book_link.text }}
+      </a>
+    </div>
+  {% endif %}
+</div>

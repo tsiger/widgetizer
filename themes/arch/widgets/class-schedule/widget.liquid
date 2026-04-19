@@ -1,0 +1,505 @@
+{% assign day_keys = 'monday,tuesday,wednesday,thursday,friday,saturday,sunday' | split: ',' %}
+{% if widget.settings.week_start_day == 'sunday' %}
+  {% assign day_keys = 'sunday,monday,tuesday,wednesday,thursday,friday,saturday' | split: ',' %}
+{% endif %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-class-schedule widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} cs-layout-{{ widget.settings.layout | default: 'tabs' }}{% if widget.settings.heading_alignment == 'start' %} widget-heading-align-left{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="class-schedule"
+  data-layout="{{ widget.settings.layout | default: 'tabs' }}"
+  data-default-day="{{ widget.settings.default_day | default: 'today' }}"
+  data-week-start="{{ widget.settings.week_start_day | default: 'monday' }}"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      /* ──────────── Shared: class row ──────────── */
+      & .cs-class {
+        display: grid;
+        grid-template-columns: minmax(7rem, auto) 1fr auto;
+        gap: var(--space-md);
+        align-items: center;
+        padding-block: var(--space-md);
+        border-block-end: var(--border-width-thin) solid var(--border-color);
+      }
+
+      & .cs-class:last-child {
+        border-block-end: none;
+      }
+
+      & .cs-class-time {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        color: var(--text-heading);
+        font-weight: var(--font-weight-semibold);
+        font-variant-numeric: tabular-nums;
+      }
+
+      & .cs-class-main {
+        min-width: 0;
+      }
+
+      & .cs-class-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-xs) var(--space-sm);
+        align-items: center;
+        margin-block-start: 0.3rem;
+      }
+
+      & .cs-class-main .w-title {
+        margin: 0;
+      }
+
+      & .cs-class-main .w-body {
+        margin-block-start: 0.4rem;
+        color: var(--text-content);
+      }
+
+      & .cs-dot {
+        width: 0.4rem;
+        height: 0.4rem;
+        border-radius: 50%;
+        background-color: currentColor;
+        opacity: 0.5;
+        display: inline-block;
+      }
+
+      /* Level badge — same visual language as job-listing's .job-badge */
+      & .cs-level-badge {
+        padding: var(--space-xs) var(--space-md);
+        background-color: var(--bg-secondary);
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-sm);
+      }
+
+      & .cs-level-advanced {
+        background-color: var(--accent);
+        color: var(--accent-text);
+        border-color: var(--accent);
+      }
+
+      & .cs-class-action {
+        justify-self: end;
+      }
+
+      & .cs-empty {
+        padding-block: var(--space-xl);
+        text-align: center;
+        color: var(--text-muted);
+      }
+
+      & .cs-note {
+        margin-block-start: var(--space-lg);
+        padding-block-start: var(--space-md);
+        border-block-start: var(--border-width-thin) solid var(--border-color);
+        color: var(--text-muted);
+      }
+
+      /* ──────────── Tabs layout ──────────── */
+      &.cs-layout-tabs {
+        & .cs-tablist {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--space-xs);
+          margin-block-end: var(--space-lg);
+          border-block-end: var(--border-width-thin) solid var(--border-color);
+        }
+
+        & .cs-tab {
+          appearance: none;
+          background: transparent;
+          border: none;
+          padding: var(--space-sm) var(--space-md);
+          font-family: inherit;
+          color: var(--text-muted);
+          cursor: pointer;
+          border-block-end: var(--border-width-medium) solid transparent;
+          margin-block-end: calc(var(--border-width-thin) * -1);
+          transition: color 0.2s, border-color 0.2s;
+        }
+
+        & .cs-tab:hover {
+          color: var(--text-heading);
+        }
+
+        & .cs-tab.is-active {
+          color: var(--text-heading);
+          border-block-end-color: var(--accent);
+        }
+
+        & .cs-tab:focus-visible {
+          outline: var(--border-width-medium) solid var(--accent);
+          outline-offset: 0.2rem;
+          border-radius: var(--radius-sm);
+        }
+
+        & .cs-tab[disabled] {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        & .cs-panel {
+          display: none;
+        }
+
+        & .cs-panel.is-active {
+          display: block;
+          animation: csFadeIn 0.2s ease-out;
+        }
+      }
+
+      /* ──────────── Accordion layout ──────────── */
+      &.cs-layout-accordion {
+        & .cs-details {
+          border-block-end: var(--border-width-thin) solid var(--border-color);
+        }
+
+        & .cs-details:first-child {
+          border-block-start: var(--border-width-thin) solid var(--border-color);
+        }
+
+        & .cs-summary {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-block: var(--space-md);
+          cursor: pointer;
+          list-style: none;
+          color: var(--text-heading);
+        }
+
+        & .cs-summary::-webkit-details-marker {
+          display: none;
+        }
+
+        & .cs-summary-label {
+          display: flex;
+          align-items: baseline;
+          gap: var(--space-sm);
+        }
+
+        & .cs-summary-chevron {
+          display: inline-block;
+          transition: transform 0.2s ease;
+          color: var(--text-muted);
+          flex-shrink: 0;
+        }
+
+        & .cs-details[open] .cs-summary-chevron {
+          transform: rotate(90deg);
+        }
+
+        & .cs-details[open] .cs-panel-body {
+          padding-block-end: var(--space-md);
+        }
+
+        & .cs-details .cs-class:first-child {
+          border-block-start: var(--border-width-thin) solid var(--border-color);
+        }
+      }
+
+      /* ──────────── List layout ──────────── */
+      &.cs-layout-list {
+        & .cs-day-group {
+          margin-block-end: var(--space-xl);
+        }
+
+        & .cs-day-group:last-child {
+          margin-block-end: 0;
+        }
+
+        & .cs-day-heading {
+          margin: 0 0 var(--space-sm);
+          color: var(--text-heading);
+          padding-block-end: var(--space-sm);
+          border-block-end: var(--border-width-medium) solid var(--accent);
+        }
+      }
+
+      /* ──────────── Mobile ──────────── */
+      @media (max-width: 749px) {
+        & .cs-class {
+          grid-template-columns: 1fr;
+          gap: var(--space-xs);
+        }
+
+        & .cs-class-action {
+          justify-self: start;
+        }
+
+        &.cs-layout-tabs .cs-tablist {
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          scrollbar-width: none;
+        }
+
+        &.cs-layout-tabs .cs-tablist::-webkit-scrollbar {
+          display: none;
+        }
+
+        &.cs-layout-tabs .cs-tab {
+          flex-shrink: 0;
+        }
+      }
+
+      @keyframes csFadeIn {
+        from { opacity: 0; transform: translateY(0.5rem); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content reveal reveal-up">
+
+      {% comment %} ──────────── TABS LAYOUT ──────────── {% endcomment %}
+      {% if widget.settings.layout == 'tabs' or widget.settings.layout == blank %}
+        <div class="cs-tablist" role="tablist" aria-label="{{ widget.settings.title | default: 'Class schedule' }}">
+          {% for day_key in day_keys %}
+            {% assign day_label = day_key | capitalize %}
+            {% assign day_has_classes = false %}
+            {% for blockId in widget.blocksOrder %}
+              {% assign block = widget.blocks[blockId] %}
+              {% if block.type == 'class' and block.settings.day == day_key %}
+                {% assign day_has_classes = true %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            {% if widget.settings.hide_empty_days and day_has_classes == false %}
+              {% continue %}
+            {% endif %}
+            <button
+              type="button"
+              class="cs-tab w-label t-base{% if forloop.first %} is-active{% endif %}"
+              role="tab"
+              data-day="{{ day_key }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-controls="cs-panel-{{ widget.id }}-{{ day_key }}"
+              id="cs-tab-{{ widget.id }}-{{ day_key }}"
+              tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+              {% unless day_has_classes %}disabled{% endunless %}
+            >{{ day_label }}</button>
+          {% endfor %}
+        </div>
+
+        {% for day_key in day_keys %}
+          {% assign day_has_classes = false %}
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            {% if block.type == 'class' and block.settings.day == day_key %}
+              {% assign day_has_classes = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          {% if widget.settings.hide_empty_days and day_has_classes == false %}
+            {% continue %}
+          {% endif %}
+          <div
+            id="cs-panel-{{ widget.id }}-{{ day_key }}"
+            class="cs-panel{% if forloop.first %} is-active{% endif %}"
+            role="tabpanel"
+            aria-labelledby="cs-tab-{{ widget.id }}-{{ day_key }}"
+            data-day="{{ day_key }}"
+            {% unless forloop.first %}hidden{% endunless %}
+          >
+            {% if day_has_classes %}
+              <div class="cs-class-list">
+                {% for blockId in widget.blocksOrder %}
+                  {% assign block = widget.blocks[blockId] %}
+                  {% if block.type == 'class' and block.settings.day == day_key %}
+                    {% render 'cs-class-row', block: block, blockId: blockId, widget: widget %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="cs-empty t-sm">No classes scheduled.</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% comment %} ──────────── ACCORDION LAYOUT ──────────── {% endcomment %}
+      {% if widget.settings.layout == 'accordion' %}
+        {% for day_key in day_keys %}
+          {% assign day_label = day_key | capitalize %}
+          {% assign day_count = 0 %}
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            {% if block.type == 'class' and block.settings.day == day_key %}
+              {% assign day_count = day_count | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+          {% if widget.settings.hide_empty_days and day_count == 0 %}
+            {% continue %}
+          {% endif %}
+          <details class="cs-details"{% if forloop.first %} open{% endif %} data-day="{{ day_key }}">
+            <summary class="cs-summary">
+              <span class="cs-summary-label">
+                <span class="w-title t-lg">{{ day_label }}</span>
+                {% if day_count > 0 %}<span class="w-meta t-sm">({{ day_count }})</span>{% endif %}
+              </span>
+              <svg class="cs-summary-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </summary>
+            <div class="cs-panel-body">
+              {% if day_count > 0 %}
+                <div class="cs-class-list">
+                  {% for blockId in widget.blocksOrder %}
+                    {% assign block = widget.blocks[blockId] %}
+                    {% if block.type == 'class' and block.settings.day == day_key %}
+                      {% render 'cs-class-row', block: block, blockId: blockId, widget: widget %}
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="cs-empty t-sm">No classes scheduled.</p>
+              {% endif %}
+            </div>
+          </details>
+        {% endfor %}
+      {% endif %}
+
+      {% comment %} ──────────── LIST LAYOUT ──────────── {% endcomment %}
+      {% if widget.settings.layout == 'list' %}
+        {% for day_key in day_keys %}
+          {% assign day_label = day_key | capitalize %}
+          {% assign day_has_classes = false %}
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            {% if block.type == 'class' and block.settings.day == day_key %}
+              {% assign day_has_classes = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          {% if widget.settings.hide_empty_days and day_has_classes == false %}
+            {% continue %}
+          {% endif %}
+          <div class="cs-day-group" data-day="{{ day_key }}">
+            <h3 class="cs-day-heading w-title t-lg t-uppercase">{{ day_label }}</h3>
+            {% if day_has_classes %}
+              <div class="cs-class-list">
+                {% for blockId in widget.blocksOrder %}
+                  {% assign block = widget.blocks[blockId] %}
+                  {% if block.type == 'class' and block.settings.day == day_key %}
+                    {% render 'cs-class-row', block: block, blockId: blockId, widget: widget %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="cs-empty t-sm">No classes scheduled.</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% if widget.settings.note != blank %}
+        <p class="cs-note t-sm" data-setting="note">{{ widget.settings.note }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if widget.settings.layout == 'tabs' or widget.settings.layout == blank %}
+    <script>
+      (function () {
+        const root = document.getElementById('{{ widget.id }}');
+        if (!root || root.dataset.initialized) return;
+        root.dataset.initialized = 'true';
+
+        const tabs = Array.from(root.querySelectorAll('.cs-tab'));
+        const panels = Array.from(root.querySelectorAll('.cs-panel'));
+        if (tabs.length === 0) return;
+
+        const getTodayKey = () => {
+          const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+          return days[new Date().getDay()];
+        };
+
+        const activateDay = (dayKey) => {
+          let activated = false;
+          tabs.forEach((t) => {
+            const match = t.getAttribute('data-day') === dayKey && !t.disabled;
+            t.classList.toggle('is-active', match);
+            t.setAttribute('aria-selected', match ? 'true' : 'false');
+            t.setAttribute('tabindex', match ? '0' : '-1');
+            if (match) activated = true;
+          });
+          panels.forEach((p) => {
+            const match = p.getAttribute('data-day') === dayKey;
+            p.classList.toggle('is-active', match);
+            if (match) { p.removeAttribute('hidden'); } else { p.setAttribute('hidden', ''); }
+          });
+          return activated;
+        };
+
+        const defaultDay = root.dataset.defaultDay || 'today';
+        const initialDay = defaultDay === 'today' ? getTodayKey() : defaultDay;
+        if (!activateDay(initialDay)) {
+          const firstEnabled = tabs.find((t) => !t.disabled);
+          if (firstEnabled) activateDay(firstEnabled.getAttribute('data-day'));
+        }
+
+        tabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+            if (tab.disabled) return;
+            activateDay(tab.getAttribute('data-day'));
+          });
+          tab.addEventListener('keydown', (event) => {
+            const enabled = tabs.filter((t) => !t.disabled);
+            const currentIndex = enabled.indexOf(tab);
+            if (currentIndex === -1) return;
+            let nextIndex = null;
+            switch (event.key) {
+              case 'ArrowRight': nextIndex = (currentIndex + 1) % enabled.length; break;
+              case 'ArrowLeft': nextIndex = (currentIndex - 1 + enabled.length) % enabled.length; break;
+              case 'Home': nextIndex = 0; break;
+              case 'End': nextIndex = enabled.length - 1; break;
+              default: return;
+            }
+            event.preventDefault();
+            const next = enabled[nextIndex];
+            next.focus();
+            activateDay(next.getAttribute('data-day'));
+          });
+        });
+
+        if (window.Widgetizer?.designMode) {
+          root.addEventListener('widget:block-select', (e) => {
+            const { blockId } = e.detail || {};
+            if (!blockId) return;
+            const row = root.querySelector('.cs-class[data-block-id="' + blockId + '"]');
+            if (!row) return;
+            const panel = row.closest('.cs-panel');
+            if (!panel) return;
+            const day = panel.getAttribute('data-day');
+            if (day) activateDay(day);
+          });
+        }
+      })();
+    </script>
+  {% endif %}
+</section>

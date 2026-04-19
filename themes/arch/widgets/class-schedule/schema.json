@@ -1,0 +1,434 @@
+{
+  "type": "class-schedule",
+  "displayName": "tTheme:class_schedule.name",
+  "aliases": [
+    "classes",
+    "timetable",
+    "weekly schedule",
+    "class timetable",
+    "fitness schedule",
+    "yoga schedule"
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "id": "content_header",
+      "label": "tTheme:global.widgets.settings.content_header.label"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label",
+      "default": "Schedule"
+    },
+    {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label",
+      "default": "Weekly Class Schedule"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label",
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        {
+          "value": "start",
+          "label": "tTheme:global.widgets.settings.alignment.options.start"
+        },
+        {
+          "value": "center",
+          "label": "tTheme:global.widgets.settings.alignment.options.center"
+        }
+      ]
+    },
+    {
+      "type": "textarea",
+      "id": "note",
+      "label": "tTheme:class_schedule.settings.note.label",
+      "description": "tTheme:class_schedule.settings.note.description",
+      "default": ""
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:class_schedule.settings.layout.label",
+      "default": "tabs",
+      "options": [
+        {
+          "value": "tabs",
+          "label": "tTheme:class_schedule.settings.layout.options.tabs"
+        },
+        {
+          "value": "accordion",
+          "label": "tTheme:class_schedule.settings.layout.options.accordion"
+        },
+        {
+          "value": "list",
+          "label": "tTheme:class_schedule.settings.layout.options.list"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "week_start_day",
+      "label": "tTheme:class_schedule.settings.week_start_day.label",
+      "default": "monday",
+      "options": [
+        {
+          "value": "monday",
+          "label": "tTheme:class_schedule.settings.week_start_day.options.monday"
+        },
+        {
+          "value": "sunday",
+          "label": "tTheme:class_schedule.settings.week_start_day.options.sunday"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "default_day",
+      "label": "tTheme:class_schedule.settings.default_day.label",
+      "description": "tTheme:class_schedule.settings.default_day.description",
+      "default": "today",
+      "options": [
+        {
+          "value": "today",
+          "label": "tTheme:class_schedule.settings.default_day.options.today"
+        },
+        {
+          "value": "monday",
+          "label": "tTheme:class_schedule.settings.days.monday"
+        },
+        {
+          "value": "tuesday",
+          "label": "tTheme:class_schedule.settings.days.tuesday"
+        },
+        {
+          "value": "wednesday",
+          "label": "tTheme:class_schedule.settings.days.wednesday"
+        },
+        {
+          "value": "thursday",
+          "label": "tTheme:class_schedule.settings.days.thursday"
+        },
+        {
+          "value": "friday",
+          "label": "tTheme:class_schedule.settings.days.friday"
+        },
+        {
+          "value": "saturday",
+          "label": "tTheme:class_schedule.settings.days.saturday"
+        },
+        {
+          "value": "sunday",
+          "label": "tTheme:class_schedule.settings.days.sunday"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_empty_days",
+      "label": "tTheme:class_schedule.settings.hide_empty_days.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_time",
+      "label": "tTheme:class_schedule.settings.show_time.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_duration",
+      "label": "tTheme:class_schedule.settings.show_duration.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_instructor",
+      "label": "tTheme:class_schedule.settings.show_instructor.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_level",
+      "label": "tTheme:class_schedule.settings.show_level.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "tTheme:class_schedule.settings.show_description.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_book_button",
+      "label": "tTheme:class_schedule.settings.show_book_button.label",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        {
+          "value": "standard-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary"
+        },
+        {
+          "value": "standard-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary"
+        },
+        {
+          "value": "highlight-primary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary"
+        },
+        {
+          "value": "highlight-secondary",
+          "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.top_spacing.options.none"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto"
+        },
+        {
+          "value": "small",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.small"
+        },
+        {
+          "value": "none",
+          "label": "tTheme:global.widgets.settings.bottom_spacing.options.none"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "class",
+      "displayName": "tTheme:class_schedule.blocks.class.name",
+      "settings": [
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.widgets.settings.content_header.label"
+        },
+        {
+          "type": "select",
+          "id": "day",
+          "label": "tTheme:class_schedule.blocks.class.settings.day.label",
+          "default": "monday",
+          "options": [
+            {
+              "value": "monday",
+              "label": "tTheme:class_schedule.settings.days.monday"
+            },
+            {
+              "value": "tuesday",
+              "label": "tTheme:class_schedule.settings.days.tuesday"
+            },
+            {
+              "value": "wednesday",
+              "label": "tTheme:class_schedule.settings.days.wednesday"
+            },
+            {
+              "value": "thursday",
+              "label": "tTheme:class_schedule.settings.days.thursday"
+            },
+            {
+              "value": "friday",
+              "label": "tTheme:class_schedule.settings.days.friday"
+            },
+            {
+              "value": "saturday",
+              "label": "tTheme:class_schedule.settings.days.saturday"
+            },
+            {
+              "value": "sunday",
+              "label": "tTheme:class_schedule.settings.days.sunday"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "time",
+          "label": "tTheme:class_schedule.blocks.class.settings.time.label",
+          "default": "6:00 AM"
+        },
+        {
+          "type": "text",
+          "id": "duration",
+          "label": "tTheme:class_schedule.blocks.class.settings.duration.label",
+          "default": "60 min"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:class_schedule.blocks.class.settings.title.label",
+          "default": "Class name"
+        },
+        {
+          "type": "text",
+          "id": "instructor",
+          "label": "tTheme:class_schedule.blocks.class.settings.instructor.label",
+          "default": ""
+        },
+        {
+          "type": "select",
+          "id": "level",
+          "label": "tTheme:class_schedule.blocks.class.settings.level.label",
+          "default": "all-levels",
+          "options": [
+            {
+              "value": "all-levels",
+              "label": "tTheme:class_schedule.blocks.class.settings.level.options.all_levels"
+            },
+            {
+              "value": "beginner",
+              "label": "tTheme:class_schedule.blocks.class.settings.level.options.beginner"
+            },
+            {
+              "value": "intermediate",
+              "label": "tTheme:class_schedule.blocks.class.settings.level.options.intermediate"
+            },
+            {
+              "value": "advanced",
+              "label": "tTheme:class_schedule.blocks.class.settings.level.options.advanced"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "tTheme:class_schedule.blocks.class.settings.description.label",
+          "default": ""
+        },
+        {
+          "type": "link",
+          "id": "book_link",
+          "label": "tTheme:class_schedule.blocks.class.settings.book_link.label",
+          "default": {
+            "href": "",
+            "text": "Book",
+            "target": "_self"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultBlocks": [
+    {
+      "type": "class",
+      "settings": {
+        "day": "monday",
+        "time": "6:00 AM",
+        "duration": "60 min",
+        "title": "Morning Strength",
+        "instructor": "Coach Sarah",
+        "level": "all-levels",
+        "description": "Progressive barbell training for all levels.",
+        "book_link": { "href": "", "text": "Book", "target": "_self" }
+      }
+    },
+    {
+      "type": "class",
+      "settings": {
+        "day": "monday",
+        "time": "12:00 PM",
+        "duration": "45 min",
+        "title": "HIIT Lunch",
+        "instructor": "Coach Marcus",
+        "level": "intermediate",
+        "description": "High-intensity intervals to break up your day.",
+        "book_link": { "href": "", "text": "Book", "target": "_self" }
+      }
+    },
+    {
+      "type": "class",
+      "settings": {
+        "day": "monday",
+        "time": "5:30 PM",
+        "duration": "60 min",
+        "title": "Boxing Fundamentals",
+        "instructor": "Coach Dre",
+        "level": "beginner",
+        "description": "Technical striking, footwork, and bag rounds.",
+        "book_link": { "href": "", "text": "Book", "target": "_self" }
+      }
+    },
+    {
+      "type": "class",
+      "settings": {
+        "day": "wednesday",
+        "time": "7:00 AM",
+        "duration": "60 min",
+        "title": "Yoga & Mobility",
+        "instructor": "Coach Priya",
+        "level": "all-levels",
+        "description": "Vinyasa flow and targeted mobility work.",
+        "book_link": { "href": "", "text": "Book", "target": "_self" }
+      }
+    },
+    {
+      "type": "class",
+      "settings": {
+        "day": "saturday",
+        "time": "9:00 AM",
+        "duration": "75 min",
+        "title": "Weekend CrossFit",
+        "instructor": "Coach Marcus",
+        "level": "intermediate",
+        "description": "Team-based metcon for the weekend warrior.",
+        "book_link": { "href": "", "text": "Book", "target": "_self" }
+      }
+    }
+  ]
+}
