@@ -1,0 +1,201 @@
+{
+  "name": "Work",
+  "slug": "work",
+  "widgets": {
+    "work_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "w-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "Work",
+            "size": "lg"
+          }
+        },
+        "w-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Things we've shipped.",
+            "size": "5xl"
+          }
+        },
+        "w-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A selection of projects from the last few years. Every one was led by a named engineer from discovery through launch, with weekly demos and working software from the start.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["w-eyebrow", "w-heading", "w-text"]
+    },
+    "projects": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "aspect_ratio": "3 / 2",
+        "text_display": "always",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "pr-01": {
+          "type": "project",
+          "settings": {
+            "title": "Northlight — Revenue intelligence dashboard",
+            "description": "A reporting platform for a Series B analytics company. React, TypeScript, ClickHouse, Tailwind. 14 weeks, end-to-end."
+          }
+        },
+        "pr-02": {
+          "type": "project",
+          "settings": {
+            "title": "Quanta — SaaS onboarding rewrite",
+            "description": "Rebuilt the self-serve onboarding for a growth-stage B2B SaaS. Activation up 38% in the first quarter. Next.js, Postgres, Stripe."
+          }
+        },
+        "pr-03": {
+          "type": "project",
+          "settings": {
+            "title": "Fieldwork — Field-ops mobile web app",
+            "description": "A durable, offline-first progressive web app for technicians in the field. React, IndexedDB, and a Rust-powered sync layer."
+          }
+        },
+        "pr-04": {
+          "type": "project",
+          "settings": {
+            "title": "Arbor — Design system & documentation site",
+            "description": "Shared component library, token system, and docs platform for a thirty-person product org. Storybook + MDX + custom Markdown pipeline."
+          }
+        },
+        "pr-05": {
+          "type": "project",
+          "settings": {
+            "title": "Cartograph — Internal CMS for editorial teams",
+            "description": "Custom content management system for a digital publisher. Role-based publishing, scheduled releases, full audit log. Remix + Postgres."
+          }
+        },
+        "pr-06": {
+          "type": "project",
+          "settings": {
+            "title": "Parallel — Billing & subscription platform",
+            "description": "Stripe-integrated billing system with multi-currency, proration, and VAT-compliant invoicing for a European SaaS."
+          }
+        }
+      },
+      "blocksOrder": ["pr-01", "pr-02", "pr-03", "pr-04", "pr-05", "pr-06"]
+    },
+    "quotes": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client voices",
+        "eyebrow_uppercase": true,
+        "title": "What clients say afterward.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "They shipped the thing we'd been trying to build for a year, in four months, and taught our team how to own it afterward.",
+            "name": "Ana Voß",
+            "title": "CTO, Northlight",
+            "rating": "5"
+          }
+        },
+        "q-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Weekly demos forced us to make decisions weekly. Best engineering engagement we've ever run — and the code still looks good two years later.",
+            "name": "Daniel Ishikawa",
+            "title": "Head of Product, Quanta",
+            "rating": "5"
+          }
+        },
+        "q-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Offline-first mobile web isn't easy. Codebase made it look like it was. Three hundred field technicians now depend on what they built.",
+            "name": "Priya Chandra",
+            "title": "VP Engineering, Fieldwork",
+            "rating": "5"
+          }
+        },
+        "q-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "They gave us a design system our whole org actually adopted — which everyone who's tried this knows is the hard part.",
+            "name": "Lukas Berger",
+            "title": "Design Director, Arbor",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["q-1", "q-2", "q-3", "q-4"]
+    },
+    "work_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Something similar in mind?",
+            "size": "3xl"
+          }
+        },
+        "wc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us what you're building. We'll reply within two business days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "wc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["wc-heading", "wc-text", "wc-button"]
+    }
+  },
+  "widgetsOrder": ["work_intro", "projects", "quotes", "work_cta"],
+  "id": "work",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

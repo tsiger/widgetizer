@@ -1,0 +1,304 @@
+{
+  "name": "Team",
+  "slug": "team",
+  "widgets": {
+    "studio_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "si-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About the studio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "si-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Eight people who've shipped a lot of software.",
+            "size": "4xl"
+          }
+        },
+        "si-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Codebase was founded in 2019 by two engineers who'd spent the previous decade building product at Stripe, Figma, and a handful of smaller European startups. We started the studio because we wanted to keep doing deep product work without the organisational gravity that comes with a fifty-person agency.</p><p>Today we're eight — six engineers, two product designers, zero account managers. Every project is led by one of us and staffed with two to four people. We take two projects at a time. That's the ceiling we've decided to keep.</p>",
+            "size": "base"
+          }
+        },
+        "si-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See our work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["si-eyebrow", "si-heading", "si-text", "si-button"]
+    },
+    "team_grid": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The studio",
+        "eyebrow_uppercase": true,
+        "title": "Who you'll actually work with.",
+        "description": "",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3/4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tm-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Mira Hartmann",
+            "role": "Co-founder, Principal Engineer",
+            "specialty": "Product engineering · TypeScript",
+            "bio": "Founded Codebase in 2019. Ten years at Stripe before that, shipping core billing and internal product platforms. Leads the studio's most architecturally complex engagements."
+          }
+        },
+        "tm-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Alex Kowalski",
+            "role": "Co-founder, Principal Designer",
+            "specialty": "Product design · design systems",
+            "bio": "Leads product design across every engagement. Previously at Figma and a handful of consumer startups. Runs the studio's design-system practice and does most of the client-facing discovery work."
+          }
+        },
+        "tm-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Yuki Tanaka",
+            "role": "Senior Engineer",
+            "specialty": "Front-end · dashboard UX",
+            "bio": "Senior front-end engineer focused on data-dense interfaces. Previously built reporting tools at Linear. Knows more about virtual scroll than is reasonable."
+          }
+        },
+        "tm-4": {
+          "type": "profile",
+          "settings": {
+            "name": "Dimitri Andreou",
+            "role": "Senior Engineer",
+            "specialty": "Back-end · Rust, Postgres",
+            "bio": "Senior back-end engineer. Rust and Postgres by preference, Node when the project needs it. Previously at Supabase and a European fintech infrastructure team."
+          }
+        },
+        "tm-5": {
+          "type": "profile",
+          "settings": {
+            "name": "Imani Okonkwo",
+            "role": "Senior Engineer",
+            "specialty": "Full-stack · MVP sprints",
+            "bio": "Full-stack senior engineer and the lead on most of the studio's MVP sprints. Previously shipped zero-to-one products at two Y Combinator startups."
+          }
+        },
+        "tm-6": {
+          "type": "profile",
+          "settings": {
+            "name": "Luca Bianchi",
+            "role": "Engineer",
+            "specialty": "TypeScript infrastructure",
+            "bio": "Engineer with a focus on monorepo tooling, typed APIs, and the ergonomics of long-lived codebases. Joined from a Turin-based platform engineering team in 2023."
+          }
+        },
+        "tm-7": {
+          "type": "profile",
+          "settings": {
+            "name": "Sarah Holm",
+            "role": "Engineer",
+            "specialty": "Full-stack · auth & permissions",
+            "bio": "Full-stack engineer with a specialty in auth and fine-grained permissions. Previously built IAM infrastructure at a compliance SaaS. The person you want on the account-security conversation."
+          }
+        },
+        "tm-8": {
+          "type": "profile",
+          "settings": {
+            "name": "Theo Laurent",
+            "role": "Product Designer",
+            "specialty": "Product design · research",
+            "bio": "Product designer with a research background. Runs the studio's early-stage discovery and user-research work. Writes design documentation your engineers will actually read."
+          }
+        }
+      },
+      "blocksOrder": ["tm-1", "tm-2", "tm-3", "tm-4", "tm-5", "tm-6", "tm-7", "tm-8"]
+    },
+    "studio_stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "st-1": {
+          "type": "figure",
+          "settings": {
+            "number": "42",
+            "suffix": "+",
+            "label": "Projects shipped",
+            "description": "Across five years of practice"
+          }
+        },
+        "st-2": {
+          "type": "figure",
+          "settings": {
+            "number": "6",
+            "suffix": "",
+            "label": "Years in practice",
+            "description": "Studio founded in 2019"
+          }
+        },
+        "st-3": {
+          "type": "figure",
+          "settings": {
+            "number": "8",
+            "suffix": "",
+            "label": "Engineers & designers",
+            "description": "No account managers, by design"
+          }
+        },
+        "st-4": {
+          "type": "figure",
+          "settings": {
+            "number": "2",
+            "suffix": "",
+            "label": "Projects at a time",
+            "description": "A ceiling we're keeping"
+          }
+        }
+      },
+      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+    },
+    "studio_history": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "History",
+        "eyebrow_uppercase": true,
+        "title": "How the studio came together.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sh-1": {
+          "type": "item",
+          "settings": {
+            "date": "2019",
+            "title": "Studio founded",
+            "description": "<p>Mira and Alex leave their previous engineering roles and open Codebase in a small office in Berlin-Mitte. First two clients are referrals from their previous companies.</p>"
+          }
+        },
+        "sh-2": {
+          "type": "item",
+          "settings": {
+            "date": "2021",
+            "title": "First ten engagements",
+            "description": "<p>The studio crosses ten shipped projects and adds Yuki and Dimitri as the first full-time senior engineers. Moves to a larger space near Kottbusser Tor.</p>"
+          }
+        },
+        "sh-3": {
+          "type": "item",
+          "settings": {
+            "date": "2023",
+            "title": "Retainer practice launched",
+            "description": "<p>After three years of repeated requests, the studio launches an on-call engineering retainer for past clients who want a senior engineer on speed-dial.</p>"
+          }
+        },
+        "sh-4": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "title": "Design practice formalized",
+            "description": "<p>Theo joins as a dedicated product designer. Every engagement now includes design from discovery through launch, with no separate design vendor handoff.</p>"
+          }
+        },
+        "sh-5": {
+          "type": "item",
+          "settings": {
+            "date": "2026",
+            "title": "Studio at eight",
+            "description": "<p>The team settles at eight people. A deliberate ceiling — big enough to staff two projects at once, small enough that everyone knows the codebase of everything we ship.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sh-1", "sh-2", "sh-3", "sh-4", "sh-5"]
+    },
+    "team_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want to meet the studio?",
+            "size": "3xl"
+          }
+        },
+        "tc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>You'll talk to Mira or Alex on the first call. Reply within two business days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "tc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["tc-heading", "tc-text", "tc-button"]
+    }
+  },
+  "widgetsOrder": ["studio_intro", "team_grid", "studio_stats", "studio_history", "team_cta"],
+  "id": "team",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

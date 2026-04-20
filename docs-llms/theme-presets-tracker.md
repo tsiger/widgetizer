@@ -10,7 +10,7 @@
 | 2 | brewline | Brewline | Cafe / Coffee Shop | DONE |
 | 3 | brightside | Brightside | Dentist | DONE |
 | 4 | clearpath | Clearpath | Consultant |  |
-| 5 | codebase | Codebase | Web Development Studio |  |
+| 5 | codebase | Codebase | Web Development Studio | DONE |
 | 6 | corkwell | Corkwell | Bar / Wine Bar | DONE |
 | 7 | crumbly | Crumbly | Bakery | DONE |
 | 8 | everafter | Everafter | Wedding Planner | DONE |

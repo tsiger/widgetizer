@@ -1,0 +1,330 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "si-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "Services",
+            "size": "lg"
+          }
+        },
+        "si-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Where we can help.",
+            "size": "5xl"
+          }
+        },
+        "si-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Four service areas we've built a practice around. Most projects touch two or three of them. Every engagement is led by a senior engineer; design work is handled in-house.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["si-eyebrow", "si-heading", "si-text"]
+    },
+    "service_areas": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Practice areas",
+        "eyebrow_uppercase": true,
+        "title": "Four things we do well.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "box",
+        "alignment": "start",
+        "icon_style": "plain",
+        "icon_size": "xl",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sa-1": {
+          "type": "card",
+          "settings": {
+            "icon": "browser",
+            "title": "Web applications",
+            "description": "<p>Custom, product-shaped web apps — login to billing, with everything in between. TypeScript end-to-end, React on the front, Node or Rust on the back, Postgres by default.</p>"
+          }
+        },
+        "sa-2": {
+          "type": "card",
+          "settings": {
+            "icon": "chart-bar",
+            "title": "Dashboards & internal tools",
+            "description": "<p>Reporting interfaces, admin consoles, and operations tools for teams that outgrew their spreadsheets. Real-time data, role-based access, and UX designed for the people actually using it every day.</p>"
+          }
+        },
+        "sa-3": {
+          "type": "card",
+          "settings": {
+            "icon": "grid-pattern",
+            "title": "Design systems",
+            "description": "<p>Component libraries, token systems, and documentation sites that your team will actually adopt. Storybook, Figma parity, versioned releases, and a rollout plan that doesn't leave anyone behind.</p>"
+          }
+        },
+        "sa-4": {
+          "type": "card",
+          "settings": {
+            "icon": "target-arrow",
+            "title": "MVP sprints",
+            "description": "<p>Two-week fixed-scope sprints that turn an idea into a working, demo-ready prototype. Enough to show investors, run user tests, or decide whether to invest in a full build.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sa-1", "sa-2", "sa-3", "sa-4"]
+    },
+    "specialties": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "In detail",
+        "eyebrow_uppercase": true,
+        "title": "Six specialties the studio is known for.",
+        "description": "Specific technical work we've shipped multiple times and can move quickly on.",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sp-1": {
+          "type": "service",
+          "settings": {
+            "title": "Product engineering",
+            "description": "<p>Full-stack product teams: shipping features, owning architecture, moving from sketch to production without handoff seams. React + TypeScript on the front, flexible on the back.</p>"
+          }
+        },
+        "sp-2": {
+          "type": "service",
+          "settings": {
+            "title": "Design-system infrastructure",
+            "description": "<p>Token pipelines, themeable component libraries, and the Figma-to-code glue that keeps designers and engineers in sync. Style Dictionary, CSS variables, Storybook, and a versioning story that works.</p>"
+          }
+        },
+        "sp-3": {
+          "type": "service",
+          "settings": {
+            "title": "TypeScript infrastructure",
+            "description": "<p>Monorepo setup (Turborepo, Nx), shared tsconfig, end-to-end type safety with tRPC or typed API clients, and the tooling that makes a codebase pleasant to work in on day 500.</p>"
+          }
+        },
+        "sp-4": {
+          "type": "service",
+          "settings": {
+            "title": "Dashboard UX",
+            "description": "<p>The specific craft of dense, data-heavy interfaces: filters that scale, tables that stay fast at 50k rows, charts that render accurately and honestly, keyboard-first workflows that power users actually use.</p>"
+          }
+        },
+        "sp-5": {
+          "type": "service",
+          "settings": {
+            "title": "Auth & permissions",
+            "description": "<p>SSO, SAML, OAuth, fine-grained roles, audit logs, session management. The security-sensitive plumbing most teams want to get right once and never touch again.</p>"
+          }
+        },
+        "sp-6": {
+          "type": "service",
+          "settings": {
+            "title": "On-call engineering partnership",
+            "description": "<p>A small retainer for teams that want a senior engineer on speed-dial — code review, architecture decisions, interviewing, the occasional hands-on fix. Not a support contract; a thinking partner.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5", "sp-6"]
+    },
+    "engagement_modes": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Engagements",
+        "eyebrow_uppercase": true,
+        "title": "Three ways to work with us.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "e-sprint": {
+          "type": "plan",
+          "settings": {
+            "title": "Sprint",
+            "price": "From €12,000",
+            "period": "2 weeks, fixed scope",
+            "features": "+ Dedicated senior engineer + designer\n+ One clear deliverable, one clear deadline\n+ Kickoff call, daily async updates\n+ Working demo at end of week two\n+ Source code delivered, no lock-in",
+            "button_link": {
+              "text": "Inquire about a sprint",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "e-project": {
+          "type": "plan",
+          "settings": {
+            "title": "Project",
+            "price": "From €80,000",
+            "period": "fixed-scope build",
+            "features": "+ Small dedicated team (2–4 people)\n+ Written statement of work, fixed fee\n+ Weekly demos of working software\n+ Code ownership transferred at launch\n+ One month of post-launch support",
+            "button_link": {
+              "text": "Inquire about a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "e-retainer": {
+          "type": "plan",
+          "settings": {
+            "title": "Retainer",
+            "price": "From €18,000",
+            "period": "per month, 3-month minimum",
+            "features": "+ Embedded senior engineer(s)\n+ Ongoing product work, no per-ticket billing\n+ Sprint planning with your team\n+ Code review & architecture partnership\n+ Monthly strategy session",
+            "button_link": {
+              "text": "Inquire about a retainer",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["e-sprint", "e-project", "e-retainer"]
+    },
+    "services_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you inquire.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Not sure which engagement fits?",
+            "text": "<p>The discovery call is the fastest way to figure it out. Tell us what you're building and we'll point to the engagement that makes sense — including none, if that's the honest answer.</p>"
+          }
+        },
+        "sf-1": {
+          "type": "item",
+          "settings": {
+            "question": "What stack do you work in?",
+            "answer": "<p>TypeScript end-to-end is the default — React (sometimes Next.js or Remix) on the front, Node, Hono, or a typed Rust service on the back, Postgres by default. We've also shipped production work in Python (Django, FastAPI) and Go. If your stack is fundamentally different, we'll tell you honestly whether we're a good fit.</p>"
+          }
+        },
+        "sf-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you write code in-house or outsource?",
+            "answer": "<p>In-house, no exceptions. Every person who writes code on your project is a full-time member of the studio — not a freelancer, not a subcontractor, not an offshore team. The engineer you meet is the engineer who ships.</p>"
+          }
+        },
+        "sf-3": {
+          "type": "item",
+          "settings": {
+            "question": "How do you handle handoff?",
+            "answer": "<p>From day one: your team has access to the repo, the CI pipeline, and the staging environment. At launch we deliver the code, the runbook, the architecture docs, and one month of on-call coverage while your team takes ownership.</p>"
+          }
+        },
+        "sf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you do design or only engineering?",
+            "answer": "<p>Both. We have two product designers on the team who lead design for every engagement — not as a separate vendor, but as part of the same conversation. We don't take projects where another agency owns the design unless we've worked with them before.</p>"
+          }
+        },
+        "sf-5": {
+          "type": "item",
+          "settings": {
+            "question": "Can we start small?",
+            "answer": "<p>Yes — the Sprint engagement exists for this. Two weeks, fixed fee, one deliverable. Half our long-term clients started with a sprint.</p>"
+          }
+        },
+        "sf-6": {
+          "type": "item",
+          "settings": {
+            "question": "What about timezone / location?",
+            "answer": "<p>We're based in Berlin, CET. We overlap well with European working hours and have four hours of overlap with US East Coast. Most communication is async — real-time calls are scheduled, not constant.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sf-sidebar", "sf-1", "sf-2", "sf-3", "sf-4", "sf-5", "sf-6"]
+    },
+    "services_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to scope something?",
+            "size": "3xl"
+          }
+        },
+        "sc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Reply within two business days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "sc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["sc-heading", "sc-text", "sc-button"]
+    }
+  },
+  "widgetsOrder": ["services_intro", "service_areas", "specialties", "engagement_modes", "services_faq", "services_cta"],
+  "id": "services",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

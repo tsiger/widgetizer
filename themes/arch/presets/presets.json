@@ -25,6 +25,12 @@
       "liveDemo": "https://widgetizer.org/demos/brightside/"
     },
     {
+      "id": "codebase",
+      "name": "Codebase",
+      "description": "Web development studio",
+      "liveDemo": "https://widgetizer.org/demos/codebase/"
+    },
+    {
       "id": "corkwell",
       "name": "Corkwell",
       "description": "Wine bar",

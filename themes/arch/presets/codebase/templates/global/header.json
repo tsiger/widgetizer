@@ -1,0 +1,18 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Codebase",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Start a project",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "highlight-primary",
+    "logoMaxWidth": 180
+  }
+}

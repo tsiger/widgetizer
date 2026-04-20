@@ -1,0 +1,231 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "inquire_opener": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "c-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Start a project</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "c-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us about your project.",
+            "size": "5xl",
+            "position": "left"
+          }
+        },
+        "c-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every inquiry is read by one of the founders — Mira or Alex — usually within a business day. If your project is a fit for the studio, we'll come back to you with follow-up questions and a time to talk. If it's not, we'll say so honestly and often point you toward a studio that is.</p>",
+            "size": "base",
+            "position": "left"
+          }
+        },
+        "c-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email hello@codebase.studio",
+              "href": "mailto:hello@codebase.studio",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        },
+        "c-right-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What to tell us.",
+            "size": "2xl",
+            "position": "right"
+          }
+        },
+        "c-r-1": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "What you're building",
+            "description": "A paragraph is plenty. Product name, what it does, who it's for, roughly where you are.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-2": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Timeline",
+            "description": "When you'd want to start, when you'd want to ship. Rough windows are fine.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-3": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Rough budget",
+            "description": "A range, a ceiling, or \"not sure yet\" — whatever you have. It helps us figure out whether this is a sprint, a project, or something else.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-4": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Current stack",
+            "description": "What's already in place — if anything. Languages, frameworks, hosting, whatever's relevant.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-5": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "What's blocking you",
+            "description": "The specific thing you want help with. Shipping faster, hiring more slowly, fixing a rewrite that stalled — anything.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "c-eyebrow",
+        "c-heading",
+        "c-text",
+        "c-button",
+        "c-right-heading",
+        "c-r-1",
+        "c-r-2",
+        "c-r-3",
+        "c-r-4",
+        "c-r-5"
+      ]
+    },
+    "what_happens_next": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "What happens next",
+        "eyebrow_uppercase": true,
+        "title": "After you write.",
+        "description": "We keep the process deliberate — every inquiry gets a real read and a real reply.",
+        "heading_alignment": "start",
+        "content_position": "end",
+        "show_divider": true,
+        "icon_style": "plain",
+        "icon_size": "xl",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wn-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "mail-opened",
+            "title": "We read every inquiry",
+            "description": "<p>One of the founders reads what you wrote and decides how to respond. No automated funnel, no discovery call with someone who'll hand you off later.</p>"
+          }
+        },
+        "wn-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "clock",
+            "title": "Reply within two business days",
+            "description": "<p>Sometimes sooner. You'll hear back with follow-up questions and — if there's a likely fit — a time to jump on a call.</p>"
+          }
+        },
+        "wn-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "calendar",
+            "title": "Scoping call",
+            "description": "<p>Forty-five minutes on video. A real technical conversation about your product, your constraints, and whether we're the right studio. No slides, no pitch.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["wn-1", "wn-2", "wn-3"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common first questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you write.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still have a question?",
+            "text": "<p>The Services page has more detail on pricing, engagement modes, and what each includes.</p><p>Or skip straight to the inquiry — the scoping call is the fastest way to get a real answer to a specific question.</p>"
+          }
+        },
+        "cf-1": {
+          "type": "item",
+          "settings": {
+            "question": "How soon will we hear back?",
+            "answer": "<p>Within two business days, almost always. If we're in the middle of a project kickoff week it may be three — but you'll always hear from a human, not an auto-reply.</p>"
+          }
+        },
+        "cf-2": {
+          "type": "item",
+          "settings": {
+            "question": "What if we're too small or too early?",
+            "answer": "<p>Then we'll say so, and often point you toward a friend of the studio — a freelancer or a smaller shop who's better set up for early-stage work. Honest referrals save everyone time.</p>"
+          }
+        },
+        "cf-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you sign NDAs before the call?",
+            "answer": "<p>Rarely. The discovery call is high-level, and we've never had a situation where we needed to see something confidential before knowing if we're a fit. If your project genuinely needs one, send ours or yours and we'll sign before the call.</p>"
+          }
+        },
+        "cf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can we skip the email and just book a call?",
+            "answer": "<p>We prefer a written inquiry first — it forces the conversation to be specific and lets the founder on your project come to the call prepared. The three business days from inquiry to call is time well spent.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4"]
+    }
+  },
+  "widgetsOrder": ["inquire_opener", "what_happens_next", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

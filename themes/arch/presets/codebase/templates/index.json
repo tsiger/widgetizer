@@ -1,0 +1,388 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A product engineering studio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We build the web applications other teams can't find the time to.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Codebase is a small team of engineers and designers shipping custom web apps, dashboards, design systems, and MVPs for product-minded companies. Berlin-based, working with teams across Europe and North America.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See our work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+    },
+    "clients": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Teams we've shipped with",
+        "eyebrow_uppercase": true,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "card_layout": "flat",
+        "layout": "grid",
+        "columns_desktop": 6,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "l-1": { "type": "logo", "settings": { "name": "Northlight" } },
+        "l-2": { "type": "logo", "settings": { "name": "Quanta" } },
+        "l-3": { "type": "logo", "settings": { "name": "Fieldwork" } },
+        "l-4": { "type": "logo", "settings": { "name": "Arbor" } },
+        "l-5": { "type": "logo", "settings": { "name": "Cartograph" } },
+        "l-6": { "type": "logo", "settings": { "name": "Parallel" } },
+        "l-7": { "type": "logo", "settings": { "name": "Halcyon" } },
+        "l-8": { "type": "logo", "settings": { "name": "Steppe" } }
+      },
+      "blocksOrder": ["l-1", "l-2", "l-3", "l-4", "l-5", "l-6", "l-7", "l-8"]
+    },
+    "how_we_work": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hw-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How we work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hw-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A small studio, on purpose.",
+            "size": "4xl"
+          }
+        },
+        "hw-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Eight people. Two projects at a time. Every engagement is led by a senior engineer — no account managers, no hand-offs mid-project. We write the code, we ship the code, we support the code.</p><p>Our stack is TypeScript, React, Postgres, and whatever sharp tool the project actually needs. Our method is weekly demos, working software from day one, and writing that explains what we built and why.</p>",
+            "size": "base"
+          }
+        },
+        "hw-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the team",
+              "href": "team.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hw-eyebrow", "hw-heading", "hw-text", "hw-button"]
+    },
+    "featured_work": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "Recent work",
+        "eyebrow_uppercase": true,
+        "title": "Four we're proud of.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "aspect_ratio": "4 / 3",
+        "text_display": "always",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "p-1": {
+          "type": "project",
+          "settings": {
+            "title": "Northlight — Revenue intelligence dashboard",
+            "description": "A reporting platform for a Series B analytics company. React, TypeScript, ClickHouse. Shipped in 14 weeks.",
+            "link": {
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "p-2": {
+          "type": "project",
+          "settings": {
+            "title": "Quanta — SaaS onboarding rewrite",
+            "description": "Rebuilt the onboarding for a growth-stage SaaS. Activation up 38% in the first quarter. Next.js, Postgres, Stripe.",
+            "link": {
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "p-3": {
+          "type": "project",
+          "settings": {
+            "title": "Fieldwork — Field-ops mobile web app",
+            "description": "A durable, offline-first PWA for technicians in the field. React, IndexedDB, Rust-powered sync layer.",
+            "link": {
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "p-4": {
+          "type": "project",
+          "settings": {
+            "title": "Arbor — Design system & docs site",
+            "description": "A shared component library and documentation platform for a thirty-person product team.",
+            "link": {
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["p-1", "p-2", "p-3", "p-4"]
+    },
+    "big_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "bq-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A client's words</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "bq-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "\"They shipped the thing we'd been trying to build for a year, in four months, and taught our team how to own it afterward.\"",
+            "size": "3xl"
+          }
+        },
+        "bq-attrib": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ana Voß, CTO — Northlight</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["bq-label", "bq-heading", "bq-attrib"]
+    },
+    "services_tease": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Services",
+        "eyebrow_uppercase": true,
+        "title": "What we can build for you.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "s-1": {
+          "type": "card",
+          "settings": {
+            "icon": "browser",
+            "title": "Web applications",
+            "description": "<p>Custom, product-shaped web apps. Full-stack builds from login to billing. TypeScript end-to-end.</p>"
+          }
+        },
+        "s-2": {
+          "type": "card",
+          "settings": {
+            "icon": "chart-bar",
+            "title": "Dashboards & internal tools",
+            "description": "<p>Reporting interfaces, admin consoles, and ops tools for teams that outgrew their spreadsheets.</p>"
+          }
+        },
+        "s-3": {
+          "type": "card",
+          "settings": {
+            "icon": "grid-pattern",
+            "title": "Design systems",
+            "description": "<p>Component libraries, token systems, and documentation sites that scale with your team.</p>"
+          }
+        },
+        "s-4": {
+          "type": "card",
+          "settings": {
+            "icon": "target-arrow",
+            "title": "MVP sprints",
+            "description": "<p>Two-week fixed-scope sprints that turn an idea into a working, demo-ready prototype.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["s-1", "s-2", "s-3", "s-4"]
+    },
+    "process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "How a project runs",
+        "eyebrow_uppercase": true,
+        "title": "Four phases, weekly demos.",
+        "description": "",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "st-1": {
+          "type": "step",
+          "settings": {
+            "title": "Discovery",
+            "description": "<p>A working session to understand the product, the users, and the technical constraints. We leave the room with a scope, a plan, and a fixed fee.</p>"
+          }
+        },
+        "st-2": {
+          "type": "step",
+          "settings": {
+            "title": "Scope",
+            "description": "<p>A written statement of work — what we'll build, what we won't, how we'll measure it, and what it costs. Signed before any code runs.</p>"
+          }
+        },
+        "st-3": {
+          "type": "step",
+          "settings": {
+            "title": "Build",
+            "description": "<p>Weekly demos of working software. Your team has access to the repo and the staging environment from day one. No black-box development.</p>"
+          }
+        },
+        "st-4": {
+          "type": "step",
+          "settings": {
+            "title": "Launch",
+            "description": "<p>We ship, we monitor, we write the handoff documentation, and we stay on-call for the first month after launch.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have a project to scope?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us what you're building. Reply within two business days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "clients",
+    "how_we_work",
+    "featured_work",
+    "big_quote",
+    "services_tease",
+    "process",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}
