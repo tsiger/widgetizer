@@ -1,0 +1,540 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Certified Public Accountants · Austin, TX</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Accounting that reads like it was built for your business.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We handle the tax, bookkeeping, and advisory work that keeps small businesses and self-employed professionals moving. Thirty-minute discovery call, no commitment, straight answers.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a free consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+    },
+    "credentials_strip": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "md",
+        "icon_shape": "sharp",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "credential-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-checkered",
+            "title": "AICPA Member",
+            "text": "American Institute of CPAs"
+          }
+        },
+        "credential-2": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "Texas Society of CPAs",
+            "text": "Licensed in Texas since 2007"
+          }
+        },
+        "credential-3": {
+          "type": "item",
+          "settings": {
+            "icon": "calculator",
+            "title": "QuickBooks ProAdvisor",
+            "text": "Certified implementation"
+          }
+        },
+        "credential-4": {
+          "type": "item",
+          "settings": {
+            "icon": "chart-line",
+            "title": "Xero Partner",
+            "text": "Certified partner firm"
+          }
+        },
+        "credential-5": {
+          "type": "item",
+          "settings": {
+            "icon": "file-invoice",
+            "title": "IRS Enrolled Agent",
+            "text": "Full representation rights"
+          }
+        }
+      },
+      "blocksOrder": ["credential-1", "credential-2", "credential-3", "credential-4", "credential-5"]
+    },
+    "services_overview": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "Services",
+        "eyebrow_uppercase": true,
+        "title": "Four practice areas, one firm.",
+        "description": "Everything a small business or self-employed professional needs, handled by the same people who know your books.",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "svc-1": {
+          "type": "service",
+          "settings": {
+            "title": "Tax preparation & filing",
+            "description": "<p>Federal, state, and local returns for individuals and businesses. Quarterly estimated payments, multi-state compliance, and IRS correspondence handled end-to-end.</p>",
+            "link": {
+              "text": "Tax services",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-2": {
+          "type": "service",
+          "settings": {
+            "title": "Bookkeeping & payroll",
+            "description": "<p>Monthly reconciliations, financial statements, and payroll run through QuickBooks or Xero. Your books are always current, always reviewed by a CPA.</p>",
+            "link": {
+              "text": "Bookkeeping services",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-3": {
+          "type": "service",
+          "settings": {
+            "title": "Advisory & forecasting",
+            "description": "<p>Quarterly strategy meetings, cash-flow forecasting, and tax planning ahead of year-end. The work that helps you make decisions, not just report them.</p>",
+            "link": {
+              "text": "Advisory services",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-4": {
+          "type": "service",
+          "settings": {
+            "title": "Audit & assurance support",
+            "description": "<p>Audit preparation, reviewed statements, and representation when the IRS or a lender needs documentation. We speak their language so you don't have to.</p>",
+            "link": {
+              "text": "Audit support",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4"]
+    },
+    "industries_switcher": {
+      "type": "content-switcher",
+      "settings": {
+        "eyebrow": "Who we work with",
+        "eyebrow_uppercase": true,
+        "title": "Different businesses, different books.",
+        "description": "We shape our engagements around how your business actually runs.",
+        "heading_alignment": "start",
+        "switcher_type": "tabs",
+        "option_1_label": "Small businesses",
+        "option_2_label": "Self-employed",
+        "option_3_label": "Nonprofits",
+        "columns": 3,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ind-1a": {
+          "type": "item",
+          "settings": {
+            "title": "Monthly close, done right",
+            "text": "<p>Reconciled books by the 10th of each month, clean financials you can share with lenders or investors, and a CPA on the account — not a bookkeeper.</p>",
+            "link": {
+              "text": "Small business services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "target_option": "1"
+          }
+        },
+        "ind-1b": {
+          "type": "item",
+          "settings": {
+            "title": "Payroll & 1099s handled",
+            "text": "<p>We run payroll, issue 1099s, and keep your multi-state obligations current. One firm, one point of contact.</p>",
+            "target_option": "1"
+          }
+        },
+        "ind-1c": {
+          "type": "item",
+          "settings": {
+            "title": "Sales tax across states",
+            "text": "<p>Nexus tracking, registration, and filings in every state where you owe — so selling into a new market doesn't come with a compliance headache.</p>",
+            "target_option": "1"
+          }
+        },
+        "ind-2a": {
+          "type": "item",
+          "settings": {
+            "title": "Quarterly estimates",
+            "text": "<p>Stop guessing what you owe the IRS. We calculate quarterly estimated payments and adjust as your income changes through the year.</p>",
+            "link": {
+              "text": "Self-employed services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "target_option": "2"
+          }
+        },
+        "ind-2b": {
+          "type": "item",
+          "settings": {
+            "title": "Schedule C, simplified",
+            "text": "<p>We organize your receipts, track deductible mileage and home-office expenses, and file a return that holds up if the IRS asks.</p>",
+            "target_option": "2"
+          }
+        },
+        "ind-2c": {
+          "type": "item",
+          "settings": {
+            "title": "Retirement that keeps more",
+            "text": "<p>SEP-IRA, Solo 401(k), and defined-benefit plans for the self-employed — picked, set up, and funded to cut your tax bill where it counts.</p>",
+            "target_option": "2"
+          }
+        },
+        "ind-3a": {
+          "type": "item",
+          "settings": {
+            "title": "Form 990 & compliance",
+            "text": "<p>Annual 990 preparation, grant-fund tracking, and board-ready financials. We keep your exempt status clean and your trustees informed.</p>",
+            "link": {
+              "text": "Nonprofit services",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "target_option": "3"
+          }
+        },
+        "ind-3b": {
+          "type": "item",
+          "settings": {
+            "title": "Audit-ready at any time",
+            "text": "<p>Monthly closes and restricted-fund tracking that keep you ready for an independent audit — not scrambling the week before.</p>",
+            "target_option": "3"
+          }
+        },
+        "ind-3c": {
+          "type": "item",
+          "settings": {
+            "title": "Grant & restricted funds",
+            "text": "<p>Fund-level accounting that keeps restricted grant dollars separate, reportable, and defensible — the way funders expect to see them.</p>",
+            "target_option": "3"
+          }
+        }
+      },
+      "blocksOrder": ["ind-1a", "ind-1b", "ind-1c", "ind-2a", "ind-2b", "ind-2c", "ind-3a", "ind-3b", "ind-3c"]
+    },
+    "approach": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "approach-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our approach</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "approach-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A firm that answers the phone.",
+            "size": "3xl"
+          }
+        },
+        "approach-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We're a small practice on purpose. Every engagement is led by a CPA, not passed to a junior. You'll know who does your books, who signs your return, and who picks up when you call.</p><p>We don't chase volume. We take on clients we can serve well — and we say no when we can't.</p>",
+            "size": "base"
+          }
+        },
+        "approach-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the team",
+              "href": "team.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["approach-eyebrow", "approach-heading", "approach-text", "approach-button"]
+    },
+    "process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "How it works",
+        "eyebrow_uppercase": true,
+        "title": "From first call to ongoing partnership.",
+        "description": "",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Discovery call",
+            "description": "<p>A 30-minute conversation about your business, your books, and what you actually need help with. No prep required.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Engagement letter",
+            "description": "<p>We scope the work, agree on a flat monthly fee, and put it in writing. No hourly surprises, no scope creep.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Onboarding",
+            "description": "<p>We connect to your accounting software, organize what exists, and bring your books current. Usually takes two to three weeks.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Ongoing partnership",
+            "description": "<p>Monthly closes, quarterly check-ins, and year-round tax planning. You get a CPA on retainer, not a once-a-year appointment.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "client_testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "quote-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A client's words</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "quote-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "\"They saved me from a mess of my own making, and I've handed them every return since.\"",
+            "size": "3xl"
+          }
+        },
+        "quote-attribution": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Mara Jensen, founder — Cedar Creek Interiors</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote-label", "quote-heading", "quote-attribution"]
+    },
+    "home_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you book.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "faq-sidebar-info": {
+          "type": "info",
+          "settings": {
+            "title": "Still have questions?",
+            "text": "<p>The Resources page has detailed answers on tax deadlines, deliverables, pricing, and what to bring to a first meeting.</p><p>Or skip straight to a call.</p>"
+          }
+        },
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work with clients outside Texas?",
+            "answer": "<p>Yes. Most of our clients are in Texas, but we work with small businesses and self-employed professionals in every state. Tax law is federal; state compliance is something we've handled in all 50 states.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How does pricing work?",
+            "answer": "<p>Flat monthly fees, agreed on in the engagement letter. Tax-only clients pay per return. We don't bill hourly for scoped work — a phone call should never come with a clock attached.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Can you take over from my current accountant?",
+            "answer": "<p>Yes. We handle the transition — requesting prior-year files, reconciling any gaps, and getting you current. It's a common first engagement.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What do I need to bring to the first call?",
+            "answer": "<p>Nothing. The discovery call is a conversation, not a review. If we decide to work together, we'll send a checklist of what to gather for onboarding.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you handle IRS notices and audits?",
+            "answer": "<p>Yes. All our CPAs and enrolled agents have full representation rights. If the IRS writes, we write back.</p>"
+          }
+        },
+        "faq-6": {
+          "type": "item",
+          "settings": {
+            "question": "What software do you use?",
+            "answer": "<p>QuickBooks Online and Xero are our primary platforms. We'll migrate from spreadsheets, desktop QuickBooks, or another cloud system as part of onboarding if needed.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-sidebar-info", "faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready when you are.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Thirty minutes, no prep, no obligation.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a 30-min call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "credentials_strip",
+    "services_overview",
+    "industries_switcher",
+    "approach",
+    "process",
+    "client_testimonial",
+    "home_faq",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

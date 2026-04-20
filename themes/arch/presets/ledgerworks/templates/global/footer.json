@@ -1,0 +1,37 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Ledgerworks CPA PLLC. All rights reserved.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>Accounting, tax, and advisory for small businesses and the self-employed. Based in Austin, serving clients nationwide.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Visit us",
+        "text": "<p>1420 Guadalupe Street, Suite 210</p><p>Austin, TX 78701</p><p>(512) 555-0134</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Navigate",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow along"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

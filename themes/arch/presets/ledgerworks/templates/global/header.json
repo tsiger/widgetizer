@@ -1,0 +1,19 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Ledgerworks",
+    "contactDetailsLine1": "(512) 555-0134",
+    "contactDetailsLine2": "Mon–Fri · 9am–5pm CT",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book a consultation",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-primary"
+  }
+}

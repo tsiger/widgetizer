@@ -1,0 +1,254 @@
+{
+  "name": "Industries",
+  "slug": "industries",
+  "widgets": {
+    "industries_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ind-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "Who we serve",
+            "size": "lg"
+          }
+        },
+        "ind-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We work with businesses like yours.",
+            "size": "5xl"
+          }
+        },
+        "ind-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The rhythms of a creative practice look nothing like a construction firm's, and a nonprofit's compliance calendar is its own world. Our engagements are shaped around the industry, not forced into a template.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["ind-eyebrow", "ind-heading", "ind-text"]
+    },
+    "industries_grid": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Industries served",
+        "eyebrow_uppercase": true,
+        "title": "Six specialties, built from experience.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "card-1": {
+          "type": "card",
+          "settings": {
+            "icon": "building-skyscraper",
+            "title": "Professional services",
+            "description": "<p>Consultants, agencies, design studios, and advisory firms. Pass-through structures, owner compensation, and project-based revenue recognition.</p>"
+          }
+        },
+        "card-2": {
+          "type": "card",
+          "settings": {
+            "icon": "shopping-bag",
+            "title": "E-commerce & retail",
+            "description": "<p>Shopify and marketplace sellers, multi-channel inventory, sales tax in every state, and margin analysis that tells you what's actually working.</p>"
+          }
+        },
+        "card-3": {
+          "type": "card",
+          "settings": {
+            "icon": "building-community",
+            "title": "Real estate & property",
+            "description": "<p>Landlords, investors, and short-term rental operators. Depreciation strategy, cost segregation, 1031 exchanges, and schedule-E returns done right.</p>"
+          }
+        },
+        "card-4": {
+          "type": "card",
+          "settings": {
+            "icon": "heart-handshake",
+            "title": "Nonprofits & foundations",
+            "description": "<p>Form 990, restricted-fund tracking, board-ready financial statements, and the compliance calendar that keeps your exempt status clean.</p>"
+          }
+        },
+        "card-5": {
+          "type": "card",
+          "settings": {
+            "icon": "user",
+            "title": "Self-employed & consultants",
+            "description": "<p>Freelancers, independent contractors, and one-person firms. Quarterly estimates, Schedule C, self-employed retirement contributions, home-office deductions.</p>"
+          }
+        },
+        "card-6": {
+          "type": "card",
+          "settings": {
+            "icon": "stethoscope",
+            "title": "Medical & dental practices",
+            "description": "<p>Solo and group practices, equipment depreciation, cost accounting by provider, and payroll that handles both W-2 staff and contract clinicians.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["card-1", "card-2", "card-3", "card-4", "card-5", "card-6"]
+    },
+    "how_we_adapt": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "How we adapt",
+        "eyebrow_uppercase": true,
+        "title": "The work changes with the industry.",
+        "description": "Every engagement starts with understanding how your business actually makes money — because that's what shapes the books, the tax posture, and the conversations we have each quarter.",
+        "heading_alignment": "start",
+        "content_position": "start",
+        "show_divider": true,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "adapt-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "route",
+            "title": "Industry-specific chart of accounts",
+            "description": "<p>A dental practice's books look different from an agency's. We structure accounts around how your industry actually reads its numbers.</p>"
+          }
+        },
+        "adapt-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "puzzle",
+            "title": "Tax strategy by sector",
+            "description": "<p>Cost segregation for real estate. QBI planning for pass-throughs. 990 strategy for nonprofits. We know where the levers are in your industry.</p>"
+          }
+        },
+        "adapt-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "clipboard-list",
+            "title": "Compliance calendars that fit",
+            "description": "<p>Your deadlines — grants, 1099s, sales tax, franchise tax, board reports — tracked and filed without you having to remember any of them.</p>"
+          }
+        },
+        "adapt-4": {
+          "type": "feature",
+          "settings": {
+            "icon": "checks",
+            "title": "Benchmarks that mean something",
+            "description": "<p>We compare your margins, payroll ratios, and overhead against peers in your industry — not generic small-business averages.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["adapt-1", "adapt-2", "adapt-3", "adapt-4"]
+    },
+    "industry_testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client voices",
+        "eyebrow_uppercase": true,
+        "title": "What clients say.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "t-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "They actually understand restaurants. Our last accountant treated us like a widget business — Ledgerworks knew the margin math on day one.",
+            "name": "Alex R.",
+            "title": "Restaurant owner",
+            "rating": "5"
+          }
+        },
+        "t-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "As a freelance designer I was filing quarterly estimates with spreadsheets and a lot of guessing. That ended the week they took over.",
+            "name": "Priya S.",
+            "title": "Freelance designer",
+            "rating": "5"
+          }
+        },
+        "t-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Cost segregation on two properties paid for three years of their fee in the first year. Wish I'd found them sooner.",
+            "name": "Daniel K.",
+            "title": "Real estate investor",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["t-1", "t-2", "t-3"]
+    },
+    "industries_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "i-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Don't see your industry?",
+            "size": "3xl"
+          }
+        },
+        "i-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>If you're a small business with a CPA-sized problem, chances are we've seen something close.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "i-cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["i-cta-heading", "i-cta-text", "i-cta-button"]
+    }
+  },
+  "widgetsOrder": ["industries_intro", "industries_grid", "how_we_adapt", "industry_testimonials", "industries_cta"],
+  "id": "industries",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

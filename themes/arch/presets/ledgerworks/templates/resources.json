@@ -1,0 +1,287 @@
+{
+  "name": "Resources",
+  "slug": "resources",
+  "widgets": {
+    "resources_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "For clients & the curious",
+            "size": "lg"
+          }
+        },
+        "r-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tax dates, checklists, and straight answers.",
+            "size": "5xl"
+          }
+        },
+        "r-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most of what people ask us shows up on this page. The deadlines you need to know, the questions that come up before hiring an accountant, and a handful of worksheets we hand to every new client.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["r-eyebrow", "r-heading", "r-text"]
+    },
+    "tax_deadlines": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Tax calendar",
+        "eyebrow_uppercase": true,
+        "title": "Key deadlines, year at a glance.",
+        "description": "The filing and payment dates that matter most for small businesses and individuals. Dates shift to the next business day when they land on a weekend or federal holiday.",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "d-1": {
+          "type": "item",
+          "settings": {
+            "date": "January 31",
+            "title": "W-2 & 1099 filings",
+            "description": "<p>W-2s to employees and 1099-NECs to contractors. Also the federal deadline to file copies with the IRS and SSA.</p>"
+          }
+        },
+        "d-2": {
+          "type": "item",
+          "settings": {
+            "date": "March 15",
+            "title": "S-corp & partnership returns",
+            "description": "<p>Form 1120-S and Form 1065 due. This is the first major filing deadline of the year for most pass-through entities.</p>"
+          }
+        },
+        "d-3": {
+          "type": "item",
+          "settings": {
+            "date": "April 15",
+            "title": "Personal returns & Q1 estimated",
+            "description": "<p>Form 1040 due. Also the deadline for C-corp returns (Form 1120) and Q1 estimated tax payments for self-employed filers.</p>"
+          }
+        },
+        "d-4": {
+          "type": "item",
+          "settings": {
+            "date": "June 15",
+            "title": "Q2 estimated payment",
+            "description": "<p>Second quarterly estimated tax payment for self-employed individuals and those with significant non-wage income.</p>"
+          }
+        },
+        "d-5": {
+          "type": "item",
+          "settings": {
+            "date": "September 15",
+            "title": "Q3 estimated & extended business returns",
+            "description": "<p>Q3 estimated tax payment. Also the extended deadline for S-corp and partnership returns filed on extension.</p>"
+          }
+        },
+        "d-6": {
+          "type": "item",
+          "settings": {
+            "date": "October 15",
+            "title": "Extended personal returns",
+            "description": "<p>Final deadline for Form 1040 filers who filed an extension in April. No further extensions available.</p>"
+          }
+        },
+        "d-7": {
+          "type": "item",
+          "settings": {
+            "date": "January 15",
+            "title": "Q4 estimated payment",
+            "description": "<p>Fourth and final quarterly estimated tax payment for the prior tax year. Skip this only if you're filing the full return by January 31.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["d-1", "d-2", "d-3", "d-4", "d-5", "d-6", "d-7"]
+    },
+    "resources_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "eyebrow_uppercase": true,
+        "title": "Things people ask before hiring an accountant.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Don't see your question?",
+            "text": "<p>These are the ones we answer most often on discovery calls. If yours isn't here, the call is still free — that's usually the fastest way to get a real answer.</p>"
+          }
+        },
+        "rf-1": {
+          "type": "item",
+          "settings": {
+            "question": "When should I switch from DIY tax software to a CPA?",
+            "answer": "<p>The moment your return has a Schedule C, rental properties, an S-corp K-1, or more than one state. At that point the cost of a CPA is usually less than the taxes you leave on the table doing it yourself.</p>"
+          }
+        },
+        "rf-2": {
+          "type": "item",
+          "settings": {
+            "question": "How much does an accountant cost?",
+            "answer": "<p>For a simple Schedule C return, expect $450–$800. For a small business with a monthly-close engagement, plan on $450–$1,200/mo depending on transaction volume, payroll, and complexity. Full advisory engagements start at $950/mo.</p>"
+          }
+        },
+        "rf-3": {
+          "type": "item",
+          "settings": {
+            "question": "What's the difference between a CPA and an enrolled agent?",
+            "answer": "<p>CPAs are licensed by the state and do audit, tax, and advisory work. Enrolled agents are licensed by the IRS and specialize in tax and representation. Both can represent you in front of the IRS. Our firm has both on staff.</p>"
+          }
+        },
+        "rf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Should I be an LLC or an S-corp?",
+            "answer": "<p>It depends on net profit and payroll math. Generally, once you're netting more than $60–80k and can pay yourself a reasonable salary, S-corp election starts to save money on self-employment tax. Below that, an LLC taxed as a sole prop is usually fine.</p>"
+          }
+        },
+        "rf-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need quarterly bookkeeping, or will annual work?",
+            "answer": "<p>If you have employees, collect sales tax, or take estimated payments, you need monthly bookkeeping. If you're a pure-consulting Schedule C filer with simple expenses, annual can work — but you'll make decisions with stale numbers.</p>"
+          }
+        },
+        "rf-6": {
+          "type": "item",
+          "settings": {
+            "question": "How do I know my return is being done right?",
+            "answer": "<p>Every return from our firm is prepared by one CPA and reviewed by a second. You'll get a signed copy of the return with schedules attached, and a 15-minute review call before it's filed.</p>"
+          }
+        },
+        "rf-7": {
+          "type": "item",
+          "settings": {
+            "question": "What should I do if I get an IRS notice?",
+            "answer": "<p>Don't panic, don't ignore it, and don't call the number on the notice before talking to your accountant. Most notices are automated and resolvable. If you're our client, forward it to us and we'll handle the response.</p>"
+          }
+        },
+        "rf-8": {
+          "type": "item",
+          "settings": {
+            "question": "Can you help with back taxes or unfiled returns?",
+            "answer": "<p>Yes. We regularly help clients clean up two to five years of unfiled returns, negotiate installment agreements, and apply for penalty abatement. It's usually less bad than you think.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["r-sidebar", "rf-1", "rf-2", "rf-3", "rf-4", "rf-5", "rf-6", "rf-7", "rf-8"]
+    },
+    "downloads": {
+      "type": "resource-list",
+      "settings": {
+        "eyebrow": "Downloads",
+        "eyebrow_uppercase": true,
+        "title": "Worksheets & checklists.",
+        "description": "The documents we hand to every new client. Feel free to use them even if you never become one.",
+        "heading_alignment": "center",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "dl-1": {
+          "type": "resource",
+          "settings": {
+            "title": "New client onboarding checklist",
+            "description": "Everything you'll need to gather for a smooth transition — prior returns, access to accounting software, payroll details, and entity documents.",
+            "button_label": "Download PDF"
+          }
+        },
+        "dl-2": {
+          "type": "resource",
+          "settings": {
+            "title": "1099 contractor worksheet",
+            "description": "A simple form for collecting contractor W-9 information and tracking annual payments so January 31 isn't a fire drill.",
+            "button_label": "Download PDF"
+          }
+        },
+        "dl-3": {
+          "type": "resource",
+          "settings": {
+            "title": "Small business tax-prep packet",
+            "description": "The standard list of documents, reports, and account access we request before preparing a small-business return.",
+            "button_label": "Download PDF"
+          }
+        },
+        "dl-4": {
+          "type": "resource",
+          "settings": {
+            "title": "Monthly close checklist",
+            "description": "The internal checklist our staff accountants follow for every monthly close. A useful reference if you're doing your own books.",
+            "button_label": "Download PDF"
+          }
+        }
+      },
+      "blocksOrder": ["dl-1", "dl-2", "dl-3", "dl-4"]
+    },
+    "resources_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "rc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to make this simpler?",
+            "size": "3xl"
+          }
+        },
+        "rc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>If you're past the basics and want a CPA on retainer, we should talk.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "rc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["rc-heading", "rc-text", "rc-button"]
+    }
+  },
+  "widgetsOrder": ["resources_intro", "tax_deadlines", "resources_faq", "downloads", "resources_cta"],
+  "id": "resources",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

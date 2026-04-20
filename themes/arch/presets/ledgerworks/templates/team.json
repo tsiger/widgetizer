@@ -1,0 +1,301 @@
+{
+  "name": "Team",
+  "slug": "team",
+  "widgets": {
+    "team_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "t-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "The practice",
+            "size": "lg"
+          }
+        },
+        "t-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The people behind your books.",
+            "size": "5xl"
+          }
+        },
+        "t-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ledgerworks is a CPA-led practice. Every client is assigned a named partner, and every return, monthly close, and advisory conversation runs through a credentialed accountant — not outsourced, not junior-staffed.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["t-eyebrow", "t-heading", "t-text"]
+    },
+    "team_grid": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": true,
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "image_style": "full",
+        "aspect_ratio": "3/4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "p-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Elena Marsh",
+            "role": "Managing Partner",
+            "specialty": "CPA, MBA",
+            "bio": "Elena founded Ledgerworks in 2007 after a decade in mid-market audit. She leads tax and advisory engagements and sets the standard for how every engagement is staffed."
+          }
+        },
+        "p-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Marcus Ochoa",
+            "role": "Partner, Tax",
+            "specialty": "CPA, EA",
+            "bio": "Marcus runs the tax practice. Enrolled agent, full IRS representation rights, and the person you want in the room if a notice arrives with a number on it."
+          }
+        },
+        "p-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Hana Lindqvist",
+            "role": "Senior Accountant",
+            "specialty": "CPA",
+            "bio": "Hana leads the monthly-close team. QuickBooks ProAdvisor, Xero Certified, and the reason your books are reconciled by the 10th every month."
+          }
+        },
+        "p-4": {
+          "type": "profile",
+          "settings": {
+            "name": "Jordan Bellamy",
+            "role": "Client Services Lead",
+            "specialty": "MBA",
+            "bio": "Jordan runs client onboarding, handles the engagement-letter process, and is usually the first person you talk to after a discovery call."
+          }
+        }
+      },
+      "blocksOrder": ["p-1", "p-2", "p-3", "p-4"]
+    },
+    "team_stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "fig-1": {
+          "type": "figure",
+          "settings": {
+            "number": "18",
+            "suffix": "",
+            "label": "Years in practice",
+            "description": "Founded 2007"
+          }
+        },
+        "fig-2": {
+          "type": "figure",
+          "settings": {
+            "number": "140",
+            "suffix": "+",
+            "label": "Clients served",
+            "description": "Across 22 states"
+          }
+        },
+        "fig-3": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": "M+",
+            "label": "Under management",
+            "description": "Combined client revenue"
+          }
+        },
+        "fig-4": {
+          "type": "figure",
+          "settings": {
+            "number": "100",
+            "suffix": "%",
+            "label": "CPA-led engagements",
+            "description": "No outsourced staffing"
+          }
+        }
+      },
+      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+    },
+    "firm_history": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "History",
+        "eyebrow_uppercase": true,
+        "title": "How we got here.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hist-1": {
+          "type": "item",
+          "settings": {
+            "date": "2007",
+            "title": "Ledgerworks founded",
+            "description": "<p>Elena opens the firm in a single office above a hardware store on Guadalupe. First client: a family dental practice that's still with us.</p>"
+          }
+        },
+        "hist-2": {
+          "type": "item",
+          "settings": {
+            "date": "2013",
+            "title": "First fifty clients",
+            "description": "<p>Marcus joins as tax partner. The practice crosses fifty recurring clients and adds its first dedicated bookkeeping staff.</p>"
+          }
+        },
+        "hist-3": {
+          "type": "item",
+          "settings": {
+            "date": "2019",
+            "title": "Moved to the current office",
+            "description": "<p>Relocated to 1420 Guadalupe. Hana joins to lead the monthly-close practice. Client count passes one hundred.</p>"
+          }
+        },
+        "hist-4": {
+          "type": "item",
+          "settings": {
+            "date": "2023",
+            "title": "Advisory practice added",
+            "description": "<p>Full Advisory engagement launched. Jordan joins to run client services. Today we serve 140+ clients across 22 states.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["hist-1", "hist-2", "hist-3", "hist-4"]
+    },
+    "credentials_reprise": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "md",
+        "icon_shape": "sharp",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "c-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-checkered",
+            "title": "AICPA Member",
+            "text": "American Institute of CPAs"
+          }
+        },
+        "c-2": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "Texas Society of CPAs",
+            "text": "Licensed since 2007"
+          }
+        },
+        "c-3": {
+          "type": "item",
+          "settings": {
+            "icon": "calculator",
+            "title": "QuickBooks ProAdvisor",
+            "text": "Certified implementation"
+          }
+        },
+        "c-4": {
+          "type": "item",
+          "settings": {
+            "icon": "chart-line",
+            "title": "Xero Partner",
+            "text": "Certified partner firm"
+          }
+        },
+        "c-5": {
+          "type": "item",
+          "settings": {
+            "icon": "file-invoice",
+            "title": "IRS Enrolled Agent",
+            "text": "Full representation rights"
+          }
+        }
+      },
+      "blocksOrder": ["c-1", "c-2", "c-3", "c-4", "c-5"]
+    },
+    "team_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Meet us over a 30-minute call.",
+            "size": "3xl"
+          }
+        },
+        "tc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>You'll talk to a partner, not a sales rep.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "tc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["tc-heading", "tc-text", "tc-button"]
+    }
+  },
+  "widgetsOrder": ["team_intro", "team_grid", "team_stats", "firm_history", "credentials_reprise", "team_cta"],
+  "id": "team",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

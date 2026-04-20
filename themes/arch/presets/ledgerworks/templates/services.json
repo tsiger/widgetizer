@@ -1,0 +1,268 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "Full-service accounting",
+            "size": "lg"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Everything a growing business needs, under one roof.",
+            "size": "5xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tax, bookkeeping, advisory, audit-prep, payroll, and entity work — handled by the same firm, by the same people, year after year. Pick the pieces you need now; the rest are here when you do.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text"]
+    },
+    "services_detail": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "What we do",
+        "eyebrow_uppercase": true,
+        "title": "Six practice areas.",
+        "description": "",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "d-svc-1": {
+          "type": "service",
+          "settings": {
+            "title": "Tax preparation & filing",
+            "description": "<p>Federal, state, and multi-state returns for individuals, partnerships, S-corps, and C-corps. Quarterly estimates, extensions, amended returns, and IRS correspondence handled in-house.</p>"
+          }
+        },
+        "d-svc-2": {
+          "type": "service",
+          "settings": {
+            "title": "Bookkeeping & monthly close",
+            "description": "<p>Reconciled by the 10th, financials reviewed by a CPA, and categorized so they hold up under scrutiny. QuickBooks Online or Xero, whichever fits your workflow.</p>"
+          }
+        },
+        "d-svc-3": {
+          "type": "service",
+          "settings": {
+            "title": "Payroll & contractor compliance",
+            "description": "<p>Full-service payroll, W-2 filings, 1099 issuance, and multi-state withholding. We handle the deadlines; you handle the hiring.</p>"
+          }
+        },
+        "d-svc-4": {
+          "type": "service",
+          "settings": {
+            "title": "Advisory & forecasting",
+            "description": "<p>Quarterly strategy sessions, cash-flow modeling, scenario planning, and year-end tax planning. The work that turns a backward-looking ledger into forward-looking decisions.</p>"
+          }
+        },
+        "d-svc-5": {
+          "type": "service",
+          "settings": {
+            "title": "Audit & assurance support",
+            "description": "<p>Independent audit preparation, reviewed financial statements, and representation for IRS examinations, lender reviews, and grant audits.</p>"
+          }
+        },
+        "d-svc-6": {
+          "type": "service",
+          "settings": {
+            "title": "Entity formation & restructuring",
+            "description": "<p>LLC vs. S-corp analysis, entity conversions, operating agreements coordinated with counsel, and tax-efficient ownership structures for new and growing businesses.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["d-svc-1", "d-svc-2", "d-svc-3", "d-svc-4", "d-svc-5", "d-svc-6"]
+    },
+    "pricing_tiers": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Engagements",
+        "eyebrow_uppercase": true,
+        "title": "Three ways to work with us.",
+        "description": "Every engagement is a flat fee agreed on in the engagement letter. No hourly billing for scoped work.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tier-1": {
+          "type": "plan",
+          "settings": {
+            "title": "Seasonal",
+            "price": "From $650",
+            "period": "per return",
+            "features": "+ Annual tax preparation & filing\n+ Federal, state, and one additional state\n+ Quarterly estimated payment calcs\n+ IRS notice handling\n+ Email access year-round",
+            "button_link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "tier-2": {
+          "type": "plan",
+          "settings": {
+            "title": "Monthly",
+            "price": "From $450",
+            "period": "per month",
+            "features": "+ Everything in Seasonal\n+ Monthly bookkeeping & reconciliation\n+ Financial statements reviewed by a CPA\n+ Payroll administration (up to 10 employees)\n+ Scheduled check-ins twice a year",
+            "button_link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "tier-3": {
+          "type": "plan",
+          "settings": {
+            "title": "Full advisory",
+            "price": "From $950",
+            "period": "per month",
+            "features": "+ Everything in Monthly\n+ Quarterly strategy & forecasting meetings\n+ Cash-flow modeling & scenario planning\n+ Proactive year-end tax planning\n+ Priority response & unlimited calls",
+            "button_link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["tier-1", "tier-2", "tier-3"]
+    },
+    "what_to_expect": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Process",
+        "eyebrow_uppercase": true,
+        "title": "What to expect.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "exp-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "From call to first close",
+            "text": "<p>Most clients are fully onboarded within two to three weeks of signing the engagement letter.</p><p>For tax-only engagements, we can turn around a return in as little as five business days during the off-season.</p>"
+          }
+        },
+        "exp-1": {
+          "type": "item",
+          "settings": {
+            "question": "How quickly can we start?",
+            "answer": "<p>Engagement letters are typically signed within two business days of a discovery call. Onboarding starts the next week and usually completes within two to three weeks for monthly clients, same-week for tax-only returns.</p>"
+          }
+        },
+        "exp-2": {
+          "type": "item",
+          "settings": {
+            "question": "What does onboarding look like?",
+            "answer": "<p>We request prior-year returns, access to your accounting software, and a list of the accounts and payroll systems currently in play. From there we reconcile, categorize, and bring books current — you mostly approve a few connections and answer a handful of questions.</p>"
+          }
+        },
+        "exp-3": {
+          "type": "item",
+          "settings": {
+            "question": "How do we communicate day-to-day?",
+            "answer": "<p>Email for async work, scheduled calls for anything that needs a conversation. Clients on the Full Advisory engagement have a direct line and priority response.</p>"
+          }
+        },
+        "exp-4": {
+          "type": "item",
+          "settings": {
+            "question": "What's included in quarterly meetings?",
+            "answer": "<p>A review of the last quarter's numbers, a look at the next quarter's tax posture, and any strategic questions on the table — entity structure, compensation strategy, major purchases, retirement contributions.</p>"
+          }
+        },
+        "exp-5": {
+          "type": "item",
+          "settings": {
+            "question": "Can we change engagement tiers later?",
+            "answer": "<p>Yes. Most clients start on Monthly and move to Full Advisory as the business grows. You can also step down if needs change — we don't lock anyone into a tier they've outgrown.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["exp-sidebar", "exp-1", "exp-2", "exp-3", "exp-4", "exp-5"]
+    },
+    "services_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "svc-cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Not sure which engagement fits?",
+            "size": "3xl"
+          }
+        },
+        "svc-cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'll talk through your numbers and tell you — or whether you need one at all.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "svc-cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a call",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["svc-cta-heading", "svc-cta-text", "svc-cta-button"]
+    }
+  },
+  "widgetsOrder": ["services_intro", "services_detail", "pricing_tiers", "what_to_expect", "services_cta"],
+  "id": "services",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

@@ -23,7 +23,7 @@
 | 15 | inkwell | Inkwell | Tattoo Studio |  |
 | 16 | ironform | Ironform | Personal Trainer |  |
 | 17 | keystoned | Keystoned | Real Estate Agent | DONE |
-| 18 | ledgerworks | Ledgerworks | Accountant |  |
+| 18 | ledgerworks | Ledgerworks | Accountant | DONE |
 | 19 | little-oaks | Little Oaks | Daycare / Preschool | DONE |
 | 20 | noteworthy | Noteworthy | Tutoring / Music Lessons |  |
 | 21 | olympic | Olympic | Gym | DONE |

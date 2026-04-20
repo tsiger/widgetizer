@@ -1,0 +1,198 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_opener": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "c-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Let's talk</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "c-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Thirty minutes, no prep, no obligation.",
+            "size": "5xl",
+            "position": "left"
+          }
+        },
+        "c-text-left": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A discovery call is a conversation, not a pitch. We'll ask about your business, your current books, and what you're hoping an accountant can help with. If we're the right fit, we'll say so. If we're not, we'll tell you who is.</p>",
+            "size": "base",
+            "position": "left"
+          }
+        },
+        "c-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (512) 555-0134",
+              "href": "tel:+15125550134",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Email hello@ledgerworks.cpa",
+              "href": "mailto:hello@ledgerworks.cpa",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        },
+        "c-right-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Visit the office",
+            "size": "2xl",
+            "position": "right"
+          }
+        },
+        "c-right-address": {
+          "type": "text",
+          "settings": {
+            "text": "<p>1420 Guadalupe Street, Suite 210</p><p>Austin, TX 78701</p>",
+            "size": "base",
+            "position": "right"
+          }
+        },
+        "c-right-hours-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Office hours",
+            "size": "2xl",
+            "position": "right"
+          }
+        },
+        "c-right-hours": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Monday – Friday, 9am – 5pm Central</p><p>Evenings & weekends by appointment during tax season</p>",
+            "size": "base",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "c-eyebrow",
+        "c-heading",
+        "c-text-left",
+        "c-buttons",
+        "c-right-heading",
+        "c-right-address",
+        "c-right-hours-heading",
+        "c-right-hours"
+      ]
+    },
+    "office_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Find us",
+        "eyebrow_uppercase": true,
+        "title": "On Guadalupe, between 14th and 15th.",
+        "description": "",
+        "heading_alignment": "start",
+        "address": "1420 Guadalupe Street, Suite 210, Austin, TX 78701",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "map-parking": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Two-hour street parking on Guadalupe.</p><p>Paid garage entrance on 15th Street, one block north.</p>"
+          }
+        },
+        "map-transit": {
+          "type": "info",
+          "settings": {
+            "title": "Getting here",
+            "text": "<p>CapMetro bus routes 7, 20, and 803 stop within two blocks.</p><p>Three blocks from UT Austin campus.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["map-parking", "map-transit"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you book",
+        "eyebrow_uppercase": true,
+        "title": "What to know ahead of the call.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Most first calls are short",
+            "text": "<p>Thirty minutes is usually plenty. We'll ask questions, you'll ask questions, and we'll both know by the end whether it makes sense to keep talking.</p>"
+          }
+        },
+        "cf-1": {
+          "type": "item",
+          "settings": {
+            "question": "What happens on the discovery call?",
+            "answer": "<p>We talk. About your business, what you're doing now for accounting, what's working, what isn't. No slides, no sales deck. By the end we'll know whether we can help — and if we can, roughly what an engagement looks like.</p>"
+          }
+        },
+        "cf-2": {
+          "type": "item",
+          "settings": {
+            "question": "What should I bring?",
+            "answer": "<p>Nothing. If you have last year's return handy it can speed things up, but it's not required. The discovery call is about the conversation, not the paperwork.</p>"
+          }
+        },
+        "cf-3": {
+          "type": "item",
+          "settings": {
+            "question": "How soon can we start?",
+            "answer": "<p>Most clients sign an engagement letter within a week of the call. For monthly engagements, full onboarding takes two to three weeks. For tax-only work during the off-season, we can often turn around a return in under a week.</p>"
+          }
+        },
+        "cf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work with clients outside Texas?",
+            "answer": "<p>Yes. Most of our clients are in Texas, but we work with small businesses and self-employed professionals across 22 states. All client communication happens by video, phone, and email — visits to the office are optional, not required.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4"]
+    }
+  },
+  "widgetsOrder": ["contact_opener", "office_map", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}
