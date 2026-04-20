@@ -1,0 +1,227 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "opener": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "co-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inquire</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "co-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us what you're thinking.",
+            "size": "6xl",
+            "position": "left"
+          }
+        },
+        "co-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every inquiry is read by a human — usually the studio manager — and routed to the artist whose style fits what you described. You'll hear back within three business days, with either a consultation time or an honest note that we're not the right fit.</p><p>No phone calls, no DMs for booking. Email is the fastest way in.</p>",
+            "size": "base",
+            "position": "left"
+          }
+        },
+        "co-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email hello@inkwell.studio",
+              "href": "mailto:hello@inkwell.studio",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        },
+        "co-right-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What to include.",
+            "size": "2xl",
+            "position": "right"
+          }
+        },
+        "co-r-1": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Which artist",
+            "description": "If you know whose style you want, name them. If you're not sure, describe what you're going for and we'll route it.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "co-r-2": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Size and placement",
+            "description": "Roughly how big, roughly where on the body. A napkin sketch photographed with your phone is fine.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "co-r-3": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Reference images",
+            "description": "Two to five images that point at the direction, vibe, or subject. Other artists' work is fine as a reference — we won't copy it.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "co-r-4": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Date window",
+            "description": "When you'd hope to book — a window like \"July–September\" is more useful than a specific date.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "co-r-5": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Anything else",
+            "description": "Meaning behind the piece, constraints, existing tattoos in the area, anything that might help the artist draw the right thing.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "co-eyebrow",
+        "co-heading",
+        "co-body",
+        "co-button",
+        "co-right-heading",
+        "co-r-1",
+        "co-r-2",
+        "co-r-3",
+        "co-r-4",
+        "co-r-5"
+      ]
+    },
+    "what_happens_next": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wn-kicker": {
+          "type": "text",
+          "settings": {
+            "text": "<p>After you write</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "wn-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What happens next.",
+            "size": "3xl"
+          }
+        },
+        "wn-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The process is deliberate. A human reads every inquiry, makes a call on which artist should take it, and then the artist drafts a plan before the first session. No auto-replies, no chatbot in the middle.</p>",
+            "size": "base"
+          }
+        },
+        "wn-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ A human reads every inquiry — usually the studio manager\n+ We route it to the right artist, and tell you who\n+ The artist replies with a plan, timeline, and deposit details"
+          }
+        }
+      },
+      "blocksOrder": ["wn-kicker", "wn-heading", "wn-text", "wn-features"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you write",
+        "eyebrow_uppercase": true,
+        "title": "Common first questions.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "More detail on the Visit page",
+            "text": "<p>The full FAQ covers pricing, deposits, licensing, aftercare, cover-ups, and the bits most people want to know before booking.</p>"
+          }
+        },
+        "cf-1": {
+          "type": "item",
+          "settings": {
+            "question": "How long until we hear back?",
+            "answer": "<p>Within three business days, almost always. If the artist you named is on deep backlog it may be longer — we'll tell you upfront rather than leaving you in silence.</p>"
+          }
+        },
+        "cf-2": {
+          "type": "item",
+          "settings": {
+            "question": "What if our timing doesn't work?",
+            "answer": "<p>We'll say so honestly and often suggest a different artist with earlier availability or point you to a trusted studio elsewhere in the city. A good referral is better than a vague \"maybe next year.\"</p>"
+          }
+        },
+        "cf-3": {
+          "type": "item",
+          "settings": {
+            "question": "Can we come in for a consult without emailing first?",
+            "answer": "<p>We don't take drop-in consultations — it disrupts another client's session. The written inquiry gives the artist time to think before the call, which is worth the wait.</p>"
+          }
+        },
+        "cf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you tattoo existing clients differently?",
+            "answer": "<p>Returning clients don't skip the inquiry flow — every project gets a fresh consultation. But their artists usually have them scheduled faster than first-timers, and deposits are often waived.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4"]
+    }
+  },
+  "widgetsOrder": ["opener", "what_happens_next", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

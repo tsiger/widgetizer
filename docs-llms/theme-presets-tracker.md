@@ -20,7 +20,7 @@
 | 12 | greystone | Greystone | Lawyer / Law Firm | DONE |
 | 13 | hearthstone | Hearthstone | Hotel / B&B |  |
 | 14 | hue-and-co | Hue & Co | Interior Designer |  |
-| 15 | inkwell | Inkwell | Tattoo Studio |  |
+| 15 | inkwell | Inkwell | Tattoo Studio | DONE |
 | 16 | ironform | Ironform | Personal Trainer |  |
 | 17 | keystoned | Keystoned | Real Estate Agent | DONE |
 | 18 | ledgerworks | Ledgerworks | Accountant | DONE |

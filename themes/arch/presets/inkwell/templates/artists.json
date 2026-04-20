@@ -1,0 +1,520 @@
+{
+  "name": "Artists",
+  "slug": "artists",
+  "widgets": {
+    "opener": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The artists</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Six artists. Six hands. Six practices.",
+            "size": "7xl",
+            "position": "left"
+          }
+        },
+        "op-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every resident at Inkwell chose the studio because it let them do their own work. We don't rotate artists through generalist queues — you book the person whose style you want, not a shift. Each artist sets their own pace, pricing, and waiting list. The studio holds the standard for hygiene, consultation, and aftercare.</p>",
+            "size": "lg",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-body"]
+    },
+    "artist_saoirse": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "right",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "s-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "left"
+          }
+        },
+        "s-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fine line · single-needle · 8 years</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "s-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Saoirse Doyle",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "s-bio": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Dublin-trained, Brooklyn-based. Saoirse works almost exclusively in single-needle fine line — botanicals, script, portraits, and architectural studies at small scale. Known for extraordinary line consistency and for flowers that actually look like flowers.</p><p>Books two to three months out.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "s-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See Saoirse's work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["s-image", "s-label", "s-name", "s-bio", "s-button"]
+    },
+    "artist_rafael": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "left",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "right"
+          }
+        },
+        "r-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Japanese · irezumi · 12 years</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "r-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Rafael Mendes",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "r-bio": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Traditional Japanese work — dragons, koi, hannya, peonies, wind and waves. Rafael trained under Horikiku in Tokyo and works predominantly on sleeves, back pieces, and bodysuit projects.</p><p>Books six to twelve months out. Does not accept small one-off pieces.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "left"
+          }
+        },
+        "r-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See Rafael's work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        }
+      },
+      "blocksOrder": ["r-image", "r-label", "r-name", "r-bio", "r-button"]
+    },
+    "artist_kiko": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "right",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "k-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "left"
+          }
+        },
+        "k-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Neotraditional · American trad · 10 years</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "k-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Kiko Nakamura",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "k-bio": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Bold line, flat colour, tight composition. Kiko apprenticed in Los Angeles and her work draws cleanly from American traditional — animals, florals, figurative pieces, nautical flash. Colour palette is measured, never muddy.</p><p>Books three to four months out.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "k-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See Kiko's work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["k-image", "k-label", "k-name", "k-bio", "k-button"]
+    },
+    "artist_elena": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "left",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "e-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "right"
+          }
+        },
+        "e-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Realism · black and grey · 14 years</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "e-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Elena Stavros",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "e-bio": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Photorealistic black-and-grey work — portraits, architectural studies, animal work, old-master-referenced figurative pieces. Elena's sessions are long (six to eight hours) and her bookings are deep.</p><p>A full sleeve typically takes five to seven sittings over six months.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "left"
+          }
+        },
+        "e-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See Elena's work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        }
+      },
+      "blocksOrder": ["e-image", "e-label", "e-name", "e-bio", "e-button"]
+    },
+    "artist_jules": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "right",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "j-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "left"
+          }
+        },
+        "j-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Blackwork · illustrative · 9 years</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "j-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Jules Wren",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "j-bio": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Heavy blackwork drawing on woodcut, etching, and ornament traditions. Jules came to tattooing from printmaking, and it shows in the composition — graphic panels, baroque borders, illustrative beasts.</p><p>Large-scale pieces a speciality.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "j-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See Jules's work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["j-image", "j-label", "j-name", "j-bio", "j-button"]
+    },
+    "artist_indra": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "left",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "i-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "right"
+          }
+        },
+        "i-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Dotwork · geometric · 7 years</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "i-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Indra Patel",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "i-bio": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Geometric dotwork and mandala-derived ornament — precise, mathematical, deeply patterned. Indra studied architecture before tattooing, which shapes her approach to symmetry and scale.</p><p>Often collaborates with Jules on large ornamental back pieces.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "left"
+          }
+        },
+        "i-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See Indra's work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        }
+      },
+      "blocksOrder": ["i-image", "i-label", "i-name", "i-bio", "i-button"]
+    },
+    "client_voices": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client voices",
+        "eyebrow_uppercase": true,
+        "title": "What clients say afterward.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cv-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Saoirse redrew the design three times over six weeks until the proportions were exactly right. The tattoo is a year old and the lines are still as fine as the day they healed.",
+            "name": "Mira L.",
+            "title": "Sternum botanical with Saoirse, 2024",
+            "rating": "5"
+          }
+        },
+        "cv-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Rafael's consultation was the most thoughtful conversation I've ever had about a tattoo. Twelve months of drawing before the first session — worth every minute.",
+            "name": "David H.",
+            "title": "Japanese back piece with Rafael, 2023",
+            "rating": "5"
+          }
+        },
+        "cv-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Elena's ability to capture a face in black and grey is genuinely uncanny. The portrait of my grandfather looks more like him than most photographs.",
+            "name": "Aliyah K.",
+            "title": "Portrait with Elena, 2024",
+            "rating": "5"
+          }
+        },
+        "cv-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "I wanted ornament, not a picture. Jules drew something that genuinely belongs on a body — it feels designed rather than illustrated.",
+            "name": "Theo R.",
+            "title": "Chest ornament with Jules, 2024",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["cv-1", "cv-2", "cv-3", "cv-4"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ac-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Found the right artist?",
+            "size": "3xl"
+          }
+        },
+        "ac-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Start an inquiry and tell us which one.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "ac-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["ac-heading", "ac-text", "ac-button"]
+    }
+  },
+  "widgetsOrder": [
+    "opener",
+    "artist_saoirse",
+    "artist_rafael",
+    "artist_kiko",
+    "artist_elena",
+    "artist_jules",
+    "artist_indra",
+    "client_voices",
+    "cta"
+  ],
+  "id": "artists",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

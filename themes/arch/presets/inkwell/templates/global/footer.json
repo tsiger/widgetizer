@@ -1,0 +1,37 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Inkwell Studio. All rights reserved.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A custom tattoo studio in Brooklyn. Six resident artists, by appointment. Licensed by the NYC Department of Health.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Visit",
+        "text": "<p>184 Graham Avenue</p><p>Brooklyn, NY 11206</p><p>Tuesday – Saturday, 12 – 8pm</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Pages",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

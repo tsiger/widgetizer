@@ -1,0 +1,185 @@
+{
+  "name": "Work",
+  "slug": "work",
+  "widgets": {
+    "opener": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wo-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "wo-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Selected pieces, in no particular order.",
+            "size": "7xl",
+            "position": "left"
+          }
+        },
+        "wo-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A rolling archive of finished work from all six residents. Pieces are posted with the client's permission and usually photographed a few weeks after healing. Featured work first, then the full archive below.</p>",
+            "size": "lg",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["wo-eyebrow", "wo-heading", "wo-body"]
+    },
+    "mosaic": {
+      "type": "checkerboard",
+      "settings": {
+        "eyebrow": "Featured",
+        "eyebrow_uppercase": true,
+        "title": "Pieces we come back to.",
+        "description": "",
+        "heading_alignment": "start",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "m-1": {
+          "type": "card",
+          "settings": {}
+        },
+        "m-2": {
+          "type": "card",
+          "settings": {
+            "title": "Japanese",
+            "description": "<p>Large-scale irezumi — dragons, koi, hannya, peonies, wind and waves. Months of drawing, sessions measured in years.</p>",
+            "button_link": {
+              "text": "With Rafael",
+              "href": "artists.html",
+              "target": "_self"
+            }
+          }
+        },
+        "m-3": {
+          "type": "card",
+          "settings": {}
+        },
+        "m-4": {
+          "type": "card",
+          "settings": {}
+        },
+        "m-5": {
+          "type": "card",
+          "settings": {
+            "title": "Blackwork & ornament",
+            "description": "<p>Woodcut, etching, and baroque-influenced graphic work. Illustration-meets-ornament; composition as the whole point.</p>",
+            "button_link": {
+              "text": "With Jules",
+              "href": "artists.html",
+              "target": "_self"
+            }
+          }
+        },
+        "m-6": {
+          "type": "card",
+          "settings": {}
+        }
+      },
+      "blocksOrder": ["m-1", "m-2", "m-3", "m-4", "m-5", "m-6"]
+    },
+    "archive": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "The archive",
+        "eyebrow_uppercase": true,
+        "title": "Recent pieces.",
+        "description": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "a-01": { "type": "item", "settings": { "title": "Hannya mask", "category": "Japanese · Rafael" } },
+        "a-02": { "type": "item", "settings": { "title": "Botanical half-sleeve", "category": "Fine line · Saoirse" } },
+        "a-03": { "type": "item", "settings": { "title": "Woodcut wolf", "category": "Blackwork · Jules" } },
+        "a-04": { "type": "item", "settings": { "title": "Photorealistic panther", "category": "Realism · Elena" } },
+        "a-05": { "type": "item", "settings": { "title": "Swallow pair", "category": "American trad · Kiko" } },
+        "a-06": { "type": "item", "settings": { "title": "Sacred geometry back piece", "category": "Dotwork · Indra" } },
+        "a-07": { "type": "item", "settings": { "title": "Koi sleeve", "category": "Japanese · Rafael" } },
+        "a-08": { "type": "item", "settings": { "title": "Minimal floral", "category": "Fine line · Saoirse" } },
+        "a-09": { "type": "item", "settings": { "title": "Engraved ornament", "category": "Blackwork · Jules" } },
+        "a-10": { "type": "item", "settings": { "title": "Architectural portrait", "category": "Realism · Elena" } },
+        "a-11": { "type": "item", "settings": { "title": "Rose and dagger", "category": "Neotraditional · Kiko" } },
+        "a-12": { "type": "item", "settings": { "title": "Mandala chest piece", "category": "Dotwork · Indra" } },
+        "a-13": { "type": "item", "settings": { "title": "Dragon and peonies", "category": "Japanese · Rafael" } },
+        "a-14": { "type": "item", "settings": { "title": "Script and filigree", "category": "Fine line · Saoirse" } },
+        "a-15": { "type": "item", "settings": { "title": "Baroque ornament", "category": "Blackwork · Jules" } },
+        "a-16": { "type": "item", "settings": { "title": "Hound portrait", "category": "Realism · Elena" } },
+        "a-17": { "type": "item", "settings": { "title": "Anchor and rope", "category": "American trad · Kiko" } },
+        "a-18": { "type": "item", "settings": { "title": "Geometric bicep band", "category": "Dotwork · Indra" } },
+        "a-19": { "type": "item", "settings": { "title": "Architectural facade", "category": "Fine line · Saoirse" } },
+        "a-20": { "type": "item", "settings": { "title": "Wave and wind back piece", "category": "Japanese · Rafael" } }
+      },
+      "blocksOrder": ["a-01", "a-02", "a-03", "a-04", "a-05", "a-06", "a-07", "a-08", "a-09", "a-10", "a-11", "a-12", "a-13", "a-14", "a-15", "a-16", "a-17", "a-18", "a-19", "a-20"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to start yours?",
+            "size": "3xl"
+          }
+        },
+        "wc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Send an inquiry with a reference and the artist you have in mind.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "wc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["wc-heading", "wc-text", "wc-button"]
+    }
+  },
+  "widgetsOrder": ["opener", "mosaic", "archive", "cta"],
+  "id": "work",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

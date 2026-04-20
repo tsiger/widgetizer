@@ -61,6 +61,12 @@
       "liveDemo": "https://widgetizer.org/demos/greystone/"
     },
     {
+      "id": "inkwell",
+      "name": "Inkwell",
+      "description": "Tattoo studio",
+      "liveDemo": "https://widgetizer.org/demos/inkwell/"
+    },
+    {
       "id": "keystoned",
       "name": "Keystoned",
       "description": "Real estate agent",

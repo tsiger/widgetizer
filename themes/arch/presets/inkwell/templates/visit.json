@@ -1,0 +1,299 @@
+{
+  "name": "Visit",
+  "slug": "visit",
+  "widgets": {
+    "opener": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "vo-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Visit</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "vo-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A quiet room on Graham Avenue.",
+            "size": "7xl",
+            "position": "left"
+          }
+        },
+        "vo-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inkwell occupies a ground-floor storefront in East Williamsburg — two chairs up front for consultation, six private stations further back, daylight through the windows and enough plants to be stubborn about the rent. Nothing on the walls but framed prints from the artists' own sketchbooks.</p>",
+            "size": "base",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["vo-eyebrow", "vo-heading", "vo-body"]
+    },
+    "session_day": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sd-kicker": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Session day</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "sd-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What to bring, what to know.",
+            "size": "3xl"
+          }
+        },
+        "sd-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your artist will brief you in detail before the day. These are the basics — the things that make a long sitting easier on your body and on the work.</p>",
+            "size": "base"
+          }
+        },
+        "sd-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Arrive fifteen minutes early\n+ Eat a full meal an hour or two beforehand\n+ Hydrate the day before — and skip alcohol for 24 hours\n+ Wear comfortable clothes you can get ink on\n+ Bring ID for first-time clients"
+          }
+        }
+      },
+      "blocksOrder": ["sd-kicker", "sd-heading", "sd-text", "sd-features"]
+    },
+    "space_tiles": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "The space",
+        "eyebrow_uppercase": true,
+        "title": "Inside the studio.",
+        "description": "",
+        "heading_alignment": "start",
+        "gap": "var(--space-md)",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "st-main": {
+          "type": "item",
+          "settings": {
+            "title": "Six private stations.",
+            "text": "Each artist has their own room. No shared tables, no back-to-back appointments — the studio is built so one session doesn't interrupt another.",
+            "overlay_color": "#0a0a0cb3",
+            "col_span": 3,
+            "row_span": 2,
+            "text_color": "light",
+            "alignment": "start"
+          }
+        },
+        "st-licensed": {
+          "type": "item",
+          "settings": {
+            "title": "Licensed",
+            "text": "By the NYC Department of Health and Mental Hygiene. Every artist individually licensed.",
+            "col_span": 1,
+            "row_span": 1,
+            "background_color": "#a01824",
+            "text_color": "light",
+            "alignment": "start"
+          }
+        },
+        "st-station": {
+          "type": "item",
+          "settings": {
+            "title": "Single-use.",
+            "text": "Needles, ink cups, razors, gloves — disposed of after every session. No exceptions.",
+            "col_span": 1,
+            "row_span": 1,
+            "background_color": "#e3e3e7",
+            "text_color": "dark",
+            "alignment": "start"
+          }
+        }
+      },
+      "blocksOrder": ["st-main", "st-licensed", "st-station"]
+    },
+    "studio_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you book.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Not sure yet?",
+            "text": "<p>The discovery-call stage is free. If after the consultation it's not the right fit — style, timing, scale — we'll tell you, and often point to an artist elsewhere in the city who's better suited.</p>"
+          }
+        },
+        "fq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Is the studio licensed?",
+            "answer": "<p>Yes. Licensed by the NYC Department of Health and Mental Hygiene. Every artist is individually licensed. Equipment is autoclave-sterilised; all needles and ink cups are single-use and disposed of after every session.</p>"
+          }
+        },
+        "fq-2": {
+          "type": "item",
+          "settings": {
+            "question": "How much does a tattoo cost?",
+            "answer": "<p>Each artist sets their own rates. Small pieces start around $250. Most sleeve-scale projects run $3,000–$8,000 total, spread across multiple sessions. Your artist will quote a figure after the consultation — never before, because the drawing shapes the price.</p>"
+          }
+        },
+        "fq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you require a deposit?",
+            "answer": "<p>Yes — a $150 deposit secures your first session and is applied to the final tattoo cost. Deposits are non-refundable but can be rescheduled once with at least 72 hours' notice.</p>"
+          }
+        },
+        "fq-4": {
+          "type": "item",
+          "settings": {
+            "question": "What does aftercare look like?",
+            "answer": "<p>You'll leave with a wrapped tattoo, a balm, and printed written aftercare. Keep it clean and moisturised for two weeks; avoid sun, pools, and gyms for ten days. Reachable by email and phone through the first two weeks if anything looks off.</p>"
+          }
+        },
+        "fq-5": {
+          "type": "item",
+          "settings": {
+            "question": "Can you do touch-ups?",
+            "answer": "<p>Touch-ups within the first year after a session are free. After that, standard hourly rate applies. Touch-ups on tattoos done elsewhere are considered on a case-by-case basis with the artist.</p>"
+          }
+        },
+        "fq-6": {
+          "type": "item",
+          "settings": {
+            "question": "Do you do cover-ups?",
+            "answer": "<p>Sometimes. Cover-ups require a consultation in person so the artist can assess scale, contrast, and whether a cover is feasible. Not every existing tattoo can be cleanly covered — we'd rather say so honestly than promise a miracle.</p>"
+          }
+        },
+        "fq-7": {
+          "type": "item",
+          "settings": {
+            "question": "Do you tattoo minors?",
+            "answer": "<p>No. New York state law requires clients to be 18 or older, and we ID every first-time client. No exceptions, even with parental consent.</p>"
+          }
+        },
+        "fq-8": {
+          "type": "item",
+          "settings": {
+            "question": "Do you take walk-ins?",
+            "answer": "<p>We don't. Walking in on a session day breaks the concentration we owe to the person on the table. Every tattoo at Inkwell is scheduled.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["fq-sidebar", "fq-1", "fq-2", "fq-3", "fq-4", "fq-5", "fq-6", "fq-7", "fq-8"]
+    },
+    "find_us": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Find us",
+        "eyebrow_uppercase": true,
+        "title": "184 Graham Avenue, Brooklyn.",
+        "description": "",
+        "heading_alignment": "start",
+        "address": "184 Graham Avenue, Brooklyn, NY 11206",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fu-transit": {
+          "type": "info",
+          "settings": {
+            "title": "Getting here",
+            "text": "<p>L train to Grand Street, seven minutes walk north.</p><p>G train to Metropolitan Avenue, five minutes walk south.</p>"
+          }
+        },
+        "fu-parking": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Metered street parking on Graham Avenue, two-hour limit.</p><p>No dedicated lot — allow an extra ten minutes on weekends.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["fu-transit", "fu-parking"]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "vc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready when you are.",
+            "size": "3xl"
+          }
+        },
+        "vc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Send us an inquiry and we'll route it to the right artist.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "vc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["vc-heading", "vc-text", "vc-button"]
+    }
+  },
+  "widgetsOrder": ["opener", "session_day", "space_tiles", "studio_faq", "find_us", "cta"],
+  "id": "visit",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

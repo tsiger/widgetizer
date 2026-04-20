@@ -1,0 +1,18 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Inkwell",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book a consult",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary",
+    "logoMaxWidth": 100
+  }
+}
