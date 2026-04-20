@@ -39,7 +39,8 @@
     {
       "id": "everafter",
       "name": "Everafter",
-      "description": "Wedding planner"
+      "description": "Wedding planner",
+      "liveDemo": "https://widgetizer.org/demos/everafter/"
     },
     {
       "id": "greenfield",
