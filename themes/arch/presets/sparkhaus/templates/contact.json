@@ -1,0 +1,266 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "opener": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ct-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Get a quote</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "ct-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A quote in under two minutes.",
+            "size": "4xl"
+          }
+        },
+        "ct-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call, email, or fill the form below. We'll confirm your flat-rate quote within the hour during business hours, and match you to a cleaner whose schedule and specialty fit. First clean typically happens within a week of booking.</p>",
+            "size": "base"
+          }
+        },
+        "ct-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (303) 555-0182",
+              "href": "tel:+13035550182",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Email hello@sparkhaus.com",
+              "href": "mailto:hello@sparkhaus.com",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["ct-eyebrow", "ct-heading", "ct-body", "ct-buttons"]
+    },
+    "what_well_ask": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "What we'll ask you",
+        "eyebrow_uppercase": true,
+        "title": "Five quick details.",
+        "description": "Have these handy and the quote takes about 90 seconds.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 5,
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wa-1": {
+          "type": "item",
+          "settings": {
+            "icon": "home",
+            "title": "Size of your home",
+            "description": "Square footage or rough total"
+          }
+        },
+        "wa-2": {
+          "type": "item",
+          "settings": {
+            "icon": "bed",
+            "title": "Bedrooms & bathrooms",
+            "description": "Counts for both"
+          }
+        },
+        "wa-3": {
+          "type": "item",
+          "settings": {
+            "icon": "calendar-repeat",
+            "title": "How often",
+            "description": "Weekly, biweekly, monthly, or one-time"
+          }
+        },
+        "wa-4": {
+          "type": "item",
+          "settings": {
+            "icon": "calendar",
+            "title": "First-clean window",
+            "description": "This week, next week, flexible"
+          }
+        },
+        "wa-5": {
+          "type": "item",
+          "settings": {
+            "icon": "paw",
+            "title": "Pets & preferences",
+            "description": "Dogs, cats, fragrance-free, eco-only"
+          }
+        }
+      },
+      "blocksOrder": ["wa-1", "wa-2", "wa-3", "wa-4", "wa-5"]
+    },
+    "whats_next": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "What happens next",
+        "eyebrow_uppercase": true,
+        "title": "From inquiry to first clean in days.",
+        "description": "",
+        "heading_alignment": "start",
+        "content_position": "start",
+        "show_divider": true,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wn-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "mail-opened",
+            "title": "We quote within the hour",
+            "description": "<p>During business hours (Mon – Sat, 7am – 7pm). Flat-rate, no sales call, no obligation. You get exactly one number and what's included in it.</p>"
+          }
+        },
+        "wn-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "user",
+            "title": "We match you to a cleaner",
+            "description": "<p>Based on neighborhood, cadence, specialty, and schedule. You meet them before the first clean — by video call or a quick in-person walkthrough.</p>"
+          }
+        },
+        "wn-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "calendar-event",
+            "title": "First clean within days",
+            "description": "<p>Most standard cleans are scheduled within a week of quote. Deep cleans and move-in/out can go sooner if the calendar has room; tell us if you're tight on time.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["wn-1", "wn-2", "wn-3"]
+    },
+    "service_area": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Service area",
+        "eyebrow_uppercase": true,
+        "title": "Where we clean.",
+        "description": "",
+        "heading_alignment": "start",
+        "address": "Denver, CO",
+        "height": "medium",
+        "show_address": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sa-areas": {
+          "type": "info",
+          "settings": {
+            "title": "Neighborhoods we serve",
+            "text": "<p>Capitol Hill, Wash Park, Platt Park, Congress Park, Five Points, Highlands, City Park, Park Hill, Cherry Creek, Baker, Berkeley, Sloan's Lake, LoDo, RiNo.</p>"
+          }
+        },
+        "sa-outside": {
+          "type": "info",
+          "settings": {
+            "title": "Outside our area?",
+            "text": "<p>We keep the radius tight on purpose — a 45-minute drive to a clean is 45 minutes the cleaner isn't working.</p><p>If you're in the broader metro (Lakewood, Englewood, Aurora), email us and we'll point you to a vetted local service we trust.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sa-areas", "sa-outside"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you write",
+        "eyebrow_uppercase": true,
+        "title": "Common first questions.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "More detail on the Services page",
+            "text": "<p>The full FAQ covers cleaning-type differences, insurance, the guarantee, pet policies, and every question people actually ask before their first clean.</p>"
+          }
+        },
+        "cf-1": {
+          "type": "item",
+          "settings": {
+            "question": "How do you handle keys?",
+            "answer": "<p>Three options: smart-lock code, lockbox we install and manage, or key-drop at your building's doorperson / concierge desk. Most clients pick smart-lock or lockbox and never think about it again.</p>"
+          }
+        },
+        "cf-2": {
+          "type": "item",
+          "settings": {
+            "question": "What's the pricing on add-ons?",
+            "answer": "<p>Every add-on is a flat rate, listed on the Services page. Inside oven is $40, inside fridge is $35, interior windows start at $45. We quote them up front before the clean — you never get surprised on the invoice.</p>"
+          }
+        },
+        "cf-3": {
+          "type": "item",
+          "settings": {
+            "question": "Can I change frequency later?",
+            "answer": "<p>Yes, any time. Biweekly to weekly, weekly to monthly, monthly to one-off and back. No contracts, no change fees. Email or text and we adjust from the next clean forward.</p>"
+          }
+        },
+        "cf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Last-minute clean?",
+            "answer": "<p>Same-week cleans are usually possible for standard and deep cleans if we have openings. Same-day is rare but not impossible; call the main line and we'll check the schedule live.</p>"
+          }
+        },
+        "cf-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you clean during holidays?",
+            "answer": "<p>We close for six federal holidays per year. Clients with recurring bookings on those days get rescheduled to the next business day — no lost clean, no fee.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4", "cf-5"]
+    }
+  },
+  "widgetsOrder": ["opener", "what_well_ask", "whats_next", "service_area", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

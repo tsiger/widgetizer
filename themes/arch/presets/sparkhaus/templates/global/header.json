@@ -1,0 +1,19 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Sparkhaus",
+    "contactDetailsLine1": "(303) 555-0182",
+    "contactDetailsLine2": "Mon–Sat · 7am – 7pm",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Get a quote",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

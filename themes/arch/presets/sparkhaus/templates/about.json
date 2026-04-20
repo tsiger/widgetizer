@@ -1,0 +1,289 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "opener": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ab-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "ab-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A neighborhood cleaning service.",
+            "size": "5xl"
+          }
+        },
+        "ab-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Sparkhaus opened in Denver in 2017 with one van, two cleaners, and a spreadsheet. Eight years later we're a team of nine — still small, still local, still intentionally choosing to not turn into a franchise.</p><p>We pay our cleaners as full-time W-2 employees with benefits, because cleaning is skilled work and good people don't stay at places that treat it otherwise. We keep the service area tight — Denver proper and the immediate metro — because a 45-minute drive to a cleaning job is 45 minutes the cleaner isn't paid to stand in.</p><p>It's boring-but-deliberate operations. You feel the results in the work.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["ab-eyebrow", "ab-heading", "ab-body"]
+    },
+    "credibility": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cb-kicker": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Boring but crucial</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "cb-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Licensing, insurance, and the stuff that matters when something goes wrong.",
+            "size": "3xl"
+          }
+        },
+        "cb-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most cleaning-service websites bury this page. We put it here because it's the first thing a reasonable person should ask before handing over a key.</p>",
+            "size": "base"
+          }
+        },
+        "cb-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Colorado DORA licensed, bonded since 2017\n+ $2,000,000 commercial general liability coverage\n+ Workers' compensation on every employee (not contractors)\n+ Green Seal-certified eco-friendly products by default\n+ 24-hour satisfaction guarantee on every clean"
+          }
+        }
+      },
+      "blocksOrder": ["cb-kicker", "cb-heading", "cb-text", "cb-features"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The humans",
+        "eyebrow_uppercase": true,
+        "title": "Who's actually in your house.",
+        "description": "",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3/4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tm-founder": {
+          "type": "profile",
+          "settings": {
+            "name": "Amara Osei",
+            "role": "Founder & Operations",
+            "specialty": "Founded Sparkhaus · 2017",
+            "bio": "Started Sparkhaus after running cleaning operations for a boutique hotel. Runs scheduling, hiring, and the client-relationship side of the business. Still personally interviews every cleaner before they join the team."
+          }
+        },
+        "tm-lead-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Daniela Reyes",
+            "role": "Lead cleaner, deep cleans",
+            "specialty": "With Sparkhaus · 7 years",
+            "bio": "Leads deep-clean and move-in/out bookings. Seven-year veteran. The one you want for the jobs nobody else wants to take on. Fluent in Spanish; speaks more English than she lets on."
+          }
+        },
+        "tm-lead-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Chris Pham",
+            "role": "Lead cleaner, recurring",
+            "specialty": "With Sparkhaus · 5 years",
+            "bio": "Anchors 40 biweekly and weekly clients across Capitol Hill and Congress Park. Clients request him back by name. Previously ran hospital housekeeping — knows infection-control cleaning cold."
+          }
+        },
+        "tm-lead-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Tess Kowalski",
+            "role": "Lead cleaner, post-construction",
+            "specialty": "With Sparkhaus · 4 years",
+            "bio": "Runs post-construction crews. Started in commercial janitorial, moved to high-end residential renovations. Calm under pressure, thorough on the details, respectful of finishes."
+          }
+        }
+      },
+      "blocksOrder": ["tm-founder", "tm-lead-1", "tm-lead-2", "tm-lead-3"]
+    },
+    "operating_stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "Operating details",
+        "eyebrow_uppercase": true,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "os-1": {
+          "type": "figure",
+          "settings": {
+            "number": "9",
+            "suffix": "",
+            "label": "Full-time cleaners",
+            "description": "W-2 employees, not contractors"
+          }
+        },
+        "os-2": {
+          "type": "figure",
+          "settings": {
+            "number": "14",
+            "suffix": "",
+            "label": "Denver neighborhoods",
+            "description": "Where we service weekly or more"
+          }
+        },
+        "os-3": {
+          "type": "figure",
+          "settings": {
+            "number": "96",
+            "suffix": "%",
+            "label": "Client retention",
+            "description": "Year-over-year recurring"
+          }
+        },
+        "os-4": {
+          "type": "figure",
+          "settings": {
+            "number": "87",
+            "suffix": "%",
+            "label": "Cleaner retention",
+            "description": "Year-over-year staff who stay"
+          }
+        }
+      },
+      "blocksOrder": ["os-1", "os-2", "os-3", "os-4"]
+    },
+    "history": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "History",
+        "eyebrow_uppercase": true,
+        "title": "Eight years, at a measured pace.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "h-1": {
+          "type": "item",
+          "settings": {
+            "date": "2017",
+            "title": "Founded",
+            "description": "<p>Amara launches Sparkhaus from a one-car garage in Park Hill with one van and two cleaners. First hundred clients all come by word of mouth through the hotel she used to run.</p>"
+          }
+        },
+        "h-2": {
+          "type": "item",
+          "settings": {
+            "date": "2020",
+            "title": "Through the pandemic, by way of commercial",
+            "description": "<p>When residential cleaning pauses in March, the team pivots to commercial sanitising for essential-business clients — clinics, food pantries, shelters. Residential resumes in the summer; commercial stays as a secondary practice.</p>"
+          }
+        },
+        "h-3": {
+          "type": "item",
+          "settings": {
+            "date": "2022",
+            "title": "Past 3,000 homes cleaned",
+            "description": "<p>Team grows to six. Introduce the 24-hour satisfaction guarantee as a formal policy — had always been how we handled complaints informally; now it's on every booking confirmation.</p>"
+          }
+        },
+        "h-4": {
+          "type": "item",
+          "settings": {
+            "date": "2026",
+            "title": "Nine cleaners, 5,000+ homes, fourteen neighborhoods",
+            "description": "<p>Today. Full-time W-2 team with benefits. Locally owned, still intentionally small. Amara still interviews every hire. We still say no to clients outside the service area because the math for them doesn't work.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["h-1", "h-2", "h-3", "h-4"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ac-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want us in your house?",
+            "size": "3xl"
+          }
+        },
+        "ac-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Flat-rate quote in under two minutes.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "ac-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["ac-heading", "ac-text", "ac-button"]
+    }
+  },
+  "widgetsOrder": ["opener", "credibility", "team", "operating_stats", "history", "about_cta"],
+  "id": "about",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

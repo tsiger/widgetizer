@@ -97,6 +97,12 @@
       "liveDemo": "https://widgetizer.org/demos/saffron/"
     },
     {
+      "id": "sparkhaus",
+      "name": "Sparkhaus",
+      "description": "Cleaning service",
+      "liveDemo": "https://widgetizer.org/demos/sparkhaus/"
+    },
+    {
       "id": "stillpoint",
       "name": "Stillpoint",
       "description": "Yoga studio",

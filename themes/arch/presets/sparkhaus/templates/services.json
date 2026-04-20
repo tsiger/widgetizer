@@ -1,0 +1,381 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "opener": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "Services",
+            "size": "lg"
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Every clean, every price.",
+            "size": "5xl"
+          }
+        },
+        "op-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Four kinds of clean, three recurring plans, a short list of honest add-ons, and a 24-hour guarantee on everything. No contracts, no cancellation fees, no surprise charges on the day.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-body"]
+    },
+    "recurring_plans": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Recurring plans",
+        "eyebrow_uppercase": true,
+        "title": "Save by booking on a cadence.",
+        "description": "All recurring plans include the same standard clean checklist. The cheaper the frequency, the cheaper each visit. No contracts — cancel any time.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "rp-weekly": {
+          "type": "plan",
+          "settings": {
+            "title": "Weekly",
+            "price": "From $135",
+            "period": "per clean",
+            "features": "+ Standard clean, every 7 days\n+ Same cleaner, same day & time\n+ Supplies always included\n+ 10% off the standard rate\n+ Priority rescheduling",
+            "button_link": {
+              "text": "Start weekly",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "rp-biweekly": {
+          "type": "plan",
+          "settings": {
+            "title": "Biweekly",
+            "price": "From $145",
+            "period": "per clean",
+            "features": "+ Standard clean, every 14 days\n+ Same cleaner, same day & time\n+ Supplies always included\n+ 7% off the standard rate\n+ Most popular choice — 60% of clients",
+            "button_link": {
+              "text": "Start biweekly",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "rp-monthly": {
+          "type": "plan",
+          "settings": {
+            "title": "Monthly",
+            "price": "From $165",
+            "period": "per clean",
+            "features": "+ Standard clean, every 28 days\n+ Same cleaner, same day & time\n+ Supplies always included\n+ Full flat rate\n+ Includes a 15-min deeper-focus area per visit",
+            "button_link": {
+              "text": "Start monthly",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["rp-weekly", "rp-biweekly", "rp-monthly"]
+    },
+    "add_ons": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Add-ons",
+        "eyebrow_uppercase": true,
+        "title": "A-la-carte extras.",
+        "description": "Add any of these to any clean. Priced per visit. We'll quote them up front — no surprises on the day.",
+        "heading_alignment": "start",
+        "layout": "single-column",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ao-1": {
+          "type": "item",
+          "settings": {
+            "name": "Inside the fridge",
+            "description": "<p>Empty, wipe every shelf and drawer, sanitise, put everything back. Add 30 minutes.</p>",
+            "price": "$35"
+          }
+        },
+        "ao-2": {
+          "type": "item",
+          "settings": {
+            "name": "Inside the oven",
+            "description": "<p>Racks out, degreaser in, every surface scrubbed. Eco-friendly oven cleaner — no fumes. Add 45 minutes.</p>",
+            "price": "$40"
+          }
+        },
+        "ao-3": {
+          "type": "item",
+          "settings": {
+            "name": "Interior windows",
+            "description": "<p>Inside glass on every window and slider in the home. Streak-free, natural-daylight finish. Add 30–60 minutes.</p>",
+            "price": "from $45"
+          }
+        },
+        "ao-4": {
+          "type": "item",
+          "settings": {
+            "name": "Laundry (one load, wash + fold)",
+            "description": "<p>Wash, dry, fold, stack on the bed. Detergent included. Add 60–90 minutes (runs alongside cleaning, doesn't extend clean time).</p>",
+            "price": "$25"
+          }
+        },
+        "ao-5": {
+          "type": "item",
+          "settings": {
+            "name": "Bed linens change",
+            "description": "<p>Strip beds, remake with fresh linens you've left out. Up to 3 beds included.</p>",
+            "price": "$20"
+          }
+        },
+        "ao-6": {
+          "type": "item",
+          "settings": {
+            "name": "Baseboards detail",
+            "description": "<p>Full hand-scrub of all baseboards. Recommended every 3–4 months. Add 30–45 minutes.</p>",
+            "price": "$35"
+          }
+        },
+        "ao-7": {
+          "type": "item",
+          "settings": {
+            "name": "Inside kitchen cabinets",
+            "description": "<p>Empty cabinet interiors, wipe, replace contents. Add 45–60 minutes.</p>",
+            "price": "from $40"
+          }
+        },
+        "ao-8": {
+          "type": "item",
+          "settings": {
+            "name": "Pet-hair deep treatment",
+            "description": "<p>Specialised tools for upholstery and textiles in pet-heavy homes. Add 30 minutes; recommended quarterly.</p>",
+            "price": "$30"
+          }
+        }
+      },
+      "blocksOrder": ["ao-1", "ao-2", "ao-3", "ao-4", "ao-5", "ao-6", "ao-7", "ao-8"]
+    },
+    "whats_included": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "Always included",
+        "eyebrow_uppercase": true,
+        "title": "Every clean, no upsell.",
+        "description": "The commitments that apply to every Sparkhaus clean at any price point.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "icon_style": "filled",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wi-1": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Eco-friendly products",
+            "description": "Green Seal-certified, non-toxic, fragrance-optional."
+          }
+        },
+        "wi-2": {
+          "type": "item",
+          "settings": {
+            "icon": "fingerprint",
+            "title": "Background-checked",
+            "description": "Every cleaner on staff, every year."
+          }
+        },
+        "wi-3": {
+          "type": "item",
+          "settings": {
+            "icon": "user",
+            "title": "Same cleaner every visit",
+            "description": "Your cleaner learns your home over time."
+          }
+        },
+        "wi-4": {
+          "type": "item",
+          "settings": {
+            "icon": "check",
+            "title": "24-hour guarantee",
+            "description": "Unhappy? We come back and re-clean free."
+          }
+        },
+        "wi-5": {
+          "type": "item",
+          "settings": {
+            "icon": "file-off",
+            "title": "No contracts",
+            "description": "Pause, change cadence, or cancel any time."
+          }
+        },
+        "wi-6": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "Cancel up to 24h",
+            "description": "No fee, no questions, no guilt."
+          }
+        },
+        "wi-7": {
+          "type": "item",
+          "settings": {
+            "icon": "key",
+            "title": "Keyless entry option",
+            "description": "Smart-lock codes, lockboxes, or doorperson drop-off."
+          }
+        },
+        "wi-8": {
+          "type": "item",
+          "settings": {
+            "icon": "basket",
+            "title": "Supplies provided",
+            "description": "We bring everything. Your home stays uncluttered."
+          }
+        }
+      },
+      "blocksOrder": ["wi-1", "wi-2", "wi-3", "wi-4", "wi-5", "wi-6", "wi-7", "wi-8"]
+    },
+    "services_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you book.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Not quite what you're looking for?",
+            "text": "<p>We offer commercial cleaning (small offices, retail, post-event) as a separate service. Mention it in your inquiry and we'll quote separately.</p>"
+          }
+        },
+        "sf-1": {
+          "type": "item",
+          "settings": {
+            "question": "How long does a clean take?",
+            "answer": "<p>A standard clean on a 2-bedroom home takes 2–3 hours with one cleaner. Deep cleans take 4–6. Move-in/out and post-construction depend on square footage — we'll quote the time with the price.</p>"
+          }
+        },
+        "sf-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need to be home?",
+            "answer": "<p>No — and most clients aren't. We offer keyless entry via smart-lock codes, lockboxes, or leaving a key with the doorperson. Whatever works for your building.</p>"
+          }
+        },
+        "sf-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you bring supplies?",
+            "answer": "<p>Yes. Every clean includes all products, cloths, vacuums, and mops. We use Green Seal-certified eco-friendly products by default; if you want us to use your own products instead (fragrance allergies, for example), just tell us.</p>"
+          }
+        },
+        "sf-4": {
+          "type": "item",
+          "settings": {
+            "question": "What if something gets damaged?",
+            "answer": "<p>We carry $2 million in liability insurance and we're bonded. If we break something, we replace it. In eight years of operation it has happened four times — we've made it right every time.</p>"
+          }
+        },
+        "sf-5": {
+          "type": "item",
+          "settings": {
+            "question": "How do you match a cleaner to my home?",
+            "answer": "<p>Based on neighborhood, cleaning style (some cleaners are deep-clean specialists, others are recurring-standard), schedule, and pets / allergies. You can request to change cleaners at any time, no explanation needed.</p>"
+          }
+        },
+        "sf-6": {
+          "type": "item",
+          "settings": {
+            "question": "What if I'm not happy with a clean?",
+            "answer": "<p>Tell us within 24 hours and we send the same cleaner (or a different one, if you'd prefer) back to re-clean the specific areas you weren't happy with. Free. That's the guarantee.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["sf-sidebar", "sf-1", "sf-2", "sf-3", "sf-4", "sf-5", "sf-6"]
+    },
+    "services_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to book?",
+            "size": "3xl"
+          }
+        },
+        "sc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Flat-rate quote in under two minutes. First clean this week if you want it.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "sc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["sc-heading", "sc-text", "sc-button"]
+    }
+  },
+  "widgetsOrder": ["opener", "recurring_plans", "add_ons", "whats_included", "services_faq", "services_cta"],
+  "id": "services",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

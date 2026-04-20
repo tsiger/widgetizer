@@ -1,0 +1,37 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Sparkhaus Cleaning. All rights reserved.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>A local residential cleaning service in Denver and the surrounding metro. Licensed, bonded, insured, and background-checked. Eco-friendly by default.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Get in touch",
+        "text": "<p>(303) 555-0182</p><p>hello@sparkhaus.com</p><p>Mon – Sat, 7am – 7pm</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Navigate",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

@@ -1,0 +1,442 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#1a2530a8",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-rating": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
+        },
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Residential cleaning · Denver metro</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your home, fresh.",
+            "size": "8xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Local, licensed, eco-friendly. Same cleaner every visit, transparent flat-rate pricing, 24-hour guarantee.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a quote in 2 minutes",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-rating", "hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+    },
+    "credentials": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cr-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-checkered",
+            "title": "Licensed & bonded",
+            "text": "Colorado DORA"
+          }
+        },
+        "cr-2": {
+          "type": "item",
+          "settings": {
+            "icon": "umbrella",
+            "title": "Fully insured",
+            "text": "$2M liability coverage"
+          }
+        },
+        "cr-3": {
+          "type": "item",
+          "settings": {
+            "icon": "fingerprint",
+            "title": "Background-checked",
+            "text": "Every cleaner"
+          }
+        },
+        "cr-4": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Eco-friendly",
+            "text": "Green Seal products"
+          }
+        },
+        "cr-5": {
+          "type": "item",
+          "settings": {
+            "icon": "check",
+            "title": "24-hour guarantee",
+            "text": "Re-clean free"
+          }
+        }
+      },
+      "blocksOrder": ["cr-1", "cr-2", "cr-3", "cr-4", "cr-5"]
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "before_label": "Before",
+        "after_label": "After",
+        "content_width": "wide",
+        "orientation": "horizontal",
+        "initial_position": 50,
+        "show_labels": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      }
+    },
+    "what_we_clean": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "What we clean",
+        "eyebrow_uppercase": true,
+        "title": "Four ways to a cleaner home.",
+        "description": "Pick the clean your home needs right now — recurring, deep, moving, or post-construction. All at a flat rate, no surprise charges.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wc-standard": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From $145",
+            "title": "Standard clean",
+            "description": "<p>The routine every-other-week reset. Kitchens, bathrooms, floors, dusting, surfaces — the whole house, top to bottom.</p>",
+            "button_link": {
+              "text": "See what's included",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "wc-deep": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From $285",
+            "title": "Deep clean",
+            "description": "<p>The first-time and once-a-season clean. Inside appliances, baseboards, door frames, detailed scrubbing — the stuff standard doesn't touch.</p>",
+            "button_link": {
+              "text": "See what's included",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "wc-movein": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From $325",
+            "title": "Move-in / out",
+            "description": "<p>The empty-house clean, done properly. Inside cabinets and drawers, inside appliances, all windows, every corner. Ready for the next chapter.</p>",
+            "button_link": {
+              "text": "See what's included",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "wc-postconstruction": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Custom quote",
+            "title": "Post-construction",
+            "description": "<p>Dust on every surface, in every vent, in every crack. We handle the multi-pass clean that finishes a renovation and hands you back a finished home.</p>",
+            "button_link": {
+              "text": "See what's included",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["wc-standard", "wc-deep", "wc-movein", "wc-postconstruction"]
+    },
+    "how_it_works": {
+      "type": "numbered-cards",
+      "settings": {
+        "eyebrow": "How it works",
+        "eyebrow_uppercase": true,
+        "title": "From quote to clean in days, not weeks.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "h-1": {
+          "type": "step",
+          "settings": {
+            "title": "Quote",
+            "description": "<p>Tell us your home's size and what you need. You get a flat-rate quote in under two minutes — no sales call, no obligation.</p>"
+          }
+        },
+        "h-2": {
+          "type": "step",
+          "settings": {
+            "title": "Confirm",
+            "description": "<p>We match you to a cleaner whose schedule and specialty fit, and lock in your first date. Reschedule any time up to 24 hours before.</p>"
+          }
+        },
+        "h-3": {
+          "type": "step",
+          "settings": {
+            "title": "Clean",
+            "description": "<p>Your cleaner arrives on time, with supplies. Three hours on average for a standard clean. We stick to the quote — no surprise add-ons.</p>"
+          }
+        },
+        "h-4": {
+          "type": "step",
+          "settings": {
+            "title": "Inspect",
+            "description": "<p>Walk through when they're done. If anything's off, tell us within 24 hours and we come back and re-clean it free. That's the guarantee.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["h-1", "h-2", "h-3", "h-4"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": true,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "st-1": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "★",
+            "label": "Google rating",
+            "description": "640+ reviews across the metro"
+          }
+        },
+        "st-2": {
+          "type": "figure",
+          "settings": {
+            "number": "5,000",
+            "suffix": "+",
+            "label": "Homes cleaned",
+            "description": "Since we opened in 2017"
+          }
+        },
+        "st-3": {
+          "type": "figure",
+          "settings": {
+            "number": "8",
+            "suffix": "",
+            "label": "Years serving Denver",
+            "description": "Locally owned and operated"
+          }
+        },
+        "st-4": {
+          "type": "figure",
+          "settings": {
+            "number": "96",
+            "suffix": "%",
+            "label": "Client retention",
+            "description": "Recurring clients who stick"
+          }
+        }
+      },
+      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Reviews",
+        "eyebrow_uppercase": true,
+        "title": "What neighbors say.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Sparkhaus has cleaned our house every other Thursday for three years. Same cleaner, same quality, same flat rate. I genuinely forget about it and come home to a spotless house.",
+            "name": "Rachel B.",
+            "title": "Capitol Hill · Weekly since 2022",
+            "rating": "5"
+          }
+        },
+        "r-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Booked a deep clean before listing the house. The quote was what I paid — no bait-and-switch. Our realtor commented on the place the day of showings.",
+            "name": "Marcus D.",
+            "title": "Wash Park · Move-out, 2024",
+            "rating": "5"
+          }
+        },
+        "r-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "I've had three different cleaning services in Denver. This is the only one that actually does the baseboards and inside the microwave without being asked.",
+            "name": "Priya N.",
+            "title": "Platt Park · Biweekly since 2023",
+            "rating": "5"
+          }
+        },
+        "r-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "The 24-hour guarantee is real. Our cleaner missed a mirror once. I sent a photo, they came back the next morning and re-cleaned the bathroom. No argument, no fee.",
+            "name": "Ben F.",
+            "title": "Congress Park · Monthly since 2023",
+            "rating": "5"
+          }
+        },
+        "r-5": {
+          "type": "quote",
+          "settings": {
+            "quote": "Post-construction after our kitchen remodel was chaos. Three cleaners, four hours, a completely different house by the time they left. Worth every dollar.",
+            "name": "Sam L.",
+            "title": "Highlands · Post-construction, 2024",
+            "rating": "5"
+          }
+        },
+        "r-6": {
+          "type": "quote",
+          "settings": {
+            "quote": "Booking was honestly easier than ordering groceries. Got my quote, picked a date, confirmed — done in under five minutes on my phone.",
+            "name": "Elena G.",
+            "title": "Five Points · Standard since 2024",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["r-1", "r-2", "r-3", "r-4", "r-5", "r-6"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready for a clean house?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Flat-rate quote in under two minutes. First clean available this week.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "credentials",
+    "before_after",
+    "what_we_clean",
+    "how_it_works",
+    "stats",
+    "reviews",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

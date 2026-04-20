@@ -32,7 +32,7 @@
 | 24 | pipeworks | Pipeworks | Plumber / Electrician |  |
 | 25 | pixelcraft | Pixelcraft | Graphic Designer |  |
 | 26 | saffron | Saffron | Restaurant | DONE |
-| 27 | sparkhaus | Sparkhaus | Cleaning Service |  |
+| 27 | sparkhaus | Sparkhaus | Cleaning Service | DONE |
 | 28 | stillpoint | Stillpoint | Yoga / Pilates Studio | DONE |
 | 29 | tailside | Tailside | Veterinarian |  |
 | 30 | torque | Torque | Auto Repair |  |
