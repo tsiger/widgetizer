@@ -1,0 +1,174 @@
+{
+  "name": "Portfolio",
+  "slug": "portfolio",
+  "widgets": {
+    "portfolio_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "p-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "Weddings",
+            "size": "lg"
+          }
+        },
+        "p-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Weddings we've shaped.",
+            "size": "5xl"
+          }
+        },
+        "p-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A small, living archive. Each of these days was built around the couple in it — which is why no two of them look quite alike.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["p-eyebrow", "p-heading", "p-text"]
+    },
+    "gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "w-01": { "type": "item", "settings": { "title": "Rose & Daniel",  "category": "Stone Barns · June 2025" } },
+        "w-02": { "type": "item", "settings": { "title": "Mei & Arjun",    "category": "Windham Peak · September 2024" } },
+        "w-03": { "type": "item", "settings": { "title": "Elena & Tomás",  "category": "Tuscany · May 2024" } },
+        "w-04": { "type": "item", "settings": { "title": "Hannah & Ben",   "category": "Private residence · October 2024" } },
+        "w-05": { "type": "item", "settings": { "title": "Cora & Ian",     "category": "Kaaterskill · August 2023" } },
+        "w-06": { "type": "item", "settings": { "title": "Sofia & Lucas",  "category": "Hudson River · July 2024" } },
+        "w-07": { "type": "item", "settings": { "title": "Naomi & Vihaan", "category": "Catskill farm · September 2023" } },
+        "w-08": { "type": "item", "settings": { "title": "Bea & Jasper",   "category": "Rhinebeck · October 2023" } },
+        "w-09": { "type": "item", "settings": { "title": "Lin & Matteo",   "category": "Amalfi · June 2023" } },
+        "w-10": { "type": "item", "settings": { "title": "Juno & Aria",    "category": "Brooklyn loft · February 2024" } },
+        "w-11": { "type": "item", "settings": { "title": "Celeste & Theo", "category": "Vermont inn · October 2022" } },
+        "w-12": { "type": "item", "settings": { "title": "Maeve & Oisín",  "category": "Connemara · August 2024" } },
+        "w-13": { "type": "item", "settings": { "title": "Priya & Noor",   "category": "Garrison · September 2022" } },
+        "w-14": { "type": "item", "settings": { "title": "Odette & Rémy",  "category": "Provence · June 2024" } },
+        "w-15": { "type": "item", "settings": { "title": "Vera & Kiran",   "category": "Olana · October 2024" } },
+        "w-16": { "type": "item", "settings": { "title": "Anaïs & Mateo",  "category": "Oaxaca · March 2025" } }
+      },
+      "blocksOrder": ["w-01", "w-02", "w-03", "w-04", "w-05", "w-06", "w-07", "w-08", "w-09", "w-10", "w-11", "w-12", "w-13", "w-14", "w-15", "w-16"]
+    },
+    "couple_voices": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Couples' voices",
+        "eyebrow_uppercase": true,
+        "title": "What clients say afterward.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "t-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "They held the whole day together with such grace we forgot we were getting married — we just got to be present. Every photograph from that day has something they put in frame.",
+            "name": "Rose & Daniel",
+            "title": "Stone Barns, June 2025",
+            "rating": "5"
+          }
+        },
+        "t-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We found the studio on a whim after a friend mentioned them. Eighteen months later they handed us the wedding we didn't know we were allowed to ask for.",
+            "name": "Elena & Tomás",
+            "title": "Tuscany, May 2024",
+            "rating": "5"
+          }
+        },
+        "t-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "The calm on the day was the gift. Every vendor had talked to them, every detail was handled, and the two of us got to be actual guests at our own wedding.",
+            "name": "Mei & Arjun",
+            "title": "Windham Peak, September 2024",
+            "rating": "5"
+          }
+        },
+        "t-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "They said no to a few things we loved, and were right about every one of them. We'd hand them another wedding tomorrow.",
+            "name": "Hannah & Ben",
+            "title": "Private residence, October 2024",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["t-1", "t-2", "t-3", "t-4"]
+    },
+    "portfolio_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "pc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to start yours?",
+            "size": "3xl"
+          }
+        },
+        "pc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us about your day. A reply within three business days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "pc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Begin an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["pc-heading", "pc-text", "pc-button"]
+    }
+  },
+  "widgetsOrder": ["portfolio_intro", "gallery", "couple_voices", "portfolio_cta"],
+  "id": "portfolio",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

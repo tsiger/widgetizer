@@ -37,6 +37,11 @@
       "liveDemo": "https://widgetizer.org/demos/crumbly/"
     },
     {
+      "id": "everafter",
+      "name": "Everafter",
+      "description": "Wedding planner"
+    },
+    {
       "id": "greenfield",
       "name": "Greenfield",
       "description": "Landscaping",

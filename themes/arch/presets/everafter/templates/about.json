@@ -1,0 +1,277 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "founder_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fi-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About the studio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "fi-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Founded on the idea that a wedding should feel like the people in it.",
+            "size": "4xl"
+          }
+        },
+        "fi-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Everafter was started by Clara Marche in 2016, after a friend's wedding pulled her into planning work she hadn't expected to love. A decade later, the studio is still small on purpose — four people, eight to ten weddings a year, every engagement led by a named planner from first call to final goodbye.</p><p>We don't have a house style, exactly. We have a set of beliefs: that the best weddings are specific to the couple, that candlelight beats stage lighting, that a long dinner is worth a short ceremony, and that the people running the day should love the couple almost as much as the couple loves each other.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["fi-eyebrow", "fi-heading", "fi-text"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "k-1": {
+          "type": "figure",
+          "settings": {
+            "number": "140",
+            "suffix": "+",
+            "label": "Weddings",
+            "description": "Planned, designed, or coordinated"
+          }
+        },
+        "k-2": {
+          "type": "figure",
+          "settings": {
+            "number": "9",
+            "suffix": "",
+            "label": "Years",
+            "description": "In practice since 2016"
+          }
+        },
+        "k-3": {
+          "type": "figure",
+          "settings": {
+            "number": "6",
+            "suffix": "",
+            "label": "Countries",
+            "description": "Destination weddings to date"
+          }
+        },
+        "k-4": {
+          "type": "figure",
+          "settings": {
+            "number": "40",
+            "suffix": "+",
+            "label": "Features",
+            "description": "Print and online editorial"
+          }
+        }
+      },
+      "blocksOrder": ["k-1", "k-2", "k-3", "k-4"]
+    },
+    "history": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "History",
+        "eyebrow_uppercase": true,
+        "title": "How the studio grew.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "h-1": {
+          "type": "item",
+          "settings": {
+            "date": "2016",
+            "title": "Studio founded",
+            "description": "<p>Clara Marche plans a friend's wedding in Rhinebeck and finds she doesn't want to stop. Everafter opens its first small office above a bookstore in Hudson.</p>"
+          }
+        },
+        "h-2": {
+          "type": "item",
+          "settings": {
+            "date": "2018",
+            "title": "First editorial feature",
+            "description": "<p>Magnolia Rouge publishes a feature of a Catskill farm wedding. Inquiries quadruple. The studio turns down more weddings than it accepts for the first time.</p>"
+          }
+        },
+        "h-3": {
+          "type": "item",
+          "settings": {
+            "date": "2020",
+            "title": "The team grows",
+            "description": "<p>Sena Okafor joins as Senior Planner. The studio restructures around named leads: every wedding has one partner or senior planner running it, with dedicated associate support.</p>"
+          }
+        },
+        "h-4": {
+          "type": "item",
+          "settings": {
+            "date": "2022",
+            "title": "First destination wedding",
+            "description": "<p>A multi-day wedding in Tuscany opens the studio's destination practice. Since then, Everafter has planned in six countries across three continents.</p>"
+          }
+        },
+        "h-5": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "title": "Design-only tier launched",
+            "description": "<p>After years of couples asking for design direction without planning logistics, the studio launches a creative-direction engagement for couples who've hired their own planner.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["h-1", "h-2", "h-3", "h-4", "h-5"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The people",
+        "eyebrow_uppercase": true,
+        "title": "Four planners, one studio.",
+        "description": "",
+        "heading_alignment": "start",
+        "image_style": "full",
+        "aspect_ratio": "3/4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "p-1": {
+          "type": "profile",
+          "settings": {
+            "name": "Clara Marche",
+            "role": "Founder & Lead Planner",
+            "specialty": "Full-service",
+            "bio": "Clara founded Everafter in 2016 and leads the studio's full-service engagements. Trained in hospitality, trained further by nine years of weddings, she is the planner most couples meet on their discovery call."
+          }
+        },
+        "p-2": {
+          "type": "profile",
+          "settings": {
+            "name": "Sena Okafor",
+            "role": "Senior Planner",
+            "specialty": "Partial & destination",
+            "bio": "Sena leads partial-planning engagements and runs the studio's destination practice. Based between Hudson and Lisbon, she speaks four languages and has coordinated weddings on three continents."
+          }
+        },
+        "p-3": {
+          "type": "profile",
+          "settings": {
+            "name": "Theo Arden",
+            "role": "Design & Floral Lead",
+            "specialty": "Design direction",
+            "bio": "Theo leads creative direction for every engagement — moodboards, moodshifts, florals, tablescapes, installation. Trained at a London flower school; grew up in a family of set designers."
+          }
+        },
+        "p-4": {
+          "type": "profile",
+          "settings": {
+            "name": "Maren Vallee",
+            "role": "Logistics & Day-of Lead",
+            "specialty": "Day-of coordination",
+            "bio": "Maren runs the day-of team and every day-of-coordination engagement. The person vendors call first. The person timelines answer to. The calm you feel when everything is handled."
+          }
+        }
+      },
+      "blocksOrder": ["p-1", "p-2", "p-3", "p-4"]
+    },
+    "press": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "plain",
+        "icon_size": "sm",
+        "icon_shape": "sharp",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "pr-1": { "type": "item", "settings": { "icon": "star", "title": "Brides",                   "text": "Real wedding feature" } },
+        "pr-2": { "type": "item", "settings": { "icon": "star", "title": "Vogue Weddings",            "text": "Planner to watch, 2024" } },
+        "pr-3": { "type": "item", "settings": { "icon": "star", "title": "Magnolia Rouge",            "text": "Editorial feature" } },
+        "pr-4": { "type": "item", "settings": { "icon": "star", "title": "Martha Stewart Weddings",   "text": "Design spotlight" } },
+        "pr-5": { "type": "item", "settings": { "icon": "star", "title": "Hudson Valley Magazine",    "text": "Studio profile" } }
+      },
+      "blocksOrder": ["pr-1", "pr-2", "pr-3", "pr-4", "pr-5"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ac-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We'd love to hear from you.",
+            "size": "3xl"
+          }
+        },
+        "ac-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us about your day — we read every inquiry.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "ac-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Begin an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["ac-heading", "ac-text", "ac-button"]
+    }
+  },
+  "widgetsOrder": ["founder_intro", "stats", "history", "team", "press", "about_cta"],
+  "id": "about",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

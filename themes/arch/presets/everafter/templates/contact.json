@@ -1,0 +1,231 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "inquire_opener": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "c-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inquire</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "c-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us about your day.",
+            "size": "5xl",
+            "position": "left"
+          }
+        },
+        "c-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every inquiry is read by a human — usually by Clara or Sena. If your date is open and the fit feels right, we'll come back to you within three business days with a few follow-up questions and a time to talk.</p><p>No pressure, no pitch, no automated form letter.</p>",
+            "size": "base",
+            "position": "left"
+          }
+        },
+        "c-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email the studio",
+              "href": "mailto:hello@everafter.studio",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        },
+        "c-right-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What to tell us.",
+            "size": "2xl",
+            "position": "right"
+          }
+        },
+        "c-r-1": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Your date",
+            "description": "Exact if you have it, a window if you don't. We'll tell you honestly whether it's available.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-2": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Your venue or region",
+            "description": "Booked already, or a shortlist, or just a rough sense — Hudson Valley, coastal Maine, abroad.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-3": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Rough guest count",
+            "description": "A ballpark is fine. Thirty people and three hundred are very different days.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-4": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "How you found us",
+            "description": "A referral, a feature, an Instagram rabbit hole — we're curious.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        },
+        "c-r-5": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "What you're hoping we can help with",
+            "description": "A sentence is enough. We'll ask the rest on the call.",
+            "size": "medium",
+            "shape": "sharp",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "c-eyebrow",
+        "c-heading",
+        "c-text",
+        "c-buttons",
+        "c-right-heading",
+        "c-r-1",
+        "c-r-2",
+        "c-r-3",
+        "c-r-4",
+        "c-r-5"
+      ]
+    },
+    "what_happens_next": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "What happens next",
+        "eyebrow_uppercase": true,
+        "title": "After you write.",
+        "description": "We keep the process slow on purpose — every couple deserves a real conversation, not a form-letter reply.",
+        "heading_alignment": "start",
+        "content_position": "end",
+        "show_divider": true,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "n-1": {
+          "type": "feature",
+          "settings": {
+            "icon": "mail-opened",
+            "title": "We read every inquiry",
+            "description": "<p>Not a form letter, not an auto-reply. Clara or Sena reads what you wrote and decides how to respond personally.</p>"
+          }
+        },
+        "n-2": {
+          "type": "feature",
+          "settings": {
+            "icon": "clock",
+            "title": "Reply within three business days",
+            "description": "<p>Sometimes sooner. You'll hear back with a few follow-up questions and — if the date's available — a link to book a call.</p>"
+          }
+        },
+        "n-3": {
+          "type": "feature",
+          "settings": {
+            "icon": "calendar",
+            "title": "The discovery call",
+            "description": "<p>Forty-five minutes on the phone or video. A real conversation about your day, your vision, and whether we're the right studio to help you build it.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["n-1", "n-2", "n-3"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you write",
+        "eyebrow_uppercase": true,
+        "title": "Common first questions.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still have a question?",
+            "text": "<p>The Services page has more detail on pricing, tiers, and what each engagement includes.</p><p>Or skip straight to the inquiry — the discovery call is the fastest way to get a real answer to a specific question.</p>"
+          }
+        },
+        "cf-1": {
+          "type": "item",
+          "settings": {
+            "question": "How soon will we hear back?",
+            "answer": "<p>Within three business days, almost always. If we're in the middle of a wedding week it may be four — but never longer than that without a note from us explaining why.</p>"
+          }
+        },
+        "cf-2": {
+          "type": "item",
+          "settings": {
+            "question": "What if our date is already booked?",
+            "answer": "<p>We'll say so honestly and recommend two or three planners we trust for your region and style. A good referral is more useful than a vague maybe.</p>"
+          }
+        },
+        "cf-3": {
+          "type": "item",
+          "settings": {
+            "question": "Is the first call actually free?",
+            "answer": "<p>Yes. Forty-five minutes, no prep, no obligation. You'll leave the call knowing whether it makes sense to keep talking.</p>"
+          }
+        },
+        "cf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can we email directly instead?",
+            "answer": "<p>Yes — hello@everafter.studio works. Just know the form tends to get a faster reply because it routes to the whole team, not one inbox.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4"]
+    }
+  },
+  "widgetsOrder": ["inquire_opener", "what_happens_next", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

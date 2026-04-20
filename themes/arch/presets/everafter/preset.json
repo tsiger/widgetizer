@@ -1,0 +1,35 @@
+{
+  "settings": {
+    "standard_bg_primary": "#f5efe5",
+    "standard_bg_secondary": "#ebe1d2",
+    "standard_text_heading": "#1a1412",
+    "standard_text_content": "#3e342e",
+    "standard_text_muted": "#897a6e",
+    "standard_border_color": "#d7cab8",
+    "standard_accent": "#a66c5f",
+    "standard_accent_text": "#ffffff",
+    "standard_rating_star": "#c9a86a",
+    "highlight_bg_primary": "#1a1412",
+    "highlight_bg_secondary": "#110b09",
+    "highlight_text_heading": "#f5efe5",
+    "highlight_text_content": "#d8cdbf",
+    "highlight_text_muted": "#8a7a6a",
+    "highlight_border_color": "#3a2f2a",
+    "highlight_accent": "#cba66c",
+    "highlight_accent_text": "#1a1412",
+    "highlight_rating_star": "#cba66c",
+    "heading_font": {
+      "stack": "\"Bodoni Moda\", serif",
+      "weight": 600
+    },
+    "body_font": {
+      "stack": "\"Work Sans\", sans-serif",
+      "weight": 400
+    },
+    "heading_scale": 105,
+    "body_scale": 100,
+    "corner_style": "slightly-rounded",
+    "spacing_density": "airy",
+    "button_shape": "auto"
+  }
+}

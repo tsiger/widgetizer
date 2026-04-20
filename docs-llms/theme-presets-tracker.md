@@ -13,7 +13,7 @@
 | 5 | codebase | Codebase | Web Development Studio |  |
 | 6 | corkwell | Corkwell | Bar / Wine Bar | DONE |
 | 7 | crumbly | Crumbly | Bakery | DONE |
-| 8 | everafter | Everafter | Wedding Planner |  |
+| 8 | everafter | Everafter | Wedding Planner | DONE |
 | 9 | formline | Formline | Architecture Firm |  |
 | 10 | framelight | Framelight | Photographer |  |
 | 11 | greenfield | Greenfield | Landscaping | DONE |

@@ -1,0 +1,426 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#1a14128a",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-rating": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
+        },
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A wedding planning studio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Made for the couples who want it to feel like them.",
+            "size": "6xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Boutique planning and design for couples who care about the details. Hudson Valley, New England, and the occasional wedding abroad.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Begin an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-rating", "hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+    },
+    "press_strip": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "plain",
+        "icon_size": "sm",
+        "icon_shape": "sharp",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "press-1": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Brides",
+            "text": "Real wedding feature"
+          }
+        },
+        "press-2": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Vogue Weddings",
+            "text": "Planner to watch, 2024"
+          }
+        },
+        "press-3": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Magnolia Rouge",
+            "text": "Editorial feature"
+          }
+        },
+        "press-4": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Martha Stewart Weddings",
+            "text": "Design spotlight"
+          }
+        }
+      },
+      "blocksOrder": ["press-1", "press-2", "press-3", "press-4"]
+    },
+    "approach": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "approach-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our approach</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "approach-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A studio that works slowly.",
+            "size": "4xl"
+          }
+        },
+        "approach-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We take on a small number of weddings each year — eight, maybe ten — so every couple has our full attention from the first conversation to the last goodbye. No junior planners running the day, no outsourced coordinators, no templates pulled from a drawer.</p><p>What we do, we do carefully.</p>",
+            "size": "base"
+          }
+        },
+        "approach-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the studio",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["approach-eyebrow", "approach-heading", "approach-text", "approach-button"]
+    },
+    "services_tease": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Services",
+        "eyebrow_uppercase": true,
+        "title": "Three ways to work together.",
+        "description": "Shape the engagement around where you are in the planning — from full creative direction to a lead planner who simply runs the day.",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "start",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tier-1": {
+          "type": "card",
+          "settings": {
+            "icon": "sparkles",
+            "subtitle": "From $18,000",
+            "title": "Full-service design & planning",
+            "description": "<p>From the first conversation to the last goodbye. Full creative direction, vendor curation, month-by-month planning, and flawless day-of execution — twelve months of careful work, co-authored with you.</p>"
+          }
+        },
+        "tier-2": {
+          "type": "card",
+          "settings": {
+            "icon": "puzzle",
+            "subtitle": "From $7,500",
+            "title": "Partial planning",
+            "description": "<p>For couples who've started the work and want a studio to lift the design, shape the vendor team, and own the final stretch. Design direction, curation, and month-by-month support for the last six months.</p>"
+          }
+        },
+        "tier-3": {
+          "type": "card",
+          "settings": {
+            "icon": "calendar-event",
+            "subtitle": "From $3,500",
+            "title": "Day-of coordination",
+            "description": "<p>You've done the planning. We take the reins the month before — timeline, vendor confirmations, logistics — and run the day itself, so you don't lift a finger when it arrives.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["tier-1", "tier-2", "tier-3"]
+    },
+    "portfolio_tease": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "Portfolio",
+        "eyebrow_uppercase": true,
+        "title": "A few weddings.",
+        "description": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "gal-1": {
+          "type": "item",
+          "settings": {
+            "title": "Rose & Daniel",
+            "category": "Stone Barns · June 2025"
+          }
+        },
+        "gal-2": {
+          "type": "item",
+          "settings": {
+            "title": "Mei & Arjun",
+            "category": "Windham Peak · September 2024"
+          }
+        },
+        "gal-3": {
+          "type": "item",
+          "settings": {
+            "title": "Elena & Tomás",
+            "category": "Tuscany · May 2024"
+          }
+        },
+        "gal-4": {
+          "type": "item",
+          "settings": {
+            "title": "Hannah & Ben",
+            "category": "Private residence · October 2024"
+          }
+        },
+        "gal-5": {
+          "type": "item",
+          "settings": {
+            "title": "Cora & Ian",
+            "category": "Kaaterskill · August 2023"
+          }
+        },
+        "gal-6": {
+          "type": "item",
+          "settings": {
+            "title": "Sofia & Lucas",
+            "category": "Hudson River · July 2024"
+          }
+        },
+        "gal-7": {
+          "type": "item",
+          "settings": {
+            "title": "Naomi & Vihaan",
+            "category": "Catskill farm · September 2023"
+          }
+        },
+        "gal-8": {
+          "type": "item",
+          "settings": {
+            "title": "Bea & Jasper",
+            "category": "Rhinebeck · October 2023"
+          }
+        },
+        "gal-9": {
+          "type": "item",
+          "settings": {
+            "title": "Lin & Matteo",
+            "category": "Amalfi · June 2023"
+          }
+        }
+      },
+      "blocksOrder": ["gal-1", "gal-2", "gal-3", "gal-4", "gal-5", "gal-6", "gal-7", "gal-8", "gal-9"]
+    },
+    "client_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "q-label": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A couple's words</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "q-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "\"They held the whole day together with such grace we forgot we were getting married — we just got to be present.\"",
+            "size": "3xl"
+          }
+        },
+        "q-attrib": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Rose & Daniel · Stone Barns, June 2025</p>",
+            "size": "base",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["q-label", "q-heading", "q-attrib"]
+    },
+    "process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "The working relationship",
+        "eyebrow_uppercase": true,
+        "title": "How an engagement unfolds.",
+        "description": "",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Inquiry",
+            "description": "<p>Tell us about your day. Every form is read by a human — usually within a day.</p>"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Discovery call",
+            "description": "<p>A relaxed 45-minute conversation about your vision, your venue, and whether we're the right studio for you.</p>"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Design & plan",
+            "description": "<p>We develop the visual direction, curate the vendor team, and build the plan alongside you — in as much detail as the engagement calls for.</p>"
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "The day",
+            "description": "<p>We run the day, start to finish. You just show up and be married.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us about your day.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A reply within three business days. No pressure, no pitch.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Begin an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "press_strip",
+    "approach",
+    "services_tease",
+    "portfolio_tease",
+    "client_quote",
+    "process",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}

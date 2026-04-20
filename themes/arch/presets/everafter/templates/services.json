@@ -1,0 +1,283 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "s-eyebrow": {
+          "type": "heading",
+          "settings": {
+            "text": "Services",
+            "size": "lg"
+          }
+        },
+        "s-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Three ways to work together.",
+            "size": "5xl"
+          }
+        },
+        "s-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every wedding is its own project, but most engagements start from one of three baseline tiers. Each one can be tailored — half of our clients end up somewhere in between. Pricing starts where it does because the work is never less than this; it often becomes more, and that's reflected in a written proposal after the discovery call.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": ["s-eyebrow", "s-heading", "s-text"]
+    },
+    "tiers": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Engagements",
+        "eyebrow_uppercase": true,
+        "title": "Where most weddings begin.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tier-day": {
+          "type": "plan",
+          "settings": {
+            "title": "Day-of coordination",
+            "price": "From $3,500",
+            "period": "flat fee",
+            "features": "+ Two meetings leading up to the day\n+ Detailed minute-by-minute timeline\n+ Vendor confirmations & final logistics\n+ Lead planner + assistant on the day\n+ Ten+ hours of on-site execution",
+            "button_link": {
+              "text": "Inquire about day-of",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "tier-partial": {
+          "type": "plan",
+          "settings": {
+            "title": "Partial planning",
+            "price": "From $7,500",
+            "period": "flat fee",
+            "features": "+ Everything in Day-of coordination\n+ Design direction & moodboard\n+ Vendor curation (up to 8 key vendors)\n+ Monthly check-ins for the final six months\n+ Budget review & honest tradeoff flags",
+            "button_link": {
+              "text": "Inquire about partial",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "tier-full": {
+          "type": "plan",
+          "settings": {
+            "title": "Full-service design & planning",
+            "price": "From $18,000",
+            "period": "flat fee",
+            "features": "+ Everything in Partial planning\n+ Full creative direction from day one\n+ Unlimited vendor curation & contract management\n+ Monthly meetings across twelve-plus months\n+ Design installation oversight on-site",
+            "button_link": {
+              "text": "Inquire about full-service",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["tier-day", "tier-partial", "tier-full"]
+    },
+    "services_break_image": {
+      "type": "image",
+      "settings": {
+        "fullwidth": true,
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "whats_included": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "Across every tier",
+        "eyebrow_uppercase": true,
+        "title": "What the work actually looks like.",
+        "description": "Six areas where we do the heavy lifting. Scope scales with the tier; quality doesn't.",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "w-1": {
+          "type": "service",
+          "settings": {
+            "title": "Design direction",
+            "description": "<p>We translate \"we like it warm, not too traditional, with room for a little strangeness\" into a coherent visual plan — moodboards, colour stories, material palettes, floral direction, and signage language.</p>"
+          }
+        },
+        "w-2": {
+          "type": "service",
+          "settings": {
+            "title": "Vendor curation",
+            "description": "<p>Florist, photographer, caterer, music, stationery, rentals, hair and makeup, officiant. We know the good ones, and we know which of the good ones will suit you specifically.</p>"
+          }
+        },
+        "w-3": {
+          "type": "service",
+          "settings": {
+            "title": "Timeline & logistics",
+            "description": "<p>A minute-by-minute day-of plan tested against reality — not a spreadsheet that falls apart when the first shuttle is late. We build it, vendors sign on to it, and we run it.</p>"
+          }
+        },
+        "w-4": {
+          "type": "service",
+          "settings": {
+            "title": "Budget shepherding",
+            "description": "<p>Honest numbers, tradeoffs flagged early, no surprise line items at month ten. We'll tell you what the Saturday in June actually costs before you fall in love with the Saturday in June.</p>"
+          }
+        },
+        "w-5": {
+          "type": "service",
+          "settings": {
+            "title": "Day-of execution",
+            "description": "<p>A lead planner and a dedicated assistant on the ground, fully on point, fully on the line. If something goes sideways, you find out about it weeks later in a funny story.</p>"
+          }
+        },
+        "w-6": {
+          "type": "service",
+          "settings": {
+            "title": "Post-wedding wrap",
+            "description": "<p>Vendor payments settled, rentals returned, gratuity distributed, thank-you lists sorted. The quiet final week that keeps the whole thing from dragging into the following month.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["w-1", "w-2", "w-3", "w-4", "w-5", "w-6"]
+    },
+    "services_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you inquire.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "faq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still unsure which tier fits?",
+            "text": "<p>The discovery call is the fastest way to figure it out. Tell us what you've done so far and we'll point to the engagement that makes sense — including none, if that's the honest answer.</p>"
+          }
+        },
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "How far in advance should we book?",
+            "answer": "<p>For Full-service, most couples book 12–14 months out — we take on a limited number of weddings a year, so popular dates fill early. Partial is usually 6–10 months out. Day-of is typically 3–6 months ahead, though we've taken on weddings four weeks out when the fit was right.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you travel?",
+            "answer": "<p>Yes. The majority of weddings happen in the Hudson Valley and New England, but we've worked as far as Mexico, Italy, and Morocco. Destination weddings carry a travel fee and typically run at the Full-service tier.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Can we customize a tier?",
+            "answer": "<p>Yes — and you probably will. Half our engagements start from one of the three tiers above and adjust from there. After the discovery call, we send a proposal that reflects what you actually need.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you do smaller weddings?",
+            "answer": "<p>Yes. We love a 30-person dinner as much as a 200-person affair. Smaller weddings often come in at Partial rather than Full-service because the logistics are simpler — but the design work can be equally demanding.</p>"
+          }
+        },
+        "faq-5": {
+          "type": "item",
+          "settings": {
+            "question": "What's your aesthetic preference?",
+            "answer": "<p>We lean natural, editorial, slightly undone. Candlelight, warm stone, herbs and overgrown florals, menus that taste of where you are. If your vision is radically different — full traditional ballroom, heavy glamour, maximalist colour — we'll happily point you to friends who do that work beautifully.</p>"
+          }
+        },
+        "faq-6": {
+          "type": "item",
+          "settings": {
+            "question": "Can we see pricing in more detail?",
+            "answer": "<p>Once we've had a discovery call. Every wedding is different enough that a line-item price list upfront would mislead more than it helps — and we'd rather talk first and price honestly after.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-sidebar", "faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6"]
+    },
+    "services_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to start the conversation?",
+            "size": "3xl"
+          }
+        },
+        "sc-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'll reply within three business days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "sc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Begin an inquiry",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["sc-heading", "sc-text", "sc-button"]
+    }
+  },
+  "widgetsOrder": ["services_intro", "tiers", "services_break_image", "whats_included", "services_faq", "services_cta"],
+  "id": "services",
+  "created": "2026-04-20T10:00:00.000Z",
+  "updated": "2026-04-20T10:00:00.000Z"
+}
