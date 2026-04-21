@@ -1,0 +1,253 @@
+{
+  "name": "Specials",
+  "slug": "specials",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#121722cc",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Specials</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Seasonal offers for Portland drivers.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Time-limited deals on the services most drivers need when the seasons change. Mention the offer when you book — no codes, no hoops.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "current_specials": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "This season",
+        "eyebrow_uppercase": true,
+        "title": "Current offers.",
+        "description": "Running for a limited time — grab them before the dates tick down.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sp-winter": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Save $50",
+            "title": "Winter Ready Check",
+            "description": "<p>Battery load test, coolant strength, tire tread, wiper blades, heater check, 4WD/AWD inspection. Normally $129 — $79 through February.</p>",
+            "button_link": {
+              "text": "Book the check",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sp-tires": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From $89 / tire",
+            "title": "Seasonal Tire Changeover",
+            "description": "<p>Swap your summer or winter set, remount and balance. Free tread measurement and storage available for the off-season set. Book early — slots fill fast.</p>",
+            "button_link": {
+              "text": "Book the swap",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sp-roadtrip": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Save $35",
+            "title": "Pre-Road-Trip Full Inspection",
+            "description": "<p>Complete 62-point inspection plus test drive, road-ready report sent to your phone. Normally $125 — $90 with this offer, good year-round before any trip over 500 miles.</p>",
+            "button_link": {
+              "text": "Book the inspection",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["sp-winter", "sp-tires", "sp-roadtrip"]
+    },
+    "countdown_offer": {
+      "type": "countdown",
+      "settings": {
+        "eyebrow": "This month",
+        "eyebrow_uppercase": true,
+        "title": "Winter Ready Check — $50 off through Feb 28.",
+        "description": "Book the full cold-weather inspection before the end of February and pay $79 instead of $129. Includes battery, coolant, heater, tires, and wipers.",
+        "heading_alignment": "center",
+        "target_date": "2027-03-01 00:00",
+        "expired_message": "Offer ended — see current specials above.",
+        "text": "<p>Mention this offer when you book. Valid once per vehicle.</p>",
+        "button": {
+          "text": "Book the check",
+          "href": "contact.html",
+          "target": "_self"
+        },
+        "show_seconds": false,
+        "style": "cards",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      }
+    },
+    "bundles": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Seasonal menu",
+        "eyebrow_uppercase": true,
+        "title": "Bundle and save.",
+        "description": "Standing discounts — no expiry, no codes. Mention the bundle when you book.",
+        "heading_alignment": "start",
+        "layout": "two-column",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "bn-winter": {
+          "type": "item",
+          "settings": {
+            "name": "Winter Prep Bundle",
+            "description": "<p>Oil change, coolant check, battery load test, wiper blades, tire rotation.</p>",
+            "price": "$189"
+          }
+        },
+        "bn-summer": {
+          "type": "item",
+          "settings": {
+            "name": "Summer Road-Trip Bundle",
+            "description": "<p>62-point inspection, AC system check, alignment, tire rotation, oil change.</p>",
+            "price": "$289"
+          }
+        },
+        "bn-newcustomer": {
+          "type": "item",
+          "settings": {
+            "name": "New-Customer First Visit",
+            "description": "<p>First full-synthetic oil change free with any diagnostic or inspection service.</p>",
+            "price": "Free"
+          }
+        },
+        "bn-fleet": {
+          "type": "item",
+          "settings": {
+            "name": "Fleet Discount (5+ vehicles)",
+            "description": "<p>15% off labor on every visit, priority scheduling, dedicated advisor.</p>",
+            "price": "15% off labor"
+          }
+        },
+        "bn-referral": {
+          "type": "item",
+          "settings": {
+            "name": "Referral Credit",
+            "description": "<p>Refer a friend — you each get $25 off your next service when they book.</p>",
+            "price": "$25 each"
+          }
+        },
+        "bn-student": {
+          "type": "item",
+          "settings": {
+            "name": "Student Discount",
+            "description": "<p>10% off labor with valid student ID from any Portland-area college or university.</p>",
+            "price": "10% off labor"
+          }
+        }
+      },
+      "blocksOrder": ["bn-winter", "bn-summer", "bn-newcustomer", "bn-fleet", "bn-referral", "bn-student"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Claim a special.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Mention the offer when you book or call — we'll apply it to the invoice.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book service",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call (555) 408-2170",
+              "href": "tel:+15554082170",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "current_specials",
+    "countdown_offer",
+    "bundles",
+    "closing_cta"
+  ],
+  "id": "specials",
+  "created": "2026-04-21T12:00:00.000Z",
+  "updated": "2026-04-21T12:00:00.000Z"
+}

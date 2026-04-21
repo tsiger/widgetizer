@@ -1,0 +1,235 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#121722cc",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Contact</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get your car on the schedule.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book online for the fastest route, or call the shop — Alicia answers 7am to 6pm weekdays and 8am to 2pm Saturdays. Most jobs booked within two business days.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "details": {
+      "type": "contact-details",
+      "settings": {
+        "title": "How to reach us.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "equal",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cd-book": {
+          "type": "text_block",
+          "settings": {
+            "title": "Book online",
+            "text": "<p>Fastest path — send the car, the concern, and a preferred day.</p><p>We reply same-day with an available slot.</p><p>hello@torqueauto.co</p>"
+          }
+        },
+        "cd-phone": {
+          "type": "text_block",
+          "settings": {
+            "title": "By phone",
+            "text": "<p>(555) 408-2170</p><p>Alicia answers during shop hours — no menu, no hold queue.</p><p>Leave a voicemail after hours; we call back first thing.</p>"
+          }
+        },
+        "cd-hours": {
+          "type": "text_block",
+          "settings": {
+            "title": "Hours",
+            "text": "<p>Mon–Fri · 7am – 6pm</p><p>Sat · 8am – 2pm</p><p>Sun · closed</p>"
+          }
+        },
+        "cd-shop": {
+          "type": "text_block",
+          "settings": {
+            "title": "Shop",
+            "text": "<p>4420 SE Milwaukie Ave</p><p>Portland, OR 97202</p><p>Free shuttle inside a 5-mile radius</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cd-book", "cd-phone", "cd-hours", "cd-shop"]
+    },
+    "shop_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Find us",
+        "eyebrow_uppercase": true,
+        "title": "Inner SE Portland.",
+        "description": "Corner of SE Milwaukie and Bybee. Customer parking in front and along the side of the building.",
+        "heading_alignment": "center",
+        "address": "4420 SE Milwaukie Ave, Portland, OR 97202",
+        "show_address": true,
+        "height": "medium",
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "info-shop": {
+          "type": "info",
+          "settings": {
+            "title": "Torque Auto Service",
+            "text": "<p>4420 SE Milwaukie Ave</p><p>Portland, OR 97202</p><p>(555) 408-2170</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-shop"]
+    },
+    "booking_faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you book",
+        "eyebrow_uppercase": true,
+        "title": "Useful to know.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "bf-1": {
+          "type": "item",
+          "settings": {
+            "question": "What info should I have ready?",
+            "answer": "<p>Year, make, model, mileage, and the reason for the visit. For check-engine lights, a photo of the dash or the scan-tool code is helpful. If you have service history with another shop, bring it — we'll log it to your record.</p>"
+          }
+        },
+        "bf-2": {
+          "type": "item",
+          "settings": {
+            "question": "Can I wait in the lobby while you work?",
+            "answer": "<p>Yes for most quick services — oil changes, tire rotations, alignments, basic inspections. The lobby has good coffee, fast Wi-Fi, and actual chairs. For longer repairs we offer a complimentary shuttle within five miles and a loaner car on a first-come basis.</p>"
+          }
+        },
+        "bf-3": {
+          "type": "item",
+          "settings": {
+            "question": "How do loaner cars and the shuttle work?",
+            "answer": "<p>The shuttle covers a five-mile radius from the shop — we'll take you home or to work and pick you up when your car's ready. Loaners are available for repairs estimated over two hours; reserve one when you book. Both are free.</p>"
+          }
+        },
+        "bf-4": {
+          "type": "item",
+          "settings": {
+            "question": "How does the warranty claim process work?",
+            "answer": "<p>If something we repaired fails inside two years or 24,000 miles, bring the car back and we'll fix it at no charge — parts and labor. Keep the original invoice (we'll have it in our system regardless). No paperwork fuss.</p>"
+          }
+        },
+        "bf-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you handle fleet accounts?",
+            "answer": "<p>Yes — small business fleets of 5 or more vehicles get priority scheduling, a dedicated service advisor, 15% off labor, and consolidated monthly invoicing. Email hello@torqueauto.co to set up an account.</p>"
+          }
+        },
+        "bf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Prefer email?",
+            "text": "<p>hello@torqueauto.co</p><p>Year, make, model, and the concern is enough — we'll reply with a quote and available slots.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["bf-1", "bf-2", "bf-3", "bf-4", "bf-5", "bf-sidebar"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready when you are.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most slots available within two business days. Free diagnostic on check-engine lights.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email us",
+              "href": "mailto:hello@torqueauto.co",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call (555) 408-2170",
+              "href": "tel:+15554082170",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "details",
+    "shop_map",
+    "booking_faqs",
+    "closing_cta"
+  ],
+  "id": "contact",
+  "created": "2026-04-21T12:00:00.000Z",
+  "updated": "2026-04-21T12:00:00.000Z"
+}

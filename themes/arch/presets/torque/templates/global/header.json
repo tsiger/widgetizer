@@ -1,0 +1,22 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Torque",
+    "logoMaxWidth": 150,
+    "contactDetailsLine1": "(555) 408-2170",
+    "contactDetailsLine2": "ASE Certified",
+    "contact_position": "menu",
+    "headerNavigation": "main-menu",
+    "center_nav": true,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Book service",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": false,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

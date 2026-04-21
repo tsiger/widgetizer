@@ -1,0 +1,531 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#121722cc",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Services</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Every job, priced before we start.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Four service areas, one promise: ASE-certified work, transparent flat-rate pricing, and a 2-year warranty on every repair that leaves the shop.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "categories": {
+      "type": "checkerboard",
+      "settings": {
+        "eyebrow": "What we do",
+        "eyebrow_uppercase": true,
+        "title": "Four service areas, factory-level across all of them.",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 4,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cat-diagnostics": {
+          "type": "card",
+          "settings": {
+            "title": "Diagnostics & Electrical",
+            "description": "<p>Check-engine lights, ABS faults, battery draws, sensor failures, infotainment glitches. Factory-grade scan tools across every major brand. Every diagnostic comes with a digital report you can keep.</p>",
+            "button_link": {
+              "text": "Book a diagnostic",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-brakes": {
+          "type": "card",
+          "settings": {
+            "title": "Brakes, Steering, Suspension",
+            "description": "<p>Pads and rotors, calipers, master cylinders, shocks, struts, control arms, 4-wheel alignment. OEM-spec parts and a measured wear-report photo included with every brake job.</p>",
+            "button_link": {
+              "text": "Book brake service",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-engine": {
+          "type": "card",
+          "settings": {
+            "title": "Engine, Transmission, Cooling",
+            "description": "<p>Timing chains, water pumps, radiators, transmission service, head gaskets, turbo replacement. Big jobs get a walk-around, a written scope, and a fixed price before we start disassembly.</p>",
+            "button_link": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-tires": {
+          "type": "card",
+          "settings": {
+            "title": "Tires, Wheels, Alignment",
+            "description": "<p>All-season, summer, winter. Seasonal changeovers, mounting and balancing, TPMS service, 4-wheel alignment. We stock Michelin, Continental, Goodyear, Bridgestone, and match online pricing.</p>",
+            "button_link": {
+              "text": "Book tire service",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-diagnostics-img": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-brakes-img": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-engine-img": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "cat-tires-img": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "cat-diagnostics-img",
+        "cat-diagnostics",
+        "cat-brakes-img",
+        "cat-brakes",
+        "cat-engine",
+        "cat-engine-img",
+        "cat-tires",
+        "cat-tires-img"
+      ]
+    },
+    "pricing": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Flat-rate services",
+        "eyebrow_uppercase": true,
+        "title": "What the common stuff costs.",
+        "description": "Prices shown include labor, diagnosis, and standard parts. Any job that turns out to be bigger gets a written quote before we start. No travel fees, no shop supply surcharges.",
+        "heading_alignment": "start",
+        "layout": "single-column",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "pr-1": {
+          "type": "item",
+          "settings": {
+            "name": "Full synthetic oil change",
+            "description": "<p>Up to 6 quarts of full synthetic, OEM-spec filter, 20-point visual inspection.</p>",
+            "price": "$89"
+          }
+        },
+        "pr-2": {
+          "type": "item",
+          "settings": {
+            "name": "Brake pad replacement (per axle)",
+            "description": "<p>OEM-spec pads, rotor resurfacing if within spec, measured wear report.</p>",
+            "price": "$295"
+          }
+        },
+        "pr-3": {
+          "type": "item",
+          "settings": {
+            "name": "Coolant flush",
+            "description": "<p>Full system drain and refill, thermostat inspection, pressure test.</p>",
+            "price": "$165"
+          }
+        },
+        "pr-4": {
+          "type": "item",
+          "settings": {
+            "name": "Battery replacement",
+            "description": "<p>Group-size matched battery, terminal cleaning, charging-system test.</p>",
+            "price": "$225"
+          }
+        },
+        "pr-5": {
+          "type": "item",
+          "settings": {
+            "name": "Alternator replacement",
+            "description": "<p>OEM or OEM-spec alternator, belt inspection, full charging-system test.</p>",
+            "price": "$545"
+          }
+        },
+        "pr-6": {
+          "type": "item",
+          "settings": {
+            "name": "4-wheel alignment",
+            "description": "<p>Hunter alignment rack, before/after printout, steering-angle sensor reset.</p>",
+            "price": "$149"
+          }
+        },
+        "pr-7": {
+          "type": "item",
+          "settings": {
+            "name": "AC system recharge",
+            "description": "<p>R-134a or R-1234yf refill, leak check, system pressure test.</p>",
+            "price": "$195"
+          }
+        },
+        "pr-8": {
+          "type": "item",
+          "settings": {
+            "name": "Transmission fluid service",
+            "description": "<p>Drain and refill with manufacturer-spec fluid, filter where serviceable.</p>",
+            "price": "$245"
+          }
+        }
+      },
+      "blocksOrder": [
+        "pr-1",
+        "pr-2",
+        "pr-3",
+        "pr-4",
+        "pr-5",
+        "pr-6",
+        "pr-7",
+        "pr-8"
+      ]
+    },
+    "inspection_compare": {
+      "type": "comparison-table",
+      "settings": {
+        "eyebrow": "Inspections",
+        "eyebrow_uppercase": true,
+        "title": "Which inspection fits?",
+        "description": "Three inspection levels for three different jobs. Most customers go with Complete; Pre-Purchase is the one you want before buying a used car off Craigslist.",
+        "heading_alignment": "center",
+        "feature_column_label": "What's covered",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "col-basic": {
+          "type": "column",
+          "settings": {
+            "name": "Basic",
+            "featured": false,
+            "link": {
+              "text": "Book basic",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "col-complete": {
+          "type": "column",
+          "settings": {
+            "name": "Complete",
+            "badge": "Most Popular",
+            "featured": true,
+            "link": {
+              "text": "Book complete",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "col-premium": {
+          "type": "column",
+          "settings": {
+            "name": "Pre-Purchase",
+            "featured": false,
+            "link": {
+              "text": "Book pre-purchase",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "ft-points": {
+          "type": "feature",
+          "settings": {
+            "name": "Points inspected",
+            "values": "27\n62\n110"
+          }
+        },
+        "ft-testdrive": {
+          "type": "feature",
+          "settings": {
+            "name": "Road test",
+            "values": "no\nyes\nyes"
+          }
+        },
+        "ft-scan": {
+          "type": "feature",
+          "settings": {
+            "name": "Computer scan (all modules)",
+            "values": "no\nyes\nyes"
+          }
+        },
+        "ft-report": {
+          "type": "feature",
+          "settings": {
+            "name": "Digital report with photos",
+            "values": "yes\nyes\nyes"
+          }
+        },
+        "ft-treads": {
+          "type": "feature",
+          "settings": {
+            "name": "Tire tread measurements",
+            "values": "yes\nyes\nyes"
+          }
+        },
+        "ft-brakes": {
+          "type": "feature",
+          "settings": {
+            "name": "Brake pad wear measurement",
+            "values": "no\nyes\nyes"
+          }
+        },
+        "ft-leaks": {
+          "type": "feature",
+          "settings": {
+            "name": "Under-vehicle leak check (lift)",
+            "values": "no\nyes\nyes"
+          }
+        },
+        "ft-prepurchase": {
+          "type": "feature",
+          "settings": {
+            "name": "Pre-purchase summary letter",
+            "values": "no\nno\nyes"
+          }
+        },
+        "ft-price": {
+          "type": "feature",
+          "settings": {
+            "name": "Typical price",
+            "values": "$65\n$125\n$165"
+          }
+        }
+      },
+      "blocksOrder": [
+        "col-basic",
+        "col-complete",
+        "col-premium",
+        "ft-points",
+        "ft-testdrive",
+        "ft-scan",
+        "ft-report",
+        "ft-treads",
+        "ft-brakes",
+        "ft-leaks",
+        "ft-prepurchase",
+        "ft-price"
+      ]
+    },
+    "faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQs",
+        "eyebrow_uppercase": true,
+        "title": "Questions we get a lot.",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "item",
+          "settings": {
+            "question": "How does flat-rate pricing work?",
+            "answer": "<p>Before we start any repair, we give you a written price for the job — labor, parts, everything. If the diagnosis turns out to be different than expected, we stop and re-quote before touching anything else. You never see a surprise number on the final invoice.</p>"
+          }
+        },
+        "q-2": {
+          "type": "item",
+          "settings": {
+            "question": "What's the warranty on your repairs?",
+            "answer": "<p>Two years or 24,000 miles, whichever comes first, on both parts and labor. That's our warranty — not a manufacturer's pass-through. If something we replaced fails inside that window, we fix it at no charge, including labor.</p>"
+          }
+        },
+        "q-3": {
+          "type": "item",
+          "settings": {
+            "question": "Do I need an appointment?",
+            "answer": "<p>For most jobs, yes — it lets us have the right tech and the right parts ready, and usually means same-day turnaround. Walk-ins for oil changes and quick inspections are welcome when the lobby schedule allows; call ahead to confirm.</p>"
+          }
+        },
+        "q-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can I get an estimate before I drop off?",
+            "answer": "<p>For common jobs (oil change, brake pads, battery, alignment) we can quote on the phone or online in under five minutes. For anything that needs diagnosis first — check-engine lights, unknown noises, performance issues — we need to see the car. Diagnostics run $95 and roll into the repair cost if you proceed.</p>"
+          }
+        },
+        "q-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you service hybrids and EVs?",
+            "answer": "<p>Yes. All nine techs are trained on hybrid systems, and four hold current high-voltage certifications for full EV service. We don't replace drive batteries in-house, but everything else — brakes, suspension, coolant, cabin systems, tires — is fully within scope.</p>"
+          }
+        },
+        "q-6": {
+          "type": "item",
+          "settings": {
+            "question": "What if the job is bigger than the quote?",
+            "answer": "<p>We stop work and call you. You see the revised scope and price before we continue. If you decide not to proceed, you pay only for the work completed to that point — never more than the original quote for the portion finished.</p>"
+          }
+        },
+        "q-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Ready to book?",
+            "text": "<p>(555) 408-2170</p><p>Mon–Fri · 7am – 6pm</p><p>Sat · 8am – 2pm</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4",
+        "q-5",
+        "q-6",
+        "q-sidebar"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Know what it'll cost before you drop off.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us the car and the concern. We'll send a written quote the same day.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book service",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call (555) 408-2170",
+              "href": "tel:+15554082170",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "categories",
+    "pricing",
+    "inspection_compare",
+    "faqs",
+    "closing_cta"
+  ],
+  "id": "services",
+  "created": "2026-04-21T12:00:00.000Z",
+  "updated": "2026-04-21T13:46:25.300Z"
+}

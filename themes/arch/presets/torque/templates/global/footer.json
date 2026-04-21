@@ -1,0 +1,39 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Torque Auto Service. ASE Certified · 2-year / 24k warranty on all repairs.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Torque",
+        "logo_width": 150,
+        "text": "<p>ASE-certified auto repair in greater Portland. Honest pricing, 2-year warranty, same-day appointments on most days.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Open now",
+        "text": "<p>(555) 408-2170</p><p>Mon–Fri · 7am – 6pm</p><p>Sat · 8am – 2pm</p><p>hello@torqueauto.co</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Site",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

@@ -109,6 +109,12 @@
       "liveDemo": "https://widgetizer.org/demos/sparkhaus/"
     },
     {
+      "id": "torque",
+      "name": "Torque",
+      "description": "Auto repair",
+      "liveDemo": "https://widgetizer.org/demos/torque/"
+    },
+    {
       "id": "stillpoint",
       "name": "Stillpoint",
       "description": "Yoga studio",

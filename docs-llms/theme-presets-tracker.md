@@ -35,6 +35,6 @@
 | 27 | sparkhaus | Sparkhaus | Cleaning Service | DONE |
 | 28 | stillpoint | Stillpoint | Yoga / Pilates Studio | DONE |
 | 29 | tailside | Tailside | Veterinarian |  |
-| 30 | torque | Torque | Auto Repair |  |
+| 30 | torque | Torque | Auto Repair | DONE |
 | 31 | uplink | Uplink | IT Support |  |
 | 32 | velvet-touch | Velvet Touch | Spa / Massage | DONE |

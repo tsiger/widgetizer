@@ -1,0 +1,604 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#121722cc",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-rating": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
+        },
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>ASE Certified · Same-day appointments · 4.9 on Google</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The service your dealer isn't giving you.",
+            "size": "7xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Modern auto repair without the dealership upcharge. Flat-rate quotes before we start, 2-year warranty on every repair, same-day appointments most days.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book service",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call (555) 408-2170",
+              "href": "tel:+15554082170",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-rating",
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
+    },
+    "credentials": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cr-1": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "ASE Certified",
+            "text": "Every tech, every bay"
+          }
+        },
+        "cr-2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-checkered",
+            "title": "2-year warranty",
+            "text": "On every repair, 24k miles"
+          }
+        },
+        "cr-3": {
+          "type": "item",
+          "settings": {
+            "icon": "receipt",
+            "title": "Flat-rate pricing",
+            "text": "Quote before we start"
+          }
+        },
+        "cr-4": {
+          "type": "item",
+          "settings": {
+            "icon": "calendar-clock",
+            "title": "Same-day appointments",
+            "text": "On most days"
+          }
+        },
+        "cr-5": {
+          "type": "item",
+          "settings": {
+            "icon": "car",
+            "title": "Free loaners",
+            "text": "For repairs over 2 hours"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cr-1",
+        "cr-2",
+        "cr-3",
+        "cr-4",
+        "cr-5"
+      ]
+    },
+    "services": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "What we fix",
+        "eyebrow_uppercase": true,
+        "title": "Full-service, factory-level expertise.",
+        "description": "From a quick oil change to an engine rebuild — our ASE-certified techs handle it all, with the same transparency and warranty across every job.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sv-diagnostics": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Check-engine to electrical",
+            "title": "Diagnostics",
+            "description": "<p>Factory-grade scan tools, a digital report with photos, and a plain-English explanation before we touch anything. Free on check-engine lights.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sv-brakes": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Steering, suspension, brakes",
+            "title": "Brakes & Suspension",
+            "description": "<p>Pads, rotors, calipers, shocks, struts, alignments. OEM-spec parts on every install, warranty on every line item.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sv-engine": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Engine & transmission",
+            "title": "Major Repairs",
+            "description": "<p>Timing chains, water pumps, transmission service, head gaskets. Big jobs get a written scope and a fixed price before day one.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sv-tires": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Tires, wheels, alignment",
+            "title": "Tires & Alignment",
+            "description": "<p>Seasonal changeovers, mounting, balance, and 4-wheel alignment. We stock the major brands and match online pricing.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "sv-diagnostics",
+        "sv-brakes",
+        "sv-engine",
+        "sv-tires"
+      ]
+    },
+    "why_torque": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "Why Torque",
+        "eyebrow_uppercase": true,
+        "title": "The shop that respects your time — and your bill.",
+        "description": "",
+        "heading_alignment": "start",
+        "content_position": "start",
+        "show_divider": true,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ft-quote": {
+          "type": "feature",
+          "settings": {
+            "icon": "receipt",
+            "title": "Transparent quotes before work starts",
+            "description": "<p>We walk you through the diagnosis, show you the parts, and hand you a written price. No surprise charges, no upsells tacked on at the end.</p>"
+          }
+        },
+        "ft-ase": {
+          "type": "feature",
+          "settings": {
+            "icon": "certificate",
+            "title": "ASE-certified on every job",
+            "description": "<p>Our techs hold current ASE certifications across engine, brakes, electrical, and transmission. We keep them — and pay for their continuing education.</p>"
+          }
+        },
+        "ft-shuttle": {
+          "type": "feature",
+          "settings": {
+            "icon": "car",
+            "title": "Complimentary shuttle and loaners",
+            "description": "<p>Free shuttle inside a 5-mile radius. Loaner cars available for repairs over two hours, first-come-first-served.</p>"
+          }
+        },
+        "ft-report": {
+          "type": "feature",
+          "settings": {
+            "icon": "clipboard-list",
+            "title": "Digital inspection reports with photos",
+            "description": "<p>After every inspection you get a link to a report with photos of everything we checked. No more trust-us-it's-worn-out conversations.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ft-quote",
+        "ft-ase",
+        "ft-shuttle",
+        "ft-report"
+      ]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "st-1": {
+          "type": "figure",
+          "settings": {
+            "number": "14",
+            "suffix": "",
+            "label": "Years serving Portland",
+            "description": "Independently owned since 2012"
+          }
+        },
+        "st-2": {
+          "type": "figure",
+          "settings": {
+            "number": "22,000",
+            "suffix": "+",
+            "label": "Vehicles serviced",
+            "description": "Cars, trucks, SUVs, hybrids"
+          }
+        },
+        "st-3": {
+          "type": "figure",
+          "settings": {
+            "number": "9",
+            "suffix": "",
+            "label": "ASE-certified techs",
+            "description": "Engine, brakes, electrical, transmission"
+          }
+        },
+        "st-4": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "★",
+            "label": "Google rating",
+            "description": "380+ reviews across the metro"
+          }
+        }
+      },
+      "blocksOrder": [
+        "st-1",
+        "st-2",
+        "st-3",
+        "st-4"
+      ]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Reviews",
+        "eyebrow_uppercase": true,
+        "title": "What drivers say.",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Took my Subaru in for a check-engine light thinking I was looking at a big bill. They diagnosed it, showed me the scan, and it turned out to be a $40 sensor. Most shops would have told me I needed a new catalytic converter. These guys are honest.",
+            "name": "Aaron W.",
+            "title": "Hawthorne · 2019 Subaru Outback",
+            "rating": "5"
+          }
+        },
+        "r-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Dealer quoted me $2,400 for brake work on our minivan. Torque quoted $1,150 for the same pads, rotors, and labor — with a 2-year warranty. Done in four hours and they gave us a loaner. Won't go back to the dealer.",
+            "name": "Priya M.",
+            "title": "Eastmoreland · 2021 Honda Odyssey",
+            "rating": "5"
+          }
+        },
+        "r-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "I am genuinely terrible at car stuff. What I appreciated was that Marcus sat with me at a monitor and walked through the digital inspection report photo by photo. Didn't push anything extra. Fixed what needed fixing.",
+            "name": "Dana L.",
+            "title": "Sellwood · 2017 Toyota RAV4",
+            "rating": "5"
+          }
+        },
+        "r-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "Our small business runs three delivery vans. Torque handles all of them on a rotating schedule, same-day turnaround when we need it. Fleet pricing is fair and they remember every vehicle's history.",
+            "name": "Javier R.",
+            "title": "Richmond · 3-vehicle fleet",
+            "rating": "5"
+          }
+        },
+        "r-5": {
+          "type": "quote",
+          "settings": {
+            "quote": "Bought a used Forester and brought it in for a pre-purchase inspection. They found two things the seller didn't disclose and saved me from a bad buy. Best $165 I've spent in years.",
+            "name": "Kenji S.",
+            "title": "Woodstock · Pre-purchase inspection",
+            "rating": "5"
+          }
+        },
+        "r-6": {
+          "type": "quote",
+          "settings": {
+            "quote": "Fourth time in two years — oil changes, a battery, and a set of tires. Always on time, always explained, always priced right. I send family here now.",
+            "name": "Heather B.",
+            "title": "Laurelhurst · Repeat customer since 2023",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "r-1",
+        "r-2",
+        "r-3",
+        "r-4",
+        "r-5",
+        "r-6"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book your next service.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most slots available within two business days. Free diagnostic on check-engine lights.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book service",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call (555) 408-2170",
+              "href": "tel:+15554082170",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    },
+    "shop_tour": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "st-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inside the shop</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "st-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Six clean bays. No secrets.",
+            "size": "4xl"
+          }
+        },
+        "st-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The lobby has real coffee and real Wi-Fi. The bays behind it have epoxy floors, factory scan tools for every major brand, and an alignment rack you can walk up to and watch.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "st-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tours welcome — ask at the counter and we'll walk you through the shop before we touch your car. We have nothing to hide from customers who want to see how their car gets serviced.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "st-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a visit",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "st-eyebrow",
+        "st-heading",
+        "st-body-1",
+        "st-body-2",
+        "st-button"
+      ]
+    },
+    "inspection_report": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ir-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Digital inspections</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "ir-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A link to every photo we take of your car.",
+            "size": "3xl"
+          }
+        },
+        "ir-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>After every inspection we send a report to your phone with photos of everything we checked — tire tread depth, brake pad thickness, fluid condition, worn components. You see exactly what we saw before we quote anything.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "ir-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Photos of every wear item\n+ Measured depths and thickness\n+ Priority recommendations, not upsells\n+ Shareable with family or a second opinion"
+          }
+        },
+        "ir-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See a sample report",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ir-eyebrow",
+        "ir-heading",
+        "ir-body",
+        "ir-features",
+        "ir-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "credentials",
+    "services",
+    "why_torque",
+    "shop_tour",
+    "stats",
+    "reviews",
+    "inspection_report",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-21T12:00:00.000Z",
+  "updated": "2026-04-21T13:45:56.454Z"
+}

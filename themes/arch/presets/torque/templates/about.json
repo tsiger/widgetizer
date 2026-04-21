@@ -1,0 +1,286 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#121722cc",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "ASE-certified. Since 2012.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Nine techs, six service bays, one promise: the price you're quoted is the price on your invoice. Independently owned, locally operated, built on referrals.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "shop_story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ss-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The shop</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "ss-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Built around the service department we wished existed.",
+            "size": "4xl"
+          }
+        },
+        "ss-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Torque opened in 2012 in a two-bay rental off Milwaukie Avenue. The founding idea was simple: bring factory-level diagnostic work and warranty standards to an independent shop, and hold prices to what the job actually costs.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "ss-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fourteen years later we run six bays, a lift-equipped alignment rack, OEM scan tools for every major brand, and a team of nine ASE-certified techs. The shop is clean enough to host customer coffee in the waiting room — and we do.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "ss-body-3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Still independently owned. Still local. Still answering the phone with the same promise we opened with: the price quoted is the price paid.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "ss-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the team",
+              "href": "#team",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["ss-eyebrow", "ss-heading", "ss-body-1", "ss-body-2", "ss-body-3", "ss-button"]
+    },
+    "milestones": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Milestones",
+        "eyebrow_uppercase": true,
+        "title": "Fourteen years, one phone number.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "centered",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ms-2012": {
+          "type": "item",
+          "settings": {
+            "date": "2012",
+            "title": "Two bays and a phone.",
+            "description": "<p>Torque opens in a rented two-bay shop in inner SE Portland with a single ASE-certified tech and the promise of transparent pricing.</p>"
+          }
+        },
+        "ms-2015": {
+          "type": "item",
+          "settings": {
+            "date": "2015",
+            "title": "Master Tech on the floor.",
+            "description": "<p>First ASE Master Technician joins the crew. Scope expands to include transmission work, diagnostics on luxury brands, and pre-purchase inspections.</p>"
+          }
+        },
+        "ms-2018": {
+          "type": "item",
+          "settings": {
+            "date": "2018",
+            "title": "Move to the six-bay facility.",
+            "description": "<p>Outgrew the original shop. Moved to the current purpose-built six-bay facility with a clean lobby, alignment rack, and customer waiting area.</p>"
+          }
+        },
+        "ms-2021": {
+          "type": "item",
+          "settings": {
+            "date": "2021",
+            "title": "Fleet services launched.",
+            "description": "<p>Added dedicated fleet service for small Portland businesses. Priority scheduling, dedicated advisor, consistent pricing across vehicles.</p>"
+          }
+        },
+        "ms-2024": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "title": "Nine techs, EV-certified.",
+            "description": "<p>Team at current size with four high-voltage-certified techs for hybrid and EV service. Still independently owned, still booking on the same number we opened with.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["ms-2012", "ms-2015", "ms-2018", "ms-2021", "ms-2024"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The team",
+        "eyebrow_uppercase": true,
+        "title": "ASE-certified, all of them.",
+        "description": "The crew that actually works on your car. Every tech holds current ASE certifications in their specialty area — we pay for the renewals, they keep the credentials current.",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3 / 4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tm-marcus": {
+          "type": "profile",
+          "settings": {
+            "name": "Marcus Chen",
+            "role": "Owner · Master Technician",
+            "specialty": "Engine & transmission",
+            "bio": "Founded Torque in 2012. ASE Master Technician since 2013, L1 Advanced Engine Performance certified. 24 years on the tools."
+          }
+        },
+        "tm-alicia": {
+          "type": "profile",
+          "settings": {
+            "name": "Alicia Wood",
+            "role": "Service Advisor",
+            "specialty": "Scheduling & quotes",
+            "bio": "The voice on the phone and the face at the counter. Eight years at Torque, nine before that at a dealer service department. Knows every customer by name."
+          }
+        },
+        "tm-jordan": {
+          "type": "profile",
+          "settings": {
+            "name": "Jordan Patel",
+            "role": "Lead Technician",
+            "specialty": "Diagnostics & electrical",
+            "bio": "ASE-certified in six areas including electrical and engine performance. Runs the scan tools and the tricky diagnostic jobs. Six years at Torque."
+          }
+        },
+        "tm-eli": {
+          "type": "profile",
+          "settings": {
+            "name": "Eli Bennett",
+            "role": "Technician · EV Certified",
+            "specialty": "Hybrid & EV service",
+            "bio": "ASE-certified with current high-voltage certifications for hybrid and EV service. Four years at Torque. Handles Tesla, Rivian, and every major hybrid platform."
+          }
+        }
+      },
+      "blocksOrder": ["tm-marcus", "tm-alicia", "tm-jordan", "tm-eli"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Meet the team in person.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book a first visit and ask for a shop tour — we'll walk you through the bays before we touch the car.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book service",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call (555) 408-2170",
+              "href": "tel:+15554082170",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "shop_story",
+    "milestones",
+    "team",
+    "closing_cta"
+  ],
+  "id": "about",
+  "created": "2026-04-21T12:00:00.000Z",
+  "updated": "2026-04-21T12:00:00.000Z"
+}
