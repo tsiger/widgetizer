@@ -91,6 +91,12 @@
       "liveDemo": "https://widgetizer.org/demos/olympic/"
     },
     {
+      "id": "pipeworks",
+      "name": "Pipeworks",
+      "description": "Plumber",
+      "liveDemo": "https://widgetizer.org/demos/pipeworks/"
+    },
+    {
       "id": "saffron",
       "name": "Saffron",
       "description": "Restaurant",

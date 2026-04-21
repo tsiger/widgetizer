@@ -1,0 +1,234 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Contact</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get us on the way.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fastest path is the phone — our dispatcher answers 24/7 for emergencies and 7am–7pm for standard jobs. Or send the details below and we'll reply same-day.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "details": {
+      "type": "contact-details",
+      "settings": {
+        "title": "How to reach us.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "equal",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cd-emergency": {
+          "type": "text_block",
+          "settings": {
+            "title": "Emergency",
+            "text": "<p>(555) 203-9844</p><p>24 hours a day, 7 days a week</p><p>Live dispatcher, no automated menu</p>"
+          }
+        },
+        "cd-standard": {
+          "type": "text_block",
+          "settings": {
+            "title": "Standard hours",
+            "text": "<p>Mon–Sat · 7am – 7pm</p><p>Sunday · emergency only</p><p>Most jobs booked same-day or next-day</p>"
+          }
+        },
+        "cd-email": {
+          "type": "text_block",
+          "settings": {
+            "title": "Email",
+            "text": "<p>hello@pipeworksplumbing.co</p><p>Same-day reply during business hours</p><p>Great for quote requests and photos</p>"
+          }
+        },
+        "cd-shop": {
+          "type": "text_block",
+          "settings": {
+            "title": "Shop",
+            "text": "<p>7320 SE Milwaukie Ave</p><p>Portland, OR 97202</p><p>Call before stopping by — techs are on the trucks most of the day</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cd-emergency", "cd-standard", "cd-email", "cd-shop"]
+    },
+    "shop_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Where we're based",
+        "eyebrow_uppercase": true,
+        "title": "Sellwood, SE Portland.",
+        "description": "We're on the trucks most of the day — call before stopping by.",
+        "heading_alignment": "center",
+        "address": "7320 SE Milwaukie Ave, Portland, OR 97202",
+        "show_address": true,
+        "height": "medium",
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "info-shop": {
+          "type": "info",
+          "settings": {
+            "title": "Pipeworks Plumbing",
+            "text": "<p>7320 SE Milwaukie Ave</p><p>Portland, OR 97202</p><p>(555) 203-9844</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-shop"]
+    },
+    "contact_faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you call",
+        "eyebrow_uppercase": true,
+        "title": "Useful to know.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cf-1": {
+          "type": "item",
+          "settings": {
+            "question": "What info should I have ready when I call?",
+            "answer": "<p>Your address with a cross-street, a quick description of the problem, and — if it's safe — a photo or two you can text us after you hang up. That's usually enough to give you a response window and a rough flat-rate quote before we roll.</p>"
+          }
+        },
+        "cf-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer free estimates for remodels?",
+            "answer": "<p>Yes, for planned work like bathroom remodels, kitchen remodels, repipes, and gas line projects. We come out, walk the space with you, and send a fixed written quote within 48 hours. No charge, no obligation.</p>"
+          }
+        },
+        "cf-3": {
+          "type": "item",
+          "settings": {
+            "question": "What payment methods do you accept?",
+            "answer": "<p>Credit card, debit card, bank transfer, personal check, and cash. For jobs over $1,500 we accept 50% deposit and 50% on completion. No finance charges or hidden fees on any payment method.</p>"
+          }
+        },
+        "cf-4": {
+          "type": "item",
+          "settings": {
+            "question": "How does after-hours emergency dispatch work?",
+            "answer": "<p>Same number, any hour. A live dispatcher answers — not a machine. There's a $75 after-hours dispatch fee that applies as a credit toward the job if you hire us. Response is typically 60–90 minutes inside our core service area.</p>"
+          }
+        },
+        "cf-5": {
+          "type": "item",
+          "settings": {
+            "question": "Can I schedule a standard appointment online?",
+            "answer": "<p>Not yet — we still run scheduling through the phone because most calls need a quick back-and-forth to get the job right before booking. Email is fine for quote requests and remodels; phone is faster for repairs.</p>"
+          }
+        },
+        "cf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Prefer email?",
+            "text": "<p>hello@pipeworksplumbing.co</p><p>Send photos of the problem for the fastest reply during business hours.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cf-1", "cf-2", "cf-3", "cf-4", "cf-5", "cf-sidebar"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Still cheaper to call.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most questions get a straight answer in under two minutes. Forms wait for office hours — phones don't.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (555) 203-9844",
+              "href": "tel:+15552039844",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Email us",
+              "href": "mailto:hello@pipeworksplumbing.co",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "details",
+    "shop_map",
+    "contact_faqs",
+    "closing_cta"
+  ],
+  "id": "contact",
+  "created": "2026-04-21T10:00:00.000Z",
+  "updated": "2026-04-21T10:00:00.000Z"
+}

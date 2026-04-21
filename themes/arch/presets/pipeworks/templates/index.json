@@ -1,0 +1,431 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#1d2a389e",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-rating": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
+        },
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>24/7 emergency · Licensed &amp; insured · 4.9 on Google</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Pipes don't wait. Neither do we.",
+            "size": "8xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Master plumber-led, 28 years in greater Portland. Flat-rate pricing before we touch a thing. On your block in 30 minutes for emergencies.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (555) 203-9844",
+              "href": "tel:+15552039844",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-rating", "hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+    },
+    "credentials": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cr-1": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-checkered",
+            "title": "Licensed & bonded",
+            "text": "CSLB #1048293"
+          }
+        },
+        "cr-2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-half",
+            "title": "Fully insured",
+            "text": "$2M liability coverage"
+          }
+        },
+        "cr-3": {
+          "type": "item",
+          "settings": {
+            "icon": "clock-24",
+            "title": "24/7 emergency",
+            "text": "Live dispatcher, any hour"
+          }
+        },
+        "cr-4": {
+          "type": "item",
+          "settings": {
+            "icon": "receipt",
+            "title": "Upfront pricing",
+            "text": "Flat-rate quote before we start"
+          }
+        },
+        "cr-5": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "Master plumber-led",
+            "text": "On every job, every day"
+          }
+        }
+      },
+      "blocksOrder": ["cr-1", "cr-2", "cr-3", "cr-4", "cr-5"]
+    },
+    "services": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "What we do",
+        "eyebrow_uppercase": true,
+        "title": "Plumbing, the hard jobs included.",
+        "description": "Residential and light commercial. Emergency dispatch, planned installs, and everything in between.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sv-emergency": {
+          "type": "card",
+          "settings": {
+            "subtitle": "24/7 dispatch",
+            "title": "Emergency repairs",
+            "description": "<p>Burst pipes, active leaks, blocked sewers. Live dispatcher every hour of every day — most emergencies seen the same day.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sv-heaters": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Tank & tankless",
+            "title": "Water heaters",
+            "description": "<p>Repair, replace, or upgrade to tankless. Same-day install on most brands, permit handled, full warranty honored.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sv-drain": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Mains & fixtures",
+            "title": "Drain & sewer",
+            "description": "<p>Snaking, hydro jetting, camera inspection, root removal. Clears the real problem — not just the symptom.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sv-install": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Remodels & installs",
+            "title": "Fixture & new install",
+            "description": "<p>Toilets, faucets, disposals, sump pumps, full bathroom remodels, repipes. Priced before we start the work.</p>",
+            "button_link": {
+              "text": "See details",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["sv-emergency", "sv-heaters", "sv-drain", "sv-install"]
+    },
+    "how_it_works": {
+      "type": "numbered-cards",
+      "settings": {
+        "eyebrow": "How it works",
+        "eyebrow_uppercase": true,
+        "title": "Four steps. No surprises.",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hw-1": {
+          "type": "step",
+          "settings": {
+            "title": "Call",
+            "description": "<p>Tell our dispatcher what's going on. She answers the phone in under four rings, any time of day, and gets a tech on the way.</p>"
+          }
+        },
+        "hw-2": {
+          "type": "step",
+          "settings": {
+            "title": "Diagnose",
+            "description": "<p>Your tech arrives in uniform, in a marked truck, and walks you through the problem. We explain what's happening before we touch anything.</p>"
+          }
+        },
+        "hw-3": {
+          "type": "step",
+          "settings": {
+            "title": "Upfront quote",
+            "description": "<p>Flat-rate price, in writing, before we start. If the job turns out to be bigger, we stop and re-quote — no mystery charges at the end.</p>"
+          }
+        },
+        "hw-4": {
+          "type": "step",
+          "settings": {
+            "title": "Fix it today",
+            "description": "<p>Most jobs finish on the first visit. We carry the parts, we handle the permits, and we clean up before we leave. That's the whole deal.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["hw-1", "hw-2", "hw-3", "hw-4"]
+    },
+    "stats": {
+      "type": "key-figures",
+      "settings": {
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "st-1": {
+          "type": "figure",
+          "settings": {
+            "number": "28",
+            "suffix": "",
+            "label": "Years serving Portland",
+            "description": "Family-owned since 1998"
+          }
+        },
+        "st-2": {
+          "type": "figure",
+          "settings": {
+            "number": "12,000",
+            "suffix": "+",
+            "label": "Calls answered",
+            "description": "Emergency and planned"
+          }
+        },
+        "st-3": {
+          "type": "figure",
+          "settings": {
+            "number": "94",
+            "suffix": "%",
+            "label": "Fixed on first visit",
+            "description": "Parts on the truck, most jobs"
+          }
+        },
+        "st-4": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "★",
+            "label": "Google rating",
+            "description": "220+ reviews across the metro"
+          }
+        }
+      },
+      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Reviews",
+        "eyebrow_uppercase": true,
+        "title": "What neighbors say.",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Called at 10pm on a Sunday with a leaking supply line flooding the laundry. Dani was at our door in 40 minutes with the parts and had it fixed by midnight. Quoted me before he started. Paid exactly what he quoted.",
+            "name": "Melissa R.",
+            "title": "Sellwood · Emergency repair, 2025",
+            "rating": "5"
+          }
+        },
+        "r-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Got three quotes on replacing our 19-year-old water heater. Pipeworks wasn't the cheapest, but they were the only ones who walked me through tank vs. tankless honestly — including why tankless wasn't right for our setup. Installed the next morning.",
+            "name": "Tom K.",
+            "title": "Eastmoreland · Water heater replace, 2024",
+            "rating": "5"
+          }
+        },
+        "r-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Kitchen drain had been slow for months. Two other plumbers snaked it and charged us, and it came back both times. Pipeworks ran a camera, found a root, and hydro-jetted the line. Hasn't backed up since.",
+            "name": "Priya S.",
+            "title": "Hawthorne · Drain & sewer, 2025",
+            "rating": "5"
+          }
+        },
+        "r-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "We own a small restaurant on Division. When a supply line under the sink burst during service, they had someone there in under an hour and we were back open for dinner. Fair price for an emergency call-out.",
+            "name": "Javier L.",
+            "title": "Richmond · Light commercial, 2024",
+            "rating": "5"
+          }
+        },
+        "r-5": {
+          "type": "quote",
+          "settings": {
+            "quote": "Repiped a 1920s bungalow. Marcus walked through the whole house on day one, marked every wall he'd need to open, and gave us a fixed price. Finished in three days, cleaned up perfectly, patched the drywall like it never happened.",
+            "name": "Anne B.",
+            "title": "Laurelhurst · Whole-house repipe, 2024",
+            "rating": "5"
+          }
+        },
+        "r-6": {
+          "type": "quote",
+          "settings": {
+            "quote": "Fourth time using Pipeworks in six years. Different houses, different jobs, same experience every time. Shows up when they said, prices what they quoted, cleans up after. That's all I'm asking for.",
+            "name": "David G.",
+            "title": "Woodstock · Repeat client since 2020",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["r-1", "r-2", "r-3", "r-4", "r-5", "r-6"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Need a plumber today?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Flat-rate quote before we start. Most emergencies answered within an hour.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (555) 203-9844",
+              "href": "tel:+15552039844",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "credentials",
+    "services",
+    "how_it_works",
+    "stats",
+    "reviews",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-21T10:00:00.000Z",
+  "updated": "2026-04-21T10:00:00.000Z"
+}

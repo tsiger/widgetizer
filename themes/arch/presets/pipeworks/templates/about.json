@@ -1,0 +1,285 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Third-generation. Since 1998.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Two trucks, eight techs, one promise: the price we quote is the price you pay. Family-owned, master plumber-led, still based where we started.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "founder_story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fs-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The founder</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "fs-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Met the van before the wrench.",
+            "size": "4xl"
+          }
+        },
+        "fs-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Marcus grew up riding along in his dad's truck — picking up parts from the supply house, holding the flashlight in crawl spaces, and learning that the job wasn't over until the floor was drier than when you arrived. He apprenticed through high school, got his journey license at 22, and his master license in 2003.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fs-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>When his father retired in 2010, Marcus took over the shop and the two trucks. He kept the phone number, the uniform design, and the upfront-pricing promise his dad started with. He added a second tech that year, then a third. Today Pipeworks runs two trucks and a team of eight — but Marcus is still on calls three days a week, and he still answers the phone most Saturdays.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fs-body-3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The goal hasn't changed: the plumber who actually shows up when promised, quotes before they start, and cleans up before they leave. That's the whole business.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fs-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the team",
+              "href": "#team",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["fs-eyebrow", "fs-heading", "fs-body-1", "fs-body-2", "fs-body-3", "fs-button"]
+    },
+    "milestones": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Milestones",
+        "eyebrow_uppercase": true,
+        "title": "Twenty-eight years, one phone number.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "centered",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ms-1998": {
+          "type": "item",
+          "settings": {
+            "date": "1998",
+            "title": "Dad buys the first truck.",
+            "description": "<p>Founded as a one-man operation serving Sellwood and Eastmoreland out of a single used Chevy van. The phone rang at the family kitchen table.</p>"
+          }
+        },
+        "ms-2003": {
+          "type": "item",
+          "settings": {
+            "date": "2003",
+            "title": "Master license.",
+            "description": "<p>Marcus earns his Oregon master plumber license. A second technician joins, and work expands into Hawthorne, Woodstock, and Laurelhurst.</p>"
+          }
+        },
+        "ms-2010": {
+          "type": "item",
+          "settings": {
+            "date": "2010",
+            "title": "Next generation.",
+            "description": "<p>Marcus takes over operations. Same number, same truck color, same upfront-pricing promise his father started with — just a bigger crew carrying it.</p>"
+          }
+        },
+        "ms-2019": {
+          "type": "item",
+          "settings": {
+            "date": "2019",
+            "title": "Expansion.",
+            "description": "<p>A third truck hits the road and coverage extends into inner Beaverton and Milwaukie. The shop on Milwaukie Avenue becomes the permanent home.</p>"
+          }
+        },
+        "ms-2024": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "title": "Eight techs, still local.",
+            "description": "<p>Team at its current size. Same number, same van color, same promise. Still family-owned, still Portland-based, still answering the phone on Saturdays.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["ms-1998", "ms-2003", "ms-2010", "ms-2019", "ms-2024"]
+    },
+    "team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The team",
+        "eyebrow_uppercase": true,
+        "title": "Your plumber, by name.",
+        "description": "The same small crew, every call. Licensed technicians — not contractors passing through.",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3 / 4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tm-marcus": {
+          "type": "profile",
+          "settings": {
+            "name": "Marcus Chen",
+            "role": "Owner · Master Plumber",
+            "specialty": "Repipes & gas lines",
+            "bio": "Third-generation plumber. 22 years on the trucks, master license since 2003. CSLB #1048293."
+          }
+        },
+        "tm-dani": {
+          "type": "profile",
+          "settings": {
+            "name": "Dani Alvarez",
+            "role": "Lead Technician",
+            "specialty": "Water heaters",
+            "bio": "Journey plumber, 11 years with Pipeworks. Tank, tankless, and heat-pump heater specialist. On-call captain for after-hours."
+          }
+        },
+        "tm-reese": {
+          "type": "profile",
+          "settings": {
+            "name": "Reese Okafor",
+            "role": "Technician",
+            "specialty": "Drain & sewer",
+            "bio": "Journey plumber, 6 years on the crew. Runs the hydro jetter and the sewer camera — rarely leaves a drain without knowing why it clogged."
+          }
+        },
+        "tm-jamie": {
+          "type": "profile",
+          "settings": {
+            "name": "Jamie Park",
+            "role": "Apprentice · Dispatch",
+            "specialty": "Scheduling & quotes",
+            "bio": "Apprentice plumber and the voice you hear when you call. Four years with the company. Answers the phone in under four rings."
+          }
+        }
+      },
+      "blocksOrder": ["tm-marcus", "tm-dani", "tm-reese", "tm-jamie"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Got a plumber on speed-dial?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pick the same crew every time. Save the number — use it when you need it.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (555) 203-9844",
+              "href": "tel:+15552039844",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "founder_story",
+    "milestones",
+    "team",
+    "closing_cta"
+  ],
+  "id": "about",
+  "created": "2026-04-21T10:00:00.000Z",
+  "updated": "2026-04-21T10:00:00.000Z"
+}

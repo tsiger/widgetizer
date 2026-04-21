@@ -323,14 +323,36 @@ This plan is the single source of truth. It must begin with the Phase 0 brief an
 
 Create `docs-llms/preset-plans/{preset-id}-images.json`
 
-This file is a **prompt library for future image generation** — it describes the images that would complete the preset visually. It is not referenced by and has no effect on the preset template files.
+This file is a **prompt library consumed directly by `scripts/generate-images.js`**. It is not a design document — it is data fed to the image generator. Keep it minimal.
 
-Every image entry must include:
+**Required shape:** a flat JSON array. No wrapper object, no top-level `notes`, no `preset`/`industry`/`brand_world`/`usage`/`id` fields. Every entry has exactly four keys:
 
-- file name
-- width
-- height
-- prompt
+```json
+[
+  { "file": "hero.jpg", "width": 1920, "height": 1080, "prompt": "..." },
+  { "file": "services/emergency.jpg", "width": 1024, "height": 768, "prompt": "..." }
+]
+```
+
+- `file` — output filename, can include subdirectory (e.g. `"testimonials/melissa.jpg"`)
+- `width` / `height` — integers in pixels; see §11.3 for dimension rules
+- `prompt` — one prose paragraph. Cover subject, setting, lighting, composition, and things to avoid — but fold it into natural sentences, not labeled sections.
+
+**Do not include:**
+- Logo variants (header logo, transparent logo, footer logo). The user generates logos manually — they are outside this pipeline.
+- Favicons. Same reason.
+- Any field other than the four above. The generator script silently ignores extras; they become dead weight that rots as the codebase evolves.
+- Any section that repeats content from the plan `.md` (brand palette, industry framing, etc.). That belongs in the plan, not here.
+
+**Filename rules:**
+- No path separators. `"file": "services-emergency.jpg"` — never `"services/emergency.jpg"`. The generator script writes flat into the output directory and does not `mkdir` subfolders; a `/` in the filename breaks the run.
+- Use hyphens, not underscores, to keep filenames consistent with the rest of the theme's asset naming.
+
+**Prompt content rules (FLUX 2 Pro):**
+- **Never ask the model to render text.** No brand wordmarks on shirts, vans, signs, doors, mugs, or boxes. No "framed photo of …", no chalked labels, no pinned maps with street names, no scrawled notepads, no headers like "SERVICE ZONE". FLUX renders garbled text 100% of the time — it looks worse than having nothing there. Describe the subject without the text; the user's logo upload handles branding.
+- **Avoid grunge vocabulary unless grunge is actually the brand.** Words like *scarred, scratched, chipped, dusty, grimy, old, lived-in, well-used, weathered* push the model to a "basement junk-shop" aesthetic that almost no preset wants. For a clean-trade brand (plumber, electrician, dentist, accountant), say *clean, organized, recent, well-kept* or just stay neutral on the surface condition.
+- **Keep prop lists short.** Three props max per image. Each additional prop is another thing FLUX can misrender, and prop-dense prompts trend toward styled-Pinterest-shot outputs rather than honest scene shots.
+- **Put the subject in the right 60–70% of the frame** for any banner/hero image with left-aligned heading text on top. Mention the left area is clear and calm so the model actually leaves room.
 
 **Critical rule:** Never put image file references in preset template JSON files. Widgets that accept images (banner, image-text, card-grid cards, profile-grid photos, steps, etc.) must omit the image setting entirely. The widget will render its built-in placeholder or empty state. Images are added by the user after project creation.
 
@@ -702,17 +724,48 @@ Image file references in preset templates break when:
 
 Broken image references produce visible errors (broken image icons, empty containers with incorrect aspect ratios, broken hero layouts) that make the preset look defective. Omitting images entirely produces clean placeholder states that the user understands and can fill.
 
-### 11.3 The images JSON is a prompt library
+### 11.3 The images JSON — format and dimensions
 
-The `{preset-id}-images.json` file in `docs-llms/preset-plans/` is a **reference document for future image generation**. It describes the images that would complete the preset visually but has no connection to the template files.
+The `{preset-id}-images.json` file in `docs-llms/preset-plans/` is consumed directly by `scripts/generate-images.js`. It is not a design document. See §4 Phase 2 for the required shape (flat array, four fields per entry, no logos).
 
-Every image prompt should specify:
+**Prompts — cover these in prose:**
 
 1. **Subject** — what is in the image
 2. **Setting** — where it is (environment, location type)
 3. **Mood/lighting** — consistent with the preset's brand personality
-4. **Composition** — framing, angle, depth of field
+4. **Composition** — framing, angle, depth of field, where negative space sits
 5. **What to avoid** — anything that contradicts the preset's no-go patterns
+
+Fold these into natural sentences — do not write `Subject: ... Setting: ...` as a labeled list inside the prompt.
+
+**Dimensions — match the widgetizer render pipeline.**
+
+Widgetizer generates four resized variants of every upload at `thumb` (150w), `small` (480w), `medium` (1024w), and `large` (1920w) — see `server/controllers/mediaController.js`. The `large` variant (1920w) is the biggest the frontend will ever request. Source images larger than ~1920w waste tokens and disk without improving anything the user sees.
+
+Pick dimensions by **the widget that will render the image**, not by what "looks big." Aspect ratio should match the widget's configured `aspect_ratio` setting when one exists. Recommended source sizes:
+
+| Widget usage | Recommended size | Aspect | Rationale |
+|---|---|---|---|
+| `banner` full-width hero background | 1920×1080 | 16:9 | Hits the `large` variant cap; hero spans the full viewport |
+| `banner` small/medium opener | 1600×900 | 16:9 | Smaller than hero; still fullwidth |
+| `card-grid` card (aspect_ratio `4 / 3`) | 1024×768 | 4:3 | Card renders at ~300–500px wide; `small`/`medium` variant served |
+| `card-grid` card (aspect_ratio `1 / 1`) | 1024×1024 | 1:1 | Same card footprint |
+| `card-grid` card (aspect_ratio `16 / 9`) | 1024×576 | 16:9 | |
+| `image-text` widget image | 1024×1280 | 4:5 | Renders at ~half-container width; portrait reads best |
+| `profile-grid` photo (aspect_ratio `3 / 4`) | 960×1280 | 3:4 | Multi-column grid; `medium` variant max |
+| `profile-grid` photo (aspect_ratio `1 / 1`) | 1024×1024 | 1:1 | |
+| `team-highlight` feature photo | 1280×1600 | 4:5 | Larger than profile-grid; single-feature layout |
+| `steps` / `resource-list` item image | 1024×768 | 4:3 | Small inline visual |
+| `gallery` / `masonry-gallery` item | 1280×960 or 1280×1600 | 4:3 or 3:4 | Gallery-led; slightly larger than cards is OK |
+| `image` widget (editorial, full-width) | 1920×1280 | 3:2 | Full-width standalone image |
+| `image-hotspots` | 1600×1200 | 4:3 | Zoomed in for hotspot interactions |
+| `comparison-slider` `before`/`after` | 1600×1067 | 3:2 | Paired images — same dimensions |
+| `testimonials` / `testimonial-slider` avatar | 512×512 | 1:1 | Renders at 40–80px (thumb variant); don't waste budget here |
+| `testimonial-hero` feature portrait | 1024×1280 | 4:5 | Single large portrait |
+
+**Hard cap:** do not exceed 1920 on either dimension. If you find yourself specifying 2400×1350, you've overshot what the render pipeline will ever serve.
+
+**Lower bound:** 512 is the practical minimum for FLUX 2 Pro to produce coherent compositions. Avatars at 512×512 are fine even though they render tiny — smaller source often looks worse, not better.
 
 ### 11.4 Validation
 

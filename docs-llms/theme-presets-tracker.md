@@ -29,7 +29,7 @@
 | 21 | olympic | Olympic | Gym | DONE |
 | 22 | pawlish | Pawlish | Pet Grooming |  |
 | 23 | petalry | Petalry | Flower Shop |  |
-| 24 | pipeworks | Pipeworks | Plumber / Electrician |  |
+| 24 | pipeworks | Pipeworks | Plumber | DONE |
 | 25 | pixelcraft | Pixelcraft | Graphic Designer |  |
 | 26 | saffron | Saffron | Restaurant | DONE |
 | 27 | sparkhaus | Sparkhaus | Cleaning Service | DONE |

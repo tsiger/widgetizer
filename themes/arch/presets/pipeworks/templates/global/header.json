@@ -1,0 +1,22 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Pipeworks",
+    "logoMaxWidth": 160,
+    "contactDetailsLine1": "(555) 203-9844 · 24/7 emergency",
+    "contactDetailsLine2": "Licensed · Insured · Bonded",
+    "contact_position": "menu",
+    "headerNavigation": "main-menu",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Get a quote",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

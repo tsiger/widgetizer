@@ -1,0 +1,456 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Services</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Plumbing that sticks.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Emergency fixes, planned installs, and everything in between. Every job starts with a flat-rate quote — so you always know what you're paying before we start.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "specialties": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "What we do",
+        "eyebrow_uppercase": true,
+        "title": "Six specialties.",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sp-1": {
+          "type": "service",
+          "settings": {
+            "title": "Emergency repairs",
+            "description": "<p>Burst supply lines, active leaks, sewer backups, gas smells. 24/7 dispatch with a live person on the phone. Most emergencies reached within 60 minutes inside our service area.</p>",
+            "link": {
+              "text": "Call now",
+              "href": "tel:+15552039844",
+              "target": "_self"
+            }
+          }
+        },
+        "sp-2": {
+          "type": "service",
+          "settings": {
+            "title": "Drain & sewer",
+            "description": "<p>Snaking, hydro jetting, camera inspection, root removal. We clear the real problem, not just the symptom — and we show you what we found.</p>",
+            "link": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sp-3": {
+          "type": "service",
+          "settings": {
+            "title": "Water heaters",
+            "description": "<p>Repair, replace, or upgrade to tankless. Gas, electric, and heat-pump models. Same-day install on most brands. Permit handled, old unit hauled away, warranty honored.</p>",
+            "link": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sp-4": {
+          "type": "service",
+          "settings": {
+            "title": "Repipes",
+            "description": "<p>Whole-house copper or PEX. We walk the house first, mark every wall we'll need to open, and give you a fixed price before day one. Drywall patched to match.</p>",
+            "link": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sp-5": {
+          "type": "service",
+          "settings": {
+            "title": "Fixture install",
+            "description": "<p>Toilets, faucets, disposals, sump pumps, shower valves, bathroom and kitchen remodels. Bring your own fixtures or let us source them. Flat-rate either way.</p>",
+            "link": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "sp-6": {
+          "type": "service",
+          "settings": {
+            "title": "Gas line service",
+            "description": "<p>New installs, line extensions, leak repair, pressure testing. Permit-ready for range, water heater, and outdoor kitchen projects. Certified for natural gas and propane.</p>",
+            "link": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5", "sp-6"]
+    },
+    "pricing": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Upfront pricing",
+        "eyebrow_uppercase": true,
+        "title": "Flat-rate jobs.",
+        "description": "Prices for the most common calls. All include diagnosis, labor, and standard parts. No travel fees within our service area. Anything beyond the flat-rate scope gets a written quote before we start.",
+        "heading_alignment": "start",
+        "layout": "single-column",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "pr-1": {
+          "type": "item",
+          "settings": {
+            "name": "Drain snake (kitchen or bath)",
+            "description": "<p>Up to 25 ft, single fixture. Includes diagnosis and clearing.</p>",
+            "price": "$149"
+          }
+        },
+        "pr-2": {
+          "type": "item",
+          "settings": {
+            "name": "Toilet reseat",
+            "description": "<p>Includes new wax ring, bolts, and leak test. Bowl removal and reset.</p>",
+            "price": "$189"
+          }
+        },
+        "pr-3": {
+          "type": "item",
+          "settings": {
+            "name": "Water heater flush",
+            "description": "<p>Tank drain, sediment flush, anode rod inspection. Annual maintenance recommended for most tanks.</p>",
+            "price": "$165"
+          }
+        },
+        "pr-4": {
+          "type": "item",
+          "settings": {
+            "name": "Garbage disposal install",
+            "description": "<p>Up to 3/4 HP unit. Includes removal of old disposal and leak test. Unit extra if replacing.</p>",
+            "price": "$225"
+          }
+        },
+        "pr-5": {
+          "type": "item",
+          "settings": {
+            "name": "Faucet replacement",
+            "description": "<p>Kitchen or bathroom. Includes supply line check and leak test. Faucet extra.</p>",
+            "price": "$175"
+          }
+        },
+        "pr-6": {
+          "type": "item",
+          "settings": {
+            "name": "Sump pump install",
+            "description": "<p>New or replacement, up to 1/3 HP. Includes check valve and float test.</p>",
+            "price": "$495"
+          }
+        },
+        "pr-7": {
+          "type": "item",
+          "settings": {
+            "name": "Hydro jetting",
+            "description": "<p>Main line, up to 100 ft. Camera inspection before and after included. Ideal for recurring clogs.</p>",
+            "price": "$395"
+          }
+        },
+        "pr-8": {
+          "type": "item",
+          "settings": {
+            "name": "Gas leak check",
+            "description": "<p>Pressure test, line inspection, and appliance check. Report provided for insurance or permits.</p>",
+            "price": "$195"
+          }
+        }
+      },
+      "blocksOrder": ["pr-1", "pr-2", "pr-3", "pr-4", "pr-5", "pr-6", "pr-7", "pr-8"]
+    },
+    "compare_heater": {
+      "type": "comparison-table",
+      "settings": {
+        "eyebrow": "Repair vs. replace",
+        "eyebrow_uppercase": true,
+        "title": "Water heater decision guide.",
+        "description": "When a heater acts up, the fix depends on age, efficiency, and the failure point. Here's how the three paths compare.",
+        "heading_alignment": "center",
+        "feature_column_label": "What's covered",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "col-repair": {
+          "type": "column",
+          "settings": {
+            "name": "Repair",
+            "featured": false,
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "col-replace": {
+          "type": "column",
+          "settings": {
+            "name": "Tank replacement",
+            "badge": "Most Common",
+            "featured": true,
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "col-tankless": {
+          "type": "column",
+          "settings": {
+            "name": "Tankless upgrade",
+            "featured": false,
+            "link": {
+              "text": "Get a quote",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "ft-cost": {
+          "type": "feature",
+          "settings": {
+            "name": "Typical cost",
+            "values": "$250–$600\n$1,800–$2,800\n$3,500–$5,500"
+          }
+        },
+        "ft-lifespan": {
+          "type": "feature",
+          "settings": {
+            "name": "Lifespan added",
+            "values": "2–4 yrs\n10–12 yrs\n20+ yrs"
+          }
+        },
+        "ft-sameday": {
+          "type": "feature",
+          "settings": {
+            "name": "Same-day service",
+            "values": "yes\nyes\nno"
+          }
+        },
+        "ft-efficiency": {
+          "type": "feature",
+          "settings": {
+            "name": "Efficiency improvement",
+            "values": "no\nyes\nyes"
+          }
+        },
+        "ft-permit": {
+          "type": "feature",
+          "settings": {
+            "name": "Requires permit",
+            "values": "no\nyes\nyes"
+          }
+        },
+        "ft-endless": {
+          "type": "feature",
+          "settings": {
+            "name": "Endless hot water",
+            "values": "no\nno\nyes"
+          }
+        },
+        "ft-install": {
+          "type": "feature",
+          "settings": {
+            "name": "Standard install time",
+            "values": "1–2 hrs\n4–6 hrs\n1–2 days"
+          }
+        }
+      },
+      "blocksOrder": [
+        "col-repair",
+        "col-replace",
+        "col-tankless",
+        "ft-cost",
+        "ft-lifespan",
+        "ft-sameday",
+        "ft-efficiency",
+        "ft-permit",
+        "ft-endless",
+        "ft-install"
+      ]
+    },
+    "faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQs",
+        "eyebrow_uppercase": true,
+        "title": "Questions we get a lot.",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "item",
+          "settings": {
+            "question": "Do you charge a dispatch fee?",
+            "answer": "<p>No — not for standard jobs. For after-hours emergency calls there's a $75 dispatch fee that's applied as a credit toward the job if you hire us. Standard-hours diagnosis is included in the flat-rate quote.</p>"
+          }
+        },
+        "q-2": {
+          "type": "item",
+          "settings": {
+            "question": "How fast can you come out?",
+            "answer": "<p>Inside our core service area, most emergencies are reached within 60 minutes. Standard jobs are typically booked same-day or next-day. If you give us a cross-street when you call, we'll give you a real response window before you book.</p>"
+          }
+        },
+        "q-3": {
+          "type": "item",
+          "settings": {
+            "question": "What's included in the flat-rate price?",
+            "answer": "<p>Diagnosis, labor, standard parts, and cleanup. If the job turns out to be bigger than the original quote — something hidden behind a wall or an unexpected code issue — we stop and re-quote. You approve the new number before we continue. No mystery charges at the end.</p>"
+          }
+        },
+        "q-4": {
+          "type": "item",
+          "settings": {
+            "question": "What brands of water heaters do you install?",
+            "answer": "<p>We install and service Rheem, Bradford White, A.O. Smith, Rinnai, Navien, and Noritz as our core lineup. If you have a specific brand preference outside that list, we can usually source it within a day. We honor all manufacturer warranties on units we install.</p>"
+          }
+        },
+        "q-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you handle the permit?",
+            "answer": "<p>Yes. For any job that requires a permit — water heaters, gas work, repipes, major fixture moves — we pull it, schedule inspection, and hand you the final sign-off. The permit fee is itemized separately from the quote so you see exactly what you're paying the city.</p>"
+          }
+        },
+        "q-6": {
+          "type": "item",
+          "settings": {
+            "question": "What if the job turns out to be bigger than the quote?",
+            "answer": "<p>We stop work and re-quote before we touch anything else. You see the new number, you see what changed, and you decide whether to move forward. If you pass, you owe only the time and labor up to that point — never more than the original quote for the portion completed.</p>"
+          }
+        },
+        "q-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still need a hand?",
+            "text": "<p>(555) 203-9844</p><p>Mon–Sat · 7am–7pm standard</p><p>24/7 for emergencies</p>"
+          }
+        }
+      },
+      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "q-5", "q-6", "q-sidebar"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get a flat-rate quote.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us the job. We'll tell you the price before we show up.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (555) 203-9844",
+              "href": "tel:+15552039844",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "specialties",
+    "pricing",
+    "compare_heater",
+    "faqs",
+    "closing_cta"
+  ],
+  "id": "services",
+  "created": "2026-04-21T10:00:00.000Z",
+  "updated": "2026-04-21T10:00:00.000Z"
+}

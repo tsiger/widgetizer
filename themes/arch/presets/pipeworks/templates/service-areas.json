@@ -1,0 +1,303 @@
+{
+  "name": "Service Areas",
+  "slug": "service-areas",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Service area</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Proudly plumbing greater Portland.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Based in Sellwood, serving the Portland core plus inner suburbs. Same-day response for emergencies across the coverage map below.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "coverage_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Coverage",
+        "eyebrow_uppercase": true,
+        "title": "Where we go.",
+        "description": "Our shop is in Sellwood. Standard response covers the Portland core and inner suburbs; extended response areas add roughly 20 minutes and no travel fee.",
+        "heading_alignment": "center",
+        "address": "7320 SE Milwaukie Ave, Portland, OR 97202",
+        "show_address": true,
+        "height": "large",
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "info-shop": {
+          "type": "info",
+          "settings": {
+            "title": "Pipeworks Plumbing",
+            "text": "<p>7320 SE Milwaukie Ave</p><p>Portland, OR 97202</p><p>(555) 203-9844</p><p>Mon–Sat · 7am–7pm</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-shop"]
+    },
+    "neighborhoods": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "Neighborhoods",
+        "eyebrow_uppercase": true,
+        "title": "Response times by area.",
+        "description": "Standard response means a tech on your block in 30 minutes or less during business hours. Extended zones add roughly 15–20 minutes and don't cost extra.",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 5,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "n-sellwood": {
+          "type": "item",
+          "settings": {
+            "icon": "home",
+            "title": "Sellwood",
+            "description": "Standard response — 20–30 min"
+          }
+        },
+        "n-eastmoreland": {
+          "type": "item",
+          "settings": {
+            "icon": "home",
+            "title": "Eastmoreland",
+            "description": "Standard response — 25–35 min"
+          }
+        },
+        "n-hawthorne": {
+          "type": "item",
+          "settings": {
+            "icon": "home-dot",
+            "title": "Hawthorne",
+            "description": "Standard response — 20–30 min"
+          }
+        },
+        "n-woodstock": {
+          "type": "item",
+          "settings": {
+            "icon": "home-dot",
+            "title": "Woodstock",
+            "description": "Standard response — 25–35 min"
+          }
+        },
+        "n-laurelhurst": {
+          "type": "item",
+          "settings": {
+            "icon": "home",
+            "title": "Laurelhurst",
+            "description": "Standard response — 25–40 min"
+          }
+        },
+        "n-kerns": {
+          "type": "item",
+          "settings": {
+            "icon": "home-dot",
+            "title": "Kerns",
+            "description": "Standard response — 25–40 min"
+          }
+        },
+        "n-montavilla": {
+          "type": "item",
+          "settings": {
+            "icon": "home",
+            "title": "Montavilla",
+            "description": "Standard response — 30–45 min"
+          }
+        },
+        "n-milwaukie": {
+          "type": "item",
+          "settings": {
+            "icon": "home-dot",
+            "title": "Milwaukie",
+            "description": "Standard response — 25–40 min"
+          }
+        },
+        "n-beaverton": {
+          "type": "item",
+          "settings": {
+            "icon": "home-shield",
+            "title": "Beaverton (inner)",
+            "description": "Extended response — 40–55 min"
+          }
+        },
+        "n-lakeoswego": {
+          "type": "item",
+          "settings": {
+            "icon": "home-shield",
+            "title": "Lake Oswego (north)",
+            "description": "Extended response — 45–60 min"
+          }
+        }
+      },
+      "blocksOrder": [
+        "n-sellwood",
+        "n-eastmoreland",
+        "n-hawthorne",
+        "n-woodstock",
+        "n-laurelhurst",
+        "n-kerns",
+        "n-montavilla",
+        "n-milwaukie",
+        "n-beaverton",
+        "n-lakeoswego"
+      ]
+    },
+    "area_faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Area questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you call.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "a-1": {
+          "type": "item",
+          "settings": {
+            "question": "My neighborhood isn't listed — do you still serve it?",
+            "answer": "<p>Probably. The list above is our most common service areas, but we regularly take calls from neighborhoods just outside it. Give us a call with your cross-street and we'll tell you honestly whether we're a good fit or whether a closer plumber would get to you faster.</p>"
+          }
+        },
+        "a-2": {
+          "type": "item",
+          "settings": {
+            "question": "Do extended-response areas cost more?",
+            "answer": "<p>No. Our flat-rate prices are the same everywhere in our service area. Extended zones just take a bit longer to reach, so we tell you that upfront when you book so you're not waiting for a truck without knowing when it'll arrive.</p>"
+          }
+        },
+        "a-3": {
+          "type": "item",
+          "settings": {
+            "question": "How does 24/7 emergency response work outside the Portland core?",
+            "answer": "<p>Same dispatcher, same number, any hour. Response windows stretch at night and on holidays — a typical after-hours emergency call takes 60–90 minutes in our core zone and up to two hours in extended areas. We stay on the phone with you until a tech is on the way.</p>"
+          }
+        },
+        "a-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you handle apartments and multi-unit buildings?",
+            "answer": "<p>Yes — duplexes, fourplexes, small condo buildings, and light commercial. We coordinate with building managers, work around tenant schedules, and we're familiar with the shared-stack issues that come up in older Portland apartments.</p>"
+          }
+        },
+        "a-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you charge a travel fee?",
+            "answer": "<p>No travel fee inside our service area — the map above covers it. For calls well outside the map we'll give you a heads-up if there's a travel component before you book, and most of the time we'll refer you to a closer plumber instead.</p>"
+          }
+        },
+        "a-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Check coverage",
+            "text": "<p>(555) 203-9844</p><p>Tell the dispatcher your cross-street and we'll confirm a response window before you book.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["a-1", "a-2", "a-3", "a-4", "a-5", "a-sidebar"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Not sure if we cover you?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Give us the cross-street. We'll confirm and give you a response window before you book.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (555) 203-9844",
+              "href": "tel:+15552039844",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Request a quote",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "coverage_map",
+    "neighborhoods",
+    "area_faqs",
+    "closing_cta"
+  ],
+  "id": "service-areas",
+  "created": "2026-04-21T10:00:00.000Z",
+  "updated": "2026-04-21T10:00:00.000Z"
+}
