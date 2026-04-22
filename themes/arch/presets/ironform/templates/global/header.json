@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Ironform",
+    "contactDetailsLine1": "(555) 000-1234",
+    "contactDetailsLine2": "hello@example.com",
+    "contact_position": "logo",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "book.html",
+      "text": "Book a Session",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "highlight-primary"
+  }
+}

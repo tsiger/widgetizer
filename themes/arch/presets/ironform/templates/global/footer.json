@@ -1,0 +1,38 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Ironform Personal Training. All rights reserved.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-secondary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Ironform",
+        "text": "<p>Private personal training and online coaching. Built for people serious about change.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>hello@example.com</p><p>(555) 000-1234</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Quick Links",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

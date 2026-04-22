@@ -1,0 +1,245 @@
+{
+  "name": "Results",
+  "slug": "results",
+  "id": "results",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "page_header": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "header-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Transformations</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "header-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The Results Speak",
+            "size": "7xl"
+          }
+        },
+        "header-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Hundreds of clients. One common thread: they showed up and did the work.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["header-eyebrow", "header-heading", "header-text"]
+    },
+    "results_stats": {
+      "type": "key-figures",
+      "settings": {
+        "title": "By the Numbers",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-secondary",
+        "animate": true
+      },
+      "blocks": {
+        "stat-kg": {
+          "type": "figure",
+          "settings": {
+            "number": "1200",
+            "suffix": "+",
+            "label": "Total kg lost by clients",
+            "description": "Across all active programmes"
+          }
+        },
+        "stat-completion": {
+          "type": "figure",
+          "settings": {
+            "number": "94",
+            "suffix": "%",
+            "label": "Complete their programme",
+            "description": "Of clients who reach week 4"
+          }
+        },
+        "stat-rating": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "/5",
+            "label": "Average client rating"
+          }
+        }
+      },
+      "blocksOrder": ["stat-kg", "stat-completion", "stat-rating"]
+    },
+    "transformation_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "title": "Client Training Gallery",
+        "heading_alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "gallery-1": {
+          "type": "item",
+          "settings": {
+            "title": "James K.",
+            "category": "12-Week Transformation"
+          }
+        },
+        "gallery-2": {
+          "type": "item",
+          "settings": {
+            "title": "Marcus L.",
+            "category": "1-on-1 Training"
+          }
+        },
+        "gallery-3": {
+          "type": "item",
+          "settings": {
+            "title": "Dan M.",
+            "category": "Online Coaching"
+          }
+        },
+        "gallery-4": {
+          "type": "item",
+          "settings": {
+            "title": "Tom D.",
+            "category": "12-Week Transformation"
+          }
+        },
+        "gallery-5": {
+          "type": "item",
+          "settings": {
+            "title": "Ryan H.",
+            "category": "1-on-1 Training"
+          }
+        },
+        "gallery-6": {
+          "type": "item",
+          "settings": {
+            "title": "Chris W.",
+            "category": "Online Coaching"
+          }
+        },
+        "gallery-7": {
+          "type": "item",
+          "settings": {
+            "title": "Steve B.",
+            "category": "12-Week Transformation"
+          }
+        },
+        "gallery-8": {
+          "type": "item",
+          "settings": {
+            "title": "Paul N.",
+            "category": "1-on-1 Training"
+          }
+        }
+      },
+      "blocksOrder": ["gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5", "gallery-6", "gallery-7", "gallery-8"]
+    },
+    "client_stories": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "In Their Words",
+        "eyebrow_uppercase": true,
+        "title": "What Clients Say",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Fourteen kilograms gone and I'm deadlifting twice what I could when I started. The programming is genuinely different — every session has a reason and a result.",
+            "name": "James K.",
+            "title": "12-Week Transformation Client",
+            "rating": ""
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Remote coaching works because the plan is that good. I travel for work constantly. Having a programme I can do anywhere, with a coach who actually checks in, changed everything.",
+            "name": "Marcus L.",
+            "title": "Online Coaching Client",
+            "rating": ""
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "I was skeptical. Personal trainers are expensive and I'd wasted money before. This was the first time the investment paid off — in every possible way.",
+            "name": "Tom D.",
+            "title": "12-Week Programme Client",
+            "rating": ""
+          }
+        },
+        "quote-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "The weekly check-ins keep you honest. You can't hide behind a bad week. You're held accountable in the best possible way — with a plan to fix it, not just a reminder that you slipped.",
+            "name": "Ryan H.",
+            "title": "1-on-1 Client",
+            "rating": ""
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3", "quote-4"]
+    },
+    "results_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Be Next?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>First consultation is free. No commitment required.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "book.html",
+              "text": "Book Your Free Session",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-btn"]
+    }
+  },
+  "widgetsOrder": ["page_header", "results_stats", "transformation_gallery", "client_stories", "results_cta"]
+}

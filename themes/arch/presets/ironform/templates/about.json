@@ -1,0 +1,218 @@
+{
+  "name": "About",
+  "slug": "about",
+  "id": "about",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "trainer_opener": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none"
+      },
+      "blocks": {
+        "opener-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your Coach</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "opener-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Alex Rowe — Personal Trainer",
+            "size": "4xl"
+          }
+        },
+        "opener-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Over a decade of training, hundreds of clients, and one core belief: anyone who shows up consistently will change. My job is to make sure you don't quit — and that the work you do actually matters.</p>",
+            "size": "base"
+          }
+        },
+        "opener-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "book.html",
+              "text": "Book a Session",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["opener-eyebrow", "opener-heading", "opener-body", "opener-cta"]
+    },
+    "credentials": {
+      "type": "timeline",
+      "settings": {
+        "title": "Experience and Credentials",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "cred-1": {
+          "type": "item",
+          "settings": {
+            "date": "2012",
+            "title": "NASM Certified Personal Trainer",
+            "description": "<p>Qualified through the National Academy of Sports Medicine with a specialisation in corrective exercise and movement assessment.</p>"
+          }
+        },
+        "cred-2": {
+          "type": "item",
+          "settings": {
+            "date": "2015",
+            "title": "Precision Nutrition — Level 1",
+            "description": "<p>Certified nutrition coach covering body composition science, habit change, and sustainable eating strategies for long-term results.</p>"
+          }
+        },
+        "cred-3": {
+          "type": "item",
+          "settings": {
+            "date": "2018",
+            "title": "Opened Private Studio",
+            "description": "<p>Left commercial gym chains to launch a private training space — fewer clients, deeper focus, better outcomes for everyone who walks through the door.</p>"
+          }
+        },
+        "cred-4": {
+          "type": "item",
+          "settings": {
+            "date": "2021",
+            "title": "Online Coaching Programme Launch",
+            "description": "<p>Expanded to serve clients remotely, building a structured online programme that delivers the same precision as in-person training.</p>"
+          }
+        },
+        "cred-5": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "title": "Strength and Conditioning Certification",
+            "description": "<p>Advanced programming for athletic performance, hypertrophy, and injury prevention — applied across all client programmes.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cred-1", "cred-2", "cred-3", "cred-4", "cred-5"]
+    },
+    "philosophy": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none"
+      },
+      "blocks": {
+        "phil-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Training Philosophy</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "phil-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Progress Over Perfection. Always.",
+            "size": "2xl"
+          }
+        },
+        "phil-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Sustainable results come from consistent effort, not extreme measures. The programmes I build are hard — but they're designed to last and built to adapt as you grow stronger.</p>",
+            "size": "base"
+          }
+        },
+        "phil-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Every plan is individual — no templates, ever\n+ Results tracked every week, not just at the end\n+ Honest coaching — I'll tell you what's working and what isn't\n+ You'll always know exactly why you're doing what you're doing"
+          }
+        }
+      },
+      "blocksOrder": ["phil-eyebrow", "phil-heading", "phil-body", "phil-features"]
+    },
+    "featured_client": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "client-quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I came in with 40 kg to lose and zero confidence. Alex didn't sugarcoat anything — he gave me a plan, held me to it, and I lost 38 kg in 9 months. Nothing else I've ever tried comes close.</p>",
+            "size": "lg"
+          }
+        },
+        "client-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Dan M.",
+            "size": "xl"
+          }
+        },
+        "client-context": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Online Coaching Client — 38 kg lost in 9 months</p>",
+            "size": "sm",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["client-quote", "client-name", "client-context"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Work With Me",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book a free consultation and let's talk about what you want to achieve.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "book.html",
+              "text": "Book a Free Consultation",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-btn"]
+    }
+  },
+  "widgetsOrder": ["trainer_opener", "credentials", "philosophy", "featured_client", "about_cta"]
+}

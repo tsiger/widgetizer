@@ -1,0 +1,296 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "id": "index",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "hero_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "overlay_color": "#1412108f",
+        "top_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Personal Training</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "No Excuses. Just Results.",
+            "size": "7xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Private 1-on-1 coaching for people serious about change.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "book.html",
+              "text": "Book a Session",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "results.html",
+              "text": "See Results",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-btn"]
+    },
+    "scrolling_strip": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "STRENGTH · DISCIPLINE · RESULTS",
+        "separator": "",
+        "speed": 7,
+        "rotate": 0,
+        "font_size": "md",
+        "bg_color": "#c47a20",
+        "text_color": "#ffffff",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "proof_stats": {
+      "type": "key-figures",
+      "settings": {
+        "title": "The Track Record",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary",
+        "animate": true
+      },
+      "blocks": {
+        "stat-years": {
+          "type": "figure",
+          "settings": {
+            "number": "8",
+            "suffix": "+",
+            "label": "Years Coaching"
+          }
+        },
+        "stat-clients": {
+          "type": "figure",
+          "settings": {
+            "number": "200",
+            "suffix": "+",
+            "label": "Clients Transformed"
+          }
+        },
+        "stat-rating": {
+          "type": "figure",
+          "settings": {
+            "number": "4.9",
+            "suffix": "/5",
+            "label": "Client Rating"
+          }
+        },
+        "stat-retention": {
+          "type": "figure",
+          "settings": {
+            "number": "92",
+            "suffix": "%",
+            "label": "Retention Rate"
+          }
+        }
+      },
+      "blocksOrder": ["stat-years", "stat-clients", "stat-rating", "stat-retention"]
+    },
+    "trainer_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-secondary",
+        "content_color_scheme": "none"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Meet Your Coach</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Built Around You. Driven by Results.",
+            "size": "3xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Private training isn't just about showing up — it's about a plan that fits your body, your schedule, and your goals. Every session is designed to push you forward without wasting a single rep.</p>",
+            "size": "base"
+          }
+        },
+        "intro-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ 1-on-1 sessions only\n+ Fully personalised programming\n+ Weekly progress check-ins\n+ Nutrition guidance included"
+          }
+        },
+        "intro-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "about.html",
+              "text": "About Me",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body", "intro-features", "intro-cta"]
+    },
+    "programs": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "Programs",
+        "eyebrow_uppercase": true,
+        "title": "How We Train",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "service-1": {
+          "type": "service",
+          "settings": {
+            "title": "1-on-1 Personal Training",
+            "description": "<p>Private in-person sessions built around your goals, fitness level, and schedule. Complete focus, complete accountability. No shared floor time.</p>"
+          }
+        },
+        "service-2": {
+          "type": "service",
+          "settings": {
+            "title": "Online Coaching",
+            "description": "<p>Full remote programming, weekly check-ins, and direct messaging — wherever you train. The same precision as in-person, without the commute.</p>"
+          }
+        },
+        "service-3": {
+          "type": "service",
+          "settings": {
+            "title": "12-Week Transformation",
+            "description": "<p>A structured programme combining training, nutrition, and accountability for a full physical overhaul. Built for people who are ready to commit.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["service-1", "service-2", "service-3"]
+    },
+    "social_proof": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client Results",
+        "eyebrow_uppercase": true,
+        "title": "They Committed. They Changed.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "I lost 14 kg in 12 weeks. I've tried everything else. This is the only thing that actually worked.",
+            "name": "James K.",
+            "title": "1-on-1 Client",
+            "rating": ""
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Not just the physical change — my energy, sleep, mindset. Everything shifted. Best investment I've ever made in myself.",
+            "name": "Marcus L.",
+            "title": "Online Coaching Client",
+            "rating": ""
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "He doesn't let you settle for less than your best. Brutal and brilliant. I'm down 20 kg and still going.",
+            "name": "Tom D.",
+            "title": "12-Week Programme",
+            "rating": ""
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "home_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Commit?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Limited spots available. First consultation is free.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-btn": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "book.html",
+              "text": "Book Your Free Session",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-btn"]
+    }
+  },
+  "widgetsOrder": ["hero_banner", "scrolling_strip", "proof_stats", "trainer_intro", "programs", "social_proof", "home_cta"]
+}

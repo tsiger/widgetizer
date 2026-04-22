@@ -1,0 +1,10 @@
+{
+  "id": "footer-menu",
+  "name": "Footer Menu",
+  "items": [
+    { "label": "Training", "link": "training.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Results", "link": "results.html", "items": [] },
+    { "label": "Book a Session", "link": "book.html", "items": [] }
+  ]
+}

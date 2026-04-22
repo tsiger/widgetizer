@@ -21,7 +21,7 @@
 | 13 | hearthstone | Hearthstone | Hotel / B&B | DONE |
 | 14 | hue-and-co | Hue & Co | Interior Designer |  |
 | 15 | inkwell | Inkwell | Tattoo Studio | DONE |
-| 16 | ironform | Ironform | Personal Trainer |  |
+| 16 | ironform | Ironform | Personal Trainer | DONE |
 | 17 | keystoned | Keystoned | Real Estate Agent | DONE |
 | 18 | ledgerworks | Ledgerworks | Accountant | DONE |
 | 19 | little-oaks | Little Oaks | Daycare / Preschool | DONE |

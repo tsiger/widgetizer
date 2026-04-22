@@ -67,6 +67,12 @@
       "liveDemo": "https://widgetizer.org/demos/hearthstone/"
     },
     {
+      "id": "ironform",
+      "name": "Ironform",
+      "description": "Personal trainer",
+      "liveDemo": "https://widgetizer.org/demos/ironform/"
+    },
+    {
       "id": "inkwell",
       "name": "Inkwell",
       "description": "Tattoo studio",
