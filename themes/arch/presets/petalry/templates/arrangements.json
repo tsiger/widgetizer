@@ -1,0 +1,204 @@
+{
+  "name": "Arrangements",
+  "slug": "arrangements",
+  "id": "arrangements",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "page_header": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "page-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Arrangements",
+            "size": "5xl"
+          }
+        },
+        "page-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Handcrafted bouquets and floral designs, made fresh with seasonal blooms.</p>",
+            "size": "lg",
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["page-heading", "page-text"]
+    },
+    "bouquets": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Ready to Give",
+        "title": "Fresh Bouquets",
+        "layout": "two-column",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "item-petite": {
+          "type": "item",
+          "settings": {
+            "name": "Petite Bouquet",
+            "description": "<p>A small, sweet arrangement of seasonal blooms. Perfect for a desk, a thank-you, or just because.</p>",
+            "price": "From $45"
+          }
+        },
+        "item-classic": {
+          "type": "item",
+          "settings": {
+            "name": "Classic Arrangement",
+            "description": "<p>Our most popular bouquet — generous, balanced, and full of seasonal colour. Ready to give immediately.</p>",
+            "price": "From $85"
+          }
+        },
+        "item-statement": {
+          "type": "item",
+          "settings": {
+            "name": "Statement Bouquet",
+            "description": "<p>A full, lush arrangement designed to make an impression. Ideal for birthdays and celebrations.</p>",
+            "price": "From $130"
+          }
+        },
+        "item-luxury": {
+          "type": "item",
+          "settings": {
+            "name": "Luxury Arrangement",
+            "description": "<p>Premium seasonal blooms in a large, sculptural composition. Our highest-tier ready-made design.</p>",
+            "price": "From $220"
+          }
+        }
+      },
+      "blocksOrder": ["item-petite", "item-classic", "item-statement", "item-luxury"]
+    },
+    "seasonal_collection": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "In Season",
+        "title": "Seasonal Highlights",
+        "description": "These change with the seasons. Ask us what's freshest right now.",
+        "layout": "single-column",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "item-dahlia": {
+          "type": "item",
+          "settings": {
+            "name": "Dahlia Collection",
+            "description": "<p>Seasonal dahlias in deep jewel tones. Available late summer through autumn.</p>",
+            "price": "From $95"
+          }
+        },
+        "item-peony": {
+          "type": "item",
+          "settings": {
+            "name": "Peony Bouquet",
+            "description": "<p>Soft, full peonies in blush and white. Available in late spring for a limited time.</p>",
+            "price": "From $110"
+          }
+        },
+        "item-tulip": {
+          "type": "item",
+          "settings": {
+            "name": "Spring Tulips",
+            "description": "<p>Classic tulips in a range of colours — bold, cheerful, and perfect for the season.</p>",
+            "price": "From $65"
+          }
+        }
+      },
+      "blocksOrder": ["item-dahlia", "item-peony", "item-tulip"]
+    },
+    "gallery_section": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "Our Work",
+        "title": "Recent Arrangements",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "staggered": true,
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "caption": "Spring Bridal Bouquet"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "caption": "Seasonal Statement Arrangement"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "caption": "Corporate Lobby Display"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "caption": "Birthday Celebration Bouquet"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "caption": "Sympathy Arrangement"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "caption": "Dahlia Autumn Collection"
+          }
+        }
+      },
+      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+    },
+    "custom_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Need a Custom Arrangement?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Have something specific in mind? We love creating bespoke designs for special occasions.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Request a Custom Order",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_header", "bouquets", "seasonal_collection", "gallery_section", "custom_cta"]
+}

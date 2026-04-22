@@ -1,0 +1,279 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "id": "index",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "hero_banner": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Handcrafted with seasonal blooms</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Flowers for Every Moment",
+            "size": "6xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From everyday bouquets to wedding florals — we create arrangements as unique as the moments they celebrate.</p>",
+            "size": "lg",
+            "muted": false
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "arrangements.html",
+              "text": "Shop Arrangements",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "events.html",
+              "text": "Plan an Event",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+    },
+    "welcome_strip": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "freshly cut flowers · handcrafted bouquets · same-day delivery · weddings & events · seasonal collections",
+        "separator": "★",
+        "bg_color": "#b85c5c",
+        "text_color": "#ffffff",
+        "top_spacing": "none",
+        "bottom_spacing": "none",
+        "rotate": 0,
+        "speed": 3
+      }
+    },
+    "collection_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Shop by Occasion",
+        "title": "Flowers for Every Moment",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "center",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "card-wedding": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Romance",
+            "title": "Weddings",
+            "description": "<p>Ceremonial arrangements, bridal bouquets, and full event florals for your perfect day.</p>"
+          }
+        },
+        "card-birthday": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Celebration",
+            "title": "Birthdays",
+            "description": "<p>Bright, joyful bouquets to mark another year of life and the people who fill it.</p>"
+          }
+        },
+        "card-sympathy": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Tribute",
+            "title": "Sympathy",
+            "description": "<p>Gentle, meaningful arrangements to express condolences and honour those we love.</p>"
+          }
+        },
+        "card-corporate": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Professional",
+            "title": "Corporate",
+            "description": "<p>Lobby displays, meeting room arrangements, and gifts that reflect your brand.</p>"
+          }
+        },
+        "card-seasonal": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Seasonal",
+            "title": "Seasonal Collections",
+            "description": "<p>Limited-edition arrangements built around what's freshest and most beautiful right now.</p>"
+          }
+        },
+        "card-everyday": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Everyday",
+            "title": "Just Because",
+            "description": "<p>Sometimes the best occasion is no occasion at all. Fresh blooms for any moment of the week.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["card-wedding", "card-birthday", "card-sympathy", "card-corporate", "card-seasonal", "card-everyday"]
+    },
+    "story_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Studio</p>",
+            "size": "sm",
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "More Than Flowers",
+            "size": "3xl"
+          }
+        },
+        "story-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We're a small studio built on a simple belief: flowers should feel personal. Every arrangement we make starts with a conversation about the moment you're celebrating — and ends with something that feels exactly right.</p>",
+            "size": "base"
+          }
+        },
+        "story-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "about.html",
+              "text": "Our Story",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text", "story-button"]
+    },
+    "testimonials_section": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Happy Clients",
+        "title": "Loved by Our Customers",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "The bridal bouquet was everything I dreamed of. They listened to every detail and delivered something that made me cry happy tears.",
+            "name": "Sophia R.",
+            "title": "Bride",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "I order a standing arrangement every week for our reception desk. Always fresh, always stunning, and always on time.",
+            "name": "Marcus L.",
+            "title": "Office Manager",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Ordered a sympathy arrangement on short notice. They were kind, thoughtful, and created something truly beautiful for a difficult moment.",
+            "name": "Diane K.",
+            "title": "Customer",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "seasonal_countdown": {
+      "type": "countdown",
+      "settings": {
+        "eyebrow": "Coming Soon",
+        "title": "Mother's Day Collection",
+        "description": "Our most-loved seasonal arrangements, ready to order before they sell out.",
+        "target_date": "2027-05-10 00:00",
+        "expired_message": "Mother's Day Collection is here — shop now.",
+        "text": "<p>Pre-order now and guarantee your arrangement. Free same-day delivery on Mother's Day.</p>",
+        "button": {
+          "href": "contact.html",
+          "text": "Pre-Order Now",
+          "target": "_self"
+        },
+        "show_seconds": false,
+        "style": "minimal",
+        "color_scheme": "standard-secondary"
+      }
+    },
+    "order_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Create Something Beautiful?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us about your occasion and we'll take care of the rest.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Get in Touch",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["hero_banner", "welcome_strip", "collection_grid", "story_section", "testimonials_section", "seasonal_countdown", "order_cta"]
+}

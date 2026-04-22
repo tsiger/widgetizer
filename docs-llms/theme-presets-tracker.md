@@ -28,7 +28,7 @@
 | 20 | noteworthy | Noteworthy | Tutoring / Music Lessons |  |
 | 21 | olympic | Olympic | Gym | DONE |
 | 22 | pawlish | Pawlish | Pet Grooming |  |
-| 23 | petalry | Petalry | Flower Shop |  |
+| 23 | petalry | Petalry | Flower Shop | DONE |
 | 24 | pipeworks | Pipeworks | Plumber | DONE |
 | 25 | pixelcraft | Pixelcraft | Graphic Designer | DONE |
 | 26 | saffron | Saffron | Restaurant | DONE |

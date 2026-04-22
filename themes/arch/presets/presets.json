@@ -97,6 +97,12 @@
       "liveDemo": "https://widgetizer.org/demos/olympic/"
     },
     {
+      "id": "petalry",
+      "name": "Petalry",
+      "description": "Flower shop",
+      "liveDemo": "https://widgetizer.org/demos/petalry/"
+    },
+    {
       "id": "pipeworks",
       "name": "Pipeworks",
       "description": "Plumber",

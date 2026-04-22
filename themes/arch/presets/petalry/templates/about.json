@@ -1,0 +1,191 @@
+{
+  "name": "About",
+  "slug": "about",
+  "id": "about",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "page_header": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "page-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Story",
+            "size": "5xl"
+          }
+        },
+        "page-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A small studio with a big passion for flowers and the moments they mark.</p>",
+            "size": "lg",
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["page-heading", "page-text"]
+    },
+    "story_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "story-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How It Started</p>",
+            "size": "sm",
+            "muted": true
+          }
+        },
+        "story-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Rooted in a Love for Flowers",
+            "size": "3xl"
+          }
+        },
+        "story-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Petalry started in a small studio with a market stall, a bucket of seasonal blooms, and a belief that every arrangement should feel intentional. Not just pretty — but specific to the person who receives it.</p>",
+            "size": "base"
+          }
+        },
+        "story-text-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Today we work with couples, families, and businesses across the city. Our approach hasn't changed: we listen first, then we build something around what we hear.</p>",
+            "size": "base"
+          }
+        }
+      },
+      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+    },
+    "studio_figures": {
+      "type": "key-figures",
+      "settings": {
+        "title": "By the Numbers",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "fig-years": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "suffix": "+",
+            "label": "Years in Business",
+            "description": "Serving our community since 2013"
+          }
+        },
+        "fig-arrangements": {
+          "type": "figure",
+          "settings": {
+            "number": "8000",
+            "suffix": "+",
+            "label": "Arrangements Created",
+            "description": "Each one made by hand"
+          }
+        },
+        "fig-events": {
+          "type": "figure",
+          "settings": {
+            "number": "400",
+            "suffix": "+",
+            "label": "Events Styled",
+            "description": "Weddings, galas, and everything in between"
+          }
+        }
+      },
+      "blocksOrder": ["fig-years", "fig-arrangements", "fig-events"]
+    },
+    "community_testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Community Love",
+        "title": "What Our Clients Say",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "They've been our go-to florist for five years. Every arrangement is better than the last.",
+            "name": "Claire V.",
+            "title": "Loyal Customer",
+            "rating": "5"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "I hired them for our daughter's wedding. The venue looked like something out of a film. Absolutely stunning work.",
+            "name": "Robert M.",
+            "title": "Father of the Bride",
+            "rating": "5"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Small studio, big heart. They put so much care into every arrangement. You can feel it when you hold the flowers.",
+            "name": "Yuki N.",
+            "title": "Regular Client",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's Create Something Together",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Whether it's a single bouquet or a full event, we'd love to hear about your occasion.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Get in Touch",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_header", "story_section", "studio_figures", "community_testimonials", "about_cta"]
+}

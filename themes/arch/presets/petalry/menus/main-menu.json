@@ -1,0 +1,11 @@
+{
+  "id": "main-menu",
+  "name": "Main Menu",
+  "items": [
+    { "label": "Home", "link": "index.html", "items": [] },
+    { "label": "Arrangements", "link": "arrangements.html", "items": [] },
+    { "label": "Events", "link": "events.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}

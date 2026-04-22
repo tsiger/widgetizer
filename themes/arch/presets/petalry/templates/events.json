@@ -1,0 +1,292 @@
+{
+  "name": "Events",
+  "slug": "events",
+  "id": "events",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "page_header": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "page-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Weddings · Birthdays · Corporate</p>",
+            "size": "sm",
+            "muted": false
+          }
+        },
+        "page-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Flowers for Every Occasion",
+            "size": "5xl"
+          }
+        },
+        "page-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From intimate gatherings to grand celebrations, we create florals that bring your vision to life.</p>",
+            "size": "lg",
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["page-eyebrow", "page-heading", "page-text"]
+    },
+    "intro_text": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Every Event Deserves Beautiful Flowers",
+            "size": "3xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We work closely with event planners, couples, and businesses to create custom floral designs. Whether you need a single centrepiece or an entire venue dressed in flowers, we handle every detail with care.</p>",
+            "size": "lg"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Start Planning",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-text", "intro-button"]
+    },
+    "occasions_grid": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Our Specialties",
+        "title": "What We Create",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "card-weddings": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Weddings",
+            "title": "Bridal Florals",
+            "description": "<p>Bouquets, boutonnieres, centrepieces, ceremony arches, and full venue styling.</p>"
+          }
+        },
+        "card-corporate": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Corporate",
+            "title": "Business Events",
+            "description": "<p>Conference table arrangements, product launches, galas, and standing weekly orders.</p>"
+          }
+        },
+        "card-birthday": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Birthdays",
+            "title": "Birthday Florals",
+            "description": "<p>Bold, joyful arrangements designed to celebrate. From surprise deliveries to party table setups.</p>"
+          }
+        },
+        "card-sympathy": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Remembrance",
+            "title": "Sympathy & Funerals",
+            "description": "<p>Thoughtful, dignified arrangements to honour a life and support those who grieve.</p>"
+          }
+        },
+        "card-baby": {
+          "type": "card",
+          "settings": {
+            "subtitle": "New Arrivals",
+            "title": "Baby Showers",
+            "description": "<p>Sweet, soft florals to welcome new life. Pastel bouquets and gift arrangements with a personal touch.</p>"
+          }
+        },
+        "card-seasonal": {
+          "type": "card",
+          "settings": {
+            "subtitle": "Seasonal",
+            "title": "Holiday & Seasonal",
+            "description": "<p>Valentine's, Mother's Day, Christmas — seasonal collections that make the moment unforgettable.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["card-weddings", "card-corporate", "card-birthday", "card-sympathy", "card-baby", "card-seasonal"]
+    },
+    "event_dates": {
+      "type": "event-list",
+      "settings": {
+        "eyebrow": "Seasonal Calendar",
+        "title": "Key Dates & Collections",
+        "description": "We offer special seasonal collections for the most meaningful occasions of the year.",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "event-valentines": {
+          "type": "event",
+          "settings": {
+            "day": "14",
+            "month": "Feb",
+            "title": "Valentine's Day Collection",
+            "location": "Pre-order open from January · Limited availability",
+            "description": "<p>Roses, ranunculus, and romantic arrangements for the most heartfelt day of the year. Reserve early.</p>",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Pre-Order",
+              "target": "_self"
+            }
+          }
+        },
+        "event-mothers": {
+          "type": "event",
+          "settings": {
+            "day": "11",
+            "month": "May",
+            "title": "Mother's Day Collection",
+            "location": "Pre-order open from April · Sold out fast",
+            "description": "<p>Our most popular seasonal collection. Soft peonies, garden roses, and bloom-heavy bouquets to celebrate the women who matter most.</p>",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Pre-Order",
+              "target": "_self"
+            }
+          }
+        },
+        "event-wedding": {
+          "type": "event",
+          "settings": {
+            "day": "1",
+            "month": "Jun",
+            "title": "Wedding Season Opens",
+            "location": "Consultations available from February",
+            "description": "<p>Peak wedding season runs June through September. Book your consultation early to secure your date.</p>",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Book a Consult",
+              "target": "_self"
+            }
+          }
+        },
+        "event-christmas": {
+          "type": "event",
+          "settings": {
+            "day": "1",
+            "month": "Dec",
+            "title": "Christmas & Holiday Collection",
+            "location": "Pre-order open from November",
+            "description": "<p>Festive wreaths, centrepieces, and gift bouquets for the most wonderful time of year.</p>",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Pre-Order",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["event-valentines", "event-mothers", "event-wedding", "event-christmas"]
+    },
+    "testimonials_events": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Client Stories",
+        "title": "Memories We've Helped Create",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "quote-wedding": {
+          "type": "quote",
+          "settings": {
+            "quote": "Our wedding flowers were absolutely breathtaking. They understood our vision perfectly and the centrepieces brought the whole room together.",
+            "name": "Emma & James T.",
+            "title": "Wedding Clients",
+            "rating": "5"
+          }
+        },
+        "quote-corporate": {
+          "type": "quote",
+          "settings": {
+            "quote": "We've used them for our monthly office arrangements for two years. Consistently beautiful work, always delivered on time.",
+            "name": "Patricia H.",
+            "title": "Events Director",
+            "rating": "5"
+          }
+        },
+        "quote-birthday": {
+          "type": "quote",
+          "settings": {
+            "quote": "Commissioned a surprise arrangement for my mother's 70th birthday. She cried. I cried. The flowers were perfect.",
+            "name": "Tom B.",
+            "title": "Birthday Client",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote-wedding", "quote-corporate", "quote-birthday"]
+    },
+    "events_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Planning a Special Event?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Get in touch to discuss your vision and we'll create something that exceeds it.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Request a Consultation",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_header", "intro_text", "occasions_grid", "event_dates", "testimonials_events", "events_cta"]
+}

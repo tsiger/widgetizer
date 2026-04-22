@@ -1,0 +1,19 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Petalry",
+    "contactDetailsLine1": "(555) 012-3456",
+    "contactDetailsLine2": "Mon–Sat 9am–6pm",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Order Now",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

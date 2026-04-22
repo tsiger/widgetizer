@@ -1,0 +1,121 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "id": "contact",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z",
+  "widgets": {
+    "page_header": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "page-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get in Touch",
+            "size": "5xl"
+          }
+        },
+        "page-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'd love to hear about your occasion. Contact us to order, ask a question, or book a consultation.</p>",
+            "size": "lg",
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["page-heading", "page-text"]
+    },
+    "contact_info": {
+      "type": "contact-details",
+      "settings": {
+        "layout": "equal",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "info-1": {
+          "type": "info",
+          "settings": {
+            "title": "Petalry",
+            "text": "<p>A small floral studio creating handcrafted bouquets and event florals for every occasion.</p><p>hello@example.com</p><p>(555) 012-3456</p>"
+          }
+        },
+        "hours-1": {
+          "type": "text_block",
+          "settings": {
+            "title": "Studio Hours",
+            "text": "<p>Monday – Friday: 9am – 6pm</p><p>Saturday: 9am – 5pm</p><p>Sunday: Closed</p>"
+          }
+        },
+        "visit-1": {
+          "type": "text_block",
+          "settings": {
+            "title": "Visit Us",
+            "text": "<p>123 Blossom Street</p><p>Your City, State 00000</p><p>Free parking available on-site.</p>"
+          }
+        },
+        "social-1": {
+          "type": "social_block",
+          "settings": {
+            "title": "Follow Along"
+          }
+        }
+      },
+      "blocksOrder": ["info-1", "hours-1", "visit-1", "social-1"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Questions",
+        "title": "Frequently Asked",
+        "style": "separated",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "q-same-day": {
+          "type": "item",
+          "settings": {
+            "question": "Do you offer same-day delivery?",
+            "answer": "<p>Yes, we offer same-day delivery for orders placed before 11am. Delivery is available within our local area. Contact us to confirm availability.</p>"
+          }
+        },
+        "q-custom": {
+          "type": "item",
+          "settings": {
+            "question": "Can I request a custom arrangement?",
+            "answer": "<p>Absolutely. We love creating bespoke designs. Just tell us your occasion, preferred colours, and any flowers you love or want to avoid — we'll take it from there.</p>"
+          }
+        },
+        "q-event": {
+          "type": "item",
+          "settings": {
+            "question": "How far in advance should I book for a wedding or large event?",
+            "answer": "<p>We recommend booking at least 3–6 months in advance for weddings and large events, especially for peak season dates (May–September). Get in touch as early as possible to secure your date.</p>"
+          }
+        },
+        "q-preorder": {
+          "type": "item",
+          "settings": {
+            "question": "Can I pre-order seasonal collections?",
+            "answer": "<p>Yes. Seasonal collections like our Valentine's Day and Mother's Day ranges are available to pre-order. Follow us on social media to be the first to know when pre-orders open.</p>"
+          }
+        },
+        "sidebar-contact": {
+          "type": "info",
+          "settings": {
+            "title": "Still Have Questions?",
+            "text": "<p>hello@example.com</p><p>(555) 012-3456</p>"
+          }
+        }
+      },
+      "blocksOrder": ["q-same-day", "q-custom", "q-event", "q-preorder", "sidebar-contact"]
+    }
+  },
+  "widgetsOrder": ["page_header", "contact_info", "faq"]
+}
