@@ -1,0 +1,411 @@
+{
+  "name": "Rooms",
+  "slug": "rooms",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#08264599",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Rooms</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Six rooms. Each different. Each quiet.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>All six are open April through October. Every room has a sea view, a private bath, and no television.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "intro_split": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Picking a room</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every room has a sea view, a private bath, hand-washed linen, and no television. They differ in size, shape, and what you hear from the window — mornings in the garden, afternoons from the harbor, nights from the cicadas in the olive trees. Rates are per night, breakfast included.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-body"
+      ]
+    },
+    "all_rooms": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "All six",
+        "eyebrow_uppercase": true,
+        "title": "Every room.",
+        "description": "Rates shown are low-season starting rates. June through August is 20–30% higher; we'll quote exactly for your dates.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "rm-olive": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From €240 · sleeps 2",
+            "title": "Olive",
+            "description": "<p>Our flagship room. Corner of the villa with two windows, a stone terrace of its own, and the best light in the house at golden hour.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        },
+        "rm-fig": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From €195 · sleeps 2",
+            "title": "Fig",
+            "description": "<p>Overlooking the walled garden. A slightly smaller room with a window that opens over the fig tree it's named for. Quiet at all hours.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        },
+        "rm-jasmine": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From €215 · sleeps 2",
+            "title": "Jasmine",
+            "description": "<p>A stone terrace sheltered by jasmine and bougainvillea. A small writing desk by the window. Our favorite room for slow mornings.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        },
+        "rm-thyme": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From €180 · sleeps 2",
+            "title": "Thyme",
+            "description": "<p>Ground-floor room opening straight onto the garden path. Shadier and cooler than the upstairs rooms — perfect for July and August.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        },
+        "rm-sage": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From €185 · sleeps 2",
+            "title": "Sage",
+            "description": "<p>Overlooking the olive orchard. A single large window, a hand-built stone bench below it, and the widest bed in the villa.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        },
+        "rm-lemon": {
+          "type": "card",
+          "settings": {
+            "subtitle": "From €170 · sleeps 2",
+            "title": "Lemon",
+            "description": "<p>Our smallest room and most affordable. Sun-washed all afternoon, with a small balcony that looks down into the lemon tree.</p>",
+            "button_link": {
+              "text": "Learn more",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "rm-olive",
+        "rm-fig",
+        "rm-jasmine",
+        "rm-thyme",
+        "rm-sage",
+        "rm-lemon"
+      ]
+    },
+    "featured_jasmine": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fj-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our favorite</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "fj-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The Jasmine Room.",
+            "size": "4xl"
+          }
+        },
+        "fj-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tucked into the east corner of the villa with its own small stone terrace, sheltered by climbing jasmine on one side and bougainvillea on the other. In the morning the light is cool and filtered; by four in the afternoon the terrace is a warm pool of gold.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fj-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inside: a king bed with hand-washed linen, a small writing desk by the window, hand-thrown ceramic tiles we commissioned from a potter in Lefkes, and nothing else. No television, no minibar, no in-room coffee machine. We bring you coffee if you ring the small bell on the desk.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fj-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Stone terrace with sea view\n+ Hand-washed linen king bed\n+ Writing desk by the window\n+ Hand-thrown ceramic tile detail"
+          }
+        },
+        "fj-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Jasmine",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "link_2": {
+              "text": "Learn more",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            },
+            "style_2": "secondary"
+          }
+        }
+      },
+      "blocksOrder": [
+        "fj-eyebrow",
+        "fj-heading",
+        "fj-body-1",
+        "fj-body-2",
+        "fj-features",
+        "fj-button"
+      ]
+    },
+    "rooms_faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you book.",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "item",
+          "settings": {
+            "question": "What's included in the rate?",
+            "answer": "<p>The room, breakfast every morning, Wi-Fi, parking, and the use of the pool and the walled garden. Airport transfer and extras like bikes or a boat day are arranged separately — you'll find those on the Nearby page.</p>"
+          }
+        },
+        "q-2": {
+          "type": "item",
+          "settings": {
+            "question": "How does the deposit work?",
+            "answer": "<p>30% deposit at booking, balance on arrival. The deposit is refundable up to 30 days before your stay, non-refundable after that. Booking is by email — no third-party platforms, no surprise fees.</p>"
+          }
+        },
+        "q-3": {
+          "type": "item",
+          "settings": {
+            "question": "Cancellation policy",
+            "answer": "<p>Full refund up to 30 days before arrival. 50% refund between 30 and 14 days. No refund inside 14 days, but we'll happily move the booking to another week in the same season if there's availability.</p>"
+          }
+        },
+        "q-4": {
+          "type": "item",
+          "settings": {
+            "question": "Pets",
+            "answer": "<p>Yes, with notice. The Thyme and Sage rooms both open directly to the garden and are the easiest for dogs. No charge, but we ask for a note at booking so we can prepare the room without rugs and with an extra water bowl.</p>"
+          }
+        },
+        "q-5": {
+          "type": "item",
+          "settings": {
+            "question": "Single-night stays",
+            "answer": "<p>We prefer three-night minimums in July and August, two-night minimums in June and September, and happy with single nights in April, May, and October. If you're doing a one-night stopover mid-season, ask us anyway — we usually find a way.</p>"
+          }
+        },
+        "q-6": {
+          "type": "item",
+          "settings": {
+            "question": "Can we book two rooms next to each other?",
+            "answer": "<p>Olive and Jasmine share the east terrace; Fig and Sage are both on the garden side upstairs; Thyme and Lemon open to the same section of the garden downstairs. Tell us the configuration you need and we'll confirm availability for both.</p>"
+          }
+        },
+        "q-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Ready to ask?",
+            "text": "<p>hello@example.com</p><p>We reply within a day, usually faster</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4",
+        "q-5",
+        "q-6",
+        "q-sidebar"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready when you are.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us the dates and how many guests. We'll send a real quote within a day.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check availability",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the villa",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "intro_split",
+    "all_rooms",
+    "featured_jasmine",
+    "rooms_faqs",
+    "closing_cta"
+  ],
+  "id": "rooms",
+  "created": "2026-04-21T16:00:00.000Z",
+  "updated": "2026-04-21T18:00:00.000Z"
+}

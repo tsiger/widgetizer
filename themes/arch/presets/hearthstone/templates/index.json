@@ -1,0 +1,558 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#08264599",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-rating": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
+        },
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Paros, Greece · Six rooms · 4.9 on Google</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A small stone villa on the Aegean.",
+            "size": "8xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Built in 1870. Quietly restored in 2013. Run by the same family who've always owned it, now taking guests April through October.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check availability",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the rooms",
+              "href": "rooms.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-rating",
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
+    },
+    "intro_split": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Six rooms, a walled garden, a stone terrace with a sea view, and breakfast from what's ripe in the orchard that week. We look after everything ourselves because that's the only way it stays the way we want it.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Since 2014.",
+            "size": "5xl",
+            "position": "left"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-body",
+        "intro-heading"
+      ]
+    },
+    "featured_rooms": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "The rooms",
+        "eyebrow_uppercase": true,
+        "title": "Three to start with.",
+        "description": "",
+        "heading_alignment": "start",
+        "gap": "var(--space-md)",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "br-olive": {
+          "type": "item",
+          "settings": {
+            "title": "Olive",
+            "text": "From €240 · sea view · sleeps 2",
+            "overlay_color": "#08264566",
+            "col_span": 2,
+            "row_span": 2,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Book Olive",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        },
+        "br-fig": {
+          "type": "item",
+          "settings": {
+            "title": "Fig",
+            "text": "From €195 · garden view · sleeps 2",
+            "overlay_color": "#08264566",
+            "col_span": 2,
+            "row_span": 1,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Book Fig",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        },
+        "br-jasmine": {
+          "type": "item",
+          "settings": {
+            "title": "Jasmine",
+            "text": "From €215 · stone terrace · sleeps 2",
+            "overlay_color": "#08264566",
+            "col_span": 2,
+            "row_span": 1,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Book Jasmine",
+              "href": "room-jasmine.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "br-olive",
+        "br-fig",
+        "br-jasmine"
+      ]
+    },
+    "terrace_moment": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "right",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tm-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "left"
+          }
+        },
+        "tm-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Breakfast</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "tm-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Fresh eggs, warm bread, the olives from our neighbor's tree.",
+            "size": "5xl",
+            "position": "right"
+          }
+        },
+        "tm-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Breakfast is served on the stone terrace every morning from seven until ten. Whatever's ripe in the orchard, fresh bread we walk down for, eggs from the four hens we keep, yogurt and honey and fruit. No buffet. No schedule. Just what we'd make for ourselves.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "tm-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>On windy days we serve inside the small dining room. On still days most guests stay out there until late morning, reading or drawing or just watching the light move.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "tm-image",
+        "tm-eyebrow",
+        "tm-heading",
+        "tm-body-1",
+        "tm-body-2"
+      ]
+    },
+    "amenities": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "What's included",
+        "eyebrow_uppercase": true,
+        "title": "Every room, every stay.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "am-breakfast": {
+          "type": "item",
+          "settings": {
+            "icon": "chef-hat",
+            "title": "Breakfast",
+            "description": "Home-cooked, every morning"
+          }
+        },
+        "am-seaview": {
+          "type": "item",
+          "settings": {
+            "icon": "beach",
+            "title": "Sea view",
+            "description": "Every room, every window"
+          }
+        },
+        "am-pool": {
+          "type": "item",
+          "settings": {
+            "icon": "pool",
+            "title": "Pool",
+            "description": "Heated, open all season"
+          }
+        },
+        "am-bikes": {
+          "type": "item",
+          "settings": {
+            "icon": "bike",
+            "title": "Bikes",
+            "description": "Free to borrow, any day"
+          }
+        },
+        "am-wifi": {
+          "type": "item",
+          "settings": {
+            "icon": "wifi",
+            "title": "Wi-Fi",
+            "description": "Fast, through the whole villa"
+          }
+        },
+        "am-transfer": {
+          "type": "item",
+          "settings": {
+            "icon": "car",
+            "title": "Airport transfer",
+            "description": "Arranged on request"
+          }
+        },
+        "am-garden": {
+          "type": "item",
+          "settings": {
+            "icon": "tree",
+            "title": "Walled garden",
+            "description": "Olive, fig, jasmine, lemon"
+          }
+        },
+        "am-ac": {
+          "type": "item",
+          "settings": {
+            "icon": "snowflake",
+            "title": "Air conditioning",
+            "description": "Silent, in every room"
+          }
+        }
+      },
+      "blocksOrder": [
+        "am-breakfast",
+        "am-seaview",
+        "am-pool",
+        "am-bikes",
+        "am-wifi",
+        "am-transfer",
+        "am-garden",
+        "am-ac"
+      ]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "From guests",
+        "eyebrow_uppercase": true,
+        "title": "What people say.",
+        "heading_alignment": "center",
+        "layout": "carousel",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "We went for four days in June for our honeymoon and stayed five. Eleni made us breakfast on the terrace every morning, Yannis walked us to the beach the first day so we wouldn't get lost, and the Olive room had the best light I've ever slept in. We'll be back.",
+            "name": "Clara & Tomás",
+            "title": "Four days · June honeymoon",
+            "rating": "5"
+          }
+        },
+        "r-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Exactly what you hope a small Greek-island hotel will be. No televisions, no buffet, no staff in uniforms. Just a family who's been doing this for a decade and a house that's been in the family since 1870. We left with a bottle of their olive oil and a recipe for something we'd had at breakfast.",
+            "name": "Hannes & Mira",
+            "title": "A week in September · Berlin",
+            "rating": "5"
+          }
+        },
+        "r-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "I went alone to work on a book for a week. Eleni let me take breakfast up to my room most mornings, Yannis pointed me to a walk along the Byzantine road that changed how I write about the sea. The Jasmine room has a small desk by a window where I wrote more than I have anywhere else.",
+            "name": "Alice R.",
+            "title": "Writing week · May",
+            "rating": "5"
+          }
+        },
+        "r-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "We've stayed three times now, once with friends and twice on our own, and it just keeps getting quieter and better. They've added the pool since we first visited and we still haven't used it once — we're always on the terrace or in the garden.",
+            "name": "Sophie & Jean-Luc",
+            "title": "Three visits · Paris",
+            "rating": "5"
+          }
+        },
+        "r-5": {
+          "type": "quote",
+          "settings": {
+            "quote": "Booked direct after finding the site on a friend's recommendation. Saved about 15% versus Booking.com, which in itself paid for a really good dinner. But the real value is that when we had a question at 11pm the night before arrival, Yannis answered in five minutes. That's the whole pitch.",
+            "name": "Andrew K.",
+            "title": "Anniversary trip · October",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "r-1",
+        "r-2",
+        "r-3",
+        "r-4",
+        "r-5"
+      ]
+    },
+    "gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "g-01": {
+          "type": "item",
+          "settings": {
+            "title": "The villa at golden hour",
+            "category": "Exterior"
+          }
+        },
+        "g-02": {
+          "type": "item",
+          "settings": {
+            "title": "Breakfast on the terrace",
+            "category": "Mornings"
+          }
+        },
+        "g-03": {
+          "type": "item",
+          "settings": {
+            "title": "A corner of the Olive room",
+            "category": "Rooms"
+          }
+        },
+        "g-04": {
+          "type": "item",
+          "settings": {
+            "title": "Naoussa harbor at dusk",
+            "category": "Around Paros"
+          }
+        },
+        "g-05": {
+          "type": "item",
+          "settings": {
+            "title": "Olives from the orchard",
+            "category": "The garden"
+          }
+        },
+        "g-06": {
+          "type": "item",
+          "settings": {
+            "title": "The pool in mid-afternoon",
+            "category": "The villa"
+          }
+        },
+        "g-07": {
+          "type": "item",
+          "settings": {
+            "title": "Ceramic tiles in the Jasmine room",
+            "category": "Details"
+          }
+        },
+        "g-08": {
+          "type": "item",
+          "settings": {
+            "title": "Pouring the morning coffee",
+            "category": "Mornings"
+          }
+        }
+      },
+      "blocksOrder": [
+        "g-01",
+        "g-02",
+        "g-03",
+        "g-04",
+        "g-05",
+        "g-06",
+        "g-07",
+        "g-08"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come stay with us.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We reply within a day, usually faster. Rooms available April through October.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check availability",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Say hello",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "intro_split",
+    "featured_rooms",
+    "terrace_moment",
+    "amenities",
+    "reviews",
+    "gallery",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-21T16:00:00.000Z",
+  "updated": "2026-04-21T18:00:00.000Z"
+}

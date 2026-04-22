@@ -1,0 +1,10 @@
+{
+  "id": "footer-menu",
+  "name": "Footer Menu",
+  "items": [
+    { "label": "Rooms", "link": "rooms.html", "items": [] },
+    { "label": "The Villa", "link": "about.html", "items": [] },
+    { "label": "Nearby", "link": "nearby.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}

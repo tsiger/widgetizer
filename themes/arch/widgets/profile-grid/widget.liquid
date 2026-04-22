@@ -123,6 +123,10 @@
         {% assign item_heading_level = 'h2' %}
       {% endif %}
 
+      {% assign cols_desktop = widget.settings.columns_desktop | default: 3 %}
+      {% assign full_desktop_px = 1200 | divided_by: cols_desktop %}
+      {% capture full_image_sizes %}(max-width: 749px) 100vw, (max-width: 1199px) 50vw, {{ full_desktop_px }}px{% endcapture %}
+
       {% if widget.settings.layout == 'carousel' %}
         <div class="carousel-container reveal reveal-up">
           <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
@@ -141,7 +145,7 @@
               <li class="profile-card carousel-item" data-block-id="{{ blockId }}">
                 {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
                   {% if widget.settings.image_style == 'full' %}
-                    {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '(max-width: 749px) 50vw, 300px', class: 'profile-image' %}
+                    {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: full_image_sizes, class: 'profile-image' %}
                   {% else %}
                     {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '160px', class: 'profile-image' %}
                   {% endif %}
@@ -267,7 +271,11 @@
             {% assign block = widget.blocks[blockId] %}
             <li class="profile-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
               {% if block.settings.photo != blank and block.settings.photo != 'placeholder' %}
-                {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '160px', class: 'profile-image' %}
+                {% if widget.settings.image_style == 'full' %}
+                  {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: full_image_sizes, class: 'profile-image' %}
+                {% else %}
+                  {% image src: block.settings.photo, size: 'medium', srcset: true, sizes: '160px', class: 'profile-image' %}
+                {% endif %}
               {% else %}
                 <div class="profile-image-placeholder t-4xl t-muted" style="background-image: url({% placeholder_image aspect: 'square', output: 'url' %}); background-size: cover; background-position: center;"></div>
               {% endif %}

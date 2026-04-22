@@ -1,0 +1,367 @@
+{
+  "name": "The Villa",
+  "slug": "about",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#08264599",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The villa</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Built in 1870. Run by the same family since then.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Five generations. One house. A slow restoration, finished in 2013. Opened as six rooms in 2014. Still answering the email ourselves.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "founder_story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fs-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our story</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "fs-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A house that became a small hotel.",
+            "size": "4xl"
+          }
+        },
+        "fs-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The villa was built by Yannis's great-great-grandfather in 1870. It passed down through the family as a private home for five generations — always lived in, never rented, never sold. We inherited it in 2011 with the roof half gone and the garden overgrown past the olive trees.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fs-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We spent two years restoring the house ourselves with a small team of local masons and a carpenter from Lefkes. We kept almost everything — the stone walls, the ceiling beams, the hand-cut floors. We added six proper bathrooms, quiet air conditioning, and a heated pool. Everything else is essentially the house Yannis's great-great-grandfather lived in.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fs-body-3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We opened in May 2014. We still live in the small stone cottage at the back of the property. We answer the email ourselves, greet every guest ourselves, and make breakfast ourselves. That's the whole offer.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "fs-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Meet the hosts",
+              "href": "#hosts",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "fs-eyebrow",
+        "fs-heading",
+        "fs-body-1",
+        "fs-body-2",
+        "fs-body-3",
+        "fs-button"
+      ]
+    },
+    "differently": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "The small things",
+        "eyebrow_uppercase": true,
+        "title": "What we do differently.",
+        "description": "Six things that set the villa apart from a standard boutique hotel — all small, all intentional.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "df-breakfast": {
+          "type": "item",
+          "settings": {
+            "icon": "chef-hat",
+            "title": "Breakfast from the garden",
+            "description": "Fresh eggs from our hens, fruit from the orchard, bread we walk down for every morning."
+          }
+        },
+        "df-linen": {
+          "type": "item",
+          "settings": {
+            "icon": "basket",
+            "title": "Hand-washed linen",
+            "description": "We wash our sheets ourselves on-site. Rooms are never made up with hotel-grade starched cotton."
+          }
+        },
+        "df-books": {
+          "type": "item",
+          "settings": {
+            "icon": "book",
+            "title": "Books chosen by us",
+            "description": "Each room has a small shelf of books — travel, poetry, Greek history — that we've personally read and liked."
+          }
+        },
+        "df-wine": {
+          "type": "item",
+          "settings": {
+            "icon": "glass-full",
+            "title": "Local wine at check-in",
+            "description": "A small glass of Paros white from one of three neighbors who make it, when you arrive."
+          }
+        },
+        "df-tv": {
+          "type": "item",
+          "settings": {
+            "icon": "device-tv-off",
+            "title": "No televisions",
+            "description": "None in any room, none in the common areas. Most guests don't notice; the rest are relieved."
+          }
+        },
+        "df-bikes": {
+          "type": "item",
+          "settings": {
+            "icon": "bike",
+            "title": "Bikes if you want them",
+            "description": "Four bikes, free to borrow, any day. A paper map of the best bike roads is in each room."
+          }
+        }
+      },
+      "blocksOrder": [
+        "df-breakfast",
+        "df-linen",
+        "df-books",
+        "df-wine",
+        "df-tv",
+        "df-bikes"
+      ]
+    },
+    "milestones": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "One hundred and fifty-four years",
+        "eyebrow_uppercase": true,
+        "title": "A brief history.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "centered",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ms-1870": {
+          "type": "item",
+          "settings": {
+            "date": "1870",
+            "title": "Built as a family home.",
+            "description": "<p>Yannis's great-great-grandfather built the villa from stone quarried a kilometer up the hill. The walls, the ceiling beams, and most of the floors are still the ones he put in.</p>"
+          }
+        },
+        "ms-generations": {
+          "type": "item",
+          "settings": {
+            "date": "1870 – 2011",
+            "title": "Through five generations.",
+            "description": "<p>The house stayed in the family through five generations. Always a private home, never rented, never sold. It quietly collected furniture, books, ceramics, and the olive orchard we still harvest from today.</p>"
+          }
+        },
+        "ms-2011": {
+          "type": "item",
+          "settings": {
+            "date": "2011",
+            "title": "Restoration begins.",
+            "description": "<p>We inherited the house with the roof partly gone and the garden overgrown. We spent two years restoring it with a small local team — keeping almost everything, adding six bathrooms, quiet air conditioning, and a heated pool.</p>"
+          }
+        },
+        "ms-2014": {
+          "type": "item",
+          "settings": {
+            "date": "May 2014",
+            "title": "Opens as six rooms.",
+            "description": "<p>First guests arrive on May 17, 2014 — friends from Athens testing the rooms before we opened to the public. We've run the villa together, just the two of us, every season since.</p>"
+          }
+        },
+        "ms-now": {
+          "type": "item",
+          "settings": {
+            "date": "Now",
+            "title": "Still a work in progress.",
+            "description": "<p>We've added small things each year — the pool in 2019, a stone bench by the orchard in 2021, the small library in 2023. We don't plan to add more rooms. Six feels right.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ms-1870",
+        "ms-generations",
+        "ms-2011",
+        "ms-2014",
+        "ms-now"
+      ]
+    },
+    "hosts": {
+      "type": "team-highlight",
+      "settings": {
+        "eyebrow": "Your hosts",
+        "eyebrow_uppercase": true,
+        "title": "The people answering the email.",
+        "description": "Two of us. No reception desk. No concierge. We answer the email, check you in, make breakfast, and point you at the best beach.",
+        "heading_alignment": "start",
+        "columns_desktop": 2,
+        "image_ratio": "portrait",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "host-eleni": {
+          "type": "member",
+          "settings": {
+            "name": "Eleni Andreou",
+            "role": "Owner · Property & logistics",
+            "specialty": "Knows every beach, boat captain, and taverna",
+            "bio": "Grew up in Athens, studied food writing in Rome, moved to Paros with Yannis in 2011 and hasn't missed a city since. Makes breakfast every morning and the occasional evening dinner for guests who ask."
+          }
+        },
+        "host-yannis": {
+          "type": "member",
+          "settings": {
+            "name": "Yannis Moraitis",
+            "role": "Innkeeper · Breakfast",
+            "specialty": "Runs the kitchen, the garden, and the email",
+            "bio": "Fifth-generation Parian. Grew up in and around the villa. Runs the property side of things — airport transfers, the pool, fixing whatever needs fixing, and pointing guests at the best walks."
+          }
+        }
+      },
+      "blocksOrder": [
+        "host-eleni",
+        "host-yannis"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Feels right?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Let's talk about dates.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check availability",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the rooms",
+              "href": "rooms.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "founder_story",
+    "differently",
+    "milestones",
+    "hosts",
+    "closing_cta"
+  ],
+  "id": "about",
+  "created": "2026-04-21T16:00:00.000Z",
+  "updated": "2026-04-22T08:48:21.280Z"
+}

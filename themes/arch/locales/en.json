@@ -2016,6 +2016,63 @@
           },
           "role": {
             "label": "Role"
+          },
+          "specialty": {
+            "label": "Specialty"
+          },
+          "bio": {
+            "label": "Bio"
+          },
+          "social_header": {
+            "label": "Social Media"
+          },
+          "linkedin": {
+            "label": "LinkedIn URL"
+          },
+          "twitter": {
+            "label": "Twitter URL"
+          },
+          "instagram": {
+            "label": "Instagram URL"
+          },
+          "facebook": {
+            "label": "Facebook URL"
+          },
+          "email": {
+            "label": "Email"
+          },
+          "github": {
+            "label": "GitHub URL"
+          },
+          "youtube": {
+            "label": "YouTube URL"
+          },
+          "tiktok": {
+            "label": "TikTok URL"
+          },
+          "pinterest": {
+            "label": "Pinterest URL"
+          },
+          "bluesky": {
+            "label": "Bluesky URL"
+          },
+          "discord": {
+            "label": "Discord URL"
+          },
+          "meta": {
+            "label": "Meta URL"
+          },
+          "reddit": {
+            "label": "Reddit URL"
+          },
+          "telegram": {
+            "label": "Telegram URL"
+          },
+          "threads": {
+            "label": "Threads URL"
+          },
+          "whatsapp": {
+            "label": "WhatsApp URL"
           }
         }
       }

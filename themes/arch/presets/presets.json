@@ -61,6 +61,12 @@
       "liveDemo": "https://widgetizer.org/demos/greystone/"
     },
     {
+      "id": "hearthstone",
+      "name": "Hearthstone",
+      "description": "Hotel / B&B",
+      "liveDemo": "https://widgetizer.org/demos/hearthstone/"
+    },
+    {
       "id": "inkwell",
       "name": "Inkwell",
       "description": "Tattoo studio",
@@ -95,6 +101,12 @@
       "name": "Pipeworks",
       "description": "Plumber",
       "liveDemo": "https://widgetizer.org/demos/pipeworks/"
+    },
+    {
+      "id": "pixelcraft",
+      "name": "Pixelcraft",
+      "description": "Graphic designer",
+      "liveDemo": "https://widgetizer.org/demos/pixelcraft/"
     },
     {
       "id": "saffron",

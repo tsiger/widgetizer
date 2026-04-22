@@ -18,7 +18,7 @@
 | 10 | framelight | Framelight | Photographer |  |
 | 11 | greenfield | Greenfield | Landscaping | DONE |
 | 12 | greystone | Greystone | Lawyer / Law Firm | DONE |
-| 13 | hearthstone | Hearthstone | Hotel / B&B |  |
+| 13 | hearthstone | Hearthstone | Hotel / B&B | DONE |
 | 14 | hue-and-co | Hue & Co | Interior Designer |  |
 | 15 | inkwell | Inkwell | Tattoo Studio | DONE |
 | 16 | ironform | Ironform | Personal Trainer |  |
@@ -30,7 +30,7 @@
 | 22 | pawlish | Pawlish | Pet Grooming |  |
 | 23 | petalry | Petalry | Flower Shop |  |
 | 24 | pipeworks | Pipeworks | Plumber | DONE |
-| 25 | pixelcraft | Pixelcraft | Graphic Designer |  |
+| 25 | pixelcraft | Pixelcraft | Graphic Designer | DONE |
 | 26 | saffron | Saffron | Restaurant | DONE |
 | 27 | sparkhaus | Sparkhaus | Cleaning Service | DONE |
 | 28 | stillpoint | Stillpoint | Yoga / Pilates Studio | DONE |

@@ -1,0 +1,444 @@
+{
+  "name": "The Jasmine Room",
+  "slug": "room-jasmine",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#08264599",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Jasmine Room · From €215 · Sleeps 2</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A stone terrace sheltered by jasmine and bougainvillea.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tucked into the east corner of the villa. A king bed, a writing desk by the window, a small stone terrace all of its own. Our favorite room for slow mornings.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "op-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check availability",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See all rooms",
+              "href": "rooms.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text",
+        "op-buttons"
+      ]
+    },
+    "room_intro": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ri-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>At a glance</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "ri-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One of the quieter corners of the villa. In the morning the light is cool and filtered; by four in the afternoon the terrace is a warm pool of gold. A king bed with hand-washed linen, a small writing desk by the window, hand-thrown ceramic tiles we commissioned from a potter in Lefkes, and nothing else. No television, no minibar.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ri-eyebrow",
+        "ri-body"
+      ]
+    },
+    "room_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "rg-01": {
+          "type": "item",
+          "settings": {
+            "title": "The bed and stone-framed window",
+            "category": "Interior"
+          }
+        },
+        "rg-02": {
+          "type": "item",
+          "settings": {
+            "title": "The terrace at mid-afternoon",
+            "category": "Terrace"
+          }
+        },
+        "rg-03": {
+          "type": "item",
+          "settings": {
+            "title": "Writing desk by the window",
+            "category": "Interior"
+          }
+        },
+        "rg-04": {
+          "type": "item",
+          "settings": {
+            "title": "Hand-thrown ceramic tile",
+            "category": "Details"
+          }
+        },
+        "rg-05": {
+          "type": "item",
+          "settings": {
+            "title": "Jasmine climbing the terrace",
+            "category": "Exterior"
+          }
+        },
+        "rg-06": {
+          "type": "item",
+          "settings": {
+            "title": "Morning light on the linen",
+            "category": "Interior"
+          }
+        }
+      },
+      "blocksOrder": [
+        "rg-01",
+        "rg-02",
+        "rg-03",
+        "rg-04",
+        "rg-05",
+        "rg-06"
+      ]
+    },
+    "room_specs": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "The details",
+        "eyebrow_uppercase": true,
+        "title": "What you get.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "sp-bed": {
+          "type": "item",
+          "settings": {
+            "icon": "bed",
+            "title": "King bed",
+            "description": "Hand-washed linen, sleeps 2"
+          }
+        },
+        "sp-terrace": {
+          "type": "item",
+          "settings": {
+            "icon": "plant",
+            "title": "Private terrace",
+            "description": "Stone, sheltered by jasmine"
+          }
+        },
+        "sp-view": {
+          "type": "item",
+          "settings": {
+            "icon": "beach",
+            "title": "Sea view",
+            "description": "Through the east window"
+          }
+        },
+        "sp-bath": {
+          "type": "item",
+          "settings": {
+            "icon": "bath",
+            "title": "En-suite bath",
+            "description": "Walk-in shower, stone tiles"
+          }
+        },
+        "sp-size": {
+          "type": "item",
+          "settings": {
+            "icon": "maximize",
+            "title": "28 m²",
+            "description": "About 300 sq ft"
+          }
+        },
+        "sp-desk": {
+          "type": "item",
+          "settings": {
+            "icon": "feather",
+            "title": "Writing desk",
+            "description": "By the window"
+          }
+        },
+        "sp-ac": {
+          "type": "item",
+          "settings": {
+            "icon": "snowflake",
+            "title": "Air conditioning",
+            "description": "Silent, independently controlled"
+          }
+        },
+        "sp-notv": {
+          "type": "item",
+          "settings": {
+            "icon": "device-tv-off",
+            "title": "No television",
+            "description": "None in any of our rooms"
+          }
+        }
+      },
+      "blocksOrder": [
+        "sp-bed",
+        "sp-terrace",
+        "sp-view",
+        "sp-bath",
+        "sp-size",
+        "sp-desk",
+        "sp-ac",
+        "sp-notv"
+      ]
+    },
+    "good_to_know": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "gk-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Good to know</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "gk-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Who it's best for.",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "gk-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Honeymoon couples and slow travelers who want a real stone terrace without leaving the room. The east-facing orientation means soft morning light through the jasmine and strong afternoon warmth on the terrace — ideal for guests who like to start the day quiet and read outdoors in the late afternoon.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "left"
+          }
+        }
+      },
+      "blocksOrder": [
+        "gk-eyebrow",
+        "gk-heading",
+        "gk-body-1"
+      ]
+    },
+    "room_faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Questions about this room",
+        "eyebrow_uppercase": true,
+        "title": "Before you book Jasmine.",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "rq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Is there a single-occupancy rate?",
+            "answer": "<p>Same rate regardless of occupancy — €215 in low season, roughly €280 in peak July and August. The room sleeps two; we don't charge a supplement for a single guest.</p>"
+          }
+        },
+        "rq-2": {
+          "type": "item",
+          "settings": {
+            "question": "Can we connect Jasmine with another room for a family?",
+            "answer": "<p>Jasmine and Olive share the east terrace but are separate rooms with their own entrances. If you need two rooms together for a family of four, ask us — we'll check availability and propose the quietest configuration.</p>"
+          }
+        },
+        "rq-3": {
+          "type": "item",
+          "settings": {
+            "question": "What's the bathroom setup?",
+            "answer": "<p>En-suite with a walk-in shower, hand-thrown tiles matching the room, and a proper counter. No tub — we kept the space for the shower. Soap, shampoo, and conditioner are from a small producer on Paros.</p>"
+          }
+        },
+        "rq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Is the terrace fully private?",
+            "answer": "<p>Private to Jasmine — not shared. The jasmine and bougainvillea create a natural screen on one side; a low stone wall encloses the other. You'll hear neighbors in Olive occasionally but you won't see them.</p>"
+          }
+        },
+        "rq-5": {
+          "type": "item",
+          "settings": {
+            "question": "Can we bring a dog?",
+            "answer": "<p>Jasmine isn't the best room for dogs — the terrace is on the first floor and the staircase is steep. If you're traveling with a dog, Thyme or Lemon on the ground floor are a much easier fit. Same rate, both open to the garden directly.</p>"
+          }
+        },
+        "rq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Ready to book?",
+            "text": "<p>hello@example.com</p><p>We reply within a day, usually faster</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "rq-1",
+        "rq-2",
+        "rq-3",
+        "rq-4",
+        "rq-5",
+        "rq-sidebar"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to book Jasmine?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us the dates. We reply within a day, usually faster.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check availability",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See other rooms",
+              "href": "rooms.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "room_intro",
+    "room_gallery",
+    "room_specs",
+    "good_to_know",
+    "room_faqs",
+    "closing_cta"
+  ],
+  "id": "room-jasmine",
+  "created": "2026-04-21T18:00:00.000Z",
+  "updated": "2026-04-21T18:00:00.000Z"
+}

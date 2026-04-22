@@ -430,6 +430,10 @@ Never guess:
 - icon names — verify every icon against [arch-icons-list.txt](arch-icons-list.txt)
 - font stacks or weights — use exact values from [arch-fonts-list.csv](arch-fonts-list.csv)
 
+Never invent real-looking email addresses, phone numbers, domains, or URLs for a preset. Always use **`hello@example.com`** for email (or `example.com` in any contact surface). Always use placeholder phone numbers that read as fake (`(555) xxx-xxxx` for US, `+xx xxxxx xx xx xx` with zeros or x's for international). Never use domains that look like real businesses — no `hearthstonevilla.gr`, no `torqueauto.co`, no `pixelcraft.studio`. A preset ships to users who will replace these values with their own; a realistic-looking fake is just noise that every user has to grep-and-replace on day one.
+
+The same rule applies to `mailto:` hrefs and `tel:` hrefs — use `mailto:hello@example.com` and `tel:+15555550100` (or equivalent international placeholder), never fabricated realistic contact targets.
+
 Never use `<br>` in widget text — anywhere. Not in `heading` block text, not in richtext bodies, not in footer text blocks, not in accordion answers, not in map info blocks, not in any text-bearing field. This rule is absolute.
 
 - **Headings:** write a single line. Let the renderer wrap. If a heading is too long, rewrite it shorter — never insert `<br>` to control where it breaks.

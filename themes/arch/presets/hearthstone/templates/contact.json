@@ -1,0 +1,359 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#08264599",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Contact & book</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us when, how many, what matters.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A few sentences about your dates and what you're looking for. We reply within a day, usually faster.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "inquiry_split": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "iq-left-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inquiry</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "iq-left-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "hello@example.com",
+            "size": "3xl",
+            "position": "left"
+          }
+        },
+        "iq-left-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Include your dates, the number of guests, and any room preferences. If you're flexible on dates, tell us that too — we'll suggest when the villa is quietest and the prices are lowest.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "left"
+          }
+        },
+        "iq-left-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email us",
+              "href": "mailto:hello@example.com",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        },
+        "iq-right-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call if you must</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "iq-right-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "+30 22840 00 00 00",
+            "size": "3xl",
+            "position": "right"
+          }
+        },
+        "iq-right-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Phone lines are open 10am–8pm Paros time, April through October. Outside those hours and off-season, email is always faster. Please note we speak English and Greek; French and a little Italian between us.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "iq-left-eyebrow",
+        "iq-left-heading",
+        "iq-left-body",
+        "iq-left-button",
+        "iq-right-eyebrow",
+        "iq-right-heading",
+        "iq-right-body"
+      ]
+    },
+    "details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "Good to know",
+        "eyebrow_uppercase": true,
+        "title": "Practical details.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "equal",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cd-response": {
+          "type": "text_block",
+          "settings": {
+            "title": "Response time",
+            "text": "<p>Within a day, usually faster.</p><p>Same-day during business hours from April through October.</p>"
+          }
+        },
+        "cd-languages": {
+          "type": "text_block",
+          "settings": {
+            "title": "Languages",
+            "text": "<p>English and Greek, fluently.</p><p>French and a little Italian between us.</p>"
+          }
+        },
+        "cd-checkin": {
+          "type": "text_block",
+          "settings": {
+            "title": "Check-in · Check-out",
+            "text": "<p>Check-in: 3pm onwards</p><p>Check-out: 11am</p><p>Early or late arrangements often possible — just ask.</p>"
+          }
+        },
+        "cd-deposit": {
+          "type": "text_block",
+          "settings": {
+            "title": "Deposit & cancellation",
+            "text": "<p>30% deposit at booking, balance on arrival.</p><p>Full refund up to 30 days before arrival; half between 30–14 days.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cd-response",
+        "cd-languages",
+        "cd-checkin",
+        "cd-deposit"
+      ]
+    },
+    "villa_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Find us",
+        "eyebrow_uppercase": true,
+        "title": "The villa.",
+        "description": "Just outside Naoussa, on the north coast. Twenty minutes from Paros airport.",
+        "heading_alignment": "center",
+        "address": "Naoussa, Paros 844 01, Greece",
+        "show_address": true,
+        "height": "medium",
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "info-villa": {
+          "type": "info",
+          "settings": {
+            "title": "Hearthstone Villa",
+            "text": "<p>Just outside Naoussa</p><p>Paros, Greece</p><p>+30 22840 00 00 00</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "info-villa"
+      ]
+    },
+    "booking_faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Booking questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you write.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "bf-1": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work with booking platforms?",
+            "answer": "<p>We're listed on Booking.com and Airbnb, but we'd rather book direct. Booking through us is usually 10–15% cheaper than through a platform, and you get a real conversation instead of a template confirmation.</p>"
+          }
+        },
+        "bf-2": {
+          "type": "item",
+          "settings": {
+            "question": "How does the deposit work?",
+            "answer": "<p>30% deposit on booking — paid by bank transfer or card. Balance due on arrival, same payment options. No platform fees, no hidden charges.</p>"
+          }
+        },
+        "bf-3": {
+          "type": "item",
+          "settings": {
+            "question": "What happens if we need to cancel?",
+            "answer": "<p>Full refund up to 30 days before arrival. Half refund between 30 and 14 days. No refund inside 14 days, but we'll usually move the booking to another week in the same season if there's availability and ask us in time.</p>"
+          }
+        },
+        "bf-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you host weddings or small events?",
+            "answer": "<p>Occasionally — the courtyard can seat twenty for dinner, and we can book out all six rooms for a small wedding weekend. Ask us early; we only take one or two events a year and the dates fill up in October.</p>"
+          }
+        },
+        "bf-5": {
+          "type": "item",
+          "settings": {
+            "question": "Is the villa accessible?",
+            "answer": "<p>Partially. The ground-floor Thyme and Lemon rooms and the main common areas are step-free. The upstairs rooms (Olive, Fig, Jasmine, Sage) require a flight of stone stairs. The garden and pool are both accessible. Tell us what you need and we'll be honest about whether we can host you well.</p>"
+          }
+        },
+        "bf-6": {
+          "type": "item",
+          "settings": {
+            "question": "What airport and how long a drive?",
+            "answer": "<p>Paros airport (PAS), twenty-minute drive. Direct seasonal flights from Athens, and direct from several European capitals in high season. If you're arriving by ferry instead, Parikia port is a fifteen-minute drive and we can pick you up.</p>"
+          }
+        },
+        "bf-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still unsure?",
+            "text": "<p>hello@example.com</p><p>Write anything. We reply within a day.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "bf-1",
+        "bf-2",
+        "bf-3",
+        "bf-4",
+        "bf-5",
+        "bf-6",
+        "bf-sidebar"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Still reading?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Then let's start talking dates.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email us",
+              "href": "mailto:hello@example.com",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call us",
+              "href": "tel:+3022840000000",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "inquiry_split",
+    "details",
+    "villa_map",
+    "booking_faqs",
+    "closing_cta"
+  ],
+  "id": "contact",
+  "created": "2026-04-21T16:00:00.000Z",
+  "updated": "2026-04-22T08:48:21.281Z"
+}

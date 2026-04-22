@@ -1,0 +1,405 @@
+{
+  "name": "Nearby",
+  "slug": "nearby",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#08264599",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Nearby</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Paros, briefly.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Twenty minutes from the airport, five from the nearest beach, a ten-minute walk from the village. Here's what we send guests who ask.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "paros_context": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "pc-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Where we are</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "pc-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Paros sits in the middle of the Cyclades, between Naxos and Antiparos. Slower than Mykonos, less crowded than Santorini, more of a working island than a cruise port. There are olive groves and windmills and a Byzantine cobbled road that runs for nine kilometers inland.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "pc-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We opened the villa here on purpose. If you want a Greek island that still feels like one, this is the right one.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "pc-eyebrow",
+        "pc-body-1",
+        "pc-body-2"
+      ]
+    },
+    "favorite_places": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "The island",
+        "eyebrow_uppercase": true,
+        "title": "Favorite places.",
+        "description": "Eight spots we send guests to. Call if you need a more specific recommendation.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fp-naoussa": {
+          "type": "card",
+          "settings": {
+            "icon": "building",
+            "subtitle": "Village · 10 min drive",
+            "title": "Naoussa",
+            "description": "<p>The harbor village for dinner. Narrow white lanes, fishing boats at the quay, six or seven tavernas we'd all recommend. Best in the hour before sunset.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "fp-kolimbithres": {
+          "type": "card",
+          "settings": {
+            "icon": "beach",
+            "subtitle": "Beach · 15 min drive",
+            "title": "Kolimbithres",
+            "description": "<p>The sculpted-rock beach on the north coast. Clear water, quieter in the mornings. Bring a snorkel; there's a reef off the small cove at the east end.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "fp-golden": {
+          "type": "card",
+          "settings": {
+            "icon": "wind",
+            "subtitle": "Beach · 25 min drive",
+            "title": "Golden Beach",
+            "description": "<p>Long sandy beach on the east coast. Best for windsurfing — the Meltemi wind rakes across it July through August. Also the best beach sunrise on the island.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "fp-lefkes": {
+          "type": "card",
+          "settings": {
+            "icon": "mountain",
+            "subtitle": "Village · 20 min drive",
+            "title": "Lefkes",
+            "description": "<p>Hill town in the interior. Whitewashed lanes climbing a slope, a single bakery, a single taverna, a Byzantine stone road that starts at the square and walks nine kilometers back to the coast.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "fp-antiparos": {
+          "type": "card",
+          "settings": {
+            "icon": "ship",
+            "subtitle": "Day trip · 45 min via Pounda ferry",
+            "title": "Antiparos",
+            "description": "<p>The small island off the southwest coast. A 10-minute ferry from Pounda. Better beaches than Paros in some places, fewer people, a village square with exactly one perfect taverna.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "fp-parikia": {
+          "type": "card",
+          "settings": {
+            "icon": "sunset",
+            "subtitle": "Port village · 15 min drive",
+            "title": "Parikia at sunset",
+            "description": "<p>The port village has a promenade that catches the sunset better than anywhere else on the island. Walk the length of it at seven in July, six in September, and stop at Taverna Apollon on the way back.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "fp-byzantine": {
+          "type": "card",
+          "settings": {
+            "icon": "walk",
+            "subtitle": "Walk · Half a day",
+            "title": "The Byzantine road",
+            "description": "<p>Nine kilometers of cobbled 11th-century path from Lefkes down through olive groves to the east coast. The single best walk on the island. Take water, a hat, and three hours.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        },
+        "fp-tavernas": {
+          "type": "card",
+          "settings": {
+            "icon": "tools-kitchen",
+            "subtitle": "Dinner · Scattered",
+            "title": "Local tavernas",
+            "description": "<p>We keep a short list of tavernas — five we always recommend, two or three reserved for when guests ask us for something unusual. Ask Yannis when you arrive and he'll match one to your mood.</p>",
+            "button_link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "fp-naoussa",
+        "fp-kolimbithres",
+        "fp-golden",
+        "fp-lefkes",
+        "fp-antiparos",
+        "fp-parikia",
+        "fp-byzantine",
+        "fp-tavernas"
+      ]
+    },
+    "villa_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Location",
+        "eyebrow_uppercase": true,
+        "title": "Where you'll find us.",
+        "description": "Twenty minutes from Paros airport, ten minutes from Naoussa village, a five-minute walk to the nearest beach.",
+        "heading_alignment": "center",
+        "address": "Naoussa, Paros 844 01, Greece",
+        "show_address": true,
+        "height": "large",
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "info-villa": {
+          "type": "info",
+          "settings": {
+            "title": "Hearthstone Villa",
+            "text": "<p>Just outside Naoussa</p><p>Paros, Greece</p><p>Airport: 20 min · Beach: 5 min walk · Village: 10 min walk</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "info-villa"
+      ]
+    },
+    "experiences": {
+      "type": "priced-list",
+      "settings": {
+        "eyebrow": "Through us",
+        "eyebrow_uppercase": true,
+        "title": "Small things we arrange.",
+        "description": "Everything below is booked through us for guests staying at the villa. Real prices, not markups — we pass through what the captain, the guide, or the cook charges, and add nothing.",
+        "heading_alignment": "start",
+        "layout": "two-column",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ex-cooking": {
+          "type": "item",
+          "settings": {
+            "name": "Cooking class with Eleni",
+            "description": "<p>Three hours in our kitchen. Four Paros dishes, start to finish. Max four guests per class. Includes wine and dinner.</p>",
+            "price": "€80 per person"
+          }
+        },
+        "ex-boat": {
+          "type": "item",
+          "settings": {
+            "name": "Private boat day",
+            "description": "<p>A day on a wooden caique with a captain we've known for ten years. Antiparos, hidden coves, swim stops, lunch on board. Up to six guests.</p>",
+            "price": "€240 per group"
+          }
+        },
+        "ex-wine": {
+          "type": "item",
+          "settings": {
+            "name": "Wine tasting tour",
+            "description": "<p>Three Paros wineries in one afternoon, with a driver so nobody has to. Tasting at each, a small plate at the last. Runs twice a week in high season.</p>",
+            "price": "€120 per person"
+          }
+        },
+        "ex-hike": {
+          "type": "item",
+          "settings": {
+            "name": "Guided hike on the Byzantine road",
+            "description": "<p>A walking guide we've worked with since 2016. Three hours from Lefkes to the coast, or the reverse. Includes water, a picnic from our kitchen, transfer back.</p>",
+            "price": "€90 per person"
+          }
+        },
+        "ex-transfer": {
+          "type": "item",
+          "settings": {
+            "name": "Airport transfer",
+            "description": "<p>We meet you at the Paros airport with a sign and drive you to the villa. 20 minutes, air-conditioned car, any hour of the day or night.</p>",
+            "price": "€40 each way"
+          }
+        },
+        "ex-bike": {
+          "type": "item",
+          "settings": {
+            "name": "Bike rental",
+            "description": "<p>Four bikes available, free if you're staying at the villa. Listed here because some guests ask to rent an extra one for a friend staying nearby.</p>",
+            "price": "€15 per day"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ex-cooking",
+        "ex-boat",
+        "ex-wine",
+        "ex-hike",
+        "ex-transfer",
+        "ex-bike"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Need a recommendation?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We know every taverna, boat captain, and beach. Ask us.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Check availability",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Say hello",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "paros_context",
+    "favorite_places",
+    "villa_map",
+    "experiences",
+    "closing_cta"
+  ],
+  "id": "nearby",
+  "created": "2026-04-21T16:00:00.000Z",
+  "updated": "2026-04-22T08:48:21.281Z"
+}

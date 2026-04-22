@@ -186,9 +186,104 @@
           "default": "Team Member"
         },
         {
+          "type": "text",
+          "id": "specialty",
+          "label": "tTheme:team_highlight.blocks.member.settings.specialty.label"
+        },
+        {
+          "type": "textarea",
+          "id": "bio",
+          "label": "tTheme:team_highlight.blocks.member.settings.bio.label"
+        },
+        {
           "type": "link",
           "id": "link",
           "label": "tTheme:global.widgets.settings.link.label"
+        },
+        {
+          "type": "header",
+          "id": "social_header",
+          "label": "tTheme:team_highlight.blocks.member.settings.social_header.label"
+        },
+        {
+          "type": "text",
+          "id": "linkedin",
+          "label": "tTheme:team_highlight.blocks.member.settings.linkedin.label"
+        },
+        {
+          "type": "text",
+          "id": "twitter",
+          "label": "tTheme:team_highlight.blocks.member.settings.twitter.label"
+        },
+        {
+          "type": "text",
+          "id": "instagram",
+          "label": "tTheme:team_highlight.blocks.member.settings.instagram.label"
+        },
+        {
+          "type": "text",
+          "id": "facebook",
+          "label": "tTheme:team_highlight.blocks.member.settings.facebook.label"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "tTheme:team_highlight.blocks.member.settings.email.label"
+        },
+        {
+          "type": "text",
+          "id": "github",
+          "label": "tTheme:team_highlight.blocks.member.settings.github.label"
+        },
+        {
+          "type": "text",
+          "id": "youtube",
+          "label": "tTheme:team_highlight.blocks.member.settings.youtube.label"
+        },
+        {
+          "type": "text",
+          "id": "tiktok",
+          "label": "tTheme:team_highlight.blocks.member.settings.tiktok.label"
+        },
+        {
+          "type": "text",
+          "id": "pinterest",
+          "label": "tTheme:team_highlight.blocks.member.settings.pinterest.label"
+        },
+        {
+          "type": "text",
+          "id": "bluesky",
+          "label": "tTheme:team_highlight.blocks.member.settings.bluesky.label"
+        },
+        {
+          "type": "text",
+          "id": "discord",
+          "label": "tTheme:team_highlight.blocks.member.settings.discord.label"
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "tTheme:team_highlight.blocks.member.settings.meta.label"
+        },
+        {
+          "type": "text",
+          "id": "reddit",
+          "label": "tTheme:team_highlight.blocks.member.settings.reddit.label"
+        },
+        {
+          "type": "text",
+          "id": "telegram",
+          "label": "tTheme:team_highlight.blocks.member.settings.telegram.label"
+        },
+        {
+          "type": "text",
+          "id": "threads",
+          "label": "tTheme:team_highlight.blocks.member.settings.threads.label"
+        },
+        {
+          "type": "text",
+          "id": "whatsapp",
+          "label": "tTheme:team_highlight.blocks.member.settings.whatsapp.label"
         }
       ]
     }
