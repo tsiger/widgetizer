@@ -1,0 +1,272 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#0a0a0ab8",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Contact</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Send us a paragraph.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One honest paragraph about the project is better than a filled-in form with boxes checked.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "reach_us": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ru-left-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Email</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "ru-left-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "hello@example.com",
+            "size": "3xl",
+            "position": "left"
+          }
+        },
+        "ru-left-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We reply within two business days during studio hours. Most new engagements start four to six weeks out from first contact.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "left"
+          }
+        },
+        "ru-left-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email us",
+              "href": "mailto:hello@example.com",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "left"
+          }
+        },
+        "ru-right-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What to send</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "ru-right-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A paragraph covering the shape of the project is enough. Tell us what you're making, who it's for, when you need it live, and roughly what you've set aside. Links to anything existing you're replacing help us more than mood boards.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "ru-right-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>If we're the wrong fit we'll tell you and point you at a studio that fits better. We'd rather send you somewhere good than take work we can't do well.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ru-left-eyebrow",
+        "ru-left-heading",
+        "ru-left-body",
+        "ru-left-button",
+        "ru-right-eyebrow",
+        "ru-right-body",
+        "ru-right-body-2"
+      ]
+    },
+    "contact_faqs": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "eyebrow_uppercase": true,
+        "title": "Common questions.",
+        "description": "",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "item",
+          "settings": {
+            "question": "How fast do you reply?",
+            "answer": "<p>Within two business days during studio hours, usually same-day. If a week has gone by and you haven't heard back, send it again — the email probably didn't land.</p>"
+          }
+        },
+        "q-2": {
+          "type": "item",
+          "settings": {
+            "question": "When could we actually start?",
+            "answer": "<p>Most new engagements start four to six weeks out from first contact. We take two to three new projects a quarter, so the calendar fills up fast in the back half of any given year.</p>"
+          }
+        },
+        "q-3": {
+          "type": "item",
+          "settings": {
+            "question": "What size projects do you take?",
+            "answer": "<p>Sprints start around $4k and go up to about $12k. Full projects typically sit between $18k and $75k. Retainers start at $8k monthly. If your project sits outside those ranges, email us anyway — we'll tell you honestly.</p>"
+          }
+        },
+        "q-4": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work with agencies or only with direct clients?",
+            "answer": "<p>Mostly direct. We occasionally take sub-engagements with other small studios we know well, but we don't work as vendor-behind-vendor three layers deep.</p>"
+          }
+        },
+        "q-5": {
+          "type": "item",
+          "settings": {
+            "question": "Do you sign NDAs?",
+            "answer": "<p>Yes, with a couple of common-sense carve-outs — we reserve the right to mention the project by name when it launches publicly, and to show the finished work in our portfolio after that launch. Everything pre-launch is obviously private.</p>"
+          }
+        },
+        "q-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Quickest route",
+            "text": "<p>hello@example.com</p><p>Mon–Fri · 10am – 6pm ET</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4",
+        "q-5",
+        "q-sidebar"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Still here?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Then we should talk.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Email us",
+              "href": "mailto:hello@example.com",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "reach_us",
+    "contact_faqs",
+    "closing_cta"
+  ],
+  "id": "contact",
+  "created": "2026-04-21T14:00:00.000Z",
+  "updated": "2026-04-21T16:32:04.776Z"
+}

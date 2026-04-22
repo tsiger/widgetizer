@@ -1,0 +1,22 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Pixelcraft",
+    "logoMaxWidth": 160,
+    "contactDetailsLine1": "",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "headerNavigation": "main-menu",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Start a project",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": false,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "highlight-primary"
+  }
+}

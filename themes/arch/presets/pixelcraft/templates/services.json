@@ -1,0 +1,408 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#0a0a0aad",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Services</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Four things we do, well.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Identity, editorial, packaging, and digital — with a small overflow of type and illustration when a project needs it.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "service_identity": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "si-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>01 — Identity</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "si-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Brand identity systems.",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "si-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Full identity engagements for new brands and repositionings. We start with the strategy and the look at the same time — not one before the other. The result is a mark and a system that actually reflects the business, not a logo bolted onto somebody else's tagline.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "left"
+          }
+        }
+      },
+      "blocksOrder": [
+        "si-eyebrow",
+        "si-heading",
+        "si-body"
+      ]
+    },
+    "service_editorial": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "se-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>02 — Editorial</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "se-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Editorial and print.",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "se-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Magazines, books, reports, and print pieces that earn their place on a table. We draw the grid, pick the type, direct the photography, and art-direct the cover. Long-form design work where the details add up.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "se-eyebrow",
+        "se-heading",
+        "se-body"
+      ]
+    },
+    "service_digital": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "sd-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>03 — Digital</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "sd-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Digital and web.",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "sd-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Marketing sites, product brand work, email and social systems, and digital-first identity work for brands that live mostly online. Design through build, or design that hands off cleanly to your team.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "left"
+          }
+        }
+      },
+      "blocksOrder": [
+        "sd-eyebrow",
+        "sd-heading",
+        "sd-body"
+      ]
+    },
+    "service_type": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "st-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>04 — Type & illustration</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "st-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Custom type and illustration.",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "st-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>When an identity needs something nobody else has. Custom wordmarks, display typefaces, editorial illustration, and icon systems — drawn from scratch, drawn to last. Usually runs alongside a larger identity engagement.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "st-eyebrow",
+        "st-heading",
+        "st-body"
+      ]
+    },
+    "engagement_compare": {
+      "type": "comparison-table",
+      "settings": {
+        "eyebrow": "How we work",
+        "eyebrow_uppercase": true,
+        "title": "Three ways to engage.",
+        "description": "Every project, sprint, and retainer starts the same way — with a conversation. The shape just changes based on what the problem needs.",
+        "heading_alignment": "center",
+        "feature_column_label": "What's included",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "col-sprint": {
+          "type": "column",
+          "settings": {
+            "name": "Sprint",
+            "featured": false,
+            "link": {
+              "text": "Request a sprint",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "col-project": {
+          "type": "column",
+          "settings": {
+            "name": "Project",
+            "badge": "Most Common",
+            "featured": true,
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "col-retainer": {
+          "type": "column",
+          "settings": {
+            "name": "Retainer",
+            "featured": false,
+            "link": {
+              "text": "Discuss a retainer",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "ft-duration": {
+          "type": "feature",
+          "settings": {
+            "name": "Typical duration",
+            "values": "1–2 weeks\n4–12 weeks\nMonthly, rolling"
+          }
+        },
+        "ft-depth": {
+          "type": "feature",
+          "settings": {
+            "name": "Depth of deliverables",
+            "values": "Focused\nFull system\nOngoing craft"
+          }
+        },
+        "ft-team": {
+          "type": "feature",
+          "settings": {
+            "name": "Team assigned",
+            "values": "1 designer\n2 designers\nFull studio"
+          }
+        },
+        "ft-reviews": {
+          "type": "feature",
+          "settings": {
+            "name": "Review cycles",
+            "values": "1\n3–4\nWeekly"
+          }
+        },
+        "ft-files": {
+          "type": "feature",
+          "settings": {
+            "name": "Source files handed over",
+            "values": "yes\nyes\nyes"
+          }
+        },
+        "ft-support": {
+          "type": "feature",
+          "settings": {
+            "name": "Post-launch support",
+            "values": "30 days\n60 days\nOngoing"
+          }
+        },
+        "ft-range": {
+          "type": "feature",
+          "settings": {
+            "name": "Typical range",
+            "values": "$4k–$12k\n$18k–$75k\nFrom $8k/mo"
+          }
+        }
+      },
+      "blocksOrder": [
+        "col-sprint",
+        "col-project",
+        "col-retainer",
+        "ft-duration",
+        "ft-depth",
+        "ft-team",
+        "ft-reviews",
+        "ft-files",
+        "ft-support",
+        "ft-range"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Pick a starting point.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Not sure which engagement fits? Email a paragraph about the project — we'll tell you which shape makes sense.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "service_identity",
+    "service_editorial",
+    "service_digital",
+    "service_type",
+    "engagement_compare",
+    "closing_cta"
+  ],
+  "id": "services",
+  "created": "2026-04-21T14:00:00.000Z",
+  "updated": "2026-04-21T16:32:04.775Z"
+}

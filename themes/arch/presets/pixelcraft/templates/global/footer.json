@@ -1,0 +1,44 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Pixelcraft Studio. A small studio in Brooklyn.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-secondary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Pixelcraft",
+        "logo_width": 160,
+        "text": "<p>A small Brooklyn design studio working with founders, brands, and people who make things.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Say hello",
+        "text": "<p>hello@pixelcraft.studio</p><p>We reply within two business days. Most engagements start four to six weeks out.</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Navigate",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Elsewhere"
+      }
+    }
+  },
+  "blocksOrder": [
+    "social_block_1",
+    "text_block_1",
+    "menu_block_1",
+    "logo_text_1"
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#0a0a0ab8",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A small studio with a loud voice.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Founded in 2018. Two designers, a shared bench, a shared opinion about what good design looks like. We work with people who want the second-best version of their brand killed quickly and the best version spent on properly.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "manifesto": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "left",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "mf-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Taste is a choice.",
+            "size": "7xl",
+            "position": "left"
+          }
+        },
+        "mf-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most design gets worse as it gets made. Briefs expand, deadlines compress, feedback accumulates, and the original strong idea ends up diluted into something safer and smaller than it started.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "mf-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The studios we admire fight that entropy on purpose. They protect the original idea, they kill the compromises, and they're comfortable saying no to their own clients when no is the right answer. That costs them some work. It also produces the only work worth remembering.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "mf-body-3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We try to be that kind of studio. Sometimes we fail. When we don't, the work speaks for itself on a shelf or a wall or a screen for a decade.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "mf-heading",
+        "mf-body-1",
+        "mf-body-2",
+        "mf-body-3"
+      ]
+    },
+    "milestones": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "Studio history",
+        "eyebrow_uppercase": true,
+        "title": "How we got here.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ms-2018": {
+          "type": "item",
+          "settings": {
+            "date": "2018",
+            "title": "Founded",
+            "description": "<p>Started in a shared Gowanus loft with one laptop, one drawing board, and a single client — a small Brooklyn bakery that's still with us.</p>"
+          }
+        },
+        "ms-2020": {
+          "type": "item",
+          "settings": {
+            "date": "2020",
+            "title": "First book project",
+            "description": "<p>Designed a 280-page visual monograph for a regional photographer. First time the studio's name was on a spine in a bookstore.</p>"
+          }
+        },
+        "ms-2022": {
+          "type": "item",
+          "settings": {
+            "date": "2022",
+            "title": "Type foundry side-project",
+            "description": "<p>Released the studio's first public typeface through a small independent distributor. Still in rotation on our own work.</p>"
+          }
+        },
+        "ms-2024": {
+          "type": "item",
+          "settings": {
+            "date": "2024",
+            "title": "Team of two",
+            "description": "<p>Added a second full-time designer after six years as a solo practice. Work quality improved the day we stopped being a solo shop.</p>"
+          }
+        },
+        "ms-2026": {
+          "type": "item",
+          "settings": {
+            "date": "2026",
+            "title": "Brooklyn studio",
+            "description": "<p>Moved into a dedicated studio space in Greenpoint. First time we could have clients over without rearranging the kitchen table.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ms-2018",
+        "ms-2020",
+        "ms-2022",
+        "ms-2024",
+        "ms-2026"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Still with us?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Good. Tell us about your project.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    },
+    "team_highlight": {
+      "type": "team-highlight",
+      "settings": {
+        "eyebrow": "Who we are",
+        "eyebrow_uppercase": false,
+        "title": "The studio.",
+        "description": "Two designers. No account managers. No project managers. You talk to the person making the work.",
+        "heading_alignment": "start",
+        "columns_desktop": 2,
+        "image_ratio": "portrait",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tm-morgan": {
+          "type": "member",
+          "settings": {
+            "name": "Morgan Ellison",
+            "role": "Co-founder · Design Director"
+          }
+        },
+        "tm-rafe": {
+          "type": "member",
+          "settings": {
+            "name": "Rafe Mendoza",
+            "role": "Senior Designer"
+          }
+        }
+      },
+      "blocksOrder": [
+        "tm-morgan",
+        "tm-rafe"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "manifesto",
+    "milestones",
+    "team_highlight",
+    "closing_cta"
+  ],
+  "id": "about",
+  "created": "2026-04-21T14:00:00.000Z",
+  "updated": "2026-04-21T16:32:04.776Z"
+}

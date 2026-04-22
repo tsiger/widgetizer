@@ -1,0 +1,361 @@
+{
+  "name": "Work",
+  "slug": "work",
+  "widgets": {
+    "page_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#0a0a0ab8",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Things we've made.",
+            "size": "7xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A selection of identity, editorial, packaging, and digital work from the last few years. Every project started with a conversation, not a brief.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
+    },
+    "intro_split": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Each project is chosen because it taught us something we now bring into the next. The ones we don't show didn't survive that test.",
+            "size": "5xl",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-heading"
+      ]
+    },
+    "portfolio": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "g-01": {
+          "type": "item",
+          "settings": {
+            "title": "Vance & Oak",
+            "category": "Identity"
+          }
+        },
+        "g-02": {
+          "type": "item",
+          "settings": {
+            "title": "Orion Quarterly",
+            "category": "Editorial"
+          }
+        },
+        "g-03": {
+          "type": "item",
+          "settings": {
+            "title": "Hearth Coffee",
+            "category": "Packaging"
+          }
+        },
+        "g-04": {
+          "type": "item",
+          "settings": {
+            "title": "Sidereal Studio",
+            "category": "Identity"
+          }
+        },
+        "g-05": {
+          "type": "item",
+          "settings": {
+            "title": "Cordage Press",
+            "category": "Type"
+          }
+        },
+        "g-06": {
+          "type": "item",
+          "settings": {
+            "title": "Northlake Zoo",
+            "category": "Wayfinding"
+          }
+        },
+        "g-07": {
+          "type": "item",
+          "settings": {
+            "title": "Parson & Blake",
+            "category": "Identity"
+          }
+        },
+        "g-08": {
+          "type": "item",
+          "settings": {
+            "title": "Foldline",
+            "category": "Digital"
+          }
+        },
+        "g-09": {
+          "type": "item",
+          "settings": {
+            "title": "Aster Type Foundry",
+            "category": "Type"
+          }
+        },
+        "g-10": {
+          "type": "item",
+          "settings": {
+            "title": "The Clay Room",
+            "category": "Packaging"
+          }
+        },
+        "g-11": {
+          "type": "item",
+          "settings": {
+            "title": "Tenny Bros.",
+            "category": "Identity"
+          }
+        },
+        "g-12": {
+          "type": "item",
+          "settings": {
+            "title": "Little Iron Bakery",
+            "category": "Packaging"
+          }
+        },
+        "g-13": {
+          "type": "item",
+          "settings": {
+            "title": "Field Notes No. 12",
+            "category": "Editorial"
+          }
+        },
+        "g-14": {
+          "type": "item",
+          "settings": {
+            "title": "Margot & Sons",
+            "category": "Identity"
+          }
+        }
+      },
+      "blocksOrder": [
+        "g-01",
+        "g-02",
+        "g-03",
+        "g-04",
+        "g-05",
+        "g-06",
+        "g-07",
+        "g-08",
+        "g-09",
+        "g-10",
+        "g-11",
+        "g-12",
+        "g-13",
+        "g-14"
+      ]
+    },
+    "featured_case": {
+      "type": "split-content",
+      "settings": {
+        "balance": "left-heavy",
+        "sticky_column": "right",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fc-image": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "left"
+          }
+        },
+        "fc-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Case study</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "fc-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Orion Quarterly — a redesign that earned its keep.",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "fc-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Orion came to us with a circulation slide and an identity that hadn't been touched in nine years. The brief was a light refresh. What we proposed was a full editorial rebuild — new masthead, new type system, new grid, new photography direction.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "fc-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Twelve weeks later the first issue landed. Subscriptions rose 34% across two quarters. Editorial won two industry awards the following year. More importantly, the magazine reads like itself again.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "fc-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Read the full study",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "fc-image",
+        "fc-eyebrow",
+        "fc-heading",
+        "fc-body-1",
+        "fc-body-2",
+        "fc-button"
+      ]
+    },
+    "capabilities_marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Logos — Wordmarks — Publications — Posters — Packaging — Signage — Wayfinding — Websites",
+        "separator": "★",
+        "speed": 8,
+        "rotate": 0,
+        "font_size": "lg",
+        "bg_color": "#0a0a0a",
+        "text_color": "#d1f600",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want to work together?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us the project and the constraints. We'll tell you whether we're the right fit.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Read the studio notes",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "page_opener",
+    "intro_split",
+    "portfolio",
+    "featured_case",
+    "capabilities_marquee",
+    "closing_cta"
+  ],
+  "id": "work",
+  "created": "2026-04-21T14:00:00.000Z",
+  "updated": "2026-04-21T16:32:04.775Z"
+}

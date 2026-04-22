@@ -1,0 +1,434 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "overlay_color": "#0a0a0ab8",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A small studio · Brooklyn, NY</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We design brands that mean something.",
+            "size": "8xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Identity, editorial, packaging, and digital work for founders and brands who care about the details.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
+    },
+    "disciplines_marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Brand Identity — Editorial Design — Packaging — Typography — Print — Digital — Art Direction",
+        "separator": "★",
+        "speed": 6,
+        "rotate": 0,
+        "font_size": "lg",
+        "bg_color": "#0a0a0a",
+        "text_color": "#d1f600",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "selected_work": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "Selected work",
+        "eyebrow_uppercase": true,
+        "title": "A few recent things.",
+        "description": "",
+        "heading_alignment": "start",
+        "gap": "var(--space-md)",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "bw-vance-oak": {
+          "type": "item",
+          "settings": {
+            "title": "Vance & Oak",
+            "text": "Identity for a Brooklyn wine shop · 2025",
+            "overlay_color": "#0a0a0a61",
+            "col_span": 2,
+            "row_span": 2,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Read the case",
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "bw-orion": {
+          "type": "item",
+          "settings": {
+            "title": "Orion Quarterly",
+            "text": "Editorial redesign · 2024",
+            "overlay_color": "#0a0a0a69",
+            "col_span": 2,
+            "row_span": 1,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Read the case",
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "bw-hearth": {
+          "type": "item",
+          "settings": {
+            "title": "Hearth Coffee",
+            "text": "Packaging system · 2024",
+            "overlay_color": "#0a0a0a66",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Read the case",
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "bw-sidereal": {
+          "type": "item",
+          "settings": {
+            "title": "Sidereal",
+            "text": "Brand for a photographer · 2023",
+            "overlay_color": "#0a0a0a00",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Read the case",
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "bw-cordage": {
+          "type": "item",
+          "settings": {
+            "title": "Cordage Press",
+            "text": "Type family + imprint · 2025",
+            "overlay_color": "#0a0a0a70",
+            "col_span": 3,
+            "row_span": 1,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Read the case",
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        },
+        "bw-northlake": {
+          "type": "item",
+          "settings": {
+            "title": "Northlake Zoo",
+            "text": "Wayfinding · 2023",
+            "overlay_color": "#0a0a0a00",
+            "col_span": 1,
+            "row_span": 1,
+            "text_color": "light",
+            "alignment": "start",
+            "link": {
+              "text": "Read the case",
+              "href": "work.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "bw-vance-oak",
+        "bw-orion",
+        "bw-hearth",
+        "bw-sidereal",
+        "bw-cordage",
+        "bw-northlake"
+      ]
+    },
+    "pace_split": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "left",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "pace-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We work slowly, on purpose.",
+            "size": "7xl",
+            "position": "left"
+          }
+        },
+        "pace-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Good identity work doesn't come out of a five-day sprint. We spend the first week looking and the second week listening. By week three we're making, and by the time we show you anything we've already thrown most of it out.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "pace-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What that means in practice: fewer clients per year, longer projects, and a final mark you can actually use for a decade.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": [
+        "pace-heading",
+        "pace-body-2",
+        "pace-body-1"
+      ]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Notes from clients",
+        "eyebrow_uppercase": true,
+        "title": "What people say.",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "r-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Pixelcraft spent a full week just looking at our shop before they drew a single thing. By the time we saw sketches, they already understood the brand better than I did. The identity they made is the one we'd hoped we could articulate ourselves.",
+            "name": "Nina Vance",
+            "title": "Co-founder · Vance & Oak",
+            "rating": "5"
+          }
+        },
+        "r-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "We went through three agencies before landing here. Pixelcraft is the only studio that pushed back on our brief — and the final magazine redesign is the one that's actually winning us subscribers, not just awards.",
+            "name": "Marcus Kay",
+            "title": "Editor-in-Chief · Orion Quarterly",
+            "rating": "5"
+          }
+        },
+        "r-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Small studio, big taste. They take the time to do the work right and they tell you honestly when you're asking for the wrong thing. That's rarer than it should be.",
+            "name": "Isla Okafor",
+            "title": "Founder · Hearth Coffee",
+            "rating": "5"
+          }
+        },
+        "r-4": {
+          "type": "quote",
+          "settings": {
+            "quote": "The type family they drew for us is going to carry our imprint for the next decade. I've commissioned type from four studios before and none felt this considered.",
+            "name": "Theo Reyes",
+            "title": "Publisher · Cordage Press",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "r-4",
+        "r-2",
+        "r-3",
+        "r-1"
+      ]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Got a project?",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We take two to three new engagements a quarter. Email a paragraph — we reply within two business days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a project",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    },
+    "disciplines_marquee_two": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Brand Identity — Editorial Design — Packaging — Typography — Print — Digital — Art Direction",
+        "separator": "★",
+        "speed": 3,
+        "rotate": -2,
+        "font_size": "lg",
+        "bg_color": "#2f2f2f",
+        "text_color": "#d1f600",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      }
+    },
+    "phases_list": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "How we work",
+        "eyebrow_uppercase": true,
+        "title": "Three phases.",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ph-listen": {
+          "type": "service",
+          "settings": {
+            "title": "Listen",
+            "description": "<p>We read the brief, read your existing materials, and talk to your team and your customers before we open Illustrator.</p>"
+          }
+        },
+        "ph-sketch": {
+          "type": "service",
+          "settings": {
+            "title": "Sketch",
+            "description": "<p>We show directions early and narrow down together. You see the ideas that didn't work as well as the ones that did.</p>"
+          }
+        },
+        "ph-ship": {
+          "type": "service",
+          "settings": {
+            "title": "Ship",
+            "description": "<p>We build the system, package the files, and brief your team so the work has legs after we leave.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "ph-listen",
+        "ph-sketch",
+        "ph-ship"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "disciplines_marquee",
+    "disciplines_marquee_two",
+    "selected_work",
+    "pace_split",
+    "reviews",
+    "phases_list",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-21T14:00:00.000Z",
+  "updated": "2026-04-21T16:32:04.771Z"
+}
