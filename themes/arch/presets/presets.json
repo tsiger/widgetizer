@@ -27,7 +27,8 @@
     {
       "id": "clearpath",
       "name": "Clearpath",
-      "description": "Consultant"
+      "description": "Consultant",
+      "liveDemo": "https://widgetizer.org/demos/clearpath/"
     },
     {
       "id": "codebase",
