@@ -1,0 +1,141 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "intro": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Contact</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's see if this is a fit.",
+            "size": "3xl",
+            "position": "right"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The first call is thirty minutes, video or phone. I'll ask what you're trying to decide and why it's proving hard. If the fit is wrong I'll say so — and often suggest someone better suited. If it's right, we'll sketch what a scoped engagement would look like. No pitch, either way.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+    },
+    "details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "",
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "first-featured",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info": {
+          "type": "info",
+          "settings": {
+            "title": "Clearpath",
+            "text": "<p>Independent strategy and operations advisory. One engagement at a time, by design.</p>"
+          }
+        },
+        "reach": {
+          "type": "text_block",
+          "settings": {
+            "title": "Reach out",
+            "text": "<p>hello@example.com</p><p>(555) 203-9844</p><p>Replies within two business days</p>"
+          }
+        },
+        "availability": {
+          "type": "text_block",
+          "settings": {
+            "title": "Availability",
+            "text": "<p>Booking engagements starting in late spring</p><p>One new engagement a month, maximum</p>"
+          }
+        },
+        "where": {
+          "type": "text_block",
+          "settings": {
+            "title": "Based",
+            "text": "<p>New York</p><p>On-site in the tri-state area, remote elsewhere</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info", "reach", "availability", "where"]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "",
+        "title": "Before you send a note",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "item",
+          "settings": {
+            "question": "What should I send before the call?",
+            "answer": "<p>Ideally: a few sentences on what you're trying to decide, rough numbers on company stage, and whether there's a deadline. That's enough for the first conversation to be useful.</p>"
+          }
+        },
+        "q-2": {
+          "type": "item",
+          "settings": {
+            "question": "Is there a fee for the first conversation?",
+            "answer": "<p>No. The first call is thirty minutes and free. It's a fit call, not billable advisory work.</p>"
+          }
+        },
+        "q-3": {
+          "type": "item",
+          "settings": {
+            "question": "How quickly can we start?",
+            "answer": "<p>Usually four to six weeks from fit call to engagement kickoff. I only run one new engagement a month, so scheduling is the longest variable.</p>"
+          }
+        },
+        "q-4": {
+          "type": "item",
+          "settings": {
+            "question": "What if we're not the right fit?",
+            "answer": "<p>I'll tell you, on the call. In most of those cases I can point you to someone who is. Referring well is part of the work.</p>"
+          }
+        },
+        "sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Prefer email first?",
+            "text": "<p>hello@example.com</p>"
+          }
+        }
+      },
+      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "sidebar"]
+    }
+  },
+  "widgetsOrder": ["intro", "details", "faq"],
+  "id": "contact",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z"
+}

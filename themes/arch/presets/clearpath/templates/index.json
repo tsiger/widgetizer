@@ -1,0 +1,263 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "home_hero_image": {
+      "type": "image",
+      "settings": {
+        "fullwidth": true,
+        "top_spacing": "none",
+        "bottom_spacing": "small"
+      }
+    },
+    "thesis": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small"
+      },
+      "blocks": {
+        "thesis-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The practice</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "thesis-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Good decisions come from clearer thinking, not louder voices.",
+            "size": "5xl",
+            "position": "right"
+          }
+        },
+        "thesis-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Clearpath is an independent strategy and operations advisory for leaders at growth-stage companies. The work is quiet, considered, and specific — one engagement at a time.</p>",
+            "size": "lg",
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "thesis-link": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See the approach",
+              "href": "approach.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["thesis-eyebrow", "thesis-heading", "thesis-body", "thesis-link"]
+    },
+    "client_logos": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Trusted by",
+        "eyebrow_uppercase": true,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "card_layout": "flat",
+        "layout": "grid",
+        "columns_desktop": 6,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "logo-1": { "type": "logo", "settings": { "name": "Northwind Operations" } },
+        "logo-2": { "type": "logo", "settings": { "name": "Halverson Group" } },
+        "logo-3": { "type": "logo", "settings": { "name": "Fieldstone & Co." } },
+        "logo-4": { "type": "logo", "settings": { "name": "Mercer Logistics" } },
+        "logo-5": { "type": "logo", "settings": { "name": "Atlas Products" } },
+        "logo-6": { "type": "logo", "settings": { "name": "Yardstick Retail" } }
+      },
+      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5", "logo-6"]
+    },
+    "how_i_work": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "How I work",
+        "eyebrow_uppercase": true,
+        "title": "Three phases, one engagement",
+        "description": "",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "phase-1": {
+          "type": "service",
+          "settings": {
+            "title": "Diagnose",
+            "description": "<p>Two weeks of listening. Interviews with leadership, a close read of the operating data, and an honest picture of where the real friction lives — not where it's been easiest to talk about it.</p>"
+          }
+        },
+        "phase-2": {
+          "type": "service",
+          "settings": {
+            "title": "Design",
+            "description": "<p>A short document. Priorities, trade-offs, and a sequenced set of decisions. Written to be read by the team and argued with, not filed in a drawer.</p>"
+          }
+        },
+        "phase-3": {
+          "type": "service",
+          "settings": {
+            "title": "Deploy",
+            "description": "<p>Weekly sessions for as long as it takes to make the decisions stick. Quiet, consistent support rather than big-bang delivery.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["phase-1", "phase-2", "phase-3"]
+    },
+    "featured_case": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "case-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Featured engagement</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "case-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "From four-hour ops reviews to forty minutes.",
+            "size": "3xl",
+            "position": "left"
+          }
+        },
+        "case-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A growth-stage logistics company had stopped making decisions in its weekly ops review. Three months of listening, one redrawn agenda, and a deliberately narrower dataset turned the meeting into the most useful hour of the week.</p><p>They crossed Series C during the engagement. The meeting stayed shorter.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "case-link": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Read more engagements",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["case-eyebrow", "case-heading", "case-body", "case-link"]
+    },
+    "client_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I'd worked with three consultancies before Clearpath. The difference was that they actually listened first — and when they wrote something down, it was shorter than I'd expected and more useful than I'd hoped.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "author-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Elena Hoffmann",
+            "size": "lg"
+          }
+        },
+        "author-role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>COO, Mercer Logistics</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote", "author-name", "author-role"]
+    },
+    "closing": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have something specific on your mind?",
+            "size": "3xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A thirty-minute call. No pitch, no obligation.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a conversation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-button"]
+    }
+  },
+  "widgetsOrder": ["home_hero_image", "thesis", "client_logos", "how_i_work", "featured_case", "client_quote", "closing"],
+  "id": "index",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z"
+}

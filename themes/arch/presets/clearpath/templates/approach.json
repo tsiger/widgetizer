@@ -1,0 +1,206 @@
+{
+  "name": "Approach",
+  "slug": "approach",
+  "widgets": {
+    "intro": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Approach</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Advisory with a shape, not an open tab.",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most consulting relationships drift. A clear engagement has a beginning, a middle, and an end — and the work ships in all three. Here's what that looks like in practice.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+    },
+    "phases": {
+      "type": "checkerboard",
+      "settings": {
+        "eyebrow": "The shape",
+        "eyebrow_uppercase": true,
+        "title": "Diagnose. Design. Deploy.",
+        "description": "",
+        "heading_alignment": "center",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "card-diagnose": {
+          "type": "card",
+          "settings": {
+            "title": "Diagnose",
+            "description": "<p>Two weeks. Interviews with leadership and the people doing the work. A close read of the operating data. The goal is an honest picture of where the friction actually lives — and where the organization has been quietly pointing away from it.</p>"
+          }
+        },
+        "card-design": {
+          "type": "card",
+          "settings": {
+            "title": "Design",
+            "description": "<p>Two to three weeks. A short document — usually fewer than a dozen pages — that names the decisions to make, the order to make them in, and the trade-offs inside each. Written to be argued with, not presented.</p>"
+          }
+        },
+        "card-deploy": {
+          "type": "card",
+          "settings": {
+            "title": "Deploy",
+            "description": "<p>Eight to twelve weeks. Weekly sessions with the decision-makers who need to carry the work forward. The role shifts from advisor to standing peer — present when useful, quiet when not.</p>"
+          }
+        },
+        "card-spacer-1": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "card-spacer-2": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "card-spacer-3": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        }
+      },
+      "blocksOrder": ["card-diagnose", "card-spacer-1", "card-deploy", "card-spacer-2", "card-design", "card-spacer-3"]
+    },
+    "engagement_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you reach out",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "item",
+          "settings": {
+            "question": "How long is a typical engagement?",
+            "answer": "<p>Between eight and sixteen weeks end to end. Diagnose and Design take four to six weeks; Deploy runs for as long as the decisions need support to stick.</p>"
+          }
+        },
+        "q-2": {
+          "type": "item",
+          "settings": {
+            "question": "How do fees work?",
+            "answer": "<p>Fixed-fee per engagement, scoped after the first conversation. No retainers and no hourly billing — both tend to blur what the work is actually for.</p>"
+          }
+        },
+        "q-3": {
+          "type": "item",
+          "settings": {
+            "question": "Who do you not work with?",
+            "answer": "<p>Companies earlier than Series A, industries where I can't bring a useful mental model (deep-tech hardware, regulated pharma), and teams whose leader isn't the person I'd be working with. Specificity is part of the service.</p>"
+          }
+        },
+        "q-4": {
+          "type": "item",
+          "settings": {
+            "question": "What does the first call cover?",
+            "answer": "<p>Thirty minutes, video or phone. I'll ask what you're trying to decide and why it's proving hard. If the fit is wrong I'll say so and often suggest someone better. If it's right, we sketch what a scoped engagement would look like.</p>"
+          }
+        },
+        "q-5": {
+          "type": "item",
+          "settings": {
+            "question": "Can you work alongside an existing team or firm?",
+            "answer": "<p>Yes — and it's common. Advisory work often complements a CFO, COO, or strategy lead; it's not a replacement for them.</p>"
+          }
+        },
+        "sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still not sure?",
+            "text": "<p>The first conversation is the right place for that question.</p><p>hello@example.com</p>"
+          }
+        }
+      },
+      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "q-5", "sidebar"]
+    },
+    "closing": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have something specific on your mind?",
+            "size": "3xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A thirty-minute call. No pitch, no obligation.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a conversation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-button"]
+    }
+  },
+  "widgetsOrder": ["intro", "phases", "engagement_faq", "closing"],
+  "id": "approach",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z"
+}

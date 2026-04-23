@@ -25,6 +25,11 @@
       "liveDemo": "https://widgetizer.org/demos/brightside/"
     },
     {
+      "id": "clearpath",
+      "name": "Clearpath",
+      "description": "Consultant"
+    },
+    {
       "id": "codebase",
       "name": "Codebase",
       "description": "Web development studio",
@@ -47,6 +52,11 @@
       "name": "Everafter",
       "description": "Wedding planner",
       "liveDemo": "https://widgetizer.org/demos/everafter/"
+    },
+    {
+      "id": "formline",
+      "name": "Formline",
+      "description": "Architecture firm"
     },
     {
       "id": "greenfield",

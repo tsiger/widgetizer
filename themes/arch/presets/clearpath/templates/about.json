@@ -1,0 +1,271 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "intro": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "portrait": {
+          "type": "image",
+          "settings": {
+            "width": 100,
+            "position": "left"
+          }
+        },
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "right"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "An independent advisor, by design.",
+            "size": "3xl",
+            "position": "right"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I spent twelve years inside the kind of companies I now advise — two as a founder, six leading operations at a growth-stage SaaS business, and four as a partner at a boutique consulting firm I left because it had gotten too big to pay attention.</p><p>Clearpath is the shape of the practice I wanted to find when I needed one, and couldn't.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["portrait", "intro-eyebrow", "intro-heading", "intro-body"]
+    },
+    "credentials": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "alignment": "start",
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cred-1": {
+          "type": "item",
+          "settings": {
+            "icon": "compass",
+            "title": "Twelve years advising",
+            "text": "Growth-stage operations and strategy"
+          }
+        },
+        "cred-2": {
+          "type": "item",
+          "settings": {
+            "icon": "building-skyscraper",
+            "title": "Former boutique partner",
+            "text": "Left to work one engagement at a time"
+          }
+        },
+        "cred-3": {
+          "type": "item",
+          "settings": {
+            "icon": "world",
+            "title": "Eight industries served",
+            "text": "Logistics, SaaS, retail, professional services"
+          }
+        },
+        "cred-4": {
+          "type": "item",
+          "settings": {
+            "icon": "book",
+            "title": "Writing and teaching",
+            "text": "Occasional essays, occasional workshops"
+          }
+        }
+      },
+      "blocksOrder": ["cred-1", "cred-2", "cred-3", "cred-4"]
+    },
+    "beliefs": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "beliefs-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What I believe about this work.",
+            "size": "3xl"
+          }
+        },
+        "beliefs-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Good consulting is mostly careful listening and accurate writing. The frameworks can be learned in an afternoon; the willingness to sit with a problem for a week until you actually understand it takes longer.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "beliefs-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most operating friction is social, not analytical. The math is usually fine. What breaks is the part where a group of intelligent people agree on what to do next — and that part is solved through clarity of language, not volume of data.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "beliefs-body-3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I'd rather be useful to a small number of people than visible to a large number. The practice is deliberately small and deliberately slow.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["beliefs-heading", "beliefs-body-1", "beliefs-body-2", "beliefs-body-3"]
+    },
+    "journey": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "",
+        "title": "How I got here",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "stop-1": {
+          "type": "item",
+          "settings": {
+            "date": "2011 — 2013",
+            "title": "Founded and sold a small SaaS",
+            "description": "<p>Two years of learning that most startup problems are about communication, not product.</p>"
+          }
+        },
+        "stop-2": {
+          "type": "item",
+          "settings": {
+            "date": "2013 — 2019",
+            "title": "VP Operations, growth-stage SaaS",
+            "description": "<p>Six years scaling a business from thirty people to four hundred. Learned the failure modes of every operating ritual at least twice.</p>"
+          }
+        },
+        "stop-3": {
+          "type": "item",
+          "settings": {
+            "date": "2019 — 2023",
+            "title": "Partner, boutique consulting firm",
+            "description": "<p>Four years of client work. Left when the firm grew past the point where I could remember every client's name.</p>"
+          }
+        },
+        "stop-4": {
+          "type": "item",
+          "settings": {
+            "date": "2023 — now",
+            "title": "Clearpath",
+            "description": "<p>Independent practice. One engagement at a time, by design.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["stop-1", "stop-2", "stop-3", "stop-4"]
+    },
+    "peer_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>She's the only person I know who treats \"I don't know yet\" as a complete sentence. That turns out to be the most valuable thing a consultant can say.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "author-name": {
+          "type": "heading",
+          "settings": {
+            "text": "David Okafor",
+            "size": "lg"
+          }
+        },
+        "author-role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Former colleague, now founder</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote", "author-name", "author-role"]
+    },
+    "closing": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have something specific on your mind?",
+            "size": "3xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A thirty-minute call. No pitch, no obligation.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a conversation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-button"]
+    }
+  },
+  "widgetsOrder": ["intro", "credentials", "beliefs", "journey", "peer_quote", "closing"],
+  "id": "about",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z"
+}

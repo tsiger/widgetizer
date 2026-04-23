@@ -9,12 +9,12 @@
 | 1 | arch | Arch | Consulting | DONE |
 | 2 | brewline | Brewline | Cafe / Coffee Shop | DONE |
 | 3 | brightside | Brightside | Dentist | DONE |
-| 4 | clearpath | Clearpath | Consultant |  |
+| 4 | clearpath | Clearpath | Consultant | DONE |
 | 5 | codebase | Codebase | Web Development Studio | DONE |
 | 6 | corkwell | Corkwell | Bar / Wine Bar | DONE |
 | 7 | crumbly | Crumbly | Bakery | DONE |
 | 8 | everafter | Everafter | Wedding Planner | DONE |
-| 9 | formline | Formline | Architecture Firm |  |
+| 9 | formline | Formline | Architecture Firm | DONE |
 | 10 | framelight | Framelight | Photographer |  |
 | 11 | greenfield | Greenfield | Landscaping | DONE |
 | 12 | greystone | Greystone | Lawyer / Law Firm | DONE |

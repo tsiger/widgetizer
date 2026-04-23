@@ -1,0 +1,22 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Clearpath",
+    "logoMaxWidth": 150,
+    "contactDetailsLine1": "hello@example.com",
+    "contactDetailsLine2": "(555) 203-9844",
+    "contact_position": "logo",
+    "headerNavigation": "main-menu",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Start a conversation",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "secondary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": false,
+    "color_scheme": "standard-primary"
+  }
+}

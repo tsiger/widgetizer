@@ -1,0 +1,229 @@
+{
+  "name": "Work",
+  "slug": "work",
+  "widgets": {
+    "intro": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Selected engagements. Names changed where the work was confidential.",
+            "size": "4xl",
+            "position": "right"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Three cases that represent the range — an operational turnaround, a product-led repositioning, and a quieter strategy reset. Each ran between eight and fourteen weeks.</p>",
+            "size": "base",
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+    },
+    "case_ops": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Case · Logistics</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "From four-hour ops reviews to forty minutes.",
+            "size": "2xl"
+          }
+        },
+        "body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A forty-person logistics operator had stopped making decisions in its weekly ops review. Over twelve weeks we redrew the agenda, narrowed the dataset to the six metrics that actually moved the business, and trained the ops lead to chair it without a consultant in the room.</p><p>The review is now the most useful hour of their week. They crossed Series C during the engagement.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "body"]
+    },
+    "case_product": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Case · Consumer products</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Repositioning a mid-market brand that had stopped standing for anything.",
+            "size": "2xl"
+          }
+        },
+        "body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A thirty-year consumer goods brand had drifted onto a middle shelf that nobody was reaching for. Ten weeks of customer interviews, a narrow repositioning around a single category claim, and a quarter of focused trade activation.</p><p>Same product, different story. Twelve percent lift in a category that was flat.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "body"]
+    },
+    "case_services": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Case · Professional services</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A small practice doubling revenue without hiring.",
+            "size": "2xl"
+          }
+        },
+        "body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A seven-person boutique practice was turning away work while staff were burning out. No revenue problem — a sequencing problem. Eight weeks redrawing how engagements were scoped, priced, and staffed.</p><p>Revenue up sixty percent, headcount flat, and the founding partner took her first real holiday in four years.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["eyebrow", "heading", "body"]
+    },
+    "full_logos": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "More clients",
+        "eyebrow_uppercase": true,
+        "title": "",
+        "description": "",
+        "heading_alignment": "center",
+        "card_layout": "flat",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "logo-1": { "type": "logo", "settings": { "name": "Northwind Operations" } },
+        "logo-2": { "type": "logo", "settings": { "name": "Halverson Group" } },
+        "logo-3": { "type": "logo", "settings": { "name": "Fieldstone & Co." } },
+        "logo-4": { "type": "logo", "settings": { "name": "Mercer Logistics" } },
+        "logo-5": { "type": "logo", "settings": { "name": "Atlas Products" } },
+        "logo-6": { "type": "logo", "settings": { "name": "Yardstick Retail" } },
+        "logo-7": { "type": "logo", "settings": { "name": "Penrose Studio" } },
+        "logo-8": { "type": "logo", "settings": { "name": "Brookline Labs" } }
+      },
+      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5", "logo-6", "logo-7", "logo-8"]
+    },
+    "closing": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have something specific on your mind?",
+            "size": "3xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A thirty-minute call. No pitch, no obligation.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start a conversation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-button"]
+    }
+  },
+  "widgetsOrder": ["intro", "case_ops", "case_product", "case_services", "full_logos", "closing"],
+  "id": "work",
+  "created": "2026-04-22T10:00:00.000Z",
+  "updated": "2026-04-22T10:00:00.000Z"
+}
