@@ -5,10 +5,10 @@
     "contact_hero": {
       "type": "banner",
       "settings": {
-        "height": "medium",
+        "height": "small",
         "fullwidth": true,
         "content_width": "medium",
-        "alignment": "center",
+        "alignment": "start",
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
@@ -28,7 +28,7 @@
           "type": "heading",
           "settings": {
             "text": "Bring your dog in.",
-            "size": "5xl"
+            "size": "7xl"
           }
         },
         "hero-text": {
@@ -41,7 +41,11 @@
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "contact_callout": {
       "type": "image-callout",
@@ -91,7 +95,12 @@
           }
         }
       },
-      "blocksOrder": ["callout-heading", "callout-text", "callout-features", "callout-button"]
+      "blocksOrder": [
+        "callout-heading",
+        "callout-text",
+        "callout-features",
+        "callout-button"
+      ]
     },
     "contact_details": {
       "type": "contact-details",
@@ -124,7 +133,11 @@
           }
         }
       },
-      "blocksOrder": ["info-book", "info-find", "info-parking"]
+      "blocksOrder": [
+        "info-book",
+        "info-find",
+        "info-parking"
+      ]
     },
     "contact_map": {
       "type": "map",
@@ -138,7 +151,12 @@
       }
     }
   },
-  "widgetsOrder": ["contact_hero", "contact_callout", "contact_details", "contact_map"],
+  "widgetsOrder": [
+    "contact_hero",
+    "contact_callout",
+    "contact_details",
+    "contact_map"
+  ],
   "id": "contact",
   "created": "2026-04-23T10:00:00.000Z",
   "updated": "2026-04-23T15:00:00.000Z"

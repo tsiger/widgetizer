@@ -87,9 +87,9 @@ Image references live OUTSIDE the preset JSON files per the image rule — apply
 | `firstvisit_steps` | `steps` | block `step-dry` → `image` | `first-visit-step-dry.jpg` | 1280×960 |
 | `firstvisit_steps` | `steps` | block `step-groom` → `image` | `first-visit-step-groom.jpg` | 1280×960 |
 | `firstvisit_steps` | `steps` | block `step-pickup` → `image` | `first-visit-step-pickup.jpg` | 1280×960 |
-| `firstvisit_diff` | `checkerboard` | block `diff-pace` → `image` | `firstvisit-diff-pace.jpg` | 1280×960 |
-| `firstvisit_diff` | `checkerboard` | block `diff-honest` → `image` | `firstvisit-diff-honest.jpg` | 1280×960 |
-| `firstvisit_diff` | `checkerboard` | block `diff-notes` → `image` | `firstvisit-diff-notes.jpg` | 1280×960 |
+| `firstvisit_diff` | `checkerboard` | block `diff-pace-image` → `image` | `firstvisit-diff-pace.jpg` | 1280×960 |
+| `firstvisit_diff` | `checkerboard` | block `diff-honest-image` → `image` | `firstvisit-diff-honest.jpg` | 1280×960 |
+| `firstvisit_diff` | `checkerboard` | block `diff-notes-image` → `image` | `firstvisit-diff-notes.jpg` | 1280×960 |
 | `firstvisit_bring` | `icon-card-grid` | — (icons only) | — | — |
 | `firstvisit_meet` | `image-callout` | `image` (widget) | `firstvisit-meet.jpg` | 1280×1280 |
 | `firstvisit_faq` | `accordion` | — | — | — |

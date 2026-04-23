@@ -9,10 +9,11 @@
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "start",
-        "vertical_alignment": "end",
+        "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "top_spacing": "auto",
+        "bottom_spacing": "auto",
+        "overlay_color": "#0a1e388a"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -28,7 +29,7 @@
           "type": "heading",
           "settings": {
             "text": "Four humans. Twenty-five years between us.",
-            "size": "5xl"
+            "size": "7xl"
           }
         },
         "hero-text": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "groomers_intro": {
       "type": "image-text",
@@ -88,7 +93,12 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text", "intro-button"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-text",
+        "intro-button"
+      ]
     },
     "groomers_team": {
       "type": "profile-grid",
@@ -145,7 +155,12 @@
           }
         }
       },
-      "blocksOrder": ["groomer-mara", "groomer-dani", "groomer-rae", "groomer-jules"]
+      "blocksOrder": [
+        "groomer-mara",
+        "groomer-dani",
+        "groomer-rae",
+        "groomer-jules"
+      ]
     },
     "groomers_promise": {
       "type": "icon-card-grid",
@@ -197,67 +212,12 @@
           }
         }
       },
-      "blocksOrder": ["promise-no-sedation", "promise-breaks", "promise-no-crate", "promise-notes"]
-    },
-    "groomers_moments": {
-      "type": "slideshow",
-      "settings": {
-        "height": "medium",
-        "fullwidth": true,
-        "autoplay": true,
-        "autoplay_speed": 5000
-      },
-      "blocks": {
-        "moment-bath": {
-          "type": "slide",
-          "settings": {
-            "heading_text": "Bath days are good days.",
-            "text_content": "Hypoallergenic shampoo by default. Scent-free or medicated on request.",
-            "alignment": "start",
-            "vertical_alignment": "end",
-            "heading_size": "3xl",
-            "text_size": "base",
-            "color_scheme": "highlight-primary"
-          }
-        },
-        "moment-dry": {
-          "type": "slide",
-          "settings": {
-            "heading_text": "Hand-dried, every coat.",
-            "text_content": "Low-noise forced-air, never crate dryers. About 20–40 minutes.",
-            "alignment": "start",
-            "vertical_alignment": "end",
-            "heading_size": "3xl",
-            "text_size": "base",
-            "color_scheme": "highlight-primary"
-          }
-        },
-        "moment-cut": {
-          "type": "slide",
-          "settings": {
-            "heading_text": "Breed-aware cuts.",
-            "text_content": "We cut to your breed, not a default style.",
-            "alignment": "start",
-            "vertical_alignment": "end",
-            "heading_size": "3xl",
-            "text_size": "base",
-            "color_scheme": "highlight-primary"
-          }
-        },
-        "moment-pickup": {
-          "type": "slide",
-          "settings": {
-            "heading_text": "One happy dog at pickup.",
-            "text_content": "Plus a written note on what we noticed.",
-            "alignment": "start",
-            "vertical_alignment": "end",
-            "heading_size": "3xl",
-            "text_size": "base",
-            "color_scheme": "highlight-primary"
-          }
-        }
-      },
-      "blocksOrder": ["moment-bath", "moment-dry", "moment-cut", "moment-pickup"]
+      "blocksOrder": [
+        "promise-no-sedation",
+        "promise-breaks",
+        "promise-no-crate",
+        "promise-notes"
+      ]
     },
     "groomers_quote": {
       "type": "testimonial-hero",
@@ -292,13 +252,19 @@
           }
         }
       },
-      "blocksOrder": ["quote-text", "quote-author", "quote-meta"]
+      "blocksOrder": [
+        "quote-text",
+        "quote-author",
+        "quote-meta"
+      ]
     },
     "groomers_close": {
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "close-heading": {
@@ -336,10 +302,21 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-text", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-text",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["groomers_hero", "groomers_intro", "groomers_team", "groomers_promise", "groomers_moments", "groomers_quote", "groomers_close"],
+  "widgetsOrder": [
+    "groomers_hero",
+    "groomers_intro",
+    "groomers_team",
+    "groomers_promise",
+    "groomers_quote",
+    "groomers_close"
+  ],
   "id": "groomers",
   "created": "2026-04-23T10:00:00.000Z",
   "updated": "2026-04-23T15:00:00.000Z"

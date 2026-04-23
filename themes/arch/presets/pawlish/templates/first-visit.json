@@ -7,12 +7,12 @@
       "settings": {
         "height": "medium",
         "fullwidth": true,
-        "content_width": "medium",
+        "content_width": "narrow",
         "alignment": "start",
-        "vertical_alignment": "end",
+        "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -28,7 +28,7 @@
           "type": "heading",
           "settings": {
             "text": "Your dog's first visit, step by step.",
-            "size": "5xl"
+            "size": "7xl"
           }
         },
         "hero-text": {
@@ -41,7 +41,11 @@
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "firstvisit_steps": {
       "type": "steps",
@@ -96,7 +100,14 @@
           }
         }
       },
-      "blocksOrder": ["step-dropoff", "step-settling", "step-bath", "step-dry", "step-groom", "step-pickup"]
+      "blocksOrder": [
+        "step-dropoff",
+        "step-settling",
+        "step-bath",
+        "step-dry",
+        "step-groom",
+        "step-pickup"
+      ]
     },
     "firstvisit_diff": {
       "type": "checkerboard",
@@ -105,7 +116,7 @@
         "eyebrow_uppercase": true,
         "title": "Three things you'll notice on day one.",
         "heading_alignment": "center",
-        "columns_desktop": 1,
+        "columns_desktop": 3,
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -139,9 +150,52 @@
             "title": "We tell you what we see.",
             "description": "<p>Written notes at every pickup — skin, nails, behavior, anything off. The hot spot you hadn't noticed. The nail quick that's getting too long. The ear that needs a recheck.</p>"
           }
+        },
+        "diff-pace-image": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "<p></p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "diff-honest-image": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "<p></p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "diff-notes-image": {
+          "type": "card",
+          "settings": {
+            "title": "",
+            "description": "<p></p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
+          }
         }
       },
-      "blocksOrder": ["diff-pace", "diff-honest", "diff-notes"]
+      "blocksOrder": [
+        "diff-pace",
+        "diff-pace-image",
+        "diff-honest",
+        "diff-honest-image",
+        "diff-notes",
+        "diff-notes-image"
+      ]
     },
     "firstvisit_bring": {
       "type": "icon-card-grid",
@@ -193,7 +247,12 @@
           }
         }
       },
-      "blocksOrder": ["bring-vaccines", "bring-history", "bring-sensitivities", "bring-time"]
+      "blocksOrder": [
+        "bring-vaccines",
+        "bring-history",
+        "bring-sensitivities",
+        "bring-time"
+      ]
     },
     "firstvisit_meet": {
       "type": "image-callout",
@@ -243,7 +302,12 @@
           }
         }
       },
-      "blocksOrder": ["meet-heading", "meet-text", "meet-features", "meet-button"]
+      "blocksOrder": [
+        "meet-heading",
+        "meet-text",
+        "meet-features",
+        "meet-button"
+      ]
     },
     "firstvisit_faq": {
       "type": "accordion",
@@ -255,7 +319,7 @@
         "style": "separated",
         "allow_multiple": false,
         "sidebar_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-secondary"
       },
       "blocks": {
         "faq-info": {
@@ -308,13 +372,23 @@
           }
         }
       },
-      "blocksOrder": ["faq-info", "faq-never-groomed", "faq-anxious", "faq-seniors", "faq-stay", "faq-cant-finish", "faq-cats"]
+      "blocksOrder": [
+        "faq-info",
+        "faq-never-groomed",
+        "faq-anxious",
+        "faq-seniors",
+        "faq-stay",
+        "faq-cant-finish",
+        "faq-cats"
+      ]
     },
     "firstvisit_close": {
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "close-heading": {
@@ -337,10 +411,21 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["firstvisit_hero", "firstvisit_steps", "firstvisit_diff", "firstvisit_bring", "firstvisit_meet", "firstvisit_faq", "firstvisit_close"],
+  "widgetsOrder": [
+    "firstvisit_hero",
+    "firstvisit_steps",
+    "firstvisit_diff",
+    "firstvisit_bring",
+    "firstvisit_meet",
+    "firstvisit_faq",
+    "firstvisit_close"
+  ],
   "id": "first-visit",
   "created": "2026-04-23T10:00:00.000Z",
   "updated": "2026-04-23T15:00:00.000Z"

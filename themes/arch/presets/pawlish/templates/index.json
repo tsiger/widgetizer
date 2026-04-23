@@ -7,12 +7,13 @@
       "settings": {
         "height": "large",
         "fullwidth": true,
-        "content_width": "medium",
+        "content_width": "narrow",
         "alignment": "start",
-        "vertical_alignment": "end",
+        "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none",
-        "bottom_spacing": "none"
+        "top_spacing": "auto",
+        "bottom_spacing": "auto",
+        "overlay_color": "#0a1e3899"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -28,7 +29,7 @@
           "type": "heading",
           "settings": {
             "text": "Happier dogs, in and out.",
-            "size": "5xl"
+            "size": "9xl"
           }
         },
         "hero-text": {
@@ -97,7 +98,7 @@
           "settings": {
             "title": "Calm intake, every time",
             "description": "Five minutes to meet your dog before anything starts. We never rush a nervous one.",
-            "size": "md",
+            "size": "medium",
             "shape": "circle"
           }
         },
@@ -106,7 +107,7 @@
           "settings": {
             "title": "Hand-dried, never crated",
             "description": "Low-noise forced-air dryers, held by a person. No crate dryers, ever.",
-            "size": "md",
+            "size": "medium",
             "shape": "circle"
           }
         },
@@ -115,7 +116,7 @@
           "settings": {
             "title": "Notes at pickup",
             "description": "Skin, nails, anything we noticed — written down so you don't forget.",
-            "size": "md",
+            "size": "medium",
             "shape": "circle"
           }
         },
@@ -156,7 +157,7 @@
         "icon_style": "filled",
         "icon_size": "xl",
         "icon_shape": "circle",
-        "color_scheme": "standard-primary"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "svc-full-groom": {
@@ -165,12 +166,7 @@
             "icon": "wand",
             "subtitle": "From $55",
             "title": "Full groom",
-            "description": "Bath, hand-dry, breed-aware cut, nails, ears.",
-            "button_link": {
-              "text": "See pricing",
-              "href": "services.html",
-              "target": "_self"
-            }
+            "description": "Bath, hand-dry, breed-aware cut, nails, ears."
           }
         },
         "svc-bath-tidy": {
@@ -179,12 +175,7 @@
             "icon": "bath",
             "subtitle": "From $35",
             "title": "Bath & tidy",
-            "description": "The clean-up between full grooms — keeps your dog comfortable.",
-            "button_link": {
-              "text": "See pricing",
-              "href": "services.html",
-              "target": "_self"
-            }
+            "description": "The clean-up between full grooms — keeps your dog comfortable."
           }
         },
         "svc-deshed": {
@@ -193,12 +184,7 @@
             "icon": "wind",
             "subtitle": "From $40",
             "title": "De-shed",
-            "description": "Undercoat work for double-coated breeds. Bath included.",
-            "button_link": {
-              "text": "See pricing",
-              "href": "services.html",
-              "target": "_self"
-            }
+            "description": "Undercoat work for double-coated breeds. Bath included."
           }
         },
         "svc-hand-strip": {
@@ -207,12 +193,7 @@
             "icon": "shield",
             "subtitle": "From $60",
             "title": "Hand-stripping",
-            "description": "Traditional coat work for terriers and schnauzers.",
-            "button_link": {
-              "text": "See pricing",
-              "href": "services.html",
-              "target": "_self"
-            }
+            "description": "Traditional coat work for terriers and schnauzers."
           }
         },
         "svc-nail-ear": {
@@ -221,12 +202,7 @@
             "icon": "paw",
             "subtitle": "From $18",
             "title": "Nails & ears",
-            "description": "Walk-in service. No appointment needed during open hours.",
-            "button_link": {
-              "text": "Walk in",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "description": "Walk-in service. No appointment needed during open hours."
           }
         },
         "svc-puppy": {
@@ -235,12 +211,7 @@
             "icon": "heart",
             "subtitle": "From $35",
             "title": "Puppy first groom",
-            "description": "Under six months. Bath, light tidy, lots of breaks.",
-            "button_link": {
-              "text": "Book this",
-              "href": "contact.html",
-              "target": "_self"
-            }
+            "description": "Under six months. Bath, light tidy, lots of breaks."
           }
         }
       },
@@ -268,101 +239,6 @@
         "initial_position": 35,
         "show_labels": true,
         "color_scheme": "standard-secondary"
-      }
-    },
-    "home_bento": {
-      "type": "bento-grid",
-      "settings": {
-        "eyebrow": "Recent cuts",
-        "eyebrow_uppercase": true,
-        "title": "From this week's table.",
-        "description": "Real dogs. Real grooms. No stock photography.",
-        "heading_alignment": "center",
-        "gap": "medium",
-        "color_scheme": "standard-primary"
-      },
-      "blocks": {
-        "bento-maple": {
-          "type": "item",
-          "settings": {
-            "title": "Maple",
-            "text": "Goldendoodle teddy",
-            "col_span": "2",
-            "row_span": "2",
-            "alignment": "end"
-          }
-        },
-        "bento-otis": {
-          "type": "item",
-          "settings": {
-            "title": "Otis",
-            "text": "Schnauzer hand-strip",
-            "col_span": "1",
-            "row_span": "1",
-            "alignment": "end"
-          }
-        },
-        "bento-koda": {
-          "type": "item",
-          "settings": {
-            "title": "Koda",
-            "text": "Husky de-shed",
-            "col_span": "1",
-            "row_span": "1",
-            "alignment": "end"
-          }
-        },
-        "bento-stat": {
-          "type": "item",
-          "settings": {
-            "title": "740+",
-            "text": "Dogs on the books",
-            "col_span": "2",
-            "row_span": "1",
-            "background_color": "highlight-primary",
-            "alignment": "center"
-          }
-        },
-        "bento-luna": {
-          "type": "item",
-          "settings": {
-            "title": "Luna",
-            "text": "Cavalier tidy",
-            "col_span": "1",
-            "row_span": "1",
-            "alignment": "end"
-          }
-        },
-        "bento-marlow": {
-          "type": "item",
-          "settings": {
-            "title": "Marlow",
-            "text": "Senior labrador bath",
-            "col_span": "2",
-            "row_span": "1",
-            "alignment": "end"
-          }
-        }
-      },
-      "blocksOrder": [
-        "bento-maple",
-        "bento-otis",
-        "bento-koda",
-        "bento-stat",
-        "bento-luna",
-        "bento-marlow"
-      ]
-    },
-    "home_marquee": {
-      "type": "scrolling-text",
-      "settings": {
-        "text": "Doodles · Schnauzers · Huskies · Terriers · Poodles · Bernedoodles · Cavaliers · Goldens · Cockapoos · Yorkies · Bichons · Shibas · Shelties · Border Collies · Aussies · Cocker spaniels · Senior dogs welcome · Anxious dogs welcome",
-        "separator": " · ",
-        "speed": "medium",
-        "rotate": false,
-        "font_size": "xl",
-        "top_spacing": "small",
-        "bottom_spacing": "small"
       }
     },
     "home_testimonials": {
@@ -421,7 +297,9 @@
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "close-heading": {
@@ -465,8 +343,6 @@
     "home_promise",
     "home_services",
     "home_compare",
-    "home_bento",
-    "home_marquee",
     "home_testimonials",
     "home_close"
   ],

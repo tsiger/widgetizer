@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-secondary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "overlay_color": "#0a1e388a"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -28,7 +29,7 @@
           "type": "heading",
           "settings": {
             "text": "What we do, what it costs.",
-            "size": "4xl"
+            "size": "7xl"
           }
         },
         "hero-text": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "services_pricing": {
       "type": "pricing",
@@ -102,7 +107,11 @@
           }
         }
       },
-      "blocksOrder": ["plan-small", "plan-medium", "plan-large"]
+      "blocksOrder": [
+        "plan-small",
+        "plan-medium",
+        "plan-large"
+      ]
     },
     "services_visual": {
       "type": "bento-grid",
@@ -112,7 +121,7 @@
         "title": "Six services, six approaches.",
         "description": "Each one shaped around the coat, the breed, and how your dog likes to be handled.",
         "heading_alignment": "center",
-        "gap": "medium",
+        "gap": "var(--space-lg)",
         "color_scheme": "standard-secondary"
       },
       "blocks": {
@@ -128,7 +137,9 @@
               "text": "Book a full groom",
               "href": "contact.html",
               "target": "_self"
-            }
+            },
+            "text_color": "light",
+            "overlay_color": "#0a1e3854"
           }
         },
         "bento-bath": {
@@ -138,7 +149,9 @@
             "text": "Between full grooms.",
             "col_span": "1",
             "row_span": "1",
-            "alignment": "end"
+            "alignment": "end",
+            "text_color": "light",
+            "overlay_color": "#0a1e386e"
           }
         },
         "bento-deshed": {
@@ -148,7 +161,9 @@
             "text": "Double-coat undercoat work.",
             "col_span": "1",
             "row_span": "1",
-            "alignment": "end"
+            "alignment": "end",
+            "text_color": "light",
+            "overlay_color": "#0a1e386e"
           }
         },
         "bento-hand-strip": {
@@ -158,7 +173,9 @@
             "text": "Traditional terrier coats.",
             "col_span": "1",
             "row_span": "1",
-            "alignment": "end"
+            "alignment": "end",
+            "text_color": "light",
+            "overlay_color": "#0a1e386e"
           }
         },
         "bento-nail": {
@@ -168,21 +185,19 @@
             "text": "Walk-in, no appointment.",
             "col_span": "1",
             "row_span": "1",
-            "alignment": "end"
-          }
-        },
-        "bento-puppy": {
-          "type": "item",
-          "settings": {
-            "title": "Puppy first groom",
-            "text": "Under six months.",
-            "col_span": "2",
-            "row_span": "1",
-            "alignment": "end"
+            "alignment": "end",
+            "text_color": "light",
+            "overlay_color": "#0a1e386e"
           }
         }
       },
-      "blocksOrder": ["bento-full", "bento-bath", "bento-deshed", "bento-hand-strip", "bento-nail", "bento-puppy"]
+      "blocksOrder": [
+        "bento-full",
+        "bento-bath",
+        "bento-deshed",
+        "bento-hand-strip",
+        "bento-nail"
+      ]
     },
     "services_included": {
       "type": "icon-card-grid",
@@ -199,7 +214,8 @@
         "icon_style": "filled",
         "icon_size": "xl",
         "icon_shape": "circle",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "featured_image_position": "end"
       },
       "blocks": {
         "inc-intake": {
@@ -233,41 +249,14 @@
             "title": "Low-noise dryers",
             "description": "Forced-air, hand-held. Never a crate dryer."
           }
-        },
-        "inc-eta": {
-          "type": "card",
-          "settings": {
-            "icon": "clock",
-            "title": "Honest timing",
-            "description": "We text you a real ETA, not a guess."
-          }
-        },
-        "inc-seniors": {
-          "type": "card",
-          "settings": {
-            "icon": "heart",
-            "title": "Gentle on seniors",
-            "description": "Breaks built in for older dogs."
-          }
-        },
-        "inc-tools": {
-          "type": "card",
-          "settings": {
-            "icon": "shield",
-            "title": "Sanitized tools",
-            "description": "Hand-checked between every dog."
-          }
-        },
-        "inc-notes": {
-          "type": "card",
-          "settings": {
-            "icon": "clipboard-text",
-            "title": "Pickup notes",
-            "description": "What we noticed about your dog, in writing."
-          }
         }
       },
-      "blocksOrder": ["inc-intake", "inc-shampoo", "inc-cut", "inc-dryer", "inc-eta", "inc-seniors", "inc-tools", "inc-notes"]
+      "blocksOrder": [
+        "inc-intake",
+        "inc-shampoo",
+        "inc-cut",
+        "inc-dryer"
+      ]
     },
     "services_faq": {
       "type": "accordion",
@@ -325,13 +314,22 @@
           }
         }
       },
-      "blocksOrder": ["faq-info", "faq-over-listed", "faq-condition-fee", "faq-walk-in", "faq-split", "faq-shave"]
+      "blocksOrder": [
+        "faq-info",
+        "faq-over-listed",
+        "faq-condition-fee",
+        "faq-walk-in",
+        "faq-split",
+        "faq-shave"
+      ]
     },
     "services_close": {
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
       },
       "blocks": {
         "close-heading": {
@@ -354,10 +352,20 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["services_hero", "services_pricing", "services_visual", "services_included", "services_faq", "services_close"],
+  "widgetsOrder": [
+    "services_hero",
+    "services_pricing",
+    "services_visual",
+    "services_included",
+    "services_faq",
+    "services_close"
+  ],
   "id": "services",
   "created": "2026-04-23T10:00:00.000Z",
   "updated": "2026-04-23T15:00:00.000Z"

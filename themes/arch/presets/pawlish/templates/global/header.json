@@ -2,6 +2,7 @@
   "type": "header",
   "settings": {
     "logoText": "Pawlish",
+    "logoMaxWidth": 200,
     "contactDetailsLine1": "(555) 020-0184",
     "contactDetailsLine2": "Open Tue – Sat",
     "contact_position": "logo",
@@ -13,9 +14,9 @@
       "target": "_self"
     },
     "ctaButtonStyle": "primary",
-    "full_width": true,
+    "full_width": false,
     "sticky": true,
-    "transparent_on_hero": false,
+    "transparent_on_hero": true,
     "color_scheme": "standard-primary"
   }
 }
