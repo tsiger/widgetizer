@@ -1,0 +1,150 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro_eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Contact",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "intro_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book a free IT assessment.",
+            "size": "5xl"
+          }
+        },
+        "intro_text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Thirty minutes with a senior engineer. We'll ask about your seat count, your stack, and what's breaking — then tell you whether we're a fit.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro_eyebrow", "intro_heading", "intro_text"]
+    },
+    "contact_details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "Reach us",
+        "eyebrow_uppercase": true,
+        "title": "Three ways to get in touch.",
+        "description": "Assessments and new-client inquiries come through the main line or email. Existing clients have a direct emergency number after hours.",
+        "heading_alignment": "start",
+        "layout": "first-featured",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "contact_info": {
+          "type": "info",
+          "settings": {
+            "title": "New clients & assessments",
+            "text": "<p>Call or email to book a free thirty-minute assessment. A senior engineer — not a salesperson — will walk through your environment with you.</p>"
+          }
+        },
+        "contact_support": {
+          "type": "text_block",
+          "settings": {
+            "title": "Main line",
+            "text": "<p>(555) 010-0123</p><p>hello@example.com</p><p>Mon–Fri, 8am–6pm ET</p>"
+          }
+        },
+        "contact_emergency": {
+          "type": "text_block",
+          "settings": {
+            "title": "After-hours (clients only)",
+            "text": "<p>(555) 010-0199</p><p>Routes to on-call engineer</p><p>Outages & security incidents</p>"
+          }
+        },
+        "contact_office": {
+          "type": "text_block",
+          "settings": {
+            "title": "Office",
+            "text": "<p>142 Fairlane Avenue, Suite 300</p><p>Columbus, OH 43215</p><p>Remote nationwide, on-site in Ohio & Kentucky</p>"
+          }
+        }
+      },
+      "blocksOrder": ["contact_info", "contact_support", "contact_emergency", "contact_office"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you reach out",
+        "eyebrow_uppercase": true,
+        "title": "A few things people usually ask.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "faq_q1": {
+          "type": "item",
+          "settings": {
+            "question": "What happens on an assessment call?",
+            "answer": "<p>Thirty minutes. We ask about seat count, current stack, and the top three things that are breaking or worrying you. You walk away with a written summary and, if it's useful, a tier recommendation. No obligation.</p>"
+          }
+        },
+        "faq_q2": {
+          "type": "item",
+          "settings": {
+            "question": "What does onboarding look like if we sign?",
+            "answer": "<p>Two to three weeks. We document your environment, deploy monitoring and EDR agents, set up the helpdesk channel, and run a cutover session with your team. The previous MSP keeps running things until we've fully taken over.</p>"
+          }
+        },
+        "faq_q3": {
+          "type": "item",
+          "settings": {
+            "question": "Do you work with our internal IT lead?",
+            "answer": "<p>Yes. Co-managed is a common setup — your lead keeps strategic control and project work; we take helpdesk overflow, after-hours, and the 24/7 monitoring stack. Roles are written into the engagement letter.</p>"
+          }
+        },
+        "faq_q4": {
+          "type": "item",
+          "settings": {
+            "question": "We're a current client with an urgent issue — what's the fastest path?",
+            "answer": "<p>Business hours: call the main line or open a ticket via the client portal. After hours: the emergency number routes to the on-call engineer with remote access to your environment.</p>"
+          }
+        },
+        "faq_sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Prefer email?",
+            "text": "<p>Send a note to hello@example.com with seat count and the top thing that's broken. We'll reply the same business day with a time for an assessment call.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq_sidebar", "faq_q1", "faq_q2", "faq_q3", "faq_q4"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "contact_details", "contact_faq"],
+  "id": "contact",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

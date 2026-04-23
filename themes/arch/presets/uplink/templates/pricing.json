@@ -1,0 +1,312 @@
+{
+  "name": "Pricing",
+  "slug": "pricing",
+  "widgets": {
+    "pricing_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro_eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Pricing",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "intro_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Per-seat, monthly, published.",
+            "size": "5xl"
+          }
+        },
+        "intro_text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Three retainers, sized by the depth of coverage. Pick the tier that matches the risk profile of your team — change tiers any quarter as you grow.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro_eyebrow", "intro_heading", "intro_text"]
+    },
+    "pricing_tiers": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Retainer tiers",
+        "eyebrow_uppercase": true,
+        "title": "Three ways to run your IT.",
+        "description": "Per-seat monthly pricing, billed on active headcount. No hourly billing for anything inside the scope.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tier_essentials": {
+          "type": "plan",
+          "settings": {
+            "title": "Essentials",
+            "price": "$95",
+            "period": "per seat / month",
+            "features": "+ Business-hours helpdesk\n+ Endpoint monitoring & patching\n+ Microsoft 365 or Google Workspace admin\n+ Email & DNS security\n+ Quarterly business review",
+            "button_link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "tier_professional": {
+          "type": "plan",
+          "settings": {
+            "title": "Professional",
+            "price": "$145",
+            "period": "per seat / month",
+            "features": "+ Everything in Essentials\n+ After-hours emergency line\n+ Managed firewall & Wi-Fi\n+ Endpoint detection & response\n+ Security awareness training\n+ Backup for workstations & mailboxes",
+            "button_link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "tier_enterprise": {
+          "type": "plan",
+          "settings": {
+            "title": "Enterprise",
+            "price": "$195",
+            "period": "per seat / month",
+            "features": "+ Everything in Professional\n+ 24/7 response & on-call engineer\n+ vCIO strategy & roadmapping\n+ Server & cloud workload coverage\n+ Disaster recovery runbooks & testing\n+ Compliance evidence packets",
+            "button_link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["tier_essentials", "tier_professional", "tier_enterprise"]
+    },
+    "pricing_included": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "In every tier",
+        "eyebrow_uppercase": true,
+        "title": "The non-negotiables.",
+        "description": "",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "inc_onboarding": {
+          "type": "service",
+          "settings": {
+            "title": "Fixed onboarding fee",
+            "description": "<p>A one-time flat fee sized by environment complexity — not an hourly surprise. You see the number before you sign.</p>"
+          }
+        },
+        "inc_response": {
+          "type": "service",
+          "settings": {
+            "title": "15-minute response SLA",
+            "description": "<p>Business-hours tickets get a named engineer inside fifteen minutes. Measured monthly and reported transparently in your quarterly review.</p>"
+          }
+        },
+        "inc_documentation": {
+          "type": "service",
+          "settings": {
+            "title": "Documentation you can read",
+            "description": "<p>A living document of your environment — network, identities, backups, vendors — maintained by us and available to you at any time. Portability is a feature, not a threat.</p>"
+          }
+        },
+        "inc_no_lock": {
+          "type": "service",
+          "settings": {
+            "title": "No multi-year lock-in",
+            "description": "<p>Annual agreements with a thirty-day exit clause. If we aren't earning our retainer, you leave with your documentation and credentials intact.</p>"
+          }
+        },
+        "inc_named": {
+          "type": "service",
+          "settings": {
+            "title": "A named team, not a pool",
+            "description": "<p>You meet the engineers on day one and they stay on the account. Tickets don't bounce to whoever picked up the phone.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["inc_onboarding", "inc_response", "inc_documentation", "inc_no_lock", "inc_named"]
+    },
+    "pricing_testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 6000,
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "quote_1": {
+          "type": "quote",
+          "settings": {
+            "quote": "We switched because every other quote came in as 'contact us' — Uplink showed us the number on the first call. Six quarters in, we're paying roughly what they said we would.",
+            "name": "Priya Desai",
+            "title": "Director of Operations, Holloway & Reed LLP",
+            "rating": "5"
+          }
+        },
+        "quote_2": {
+          "type": "quote",
+          "settings": {
+            "quote": "The Professional tier covered everything our cyber-insurance renewal was asking about. We stopped paying a separate security vendor and our premium actually came down.",
+            "name": "Daniel Okafor",
+            "title": "IT Manager, Meridian Professional Services",
+            "rating": "5"
+          }
+        },
+        "quote_3": {
+          "type": "quote",
+          "settings": {
+            "quote": "I wanted published pricing because I was tired of being the office manager stuck on the phone comparing MSP proposals. Uplink made that part of the decision boring, which is exactly what I needed.",
+            "name": "Rebecca Lindquist",
+            "title": "Office Manager, Arbor Dental Group",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["quote_1", "quote_2", "quote_3"]
+    },
+    "pricing_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Pricing questions",
+        "eyebrow_uppercase": true,
+        "title": "Before you sign.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "faq_sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Not sure which tier?",
+            "text": "<p>Most clients land in Professional. Essentials fits lean teams under thirty seats; Enterprise fits regulated industries or anyone running their own servers.</p><p>A thirty-minute call will tell you which one.</p>"
+          }
+        },
+        "faq_seat": {
+          "type": "item",
+          "settings": {
+            "question": "What counts as a seat?",
+            "answer": "<p>An active user with a mailbox or a managed device. Shared kiosks, reception PCs, and meeting-room displays are billed as devices at half a seat. Contractors and occasional access accounts aren't counted unless we're managing their identity.</p>"
+          }
+        },
+        "faq_servers": {
+          "type": "item",
+          "settings": {
+            "question": "Are servers and cloud workloads extra?",
+            "answer": "<p>Essentials and Professional cover workstations and SaaS. Servers — physical, virtual, or cloud — are included in Enterprise or added to either lower tier at a flat per-workload rate quoted in the engagement letter.</p>"
+          }
+        },
+        "faq_projects": {
+          "type": "item",
+          "settings": {
+            "question": "What's in scope vs. a project?",
+            "answer": "<p>Anything that's part of running the environment you have is in scope. New builds — a cloud migration, office relocation, hardware refresh — are scoped and quoted separately as fixed-fee projects so you know the price going in.</p>"
+          }
+        },
+        "faq_minimum": {
+          "type": "item",
+          "settings": {
+            "question": "Is there a minimum seat count?",
+            "answer": "<p>Ten seats. Below that, the economics of a dedicated named team don't work — we'll refer you to a partner better suited to very small teams.</p>"
+          }
+        },
+        "faq_custom": {
+          "type": "item",
+          "settings": {
+            "question": "Can we customise a tier?",
+            "answer": "<p>Yes, within reason. If you need two Essentials seats and three Enterprise seats inside the same organisation — common for regulated sub-teams — we'll structure that on a single retainer.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq_sidebar", "faq_seat", "faq_servers", "faq_projects", "faq_minimum", "faq_custom"]
+    },
+    "pricing_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "closing_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get a quote in one call.",
+            "size": "4xl"
+          }
+        },
+        "closing_text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Book a free assessment. We'll ask about your seat count, your stack, and your renewals — then tell you which tier fits and what it costs.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "closing_button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["closing_heading", "closing_text", "closing_button"]
+    }
+  },
+  "widgetsOrder": ["pricing_intro", "pricing_tiers", "pricing_included", "pricing_testimonials", "pricing_faq", "pricing_closing"],
+  "id": "pricing",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

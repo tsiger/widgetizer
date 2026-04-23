@@ -1,0 +1,430 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "home_hero": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Managed IT</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your IT, handled.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We run the helpdesk, the network, the cloud, the security baseline, and the backups — so your team stops running them in their spare time. Published pricing. Real engineers. Written SLAs.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See pricing",
+              "href": "pricing.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+    },
+    "home_trust": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "plain",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "trust-response": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "15-minute response",
+            "text": "First-response SLA during business hours"
+          }
+        },
+        "trust-uptime": {
+          "type": "item",
+          "settings": {
+            "icon": "activity",
+            "title": "99.95% uptime",
+            "text": "Measured across managed infrastructure, 2025"
+          }
+        },
+        "trust-years": {
+          "type": "item",
+          "settings": {
+            "icon": "building",
+            "title": "Since 2017",
+            "text": "Eight years of managed IT, three regional offices"
+          }
+        },
+        "trust-seats": {
+          "type": "item",
+          "settings": {
+            "icon": "users-group",
+            "title": "2,400 seats",
+            "text": "Under active management across 80+ clients"
+          }
+        }
+      },
+      "blocksOrder": ["trust-response", "trust-uptime", "trust-years", "trust-seats"]
+    },
+    "home_services": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "What we do",
+        "eyebrow_uppercase": true,
+        "title": "Five pillars, one retainer.",
+        "description": "Everything a growing team needs from IT — delivered by one team, billed under one contract.",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "svc-helpdesk": {
+          "type": "service",
+          "settings": {
+            "title": "Helpdesk",
+            "description": "<p>People-first support. Pick up the phone and get a real engineer — no tier-1 robots, no ticket hot-potato. Full coverage Monday through Friday, after-hours on-call for managed clients.</p>",
+            "link": {
+              "text": "How we run helpdesk",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-networking": {
+          "type": "service",
+          "settings": {
+            "title": "Managed networking",
+            "description": "<p>Routers, switches, Wi‑Fi, VPN, and firewalls — designed, deployed, monitored, and documented. Vendor-neutral procurement so you're not locked in.</p>",
+            "link": {
+              "text": "Our networking approach",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-security": {
+          "type": "service",
+          "settings": {
+            "title": "Cybersecurity",
+            "description": "<p>Endpoint detection, MFA on every identity, email filtering, phishing simulations, and a quarterly security review. A written baseline with real teeth — not a slide deck.</p>",
+            "link": {
+              "text": "Security baseline",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-cloud": {
+          "type": "service",
+          "settings": {
+            "title": "Cloud",
+            "description": "<p>Microsoft 365, Google Workspace, Azure. Licensing, identity, tenant hardening, and migrations from on‑prem or cross‑cloud — scoped and priced up front.</p>",
+            "link": {
+              "text": "Cloud services",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-backup": {
+          "type": "service",
+          "settings": {
+            "title": "Backup & disaster recovery",
+            "description": "<p>Off‑site encrypted backups with documented RTO per system, quarterly restore drills, and written recovery runbooks. You never find out your backup is broken at the wrong moment.</p>",
+            "link": {
+              "text": "Backup program",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["svc-helpdesk", "svc-networking", "svc-security", "svc-cloud", "svc-backup"]
+    },
+    "home_industries": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Industries",
+        "title": "Teams we understand.",
+        "description": "We focus on small‑ and mid‑size businesses in a handful of sectors where our baseline genuinely fits.",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "box",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "ind-professional": {
+          "type": "card",
+          "settings": {
+            "subtitle": "20–100 seats",
+            "title": "Professional services",
+            "description": "<p>Accounting firms, consulting shops, creative agencies. Knowledge-worker seats, sensitive client data, deadline pressure.</p>"
+          }
+        },
+        "ind-medical": {
+          "type": "card",
+          "settings": {
+            "subtitle": "10–60 seats",
+            "title": "Medical",
+            "description": "<p>Private practices and outpatient clinics. HIPAA-aware baselines, secure EHR integrations, strict uptime requirements.</p>"
+          }
+        },
+        "ind-legal": {
+          "type": "card",
+          "settings": {
+            "subtitle": "5–40 seats",
+            "title": "Legal",
+            "description": "<p>Solo practices and small firms. Practice-management tooling, privileged document handling, case-deadline reliability.</p>"
+          }
+        },
+        "ind-nonprofit": {
+          "type": "card",
+          "settings": {
+            "subtitle": "15–80 seats",
+            "title": "Nonprofit",
+            "description": "<p>501(c)(3) organizations balancing tight budgets with real operational needs. TechSoup licensing, shared drives, donor-data hygiene.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["ind-professional", "ind-medical", "ind-legal", "ind-nonprofit"]
+    },
+    "home_logos": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Trusted by",
+        "title": "Teams we've supported.",
+        "heading_alignment": "center",
+        "card_layout": "flat",
+        "layout": "grid",
+        "columns_desktop": 6,
+        "aspect_ratio": "3 / 2",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "logo-meridian": {
+          "type": "logo",
+          "settings": {
+            "name": "Meridian Partners"
+          }
+        },
+        "logo-coastal": {
+          "type": "logo",
+          "settings": {
+            "name": "Coastal Health Group"
+          }
+        },
+        "logo-keystone": {
+          "type": "logo",
+          "settings": {
+            "name": "Keystone Legal"
+          }
+        },
+        "logo-ardent": {
+          "type": "logo",
+          "settings": {
+            "name": "Ardent Tax"
+          }
+        },
+        "logo-evergreen": {
+          "type": "logo",
+          "settings": {
+            "name": "Evergreen Alliance"
+          }
+        },
+        "logo-bright": {
+          "type": "logo",
+          "settings": {
+            "name": "Bright Harbor Clinic"
+          }
+        }
+      },
+      "blocksOrder": ["logo-meridian", "logo-coastal", "logo-keystone", "logo-ardent", "logo-evergreen", "logo-bright"]
+    },
+    "home_testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "t-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Client story</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "t-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "\"They flagged our failure at 2 a.m. We were running again before Monday.\"",
+            "size": "3xl"
+          }
+        },
+        "t-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>When our old MSP missed a server failure over a long weekend, we lost three days of client work. Uplink caught ours the same night and had it running before the team arrived. That's the whole difference.</p>",
+            "size": "base"
+          }
+        },
+        "t-attribution": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Marcus Chen — IT Director, Meridian Professional Services</p>",
+            "size": "sm",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["t-eyebrow", "t-heading", "t-body", "t-attribution"]
+    },
+    "home_process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "How we onboard",
+        "title": "A calm 60-day handover.",
+        "description": "We've done this dozens of times. The goal is zero downtime for your team and zero mystery for you.",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "step-discovery": {
+          "type": "step",
+          "settings": {
+            "title": "Discovery call",
+            "description": "<p>30 minutes to understand your environment, stack, and pressure points. No sales theater — we ask what's broken.</p>"
+          }
+        },
+        "step-audit": {
+          "type": "step",
+          "settings": {
+            "title": "IT audit",
+            "description": "<p>Two weeks of quiet assessment — asset inventory, security baseline, license review, risk register. Delivered as a written report.</p>"
+          }
+        },
+        "step-proposal": {
+          "type": "step",
+          "settings": {
+            "title": "Proposal",
+            "description": "<p>Scoped plan with published tier pricing. Written SLAs. No mystery surcharges, no multi-year lock-in.</p>"
+          }
+        },
+        "step-transition": {
+          "type": "step",
+          "settings": {
+            "title": "Transition",
+            "description": "<p>60-day onboarding alongside your existing team or provider. Credentials rotated, documentation captured, runbooks written.</p>"
+          }
+        },
+        "step-run": {
+          "type": "step",
+          "settings": {
+            "title": "Run",
+            "description": "<p>Monthly reports, quarterly business review, always-on monitoring. Your dedicated lead knows your stack and keeps it that way.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-discovery", "step-audit", "step-proposal", "step-transition", "step-run"]
+    },
+    "home_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "close-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Free, no commitment</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book a free IT assessment.",
+            "size": "5xl"
+          }
+        },
+        "close-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>30 minutes on a call. If it's a fit, we follow up with a two-week audit and a written proposal — no cost, no commitment.</p>",
+            "size": "lg"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-eyebrow", "close-heading", "close-text", "close-button"]
+    }
+  },
+  "widgetsOrder": ["home_hero", "home_trust", "home_services", "home_industries", "home_logos", "home_testimonial", "home_process", "home_closing"],
+  "id": "index",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

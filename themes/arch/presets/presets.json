@@ -161,6 +161,12 @@
       "name": "Velvet Touch",
       "description": "Day spa",
       "liveDemo": "https://widgetizer.org/demos/velvet-touch/"
+    },
+    {
+      "id": "uplink",
+      "name": "Uplink",
+      "description": "IT Support",
+      "liveDemo": "https://widgetizer.org/demos/uplink/"
     }
   ]
 }

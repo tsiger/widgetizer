@@ -1,0 +1,39 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Uplink IT. All rights reserved.",
+    "layout": "equal",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Uplink",
+        "logo_width": 120,
+        "text": "<p>Managed IT for growing businesses. Helpdesk, networking, cybersecurity, cloud, and backup — under one retainer.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Support",
+        "text": "<p>(555) 010-0123</p><p>Mon–Fri, 8am–6pm ET</p><p>After-hours: (555) 010-0199</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Site",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+}

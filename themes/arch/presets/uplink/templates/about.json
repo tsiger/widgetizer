@@ -1,0 +1,392 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro_eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "About",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "intro_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A quiet, competent team running your IT.",
+            "size": "5xl"
+          }
+        },
+        "intro_text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Eight engineers, nine years in business, 2,400 seats managed across the region. We pick up the phone, we know what we're doing, and we explain it afterward in plain terms.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro_eyebrow", "intro_heading", "intro_text"]
+    },
+    "about_story": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "story_eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Our story",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "story_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Why we started Uplink.",
+            "size": "3xl"
+          }
+        },
+        "story_body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We spent a decade inside larger MSPs where every ticket bounced between three engineers and nobody owned the outcome. Office managers were the ones left on hold, translating between techs and their own frustrated staff.</p><p>Uplink is the version of that model we wish had existed — small named teams, published pricing, documentation the client actually owns. Run the way we'd want our own family's business to be run.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["story_eyebrow", "story_heading", "story_body"]
+    },
+    "about_team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The team",
+        "eyebrow_uppercase": true,
+        "title": "The engineers on your account.",
+        "description": "",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3 / 4",
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "profile_1": {
+          "type": "profile",
+          "settings": {
+            "name": "Marcus Whitfield",
+            "role": "Founder & Principal",
+            "specialty": "Network & security architecture",
+            "bio": "Seventeen years in managed IT. Still the one on the other end of the line when something is genuinely on fire."
+          }
+        },
+        "profile_2": {
+          "type": "profile",
+          "settings": {
+            "name": "Nadia Saleh",
+            "role": "Operations Lead",
+            "specialty": "Client success & onboarding",
+            "bio": "Runs the engagement side of every account. Translates between engineers and office managers for a living."
+          }
+        },
+        "profile_3": {
+          "type": "profile",
+          "settings": {
+            "name": "Owen Pritchard",
+            "role": "Senior Systems Engineer",
+            "specialty": "Microsoft 365 & Azure",
+            "bio": "Microsoft Certified Solutions Expert. Migrations, identity, and the kind of Intune policy that doesn't lock you out."
+          }
+        },
+        "profile_4": {
+          "type": "profile",
+          "settings": {
+            "name": "Yuki Tanaka",
+            "role": "Security Engineer",
+            "specialty": "EDR, email filtering, awareness training",
+            "bio": "Handles the security stack and the insurance-renewal evidence packets. Calm when things go sideways."
+          }
+        },
+        "profile_5": {
+          "type": "profile",
+          "settings": {
+            "name": "Darius Coleman",
+            "role": "Helpdesk Lead",
+            "specialty": "End-user support & triage",
+            "bio": "Runs the helpdesk queue and the fifteen-minute SLA. Nine out of ten tickets never touch an engineer."
+          }
+        },
+        "profile_6": {
+          "type": "profile",
+          "settings": {
+            "name": "Ines Marchetti",
+            "role": "Field Engineer",
+            "specialty": "Networking & hardware",
+            "bio": "On-site work — switch refreshes, office relocations, cabling. Does the kind of install where the cable tray is still neat a year later."
+          }
+        }
+      },
+      "blocksOrder": ["profile_1", "profile_2", "profile_3", "profile_4", "profile_5", "profile_6"]
+    },
+    "about_certs": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Certifications & partnerships",
+        "eyebrow_uppercase": true,
+        "title": "The stack we actually hold credentials in.",
+        "description": "",
+        "heading_alignment": "center",
+        "card_layout": "flat",
+        "layout": "grid",
+        "columns_desktop": 6,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cert_ms": {
+          "type": "logo",
+          "settings": {
+            "name": "Microsoft Solutions Partner",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cert_cisco": {
+          "type": "logo",
+          "settings": {
+            "name": "Cisco Meraki Partner",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cert_fortinet": {
+          "type": "logo",
+          "settings": {
+            "name": "Fortinet Partner",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cert_sentinel": {
+          "type": "logo",
+          "settings": {
+            "name": "SentinelOne Partner",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cert_comptia": {
+          "type": "logo",
+          "settings": {
+            "name": "CompTIA Network+ & Security+",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cert_google": {
+          "type": "logo",
+          "settings": {
+            "name": "Google Workspace Partner",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        }
+      },
+      "blocksOrder": ["cert_ms", "cert_cisco", "cert_fortinet", "cert_sentinel", "cert_comptia", "cert_google"]
+    },
+    "about_values": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "left",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "values_eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How we work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "values_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Three commitments that shape everything we do.",
+            "size": "4xl",
+            "position": "left"
+          }
+        },
+        "values_1_title": {
+          "type": "heading",
+          "settings": {
+            "text": "Small named teams.",
+            "size": "xl",
+            "position": "right"
+          }
+        },
+        "values_1_body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>You don't call a pool of rotating engineers. You call three people by name, and they already know your stack, your vendors, and the room your server lives in.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "values_2_title": {
+          "type": "heading",
+          "settings": {
+            "text": "Portable documentation.",
+            "size": "xl",
+            "position": "right"
+          }
+        },
+        "values_2_body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your environment is documented in a system you can read and export at any time. If you leave, you walk out with everything a competent successor needs. We don't hold knowledge hostage.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "values_3_title": {
+          "type": "heading",
+          "settings": {
+            "text": "Plain-language reporting.",
+            "size": "xl",
+            "position": "right"
+          }
+        },
+        "values_3_body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Quarterly reviews written for an office manager, not a network engineer. What broke, what we fixed, what to budget for next quarter — in sentences you'd read aloud at a partner meeting.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["values_eyebrow", "values_heading", "values_1_title", "values_1_body", "values_2_title", "values_2_body", "values_3_title", "values_3_body"]
+    },
+    "about_testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "testimonial_quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We moved to Uplink after our previous MSP missed two outages in a row. What's actually changed is boring — the tickets close on the same day, the quarterly review is twenty minutes instead of a sales pitch, and the invoice is the number we agreed on.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "testimonial_name": {
+          "type": "heading",
+          "settings": {
+            "text": "Elena Vargas",
+            "size": "lg"
+          }
+        },
+        "testimonial_role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>IT Director, Cedar Creek Imaging</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["testimonial_quote", "testimonial_name", "testimonial_role"]
+    },
+    "about_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "closing_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Meet the team in a free assessment.",
+            "size": "4xl"
+          }
+        },
+        "closing_text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The engineer on your first call is the same one you'll still be talking to in three years. Book thirty minutes and see for yourself.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "closing_button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["closing_heading", "closing_text", "closing_button"]
+    }
+  },
+  "widgetsOrder": ["about_intro", "about_story", "about_team", "about_certs", "about_values", "about_testimonial", "about_closing"],
+  "id": "about",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

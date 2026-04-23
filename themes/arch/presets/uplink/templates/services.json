@@ -1,0 +1,324 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro_eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "Services",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "intro_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Managed IT, end to end.",
+            "size": "5xl"
+          }
+        },
+        "intro_text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Five practice areas under one retainer — helpdesk, networking, security, cloud, and backup. Pick the layers you need; we run the rest as a single stack.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro_eyebrow", "intro_heading", "intro_text"]
+    },
+    "services_pillars": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "Practice areas",
+        "eyebrow_uppercase": true,
+        "title": "What we run for you.",
+        "description": "Pick a pillar for a deep dive on how we deliver it in practice.",
+        "heading_alignment": "start",
+        "image_position": "end",
+        "aspect_ratio": "1 / 1",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tab_helpdesk": {
+          "type": "tab",
+          "settings": {
+            "title": "Helpdesk",
+            "description": "<p>A named team your staff can call, chat, or email — answered inside fifteen minutes during business hours, with after-hours escalation for outages. We triage, resolve, and document every ticket so you have a real record of what happened.</p>"
+          }
+        },
+        "tab_networking": {
+          "type": "tab",
+          "settings": {
+            "title": "Managed networking",
+            "description": "<p>Switches, access points, firewalls, and VPN — procured, configured, monitored, and patched. We run the LAN as a single managed system with real-time alerts instead of a pile of vendor portals.</p>"
+          }
+        },
+        "tab_security": {
+          "type": "tab",
+          "settings": {
+            "title": "Cybersecurity",
+            "description": "<p>Endpoint detection, email filtering, multi-factor enforcement, security awareness training, and quarterly vulnerability reviews. Aligned to the controls your cyber-insurance renewal is going to ask about.</p>"
+          }
+        },
+        "tab_cloud": {
+          "type": "tab",
+          "settings": {
+            "title": "Cloud & productivity",
+            "description": "<p>Microsoft 365 or Google Workspace — identity, licensing, SharePoint or Drive, and Intune or MDM device enrollment. Migrations handled in stages so nobody loses access to their inbox mid-week.</p>"
+          }
+        },
+        "tab_backup": {
+          "type": "tab",
+          "settings": {
+            "title": "Backup & disaster recovery",
+            "description": "<p>Backups of workstations, servers, and cloud mailboxes, tested on a schedule — not just configured and forgotten. Documented recovery runbooks so a ransomware event turns into a rebuild, not a ransom.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["tab_helpdesk", "tab_networking", "tab_security", "tab_cloud", "tab_backup"]
+    },
+    "services_included": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "At every tier",
+        "eyebrow_uppercase": true,
+        "title": "What's always included.",
+        "description": "",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "inc_monitoring": {
+          "type": "service",
+          "settings": {
+            "title": "24/7 monitoring",
+            "description": "<p>Endpoints, servers, and network devices monitored around the clock. Alerts route to an on-call engineer — not an unwatched dashboard.</p>"
+          }
+        },
+        "inc_patching": {
+          "type": "service",
+          "settings": {
+            "title": "Patch management",
+            "description": "<p>Operating system, browser, and third-party patches reviewed and deployed on a rolling weekly cadence, with emergency patches inside twenty-four hours.</p>"
+          }
+        },
+        "inc_assets": {
+          "type": "service",
+          "settings": {
+            "title": "Asset & licence tracking",
+            "description": "<p>A single ledger of every device, user, and subscription you own — with warranty, renewal, and end-of-life dates so nothing expires unnoticed.</p>"
+          }
+        },
+        "inc_review": {
+          "type": "service",
+          "settings": {
+            "title": "Quarterly business review",
+            "description": "<p>A ninety-minute session every quarter where we walk through ticket trends, upcoming renewals, security posture, and the next two quarters of IT spend.</p>"
+          }
+        },
+        "inc_vcio": {
+          "type": "service",
+          "settings": {
+            "title": "vCIO consult",
+            "description": "<p>Strategic guidance — budgets, vendor selection, compliance readiness — from a senior engineer who already knows your environment, not a stranger on a sales call.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["inc_monitoring", "inc_patching", "inc_assets", "inc_review", "inc_vcio"]
+    },
+    "services_industries": {
+      "type": "logo-cloud",
+      "settings": {
+        "eyebrow": "Trusted by",
+        "eyebrow_uppercase": true,
+        "title": "Teams that run on Uplink.",
+        "description": "",
+        "heading_alignment": "center",
+        "card_layout": "flat",
+        "layout": "grid",
+        "columns_desktop": 6,
+        "aspect_ratio": "3 / 2",
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "logo_1": {
+          "type": "logo",
+          "settings": {
+            "name": "Meridian Professional Services",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "logo_2": {
+          "type": "logo",
+          "settings": {
+            "name": "Arbor Dental Group",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "logo_3": {
+          "type": "logo",
+          "settings": {
+            "name": "Holloway & Reed LLP",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "logo_4": {
+          "type": "logo",
+          "settings": {
+            "name": "Northbrook Nonprofit Alliance",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "logo_5": {
+          "type": "logo",
+          "settings": {
+            "name": "Cedar Creek Imaging",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "logo_6": {
+          "type": "logo",
+          "settings": {
+            "name": "Fairlane Architects",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        }
+      },
+      "blocksOrder": ["logo_1", "logo_2", "logo_3", "logo_4", "logo_5", "logo_6"]
+    },
+    "services_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "FAQ",
+        "eyebrow_uppercase": true,
+        "title": "Common questions.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "faq_sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still unsure? Talk to us.",
+            "text": "<p>A thirty-minute assessment call will clarify which pillars matter for your setup — and whether you need all of them.</p><p>No obligation, no sales pressure.</p>"
+          }
+        },
+        "faq_1": {
+          "type": "item",
+          "settings": {
+            "question": "Do we have to take every service?",
+            "answer": "<p>No. Most clients start with helpdesk plus security and add networking or cloud when a refresh or migration is on the table. The retainer scales to the pillars you enable.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "item",
+          "settings": {
+            "question": "How do you work alongside an internal IT lead?",
+            "answer": "<p>Co-managed is a common setup. Your lead keeps strategic control and project work; we take helpdesk overflow, after-hours, and the 24/7 monitoring stack.</p>"
+          }
+        },
+        "faq_3": {
+          "type": "item",
+          "settings": {
+            "question": "What happens on day one if something goes down?",
+            "answer": "<p>During business hours, a named engineer picks up inside fifteen minutes. After hours, the emergency line routes to an on-call engineer with remote access to your environment.</p>"
+          }
+        },
+        "faq_4": {
+          "type": "item",
+          "settings": {
+            "question": "Are you Microsoft or Google shop?",
+            "answer": "<p>Both. Microsoft 365 is the majority of our book, Google Workspace is the rest. We'll run whichever stack fits your team and keep migrations clean when you need to switch.</p>"
+          }
+        },
+        "faq_5": {
+          "type": "item",
+          "settings": {
+            "question": "What about compliance — HIPAA, SOC 2, cyber-insurance?",
+            "answer": "<p>We align controls to the framework your auditor or insurer asks for and produce the evidence packets at renewal. We don't issue attestations, but we make them cheaper to obtain.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq_sidebar", "faq_1", "faq_2", "faq_3", "faq_4", "faq_5"]
+    },
+    "services_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "closing_heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book a free IT assessment.",
+            "size": "4xl"
+          }
+        },
+        "closing_text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Thirty minutes with a senior engineer. Walk away with a clear picture of your gaps — whether you hire us or not.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "closing_button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book assessment",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["closing_heading", "closing_text", "closing_button"]
+    }
+  },
+  "widgetsOrder": ["services_intro", "services_pillars", "services_included", "services_industries", "services_faq", "services_closing"],
+  "id": "services",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}
