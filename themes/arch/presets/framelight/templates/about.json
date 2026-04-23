@@ -1,0 +1,211 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The studio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A small studio, one photographer, thirteen years.",
+            "size": "5xl"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading"]
+    },
+    "about_bio": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "flex-end",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none"
+      },
+      "blocks": {
+        "bio-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Behind the camera",
+            "size": "3xl"
+          }
+        },
+        "bio-body-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Framelight is the working practice of a single photographer. I started in editorial, found my way into portraiture, and now work across both alongside lifestyle and commercial commissions for a small group of returning clients.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "bio-body-2": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I shoot in natural light wherever the brief allows. Medium format, by preference, film when the day can hold it. Most sessions are quiet, most of the day is spent waiting for the right minute, and most of the work happens in the edit.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["bio-heading", "bio-body-1", "bio-body-2"]
+    },
+    "about_bts": {
+      "type": "video-popup",
+      "settings": {
+        "video_url": "https://www.youtube.com/watch?v=2PuFyjAs7JA",
+        "video_title": "A morning in the studio",
+        "height": "medium",
+        "fullwidth": true,
+        "play_button_style": "light",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      }
+    },
+    "about_testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "t-quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The pictures we got back were closer to how the place actually felt than I thought a camera could manage. People who worked there recognised the rooms. That was the compliment.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "t-name": {
+          "type": "heading",
+          "settings": {
+            "text": "James Okafor",
+            "size": "lg"
+          }
+        },
+        "t-role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Editor, The Long Room</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["t-quote", "t-name", "t-role"]
+    },
+    "about_philosophy": {
+      "type": "split-content",
+      "settings": {
+        "balance": "right-heavy",
+        "sticky_column": "none",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "phil-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What I believe</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "phil-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The work happens in the waiting.",
+            "size": "3xl",
+            "position": "right"
+          }
+        },
+        "phil-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Good photographs come from three things: the room, the person, and the time you give them. The camera sits last in that list. I try to remember it on every shoot.</p><p>I keep crew small, keep the day unhurried, and trust that the frames worth having will turn up if I'm patient enough to watch for them. That's the whole method.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["phil-eyebrow", "phil-heading", "phil-body"]
+    },
+    "about_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Start a project",
+            "size": "5xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Send a few lines about what you have in mind. I reply to everything.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-cta"]
+    }
+  },
+  "widgetsOrder": ["about_intro", "about_bio", "about_bts", "about_testimonial", "about_philosophy", "about_closing"],
+  "id": "about",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

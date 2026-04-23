@@ -68,6 +68,42 @@
       ]
     },
     {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "tTheme:global.widgets.settings.aspect_ratio.label",
+      "default": "4 / 3",
+      "options": [
+        {
+          "value": "auto",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.auto"
+        },
+        {
+          "value": "contain",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.contain"
+        },
+        {
+          "value": "1 / 1",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1"
+        },
+        {
+          "value": "4 / 3",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3"
+        },
+        {
+          "value": "3 / 2",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 2"
+        },
+        {
+          "value": "3 / 4",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 4"
+        },
+        {
+          "value": "16 / 9",
+          "label": "tTheme:global.widgets.settings.aspect_ratio.options.16 / 9"
+        }
+      ]
+    },
+    {
       "type": "header",
       "id": "widget_header",
       "label": "Widget"

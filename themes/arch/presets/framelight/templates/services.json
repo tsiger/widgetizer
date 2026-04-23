@@ -1,0 +1,284 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How we work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What a project looks like in practice.",
+            "size": "5xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Honest scope, clear process, and delivery you can hold. No tiered packages.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+    },
+    "services_categories": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "What we shoot",
+        "eyebrow_uppercase": true,
+        "title": "Four lanes, one studio",
+        "description": "",
+        "heading_alignment": "start",
+        "image_position": "start",
+        "color_scheme": "standard-primary",
+        "aspect_ratio": "3 / 4"
+      },
+      "blocks": {
+        "tab-editorial": {
+          "type": "tab",
+          "settings": {
+            "title": "Editorial",
+            "description": "<p>Features and profiles for magazines, books, and independent publications. Shot in natural light, over unhurried mornings, with a small footprint on set.</p>"
+          }
+        },
+        "tab-portrait": {
+          "type": "tab",
+          "settings": {
+            "title": "Portrait",
+            "description": "<p>Individual and small-group portraiture for founders, creatives, and private clients. Studio or on location. One strong frame is worth more than fifty adequate ones.</p>"
+          }
+        },
+        "tab-lifestyle": {
+          "type": "tab",
+          "settings": {
+            "title": "Lifestyle",
+            "description": "<p>Families, couples, and documentary commissions. Unposed, patient, and built around the real rhythm of the day rather than a shot list.</p>"
+          }
+        },
+        "tab-commercial": {
+          "type": "tab",
+          "settings": {
+            "title": "Commercial",
+            "description": "<p>Small brand campaigns, still-life, and look books for independent makers. Editorial in spirit, practical in delivery, licensed cleanly.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["tab-editorial", "tab-portrait", "tab-lifestyle", "tab-commercial"]
+    },
+    "services_offerings": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "What's included",
+        "eyebrow_uppercase": true,
+        "title": "A small number of offerings, honestly scoped",
+        "description": "",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "svc-01": {
+          "type": "service",
+          "settings": {
+            "title": "Half-day session",
+            "description": "<p>Four hours on location or in the studio. One or two setups, a measured pace, and a curated set of final images delivered as high-resolution files.</p>"
+          }
+        },
+        "svc-02": {
+          "type": "service",
+          "settings": {
+            "title": "Full-day session",
+            "description": "<p>A full working day, suited to editorial features, multi-look portraiture, and small brand campaigns. Includes location scout, shoot, and delivery.</p>"
+          }
+        },
+        "svc-03": {
+          "type": "service",
+          "settings": {
+            "title": "Multi-day project",
+            "description": "<p>Two or more shooting days for longer editorial work, interiors books, and family albums. Scoped per project — we talk it through before anything is booked.</p>"
+          }
+        },
+        "svc-04": {
+          "type": "service",
+          "settings": {
+            "title": "Print and album",
+            "description": "<p>Prints up to A2 on archival cotton rag and hand-bound linen albums. Priced per item; most sessions include a small house-album by default.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["svc-01", "svc-02", "svc-03", "svc-04"]
+    },
+    "services_process": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "Process",
+        "eyebrow_uppercase": true,
+        "title": "Five steps, start to finish",
+        "description": "",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "step-01": {
+          "type": "step",
+          "settings": {
+            "title": "Inquiry",
+            "description": "<p>You send a few lines about what you have in mind — who the shoot is for, a rough timeline, where it might happen. I reply within two working days.</p>"
+          }
+        },
+        "step-02": {
+          "type": "step",
+          "settings": {
+            "title": "Brief",
+            "description": "<p>A short call or exchange of notes. We talk through references, logistics, and any hard constraints. You get a written brief and a proposed date.</p>"
+          }
+        },
+        "step-03": {
+          "type": "step",
+          "settings": {
+            "title": "Shoot",
+            "description": "<p>The session itself. Unhurried, quiet, with minimal crew. Medium format, film or digital depending on the brief, always natural or window light by default.</p>"
+          }
+        },
+        "step-04": {
+          "type": "step",
+          "settings": {
+            "title": "Edit",
+            "description": "<p>I spend more time editing than shooting. You receive a curated selection within three weeks, with an option to request minor revisions to the final set.</p>"
+          }
+        },
+        "step-05": {
+          "type": "step",
+          "settings": {
+            "title": "Deliver",
+            "description": "<p>Final files via a private gallery, plus prints or a linen-bound album if that's part of the project. Licenses are simple, written, and specific to your use.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-01", "step-02", "step-03", "step-04", "step-05"]
+    },
+    "services_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you inquire",
+        "eyebrow_uppercase": true,
+        "title": "Questions, usually asked",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "faq-01": {
+          "type": "item",
+          "settings": {
+            "question": "What are your rates?",
+            "answer": "<p>Session rates begin at a half-day rate and scale with scope. Every project is quoted in a written brief — there are no listed packages because every shoot is a little different.</p>"
+          }
+        },
+        "faq-02": {
+          "type": "item",
+          "settings": {
+            "question": "What's the turnaround?",
+            "answer": "<p>Three weeks for a final curated set. Rush delivery is possible on editorial assignments; say so in the inquiry.</p>"
+          }
+        },
+        "faq-03": {
+          "type": "item",
+          "settings": {
+            "question": "Do you travel?",
+            "answer": "<p>Yes — for editorial and commissioned work. Travel and accommodation are billed at cost and agreed in writing before the shoot.</p>"
+          }
+        },
+        "faq-04": {
+          "type": "item",
+          "settings": {
+            "question": "How do licensing and usage rights work?",
+            "answer": "<p>Every commercial project ships with a written license that names the usage, territory, and term. Private-client work includes personal-use rights by default.</p>"
+          }
+        },
+        "faq-info": {
+          "type": "info",
+          "settings": {
+            "title": "Ask anything",
+            "text": "<p>If a question isn't covered here, send a line — I'd rather answer it directly than guess what it was.</p><p>hello@example.com</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-01", "faq-02", "faq-03", "faq-04", "faq-info"]
+    },
+    "services_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Start a project",
+            "size": "3xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Send a few lines about timeline, location, and scope. I reply to everything.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-cta"]
+    }
+  },
+  "widgetsOrder": ["services_intro", "services_categories", "services_offerings", "services_process", "services_faq", "services_closing"],
+  "id": "services",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

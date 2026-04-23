@@ -1,0 +1,31 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Framelight. Photography by appointment.",
+    "layout": "equal",
+    "color_scheme": "standard-secondary"
+  },
+  "blocks": {
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Studio",
+        "text": "<p>hello@example.com</p><p>By appointment</p><p>Mon–Fri, 9–5</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore",
+        "menu": "footer-menu"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow"
+      }
+    }
+  },
+  "blocksOrder": ["text_block_1", "menu_block_1", "social_block_1"]
+}

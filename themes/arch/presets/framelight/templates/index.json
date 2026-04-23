@@ -1,0 +1,266 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "home_hero": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Framelight studio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Photography for people who care how things look.",
+            "size": "5xl"
+          }
+        },
+        "hero-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>An editorial studio working in portrait, lifestyle, and commercial photography. Unhurried, observed, and quiet.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-body", "hero-cta"]
+    },
+    "home_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "Selected frames",
+        "eyebrow_uppercase": true,
+        "title": "A way of seeing",
+        "description": "Recent work across editorial, portrait, and lifestyle.",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "g-01": { "type": "item", "settings": { "title": "Alcove", "category": "Portrait" } },
+        "g-02": { "type": "item", "settings": { "title": "Camel & cream", "category": "Editorial" } },
+        "g-03": { "type": "item", "settings": { "title": "Window light", "category": "Portrait" } },
+        "g-04": { "type": "item", "settings": { "title": "Long grass", "category": "Lifestyle" } },
+        "g-05": { "type": "item", "settings": { "title": "Stone threshold", "category": "Still life" } },
+        "g-06": { "type": "item", "settings": { "title": "Unposed", "category": "Family" } },
+        "g-07": { "type": "item", "settings": { "title": "Silk fold", "category": "Still life" } },
+        "g-08": { "type": "item", "settings": { "title": "Lime wash", "category": "Interior" } },
+        "g-09": { "type": "item", "settings": { "title": "Silver & linen", "category": "Portrait" } }
+      },
+      "blocksOrder": ["g-01", "g-02", "g-03", "g-04", "g-05", "g-06", "g-07", "g-08", "g-09"]
+    },
+    "home_about": {
+      "type": "split-content",
+      "settings": {
+        "balance": "equal",
+        "sticky_column": "none",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "about-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The studio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true,
+            "position": "left"
+          }
+        },
+        "about-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Quiet, considered, made for the long look.",
+            "size": "3xl",
+            "position": "left"
+          }
+        },
+        "about-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Framelight is a small working studio run by a single photographer. The work is editorial in spirit — warm, observed, and shaped around the subject rather than the camera. Every project begins with a conversation and ends with prints you can hold.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false,
+            "position": "right"
+          }
+        },
+        "about-link": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "About the studio",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium",
+            "alignment": "start",
+            "position": "right"
+          }
+        }
+      },
+      "blocksOrder": ["about-eyebrow", "about-heading", "about-body", "about-link"]
+    },
+    "home_feature_image": {
+      "type": "image",
+      "settings": {
+        "fullwidth": true,
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "home_testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "quote-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I had written the shoot off as a difficult one before we began. Within ten minutes I realised the quiet in the room was the work — not a preamble to it. The photographs still hang in our office a year later.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "quote-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Sarah Alderman",
+            "size": "lg"
+          }
+        },
+        "quote-role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Creative Director, Halverson Studio</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote-text", "quote-name", "quote-role"]
+    },
+    "home_projects": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "Recent projects",
+        "eyebrow_uppercase": true,
+        "title": "A short list of recent work",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "3 / 4",
+        "text_display": "always",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "p-01": {
+          "type": "project",
+          "settings": {
+            "title": "The Long Room — editorial",
+            "description": "A quiet feature for an independent magazine, shot over two mornings."
+          }
+        },
+        "p-02": {
+          "type": "project",
+          "settings": {
+            "title": "Halverson — brand campaign",
+            "description": "A still-life and portrait series for a small homewares studio."
+          }
+        },
+        "p-03": {
+          "type": "project",
+          "settings": {
+            "title": "Mendel family — session",
+            "description": "A morning with a family on a quiet stretch of coast."
+          }
+        }
+      },
+      "blocksOrder": ["p-01", "p-02", "p-03"]
+    },
+    "home_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Start a project",
+            "size": "3xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Send a few lines about what you have in mind. I reply to everything.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-cta"]
+    }
+  },
+  "widgetsOrder": ["home_hero", "home_gallery", "home_about", "home_feature_image", "home_testimonial", "home_projects", "home_closing"],
+  "id": "index",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

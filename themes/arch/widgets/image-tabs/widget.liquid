@@ -19,7 +19,9 @@
       & .image-tabs-image-area {
         position: relative;
         width: 100%;
-        aspect-ratio: 4 / 3;
+        {% if widget.settings.aspect_ratio != 'auto' and widget.settings.aspect_ratio != 'contain' %}
+          aspect-ratio: {{ widget.settings.aspect_ratio | default: '4 / 3' }};
+        {% endif %}
         overflow: hidden;
         background-color: var(--bg-secondary);
         border: var(--border-width-thin) solid var(--border-color);
@@ -41,6 +43,18 @@
         object-fit: cover;
         display: block;
       }
+
+      {% if widget.settings.aspect_ratio == 'contain' %}
+        & .image-tabs-image-area {
+          aspect-ratio: auto;
+        }
+
+        & .image-tabs-image {
+          height: 24rem;
+          max-height: 60vh;
+          object-fit: contain;
+        }
+      {% endif %}
 
       & .image-tabs-list {
         list-style: none;
@@ -95,12 +109,6 @@
 
         & .image-tabs-tab {
           padding: var(--space-xl);
-        }
-      }
-
-      @media (min-width: 990px) {
-        & .image-tabs-image-area {
-          aspect-ratio: 3 / 2;
         }
       }
 

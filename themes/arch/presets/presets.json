@@ -55,9 +55,10 @@
       "liveDemo": "https://widgetizer.org/demos/everafter/"
     },
     {
-      "id": "formline",
-      "name": "Formline",
-      "description": "Architecture firm"
+      "id": "framelight",
+      "name": "Framelight",
+      "description": "Photographer",
+      "liveDemo": "https://widgetizer.org/demos/framelight"
     },
     {
       "id": "greenfield",

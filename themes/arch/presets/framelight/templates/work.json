@@ -1,0 +1,216 @@
+{
+  "name": "Work",
+  "slug": "work",
+  "widgets": {
+    "work_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Portfolio</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Selected work",
+            "size": "6xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A running set of editorial, portrait, and lifestyle work from the last two years.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+    },
+    "work_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "",
+        "description": "",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "w-01": { "type": "item", "settings": { "title": "Alcove", "category": "Portrait" } },
+        "w-02": { "type": "item", "settings": { "title": "Camel & cream", "category": "Editorial" } },
+        "w-03": { "type": "item", "settings": { "title": "Window light", "category": "Portrait" } },
+        "w-04": { "type": "item", "settings": { "title": "Long grass", "category": "Lifestyle" } },
+        "w-05": { "type": "item", "settings": { "title": "Stone threshold", "category": "Still life" } },
+        "w-06": { "type": "item", "settings": { "title": "Unposed", "category": "Family" } },
+        "w-07": { "type": "item", "settings": { "title": "Silk fold", "category": "Still life" } },
+        "w-08": { "type": "item", "settings": { "title": "Lime wash", "category": "Interior" } },
+        "w-09": { "type": "item", "settings": { "title": "Silver & linen", "category": "Portrait" } },
+        "w-10": { "type": "item", "settings": { "title": "Pouring", "category": "Lifestyle" } },
+        "w-11": { "type": "item", "settings": { "title": "Field fog", "category": "Landscape" } },
+        "w-12": { "type": "item", "settings": { "title": "Long shadow", "category": "Fashion" } }
+      },
+      "blocksOrder": ["w-01", "w-02", "w-03", "w-04", "w-05", "w-06", "w-07", "w-08", "w-09", "w-10", "w-11", "w-12"]
+    },
+    "work_projects": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "Case studies",
+        "eyebrow_uppercase": true,
+        "title": "Four projects, in detail",
+        "description": "A closer look at how sessions come together, from brief to delivery.",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 2,
+        "aspect_ratio": "3 / 4",
+        "text_display": "always",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "proj-01": {
+          "type": "project",
+          "settings": {
+            "title": "The Long Room — editorial",
+            "description": "A quiet feature for an independent magazine, shot over two mornings in a small editor's office."
+          }
+        },
+        "proj-02": {
+          "type": "project",
+          "settings": {
+            "title": "Halverson — brand campaign",
+            "description": "A still-life and portrait series for a small homewares studio; the whole campaign was shot in natural window light."
+          }
+        },
+        "proj-03": {
+          "type": "project",
+          "settings": {
+            "title": "Mendel family — session",
+            "description": "A morning with a family on a quiet stretch of coast. Documentary, unposed, delivered as a small hardback album."
+          }
+        },
+        "proj-04": {
+          "type": "project",
+          "settings": {
+            "title": "Wren Interiors — editorial",
+            "description": "A one-day shoot for an interior designer's portfolio book, working around the daylight from a single tall arched window."
+          }
+        }
+      },
+      "blocksOrder": ["proj-01", "proj-02", "proj-03", "proj-04"]
+    },
+    "work_testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 6000,
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "t-01": {
+          "type": "quote",
+          "settings": {
+            "quote": "The pictures we got back were closer to how the place actually felt than I thought a camera could manage. People who worked there recognised the rooms. That was the compliment.",
+            "name": "Sarah Alderman",
+            "title": "Creative Director, Halverson Studio",
+            "rating": "5"
+          }
+        },
+        "t-02": {
+          "type": "quote",
+          "settings": {
+            "quote": "I had written the shoot off as a difficult one before we began. Within ten minutes I realised the quiet in the room was the work — not a preamble to it.",
+            "name": "James Okafor",
+            "title": "Editor, The Long Room",
+            "rating": "5"
+          }
+        },
+        "t-03": {
+          "type": "quote",
+          "settings": {
+            "quote": "I don't love being photographed. The shoot didn't feel like being photographed. The album sits on the kitchen shelf and the kids take it down on their own.",
+            "name": "Elena Mendel",
+            "title": "Private client",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": ["t-01", "t-02", "t-03"]
+    },
+    "work_feature_image": {
+      "type": "image",
+      "settings": {
+        "fullwidth": true,
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "work_closing": {
+      "type": "banner",
+      "settings": {
+        "height": "auto",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Start a project",
+            "size": "5xl"
+          }
+        },
+        "close-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Send a few lines about timeline, location, and scope. I reply to everything.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "close-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Inquire",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-body", "close-cta"]
+    }
+  },
+  "widgetsOrder": ["work_intro", "work_gallery", "work_projects", "work_testimonials", "work_feature_image", "work_closing"],
+  "id": "work",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

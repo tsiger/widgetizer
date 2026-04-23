@@ -15,7 +15,7 @@
 | 7 | crumbly | Crumbly | Bakery | DONE |
 | 8 | everafter | Everafter | Wedding Planner | DONE |
 | 9 | formline | Formline | Architecture Firm | DONE |
-| 10 | framelight | Framelight | Photographer |  |
+| 10 | framelight | Framelight | Photographer | DONE |
 | 11 | greenfield | Greenfield | Landscaping | DONE |
 | 12 | greystone | Greystone | Lawyer / Law Firm | DONE |
 | 13 | hearthstone | Hearthstone | Hotel / B&B | DONE |

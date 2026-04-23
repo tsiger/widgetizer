@@ -1,0 +1,181 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "banner",
+      "settings": {
+        "height": "small",
+        "fullwidth": true,
+        "content_width": "narrow",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inquire</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Start a project",
+            "size": "6xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A few lines about timeline, location, and scope helps us reply usefully. No form is required — email works just as well.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+    },
+    "contact_details": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "details-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get in touch",
+            "size": "2xl"
+          }
+        },
+        "details-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Email.</strong> hello@example.com — the fastest way to reach the studio. I reply within two working days.</p><p><strong>Studio.</strong> By appointment. Address shared when the project date is confirmed.</p><p><strong>Hours.</strong> Monday to Friday, nine to five. Sessions on weekends by arrangement.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "details-cta": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "hello@example.com",
+              "href": "mailto:hello@example.com",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["details-heading", "details-body", "details-cta"]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you inquire",
+        "eyebrow_uppercase": true,
+        "title": "A few things worth saying first",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "cfaq-01": {
+          "type": "item",
+          "settings": {
+            "question": "Do you travel?",
+            "answer": "<p>Yes — for editorial and commissioned work. Travel and accommodation are billed at cost and agreed in writing before the shoot.</p>"
+          }
+        },
+        "cfaq-02": {
+          "type": "item",
+          "settings": {
+            "question": "What are your rates?",
+            "answer": "<p>Session rates begin at a half-day rate and scale with scope. Every project is quoted in a written brief — there are no listed packages because every shoot is a little different.</p>"
+          }
+        },
+        "cfaq-03": {
+          "type": "item",
+          "settings": {
+            "question": "What's your turnaround?",
+            "answer": "<p>Three weeks for a final curated set. Rush delivery is possible on editorial assignments; say so in the inquiry.</p>"
+          }
+        },
+        "cfaq-04": {
+          "type": "item",
+          "settings": {
+            "question": "How do licensing and usage rights work?",
+            "answer": "<p>Every commercial project ships with a written license that names the usage, territory, and term. Private-client work includes personal-use rights by default.</p>"
+          }
+        },
+        "cfaq-info": {
+          "type": "info",
+          "settings": {
+            "title": "Direct line",
+            "text": "<p>hello@example.com</p><p>By appointment</p>"
+          }
+        }
+      },
+      "blocksOrder": ["cfaq-01", "cfaq-02", "cfaq-03", "cfaq-04", "cfaq-info"]
+    },
+    "contact_closing": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "c-quote": {
+          "type": "text",
+          "settings": {
+            "text": "<p>I don't love being photographed. The shoot didn't feel like being photographed. The album sits on the kitchen shelf and the kids take it down on their own.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "c-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Elena Mendel",
+            "size": "lg"
+          }
+        },
+        "c-role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Private client</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["c-quote", "c-name", "c-role"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "contact_details", "contact_faq", "contact_closing"],
+  "id": "contact",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

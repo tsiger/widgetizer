@@ -1,0 +1,10 @@
+{
+  "id": "footer-menu",
+  "name": "Footer Menu",
+  "items": [
+    { "label": "Work", "link": "work.html", "items": [] },
+    { "label": "Services", "link": "services.html", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}
