@@ -1,0 +1,44 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "(c) 2026 Tailside Animal Clinic. All rights reserved.",
+    "layout": "first-featured",
+    "color_scheme": "highlight-primary"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "logo_text": "Tailside",
+        "text": "<p>Small-animal veterinary care for dogs and cats, built around clear guidance and calm visits.</p>"
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Tue-Fri: 8 AM - 6 PM</p><p>Sat: 9 AM - 2 PM</p><p>Sun-Mon: Closed</p>"
+      }
+    },
+    "text_block_2": {
+      "type": "text_block",
+      "settings": {
+        "title": "Contact",
+        "text": "<p>(555) 555-0100</p><p>hello@example.com</p><p>123 Pet Care Lane, Your City</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Quick Links",
+        "menu": "footer-menu"
+      }
+    }
+  },
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "text_block_2",
+    "menu_block_1"
+  ]
+}

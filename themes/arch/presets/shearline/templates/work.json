@@ -1,0 +1,148 @@
+{
+  "name": "Work",
+  "slug": "work",
+  "widgets": {
+    "work_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Recent work, by category.",
+            "size": "4xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every image on this page is a real client from our chairs — no stock, no model reps. Use the tabs to see how each stylist thinks about different cuts.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-body"]
+    },
+    "work_by_category": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "Browse the portfolio",
+        "eyebrow_uppercase": true,
+        "title": "Five ways we cut.",
+        "description": "Different goals, different approaches. Pick a tab to see how we think about each.",
+        "heading_alignment": "center",
+        "image_position": "start",
+        "aspect_ratio": "3/2",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "tab-short-cuts": {
+          "type": "tab",
+          "settings": {
+            "title": "Short cuts",
+            "description": "<p>Precision bobs, pixies, and undercuts. The shortest shapes are the least forgiving — which is exactly why they need the most considered cut. We dry-check every line before you leave.</p>"
+          }
+        },
+        "tab-long-lengths": {
+          "type": "tab",
+          "settings": {
+            "title": "Long & Lengths",
+            "description": "<p>Layered long cuts, lived-in shapes, movement without weight loss. We cut with the hair's natural fall in mind so the shape still reads on day twenty-one.</p>"
+          }
+        },
+        "tab-color-balayage": {
+          "type": "tab",
+          "settings": {
+            "title": "Color & Balayage",
+            "description": "<p>Hand-painted balayage, foil work, dimensional blonding, and the gentler single-process services. Consultation first, always — color done well is a conversation.</p>"
+          }
+        },
+        "tab-mens": {
+          "type": "tab",
+          "settings": {
+            "title": "Men's",
+            "description": "<p>Classic cuts, skin fades, textured crops, and beard shaping. Same attention to shape and finish as every other service in the salon.</p>"
+          }
+        },
+        "tab-editorial-events": {
+          "type": "tab",
+          "settings": {
+            "title": "Editorial & Events",
+            "description": "<p>Bridal, event styling, and photoshoot work. Hair that holds up through a long day and still looks considered in photographs.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["tab-short-cuts", "tab-long-lengths", "tab-color-balayage", "tab-mens", "tab-editorial-events"]
+    },
+    "work_gallery": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "Full archive",
+        "eyebrow_uppercase": true,
+        "title": "Recent months, all stylists.",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "gallery-01": { "type": "item", "settings": { "title": "Lena", "category": "Short cut" } },
+        "gallery-02": { "type": "item", "settings": { "title": "Priya", "category": "Short cut" } },
+        "gallery-03": { "type": "item", "settings": { "title": "Jess", "category": "Short cut" } },
+        "gallery-04": { "type": "item", "settings": { "title": "Iris", "category": "Long & Lengths" } },
+        "gallery-05": { "type": "item", "settings": { "title": "Sana", "category": "Long & Lengths" } },
+        "gallery-06": { "type": "item", "settings": { "title": "Clara", "category": "Long & Lengths" } },
+        "gallery-07": { "type": "item", "settings": { "title": "Nadia", "category": "Balayage" } },
+        "gallery-08": { "type": "item", "settings": { "title": "Juno", "category": "Color" } },
+        "gallery-09": { "type": "item", "settings": { "title": "Harper", "category": "Color" } },
+        "gallery-10": { "type": "item", "settings": { "title": "Marco", "category": "Men's" } },
+        "gallery-11": { "type": "item", "settings": { "title": "Dev", "category": "Men's" } },
+        "gallery-12": { "type": "item", "settings": { "title": "Omari", "category": "Men's" } },
+        "gallery-13": { "type": "item", "settings": { "title": "Noor", "category": "Editorial" } },
+        "gallery-14": { "type": "item", "settings": { "title": "Elena", "category": "Editorial" } },
+        "gallery-15": { "type": "item", "settings": { "title": "Wren", "category": "Editorial" } }
+      },
+      "blocksOrder": ["gallery-01", "gallery-02", "gallery-03", "gallery-04", "gallery-05", "gallery-06", "gallery-07", "gallery-08", "gallery-09", "gallery-10", "gallery-11", "gallery-12", "gallery-13", "gallery-14", "gallery-15"]
+    },
+    "work_closing": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want this for your hair?",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Pick a stylist",
+              "href": "stylists.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-button"]
+    }
+  },
+  "widgetsOrder": ["work_intro", "work_by_category", "work_gallery", "work_closing"],
+  "id": "work",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

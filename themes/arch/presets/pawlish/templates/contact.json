@@ -1,0 +1,145 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Get in touch</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Bring your dog in.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call, email, or stop by during open hours. We'll get back within a business day.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+    },
+    "contact_callout": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "callout-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We can't wait to meet your dog.",
+            "size": "3xl"
+          }
+        },
+        "callout-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us about them — breed, age, last groom date, and one thing we should know. We'll get back with available slots.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "callout-features": {
+          "type": "features",
+          "settings": {
+            "features": "Open Tue – Sat, 9am – 5pm\nClosed Sunday & Monday\nWalk-in nails Wednesday afternoons\nBookings 2 weeks out, typically"
+          }
+        },
+        "callout-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Call (555) 020-0184",
+              "href": "tel:5550200184",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Email us",
+              "href": "mailto:hello@example.com",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["callout-heading", "callout-text", "callout-features", "callout-button"]
+    },
+    "contact_details": {
+      "type": "contact-details",
+      "settings": {
+        "title": "How to reach us.",
+        "heading_alignment": "center",
+        "layout": "equal",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "info-book": {
+          "type": "info",
+          "settings": {
+            "title": "Book a groom",
+            "text": "<p>(555) 020-0184</p><p>hello@example.com</p><p>We return calls within a business day.</p>"
+          }
+        },
+        "info-find": {
+          "type": "info",
+          "settings": {
+            "title": "Find us",
+            "text": "<p>1842 Linden Ave</p><p>Open Tue – Sat, 9am – 5pm</p><p>Closed Sunday & Monday</p>"
+          }
+        },
+        "info-parking": {
+          "type": "info",
+          "settings": {
+            "title": "Parking & access",
+            "text": "<p>Free street parking on Linden</p><p>Step-free side entrance</p><p>Curbside drop-off available</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-book", "info-find", "info-parking"]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "title": "Find us.",
+        "heading_alignment": "center",
+        "address": "1842 Linden Ave",
+        "height": "large",
+        "show_address": true,
+        "color_scheme": "standard-primary"
+      }
+    }
+  },
+  "widgetsOrder": ["contact_hero", "contact_callout", "contact_details", "contact_map"],
+  "id": "contact",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T15:00:00.000Z"
+}

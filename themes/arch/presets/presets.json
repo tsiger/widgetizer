@@ -115,6 +115,12 @@
       "liveDemo": "https://widgetizer.org/demos/olympic/"
     },
     {
+      "id": "pawlish",
+      "name": "Pawlish",
+      "description": "Dog grooming salon",
+      "liveDemo": "https://widgetizer.org/demos/pawlish/"
+    },
+    {
       "id": "petalry",
       "name": "Petalry",
       "description": "Flower shop",
@@ -139,6 +145,11 @@
       "liveDemo": "https://widgetizer.org/demos/saffron/"
     },
     {
+      "id": "shearline",
+      "name": "Shearline",
+      "description": "Hair salon"
+    },
+    {
       "id": "sparkhaus",
       "name": "Sparkhaus",
       "description": "Cleaning service",
@@ -155,6 +166,12 @@
       "name": "Stillpoint",
       "description": "Yoga studio",
       "liveDemo": "https://widgetizer.org/demos/stillpoint/"
+    },
+    {
+      "id": "tailside",
+      "name": "Tailside",
+      "description": "Veterinary clinic",
+      "liveDemo": "https://widgetizer.org/demos/tailside/"
     },
     {
       "id": "velvet-touch",

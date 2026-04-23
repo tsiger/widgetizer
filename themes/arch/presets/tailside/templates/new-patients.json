@@ -1,0 +1,281 @@
+{
+  "name": "New Patients",
+  "slug": "new-patients",
+  "widgets": {
+    "new_patients_intro": {
+      "type": "split-hero",
+      "settings": {
+        "overlay_color": "#10332d22",
+        "image_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-kicker": {
+          "type": "text",
+          "settings": {
+            "text": "<p>New patients</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A first visit that feels organized before you arrive.",
+            "size": "4xl"
+          }
+        },
+        "intro-copy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Bring records, a current medication list, and anything you have noticed at home. We will guide the rest.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Schedule a first visit",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-kicker",
+        "intro-heading",
+        "intro-copy",
+        "intro-button"
+      ]
+    },
+    "new_patient_steps": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "What to expect",
+        "eyebrow_uppercase": false,
+        "title": "Your first visit, step by step.",
+        "description": "A simple visit flow helps your pet settle in and helps the team make useful recommendations.",
+        "heading_alignment": "start",
+        "layout": "vertical",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "records": {
+          "type": "item",
+          "settings": {
+            "date": "Before",
+            "duration": "At home",
+            "title": "Send records if you have them",
+            "description": "<p>Previous vaccines, lab work, medications, and surgery notes help us avoid guesswork.</p>",
+            "features": "+ Email records before the visit\n+ Bring medication names and doses"
+          }
+        },
+        "arrival": {
+          "type": "item",
+          "settings": {
+            "date": "Arrival",
+            "duration": "10 minutes early",
+            "title": "Check in with your pet secure",
+            "description": "<p>Dogs should arrive on a leash and cats should arrive in a carrier.</p>",
+            "features": "+ Tell us if your pet is nervous\n+ We can adjust the room setup"
+          }
+        },
+        "exam": {
+          "type": "item",
+          "settings": {
+            "date": "Exam",
+            "duration": "With the doctor",
+            "title": "Talk through health and behavior",
+            "description": "<p>The veterinarian examines your pet, answers questions, and explains what is recommended.</p>",
+            "features": "+ Plain-language findings\n+ Estimates before treatment"
+          }
+        },
+        "home": {
+          "type": "item",
+          "settings": {
+            "date": "After",
+            "duration": "Go-home plan",
+            "title": "Leave with next steps",
+            "description": "<p>You will know what to watch for, when to return, and how to reach us with follow-up questions.</p>",
+            "features": "+ Care notes\n+ Reminder support"
+          }
+        }
+      },
+      "blocksOrder": [
+        "records",
+        "arrival",
+        "exam",
+        "home"
+      ]
+    },
+    "new_patient_forms": {
+      "type": "resource-list",
+      "settings": {
+        "eyebrow": "Forms",
+        "eyebrow_uppercase": false,
+        "title": "Helpful documents before your appointment.",
+        "description": "Upload your own forms after setup, or use this section as a simple new-patient checklist.",
+        "heading_alignment": "start",
+        "image_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "new-client": {
+          "type": "resource",
+          "settings": {
+            "title": "New client form",
+            "description": "Basic household details, preferred contact method, and consent information.",
+            "button_label": "Download form"
+          }
+        },
+        "medical-history": {
+          "type": "resource",
+          "settings": {
+            "title": "Pet medical history",
+            "description": "A place to note diet, medications, allergies, symptoms, and prior care.",
+            "button_label": "Download form"
+          }
+        },
+        "pre-visit": {
+          "type": "resource",
+          "settings": {
+            "title": "First-visit checklist",
+            "description": "What to bring, when to arrive, and how to prepare nervous pets.",
+            "button_label": "View checklist"
+          }
+        }
+      },
+      "blocksOrder": [
+        "new-client",
+        "medical-history",
+        "pre-visit"
+      ]
+    },
+    "new_patient_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you arrive",
+        "eyebrow_uppercase": false,
+        "title": "First-visit questions.",
+        "description": "A few details that make the appointment easier for everyone.",
+        "heading_alignment": "start",
+        "style": "connected",
+        "allow_multiple": true,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "bring": {
+          "type": "info",
+          "settings": {
+            "title": "Bring with you",
+            "text": "<p>Medical records</p><p>Medication list</p><p>Stool sample if requested</p><p>Questions you want answered</p>"
+          }
+        },
+        "cat-carrier": {
+          "type": "item",
+          "settings": {
+            "question": "My cat hates the carrier. What should I do?",
+            "answer": "<p>Leave the carrier out at home before the visit when possible. Add familiar bedding and call us if your cat needs extra travel guidance.</p>"
+          }
+        },
+        "anxious-dog": {
+          "type": "item",
+          "settings": {
+            "question": "My dog is nervous at the vet. Can you help?",
+            "answer": "<p>Yes. Tell us before arrival so we can choose a calmer room setup and move at a pace that keeps the visit useful.</p>"
+          }
+        },
+        "vaccines": {
+          "type": "item",
+          "settings": {
+            "question": "Will my pet get vaccines on the first visit?",
+            "answer": "<p>Maybe. The doctor will review records, health status, lifestyle, and age before recommending vaccines.</p>"
+          }
+        },
+        "payment": {
+          "type": "item",
+          "settings": {
+            "question": "When do I pay?",
+            "answer": "<p>Payment is due at the time of service. We explain estimates before care begins whenever treatment choices are involved.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "bring",
+        "cat-carrier",
+        "anxious-dog",
+        "vaccines",
+        "payment"
+      ]
+    },
+    "new_patient_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us about your pet.",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>New patients are welcome by appointment. Call or send a request and we will help you get started.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a first visit",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "new_patients_intro",
+    "new_patient_steps",
+    "new_patient_forms",
+    "new_patient_faq",
+    "new_patient_cta"
+  ],
+  "id": "new-patients",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

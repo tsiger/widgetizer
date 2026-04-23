@@ -13,7 +13,6 @@ This document exists to help generate presets that:
 Use this guide together with:
 
 - [theme-preset-file-format.md](theme-preset-file-format.md) — JSON file structures for all preset files (pages, header, footer, menus, preset.json)
-- [theme-design-system.md](theme-design-system.md)
 - [theme-presets-tracker.md](theme-presets-tracker.md) for preset ids and status only
 - `themes/arch/theme.json`
 - widget `schema.json` files
@@ -190,49 +189,27 @@ If this is not clear yet, do not move on to planning.
 
 At the top of `docs-llms/preset-plans/{preset-id}.md`, write a Phase 0 brief with all of the following:
 
-- **Business archetype**
-  What kind of small business site is this structurally?
-  Examples: local lead-gen service, booking-based service, portfolio-led studio, menu/catalog business, class/program business, event/venue business, listing/property business.
+- **Business archetype** What kind of small business site is this structurally? Examples: local lead-gen service, booking-based service, portfolio-led studio, menu/catalog business, class/program business, event/venue business, listing/property business.
 
-- **Primary conversion**
-  What is the main action the site should drive?
-  Examples: call, booking request, reservation, quote request, consultation, visit, signup.
+- **Primary conversion** What is the main action the site should drive? Examples: call, booking request, reservation, quote request, consultation, visit, signup.
 
-- **Trust mechanism**
-  What will make this business believable?
-  Examples: reviews, credentials, process clarity, craftsmanship, before/after proof, atmosphere, pricing clarity, location legitimacy, portfolio quality.
+- **Trust mechanism** What will make this business believable? Examples: reviews, credentials, process clarity, craftsmanship, before/after proof, atmosphere, pricing clarity, location legitimacy, portfolio quality.
 
-- **Decision mode**
-  How do customers usually choose this business?
-  Examples: urgent, considered, emotional, practical, high-ticket, repeat-visit.
+- **Decision mode** How do customers usually choose this business? Examples: urgent, considered, emotional, practical, high-ticket, repeat-visit.
 
-- **Brand personality**
-  What should the site feel like?
-  Examples: warm and approachable, clinical and precise, bold and edgy, refined and quiet, playful and energetic, rugged and honest.
+- **Brand personality** What should the site feel like? Examples: warm and approachable, clinical and precise, bold and edgy, refined and quiet, playful and energetic, rugged and honest.
 
-- **Content posture**
-  What should carry the site most strongly?
-  Examples: image-led, text-led, process-led, offer-led, listing-led.
+- **Content posture** What should carry the site most strongly? Examples: image-led, text-led, process-led, offer-led, listing-led.
 
-- **Audience model**
-  Is there one audience or multiple?
-  Examples: retail only, diners + event bookings, homeowners + property managers, consumers + fleet managers.
+- **Audience model** Is there one audience or multiple? Examples: retail only, diners + event bookings, homeowners + property managers, consumers + fleet managers.
 
-- **Required page jobs**
-  What page types are necessary for this industry to feel complete and trustworthy?
+- **Required page jobs** What page types are necessary for this industry to feel complete and trustworthy?
 
-- **No-go patterns**
-  What should feel wrong for this industry?
-  Examples: overly salesy CTA stacking, playful rounded styling, dark cinematic tone, overly corporate minimalism, too much text before proof.
+- **No-go patterns** What should feel wrong for this industry? Examples: overly salesy CTA stacking, playful rounded styling, dark cinematic tone, overly corporate minimalism, too much text before proof.
 
-- **Opener candidates**
-  What kinds of page-opening moments fit this industry?
-  Describe them by role first, not by widget name.
-  Examples: cinematic image opener, editorial text opener, proof-first opener, offer-first opener, process-first opener.
+- **Opener candidates** What kinds of page-opening moments fit this industry? Describe them by role first, not by widget name. Examples: cinematic image opener, editorial text opener, proof-first opener, offer-first opener, process-first opener.
 
-- **Closing pattern**
-  How should pages usually end?
-  Examples: strong CTA, soft invitation, booking nudge, contact handoff, proof + CTA, resources.
+- **Closing pattern** How should pages usually end? Examples: strong CTA, soft invitation, booking nudge, contact handoff, proof + CTA, resources.
 
 ### 3.2 Gate rules
 
@@ -339,18 +316,21 @@ This file is a **prompt library consumed directly by `scripts/generate-images.js
 - `prompt` — one prose paragraph. Cover subject, setting, lighting, composition, and things to avoid — but fold it into natural sentences, not labeled sections.
 
 **Do not include:**
+
 - Logo variants (header logo, transparent logo, footer logo). The user generates logos manually — they are outside this pipeline.
 - Favicons. Same reason.
 - Any field other than the four above. The generator script silently ignores extras; they become dead weight that rots as the codebase evolves.
 - Any section that repeats content from the plan `.md` (brand palette, industry framing, etc.). That belongs in the plan, not here.
 
 **Filename rules:**
+
 - No path separators. `"file": "services-emergency.jpg"` — never `"services/emergency.jpg"`. The generator script writes flat into the output directory and does not `mkdir` subfolders; a `/` in the filename breaks the run.
 - Use hyphens, not underscores, to keep filenames consistent with the rest of the theme's asset naming.
 
 **Prompt content rules (FLUX 2 Pro):**
+
 - **Never ask the model to render text.** No brand wordmarks on shirts, vans, signs, doors, mugs, or boxes. No "framed photo of …", no chalked labels, no pinned maps with street names, no scrawled notepads, no headers like "SERVICE ZONE". FLUX renders garbled text 100% of the time — it looks worse than having nothing there. Describe the subject without the text; the user's logo upload handles branding.
-- **Avoid grunge vocabulary unless grunge is actually the brand.** Words like *scarred, scratched, chipped, dusty, grimy, old, lived-in, well-used, weathered* push the model to a "basement junk-shop" aesthetic that almost no preset wants. For a clean-trade brand (plumber, electrician, dentist, accountant), say *clean, organized, recent, well-kept* or just stay neutral on the surface condition.
+- **Avoid grunge vocabulary unless grunge is actually the brand.** Words like _scarred, scratched, chipped, dusty, grimy, old, lived-in, well-used, weathered_ push the model to a "basement junk-shop" aesthetic that almost no preset wants. For a clean-trade brand (plumber, electrician, dentist, accountant), say _clean, organized, recent, well-kept_ or just stay neutral on the surface condition.
 - **Keep prop lists short.** Three props max per image. Each additional prop is another thing FLUX can misrender, and prop-dense prompts trend toward styled-Pinterest-shot outputs rather than honest scene shots.
 - **Put the subject in the right 60–70% of the frame** for any banner/hero image with left-aligned heading text on top. Mention the left area is clear and calm so the model actually leaves room.
 
@@ -680,6 +660,7 @@ Every widget's `top_spacing` and `bottom_spacing` should be `auto` unless there 
 Use `small` on widgets that are lightweight bridge elements — they carry less content and feel better with reduced gaps above and below. This is a **widget-type decision**, not a per-instance decision. If a trust-bar should use `small` spacing, it should use `small` spacing in every preset, not just when someone feels like the page is too spread out.
 
 Common `small` candidates:
+
 - `trust-bar`
 - `scrolling-text`
 - `logo-cloud`
@@ -688,6 +669,7 @@ Common `small` candidates:
 ### 10.4 When to use `none`
 
 Use `none` only when two adjacent widgets are meant to read as a single fused composition. Common cases:
+
 - A full-width image fused to the section below it
 - Two filled sections that share the same visual band
 - A split-content zigzag sequence where multiple instances chain together
@@ -759,15 +741,15 @@ Widgetizer generates four resized variants of every upload at `thumb` (150w), `s
 Pick dimensions by **the widget that will render the image**, not by what "looks big." Aspect ratio should match the widget's configured `aspect_ratio` setting when one exists. Recommended source sizes:
 
 | Widget usage | Recommended size | Aspect | Rationale |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `banner` full-width hero background | 1920×1080 | 16:9 | Hits the `large` variant cap; hero spans the full viewport |
 | `banner` small/medium opener | 1600×900 | 16:9 | Smaller than hero; still fullwidth |
 | `card-grid` card (aspect_ratio `4 / 3`) | 1024×768 | 4:3 | Card renders at ~300–500px wide; `small`/`medium` variant served |
 | `card-grid` card (aspect_ratio `1 / 1`) | 1024×1024 | 1:1 | Same card footprint |
-| `card-grid` card (aspect_ratio `16 / 9`) | 1024×576 | 16:9 | |
+| `card-grid` card (aspect_ratio `16 / 9`) | 1024×576 | 16:9 |  |
 | `image-text` widget image | 1024×1280 | 4:5 | Renders at ~half-container width; portrait reads best |
 | `profile-grid` photo (aspect_ratio `3 / 4`) | 960×1280 | 3:4 | Multi-column grid; `medium` variant max |
-| `profile-grid` photo (aspect_ratio `1 / 1`) | 1024×1024 | 1:1 | |
+| `profile-grid` photo (aspect_ratio `1 / 1`) | 1024×1024 | 1:1 |  |
 | `team-highlight` feature photo | 1280×1600 | 4:5 | Larger than profile-grid; single-feature layout |
 | `steps` / `resource-list` item image | 1024×768 | 4:3 | Small inline visual |
 | `gallery` / `masonry-gallery` item | 1280×960 or 1280×1600 | 4:3 or 3:4 | Gallery-led; slightly larger than cards is OK |

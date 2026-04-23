@@ -1,0 +1,198 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_details": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "Contact",
+        "eyebrow_uppercase": false,
+        "title": "Book a visit or ask a care question.",
+        "description": "Call for urgent concerns. For routine care, send a request and the team will follow up.",
+        "heading_alignment": "center",
+        "layout": "first-featured",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "clinic": {
+          "type": "info",
+          "settings": {
+            "title": "Tailside Animal Clinic",
+            "text": "<p><a href=\"tel:+15555550100\">(555) 555-0100</a></p><p><a href=\"mailto:hello@example.com\">hello@example.com</a></p><p>123 Pet Care Lane, Your City</p>"
+          }
+        },
+        "hours": {
+          "type": "text_block",
+          "settings": {
+            "title": "Hours",
+            "text": "<p>Tue-Fri: 8 AM - 6 PM</p><p>Sat: 9 AM - 2 PM</p><p>Sun-Mon: Closed</p>"
+          }
+        },
+        "urgent": {
+          "type": "text_block",
+          "settings": {
+            "title": "Urgent concerns",
+            "text": "<p>If your pet is having trouble breathing, has collapsed, may have eaten something toxic, or has severe pain, call now.</p><p>After hours, contact your nearest emergency hospital.</p>"
+          }
+        },
+        "quick_links": {
+          "type": "menu_block",
+          "settings": {
+            "title": "Quick Links",
+            "menu": "footer-menu"
+          }
+        }
+      },
+      "blocksOrder": [
+        "clinic",
+        "hours",
+        "urgent",
+        "quick_links"
+      ]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "Visit",
+        "eyebrow_uppercase": false,
+        "title": "Find the clinic.",
+        "description": "Add your Google Maps embed URL after setup to show the live location.",
+        "heading_alignment": "start",
+        "address": "123 Pet Care Lane, Your City",
+        "embed_url": "",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "parking": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Short-term parking is available near the entrance. Keep dogs leashed and cats in carriers from the car to the lobby.</p>"
+          }
+        },
+        "accessibility": {
+          "type": "info",
+          "settings": {
+            "title": "Accessibility",
+            "text": "<p>Call ahead if your pet needs a quieter entry, extra space, or mobility support.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "parking",
+        "accessibility"
+      ]
+    },
+    "contact_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you call",
+        "eyebrow_uppercase": false,
+        "title": "Helpful contact notes.",
+        "description": "These details help the team route your question quickly.",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "records": {
+          "type": "item",
+          "settings": {
+            "question": "Where should records be sent?",
+            "answer": "<p>Send records to hello@example.com or ask your prior clinic to forward them before your appointment.</p>"
+          }
+        },
+        "meds": {
+          "type": "item",
+          "settings": {
+            "question": "What should I mention when I call?",
+            "answer": "<p>Tell us your pet's age, species, main concern, current medications, and whether symptoms are getting worse.</p>"
+          }
+        },
+        "late": {
+          "type": "item",
+          "settings": {
+            "question": "What if I am running late?",
+            "answer": "<p>Call the clinic. We may need to adjust the appointment so the team can still give your pet enough time.</p>"
+          }
+        },
+        "contact_help": {
+          "type": "info",
+          "settings": {
+            "title": "Need help now?",
+            "text": "<p>Call (555) 555-0100 for same-day guidance during clinic hours.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "records",
+        "meds",
+        "late",
+        "contact_help"
+      ]
+    },
+    "contact_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Call if you are worried.",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>If your pet's symptoms feel urgent, phone is the fastest way to reach the team.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "tel:+15555550100",
+              "text": "Call (555) 555-0100",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "contact_details",
+    "contact_map",
+    "contact_faq",
+    "contact_cta"
+  ],
+  "id": "contact",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

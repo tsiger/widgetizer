@@ -1,0 +1,346 @@
+{
+  "name": "Groomers",
+  "slug": "groomers",
+  "widgets": {
+    "groomers_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "vertical_alignment": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The team</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Four humans. Twenty-five years between us.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your groomer is the person at the table. We pick by what we do best — terriers, doodles, double coats, anxious dogs.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+    },
+    "groomers_intro": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Why we're four, not forty</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A small team, on purpose.",
+            "size": "3xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We stayed small so your dog sees the same face every visit. The four of us split the calendar — Mara takes doodles and anxious dogs, Dani runs double coats, Rae handles puppies and small breeds, Jules runs the bath and walk-in nails.</p><p>Your dog gets matched to a groomer at intake, then stays with that person for as long as they're a regular. Continuity matters more than schedule magic.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book with us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text", "intro-button"]
+    },
+    "groomers_team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Meet the team",
+        "eyebrow_uppercase": true,
+        "title": "Who's at the table.",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3 / 4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "groomer-mara": {
+          "type": "profile",
+          "settings": {
+            "name": "Mara Voss",
+            "role": "Lead groomer & founder",
+            "specialty": "Doodles · hand-stripping · anxious dogs",
+            "bio": "Twelve years in two other shops before opening Pawlish in 2017. Specializes in doodle teddy cuts, terrier hand-stripping, and the slow work nervous dogs need. NDGAA certified. The person to ask if your dog has been turned away elsewhere.",
+            "instagram": "pawlishgrooming"
+          }
+        },
+        "groomer-dani": {
+          "type": "profile",
+          "settings": {
+            "name": "Dani Iyer",
+            "role": "Senior groomer",
+            "specialty": "Double coats · de-shed · large breeds",
+            "bio": "Nine years grooming, four with Pawlish. Handles huskies, malamutes, shepherds, and large retrievers — the double coats nobody else wants. IPG certified. Strong, calm, patient with the big dogs.",
+            "instagram": "danigroomsdogs"
+          }
+        },
+        "groomer-rae": {
+          "type": "profile",
+          "settings": {
+            "name": "Rae Kowalski",
+            "role": "Groomer",
+            "specialty": "Small breeds · puppies · sanitary trims",
+            "bio": "Vet tech background, three years grooming. The right person for puppies, small breeds, and any dog whose first grooming experience needs to land well. Working toward NDGAA Master Groomer.",
+            "instagram": ""
+          }
+        },
+        "groomer-jules": {
+          "type": "profile",
+          "settings": {
+            "name": "Jules Okafor",
+            "role": "Groomer & bath tech",
+            "specialty": "Bath services · walk-in nails · seniors",
+            "bio": "Five years at Pawlish, runs the bath station and walk-in nail service. Pet First Aid & CPR certified. The gentle hand most senior dogs settle into immediately.",
+            "instagram": ""
+          }
+        }
+      },
+      "blocksOrder": ["groomer-mara", "groomer-dani", "groomer-rae", "groomer-jules"]
+    },
+    "groomers_promise": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "How we handle",
+        "eyebrow_uppercase": true,
+        "title": "Promises about the time your dog spends here.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "outlined",
+        "alignment": "center",
+        "icon_style": "filled",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "promise-no-sedation": {
+          "type": "card",
+          "settings": {
+            "icon": "paw",
+            "title": "Never sedated",
+            "description": "If a dog can't be groomed without sedation, we don't groom them."
+          }
+        },
+        "promise-breaks": {
+          "type": "card",
+          "settings": {
+            "icon": "clock",
+            "title": "Breaks built in",
+            "description": "Senior and anxious dogs work in shorter blocks."
+          }
+        },
+        "promise-no-crate": {
+          "type": "card",
+          "settings": {
+            "icon": "home",
+            "title": "No crate dryers",
+            "description": "Hand-dried with low-noise forced-air, every dog."
+          }
+        },
+        "promise-notes": {
+          "type": "card",
+          "settings": {
+            "icon": "clipboard-text",
+            "title": "Notes at pickup",
+            "description": "Skin, nails, anything off — written down."
+          }
+        }
+      },
+      "blocksOrder": ["promise-no-sedation", "promise-breaks", "promise-no-crate", "promise-notes"]
+    },
+    "groomers_moments": {
+      "type": "slideshow",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "autoplay": true,
+        "autoplay_speed": 5000
+      },
+      "blocks": {
+        "moment-bath": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Bath days are good days.",
+            "text_content": "Hypoallergenic shampoo by default. Scent-free or medicated on request.",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "3xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        },
+        "moment-dry": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Hand-dried, every coat.",
+            "text_content": "Low-noise forced-air, never crate dryers. About 20–40 minutes.",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "3xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        },
+        "moment-cut": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Breed-aware cuts.",
+            "text_content": "We cut to your breed, not a default style.",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "3xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        },
+        "moment-pickup": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "One happy dog at pickup.",
+            "text_content": "Plus a written note on what we noticed.",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "3xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        }
+      },
+      "blocksOrder": ["moment-bath", "moment-dry", "moment-cut", "moment-pickup"]
+    },
+    "groomers_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "quote-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>After three salons turned us away, Mara was the first person who didn't flinch when I described Otis. He's a different dog at pickup — calmer, lighter on his feet. Two years and counting.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "quote-author": {
+          "type": "heading",
+          "settings": {
+            "text": "Rebecca H., Otis's owner",
+            "size": "lg"
+          }
+        },
+        "quote-meta": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Standard schnauzer · age 11 · groomed by Mara since 2024</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote-text", "quote-author", "quote-meta"]
+    },
+    "groomers_close": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us about your dog.",
+            "size": "3xl"
+          }
+        },
+        "close-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'll match you with the right groomer for the breed.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See our work",
+              "href": "gallery.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-text", "close-button"]
+    }
+  },
+  "widgetsOrder": ["groomers_hero", "groomers_intro", "groomers_team", "groomers_promise", "groomers_moments", "groomers_quote", "groomers_close"],
+  "id": "groomers",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T15:00:00.000Z"
+}

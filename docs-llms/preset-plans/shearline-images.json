@@ -1,0 +1,218 @@
+[
+  {
+    "file": "hero.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Editorial portrait of a person with a precision-cut short bob, photographed in natural window light from the side so the sharp line of the cut reads clearly along the jaw. The subject is positioned in the right two-thirds of the frame, and the left third is a softly out-of-focus warm-stone interior wall that holds negative space for heading text on top. Warm neutral tones throughout, a shallow depth of field, hair that reads as freshly cut with visible shape and movement. Editorial fashion-magazine sensibility rather than a commercial headshot; calm, unsmiling, considered. Avoid any visible text, logos, watermarks, signage, or printed labels; avoid heavy jewelry and heavy makeup; avoid a rose-gold or marble beauty-bar aesthetic; avoid overly posed smiling stock-photo framing."
+  },
+  {
+    "file": "stylist-rowan.jpg",
+    "width": 960,
+    "height": 1280,
+    "prompt": "Environmental three-quarter portrait of a woman in her late thirties standing at her chair in a craft-forward hair salon, wearing a clean black apron over neutral clothing. Her own hair is a precision short bob with a sharp sight line at the jaw, and she holds a pair of hairdressing shears at rest in one hand. She is looking directly at the camera with a calm, composed expression — not smiling, not posed. Matte-black salon chair and warm wood counter visible behind her, warm window light coming from camera-right, warm stone wall in the background. Shallow depth of field, editorial observational feel. Avoid any text, logos, name tags, product labels, rose-gold or pink beauty-bar styling, and avoid overly polished commercial-stock expressions."
+  },
+  {
+    "file": "stylist-sloane.jpg",
+    "width": 960,
+    "height": 1280,
+    "prompt": "Environmental three-quarter portrait of a senior colorist in her late thirties standing at a color station in a hair salon, wearing a clean black apron over neutral clothing. Her own hair shows hand-painted dimensional blonding with soft lived-in roots, and she is holding a tint brush resting across a small ceramic bowl. Behind her, a wall of color-tube containers organized like an art-supply shelf, softly out of focus. Warm natural daylight from camera-left, calm alert expression looking at camera. Shallow depth of field, editorial sensibility. Avoid any readable text, visible brand labels on tubes or packaging, watermarks, or the rose-gold beauty-bar aesthetic."
+  },
+  {
+    "file": "stylist-mara.jpg",
+    "width": 960,
+    "height": 1280,
+    "prompt": "Environmental three-quarter portrait of a Black woman in her early thirties standing at her chair in a hair salon, wearing a clean black apron over neutral clothing. Her own hair is well-defined natural coils with visible shape and shine, and she holds a wide-tooth comb at rest. Warm stone wall behind her, warm window light from camera-right, matte-black chair partially visible. Calm, alert, direct expression at camera — professional, unsmiling. Shallow depth of field, editorial observational feel. Avoid any visible text, logos, product labels, cartoony styling, and avoid the pink or rose-gold beauty-bar aesthetic."
+  },
+  {
+    "file": "stylist-theo.jpg",
+    "width": 960,
+    "height": 1280,
+    "prompt": "Environmental three-quarter portrait of a man in his late thirties standing at his chair in a hair salon, wearing a clean black apron over a dark T-shirt. His own hair is a short textured crop and he has a neatly groomed beard. Professional clippers rest on the counter beside him, partly visible. Matte-black chair, warm wood shelf, natural window light, warm stone wall. Direct calm expression at camera, not smiling, not posed. Shallow depth of field, editorial feel. Avoid any visible text, logos, name tags, and avoid retro-barbershop props such as leather chairs, brass tins, vintage signage, or handlebar-mustache iconography."
+  },
+  {
+    "file": "philosophy-scene.jpg",
+    "width": 1024,
+    "height": 1280,
+    "prompt": "Quiet interior moment in a craft-forward hair salon photographed in portrait orientation — a stylist in a black apron stands behind a seated client at a matte-black chair, both visible as a reflection in the mirror as they have a soft pre-cut conversation. Warm daylight through a window beyond the frame, a single potted plant on the counter, warm wood shelf, warm stone walls. Ambient natural lighting, no harsh fluorescents, editorial observational sensibility. Avoid any readable text, logos, mirror labels, product branding; avoid the pink rose-gold beauty-bar aesthetic; avoid a clinical sterile-salon look with medical-white surfaces."
+  },
+  {
+    "file": "work-home-1.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Editorial photograph of a woman's precision short bob seen from a three-quarter back view so the sharp cut line at the nape and the shape around the ear both read clearly. Warm natural window light, soft shadows, warm stone interior background softly out of focus. Clean modern editorial feel, portrait orientation. Avoid any visible text, logos, watermarks, heavy jewelry, or the rose-gold beauty-bar aesthetic."
+  },
+  {
+    "file": "work-home-2.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Detail photograph of hand-painted balayage blonding on long brunette hair in motion, caught mid-sway so the dimensional color and ribbons of light read clearly. Warm natural daylight, soft neutral background, landscape orientation. Editorial color-work photography. Avoid visible text, logos, watermarks, product labels, and avoid overly saturated commercial-catalog color grading."
+  },
+  {
+    "file": "work-home-3.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Editorial portrait of a woman with long layered hair mid-step, looking back over her shoulder, natural window light catching the movement in the layers. Warm stone wall softly out of focus in the background. Portrait orientation, editorial sensibility. Avoid any visible text, logos, watermarks, branded clothing, or glamour-stock posing."
+  },
+  {
+    "file": "work-home-4.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Side profile photograph of a man with a freshly cut textured crop fading into a short taper, showing the shape and movement of the cut clearly. Warm natural daylight, soft neutral wall background, landscape orientation, editorial feel. Avoid visible text, logos, watermarks, tattoos prominently placed, and avoid retro-barbershop styling cues."
+  },
+  {
+    "file": "work-home-5.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Editorial portrait of a woman with well-defined natural curly hair facing the camera at three-quarter angle, the coils catching warm natural window light with visible shape and shine. Warm stone wall behind, portrait orientation, calm unsmiling expression. Avoid visible text, logos, product labels, heavy makeup, or the pink beauty-bar aesthetic."
+  },
+  {
+    "file": "work-home-6.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Three-quarter editorial view of a recently finished dimensional blonde, hair styled in a soft lived-in wave that catches warm window light and reveals the hand-painted color ribbons. Landscape orientation, warm neutral background softly out of focus. Editorial color-work photography. Avoid visible text, logos, watermarks, and commercial-catalog color grading."
+  },
+  {
+    "file": "work-home-7.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Event-ready updo photographed from the side so the architecture of the styling reads clearly — pinned shape, smooth surface, intentional finish. Warm natural light, soft warm-stone background, portrait orientation, editorial feel. Avoid visible text, logos, tiaras, rhinestone accessories, and bridal-catalog glamour styling."
+  },
+  {
+    "file": "work-home-8.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Close three-quarter view of a freshly finished men's classic cut paired with groomed beard, showing clean cut lines at the temple and the shape of the beard against the jaw. Warm natural light, soft neutral background, landscape orientation, editorial sensibility. Avoid visible text, logos, watermarks, and retro-barbershop props such as leather chairs or vintage signage."
+  },
+  {
+    "file": "work-home-9.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Editorial close-up of a fringe trim on straight hair, front view cropped tight on brows and forehead so the freshly cut fringe line reads with precision. Warm natural light, neutral warm-stone background softly out of focus, portrait orientation. Avoid visible text, logos, heavy makeup, and commercial-stock posing."
+  },
+  {
+    "file": "work-tab-short-cuts.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Editorial three-quarter portrait of a person with a freshly cut sharp bob, positioned center-frame with warm salon interior softly out of focus behind. Warm natural window light, shallow depth of field, landscape orientation at 3:2. Composed, unsmiling, editorial sensibility. Avoid visible text, logos, watermarks, heavy jewelry, rose-gold beauty-bar styling."
+  },
+  {
+    "file": "work-tab-long-lengths.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Editorial photograph of long layered hair in motion, caught mid-sway so the layers and internal movement read clearly. Warm daylight, neutral stone wall softly out of focus, landscape 3:2 orientation, shallow depth of field. Avoid visible text, logos, watermarks, branded clothing, and overly saturated commercial grading."
+  },
+  {
+    "file": "work-tab-color-balayage.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Detail photograph of hand-painted balayage color on long hair arranged in a soft shape, showing the ribbons of dimensional color clearly in warm natural light. Neutral stone background softly out of focus, landscape 3:2 orientation, editorial color-work sensibility. Avoid visible text, logos, watermarks, product labels, and commercial-catalog color grading."
+  },
+  {
+    "file": "work-tab-mens.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Profile editorial portrait of a man's freshly cut textured crop with a clean taper fade and groomed beard, composed so the shape of the cut reads clearly against a softly out-of-focus warm-stone background. Warm natural window light, landscape 3:2 orientation, editorial sensibility. Avoid visible text, logos, watermarks, tattoos prominently placed, leather-chair or brass-tin barbershop props."
+  },
+  {
+    "file": "work-tab-editorial-events.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Event-ready styled hair photographed from a three-quarter angle so the architecture of the styling reads clearly — pinned shape, smooth surface, considered finish. Warm natural light, neutral warm-stone background softly out of focus, landscape 3:2 orientation, editorial sensibility. Avoid visible text, logos, watermarks, tiaras, rhinestone accessories, and bridal-catalog glamour styling."
+  },
+  {
+    "file": "work-gallery-01.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Editorial front portrait of a sharp chin-length bob with blunt line, warm natural light, neutral stone background softly out of focus, portrait orientation. Composed, unsmiling. Avoid visible text, logos, heavy jewelry, commercial-stock posing."
+  },
+  {
+    "file": "work-gallery-02.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Side profile of a pixie cut with visible shape around the ear and at the nape, warm window light, neutral wall background, landscape orientation, editorial sensibility. Avoid visible text, logos, watermarks, or posed stock expressions."
+  },
+  {
+    "file": "work-gallery-03.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Back-view photograph of an undercut detail with crisp hairline design, showing the precision of the shape under longer hair on top. Warm natural light, neutral background softly out of focus, portrait orientation. Avoid visible text, logos, watermarks, and overly stylized editorial filters."
+  },
+  {
+    "file": "work-gallery-04.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Three-quarter editorial portrait of long layered hair in natural movement, warm daylight, neutral stone wall softly out of focus, portrait orientation. Shallow depth of field, editorial sensibility. Avoid visible text, logos, branded clothing, commercial glamour grading."
+  },
+  {
+    "file": "work-gallery-05.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Back-view photograph of loose lived-in waves on long hair, warm window light catching the shape and internal movement. Neutral background softly out of focus, landscape orientation, editorial feel. Avoid visible text, logos, watermarks, or commercial-catalog color grading."
+  },
+  {
+    "file": "work-gallery-06.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Editorial front portrait of long hair with a full fringe, warm natural light, neutral stone background softly out of focus, portrait orientation. Calm composed expression. Avoid visible text, logos, heavy makeup, posed stock smiles."
+  },
+  {
+    "file": "work-gallery-07.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Detail photograph of dimensional balayage blonding on mid-length hair arranged to catch warm natural light, showing the painted ribbons of color clearly. Neutral soft-focus background, landscape orientation, editorial color-work sensibility. Avoid visible text, logos, product labels, and commercial-catalog color grading."
+  },
+  {
+    "file": "work-gallery-08.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Three-quarter editorial portrait of a rich brunette single-process color with gloss finish, showing dimension and shine in warm natural window light. Neutral warm-stone wall behind, portrait orientation, editorial sensibility. Avoid visible text, logos, watermarks, heavy makeup, commercial-catalog grading."
+  },
+  {
+    "file": "work-gallery-09.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Detail photograph of a recently finished platinum blonde showing clean tonal work at the root area and mid-lengths, warm natural light, neutral soft-focus background, landscape orientation. Editorial color-work sensibility. Avoid visible text, logos, product labels, overly cool clinical lighting."
+  },
+  {
+    "file": "work-gallery-10.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Profile portrait of a freshly cut classic men's taper with side parting, showing clean cut lines at the temple and over the ear. Warm natural light, neutral wall background softly out of focus, landscape orientation, editorial sensibility. Avoid visible text, logos, watermarks, leather-chair and brass-tin barbershop props."
+  },
+  {
+    "file": "work-gallery-11.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Front editorial portrait of a textured men's crop with a slightly messy hand-dried finish and light stubble, warm natural light, neutral warm-stone background softly out of focus, portrait orientation. Composed, unsmiling. Avoid visible text, logos, watermarks, and retro-barbershop styling cues."
+  },
+  {
+    "file": "work-gallery-12.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Close three-quarter detail of a groomed beard paired with a clean skin fade, showing the transition lines clearly. Warm natural daylight, neutral soft-focus background, landscape orientation, editorial feel. Avoid visible text, logos, prominently placed tattoos, vintage barbershop props."
+  },
+  {
+    "file": "work-gallery-13.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Side profile of an event-ready pinned updo, architecture of the styling clearly legible — smooth surfaces, considered shape. Warm natural light, neutral warm-stone background softly out of focus, portrait orientation, editorial sensibility. Avoid visible text, logos, tiaras, rhinestones, bridal-catalog glamour styling."
+  },
+  {
+    "file": "work-gallery-14.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Editorial three-quarter bridal portrait of a soft romantic half-up style with loose face-framing pieces, warm natural light, neutral warm-stone background softly out of focus, portrait orientation. Calm composed expression, editorial sensibility over glamour-catalog feel. Avoid visible text, logos, tiaras, rhinestones, heavy commercial makeup."
+  },
+  {
+    "file": "work-gallery-15.jpg",
+    "width": 1280,
+    "height": 960,
+    "prompt": "Three-quarter editorial photograph of event-styled hair with strong texture and deliberate shape — a party-ready finish with visible craft. Warm natural light, neutral warm-stone background softly out of focus, landscape orientation, editorial sensibility. Avoid visible text, logos, watermarks, and overtly commercial glamour grading."
+  },
+  {
+    "file": "color-consult.jpg",
+    "width": 1024,
+    "height": 1280,
+    "prompt": "Quiet color-consultation moment photographed in portrait orientation — a stylist in a black apron holds a painted color-swatch ring beside a seated client's hair at the mirror, comparing tone in warm natural window light. Matte-black chair, warm wood counter, a single potted plant partly visible. Ambient natural lighting, no harsh fluorescents, editorial observational sensibility, calm focused expressions — not posed, not smiling at camera. Avoid any readable text, logos, product labels, brand names on swatches or bottles; avoid the pink rose-gold beauty-bar aesthetic and avoid a clinical sterile-salon look."
+  }
+]

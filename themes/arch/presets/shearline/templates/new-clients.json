@@ -1,0 +1,239 @@
+{
+  "name": "New Clients",
+  "slug": "new-clients",
+  "widgets": {
+    "new_clients_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your first appointment, step by step.",
+            "size": "4xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>If you haven't cut hair with us before, this page walks you through what to expect — from booking the right service to leaving with a cut that'll still look good three weeks from now.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-body"]
+    },
+    "new_clients_steps": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "What happens",
+        "eyebrow_uppercase": true,
+        "title": "From booking to leaving.",
+        "heading_alignment": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "step-booking": {
+          "type": "step",
+          "settings": {
+            "title": "Booking",
+            "description": "<p>Pick a stylist from the roster based on what you're trying to do — short cut, color, curly, men's. For anything but a cut, you'll start with a consultation. Same-day bookings aren't available for balayage or color correction.</p>",
+            "button_link": {
+              "text": "See the stylists",
+              "href": "stylists.html",
+              "target": "_self"
+            }
+          }
+        },
+        "step-consultation": {
+          "type": "step",
+          "settings": {
+            "title": "Consultation",
+            "description": "<p>Ten minutes at the start of your appointment — your stylist looks at your hair, asks about your history and products, and sets realistic expectations on what this appointment can and can't do.</p>"
+          }
+        },
+        "step-service": {
+          "type": "step",
+          "settings": {
+            "title": "The service",
+            "description": "<p>Shampoo, the cut or color work itself, and any treatments that were booked. Longer services include breaks. If anything changes mid-appointment, your stylist will check in before continuing.</p>"
+          }
+        },
+        "step-finish": {
+          "type": "step",
+          "settings": {
+            "title": "Finish & style",
+            "description": "<p>Dry cut refinements, a proper blowout, and a photo for your stylist's records so the next visit picks up where this one ended.</p>"
+          }
+        },
+        "step-between": {
+          "type": "step",
+          "settings": {
+            "title": "Between visits",
+            "description": "<p>You'll leave with notes on maintenance cadence, at-home products, and when to rebook. Most clients return every five to ten weeks for cuts, eight to fourteen for color — we'll tell you what fits your hair.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-booking", "step-consultation", "step-service", "step-finish", "step-between"]
+    },
+    "new_clients_color_process": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "color-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>For color clients</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "color-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Color starts with a consultation.",
+            "size": "3xl"
+          }
+        },
+        "color-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Before any color service — especially balayage, blonding, or correction — we need to see your hair in person. Twenty minutes, in the chair, honest assessment of where your hair is and where it can realistically go.</p><p>We'll strand-test if we're not sure how your hair will take the formula, quote a final price, and book you in for the service itself. For big transformations, that might mean more than one appointment — we'll lay out the whole path so you know what you're signing up for.</p><p>Consultations are $30, free if you book a service within two weeks.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "color-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Request a consultation",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["color-eyebrow", "color-heading", "color-body", "color-button"]
+    },
+    "new_clients_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common questions",
+        "eyebrow_uppercase": true,
+        "title": "Questions new clients ask.",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "faq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Still have questions?",
+            "text": "<p>Call or email — we'd rather answer upfront than have you arrive unsure.</p>"
+          }
+        },
+        "faq-pick-stylist": {
+          "type": "item",
+          "settings": {
+            "question": "How do I pick the right stylist?",
+            "answer": "<p>Start with what you're trying to do. Short cut, Rowan. Color, Sloane. Curly or long, Mara. Men's, Theo. If you're not sure, call us with your hair history and what you're thinking — we'll point you at the right chair.</p>"
+          }
+        },
+        "faq-what-to-bring": {
+          "type": "item",
+          "settings": {
+            "question": "What should I bring to a first appointment?",
+            "answer": "<p>A few reference photos of cuts you like, a rough history of recent color work if any, and any products you're currently using that have left residue or coating on your hair. Arrive with hair washed within the last day or two — not same-day.</p>"
+          }
+        },
+        "faq-same-day-color": {
+          "type": "item",
+          "settings": {
+            "question": "Do you do same-day color?",
+            "answer": "<p>For simple services like a gloss refresh or root touch-up with a stylist you've seen before, yes. For balayage, blonding, or color correction — no. Those require a separate consultation appointment first.</p>"
+          }
+        },
+        "faq-how-far-ahead": {
+          "type": "item",
+          "settings": {
+            "question": "How far in advance should I book?",
+            "answer": "<p>Three to four weeks for cuts, four to six for color with a specific stylist. Same-week openings do happen — we keep a waitlist for cancellations.</p>"
+          }
+        },
+        "faq-walkins": {
+          "type": "item",
+          "settings": {
+            "question": "Do you take walk-ins?",
+            "answer": "<p>Rarely for full services, but we do keep space for fringe trims and beard tidies when a stylist is between appointments. Call before you come in.</p>"
+          }
+        },
+        "faq-if-unhappy": {
+          "type": "item",
+          "settings": {
+            "question": "What if I don't like the result?",
+            "answer": "<p>Tell us within seven days and we'll bring you back in for a complimentary adjustment with the same stylist. We'd rather you leave happy than post-rationalize a cut you didn't want.</p>"
+          }
+        },
+        "faq-textured": {
+          "type": "item",
+          "settings": {
+            "question": "How do you approach textured or curly hair?",
+            "answer": "<p>Mara specializes in textured cutting — dry cutting, curl-by-curl shape work, finishes that work with the texture. Arrive with your hair in its natural state if possible, so she can see the shape you're actually wearing day to day.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-sidebar", "faq-pick-stylist", "faq-what-to-bring", "faq-same-day-color", "faq-how-far-ahead", "faq-walkins", "faq-if-unhappy", "faq-textured"]
+    },
+    "new_clients_closing": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to book?",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See the stylists",
+              "href": "stylists.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-button"]
+    }
+  },
+  "widgetsOrder": ["new_clients_intro", "new_clients_steps", "new_clients_color_process", "new_clients_faq", "new_clients_closing"],
+  "id": "new-clients",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

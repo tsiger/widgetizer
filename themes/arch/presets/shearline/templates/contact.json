@@ -1,0 +1,98 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Say hello.",
+            "size": "4xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call, email, or book directly with a stylist. For color consultations, email with a photo of your current hair and what you're thinking — we'll get back within a business day.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-body"]
+    },
+    "contact_details": {
+      "type": "contact-details",
+      "settings": {
+        "heading_alignment": "start",
+        "layout": "equal",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info-book": {
+          "type": "info",
+          "settings": {
+            "title": "Book",
+            "text": "<p>(555) 020-0149</p><p>hello@example.com</p><p>We reply within a business day.</p>"
+          }
+        },
+        "info-find": {
+          "type": "info",
+          "settings": {
+            "title": "Find us",
+            "text": "<p>1216 Vinebrook Ave</p><p>Tue–Fri, 10am–7pm</p><p>Sat, 9am–5pm</p><p>Closed Sun &amp; Mon</p>"
+          }
+        },
+        "info-color-consult": {
+          "type": "info",
+          "settings": {
+            "title": "Color consultations",
+            "text": "<p>Email hello@example.com</p><p>Attach a photo of your current hair</p><p>Reply within a business day</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-book", "info-find", "info-color-consult"]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "title": "Find us.",
+        "heading_alignment": "center",
+        "address": "1216 Vinebrook Ave",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "info-parking": {
+          "type": "info",
+          "settings": {
+            "title": "Parking & transit",
+            "text": "<p>Metered street parking on Vinebrook.</p><p>Two blocks from the Vinebrook subway stop.</p>"
+          }
+        },
+        "info-access": {
+          "type": "info",
+          "settings": {
+            "title": "Accessibility",
+            "text": "<p>Step-free entrance on 12th Street side.</p><p>One accessible chair available — please mention at booking.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["info-parking", "info-access"]
+    }
+  },
+  "widgetsOrder": ["contact_intro", "contact_details", "contact_map"],
+  "id": "contact",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

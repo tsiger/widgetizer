@@ -1,0 +1,22 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Shearline",
+    "logoMaxWidth": 150,
+    "contactDetailsLine1": "(555) 020-0149",
+    "contactDetailsLine2": "Tue–Sat, by appointment",
+    "contact_position": "logo",
+    "headerNavigation": "main-menu",
+    "center_nav": false,
+    "ctaButtonLink": {
+      "href": "stylists.html",
+      "text": "Pick a stylist",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary"
+  }
+}

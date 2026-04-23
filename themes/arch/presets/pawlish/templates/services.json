@@ -1,0 +1,364 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Services & pricing</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What we do, what it costs.",
+            "size": "4xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Three sizes. Six services per size. Honest pricing — we tell you the condition fee at intake, never at pickup.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+    },
+    "services_pricing": {
+      "type": "pricing",
+      "settings": {
+        "eyebrow": "Pricing by size",
+        "eyebrow_uppercase": true,
+        "title": "Find your dog's bracket.",
+        "description": "Long, matted, or four-plus-month coats may add a small condition fee — quoted before we start.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "plan-small": {
+          "type": "plan",
+          "settings": {
+            "title": "Small",
+            "price": "$55+",
+            "period": "Under 25 lb · full groom",
+            "features": "Full groom — $55+\nBath & tidy — $35+\nDe-shed — $40+\nHand-stripping — $60+\nNails & ears walk-in — $18\nPuppy first groom — $35",
+            "button_link": {
+              "text": "Book small",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        },
+        "plan-medium": {
+          "type": "plan",
+          "settings": {
+            "title": "Medium",
+            "price": "$80+",
+            "period": "25 – 60 lb · full groom",
+            "features": "Full groom — $80+\nBath & tidy — $50+\nDe-shed — $65+\nHand-stripping — $90+\nNails & ears walk-in — $20\nPuppy first groom — $45",
+            "button_link": {
+              "text": "Book medium",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": true
+          }
+        },
+        "plan-large": {
+          "type": "plan",
+          "settings": {
+            "title": "Large",
+            "price": "$115+",
+            "period": "60 lb+ · full groom",
+            "features": "Full groom — $115+\nBath & tidy — $75+\nDe-shed — $95+\nHand-stripping — $130+\nNails & ears walk-in — $25\nPuppy first groom — $55",
+            "button_link": {
+              "text": "Book large",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "featured": false
+          }
+        }
+      },
+      "blocksOrder": ["plan-small", "plan-medium", "plan-large"]
+    },
+    "services_visual": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "Inside the service",
+        "eyebrow_uppercase": true,
+        "title": "Six services, six approaches.",
+        "description": "Each one shaped around the coat, the breed, and how your dog likes to be handled.",
+        "heading_alignment": "center",
+        "gap": "medium",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "bento-full": {
+          "type": "item",
+          "settings": {
+            "title": "Full groom",
+            "text": "Bath, dry, breed-aware cut, nails, ears.",
+            "col_span": "2",
+            "row_span": "2",
+            "alignment": "end",
+            "link": {
+              "text": "Book a full groom",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "bento-bath": {
+          "type": "item",
+          "settings": {
+            "title": "Bath & tidy",
+            "text": "Between full grooms.",
+            "col_span": "1",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        },
+        "bento-deshed": {
+          "type": "item",
+          "settings": {
+            "title": "De-shed",
+            "text": "Double-coat undercoat work.",
+            "col_span": "1",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        },
+        "bento-hand-strip": {
+          "type": "item",
+          "settings": {
+            "title": "Hand-strip",
+            "text": "Traditional terrier coats.",
+            "col_span": "1",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        },
+        "bento-nail": {
+          "type": "item",
+          "settings": {
+            "title": "Nails & ears",
+            "text": "Walk-in, no appointment.",
+            "col_span": "1",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        },
+        "bento-puppy": {
+          "type": "item",
+          "settings": {
+            "title": "Puppy first groom",
+            "text": "Under six months.",
+            "col_span": "2",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        }
+      },
+      "blocksOrder": ["bento-full", "bento-bath", "bento-deshed", "bento-hand-strip", "bento-nail", "bento-puppy"]
+    },
+    "services_included": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Every groom includes",
+        "eyebrow_uppercase": true,
+        "title": "What you get with every visit.",
+        "description": "No upsells. No surprise add-ons.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "icon_style": "filled",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "inc-intake": {
+          "type": "card",
+          "settings": {
+            "icon": "paw",
+            "title": "Calm intake",
+            "description": "Five minutes to meet your dog before anything starts."
+          }
+        },
+        "inc-shampoo": {
+          "type": "card",
+          "settings": {
+            "icon": "bath",
+            "title": "Hypoallergenic bath",
+            "description": "Scent-free shampoo on request, no charge."
+          }
+        },
+        "inc-cut": {
+          "type": "card",
+          "settings": {
+            "icon": "wand",
+            "title": "Breed-aware finish",
+            "description": "We cut to your breed, not a default style."
+          }
+        },
+        "inc-dryer": {
+          "type": "card",
+          "settings": {
+            "icon": "wind",
+            "title": "Low-noise dryers",
+            "description": "Forced-air, hand-held. Never a crate dryer."
+          }
+        },
+        "inc-eta": {
+          "type": "card",
+          "settings": {
+            "icon": "clock",
+            "title": "Honest timing",
+            "description": "We text you a real ETA, not a guess."
+          }
+        },
+        "inc-seniors": {
+          "type": "card",
+          "settings": {
+            "icon": "heart",
+            "title": "Gentle on seniors",
+            "description": "Breaks built in for older dogs."
+          }
+        },
+        "inc-tools": {
+          "type": "card",
+          "settings": {
+            "icon": "shield",
+            "title": "Sanitized tools",
+            "description": "Hand-checked between every dog."
+          }
+        },
+        "inc-notes": {
+          "type": "card",
+          "settings": {
+            "icon": "clipboard-text",
+            "title": "Pickup notes",
+            "description": "What we noticed about your dog, in writing."
+          }
+        }
+      },
+      "blocksOrder": ["inc-intake", "inc-shampoo", "inc-cut", "inc-dryer", "inc-eta", "inc-seniors", "inc-tools", "inc-notes"]
+    },
+    "services_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "About pricing",
+        "eyebrow_uppercase": true,
+        "title": "Common pricing questions.",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "faq-info": {
+          "type": "info",
+          "settings": {
+            "title": "Not sure what to book?",
+            "text": "<p>Call us with your dog's breed and last groom date — we'll tell you which service fits.</p><p>(555) 020-0184</p>"
+          }
+        },
+        "faq-over-listed": {
+          "type": "item",
+          "settings": {
+            "question": "Why does my dog cost more than the listed price?",
+            "answer": "<p>Listed prices assume a clean, well-maintained coat in that size bracket. If we hit heavy matting, an unusually thick coat, or a much longer cut than typical, we add a small condition fee. We always tell you before we start, never at pickup.</p>"
+          }
+        },
+        "faq-condition-fee": {
+          "type": "item",
+          "settings": {
+            "question": "What's a coat condition fee?",
+            "answer": "<p>An honest add-on for coats that take longer to work — usually heavy mats, double-coat de-shed beyond the standard treatment, or a coat that's grown out four-plus months. We quote it during intake.</p>"
+          }
+        },
+        "faq-walk-in": {
+          "type": "item",
+          "settings": {
+            "question": "Do you charge for nail walk-ins?",
+            "answer": "<p>Yes — flat $18 small / $20 medium / $25 large. Walk in during open hours, no appointment needed. Five to ten minutes most of the time.</p>"
+          }
+        },
+        "faq-split": {
+          "type": "item",
+          "settings": {
+            "question": "Can I split the cost across services?",
+            "answer": "<p>You can book a bath & tidy between full grooms to spread the cost. Many regulars do six-week bath & tidy plus twelve-week full groom — keeps a coat right for less per visit.</p>"
+          }
+        },
+        "faq-shave": {
+          "type": "item",
+          "settings": {
+            "question": "What if my dog needs a shave-down instead of a cut?",
+            "answer": "<p>If the coat is matted past safe brushing, we'll recommend a shave-down — it's faster, cheaper, kinder. We'll talk through what to expect and help you plan how to grow it back.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-info", "faq-over-listed", "faq-condition-fee", "faq-walk-in", "faq-split", "faq-shave"]
+    },
+    "services_close": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Pick a slot.",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-button"]
+    }
+  },
+  "widgetsOrder": ["services_hero", "services_pricing", "services_visual", "services_included", "services_faq", "services_close"],
+  "id": "services",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T15:00:00.000Z"
+}

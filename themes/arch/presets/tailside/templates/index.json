@@ -1,0 +1,348 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "home_hero": {
+      "type": "split-hero",
+      "settings": {
+        "overlay_color": "#10332d22",
+        "image_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-kicker": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Neighborhood veterinary clinic</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Veterinary care for the pets at your side.",
+            "size": "5xl"
+          }
+        },
+        "hero-copy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Routine visits, sick care, dental health, and clear next steps from a team that knows pets are family.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Book a visit",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "services.html",
+              "text": "View services",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-kicker",
+        "hero-heading",
+        "hero-copy",
+        "hero-buttons"
+      ]
+    },
+    "home_trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "alignment": "start",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "licensed-care": {
+          "type": "item",
+          "settings": {
+            "icon": "stethoscope",
+            "title": "Licensed care",
+            "text": "Exams, plans, and follow-up from a veterinary team."
+          }
+        },
+        "same-week": {
+          "type": "item",
+          "settings": {
+            "icon": "calendar-heart",
+            "title": "Same-week sick visits",
+            "text": "Call early and we will help you choose the right next step."
+          }
+        },
+        "dogs-cats": {
+          "type": "item",
+          "settings": {
+            "icon": "paw",
+            "title": "Dogs and cats",
+            "text": "Preventive care and practical guidance for small animals."
+          }
+        },
+        "clear-estimates": {
+          "type": "item",
+          "settings": {
+            "icon": "receipt-dollar",
+            "title": "Clear estimates",
+            "text": "We explain recommendations before treatment begins."
+          }
+        }
+      },
+      "blocksOrder": [
+        "licensed-care",
+        "same-week",
+        "dogs-cats",
+        "clear-estimates"
+      ]
+    },
+    "home_services": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Services",
+        "eyebrow_uppercase": false,
+        "title": "The everyday care your pet needs.",
+        "description": "A full-service clinic for wellness, illness, dental health, diagnostics, and ongoing support.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "alignment": "start",
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "wellness-exams": {
+          "type": "card",
+          "settings": {
+            "icon": "stethoscope",
+            "subtitle": "Wellness",
+            "title": "Annual exams",
+            "description": "<p>Nose-to-tail checkups, vaccine planning, and practical health guidance.</p>"
+          }
+        },
+        "vaccines": {
+          "type": "card",
+          "settings": {
+            "icon": "vaccine",
+            "subtitle": "Prevention",
+            "title": "Vaccines",
+            "description": "<p>Core vaccines, lifestyle protection, parasite prevention, and reminders.</p>"
+          }
+        },
+        "sick-care": {
+          "type": "card",
+          "settings": {
+            "icon": "first-aid-kit",
+            "subtitle": "Sick visits",
+            "title": "When something changes",
+            "description": "<p>Vomiting, limping, coughing, skin issues, appetite changes, and more.</p>"
+          }
+        },
+        "dental-care": {
+          "type": "card",
+          "settings": {
+            "icon": "dental",
+            "subtitle": "Dental",
+            "title": "Oral health",
+            "description": "<p>Dental exams, cleanings, and home-care plans that protect long-term health.</p>"
+          }
+        },
+        "diagnostics": {
+          "type": "card",
+          "settings": {
+            "icon": "microscope",
+            "subtitle": "Diagnostics",
+            "title": "Labs and imaging",
+            "description": "<p>Testing support for clearer answers when symptoms need a closer look.</p>"
+          }
+        },
+        "senior-care": {
+          "type": "card",
+          "settings": {
+            "icon": "heart-rate-monitor",
+            "subtitle": "Senior pets",
+            "title": "Ongoing comfort",
+            "description": "<p>Monitoring, mobility conversations, and care plans for aging pets.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "wellness-exams",
+        "vaccines",
+        "sick-care",
+        "dental-care",
+        "diagnostics",
+        "senior-care"
+      ]
+    },
+    "home_visit_flow": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "How visits work",
+        "eyebrow_uppercase": false,
+        "title": "A clearer clinic visit from start to finish.",
+        "description": "We keep the process simple so you know what is happening and why.",
+        "heading_alignment": "center",
+        "layout": "horizontal",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "book": {
+          "type": "item",
+          "settings": {
+            "date": "Step 1",
+            "title": "Book",
+            "description": "<p>Tell us what changed or what you want checked.</p>",
+            "features": "+ New and returning pets welcome\n+ Same-week guidance when available"
+          }
+        },
+        "prepare": {
+          "type": "item",
+          "settings": {
+            "date": "Step 2",
+            "title": "Prepare",
+            "description": "<p>Bring records, medications, and a few notes about behavior or symptoms.</p>",
+            "features": "+ Records help us avoid repeat work\n+ Carriers and leashes keep pets safer"
+          }
+        },
+        "visit": {
+          "type": "item",
+          "settings": {
+            "date": "Step 3",
+            "title": "Visit",
+            "description": "<p>Your veterinarian examines your pet and explains the options in plain language.</p>",
+            "features": "+ Clear recommendations\n+ Estimates before treatment"
+          }
+        },
+        "follow-up": {
+          "type": "item",
+          "settings": {
+            "date": "Step 4",
+            "title": "Follow up",
+            "description": "<p>You leave with notes, reminders, and a care plan you can use at home.</p>",
+            "features": "+ Written next steps\n+ Reminder support"
+          }
+        }
+      },
+      "blocksOrder": [
+        "book",
+        "prepare",
+        "visit",
+        "follow-up"
+      ]
+    },
+    "home_statement": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "statement-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A neighborhood clinic with room for questions.",
+            "size": "3xl"
+          }
+        },
+        "statement-copy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Whether your pet is here for a first vaccine, a dental check, or a worry you cannot quite name, we make the visit calm, useful, and easy to understand.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": [
+        "statement-heading",
+        "statement-copy"
+      ]
+    },
+    "home_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to book your pet's next visit?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call the clinic or send a booking request and we will help you choose the right appointment.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Contact Tailside",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "home_hero",
+    "home_trust_bar",
+    "home_services",
+    "home_visit_flow",
+    "home_statement",
+    "home_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

@@ -1,0 +1,376 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What we do, and what it costs.",
+            "size": "4xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pricing ranges by length, condition, and stylist level. Pick a category to see the menu — for color work, a consultation comes first.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-body"]
+    },
+    "services_pricing": {
+      "type": "content-switcher",
+      "settings": {
+        "eyebrow": "Pricing",
+        "eyebrow_uppercase": true,
+        "title": "By service category.",
+        "description": "Cuts, color, and treatments priced with ranges. Final price after consultation.",
+        "heading_alignment": "center",
+        "switcher_type": "tabs",
+        "option_1_label": "Cuts",
+        "option_2_label": "Color",
+        "option_3_label": "Treatments",
+        "columns": 3,
+        "aspect_ratio": "auto",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "cut-womens": {
+          "type": "item",
+          "settings": {
+            "title": "Women's cut",
+            "text": "<p>Consultation, shampoo, precision cut, style and finish.</p>",
+            "price": "from $75",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "1"
+          }
+        },
+        "cut-mens": {
+          "type": "item",
+          "settings": {
+            "title": "Men's cut",
+            "text": "<p>Classic, taper, fade, or editorial. Includes neck shape-up.</p>",
+            "price": "from $55",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "1"
+          }
+        },
+        "cut-kids": {
+          "type": "item",
+          "settings": {
+            "title": "Kids' cut",
+            "text": "<p>12 and under. Gentle, patient, no rushing.</p>",
+            "price": "from $35",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "1"
+          }
+        },
+        "cut-fringe": {
+          "type": "item",
+          "settings": {
+            "title": "Fringe trim",
+            "text": "<p>Between appointments. Walk-in when we have space.</p>",
+            "price": "$25",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "1"
+          }
+        },
+        "cut-consult": {
+          "type": "item",
+          "settings": {
+            "title": "Consultation",
+            "text": "<p>Twenty minutes. Free when paired with a booked service within two weeks.</p>",
+            "price": "$30",
+            "link": { "text": "Request a consultation", "href": "contact.html", "target": "_self" },
+            "target_option": "1"
+          }
+        },
+        "color-single": {
+          "type": "item",
+          "settings": {
+            "title": "Single-process color",
+            "text": "<p>All-over color or root touch-up. Gloss finish included.</p>",
+            "price": "from $95",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "2"
+          }
+        },
+        "color-gloss": {
+          "type": "item",
+          "settings": {
+            "title": "Gloss &amp; tone",
+            "text": "<p>Refresh color between appointments. Thirty minutes.</p>",
+            "price": "from $65",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "2"
+          }
+        },
+        "color-highlights": {
+          "type": "item",
+          "settings": {
+            "title": "Highlights",
+            "text": "<p>Foil work, partial or full. Length and thickness affect final price.</p>",
+            "price": "from $155",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "2"
+          }
+        },
+        "color-balayage": {
+          "type": "item",
+          "settings": {
+            "title": "Balayage",
+            "text": "<p>Hand-painted color. Consultation required before first booking.</p>",
+            "price": "from $195",
+            "link": { "text": "Request a consultation", "href": "contact.html", "target": "_self" },
+            "target_option": "2"
+          }
+        },
+        "color-correction": {
+          "type": "item",
+          "settings": {
+            "title": "Color correction",
+            "text": "<p>Fixing previous color or taking hair a long way from current. Quoted after consultation.</p>",
+            "price": "from $250",
+            "link": { "text": "Request a consultation", "href": "contact.html", "target": "_self" },
+            "target_option": "2"
+          }
+        },
+        "treat-olaplex": {
+          "type": "item",
+          "settings": {
+            "title": "Olaplex restoration",
+            "text": "<p>Bond-building treatment for damaged or over-processed hair.</p>",
+            "price": "from $55",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "3"
+          }
+        },
+        "treat-keratin": {
+          "type": "item",
+          "settings": {
+            "title": "Keratin smoothing",
+            "text": "<p>Frizz reduction and manageability. Lasts three to five months.</p>",
+            "price": "from $275",
+            "link": { "text": "Request a consultation", "href": "contact.html", "target": "_self" },
+            "target_option": "3"
+          }
+        },
+        "treat-deep-cond": {
+          "type": "item",
+          "settings": {
+            "title": "Deep conditioning",
+            "text": "<p>Added on to any service, or booked as a standalone.</p>",
+            "price": "from $40",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "3"
+          }
+        },
+        "treat-scalp": {
+          "type": "item",
+          "settings": {
+            "title": "Scalp treatment",
+            "text": "<p>Clarifying and balancing. Good for product buildup or dry conditions.</p>",
+            "price": "from $45",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "3"
+          }
+        },
+        "treat-blowout": {
+          "type": "item",
+          "settings": {
+            "title": "Blowout &amp; style",
+            "text": "<p>Clean hair to finished look. Event-ready, standalone or add-on.</p>",
+            "price": "from $60",
+            "link": { "text": "Book with a stylist", "href": "stylists.html", "target": "_self" },
+            "target_option": "3"
+          }
+        }
+      },
+      "blocksOrder": ["cut-womens", "cut-mens", "cut-kids", "cut-fringe", "cut-consult", "color-single", "color-gloss", "color-highlights", "color-balayage", "color-correction", "treat-olaplex", "treat-keratin", "treat-deep-cond", "treat-scalp", "treat-blowout"]
+    },
+    "services_included": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "Every visit includes",
+        "eyebrow_uppercase": true,
+        "title": "The quiet parts of a good appointment.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "inc-consult": {
+          "type": "item",
+          "settings": {
+            "icon": "user",
+            "title": "Full consultation",
+            "description": "Every visit starts with your stylist looking at what your hair is actually doing."
+          }
+        },
+        "inc-wash": {
+          "type": "item",
+          "settings": {
+            "icon": "droplets",
+            "title": "Shampoo & scalp",
+            "description": "Included with every cut or color."
+          }
+        },
+        "inc-finish": {
+          "type": "item",
+          "settings": {
+            "icon": "razor",
+            "title": "Precision finish",
+            "description": "Dry cut refinements after the blow-out."
+          }
+        },
+        "inc-style": {
+          "type": "item",
+          "settings": {
+            "icon": "wand",
+            "title": "Styling",
+            "description": "Finished the way you can redo at home."
+          }
+        },
+        "inc-ammonia-free": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Ammonia-free options",
+            "description": "Available for every color service on request."
+          }
+        },
+        "inc-sensitive": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Gentle on sensitive scalps",
+            "description": "Speak up at consultation; we adjust."
+          }
+        },
+        "inc-gloss": {
+          "type": "item",
+          "settings": {
+            "icon": "sparkles",
+            "title": "Gloss finish",
+            "description": "Free with every color appointment."
+          }
+        },
+        "inc-timing": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "Honest timing",
+            "description": "We text a real ETA, not a guess."
+          }
+        }
+      },
+      "blocksOrder": ["inc-consult", "inc-wash", "inc-finish", "inc-style", "inc-ammonia-free", "inc-sensitive", "inc-gloss", "inc-timing"]
+    },
+    "services_pricing_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "About pricing",
+        "eyebrow_uppercase": true,
+        "title": "Why ranges, and what shifts the price.",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "faq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Not sure what to book?",
+            "text": "<p>Tell us your hair length, last appointment, and what you're thinking. We'll help you pick the right service before you book.</p>"
+          }
+        },
+        "faq-single-price": {
+          "type": "item",
+          "settings": {
+            "question": "Why isn't there a single price for my cut?",
+            "answer": "<p>Length, density, and condition all affect how long a cut takes. The range reflects that range honestly — you'll know the final number before we start.</p>"
+          }
+        },
+        "faq-from": {
+          "type": "item",
+          "settings": {
+            "question": "What does \"from\" mean on a price?",
+            "answer": "<p>It means that's the starting price for the shortest or simplest version of the service. Longer, thicker, or more-damaged hair takes longer to work with, and we price honestly for that.</p>"
+          }
+        },
+        "faq-color-consult": {
+          "type": "item",
+          "settings": {
+            "question": "Why is a consultation required for color?",
+            "answer": "<p>Because color done right starts with seeing your hair in person, understanding its history, and agreeing on an outcome. Same-day bookings for balayage or color correction almost always end badly.</p>"
+          }
+        },
+        "faq-long-hair": {
+          "type": "item",
+          "settings": {
+            "question": "Do you charge more for long hair?",
+            "answer": "<p>Yes — long hair takes more time to wash, cut, and finish, and more product to treat. The range on every service accounts for length.</p>"
+          }
+        },
+        "faq-gender-pricing": {
+          "type": "item",
+          "settings": {
+            "question": "Same price for men's and women's cuts?",
+            "answer": "<p>We price by time and technique, not gender. A short precision bob and a men's scissor cut cost roughly the same. A long layered cut costs more than either, regardless of who's in the chair.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-sidebar", "faq-single-price", "faq-from", "faq-color-consult", "faq-long-hair", "faq-gender-pricing"]
+    },
+    "services_closing": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Know what you want?",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Pick a stylist",
+              "href": "stylists.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-button"]
+    }
+  },
+  "widgetsOrder": ["services_intro", "services_pricing", "services_included", "services_pricing_faq", "services_closing"],
+  "id": "services",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

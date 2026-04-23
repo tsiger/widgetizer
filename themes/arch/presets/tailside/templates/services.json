@@ -1,0 +1,327 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "services_intro": {
+      "type": "split-hero",
+      "settings": {
+        "overlay_color": "#10332d22",
+        "image_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-kicker": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Services</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Care for checkups, changes, and everything between.",
+            "size": "4xl"
+          }
+        },
+        "intro-copy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use this page as a starting point. If you are not sure which appointment your pet needs, call and we will help you decide.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Ask about a visit",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-kicker",
+        "intro-heading",
+        "intro-copy",
+        "intro-button"
+      ]
+    },
+    "services_grid": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Care menu",
+        "eyebrow_uppercase": false,
+        "title": "Common reasons pets visit us.",
+        "description": "Most appointments fit one of these everyday care categories.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "box",
+        "alignment": "start",
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "preventive": {
+          "type": "card",
+          "settings": {
+            "icon": "checkup-list",
+            "subtitle": "Prevention",
+            "title": "Wellness plans",
+            "description": "<p>Routine exams, vaccine schedules, nutrition notes, and parasite prevention.</p>"
+          }
+        },
+        "puppy-kitten": {
+          "type": "card",
+          "settings": {
+            "icon": "baby-bottle",
+            "subtitle": "New pets",
+            "title": "Puppy and kitten visits",
+            "description": "<p>Starter vaccines, microchip conversations, diet guidance, and early behavior questions.</p>"
+          }
+        },
+        "sick": {
+          "type": "card",
+          "settings": {
+            "icon": "emergency-bed",
+            "subtitle": "Illness",
+            "title": "Sick care",
+            "description": "<p>Support for vomiting, diarrhea, limping, ear issues, coughing, and appetite changes.</p>"
+          }
+        },
+        "dental": {
+          "type": "card",
+          "settings": {
+            "icon": "dental",
+            "subtitle": "Dental",
+            "title": "Teeth and gums",
+            "description": "<p>Oral exams, dental cleanings, and practical prevention at home.</p>"
+          }
+        },
+        "labs": {
+          "type": "card",
+          "settings": {
+            "icon": "flask",
+            "subtitle": "Testing",
+            "title": "Lab work",
+            "description": "<p>Bloodwork, urine checks, parasite screening, and monitoring for chronic conditions.</p>"
+          }
+        },
+        "imaging": {
+          "type": "card",
+          "settings": {
+            "icon": "photo-scan",
+            "subtitle": "Imaging",
+            "title": "X-rays and imaging",
+            "description": "<p>When an exam needs more information, imaging helps us see what cannot be felt.</p>"
+          }
+        },
+        "surgery": {
+          "type": "card",
+          "settings": {
+            "icon": "hospital",
+            "subtitle": "Procedures",
+            "title": "Surgery",
+            "description": "<p>Routine procedures with pre-visit instructions, estimates, and go-home care notes.</p>"
+          }
+        },
+        "behavior": {
+          "type": "card",
+          "settings": {
+            "icon": "heart-handshake",
+            "subtitle": "Support",
+            "title": "Behavior guidance",
+            "description": "<p>Conversations around anxiety, new habits, age-related changes, and comfort at home.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "preventive",
+        "puppy-kitten",
+        "sick",
+        "dental",
+        "labs",
+        "imaging",
+        "surgery",
+        "behavior"
+      ]
+    },
+    "services_life_stages": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "Life stages",
+        "eyebrow_uppercase": false,
+        "title": "Care changes as pets grow.",
+        "description": "A good plan looks different for a new kitten, a healthy adult dog, and a senior cat with new stiffness.",
+        "heading_alignment": "start",
+        "content_position": "start",
+        "show_divider": true,
+        "icon_style": "filled",
+        "icon_size": "md",
+        "icon_shape": "circle",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "young": {
+          "type": "feature",
+          "settings": {
+            "icon": "baby-bottle",
+            "title": "Puppy and kitten starts",
+            "description": "<p>Vaccines, nutrition, early socialization, and prevention habits from the beginning.</p>"
+          }
+        },
+        "adult": {
+          "type": "feature",
+          "settings": {
+            "icon": "activity-heartbeat",
+            "title": "Adult health maintenance",
+            "description": "<p>Annual exams, dental screening, weight conversations, and lifestyle-specific prevention.</p>"
+          }
+        },
+        "senior": {
+          "type": "feature",
+          "settings": {
+            "icon": "old",
+            "title": "Senior comfort and monitoring",
+            "description": "<p>Mobility, pain, kidney, thyroid, and behavior changes are easier to manage when tracked early.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "young",
+        "adult",
+        "senior"
+      ]
+    },
+    "services_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Questions",
+        "eyebrow_uppercase": false,
+        "title": "Service questions we hear often.",
+        "description": "Short answers before you book.",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "faq-price": {
+          "type": "item",
+          "settings": {
+            "question": "Can you give prices before the appointment?",
+            "answer": "<p>We can share typical visit ranges by phone. Your veterinarian will explain recommendations and estimates before treatment begins.</p>"
+          }
+        },
+        "faq-records": {
+          "type": "item",
+          "settings": {
+            "question": "Do you need my pet's records?",
+            "answer": "<p>Records help us understand vaccine history, medications, allergies, and previous test results. Bring them or ask your prior clinic to send them ahead.</p>"
+          }
+        },
+        "faq-urgent": {
+          "type": "item",
+          "settings": {
+            "question": "What counts as urgent?",
+            "answer": "<p>Trouble breathing, collapse, repeated vomiting, toxin exposure, severe pain, seizures, or major injury should be treated as urgent. Call the clinic or local emergency hospital right away.</p>"
+          }
+        },
+        "faq-cats": {
+          "type": "item",
+          "settings": {
+            "question": "Do you see cats?",
+            "answer": "<p>Yes. We see cats and dogs, and we can help with carrier tips if your cat is nervous about travel.</p>"
+          }
+        },
+        "help": {
+          "type": "info",
+          "settings": {
+            "title": "Not sure what to book?",
+            "text": "<p>Call (555) 555-0100 and tell us what you are noticing. We will help route you to the right appointment.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "faq-price",
+        "faq-records",
+        "faq-urgent",
+        "faq-cats",
+        "help"
+      ]
+    },
+    "services_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Have a question about care?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call us before booking if you are unsure whether your pet needs a wellness, sick, or urgent visit.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Contact the clinic",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "services_intro",
+    "services_grid",
+    "services_life_stages",
+    "services_faq",
+    "services_cta"
+  ],
+  "id": "services",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

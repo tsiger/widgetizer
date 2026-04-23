@@ -1,0 +1,223 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgets": {
+    "about_intro": {
+      "type": "split-hero",
+      "settings": {
+        "overlay_color": "#10332d22",
+        "image_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "intro-kicker": {
+          "type": "text",
+          "settings": {
+            "text": "<p>About Tailside</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Friendly medicine, explained clearly.",
+            "size": "4xl"
+          }
+        },
+        "intro-copy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tailside is built for everyday pet care: useful appointments, steady follow-up, and a team that takes time to explain what matters.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "new-patients.html",
+              "text": "New patient info",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-kicker",
+        "intro-heading",
+        "intro-copy",
+        "intro-button"
+      ]
+    },
+    "about_values": {
+      "type": "features-split",
+      "settings": {
+        "eyebrow": "Clinic promise",
+        "eyebrow_uppercase": false,
+        "title": "What guides every appointment.",
+        "description": "The best veterinary care feels both medically sound and easy to understand.",
+        "heading_alignment": "start",
+        "content_position": "end",
+        "show_divider": true,
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "circle",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "listen-first": {
+          "type": "feature",
+          "settings": {
+            "icon": "message-heart",
+            "title": "Listen first",
+            "description": "<p>You know your pet's normal. We start there, then connect what you see at home with what we find in the exam room.</p>"
+          }
+        },
+        "plain-language": {
+          "type": "feature",
+          "settings": {
+            "icon": "clipboard-text",
+            "title": "Explain options",
+            "description": "<p>We talk through recommendations, priorities, and estimates so you can make informed decisions.</p>"
+          }
+        },
+        "low-stress": {
+          "type": "feature",
+          "settings": {
+            "icon": "empathize",
+            "title": "Respect the pet in front of us",
+            "description": "<p>Visits are more useful when pets feel safer. We adjust handling whenever possible.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "listen-first",
+        "plain-language",
+        "low-stress"
+      ]
+    },
+    "about_team": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "Team",
+        "eyebrow_uppercase": false,
+        "title": "Meet the people caring for your pet.",
+        "description": "Replace these profiles with your clinic team, specialties, and booking details.",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3 / 4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "dr-avery": {
+          "type": "profile",
+          "settings": {
+            "name": "Dr. Avery Chen",
+            "role": "Veterinarian",
+            "specialty": "Preventive care and internal medicine",
+            "bio": "Avery helps families understand what changed, what matters most, and what to watch for next."
+          }
+        },
+        "maya-rivera": {
+          "type": "profile",
+          "settings": {
+            "name": "Maya Rivera",
+            "role": "Veterinary Nurse",
+            "specialty": "Patient comfort and recovery",
+            "bio": "Maya keeps visits organized and helps anxious pets settle into the room."
+          }
+        },
+        "dr-jordan": {
+          "type": "profile",
+          "settings": {
+            "name": "Dr. Jordan Brooks",
+            "role": "Veterinarian",
+            "specialty": "Dental health and senior pets",
+            "bio": "Jordan focuses on clear care plans for pets with changing needs."
+          }
+        },
+        "sam-patel": {
+          "type": "profile",
+          "settings": {
+            "name": "Sam Patel",
+            "role": "Client Care",
+            "specialty": "Scheduling and follow-up",
+            "bio": "Sam helps route questions, records, reminders, and appointment requests."
+          }
+        }
+      },
+      "blocksOrder": [
+        "dr-avery",
+        "maya-rivera",
+        "dr-jordan",
+        "sam-patel"
+      ]
+    },
+    "about_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Looking for a new veterinary clinic?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Start with a first visit, records review, or simple care question.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Contact the clinic",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "about_intro",
+    "about_values",
+    "about_team",
+    "about_cta"
+  ],
+  "id": "about",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

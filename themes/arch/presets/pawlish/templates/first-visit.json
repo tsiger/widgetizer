@@ -1,0 +1,347 @@
+{
+  "name": "First visit",
+  "slug": "first-visit",
+  "widgets": {
+    "firstvisit_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "vertical_alignment": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What to expect</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your dog's first visit, step by step.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most dogs settle within the first ten minutes. The rest is just good work.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+    },
+    "firstvisit_steps": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "Door to door",
+        "eyebrow_uppercase": true,
+        "title": "Six steps from drop-off to pickup.",
+        "heading_alignment": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "step-dropoff": {
+          "type": "step",
+          "settings": {
+            "title": "Drop-off",
+            "description": "<p>Five-minute intake. We look at your dog, you tell us what you want, we set expectations on time and price. No surprises at pickup.</p>"
+          }
+        },
+        "step-settling": {
+          "type": "step",
+          "settings": {
+            "title": "Settling in",
+            "description": "<p>Your dog meets the room. Water, a quiet corner, no rush. Most dogs settle within ten minutes — we don't start until they're ready.</p>"
+          }
+        },
+        "step-bath": {
+          "type": "step",
+          "settings": {
+            "title": "Bath",
+            "description": "<p>Hypoallergenic shampoo by default. Switch to medicated, scent-free, or whitening on request, no charge.</p>"
+          }
+        },
+        "step-dry": {
+          "type": "step",
+          "settings": {
+            "title": "Hand dry",
+            "description": "<p>Low-noise forced-air, never crate. About 20–40 minutes depending on coat. Senior or anxious dogs work in shorter sessions with breaks.</p>"
+          }
+        },
+        "step-groom": {
+          "type": "step",
+          "settings": {
+            "title": "The groom",
+            "description": "<p>The cut, the trim, the nails, the ears. We work to your breed standard, not a default style.</p>"
+          }
+        },
+        "step-pickup": {
+          "type": "step",
+          "settings": {
+            "title": "Pickup",
+            "description": "<p>Written notes on what we noticed, your dog smelling like a dog (not perfume), one happy human. We'll text when ready.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-dropoff", "step-settling", "step-bath", "step-dry", "step-groom", "step-pickup"]
+    },
+    "firstvisit_diff": {
+      "type": "checkerboard",
+      "settings": {
+        "eyebrow": "What makes us different",
+        "eyebrow_uppercase": true,
+        "title": "Three things you'll notice on day one.",
+        "heading_alignment": "center",
+        "columns_desktop": 1,
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "diff-pace": {
+          "type": "card",
+          "settings": {
+            "title": "We work at your dog's pace.",
+            "description": "<p>Anxious dogs work in shorter blocks with longer breaks. Senior dogs get a soft mat and shortcuts where it matters. We never push through distress to finish on time.</p>",
+            "button_link": {
+              "text": "Meet the team",
+              "href": "groomers.html",
+              "target": "_self"
+            }
+          }
+        },
+        "diff-honest": {
+          "type": "card",
+          "settings": {
+            "title": "Honest pricing, before we start.",
+            "description": "<p>If your dog needs a condition fee, we quote it during intake — never at pickup. If a coat needs a shave-down instead of a cut, we'll talk through what to expect first.</p>",
+            "button_link": {
+              "text": "See services",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "diff-notes": {
+          "type": "card",
+          "settings": {
+            "title": "We tell you what we see.",
+            "description": "<p>Written notes at every pickup — skin, nails, behavior, anything off. The hot spot you hadn't noticed. The nail quick that's getting too long. The ear that needs a recheck.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["diff-pace", "diff-honest", "diff-notes"]
+    },
+    "firstvisit_bring": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "Before you come",
+        "eyebrow_uppercase": true,
+        "title": "What to bring, what to mention.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "outlined",
+        "alignment": "start",
+        "icon_style": "filled",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "bring-vaccines": {
+          "type": "card",
+          "settings": {
+            "icon": "vaccine",
+            "title": "Vaccination records",
+            "description": "Rabies and DHPP, current. Email ahead or bring a photo on your phone."
+          }
+        },
+        "bring-history": {
+          "type": "card",
+          "settings": {
+            "icon": "clipboard-list",
+            "title": "Recent groom history",
+            "description": "When was the last cut, where, and what was done."
+          }
+        },
+        "bring-sensitivities": {
+          "type": "card",
+          "settings": {
+            "icon": "paw",
+            "title": "Sensitivities or fears",
+            "description": "Anxious moments, hot spots, no-touch zones."
+          }
+        },
+        "bring-time": {
+          "type": "card",
+          "settings": {
+            "icon": "clock",
+            "title": "Two- to three-hour window",
+            "description": "Drop-off and pickup, not stay-and-wait — your dog settles better without you."
+          }
+        }
+      },
+      "blocksOrder": ["bring-vaccines", "bring-history", "bring-sensitivities", "bring-time"]
+    },
+    "firstvisit_meet": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "meet-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Meet your groomer before you book.",
+            "size": "3xl"
+          }
+        },
+        "meet-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Drop in during open hours. Bring your dog if you like. Five minutes to see the space, ask anything, and meet the person who'd be at the table.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "meet-features": {
+          "type": "features",
+          "settings": {
+            "features": "No appointment needed for a quick meet\nGood for first-time owners and rescues\nWe'll be honest if we're not the right fit\nFree, always"
+          }
+        },
+        "meet-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Stop by",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Or book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["meet-heading", "meet-text", "meet-features", "meet-button"]
+    },
+    "firstvisit_faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Common worries",
+        "eyebrow_uppercase": true,
+        "title": "Questions parents ask before the first visit.",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "start",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "faq-info": {
+          "type": "info",
+          "settings": {
+            "title": "Still not sure?",
+            "text": "<p>Call us. Tell us about your dog. We'll tell you honestly whether we're the right fit.</p><p>(555) 020-0184</p>"
+          }
+        },
+        "faq-never-groomed": {
+          "type": "item",
+          "settings": {
+            "question": "What if my dog has never been groomed before?",
+            "answer": "<p>That's a good reason to come to us. We treat first-time grooms as introductions — short, gentle, lots of breaks. The first appointment may be slower than future ones, and that's the point.</p>"
+          }
+        },
+        "faq-anxious": {
+          "type": "item",
+          "settings": {
+            "question": "My dog is anxious — can you still groom them?",
+            "answer": "<p>Almost always, yes. We work in shorter blocks, take breaks, and stop if the dog is genuinely distressed. We never sedate. If after the first visit we don't think we're the right fit, we'll tell you honestly.</p>"
+          }
+        },
+        "faq-seniors": {
+          "type": "item",
+          "settings": {
+            "question": "Do you take senior dogs?",
+            "answer": "<p>Yes, with extra care. Older dogs work in shorter blocks with longer breaks, on a soft mat, and we'll trim what's essential rather than push for a perfect cut. Many regulars are 10+; our oldest is 14.</p>"
+          }
+        },
+        "faq-stay": {
+          "type": "item",
+          "settings": {
+            "question": "Can I stay during the appointment?",
+            "answer": "<p>We ask owners not to stay. Most dogs settle better without you in the room. We'll text when your dog is ready, usually 2–3 hours after drop-off.</p>"
+          }
+        },
+        "faq-cant-finish": {
+          "type": "item",
+          "settings": {
+            "question": "What if my dog won't let you finish?",
+            "answer": "<p>We stop. We charge only for the work that was done. We'll talk through what we noticed and offer a plan — sometimes shorter sessions over multiple visits work better than pushing through.</p>"
+          }
+        },
+        "faq-cats": {
+          "type": "item",
+          "settings": {
+            "question": "Do you take cats?",
+            "answer": "<p>No — dogs only. We'd rather do that one thing well than spread thin. For cats, ask your vet for a cat-specific groomer recommendation.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-info", "faq-never-groomed", "faq-anxious", "faq-seniors", "faq-stay", "faq-cant-finish", "faq-cats"]
+    },
+    "firstvisit_close": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready when you are.",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-button"]
+    }
+  },
+  "widgetsOrder": ["firstvisit_hero", "firstvisit_steps", "firstvisit_diff", "firstvisit_bring", "firstvisit_meet", "firstvisit_faq", "firstvisit_close"],
+  "id": "first-visit",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T15:00:00.000Z"
+}

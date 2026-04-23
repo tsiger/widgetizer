@@ -1,0 +1,476 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "home_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "start",
+        "vertical_alignment": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Open Tue – Sat · Walk-in nails Wednesdays</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Happier dogs, in and out.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Calm, breed-aware grooming on the corner of Linden. Hand-dried, never crated. Your dog will skip in.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See our work",
+              "href": "gallery.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
+    },
+    "home_promise": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "promise-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Three things every dog gets</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "promise-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The kind of groom you'd want for your own dog.",
+            "size": "3xl"
+          }
+        },
+        "promise-icon-1": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Calm intake, every time",
+            "description": "Five minutes to meet your dog before anything starts. We never rush a nervous one.",
+            "size": "md",
+            "shape": "circle"
+          }
+        },
+        "promise-icon-2": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Hand-dried, never crated",
+            "description": "Low-noise forced-air dryers, held by a person. No crate dryers, ever.",
+            "size": "md",
+            "shape": "circle"
+          }
+        },
+        "promise-icon-3": {
+          "type": "numbered-item",
+          "settings": {
+            "title": "Notes at pickup",
+            "description": "Skin, nails, anything we noticed — written down so you don't forget.",
+            "size": "md",
+            "shape": "circle"
+          }
+        },
+        "promise-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "How a first visit works",
+              "href": "first-visit.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "promise-eyebrow",
+        "promise-heading",
+        "promise-icon-1",
+        "promise-icon-2",
+        "promise-icon-3",
+        "promise-button"
+      ]
+    },
+    "home_services": {
+      "type": "icon-card-grid",
+      "settings": {
+        "eyebrow": "What we do",
+        "eyebrow_uppercase": true,
+        "title": "Six services for every coat.",
+        "description": "From puppy first-grooms to giant double-coat de-sheds. Pick what fits.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "outlined",
+        "alignment": "start",
+        "icon_style": "filled",
+        "icon_size": "xl",
+        "icon_shape": "circle",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "svc-full-groom": {
+          "type": "card",
+          "settings": {
+            "icon": "wand",
+            "subtitle": "From $55",
+            "title": "Full groom",
+            "description": "Bath, hand-dry, breed-aware cut, nails, ears.",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-bath-tidy": {
+          "type": "card",
+          "settings": {
+            "icon": "bath",
+            "subtitle": "From $35",
+            "title": "Bath & tidy",
+            "description": "The clean-up between full grooms — keeps your dog comfortable.",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-deshed": {
+          "type": "card",
+          "settings": {
+            "icon": "wind",
+            "subtitle": "From $40",
+            "title": "De-shed",
+            "description": "Undercoat work for double-coated breeds. Bath included.",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-hand-strip": {
+          "type": "card",
+          "settings": {
+            "icon": "shield",
+            "subtitle": "From $60",
+            "title": "Hand-stripping",
+            "description": "Traditional coat work for terriers and schnauzers.",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-nail-ear": {
+          "type": "card",
+          "settings": {
+            "icon": "paw",
+            "subtitle": "From $18",
+            "title": "Nails & ears",
+            "description": "Walk-in service. No appointment needed during open hours.",
+            "button_link": {
+              "text": "Walk in",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        },
+        "svc-puppy": {
+          "type": "card",
+          "settings": {
+            "icon": "heart",
+            "subtitle": "From $35",
+            "title": "Puppy first groom",
+            "description": "Under six months. Bath, light tidy, lots of breaks.",
+            "button_link": {
+              "text": "Book this",
+              "href": "contact.html",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": [
+        "svc-full-groom",
+        "svc-bath-tidy",
+        "svc-deshed",
+        "svc-hand-strip",
+        "svc-nail-ear",
+        "svc-puppy"
+      ]
+    },
+    "home_compare": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Drag the handle",
+        "eyebrow_uppercase": true,
+        "title": "Walked in. Walked out.",
+        "description": "Same dog, three hours apart. That's nine years of practice in one slide.",
+        "heading_alignment": "center",
+        "before_label": "Walked in",
+        "after_label": "Walked out",
+        "content_width": "wide",
+        "orientation": "horizontal",
+        "initial_position": 35,
+        "show_labels": true,
+        "color_scheme": "standard-secondary"
+      }
+    },
+    "home_bento": {
+      "type": "bento-grid",
+      "settings": {
+        "eyebrow": "Recent cuts",
+        "eyebrow_uppercase": true,
+        "title": "From this week's table.",
+        "description": "Real dogs. Real grooms. No stock photography.",
+        "heading_alignment": "center",
+        "gap": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "bento-maple": {
+          "type": "item",
+          "settings": {
+            "title": "Maple",
+            "text": "Goldendoodle teddy",
+            "col_span": "2",
+            "row_span": "2",
+            "alignment": "end"
+          }
+        },
+        "bento-otis": {
+          "type": "item",
+          "settings": {
+            "title": "Otis",
+            "text": "Schnauzer hand-strip",
+            "col_span": "1",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        },
+        "bento-koda": {
+          "type": "item",
+          "settings": {
+            "title": "Koda",
+            "text": "Husky de-shed",
+            "col_span": "1",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        },
+        "bento-stat": {
+          "type": "item",
+          "settings": {
+            "title": "740+",
+            "text": "Dogs on the books",
+            "col_span": "2",
+            "row_span": "1",
+            "background_color": "highlight-primary",
+            "alignment": "center"
+          }
+        },
+        "bento-luna": {
+          "type": "item",
+          "settings": {
+            "title": "Luna",
+            "text": "Cavalier tidy",
+            "col_span": "1",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        },
+        "bento-marlow": {
+          "type": "item",
+          "settings": {
+            "title": "Marlow",
+            "text": "Senior labrador bath",
+            "col_span": "2",
+            "row_span": "1",
+            "alignment": "end"
+          }
+        }
+      },
+      "blocksOrder": [
+        "bento-maple",
+        "bento-otis",
+        "bento-koda",
+        "bento-stat",
+        "bento-luna",
+        "bento-marlow"
+      ]
+    },
+    "home_marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Doodles · Schnauzers · Huskies · Terriers · Poodles · Bernedoodles · Cavaliers · Goldens · Cockapoos · Yorkies · Bichons · Shibas · Shelties · Border Collies · Aussies · Cocker spaniels · Senior dogs welcome · Anxious dogs welcome",
+        "separator": " · ",
+        "speed": "medium",
+        "rotate": false,
+        "font_size": "xl",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      }
+    },
+    "home_testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 6000,
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "q-rebecca": {
+          "type": "quote",
+          "settings": {
+            "quote": "After three salons turned us away, Mara was the first person who didn't flinch when I described Otis. He's a different dog at pickup — calmer, lighter on his feet.",
+            "name": "Rebecca H.",
+            "title": "Otis, standard schnauzer · age 11",
+            "rating": "5"
+          }
+        },
+        "q-priya": {
+          "type": "quote",
+          "settings": {
+            "quote": "Maple comes home looking like a magazine doodle and smelling like a dog instead of perfume. That's exactly what I want.",
+            "name": "Priya K.",
+            "title": "Maple, goldendoodle · age 4",
+            "rating": "5"
+          }
+        },
+        "q-tomas": {
+          "type": "quote",
+          "settings": {
+            "quote": "Koda is a 75lb husky who hates being touched by strangers. Dani figured him out by the second visit and we've been on a six-week cycle ever since.",
+            "name": "Tomás R.",
+            "title": "Koda, husky · age 6",
+            "rating": "5"
+          }
+        },
+        "q-aisha": {
+          "type": "quote",
+          "settings": {
+            "quote": "I was nervous bringing in a senior dog. The notes at pickup told me about a hot spot I hadn't noticed yet. Exactly the attention I'd been hoping for.",
+            "name": "Aisha P.",
+            "title": "Marlow, labrador · age 13",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "q-rebecca",
+        "q-priya",
+        "q-tomas",
+        "q-aisha"
+      ]
+    },
+    "home_close": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Bring your dog in.",
+            "size": "3xl"
+          }
+        },
+        "close-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tuesday through Saturday, by appointment.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "close-heading",
+        "close-text",
+        "close-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "home_hero",
+    "home_promise",
+    "home_services",
+    "home_compare",
+    "home_bento",
+    "home_marquee",
+    "home_testimonials",
+    "home_close"
+  ],
+  "id": "index",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T14:38:47.000Z"
+}

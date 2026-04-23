@@ -1,0 +1,183 @@
+{
+  "name": "Stylists",
+  "slug": "stylists",
+  "widgets": {
+    "stylists_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Four chairs, four specialties.",
+            "size": "4xl"
+          }
+        },
+        "intro-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We don't overlap. Each stylist specializes in a different part of the craft — pick by what your hair is growing toward, not by who's available first.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["intro-heading", "intro-body"]
+    },
+    "stylists_roster": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The team",
+        "eyebrow_uppercase": true,
+        "title": "Who's at which chair.",
+        "heading_alignment": "start",
+        "image_style": "full",
+        "aspect_ratio": "3/4",
+        "columns_desktop": 2,
+        "layout": "grid",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "stylist-rowan": {
+          "type": "profile",
+          "settings": {
+            "name": "Rowan Ellis",
+            "role": "Lead Stylist & Founder",
+            "specialty": "Precision bobs, fringe, short cuts",
+            "bio": "Twelve years at the chair. Trained at a Vidal Sassoon academy in London, then spent four years in a studio on the Lower East Side before opening Shearline in 2019. Rowan built the salon around one idea: a cut that still looks good three weeks later. If you're growing out layers, cutting a blunt bob, or trying to land on a fringe that works with your cowlick, this is the chair.",
+            "instagram": "https://instagram.com/",
+            "email": "hello@example.com"
+          }
+        },
+        "stylist-sloane": {
+          "type": "profile",
+          "settings": {
+            "name": "Sloane Park",
+            "role": "Senior Colorist",
+            "specialty": "Balayage, blonding, color correction",
+            "bio": "Nine years specializing in color, certified in Redken and Goldwell. Sloane is the person to book for balayage that grows out beautifully — no hard lines, no brassy shift at week six. She also handles the rescues when someone else got it wrong, and she will tell you honestly whether a color transformation is one appointment or three. All color services require a consultation first.",
+            "instagram": "https://instagram.com/",
+            "email": "hello@example.com"
+          }
+        },
+        "stylist-mara": {
+          "type": "profile",
+          "settings": {
+            "name": "Mara Okafor",
+            "role": "Stylist",
+            "specialty": "Textured & curly hair, long layers",
+            "bio": "Seven years focused on curly and coily hair, from defined 3A waves to 4C coils. Mara trained with a curl specialist in Atlanta and carries that approach here — dry cutting, curl-by-curl shape work, and finishes that respect the texture instead of fighting it. If another stylist has ever told you your hair is hard to cut, this is the chair to book.",
+            "instagram": "https://instagram.com/",
+            "email": "hello@example.com"
+          }
+        },
+        "stylist-theo": {
+          "type": "profile",
+          "settings": {
+            "name": "Theo Vance",
+            "role": "Stylist",
+            "specialty": "Men's cuts, fades, beard work",
+            "bio": "Eight years in men's grooming. Theo works the whole range — a quiet executive side part, a sharp skin fade, a textured crop, and the beards that come with them. He's especially good if you're growing your hair out from a shorter cut and want the in-between months to actually look intentional. Walk-ins welcome for beard trims when the chair is free.",
+            "instagram": "https://instagram.com/",
+            "email": "hello@example.com"
+          }
+        }
+      },
+      "blocksOrder": ["stylist-rowan", "stylist-sloane", "stylist-mara", "stylist-theo"]
+    },
+    "stylists_how_to_pick": {
+      "type": "icon-list",
+      "settings": {
+        "eyebrow": "Not sure who to book with?",
+        "eyebrow_uppercase": true,
+        "title": "Match by what you're trying to do.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "icon_style": "filled",
+        "icon_size": "xl",
+        "icon_shape": "sharp",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "pick-short": {
+          "type": "item",
+          "settings": {
+            "icon": "razor",
+            "title": "Short cuts & precision",
+            "description": "Book with Rowan"
+          }
+        },
+        "pick-color": {
+          "type": "item",
+          "settings": {
+            "icon": "sparkles",
+            "title": "Color, balayage, blonding",
+            "description": "Book with Sloane"
+          }
+        },
+        "pick-textured": {
+          "type": "item",
+          "settings": {
+            "icon": "wand",
+            "title": "Textured, curly, long hair",
+            "description": "Book with Mara"
+          }
+        },
+        "pick-mens": {
+          "type": "item",
+          "settings": {
+            "icon": "user",
+            "title": "Men's cuts & fades",
+            "description": "Book with Theo"
+          }
+        }
+      },
+      "blocksOrder": ["pick-short", "pick-color", "pick-textured", "pick-mens"]
+    },
+    "stylists_closing": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Still deciding?",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "How a first visit works",
+              "href": "new-clients.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Call or email",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-button"]
+    }
+  },
+  "widgetsOrder": ["stylists_intro", "stylists_roster", "stylists_how_to_pick", "stylists_closing"],
+  "id": "stylists",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T10:00:00.000Z"
+}

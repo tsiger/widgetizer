@@ -1,0 +1,250 @@
+{
+  "name": "Gallery",
+  "slug": "gallery",
+  "widgets": {
+    "gallery_hero": {
+      "type": "banner",
+      "settings": {
+        "height": "medium",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-secondary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Gallery</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Cuts from our table.",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Real dogs. Real grooms. Updated weekly.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text"]
+    },
+    "gallery_slideshow": {
+      "type": "slideshow",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "autoplay": true,
+        "autoplay_speed": 5000
+      },
+      "blocks": {
+        "slide-maple": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Maple",
+            "text_content": "Goldendoodle · teddy cut · 2.5 hour appointment",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "4xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        },
+        "slide-otis": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Otis",
+            "text_content": "Standard schnauzer · hand-strip · 2 hour appointment",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "4xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        },
+        "slide-koda": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Koda",
+            "text_content": "Husky · de-shed treatment · 90 minute appointment",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "4xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        },
+        "slide-marlow": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Marlow",
+            "text_content": "Senior labrador · gentle bath & tidy · 1 hour appointment",
+            "alignment": "start",
+            "vertical_alignment": "end",
+            "heading_size": "4xl",
+            "text_size": "base",
+            "color_scheme": "highlight-primary"
+          }
+        }
+      },
+      "blocksOrder": ["slide-maple", "slide-otis", "slide-koda", "slide-marlow"]
+    },
+    "gallery_styles": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "Browse by cut",
+        "eyebrow_uppercase": true,
+        "title": "Five ways we cut a dog.",
+        "description": "Different breeds, different goals — pick a tab to see how we think about each.",
+        "heading_alignment": "center",
+        "image_position": "start",
+        "aspect_ratio": "3 / 2",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "tab-doodle": {
+          "type": "tab",
+          "settings": {
+            "title": "Doodle teddy",
+            "description": "<p>Even body length, neat round face, clean feet. Mara's most-grooming-table cut. The trick is keeping the face soft without leaving fur in the eyes, and matching legs to body without column-trimming them.</p>"
+          }
+        },
+        "tab-schnauzer": {
+          "type": "tab",
+          "settings": {
+            "title": "Hand-strip",
+            "description": "<p>Pulling the dead outer coat by hand instead of clipping. Restores the harsh, weather-resistant texture and rich color the breed is supposed to have. Slower work — usually 2–3 hours — but the coat stays right between visits.</p>"
+          }
+        },
+        "tab-double-coat": {
+          "type": "tab",
+          "settings": {
+            "title": "Double-coat de-shed",
+            "description": "<p>Huskies, malamutes, shepherds, retrievers — never shaved. Bath, blow out the dead undercoat with a high-velocity dryer, finish with an undercoat rake. Most double coats need this every 8–12 weeks.</p>"
+          }
+        },
+        "tab-sanitary": {
+          "type": "tab",
+          "settings": {
+            "title": "Sanitary trim",
+            "description": "<p>Hygiene-only — undercarriage, paw pads, around the eyes. No body cut, no full bath. Great for puppies between full grooms, senior dogs who don't tolerate long appointments, and dogs whose owners are keeping the coat long.</p>"
+          }
+        },
+        "tab-demat": {
+          "type": "tab",
+          "settings": {
+            "title": "De-mat & shave-down",
+            "description": "<p>When a coat has matted past safe brushing, the kind decision is often a fresh start. We assess, walk you through options, and — if a shave-down is right — go short enough to stop the discomfort but not so short the dog is uncomfortable in the cold.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["tab-doodle", "tab-schnauzer", "tab-double-coat", "tab-sanitary", "tab-demat"]
+    },
+    "gallery_feature": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Six hours, one extremely matted retriever",
+        "eyebrow_uppercase": true,
+        "title": "Sometimes a coat needs a fresh start.",
+        "description": "We don't shave on sight. We work it down to a shape the dog will actually live in.",
+        "heading_alignment": "start",
+        "before_label": "Day of intake",
+        "after_label": "Walking out",
+        "content_width": "wide",
+        "orientation": "horizontal",
+        "initial_position": 25,
+        "show_labels": true,
+        "color_scheme": "standard-secondary"
+      }
+    },
+    "gallery_grid": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "The full table",
+        "eyebrow_uppercase": true,
+        "title": "Recent work.",
+        "heading_alignment": "start",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "item-maple": { "type": "item", "settings": { "title": "Maple", "category": "Goldendoodle · teddy" } },
+        "item-otis": { "type": "item", "settings": { "title": "Otis", "category": "Schnauzer · hand-strip" } },
+        "item-koda": { "type": "item", "settings": { "title": "Koda", "category": "Husky · de-shed" } },
+        "item-luna": { "type": "item", "settings": { "title": "Luna", "category": "Cavalier · tidy" } },
+        "item-biscuit": { "type": "item", "settings": { "title": "Biscuit", "category": "Cockapoo · puppy cut" } },
+        "item-marlow": { "type": "item", "settings": { "title": "Marlow", "category": "Senior lab · bath" } },
+        "item-finn": { "type": "item", "settings": { "title": "Finn", "category": "Wire fox terrier · hand-strip" } },
+        "item-ziggy": { "type": "item", "settings": { "title": "Ziggy", "category": "Sheltie · brush-out" } },
+        "item-arlo": { "type": "item", "settings": { "title": "Arlo", "category": "Bichon · round head" } },
+        "item-pepper": { "type": "item", "settings": { "title": "Pepper", "category": "Yorkie · short cut" } },
+        "item-hank": { "type": "item", "settings": { "title": "Hank", "category": "Bernedoodle · long teddy" } },
+        "item-rosie": { "type": "item", "settings": { "title": "Rosie", "category": "Border collie · groom" } },
+        "item-gus": { "type": "item", "settings": { "title": "Gus", "category": "Bedlington · trim" } },
+        "item-ivy": { "type": "item", "settings": { "title": "Ivy", "category": "Cavachon · puppy cut" } }
+      },
+      "blocksOrder": ["item-maple", "item-otis", "item-koda", "item-luna", "item-biscuit", "item-marlow", "item-finn", "item-ziggy", "item-arlo", "item-pepper", "item-hank", "item-rosie", "item-gus", "item-ivy"]
+    },
+    "gallery_marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Doodles · Schnauzers · Huskies · Terriers · Poodles · Bernedoodles · Cavaliers · Goldens · Cockapoos · Yorkies · Bichons · Shibas · Shelties · Border Collies · Aussies",
+        "separator": " · ",
+        "speed": "medium",
+        "rotate": false,
+        "font_size": "xl",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      }
+    },
+    "gallery_close": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Want this for your dog?",
+            "size": "3xl"
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book a groom",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["close-heading", "close-button"]
+    }
+  },
+  "widgetsOrder": ["gallery_hero", "gallery_slideshow", "gallery_styles", "gallery_feature", "gallery_grid", "gallery_marquee", "gallery_close"],
+  "id": "gallery",
+  "created": "2026-04-23T10:00:00.000Z",
+  "updated": "2026-04-23T15:00:00.000Z"
+}
