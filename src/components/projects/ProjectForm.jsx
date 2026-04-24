@@ -189,50 +189,52 @@ export default function ProjectForm({
   if (loading) return <LoadingSpinner message={t("forms.project.loadingThemes")} />;
 
   return (
-    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="form-container">
+    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="space-y-6">
       <input type="hidden" {...register("preset")} />
       <div className="form-section">
-        <div className="form-field">
-          <label htmlFor="name" className="form-label">
-            {t("forms.project.titleLabel")} <span className="text-pink-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="name"
-            {...register("name", {
-              required: t("forms.project.titleRequired"),
-              validate: (value) => value.trim() !== "" || t("forms.project.nameNotEmpty"),
-            })}
-            className="form-input"
-          />
-          {errors.name && <p className="form-error">{errors.name.message}</p>}
-          <p className="form-description">{t("forms.project.titleHelp")}</p>
-        </div>
-
-        {/* Theme field - shown for new projects before More Settings */}
-        {isNew && (
+        <div className="max-w-xl space-y-4">
           <div className="form-field">
-            <label htmlFor="theme" className="form-label">
-              {t("forms.project.themeLabel")} <span className="text-pink-500">*</span>
+            <label htmlFor="name" className="form-label">
+              {t("forms.project.titleLabel")} <span className="text-pink-500">*</span>
             </label>
-            <select
-              id="theme"
-              {...register("theme", {
-                required: isNew ? t("forms.project.themeRequired") : false,
+            <input
+              type="text"
+              id="name"
+              {...register("name", {
+                required: t("forms.project.titleRequired"),
+                validate: (value) => value.trim() !== "" || t("forms.project.nameNotEmpty"),
               })}
-              className="form-select"
-            >
-              <option value="">{t("forms.project.selectTheme")}</option>
-              {themes.map((theme) => (
-                <option key={theme.id} value={theme.id}>
-                  {theme.name} {theme.version && `(v${theme.version})`}
-                </option>
-              ))}
-            </select>
-            {errors.theme && <p className="form-error">{errors.theme.message}</p>}
-            <p className="form-description">{t("forms.project.themeHelp")}</p>
+              className="form-input"
+            />
+            {errors.name && <p className="form-error">{errors.name.message}</p>}
+            <p className="form-description">{t("forms.project.titleHelp")}</p>
           </div>
-        )}
+
+          {/* Theme field - shown for new projects before More Settings */}
+          {isNew && (
+            <div className="form-field">
+              <label htmlFor="theme" className="form-label">
+                {t("forms.project.themeLabel")} <span className="text-pink-500">*</span>
+              </label>
+              <select
+                id="theme"
+                {...register("theme", {
+                  required: isNew ? t("forms.project.themeRequired") : false,
+                })}
+                className="form-select"
+              >
+                <option value="">{t("forms.project.selectTheme")}</option>
+                {themes.map((theme) => (
+                  <option key={theme.id} value={theme.id}>
+                    {theme.name} {theme.version && `(v${theme.version})`}
+                  </option>
+                ))}
+              </select>
+              {errors.theme && <p className="form-error">{errors.theme.message}</p>}
+              <p className="form-description">{t("forms.project.themeHelp")}</p>
+            </div>
+          )}
+        </div>
 
         {/* Preset selection - shown when theme has presets */}
         {isNew && presets.presets.length > 0 && (
@@ -241,7 +243,7 @@ export default function ProjectForm({
             {presetsLoading ? (
               <p className="text-sm text-gray-500">{t("forms.project.loadingPresets")}</p>
             ) : (
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
                 {presets.presets.map((preset) => (
                   <div key={preset.id} className="min-w-0">
                     <button
@@ -285,119 +287,121 @@ export default function ProjectForm({
           </div>
         )}
 
-        {/* Theme info for existing projects */}
-        {!isNew && initialData.theme && (
-          <div className="form-field">
-            <label className="form-label">{t("forms.project.themeLabel")}</label>
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-medium">{initialData.themeName || initialData.theme}</span>
-              {initialData.themeVersion && (
-                <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
-                  v{initialData.themeVersion}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* More Settings Toggle */}
-        <button
-          type="button"
-          onClick={() => setShowMoreSettings(!showMoreSettings)}
-          className="flex items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
-        >
-          {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          {t("forms.project.moreSettings")}
-        </button>
-
-        {/* Collapsible Settings */}
-        {showMoreSettings && (
-          <>
+        <div className="max-w-xl space-y-4">
+          {/* Theme info for existing projects */}
+          {!isNew && initialData.theme && (
             <div className="form-field">
-              <label htmlFor="folderName" className="form-label">
-                {t("forms.project.folderNameLabel")} <span className="text-pink-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="folderName"
-                {...register("folderName", {
-                  required: t("forms.project.folderNameRequired"),
-                  validate: (value) => value.trim() !== "" || t("forms.project.folderNameNotEmpty"),
-                  pattern: {
-                    value: /^[a-z0-9-]+$/,
-                    message: t("forms.project.folderNamePattern"),
-                  },
-                })}
-                className="form-input"
-              />
-              {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
-              <p className="form-description">{t("forms.project.folderNameHelp")}</p>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="description" className="form-label-optional">
-                {t("forms.project.descriptionLabel")}
-              </label>
-              <textarea id="description" {...register("description")} rows="4" className="form-textarea" />
-              <p className="form-description">{t("forms.project.descriptionHelp")}</p>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="siteTitle" className="form-label-optional">
-                {t("forms.project.siteTitleLabel")}
-              </label>
-              <input type="text" id="siteTitle" {...register("siteTitle")} className="form-input" />
-              <p className="form-description">{t("forms.project.siteTitleHelp")}</p>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="siteUrl" className="form-label-optional">
-                {t("forms.project.siteUrlLabel")}
-              </label>
-              <input
-                type="url"
-                id="siteUrl"
-                {...register("siteUrl", {
-                  validate: (value) => {
-                    // Allow empty values
-                    if (!value || value.trim() === "") {
-                      return true;
-                    }
-                    // If a value is provided, validate URL format
-                    try {
-                      new URL(value.trim());
-                      return true;
-                    } catch {
-                      return t("forms.project.siteUrlInvalid") || "Please enter a valid URL (e.g., https://mysite.com)";
-                    }
-                  },
-                })}
-                className="form-input"
-                placeholder="https://mysite.com"
-              />
-              {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
-              <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
-            </div>
-
-            {/* Theme Updates Toggle - only for existing projects */}
-            {!isNew && (
-              <div className="form-field">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    {...register("receiveThemeUpdates")}
-                    className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-500"
-                  />
-                  <span className="form-label !mb-0">{t("forms.project.receiveThemeUpdatesLabel")}</span>
-                </label>
-                <p className="form-description ml-7">{t("forms.project.receiveThemeUpdatesHelp")}</p>
+              <label className="form-label">{t("forms.project.themeLabel")}</label>
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-medium">{initialData.themeName || initialData.theme}</span>
+                {initialData.themeVersion && (
+                  <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                    v{initialData.themeVersion}
+                  </span>
+                )}
               </div>
-            )}
-          </>
-        )}
+            </div>
+          )}
+
+          {/* More Settings Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowMoreSettings(!showMoreSettings)}
+            className="flex items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
+          >
+            {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {t("forms.project.moreSettings")}
+          </button>
+
+          {/* Collapsible Settings */}
+          {showMoreSettings && (
+            <>
+              <div className="form-field">
+                <label htmlFor="folderName" className="form-label">
+                  {t("forms.project.folderNameLabel")} <span className="text-pink-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="folderName"
+                  {...register("folderName", {
+                    required: t("forms.project.folderNameRequired"),
+                    validate: (value) => value.trim() !== "" || t("forms.project.folderNameNotEmpty"),
+                    pattern: {
+                      value: /^[a-z0-9-]+$/,
+                      message: t("forms.project.folderNamePattern"),
+                    },
+                  })}
+                  className="form-input"
+                />
+                {errors.folderName && <p className="form-error">{errors.folderName.message}</p>}
+                <p className="form-description">{t("forms.project.folderNameHelp")}</p>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="description" className="form-label-optional">
+                  {t("forms.project.descriptionLabel")}
+                </label>
+                <textarea id="description" {...register("description")} rows="4" className="form-textarea" />
+                <p className="form-description">{t("forms.project.descriptionHelp")}</p>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="siteTitle" className="form-label-optional">
+                  {t("forms.project.siteTitleLabel")}
+                </label>
+                <input type="text" id="siteTitle" {...register("siteTitle")} className="form-input" />
+                <p className="form-description">{t("forms.project.siteTitleHelp")}</p>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="siteUrl" className="form-label-optional">
+                  {t("forms.project.siteUrlLabel")}
+                </label>
+                <input
+                  type="url"
+                  id="siteUrl"
+                  {...register("siteUrl", {
+                    validate: (value) => {
+                      // Allow empty values
+                      if (!value || value.trim() === "") {
+                        return true;
+                      }
+                      // If a value is provided, validate URL format
+                      try {
+                        new URL(value.trim());
+                        return true;
+                      } catch {
+                        return t("forms.project.siteUrlInvalid") || "Please enter a valid URL (e.g., https://mysite.com)";
+                      }
+                    },
+                  })}
+                  className="form-input"
+                  placeholder="https://mysite.com"
+                />
+                {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
+                <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
+              </div>
+
+              {/* Theme Updates Toggle - only for existing projects */}
+              {!isNew && (
+                <div className="form-field">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      {...register("receiveThemeUpdates")}
+                      className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-500"
+                    />
+                    <span className="form-label !mb-0">{t("forms.project.receiveThemeUpdatesLabel")}</span>
+                  </label>
+                  <p className="form-description ml-7">{t("forms.project.receiveThemeUpdatesHelp")}</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="form-actions-separated justify-end">
+      <div className="sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t border-slate-200 bg-white px-4 py-4 rounded-b-md z-10">
         {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}

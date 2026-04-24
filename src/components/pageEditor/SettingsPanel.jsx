@@ -55,7 +55,7 @@ export default function SettingsPanel({
 
   if (!isThemeSettings && (!currentWidget || (!selectedWidgetId && !selectedGlobalWidgetId))) {
     return (
-      <div className="w-70 bg-white border-l border-slate-200">
+      <div className="w-60 2xl:w-70 bg-white border-l border-slate-200">
         <div className="p-4">
           <p className="text-slate-500 text-center mt-8">{t("pageEditor.settingsPanel.emptyState")}</p>
         </div>
@@ -116,7 +116,7 @@ export default function SettingsPanel({
       : settings;
 
   return (
-    <div className="w-70 bg-white border-l border-slate-200 flex flex-col h-full">
+    <div className="w-60 2xl:w-70 bg-white border-l border-slate-200 flex flex-col h-full">
       <div className="px-4 pt-4 pb-2 border-b border-slate-100 font-bold">
         {selectedBlockId ? (
           <div className="flex items-center gap-2">

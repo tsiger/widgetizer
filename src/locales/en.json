@@ -572,7 +572,7 @@
       "unknownError": "An unknown error occurred during exporting."
     }
   },
-"media": {
+  "media": {
     "title": "Media",
     "loading": "Loading media files...",
     "emptyTitle": "No media files yet",
@@ -740,7 +740,7 @@
     "developer": {
       "enabled": {
         "label": "Enable Developer Mode",
-        "description": "Shows developer tools for theme development, such as the ability to rebuild theme versions."
+        "description": "Shows developer tools for theme development."
       }
     },
     "messages": {

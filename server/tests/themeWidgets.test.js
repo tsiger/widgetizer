@@ -710,13 +710,13 @@ describe("image-tabs widget", () => {
     assert.ok(html.includes('aria-selected="true"'), "first tab should be selected");
   });
 
-  it("applies layout-image-right class when image_position is right", async () => {
+  it("applies layout-image-end class when image_position is end", async () => {
     const html = await renderWidget(
       PROJECT_ID,
-      "imgtabs-right",
+      "imgtabs-end",
       {
         type: "image-tabs",
-        settings: { title: "Features", image_position: "right" },
+        settings: { title: "Features", image_position: "end" },
         blocks: {
           "t1": { type: "tab", settings: { title: "One" } },
         },
@@ -728,16 +728,17 @@ describe("image-tabs widget", () => {
       null,
     );
 
-    assert.ok(html.includes("layout-image-right"), "should add image-right layout class");
+    const rootClasses = getRootClasses(html);
+    assert.ok(rootClasses.includes("layout-image-end"), "should add image-end layout class on root element");
   });
 
-  it("does not apply layout-image-right class when position is left", async () => {
+  it("does not apply layout-image-end class when position is start", async () => {
     const html = await renderWidget(
       PROJECT_ID,
-      "imgtabs-left",
+      "imgtabs-start",
       {
         type: "image-tabs",
-        settings: { title: "Features", image_position: "left" },
+        settings: { title: "Features", image_position: "start" },
         blocks: {
           "t1": { type: "tab", settings: { title: "One" } },
         },
@@ -749,9 +750,9 @@ describe("image-tabs widget", () => {
       null,
     );
 
-    // Check root <section> class (not the <style> block which always has CSS for layout-image-right)
+    // Check root <section> class (not the <style> block which always has CSS for layout-image-end)
     const rootClasses = getRootClasses(html);
-    assert.ok(!rootClasses.includes("layout-image-right"), "left position should not have image-right class on root element");
+    assert.ok(!rootClasses.includes("layout-image-end"), "start position should not have image-end class on root element");
   });
 
   it("renders richtext tab descriptions unescaped", async () => {

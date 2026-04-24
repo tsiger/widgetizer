@@ -86,6 +86,11 @@ after(async () => {
   await fs.remove(TEST_ROOT);
   // Also clean up any publish dirs we created
   // (PUBLISH_DIR is under TEST_DATA_DIR which is under TEST_ROOT, so already handled)
+
+  // Remove the test-only core-link widget that gets written into the real
+  // CORE_WIDGETS_DIR. export.test.js doesn't override APP_ROOT, so without
+  // this cleanup the widget pollutes src/core/widgets/.
+  await fs.remove(path.join(CORE_WIDGETS_DIR, "core-link"));
 });
 
 // ============================================================================

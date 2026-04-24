@@ -50,8 +50,9 @@ export default function BlockSelector({ isOpen, onClose, widgetSchema, onSelectB
     const viewportWidth = window.innerWidth;
 
     // Default position: to the right of the sidebar
-    // Sidebar width is typically 280px (w-70)
-    let left = 280 - 24; // Overlap slightly
+    // Sidebar width is responsive: w-60 (240px) default, 2xl:w-70 (280px) on ≥1536px
+    const sidebarWidth = window.innerWidth >= 1536 ? 280 : 240;
+    let left = sidebarWidth - 24; // Overlap slightly
 
     // Ensure horizontal fit
     if (left + dropdownWidth > viewportWidth) {

@@ -140,8 +140,8 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const dropdownWidth = 224; // w-56 = 224px
 
-    // Position the dropdown outside the sidebar (sidebar is w-70 = 280px)
-    const sidebarWidth = 280;
+    // Position the dropdown outside the sidebar — width matches the responsive sidebar (w-60 / 2xl:w-70)
+    const sidebarWidth = window.innerWidth >= 1536 ? 280 : 240;
     let leftPosition = sidebarWidth - 24; // Position closer to sidebar edge
 
     // If it would go off the right edge of the screen, position to the left instead

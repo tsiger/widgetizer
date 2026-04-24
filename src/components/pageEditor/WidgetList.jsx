@@ -216,7 +216,7 @@ export default function WidgetList({
   const activeWidgetSchema = activeWidget ? widgetSchemas[activeWidget.type] || {} : {};
 
   return (
-    <div className="w-70 bg-white border-r border-slate-200 flex flex-col h-full overflow-hidden">
+    <div className="w-60 2xl:w-70 bg-white border-r border-slate-200 flex flex-col h-full overflow-hidden">
       <div className="overflow-y-auto flex-grow p-3">
         {headerWidget && (
           <WidgetSection>
