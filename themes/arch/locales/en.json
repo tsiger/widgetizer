@@ -1069,6 +1069,36 @@
             "label": "Text"
           }
         }
+      },
+      "badges_block": {
+        "name": "Badges",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "max_height": {
+            "label": "Badge max height",
+            "description": "Caps the height of each badge image to keep them visually consistent"
+          },
+          "badge_image": {
+            "label": "Image"
+          },
+          "badge_link": {
+            "label": "Link"
+          },
+          "badge_1_header": {
+            "label": "Badge 1"
+          },
+          "badge_2_header": {
+            "label": "Badge 2"
+          },
+          "badge_3_header": {
+            "label": "Badge 3"
+          },
+          "badge_4_header": {
+            "label": "Badge 4"
+          }
+        }
       }
     }
   },

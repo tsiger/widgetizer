@@ -68,6 +68,33 @@
             <div class="social-links footer-social">
               {% render 'social-icons', social: theme.social %}
             </div>
+
+          {% when 'badges_block' %}
+            {% if block.settings.title != blank %}
+              <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
+            {% endif %}
+            <style>.widget-{{ widget.id }} [data-block-id="{{ blockId }}"] .footer-badge-image { max-height: {{ block.settings.max_height | default: 50 }}px; }</style>
+            <ul class="footer-badges">
+              {% for i in (1..4) %}
+                {% assign image_key = 'badge_' | append: i | append: '_image' %}
+                {% assign link_key = 'badge_' | append: i | append: '_link' %}
+                {% assign badge_image = block.settings[image_key] %}
+                {% assign badge_link = block.settings[link_key] %}
+                {% if badge_image != blank %}
+                  <li class="footer-badge" data-setting="{{ image_key }}">
+                    {% if badge_link.href != blank %}
+                      <a href="{{ badge_link.href }}"
+                         {% if badge_link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}
+                         {% if badge_link.text != blank %}aria-label="{{ badge_link.text }}"{% endif %}>
+                        {% image src: badge_image, size: 'small', class: 'footer-badge-image', alt: badge_link.text | default: '' %}
+                      </a>
+                    {% else %}
+                      {% image src: badge_image, size: 'small', class: 'footer-badge-image', alt: '' %}
+                    {% endif %}
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
           {% endcase %}
         </div>
       {% endfor %}

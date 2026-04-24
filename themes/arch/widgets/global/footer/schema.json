@@ -146,6 +146,89 @@
           "default": "Get in Touch"
         }
       ]
+    },
+    {
+      "type": "badges_block",
+      "displayName": "tTheme:footer.blocks.badges_block.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "tTheme:footer.blocks.badges_block.settings.title.label",
+          "default": "Certifications"
+        },
+        {
+          "type": "range",
+          "id": "max_height",
+          "label": "tTheme:footer.blocks.badges_block.settings.max_height.label",
+          "description": "tTheme:footer.blocks.badges_block.settings.max_height.description",
+          "min": 30,
+          "max": 80,
+          "step": 5,
+          "default": 50,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "id": "badge_1_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_1_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_1_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_1_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        },
+        {
+          "type": "header",
+          "id": "badge_2_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_2_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_2_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_2_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        },
+        {
+          "type": "header",
+          "id": "badge_3_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_3_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_3_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_3_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        },
+        {
+          "type": "header",
+          "id": "badge_4_header",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_4_header.label"
+        },
+        {
+          "type": "image",
+          "id": "badge_4_image",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_image.label"
+        },
+        {
+          "type": "link",
+          "id": "badge_4_link",
+          "label": "tTheme:footer.blocks.badges_block.settings.badge_link.label"
+        }
+      ]
     }
   ],
   "defaultBlocks": [

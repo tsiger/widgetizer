@@ -2884,6 +2884,37 @@ b {
     justify-content: flex-start;
   }
 
+  & .footer-badges {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    align-items: center;
+  }
+
+  & .footer-badge {
+    display: inline-flex;
+    align-items: center;
+
+    & a {
+      display: inline-flex;
+      align-items: center;
+      transition: opacity var(--transition-speed-fast);
+
+      &:hover {
+        opacity: 0.75;
+      }
+    }
+  }
+
+  & .footer-badge-image {
+    width: auto;
+    height: auto;
+    display: block;
+  }
+
   & .footer-copyright {
     color: var(--text-muted);
     font-size: calc(var(--font-size-xs) * var(--body-scale));
