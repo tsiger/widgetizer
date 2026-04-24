@@ -101,9 +101,9 @@
     </div>
 
     {% if widget.settings.copyright != blank %}
-      <p class="footer-copyright" data-setting="copyright">
-        {{ widget.settings.copyright }}
-      </p>
+      <div class="footer-copyright w-rte" data-setting="copyright">
+        {{ widget.settings.copyright | raw }}
+      </div>
     {% endif %}
   </div>
 </footer>

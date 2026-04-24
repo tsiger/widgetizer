@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "(c) 2026 Tailside Animal Clinic. All rights reserved.",
+    "copyright": "<p>(c) 2026 Tailside Animal Clinic. All rights reserved.</p>",
     "layout": "equal",
     "color_scheme": "highlight-primary"
   },

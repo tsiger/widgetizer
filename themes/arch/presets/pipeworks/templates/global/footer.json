@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Pipeworks Plumbing Co. Licensed · Insured · Bonded. CSLB #1048293.",
+    "copyright": "<p>© 2026 Pipeworks Plumbing Co. Licensed · Insured · Bonded. CSLB #1048293.</p>",
     "layout": "first-featured",
     "color_scheme": "highlight-secondary"
   },

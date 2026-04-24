@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Ironform Personal Training. All rights reserved.",
+    "copyright": "<p>© 2026 Ironform Personal Training. All rights reserved.</p>",
     "layout": "first-featured",
     "color_scheme": "highlight-secondary"
   },

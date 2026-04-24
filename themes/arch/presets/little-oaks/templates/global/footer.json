@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "\u00a9 2026 Little Oaks Learning Center. All rights reserved.",
+    "copyright": "<p>\u00a9 2026 Little Oaks Learning Center. All rights reserved.</p>",
     "layout": "equal",
     "color_scheme": "highlight-secondary"
   },

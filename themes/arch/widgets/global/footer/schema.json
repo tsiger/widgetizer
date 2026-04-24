@@ -9,10 +9,10 @@
       "label": "tTheme:global.widgets.settings.content_header.label"
     },
     {
-      "type": "textarea",
+      "type": "richtext",
       "id": "copyright",
       "label": "tTheme:footer.settings.copyright.label",
-      "default": "© 2026 Widgetizer. All rights are yours to keep."
+      "default": "<p>© 2026 Widgetizer. All rights are yours to keep.</p>"
     },
     {
       "type": "header",

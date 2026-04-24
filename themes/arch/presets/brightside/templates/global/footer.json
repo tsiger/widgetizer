@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Brightside Dental. All rights reserved.",
+    "copyright": "<p>© 2026 Brightside Dental. All rights reserved.</p>",
     "color_scheme": "highlight-secondary"
   },
   "blocks": {

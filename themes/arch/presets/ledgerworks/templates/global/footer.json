@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Ledgerworks CPA PLLC. All rights reserved.",
+    "copyright": "<p>© 2026 Ledgerworks CPA PLLC. All rights reserved.</p>",
     "layout": "first-featured",
     "color_scheme": "highlight-primary"
   },

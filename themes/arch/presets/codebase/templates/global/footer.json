@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Codebase Studio. All rights reserved.",
+    "copyright": "<p>© 2026 Codebase Studio. All rights reserved.</p>",
     "layout": "first-featured",
     "color_scheme": "highlight-primary"
   },

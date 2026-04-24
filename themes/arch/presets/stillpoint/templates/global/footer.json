@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Stillpoint Yoga Studio. All rights reserved.",
+    "copyright": "<p>© 2026 Stillpoint Yoga Studio. All rights reserved.</p>",
     "color_scheme": "highlight-secondary",
     "layout": "equal"
   },

@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Hearthstone Villa · Paros, Greece",
+    "copyright": "<p>© 2026 Hearthstone Villa · Paros, Greece</p>",
     "layout": "equal",
     "color_scheme": "highlight-primary"
   },

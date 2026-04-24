@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Pixelcraft Studio. A small studio in Brooklyn.",
+    "copyright": "<p>© 2026 Pixelcraft Studio. A small studio in Brooklyn.</p>",
     "layout": "first-featured",
     "color_scheme": "highlight-secondary"
   },

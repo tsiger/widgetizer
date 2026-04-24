@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "© 2026 Torque Auto Service. ASE Certified · 2-year / 24k warranty on all repairs.",
+    "copyright": "<p>© 2026 Torque Auto Service. ASE Certified · 2-year / 24k warranty on all repairs.</p>",
     "layout": "first-featured",
     "color_scheme": "highlight-primary"
   },
