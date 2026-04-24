@@ -189,6 +189,7 @@ These tokens control shapes, card appearance, and spacing density. Unlike other 
 | `--radius-md` | `0` | Medium radius (cards, images, video embeds) |
 | `--radius-lg` | `0` | Large radius (hero images, bento grids, callouts) |
 | `--radius-button` | `0` | Button border-radius (separate for pill override) |
+| `--radius-marker` | `0` | Numbered badge / marker radius — becomes `50%` (circle) on `corner-rounded` |
 | `--card-border` | `var(--border-width-thin) solid var(--border-color)` | Card border style |
 | `--card-shadow` | `none` | Card box-shadow |
 | `--spacing-scale` | `1` | Multiplier applied to card padding and widget container spacing |
@@ -1049,8 +1050,8 @@ The Arch theme uses **body classes** to implement global style settings that aff
 | Class | Effect |
 | --- | --- |
 | `corner-sharp` (default) | All radii `0` — square corners everywhere |
-| `corner-slightly-rounded` | `--radius-sm: 0.4rem`, `--radius-md: 0.6rem`, `--radius-lg: 0.8rem`, `--radius-button: 0.4rem` |
-| `corner-rounded` | `--radius-sm: 0.6rem`, `--radius-md: 1.2rem`, `--radius-lg: 1.6rem`, `--radius-button: 0.8rem` |
+| `corner-slightly-rounded` | `--radius-sm: 0.4rem`, `--radius-md: 0.6rem`, `--radius-lg: 0.8rem`, `--radius-button: 0.4rem`, `--radius-marker: 0.8rem` |
+| `corner-rounded` | `--radius-sm: 0.6rem`, `--radius-md: 1.2rem`, `--radius-lg: 1.6rem`, `--radius-button: 0.8rem`, `--radius-marker: 50%` |
 
 #### Layout Density (`spacing-*`)
 
@@ -1117,6 +1118,8 @@ Widgets with custom token usage:
 | testimonial-hero | `.testimonial-image-wrapper` | `--radius-lg` |
 | event-list | `.event-date` | `--radius-sm` |
 | timeline | `.timeline-content` | `--radius-sm` |
+| timeline | `.timeline-marker` | `--radius-marker` |
+| steps | `.steps-badge` | `--radius-marker` |
 | logo-cloud | `.logo-item` | `--radius-sm` |
 | job-listing | `.job-badge` | `--radius-sm` |
 | job-listing | `.job-filter-btn` | `--radius-button` |
@@ -1134,7 +1137,7 @@ Widgets with custom token usage:
 Widgets intentionally **not** affected by shapes:
 - banner/slideshow/split-hero when fullwidth (edge-to-edge backgrounds)
 - profile-grid/testimonials avatars (`border-radius: 50%` — always circular)
-- timeline markers, hotspot buttons (`border-radius: 50%`)
+- hotspot buttons (`border-radius: 50%` — interactive dots)
 - gallery/masonry `.widget-card-image` (`border-radius: 0` — images fill card, card has radius)
 - project-showcase `.project-image` (`border-radius: 0` — same pattern)
 

@@ -251,6 +251,7 @@ img {
   --radius-md: 0;
   --radius-lg: 0;
   --radius-button: 0;
+  --radius-marker: 0;
 
   /* Card presentation */
   --card-border: var(--border-width-thin) solid var(--border-color);
@@ -340,6 +341,7 @@ img {
   --radius-md: 0.6rem;
   --radius-lg: 0.8rem;
   --radius-button: 0.4rem;
+  --radius-marker: 0.8rem;
 }
 
 .corner-rounded {
@@ -347,6 +349,7 @@ img {
   --radius-md: 1.2rem;
   --radius-lg: 1.6rem;
   --radius-button: 0.8rem;
+  --radius-marker: 50%;
 }
 
 /* --------------------------------------------------------------------------
