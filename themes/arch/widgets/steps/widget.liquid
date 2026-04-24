@@ -97,20 +97,22 @@
         margin: 0;
       }
 
-      /* Even rows: text left, badge center, image right */
-      & .steps-item:nth-child(even) {
-        & .steps-image {
-          order: 3;
-        }
+      @media (min-width: 750px) {
+        /* Even rows: text left, badge center, image right */
+        & .steps-item:nth-child(even) {
+          & .steps-image {
+            order: 3;
+          }
 
-        & .steps-badge-col {
-          order: 2;
-        }
+          & .steps-badge-col {
+            order: 2;
+          }
 
-        & .steps-content {
-          order: 1;
-          text-align: end;
-          align-items: flex-end;
+          & .steps-content {
+            order: 1;
+            text-align: end;
+            align-items: flex-end;
+          }
         }
       }
 
@@ -131,15 +133,15 @@
         }
 
         & .steps-image {
-          order: 2 !important;
+          order: 2;
         }
 
         & .steps-badge-col {
-          order: 1 !important;
+          order: 1;
         }
 
         & .steps-content {
-          order: 3 !important;
+          order: 3;
           align-items: center;
         }
       }
