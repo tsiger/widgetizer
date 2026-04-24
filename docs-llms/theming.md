@@ -1744,7 +1744,6 @@ The `{% seo %}` tag automatically handles:
 - Open Graph tags
 - Twitter Card meta tags
 - Canonical URLs
-- JSON-LD structured data
 
 ### Font Management
 
