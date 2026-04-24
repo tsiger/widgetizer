@@ -2,7 +2,7 @@
   "type": "footer",
   "settings": {
     "copyright": "(c) 2026 Tailside Animal Clinic. All rights reserved.",
-    "layout": "first-featured",
+    "layout": "equal",
     "color_scheme": "highlight-primary"
   },
   "blocks": {
@@ -10,6 +10,7 @@
       "type": "logo_text",
       "settings": {
         "logo_text": "Tailside",
+        "logo_width": 190,
         "text": "<p>Small-animal veterinary care for dogs and cats, built around clear guidance and calm visits.</p>"
       }
     },

@@ -7,9 +7,9 @@
       "settings": {
         "overlay_color": "#10332d22",
         "image_position": "start",
-        "color_scheme": "standard-secondary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "intro-kicker": {
@@ -126,7 +126,7 @@
         "eyebrow_uppercase": false,
         "title": "Helpful documents before your appointment.",
         "description": "Upload your own forms after setup, or use this section as a simple new-patient checklist.",
-        "heading_alignment": "start",
+        "heading_alignment": "center",
         "image_position": "end",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",

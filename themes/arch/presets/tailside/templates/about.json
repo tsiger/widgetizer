@@ -7,9 +7,9 @@
       "settings": {
         "overlay_color": "#10332d22",
         "image_position": "end",
-        "color_scheme": "standard-primary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "intro-kicker": {

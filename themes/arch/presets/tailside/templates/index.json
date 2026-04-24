@@ -7,9 +7,9 @@
       "settings": {
         "overlay_color": "#10332d22",
         "image_position": "end",
-        "color_scheme": "standard-primary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
       },
       "blocks": {
         "hero-kicker": {
@@ -220,7 +220,7 @@
             "date": "Step 1",
             "title": "Book",
             "description": "<p>Tell us what changed or what you want checked.</p>",
-            "features": "+ New and returning pets welcome\n+ Same-week guidance when available"
+            "features": ""
           }
         },
         "prepare": {
@@ -229,7 +229,7 @@
             "date": "Step 2",
             "title": "Prepare",
             "description": "<p>Bring records, medications, and a few notes about behavior or symptoms.</p>",
-            "features": "+ Records help us avoid repeat work\n+ Carriers and leashes keep pets safer"
+            "features": ""
           }
         },
         "visit": {
@@ -238,7 +238,7 @@
             "date": "Step 3",
             "title": "Visit",
             "description": "<p>Your veterinarian examines your pet and explains the options in plain language.</p>",
-            "features": "+ Clear recommendations\n+ Estimates before treatment"
+            "features": ""
           }
         },
         "follow-up": {
@@ -247,7 +247,7 @@
             "date": "Step 4",
             "title": "Follow up",
             "description": "<p>You leave with notes, reminders, and a care plan you can use at home.</p>",
-            "features": "+ Written next steps\n+ Reminder support"
+            "features": ""
           }
         }
       },
@@ -256,38 +256,6 @@
         "prepare",
         "visit",
         "follow-up"
-      ]
-    },
-    "home_statement": {
-      "type": "rich-text",
-      "settings": {
-        "text_alignment": "center",
-        "content_width": "medium",
-        "color_scheme": "highlight-primary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
-      },
-      "blocks": {
-        "statement-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "A neighborhood clinic with room for questions.",
-            "size": "3xl"
-          }
-        },
-        "statement-copy": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Whether your pet is here for a first vaccine, a dental check, or a worry you cannot quite name, we make the visit calm, useful, and easy to understand.</p>",
-            "size": "lg",
-            "uppercase": false,
-            "muted": false
-          }
-        }
-      },
-      "blocksOrder": [
-        "statement-heading",
-        "statement-copy"
       ]
     },
     "home_cta": {
@@ -339,7 +307,6 @@
     "home_trust_bar",
     "home_services",
     "home_visit_flow",
-    "home_statement",
     "home_cta"
   ],
   "id": "index",

@@ -61,10 +61,15 @@
         "description": "Add your Google Maps embed URL after setup to show the live location.",
         "heading_alignment": "start",
         "address": "123 Pet Care Lane, Your City",
-        "embed_url": "",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.25280949928!2d-74.11976373946229!3d40.69766374859258!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1234567890",
+        "directions_link": {
+          "href": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.25280949928!2d-74.11976373946229!3d40.69766374859258!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1234567890",
+          "text": "Directions",
+          "target": "_self"
+        },
         "height": "medium",
         "show_address": true,
-        "sidebar_position": "start",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"

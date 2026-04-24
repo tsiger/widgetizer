@@ -2,6 +2,7 @@
   "type": "header",
   "settings": {
     "logoText": "Tailside",
+    "logoMaxWidth": 200,
     "contactDetailsLine1": "(555) 555-0100",
     "contactDetailsLine2": "Tue-Sat appointments",
     "contact_position": "logo",
