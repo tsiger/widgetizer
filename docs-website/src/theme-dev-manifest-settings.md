@@ -1,0 +1,276 @@
+---
+description: Configure theme.json manifest for Widgetizer themes. Define metadata, global settings, and how settings flow into CSS and Liquid.
+---
+
+The `theme.json` file is the manifest for a Widgetizer theme. It defines theme metadata and the global settings users can edit in the Theme Settings panel. This page explains the schema, grouping, and how settings flow into CSS and Liquid.
+
+# Theme Manifest Overview
+
+The manifest lives at the root of your theme and contains metadata and a `settings.global` schema.
+
+### Example (Arch)
+
+The default Arch theme uses:
+
+- `themes/arch/theme.json`
+- Groups: `layout`, `colors`, `typography`, `privacy`, `advanced`
+
+You can add any groups you want. Groups are just sections in the Theme Settings UI, so name them to match your design system or product goals. Example group ideas:
+
+- `branding` (logos, site name, tagline)
+- `buttons` (radius, padding, hover styles)
+- `motion` (animation timing and toggles)
+- `navigation` (menu variants, sticky header)
+- `commerce` (currency format, pricing labels)
+
+For group item structure and field options, see [Setting Types](theme-dev-setting-types.html).
+
+# Required Metadata
+
+These fields are required for a theme to be valid:
+
+**`name`** — Human-friendly theme name shown in the UI.
+
+**`version`** — Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-structure.html#publishing-theme-updates) to track which version users have installed and to determine when updates are available.
+
+**`author`** — Theme author or organization name.
+
+# Optional Metadata
+
+**`description`** — A short description shown in the theme picker.
+
+**`useCoreWidgets`** — When `true` (or absent), core widgets are included alongside theme widgets. If `false`, core widgets are not exposed in the editor.
+
+# Theme-Defined Image Sizes (Optional)
+
+Themes can override the app-level image size configuration by defining `settings.imageSizes` in `theme.json`. This is useful when your theme needs specific dimensions (e.g. a `hero` size at 1600px for hero banners).
+
+When present, theme image sizes **replace** the app settings entirely for projects using that theme. The App Settings UI hides the Image Sizes controls and shows a notice that sizes are managed by the theme. The `thumb` size is always generated for the media library, even if not listed.
+
+**Example:**
+
+```json
+{
+  "settings": {
+    "imageSizes": {
+      "thumb": { "width": 150, "enabled": true },
+      "small": { "width": 480, "enabled": true },
+      "medium": { "width": 1024, "enabled": true },
+      "hero": { "width": 1600, "enabled": true, "quality": 90 },
+      "large": { "enabled": false }
+    }
+  }
+}
+```
+
+**Per-size properties:**
+
+- **`width`** (number) — Maximum width in pixels
+- **`enabled`** (boolean) — Whether to generate this size (default: `true`)
+- **`quality`** (number, optional) — JPEG/WebP quality 1–100; falls back to app setting if omitted
+
+Templates can reference these sizes with the `{% image %}` tag, e.g. `{% image src: image, size: 'hero' %}`.
+
+# Global Settings Schema
+
+Global settings are defined in `settings.global`. Each key is a group that becomes a section in the Theme Settings UI.
+
+### Group Structure
+
+```json
+{
+  "settings": {
+    "global": {
+      "colors": [
+        {
+          "type": "color",
+          "id": "standard_bg_primary",
+          "label": "Primary Background",
+          "default": "#ffffff",
+          "outputAsCssVar": true
+        }
+      ]
+    }
+  }
+}
+```
+
+### Example Groups (Arch)
+
+Arch defines:
+
+- `layout` (animations)
+- `colors` (standard and highlight color sets)
+- `typography` (heading and body font pickers)
+- `privacy` (Bunny Fonts toggle)
+- `advanced` (custom CSS and script injection)
+
+# Setting Types
+
+Theme settings use the same types as widgets. Common types include:
+
+- `header`
+- `text`
+- `textarea`
+- `code`
+- `color`
+- `checkbox`
+- `range`
+- `select`
+- `radio`
+- `font_picker`
+- `image`
+- `youtube`
+- `menu`
+- `link`
+- `icon`
+
+For a complete list and properties, see [Setting Types](theme-dev-setting-types.html).
+
+# CSS Variables Output
+
+When `outputAsCssVar: true` is set, the `{% theme_settings %}` tag outputs a CSS variable in the `<head>`. See [Liquid Tags & Assets](theme-dev-liquid-assets.html) for tag details and [Design System & Utilities](theme-dev-design-system.html) for how tokens map to CSS variables.
+
+### Naming Convention
+
+Variables are generated as:
+
+```
+--{group}-{settingId}
+```
+
+Example:
+
+```
+--colors-standard_bg_primary
+```
+
+### Font Picker Special Case
+
+`font_picker` always generates CSS variables (no `outputAsCssVar` needed). It produces:
+
+```
+--{group}-{settingId}-family
+--{group}-{settingId}-weight
+```
+
+For body fonts, a `--{group}-body_font_bold-weight` variable is also generated to avoid faux bold rendering.
+
+# Accessing Theme Settings in Liquid
+
+All settings are available in templates through the `theme` object using the same group and ID structure.
+
+### Example
+
+```liquid
+{{ theme.colors.standard_bg_primary }}
+{{ theme.typography.heading_font.stack }}
+{% if theme.layout.enable_reveal_animations %}
+  <!-- Animation logic -->
+{% endif %}
+```
+
+# Advanced Settings (Custom Code)
+
+If you include the `advanced` group, users can inject:
+
+- Custom CSS via `{% custom_css %}`
+- Custom scripts in `<head>` via `{% custom_head_scripts %}`
+- Custom scripts before `</body>` via `{% custom_footer_scripts %}`
+
+These tags must be present in `layout.liquid` for the settings to take effect. See [Layout & Templates](theme-dev-layout-templates.html) for required placeholders and tag placement.
+
+# Theme Localization (i18n)
+
+Themes can provide translated labels for all settings and widget fields. This allows the Theme Settings panel and widget editor to display in the user's chosen language.
+
+### Locale Files
+
+Create a `locales/` folder in your theme root with one JSON file per language:
+
+```
+themes/my-theme/
+├── locales/
+│   ├── en.json
+│   ├── fr.json
+│   ├── de.json
+│   └── es.json
+```
+
+Each file contains nested keys matching your settings structure:
+
+```json
+{
+  "global": {
+    "colors": {
+      "settings": {
+        "standard_bg_primary": {
+          "label": "Primary Background"
+        }
+      }
+    }
+  },
+  "hero": {
+    "displayName": "Hero Banner",
+    "settings": {
+      "layout": {
+        "label": "Layout"
+      }
+    }
+  }
+}
+```
+
+### Using Translation Keys
+
+In `theme.json` and widget `schema.json` files, use the `tTheme:` prefix followed by a dot-notation path instead of a hardcoded string:
+
+```json
+{
+  "type": "color",
+  "id": "standard_bg_primary",
+  "label": "tTheme:global.colors.settings.standard_bg_primary.label",
+  "default": "#ffffff"
+}
+```
+
+The system resolves `tTheme:global.colors.settings.standard_bg_primary.label` by looking up `global.colors.settings.standard_bg_primary.label` in the active locale file. If the key is not found or no locale file exists for the current language, the raw key string is displayed as a fallback.
+
+### Widget Schema Localization
+
+Widget `displayName` and setting `label` fields support the same `tTheme:` prefix:
+
+```json
+{
+  "type": "hero",
+  "displayName": "tTheme:hero.displayName",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:hero.settings.layout.label",
+      "options": [
+        { "value": "centered", "label": "tTheme:hero.settings.layout.options.centered" }
+      ]
+    }
+  ]
+}
+```
+
+### Supported Languages
+
+Widgetizer's admin interface supports English, French, German, Greek, Italian, and Spanish. Your theme can provide locale files for any of these languages. The active locale matches the user's language setting in [App Settings](settings.html).
+
+# Practical Guidance
+
+### Organize by Groups
+
+Use clear group names and include a `header` item at the top of each group for readability.
+
+### Use CSS Variables
+
+Prefer `outputAsCssVar` for visual settings so widgets and base styles can read values from CSS.
+
+### Keep Defaults Sensible
+
+Defaults should render a complete, attractive site without any configuration.

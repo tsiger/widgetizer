@@ -1,0 +1,19 @@
+{
+  "name": "widgetizer-docs-builder",
+  "version": "1.0.0",
+  "description": "Static site generator for Widgetizer documentation",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "deploy": "npm run build && wrangler deploy --config ../wrangler.toml"
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "highlight.js": "^11.10.0",
+    "marked": "^11.1.1",
+    "marked-highlight": "^2.2.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.63.0"
+  }
+}

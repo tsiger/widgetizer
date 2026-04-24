@@ -79,16 +79,16 @@
       "liveDemo": "https://widgetizer.org/demos/hearthstone/"
     },
     {
-      "id": "ironform",
-      "name": "Ironform",
-      "description": "Personal trainer",
-      "liveDemo": "https://widgetizer.org/demos/ironform/"
-    },
-    {
       "id": "inkwell",
       "name": "Inkwell",
       "description": "Tattoo studio",
       "liveDemo": "https://widgetizer.org/demos/inkwell/"
+    },
+    {
+      "id": "ironform",
+      "name": "Ironform",
+      "description": "Personal trainer",
+      "liveDemo": "https://widgetizer.org/demos/ironform/"
     },
     {
       "id": "keystoned",
@@ -157,12 +157,6 @@
       "liveDemo": "https://widgetizer.org/demos/sparkhaus/"
     },
     {
-      "id": "torque",
-      "name": "Torque",
-      "description": "Auto repair",
-      "liveDemo": "https://widgetizer.org/demos/torque/"
-    },
-    {
       "id": "stillpoint",
       "name": "Stillpoint",
       "description": "Yoga studio",
@@ -175,16 +169,22 @@
       "liveDemo": "https://widgetizer.org/demos/tailside/"
     },
     {
-      "id": "velvet-touch",
-      "name": "Velvet Touch",
-      "description": "Day spa",
-      "liveDemo": "https://widgetizer.org/demos/velvet-touch/"
+      "id": "torque",
+      "name": "Torque",
+      "description": "Auto repair",
+      "liveDemo": "https://widgetizer.org/demos/torque/"
     },
     {
       "id": "uplink",
       "name": "Uplink",
       "description": "IT Support",
       "liveDemo": "https://widgetizer.org/demos/uplink/"
+    },
+    {
+      "id": "velvet-touch",
+      "name": "Velvet Touch",
+      "description": "Day spa",
+      "liveDemo": "https://widgetizer.org/demos/velvet-touch/"
     }
   ]
 }

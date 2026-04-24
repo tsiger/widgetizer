@@ -37,7 +37,7 @@ export default {
     entitlements: "electron/entitlements.mac.plist",
     entitlementsInherit: "electron/entitlements.mac.plist",
   },
-  afterSign: "scripts/notarize.cjs",
+  afterSign: "electron/notarize.cjs",
   publish: {
     provider: "github",
     owner: "tsiger",

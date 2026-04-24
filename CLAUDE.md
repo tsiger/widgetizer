@@ -119,6 +119,8 @@ Copy `.env.example` to `.env`. Key variables:
 npm run electron:dev   # Starts Vite + Express + Electron together
 ```
 
+Note: the `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev`, rebuilding `better-sqlite3` for the installed Electron runtime and validating locales. No need to run those by hand.
+
 ### Building Installers
 
 Mac (run on Mac):

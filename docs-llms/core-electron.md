@@ -192,7 +192,7 @@ export $(cat .env.mac | xargs) && npm run electron:build:mac
 **How it works:**
 
 1. `electron-builder` packages the app with `hardenedRuntime: true`
-2. The `afterSign` hook runs `scripts/notarize.cjs`
+2. The `afterSign` hook runs `electron/notarize.cjs`
 3. `@electron/notarize` submits the `.app` to Apple's notarization service via `notarytool`
 4. Notarization typically takes 5–30 minutes
 5. `electron-builder` then staples the notarization ticket to the `.dmg`
@@ -208,7 +208,7 @@ export $(cat .env.mac | xargs) && npm run electron:build:mac
   "entitlements": "electron/entitlements.mac.plist",
   "entitlementsInherit": "electron/entitlements.mac.plist"
 },
-"afterSign": "scripts/notarize.cjs"
+"afterSign": "electron/notarize.cjs"
 ```
 
 **Entitlements (`electron/entitlements.mac.plist`):**
@@ -217,7 +217,7 @@ export $(cat .env.mac | xargs) && npm run electron:build:mac
 - `com.apple.security.cs.allow-unsigned-executable-memory` — required for Node.js
 - `com.apple.security.cs.disable-library-validation` — required for native modules (sharp, better-sqlite3)
 
-**`scripts/notarize.cjs`** — CJS module required by `electron-builder`'s `afterSign` hook. Uses `@electron/notarize` (`^3.1.1`) with `notarytool`. Skips automatically on non-darwin platforms.
+**`electron/notarize.cjs`** — CJS module required by `electron-builder`'s `afterSign` hook. Uses `@electron/notarize` (`^3.1.1`) with `notarytool`. Skips automatically on non-darwin platforms.
 
 ### Windows
 
@@ -299,7 +299,7 @@ Notes:
 
 - Keep the HTTP server running while the update downloads.
 - The served folder must contain `latest.yml`, the Windows `.exe`, and the matching `.exe.blockmap`.
-- Windows artifact naming is forced via `electron-builder.config.mjs`, so `latest.yml` and the generated files stay aligned.
+- Windows artifact naming is forced via `electron/builder.config.mjs`, so `latest.yml` and the generated files stay aligned.
 - If differential download fails, `electron-updater` falls back to a full installer download automatically.
 
 **Implementation files:**

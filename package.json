@@ -36,11 +36,11 @@
     "validate:locales": "node scripts/validate-locales.js",
     "validate:theme-locales": "node scripts/validate-theme-locales.js",
     "validate:all-locales": "node scripts/validate-locales.js && node scripts/validate-theme-locales.js",
-    "electron:build:mac": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && electron-builder --config electron-builder.config.mjs --mac",
-    "electron:build:mac:unsigned": "npm run build && node electron/prepareMacSharp.cjs && npx @electron/rebuild --force && CSC_IDENTITY_AUTO_DISCOVERY=false SKIP_NOTARIZE=1 electron-builder --config electron-builder.config.mjs --mac dir",
-    "electron:build:win": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && electron-builder --config electron-builder.config.mjs --win",
-    "electron:build:win:unsigned": "npm run build && npm install --no-save --platform=win32 --arch=x64 --include=optional && npx @electron/rebuild --force && cross-env WIN_UNSIGNED=1 CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config electron-builder.config.mjs --win",
-    "electron:build:validate": "npm run validate:all-locales && npm run lint:all"
+    "electron:build:mac": "node scripts/build-electron.mjs --platform mac",
+    "electron:build:mac:unsigned": "node scripts/build-electron.mjs --platform mac --unsigned",
+    "electron:build:win": "node scripts/build-electron.mjs --platform win",
+    "electron:build:win:unsigned": "node scripts/build-electron.mjs --platform win --unsigned",
+    "electron:preflight": "npm run validate:all-locales && npm run lint:all"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

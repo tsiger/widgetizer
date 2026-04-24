@@ -274,6 +274,12 @@ export default function ProjectForm({
                         href={preset.liveDemo}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={(e) => {
+                          if (window.electronUpdater?.openExternal) {
+                            e.preventDefault();
+                            window.electronUpdater.openExternal(preset.liveDemo);
+                          }
+                        }}
                         className="mt-1 flex items-center justify-center gap-1 text-sm text-pink-600 hover:text-pink-700 hover:underline"
                       >
                         Live demo
