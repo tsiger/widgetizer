@@ -1389,6 +1389,35 @@ b {
   color: var(--text-muted);
 }
 
+@media (max-width: 749px) {
+  .gallery-modal {
+    padding: var(--space-md);
+  }
+
+  .gallery-modal-content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .gallery-modal-image {
+    width: 100%;
+    max-width: 100%;
+    max-height: 70vh;
+  }
+
+  .gallery-modal-close {
+    inset-inline-end: 0;
+  }
+
+  .gallery-modal-nav.is-prev {
+    inset-inline-start: 0.5rem;
+  }
+
+  .gallery-modal-nav.is-next {
+    inset-inline-end: 0.5rem;
+  }
+}
+
 /* --------------------------------------------------------------------------
    7.2b Video Modal
    -------------------------------------------------------------------------- */
