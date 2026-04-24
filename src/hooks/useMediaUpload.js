@@ -147,8 +147,6 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
         });
       }
 
-      console.log("Upload Result:", { processedFiles: allProcessedFiles, rejectedFiles: allRejectedFiles });
-
       // Update state ONLY with successfully processed files from all batches
       if (allProcessedFiles.length > 0) {
         const newFilesWithMetadata = allProcessedFiles.map((file) => ({

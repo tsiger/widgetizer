@@ -347,20 +347,6 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 
 ---
 
-## 🎨 Code Quality & Standards
-
-### **[beta-testing-script.md](beta-testing-script.md)** - Beta Testing Checklist
-
-**Purpose**: End-to-end manual validation checklist for core product workflows **When to use**:
-
-- Running a full regression pass before release
-- Validating project/theme/media/export workflows manually
-- Coordinating beta testing with explicit pass/fail checklists
-
-**Key topics**: Core flow scenarios, expected results, edge-case checks, release readiness validation
-
----
-
 ## 💻 Desktop Builds
 
 ### **[core-electron.md](core-electron.md)** - Electron Desktop App

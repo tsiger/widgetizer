@@ -43,9 +43,6 @@ async function getImageProcessingSettings(projectId) {
         if (await fs.pathExists(themeJsonPath)) {
           const themeConfig = await fs.readJson(themeJsonPath);
           if (themeConfig.settings?.imageSizes) {
-            console.log(
-              `[getImageProcessingSettings] Using theme image sizes for project ${projectId} (theme: ${project.theme})`,
-            );
             // When a theme defines image sizes, use them instead of app settings.
             // Always ensure thumbnails are generated for the media library.
             sizesConfig = {

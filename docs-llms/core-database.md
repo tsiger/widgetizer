@@ -93,7 +93,7 @@ Runtime metadata source is SQLite, but project ZIP workflows include serialized 
 
 ---
 
-## 7. Data Ownership Summary
+## 6. Data Ownership Summary
 
 Use this as the quick rule:
 
