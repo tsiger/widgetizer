@@ -5,7 +5,7 @@
     "work_intro": {
       "type": "rich-text",
       "settings": {
-        "text_alignment": "start",
+        "text_alignment": "center",
         "content_width": "medium",
         "color_scheme": "standard-primary"
       },
@@ -14,7 +14,7 @@
           "type": "heading",
           "settings": {
             "text": "Recent work, by category.",
-            "size": "4xl"
+            "size": "5xl"
           }
         },
         "intro-body": {
@@ -30,55 +30,64 @@
       "blocksOrder": ["intro-heading", "intro-body"]
     },
     "work_by_category": {
-      "type": "image-tabs",
+      "type": "project-showcase",
       "settings": {
         "eyebrow": "Browse the portfolio",
         "eyebrow_uppercase": true,
         "title": "Five ways we cut.",
-        "description": "Different goals, different approaches. Pick a tab to see how we think about each.",
+        "description": "Different goals, different approaches. Hover over a tile to see how we think about each.",
         "heading_alignment": "center",
-        "image_position": "start",
-        "aspect_ratio": "3/2",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "aspect_ratio": "3 / 2",
+        "text_display": "hover",
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "tab-short-cuts": {
-          "type": "tab",
+        "project-short-cuts": {
+          "type": "project",
           "settings": {
             "title": "Short cuts",
-            "description": "<p>Precision bobs, pixies, and undercuts. The shortest shapes are the least forgiving — which is exactly why they need the most considered cut. We dry-check every line before you leave.</p>"
+            "description": "Bobs, pixies, undercuts"
           }
         },
-        "tab-long-lengths": {
-          "type": "tab",
+        "project-long-lengths": {
+          "type": "project",
           "settings": {
             "title": "Long & Lengths",
-            "description": "<p>Layered long cuts, lived-in shapes, movement without weight loss. We cut with the hair's natural fall in mind so the shape still reads on day twenty-one.</p>"
+            "description": "Layered, lived-in, movement with weight"
           }
         },
-        "tab-color-balayage": {
-          "type": "tab",
+        "project-color-balayage": {
+          "type": "project",
           "settings": {
             "title": "Color & Balayage",
-            "description": "<p>Hand-painted balayage, foil work, dimensional blonding, and the gentler single-process services. Consultation first, always — color done well is a conversation.</p>"
+            "description": "Hand-painted, foil, dimensional blonding"
           }
         },
-        "tab-mens": {
-          "type": "tab",
+        "project-mens": {
+          "type": "project",
           "settings": {
             "title": "Men's",
-            "description": "<p>Classic cuts, skin fades, textured crops, and beard shaping. Same attention to shape and finish as every other service in the salon.</p>"
+            "description": "Classic cuts, skin fades, crops, beards"
           }
         },
-        "tab-editorial-events": {
-          "type": "tab",
+        "project-editorial-events": {
+          "type": "project",
           "settings": {
             "title": "Editorial & Events",
-            "description": "<p>Bridal, event styling, and photoshoot work. Hair that holds up through a long day and still looks considered in photographs.</p>"
+            "description": "Bridal, shoots, event styling"
+          }
+        },
+        "project-editorial-events-2": {
+          "type": "project",
+          "settings": {
+            "title": "Editorial & Events",
+            "description": "Bridal, shoots, event styling"
           }
         }
       },
-      "blocksOrder": ["tab-short-cuts", "tab-long-lengths", "tab-color-balayage", "tab-mens", "tab-editorial-events"]
+      "blocksOrder": ["project-short-cuts", "project-long-lengths", "project-color-balayage", "project-mens", "project-editorial-events", "project-editorial-events-2"]
     },
     "work_gallery": {
       "type": "masonry-gallery",

@@ -5,7 +5,7 @@
     "new_clients_intro": {
       "type": "rich-text",
       "settings": {
-        "text_alignment": "start",
+        "text_alignment": "center",
         "content_width": "medium",
         "color_scheme": "standard-primary"
       },
@@ -14,7 +14,7 @@
           "type": "heading",
           "settings": {
             "text": "Your first appointment, step by step.",
-            "size": "4xl"
+            "size": "5xl"
           }
         },
         "intro-body": {

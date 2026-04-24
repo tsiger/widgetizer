@@ -147,7 +147,8 @@
     {
       "id": "shearline",
       "name": "Shearline",
-      "description": "Hair salon"
+      "description": "Hair salon",
+      "liveDemo": "https://widgetizer.org/demos/shearline/"
     },
     {
       "id": "sparkhaus",

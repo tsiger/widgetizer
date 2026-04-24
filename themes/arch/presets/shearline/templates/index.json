@@ -7,12 +7,13 @@
       "settings": {
         "height": "large",
         "fullwidth": true,
-        "content_width": "wide",
-        "alignment": "start",
+        "content_width": "medium",
+        "alignment": "center",
         "vertical_alignment": "end",
+        "overlay_color": "#0a1e385e",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "small"
+        "bottom_spacing": "auto"
       },
       "blocks": {
         "opener-eyebrow": {
@@ -37,7 +38,7 @@
             "text": "<p>A small studio of four stylists. Editorial cuts, considered color, no bar, no pretense.</p>",
             "size": "lg",
             "uppercase": false,
-            "muted": true
+            "muted": false
           }
         },
         "opener-buttons": {
@@ -62,92 +63,90 @@
       "blocksOrder": ["opener-eyebrow", "opener-heading", "opener-subtitle", "opener-buttons"]
     },
     "home_services_teaser": {
-      "type": "numbered-service-list",
+      "type": "card-grid",
       "settings": {
         "eyebrow": "What we do",
         "eyebrow_uppercase": true,
         "title": "Six things, done properly.",
-        "heading_alignment": "start",
-        "show_numbers": true,
-        "show_dividers": true,
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
         "color_scheme": "standard-primary"
       },
       "blocks": {
         "svc-womens": {
-          "type": "service",
+          "type": "card",
           "settings": {
             "title": "Women's cut",
-            "description": "Consultation, shampoo, precision cut, style.",
-            "link": {
-              "text": "",
+            "description": "<p>Consultation, shampoo, precision cut, style.</p>",
+            "button_link": {
+              "text": "See pricing",
               "href": "services.html",
-              "target": "_self",
-              "hide_text": true
+              "target": "_self"
             }
           }
         },
         "svc-mens": {
-          "type": "service",
+          "type": "card",
           "settings": {
             "title": "Men's cut",
-            "description": "Classic, fade, or editorial — same attention to shape.",
-            "link": {
-              "text": "",
+            "description": "<p>Classic, fade, or editorial — same attention to shape.</p>",
+            "button_link": {
+              "text": "See pricing",
               "href": "services.html",
-              "target": "_self",
-              "hide_text": true
+              "target": "_self"
             }
           }
         },
         "svc-single-color": {
-          "type": "service",
+          "type": "card",
           "settings": {
             "title": "Single-process color",
-            "description": "All-over, root touch-up, or gloss.",
-            "link": {
-              "text": "",
+            "description": "<p>All-over, root touch-up, or gloss.</p>",
+            "button_link": {
+              "text": "See pricing",
               "href": "services.html",
-              "target": "_self",
-              "hide_text": true
+              "target": "_self"
             }
           }
         },
         "svc-balayage": {
-          "type": "service",
+          "type": "card",
           "settings": {
             "title": "Balayage & highlights",
-            "description": "Hand-painted, foil, or combined — consultation first.",
-            "link": {
-              "text": "",
+            "description": "<p>Hand-painted, foil, or combined — consultation first.</p>",
+            "button_link": {
+              "text": "See pricing",
               "href": "services.html",
-              "target": "_self",
-              "hide_text": true
+              "target": "_self"
             }
           }
         },
         "svc-treatments": {
-          "type": "service",
+          "type": "card",
           "settings": {
             "title": "Treatments",
-            "description": "Olaplex, keratin smoothing, deep conditioning.",
-            "link": {
-              "text": "",
+            "description": "<p>Olaplex, keratin smoothing, deep conditioning.</p>",
+            "button_link": {
+              "text": "See pricing",
               "href": "services.html",
-              "target": "_self",
-              "hide_text": true
+              "target": "_self"
             }
           }
         },
         "svc-blowout": {
-          "type": "service",
+          "type": "card",
           "settings": {
             "title": "Blowout & styling",
-            "description": "Event-ready finishes, standalone or paired.",
-            "link": {
-              "text": "",
+            "description": "<p>Event-ready finishes, standalone or paired.</p>",
+            "button_link": {
+              "text": "See pricing",
               "href": "services.html",
-              "target": "_self",
-              "hide_text": true
+              "target": "_self"
             }
           }
         }
@@ -161,7 +160,7 @@
         "eyebrow_uppercase": true,
         "title": "Pick the stylist before the date.",
         "description": "Each of us specializes. Short cuts, blonding, textured hair, men's — we match by what you're growing toward.",
-        "heading_alignment": "start",
+        "heading_alignment": "center",
         "image_style": "full",
         "aspect_ratio": "3/4",
         "columns_desktop": 4,
@@ -218,7 +217,7 @@
         "eyebrow": "Recent work",
         "eyebrow_uppercase": true,
         "title": "From this month's chairs.",
-        "heading_alignment": "start",
+        "heading_alignment": "center",
         "alignment": "start",
         "columns_desktop": 3,
         "gap": "medium",

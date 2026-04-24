@@ -5,7 +5,7 @@
     "stylists_intro": {
       "type": "rich-text",
       "settings": {
-        "text_alignment": "start",
+        "text_alignment": "center",
         "content_width": "medium",
         "color_scheme": "standard-primary"
       },
@@ -14,7 +14,7 @@
           "type": "heading",
           "settings": {
             "text": "Four chairs, four specialties.",
-            "size": "4xl"
+            "size": "5xl"
           }
         },
         "intro-body": {
@@ -32,13 +32,13 @@
     "stylists_roster": {
       "type": "profile-grid",
       "settings": {
-        "eyebrow": "The team",
+        "eyebrow": "",
         "eyebrow_uppercase": true,
-        "title": "Who's at which chair.",
+        "title": "",
         "heading_alignment": "start",
         "image_style": "full",
         "aspect_ratio": "3/4",
-        "columns_desktop": 2,
+        "columns_desktop": 3,
         "layout": "grid",
         "color_scheme": "standard-primary"
       },
@@ -49,7 +49,7 @@
             "name": "Rowan Ellis",
             "role": "Lead Stylist & Founder",
             "specialty": "Precision bobs, fringe, short cuts",
-            "bio": "Twelve years at the chair. Trained at a Vidal Sassoon academy in London, then spent four years in a studio on the Lower East Side before opening Shearline in 2019. Rowan built the salon around one idea: a cut that still looks good three weeks later. If you're growing out layers, cutting a blunt bob, or trying to land on a fringe that works with your cowlick, this is the chair.",
+            "bio": "Twelve years at the chair. Trained at a Vidal Sassoon academy in London, then spent four years in a studio on the Lower East Side before opening Shearline in 2019. ",
             "instagram": "https://instagram.com/",
             "email": "hello@example.com"
           }
@@ -60,7 +60,7 @@
             "name": "Sloane Park",
             "role": "Senior Colorist",
             "specialty": "Balayage, blonding, color correction",
-            "bio": "Nine years specializing in color, certified in Redken and Goldwell. Sloane is the person to book for balayage that grows out beautifully — no hard lines, no brassy shift at week six. She also handles the rescues when someone else got it wrong, and she will tell you honestly whether a color transformation is one appointment or three. All color services require a consultation first.",
+            "bio": "Nine years specializing in color, certified in Redken and Goldwell. Sloane is the person to book for balayage that grows out beautifully — no hard lines, no brassy shift at week six. ",
             "instagram": "https://instagram.com/",
             "email": "hello@example.com"
           }
@@ -71,27 +71,16 @@
             "name": "Mara Okafor",
             "role": "Stylist",
             "specialty": "Textured & curly hair, long layers",
-            "bio": "Seven years focused on curly and coily hair, from defined 3A waves to 4C coils. Mara trained with a curl specialist in Atlanta and carries that approach here — dry cutting, curl-by-curl shape work, and finishes that respect the texture instead of fighting it. If another stylist has ever told you your hair is hard to cut, this is the chair to book.",
-            "instagram": "https://instagram.com/",
-            "email": "hello@example.com"
-          }
-        },
-        "stylist-theo": {
-          "type": "profile",
-          "settings": {
-            "name": "Theo Vance",
-            "role": "Stylist",
-            "specialty": "Men's cuts, fades, beard work",
-            "bio": "Eight years in men's grooming. Theo works the whole range — a quiet executive side part, a sharp skin fade, a textured crop, and the beards that come with them. He's especially good if you're growing your hair out from a shorter cut and want the in-between months to actually look intentional. Walk-ins welcome for beard trims when the chair is free.",
+            "bio": "Mara trained with a curl specialist in Atlanta and carries that approach here — dry cutting, curl-by-curl shape work, and finishes that respect the texture instead of fighting it. ",
             "instagram": "https://instagram.com/",
             "email": "hello@example.com"
           }
         }
       },
-      "blocksOrder": ["stylist-rowan", "stylist-sloane", "stylist-mara", "stylist-theo"]
+      "blocksOrder": ["stylist-rowan", "stylist-sloane", "stylist-mara"]
     },
     "stylists_how_to_pick": {
-      "type": "icon-list",
+      "type": "icon-card-grid",
       "settings": {
         "eyebrow": "Not sure who to book with?",
         "eyebrow_uppercase": true,
@@ -99,6 +88,8 @@
         "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "center",
         "icon_style": "filled",
         "icon_size": "xl",
         "icon_shape": "sharp",
@@ -106,35 +97,39 @@
       },
       "blocks": {
         "pick-short": {
-          "type": "item",
+          "type": "card",
           "settings": {
             "icon": "razor",
             "title": "Short cuts & precision",
-            "description": "Book with Rowan"
+            "description": "<p>Book with Rowan.</p>",
+            "button_link": { "text": "", "href": "", "target": "_self" }
           }
         },
         "pick-color": {
-          "type": "item",
+          "type": "card",
           "settings": {
             "icon": "sparkles",
             "title": "Color, balayage, blonding",
-            "description": "Book with Sloane"
+            "description": "<p>Book with Sloane.</p>",
+            "button_link": { "text": "", "href": "", "target": "_self" }
           }
         },
         "pick-textured": {
-          "type": "item",
+          "type": "card",
           "settings": {
             "icon": "wand",
             "title": "Textured, curly, long hair",
-            "description": "Book with Mara"
+            "description": "<p>Book with Mara.</p>",
+            "button_link": { "text": "", "href": "", "target": "_self" }
           }
         },
         "pick-mens": {
-          "type": "item",
+          "type": "card",
           "settings": {
             "icon": "user",
             "title": "Men's cuts & fades",
-            "description": "Book with Theo"
+            "description": "<p>Book with Theo.</p>",
+            "button_link": { "text": "", "href": "", "target": "_self" }
           }
         }
       },
