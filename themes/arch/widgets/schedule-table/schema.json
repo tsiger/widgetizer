@@ -95,6 +95,13 @@
       "default": "1"
     },
     {
+      "type": "checkbox",
+      "id": "highlight_today",
+      "label": "tTheme:schedule_table.settings.highlight_today.label",
+      "description": "tTheme:schedule_table.settings.highlight_today.description",
+      "default": true
+    },
+    {
       "type": "header",
       "id": "widget_header",
       "label": "Widget"

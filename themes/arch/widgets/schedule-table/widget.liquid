@@ -166,25 +166,27 @@
     </div>
   </div>
 
-  <script>
-    (function() {
-      const widget = document.getElementById('{{ widget.id }}');
-      if (!widget || widget.dataset.initialized) return;
-      widget.dataset.initialized = 'true';
+  {% if widget.settings.highlight_today %}
+    <script>
+      (function() {
+        const widget = document.getElementById('{{ widget.id }}');
+        if (!widget || widget.dataset.initialized) return;
+        widget.dataset.initialized = 'true';
 
-      const weekStartDay = parseInt('{{ widget.settings.week_start_day }}', 10);
-      const jsDay = new Date().getDay();
+        const weekStartDay = parseInt('{{ widget.settings.week_start_day }}', 10);
+        const jsDay = new Date().getDay();
 
-      // Convert JS day (0=Sun, 1=Mon, ..., 6=Sat) to schedule index based on week start
-      const today = (jsDay - weekStartDay + 7) % 7;
+        // Convert JS day (0=Sun, 1=Mon, ..., 6=Sat) to schedule index based on week start
+        const today = (jsDay - weekStartDay + 7) % 7;
 
-      const scheduleRows = widget.querySelectorAll('.schedule-row');
-      scheduleRows.forEach(row => {
-        const dayIndex = parseInt(row.getAttribute('data-day-index'), 10);
-        if (dayIndex === today) {
-          row.classList.add('is-today');
-        }
-      });
-    })();
-  </script>
+        const scheduleRows = widget.querySelectorAll('.schedule-row');
+        scheduleRows.forEach(row => {
+          const dayIndex = parseInt(row.getAttribute('data-day-index'), 10);
+          if (dayIndex === today) {
+            row.classList.add('is-today');
+          }
+        });
+      })();
+    </script>
+  {% endif %}
 </section>

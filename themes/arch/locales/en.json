@@ -1649,6 +1649,10 @@
           "0": "Sunday",
           "1": "Monday"
         }
+      },
+      "highlight_today": {
+        "label": "Highlight current day",
+        "description": "Emphasize today's row with an accent border and bold text"
       }
     },
     "blocks": {
