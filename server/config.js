@@ -101,12 +101,3 @@ export function getMediaDir(projectFolderName, mimeType) {
   return getProjectImagesDir(projectFolderName);
 }
 
-// Log configuration on startup (useful for debugging)
-if (process.env.NODE_ENV !== "test") {
-  console.log("Server config initialized:");
-  console.log(`  APP_ROOT: ${APP_ROOT}`);
-  console.log(`  UNPACKED_ROOT: ${UNPACKED_ROOT}`);
-  console.log(`  DATA_DIR: ${DATA_DIR}`);
-  console.log(`  THEMES_SEED_DIR: ${THEMES_SEED_DIR}`);
-  console.log(`  CORE_WIDGETS_DIR: ${CORE_WIDGETS_DIR}`);
-}
