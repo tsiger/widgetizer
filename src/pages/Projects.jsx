@@ -44,7 +44,20 @@ export default function Projects() {
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [exportingProjectId, setExportingProjectId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuDirection, setMenuDirection] = useState("down");
   const menuRef = useRef(null);
+
+  const toggleMenu = (projectId, event) => {
+    if (openMenuId === projectId) {
+      setOpenMenuId(null);
+      return;
+    }
+    const rect = event.currentTarget.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const MENU_HEIGHT = 260;
+    setMenuDirection(spaceBelow < MENU_HEIGHT && rect.top > spaceBelow ? "up" : "down");
+    setOpenMenuId(projectId);
+  };
 
   const showToast = useToastStore((state) => state.showToast);
   const dismissToast = useToastStore((state) => state.dismissToast);
@@ -288,7 +301,7 @@ export default function Projects() {
                   <td className="py-3 px-4 text-right">
                     <div className="relative inline-flex items-center justify-end gap-1.5" ref={openMenuId === project.id ? menuRef : null}>
                       <IconButton
-                        onClick={() => setOpenMenuId(openMenuId === project.id ? null : project.id)}
+                        onClick={(e) => toggleMenu(project.id, e)}
                         variant="neutral"
                         size="sm"
                         className={`border transition-all ${
@@ -304,7 +317,11 @@ export default function Projects() {
                       </IconButton>
 
                       {openMenuId === project.id && (
-                        <div className="absolute right-0 top-full z-10 mt-1 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                        <div
+                          className={`absolute right-0 z-10 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg ${
+                            menuDirection === "up" ? "bottom-full mb-1" : "top-full mt-1"
+                          }`}
+                        >
                           <button
                             type="button"
                             onClick={() => {
