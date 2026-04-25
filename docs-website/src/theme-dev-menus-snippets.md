@@ -50,6 +50,14 @@ Use the menu snippet and pass class names for styling:
 
 If you need the menu data directly (for custom rendering), access it in widget templates via a `menu` setting type. See [Setting Types](theme-dev-setting-types.html) and [Widgets & Blocks](theme-dev-widgets-blocks.html).
 
+### Active Menu Items
+
+The core `menu.liquid` snippet automatically adds an `is-active` class to menu items whose link matches the current page slug (resolved via the global `pageSlug` variable — see [Theme Objects & Context](theme-dev-objects-context.html#global-variables-available-everywhere)). Hook into this class in your theme CSS to style the current page in navigation:
+
+```css
+.site-header__nav-link.is-active { color: var(--accent); }
+```
+
 # Snippets
 
 Snippets are reusable Liquid partials in `snippets/`.

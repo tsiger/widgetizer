@@ -260,6 +260,7 @@ Example schema:
     "default": "auto",
     "options": [
       { "value": "auto", "label": "tTheme:global.widgets.settings.top_spacing.options.auto" },
+      { "value": "small", "label": "tTheme:global.widgets.settings.top_spacing.options.small" },
       { "value": "none", "label": "tTheme:global.widgets.settings.top_spacing.options.none" }
     ]
   },
@@ -270,6 +271,7 @@ Example schema:
     "default": "auto",
     "options": [
       { "value": "auto", "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto" },
+      { "value": "small", "label": "tTheme:global.widgets.settings.bottom_spacing.options.small" },
       { "value": "none", "label": "tTheme:global.widgets.settings.bottom_spacing.options.none" }
     ]
   }
@@ -281,7 +283,7 @@ Example template:
 ```liquid
 <section
   id="{{ widget.id }}"
-  class="widget widget-testimonial widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
+  class="widget widget-testimonial widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing == 'small' %} spacing-top-small{% elsif widget.settings.top_spacing == 'none' %} spacing-top-none{% endif %}{% if widget.settings.bottom_spacing == 'small' %} spacing-bottom-small{% elsif widget.settings.bottom_spacing == 'none' %} spacing-bottom-none{% endif %}"
   {% unless widget.settings.color_scheme == 'standard' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="testimonial"
@@ -298,7 +300,7 @@ Example template:
 </section>
 ```
 
-The shared spacing rules target descendants (`.widget.spacing-top-none .widget-container`) rather than direct children, so they still work when a widget injects a `<style>` block before the container.
+The shared spacing rules target descendants (`.widget.spacing-top-none .widget-container`, `.widget.spacing-top-small .widget-container`) rather than direct children, so they still work when a widget injects a `<style>` block before the container. The same intermediate `small` and override `none` values exist for both top and bottom spacing.
 
 ## Rendering Blocks
 

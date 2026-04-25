@@ -16,11 +16,17 @@ You can upload multiple files at once. Widgetizer will process them in batches.
 
 ### Supported File Types
 
+**Images:**
+
 - JPEG/JPG
 - PNG
 - GIF
 - WebP
 - SVG
+
+**Documents:**
+
+- PDF — for use with the PDF Viewer widget and with `file`-type theme settings (downloads, brochures, menus, etc.)
 
 > **Note:** Audio and video file uploads are not supported. Use embed widgets (e.g. YouTube) for video and audio content.
 
@@ -185,7 +191,8 @@ When you upload a file, Widgetizer:
 
 ### Storage Location
 
-Files are stored in your project directory at `/data/projects/your-project/uploads/images/`.
+- Images live at `/data/projects/your-project/uploads/images/`
+- Document files (PDFs) live at `/data/projects/your-project/uploads/files/`
 
 Generated image sizes are stored with `-{size}` suffixes:
 
@@ -193,6 +200,8 @@ Generated image sizes are stored with `-{size}` suffixes:
 - `my-image-small.jpg`
 - `my-image-medium.jpg`
 - `my-image-large.jpg`
+
+PDFs are stored as-is without variants. During export, `/uploads/files/` paths are rewritten to `assets/files/` in the output.
 
 # Tips & Best Practices
 

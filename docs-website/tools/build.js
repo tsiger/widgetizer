@@ -84,6 +84,9 @@ function generateNav() {
   html += `  <a href="index.html" class="logo">\n`;
   html += `    <img src="${sitemap.logo}" alt="Widgetizer" />\n`;
   html += `  </a>\n`;
+  html += `  <a href="https://widgetizer.org" class="back-to-site">\n`;
+  html += `    <span aria-hidden="true">&larr;</span> Back to widgetizer.org\n`;
+  html += `  </a>\n`;
   html += '  <ul class="nav-list">\n';
 
   for (const item of sitemap.navigation) {

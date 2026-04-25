@@ -199,6 +199,33 @@ In Liquid templates, output directly (it's already HTML):
 }
 ```
 
+**`file`** — File asset selector for downloadable documents (currently PDF). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
+
+```json
+{
+  "id": "download_file",
+  "type": "file",
+  "label": "Download File"
+}
+```
+
+Features:
+
+- **Upload**: Direct file upload from the OS file picker (accepts PDF)
+- **Browse**: Opens the media selector drawer filtered to file assets
+- **Selected state**: Displays filename and extension badge with a clear button
+- **No metadata editing**: File assets do not have alt text or title metadata
+
+In Liquid, resolve the file path using the `filePath` context variable (set by the rendering service), which points to the correct base in both preview and publish:
+
+```liquid
+{% assign file_filename = block.settings.file | split: '/' | last %}
+{% assign file_url = filePath | append: '/' | append: file_filename %}
+<a href="{{ file_url }}" target="_blank" rel="noopener">Download</a>
+```
+
+The export pipeline rewrites `/uploads/files/` paths to `assets/files/` in exported HTML automatically.
+
 # UI-Specific Types
 
 **`font_picker`** — Font family + weight selector. This always outputs CSS variables for `-family` and `-weight`.

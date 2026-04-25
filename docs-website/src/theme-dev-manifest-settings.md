@@ -112,6 +112,7 @@ Theme settings use the same types as widgets. Common types include:
 - `header`
 - `text`
 - `textarea`
+- `richtext`
 - `code`
 - `color`
 - `checkbox`
@@ -120,7 +121,10 @@ Theme settings use the same types as widgets. Common types include:
 - `radio`
 - `font_picker`
 - `image`
+- `video`
+- `audio`
 - `youtube`
+- `file`
 - `menu`
 - `link`
 - `icon`

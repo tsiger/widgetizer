@@ -6,14 +6,111 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
-## Unreleased
+## 0.9.8 - Pending release
+
+### New Theme Presets
+
+29 new Arch presets, each with full template content, menus, and curated screenshots. Pick a preset on theme install to scaffold a complete site:
+
+- **Brewline** — Coffee shop / cafe
+- **Brightside** — Dental practice
+- **Clearpath** — Consulting / professional services
+- **Codebase** — Software agency / dev studio
+- **Corkwell** — Wine bar / restaurant
+- **Crumbly** — Bakery
+- **Everafter** — Wedding photographer / event services
+- **Framelight** — Photography portfolio
+- **Greenfield** — Landscaping / outdoor services
+- **Greystone** — Architecture / construction
+- **Hearthstone** — Boutique inn / hospitality
+- **Inkwell** — Tattoo studio
+- **Ironform** — Fitness / gym
+- **Keystoned** — Real estate / property
+- **Ledgerworks** — Accounting / financial services
+- **Little Oaks** — School / childcare
+- **Olympic** — Sports club
+- **Pawlish** — Pet grooming / vet
+- **Petalry** — Florist
+- **Pipeworks** — Trades / plumbing
+- **Pixelcraft** — Creative / digital agency
+- **Saffron** — Restaurant
+- **Shearline** — Barber / salon
+- **Sparkhaus** — Electrician / home services
+- **Stillpoint** — Yoga / wellness studio
+- **Tailside** — Pet services
+- **Torque** — Auto shop / mechanics
+- **Uplink** — SaaS / tech startup
+- **Velvet Touch** — Beauty / spa
+
+Plus a refreshed default **Arch** preset.
+
+### New Widgets
+
+- **PDF Viewer** — Embed a PDF document inline
+- **Class Schedule** — Weekly class / session timetable
+
+### Added
+
+- **Embed widget background & overlay** — Add a background image and overlay to embed widgets for richer hero/section embeds
+- **Footer Badges block** — Display certification, payment, and trust badges in the footer
+- **Footer copyright is now richtext** — Inline links and basic formatting in the footer copyright line
+- **Footer layout variations** — Multiple footer arrangements
+- **Per-widget spacing controls** — `top_spacing` / `bottom_spacing` per widget with intermediate values, plus shared `spacing-top-none` / `spacing-bottom-none` overrides
+- **Heading alignment** — New alignment setting available across widgets
+- **Two new color schemes** — `standard-accent` and `highlight-accent`, complementing the existing `standard` and `highlight`
+- **Eyebrow uppercase setting** — Toggle uppercase styling on widget eyebrows
+- **Active menu item styles** — Visual treatment for the current page in navigation
+- **Carousel arrows on hover** — Slider arrows reveal on hover for cleaner card layouts
+- **File input setting type** — A dedicated setting type for file uploads in theme schemas (documented in Setting Types)
+- **Project-specific theme locales** — Themes (and presets) can now ship locale data scoped per project, with locale resolution honoring preset overrides
+- **Markdown alternate output during export** — When `.md` generation is enabled, exports include Markdown alternates alongside HTML
+- **Site title in project export** — Exported project archives include site title metadata
+- **Theme update badge** — Surfaces theme update availability in the editor
+- **Debug state panel** — Development-only panel for inspecting frontend stores
 
 ### Changed
 
 - **Responsive image delivery refined** — `srcset` and export behavior now treat the `large` variant as the public delivery ceiling when it exists, while still falling back to the original when no `large` variant is available
-- **Export media handling clarified** — docs now reflect that exports copy only used media, skip `thumb` image variants, and flatten widget assets into a shared `assets/` folder
-- **Arch color schemes expanded** — widget docs now cover `standard-accent` and `highlight-accent` in addition to the existing `standard` and `highlight` options
-- **Per-widget spacing controls** — Arch widget documentation now covers the new `top_spacing` / `bottom_spacing` options and the shared `spacing-top-none` / `spacing-bottom-none` class behavior
+- **Image rendering overhaul** — Image rendering and responsive image sizes reworked across widgets; ImageInput component standardized for aspect ratio and styling
+- **Slideshow improvements** — Cleaner slideshow rendering and behavior
+- **Mobile menu rework** — Mobile menu and toggle button polished
+- **Lightbox mobile fix** — Lightbox now renders correctly on mobile
+- **Steps widget mobile alignment** — Fixed layout on small screens
+- **Timeline widget shapes** — Number markers now follow the theme `shapes` setting
+- **Scheduled Table** — Optional setting to disable highlighting of the current day
+- **Transparent header** — Improved behavior and presentation
+- **Map widget** — Polish and broader common-locale coverage
+- **Email setting** — Renders as an email link rather than a generic URL
+- **Color scheme renames** — Schemes renamed for consistency across themes
+- **Date/time formatting** — Default date/time format updated; formatting unified through a shared hook
+- **Project import flow** — Reworked import UI and flow for clearer step-by-step setup
+- **Media management** — Improved media selector drawer, media management UI, and uploads
+- **Widget settings panel** — Reorganized for better discoverability
+- **Widget drag-and-drop** — Refined drag/drop interactions
+- **Custom CSS / JS editor** — CodeInput overhaul with better syntax handling
+- **Themes & preview UI** — Polished themes page, preview button, and live preview reliability
+- **Toolbar & toasts** — Streamlined toolbar buttons; improved toast position and styling
+- **Item duplication & sorting** — Better behavior across Projects, Menus, and Pages
+- **Action sets streamlined** — Consistent action menus across Projects, Menus, and Pages
+- **Favicon & list UI polish**
+- **Project backup vs site export terminology** — Clearer naming across the UI
+- **Translations** — Consolidated translations and filled in missing keys; locale files cleaned up
+- **Live demo URLs** — Updated to reflect current hosted demos
+
+### Fixed
+
+- Lightbox mobile rendering issue
+- Steps widget alignment on mobile
+- Missing translation keys
+- Various minor widget and editor fixes
+
+### Documentation
+
+- **Color schemes** — Widget docs now cover `standard-accent` and `highlight-accent` alongside the existing `standard` and `highlight`
+- **Spacing controls** — Theme dev docs now cover `top_spacing` / `bottom_spacing` and the shared `spacing-top-none` / `spacing-bottom-none` class overrides
+- **Export** — Docs reflect usage-aware media copying, `thumb` exclusion, flattened widget assets, and Markdown alternate output
+- **File input type** — Setting Types docs now document the file input
+- **Themes** — Themes page lists the expanded preset library
 
 ## 0.9.7 - 2026-03-26
 

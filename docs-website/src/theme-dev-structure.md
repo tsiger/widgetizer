@@ -55,6 +55,17 @@ themes/my-theme/
 │   ├── en.json
 │   ├── fr.json
 │   └── ...
+├── presets/              # Optional preset variants (color schemes + demo content)
+│   ├── default/
+│   │   ├── preset.json
+│   │   ├── screenshot.png
+│   │   ├── menus/
+│   │   └── templates/
+│   └── alt-preset/
+│       ├── preset.json
+│       ├── screenshot.png
+│       ├── menus/
+│       └── templates/
 ├── updates/              # Version update folders (for distributing updates)
 │   ├── 1.1.0/
 │   │   ├── theme.json    # Required, version must match folder name
@@ -104,6 +115,10 @@ Menu and snippet structures are covered in [Menus & Snippets](theme-dev-menus-sn
 
 A folder containing translation JSON files for theme localization. Each file is named by language code (e.g., `en.json`, `fr.json`). When present, labels in `theme.json` and widget schemas can use translation keys instead of hardcoded strings. See [Theme Manifest & Settings](theme-dev-manifest-settings.html#theme-localization-i18n) for details.
 
+**`presets/`** (optional)
+
+A folder containing preset variants of the theme. Each subfolder is one preset and contains its own `preset.json` (manifest with name, description, and overridden theme settings), `screenshot.png` (preview shown during project creation), and optionally `menus/` and `templates/` to ship preset-specific demo content. Presets are picked at project creation time — see [Themes](themes.html#theme-presets) for the user flow.
+
 # What Widgetizer Loads
 
 When a theme is selected for a project, the system loads:
@@ -116,6 +131,7 @@ When a theme is selected for a project, the system loads:
 - `menus/` for navigation menus
 - `snippets/` for reusable Liquid partials
 - `locales/` for translation strings (when present)
+- `presets/*/preset.json` for preset variants (when present)
 
 # Arch Theme Example
 

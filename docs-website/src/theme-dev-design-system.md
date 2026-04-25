@@ -48,9 +48,20 @@ Tokens often map to theme settings:
 Widgets switch between schemes using:
 
 - `color-scheme-standard`
+- `color-scheme-standard-accent`
 - `color-scheme-highlight`
+- `color-scheme-highlight-accent`
 
-These classes update semantic variables such as `--text-content`, `--bg-primary`, and `--accent`.
+These classes update semantic variables such as `--text-content`, `--bg-primary`, and `--accent`. The `*-accent` variants apply the accent palette on top of the base scheme — useful for breaking up long pages with alternating section emphasis.
+
+# Spacing Overrides
+
+In addition to the per-widget `top_spacing` / `bottom_spacing` setting (see [Widgets & Blocks](theme-dev-widgets-blocks.html)), the design system ships with shared override classes that target `.widget-container`:
+
+- `spacing-top-none` / `spacing-bottom-none` — collapse the spacing entirely
+- `spacing-top-small` / `spacing-bottom-small` — reduce to a tighter intermediate value
+
+These are descendant selectors (`.widget.spacing-top-none .widget-container`), so they keep working when a widget injects a `<style>` block before the container.
 
 # Typography Utilities
 
