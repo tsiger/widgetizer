@@ -32,6 +32,36 @@ async function ensureDirectories() {
 }
 
 /**
+ * Resolve a desired project name and folder against existing projects, returning
+ * collision-free values. Used by both create and import to share identical
+ * disambiguation behavior:
+ *   - If the name doesn't collide (case-insensitive), it's kept as-is.
+ *   - Otherwise we append "(Copy)" / "(Copy N)" using the same scheme as duplicate.
+ *   - The folder is always passed through generateUniqueSlug, which sanitizes
+ *     the input and appends -1, -2, ... until both the DB and filesystem are clear.
+ *
+ * @param {string} desiredName - The user-typed or imported project name
+ * @param {string} [desiredFolder] - Optional folder slug; if absent, derived from name
+ * @returns {Promise<{ name: string, folder: string }>}
+ */
+async function resolveProjectIdentity(desiredName, desiredFolder) {
+  const existingNames = projectRepo.getAllProjects().map((p) => p.name);
+  const collides = existingNames.some((existing) => existing.toLowerCase() === desiredName.toLowerCase());
+  const resolvedName = collides
+    ? generateCopyName(desiredName, existingNames, { caseInsensitive: true })
+    : desiredName;
+
+  const folderSeed = desiredFolder && desiredFolder.trim() ? desiredFolder : resolvedName;
+  const resolvedFolder = await generateUniqueSlug(
+    folderSeed,
+    async (slug) => projectRepo.projectFolderExists(slug, null) || (await fs.pathExists(getProjectDir(slug))),
+    { fallback: "project" },
+  );
+
+  return { name: resolvedName, folder: resolvedFolder };
+}
+
+/**
  * Retrieves all projects with enriched metadata including theme update status.
  * @param {import('express').Request} _ - Express request object (unused)
  * @param {import('express').Response} res - Express response object
@@ -130,32 +160,20 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
-    // Check for duplicate project names
-    if (projectRepo.projectNameExists(name.trim(), null)) {
-      return res
-        .status(400)
-        .json({ error: `A project named "${name}" already exists. Please choose a different name.` });
-    }
-
-    // Use provided folderName or generate one from name
-    let folderName;
+    // If a folder name is explicitly provided, validate its format. Collisions on
+    // either name or folder are no longer hard errors — resolveProjectIdentity
+    // disambiguates them with suffixes, matching the import flow.
     if (providedFolderName && providedFolderName.trim()) {
-      folderName = providedFolderName.trim();
-      // Validate folderName format
       const folderNamePattern = /^[a-z0-9-]+$/;
-      if (!folderNamePattern.test(folderName)) {
+      if (!folderNamePattern.test(providedFolderName.trim())) {
         return res.status(400).json({ error: "Folder Name can only contain lowercase letters, numbers, and hyphens" });
       }
-      // Check for duplicate folderNames
-      if (projectRepo.projectFolderExists(folderName, null)) {
-        return res.status(400).json({
-          error: `A project with folder name "${folderName}" already exists. Please choose a different folder name.`,
-        });
-      }
-    } else {
-      // Generate folderName from name if not provided
-      folderName = await generateUniqueSlug(name, (slug) => projectRepo.projectFolderExists(slug, null), { fallback: "project" });
     }
+
+    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(
+      name.trim(),
+      providedFolderName,
+    );
 
     // Use the permanent folderName for directory creation
     const projectDir = getProjectDir(folderName);
@@ -196,7 +214,7 @@ export async function createProject(req, res) {
     const newProject = {
       id: randomUUID(), // ✅ Generate stable UUID
       folderName, // Folder identifier
-      name,
+      name: resolvedName,
       description,
       siteTitle: siteTitle && siteTitle.trim() !== "" ? stripHtmlTags(siteTitle.trim()) : "",
       theme,
@@ -908,12 +926,10 @@ export async function importProject(req, res) {
       });
     }
 
-    // Generate unique folderName (checking both DB metadata and filesystem)
-    const folderName = await generateUniqueSlug(
-      manifest.project.name,
-      async (slug) => projectRepo.projectFolderExists(slug, null) || await fs.pathExists(getProjectDir(slug)),
-      { fallback: "project" },
-    );
+    // Resolve a unique name + folder pair using the same scheme as createProject.
+    // If a project with the same name already exists, the imported one becomes
+    // "X (Copy)" / "X (Copy N)" so the project switcher stays unambiguous.
+    const { name: resolvedName, folder: folderName } = await resolveProjectIdentity(manifest.project.name);
     const projectDir = getProjectDir(folderName);
 
     // Create temporary extraction directory
@@ -950,7 +966,7 @@ export async function importProject(req, res) {
       newProject = {
         id: randomUUID(),
         folderName,
-        name: manifest.project.name,
+        name: resolvedName,
         description: manifest.project.description || "",
         siteTitle: manifest.project.siteTitle || "",
         theme: manifest.project.theme,

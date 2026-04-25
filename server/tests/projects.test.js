@@ -585,24 +585,36 @@ describe("createProject", () => {
     assert.notEqual(second.wasSetAsActive, true);
   });
 
-  it("rejects duplicate project names (case-insensitive)", async () => {
+  it("auto-suffixes duplicate project names (case-insensitive)", async () => {
     await createTestProject("Unique Name");
 
     const res = await callController(createProject, {
       body: { name: "unique name", description: "", theme: TEST_THEME_ID },
     });
-    assert.equal(res._status, 400);
-    assert.match(res._json.error, /already exists/i);
+    assert.equal(res._status, 201);
+    assert.equal(res._json.name, "unique name (Copy)");
+    // Folder is derived from the resolved name when none is provided, so it
+    // mirrors the "(Copy)" suffix in slug form rather than a numeric suffix.
+    assert.equal(res._json.folderName, "unique-name-copy");
   });
 
-  it("rejects duplicate folderNames", async () => {
+  it("increments copy number on repeated name collisions", async () => {
+    await createTestProject("Acme Site");
+    const second = await createTestProject("Acme Site");
+    assert.equal(second.name, "Acme Site (Copy)");
+    const third = await createTestProject("Acme Site");
+    assert.equal(third.name, "Acme Site (Copy 2)");
+  });
+
+  it("auto-suffixes duplicate folderNames", async () => {
     await createTestProject("Project A", { folderName: "my-folder" });
 
     const res = await callController(createProject, {
       body: { name: "Project B", description: "", theme: TEST_THEME_ID, folderName: "my-folder" },
     });
-    assert.equal(res._status, 400);
-    assert.match(res._json.error, /folder name.*already exists/i);
+    assert.equal(res._status, 201);
+    assert.equal(res._json.name, "Project B");
+    assert.equal(res._json.folderName, "my-folder-1");
   });
 
   it("rejects invalid folderName characters", async () => {
@@ -1469,6 +1481,35 @@ describe("importProject", () => {
     assert.equal(data.projects[0].name, "Imported Project");
   });
 
+  it("auto-suffixes name and folder when importing collides with an existing project", async () => {
+    await createTestProject("Imported Project");
+
+    const zipFile = buildImportZip(baseManifest, {
+      "theme.json": { name: "Test Theme", version: "1.0.0" },
+      "pages/index.json": { name: "Home", slug: "index", widgets: {} },
+    });
+
+    const res = await callController(importProject, { file: zipFile });
+
+    assert.equal(res._status, 201);
+    assert.equal(res._json.name, "Imported Project (Copy)");
+    assert.equal(res._json.folderName, "imported-project-copy");
+  });
+
+  it("increments copy number when name already has (Copy) variants", async () => {
+    await createTestProject("Imported Project");
+    await createTestProject("Imported Project (Copy)");
+
+    const zipFile = buildImportZip(baseManifest, {
+      "theme.json": { name: "Test Theme", version: "1.0.0" },
+    });
+
+    const res = await callController(importProject, { file: zipFile });
+
+    assert.equal(res._status, 201);
+    assert.equal(res._json.name, "Imported Project (Copy 2)");
+  });
+
   it("preserves receiveThemeUpdates and preset from manifest", async () => {
     const manifest = {
       ...baseManifest,
@@ -1764,8 +1805,9 @@ describe("exportProject -> importProject round-trip", () => {
     });
     assert.equal(importRes._status, 201);
 
-    // Verify metadata is preserved
-    assert.equal(importRes._json.name, "Round Trip");
+    // Verify metadata is preserved (name gets a (Copy) suffix because the
+    // original is still in the DB; the resolver ensures unambiguous identity).
+    assert.equal(importRes._json.name, "Round Trip (Copy)");
     assert.equal(importRes._json.theme, TEST_THEME_ID);
     assert.equal(importRes._json.receiveThemeUpdates, true);
 
