@@ -238,6 +238,15 @@
         "labels_header": {
           "label": "Labels"
         },
+        "cards_header": {
+          "label": "Cards"
+        },
+        "icon_header": {
+          "label": "Icon"
+        },
+        "appearance_header": {
+          "label": "Appearance"
+        },
         "eyebrow": {
           "label": "Eyebrow text"
         },

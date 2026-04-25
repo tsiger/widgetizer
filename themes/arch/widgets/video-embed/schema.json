@@ -94,8 +94,8 @@
     },
     {
       "type": "header",
-      "id": "widget_header",
-      "label": "Widget"
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
     },
     {
       "type": "select",

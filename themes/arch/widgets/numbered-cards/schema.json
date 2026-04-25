@@ -79,7 +79,7 @@
     {
       "type": "header",
       "id": "cards_header",
-      "label": "Cards"
+      "label": "tTheme:global.widgets.settings.cards_header.label"
     },
     {
       "type": "select",
@@ -115,8 +115,8 @@
     },
     {
       "type": "header",
-      "id": "widget_header",
-      "label": "Widget"
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
     },
     {
       "type": "select",
