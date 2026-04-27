@@ -39,6 +39,17 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
+**`number`** — Single-line input restricted to numeric values.
+
+```json
+{
+  "id": "items_per_row",
+  "type": "number",
+  "label": "Items Per Row",
+  "default": 3
+}
+```
+
 **`textarea`** — Multi-line input for longer text.
 
 ```json
@@ -166,26 +177,6 @@ In Liquid templates, output directly (it's already HTML):
   "id": "hero_image",
   "type": "image",
   "label": "Hero Image"
-}
-```
-
-**`video`** — Video picker for MP4 format.
-
-```json
-{
-  "id": "background_video",
-  "type": "video",
-  "label": "Background Video"
-}
-```
-
-**`audio`** — Audio file picker (MP3 recommended).
-
-```json
-{
-  "id": "background_music",
-  "type": "audio",
-  "label": "Background Music"
 }
 ```
 

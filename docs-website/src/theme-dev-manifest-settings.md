@@ -111,6 +111,7 @@ Theme settings use the same types as widgets. Common types include:
 
 - `header`
 - `text`
+- `number`
 - `textarea`
 - `richtext`
 - `code`
@@ -121,8 +122,6 @@ Theme settings use the same types as widgets. Common types include:
 - `radio`
 - `font_picker`
 - `image`
-- `video`
-- `audio`
 - `youtube`
 - `file`
 - `menu`
@@ -263,7 +262,7 @@ Widget `displayName` and setting `label` fields support the same `tTheme:` prefi
 
 ### Supported Languages
 
-Widgetizer's admin interface supports English, French, German, Greek, Italian, and Spanish. Your theme can provide locale files for any of these languages. The active locale matches the user's language setting in [App Settings](settings.html).
+Widgetizer's admin interface currently ships with English; additional languages will be added in future releases. Your theme can provide a locale file for any language code you intend to support — the active locale matches the user's language setting in [App Settings](settings.html), and locale files for languages that aren't yet selectable in the UI sit dormant until they are.
 
 # Practical Guidance
 

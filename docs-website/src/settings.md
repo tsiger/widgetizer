@@ -13,13 +13,8 @@ Sets the language for the Widgetizer admin interface. This affects all menus, bu
 **Available languages:**
 
 - English
-- French
-- German
-- Greek
-- Italian
-- Spanish
 
-Changing the language takes effect immediately after saving. You don't need to restart the application.
+Additional languages will be added in future releases. Changing the language takes effect immediately after saving — you don't need to restart the application.
 
 ### Date Format
 

@@ -149,10 +149,11 @@ The default theme lives in `themes/arch/` and includes all required components p
 
 # Theme Copying in Projects
 
-When a new project is created, the selected theme is copied into the project’s data directory so it can be customized per project without modifying the original theme:
+When a new project is created, the selected theme is copied into the project's data directory so it can be customized per project without modifying the original theme:
 
 - Destination: `data/projects/<folderName>/`
-- Copied items: `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`
+- Copied items: every theme file (`theme.json`, `layout.liquid`, `widgets/`, `assets/`, `snippets/`, `menus/`, `locales/`, `screenshot.png`, …) **except** `updates/`, `latest/`, and `presets/`
+- `templates/` are resolved separately: from the chosen preset's `templates/` folder if a preset is selected, otherwise from the theme's root `templates/`
 
 This ensures each project has its own theme files and can evolve independently.
 
@@ -238,14 +239,16 @@ To distribute your theme with updates:
 
 When users apply your theme update to their projects:
 
-| Path            | Behavior                                |
-| --------------- | --------------------------------------- |
-| `layout.liquid` | Replaced                                |
-| `widgets/`      | Replaced                                |
-| `assets/`       | Replaced                                |
-| `snippets/`     | Replaced                                |
-| `theme.json`    | Settings merged (user values preserved) |
-| `menus/`        | New menus added, existing preserved     |
-| `templates/`    | New templates added, existing preserved |
+| Path              | Behavior                                |
+| ----------------- | --------------------------------------- |
+| `layout.liquid`   | Replaced                                |
+| `widgets/`        | Replaced                                |
+| `assets/`         | Replaced                                |
+| `snippets/`       | Replaced                                |
+| `locales/`        | Replaced                                |
+| `screenshot.png`  | Replaced                                |
+| `theme.json`      | Settings merged (user values preserved) |
+| `menus/`          | New menus added, existing preserved     |
+| `templates/`      | New templates added, existing preserved |
 
 User content (`pages/`, `uploads/`) is never modified.

@@ -61,7 +61,7 @@ When a theme author releases an update:
 
 1. **Notification**: The sidebar shows a badge indicating themes have updates available
 2. **Theme Page**: Visit the Themes page to see which themes have updates
-3. **Build Update**: Click "Update" on a theme to build the latest version
+3. **Update**: Click **"Update"** on a theme card to install the latest version
 4. **Apply to Projects**: Projects using that theme will show an update indicator
 
 ### Applying Updates to Your Projects
@@ -81,6 +81,8 @@ Theme updates can include:
 - **Widgets** - Entire widget folder replaced with new versions
 - **Assets** (CSS, JS) - Replaced with new versions
 - **Snippets** - Replaced with new versions
+- **Locales** (translation JSON files) - Replaced with new versions
+- **Theme screenshot** - Replaced with new version
 - **Theme settings schema** - New settings are added, your existing values are preserved
 
 ### What's Protected (Never Changed)
@@ -88,7 +90,7 @@ Theme updates can include:
 Your content is always safe:
 
 - **Pages** - Your page content is never modified
-- **Media** - Your uploaded images and videos are preserved
+- **Media** - Your uploaded images and PDFs are preserved
 - **Menus** - Existing menus are kept (new menus may be added)
 - **Templates** - Existing page templates are kept (new templates may be added)
 

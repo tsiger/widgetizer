@@ -104,7 +104,7 @@ To change a menu's name or description:
 
 Want to create a similar menu? Click the **copy icon** to duplicate a menu. This creates an exact copy with all menu items and nested structure.
 
-The duplicate will be named "Copy of [Original Name]".
+The duplicate will be named "[Original Name] (Copy)" — and "(Copy 2)", "(Copy 3)", etc. if a copy already exists.
 
 ### Deleting a Menu
 

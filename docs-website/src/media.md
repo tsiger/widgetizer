@@ -162,10 +162,10 @@ Widgetizer automatically tracks where your media files are being used. This help
 
 ### Usage Badges
 
-In Grid View, files display badges showing how many pages use them:
+Files in both grid and list view display a badge when they're in use:
 
 - No badge: File isn't being used anywhere
-- Badge with number: File is used in that many pages
+- "Used in N place(s)" badge: hover the badge to see exactly which pages or global widgets reference it
 
 ### Refreshing Usage
 

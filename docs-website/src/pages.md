@@ -14,7 +14,7 @@ Pages are the individual sections of your website. Each page can have its own co
 
 #### Title
 
-The title shown in the browser tab and search results. If left empty, your page name will be used.
+The title shown in the browser tab and search results. This field is required.
 
 #### Filename
 
@@ -70,14 +70,16 @@ The preferred URL for this page if it exists elsewhere. This tells search engine
 
 #### Search Engine Indexing
 
-Controls whether search engines can find and index this page.
+Controls whether search engines can find and index this page, and whether they follow its links.
 
 **Options:**
 
 - **Index and Follow (Default)**: Search engines can index this page and follow its links
-- **No Index**: Search engines should not include this page in search results (useful for thank you pages, private content, etc.)
+- **Don't Index, but Follow Links**: The page won't appear in search results, but link equity still flows through it
+- **Index, but Don't Follow Links**: The page can appear in search results, but search engines won't follow its links
+- **Don't Index or Follow Links**: Useful for thank you pages, private content, etc.
 
-> When you [export your site](export.html) with a Site URL set, pages marked as "No Index" will automatically be added to your `robots.txt` file's disallow rules.
+> When you [export your site](export.html) with a Site URL set, any page whose option starts with "Don't Index" is automatically added to your `robots.txt` file's disallow rules and excluded from `sitemap.xml`.
 
 # Editing a Page
 
@@ -147,6 +149,6 @@ Always create a page with the filename `index` or `home` to serve as your homepa
 
 ### Search Engine Control
 
-- Use "No Index" for pages you don't want in search results (thank you pages, member-only pages, etc.)
+- Pick one of the "Don't Index" options for pages you don't want in search results (thank you pages, member-only pages, etc.)
 - Set canonical URLs when you have duplicate or similar content
-- Remember that pages marked "No Index" are automatically added to robots.txt when you [export](export.html)
+- "Don't Index" pages are automatically added to `robots.txt` and excluded from `sitemap.xml` when you [export](export.html)

@@ -6,7 +6,7 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
-## 0.9.8 - Pending release
+## 0.9.8 - 2026-04-26
 
 ### New Theme Presets
 

@@ -1,5 +1,5 @@
 ---
-description: Widgetizer is a visual website builder for creating high-performance static websites. No database, no complexity — just simple, portable files.
+description: Widgetizer is a visual website builder for creating high-performance static websites. Your content lives in human-readable files, and the published site is pure static HTML.
 ---
 
 Widgetizer is a powerful, yet simple, visual website builder designed to create high-performance static websites. It is specifically built for creating small websites, providing the tools to bring your vision to life without the complexity of traditional web development.
@@ -8,13 +8,13 @@ Widgetizer is a powerful, yet simple, visual website builder designed to create 
 
 Widgetizer is built on two fundamental principles: **simplicity** and **portability**.
 
-### 1. File-Based Architecture
+### 1. File-Based Content
 
-Unlike most website builders, Widgetizer has **no database**. Everything—from your page content and media to your site settings—is stored in simple, human-readable files. This makes the system incredibly fast, easy to back up, and resistant to common database-related security issues.
+Your page content, global widgets (header/footer), menus, theme files, and uploaded media all live as plain files inside your project folder. Page content is stored as readable JSON, themes are normal Liquid templates, and uploads are the original binaries you put in. A small local SQLite database (`data/widgetizer.db`) tracks editor metadata such as the project list, media metadata and usage, app settings, and export history — but the content itself is always on disk.
 
-### 2. Privacy & Portability
+### 2. Privacy & Static Output
 
-Because your site is just a collection of files, you own your data. You can easily move your entire project between folders, zip it up for backup, or share it with others. There's no "vendor lock-in."
+You own your data: it stays on your machine, in files you can read. When you publish, Widgetizer exports your project to a folder of static HTML, CSS, JS, and assets — no database, no server-side processing, no vendor lock-in. Drop the export onto any static host and you're live.
 
 # Key Concepts
 
@@ -55,6 +55,6 @@ Working with Widgetizer follows a simple, three-step journey:
 # Why Widgetizer?
 
 - **Speed**: Static sites are naturally faster than dynamic ones.
-- **Security**: Without a database or server-side processing on the final site, there are fewer "moving parts" for hackers to target.
+- **Security**: The exported site has no database or server-side processing, so there are fewer "moving parts" for hackers to target.
 - **Simplicity**: Focus on content and design without worrying about technical stacks or server maintenance.
-- **Control**: Your data stays in your files, exactly where it belongs.
+- **Control**: Your data stays on your machine, in files you can read.

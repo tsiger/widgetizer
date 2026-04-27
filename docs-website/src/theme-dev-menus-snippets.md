@@ -39,7 +39,8 @@ Use the menu snippet and pass class names for styling:
 ```liquid
 {% render 'menu',
   menu: widget.settings.headerNavigation,
-  class_menu: 'site-header__nav',
+  aria_label: 'Primary',
+  class_nav: 'site-header__nav',
   class_list: 'site-header__nav-list',
   class_item: 'site-header__nav-item',
   class_link: 'site-header__nav-link',
@@ -47,6 +48,18 @@ Use the menu snippet and pass class names for styling:
   class_has_submenu: 'site-header__nav-item--has-submenu'
 %}
 ```
+
+**Available parameters:**
+
+- `menu` — Menu object with an `items` array (required)
+- `aria_label` — Accessible label for the `<nav>` element (e.g., "Primary", "Footer")
+- `skip_nav` — Set to `true` if your widget already wraps the menu in its own `<nav>`
+- `class_nav` — Classes for the `<nav>` element (when not skipped)
+- `class_list` — Classes for `<ul>` elements
+- `class_item` — Classes for `<li>` elements
+- `class_link` — Classes for `<a>` elements
+- `class_submenu` — Classes for nested `<ul>` elements
+- `class_has_submenu` — Extra class for `<li>` items that contain a submenu
 
 If you need the menu data directly (for custom rendering), access it in widget templates via a `menu` setting type. See [Setting Types](theme-dev-setting-types.html) and [Widgets & Blocks](theme-dev-widgets-blocks.html).
 
