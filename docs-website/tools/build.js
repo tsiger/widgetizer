@@ -233,4 +233,36 @@ for (const item of sitemap.navigation) {
   }
 }
 
+// Generate sitemap.xml
+const SITE_URL = "https://docs.widgetizer.org";
+const lastmod = new Date().toISOString().split("T")[0];
+const urls = sitemap.navigation
+  .filter((item) => item.type === "page")
+  .map((item) => {
+    const slug = item.path.replace(".md", ".html");
+    const loc = item.path === "index.md" ? `${SITE_URL}/` : `${SITE_URL}/${slug}`;
+    const priority = item.path === "index.md" ? "1.0" : "0.8";
+    return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+  })
+  .join("\n");
+
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>
+`;
+
+await fs.writeFile(path.join(DIST_DIR, "sitemap.xml"), sitemapXml);
+console.log("✓ Generated sitemap.xml");
+
+// Generate robots.txt
+const robotsTxt = `User-agent: *
+Allow: /
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+
+await fs.writeFile(path.join(DIST_DIR, "robots.txt"), robotsTxt);
+console.log("✓ Generated robots.txt");
+
 console.log("\n✨ Documentation site built successfully!\n");
