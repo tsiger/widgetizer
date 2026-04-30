@@ -7,9 +7,15 @@
 
 <p align="center"><a href="LICENSE"><img src="https://img.shields.io/github/license/tsiger/widgetizer" alt="GitHub License"></a> <a href="https://github.com/tsiger/widgetizer/releases"><img src="https://img.shields.io/github/v/release/tsiger/widgetizer" alt="GitHub Release"></a></p>
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=pNMlz3Q1nVA">
+    <img src="https://img.youtube.com/vi/pNMlz3Q1nVA/maxresdefault.jpg" alt="Widgetizer Demo Video" width="800">
+  </a>
+</p>
+
 ## ✨ Features
 
-- **Visual Page Builder** - Build pages fast with drag-and-drop widgets, blocks, and live preview
+- **Visual Website Builder** - [Build websites](https://widgetizer.org) fast with drag-and-drop widgets, blocks, and live preview
 - **Theme Presets** - Start from a blank slate or polished presets, then fine-tune colors, typography, layouts, and global styles
 - **Hybrid Storage** - SQLite keeps project metadata reliable while pages, menus, themes, and uploads stay portable on disk
 - **Media Pipeline** - Upload once, get optimized image variants, metadata editing, and usage tracking built in
