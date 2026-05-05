@@ -256,6 +256,7 @@ export default function Projects() {
             emptyMessage={t("projects.noProjects")}
             renderRow={(project) => {
               const isCurrentProject = activeProject && project.id === activeProject.id;
+              const showActiveBadge = isCurrentProject && sortedProjects.length > 1;
               const themeLabel = project.themeName || project.theme || "Unknown";
               const isExporting = exportingProjectId === project.id;
               const menuButtonClass = "flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors";
@@ -272,7 +273,7 @@ export default function Projects() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="block min-w-0 truncate font-semibold">{project.name}</span>
-                          {isCurrentProject && (
+                          {showActiveBadge && (
                             <Badge
                               variant="success"
                               className="inline-flex shrink-0 whitespace-nowrap px-3 py-0.5 text-[11px] font-semibold"
