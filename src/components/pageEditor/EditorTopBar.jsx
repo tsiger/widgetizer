@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2 } from "lucide-react";
+import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAllPages } from "../../queries/pageManager";
@@ -144,6 +144,11 @@ export default function EditorTopBar({
   }, [pageId]);
 
   const hasMultiplePages = pages.length > 1;
+  
+  const handleNewPage = () => {
+    navigate("/pages/add");
+    setIsDropdownOpen(false);
+  };
 
   return (
     <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
@@ -195,6 +200,11 @@ export default function EditorTopBar({
                   )}
                 </button>
               ))}
+              <button
+              onClick={handleNewPage} 
+              className="w-full px-4 py-2 text-left flex items-center gap-2 border-t border-slate-100 text-slate-800 hover:bg-slate-100">
+                <CirclePlus size={16} /> {t("pages.newPage")}
+              </button>
             </div>
           )}
         </div>
