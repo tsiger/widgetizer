@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, Check } from "lucide-react";
 import { apiFetch } from "../../lib/apiFetch";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import Button from "../ui/Button";
@@ -60,6 +60,35 @@ export default function ProjectForm({
   useEffect(() => {
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
+
+  // Detect whether the sticky action bar is currently covering scrollable content.
+  // The sentinel sits right after the bar in the DOM, so it is only visible when
+  // the form is fully scrolled to the bottom (or short enough not to need scrolling).
+  // We must observe against the actual scrolling ancestor (not the viewport), since
+  // the page is laid out inside an inner overflow-y-auto container.
+  const stickyBarSentinelRef = useRef(null);
+  const [isStickyBarStuck, setIsStickyBarStuck] = useState(false);
+  useEffect(() => {
+    const sentinel = stickyBarSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === "undefined") return;
+    const findScrollParent = (node) => {
+      let current = node?.parentElement || null;
+      while (current && current !== document.body) {
+        const { overflowY } = window.getComputedStyle(current);
+        if ((overflowY === "auto" || overflowY === "scroll") && current.scrollHeight > current.clientHeight) {
+          return current;
+        }
+        current = current.parentElement;
+      }
+      return null;
+    };
+    const observer = new IntersectionObserver(([entry]) => setIsStickyBarStuck(!entry.isIntersecting), {
+      root: findScrollParent(sentinel),
+      threshold: 1,
+    });
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [presets, themes, presetsLoading]);
 
   // Track previous initialData to prevent infinite loops
   const prevInitialDataRef = useRef(JSON.stringify(initialData));
@@ -253,10 +282,10 @@ export default function ProjectForm({
                         setSelectedPreset(nextPresetId);
                         setValue("preset", nextPresetId || "", { shouldDirty: true });
                       }}
-                      className={`relative w-full rounded-lg border-2 overflow-hidden text-left transition-all ${
+                      className={`group relative w-full rounded-lg overflow-hidden text-left transition-all ${
                         selectedPreset === preset.id
-                          ? "border-pink-500 ring-2 ring-pink-500/20"
-                          : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                          ? "border-[3px] border-pink-500 ring-2 ring-pink-500/20"
+                          : "border-2 border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-400"
                       }`}
                     >
                       <img
@@ -264,11 +293,23 @@ export default function ProjectForm({
                         alt={preset.name}
                         className="w-full aspect-square object-cover"
                       />
+                      {selectedPreset === preset.id ? (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center shadow">
+                          <Check size={14} className="text-white" />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors pointer-events-none" />
+                          <span className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-semibold bg-black/50 px-2.5 py-1 rounded pointer-events-none">
+                            Select
+                          </span>
+                        </>
+                      )}
                     </button>
-                    <p className="mt-2 text-center text-base font-medium leading-tight">{preset.name}</p>
                     {preset.description && (
-                      <p className="text-center text-xs text-slate-500">{preset.description}</p>
+                      <p className="mt-2 text-center text-sm font-semibold leading-tight">{preset.description}</p>
                     )}
+                    <p className={`text-center text-xs text-slate-500 ${preset.description ? "" : "mt-2"}`}>{preset.name}</p>
                     {preset.liveDemo && (
                       <a
                         href={preset.liveDemo}
@@ -407,7 +448,13 @@ export default function ProjectForm({
         </div>
       </div>
 
-      <div className="sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t border-slate-200 bg-white px-4 py-4 rounded-b-md z-10">
+      <div
+        className={`sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t bg-white px-4 py-4 rounded-b-md z-10 transition-shadow duration-200 ${
+          isStickyBarStuck
+            ? "border-slate-200 shadow-[0_-12px_24px_-4px_rgba(15,23,42,0.18)] after:content-[''] after:absolute after:left-0 after:right-0 after:top-full after:h-10 after:bg-white"
+            : "border-transparent"
+        }`}
+      >
         {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}
@@ -418,6 +465,7 @@ export default function ProjectForm({
           {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
         </Button>
       </div>
+      <div ref={stickyBarSentinelRef} aria-hidden="true" className="h-px" />
     </form>
   );
 }
