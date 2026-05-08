@@ -244,9 +244,10 @@
     },
     "actions": {
       "currentActive": "Current project",
-      "setActive": "Open project",
+      "openProject": "Open project",
       "edit": "Edit project",
       "editDetails": "Project details",
+      "setActive": "Set to active",
       "duplicate": "Duplicate project",
       "export": "Download backup",
       "delete": "Delete project",

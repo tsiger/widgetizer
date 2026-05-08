@@ -10,6 +10,7 @@ import {
   Download,
   ArrowUpCircle,
   MoreVertical,
+  Check,
 } from "lucide-react";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -26,7 +27,7 @@ import {
   getAllProjects,
   deleteProject,
   duplicateProject,
-  setActiveProject as activateProject,
+  setActiveProject,
   exportProject,
 } from "../queries/projectManager";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
@@ -137,17 +138,21 @@ export default function Projects() {
     });
   };
 
+  const activateProject = async (project, { showToast: showSuccessToast = true } = {}) => {
+    if (activeProject?.id === project.id) {
+      return;
+    }
+    await setActiveProject(project.id);
+    await fetchActiveProject();
+    await loadProjects();
+    if (showSuccessToast) {
+      showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
+    }
+  };
+
   const openProjectWorkspace = async (project, { showActivationToast = true } = {}) => {
     try {
-      if (!activeProject || activeProject.id !== project.id) {
-        await activateProject(project.id);
-        await fetchActiveProject();
-        await loadProjects();
-        if (showActivationToast) {
-          showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
-        }
-      }
-
+      await activateProject(project, { showToast: showActivationToast });
       navigate(workspaceDestination);
     } catch (error) {
       console.error("Failed to open project:", error);
@@ -332,7 +337,7 @@ export default function Projects() {
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
                             <FolderOpen size={14} />
-                            {t("projects.actions.setActive")}
+                            {t("projects.actions.openProject")}
                           </button>
                           <div className="my-1 border-t border-slate-200" />
                           <Link
@@ -354,6 +359,21 @@ export default function Projects() {
                             <Copy size={14} />
                             {t("projects.actions.duplicate")}
                           </button>
+                          {!isCurrentProject && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  activateProject(project);
+                                }}
+                                className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                              >
+                                <Check size={14} />
+                                {t("projects.actions.setActive")}
+                              </button>
+                            </>
+                          )}
                           <button
                             type="button"
                             onClick={() => {
