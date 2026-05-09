@@ -187,7 +187,10 @@ export async function exportProjectToDir(projectId, options = {}) {
         const sitemapUrls = pagesDataArray
           .filter((page) => !page.seo?.robots?.includes("noindex")) // Filter out 'noindex' pages
           .map((page) => {
-            const pageUrl = new URL(`${page.slug}.html`, siteUrl).href;
+            const isHomepage = page.slug === "index" || page.slug === "home";
+            const pageUrl = isHomepage
+              ? new URL("/", siteUrl).href
+              : new URL(`${page.slug}.html`, siteUrl).href;
             const lastMod = page.updated || page.gcreated || new Date().toISOString();
             return `
   <url>

@@ -675,10 +675,11 @@ describe("exportProject", () => {
     assert.ok(sitemap.includes(SITE_URL), "Should reference site URL");
   });
 
-  it("sitemap includes index and about pages", async () => {
+  it("sitemap includes homepage as bare root and about as .html", async () => {
     const exportDir = await getLatestExportDir();
     const sitemap = await fs.readFile(path.join(exportDir, "sitemap.xml"), "utf8");
-    assert.ok(sitemap.includes("index.html"), "Should include index page");
+    assert.ok(sitemap.includes(`<loc>${SITE_URL}/</loc>`), "Homepage should be the bare site root");
+    assert.ok(!sitemap.includes("index.html"), "Sitemap should not reference /index.html");
     assert.ok(sitemap.includes("about.html"), "Should include about page");
   });
 

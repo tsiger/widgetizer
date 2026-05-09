@@ -710,6 +710,105 @@ describe("renderPageLayout", () => {
     assert.ok(html.includes("A page with SEO"));
   });
 
+  it("emits explicit canonical URL when set on the page", async () => {
+    const html = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "", footerContent: "" },
+      {
+        name: "Canonical Page",
+        slug: "canonical-page",
+        seo: { canonical_url: "https://other.example.com/preferred" },
+      },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+    );
+
+    assert.ok(html.includes('<link rel="canonical" href="https://other.example.com/preferred">'));
+  });
+
+  it("auto-generates canonical from siteUrl + slug when page canonical is empty", async () => {
+    const html = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "", footerContent: "" },
+      { name: "About", slug: "about" },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+    );
+
+    assert.ok(html.includes('<link rel="canonical" href="https://example.com/about.html">'));
+  });
+
+  it("canonicalizes the homepage to the bare site root", async () => {
+    const indexHtml = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "", footerContent: "" },
+      { name: "Home", slug: "index" },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+    );
+    assert.ok(indexHtml.includes('<link rel="canonical" href="https://example.com/">'));
+    assert.ok(!indexHtml.includes("index.html"));
+
+    const homeHtml = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "", footerContent: "" },
+      { name: "Home", slug: "home" },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+    );
+    assert.ok(homeHtml.includes('<link rel="canonical" href="https://example.com/">'));
+  });
+
+  it("emits no canonical link when neither page nor project URL is set", async () => {
+    // Temporarily blank the project's siteUrl
+    const projectsData = await projectRepo.readProjectsData();
+    const original = projectsData.projects[0].siteUrl;
+    projectsData.projects[0].siteUrl = "";
+    await projectRepo.writeProjectsData(projectsData);
+
+    try {
+      const html = await renderPageLayout(
+        PROJECT_ID,
+        { headerContent: "", mainContent: "", footerContent: "" },
+        { name: "Orphan", slug: "orphan" },
+        RAW_THEME_SETTINGS,
+        "preview",
+        null,
+      );
+      assert.ok(!html.includes('rel="canonical"'));
+    } finally {
+      projectsData.projects[0].siteUrl = original;
+      await projectRepo.writeProjectsData(projectsData);
+    }
+  });
+
+  it("normalizes a trailing slash on siteUrl", async () => {
+    const projectsData = await projectRepo.readProjectsData();
+    const original = projectsData.projects[0].siteUrl;
+    projectsData.projects[0].siteUrl = "https://example.com/";
+    await projectRepo.writeProjectsData(projectsData);
+
+    try {
+      const html = await renderPageLayout(
+        PROJECT_ID,
+        { headerContent: "", mainContent: "", footerContent: "" },
+        { name: "About", slug: "about" },
+        RAW_THEME_SETTINGS,
+        "preview",
+        null,
+      );
+      assert.ok(html.includes('<link rel="canonical" href="https://example.com/about.html">'));
+      assert.ok(!html.includes("//about.html"));
+    } finally {
+      projectsData.projects[0].siteUrl = original;
+      await projectRepo.writeProjectsData(projectsData);
+    }
+  });
+
   it("handles missing page data gracefully", async () => {
     const html = await renderPageLayout(
       PROJECT_ID,

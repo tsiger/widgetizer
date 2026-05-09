@@ -39,9 +39,11 @@ export const SeoTag = {
       const robots = seo.robots || "index,follow";
       metaTags.push(`<meta name="robots" content="${escapeHtml(robots)}">`);
 
-      // Canonical URL if specified
-      if (seo.canonical_url && seo.canonical_url.trim()) {
-        metaTags.push(`<link rel="canonical" href="${escapeHtml(seo.canonical_url)}">`);
+      // Canonical URL: explicit page-level value wins; otherwise auto-generate
+      // from siteUrl + slug (homepage canonicalizes to the bare root).
+      const canonicalUrl = resolveCanonicalUrl(seo.canonical_url, project?.siteUrl, page.slug);
+      if (canonicalUrl) {
+        metaTags.push(`<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
       }
 
       // Open Graph tags
@@ -125,6 +127,21 @@ function getPublicImageFilename(filename, mediaFiles) {
   }
 
   return filename;
+}
+
+function resolveCanonicalUrl(explicitUrl, siteUrl, slug) {
+  if (explicitUrl && explicitUrl.trim()) return explicitUrl.trim();
+  if (!siteUrl || !siteUrl.trim()) return "";
+
+  let base;
+  try {
+    base = new URL(siteUrl).href.replace(/\/$/, "");
+  } catch {
+    return "";
+  }
+
+  const isHomepage = slug === "index" || slug === "home";
+  return isHomepage ? `${base}/` : `${base}/${slug}.html`;
 }
 
 // Helper function to escape HTML entities
