@@ -138,25 +138,29 @@ export default function Projects() {
     });
   };
 
-  const activateProject = async (project, { showToast: showSuccessToast = true } = {}) => {
+  const activateProject = async (project, { silent = false } = {}) => {
     if (activeProject?.id === project.id) {
-      return;
+      return true;
     }
-    await setActiveProject(project.id);
-    await fetchActiveProject();
-    await loadProjects();
-    if (showSuccessToast) {
-      showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
+    try {
+      await setActiveProject(project.id);
+      await fetchActiveProject();
+      await loadProjects();
+      if (!silent) {
+        showToast(t("projects.toasts.setActiveSuccess", { name: project.name }), "success");
+      }
+      return true;
+    } catch (error) {
+      console.error("Failed to set active project:", error);
+      showToast(t("projects.toasts.setActiveError"), "error");
+      return false;
     }
   };
 
   const openProjectWorkspace = async (project, { showActivationToast = true } = {}) => {
-    try {
-      await activateProject(project, { showToast: showActivationToast });
+    const activated = await activateProject(project, { silent: !showActivationToast });
+    if (activated) {
       navigate(workspaceDestination);
-    } catch (error) {
-      console.error("Failed to open project:", error);
-      showToast(t("projects.toasts.setActiveError"), "error");
     }
   };
 
@@ -339,6 +343,19 @@ export default function Projects() {
                             <FolderOpen size={14} />
                             {t("projects.actions.openProject")}
                           </button>
+                          {!isCurrentProject && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenMenuId(null);
+                                activateProject(project);
+                              }}
+                              className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                            >
+                              <Check size={14} />
+                              {t("projects.actions.setActive")}
+                            </button>
+                          )}
                           <div className="my-1 border-t border-slate-200" />
                           <Link
                             to={`/projects/edit/${project.id}`}
@@ -359,21 +376,6 @@ export default function Projects() {
                             <Copy size={14} />
                             {t("projects.actions.duplicate")}
                           </button>
-                          {!isCurrentProject && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  activateProject(project);
-                                }}
-                                className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
-                              >
-                                <Check size={14} />
-                                {t("projects.actions.setActive")}
-                              </button>
-                            </>
-                          )}
                           <button
                             type="button"
                             onClick={() => {
