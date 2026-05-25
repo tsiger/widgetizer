@@ -24,7 +24,7 @@ import SettingsField from "./SettingsField";
 /**
  * Renders the appropriate input component for a given setting
  */
-export default function SettingsRenderer({ setting, value, onChange, error, allowExpand = false }) {
+export default function SettingsRenderer({ setting, value, onChange, error, allowExpand = false, resizable = false }) {
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
 
@@ -82,7 +82,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
       case "richtext":
         return <RichTextInput {...inputProps} placeholder={setting.placeholder} allowSource={setting.allow_source} />;
       case "code":
-        return <CodeInput {...inputProps} language={language || "html"} rows={setting.rows || 10} allowExpand={allowExpand} />;
+        return <CodeInput {...inputProps} language={language || "html"} rows={setting.rows || 10} allowExpand={allowExpand} resizable={resizable} />;
       case "color":
         return <ColorInput {...inputProps} />;
       case "range":

@@ -43,6 +43,10 @@
   overflow: auto;
 }
 
+.code-editor-resizable {
+  resize: vertical;
+}
+
 /* Code editor textarea styling */
 .code-textarea {
   font-family: "Fira Code", "Fira Mono", "Consolas", "Monaco", "Courier New", monospace !important;

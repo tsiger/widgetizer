@@ -37,7 +37,7 @@ export default function SettingsPanel({ schema = {}, values = {}, onChange, erro
 
       {/* Content area */}
       <div className="flex-1 px-6 pb-6 min-h-[400px]">
-        <SettingsGroup settings={schema[activeTab]} values={values} onChange={onChange} errors={errors} />
+        <SettingsGroup settings={schema[activeTab]} values={values} onChange={onChange} errors={errors} resizable />
       </div>
     </div>
   );

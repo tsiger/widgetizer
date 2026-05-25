@@ -201,6 +201,7 @@ A code editor with syntax highlighting and line numbers. Ideal for editing CSS, 
 - Monospace font for better code readability
 - Scrollable editor with synchronized line number scrolling
 - Shared inner padding keeps code aligned with the line-number gutter
+- Vertically resizable by dragging the bottom-right corner when rendered on the Theme Settings page (fixed height in the page editor's inline settings panel)
 - Minimal design that matches other form inputs
 
 **When to use Code vs Textarea:**

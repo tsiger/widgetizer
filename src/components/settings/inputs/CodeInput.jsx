@@ -19,6 +19,7 @@ export default function CodeInput({
   placeholder = "",
   rows = 10,
   allowExpand = false,
+  resizable = false,
 }) {
   const editorRef = useRef(null);
   const lineNumbersRef = useRef(null);
@@ -120,7 +121,7 @@ export default function CodeInput({
       <div
         ref={expanded ? expandedLineNumbersRef : lineNumbersRef}
         className="code-line-numbers"
-        style={expanded ? undefined : { maxHeight: `${rows * 1.5}rem` }}
+        style={expanded || resizable ? undefined : { maxHeight: `${rows * 1.5}rem` }}
       >
         {Array.from({ length: lineCount }, (_, i) => (
           <div key={i} className="code-line-number">
@@ -132,8 +133,14 @@ export default function CodeInput({
       {/* Code editor */}
       <div
         ref={expanded ? expandedEditorContainerRef : editorContainerRef}
-        className="code-editor"
-        style={expanded ? undefined : { minHeight: `${rows * 1.5}rem`, maxHeight: `${rows * 1.5}rem` }}
+        className={`code-editor${!expanded && resizable ? " code-editor-resizable" : ""}`}
+        style={
+          expanded
+            ? undefined
+            : resizable
+              ? { height: `${rows * 1.5}rem`, minHeight: `${rows * 1.5}rem` }
+              : { minHeight: `${rows * 1.5}rem`, maxHeight: `${rows * 1.5}rem` }
+        }
       >
         <Editor
           ref={expanded ? undefined : editorRef}
