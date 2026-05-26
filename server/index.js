@@ -9,7 +9,16 @@ const requestedPort = parseInt(process.env.PORT || "3001", 10);
 
 const server = app.listen(requestedPort, "127.0.0.1", () => {
   const { port } = server.address();
-  console.log(`Server is running on http://127.0.0.1:${port}`);
+
+  // Publish the actual bound port so downstream code (preview/render
+  // controllers) that builds self-referencing URLs sees the real port,
+  // not the placeholder "0" we may have asked the OS to fill in.
+  process.env.PORT = String(port);
+  if (!process.env.SERVER_URL) {
+    process.env.SERVER_URL = `http://127.0.0.1:${port}`;
+  }
+
+  console.log(`Server is running on ${process.env.SERVER_URL}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 
   // When spawned by Electron's utilityProcess.fork(), report the actual bound

@@ -415,7 +415,11 @@ function createPreviewWindow() {
   const sourceWindow = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
   const bounds = sourceWindow ? sourceWindow.getBounds() : fallbackBounds;
 
-  previewWindow = new BrowserWindow({
+  // Offset the preview window so it doesn't sit exactly on top of the editor
+  // when the editor isn't maximized. Only meaningful when we have source bounds
+  // — otherwise Electron centers the new window for us.
+  const PREVIEW_OFFSET_PX = 50;
+  const browserWindowOpts = {
     width: bounds.width,
     height: bounds.height,
     minWidth: 1024,
@@ -427,7 +431,13 @@ function createPreviewWindow() {
       nodeIntegration: false,
       preload: preloadPath,
     },
-  });
+  };
+  if (sourceWindow && Number.isFinite(bounds.x) && Number.isFinite(bounds.y)) {
+    browserWindowOpts.x = bounds.x + PREVIEW_OFFSET_PX;
+    browserWindowOpts.y = bounds.y + PREVIEW_OFFSET_PX;
+  }
+
+  previewWindow = new BrowserWindow(browserWindowOpts);
 
   previewWindow.on("closed", () => {
     log("Preview window closed");
@@ -438,7 +448,6 @@ function createPreviewWindow() {
     if (!previewWindow) return;
 
     log("Preview window ready to show");
-    previewWindow.maximize();
     previewWindow.show();
     previewWindow.focus();
   });
@@ -473,7 +482,6 @@ async function openPreviewWindow(pageId) {
       previewWindow.restore();
     }
 
-    previewWindow.maximize();
     previewWindow.show();
     previewWindow.focus();
     return;
