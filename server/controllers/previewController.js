@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectDir } from "../config.js";
+import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getSetting } from "../db/repositories/settingsRepository.js";
@@ -420,10 +420,15 @@ export async function serveAsset(req, res) {
     return res.status(400).send("Asset path is required");
   }
 
+  const normalizedSubpath = path.normalize(assetSubpath).replace(/^(\.\.(\/|\\|$))+/, "");
+
+  // Core widget assets (type prefixed with "core-") live in CORE_WIDGETS_DIR, not the project dir.
+  // The widget type is the first path segment, e.g. "core-divider/preview.png".
+  const isCoreWidgetAsset = folder === "widgets" && normalizedSubpath.startsWith("core-");
+
   // Build the path to the asset file
   const projectFolderName = await getProjectFolderName(projectId);
-  const baseDir = path.join(getProjectDir(projectFolderName), folder);
-  const normalizedSubpath = path.normalize(assetSubpath).replace(/^(\.\.(\/|\\|$))+/, "");
+  const baseDir = isCoreWidgetAsset ? CORE_WIDGETS_DIR : path.join(getProjectDir(projectFolderName), folder);
   const filePath = path.resolve(baseDir, normalizedSubpath);
 
   if (!isWithinDirectory(filePath, baseDir)) {
@@ -433,8 +438,9 @@ export async function serveAsset(req, res) {
   try {
     let resolvedPath = filePath;
 
-    // Fallback: if asset not found in widget folder, try theme assets folder
-    if (!(await fs.pathExists(resolvedPath)) && folder === "widgets") {
+    // Fallback: if a theme widget asset isn't in its widget folder, try the theme assets folder.
+    // Core widget assets resolve against CORE_WIDGETS_DIR and have no project-assets fallback.
+    if (!isCoreWidgetAsset && !(await fs.pathExists(resolvedPath)) && folder === "widgets") {
       const assetsDir = path.join(getProjectDir(projectFolderName), "assets");
       const fallbackPath = path.resolve(assetsDir, path.basename(normalizedSubpath));
       if (isWithinDirectory(fallbackPath, assetsDir) && (await fs.pathExists(fallbackPath))) {

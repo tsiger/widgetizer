@@ -91,6 +91,8 @@ before(async () => {
     settings: [{ id: "color", type: "color", default: "#ccc" }],
   });
   await fs.writeFile(path.join(dividerDir, "widget.liquid"), '<hr style="color: {{ color }}">');
+  // Only core-divider ships a preview image
+  await fs.writeFile(path.join(dividerDir, "preview.png"), "fake-png-data");
 
   // core-broken — has invalid JSON in schema
   const brokenDir = path.join(TEST_CORE_WIDGETS_DIR, "core-broken");
@@ -126,6 +128,14 @@ describe("getCoreWidgets", () => {
 
     const types = widgets.map((w) => w.type).sort();
     assert.deepEqual(types, ["core-divider", "core-spacer"]);
+  });
+
+  it("flags hasPreview only for widgets that ship a preview.png", async () => {
+    const widgets = await getCoreWidgets();
+    const divider = widgets.find((w) => w.type === "core-divider");
+    const spacer = widgets.find((w) => w.type === "core-spacer");
+    assert.equal(divider.hasPreview, true, "core-divider ships preview.png");
+    assert.equal(spacer.hasPreview, undefined, "core-spacer has no preview.png");
   });
 
   it("skips widgets with invalid schema.json", async () => {
@@ -179,6 +189,13 @@ describe("getCoreWidget", () => {
   it("returns null for nonexistent widget", async () => {
     const widget = await getCoreWidget("core-nonexistent");
     assert.equal(widget, null);
+  });
+
+  it("flags hasPreview when the widget ships a preview.png", async () => {
+    const divider = await getCoreWidget("core-divider");
+    assert.equal(divider.hasPreview, true);
+    const spacer = await getCoreWidget("core-spacer");
+    assert.equal(spacer.hasPreview, undefined);
   });
 });
 

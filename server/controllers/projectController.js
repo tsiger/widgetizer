@@ -572,12 +572,16 @@ export async function getProjectWidgets(req, res) {
       // If there's an error reading theme.json, default to including core widgets
     }
 
-    // Helper function to process a widget folder (reads schema.json)
+    // Helper function to process a widget folder (reads schema.json, flags preview.png)
     async function processWidgetFolder(folderPath) {
       try {
         const schemaPath = path.join(folderPath, "schema.json");
         const content = await fs.readFile(schemaPath, "utf8");
-        return JSON.parse(content);
+        const schema = JSON.parse(content);
+        if (await fs.pathExists(path.join(folderPath, "preview.png"))) {
+          schema.hasPreview = true;
+        }
+        return schema;
       } catch (error) {
         console.warn(`[ProjectController] Failed to parse schema for widget at ${folderPath}: ${error.message}`);
         // Silently handle widget schema parsing errors

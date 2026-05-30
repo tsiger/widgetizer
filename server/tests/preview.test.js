@@ -22,6 +22,9 @@ const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-preview-test-${Date.now()}`
 const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
 const TEST_THEMES_DIR = path.join(TEST_ROOT, "themes");
 
+// APP_ROOT drives CORE_WIDGETS_DIR (APP_ROOT/src/core/widgets); isolate it so core
+// widget asset serving can be tested without touching the real repo source tree.
+process.env.APP_ROOT = TEST_ROOT;
 process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
@@ -34,7 +37,7 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const { getProjectDir, getProjectPagesDir } = await import("../config.js");
+const { getProjectDir, getProjectPagesDir, CORE_WIDGETS_DIR } = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
@@ -309,6 +312,11 @@ describe("serveAsset", () => {
 
     // Create a sensitive file outside assets to verify traversal protection
     await fs.writeFile(path.join(projectDir, "secret.txt"), "SENSITIVE DATA");
+
+    // Core widget asset lives in CORE_WIDGETS_DIR, not the project dir
+    const coreDividerDir = path.join(CORE_WIDGETS_DIR, "core-divider");
+    await fs.ensureDir(coreDividerDir);
+    await fs.writeFile(path.join(coreDividerDir, "preview.png"), "fake-core-png-data");
   });
 
   it("serves CSS with correct Content-Type", async () => {
@@ -417,6 +425,25 @@ describe("serveAsset", () => {
       params: { projectId: PROJECT_ID, folder: "widgets", filepath: ["..", "secret.txt"] },
     });
     assert.ok(res._status === 400 || res._status === 404, `Should block traversal, got ${res._status}`);
+  });
+
+  it("serves a core widget asset from CORE_WIDGETS_DIR, not the project dir", async () => {
+    const res = await callController(serveAsset, {
+      params: { projectId: PROJECT_ID, folder: "widgets", filepath: ["core-divider", "preview.png"] },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._headers["Content-Type"], "image/png");
+  });
+
+  it("does not fall back to project assets for a missing core widget asset", async () => {
+    // A like-named file exists in project assets, but core widget assets must not use that fallback.
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.writeFile(path.join(projectDir, "assets", "preview.png"), "project-asset-png");
+
+    const res = await callController(serveAsset, {
+      params: { projectId: PROJECT_ID, folder: "widgets", filepath: ["core-missing", "preview.png"] },
+    });
+    assert.equal(res._status, 404);
   });
 });
 
