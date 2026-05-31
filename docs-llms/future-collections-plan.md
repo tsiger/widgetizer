@@ -2,6 +2,11 @@
 
 > Companion to [future-collections.md](future-collections.md). That doc is the *specification* (what to build, in detail). This doc is the *execution plan* (what order to build it in, and how to know each phase is done).
 
+> 🚫 **BLOCKED — do not start Phase 1.** This plan cannot begin while
+> [future-collections-blockers.md](future-collections-blockers.md) has any unresolved blocker.
+> `BLOCKER-1` (preset collection-type overrides destroyed by theme updates) is currently
+> **UNRESOLVED**. Phase 0 below is not complete until that document is clear.
+
 The work is split into 21 phases. Each phase is small enough to complete and verify in one or two work sessions. **Don't start a phase until every dependency listed is merged and tested.** When you finish a phase, run its acceptance checks before opening the next one.
 
 The spec document has a higher-level "Gate 1 / Gate 2 / ..." view in Section 19; this plan is the fine-grained breakdown of those gates.
@@ -12,13 +17,21 @@ The spec document has a higher-level "Gate 1 / Gate 2 / ..." view in Section 19;
 
 Nothing to build. Confirm the team is aligned on what's already settled in the spec.
 
+**First: clear all blockers.** Phase 0 is not done until
+[future-collections-blockers.md](future-collections-blockers.md) has **zero** unresolved entries.
+Each resolution must be written back into the spec, not just agreed verbally.
+
+- 🚫 **`BLOCKER-1` UNRESOLVED** — presets can seed/override `collection-types/` at creation, but the
+  theme update replaces that folder wholesale from the theme source, silently reverting the schema
+  and dropping preset-only field data. Must be resolved (and the spec amended) before Phase 1.
 - Asset paths use depth-aware relative URLs (`outputPathPrefix`).
 - Items get stable UUIDs in v1.
-- Presets can seed `collection-types/` and `collections/`.
+- Presets can seed `collection-types/` and `collections/`. **(Gated by `BLOCKER-1` for the
+  `collection-types/` half — `collections/` data seeding is unaffected.)**
 - Forms inside collection item templates: **open question, deferred** (see spec Section 14). Build Phases 1 and 2 with the interim behavior — no forms wiring in templates. Revisit before any phase that would need them.
 - SEO field mapping: `usedAsOgImage` flag, `og_type: "article"`, canonical always explicit when `siteUrl` is set.
 
-If anything here is in dispute, resolve it before Phase 1.
+If anything here is in dispute, resolve it before Phase 1. Do not begin Phase 1 while any blocker is open.
 
 ---
 

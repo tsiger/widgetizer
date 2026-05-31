@@ -1,6 +1,14 @@
-# Widgetizer
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Widgetizer
 
 Visual website builder with theme support. Runs as an Electron desktop app or as a web app (Express backend + React frontend).
+
+## Deep-dive docs
+
+Before tackling non-trivial work in an unfamiliar area, skim the relevant file under `docs-llms/` — it contains LLM-targeted reference docs maintained alongside the code. Start at `docs-llms/documentation-index.md`. Notable entries: `core-architecture.md`, `core-security.md`, `core-pages.md`, `core-page-editor.md`, `core-widgets.md`, `core-themes.md`, `core-media.md`, `core-export.md`, `core-database.md`, `core-design-system.md`, `core-project-id-architecture.md`, `theming.md`, `theming-widgets.md`, `theming-setting-types.md`.
 
 ## Quick Reference
 
@@ -11,11 +19,25 @@ npm run dev                        # Frontend only (port 3000, Vite)
 npm run build                      # Production frontend build
 npm test                           # Run backend tests (Node test runner)
 npm run test:verbose               # Tests with full output
+npm run test:frontend              # Run frontend tests (Vitest, one-shot)
 npm run lint                       # Lint src/ and server/
 npm run electron:dev               # Full Electron dev mode
 npm run electron:build:mac         # Build Mac installer (signed)
 npm run electron:build:win         # Build Windows installer (signed, run on Windows)
-npm run theme:sync -- --project <name>  # Watch themes/ → data (requires --project)
+npm run theme:sync -- --project <name>   # Watch themes/ → data/projects/<name>
+npm run preset:sync -- --project <name>  # Watch theme presets → project data
+npm run validate:all-locales       # Validate frontend + theme locale files
+```
+
+### Running a single test
+
+```bash
+# Backend (Node test runner): pass a single file or glob
+node --test --test-reporter ./server/tests/reporter.js server/tests/<file>.test.js
+# Filter by test name pattern (Node test runner)
+node --test --test-name-pattern "<substring>" server/tests/<file>.test.js
+# Frontend (Vitest): filter by test name or pass a file
+npx vitest run -t "<name>" [path/to/file.test.js]
 ```
 
 ## Architecture
@@ -164,6 +186,8 @@ Output goes to `dist-electron/`.
 ## Important Patterns
 
 - ES modules throughout (`"type": "module"` in package.json)
-- Vite dev server on port 3000, Express API on port 3001
+- Vite dev server on port 3000, Express API on port 3001; `npm run dev:all` starts the backend, then `dev:frontend` waits on `http://localhost:3001/health` before launching Vite — if Vite never starts, the API isn't up yet
 - `data/` directory is gitignored except for the `projects/` directory structure
 - Theme widgets define their schema in `schema.json` and template in `widget.liquid`
+- The `predev:all` and `preelectron:dev` lifecycle hooks rebuild `better-sqlite3` and run locale validation; do not bypass them by invoking `vite`/`electron` directly
+- `AGENTS.md` mirrors this file for non-Claude agents — keep edits in sync when changing project-wide guidance

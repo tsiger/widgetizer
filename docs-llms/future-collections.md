@@ -1,9 +1,16 @@
 # Collections System (Custom Post Types)
 
-> **Status**: Future Feature
+> **Status**: Future Feature — 🚫 **BLOCKED**
 > **Priority**: TBD
 > **Complexity**: High
-> **Revision**: 9 (Section 14 rewritten: forms-inside-collection-templates is no longer a settled "not supported" decision — it's an open question with three options (A: support via manifest extension, B: explicitly don't, C: defer) and a documented interim behavior. Section 18 open-question entry and Section 19 Gate 0 checklist updated to match. Implementation proceeds under the interim behavior; revisit before any phase that would need forms wiring in templates.)
+> **Revision**: 10 (Added a hard implementation gate: this feature MUST NOT be built until every blocker in [future-collections-blockers.md](future-collections-blockers.md) is RESOLVED. Revision 9 reworked Section 14 — forms-inside-collection-templates is an open question with documented interim behavior; that remains true.)
+>
+> ⛔ **Do not implement this spec yet.** A latent design conflict — preset collection-type overrides
+> are destroyed by the wholesale theme-update replace (silent schema revert + user data loss) — is
+> tracked in **[future-collections-blockers.md](future-collections-blockers.md)** as `BLOCKER-1`.
+> Implementation is gated at **Gate 0** (Section 19) until that document has **zero** unresolved
+> blockers, or each blocker has an agreed remediation written back into this spec. Append any newly
+> discovered blockers to that document.
 
 A comprehensive plan for implementing a Collections system in Widgetizer that allows users to create structured content types like Portfolios, Team Members, Testimonials, Blog Posts, etc.
 
@@ -345,6 +352,13 @@ Collections follow the same philosophy as the rest of the [theme update system](
 
 Add `"collection-types"` to the `UPDATABLE_PATHS` array in [server/services/themeUpdateService.js:21](../server/services/themeUpdateService.js#L21) (currently `["layout.liquid", "assets", "widgets", "snippets", "locales", "screenshot.png"]`). Treat it like `widgets/` — the entire folder is replaced on update.
 
+> ⛔ **BLOCKER-1 ([future-collections-blockers.md](future-collections-blockers.md)).** This
+> wholesale replace conflicts with the "Preset Seeding" subsection below, which lets a preset
+> *overwrite* the theme's collection-type schema at creation. Because updates read only the theme
+> source (never `presets/`), the first theme update silently reverts a preset-derived project to the
+> theme's base schema and — via Section 4 normalization — drops user data in preset-only fields.
+> **Do not implement this allowlist change until BLOCKER-1 is resolved.**
+
 `collections/` (under `data/projects/{projectFolderName}/`) is **protected user content**, in the same category as `pages/` and `uploads/`. It must never appear in the allowlist.
 
 New project creation already copies the whole theme source into the project and excludes only `templates`, `updates`, `latest`, and `presets` (verified in [server/controllers/themeController.js:977](../server/controllers/themeController.js#L977)), so `collection-types/` is copied automatically once it exists in a theme. Project ZIP export/import and project duplication copy the whole project directory, so they carry both `collection-types/` and `collections/` automatically. `npm run theme:sync` already syncs `collection-types/` into projects because its `PROJECT_EXCLUDES` list ([scripts/theme-sync.js:17](../scripts/theme-sync.js#L17)) does not include it.
@@ -404,6 +418,15 @@ When a theme update adds a new `required: true` field to an existing collection,
 This validation applies symmetrically: even items created via API or imported from JSON go through the same check.
 
 #### Preset Seeding
+
+> ⛔ **BLOCKER-1 ([future-collections-blockers.md](future-collections-blockers.md)).** Step 1 below
+> lets a preset *overwrite* the theme's `collection-types/` at creation. The "Theme Update Allowlist"
+> subsection above then replaces that same folder wholesale from the **theme** source on every update
+> (presets are creation-time only — [theme-presets.md:142](theme-presets.md)). Net effect: the first
+> theme update reverts a preset-derived project to the theme's base schema and silently drops
+> preset-only field data. **The preset → collection-types interaction must be resolved before this
+> seeding logic is implemented.** Seeding of `collections/` (item *data*) is not affected — that path
+> only writes collection items, never pages, and never runs during updates.
 
 Project presets (currently `themes/{theme}/presets/{preset}/`) bundle starter content — menus, templates, and theme.json overrides — that ship with a new project created from that preset. Today's preset structure is resolved by `resolvePresetPaths` in [server/controllers/themeController.js:530-590](../server/controllers/themeController.js), which returns `{ templatesDir, menusDir, settingsOverrides }`.
 
@@ -1928,6 +1951,11 @@ The collection's listing page shows the empty state ("No items yet"). Export ski
 
 ## 18. Open Questions / Explicitly Deferred
 
+> ⛔ **Separate from open questions: hard blockers gate the whole feature.** Tracked in
+> [future-collections-blockers.md](future-collections-blockers.md). Unlike the deferred items below
+> (which can be punted to a later phase), an unresolved blocker means **no code lands at all**. See
+> Section 19 Gate 0.
+
 1. **Drafts and publish states** — current plan: items are always "published". A `draft: true` flag could come in Phase 3 if needed.
 2. **Cross-collection relationships** — deferred to Phase 3. v1 items have UUIDs ready for this.
 3. **Cursor-based pagination and `paginate` tag** — deferred. `limit` + `offset` ship in Phase 1.
@@ -1947,9 +1975,10 @@ The collection's listing page shows the empty state ("No items yet"). Export ski
 To reduce risk, build this in gated phases:
 
 **Gate 0 — Prerequisites before any code lands:**
+- 🚫 **All blockers in [future-collections-blockers.md](future-collections-blockers.md) RESOLVED.** Gate 0 is **not** clear while any blocker is open. Currently **`BLOCKER-1` is UNRESOLVED**, so no Collections code may land.
 - ✅ Asset-path strategy decided (Section 6: depth-aware relative paths via `outputPathPrefix`)
 - ✅ Item UUID decision (Section 2: yes, in v1)
-- ✅ Preset seeding decision (Section 5: extend `resolvePresetPaths`)
+- ❌ Preset seeding decision (Section 5: extend `resolvePresetPaths`) — **reopened by `BLOCKER-1`**: preset collection-type overrides are destroyed by the wholesale theme-update replace. Must be resolved before this counts as decided.
 - ⏸️ Forms-in-templates decision **deferred** (Section 14: open question; build interim behavior — don't wire forms into templates yet)
 - ✅ SEO field mapping spelled out (Section 13)
 
