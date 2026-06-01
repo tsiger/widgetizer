@@ -1,0 +1,28 @@
+{
+  "type": "offers",
+  "displayName": "Offers",
+  "aliases": ["packages", "deals", "promotions", "experiences"],
+  "maxBlocks": 9,
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Heading" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Latest offers" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Seasonal escapes" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Curated packages to make the most of your time on the island." },
+    { "type": "range", "id": "columns", "label": "Columns", "default": 3, "min": 2, "max": 3, "step": 1 }
+  ],
+  "blocks": [
+    {
+      "type": "offer",
+      "displayName": "Offer",
+      "settings": [
+        { "type": "image", "id": "image", "label": "Image" },
+        { "type": "text", "id": "tag", "label": "Badge", "default": "Save 20%" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Sunset honeymoon" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Five nights with private dinners, spa rituals and a caldera cruise." },
+        { "type": "text", "id": "meta", "label": "Meta", "default": "From €1,450 · 5 nights" },
+        { "type": "text", "id": "link_label", "label": "Link label", "default": "Read more" },
+        { "type": "link", "id": "link", "label": "Link", "hide_text": true }
+      ]
+    }
+  ]
+}

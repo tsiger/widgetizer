@@ -1,0 +1,130 @@
+{
+  "name": "About",
+  "slug": "about",
+  "widgetsOrder": [
+    "hero",
+    "story",
+    "amenities",
+    "testimonial",
+    "cta"
+  ],
+  "widgets": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Since 1978",
+        "heading": "Our story",
+        "subheading": "Three generations of island hospitality, distilled into one cliffside retreat.",
+        "button_label": "View rooms",
+        "button_link": {
+          "href": "index.html#rooms",
+          "text": "",
+          "target": "_self"
+        },
+        "button2_label": "",
+        "button2_link": {
+          "href": "",
+          "text": "",
+          "target": "_self"
+        },
+        "background_image": "/uploads/images/aegean-13.jpg",
+        "overlay": 45,
+        "height": "tall",
+        "alignment": "center",
+        "scroll_hint": false
+      }
+    },
+    "story": {
+      "type": "intro",
+      "settings": {
+        "eyebrow": "The family",
+        "heading": "A house built by the wind and the sea",
+        "body": "<p>In 1978 the Pavlou family carved their first three rooms into the rock of Oia and opened their door to travellers. Almost half a century later, Aegean Resort remains family-run — quietly tended, endlessly cared for.</p><p>We believe luxury is not excess but attention: the right light, the cool of thick walls in August, a breakfast that tastes of the island.</p>",
+        "button_label": "Meet the team",
+        "button_link": {
+          "href": "contact.html",
+          "text": "",
+          "target": "_self"
+        },
+        "image": "/uploads/images/aegean-11.jpg",
+        "image_caption": "The Pavlou family",
+        "image_position": "start"
+      }
+    },
+    "amenities": {
+      "type": "amenities",
+      "settings": {
+        "eyebrow": "Our values",
+        "heading": "What guides us",
+        "subheading": "",
+        "columns": 3,
+        "variant": "plain"
+      },
+      "blocksOrder": [
+        "v1",
+        "v2",
+        "v3"
+      ],
+      "blocks": {
+        "v1": {
+          "type": "amenity",
+          "settings": {
+            "icon": "sea-view",
+            "title": "Place",
+            "text": "Rooted in Santorini — its light, its stone, its sea."
+          }
+        },
+        "v2": {
+          "type": "amenity",
+          "settings": {
+            "icon": "breakfast",
+            "title": "Table",
+            "text": "Local produce and Cycladic recipes, served with generosity."
+          }
+        },
+        "v3": {
+          "type": "amenity",
+          "settings": {
+            "icon": "spa",
+            "title": "Calm",
+            "text": "An unhurried rhythm that lets the island slow you down."
+          }
+        }
+      }
+    },
+    "testimonial": {
+      "type": "testimonial",
+      "settings": {
+        "eyebrow": "Guest stories",
+        "rating": 5,
+        "quote": "It feels less like a hotel and more like staying with friends who happen to live in the most beautiful place on earth.",
+        "author_name": "James W.",
+        "author_detail": "Returning guest · 4 stays",
+        "author_image": "",
+        "background": "sea"
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {
+        "eyebrow": "Come stay",
+        "heading": "Begin your Aegean story",
+        "text": "Our team will help you choose the right room and time of year.",
+        "button_label": "Check availability",
+        "button_link": {
+          "href": "contact.html",
+          "text": "",
+          "target": "_self"
+        },
+        "button2_label": "",
+        "button2_link": {
+          "href": "",
+          "text": "",
+          "target": "_self"
+        },
+        "background_image": "/uploads/images/aegean-00.jpg",
+        "overlay": 55
+      }
+    }
+  }
+}

@@ -1,0 +1,94 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-cta-banner widget-{{ widget.id }}"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="cta-banner"
+  style="--ov: {{ widget.settings.overlay | default: 55 }}%;"
+>
+  <style>
+    .widget-{{ widget.id }} {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      color: #fff;
+      text-align: center;
+    }
+    .widget-{{ widget.id }} .cta__img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+    .widget-{{ widget.id }} .cta__veil {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(21,48,63,calc(var(--ov) / 100)), rgba(31,111,139,calc(var(--ov) / 100)));
+    }
+    .widget-{{ widget.id }} .cta__inner {
+      max-width: 50rem;
+      margin-inline: auto;
+      padding-block: clamp(5rem, 12vw, 9rem);
+    }
+    .widget-{{ widget.id }} .cta__eyebrow {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: var(--s3);
+    }
+    .widget-{{ widget.id }} .cta__title {
+      color: #fff;
+      font-size: var(--fs-h1);
+      font-weight: 500;
+      line-height: 1.08;
+      text-wrap: balance;
+    }
+    .widget-{{ widget.id }} .cta__text {
+      max-width: 36rem;
+      margin: var(--s4) auto 0;
+      font-size: var(--fs-lede);
+      color: rgba(255,255,255,0.9);
+    }
+    .widget-{{ widget.id }} .cta__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s3);
+      justify-content: center;
+      margin-top: var(--s6);
+    }
+  </style>
+
+  {% if widget.settings.background_image != blank %}
+    {% image src: widget.settings.background_image, size: 'hero', srcset: true, sizes: '100vw', class: 'cta__img', alt: '' %}
+  {% else %}
+    {% placeholder_image aspect: 'landscape', class: 'cta__img' %}
+  {% endif %}
+  <div class="cta__veil"></div>
+
+  <div class="cta__inner container reveal reveal-up">
+    {% if widget.settings.eyebrow != blank %}
+      <span class="cta__eyebrow" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+    {% endif %}
+    {% if widget.settings.heading != blank %}
+      <h2 class="cta__title" data-setting="heading">{{ widget.settings.heading }}</h2>
+    {% endif %}
+    {% if widget.settings.text != blank %}
+      <p class="cta__text" data-setting="text">{{ widget.settings.text }}</p>
+    {% endif %}
+    {% if widget.settings.button_label != blank or widget.settings.button2_label != blank %}
+      <div class="cta__actions">
+        {% if widget.settings.button_label != blank %}
+          <a class="btn" href="{{ widget.settings.button_link.href | default: 'contact.html' }}"{% if widget.settings.button_link.target != blank %} target="{{ widget.settings.button_link.target }}"{% endif %}>{{ widget.settings.button_label }}</a>
+        {% endif %}
+        {% if widget.settings.button2_label != blank %}
+          <a class="btn btn--light" href="{{ widget.settings.button2_link.href | default: '#' }}"{% if widget.settings.button2_link.target != blank %} target="{{ widget.settings.button2_link.target }}"{% endif %}>{{ widget.settings.button2_label }}</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>

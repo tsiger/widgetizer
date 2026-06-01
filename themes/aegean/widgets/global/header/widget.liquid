@@ -1,0 +1,75 @@
+<header
+  id="{{ widget.id }}"
+  class="widget site-header"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="header"
+>
+  {% if widget.settings.show_topbar %}
+    <div class="site-header__topbar">
+      <div class="container container--wide">
+        <div class="topbar-meta">
+          {% if widget.settings.topbar_location != blank %}
+            <span>{% render 'icon', name: 'map-pin' %}{{ widget.settings.topbar_location }}</span>
+          {% endif %}
+          {% if widget.settings.topbar_phone != blank %}
+            <span><a href="tel:{{ widget.settings.topbar_phone | replace: ' ', '' }}">{% render 'icon', name: 'phone' %}{{ widget.settings.topbar_phone }}</a></span>
+          {% endif %}
+        </div>
+        {% if widget.settings.show_topbar_social %}
+          <div class="topbar-social">
+            {% render 'social-links', social: theme.social %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="site-header__bar container container--wide">
+    <a class="site-header__brand" href="index.html" aria-label="{{ widget.settings.logoText | default: 'Home' }}">
+      {% if widget.settings.logoImage != blank %}
+        {% image src: widget.settings.logoImage, size: 'small', class: 'site-header__logo--dark', lazy: false, alt: widget.settings.logoText %}
+      {% endif %}
+      {% if widget.settings.logoImageLight != blank %}
+        {% image src: widget.settings.logoImageLight, size: 'small', class: 'site-header__logo--light', lazy: false, alt: widget.settings.logoText %}
+      {% endif %}
+      {% if widget.settings.logoImage == blank and widget.settings.logoImageLight == blank %}
+        {{ widget.settings.logoText }}
+      {% endif %}
+    </a>
+
+    <nav class="site-nav" id="site-navigation" aria-label="Primary navigation">
+      {% if widget.settings.headerNavigation %}
+        {% render 'menu',
+          menu: widget.settings.headerNavigation,
+          skip_nav: true,
+          class_list: 'nav-list',
+          class_item: 'nav-item',
+          class_link: '',
+          class_submenu: 'nav-submenu',
+          class_has_submenu: 'has-submenu'
+        %}
+      {% endif %}
+    </nav>
+
+    <div class="site-header__actions">
+      {% if widget.settings.ctaLink.href != blank %}
+        <a
+          class="btn"
+          href="{{ widget.settings.ctaLink.href }}"
+          {% if widget.settings.ctaLink.target != blank %}target="{{ widget.settings.ctaLink.target }}"{% endif %}
+        >{{ widget.settings.ctaLabel | default: 'Book Now' }}</a>
+      {% elsif widget.settings.ctaLabel != blank %}
+        <a class="btn" href="contact.html">{{ widget.settings.ctaLabel }}</a>
+      {% endif %}
+      <button
+        type="button"
+        class="nav-toggle"
+        aria-label="Toggle menu"
+        aria-controls="site-navigation"
+        aria-expanded="false"
+      >
+        {% render 'icon', name: 'menu-bars' %}
+      </button>
+    </div>
+  </div>
+</header>

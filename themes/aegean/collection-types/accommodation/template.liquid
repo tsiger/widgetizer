@@ -1,0 +1,204 @@
+{%- comment -%} Single accommodation page. Rendered at rooms/{slug}.html (depth 1), so internal links use ../ {%- endcomment -%}
+<article class="room-single">
+  <style>
+    .room-single .room-hero { padding-block: var(--section-y) var(--s7); }
+    .room-single .room-hero__grid {
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+    }
+    .room-single .room-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: var(--s5);
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .room-single .room-back svg { width: 1rem; height: 1rem; rotate: 180deg; }
+    .room-single .room-back:hover { color: var(--accent); }
+    .room-single .room-type {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--sea);
+    }
+    .room-single .room-title { font-size: var(--fs-h1); margin: var(--s3) 0 var(--s4); text-wrap: balance; }
+    .room-single .room-summary { font-size: var(--fs-lede); color: var(--text); max-width: 36rem; }
+    .room-single .room-specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.6rem;
+      margin-top: var(--s5);
+      padding-block: var(--s4);
+      border-block: 1px solid var(--line);
+    }
+    .room-single .room-specs span { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; color: var(--ink); }
+    .room-single .room-specs svg { width: 1.2rem; height: 1.2rem; color: var(--sea); }
+    .room-single .room-priceline {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: var(--s5);
+    }
+    .room-single .room-price b { font-family: var(--font-head); font-weight: 600; font-size: 2.4rem; color: var(--ink); }
+    .room-single .room-price small { color: var(--muted); }
+    .room-single .room-hero__media .media { aspect-ratio: 4 / 5; box-shadow: var(--shadow-lg); cursor: zoom-in; }
+
+    .room-single .room-thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(0.5rem, 1.2vw, 1rem);
+      margin-top: var(--s4);
+    }
+    .room-single .room-thumb { aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md); cursor: zoom-in; background: var(--panel); padding: 0; border: none; }
+    .room-single .room-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
+    .room-single .room-thumb:hover img { transform: scale(1.07); }
+
+    .room-single .room-body { padding-block: var(--s5) var(--section-y); }
+    .room-single .room-body__grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: clamp(2rem, 5vw, 4.5rem);
+      align-items: start;
+    }
+    .room-single .room-desc h2 { font-size: var(--fs-h2); margin-bottom: var(--s4); }
+    .room-single .room-aside {
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem);
+      display: flex;
+      flex-direction: column;
+      gap: var(--s4);
+      padding: var(--s5);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    .room-single .aside-title { font-family: var(--font-head); font-size: 1.4rem; color: var(--ink); }
+    .room-single .amenity-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem 1rem; }
+    .room-single .amenity-list li { display: flex; align-items: center; gap: 0.55rem; font-size: 0.9rem; }
+    .room-single .amenity-list svg { width: 1.1rem; height: 1.1rem; color: var(--sea); flex-shrink: 0; }
+    .room-single .rates-table { width: 100%; border-collapse: collapse; }
+    .room-single .rates-table tr { border-bottom: 1px solid var(--line); }
+    .room-single .rates-table td { padding: 0.7rem 0; font-size: 0.92rem; }
+    .room-single .rates-table td:last-child { text-align: right; font-weight: 700; color: var(--ink); white-space: nowrap; }
+    .room-single .rates-note { font-size: 0.82rem; color: var(--muted); }
+    .room-single .aside-divider { height: 1px; background: var(--line); }
+
+    @media (max-width: 900px) {
+      .room-single .room-hero__grid { grid-template-columns: 1fr; }
+      .room-single .room-hero__media { order: -1; }
+      .room-single .room-hero__media .media { aspect-ratio: 5/4; }
+      .room-single .room-body__grid { grid-template-columns: 1fr; }
+      .room-single .room-aside { position: static; }
+    }
+  </style>
+
+  <section class="room-hero">
+    <div class="container container--wide">
+      <a class="room-back" href="../index.html">{% render 'icon', name: 'arrow-right' %}Back to resort</a>
+      <div class="room-hero__grid">
+        <div class="room-hero__content reveal reveal-up">
+          {% if item.settings.room_type != blank %}<span class="room-type">{{ item.settings.room_type }}</span>{% endif %}
+          <h1 class="room-title">{{ item.settings.title }}</h1>
+          {% if item.settings.summary != blank %}<p class="room-summary">{{ item.settings.summary }}</p>{% endif %}
+
+          <div class="room-specs">
+            {% if item.settings.max_guests != blank %}<span>{% render 'icon', name: 'guests' %}{{ item.settings.max_guests }} guests</span>{% endif %}
+            {% if item.settings.size_sqm != blank %}<span>{% render 'icon', name: 'size' %}{{ item.settings.size_sqm }} m²</span>{% endif %}
+            {% if item.settings.bed_type != blank %}<span>{% render 'icon', name: 'bed' %}{{ item.settings.bed_type }}</span>{% endif %}
+            {% if item.settings.view != blank %}<span>{% render 'icon', name: 'sea-view' %}{{ item.settings.view }}</span>{% endif %}
+          </div>
+
+          <div class="room-priceline">
+            {% if item.settings.from_price != blank %}
+              <span class="room-price"><small>From</small> <b>€{{ item.settings.from_price }}</b> <small>/ night</small></span>
+            {% endif %}
+            <a class="btn" href="{{ item.settings.book_link.href | default: '../contact.html' }}"{% if item.settings.book_link.target != blank %} target="{{ item.settings.book_link.target }}"{% endif %}>{{ item.settings.book_label | default: 'Check availability' }}</a>
+          </div>
+        </div>
+
+        <div class="room-hero__media reveal reveal-scale">
+          <button type="button" class="media media--arch" data-lightbox="room-{{ item.slug }}" data-lightbox-src="{% if item.settings.featured_image != blank %}{% image src: item.settings.featured_image, size: 'hero', output: 'url' %}{% endif %}" aria-label="View larger image">
+            {% if item.settings.featured_image != blank %}
+              {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: '(max-width: 900px) 100vw, 50vw', alt: item.settings.title %}
+            {% else %}
+              {% placeholder_image aspect: 'portrait' %}
+            {% endif %}
+          </button>
+
+          {% assign has_gallery = false %}
+          {% if item.settings.gallery_1 != blank or item.settings.gallery_2 != blank or item.settings.gallery_3 != blank or item.settings.gallery_4 != blank %}{% assign has_gallery = true %}{% endif %}
+          {% if has_gallery %}
+            <div class="room-thumbs">
+              {% for n in (1..4) %}
+                {% assign key = 'gallery_' | append: n %}
+                {% assign gimg = item.settings[key] %}
+                {% if gimg != blank %}
+                  <button type="button" class="room-thumb" data-lightbox="room-{{ item.slug }}" data-lightbox-src="{% image src: gimg, size: 'hero', output: 'url' %}" aria-label="View photo {{ n }}">
+                    {% image src: gimg, size: 'small', alt: item.settings.title %}
+                  </button>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="room-body">
+    <div class="container container--wide">
+      <div class="room-body__grid">
+        <div class="room-desc reveal reveal-up">
+          <h2>About this room</h2>
+          {% if item.settings.description != blank %}
+            <div class="rte">{{ item.settings.description | raw }}</div>
+          {% endif %}
+        </div>
+
+        <aside class="room-aside reveal reveal-up">
+          <span class="aside-title">Amenities</span>
+          <ul class="amenity-list">
+            {% if item.settings.amenity_sea_view %}<li>{% render 'icon', name: 'sea-view' %}Sea view</li>{% endif %}
+            {% if item.settings.amenity_balcony %}<li>{% render 'icon', name: 'balcony' %}Private terrace</li>{% endif %}
+            {% if item.settings.amenity_pool %}<li>{% render 'icon', name: 'pool' %}Pool access</li>{% endif %}
+            {% if item.settings.amenity_wifi %}<li>{% render 'icon', name: 'wifi' %}Free Wi-Fi</li>{% endif %}
+            {% if item.settings.amenity_ac %}<li>{% render 'icon', name: 'ac' %}Air conditioning</li>{% endif %}
+            {% if item.settings.amenity_breakfast %}<li>{% render 'icon', name: 'breakfast' %}Breakfast</li>{% endif %}
+            {% if item.settings.amenity_minibar %}<li>{% render 'icon', name: 'minibar' %}Minibar</li>{% endif %}
+            {% if item.settings.amenity_bath %}<li>{% render 'icon', name: 'bath' %}Bath / jacuzzi</li>{% endif %}
+            {% if item.settings.amenity_room_service %}<li>{% render 'icon', name: 'room-service' %}Room service</li>{% endif %}
+            {% if item.settings.amenity_spa %}<li>{% render 'icon', name: 'spa' %}Spa access</li>{% endif %}
+            {% if item.settings.amenity_parking %}<li>{% render 'icon', name: 'parking' %}Parking</li>{% endif %}
+          </ul>
+
+          {% if item.settings.rates != blank %}
+            <div class="aside-divider"></div>
+            <span class="aside-title">Rates</span>
+            <table class="rates-table">
+              {%- assign rate_lines = item.settings.rates | strip | split: '
+' -%}
+              {% for line in rate_lines %}
+                {% assign cells = line | split: '|' %}
+                {% if cells.size > 0 and cells[0] != blank %}
+                  <tr><td>{{ cells[0] | strip }}</td><td>{{ cells[1] | strip }}</td></tr>
+                {% endif %}
+              {% endfor %}
+            </table>
+            {% if item.settings.rates_note != blank %}<p class="rates-note">{{ item.settings.rates_note }}</p>{% endif %}
+          {% endif %}
+
+          <div class="aside-divider"></div>
+          <a class="btn" style="justify-content:center;" href="{{ item.settings.book_link.href | default: '../contact.html' }}"{% if item.settings.book_link.target != blank %} target="{{ item.settings.book_link.target }}"{% endif %}>{{ item.settings.book_label | default: 'Check availability' }}</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+</article>

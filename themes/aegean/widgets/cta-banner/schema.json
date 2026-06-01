@@ -1,0 +1,18 @@
+{
+  "type": "cta-banner",
+  "displayName": "CTA Banner",
+  "aliases": ["call to action", "book", "banner", "reserve"],
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Your island awaits" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Reserve your stay above the caldera" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Best rates guaranteed when you book directly with us." },
+    { "type": "text", "id": "button_label", "label": "Primary button", "default": "Check availability" },
+    { "type": "link", "id": "button_link", "label": "Primary link", "hide_text": true },
+    { "type": "text", "id": "button2_label", "label": "Secondary button", "default": "Call the resort" },
+    { "type": "link", "id": "button2_link", "label": "Secondary link", "hide_text": true },
+    { "type": "header", "id": "media_header", "label": "Background" },
+    { "type": "image", "id": "background_image", "label": "Background image" },
+    { "type": "range", "id": "overlay", "label": "Overlay strength", "default": 55, "min": 0, "max": 85, "step": 5, "unit": "%" }
+  ]
+}

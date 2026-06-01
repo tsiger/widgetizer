@@ -1,0 +1,73 @@
+<footer
+  id="{{ widget.id }}"
+  class="widget site-footer"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="footer"
+>
+  <div class="container container--wide">
+    <div class="site-footer__grid">
+      <div class="footer-col footer-about">
+        <div class="site-footer__brand">{{ widget.settings.brand | default: theme.general.brand_name }}</div>
+        {% if widget.settings.tagline != blank %}
+          <p>{{ widget.settings.tagline }}</p>
+        {% endif %}
+        {% if widget.settings.show_social %}
+          <div class="footer-social" style="margin-top: var(--s4);">
+            {% render 'social-links', social: theme.social %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="footer-col">
+        <h4>{{ widget.settings.contact_heading | default: 'Contact' }}</h4>
+        <ul class="footer-contact">
+          {% if widget.settings.address != blank %}
+            <li>{% render 'icon', name: 'map-pin' %}<span>{{ widget.settings.address }}</span></li>
+          {% endif %}
+          {% if widget.settings.phone != blank %}
+            <li>{% render 'icon', name: 'phone' %}<a href="tel:{{ widget.settings.phone | replace: ' ', '' }}">{{ widget.settings.phone }}</a></li>
+          {% endif %}
+          {% if widget.settings.email != blank %}
+            <li>{% render 'icon', name: 'mail' %}<a href="mailto:{{ widget.settings.email }}">{{ widget.settings.email }}</a></li>
+          {% endif %}
+          {% if widget.settings.hours != blank %}
+            <li>{% render 'icon', name: 'clock' %}<span>{{ widget.settings.hours }}</span></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>{{ widget.settings.links_heading | default: 'Explore' }}</h4>
+        {% if widget.settings.links_menu %}
+          {% render 'menu',
+            menu: widget.settings.links_menu,
+            skip_nav: true,
+            class_list: 'footer-menu',
+            class_item: 'footer-menu-item',
+            class_link: '',
+            class_submenu: 'visually-hidden',
+            class_has_submenu: ''
+          %}
+        {% endif %}
+      </div>
+
+      {% if widget.settings.show_newsletter %}
+        <div class="footer-col">
+          <h4>{{ widget.settings.newsletter_heading | default: 'Newsletter' }}</h4>
+          {% if widget.settings.newsletter_text != blank %}
+            <p>{{ widget.settings.newsletter_text }}</p>
+          {% endif %}
+          <form class="newsletter-form" onsubmit="return false;">
+            <input type="email" placeholder="Your email" aria-label="Email address" required />
+            <button type="submit" class="btn">{{ widget.settings.newsletter_button | default: 'Join' }}</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="site-footer__bottom">
+      <span>{{ widget.settings.copyright }}</span>
+      <span class="muted">Crafted with care on the Aegean.</span>
+    </div>
+  </div>
+</footer>

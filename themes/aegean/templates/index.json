@@ -1,0 +1,308 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgetsOrder": [
+    "hero",
+    "welcome",
+    "rooms",
+    "excursions",
+    "amenities",
+    "gallery",
+    "testimonial",
+    "offers",
+    "cta"
+  ],
+  "widgets": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Oia · Santorini",
+        "heading": "Where the Aegean\nmeets the sky",
+        "subheading": "A whitewashed retreat perched above the caldera, with sunsets that fold the sea into gold.",
+        "button_label": "Reserve your stay",
+        "button_link": {
+          "href": "contact.html",
+          "text": "",
+          "target": "_self"
+        },
+        "button2_label": "Explore rooms",
+        "button2_link": {
+          "href": "index.html#rooms",
+          "text": "",
+          "target": "_self"
+        },
+        "background_image": "/uploads/images/aegean-01.jpg",
+        "overlay": 42,
+        "height": "full",
+        "alignment": "center",
+        "scroll_hint": true
+      }
+    },
+    "welcome": {
+      "type": "intro",
+      "settings": {
+        "eyebrow": "Welcome",
+        "heading": "A quiet luxury, carved into the cliffs",
+        "body": "<p>Aegean Resort is a collection of suites and villas terraced into the volcanic rock of Oia. Each room opens to the caldera, where whitewashed walls catch the morning light and the sea stretches endlessly toward the horizon.</p><p>Ours is a slow kind of luxury — long breakfasts, warm stone underfoot, and the hush of the Cyclades at dusk.</p>",
+        "button_label": "Our story",
+        "button_link": {
+          "href": "about.html",
+          "text": "",
+          "target": "_self"
+        },
+        "image": "/uploads/images/aegean-12.jpg",
+        "image_caption": "Est. 1978",
+        "image_position": "end"
+      }
+    },
+    "rooms": {
+      "type": "accommodation-grid",
+      "settings": {
+        "eyebrow": "Stay with us",
+        "heading": "Rooms & Suites",
+        "subheading": "Each room is a private balcony over the Aegean — choose the space that suits your escape.",
+        "limit": 3,
+        "sort": "manual",
+        "columns": 3,
+        "currency": "€",
+        "price_suffix": "night",
+        "cta_label": "View details",
+        "all_label": "All accommodation",
+        "all_link": {
+          "href": "",
+          "text": "",
+          "target": "_self"
+        }
+      }
+    },
+    "excursions": {
+      "type": "excursions-grid",
+      "settings": {
+        "eyebrow": "Things to do",
+        "heading": "Excursions & experiences",
+        "subheading": "Hand-picked tours to take you beyond the resort — by sea, on foot and through the vineyards.",
+        "limit": 2,
+        "sort": "manual",
+        "columns": 2,
+        "currency": "€",
+        "price_suffix": "person",
+        "cta_label": "View details",
+        "all_label": "All excursions",
+        "all_link": {
+          "href": "",
+          "text": "",
+          "target": "_self"
+        }
+      }
+    },
+    "amenities": {
+      "type": "amenities",
+      "settings": {
+        "eyebrow": "The resort",
+        "heading": "Everything for a slow escape",
+        "subheading": "Thoughtful comforts woven into every corner of the property.",
+        "columns": 4,
+        "variant": "boxed"
+      },
+      "blocksOrder": [
+        "a1",
+        "a2",
+        "a3",
+        "a4"
+      ],
+      "blocks": {
+        "a1": {
+          "type": "amenity",
+          "settings": {
+            "icon": "pool",
+            "title": "Infinity pool",
+            "text": "A heated pool that spills toward the caldera."
+          }
+        },
+        "a2": {
+          "type": "amenity",
+          "settings": {
+            "icon": "spa",
+            "title": "Cliffside spa",
+            "text": "Sea-salt rituals and massage in a cave-cut hammam."
+          }
+        },
+        "a3": {
+          "type": "amenity",
+          "settings": {
+            "icon": "breakfast",
+            "title": "Greek breakfast",
+            "text": "Island produce served on your terrace each morning."
+          }
+        },
+        "a4": {
+          "type": "amenity",
+          "settings": {
+            "icon": "sea-view",
+            "title": "Caldera views",
+            "text": "Every room faces the most famous sunset in the world."
+          }
+        }
+      }
+    },
+    "gallery": {
+      "type": "gallery",
+      "settings": {
+        "eyebrow": "Gallery",
+        "heading": "Moments on the island",
+        "subheading": "",
+        "layout": "mosaic"
+      },
+      "blocksOrder": [
+        "g1",
+        "g2",
+        "g3",
+        "g4",
+        "g5",
+        "g6"
+      ],
+      "blocks": {
+        "g1": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/aegean-11.jpg",
+            "caption": "Sunset over the caldera"
+          }
+        },
+        "g2": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/aegean-01.jpg",
+            "caption": "Whitewashed terraces"
+          }
+        },
+        "g3": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/aegean-17.jpg",
+            "caption": "The infinity pool"
+          }
+        },
+        "g4": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/aegean-13.jpg",
+            "caption": "Blue domes of Oia"
+          }
+        },
+        "g5": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/aegean-12.jpg",
+            "caption": "Morning on the terrace"
+          }
+        },
+        "g6": {
+          "type": "image",
+          "settings": {
+            "image": "/uploads/images/aegean-00.jpg",
+            "caption": "A suite at dusk"
+          }
+        }
+      }
+    },
+    "testimonial": {
+      "type": "testimonial",
+      "settings": {
+        "eyebrow": "Guest stories",
+        "rating": 5,
+        "quote": "We watched the sun melt into the sea from our own terrace every evening. There is nowhere on earth quite like waking up here.",
+        "author_name": "Eleni & Marco",
+        "author_detail": "Honeymoon · Suite Caldera",
+        "author_image": "",
+        "background": "ink"
+      }
+    },
+    "offers": {
+      "type": "offers",
+      "settings": {
+        "eyebrow": "Latest offers",
+        "heading": "Seasonal escapes",
+        "subheading": "Curated packages to make the most of your time on the island.",
+        "columns": 3
+      },
+      "blocksOrder": [
+        "o1",
+        "o2",
+        "o3"
+      ],
+      "blocks": {
+        "o1": {
+          "type": "offer",
+          "settings": {
+            "image": "/uploads/images/aegean-02.jpg",
+            "tag": "Save 20%",
+            "title": "Sunset honeymoon",
+            "meta": "From €1,450 · 5 nights",
+            "text": "Private dinners, spa rituals and a caldera sailing cruise for two.",
+            "link_label": "Read more",
+            "link": {
+              "href": "contact.html",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "o2": {
+          "type": "offer",
+          "settings": {
+            "image": "/uploads/images/aegean-09.jpg",
+            "tag": "Family",
+            "title": "Island summer",
+            "meta": "From €2,100 · 7 nights",
+            "text": "A villa for four, daily breakfast and a private day on a sailing boat.",
+            "link_label": "Read more",
+            "link": {
+              "href": "contact.html",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        },
+        "o3": {
+          "type": "offer",
+          "settings": {
+            "image": "/uploads/images/aegean-16.jpg",
+            "tag": "Stay longer",
+            "title": "Slow Cyclades",
+            "meta": "From €1,890 · 10 nights",
+            "text": "Ten unhurried nights with a complimentary spa day and wine tasting.",
+            "link_label": "Read more",
+            "link": {
+              "href": "contact.html",
+              "text": "",
+              "target": "_self"
+            }
+          }
+        }
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {
+        "eyebrow": "Your island awaits",
+        "heading": "Reserve your stay above the caldera",
+        "text": "Best rates guaranteed when you book directly with us.",
+        "button_label": "Check availability",
+        "button_link": {
+          "href": "contact.html",
+          "text": "",
+          "target": "_self"
+        },
+        "button2_label": "Call the resort",
+        "button2_link": {
+          "href": "tel:+302286071234",
+          "text": "",
+          "target": "_self"
+        },
+        "background_image": "/uploads/images/aegean-04.jpg",
+        "overlay": 55
+      }
+    }
+  }
+}

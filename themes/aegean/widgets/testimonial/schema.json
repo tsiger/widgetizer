@@ -1,0 +1,26 @@
+{
+  "type": "testimonial",
+  "displayName": "Testimonial",
+  "aliases": ["quote", "review", "guest"],
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Guest stories" },
+    { "type": "range", "id": "rating", "label": "Rating (stars)", "default": 5, "min": 0, "max": 5, "step": 1 },
+    { "type": "textarea", "id": "quote", "label": "Quote", "default": "We watched the sun melt into the sea from our own terrace every evening. There is nowhere on earth quite like waking up here." },
+    { "type": "text", "id": "author_name", "label": "Author", "default": "Eleni & Marco" },
+    { "type": "text", "id": "author_detail", "label": "Author detail", "default": "Honeymoon · Suite Caldera" },
+    { "type": "image", "id": "author_image", "label": "Author photo" },
+    { "type": "header", "id": "style_header", "label": "Style" },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "default": "ink",
+      "options": [
+        { "value": "panel", "label": "Sand panel" },
+        { "value": "ink", "label": "Aegean ink" },
+        { "value": "sea", "label": "Sea blue" }
+      ]
+    }
+  ]
+}

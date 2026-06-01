@@ -1,0 +1,77 @@
+{
+  "type": "accommodation",
+  "schemaVersion": 1,
+  "displayName": "Room",
+  "displayNamePlural": "Accommodation",
+  "icon": "BedDouble",
+  "description": "Rooms, suites and villas with rates, amenities and a gallery.",
+  "slugPrefix": "rooms",
+  "hasItemPages": true,
+  "sortable": true,
+  "defaultSort": "manual",
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "title", "label": "Name", "required": true, "usedAsTitle": true },
+    {
+      "type": "select",
+      "id": "room_type",
+      "label": "Room type",
+      "default": "Suite",
+      "options": [
+        { "value": "Suite", "label": "Suite" },
+        { "value": "Double Room", "label": "Double Room" },
+        { "value": "Single Room", "label": "Single Room" },
+        { "value": "Studio", "label": "Studio" },
+        { "value": "Villa", "label": "Villa" }
+      ]
+    },
+    { "type": "textarea", "id": "summary", "label": "Short summary", "default": "A serene room with a private terrace over the caldera." },
+    { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Carved into the cliffside, this room blends whitewashed Cycladic calm with quiet modern comfort. Wake to the light off the water and watch the famous Santorini sunset from your own terrace.</p>" },
+    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
+
+    { "type": "header", "id": "details_header", "label": "Details" },
+    { "type": "text", "id": "from_price", "label": "From price (number)", "default": "180" },
+    { "type": "text", "id": "max_guests", "label": "Max guests", "default": "2" },
+    { "type": "text", "id": "size_sqm", "label": "Size (m²)", "default": "38" },
+    { "type": "text", "id": "bed_type", "label": "Bed", "default": "King bed" },
+    { "type": "text", "id": "view", "label": "View", "default": "Caldera & sea view" },
+
+    { "type": "header", "id": "gallery_header", "label": "Gallery" },
+    { "type": "image", "id": "gallery_1", "label": "Gallery image 1" },
+    { "type": "image", "id": "gallery_2", "label": "Gallery image 2" },
+    { "type": "image", "id": "gallery_3", "label": "Gallery image 3" },
+    { "type": "image", "id": "gallery_4", "label": "Gallery image 4" },
+
+    { "type": "header", "id": "amenities_header", "label": "Amenities" },
+    { "type": "checkbox", "id": "amenity_sea_view", "label": "Sea view", "default": true },
+    { "type": "checkbox", "id": "amenity_balcony", "label": "Private balcony / terrace", "default": true },
+    { "type": "checkbox", "id": "amenity_pool", "label": "Pool access", "default": false },
+    { "type": "checkbox", "id": "amenity_wifi", "label": "Free Wi-Fi", "default": true },
+    { "type": "checkbox", "id": "amenity_ac", "label": "Air conditioning", "default": true },
+    { "type": "checkbox", "id": "amenity_breakfast", "label": "Breakfast included", "default": true },
+    { "type": "checkbox", "id": "amenity_minibar", "label": "Minibar", "default": true },
+    { "type": "checkbox", "id": "amenity_bath", "label": "Bath / jacuzzi", "default": false },
+    { "type": "checkbox", "id": "amenity_room_service", "label": "Room service", "default": true },
+    { "type": "checkbox", "id": "amenity_spa", "label": "Spa access", "default": false },
+    { "type": "checkbox", "id": "amenity_parking", "label": "Parking", "default": false },
+
+    { "type": "header", "id": "rates_header", "label": "Rates" },
+    {
+      "type": "textarea",
+      "id": "rates",
+      "label": "Rates table",
+      "description": "One row per line, formatted as: Season | Price per night",
+      "default": "Low season (Apr–May, Oct) | €180\nMid season (Jun, Sep) | €240\nHigh season (Jul–Aug) | €320"
+    },
+    { "type": "text", "id": "rates_note", "label": "Rates note", "default": "Rates include breakfast and all taxes. Minimum 2 nights in high season." },
+
+    { "type": "header", "id": "booking_header", "label": "Booking" },
+    { "type": "text", "id": "book_label", "label": "Booking button label", "default": "Check availability" },
+    { "type": "link", "id": "book_link", "label": "Booking link", "hide_text": true },
+
+    { "type": "header", "id": "seo_header", "label": "SEO" },
+    { "type": "text", "id": "seo_title", "label": "SEO title" },
+    { "type": "textarea", "id": "seo_description", "label": "SEO description" },
+    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+  ]
+}

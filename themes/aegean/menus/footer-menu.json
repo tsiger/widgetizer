@@ -1,0 +1,11 @@
+{
+  "id": "footer-menu",
+  "name": "Footer Menu",
+  "items": [
+    { "label": "Rooms & Suites", "link": "index.html#rooms", "items": [] },
+    { "label": "Offers", "link": "index.html#offers", "items": [] },
+    { "label": "Gallery", "link": "index.html#gallery", "items": [] },
+    { "label": "About", "link": "about.html", "items": [] },
+    { "label": "Contact", "link": "contact.html", "items": [] }
+  ]
+}

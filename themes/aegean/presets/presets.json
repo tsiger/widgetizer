@@ -1,0 +1,10 @@
+{
+  "default": "default",
+  "presets": [
+    {
+      "id": "default",
+      "name": "Aegean Resort",
+      "description": "A serene Santorini resort with a furnished home, about and contact pages, plus seeded Accommodation (rooms and suites) and Excursion collections."
+    }
+  ]
+}

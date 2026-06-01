@@ -1,0 +1,97 @@
+{
+  "type": "excursion",
+  "schemaVersion": 1,
+  "displayName": "Excursion",
+  "displayNamePlural": "Excursions",
+  "icon": "Compass",
+  "description": "Guided tours and day trips with pricing, itinerary and a gallery.",
+  "slugPrefix": "excursions",
+  "hasItemPages": true,
+  "sortable": true,
+  "defaultSort": "manual",
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "title", "label": "Name", "required": true, "usedAsTitle": true },
+    {
+      "type": "select",
+      "id": "category",
+      "label": "Category",
+      "default": "Boat tour",
+      "options": [
+        { "value": "Boat tour", "label": "Boat tour" },
+        { "value": "Hiking", "label": "Hiking" },
+        { "value": "Cultural", "label": "Cultural" },
+        { "value": "Wine tasting", "label": "Wine tasting" },
+        { "value": "Food tour", "label": "Food tour" },
+        { "value": "Adventure", "label": "Adventure" }
+      ]
+    },
+    { "type": "textarea", "id": "summary", "label": "Short summary", "default": "A half-day sail along the caldera with swim stops and a sunset finale." },
+    { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Cast off from the old port and trace the volcanic rim by traditional caïque. We drop anchor at the hot springs and the red and white beaches for swimming and snorkelling, then turn west to catch the Santorini sunset from the water with a glass of local wine in hand.</p>" },
+    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
+
+    { "type": "header", "id": "details_header", "label": "Details" },
+    { "type": "text", "id": "price_per_person", "label": "Price per person (number)", "default": "85" },
+    { "type": "text", "id": "min_persons", "label": "Minimum persons", "default": "2" },
+    { "type": "text", "id": "group_size_max", "label": "Max group size", "default": "12" },
+    { "type": "text", "id": "duration", "label": "Duration", "default": "5 hours" },
+    {
+      "type": "select",
+      "id": "difficulty",
+      "label": "Difficulty",
+      "default": "Easy",
+      "options": [
+        { "value": "Easy", "label": "Easy" },
+        { "value": "Moderate", "label": "Moderate" },
+        { "value": "Challenging", "label": "Challenging" }
+      ]
+    },
+    { "type": "text", "id": "meeting_point", "label": "Meeting point", "default": "Resort reception" },
+    { "type": "text", "id": "languages", "label": "Languages", "default": "English, Greek" },
+    { "type": "text", "id": "season", "label": "Season / availability", "default": "April – October" },
+
+    { "type": "header", "id": "gallery_header", "label": "Gallery" },
+    { "type": "image", "id": "gallery_1", "label": "Gallery image 1" },
+    { "type": "image", "id": "gallery_2", "label": "Gallery image 2" },
+    { "type": "image", "id": "gallery_3", "label": "Gallery image 3" },
+    { "type": "image", "id": "gallery_4", "label": "Gallery image 4" },
+
+    { "type": "header", "id": "itinerary_header", "label": "Itinerary" },
+    {
+      "type": "textarea",
+      "id": "itinerary",
+      "label": "Itinerary",
+      "description": "One stop per line, formatted as: Time/Stop | Description",
+      "default": "Departure | Board the caïque at the old port\nHot springs | Swim in the warm volcanic waters\nRed Beach | Snorkelling and free time ashore\nSunset | Sail west with wine as the sun sets"
+    },
+
+    { "type": "header", "id": "includes_header", "label": "What's included" },
+    { "type": "checkbox", "id": "incl_hotel_pickup", "label": "Hotel pickup", "default": true },
+    { "type": "checkbox", "id": "incl_guide", "label": "Professional guide", "default": true },
+    { "type": "checkbox", "id": "incl_transport", "label": "Transport", "default": true },
+    { "type": "checkbox", "id": "incl_lunch", "label": "Lunch", "default": false },
+    { "type": "checkbox", "id": "incl_drinks", "label": "Drinks", "default": true },
+    { "type": "checkbox", "id": "incl_equipment", "label": "Equipment", "default": true },
+    { "type": "checkbox", "id": "incl_photos", "label": "Photos", "default": false },
+    { "type": "checkbox", "id": "incl_insurance", "label": "Insurance", "default": true },
+
+    { "type": "header", "id": "rates_header", "label": "Pricing tiers" },
+    {
+      "type": "textarea",
+      "id": "rates",
+      "label": "Pricing table",
+      "description": "One row per line, formatted as: Tier | Price per person",
+      "default": "Adult | €85\nChild (4–12) | €45\nPrivate group (up to 8) | €640"
+    },
+    { "type": "text", "id": "rates_note", "label": "Pricing note", "default": "Prices include taxes. Free for infants under 4. Minimum 2 guests to confirm." },
+
+    { "type": "header", "id": "booking_header", "label": "Booking" },
+    { "type": "text", "id": "book_label", "label": "Booking button label", "default": "Book this excursion" },
+    { "type": "link", "id": "book_link", "label": "Booking link", "hide_text": true },
+
+    { "type": "header", "id": "seo_header", "label": "SEO" },
+    { "type": "text", "id": "seo_title", "label": "SEO title" },
+    { "type": "textarea", "id": "seo_description", "label": "SEO description" },
+    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+  ]
+}

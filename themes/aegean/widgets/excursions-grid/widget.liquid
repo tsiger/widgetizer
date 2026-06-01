@@ -1,0 +1,193 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-excursions-grid widget-{{ widget.id }} section"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="excursions-grid"
+  style="--cols: {{ widget.settings.columns | default: 2 }};"
+>
+  <style>
+    .widget-{{ widget.id }} .exc-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+      gap: clamp(1.5rem, 3vw, 2.6rem);
+      margin-top: var(--s7);
+    }
+    .widget-{{ widget.id }} .exc-card { position: relative; }
+    .widget-{{ widget.id }} .exc-card .media {
+      aspect-ratio: 16 / 10;
+      border-bottom: none;
+    }
+    .widget-{{ widget.id }} .exc-card__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: var(--s5);
+      gap: var(--s2);
+    }
+    .widget-{{ widget.id }} .exc-card__type {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--sea);
+    }
+    .widget-{{ widget.id }} .exc-card__title {
+      font-size: var(--fs-h3);
+      line-height: 1.1;
+    }
+    .widget-{{ widget.id }} .exc-card__title a { color: inherit; }
+    .widget-{{ widget.id }} .exc-card__title a:hover { color: var(--accent); }
+    .widget-{{ widget.id }} .exc-card__summary {
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.6;
+    }
+    .widget-{{ widget.id }} .exc-card__specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.2rem;
+      margin-top: var(--s2);
+      padding-top: var(--s3);
+      border-top: 1px solid var(--line);
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+    .widget-{{ widget.id }} .exc-card__specs span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .widget-{{ widget.id }} .exc-card__specs svg {
+      width: 1.05rem;
+      height: 1.05rem;
+      color: var(--sea);
+    }
+    .widget-{{ widget.id }} .exc-card__foot {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: auto;
+      padding-top: var(--s4);
+    }
+    .widget-{{ widget.id }} .exc-card__price {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .widget-{{ widget.id }} .exc-card__price small {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .widget-{{ widget.id }} .exc-card__price b {
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 1.9rem;
+      color: var(--ink);
+    }
+    .widget-{{ widget.id }} .exc-card__price b span {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .widget-{{ widget.id }} .exc-grid--empty {
+      display: block;
+      margin-top: var(--s6);
+      padding: var(--s7);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-lg);
+      color: var(--muted);
+    }
+    .widget-{{ widget.id }} .exc-grid-foot {
+      display: flex;
+      justify-content: center;
+      margin-top: var(--s7);
+    }
+    @media (max-width: 880px) {
+      .widget-{{ widget.id }} .exc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .widget-{{ widget.id }} .exc-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div class="container container--wide">
+    <div class="heading-group heading-group--center reveal reveal-up">
+      {% if widget.settings.eyebrow != blank %}
+        <span class="eyebrow eyebrow--center" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+      {% endif %}
+      {% if widget.settings.heading != blank %}
+        <h2 class="section-title" data-setting="heading">{{ widget.settings.heading }}</h2>
+      {% endif %}
+      {% if widget.settings.subheading != blank %}
+        <p class="lede" data-setting="subheading">{{ widget.settings.subheading }}</p>
+      {% endif %}
+    </div>
+
+    {% assign excursions = 'excursion' | collection: limit: widget.settings.limit, sort: widget.settings.sort %}
+
+    {% if excursions == empty %}
+      <p class="exc-grid--empty">No excursions have been added yet. Create items in the <strong>Excursions</strong> collection to populate this section.</p>
+    {% else %}
+      <div class="exc-grid">
+        {% for excursion in excursions %}
+          <article class="card exc-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }};" data-block-id="{{ excursion.uuid }}">
+            <div class="media media--arch">
+              {% if excursion.url %}<a href="{{ excursion.url }}" aria-label="{{ excursion.settings.title }}">{% endif %}
+              {% if excursion.settings.featured_image != blank %}
+                {% image src: excursion.settings.featured_image, size: 'large', srcset: true, sizes: '(max-width: 560px) 100vw, 50vw', alt: excursion.settings.title %}
+              {% else %}
+                {% placeholder_image aspect: 'landscape' %}
+              {% endif %}
+              {% if excursion.url %}</a>{% endif %}
+            </div>
+
+            <div class="exc-card__body">
+              {% if excursion.settings.category != blank %}
+                <span class="exc-card__type">{{ excursion.settings.category }}</span>
+              {% endif %}
+              <h3 class="exc-card__title">
+                {% if excursion.url %}<a href="{{ excursion.url }}">{{ excursion.settings.title }}</a>{% else %}{{ excursion.settings.title }}{% endif %}
+              </h3>
+              {% if excursion.settings.summary != blank %}
+                <p class="exc-card__summary">{{ excursion.settings.summary }}</p>
+              {% endif %}
+
+              <div class="exc-card__specs">
+                {% if excursion.settings.duration != blank %}
+                  <span>{% render 'icon', name: 'clock' %}{{ excursion.settings.duration }}</span>
+                {% endif %}
+                {% if excursion.settings.group_size_max != blank %}
+                  <span>{% render 'icon', name: 'guests' %}Up to {{ excursion.settings.group_size_max }}</span>
+                {% endif %}
+                {% if excursion.settings.difficulty != blank %}
+                  <span>{% render 'icon', name: 'compass' %}{{ excursion.settings.difficulty }}</span>
+                {% endif %}
+              </div>
+
+              <div class="exc-card__foot">
+                {% if excursion.settings.price_per_person != blank %}
+                  <span class="exc-card__price">
+                    <small>From</small>
+                    <b>{{ widget.settings.currency }}{{ excursion.settings.price_per_person }} <span>/ {{ widget.settings.price_suffix }}</span></b>
+                  </span>
+                {% endif %}
+                {% if excursion.url %}
+                  <a class="text-link" href="{{ excursion.url }}">{{ widget.settings.cta_label | default: 'View details' }}{% render 'icon', name: 'arrow-right' %}</a>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      {% if widget.settings.all_link.href != blank and widget.settings.all_label != blank %}
+        <div class="exc-grid-foot">
+          <a class="btn btn--outline" href="{{ widget.settings.all_link.href }}"{% if widget.settings.all_link.target != blank %} target="{{ widget.settings.all_link.target }}"{% endif %}>{{ widget.settings.all_label }}</a>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,104 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-offers widget-{{ widget.id }} section"
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="offers"
+  style="--cols: {{ widget.settings.columns | default: 3 }};"
+>
+  <style>
+    .widget-{{ widget.id }} .offer-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+      gap: clamp(1.5rem, 3vw, 2.4rem);
+      margin-top: var(--s7);
+    }
+    .widget-{{ widget.id }} .offer-card .media {
+      aspect-ratio: 3 / 2;
+      position: relative;
+    }
+    .widget-{{ widget.id }} .offer-card__tag {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-sm);
+    }
+    .widget-{{ widget.id }} .offer-card__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: var(--s2);
+      padding: var(--s5);
+    }
+    .widget-{{ widget.id }} .offer-card__title { font-size: var(--fs-h3); line-height: 1.12; }
+    .widget-{{ widget.id }} .offer-card__text { color: var(--muted); font-size: 0.96rem; line-height: 1.6; }
+    .widget-{{ widget.id }} .offer-card__meta {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--sea);
+    }
+    .widget-{{ widget.id }} .offer-card__foot { margin-top: auto; padding-top: var(--s4); }
+    @media (max-width: 860px) {
+      .widget-{{ widget.id }} .offer-grid { grid-template-columns: 1fr; max-width: 30rem; margin-inline: auto; }
+    }
+  </style>
+
+  <div class="container container--wide">
+    <div class="heading-group heading-group--center reveal reveal-up">
+      {% if widget.settings.eyebrow != blank %}
+        <span class="eyebrow eyebrow--center" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+      {% endif %}
+      {% if widget.settings.heading != blank %}
+        <h2 class="section-title" data-setting="heading">{{ widget.settings.heading }}</h2>
+      {% endif %}
+      {% if widget.settings.subheading != blank %}
+        <p class="lede" data-setting="subheading">{{ widget.settings.subheading }}</p>
+      {% endif %}
+    </div>
+
+    {% if widget.blocks != blank %}
+      <div class="offer-grid">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          <article class="card offer-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }};" data-block-id="{{ blockId }}">
+            <div class="media">
+              {% if block.settings.tag != blank %}
+                <span class="offer-card__tag">{{ block.settings.tag }}</span>
+              {% endif %}
+              {% if block.settings.image != blank %}
+                {% image src: block.settings.image, size: 'large', srcset: true, sizes: '(max-width: 860px) 100vw, 33vw', alt: block.settings.title %}
+              {% else %}
+                {% placeholder_image aspect: 'landscape' %}
+              {% endif %}
+            </div>
+            <div class="offer-card__body">
+              {% if block.settings.title != blank %}
+                <h3 class="offer-card__title" data-setting="title">{{ block.settings.title }}</h3>
+              {% endif %}
+              {% if block.settings.meta != blank %}
+                <span class="offer-card__meta" data-setting="meta">{{ block.settings.meta }}</span>
+              {% endif %}
+              {% if block.settings.text != blank %}
+                <p class="offer-card__text" data-setting="text">{{ block.settings.text }}</p>
+              {% endif %}
+              {% if block.settings.link_label != blank %}
+                <div class="offer-card__foot">
+                  <a class="text-link" href="{{ block.settings.link.href | default: '#' }}"{% if block.settings.link.target != blank %} target="{{ block.settings.link.target }}"{% endif %}>{{ block.settings.link_label }}{% render 'icon', name: 'arrow-right' %}</a>
+                </div>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>

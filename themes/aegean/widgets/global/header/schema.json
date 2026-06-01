@@ -1,0 +1,28 @@
+{
+  "type": "header",
+  "displayName": "Header",
+  "settings": [
+    { "type": "header", "id": "brand_header", "label": "Branding" },
+    { "type": "text", "id": "logoText", "label": "Logo text", "default": "Aegean Resort" },
+    { "type": "image", "id": "logoImage", "label": "Logo (dark)" },
+    { "type": "image", "id": "logoImageLight", "label": "Logo (light, for transparent header)" },
+    { "type": "header", "id": "nav_header", "label": "Navigation" },
+    { "type": "menu", "id": "headerNavigation", "label": "Menu", "default": "main-menu" },
+    { "type": "header", "id": "cta_header", "label": "Call to action" },
+    { "type": "text", "id": "ctaLabel", "label": "Button label", "default": "Book Now" },
+    { "type": "link", "id": "ctaLink", "label": "Button link", "hide_text": true },
+    { "type": "header", "id": "topbar_header", "label": "Top bar" },
+    { "type": "checkbox", "id": "show_topbar", "label": "Show top bar", "default": true },
+    { "type": "text", "id": "topbar_location", "label": "Location", "default": "Oia, Santorini · Greece" },
+    { "type": "text", "id": "topbar_phone", "label": "Phone", "default": "+30 22860 71234" },
+    { "type": "checkbox", "id": "show_topbar_social", "label": "Show social icons in top bar", "default": true },
+    { "type": "header", "id": "behaviour_header", "label": "Behaviour" },
+    {
+      "type": "checkbox",
+      "id": "transparent_on_hero",
+      "label": "Transparent over hero",
+      "description": "Overlay the header on a full-bleed first section, turning solid on scroll.",
+      "default": true
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+{%- comment -%} Single excursion page. Rendered at excursions/{slug}.html (depth 1), so internal links use ../ {%- endcomment -%}
+<article class="excursion-single">
+  <style>
+    .excursion-single .exc-hero { padding-block: var(--section-y) var(--s7); }
+    .excursion-single .exc-hero__grid {
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+    }
+    .excursion-single .exc-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: var(--s5);
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .excursion-single .exc-back svg { width: 1rem; height: 1rem; rotate: 180deg; }
+    .excursion-single .exc-back:hover { color: var(--accent); }
+    .excursion-single .exc-cat {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--sea);
+    }
+    .excursion-single .exc-title { font-size: var(--fs-h1); margin: var(--s3) 0 var(--s4); text-wrap: balance; }
+    .excursion-single .exc-summary { font-size: var(--fs-lede); color: var(--text); max-width: 36rem; }
+    .excursion-single .exc-specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.6rem;
+      margin-top: var(--s5);
+      padding-block: var(--s4);
+      border-block: 1px solid var(--line);
+    }
+    .excursion-single .exc-specs span { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; color: var(--ink); }
+    .excursion-single .exc-specs svg { width: 1.2rem; height: 1.2rem; color: var(--sea); }
+    .excursion-single .exc-priceline {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: var(--s5);
+    }
+    .excursion-single .exc-price b { font-family: var(--font-head); font-weight: 600; font-size: 2.4rem; color: var(--ink); }
+    .excursion-single .exc-price small { color: var(--muted); }
+    .excursion-single .exc-hero__media .media { aspect-ratio: 4 / 5; box-shadow: var(--shadow-lg); cursor: zoom-in; }
+
+    .excursion-single .exc-thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(0.5rem, 1.2vw, 1rem);
+      margin-top: var(--s4);
+    }
+    .excursion-single .exc-thumb { aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md); cursor: zoom-in; background: var(--panel); padding: 0; border: none; }
+    .excursion-single .exc-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
+    .excursion-single .exc-thumb:hover img { transform: scale(1.07); }
+
+    .excursion-single .exc-body { padding-block: var(--s5) var(--section-y); }
+    .excursion-single .exc-body__grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: clamp(2rem, 5vw, 4.5rem);
+      align-items: start;
+    }
+    .excursion-single .exc-desc h2 { font-size: var(--fs-h2); margin-bottom: var(--s4); }
+
+    .excursion-single .itinerary { list-style: none; margin: var(--s5) 0 0; padding: 0; }
+    .excursion-single .itinerary li {
+      position: relative;
+      padding: 0 0 var(--s5) var(--s6);
+      border-left: 1px solid var(--line);
+    }
+    .excursion-single .itinerary li:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .excursion-single .itinerary li::before {
+      content: "";
+      position: absolute;
+      left: -0.4rem;
+      top: 0.15rem;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--sea);
+    }
+    .excursion-single .itinerary b { display: block; font-family: var(--font-head); font-size: 1.05rem; color: var(--ink); margin-bottom: 0.2rem; }
+    .excursion-single .itinerary span { color: var(--muted); font-size: 0.92rem; }
+
+    .excursion-single .exc-aside {
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem);
+      display: flex;
+      flex-direction: column;
+      gap: var(--s4);
+      padding: var(--s5);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    .excursion-single .aside-title { font-family: var(--font-head); font-size: 1.4rem; color: var(--ink); }
+    .excursion-single .incl-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem 1rem; }
+    .excursion-single .incl-list li { display: flex; align-items: center; gap: 0.55rem; font-size: 0.9rem; }
+    .excursion-single .incl-list svg { width: 1.1rem; height: 1.1rem; color: var(--sea); flex-shrink: 0; }
+    .excursion-single .rates-table { width: 100%; border-collapse: collapse; }
+    .excursion-single .rates-table tr { border-bottom: 1px solid var(--line); }
+    .excursion-single .rates-table td { padding: 0.7rem 0; font-size: 0.92rem; }
+    .excursion-single .rates-table td:last-child { text-align: right; font-weight: 700; color: var(--ink); white-space: nowrap; }
+    .excursion-single .rates-note { font-size: 0.82rem; color: var(--muted); }
+    .excursion-single .aside-divider { height: 1px; background: var(--line); }
+
+    @media (max-width: 900px) {
+      .excursion-single .exc-hero__grid { grid-template-columns: 1fr; }
+      .excursion-single .exc-hero__media { order: -1; }
+      .excursion-single .exc-hero__media .media { aspect-ratio: 5/4; }
+      .excursion-single .exc-body__grid { grid-template-columns: 1fr; }
+      .excursion-single .exc-aside { position: static; }
+    }
+  </style>
+
+  <section class="exc-hero">
+    <div class="container container--wide">
+      <a class="exc-back" href="../index.html">{% render 'icon', name: 'arrow-right' %}Back to resort</a>
+      <div class="exc-hero__grid">
+        <div class="exc-hero__content reveal reveal-up">
+          {% if item.settings.category != blank %}<span class="exc-cat">{{ item.settings.category }}</span>{% endif %}
+          <h1 class="exc-title">{{ item.settings.title }}</h1>
+          {% if item.settings.summary != blank %}<p class="exc-summary">{{ item.settings.summary }}</p>{% endif %}
+
+          <div class="exc-specs">
+            {% if item.settings.duration != blank %}<span>{% render 'icon', name: 'clock' %}{{ item.settings.duration }}</span>{% endif %}
+            {% if item.settings.group_size_max != blank %}<span>{% render 'icon', name: 'guests' %}Up to {{ item.settings.group_size_max }}</span>{% endif %}
+            {% if item.settings.difficulty != blank %}<span>{% render 'icon', name: 'compass' %}{{ item.settings.difficulty }}</span>{% endif %}
+            {% if item.settings.meeting_point != blank %}<span>{% render 'icon', name: 'map-pin' %}{{ item.settings.meeting_point }}</span>{% endif %}
+          </div>
+
+          <div class="exc-priceline">
+            {% if item.settings.price_per_person != blank %}
+              <span class="exc-price"><small>From</small> <b>€{{ item.settings.price_per_person }}</b> <small>/ person</small></span>
+            {% endif %}
+            <a class="btn" href="{{ item.settings.book_link.href | default: '../contact.html' }}"{% if item.settings.book_link.target != blank %} target="{{ item.settings.book_link.target }}"{% endif %}>{{ item.settings.book_label | default: 'Book this excursion' }}</a>
+          </div>
+        </div>
+
+        <div class="exc-hero__media reveal reveal-scale">
+          <button type="button" class="media media--arch" data-lightbox="exc-{{ item.slug }}" data-lightbox-src="{% if item.settings.featured_image != blank %}{% image src: item.settings.featured_image, size: 'hero', output: 'url' %}{% endif %}" aria-label="View larger image">
+            {% if item.settings.featured_image != blank %}
+              {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: '(max-width: 900px) 100vw, 50vw', alt: item.settings.title %}
+            {% else %}
+              {% placeholder_image aspect: 'portrait' %}
+            {% endif %}
+          </button>
+
+          {% assign has_gallery = false %}
+          {% if item.settings.gallery_1 != blank or item.settings.gallery_2 != blank or item.settings.gallery_3 != blank or item.settings.gallery_4 != blank %}{% assign has_gallery = true %}{% endif %}
+          {% if has_gallery %}
+            <div class="exc-thumbs">
+              {% for n in (1..4) %}
+                {% assign key = 'gallery_' | append: n %}
+                {% assign gimg = item.settings[key] %}
+                {% if gimg != blank %}
+                  <button type="button" class="exc-thumb" data-lightbox="exc-{{ item.slug }}" data-lightbox-src="{% image src: gimg, size: 'hero', output: 'url' %}" aria-label="View photo {{ n }}">
+                    {% image src: gimg, size: 'small', alt: item.settings.title %}
+                  </button>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="exc-body">
+    <div class="container container--wide">
+      <div class="exc-body__grid">
+        <div class="exc-desc reveal reveal-up">
+          <h2>About this excursion</h2>
+          {% if item.settings.description != blank %}
+            <div class="rte">{{ item.settings.description | raw }}</div>
+          {% endif %}
+
+          {% if item.settings.itinerary != blank %}
+            <h2 style="margin-top: var(--s6);">Itinerary</h2>
+            <ul class="itinerary">
+              {%- assign stops = item.settings.itinerary | strip | split: '
+' -%}
+              {% for line in stops %}
+                {% assign cells = line | split: '|' %}
+                {% if cells.size > 0 and cells[0] != blank %}
+                  <li><b>{{ cells[0] | strip }}</b>{% if cells[1] != blank %}<span>{{ cells[1] | strip }}</span>{% endif %}</li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <aside class="exc-aside reveal reveal-up">
+          {% assign has_incl = false %}
+          {% if item.settings.incl_hotel_pickup or item.settings.incl_guide or item.settings.incl_transport or item.settings.incl_lunch or item.settings.incl_drinks or item.settings.incl_equipment or item.settings.incl_photos or item.settings.incl_insurance %}{% assign has_incl = true %}{% endif %}
+          {% if has_incl %}
+            <span class="aside-title">What's included</span>
+            <ul class="incl-list">
+              {% if item.settings.incl_hotel_pickup %}<li>{% render 'icon', name: 'car' %}Hotel pickup</li>{% endif %}
+              {% if item.settings.incl_guide %}<li>{% render 'icon', name: 'guests' %}Guide</li>{% endif %}
+              {% if item.settings.incl_transport %}<li>{% render 'icon', name: 'car' %}Transport</li>{% endif %}
+              {% if item.settings.incl_lunch %}<li>{% render 'icon', name: 'breakfast' %}Lunch</li>{% endif %}
+              {% if item.settings.incl_drinks %}<li>{% render 'icon', name: 'minibar' %}Drinks</li>{% endif %}
+              {% if item.settings.incl_equipment %}<li>{% render 'icon', name: 'compass' %}Equipment</li>{% endif %}
+              {% if item.settings.incl_photos %}<li>{% render 'icon', name: 'camera' %}Photos</li>{% endif %}
+              {% if item.settings.incl_insurance %}<li>{% render 'icon', name: 'shield' %}Insurance</li>{% endif %}
+            </ul>
+          {% endif %}
+
+          {% if item.settings.languages != blank or item.settings.season != blank or item.settings.min_persons != blank %}
+            <div class="aside-divider"></div>
+            <ul class="incl-list" style="grid-template-columns: 1fr;">
+              {% if item.settings.season != blank %}<li>{% render 'icon', name: 'calendar' %}{{ item.settings.season }}</li>{% endif %}
+              {% if item.settings.languages != blank %}<li>{% render 'icon', name: 'globe' %}{{ item.settings.languages }}</li>{% endif %}
+              {% if item.settings.min_persons != blank %}<li>{% render 'icon', name: 'ticket' %}Min {{ item.settings.min_persons }} guests</li>{% endif %}
+            </ul>
+          {% endif %}
+
+          {% if item.settings.rates != blank %}
+            <div class="aside-divider"></div>
+            <span class="aside-title">Pricing</span>
+            <table class="rates-table">
+              {%- assign rate_lines = item.settings.rates | strip | split: '
+' -%}
+              {% for line in rate_lines %}
+                {% assign cells = line | split: '|' %}
+                {% if cells.size > 0 and cells[0] != blank %}
+                  <tr><td>{{ cells[0] | strip }}</td><td>{{ cells[1] | strip }}</td></tr>
+                {% endif %}
+              {% endfor %}
+            </table>
+            {% if item.settings.rates_note != blank %}<p class="rates-note">{{ item.settings.rates_note }}</p>{% endif %}
+          {% endif %}
+
+          <div class="aside-divider"></div>
+          <a class="btn" style="justify-content:center;" href="{{ item.settings.book_link.href | default: '../contact.html' }}"{% if item.settings.book_link.target != blank %} target="{{ item.settings.book_link.target }}"{% endif %}>{{ item.settings.book_label | default: 'Book this excursion' }}</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+</article>
