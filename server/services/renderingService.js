@@ -24,6 +24,12 @@ import { YouTubeTag } from "../../src/core/tags/youtubeTag.js";
 import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.js";
+import { registerCollectionFilter } from "../../src/core/filters/collectionFilter.js";
+import {
+  listCollectionItems,
+  getCollectionSchema,
+  resolveCollectionItemLinks,
+} from "./collectionService.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
@@ -83,6 +89,7 @@ function configureLiquidEngine(engine) {
   // Register custom filters
   registerMediaMetaFilter(engine);
   registerHandleizeFilter(engine);
+  registerCollectionFilter(engine);
 }
 
 // Global engine for fallback/static use if needed (optional, can be removed if strictly per-request)
@@ -462,6 +469,64 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   if (!globals.icons) {
     globals.icons = flatIcons;
     globals.iconPrefix = projectIcons.prefix || "";
+  }
+
+  // Collection items loader for the `| collection` filter (Phase 8). Attached
+  // once per render; results cached per (type, options) on `globals` so multiple
+  // widgets reading the same collection only hit the filesystem once. The cache
+  // is per-render (scoped to `globals`) because `outputPathPrefix` differs across
+  // output depths, so a root page and a nested item page must not share a `url`.
+  if (!globals.collectionCache) globals.collectionCache = new Map();
+  if (!globals.getCollectionItems) {
+    const collectionProjectFolder = await getProjectFolderName(projectId);
+    globals.getCollectionItems = async (collectionType, options = {}) => {
+      const cacheKey = `${collectionType}:${JSON.stringify(options ?? {})}`;
+      if (globals.collectionCache.has(cacheKey)) return globals.collectionCache.get(cacheKey);
+
+      // Sort in the service, but apply limit/offset HERE — after excluding
+      // invalid items — so `limit` counts valid items (an invalid item must not
+      // consume a slot in the returned window).
+      const { limit, offset, ...sortOptions } = options ?? {};
+      const [items, schema] = await Promise.all([
+        listCollectionItems(collectionProjectFolder, collectionType, sortOptions),
+        getCollectionSchema(collectionProjectFolder, collectionType),
+      ]);
+
+      const outputPathPrefix = globals.outputPathPrefix || "";
+      const pagesByUuid = globals.pagesByUuid || new Map();
+
+      const excluded = items.filter((item) => item.invalid);
+      if (excluded.length > 0 && process.env.NODE_ENV !== "production") {
+        console.warn(
+          `[collections] "${collectionType}": excluding ${excluded.length} invalid item(s): ${excluded
+            .map((i) => i.slug)
+            .join(", ")}`,
+        );
+      }
+
+      let valid = items.filter((item) => !item.invalid);
+      if (offset) valid = valid.slice(offset);
+      if (limit != null) valid = valid.slice(0, limit);
+
+      const result = valid.map((item) => {
+          const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix);
+          const url = schema?.hasItemPages
+            ? `${outputPathPrefix}${schema.slugPrefix}/${resolved.slug}.html`
+            : null;
+          return {
+            id: resolved.id,
+            uuid: resolved.uuid,
+            slug: resolved.slug,
+            url,
+            created: resolved.created,
+            updated: resolved.updated,
+            settings: resolved.settings,
+          };
+        });
+
+      globals.collectionCache.set(cacheKey, result);
+      return result;
+    };
   }
 
   // Return the base context
