@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import sharp from "sharp";
+import { prefixInternalHref } from "./linkPrefixer.js";
 
 function getMimeTypeFromFilename(filename = "") {
   const extension = path.extname(filename).toLowerCase();
@@ -47,6 +48,27 @@ function getSiteIconMetadata(siteIconSrc, mediaFiles = {}) {
     sourceFilename,
     mimeType,
     isSvg,
+  };
+}
+
+/**
+ * Return a shallow copy of a site_icons object with every href field rewritten
+ * for the given output depth. Used when icon hrefs were generated at the export
+ * root (bare filenames) but are rendered into a nested item page. Non-href
+ * fields (type/sizes) and empty hrefs are left untouched; at the root (prefix
+ * "") the copy is byte-identical to the input.
+ * @param {object} siteIcons
+ * @param {string} outputPathPrefix - "" at the root, "../" one level deep
+ * @returns {object}
+ */
+export function prefixSiteIcons(siteIcons, outputPathPrefix) {
+  if (!siteIcons) return siteIcons;
+  return {
+    ...siteIcons,
+    primaryIconHref: prefixInternalHref(siteIcons.primaryIconHref, outputPathPrefix),
+    legacyIconHref: prefixInternalHref(siteIcons.legacyIconHref, outputPathPrefix),
+    appleTouchIconHref: prefixInternalHref(siteIcons.appleTouchIconHref, outputPathPrefix),
+    manifestHref: prefixInternalHref(siteIcons.manifestHref, outputPathPrefix),
   };
 }
 

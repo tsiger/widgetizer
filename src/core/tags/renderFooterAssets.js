@@ -21,6 +21,8 @@ export const RenderFooterAssetsTag = {
       const apiUrl = globals.apiUrl || "";
       const projectId = globals.projectId || "";
       const renderMode = globals.renderMode || "preview";
+      // Depth-aware prefix for nested item pages ("" at the export root).
+      const outputPathPrefix = globals.outputPathPrefix || "";
 
       let output = "";
 
@@ -53,7 +55,7 @@ export const RenderFooterAssetsTag = {
         let assetUrl;
         if (renderMode === "publish") {
           const version = globals.exportVersion;
-          assetUrl = version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
+          assetUrl = version ? `${outputPathPrefix}assets/${filepath}?v=${version}` : `${outputPathPrefix}assets/${filepath}`;
         } else if (options.source === "widget" && options.widgetType) {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {
@@ -73,7 +75,7 @@ export const RenderFooterAssetsTag = {
         let assetUrl;
         if (renderMode === "publish") {
           const version = globals.exportVersion;
-          assetUrl = version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
+          assetUrl = version ? `${outputPathPrefix}assets/${filepath}?v=${version}` : `${outputPathPrefix}assets/${filepath}`;
         } else if (options.source === "widget" && options.widgetType) {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {

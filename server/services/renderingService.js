@@ -31,7 +31,7 @@ import {
   resolveCollectionItemLinks,
 } from "./collectionService.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
-import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
+import { buildRuntimeSiteIcons, prefixSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { sanitizeWidgetData } from "./sanitizationService.js";
@@ -345,14 +345,23 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   const apiUrl =
     renderMode === "preview" ? process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}` : "";
 
+  // Depth-aware prefix for nested item pages. Read from sharedGlobals because it
+  // is set per-render (before this context is built) and differs by output depth
+  // ("" at the export root, "../" one level deep). Pages always use "".
+  const outputPathPrefix = (sharedGlobals && sharedGlobals.outputPathPrefix) || "";
+
   // Determine image base path based on render mode
   // Publish mode uses assets/images/ for consistent CSS path resolution
   const imageBasePath =
-    renderMode === "publish" ? "assets/images" : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
+    renderMode === "publish"
+      ? `${outputPathPrefix}assets/images`
+      : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
 
   // Determine file base path based on render mode (for PDF and other file assets)
   const fileBasePath =
-    renderMode === "publish" ? "assets/files" : `${apiUrl}/api/media/projects/${projectId}/uploads/files`;
+    renderMode === "publish"
+      ? `${outputPathPrefix}assets/files`
+      : `${apiUrl}/api/media/projects/${projectId}/uploads/files`;
 
   const siteIconSrc = processedThemeSettings?.general?.favicon || "";
 
@@ -471,6 +480,13 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     globals.iconPrefix = projectIcons.prefix || "";
   }
 
+  // Expose depth-aware path globals (defaults keep pages at the export root).
+  // `outputPathPrefix` prefixes relative asset/link URLs; `currentCanonicalPath`
+  // is the un-prefixed path of the page being rendered, used for menu
+  // active-state matching (Phase 16).
+  if (globals.outputPathPrefix === undefined) globals.outputPathPrefix = outputPathPrefix;
+  if (globals.currentCanonicalPath === undefined) globals.currentCanonicalPath = "";
+
   // Collection items loader for the `| collection` filter (Phase 8). Attached
   // once per render; results cached per (type, options) on `globals` so multiple
   // widgets reading the same collection only hit the filesystem once. The cache
@@ -536,7 +552,12 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
     globals,
     imagePath: imageBasePath,
     filePath: fileBasePath,
-    site_icons: globals.siteIcons || buildRuntimeSiteIcons(siteIconSrc, mediaFiles, imageBasePath),
+    // Export-generated site icons carry root-relative filenames, so prefix them
+    // per render depth. Runtime icons are built from the already-prefixed
+    // imageBasePath, so they need no further prefixing.
+    site_icons: globals.siteIcons
+      ? prefixSiteIcons(globals.siteIcons, outputPathPrefix)
+      : buildRuntimeSiteIcons(siteIconSrc, mediaFiles, imageBasePath),
   };
 }
 
@@ -876,12 +897,13 @@ function renderEnqueuedAssetTags(sharedGlobals) {
   const apiUrl = sharedGlobals.apiUrl || "";
   const projectId = sharedGlobals.projectId || "";
   const renderMode = sharedGlobals.renderMode || "preview";
+  const outputPathPrefix = sharedGlobals.outputPathPrefix || "";
   let output = "";
 
   function resolveUrl(filepath, opts) {
     if (renderMode === "publish") {
       const version = sharedGlobals.exportVersion;
-      return version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
+      return version ? `${outputPathPrefix}assets/${filepath}?v=${version}` : `${outputPathPrefix}assets/${filepath}`;
     }
     if (opts.source === "widget" && opts.widgetType) {
       return `${apiUrl}/api/preview/assets/${projectId}/widgets/${opts.widgetType}/${filepath}`;
