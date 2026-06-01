@@ -5,7 +5,20 @@ import { getProjectDir, getPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
-import { renderWidget, renderPageLayout, widgetSupportsTransparentHeader } from "../services/renderingService.js";
+import {
+  renderWidget,
+  renderPageLayout,
+  renderLiquidTemplate,
+  createBaseRenderContext,
+  widgetSupportsTransparentHeader,
+} from "../services/renderingService.js";
+import {
+  listCollectionSchemas,
+  listCollectionItems,
+  loadCollectionTemplate,
+  resolveCollectionItemLinks,
+  buildCollectionItemPageData,
+} from "../services/collectionService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -176,6 +189,33 @@ export async function exportProjectToDir(projectId, options = {}) {
       const err = new Error('Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.');
       err.statusCode = 400;
       err.errorTitle = "Export failed: No homepage found";
+      throw err;
+    }
+
+    // Two-pass collection validation (fail-fast): gather every invalid item
+    // across all collections up front and refuse the export with a full
+    // per-item-per-field error list. No HTML is written when this trips.
+    const collectionSchemas = await listCollectionSchemas(projectFolderName);
+    const invalidCollectionItems = [];
+    for (const schema of collectionSchemas) {
+      const items = await listCollectionItems(projectFolderName, schema.type);
+      for (const item of items) {
+        if (item.invalid) {
+          invalidCollectionItems.push({
+            collection: schema.type,
+            slug: item.slug,
+            errors: item.validationErrors,
+          });
+        }
+      }
+    }
+    if (invalidCollectionItems.length > 0) {
+      const err = new Error(
+        `Export blocked: ${invalidCollectionItems.length} collection item(s) have validation errors. Fix them before exporting.`,
+      );
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: invalid collection items";
+      err.validationErrors = invalidCollectionItems;
       throw err;
     }
 
@@ -436,6 +476,123 @@ Per aspera ad astra
         } catch (mdError) {
           console.warn(`Could not generate markdown for ${pageData.id}: ${mdError.message}`);
         }
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // Render collection item pages (Phase 19 — spec Section 13).
+    // For each hasItemPages collection, render every valid item to
+    // {slugPrefix}/{itemSlug}.html with fresh per-item globals (no asset bleed),
+    // the full header/footer/layout wrap, and the same HTML post-processing
+    // pages receive — at outputPathPrefix "../" since items live one dir deep.
+    // ----------------------------------------------------------------------
+    // uuid -> page map for resolving item links (built once, shared across items).
+    const pagesByUuidForItems = new Map();
+    for (const page of pagesDataArray) {
+      if (page.uuid) pagesByUuidForItems.set(page.uuid, page);
+    }
+    const itemAppVersion = await getAppVersion();
+    const itemEasterEgg = `<!--\nMade with Widgetizer v${itemAppVersion}\nPer aspera ad astra\n-->\n`;
+
+    for (const schema of collectionSchemas) {
+      if (!schema.hasItemPages) continue;
+
+      const items = await listCollectionItems(projectFolderName, schema.type);
+      const validItems = items.filter((item) => !item.invalid);
+      if (validItems.length === 0) continue;
+
+      const template = await loadCollectionTemplate(projectFolderName, schema.type);
+      if (template === null) {
+        const err = new Error(
+          `Collection "${schema.type}" has hasItemPages: true but no template.liquid file at collection-types/${schema.type}/template.liquid`,
+        );
+        err.statusCode = 400;
+        err.errorTitle = "Export failed: missing collection template";
+        throw err;
+      }
+
+      const collectionOutputDir = path.join(outputDir, schema.slugPrefix);
+      await fs.ensureDir(collectionOutputDir);
+
+      for (const item of validItems) {
+        // Fresh globals per item so enqueued assets never bleed between items.
+        const sharedGlobals = {
+          projectId,
+          apiUrl: "",
+          renderMode: "publish",
+          themeSettingsRaw: rawThemeSettings,
+          siteIcons: generatedSiteIcons,
+          enqueuedStyles: new Map(),
+          enqueuedScripts: new Map(),
+          enqueuedPreloads: new Map(),
+          collectionCache: new Map(),
+          pagesByUuid: pagesByUuidForItems,
+          exportVersion: version,
+          outputPathPrefix: "../",
+          currentCanonicalPath: `${schema.slugPrefix}/${item.slug}.html`,
+        };
+
+        // Render header/footer with the item's globals (captures their assets).
+        let itemHeaderHtml = "";
+        let itemFooterHtml = "";
+        if (headerData) {
+          itemHeaderHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null);
+        }
+        if (footerData) {
+          itemFooterHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null);
+        }
+
+        // Resolve item links at depth, then render the collection template.
+        const resolvedItem = resolveCollectionItemLinks(item, pagesByUuidForItems, "../");
+        const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, "publish", sharedGlobals);
+        const itemContext = { ...baseContext, item: resolvedItem };
+        const itemContentHtml = await renderLiquidTemplate(projectId, template, itemContext, sharedGlobals);
+
+        // Page-shaped object (spec Section 13) drives layout title/seo/body class.
+        const itemPageData = buildCollectionItemPageData(schema, resolvedItem, siteUrl);
+
+        let itemHtml = await renderPageLayout(
+          projectId,
+          {
+            headerContent: itemHeaderHtml,
+            mainContent: itemContentHtml,
+            footerContent: itemFooterHtml,
+            bodyClass: `collection-${schema.type} item-${item.slug}`,
+          },
+          itemPageData,
+          rawThemeSettings,
+          "publish",
+          sharedGlobals,
+        );
+
+        const itemFormat = await formatHtml(itemHtml);
+        itemHtml = itemFormat.html;
+        if (!itemFormat.success) {
+          console.warn(`Could not format HTML for ${schema.slugPrefix}/${item.slug}.html: ${itemFormat.error}.`);
+        }
+
+        // Storage-path rewrite at the item's depth.
+        itemHtml = rewriteStoragePaths(itemHtml, "../");
+
+        if (devModeEnabled) {
+          const validation = await validateHtml(itemHtml, `${schema.slugPrefix}/${item.slug}`);
+          if (validation.issues.length > 0) {
+            validationIssues.push({
+              page: `${schema.slugPrefix}/${item.slug}`,
+              filename: `${schema.slugPrefix}/${item.slug}.html`,
+              issues: validation.issues,
+            });
+          }
+        }
+
+        itemHtml = itemEasterEgg + itemHtml;
+
+        if (exportMarkdown) {
+          const mdHref = markdownAlternateHref(`${item.slug}.md`, siteUrl, validSiteUrl, "../");
+          itemHtml = itemHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
+        }
+
+        await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.html`), itemHtml);
       }
     }
 

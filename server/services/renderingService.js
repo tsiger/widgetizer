@@ -1009,6 +1009,7 @@ export {
   renderWidget,
   renderPageLayout,
   renderLiquidTemplate,
+  createBaseRenderContext,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
   resolveLinkValue,

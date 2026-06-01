@@ -921,3 +921,56 @@ export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix) 
   }
   return resolved;
 }
+
+/** True when `siteUrl` is a non-empty, parseable absolute URL. */
+function isValidSiteUrl(siteUrl) {
+  if (!siteUrl || !siteUrl.trim()) return false;
+  try {
+    new URL(siteUrl);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Map a normalized collection item + its schema into the page-shaped object that
+ * renderPageLayout and SeoTag consume for an item page (spec Section 13). The
+ * title/og-image come from the schema's usedAsTitle / usedAsOgImage fields; SEO
+ * fields follow the seo_title / seo_description / seo_noindex conventions.
+ *
+ * @param {object} schema - normalized collection schema
+ * @param {object} item - normalized (and link-resolved) collection item
+ * @param {string} siteUrl - project siteUrl ("" when unset)
+ * @returns {object} page-shaped object
+ */
+export function buildCollectionItemPageData(schema, item, siteUrl) {
+  const fieldSettings = (schema.settings || []).filter((s) => s.type !== HEADER_TYPE);
+  const titleField = fieldSettings.find((s) => s.usedAsTitle);
+  const ogImageField = fieldSettings.find((s) => s.usedAsOgImage);
+  const settings = item.settings || {};
+
+  const titleValue = (titleField && settings[titleField.id]) || item.slug;
+  const seoTitle = settings.seo_title || "";
+  const validSiteUrl = isValidSiteUrl(siteUrl);
+  const canonicalBase = validSiteUrl ? siteUrl.replace(/\/$/, "") : "";
+
+  return {
+    id: `${schema.slugPrefix}-${item.slug}`,
+    slug: `${schema.slugPrefix}/${item.slug}`,
+    uuid: item.uuid,
+    name: titleValue,
+    created: item.created,
+    updated: item.updated,
+    seo: {
+      title: seoTitle,
+      description: settings.seo_description || "",
+      robots: settings.seo_noindex ? "noindex,follow" : "index,follow",
+      canonical_url: validSiteUrl ? `${canonicalBase}/${schema.slugPrefix}/${item.slug}.html` : "",
+      og_image: (ogImageField && settings[ogImageField.id]) || "",
+      og_title: seoTitle || titleValue,
+      og_type: "article",
+      twitter_card: "summary_large_image",
+    },
+  };
+}
