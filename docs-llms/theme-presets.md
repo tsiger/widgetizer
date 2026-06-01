@@ -141,14 +141,16 @@ For any preset:
 
 **Theme updates**: Presets are only used at project creation time. Once a project is created, it's independent. Theme updates (`applyThemeUpdate`) replace project-owned theme infrastructure like widgets/layout/assets/snippets/locales, merge `theme.json`, and add new menus/templates without overwriting existing project content. Preset files can be updated via the existing version system (add/modify files in `updates/` version folders).
 
-> ℹ️ **Note for the future Collections feature.** This "presets are creation-time only" rule was the
-> root cause of `BLOCKER-1` in [future-collections-blockers.md](future-collections-blockers.md): a
-> preset that *overrode* a collection-type schema would have that override wiped on the first theme
-> update (the update replaces `collection-types/` from the theme source, never the preset).
-> **Resolved (approach C):** collection-type schemas and templates are theme-only — presets may seed
-> only `collections/` (item data), never `collection-types/`. So this rule needs no change for
-> collections; collection schemas simply follow the same "theme-owned, replaced on update" path as
-> widgets. See spec [future-collections.md](future-collections.md) Section 5 ("Preset Seeding").
+> ℹ️ **Collections and presets.** The "presets are creation-time only" rule shapes how presets
+> interact with the [Collections](core-collections.md) feature. Collection-type schemas and templates
+> are **theme-only** — presets may seed only `collections/` (item *data*), never `collection-types/`
+> (a preset that ships a `collection-types/` folder is rejected at theme upload). This keeps collection
+> schemas on the same "theme-owned, replaced on update" path as widgets: a theme update can replace
+> `collection-types/` wholesale without ever reverting a preset-specific schema or silently dropping
+> the data entered into preset-only fields. When a preset ships a `collections/` folder,
+> `resolvePresetPaths` returns its `collectionsDir` (never a `collectionTypesDir`) and project creation
+> copies the items in, regenerating UUIDs/timestamps and skipping any item whose `type` the theme
+> doesn't define. See [Collections — Design Rationale](core-collections.md#10-design-rationale).
 
 **Backward compatibility**: Everything is opt-in. No `presets/` directory = no presets = existing behavior unchanged. The `preset` param in `createProject` is optional and defaults to null.
 

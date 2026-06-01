@@ -136,22 +136,26 @@ These theme files can be updated in projects:
 
 | Path             | Behavior                              |
 | ---------------- | ------------------------------------- |
-| `layout.liquid`  | Replaced with new version             |
-| `assets/`        | Entire folder replaced                |
-| `widgets/`       | Entire folder replaced                |
-| `snippets/`      | Entire folder replaced                |
-| `locales/`       | Entire folder replaced                |
-| `theme.json`     | **Merged** (see Settings Merge below) |
-| `screenshot.png` | Replaced with new version             |
+| `layout.liquid`     | Replaced with new version             |
+| `assets/`           | Entire folder replaced                |
+| `widgets/`          | Entire folder replaced                |
+| `snippets/`         | Entire folder replaced                |
+| `locales/`          | Entire folder replaced                |
+| `collection-types/` | Entire folder replaced (theme-owned collection schemas + templates) |
+| `theme.json`        | **Merged** (see Settings Merge below) |
+| `screenshot.png`    | Replaced with new version             |
+
+`collection-types/` is in `themeUpdateService.UPDATABLE_PATHS` and treated exactly like `widgets/` — replaced wholesale from the theme source. This is safe because collection-type schemas/templates are **theme-only**: presets may seed item data (`collections/`) but never `collection-types/`, so a replace never reverts a preset-specific schema. See [Collections — Design Rationale](core-collections.md#10-design-rationale).
 
 ### Protected Paths (Never Updated)
 
 User content is never modified:
 
-| Path       | Reason              |
-| ---------- | ------------------- |
-| `pages/`   | User's page content |
-| `uploads/` | User's media files  |
+| Path           | Reason                            |
+| -------------- | --------------------------------- |
+| `pages/`       | User's page content               |
+| `uploads/`     | User's media files                |
+| `collections/` | User's collection item data       |
 
 ### Add-New-Only Paths
 
@@ -351,3 +355,4 @@ Projects track theme update information:
 - [Theme Management](core-themes.md) - Themes page and upload functionality
 - [Project Management](core-projects.md) - Project theme relationship
 - [Theming Guide](theming.md) - Theme structure and development
+- [Collections](core-collections.md) - Theme-owned `collection-types/` vs protected `collections/` item data

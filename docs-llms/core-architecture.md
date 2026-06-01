@@ -219,6 +219,39 @@ Core widgets are reusable, theme-independent widgets stored in the core widgets 
 
 ---
 
+## Collections
+
+Theme-defined custom post types (Portfolio, Team, etc.) authored as items via a CMS. Full reference: [Collections](core-collections.md).
+
+### Frontend Files
+
+- `src/pages/CollectionItems.jsx` - Listing table (search, bulk delete, drag-reorder, needs-attention filter)
+- `src/pages/CollectionItemAdd.jsx` / `CollectionItemEdit.jsx` - Add/edit routes
+- `src/components/collections/CollectionItemForm.jsx` - Shared schema-driven form (`SettingsRenderer`)
+- Sidebar nav items rendered by `src/components/layout/Sidebar.jsx` via `useCollections()`
+
+### Query Layer (`src/queries/collectionManager.js`)
+
+API client mirroring the controller surface; uses `apiFetch` (`X-Project-Id`). Hooks: `src/hooks/useCollections.js` (schemas, with `invalidateCollectionsCache`) and `src/hooks/useCollectionItems.js` (items).
+
+### Server Controller (`server/controllers/collectionController.js`)
+
+Ten handlers under `/api/collections` (`server/routes/collections.js`): `getCollectionSchemas`, `getCollectionSchema`, `getAllItems`, `getItem`, `createItem`, `updateItem`, `deleteItem`, `bulkDeleteItems`, `duplicateItem`, `reorderItems`. Validated by `express-validator` + `resolveActiveProject`.
+
+### Service (`server/services/collectionService.js`)
+
+Owns schema validation/migration, item CRUD with atomic + slug-safe writes, `_order.json`, render-time link resolution (`resolveCollectionItemLinks`), and the export page-shaped object (`buildCollectionItemPageData`).
+
+### Utils & Integration
+
+- `server/utils/atomicFs.js` - `writeJsonAtomic` (UUID-tmp + rename), shared by item and `_order.json` writes
+- `server/utils/linkPrefixer.js` - `prefixInternalHref` / `normalize`, shared by widget/menu/collection link resolvers for depth-aware paths
+- `src/core/filters/collectionFilter.js` - the `| collection` Liquid filter, registered in `renderingService.configureLiquidEngine`
+- `src/components/settings/supportedSettingTypes.js` - single source of truth for valid setting types (renderer + schema validator)
+- Wired into `mediaUsageService` (collection media), `themeUpdateService` (`collection-types` updatable), `linkEnrichment` (page-delete cleanup / duplication), and `exportController` (item-page export)
+
+---
+
 ## Media
 
 ### Frontend Files

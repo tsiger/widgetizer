@@ -58,6 +58,10 @@ A theme is organized as a directory with the following structure:
 │   └── en.json             # English locale (nested key-value pairs)
 ├── menus/                  # Navigation menu definitions
 │   └── main-nav.json       # Menu structure and items
+├── collection-types/       # Optional custom post types (see §9)
+│   └── portfolio/
+│       ├── schema.json     # Collection field schema
+│       └── template.liquid # Item-page template (only when hasItemPages: true)
 ├── presets/                # Optional preset variants
 │   ├── presets.json        # Preset registry (names, descriptions, default)
 │   ├── financial/
@@ -1333,7 +1337,86 @@ Global templates can also include default blocks (when the widget schema defines
 }
 ```
 
-## 9. Navigation Menus
+## 9. Collection Types
+
+Themes can define **collection types** — structured custom post types (Portfolio, Team, Testimonials, Blog Posts) that users author as items through a CMS interface and that widgets read via the `| collection` Liquid filter. Each type is a folder under `collection-types/{type}/` containing a `schema.json` (and, when `hasItemPages: true`, a `template.liquid`).
+
+This is a theme-authoring summary. For the full system (storage model, migration, API, export, concurrency), see [Collections](core-collections.md).
+
+### Schema (`collection-types/{type}/schema.json`)
+
+The schema reuses the same setting types as widgets/`theme.json`, plus a few top-level fields and three field flags:
+
+```json
+{
+  "type": "portfolio",
+  "schemaVersion": 1,
+  "displayName": "Portfolio Item",
+  "displayNamePlural": "Portfolio",
+  "icon": "Briefcase",
+  "slugPrefix": "portfolio",
+  "hasItemPages": true,
+  "sortable": true,
+  "defaultSort": "manual",
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+    { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
+    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
+    { "type": "textarea", "id": "description", "label": "Description" },
+    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+  ]
+}
+```
+
+Authoring rules (enforced at runtime and at theme upload):
+
+- `type` must match the folder name and be `^[a-z0-9-]+$`; `slugPrefix` must be `^[a-z0-9-]+$` (defaults to `type`).
+- **Exactly one** non-`header` setting must declare `usedAsTitle: true` (must be a `text` field) — it's the display name and the slug source.
+- **At most one** setting may declare `usedAsOgImage: true` (must be an `image` field) — the default social image for item pages.
+- `defaultSort` ∈ `manual` \| `created_desc` \| `created_asc` \| `title_asc` \| `title_desc`.
+- Only setting types in `supportedSettingTypes.js` are allowed; `multiple`/`blocks`/repeater/relationship/taxonomy fields are rejected. No `gallery`/multi-image type exists yet.
+- Two collections can't share a `slugPrefix`, and a `slugPrefix` can't be a reserved output dir (`assets`).
+- SEO is field-id convention: a `checkbox` with `id: "seo_noindex"`, plus `seo_title`/`seo_description` text fields.
+- Labels support `tTheme:` locale keys, same as widget schemas.
+
+### Item pages (`template.liquid`)
+
+When `hasItemPages: true`, export generates `{slugPrefix}/{itemSlug}.html` per item, rendering `collection-types/{type}/template.liquid` **inside** the theme's main layout (header/footer/main slots, like a page template). Context: `item` (`id`, `uuid`, `slug`, `url`, `created`, `updated`, `settings.*`), `collection` (the schema), `page` (a page-shaped SEO object), plus the usual `project`/`theme`/`mediaFiles`.
+
+```liquid
+<article class="portfolio-single">
+  <h1>{{ item.settings.title }}</h1>
+  {% image src: item.settings.featured_image, size: 'large' %}
+  <div class="content">{{ item.settings.description }}</div>
+  {% if item.settings.external_url.href %}
+    <a href="{{ item.settings.external_url.href }}" target="{{ item.settings.external_url.target }}">View project</a>
+  {% endif %}
+</article>
+```
+
+Collections that only render inside widgets (e.g. a testimonials carousel) set `hasItemPages: false` and ship no template. A `hasItemPages: true` collection with no `template.liquid` fails export with a clear error.
+
+> Item pages export one directory deep, so the core `menu.liquid` snippet and asset tags use depth-aware relative paths. Themes that override `menu.liquid` must adopt the `canonicalPath`/`currentCanonicalPath` active-state comparison — see [Collections §6](core-collections.md#6-render-time-link-resolution).
+
+### Reading collections in widgets (`| collection`)
+
+Any widget can read collection data without configuration:
+
+```liquid
+{% assign items = 'portfolio' | collection: limit: 6, sort: 'created_desc' %}
+{% for item in items %}
+  <h3>{{ item.settings.title }}</h3>
+  {% if item.url %}<a href="{{ item.url }}">View</a>{% endif %}
+{% endfor %}
+```
+
+Options: `limit`, `offset`, `sort`. `item.url` is `null` when `hasItemPages: false`. Invalid items (missing required fields) are excluded.
+
+### Presets and updates
+
+Collection-type schemas/templates are **theme-owned** and replaced wholesale on theme update; user item data (`collections/`) is protected. Presets may seed `collections/` item data only — never `collection-types/`. See [Theme Updates](theme-updates.md) and [Theme Presets](theme-presets.md).
+
+## 10. Navigation Menus
 
 Menus are defined as JSON files in the `/menus/` directory and support nested navigation up to 4 levels deep.
 
@@ -1397,7 +1480,7 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 
 The menu snippet automatically adds the `class_has_submenu` class to items that have child items, allowing you to style dropdown indicators and submenu behaviors.
 
-## 10. Assets Management
+## 11. Assets Management
 
 ### CSS Files
 
@@ -1486,7 +1569,7 @@ When exporting a project to static HTML:
 
 > [!WARNING] Because widget assets are flattened during export, files with the same name from different widgets will collide. Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`).
 
-## 11. Theme Locales
+## 12. Theme Locales
 
 Theme locale files provide the translated strings for all theme-owned `tTheme:` prefixed keys used in theme widget schemas and global settings. They live in the `locales/` directory at the theme root.
 
@@ -1584,7 +1667,7 @@ Run `npm run validate:theme-locales` to validate theme locale files. The validat
 2. The theme's `en.json` contains no orphaned theme-owned keys that aren't referenced by any theme schema
 3. Shared core-widget locales are validated separately against `src/core/widgets/`
 
-## 12. Advanced Features
+## 13. Advanced Features
 
 ### Scroll Reveal Animations
 
@@ -1897,7 +1980,7 @@ To enable these features in your theme, add the `advanced` settings group to you
 
 Then add the corresponding tags in your `layout.liquid` where you want the content to appear.
 
-## 13. Theme Presets
+## 14. Theme Presets
 
 Presets are named variants of a theme that can override **settings** (colors, fonts, etc.) and/or **demo content** (templates, menus, global widgets) while sharing the same theme codebase (layout, widgets, assets, snippets). Users pick a preset when creating a project. Once a project is created, it is independent from the preset.
 
@@ -1989,7 +2072,7 @@ When a user selects a theme with presets during project creation, a visual card 
 
 For detailed implementation information, see [Theme Presets](theme-presets.md).
 
-## 14. Theme Development Workflow
+## 15. Theme Development Workflow
 
 1. **Planning**: Define the theme's purpose, target audience, and key features
 2. **Setup**: Create the basic theme structure and `theme.json` with global settings
@@ -2009,7 +2092,7 @@ This theming system provides a powerful and flexible foundation for creating bea
 
 ---
 
-## 15. Theme Lifecycle in Projects
+## 16. Theme Lifecycle in Projects
 
 When a new project is created, the selected theme is copied into the project's data directory so it can be customized independently of the source theme:
 

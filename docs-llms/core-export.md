@@ -181,6 +181,17 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
 12. **Send Response**:
     - Once all steps are complete, the server sends a success response to the client, including the export record with version information.
 
+### Collection item pages (export)
+
+When a project has collection types with `hasItemPages: true`, the export also generates one static HTML page per item under `{slugPrefix}/{itemSlug}.html`. See [Collections — Individual Item Pages](core-collections.md#8-individual-item-pages-export) for the full feature; the export-specific mechanics are:
+
+- **Depth-aware paths**: item pages render one directory below the export root, so a render global `outputPathPrefix` (`""` for root pages, `"../"` for item pages, consulted only in publish mode) is prepended to every internal URL. The asset tags (`{% asset %}`, `{% image %}`, header/footer asset enqueues, preload `href`/`imagesrcset`, `{% placeholder_image %}`), the `imagePath`/`filePath`/`site_icons` globals, the post-render `/uploads/` → `assets/` rewrite, the markdown alternate-link fallback, menu/widget/collection link resolution (via `prefixInternalHref`), and the favicon refs all consult `outputPathPrefix`. Pages at the root pass `""`, which is a no-op, so existing page output is byte-for-byte unchanged (guarded by a regression snapshot test).
+- **Two-pass validation (before any disk write)**: the controller loads pages and validated collection schemas/items first; if any `hasItemPages` item is `invalid` (missing required fields), the export **fails with 400** and a full per-item-per-field error list, writing **no** HTML. Only when validation is clean does any disk write begin (favicons → pages → items → sitemap/robots).
+- **Per-item render loop**: each item gets **fresh** `sharedGlobals` (new `enqueuedStyles`/`enqueuedScripts`/`enqueuedPreloads`/`collectionCache` Maps; shared cached `pagesByUuid`; `outputPathPrefix: "../"`; `currentCanonicalPath: "{slugPrefix}/{itemSlug}.html"`) so styles/scripts enqueued by one item don't bleed into the next. Links are resolved via `resolveCollectionItemLinks`; the template is rendered via `renderLiquidTemplate` and wrapped via `renderPageLayout` with `contentSections.bodyClass = "collection-{type} item-{slug}"`. A missing `template.liquid` for a `hasItemPages` collection fails the export with a clear error.
+- **Page-shaped object & SEO**: `buildCollectionItemPageData` builds the `page` object the layout/SeoTag consume — `seo.robots` from `seo_noindex`, explicit `seo.canonical_url` when `siteUrl` is valid, `og_image` from the `usedAsOgImage` field, `og_type: "article"`.
+- **Sitemap / robots / manifest**: valid non-`noindex` items are appended to `sitemap.xml` (with `lastmod: item.updated`); `noindex` items are added to `robots.txt` Disallow lines, deduplicated with page disallows across a single Set; `manifest.json` gains a `collections` array (`{ type, itemPages, itemCount }`) including `hasItemPages: false` types. As with pages, no sitemap/robots is written when `siteUrl` is unset.
+- **Markdown parity**: when `exportMarkdown` is true, items also export `.md` files at `{slugPrefix}/{itemSlug}.md`, with YAML frontmatter (`title`, `description`, `collection`, `slug`, `source_url.html`/`.md`) and a depth-prefixed alternate link.
+
 ## 3. Export Management Features
 
 ### Version Control System
@@ -294,3 +305,4 @@ All API endpoints described in this document are protected by input validation a
 
 - [App Settings](core-appSettings.md) — Configure export retention limits
 - [Media Library](core-media.md) — Media usage tracking for optimized exports
+- [Collections](core-collections.md) — Collection item-page export, depth-aware paths, sitemap/robots/manifest

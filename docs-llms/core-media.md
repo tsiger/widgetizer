@@ -71,7 +71,7 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
 - **Tables**:
   - `media_files`: core file records (id, project_id, filename, type, path, dimensions, metadata)
   - `media_sizes`: generated image variants (thumb/small/medium/etc.)
-  - `media_usage`: usage relationships (`used_in`) for pages, globals, and theme settings
+  - `media_usage`: usage relationships (`used_in`) for pages, globals, theme settings, and collection items
 - **Filesystem**: original uploads and generated image variants still live in:
   - `data/projects/{folderName}/uploads/images/`
 
@@ -135,8 +135,17 @@ The media library automatically tracks which pages and global widgets are using 
   - **Global widgets** (header/footer) are saved or updated (scans settings for media paths)
 - **Delete Protection**: Files with a non-empty `usedIn` array cannot be deleted
 - **Manual Refresh**: Users can manually refresh usage tracking to recalculate all relationships
-- **Media Types Tracked**: Images and file assets (PDFs) are tracked across pages, global widgets, and theme settings
+- **Media Types Tracked**: Images and file assets (PDFs) are tracked across pages, global widgets, theme settings, and **collection items**
 - **Recursive Scanning**: The usage scanner recurses into nested objects (e.g. link settings with `{ href: "/uploads/files/brochure.pdf", ... }`) so media paths inside link fields are tracked for deletion protection and export
+
+#### Collection item usage
+
+Collection items reference media through `image`, `file`, and `link` settings just like pages. Their usage source string is `collection:{collectionType}/{itemSlug}` (e.g. `collection:portfolio/project-alpha`) — no new `{ contextType, contextId }` shape; the repository contract is unchanged. See [Collections](core-collections.md) for the content model.
+
+- `mediaUsageService.js` adds `extractMediaPathsFromCollectionItem`, `updateCollectionItemMediaUsage`, `removeCollectionItemFromMediaUsage`, and `syncCollectionItemMediaUsageOnWrite` (the last handles renames: remove the old source, add the new).
+- `refreshAllMediaUsage` also scans `data/projects/{folder}/collections/*/*.json` (excluding `_order.json`), so the existing structural-refresh hooks (project creation/duplication/import, theme-update apply) pick up collection media with **no** new refresh call sites.
+- The collection controller's CRUD handlers wire the sync calls; a mid-rename crash can leave a stale source until the next structural refresh repairs it (eventually consistent).
+- **Media library display**: source strings are resolved to friendly titles by `resolveUsageTitle` in `src/utils/mediaUsageDisplay.js` (shared by `MediaGridItem` and `MediaListItem`). `Media.jsx` lazily fetches the collection schemas + items referenced in usage rows and renders `collection:portfolio/project-alpha` as `Portfolio: Project Alpha`, falling back to the raw string when a schema/item can't be resolved (e.g. the collection was removed by a theme switch).
 
 ### Media Type Configuration
 
@@ -372,7 +381,8 @@ The media usage tracking is handled by a dedicated service that provides automat
 - **`updateGlobalWidgetMediaUsage(projectId, globalId, widgetData)`**: Scans a global widget (header/footer) for media references and updates the `usedIn` arrays. Works the same way as page tracking but for global widgets. Also recurses into nested objects.
 - **`removePageFromMediaUsage(projectId, pageId)`**: Removes a page from all media files' `usedIn` arrays when the page is deleted.
 - **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages and global widgets use it.
-- **`refreshAllMediaUsage(projectId)`**: Scans all pages and global widgets in a project and rebuilds the complete usage tracking data.
+- **`refreshAllMediaUsage(projectId)`**: Scans all pages, global widgets, and collection items in a project and rebuilds the complete usage tracking data.
+- **Collection item functions**: `extractMediaPathsFromCollectionItem`, `updateCollectionItemMediaUsage`, `removeCollectionItemFromMediaUsage`, and `syncCollectionItemMediaUsageOnWrite` track media referenced by collection items under the `collection:{type}/{slug}` source string (see the "Collection item usage" subsection above).
 
 **Integration with Page Operations:**
 
@@ -397,3 +407,4 @@ All API endpoints described in this document are protected by input validation a
 - [Export System](core-export.md) - How media usage tracking optimizes exports
 - [File Assets Architecture](core-file-assets.md) - Architecture and product decisions for file asset support
 - [Custom Hooks](core-hooks.md) - Media management hooks documentation
+- [Collections](core-collections.md) - Collection item media usage tracking and "Used in" display

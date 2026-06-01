@@ -68,6 +68,8 @@ SQLite does **not** replace project content files. These remain file-based:
 - `data/projects/<folderName>/menus/*.json`
 - `data/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
 - `data/projects/<folderName>/uploads/images/*`
+- `data/projects/<folderName>/collection-types/<type>/schema.json` (and optional `template.liquid`) — theme-owned collection definitions
+- `data/projects/<folderName>/collections/<type>/*.json` (and `_order.json`) — user collection item data; see [Collections](core-collections.md)
 
 ---
 

@@ -238,6 +238,7 @@ Handles applying theme updates to projects:
 - `widgets/`
 - `snippets/`
 - `locales/`
+- `collection-types/` (theme-owned collection schemas/templates; see [Collections](core-collections.md))
 - `theme.json` (merged, not replaced)
 - `screenshot.png`
 
@@ -245,7 +246,7 @@ Handles applying theme updates to projects:
 
 - `pages/`
 - `uploads/`
-- `collections/` (if present)
+- `collections/` (if present) — user collection item data
 
 **Add-new-only paths**:
 

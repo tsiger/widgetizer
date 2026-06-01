@@ -8,7 +8,7 @@ Visual website builder with theme support. Runs as an Electron desktop app or as
 
 ## Deep-dive docs
 
-Before tackling non-trivial work in an unfamiliar area, skim the relevant file under `docs-llms/` — it contains LLM-targeted reference docs maintained alongside the code. Start at `docs-llms/documentation-index.md`. Notable entries: `core-architecture.md`, `core-security.md`, `core-pages.md`, `core-page-editor.md`, `core-widgets.md`, `core-themes.md`, `core-media.md`, `core-export.md`, `core-database.md`, `core-design-system.md`, `core-project-id-architecture.md`, `theming.md`, `theming-widgets.md`, `theming-setting-types.md`.
+Before tackling non-trivial work in an unfamiliar area, skim the relevant file under `docs-llms/` — it contains LLM-targeted reference docs maintained alongside the code. Start at `docs-llms/documentation-index.md`. Notable entries: `core-architecture.md`, `core-security.md`, `core-pages.md`, `core-page-editor.md`, `core-widgets.md`, `core-collections.md`, `core-themes.md`, `core-media.md`, `core-export.md`, `core-database.md`, `core-design-system.md`, `core-project-id-architecture.md`, `theming.md`, `theming-widgets.md`, `theming-setting-types.md`.
 
 ## Quick Reference
 

@@ -186,6 +186,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[core-collections.md](core-collections.md)** - Collections System (Custom Post Types)
+
+**Purpose**: Theme-defined structured content types (Portfolio, Team, Testimonials, Blog Posts) authored as items via a CMS, read by widgets via a Liquid filter, with optional per-item static page export **When to use**:
+
+- Defining collection types in a theme (`collection-types/{type}/schema.json`)
+- Understanding collection item storage, schema migration, and slug rules
+- Working with the `| collection` Liquid filter or item-page templates
+- Implementing or tracing collection CRUD, export, media usage, or link resolution
+
+**Key topics**: Collection schema + field flags (`usedAsTitle`/`usedAsOgImage`), item data model + `_order.json`, schema migration (warn-before-drop), service/controller/routes, `| collection` filter, individual item-page export (depth-aware paths, SEO mapping), atomic writes + crash recovery, link resolution, design rationale, deferred Phase 3 scope
+
+---
+
 ## 🗂️ Content Organization
 
 ### **[core-menus.md](core-menus.md)** - Navigation Menu System
@@ -317,7 +330,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **Theme Developers**
 
-Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md`, `theme-presets.md` Secondary: `core-export.md`, `core-menus.md`
+Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md`, `theme-presets.md` Secondary: `core-export.md`, `core-menus.md`, `core-collections.md`
 
 ### **Frontend Developers**
 
@@ -325,7 +338,7 @@ Primary docs: `core-page-editor.md`, `core-projects.md`, `core-pages.md` Seconda
 
 ### **Backend Developers**
 
-Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `core-pages.md`, `core-menus.md`, `core-appSettings.md`
+Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `core-pages.md`, `core-menus.md`, `core-appSettings.md`, `core-collections.md`
 
 ### **System Architects**
 
