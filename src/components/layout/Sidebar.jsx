@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
 import { navigationSections } from "../../config/navigation";
 import { getAllPages } from "../../queries/pageManager";
+import useCollections from "../../hooks/useCollections";
+import { resolveLucideIcon } from "../../utils/lucideIcon";
 import SidebarMeta from "./SidebarMeta";
 
 export default function Sidebar() {
@@ -12,6 +14,7 @@ export default function Sidebar() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const hasActiveProject = !!activeProject;
   const [hasPages, setHasPages] = useState(false);
+  const { schemas: collectionSchemas } = useCollections();
 
   useEffect(() => {
     let isCancelled = false;
@@ -107,6 +110,24 @@ export default function Sidebar() {
     </Link>
   );
 
+  // Nav items may declare a label two ways: a `labelKey` (built-in items, run
+  // through i18n) or a pre-resolved `label` string (dynamic collection items,
+  // whose text is the theme-authored displayNamePlural).
+  const resolveLabel = (item) => (item.labelKey ? t(item.labelKey) : item.label);
+
+  const renderBadge = (item, disabled) => {
+    if (typeof item.badge !== "number") return null;
+    return (
+      <span
+        className={`ml-auto hidden min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold md:inline-flex ${
+          disabled ? "bg-slate-800 text-slate-500" : "bg-slate-800 text-slate-300 group-hover:text-white"
+        }`}
+      >
+        {item.badge}
+      </span>
+    );
+  };
+
   const renderNavItem = (item) => {
     const Icon = item.icon;
     const disabled = (item.requiresProject && !hasActiveProject) || (item.action === "openSitePreview" && !canOpenSitePreview);
@@ -130,7 +151,8 @@ export default function Sidebar() {
             <div className={iconClass("__none__", disabled)}>
               <Icon size={20} />
             </div>
-            <span className={navLabelClass("__none__", disabled)}>{t(item.labelKey)}</span>
+            <span className={navLabelClass("__none__", disabled)}>{resolveLabel(item)}</span>
+            {renderBadge(item, disabled)}
           </button>
         </li>
       );
@@ -142,7 +164,8 @@ export default function Sidebar() {
           <div className={iconClass(item.path, disabled)}>
             <Icon size={20} />
           </div>
-          <span className={navLabelClass(item.path, disabled)}>{t(item.labelKey)}</span>
+          <span className={navLabelClass(item.path, disabled)}>{resolveLabel(item)}</span>
+          {renderBadge(item, disabled)}
         </NavLink>
       </li>
     );
@@ -166,8 +189,31 @@ export default function Sidebar() {
     );
   };
 
-  const topSections = navigationSections.filter((section) => section.position !== "bottom");
-  const bottomSections = navigationSections.filter((section) => section.position === "bottom");
+  // Build one nav item per collection type and splice them into the Site section
+  // after Pages/Menus. Empty collections still appear (with a 0 badge).
+  const collectionNavItems = (collectionSchemas || []).map((schema) => ({
+    id: `collection-${schema.type}`,
+    label: schema.displayNamePlural || schema.displayName || schema.type,
+    path: `/collections/${schema.type}`,
+    icon: resolveLucideIcon(schema.icon),
+    badge: typeof schema.itemCount === "number" ? schema.itemCount : 0,
+    requiresProject: true,
+  }));
+
+  const sectionsWithCollections =
+    collectionNavItems.length === 0
+      ? navigationSections
+      : navigationSections.map((section) => {
+          if (section.id !== "site") return section;
+          const items = [...section.items];
+          const menusIndex = items.findIndex((item) => item.id === "menus");
+          const insertAt = menusIndex >= 0 ? menusIndex + 1 : items.length;
+          items.splice(insertAt, 0, ...collectionNavItems);
+          return { ...section, items };
+        });
+
+  const topSections = sectionsWithCollections.filter((section) => section.position !== "bottom");
+  const bottomSections = sectionsWithCollections.filter((section) => section.position === "bottom");
 
   return (
     <div className="fixed left-0 top-0 flex h-screen w-[72px] flex-col overflow-y-auto bg-slate-900 text-white md:w-[var(--sidebar-width)]">
