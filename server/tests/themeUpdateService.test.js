@@ -362,6 +362,53 @@ describe("applyThemeUpdate", () => {
     assert.ok(newCss.includes(".new"), "New asset file should be added");
   });
 
+  it("replaces collection-types from the theme but preserves user collections/ (BLOCKER-1 regression)", async () => {
+    await createTheme("1.0.0", {
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            // theme ships an updated portfolio schema in the update
+            "collection-types/portfolio/schema.json": { type: "portfolio", schemaVersion: 2 },
+          },
+        },
+      ],
+    });
+    // base theme collection-types (v1) so latest snapshot starts from it
+    const themeDir = getThemeDir(THEME_NAME);
+    await fs.outputJson(path.join(themeDir, "collection-types", "portfolio", "schema.json"), {
+      type: "portfolio",
+      schemaVersion: 1,
+    });
+    await buildLatestSnapshot(THEME_NAME);
+    await createProject("1.0.0");
+
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    // project's copied (base) schema + user-authored item data
+    await fs.outputJson(path.join(projectDir, "collection-types", "portfolio", "schema.json"), {
+      type: "portfolio",
+      schemaVersion: 1,
+    });
+    await fs.outputJson(path.join(projectDir, "collections", "portfolio", "alpha.json"), {
+      id: "alpha",
+      slug: "alpha",
+      uuid: "u-alpha",
+      settings: { title: "Alpha" },
+    });
+
+    await applyThemeUpdate(PROJECT_ID);
+
+    // collection-types REPLACED from the theme (now schemaVersion 2) — a
+    // preset-derived project ends up identical to a non-preset one.
+    const schema = await fs.readJson(path.join(projectDir, "collection-types", "portfolio", "schema.json"));
+    assert.equal(schema.schemaVersion, 2, "collection-types should be replaced from the theme");
+
+    // collections/ (user item data) is PROTECTED — untouched by the update.
+    const item = await fs.readJson(path.join(projectDir, "collections", "portfolio", "alpha.json"));
+    assert.equal(item.uuid, "u-alpha");
+    assert.equal(item.settings.title, "Alpha");
+  });
+
   it("adds new menus without overwriting existing user menus", async () => {
     await createTheme("1.0.0", {
       updates: [

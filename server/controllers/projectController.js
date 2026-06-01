@@ -9,6 +9,9 @@ import {
   getProjectPagesDir,
   getProjectMenusDir,
   getThemeDir,
+  getProjectCollectionDir,
+  getProjectCollectionItemPath,
+  getProjectCollectionOrderPath,
 } from "../config.js";
 import { randomUUID } from "crypto";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
@@ -17,6 +20,8 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
+import { listCollectionSchemas } from "../services/collectionService.js";
+import { writeJsonAtomic } from "../utils/atomicFs.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -29,6 +34,51 @@ import { readAppSettingsFile } from "./appSettingsController.js";
 // Make sure the projects directory exists
 async function ensureDirectories() {
   await fs.ensureDir(path.join(DATA_DIR, "projects"));
+}
+
+/**
+ * Seed preset collection item data into a freshly created project (Phase 9).
+ * Each item gets a fresh uuid + created/updated timestamps. Items whose type is
+ * not defined by the (theme-owned) collection-types schemas are skipped with a
+ * warning — preset schemas are never honored (BLOCKER-1 resolution).
+ *
+ * @param {string} folderName - project folder name
+ * @param {string} presetCollectionsDir - absolute path to preset's collections/
+ */
+export async function seedPresetCollections(folderName, presetCollectionsDir) {
+  const knownTypes = new Set((await listCollectionSchemas(folderName)).map((s) => s.type));
+  const typeEntries = await fs.readdir(presetCollectionsDir, { withFileTypes: true });
+
+  for (const typeEntry of typeEntries) {
+    if (!typeEntry.isDirectory()) continue;
+    const type = typeEntry.name;
+    if (!knownTypes.has(type)) {
+      console.warn(
+        `[ProjectController] Skipping preset collection "${type}": the theme defines no such collection type.`,
+      );
+      continue;
+    }
+
+    const srcTypeDir = path.join(presetCollectionsDir, type);
+    await fs.ensureDir(getProjectCollectionDir(folderName, type));
+    const names = (await fs.readdir(srcTypeDir)).filter(
+      (n) => n.endsWith(".json") && n !== "_order.json",
+    );
+
+    for (const name of names) {
+      const slug = name.replace(/\.json$/, "");
+      const raw = await fs.readJSON(path.join(srcTypeDir, name));
+      const now = new Date().toISOString();
+      const seeded = { ...raw, id: slug, slug, uuid: randomUUID(), created: now, updated: now };
+      await writeJsonAtomic(getProjectCollectionItemPath(folderName, type, slug), seeded);
+    }
+
+    // Carry over a manual order file verbatim if the preset shipped one.
+    const orderSrc = path.join(srcTypeDir, "_order.json");
+    if (await fs.pathExists(orderSrc)) {
+      await fs.copy(orderSrc, getProjectCollectionOrderPath(folderName, type));
+    }
+  }
 }
 
 /**
@@ -196,9 +246,13 @@ export async function createProject(req, res) {
       throw new Error(`Failed to copy theme: ${error.message}`);
     }
 
-    // Resolve preset paths (templates, menus, settings overrides)
-    const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
-      await themeController.resolvePresetPaths(theme, preset);
+    // Resolve preset paths (templates, menus, settings overrides, collection data)
+    const {
+      templatesDir: resolvedTemplatesDir,
+      menusDir: presetMenusDir,
+      settingsOverrides,
+      collectionsDir: presetCollectionsDir,
+    } = await themeController.resolvePresetPaths(theme, preset);
 
     // If preset has custom menus, replace root menus with preset menus
     if (presetMenusDir) {
@@ -274,6 +328,17 @@ export async function createProject(req, res) {
         await fs.writeFile(projectThemeJsonPath, JSON.stringify(themeJson, null, 2));
       } catch (error) {
         console.warn(`[ProjectController] Failed to apply preset settings overrides: ${error.message}`);
+      }
+    }
+
+    // Seed preset collection ITEM data (schemas always come from the theme via
+    // copyThemeToProject — never the preset; BLOCKER-1 resolution). New uuids +
+    // timestamps per item; items whose type the theme doesn't define are skipped.
+    if (presetCollectionsDir) {
+      try {
+        await seedPresetCollections(folderName, presetCollectionsDir);
+      } catch (error) {
+        console.warn(`[ProjectController] Failed to seed preset collections: ${error.message}`);
       }
     }
 

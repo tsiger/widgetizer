@@ -526,7 +526,7 @@ export async function buildLatestSnapshot(themeId) {
  * If no presetId or preset directory doesn't exist, falls back to root.
  * @param {string} themeId - Theme identifier
  * @param {string|null} presetId - Preset identifier (null = use root defaults)
- * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null}>}
+ * @returns {Promise<{templatesDir: string, menusDir: string|null, settingsOverrides: object|null, collectionsDir: string|null}>}
  */
 export async function resolvePresetPaths(themeId, presetId) {
   // Use the theme source directory (latest/ if it exists, root otherwise)
@@ -587,7 +587,19 @@ export async function resolvePresetPaths(themeId, presetId) {
     // No preset.json or invalid JSON, no overrides
   }
 
-  return { templatesDir, menusDir, settingsOverrides };
+  // Resolve preset collections/ (item DATA only). Collection-type SCHEMAS are
+  // theme-only (BLOCKER-1 resolution) — a preset's collection-types/ folder is
+  // rejected at upload and never consulted here.
+  let collectionsDir = null;
+  const presetCollectionsDir = path.join(presetDir, "collections");
+  try {
+    await fs.access(presetCollectionsDir);
+    collectionsDir = presetCollectionsDir;
+  } catch {
+    // No preset collections to seed
+  }
+
+  return { templatesDir, menusDir, settingsOverrides, collectionsDir };
 }
 
 /**
