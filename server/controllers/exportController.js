@@ -628,6 +628,40 @@ Per aspera ad astra
         }
 
         await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.html`), itemHtml);
+
+        // Markdown parity (Phase 21): content-only .md alongside the item HTML.
+        if (exportMarkdown) {
+          try {
+            const turndown = new TurndownService({
+              headingStyle: "atx",
+              codeBlockStyle: "fenced",
+              bulletListMarker: "-",
+            });
+            turndown.remove(["style", "script", "noscript", "form", "input", "button", "select", "textarea"]);
+            const cleanHtml = itemContentHtml
+              .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+              .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+              .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
+              .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
+            const itemMarkdown = turndown.turndown(cleanHtml);
+            const frontmatter = [
+              "---",
+              `title: ${itemPageData.name || item.slug}`,
+              `description: ${itemPageData.seo.description || ""}`,
+              `collection: ${schema.type}`,
+              `slug: ${item.slug}`,
+              "source_url:",
+              `  html: '${item.slug}.html'`,
+              `  md: '${item.slug}.md'`,
+              "---",
+              "",
+              "",
+            ].join("\n");
+            await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.md`), frontmatter + itemMarkdown);
+          } catch (mdError) {
+            console.warn(`Could not generate markdown for ${schema.slugPrefix}/${item.slug}: ${mdError.message}`);
+          }
+        }
       }
     }
 

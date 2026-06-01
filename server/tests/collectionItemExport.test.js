@@ -89,7 +89,7 @@ const TEMPLATE = `<article>
   <a class="dead" href="{{ item.settings.dead_link.href }}">dead</a>
 </article>`;
 
-async function seedProject(id, folder, { withTemplate = true, items } = {}) {
+async function seedProject(id, folder, { withTemplate = true, items, siteUrl = SITE_URL } = {}) {
   const existing = (await projectRepo.readProjectsData()) || { projects: [] };
   const projects = (existing.projects || []).filter((p) => p.id !== id);
   projects.push({
@@ -99,7 +99,7 @@ async function seedProject(id, folder, { withTemplate = true, items } = {}) {
     siteTitle: "Items",
     theme: "__citem_theme__",
     themeVersion: "1.0.0",
-    siteUrl: SITE_URL,
+    siteUrl,
     created: new Date().toISOString(),
   });
   await projectRepo.writeProjectsData({ projects, activeProjectId: id });
@@ -283,6 +283,40 @@ describe("item-page export — two-pass validation", () => {
     const outputDir = path.join(TEST_ROOT, "data", "publish", "citem-bad-v1");
     assert.ok(!(await fs.pathExists(path.join(outputDir, "portfolio", "bad.html"))));
     assert.ok(!(await fs.pathExists(path.join(outputDir, "portfolio", "project-alpha.html"))));
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe("item-page export — markdown parity", () => {
+  let outputDir;
+  before(async () => {
+    // siteUrl unset → exercises the depth-prefixed markdown alternate-link fallback.
+    await seedProject("citem-md-uuid", "citem-md", { items: [ALPHA, BETA], siteUrl: "" });
+    const result = await exportProjectToDir("citem-md-uuid", { exportMarkdown: true });
+    outputDir = result.outputDir;
+  });
+
+  it("writes a .md alongside each item HTML at the right path", async () => {
+    assert.ok(await fs.pathExists(path.join(outputDir, "portfolio", "project-alpha.md")));
+    assert.ok(await fs.pathExists(path.join(outputDir, "portfolio", "project-beta.md")));
+  });
+
+  it("markdown has YAML frontmatter with title/description/collection/slug/source_url", async () => {
+    const md = await fs.readFile(path.join(outputDir, "portfolio", "project-alpha.md"), "utf8");
+    assert.ok(md.startsWith("---"));
+    assert.match(md, /title: Project Alpha/);
+    assert.match(md, /collection: portfolio/);
+    assert.match(md, /slug: project-alpha/);
+    assert.match(md, /source_url:/);
+    assert.match(md, /html: 'project-alpha\.html'/);
+    assert.match(md, /md: 'project-alpha\.md'/);
+    // content from the template made it through Turndown
+    assert.match(md, /Project Alpha/);
+  });
+
+  it("item HTML alternate link uses the depth-prefixed fallback when siteUrl is unset", async () => {
+    const html = await fs.readFile(path.join(outputDir, "portfolio", "project-alpha.html"), "utf8");
+    assert.match(html, /rel="alternate" type="text\/markdown" href="\.\.\/project-alpha\.md"/);
   });
 });
 
