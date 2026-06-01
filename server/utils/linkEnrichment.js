@@ -1,7 +1,9 @@
 import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
-import { getProjectPagesDir, getProjectMenusDir } from "../config.js";
+import { getProjectPagesDir, getProjectMenusDir, getProjectCollectionsDir } from "../config.js";
+import { writeJsonAtomic, isAtomicTmpFile } from "./atomicFs.js";
+import { syncCollectionItemMediaUsageOnWrite } from "../services/mediaUsageService.js";
 
 // ---------------------------------------------------------------------------
 // Shared building blocks (internal)
@@ -109,6 +111,65 @@ function processMenuItems(items, itemTransformer) {
     }
     return processed;
   });
+}
+
+/**
+ * Apply a value transformer to every top-level setting value of a collection
+ * item. Returns a clone plus whether anything changed. v1 item settings are
+ * flat (no repeaters), so a single pass suffices.
+ */
+function transformItemSettings(item, valueTransformer) {
+  if (!item?.settings || typeof item.settings !== "object") return { item, changed: false };
+  const settings = {};
+  let changed = false;
+  for (const [key, value] of Object.entries(item.settings)) {
+    const next = valueTransformer(value);
+    settings[key] = next;
+    if (next !== value) changed = true;
+  }
+  return { item: { ...item, settings }, changed };
+}
+
+/**
+ * Walk every collection item file under collections/<type>/<slug>.json, run it
+ * through `itemTransformer(item, type, slug) => { item, changed }`, and write
+ * back (atomically) those that changed. Returns the touched items.
+ */
+async function updateCollectionItems(projectFolderName, itemTransformer) {
+  const collectionsDir = getProjectCollectionsDir(projectFolderName);
+  if (!(await fs.pathExists(collectionsDir))) return [];
+
+  const touched = [];
+  const typeEntries = await fs.readdir(collectionsDir, { withFileTypes: true });
+  for (const typeEntry of typeEntries) {
+    if (!typeEntry.isDirectory()) continue;
+    const type = typeEntry.name;
+    const typeDir = path.join(collectionsDir, type);
+    let names;
+    try {
+      names = await fs.readdir(typeDir);
+    } catch {
+      continue;
+    }
+    for (const name of names) {
+      if (!name.endsWith(".json") || name === "_order.json" || isAtomicTmpFile(name)) continue;
+      const slug = name.replace(/\.json$/, "");
+      const itemPath = path.join(typeDir, name);
+      try {
+        const item = JSON.parse(await fs.readFile(itemPath, "utf8"));
+        const { item: nextItem, changed } = itemTransformer(item, type, slug);
+        if (changed) {
+          await writeJsonAtomic(itemPath, nextItem);
+          touched.push({ type, slug, item: nextItem });
+        }
+      } catch (error) {
+        console.warn(
+          `[linkEnrichment] Failed to process collection item ${type}/${name}: ${error.message}`,
+        );
+      }
+    }
+  }
+  return touched;
 }
 
 // ---------------------------------------------------------------------------
@@ -238,6 +299,16 @@ export async function enrichNewProjectReferences(projectFolderName) {
   } catch (error) {
     console.warn(`[linkEnrichment] Failed to enrich widget links: ${error.message}`);
   }
+
+  // Step 5: Enrich seeded collection items (slug-format links -> pageUuid).
+  // Media usage is rebuilt by the project-creation structural refresh.
+  try {
+    await updateCollectionItems(projectFolderName, (item) =>
+      transformItemSettings(item, enrichValue),
+    );
+  } catch (error) {
+    console.warn(`[linkEnrichment] Failed to enrich collection item links: ${error.message}`);
+  }
 }
 
 /**
@@ -317,6 +388,14 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+
+  // Step 4: Remap pageUuid refs in collection item links AND give each item its
+  // own fresh uuid so the duplicated project has an independent item identity
+  // space. (uuid always changes, so every item is rewritten.)
+  await updateCollectionItems(projectFolderName, (item) => {
+    const { item: remapped } = transformItemSettings(item, remapValue);
+    return { item: { ...remapped, uuid: randomUUID() }, changed: true };
+  });
 }
 
 /**
@@ -325,8 +404,14 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
  * and menu items, writing back only files that were actually modified.
  * @param {string} projectFolderName - The project folder name
  * @param {string} deletedPageUuid - The UUID of the deleted page
+ * @param {string|null} [projectId=null] - When provided, refreshes media usage
+ *   for any collection item whose link settings were cleared.
  */
-export async function cleanupDeletedPageReferences(projectFolderName, deletedPageUuid) {
+export async function cleanupDeletedPageReferences(
+  projectFolderName,
+  deletedPageUuid,
+  projectId = null,
+) {
   const pagesDir = getProjectPagesDir(projectFolderName);
   const menusDir = getProjectMenusDir(projectFolderName);
 
@@ -364,6 +449,23 @@ export async function cleanupDeletedPageReferences(projectFolderName, deletedPag
       if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
         menu.items = cleanedItems;
         await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+      }
+    }
+  }
+
+  // Clean collection item link settings, then keep media usage in sync for each
+  // touched item (a cleared file/link may have removed an upload reference).
+  const touched = await updateCollectionItems(projectFolderName, (item) =>
+    transformItemSettings(item, cleanValue),
+  );
+  if (projectId) {
+    for (const { type, slug, item } of touched) {
+      try {
+        await syncCollectionItemMediaUsageOnWrite(projectId, type, slug, item, null);
+      } catch (error) {
+        console.warn(
+          `[linkEnrichment] Failed to sync media usage for ${type}/${slug}: ${error.message}`,
+        );
       }
     }
   }

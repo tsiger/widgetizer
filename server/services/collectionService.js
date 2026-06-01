@@ -21,6 +21,7 @@ import { randomUUID } from "node:crypto";
 import { isSupportedSettingType } from "../../src/components/settings/supportedSettingTypes.js";
 import { isAtomicTmpFile, writeJsonAtomic } from "../utils/atomicFs.js";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
+import { prefixInternalHref } from "../utils/linkPrefixer.js";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc"];
@@ -743,7 +744,8 @@ export async function writeCollectionItem(
 
   await cleanupDuplicateUuidSiblings(projectFolderName, collectionType, item);
 
-  // TODO(Phase 6): updateCollectionItemMediaUsage(projectId, collectionType, item.slug, item)
+  // Media-usage sync is performed by callers (collectionController, linkEnrichment)
+  // and the refreshAllMediaUsage safety net; the storage layer stays decoupled.
   void projectId;
   return item;
 }
@@ -756,7 +758,7 @@ export async function deleteCollectionItem(projectId, projectFolderName, collect
   await rewriteOrder(projectFolderName, collectionType, (order) =>
     order.filter((slug) => slug !== itemSlug),
   );
-  // TODO(Phase 6): removeCollectionItemFromMediaUsage(projectId, collectionType, itemSlug)
+  // Media-usage sync handled by caller (see writeCollectionItem note).
   void projectId;
   return { deleted: existed };
 }
@@ -793,7 +795,7 @@ export async function bulkDeleteCollectionItems(
     );
   }
 
-  // TODO(Phase 6): remove each deleted slug from media usage.
+  // Media-usage sync handled by caller (see writeCollectionItem note).
   void projectId;
   return { deleted, notFound, errors };
 }
@@ -859,7 +861,7 @@ export async function duplicateCollectionItem(
     return next;
   });
 
-  // TODO(Phase 6): add collection:{type}/{newSlug} to media usage.
+  // Media-usage sync handled by caller (see writeCollectionItem note).
   void projectId;
   return item;
 }
@@ -874,4 +876,48 @@ export async function reorderCollectionItems(projectId, projectFolderName, colle
   await rewriteOrder(projectFolderName, collectionType, () => desired);
   void projectId;
   return { order: desired };
+}
+
+// ============================================================================
+// Render-time link resolution (Phase 7 — spec Section 9)
+// ============================================================================
+
+/** A link-type setting value: an object carrying an `href`. */
+function isLinkObject(value) {
+  return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
+}
+
+function resolveLink(linkValue, pagesByUuid, outputPathPrefix) {
+  const { pageUuid } = linkValue;
+  if (!pageUuid) {
+    // Custom URL — depth-prefix internal-looking hrefs, leave the rest as-is.
+    return { ...linkValue, href: prefixInternalHref(linkValue.href, outputPathPrefix) };
+  }
+  const page = pagesByUuid?.get(pageUuid);
+  if (!page) {
+    return { href: "", text: "", target: "_self" }; // page deleted — clear the link
+  }
+  return { ...linkValue, href: prefixInternalHref(`${page.slug}.html`, outputPathPrefix) };
+}
+
+/**
+ * Resolve link settings on a collection item at render time (spec Section 9):
+ * `pageUuid` → current page slug, custom URLs depth-prefixed, dead refs cleared.
+ * Returns a deep clone; the input item is never mutated. v1 schemas are flat, so
+ * a single pass over top-level settings suffices (repeaters arrive in Phase 3+).
+ *
+ * @param {object} item - a collection item ({ settings })
+ * @param {Map} pagesByUuid - uuid -> page ({ slug })
+ * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
+ * @returns {object} resolved clone
+ */
+export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix) {
+  if (!item?.settings) return item;
+  const resolved = JSON.parse(JSON.stringify(item));
+  for (const [key, value] of Object.entries(resolved.settings)) {
+    if (isLinkObject(value)) {
+      resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix);
+    }
+  }
+  return resolved;
 }

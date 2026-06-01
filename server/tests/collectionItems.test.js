@@ -34,6 +34,7 @@ const {
   duplicateCollectionItem,
   reorderCollectionItems,
   readRawCollectionItem,
+  resolveCollectionItemLinks,
 } = await import("../services/collectionService.js");
 const {
   getProjectCollectionSchemaPath,
@@ -521,6 +522,48 @@ describe("write-side storage", () => {
     const raw = await readRawCollectionItem("p", "portfolio", "alpha");
     assert.equal(raw.settings.subtitle, "orphan"); // raw keeps out-of-schema keys
     assert.equal(await readRawCollectionItem("p", "portfolio", "missing"), null);
+  });
+});
+
+// ============================================================================
+// resolveCollectionItemLinks (Phase 7 — render-time link resolution)
+// ============================================================================
+
+describe("resolveCollectionItemLinks", () => {
+  const pagesByUuid = new Map([["page-uuid-1", { slug: "about" }]]);
+
+  it("resolves a pageUuid link to the current slug, depth-prefixed", () => {
+    const item = {
+      settings: { cta: { pageUuid: "page-uuid-1", href: "", text: "About", target: "_self" } },
+    };
+    const out = resolveCollectionItemLinks(item, pagesByUuid, "../");
+    assert.equal(out.settings.cta.href, "../about.html");
+    assert.equal(out.settings.cta.text, "About"); // other fields preserved
+  });
+
+  it("clears a link whose page was deleted", () => {
+    const item = {
+      settings: { cta: { pageUuid: "gone", href: "", text: "X", target: "_blank" } },
+    };
+    const out = resolveCollectionItemLinks(item, pagesByUuid, "../");
+    assert.deepEqual(out.settings.cta, { href: "", text: "", target: "_self" });
+  });
+
+  it("depth-prefixes a custom-URL link (no pageUuid)", () => {
+    const item = { settings: { cta: { href: "contact.html", target: "_self" } } };
+    const out = resolveCollectionItemLinks(item, pagesByUuid, "../");
+    assert.equal(out.settings.cta.href, "../contact.html");
+  });
+
+  it("leaves non-link settings untouched and does not mutate the input", () => {
+    const item = { settings: { title: "Hi", img: "/uploads/images/x.jpg" } };
+    const out = resolveCollectionItemLinks(item, pagesByUuid, "../");
+    assert.equal(out.settings.title, "Hi");
+    assert.equal(out.settings.img, "/uploads/images/x.jpg");
+    // input untouched
+    const item2 = { settings: { cta: { href: "contact.html" } } };
+    resolveCollectionItemLinks(item2, pagesByUuid, "../");
+    assert.equal(item2.settings.cta.href, "contact.html");
   });
 });
 
