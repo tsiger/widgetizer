@@ -311,6 +311,47 @@ collection items, and decide whether to add stable item references
 (`collectionType` + item `uuid`) that resolve to the current item slug at render
 time.
 
+### 12. Collection item SEO is not at parity with page SEO
+
+Simple: pages and collection item pages both produce SEO tags, but users edit
+different SEO controls for each one.
+
+Normal pages have a dedicated `seo` object and a page form section for meta
+description, social title, social image, canonical URL, and the full robots
+choice. Collection item pages currently get SEO through collection schema
+conventions: `seo_title`, `seo_description`, `seo_noindex`, and one image field
+marked with `usedAsOgImage`. The render/export layer then maps those fields into
+a page-shaped SEO object. That means collection items do not expose the same
+canonical, robots, social-image, Open Graph, and Twitter-card controls that page
+authors already know.
+
+Evidence:
+
+- `src/components/pages/PageForm.jsx:36-43` initializes the page `seo` object
+  with `description`, `og_title`, `og_image`, `og_type`, `twitter_card`,
+  `canonical_url`, and `robots`.
+- `src/components/pages/PageForm.jsx:170-224` renders the existing page SEO
+  editor controls.
+- `docs-llms/core-collections.md:112-114` documents collection item SEO as a
+  field-id convention rather than a dedicated SEO model.
+- `server/services/collectionService.js:939-973` maps collection item convention
+  fields into SEO output, with `og_type` and `twitter_card` fixed and canonical
+  generated from `siteUrl`.
+- `themes/arch/collection-types/portfolio/schema.json:20-23` and
+  `themes/aegean/collection-types/accommodation/schema.json:72-75` expose only
+  the reduced convention fields in shipped collection schemas.
+
+Impact: medium. The generated tags are mostly present, but the authoring model
+is inconsistent. Users who understand page SEO will reasonably expect collection
+item pages to offer the same controls, especially because those items export as
+real pages and can appear in sitemap/robots output.
+
+Suggested fix: streamline collection item SEO around the existing page SEO
+functionality. Reuse the same SEO field shape, validation rules, media picker,
+robots options, canonical handling, translations, and render/export mapping
+wherever possible, while keeping sensible defaults for collection schemas and
+presets.
+
 ## Checks Performed
 
 - `git diff --check master...HEAD` passed.
