@@ -28,7 +28,7 @@ import { registerCollectionFilter } from "../../src/core/filters/collectionFilte
 import {
   listCollectionItems,
   getCollectionSchema,
-  resolveCollectionItemLinks,
+  prepareCollectionItemForRender,
 } from "./collectionService.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { buildRuntimeSiteIcons, prefixSiteIcons } from "../utils/siteIconHelpers.js";
@@ -536,7 +536,7 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
       if (limit != null) valid = valid.slice(0, limit);
 
       const result = valid.map((item) => {
-          const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix);
+          const resolved = prepareCollectionItemForRender(item, schema, pagesByUuid, outputPathPrefix);
           const url = schema?.hasItemPages
             ? `${outputPathPrefix}${schema.slugPrefix}/${resolved.slug}.html`
             : null;

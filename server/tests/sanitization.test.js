@@ -17,6 +17,7 @@ import assert from "node:assert/strict";
 import {
   sanitizeRichText,
   sanitizeWidgetData,
+  sanitizeCollectionItemData,
   stripHtmlTags,
   sanitizeCssValue,
   sanitizeThemeSettings,
@@ -647,6 +648,98 @@ describe("sanitizeWidgetData — schema edge cases", () => {
     assert.doesNotMatch(data.blocks.card_1.settings.description, /<script/i);
     assert.doesNotMatch(data.blocks.card_2.settings.description, /<script/i);
     assert.match(data.blocks.card_3.settings.description, /<p>Three<\/p>/);
+  });
+});
+
+// ============================================================================
+// sanitizeCollectionItemData — collection item settings (mirrors widget rules)
+// ============================================================================
+
+describe("sanitizeCollectionItemData", () => {
+  const schema = {
+    settings: [
+      { id: "title", type: "text" },
+      { id: "description", type: "richtext" },
+      { id: "summary", type: "textarea" },
+      { id: "book_link", type: "link" },
+      { id: "embed", type: "code" },
+    ],
+  };
+
+  it("sanitizes richtext fields (strips <script>, keeps safe tags)", () => {
+    const item = {
+      settings: { description: '<p>Stay with us</p><script>steal()</script>' },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.doesNotMatch(item.settings.description, /<script/i);
+    assert.match(item.settings.description, /<p>Stay with us<\/p>/);
+  });
+
+  it("strips event-handler attributes from richtext", () => {
+    const item = {
+      settings: { description: '<p>Hi</p><img src=x onerror="alert(1)">' },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.doesNotMatch(item.settings.description, /<img/i);
+    assert.doesNotMatch(item.settings.description, /onerror/i);
+  });
+
+  it("blocks javascript: protocol in link hrefs", () => {
+    const item = {
+      settings: { book_link: { text: "Book", href: "javascript:alert(1)" } },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.book_link.href, "");
+  });
+
+  it("blocks data: and vbscript: protocols in link hrefs", () => {
+    const item1 = { settings: { book_link: { href: "data:text/html,<script>x</script>" } } };
+    const item2 = { settings: { book_link: { href: "vbscript:msgbox(1)" } } };
+    sanitizeCollectionItemData(item1, schema);
+    sanitizeCollectionItemData(item2, schema);
+    assert.equal(item1.settings.book_link.href, "");
+    assert.equal(item2.settings.book_link.href, "");
+  });
+
+  it("passes through safe http/mailto/tel link hrefs", () => {
+    const item = { settings: { book_link: { href: "https://example.com/book" } } };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.book_link.href, "https://example.com/book");
+  });
+
+  it("leaves text and textarea fields untouched (LiquidJS autoescape handles them)", () => {
+    const item = {
+      settings: {
+        title: "<img src=x onerror=alert(1)>",
+        summary: '<script>alert("xss")</script>',
+      },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.title, "<img src=x onerror=alert(1)>");
+    assert.equal(item.settings.summary, '<script>alert("xss")</script>');
+  });
+
+  it("leaves code fields untouched (intentionally raw)", () => {
+    const item = {
+      settings: { embed: '<iframe src="https://maps.example/embed"></iframe>' },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.embed, '<iframe src="https://maps.example/embed"></iframe>');
+  });
+
+  it("leaves settings not declared in the schema untouched", () => {
+    const item = { settings: { stray: '<script>alert(1)</script>' } };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.stray, '<script>alert(1)</script>');
+  });
+
+  it("handles null/missing item, settings, schema, and values gracefully", () => {
+    // none of these should throw
+    sanitizeCollectionItemData(null, schema);
+    sanitizeCollectionItemData({}, schema);
+    sanitizeCollectionItemData({ settings: { description: null } }, schema);
+    sanitizeCollectionItemData({ settings: { description: "<p>x</p>" } }, null);
+    assert.ok(true);
   });
 });
 

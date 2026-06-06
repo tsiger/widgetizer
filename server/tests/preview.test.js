@@ -34,7 +34,13 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const { getProjectDir, getProjectPagesDir, getProjectCollectionSchemaPath } = await import("../config.js");
+const {
+  getProjectDir,
+  getProjectPagesDir,
+  getProjectCollectionSchemaPath,
+  getProjectThemeJsonPath,
+  getProjectCollectionTemplatePath,
+} = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
@@ -42,6 +48,7 @@ const { writeMediaFile } = await import("../controllers/mediaController.js");
 const { getGlobalWidgets, saveGlobalWidget, serveAsset, createCollectionPreviewToken } = await import(
   "../controllers/previewController.js"
 );
+const { getToken } = await import("../services/previewTokenStore.js");
 const { closeDb } = await import("../db/index.js");
 
 // ============================================================================
@@ -490,5 +497,85 @@ describe("createCollectionPreviewToken — guards", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /Preview unavailable/i);
+  });
+});
+
+// ============================================================================
+// createCollectionPreviewToken — successful render
+// Covers Finding #6 (pageUuid links resolve against the project folder) and the
+// preview half of Finding #5 (item template receives collection/page context).
+// ============================================================================
+
+describe("createCollectionPreviewToken — render", () => {
+  before(async () => {
+    const folder = PROJECT_FOLDER;
+    const projectDir = getProjectDir(folder);
+    await fs.ensureDir(path.join(projectDir, "snippets"));
+
+    // Minimal theme + layout so the item page renders through the full pipeline.
+    await fs.outputJson(getProjectThemeJsonPath(folder), { settings: { global: {} } });
+    await fs.writeFile(
+      path.join(projectDir, "layout.liquid"),
+      `<!DOCTYPE html><html><head></head><body class="{{ body_class }}">{{ main_content | raw }}</body></html>`,
+    );
+
+    // A real project page whose uuid the previewed item links to. If preview
+    // reads pages from the wrong path (the #6 bug), this page is invisible and
+    // the link resolves to "" instead of "about.html".
+    await fs.outputJson(path.join(getProjectPagesDir(folder), "about.json"), {
+      name: "About",
+      slug: "about",
+      uuid: "uuid-about",
+      widgets: {},
+      widgetsOrder: [],
+    });
+
+    // A hasItemPages collection with a link field, plus a template that prints
+    // the resolved link href and the documented collection/page context.
+    await fs.outputJson(getProjectCollectionSchemaPath(folder, "places"), {
+      type: "places",
+      schemaVersion: 1,
+      displayName: "Places",
+      displayNamePlural: "Places",
+      icon: "MapPin",
+      hasItemPages: true,
+      slugPrefix: "places",
+      defaultSort: "manual",
+      settings: [
+        { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+        { type: "link", id: "cta", label: "Link" },
+      ],
+    });
+    await fs.writeFile(
+      getProjectCollectionTemplatePath(folder, "places"),
+      `<a class="cta" href="{{ item.settings.cta.href }}">go</a>` +
+        `<p class="ctx">{{ collection.displayName }}|{{ page.slug }}</p>`,
+    );
+  });
+
+  it("resolves a pageUuid link to the page slug and passes collection/page context", async () => {
+    const res = await callController(createCollectionPreviewToken, {
+      body: {
+        collectionType: "places",
+        slug: "draft",
+        settings: {
+          title: "Draft",
+          cta: { pageUuid: "uuid-about", href: "", text: "About", target: "_self" },
+        },
+      },
+    });
+    assert.equal(res._status, 200);
+    assert.ok(res._json.token, "should return a preview token");
+
+    const html = getToken(res._json.token);
+    assert.ok(html, "token should resolve to rendered HTML");
+
+    // Finding #6: pages loaded from the project folder, so the pageUuid link
+    // resolves to the page slug. Before the fix (UUID passed as folder name) no
+    // pages load and the link would render href="".
+    assert.match(html, /<a class="cta" href="about\.html">/);
+
+    // Finding #5 (preview): the item template received `collection` and `page`.
+    assert.match(html, /<p class="ctx">Places\|places\/draft<\/p>/);
   });
 });

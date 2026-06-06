@@ -40,7 +40,7 @@ partial-failure `errors` array instead of building a path. Regression test
 `server/tests/collectionApi.test.js` confirms a `../../pages/victim` slug is
 rejected and the out-of-collection file survives.
 
-### 2. Collection richtext and link fields bypass sanitization
+### 2. Collection richtext and link fields bypass sanitization — ✅ Resolved (2026-06-06)
 
 Simple: collection item values are rendered like widget values, but are not
 sanitized like widget values.
@@ -71,7 +71,26 @@ applies the same rules as widget settings: sanitize `richtext`, block dangerous
 link protocols, leave `code` intentionally raw, and rely on Liquid autoescape
 for text/textarea.
 
-### 3. Invalid collection export errors lose useful details
+**Resolution:** Added `sanitizeCollectionItemData(item, schema)` in
+`server/services/sanitizationService.js`, reusing the same per-type rules as
+`sanitizeWidgetData` (richtext → DOMPurify, link → block `javascript:`/`data:`/
+`vbscript:`, text/textarea → Liquid autoescape, code → raw). Introduced a single
+render gate, `prepareCollectionItemForRender(item, schema, pagesByUuid, prefix)`
+in `server/services/collectionService.js`, that resolves links and then
+sanitizes (sanitize-after-resolve, so resolved hrefs are validated too — the
+widget order). All three collection-item render paths now go through it instead
+of the bare `resolveCollectionItemLinks`: the page-list path
+(`renderingService.js`), the preview item page (`previewController.js`), and the
+export item page (`exportController.js`) — so an item can never reach a template
+unsanitized. Tests: `sanitizeCollectionItemData` (9 cases) in
+`server/tests/sanitization.test.js` and `prepareCollectionItemForRender` (3
+cases, including one asserting the on-disk item is never mutated) in
+`server/tests/collectionItems.test.js`. Follow-up (separate ticket): unify the
+preview and export item-page render sequences into one shared pipeline, the way
+pages share `renderWidget` — these three call sites duplicate that sequence
+today.
+
+### 3. Invalid collection export errors lose useful details — ✅ Resolved (2026-06-06)
 
 Simple: export detects exactly which collection fields are invalid, then the
 HTTP response drops that information.
@@ -95,7 +114,18 @@ poor and likely forces manual inspection.
 Suggested fix: include `validationErrors` in the response for this error, and
 teach the export UI to display collection/type/slug/field.
 
-### 4. Failed collection exports can still leave files behind
+**Resolution:** The HTTP wrapper `exportProject()` now spreads `validationErrors`
+into the status-coded JSON response (`server/controllers/exportController.js`),
+so the per-item collection/slug/field detail that `exportProjectToDir()` builds
+reaches the client instead of being dropped. `ExportCreator.jsx` captures
+`err.data.validationErrors` and renders a persistent red panel listing each
+offending item (`collection / slug` + `fieldId: reason`); new i18n key
+`exportSite.creator.validationTitle`. Test: `collectionItemExport.test.js`
+"surfaces per-item validationErrors in the HTTP 400 response" drives the wrapper
+and asserts the response body carries the detail. (The frontend panel has no
+component test — covered by lint + locale validation.)
+
+### 4. Failed collection exports can still leave files behind — ✅ Resolved (2026-06-06)
 
 Simple: the docs promise validation before disk writes, but the code writes
 export directories and site icons first.
@@ -120,7 +150,16 @@ Suggested fix: move collection validation before `ensureDir()` and
 `generateExportSiteIcons()`, or update the docs/tests if partial export
 directories are intentional.
 
-### 5. Item templates do not receive the documented context
+**Resolution:** Reordered `exportProjectToDir()` so all read-only setup and both
+fail-fast validations (the homepage-`index` check and the two-pass collection
+validation) run before the first disk write; `ensureDir()` and
+`generateExportSiteIcons()` now sit below a "validation passed" marker. A blocked
+export leaves no output directory, favicon, or manifest behind. No doc change —
+`core-export.md` already promised validation before any disk write; the code now
+matches it. Test: `collectionItemExport.test.js` strengthened to assert a blocked
+export leaves no output directory at all (not merely no HTML).
+
+### 5. Item templates do not receive the documented context — ✅ Resolved (2026-06-06)
 
 Simple: item templates are documented as receiving `collection`, `page`, and
 `project`, but the collection template render only receives `item`.
@@ -150,7 +189,17 @@ Suggested fix: build `itemPageData` before rendering the item template and pass
 `{ ...baseContext, item: resolvedItem, collection: schema, page: itemPageData,
 project: projectData }` in both export and preview.
 
-### 6. Collection item preview resolves page links against the wrong path
+**Resolution:** `buildCollectionItemPageData()` is now built before the item
+template render at both sites, and the template context passes
+`{ ...baseContext, item, collection: schema, page: itemPageData, project: projectData }`
+(export: `exportController.js`; preview: `previewController.js`, which also loads
+`projectData` via `projectRepo.getProjectById`, matching the object page
+templates receive). No doc change — `core-collections.md` already documents this
+context. Tests: `collectionItemExport.test.js` asserts
+`collection.displayName`/`project.siteTitle`/`page.slug` render in the export
+item template; `preview.test.js` render test covers the preview path.
+
+### 6. Collection item preview resolves page links against the wrong path — ✅ Resolved (2026-06-06)
 
 Simple: item preview asks for project pages using the project UUID where the
 page reader expects the project folder name.
@@ -173,6 +222,15 @@ Impact: medium. Collection item preview can render dead/blank links while export
 renders them correctly.
 
 Suggested fix: call `listProjectPagesData(folder)`.
+
+**Resolution:** `createCollectionPreviewToken()` now calls
+`listProjectPagesData(folder)` instead of `listProjectPagesData(activeProjectId)`
+(`server/controllers/previewController.js`). The helper reads
+`data/projects/<folder>/pages`, so passing the UUID pointed at a missing
+directory, returned no pages, and blanked every `pageUuid` link in preview;
+export already used the folder name. Test: `preview.test.js` render test asserts
+a `pageUuid` link resolves to the page slug (`about.html`) — confirmed it renders
+`href=""` with the fix reverted, so the test genuinely guards the regression.
 
 ### 7. Standalone site preview cannot navigate to collection item pages
 

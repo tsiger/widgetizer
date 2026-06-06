@@ -297,3 +297,39 @@ export function sanitizeWidgetData(resolvedWidgetData, schema) {
     }
   }
 }
+
+// ============================================================================
+// Collection Item Data Sanitization
+// ============================================================================
+
+/**
+ * Sanitize a collection item's settings in place, driven by the collection
+ * schema's field types. This is the item-level equivalent of sanitizeWidgetData:
+ * collection items carry the same field types as widgets (richtext, link, text,
+ * code, …) and their templates render richtext with | raw and emit link hrefs,
+ * so they need the same protection.
+ *
+ * Same rules as widget settings:
+ * - richtext: DOMPurify strips dangerous HTML (output via | raw in templates)
+ * - link: href validated against dangerous protocols
+ * - text/textarea: left for LiquidJS autoescape
+ * - code: left untouched (intentionally raw)
+ *
+ * Collection items have flat settings (no blocks in v1 schemas), so a single
+ * pass over top-level settings suffices. Callers pass a clone (items are
+ * rendered from a resolved clone), so mutating in place never touches disk.
+ *
+ * @param {object} item - Collection item with a .settings object
+ * @param {object} schema - Collection-type schema with a .settings array
+ */
+export function sanitizeCollectionItemData(item, schema) {
+  if (!item || !item.settings || !schema) return;
+
+  const typeMap = buildTypeMap(schema.settings);
+  for (const [key, value] of Object.entries(item.settings)) {
+    const type = typeMap.get(key);
+    if (type) {
+      item.settings[key] = sanitizeSettingValue(value, type);
+    }
+  }
+}

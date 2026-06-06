@@ -620,7 +620,8 @@
       "exportButton": "Export Site",
       "exporting": "Exporting...",
       "successTitle": "Export version {{version}} created successfully!",
-      "successCreated": "Created: {{date}}"
+      "successCreated": "Created: {{date}}",
+      "validationTitle": "Export blocked — fix these collection items first:"
     },
     "history": {
       "title": "Export History",

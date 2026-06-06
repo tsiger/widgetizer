@@ -22,6 +22,7 @@ import { isSupportedSettingType } from "../../src/components/settings/supportedS
 import { isAtomicTmpFile, writeJsonAtomic } from "../utils/atomicFs.js";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { prefixInternalHref } from "../utils/linkPrefixer.js";
+import { sanitizeCollectionItemData } from "./sanitizationService.js";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc"];
@@ -925,6 +926,30 @@ export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix) 
       resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix);
     }
   }
+  return resolved;
+}
+
+/**
+ * The single gate every collection-item render path must go through. Resolves
+ * the item's links to current page slugs, then sanitizes its settings by schema
+ * type — the item-level equivalent of the widget render gate (renderWidget →
+ * sanitizeWidgetData). Going through one function means a collection item can
+ * never reach a template unsanitized, no matter which path renders it (page
+ * lists, preview item pages, or export item pages).
+ *
+ * Sanitization runs AFTER link resolution so resolved hrefs are validated too,
+ * mirroring the widget flow (resolveWidgetPageLinks → sanitizeWidgetData).
+ * Returns a resolved + sanitized clone; the on-disk item is never mutated.
+ *
+ * @param {object} item - Raw collection item ({ settings })
+ * @param {object} schema - Collection-type schema ({ settings })
+ * @param {Map} pagesByUuid - uuid -> page ({ slug })
+ * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
+ * @returns {object} resolved + sanitized clone
+ */
+export function prepareCollectionItemForRender(item, schema, pagesByUuid, outputPathPrefix) {
+  const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix);
+  sanitizeCollectionItemData(resolved, schema);
   return resolved;
 }
 

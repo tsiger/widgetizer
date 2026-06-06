@@ -22,7 +22,7 @@ import { generateToken, getToken } from "../services/previewTokenStore.js";
 import {
   getCollectionSchema,
   loadCollectionTemplate,
-  resolveCollectionItemLinks,
+  prepareCollectionItemForRender,
   buildCollectionItemPageData,
 } from "../services/collectionService.js";
 import { readProjectThemeData } from "./themeController.js";
@@ -331,7 +331,11 @@ export async function createCollectionPreviewToken(req, res) {
     const footerData = await readGlobalWidgetData(folder, "footer");
 
     // uuid -> page map so pageUuid links inside the item resolve to slugs.
-    const pages = await listProjectPagesData(activeProjectId);
+    // listProjectPagesData expects the project FOLDER name (it reads
+    // data/projects/<folder>/pages), not the UUID — passing the UUID points at a
+    // missing dir, yields no pages, and silently breaks pageUuid link resolution
+    // in preview (Finding #6). Export already uses the folder name.
+    const pages = await listProjectPagesData(folder);
     const pagesByUuid = new Map();
     for (const page of pages || []) {
       if (page.uuid) pagesByUuid.set(page.uuid, page);
@@ -368,7 +372,7 @@ export async function createCollectionPreviewToken(req, res) {
       currentCanonicalPath: `${schema.slugPrefix}/${safeSlug}.html`,
     };
 
-    const resolvedItem = resolveCollectionItemLinks(draftItem, pagesByUuid, "");
+    const resolvedItem = prepareCollectionItemForRender(draftItem, schema, pagesByUuid, "");
 
     let headerContent = "";
     let footerContent = "";
@@ -379,10 +383,17 @@ export async function createCollectionPreviewToken(req, res) {
       footerContent = await renderWidget(activeProjectId, "footer", footerData, rawThemeSettings, "preview", sharedGlobals, null);
     }
 
-    const baseContext = await createBaseRenderContext(activeProjectId, rawThemeSettings, "preview", sharedGlobals);
-    const mainContent = await renderLiquidTemplate(activeProjectId, template, { ...baseContext, item: resolvedItem }, sharedGlobals);
-
+    // Page-shaped object built BEFORE the template render so the item template
+    // receives the documented page/collection/project context, not just item (#5).
     const itemPageData = buildCollectionItemPageData(schema, resolvedItem, "");
+    const projectData = projectRepo.getProjectById(activeProjectId);
+    const baseContext = await createBaseRenderContext(activeProjectId, rawThemeSettings, "preview", sharedGlobals);
+    const mainContent = await renderLiquidTemplate(
+      activeProjectId,
+      template,
+      { ...baseContext, item: resolvedItem, collection: schema, page: itemPageData, project: projectData },
+      sharedGlobals,
+    );
 
     let html = await renderPageLayout(
       activeProjectId,

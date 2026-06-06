@@ -38,7 +38,7 @@ const {
 } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
-const { exportProjectToDir } = await import("../controllers/exportController.js");
+const { exportProjectToDir, exportProject } = await import("../controllers/exportController.js");
 const { closeDb } = await import("../db/index.js");
 
 const SITE_URL = "https://items.example.com";
@@ -87,6 +87,9 @@ const TEMPLATE = `<article>
   <img class="feat" src="{{ item.settings.featured_image }}">
   <a class="ext" href="{{ item.settings.external_url.href }}">ext</a>
   <a class="dead" href="{{ item.settings.dead_link.href }}">dead</a>
+  <p class="ctx-collection">{{ collection.displayName }}</p>
+  <p class="ctx-project">{{ project.siteTitle }}</p>
+  <p class="ctx-page">{{ page.slug }}</p>
 </article>`;
 
 async function seedProject(id, folder, { withTemplate = true, items, siteUrl = SITE_URL } = {}) {
@@ -234,6 +237,14 @@ describe("item-page export — happy path", () => {
     assert.match(html, /<!doctype html>/i); // prettier lowercases the doctype
   });
 
+  it("passes the documented collection/page/project context to the item template (Finding #5)", async () => {
+    const html = await fs.readFile(path.join(outputDir, "portfolio", "project-alpha.html"), "utf8");
+    // collection = the schema; page = the page-shaped object; project = project data.
+    assert.match(html, /<p class="ctx-collection">Portfolio Item<\/p>/); // schema.displayName
+    assert.match(html, /<p class="ctx-project">Items<\/p>/); // projectData.siteTitle
+    assert.match(html, /<p class="ctx-page">portfolio\/project-alpha<\/p>/); // page.slug
+  });
+
   // --- Phase 20: SEO outputs ---
 
   it("sitemap.xml lists indexable item URLs and excludes noindex items", async () => {
@@ -279,10 +290,33 @@ describe("item-page export — two-pass validation", () => {
     assert.equal(badEntry.collection, "portfolio");
     assert.ok(badEntry.errors.some((e) => e.fieldId === "title"));
 
-    // No HTML written for the collection.
+    // Finding #4: a blocked export must leave NO disk artifacts at all — not
+    // just no HTML, but no output directory, favicon, or manifest. Validation
+    // now runs before any write, so the version directory is never created.
     const outputDir = path.join(TEST_ROOT, "data", "publish", "citem-bad-v1");
-    assert.ok(!(await fs.pathExists(path.join(outputDir, "portfolio", "bad.html"))));
-    assert.ok(!(await fs.pathExists(path.join(outputDir, "portfolio", "project-alpha.html"))));
+    assert.ok(!(await fs.pathExists(outputDir)), "blocked export must leave no output directory");
+  });
+
+  it("surfaces per-item validationErrors in the HTTP 400 response (Finding #3)", async () => {
+    const invalid = { id: "bad", slug: "bad", uuid: "uuid-bad2", settings: { title: "" } };
+    await seedProject("citem-bad-http-uuid", "citem-bad-http", { items: [ALPHA, invalid] });
+
+    // Mock res capturing the status code + JSON body the wrapper sends.
+    let status = 200;
+    let body = null;
+    const res = {
+      status(code) { status = code; return res; },
+      json(data) { body = data; return res; },
+    };
+    await exportProject({ params: { projectId: "citem-bad-http-uuid" }, body: {} }, res);
+
+    assert.equal(status, 400);
+    // The detail the inner function attaches must survive into the response.
+    assert.ok(Array.isArray(body.validationErrors), "response should carry validationErrors");
+    const badEntry = body.validationErrors.find((e) => e.slug === "bad");
+    assert.ok(badEntry, "response should name the invalid item");
+    assert.equal(badEntry.collection, "portfolio");
+    assert.ok(badEntry.errors.some((e) => e.fieldId === "title"));
   });
 });
 

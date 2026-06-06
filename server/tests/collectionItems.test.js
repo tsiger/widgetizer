@@ -35,6 +35,7 @@ const {
   reorderCollectionItems,
   readRawCollectionItem,
   resolveCollectionItemLinks,
+  prepareCollectionItemForRender,
 } = await import("../services/collectionService.js");
 const {
   getProjectCollectionSchemaPath,
@@ -564,6 +565,49 @@ describe("resolveCollectionItemLinks", () => {
     const item2 = { settings: { cta: { href: "contact.html" } } };
     resolveCollectionItemLinks(item2, pagesByUuid, "../");
     assert.equal(item2.settings.cta.href, "contact.html");
+  });
+});
+
+// ============================================================================
+// prepareCollectionItemForRender — the render gate (resolve links + sanitize)
+// ============================================================================
+
+describe("prepareCollectionItemForRender", () => {
+  const pagesByUuid = new Map([["page-uuid-1", { slug: "about" }]]);
+  const schema = {
+    settings: [
+      { id: "description", type: "richtext" },
+      { id: "cta", type: "link" },
+      { id: "title", type: "text" },
+    ],
+  };
+
+  it("resolves links AND sanitizes in one pass", () => {
+    const item = {
+      settings: {
+        description: '<p>Welcome</p><script>steal()</script>',
+        cta: { pageUuid: "page-uuid-1", href: "", text: "About", target: "_self" },
+      },
+    };
+    const out = prepareCollectionItemForRender(item, schema, pagesByUuid, "../");
+    // link resolution still happens (pageUuid -> depth-prefixed slug)
+    assert.equal(out.settings.cta.href, "../about.html");
+    // sanitization happens too (script stripped, safe markup kept)
+    assert.doesNotMatch(out.settings.description, /<script/i);
+    assert.match(out.settings.description, /<p>Welcome<\/p>/);
+  });
+
+  it("blocks a javascript: href that survives link resolution", () => {
+    const item = { settings: { cta: { href: "javascript:alert(1)", text: "Go" } } };
+    const out = prepareCollectionItemForRender(item, schema, pagesByUuid, "../");
+    assert.equal(out.settings.cta.href, "");
+  });
+
+  it("does not mutate the on-disk item (operates on a clone)", () => {
+    const item = { settings: { description: '<p>Hi</p><script>x()</script>' } };
+    prepareCollectionItemForRender(item, schema, pagesByUuid, "");
+    // original still carries the raw payload — only the returned clone is cleaned
+    assert.match(item.settings.description, /<script>x\(\)<\/script>/);
   });
 });
 

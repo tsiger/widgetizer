@@ -4,7 +4,7 @@ import Button from "../ui/Button";
 import { exportProjectAPI } from "../../queries/exportManager";
 import useProjectStore from "../../stores/projectStore";
 import useToastStore from "../../stores/toastStore";
-import { Loader2, Package } from "lucide-react";
+import { Loader2, Package, AlertTriangle } from "lucide-react";
 
 export default function ExportCreator({
   activeProject,
@@ -18,6 +18,9 @@ export default function ExportCreator({
   const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [exportMarkdown, setExportMarkdown] = useState(false);
+  // Per-item collection validation errors from a blocked export (Finding #3),
+  // shown in a persistent panel so the author can see exactly what to fix.
+  const [validationErrors, setValidationErrors] = useState(null);
   const showToast = useToastStore((state) => state.showToast);
   const isEmptyState = variant === "empty";
 
@@ -39,6 +42,7 @@ export default function ExportCreator({
     const projectIdAtStart = activeProject.id;
     setIsExporting(true);
     setLastExport(null);
+    setValidationErrors(null);
 
     try {
       const result = await exportProjectAPI(projectIdAtStart, { exportMarkdown });
@@ -57,6 +61,12 @@ export default function ExportCreator({
     } catch (err) {
       if (useProjectStore.getState().activeProject?.id !== projectIdAtStart) return;
       console.error("Exporting failed:", err);
+      // Surface per-item collection validation errors in a panel; the toast
+      // alone can't show which items need fixing.
+      const items = err?.data?.validationErrors;
+      if (Array.isArray(items) && items.length > 0) {
+        setValidationErrors(items);
+      }
       showToast(err.message || t("exportSite.toasts.unknownError"), "error");
     } finally {
       setIsExporting(false);
@@ -104,6 +114,31 @@ export default function ExportCreator({
           <p className="mt-1 text-sm text-green-700">
             {t("exportSite.creator.successCreated", { date: formatDate(lastExport.timestamp) })}
           </p>
+        </div>
+      )}
+
+      {validationErrors && (
+        <div className={`mt-4 rounded-sm border border-red-200 bg-red-50 p-4 ${isEmptyState ? "w-full max-w-md text-left" : ""}`}>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="shrink-0 text-red-600" size={16} />
+            <p className="text-sm font-medium text-red-800">{t("exportSite.creator.validationTitle")}</p>
+          </div>
+          <ul className="mt-2 space-y-2">
+            {validationErrors.map((item) => (
+              <li key={`${item.collection}/${item.slug}`} className="text-sm text-red-700">
+                <span className="font-medium">
+                  {item.collection} / {item.slug}
+                </span>
+                <ul className="mt-0.5 ml-4 list-disc">
+                  {(item.errors || []).map((fieldError, i) => (
+                    <li key={`${fieldError.fieldId}-${i}`}>
+                      <span className="font-mono">{fieldError.fieldId}</span>: {fieldError.reason}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </section>

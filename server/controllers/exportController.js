@@ -16,7 +16,7 @@ import {
   listCollectionSchemas,
   listCollectionItems,
   loadCollectionTemplate,
-  resolveCollectionItemLinks,
+  prepareCollectionItemForRender,
   buildCollectionItemPageData,
 } from "../services/collectionService.js";
 import { readProjectThemeData } from "./themeController.js";
@@ -165,19 +165,13 @@ export async function exportProjectToDir(projectId, options = {}) {
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images");
 
-    // Ensure output directories exist
-    await fs.ensureDir(outputDir);
-    await fs.ensureDir(outputAssetsDir);
-    await fs.ensureDir(outputImagesDir);
+    // Read-only setup + all fail-fast validation runs BEFORE any disk write, so
+    // a blocked export (missing homepage or invalid collection items) leaves no
+    // output directory, favicon, or manifest behind (Finding #4; core-export.md
+    // promises validation before any disk write). Nothing below touches disk
+    // until the "validation passed" marker further down.
     const rawThemeSettings = await readProjectThemeData(projectId);
     const processedThemeSettings = preprocessThemeSettings(rawThemeSettings);
-    const generatedSiteIcons = await generateExportSiteIcons({
-      outputDir,
-      projectDir,
-      projectName: projectData.name,
-      siteTitle: projectData.siteTitle,
-      siteIconSrc: processedThemeSettings?.general?.favicon || "",
-    });
 
     // Fetch list of page data using the helper function
     const pagesDataArray = await listProjectPagesData(projectFolderName);
@@ -234,6 +228,19 @@ export async function exportProjectToDir(projectId, options = {}) {
       err.validationErrors = invalidCollectionItems;
       throw err;
     }
+
+    // --- Validation passed: from here on, disk writes are safe ---
+    // Ensure output directories exist
+    await fs.ensureDir(outputDir);
+    await fs.ensureDir(outputAssetsDir);
+    await fs.ensureDir(outputImagesDir);
+    const generatedSiteIcons = await generateExportSiteIcons({
+      outputDir,
+      projectDir,
+      projectName: projectData.name,
+      siteTitle: projectData.siteTitle,
+      siteIconSrc: processedThemeSettings?.general?.favicon || "",
+    });
 
     // --- Generate sitemap.xml and robots.txt ---
     if (siteUrl && siteUrl.trim() !== "") {
@@ -577,14 +584,21 @@ Per aspera ad astra
           itemFooterHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null);
         }
 
-        // Resolve item links at depth, then render the collection template.
-        const resolvedItem = resolveCollectionItemLinks(item, pagesByUuidForItems, "../");
-        const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, "publish", sharedGlobals);
-        const itemContext = { ...baseContext, item: resolvedItem };
-        const itemContentHtml = await renderLiquidTemplate(projectId, template, itemContext, sharedGlobals);
-
+        // Resolve item links at depth + sanitize, then render the collection template.
+        const resolvedItem = prepareCollectionItemForRender(item, schema, pagesByUuidForItems, "../");
         // Page-shaped object (spec Section 13) drives layout title/seo/body class.
+        // Built BEFORE the template render so item templates receive the
+        // documented page/collection/project context, not just item (Finding #5).
         const itemPageData = buildCollectionItemPageData(schema, resolvedItem, siteUrl);
+        const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, "publish", sharedGlobals);
+        const itemContext = {
+          ...baseContext,
+          item: resolvedItem,
+          collection: schema,
+          page: itemPageData,
+          project: projectData,
+        };
+        const itemContentHtml = await renderLiquidTemplate(projectId, template, itemContext, sharedGlobals);
 
         let itemHtml = await renderPageLayout(
           projectId,
@@ -939,6 +953,10 @@ export async function exportProject(req, res) {
       return res.status(error.statusCode).json({
         error: error.errorTitle || "Export failed",
         message: error.message,
+        // Preserve per-item collection validation details (collection/slug/field)
+        // so the UI can point the author at the exact items to fix, instead of
+        // forcing manual inspection. Omitted when the error carries none.
+        ...(error.validationErrors ? { validationErrors: error.validationErrors } : {}),
       });
     }
     // Send specific error if theme read failed
