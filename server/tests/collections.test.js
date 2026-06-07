@@ -57,7 +57,7 @@ function validSchema(overrides = {}) {
     settings: [
       { type: "header", id: "content_header", label: "Content" },
       { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
-      { type: "image", id: "featured_image", label: "Featured", usedAsOgImage: true },
+      { type: "image", id: "featured_image", label: "Featured" },
     ],
     ...overrides,
   };
@@ -174,51 +174,6 @@ describe("validateCollectionSchema — usedAsTitle", () => {
     );
     assert.equal(result.valid, false);
     assert.ok(result.errors.some((e) => /usedastitle/i.test(e) && /text/i.test(e)));
-  });
-});
-
-// ============================================================================
-// Rule: at most one usedAsOgImage, must be an image setting
-// ============================================================================
-
-describe("validateCollectionSchema — usedAsOgImage", () => {
-  it("rejects more than one usedAsOgImage", () => {
-    const result = validateCollectionSchema(
-      validSchema({
-        settings: [
-          { type: "text", id: "title", label: "Title", usedAsTitle: true },
-          { type: "image", id: "img1", label: "Image 1", usedAsOgImage: true },
-          { type: "image", id: "img2", label: "Image 2", usedAsOgImage: true },
-        ],
-      }),
-      "portfolio",
-    );
-    assert.equal(result.valid, false);
-    assert.ok(result.errors.some((e) => /usedasogimage/i.test(e)));
-  });
-
-  it("rejects usedAsOgImage on a non-image setting", () => {
-    const result = validateCollectionSchema(
-      validSchema({
-        settings: [
-          { type: "text", id: "title", label: "Title", usedAsTitle: true },
-          { type: "text", id: "notimg", label: "Not image", usedAsOgImage: true },
-        ],
-      }),
-      "portfolio",
-    );
-    assert.equal(result.valid, false);
-    assert.ok(result.errors.some((e) => /usedasogimage/i.test(e) && /image/i.test(e)));
-  });
-
-  it("accepts zero usedAsOgImage settings", () => {
-    const result = validateCollectionSchema(
-      validSchema({
-        settings: [{ type: "text", id: "title", label: "Title", usedAsTitle: true }],
-      }),
-      "portfolio",
-    );
-    assert.equal(result.valid, true);
   });
 });
 

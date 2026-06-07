@@ -162,6 +162,34 @@ describe("item create / read", () => {
     assert.equal(got._json.title, "Hello World");
   });
 
+  it("accepts a page-shaped seo object, sanitizes + persists it, and returns it (Finding #12)", async () => {
+    const created = await call(collectionController.createItem, {
+      params: { collectionType: "portfolio" },
+      body: {
+        slug: "seo-item",
+        settings: { title: "SEO Item" },
+        seo: { description: "<b>Meta</b> desc", og_title: "Social", robots: "noindex,follow" },
+      },
+    });
+    assert.equal(created._status, 201);
+    assert.equal(created._json.seo.description, "Meta desc"); // HTML stripped on save
+    assert.equal(created._json.seo.og_title, "Social");
+    assert.equal(created._json.seo.robots, "noindex,follow");
+    assert.equal(created._json.seo.og_type, "article"); // item default
+
+    // persisted on disk
+    const itemPath = path.join(getProjectDir(PROJECT_FOLDER), "collections", "portfolio", "seo-item.json");
+    const raw = await fs.readJSON(itemPath);
+    assert.equal(raw.seo.description, "Meta desc");
+    assert.equal(raw.seo.robots, "noindex,follow");
+
+    // GET returns it too
+    const got = await call(collectionController.getItem, {
+      params: { collectionType: "portfolio", itemSlug: "seo-item" },
+    });
+    assert.equal(got._json.seo.og_title, "Social");
+  });
+
   it("returns 400 when a required field is missing", async () => {
     const res = await call(collectionController.createItem, {
       params: { collectionType: "portfolio" },

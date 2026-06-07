@@ -68,12 +68,9 @@ const PORTFOLIO_SCHEMA = {
   settings: [
     { type: "header", id: "content_header", label: "Content" },
     { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
-    { type: "image", id: "featured_image", label: "Image", usedAsOgImage: true },
+    { type: "image", id: "featured_image", label: "Image" },
     { type: "link", id: "external_url", label: "Link" },
     { type: "link", id: "dead_link", label: "Dead link" },
-    { type: "text", id: "seo_title", label: "SEO title" },
-    { type: "textarea", id: "seo_description", label: "SEO description" },
-    { type: "checkbox", id: "seo_noindex", label: "Hide from search engines", default: false },
   ],
 };
 
@@ -152,8 +149,9 @@ const ALPHA = {
     featured_image: "/uploads/images/featured.jpg",
     external_url: { pageUuid: "uuid-about", href: "", text: "", target: "_self" },
     dead_link: { pageUuid: "uuid-gone", href: "", text: "", target: "_self" },
-    seo_title: "Alpha SEO",
   },
+  // Page-shaped SEO (Finding #12): manual meta description + social image.
+  seo: { description: "Alpha case study.", og_image: "/uploads/images/featured.jpg" },
 };
 const BETA = {
   id: "project-beta",
@@ -170,7 +168,9 @@ const GAMMA = {
   uuid: "uuid-gamma",
   created: "2025-01-05T00:00:00.000Z",
   updated: "2025-02-06T00:00:00.000Z",
-  settings: { title: "Project Gamma", seo_noindex: true, featured_image: "", external_url: { href: "" }, dead_link: { href: "" } },
+  settings: { title: "Project Gamma", featured_image: "", external_url: { href: "" }, dead_link: { href: "" } },
+  // noindex via the page-shaped robots field — excluded from sitemap, disallowed in robots.
+  seo: { robots: "noindex,follow" },
 };
 
 after(async () => {
@@ -202,9 +202,11 @@ describe("item-page export — happy path", () => {
     assert.doesNotMatch(html, /page-project-alpha/);
   });
 
-  it("renders the page-shaped SEO title and absolute canonical/og:image", async () => {
+  it("renders title, meta description, canonical and og:image from the item seo object", async () => {
     const html = await fs.readFile(path.join(outputDir, "portfolio", "project-alpha.html"), "utf8");
-    assert.match(html, /<title>Alpha SEO - Items<\/title>/);
+    // <title> is the item's display title (no meta-title override, parity with pages).
+    assert.match(html, /<title>Project Alpha - Items<\/title>/);
+    assert.match(html, /name="description" content="Alpha case study\."/);
     assert.match(html, /rel="canonical" href="https:\/\/items\.example\.com\/portfolio\/project-alpha\.html"/);
     assert.match(html, /og:image" content="https:\/\/items\.example\.com\/assets\/images\/featured\.jpg"/);
   });

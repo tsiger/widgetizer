@@ -2,7 +2,7 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import { Eye, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, Info } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import { discardArchivedCollectionItem } from "../../queries/collectionManager";
 import { invalidateMediaCache } from "../../queries/mediaManager";
@@ -11,6 +11,7 @@ import useToastStore from "../../stores/toastStore";
 import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
 import SettingsRenderer from "../settings/SettingsRenderer";
+import SeoFields from "../settings/SeoFields";
 import CollectionItemPreview from "./CollectionItemPreview";
 
 const HEADER_TYPE = "header";
@@ -38,6 +39,20 @@ function humanizeFieldId(id) {
     .replace(/^\w/, (c) => c.toUpperCase());
 }
 
+/** Page-shaped SEO form defaults for a collection item (Finding #12). Mirrors
+ *  the page SEO shape; items default og_type to "article" (they are content). */
+function seoDefaults(seo = {}) {
+  return {
+    description: seo?.description || "",
+    og_title: seo?.og_title || "",
+    og_image: seo?.og_image || "",
+    og_type: seo?.og_type || "article",
+    twitter_card: seo?.twitter_card || "summary",
+    canonical_url: seo?.canonical_url || "",
+    robots: seo?.robots || "index,follow",
+  };
+}
+
 /**
  * Schema-driven create/edit form for a collection item. Mirrors PageForm's
  * contract (initialData / onSubmit / onDirtyChange / isDirty) so the page shells
@@ -62,6 +77,8 @@ export default function CollectionItemForm({
   const { t } = useTranslation();
   const showToast = useToastStore((state) => state.showToast);
   const isNew = !initialData.id && !initialData.slug;
+  // Item-page collections get the same SEO editor as pages (Finding #12).
+  const hasItemPages = !!schema?.hasItemPages;
 
   // Finding #8: out-of-schema values are kept on disk in `_archived`. Surface
   // them with a confirmed discard. Empty for new items, so this is edit-only.
@@ -107,6 +124,7 @@ export default function CollectionItemForm({
     defaultValues: {
       slug: initialData.slug || "",
       settings: initialData.settings || {},
+      seo: seoDefaults(initialData.seo),
     },
   });
 
@@ -114,6 +132,7 @@ export default function CollectionItemForm({
   const [fieldErrors, setFieldErrors] = useState({});
 
   const settingsValues = watch("settings") || {};
+  const ogImage = watch("seo.og_image");
   const titleValue = titleSetting ? settingsValues[titleSetting.id] : undefined;
 
   // Notify parent of dirty changes.
@@ -146,11 +165,15 @@ export default function CollectionItemForm({
   const prevKeyRef = useRef(initialData.slug);
   useEffect(() => {
     if (prevKeyRef.current !== initialData.slug) {
-      reset({ slug: initialData.slug || "", settings: initialData.settings || {} });
+      reset({
+        slug: initialData.slug || "",
+        settings: initialData.settings || {},
+        seo: seoDefaults(initialData.seo),
+      });
       setArchived(initialData._archived || {});
       prevKeyRef.current = initialData.slug;
     }
-  }, [initialData.slug, initialData.settings, initialData._archived, reset]);
+  }, [initialData.slug, initialData.settings, initialData.seo, initialData._archived, reset]);
 
   const effectiveValue = (setting) => {
     const v = settingsValues[setting.id];
@@ -184,6 +207,7 @@ export default function CollectionItemForm({
       return await onSubmit({
         slug: formatSlug(data.slug),
         settings: data.settings || {},
+        ...(hasItemPages ? { seo: data.seo } : {}),
       });
     } catch (err) {
       showToast(err.message || t("collectionsForm.toasts.updateError"), "error");
@@ -195,7 +219,8 @@ export default function CollectionItemForm({
   // collection's theme template. Only meaningful when the collection has item
   // pages (otherwise there is no template to render).
   const [previewDraft, setPreviewDraft] = useState(null);
-  const canPreview = !!schema?.hasItemPages;
+  const canPreview = hasItemPages;
+  const [showSeo, setShowSeo] = useState(false);
   const openPreview = () => {
     const values = getValues();
     setPreviewDraft({
@@ -369,6 +394,22 @@ export default function CollectionItemForm({
           return renderer;
         })}
       </div>
+
+      {/* SEO — same editor pages use (Finding #12), only for collections that
+          render item pages. Collapsed by default, mirroring PageForm. */}
+      {hasItemPages && (
+        <div className="form-section">
+          <button
+            type="button"
+            onClick={() => setShowSeo((v) => !v)}
+            className="flex items-center gap-1 text-sm text-pink-500 hover:text-pink-700"
+          >
+            {showSeo ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {t("forms.project.moreSettings")}
+          </button>
+          {showSeo && <SeoFields register={register} setValue={setValue} ogImage={ogImage} />}
+        </div>
+      )}
 
       <div className="form-actions-separated justify-end">
         {onCancel && (

@@ -1363,9 +1363,8 @@ The schema reuses the same setting types as widgets/`theme.json`, plus a few top
   "settings": [
     { "type": "header", "id": "content_header", "label": "Content" },
     { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
-    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
-    { "type": "textarea", "id": "description", "label": "Description" },
-    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
+    { "type": "textarea", "id": "description", "label": "Description" }
   ]
 }
 ```
@@ -1374,11 +1373,10 @@ Authoring rules (enforced at runtime and at theme upload):
 
 - `type` must match the folder name and be `^[a-z0-9-]+$`; `slugPrefix` must be `^[a-z0-9-]+$` (defaults to `type`).
 - **Exactly one** non-`header` setting must declare `usedAsTitle: true` (must be a `text` field) — it's the display name and the slug source.
-- **At most one** setting may declare `usedAsOgImage: true` (must be an `image` field) — the default social image for item pages.
 - `defaultSort` ∈ `manual` \| `created_desc` \| `created_asc` \| `title_asc` \| `title_desc`.
 - Only setting types in `supportedSettingTypes.js` are allowed; `multiple`/`blocks`/repeater/relationship/taxonomy fields are rejected. No `gallery`/multi-image type exists yet.
 - Two collections can't share a `slugPrefix`, and a `slugPrefix` can't be a reserved output dir (`assets`).
-- SEO is field-id convention: a `checkbox` with `id: "seo_noindex"`, plus `seo_title`/`seo_description` text fields.
+- SEO is **not** a schema concern: `hasItemPages` items get a built-in page-shaped `seo` object and the same SEO editor pages use (Finding #12). Don't declare `seo_*` fields or `usedAsOgImage`.
 - Labels support `tTheme:` locale keys, same as widget schemas.
 
 ### Item pages (`template.liquid`)

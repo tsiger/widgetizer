@@ -39,9 +39,15 @@
       "href": "../contact.html",
       "text": "",
       "target": "_self"
-    },
-    "seo_title": "",
-    "seo_description": "A guided Santorini wine tour through three cliff-top wineries tasting Assyrtiko and Vinsanto.",
-    "seo_noindex": false
+    }
+  },
+  "seo": {
+    "description": "A guided Santorini wine tour through three cliff-top wineries tasting Assyrtiko and Vinsanto.",
+    "og_title": "",
+    "og_image": "/uploads/images/aegean-10.jpg",
+    "og_type": "article",
+    "twitter_card": "summary",
+    "canonical_url": "",
+    "robots": "index,follow"
   }
 }

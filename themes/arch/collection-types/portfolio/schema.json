@@ -13,13 +13,9 @@
     { "type": "header", "id": "content_header", "label": "Content" },
     { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
     { "type": "textarea", "id": "description", "label": "Description" },
-    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
     { "type": "text", "id": "client", "label": "Client" },
     { "type": "text", "id": "year", "label": "Year" },
-    { "type": "link", "id": "external_url", "label": "Project link", "hide_text": true },
-    { "type": "header", "id": "seo_header", "label": "SEO" },
-    { "type": "text", "id": "seo_title", "label": "SEO title" },
-    { "type": "textarea", "id": "seo_description", "label": "SEO description" },
-    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+    { "type": "link", "id": "external_url", "label": "Project link", "hide_text": true }
   ]
 }

@@ -28,7 +28,7 @@
     },
     { "type": "textarea", "id": "summary", "label": "Short summary", "default": "A half-day sail along the caldera with swim stops and a sunset finale." },
     { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Cast off from the old port and trace the volcanic rim by traditional caïque. We drop anchor at the hot springs and the red and white beaches for swimming and snorkelling, then turn west to catch the Santorini sunset from the water with a glass of local wine in hand.</p>" },
-    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
 
     { "type": "header", "id": "details_header", "label": "Details" },
     { "type": "text", "id": "price_per_person", "label": "Price per person (number)", "default": "85" },
@@ -87,11 +87,6 @@
 
     { "type": "header", "id": "booking_header", "label": "Booking" },
     { "type": "text", "id": "book_label", "label": "Booking button label", "default": "Book this excursion" },
-    { "type": "link", "id": "book_link", "label": "Booking link", "hide_text": true },
-
-    { "type": "header", "id": "seo_header", "label": "SEO" },
-    { "type": "text", "id": "seo_title", "label": "SEO title" },
-    { "type": "textarea", "id": "seo_description", "label": "SEO description" },
-    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+    { "type": "link", "id": "book_link", "label": "Booking link", "hide_text": true }
   ]
 }

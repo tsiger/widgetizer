@@ -366,6 +366,57 @@ describe("buildCollectionItemData", () => {
 });
 
 // ============================================================================
+// collection item SEO — page-shaped seo object (Finding #12)
+// ============================================================================
+
+describe("collection item SEO", () => {
+  const withSeo = (seo) => ({ slug: "alpha", settings: { title: "Alpha" }, seo });
+
+  it("buildCollectionItemData persists a page-shaped seo object with item defaults", () => {
+    const { item } = buildCollectionItemData(portfolioSchema(), withSeo({ description: "d", robots: "noindex,follow" }));
+    assert.deepEqual(item.seo, {
+      description: "d",
+      og_title: "",
+      og_image: "",
+      og_type: "article", // collection items are content
+      twitter_card: "summary",
+      canonical_url: "",
+      robots: "noindex,follow",
+    });
+  });
+
+  it("buildCollectionItemData strips HTML from seo text fields (parity with page SEO)", () => {
+    const { item } = buildCollectionItemData(
+      portfolioSchema(),
+      withSeo({ description: "<b>Bold</b> summary", og_title: "<i>Italic</i> Title", canonical_url: "<u>https://x.com/p</u>" }),
+    );
+    assert.equal(item.seo.description, "Bold summary");
+    assert.equal(item.seo.og_title, "Italic Title");
+    assert.equal(item.seo.canonical_url, "https://x.com/p");
+  });
+
+  it("buildCollectionItemData carries forward existing seo when an update omits it", () => {
+    const existing = itemFile("alpha", { seo: { description: "kept", robots: "index,follow" } });
+    const { item } = buildCollectionItemData(portfolioSchema(), { slug: "alpha", settings: { title: "Alpha" } }, existing);
+    assert.equal(item.seo.description, "kept");
+  });
+
+  it("normalizeCollectionItem surfaces a default seo object for a legacy item with none", () => {
+    const n = normalizeCollectionItem(itemFile("alpha"), portfolioSchema());
+    assert.equal(n.seo.robots, "index,follow");
+    assert.equal(n.seo.og_type, "article");
+    assert.equal(n.seo.description, "");
+  });
+
+  it("list-only collections (no item pages) carry no seo object", () => {
+    const listOnly = portfolioSchema({ hasItemPages: false });
+    const { item } = buildCollectionItemData(listOnly, withSeo({ description: "ignored" }));
+    assert.equal("seo" in item, false);
+    assert.equal("seo" in normalizeCollectionItem(itemFile("alpha"), listOnly), false);
+  });
+});
+
+// ============================================================================
 // writeCollectionItem / delete / bulkDelete / duplicate (Phase 4)
 // ============================================================================
 
@@ -503,6 +554,27 @@ describe("write-side storage", () => {
     const order = await readOrder("p", "portfolio");
     assert.equal(order[0], "alpha");
     assert.equal(order[1], dup.slug); // inserted immediately after source
+  });
+
+  it("copies the page-shaped seo object to the duplicate (Finding #12)", async () => {
+    await setupCollection(
+      "p",
+      "portfolio",
+      portfolioSchema(),
+      [
+        itemFile("alpha", {
+          uuid: "uA",
+          settings: { title: "Alpha" },
+          seo: { description: "Meta", og_image: "/uploads/images/social.jpg", robots: "noindex,follow" },
+        }),
+      ],
+      ["alpha"],
+    );
+    const dup = await duplicateCollectionItem("pid", "p", "portfolio", "alpha");
+    assert.equal(dup.seo.description, "Meta");
+    assert.equal(dup.seo.og_image, "/uploads/images/social.jpg");
+    assert.equal(dup.seo.robots, "noindex,follow");
+    assert.equal(dup.seo.og_type, "article"); // shaped default
   });
 
   it("reorders items, pruning stale slugs", async () => {

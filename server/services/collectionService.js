@@ -22,7 +22,7 @@ import { isSupportedSettingType } from "../../src/components/settings/supportedS
 import { isAtomicTmpFile, writeJsonAtomic } from "../utils/atomicFs.js";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { prefixInternalHref } from "../utils/linkPrefixer.js";
-import { sanitizeCollectionItemData } from "./sanitizationService.js";
+import { sanitizeCollectionItemData, stripHtmlTags } from "./sanitizationService.js";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc"];
@@ -59,7 +59,6 @@ export function validateCollectionSchema(schema, folderName) {
 
   // --- settings array + per-setting checks ---
   let titleSettings = [];
-  let ogImageSettings = [];
   if (!Array.isArray(schema.settings)) {
     errors.push("`settings` must be an array.");
   } else {
@@ -83,9 +82,6 @@ export function validateCollectionSchema(schema, folderName) {
       if (setting.usedAsTitle === true && setting.type !== "header") {
         titleSettings.push(setting);
       }
-      if (setting.usedAsOgImage === true) {
-        ogImageSettings.push(setting);
-      }
     });
   }
 
@@ -96,15 +92,6 @@ export function validateCollectionSchema(schema, folderName) {
     );
   } else if (titleSettings[0].type !== "text") {
     errors.push("`usedAsTitle` must be on a `text` setting.");
-  }
-
-  // --- usedAsOgImage: at most one, must be an image setting ---
-  if (ogImageSettings.length > 1) {
-    errors.push(
-      `At most one setting may declare \`usedAsOgImage: true\` (found ${ogImageSettings.length}).`,
-    );
-  } else if (ogImageSettings.length === 1 && ogImageSettings[0].type !== "image") {
-    errors.push("`usedAsOgImage` must be on an `image` setting.");
   }
 
   // --- defaultSort ---
@@ -330,6 +317,38 @@ export async function getCollectionSchema(projectFolderName, collectionType) {
  * @param {object} schema - normalized schema
  * @returns {object} normalized item with title/invalid/validationErrors/_archived
  */
+/**
+ * Shape a raw SEO object (from form input or disk) into the page-shaped `seo`
+ * object collection item pages use — the SAME field set as page SEO (Finding
+ * #12), so item pages feed the shared `SeoTag` exactly like pages. Only the five
+ * user-edited fields are authored (description, og_title, og_image,
+ * canonical_url, robots); `og_type`/`twitter_card` are non-UI defaults (items
+ * are content, so `og_type` defaults to "article"). With `sanitize`, the
+ * author-editable text fields are stripped of HTML — parity with the page SEO
+ * save path (pageController runs the same `stripHtmlTags`).
+ *
+ * @param {object} rawSeo - partial/raw seo object (may be undefined)
+ * @param {{ sanitize?: boolean }} [opts]
+ * @returns {object} full page-shaped seo object with defaults applied
+ */
+export function shapeItemSeo(rawSeo, { sanitize = false } = {}) {
+  const seo = rawSeo && typeof rawSeo === "object" ? rawSeo : {};
+  const text = (v) => {
+    const s = typeof v === "string" ? v : "";
+    return sanitize ? stripHtmlTags(s) : s;
+  };
+  const str = (v, fallback) => (typeof v === "string" && v ? v : fallback);
+  return {
+    description: text(seo.description),
+    og_title: text(seo.og_title),
+    og_image: typeof seo.og_image === "string" ? seo.og_image : "",
+    og_type: str(seo.og_type, "article"),
+    twitter_card: str(seo.twitter_card, "summary"),
+    canonical_url: text(seo.canonical_url),
+    robots: str(seo.robots, "index,follow"),
+  };
+}
+
 export function normalizeCollectionItem(rawItem, schema) {
   const fieldSettings = (schema.settings || []).filter((s) => s.type !== HEADER_TYPE);
   const knownIds = new Set(fieldSettings.map((s) => s.id));
@@ -366,6 +385,9 @@ export function normalizeCollectionItem(rawItem, schema) {
     schemaVersion: schema.schemaVersion,
     created: rawItem.created,
     updated: rawItem.updated,
+    // Item-page SEO is a page-shaped object (Finding #12), surfaced only for
+    // collections that render item pages.
+    ...(schema.hasItemPages ? { seo: shapeItemSeo(rawItem?.seo) } : {}),
     settings,
     _archived,
     title,
@@ -636,6 +658,10 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
     throw new CollectionValidationError(validationErrors);
   }
 
+  // A page-shaped seo object lives top-level (parity with pages, Finding #12),
+  // sanitized like page SEO, and only for collections that render item pages.
+  // Carry forward existing seo when an update omits it.
+  const rawSeo = input && input.seo !== undefined ? input.seo : existingItem?.seo;
   const item = {
     id: slug,
     uuid: existingItem?.uuid ?? randomUUID(),
@@ -643,6 +669,7 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
     schemaVersion: schema.schemaVersion,
     created: existingItem?.created ?? nowIso(),
     updated: nextUpdatedIso(existingItem?.updated),
+    ...(schema.hasItemPages ? { seo: shapeItemSeo(rawSeo, { sanitize: true }) } : {}),
     settings,
   };
   return { item, previousSlug: existingItem?.slug ?? null };
@@ -880,6 +907,9 @@ export async function duplicateCollectionItem(
     schemaVersion: schema.schemaVersion,
     created: now,
     updated: now,
+    // Carry the page-shaped SEO object to the copy (Finding #12); before the
+    // SEO object existed these fields lived in settings and copied for free.
+    ...(schema.hasItemPages ? { seo: shapeItemSeo(source.seo) } : {}),
     settings,
   };
 
@@ -996,8 +1026,12 @@ function isValidSiteUrl(siteUrl) {
 /**
  * Map a normalized collection item + its schema into the page-shaped object that
  * renderPageLayout and SeoTag consume for an item page (spec Section 13). The
- * title/og-image come from the schema's usedAsTitle / usedAsOgImage fields; SEO
- * fields follow the seo_title / seo_description / seo_noindex conventions.
+ * title comes from the schema's usedAsTitle field; SEO comes from the item's
+ * own page-shaped `seo` object (Finding #12 — at parity with page SEO), so the
+ * shared `SeoTag` handles `<title>`, og fallbacks, og:image absolutization, and
+ * the twitter card exactly as it does for pages. An explicit `seo.canonical_url`
+ * wins; otherwise we precompute the absolute canonical from siteUrl so the
+ * returned page object is self-describing.
  *
  * @param {object} schema - normalized collection schema
  * @param {object} item - normalized (and link-resolved) collection item
@@ -1007,13 +1041,18 @@ function isValidSiteUrl(siteUrl) {
 export function buildCollectionItemPageData(schema, item, siteUrl) {
   const fieldSettings = (schema.settings || []).filter((s) => s.type !== HEADER_TYPE);
   const titleField = fieldSettings.find((s) => s.usedAsTitle);
-  const ogImageField = fieldSettings.find((s) => s.usedAsOgImage);
   const settings = item.settings || {};
-
   const titleValue = (titleField && settings[titleField.id]) || item.slug;
-  const seoTitle = settings.seo_title || "";
+
+  const seo = shapeItemSeo(item.seo);
   const validSiteUrl = isValidSiteUrl(siteUrl);
   const canonicalBase = validSiteUrl ? siteUrl.replace(/\/$/, "") : "";
+  const canonical_url =
+    seo.canonical_url && seo.canonical_url.trim()
+      ? seo.canonical_url.trim()
+      : validSiteUrl
+        ? `${canonicalBase}/${schema.slugPrefix}/${item.slug}.html`
+        : "";
 
   return {
     id: `${schema.slugPrefix}-${item.slug}`,
@@ -1022,15 +1061,6 @@ export function buildCollectionItemPageData(schema, item, siteUrl) {
     name: titleValue,
     created: item.created,
     updated: item.updated,
-    seo: {
-      title: seoTitle,
-      description: settings.seo_description || "",
-      robots: settings.seo_noindex ? "noindex,follow" : "index,follow",
-      canonical_url: validSiteUrl ? `${canonicalBase}/${schema.slugPrefix}/${item.slug}.html` : "",
-      og_image: (ogImageField && settings[ogImageField.id]) || "",
-      og_title: seoTitle || titleValue,
-      og_type: "article",
-      twitter_card: "summary_large_image",
-    },
+    seo: { ...seo, canonical_url },
   };
 }

@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
 import Button from "../ui/Button";
-import ImageInput from "../settings/inputs/ImageInput";
+import SeoFields from "../settings/SeoFields";
 
 export default function PageForm({
   initialData = { name: "", slug: "" },
@@ -169,61 +169,7 @@ export default function PageForm({
 
       {/* SEO Fields - Collapsible */}
       {showMoreSettings && (
-        <div className="form-section">
-          <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
-
-          <div className="form-field">
-            <label htmlFor="seo-description" className="form-label">
-              {t("forms.page.metaDescription")}
-            </label>
-            <textarea id="seo-description" {...register("seo.description")} rows={3} className="form-textarea" />
-            <p className="form-description">{t("forms.page.metaDescriptionHelp")}</p>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="seo-og-title" className="form-label-optional">
-              {t("forms.page.socialTitle")}
-            </label>
-            <input type="text" id="seo-og-title" {...register("seo.og_title")} className="form-input" />
-            <p className="form-description">{t("forms.page.socialTitleHelp")}</p>
-          </div>
-
-          <div className="form-field">
-            <label className="form-label-optional">{t("forms.page.socialImage")}</label>
-            <ImageInput
-              id="seo-og-image"
-              value={ogImage}
-              onChange={(value) =>
-                setValue("seo.og_image", value, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-            />
-            <p className="form-description">{t("forms.page.socialImageHelp")}</p>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="seo-canonical-url" className="form-label-optional">
-              {t("forms.page.canonicalUrl")}
-            </label>
-            <input type="url" id="seo-canonical-url" {...register("seo.canonical_url")} className="form-input" />
-            <p className="form-description">{t("forms.page.canonicalUrlHelp")}</p>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="seo-robots" className="form-label">
-              {t("forms.page.robotsLabel")}
-            </label>
-            <select id="seo-robots" {...register("seo.robots")} className="form-select">
-              <option value="index,follow">{t("forms.page.robots.indexFollow")}</option>
-              <option value="noindex,follow">{t("forms.page.robots.noindexFollow")}</option>
-              <option value="index,nofollow">{t("forms.page.robots.indexNofollow")}</option>
-              <option value="noindex,nofollow">{t("forms.page.robots.noindexNofollow")}</option>
-            </select>
-            <p className="form-description">{t("forms.page.robotsHelp")}</p>
-          </div>
-        </div>
+        <SeoFields register={register} setValue={setValue} ogImage={ogImage} />
       )}
 
       <div className="form-actions-separated justify-end">

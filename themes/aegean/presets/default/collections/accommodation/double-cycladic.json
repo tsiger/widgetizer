@@ -38,9 +38,15 @@
       "href": "../contact.html",
       "text": "",
       "target": "_self"
-    },
-    "seo_title": "",
-    "seo_description": "A serene Cycladic double room with a private bougainvillea terrace in Oia.",
-    "seo_noindex": false
+    }
+  },
+  "seo": {
+    "description": "A serene Cycladic double room with a private bougainvillea terrace in Oia.",
+    "og_title": "",
+    "og_image": "/uploads/images/aegean-19.jpg",
+    "og_type": "article",
+    "twitter_card": "summary",
+    "canonical_url": "",
+    "robots": "index,follow"
   }
 }

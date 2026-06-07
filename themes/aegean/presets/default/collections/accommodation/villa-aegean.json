@@ -38,9 +38,15 @@
       "href": "../contact.html",
       "text": "",
       "target": "_self"
-    },
-    "seo_title": "",
-    "seo_description": "A two-bedroom Santorini villa with a private heated infinity pool over the caldera.",
-    "seo_noindex": false
+    }
+  },
+  "seo": {
+    "description": "A two-bedroom Santorini villa with a private heated infinity pool over the caldera.",
+    "og_title": "",
+    "og_image": "/uploads/images/aegean-17.jpg",
+    "og_type": "article",
+    "twitter_card": "summary",
+    "canonical_url": "",
+    "robots": "index,follow"
   }
 }

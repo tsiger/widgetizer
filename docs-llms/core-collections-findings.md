@@ -508,7 +508,7 @@ Tests: `linkMenuPrefixing.test.js` (resolve at root/depth + clear-if-missing) an
 `collectionLinkEnrichment.test.js` (delete cleanup + duplication remap); lint, 88
 targeted backend tests, and a production build pass.
 
-### 12. Collection item SEO is not at parity with page SEO
+### 12. Collection item SEO is not at parity with page SEO — ✅ Resolved (2026-06-07)
 
 Simple: pages and collection item pages both produce SEO tags, but users edit
 different SEO controls for each one.
@@ -548,6 +548,30 @@ functionality. Reuse the same SEO field shape, validation rules, media picker,
 robots options, canonical handling, translations, and render/export mapping
 wherever possible, while keeping sensible defaults for collection schemas and
 presets.
+
+**Resolution:** Collection item pages now use a first-class, page-shaped `seo`
+object instead of the `seo_*` field-id convention — full parity with page SEO.
+The page SEO controls were extracted into a shared `SeoFields` component
+(`src/components/settings/SeoFields.jsx`) used by **both** `PageForm` and
+`CollectionItemForm` (the item form surfaces a collapsible SEO section only when
+`hasItemPages`), reusing the existing `forms.page.*` translations, the
+`ImageInput` media picker, the four robots options, and the canonical input
+verbatim. Items carry a top-level `seo` object (`description`, `og_title`,
+`og_image`, `og_type`, `twitter_card`, `canonical_url`, `robots`):
+`buildCollectionItemData` persists it (sanitized with the same `stripHtmlTags`
+page SEO uses) and `normalizeCollectionItem` surfaces it, both gated on
+`hasItemPages`. `buildCollectionItemPageData` passes the item's `seo` through to
+the shared `SeoTag` — which already applies the `<title>`/og fallbacks, canonical
+auto-derive, og:image absolutization, and twitter card — so the item render path
+is byte-for-byte the page render path. Sitemap/robots `noindex` now reads
+`seo.robots` instead of `settings.seo_noindex`. Per the dev-phase decision the
+old convention was removed wholesale: the `seo_*`/`usedAsOgImage` fields were
+stripped from the shipped Arch/Aegean schemas and the obsolete `usedAsOgImage`
+validation deleted (social image is manual-only — no featured-image fallback; no
+data migration). Verified: `npm run lint`, `npm run validate:all-locales`, the
+backend suite (existing collection/SEO/export tests updated to the new model +
+new `seo` round-trip, API persistence, and export noindex coverage), and
+`npm run build`.
 
 ## Checks Performed
 

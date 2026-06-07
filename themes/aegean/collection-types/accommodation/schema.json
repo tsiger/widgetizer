@@ -27,7 +27,7 @@
     },
     { "type": "textarea", "id": "summary", "label": "Short summary", "default": "A serene room with a private terrace over the caldera." },
     { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Carved into the cliffside, this room blends whitewashed Cycladic calm with quiet modern comfort. Wake to the light off the water and watch the famous Santorini sunset from your own terrace.</p>" },
-    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
 
     { "type": "header", "id": "details_header", "label": "Details" },
     { "type": "text", "id": "from_price", "label": "From price (number)", "default": "180" },
@@ -67,11 +67,6 @@
 
     { "type": "header", "id": "booking_header", "label": "Booking" },
     { "type": "text", "id": "book_label", "label": "Booking button label", "default": "Check availability" },
-    { "type": "link", "id": "book_link", "label": "Booking link", "hide_text": true },
-
-    { "type": "header", "id": "seo_header", "label": "SEO" },
-    { "type": "text", "id": "seo_title", "label": "SEO title" },
-    { "type": "textarea", "id": "seo_description", "label": "SEO description" },
-    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+    { "type": "link", "id": "book_link", "label": "Booking link", "hide_text": true }
   ]
 }

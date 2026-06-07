@@ -296,14 +296,20 @@ function collectionSource(collectionType, itemSlug) {
 
 /**
  * Extract tracked upload paths from a collection item's settings (recurses into
- * nested objects/arrays like link settings). Mirrors page/global extraction.
- * @param {object} itemData - raw collection item ({ settings })
+ * nested objects/arrays like link settings) plus its SEO social image. Mirrors
+ * page/global extraction.
+ * @param {object} itemData - raw collection item ({ settings, seo })
  * @returns {string[]} unique media paths
  */
 export function extractMediaPathsFromCollectionItem(itemData) {
   const mediaPaths = new Set();
   if (itemData?.settings && typeof itemData.settings === "object") {
     Object.values(itemData.settings).forEach((value) => collectMediaPaths(value, mediaPaths));
+  }
+  // SEO social image (Finding #12 — parity with page media tracking).
+  if (itemData?.seo?.og_image && typeof itemData.seo.og_image === "string") {
+    const normalized = normalizeMediaPath(itemData.seo.og_image);
+    if (normalized) mediaPaths.add(normalized);
   }
   return Array.from(mediaPaths);
 }

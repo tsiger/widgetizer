@@ -39,9 +39,15 @@
       "href": "../contact.html",
       "text": "",
       "target": "_self"
-    },
-    "seo_title": "",
-    "seo_description": "A guided hike across the Nea Kameni crater with a swim in Santorini's volcanic hot springs.",
-    "seo_noindex": false
+    }
+  },
+  "seo": {
+    "description": "A guided hike across the Nea Kameni crater with a swim in Santorini's volcanic hot springs.",
+    "og_title": "",
+    "og_image": "/uploads/images/aegean-06.jpg",
+    "og_type": "article",
+    "twitter_card": "summary",
+    "canonical_url": "",
+    "robots": "index,follow"
   }
 }

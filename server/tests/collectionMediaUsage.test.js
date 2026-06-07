@@ -88,6 +88,16 @@ describe("extractMediaPathsFromCollectionItem", () => {
     assert.ok(paths.includes("/uploads/images/hero.jpg"));
     assert.ok(paths.includes("/uploads/files/spec.pdf"));
   });
+
+  it("includes the SEO social image (seo.og_image) — Finding #12 media tracking", () => {
+    const item = {
+      settings: { featured_image: "/uploads/images/hero.jpg" },
+      seo: { og_image: "/uploads/images/social.jpg" },
+    };
+    const paths = extractMediaPathsFromCollectionItem(item);
+    assert.ok(paths.includes("/uploads/images/hero.jpg"));
+    assert.ok(paths.includes("/uploads/images/social.jpg"), "seo.og_image must be tracked as used media");
+  });
 });
 
 describe("updateCollectionItemMediaUsage", () => {

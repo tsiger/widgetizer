@@ -38,9 +38,15 @@
       "href": "../contact.html",
       "text": "",
       "target": "_self"
-    },
-    "seo_title": "",
-    "seo_description": "A cliffside cave-suite with a private plunge pool over the Santorini caldera.",
-    "seo_noindex": false
+    }
+  },
+  "seo": {
+    "description": "A cliffside cave-suite with a private plunge pool over the Santorini caldera.",
+    "og_title": "",
+    "og_image": "/uploads/images/aegean-18.jpg",
+    "og_type": "article",
+    "twitter_card": "summary",
+    "canonical_url": "",
+    "robots": "index,follow"
   }
 }

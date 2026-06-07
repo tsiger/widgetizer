@@ -289,7 +289,7 @@ export async function exportProjectToDir(projectId, options = {}) {
         const collectionSitemapUrls = [];
         for (const { slugPrefix, items } of itemPagesForSeo) {
           for (const item of items) {
-            if (item.settings?.seo_noindex) continue;
+            if (item.seo?.robots?.includes("noindex")) continue;
             const loc = new URL(`${slugPrefix}/${item.slug}.html`, siteUrl).href;
             const lastMod = item.updated || new Date().toISOString();
             collectionSitemapUrls.push(`
@@ -321,7 +321,7 @@ export async function exportProjectToDir(projectId, options = {}) {
         }
         for (const { slugPrefix, items } of itemPagesForSeo) {
           for (const item of items) {
-            if (item.settings?.seo_noindex) disallowSet.add(`/${slugPrefix}/${item.slug}.html`);
+            if (item.seo?.robots?.includes("noindex")) disallowSet.add(`/${slugPrefix}/${item.slug}.html`);
           }
         }
         const disallowPaths = Array.from(disallowSet);

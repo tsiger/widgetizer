@@ -73,14 +73,10 @@ A collection type reuses existing setting types (the same ones widgets and `them
     { "type": "header", "id": "content_header", "label": "Content" },
     { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
     { "type": "textarea", "id": "description", "label": "Description" },
-    { "type": "image", "id": "featured_image", "label": "Featured image", "usedAsOgImage": true },
+    { "type": "image", "id": "featured_image", "label": "Featured image" },
     { "type": "text", "id": "client", "label": "Client" },
     { "type": "text", "id": "year", "label": "Year" },
-    { "type": "link", "id": "external_url", "label": "Project link", "hide_text": true },
-    { "type": "header", "id": "seo_header", "label": "SEO" },
-    { "type": "text", "id": "seo_title", "label": "SEO title" },
-    { "type": "textarea", "id": "seo_description", "label": "SEO description" },
-    { "type": "checkbox", "id": "seo_noindex", "label": "Hide from search engines", "default": false }
+    { "type": "link", "id": "external_url", "label": "Project link", "hide_text": true }
   ]
 }
 ```
@@ -104,14 +100,13 @@ A collection type reuses existing setting types (the same ones widgets and `them
 ### Field-level flags
 
 - **`usedAsTitle: true`** — marks the field used as the item's display name in listings and as the source for auto-generated slugs. **Exactly one non-`header` setting must declare this**, and it must be a `text` field.
-- **`usedAsOgImage: true`** — marks the field used as the default `og_image`/Twitter card image for the item's page (§8). **At most one per collection**, and it must be an `image` field. If omitted, no default social image is emitted.
 - **`required: true`** — enforced on save and on export.
 
 A `gallery`/multi-image field type does not exist yet (the `image` type holds a single value); multi-image data is a deferred item — see "Out of Scope" below.
 
-### SEO field convention
+### SEO (item pages)
 
-Item-page SEO uses field-id convention rather than a dedicated schema block: a `checkbox` with `id: "seo_noindex"` flips the item to `noindex,follow`, excludes it from `sitemap.xml`, and adds its path to `robots.txt`. `seo_title` and `seo_description` text fields feed the meta tags.
+Item-page SEO is **at parity with page SEO** (Finding #12), not a schema-field convention. Every `hasItemPages` item carries its own page-shaped `seo` object — `{ description, og_title, og_image, og_type, twitter_card, canonical_url, robots }` — edited through the **same** SEO editor pages use (`src/components/settings/SeoFields.jsx`, surfaced in `CollectionItemForm` when `hasItemPages`). Schemas declare **no** `seo_*` fields. The object lives top-level on the item JSON (alongside `settings`) and is sanitized on save exactly like page SEO. Defaults: `og_type: "article"` (items are content), `robots: "index,follow"`; an empty `canonical_url` auto-resolves from `siteUrl + slugPrefix/slug`. The shared `SeoTag` renders the tags (title/og/twitter/canonical) with the same fallbacks as pages, and `robots` containing `noindex` excludes the item from `sitemap.xml` and adds its path to `robots.txt`.
 
 ### Validation (`validateCollectionSchema`)
 
@@ -120,7 +115,6 @@ Item-page SEO uses field-id convention rather than a dedicated schema block: a `
 - `type` and folder name must match and use `^[a-z0-9-]+$`.
 - `slugPrefix` must be `^[a-z0-9-]+$`; defaults to `type` when omitted.
 - Exactly one non-`header` setting must declare `usedAsTitle: true`, and it must be `type: "text"`.
-- At most one setting may declare `usedAsOgImage: true`, and it must be `type: "image"`.
 - `defaultSort` must be one of the five allowed values (defaults to `manual`).
 - `settings` may only use setting types in `src/components/settings/supportedSettingTypes.js` (`SUPPORTED_SETTING_TYPES`) — the single source of truth shared by the renderer and the backend validator: `header`, `text`, `number`, `textarea`, `richtext`, `code`, `color`, `range`, `select`, `checkbox`, `radio`, `font_picker`, `menu`, `image`, `file`, `link`, `youtube`, `icon`.
 - `multiple`, `blocks`, repeater, relationship, and taxonomy fields are **rejected**, not silently ignored.
@@ -146,8 +140,16 @@ Items are stored as one JSON file per item: `collections/{type}/{item-slug}.json
   "settings": {
     "title": "Project Alpha",
     "featured_image": "/uploads/images/alpha-hero.jpg",
-    "external_url": { "href": "https://example.com/alpha", "target": "_blank" },
-    "seo_noindex": false
+    "external_url": { "href": "https://example.com/alpha", "target": "_blank" }
+  },
+  "seo": {
+    "description": "A short summary for search and social.",
+    "og_title": "",
+    "og_image": "/uploads/images/alpha-social.jpg",
+    "og_type": "article",
+    "twitter_card": "summary",
+    "canonical_url": "",
+    "robots": "index,follow"
   }
 }
 ```
@@ -161,6 +163,7 @@ Items are stored as one JSON file per item: `collections/{type}/{item-slug}.json
 | `created`       | ISO 8601, set on create, never mutated                                                          |
 | `updated`       | ISO 8601, **strictly monotonic** on every write (see §7)                                         |
 | `settings`      | User-entered values keyed by schema field `id`                                                  |
+| `seo`           | Page-shaped SEO object (`description`/`og_title`/`og_image`/`og_type`/`twitter_card`/`canonical_url`/`robots`) for `hasItemPages` items — parity with page SEO (Finding #12, see §8); omitted for list-only collections |
 | `_archived`     | **In-memory only**, never written. Holds values for fields the current schema no longer defines (see §4) |
 
 Item `uuid`s exist in v1 even though no v1 feature references items by UUID — they let Phase 3 relationships land without a backfill across every project.
@@ -327,7 +330,7 @@ The template renders **inside** the theme's main layout (header/footer/main slot
 
 The full export wiring (two-pass validation, subdirectory creation, per-item `sharedGlobals` isolation, page-shaped object, SEO mapping, body-class override, sitemap/robots/manifest, markdown parity) lives in [Site Exporting → Collection item pages](core-export.md#collection-item-pages-export). The essentials:
 
-- **Page-shaped object** (`buildCollectionItemPageData`): `id` = `{slugPrefix}-{slug}` (CSS-safe), `slug` = `{slugPrefix}/{slug}` (path-shaped), plus a `seo` block — `robots` from `seo_noindex`, `canonical_url` set explicitly when `siteUrl` is valid, `og_image` from the `usedAsOgImage` field, `og_type: "article"`, `twitter_card: "summary_large_image"`.
+- **Page-shaped object** (`buildCollectionItemPageData`): `id` = `{slugPrefix}-{slug}` (CSS-safe), `slug` = `{slugPrefix}/{slug}` (path-shaped), plus the item's own page-shaped `seo` object (Finding #12 — parity with page SEO): `robots`, `description`, `og_title`, manual `og_image`, `og_type: "article"`, and `canonical_url` (explicit author value, else auto-built from `siteUrl + slugPrefix/slug`).
 - **Body class**: `renderPageLayout` honors a `contentSections.bodyClass` override; items get `collection-{type} item-{slug}` instead of `page-{slug}`, so a `.page-portfolio` rule for the index page never leaks onto item pages.
 - **SeoTag** (`src/core/tags/SeoTag.js`): social images resolve from a constant `assets/images` base (not the depth-aware `imagePath`), preserving the existing two output forms — absolute `${siteUrl}/assets/images/...` when `siteUrl` is set, root-absolute `/assets/images/...` when not — so existing page output is byte-for-byte unchanged. Canonical URLs for items are always explicit, so the SeoTag auto-derive fallback isn't reached for them.
 

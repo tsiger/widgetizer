@@ -195,7 +195,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with the `| collection` Liquid filter or item-page templates
 - Implementing or tracing collection CRUD, export, media usage, or link resolution
 
-**Key topics**: Collection schema + field flags (`usedAsTitle`/`usedAsOgImage`), item data model + `_order.json`, schema migration (warn-before-drop), service/controller/routes, `| collection` filter, individual item-page export (depth-aware paths, SEO mapping), atomic writes + crash recovery, link resolution, design rationale, deferred Phase 3 scope
+**Key topics**: Collection schema + field flags (`usedAsTitle`), item data model + page-shaped `seo` object (item SEO at parity with page SEO) + `_order.json`, schema migration (warn-before-drop), service/controller/routes, `| collection` filter, individual item-page export (depth-aware paths, SEO mapping), atomic writes + crash recovery, link resolution, design rationale, deferred Phase 3 scope
 
 ---
 
