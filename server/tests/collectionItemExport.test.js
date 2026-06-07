@@ -368,5 +368,10 @@ describe("item-page export — missing template", () => {
     assert.ok(thrown, "export should throw");
     assert.equal(thrown.statusCode, 400);
     assert.match(thrown.message, /template\.liquid/);
+
+    // #4-shaped guarantee: a missing template is caught before any disk write,
+    // so the version directory is never created (mirrors the invalid-item test).
+    const outputDir = path.join(TEST_ROOT, "data", "publish", "citem-notpl-v1");
+    assert.ok(!(await fs.pathExists(outputDir)), "blocked export must leave no output directory");
   });
 });

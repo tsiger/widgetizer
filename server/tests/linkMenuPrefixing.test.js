@@ -69,6 +69,13 @@ describe("resolveMenuItemLinks — link prefixing + canonicalPath", () => {
     assert.equal(item.canonicalPath, "https://x.com");
   });
 
+  it("blocks dangerous-protocol custom URLs (incl. obfuscated)", () => {
+    for (const link of ["javascript:alert(1)", "java\tscript:alert(1)", "\x01javascript:alert(1)"]) {
+      const [item] = resolveMenuItemLinks([{ link, label: "Evil" }], pagesByUuid, "");
+      assert.equal(item.link, "", `expected blocked link for ${JSON.stringify(link)}`);
+    }
+  });
+
   it("padded custom URL: rendered prefixed/cleaned at depth, canonicalPath trimmed", () => {
     const [item] = resolveMenuItemLinks([{ link: "  about.html  ", label: "About" }], pagesByUuid, "../");
     assert.equal(item.link, "../about.html");

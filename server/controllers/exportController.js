@@ -191,6 +191,7 @@ export async function exportProjectToDir(projectId, options = {}) {
     // per-item-per-field error list. No HTML is written when this trips.
     const collectionSchemas = await listCollectionSchemas(projectFolderName);
     const invalidCollectionItems = [];
+    const missingTemplates = [];
     // Per-collection summary for manifest.json (every collection, incl. those
     // without item pages) and the valid items of hasItemPages collections for
     // sitemap/robots (grouped by type, in schema listing order — deterministic).
@@ -213,10 +214,21 @@ export async function exportProjectToDir(projectId, options = {}) {
         }
       }
       if (schema.hasItemPages) {
+        const validItems = items.filter((item) => !item.invalid);
         itemPagesForSeo.push({
           slugPrefix: schema.slugPrefix,
-          items: items.filter((item) => !item.invalid),
+          items: validItems,
         });
+        // Preflight the template too: a hasItemPages collection with renderable
+        // items but no template.liquid must fail BEFORE any disk write (same
+        // contract as Finding #4), not midway through export with partial
+        // artifacts already written. The render loop keeps a defensive re-check.
+        if (validItems.length > 0) {
+          const template = await loadCollectionTemplate(projectFolderName, schema.type);
+          if (template === null) {
+            missingTemplates.push(schema.type);
+          }
+        }
       }
     }
     if (invalidCollectionItems.length > 0) {
@@ -226,6 +238,14 @@ export async function exportProjectToDir(projectId, options = {}) {
       err.statusCode = 400;
       err.errorTitle = "Export failed: invalid collection items";
       err.validationErrors = invalidCollectionItems;
+      throw err;
+    }
+    if (missingTemplates.length > 0) {
+      const err = new Error(
+        `Export blocked: collection(s) ${missingTemplates.join(", ")} have hasItemPages: true with renderable items but no template.liquid. Add the template before exporting.`,
+      );
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: missing collection template";
       throw err;
     }
 

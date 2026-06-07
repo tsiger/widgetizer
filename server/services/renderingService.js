@@ -25,6 +25,8 @@ import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.js";
 import { registerCollectionFilter } from "../../src/core/filters/collectionFilter.js";
+import { registerSafeUrlFilter } from "../../src/core/filters/safeUrlFilter.js";
+import { sanitizeHref } from "../../src/core/utils/urlSafety.js";
 import {
   listCollectionItems,
   getCollectionSchema,
@@ -91,6 +93,7 @@ function configureLiquidEngine(engine) {
   registerMediaMetaFilter(engine);
   registerHandleizeFilter(engine);
   registerCollectionFilter(engine);
+  registerSafeUrlFilter(engine);
 }
 
 // Global engine for fallback/static use if needed (optional, can be removed if strictly per-request)
@@ -243,6 +246,13 @@ function resolveMenuItemLinks(menuItems, pagesByUuid, outputPathPrefix = "") {
       resolved.canonicalPath = normalize(item.link);
     } else {
       resolved.canonicalPath = "";
+    }
+
+    // Block dangerous protocols in author-entered custom links (parity with
+    // setting-type "link" fields). pageUuid links resolve to internal slugs and
+    // are unaffected; this catches javascript:/data:/vbscript: in custom URLs.
+    if (typeof resolved.link === "string") {
+      resolved.link = sanitizeHref(resolved.link);
     }
 
     // Recursively resolve children

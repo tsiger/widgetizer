@@ -333,6 +333,8 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 </html>
 ```
 
+> **Emitting author-entered URLs:** when a template outputs a user-provided URL into an `href` (social links, profile links, etc.), pass it through the `| safe_url` filter — e.g. `href="{{ social.facebook_url | safe_url }}"`. It blocks dangerous schemes (`javascript:`/`data:`/`vbscript:`, including tab/control-char-obfuscated variants), returning `""` for an unsafe value. Setting type `link` and menu links are sanitized automatically; plain `text`/URL values are **not**, because LiquidJS autoescape stops attribute breakout but not a dangerous URL scheme.
+
 ### Key Liquid Tags
 
 - `{% seo %}`: Automatically generates SEO meta tags (title, description, Open Graph, etc.)

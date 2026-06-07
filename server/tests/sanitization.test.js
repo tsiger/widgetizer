@@ -291,6 +291,34 @@ describe("sanitizeWidgetData — link fields", () => {
     assert.equal(data.settings.cta_link.href, "");
   });
 
+  it("blocks tab/newline/CR-obfuscated dangerous protocols", () => {
+    // Browsers strip these control chars while resolving the scheme, so each of
+    // these executes as javascript:/vbscript: despite the interleaved char.
+    const hrefs = [
+      "java\tscript:alert(1)",
+      "java\nscript:alert(1)",
+      "java\rscript:alert(1)",
+      "\tjavascript:alert(1)",
+      "vb\rscript:MsgBox(1)",
+    ];
+    for (const href of hrefs) {
+      const data = { settings: { cta_link: { text: "Evil", href } } };
+      sanitizeWidgetData(data, schema);
+      assert.equal(data.settings.cta_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
+  });
+
+  it("blocks leading C0-control / null obfuscated protocols", () => {
+    // WHATWG URL preprocessing strips leading C0-or-space, so these resolve to
+    // javascript: in a browser even though they are not contiguous schemes.
+    const hrefs = ["\x01javascript:alert(1)", "\x00javascript:alert(1)", "\x1Fjavascript:alert(1)"];
+    for (const href of hrefs) {
+      const data = { settings: { cta_link: { text: "Evil", href } } };
+      sanitizeWidgetData(data, schema);
+      assert.equal(data.settings.cta_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
+  });
+
   it("preserves text field — does not sanitize (left for autoescape)", () => {
     const data = {
       settings: {
@@ -699,6 +727,24 @@ describe("sanitizeCollectionItemData", () => {
     sanitizeCollectionItemData(item2, schema);
     assert.equal(item1.settings.book_link.href, "");
     assert.equal(item2.settings.book_link.href, "");
+  });
+
+  it("blocks tab/newline/CR-obfuscated protocols in link hrefs", () => {
+    const hrefs = ["java\tscript:alert(1)", "java\nscript:alert(1)", "vb\rscript:msgbox(1)"];
+    for (const href of hrefs) {
+      const item = { settings: { book_link: { href } } };
+      sanitizeCollectionItemData(item, schema);
+      assert.equal(item.settings.book_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
+  });
+
+  it("blocks leading C0-control / null obfuscated protocols in link hrefs", () => {
+    const hrefs = ["\x01javascript:alert(1)", "\x00javascript:alert(1)"];
+    for (const href of hrefs) {
+      const item = { settings: { book_link: { href } } };
+      sanitizeCollectionItemData(item, schema);
+      assert.equal(item.settings.book_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
   });
 
   it("passes through safe http/mailto/tel link hrefs", () => {

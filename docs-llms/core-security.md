@@ -13,8 +13,8 @@ All incoming data is validated and sanitized before reaching controllers.
 - `express-validator` rules on every API route that accepts input
 - `validateRequest` middleware centralizes the validation-result check (one place, all routes)
 - Plain-text fields (project/page/menu names, descriptions) use `stripHtmlTags()` — a DOMPurify-based sanitizer that strips all HTML while preserving `&`, `"`, `'`
-- Widget/block settings use schema-aware sanitization via `sanitizationService.js` (DOMPurify for richtext, protocol blocking for links)
-- Text/textarea fields rely on LiquidJS autoescape (`outputEscape: "escape"`) at render time
+- Widget/block settings (and collection items) use schema-aware sanitization via `sanitizationService.js` (DOMPurify for richtext, dangerous-protocol blocking for `link`-type hrefs). Menu custom links are blocked the same way at render time. The href check is the shared `sanitizeHref` in `src/core/utils/urlSafety.js`, which tests the browser-preprocessed URL (WHATWG: trim leading/trailing C0-control-or-space, remove embedded tab/LF/CR) so obfuscated schemes (a tab inside "javascript", or a leading control byte) cannot bypass it
+- Text/textarea fields rely on LiquidJS autoescape (`outputEscape: "escape"`) at render time. Autoescape stops attribute breakout but does **not** neutralize a dangerous URL *scheme* — so a theme that emits an author-entered URL into an `href` must pass it through the `| safe_url` Liquid filter (backed by the same `sanitizeHref`). Shipped themes apply it to social/profile/team URL fields
 
 ### 2. HTTP Security Headers
 

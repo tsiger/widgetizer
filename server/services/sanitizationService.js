@@ -1,4 +1,5 @@
 import DOMPurify from "isomorphic-dompurify";
+import { sanitizeHref } from "../../src/core/utils/urlSafety.js";
 
 /**
  * Strip all HTML tags from a string, keeping only the text content.
@@ -24,11 +25,6 @@ const RICHTEXT_CONFIG = {
 };
 
 /**
- * Dangerous URL protocols that should be blocked in href attributes.
- */
-const DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript)\s*:/i;
-
-/**
  * Sanitize richtext HTML, allowing only safe formatting tags.
  * Used for richtext fields before they are output with | raw in templates.
  * @param {string} value - The raw HTML from the richtext editor
@@ -50,8 +46,8 @@ function sanitizeLink(linkObj) {
 
   const sanitized = { ...linkObj };
 
-  if (typeof sanitized.href === "string" && DANGEROUS_PROTOCOLS.test(sanitized.href)) {
-    sanitized.href = "";
+  if (typeof sanitized.href === "string") {
+    sanitized.href = sanitizeHref(sanitized.href);
   }
 
   return sanitized;

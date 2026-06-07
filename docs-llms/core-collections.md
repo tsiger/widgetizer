@@ -216,7 +216,8 @@ The service owns all filesystem/schema logic so Liquid, export, and HTTP handler
 | `loadCollectionTemplate` | Read `template.liquid` from the project copy (returns `null` if missing) |
 | `buildCollectionItemData` | Apply defaults, preserve `created`/`uuid`, generate/sanitize slug, enforce required, set monotonic `updated`, merge back archived keys |
 | `writeCollectionItem` / `deleteCollectionItem` / `bulkDeleteCollectionItems` / `duplicateCollectionItem` / `reorderCollectionItems` | Atomic, slug-safe writes with `_order.json` + media-usage sync |
-| `resolveCollectionItemLinks` | Render-time link resolution (`pageUuid` → slug + depth prefixing) — see §6 |
+| `resolveCollectionItemLinks` | Link resolution (`pageUuid` → slug + depth prefixing) — see §6 |
+| `prepareCollectionItemForRender` | Render gate: clone, resolve links, then sanitize item settings (richtext/link). **Every** item render path goes through this, not bare `resolveCollectionItemLinks` |
 | `buildCollectionItemPageData` | Build the page-shaped object for the layout/SeoTag during export — see §8 |
 | `CollectionSlugConflictError` / `CollectionValidationError` | Typed errors the controller maps to 409/400 |
 
@@ -308,7 +309,7 @@ Item shape: `{ id, uuid, slug, url, created, updated, settings }`. `url` is comp
 Implementation:
 
 - `src/core/filters/collectionFilter.js` exports `registerCollectionFilter(engine)` (and `normalizeCollectionFilterArgs`), registered in `configureLiquidEngine()`. It lives under `src/core/`, so it imports **no** backend module — it reads `projectId`, `renderMode`, `outputPathPrefix`, and a `getCollectionItems` loader off `this.context.globals`.
-- `createBaseRenderContext` attaches the `getCollectionItems` loader once per render. The loader calls `collectionService.listCollectionItems`, applies `resolveCollectionItemLinks` per item, computes `item.url`, and caches results per `(type, options)` in a per-render `globals.collectionCache` Map. The cache is **per-render** (not global) because `outputPathPrefix` differs between root pages and item pages.
+- `createBaseRenderContext` attaches the `getCollectionItems` loader once per render. The loader calls `collectionService.listCollectionItems`, applies `prepareCollectionItemForRender` per item (resolves `pageUuid` links **and** sanitizes richtext/link settings — sanitize-after-resolve), computes `item.url`, and caches results per `(type, options)` in a per-render `globals.collectionCache` Map. The cache is **per-render** (not global) because `outputPathPrefix` differs between root pages and item pages.
 - Supported options: `limit`, `sort`, `offset`.
 - **`invalid: true` items are excluded by default** (matching export's refusal to publish them); developer mode logs the skipped type/slug values. There is no `includeInvalid` option in v1.
 
