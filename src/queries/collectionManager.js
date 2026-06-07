@@ -16,8 +16,6 @@ import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
  * @property {string} slugPrefix
  * @property {string} defaultSort
  * @property {Array<Object>} settings
- * @property {number} [itemCount] - present on the /schemas list endpoint
- * @property {number} [invalidCount] - present on the /schemas list endpoint
  *
  * @typedef {Object} CollectionItem
  * @property {string} id
@@ -33,8 +31,7 @@ import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
  */
 
 /**
- * Fetch all collection schemas for the active project, each with itemCount and
- * invalidCount.
+ * Fetch all collection schemas for the active project.
  * @returns {Promise<CollectionSchema[]>}
  */
 export async function getCollectionSchemas() {

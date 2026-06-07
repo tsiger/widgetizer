@@ -36,7 +36,7 @@ import {
   bulkDeleteCollectionItems,
   reorderCollectionItems,
 } from "../queries/collectionManager";
-import useCollections, { invalidateCollectionsCache } from "../hooks/useCollections";
+import useCollections from "../hooks/useCollections";
 import useCollectionItems from "../hooks/useCollectionItems";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import useConfirmationAction from "../hooks/useConfirmationAction";
@@ -138,7 +138,7 @@ export default function CollectionItems() {
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  const { schemas, loading: schemasLoading, refetch: refetchSchemas } = useCollections();
+  const { schemas, loading: schemasLoading } = useCollections();
   const { items, loading: itemsLoading, refetch: refetchItems } = useCollectionItems(type);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -217,10 +217,8 @@ export default function CollectionItems() {
   };
 
   const afterMutation = () => {
-    invalidateCollectionsCache(activeProject?.id);
     invalidateMediaCache(activeProject?.id);
     refetchItems();
-    refetchSchemas();
   };
 
   const handleDelete = async (data) => {

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/incompatible-library */
 import { Fragment, useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp, Eye, Info } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
@@ -75,6 +76,7 @@ export default function CollectionItemForm({
   isDirty: isDirtyProp = false,
 }) {
   const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
   const showToast = useToastStore((state) => state.showToast);
   const isNew = !initialData.id && !initialData.slug;
   // Item-page collections get the same SEO editor as pages (Finding #12).
@@ -229,71 +231,6 @@ export default function CollectionItemForm({
     });
   };
 
-  // Float the title field as a flush bar at the top of the scroll area while
-  // scrolling. A plain `sticky` element is trapped below the page's content
-  // padding, so once "stuck" we switch the bar to `position: fixed` (escaping
-  // that padding) and collapse its label. A sentinel just above the row tells
-  // us when to flip; a spacer holds the bar's place so the form doesn't jump.
-  const [titleStuck, setTitleStuck] = useState(false);
-  const [titleBarStyle, setTitleBarStyle] = useState(null);
-  const [titleBarHeight, setTitleBarHeight] = useState(0);
-  const titleSentinelRef = useRef(null);
-  const titleSpacerRef = useRef(null);
-  const titleBarRef = useRef(null);
-  const titleScrollRootRef = useRef(null);
-
-  useEffect(() => {
-    const sentinel = titleSentinelRef.current;
-    if (!sentinel) return undefined;
-    let root = sentinel.parentElement;
-    while (root && root !== document.body) {
-      const overflowY = getComputedStyle(root).overflowY;
-      if (overflowY === "auto" || overflowY === "scroll") break;
-      root = root.parentElement;
-    }
-    titleScrollRootRef.current = root && root !== document.body ? root : null;
-    const io = new IntersectionObserver(([entry]) => setTitleStuck(!entry.isIntersecting), {
-      root: titleScrollRootRef.current,
-      threshold: 0,
-    });
-    io.observe(sentinel);
-    return () => io.disconnect();
-  }, [canPreview]);
-
-  // While stuck, keep the fixed bar aligned with its in-flow spacer (left/width)
-  // and pinned to the top of the scroll viewport, updating on scroll/resize.
-  useEffect(() => {
-    if (!titleStuck) {
-      setTitleBarStyle(null);
-      return undefined;
-    }
-    const compute = () => {
-      const spacer = titleSpacerRef.current;
-      if (!spacer) return;
-      const rect = spacer.getBoundingClientRect();
-      const root = titleScrollRootRef.current;
-      const top = root ? root.getBoundingClientRect().top : 0;
-      setTitleBarStyle({ position: "fixed", top, left: rect.left, width: rect.width });
-    };
-    compute();
-    const root = titleScrollRootRef.current;
-    root?.addEventListener("scroll", compute, { passive: true });
-    window.addEventListener("resize", compute);
-    return () => {
-      root?.removeEventListener("scroll", compute);
-      window.removeEventListener("resize", compute);
-    };
-  }, [titleStuck]);
-
-  // Measure the bar's natural height so the spacer can hold its place when the
-  // bar becomes fixed (prevents the form below it from jumping up).
-  useEffect(() => {
-    if (!titleStuck && titleBarRef.current) {
-      const h = titleBarRef.current.offsetHeight;
-      setTitleBarHeight((prev) => (prev !== h ? h : prev));
-    }
-  }, [titleStuck]);
-
   const labelWithRequired = (setting) =>
     setting.required && setting.label ? `${setting.label} *` : setting.label;
 
@@ -353,7 +290,17 @@ export default function CollectionItemForm({
             icon-only Preview button so it stays reachable while scrolling. */}
         {allSettings.map((setting) => {
           if (setting.type === HEADER_TYPE) {
-            return <SettingsRenderer key={setting.id} setting={setting} value={undefined} onChange={() => {}} />;
+            // Render schema headers as the page form's section titles (1:1 with
+            // PageForm/SeoFields), not the compact panel divider SettingsRenderer
+            // uses for the widget/theme settings panels.
+            const headerLabel = tTheme(setting.label);
+            const headerDesc = tTheme(setting.description);
+            return (
+              <Fragment key={setting.id}>
+                {headerLabel && <h3 className="form-section-title pt-4">{headerLabel}</h3>}
+                {headerDesc && <p className="form-description">{headerDesc}</p>}
+              </Fragment>
+            );
           }
           const renderer = (
             <SettingsRenderer
@@ -366,29 +313,18 @@ export default function CollectionItemForm({
           );
           if (setting.usedAsTitle && canPreview) {
             return (
-              <Fragment key={setting.id}>
-                <div ref={titleSentinelRef} aria-hidden="true" className="h-px" />
-                <div ref={titleSpacerRef} className="-mx-4" style={titleStuck ? { height: titleBarHeight } : undefined}>
-                  <div
-                    ref={titleBarRef}
-                    style={titleBarStyle || undefined}
-                    className={`z-30 flex items-end gap-3 border-b border-slate-200 bg-white px-4 pb-3 pt-2 ${
-                      titleStuck ? "shadow-sm [&_.form-label]:hidden" : ""
-                    }`}
-                  >
-                    <div className="min-w-0 flex-1">{renderer}</div>
-                    <button
-                      type="button"
-                      onClick={openPreview}
-                      title={t("collectionsForm.preview")}
-                      aria-label={t("collectionsForm.preview")}
-                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-                    >
-                      <Eye size={18} />
-                    </button>
-                  </div>
-                </div>
-              </Fragment>
+              <div key={setting.id} className="flex items-end gap-3">
+                <div className="min-w-0 flex-1">{renderer}</div>
+                <button
+                  type="button"
+                  onClick={openPreview}
+                  title={t("collectionsForm.preview")}
+                  aria-label={t("collectionsForm.preview")}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <Eye size={18} />
+                </button>
+              </div>
             );
           }
           return renderer;

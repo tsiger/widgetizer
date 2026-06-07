@@ -213,7 +213,7 @@ The service owns all filesystem/schema logic so Liquid, export, and HTTP handler
 
 | Function | Responsibility |
 | --- | --- |
-| `validateCollectionSchema` / `listCollectionSchemas` / `validateThemeCollectionSchemas` / `getCollectionSchema` | Schema validation + load (runtime and theme-upload paths); `listCollectionSchemas` returns UI-safe schemas with `itemCount`/`invalidCount` |
+| `validateCollectionSchema` / `listCollectionSchemas` / `validateThemeCollectionSchemas` / `getCollectionSchema` | Schema validation + load (runtime and theme-upload paths); `listCollectionSchemas` returns UI-safe schemas |
 | `normalizeCollectionItem` | In-memory schema migration (archive unknown fields, fill required, flag invalid) |
 | `listCollectionItems` / `readCollectionItem` / `readRawCollectionItem` | Read + normalize items; apply sort/`limit`/`offset`; `readRaw` returns un-normalized data for the editor |
 | `loadCollectionTemplate` | Read `template.liquid` from the project copy (returns `null` if missing) |
@@ -235,7 +235,7 @@ Slug helpers come from `server/utils/slugHelpers.js`; the service does not dupli
 
 | Method & path | Handler |
 | --- | --- |
-| `GET /schemas` | `getCollectionSchemas` (incl. `itemCount`/`invalidCount`) |
+| `GET /schemas` | `getCollectionSchemas` |
 | `GET /schema/:collectionType` | `getCollectionSchema` |
 | `GET /:collectionType` | `getAllItems` (sorted; supports limit/offset/filter) |
 | `GET /:collectionType/:itemSlug` | `getItem` |
@@ -344,14 +344,14 @@ The full export wiring (two-pass validation, subdirectory creation, per-item `sh
 | File | Purpose |
 | --- | --- |
 | `src/queries/collectionManager.js` | API client mirroring the controller surface; uses `apiFetch` (injects `X-Project-Id`) |
-| `src/hooks/useCollections.js` | `{ schemas, loading, error, refetch }` with a module-level cache (matches `useAppSettings`); also exports `invalidateCollectionsCache` |
+| `src/hooks/useCollections.js` | `{ schemas, loading, error, refetch }` with a module-level cache (matches `useAppSettings`) |
 | `src/hooks/useCollectionItems.js` | `{ items, loading, error, refetch }` for one type |
 | `src/pages/CollectionItems.jsx` | Listing table (search, multi-select bulk delete, row actions, drag-reorder when `sortable`, "Needs attention" filter for invalid items) |
 | `src/pages/CollectionItemAdd.jsx` / `CollectionItemEdit.jsx` | Add/edit routes; edit re-routes with `navigate(newPath, { replace: true })` on slug change |
-| `src/components/collections/CollectionItemForm.jsx` | Shared schema-driven form: `react-hook-form`, renders fields via `SettingsRenderer`, `useGuardedFormPage(isDirty)`, slug auto-generated from the `usedAsTitle` field, inline required-field validation, invalid items load with `validationErrors` pre-populated; the `usedAsTitle` field renders in a floating bar with an icon-only **Preview** (eye) button when the type has item pages; a collapsible **SEO** section (shared `SeoFields`, parity with `PageForm`) shows for `hasItemPages` types (Finding #12); a **"Leftover content"** notice with a confirmed discard surfaces any archived fields (Finding #8) |
+| `src/components/collections/CollectionItemForm.jsx` | Shared schema-driven form: `react-hook-form`, renders fields via `SettingsRenderer`, `useGuardedFormPage(isDirty)`, slug auto-generated from the `usedAsTitle` field, inline required-field validation, invalid items load with `validationErrors` pre-populated; the `usedAsTitle` field renders with an inline icon-only **Preview** (eye) button when the type has item pages; a collapsible **SEO** section (shared `SeoFields`, parity with `PageForm`) shows for `hasItemPages` types (Finding #12); a **"Leftover content"** notice with a confirmed discard surfaces any archived fields (Finding #8) |
 | `src/components/collections/CollectionItemPreview.jsx` | Full-screen, page-editor-style item preview overlay (back button, item dropdown, desktop/mobile toggle); renders the selected item — including the live unsaved draft — through the theme template in an iframe |
 
-Routes are registered in `src/App.jsx` (`collections/:collectionType`, `.../add`, `.../:itemSlug/edit`). The sidebar (`src/components/layout/Sidebar.jsx`) calls `useCollections()` and renders one nav entry per type after Pages/Menus, with a numeric item-count badge (shown even at `0`) and a Lucide icon resolved from the schema `icon` string (fallback `Database`); the label adapter accepts a pre-resolved `label` alongside the existing `labelKey`.
+Routes are registered in `src/App.jsx` (`collections/:collectionType`, `.../add`, `.../:itemSlug/edit`). The sidebar (`src/components/layout/Sidebar.jsx`) calls `useCollections()` and renders one nav entry per type after Pages/Menus, with a Lucide icon resolved from the schema `icon` string (fallback `Database`); the label adapter accepts a pre-resolved `label` alongside the existing `labelKey`.
 
 There is no autosave or undo/redo for collection items in v1 — explicit save plus the navigation guard is sufficient. These are deliberate omissions, not gaps.
 

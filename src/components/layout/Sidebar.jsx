@@ -115,19 +115,6 @@ export default function Sidebar() {
   // whose text is the theme-authored displayNamePlural).
   const resolveLabel = (item) => (item.labelKey ? t(item.labelKey) : item.label);
 
-  const renderBadge = (item, disabled) => {
-    if (typeof item.badge !== "number") return null;
-    return (
-      <span
-        className={`ml-auto hidden min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold md:inline-flex ${
-          disabled ? "bg-slate-800 text-slate-500" : "bg-slate-800 text-slate-300 group-hover:text-white"
-        }`}
-      >
-        {item.badge}
-      </span>
-    );
-  };
-
   const renderNavItem = (item) => {
     const Icon = item.icon;
     const disabled = (item.requiresProject && !hasActiveProject) || (item.action === "openSitePreview" && !canOpenSitePreview);
@@ -152,7 +139,6 @@ export default function Sidebar() {
               <Icon size={20} />
             </div>
             <span className={navLabelClass("__none__", disabled)}>{resolveLabel(item)}</span>
-            {renderBadge(item, disabled)}
           </button>
         </li>
       );
@@ -165,7 +151,6 @@ export default function Sidebar() {
             <Icon size={20} />
           </div>
           <span className={navLabelClass(item.path, disabled)}>{resolveLabel(item)}</span>
-          {renderBadge(item, disabled)}
         </NavLink>
       </li>
     );
@@ -190,13 +175,12 @@ export default function Sidebar() {
   };
 
   // Build one nav item per collection type and splice them into the Site section
-  // after Pages/Menus. Empty collections still appear (with a 0 badge).
+  // after Pages/Menus.
   const collectionNavItems = (collectionSchemas || []).map((schema) => ({
     id: `collection-${schema.type}`,
     label: schema.displayNamePlural || schema.displayName || schema.type,
     path: `/collections/${schema.type}`,
     icon: resolveLucideIcon(schema.icon),
-    badge: typeof schema.itemCount === "number" ? schema.itemCount : 0,
     requiresProject: true,
   }));
 

@@ -23,7 +23,7 @@ describe("collectionManager", () => {
   });
 
   it("getCollectionSchemas fetches the schemas list", async () => {
-    const schemas = [{ type: "portfolio", itemCount: 2 }];
+    const schemas = [{ type: "portfolio" }];
     apiFetchJson.mockResolvedValue(schemas);
 
     const result = await manager.getCollectionSchemas();

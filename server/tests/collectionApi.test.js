@@ -115,16 +115,12 @@ beforeEach(async () => {
 // ============================================================================
 
 describe("GET /schemas + /schema/:type", () => {
-  it("lists schemas with itemCount and invalidCount", async () => {
-    await call(collectionController.createItem, {
-      params: { collectionType: "portfolio" },
-      body: { settings: { title: "Alpha" } },
-    });
+  it("lists collection schemas", async () => {
     const res = await call(collectionController.getCollectionSchemas);
     assert.equal(res._status, 200);
     const portfolio = res._json.find((s) => s.type === "portfolio");
-    assert.equal(portfolio.itemCount, 1);
-    assert.equal(portfolio.invalidCount, 0);
+    assert.ok(portfolio, "portfolio schema should be listed");
+    assert.equal(portfolio.type, "portfolio");
   });
 
   it("returns a single schema, 404 for unknown", async () => {

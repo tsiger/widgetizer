@@ -8,7 +8,6 @@ import CollectionItemForm from "../components/collections/CollectionItemForm";
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { getCollectionSchema, createCollectionItem } from "../queries/collectionManager";
-import { invalidateCollectionsCache } from "../hooks/useCollections";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
@@ -49,7 +48,6 @@ export default function CollectionItemAdd() {
       showToast(t("collectionsForm.toasts.createSuccess", { name: schema?.displayName || type }), "success");
 
       const activeProject = useProjectStore.getState().activeProject;
-      invalidateCollectionsCache(activeProject?.id);
       invalidateMediaCache(activeProject?.id);
 
       navigateSafely(`/collections/${type}`);

@@ -232,7 +232,7 @@ Theme-defined custom post types (Portfolio, Team, etc.) authored as items via a 
 
 ### Query Layer (`src/queries/collectionManager.js`)
 
-API client mirroring the controller surface; uses `apiFetch` (`X-Project-Id`). Hooks: `src/hooks/useCollections.js` (schemas, with `invalidateCollectionsCache`) and `src/hooks/useCollectionItems.js` (items).
+API client mirroring the controller surface; uses `apiFetch` (`X-Project-Id`). Hooks: `src/hooks/useCollections.js` (schemas) and `src/hooks/useCollectionItems.js` (items).
 
 ### Server Controller (`server/controllers/collectionController.js`)
 

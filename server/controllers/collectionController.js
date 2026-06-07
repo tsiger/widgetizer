@@ -40,17 +40,7 @@ export async function getCollectionSchemas(req, res) {
   try {
     const folder = req.activeProject.folderName;
     const schemas = await collectionService.listCollectionSchemas(folder);
-    const withCounts = await Promise.all(
-      schemas.map(async (schema) => {
-        const items = await collectionService.listCollectionItems(folder, schema.type);
-        return {
-          ...schema,
-          itemCount: items.length,
-          invalidCount: items.filter((i) => i.invalid).length,
-        };
-      }),
-    );
-    res.json(withCounts);
+    res.json(schemas);
   } catch (err) {
     respondError(res, err);
   }
