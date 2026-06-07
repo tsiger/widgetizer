@@ -751,6 +751,35 @@ export async function writeCollectionItem(
   return item;
 }
 
+/**
+ * Explicitly discard an item's archived (out-of-schema) settings — the
+ * counterpart to the BLOCKER-2 merge-back in `buildCollectionItemData`. Keeps
+ * only current-schema setting keys and rewrites the item in place, preserving
+ * `uuid`/`created`/`updated` (this clears hidden data, not visible content).
+ * Returns the re-normalized item (now with an empty `_archived`), or null if the
+ * collection type or item file is missing.
+ */
+export async function discardArchivedCollectionItem(projectId, projectFolderName, collectionType, itemSlug) {
+  const schema = await getCollectionSchema(projectFolderName, collectionType);
+  if (!schema) return null;
+  const raw = await readRawCollectionItem(projectFolderName, collectionType, itemSlug);
+  if (!raw) return null;
+
+  const knownIds = new Set(
+    (schema.settings || []).filter((s) => s.type !== HEADER_TYPE).map((s) => s.id),
+  );
+  const settings = {};
+  for (const [key, value] of Object.entries(raw.settings || {})) {
+    if (knownIds.has(key)) settings[key] = value;
+  }
+
+  // previousSlug === slug → update in place (not create/rename); timestamps and
+  // uuid are carried through untouched, only the orphaned keys disappear.
+  const updatedItem = { ...raw, settings };
+  await writeCollectionItem(projectId, projectFolderName, collectionType, updatedItem, updatedItem.slug);
+  return normalizeCollectionItem(updatedItem, schema);
+}
+
 /** Delete one item and prune it (and any stale slugs) from `_order.json`. */
 export async function deleteCollectionItem(projectId, projectFolderName, collectionType, itemSlug) {
   const itemPath = getProjectCollectionItemPath(projectFolderName, collectionType, itemSlug);

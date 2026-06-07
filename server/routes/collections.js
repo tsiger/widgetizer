@@ -82,6 +82,12 @@ router.post(
   collectionController.duplicateItem,
 );
 router.post(
+  "/:collectionType/:itemSlug/discard-archived",
+  [slugParam("collectionType"), slugParam("itemSlug")],
+  validateRequest,
+  collectionController.discardArchivedItem,
+);
+router.post(
   "/:collectionType/reorder",
   [slugParam("collectionType"), body("order").isArray(), slugBody("order.*")],
   validateRequest,

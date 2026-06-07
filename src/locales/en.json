@@ -86,12 +86,23 @@
     "preview": "Preview",
     "previewLoading": "Opening…",
     "previewError": "Could not build preview",
+    "archivedTitle": "Leftover content",
+    "archivedDescription": "Some of this item's saved content is no longer used. It's kept safely but doesn't show anywhere — you can keep it or remove it.",
+    "discardArchived": "Remove this content",
+    "discardModal": {
+      "title": "Remove leftover content?",
+      "message": "This permanently deletes that leftover content. The rest of this item is unaffected, and this can't be undone.",
+      "confirm": "Remove",
+      "cancel": "Keep it"
+    },
     "toasts": {
       "createSuccess": "{{name}} created",
       "createError": "Failed to create item",
       "updateSuccess": "{{name}} updated",
       "updateSuccessUrlChanged": "{{name}} updated. The URL changed to match the new slug.",
-      "updateError": "Failed to update item"
+      "updateError": "Failed to update item",
+      "archivedDiscarded": "Content removed",
+      "archivedDiscardError": "Couldn't remove the content. Please try again."
     }
   },
   "collectionsPreview": {

@@ -1,6 +1,6 @@
 {
   "collapse-filter": false,
-  "search": "Electro",
+  "search": "",
   "showTags": false,
   "showAttachments": false,
   "hideUnresolved": false,
@@ -8,7 +8,7 @@
   "collapse-color-groups": false,
   "colorGroups": [],
   "collapse-display": false,
-  "showArrow": true,
+  "showArrow": false,
   "textFadeMultiplier": 0.1,
   "nodeSizeMultiplier": 1.14635416666667,
   "lineSizeMultiplier": 0.993229166666667,
@@ -17,6 +17,6 @@
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 0.6711870912854229,
+  "scale": 0.5883413415553009,
   "close": false
 }

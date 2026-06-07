@@ -2,9 +2,13 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import { Eye } from "lucide-react";
+import { Eye, Info } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
+import { discardArchivedCollectionItem } from "../../queries/collectionManager";
+import { invalidateMediaCache } from "../../queries/mediaManager";
+import useConfirmationAction from "../../hooks/useConfirmationAction";
 import useToastStore from "../../stores/toastStore";
+import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
 import SettingsRenderer from "../settings/SettingsRenderer";
 import CollectionItemPreview from "./CollectionItemPreview";
@@ -22,6 +26,16 @@ function isMissingValue(value) {
     if ("url" in value) return !value.url;
   }
   return false;
+}
+
+/** Turn a stored field id (snake/kebab case) into a friendly label, e.g.
+ *  "promo_code" → "Promo code". The schema label is gone once a field is
+ *  removed, so this is the best human-readable name we can show the user. */
+function humanizeFieldId(id) {
+  return String(id)
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .replace(/^\w/, (c) => c.toUpperCase());
 }
 
 /**
@@ -48,6 +62,34 @@ export default function CollectionItemForm({
   const { t } = useTranslation();
   const showToast = useToastStore((state) => state.showToast);
   const isNew = !initialData.id && !initialData.slug;
+
+  // Finding #8: out-of-schema values are kept on disk in `_archived`. Surface
+  // them with a confirmed discard. Empty for new items, so this is edit-only.
+  const [archived, setArchived] = useState(() => initialData._archived || {});
+  const archivedKeys = Object.keys(archived);
+
+  const { confirm: confirmDiscardArchived, confirmationModal } = useConfirmationAction(async () => {
+    try {
+      await discardArchivedCollectionItem(schema.type, initialData.slug);
+      // Mirror the save path: discarding can shrink media usage if an archived
+      // field held an upload, so refresh the media cache (else stale usedIn /
+      // delete state lingers in the media library until expiry).
+      invalidateMediaCache(useProjectStore.getState().activeProject?.id);
+      setArchived({});
+      showToast(t("collectionsForm.toasts.archivedDiscarded"), "success");
+    } catch (err) {
+      showToast(err.message || t("collectionsForm.toasts.archivedDiscardError"), "error");
+    }
+  });
+
+  const openDiscardArchived = () =>
+    confirmDiscardArchived({
+      title: t("collectionsForm.discardModal.title"),
+      message: t("collectionsForm.discardModal.message"),
+      confirmText: t("collectionsForm.discardModal.confirm"),
+      cancelText: t("collectionsForm.discardModal.cancel"),
+      variant: "warning",
+    });
 
   const allSettings = Array.isArray(schema?.settings) ? schema.settings : [];
   const fieldSettings = allSettings.filter((s) => s.type !== HEADER_TYPE);
@@ -105,9 +147,10 @@ export default function CollectionItemForm({
   useEffect(() => {
     if (prevKeyRef.current !== initialData.slug) {
       reset({ slug: initialData.slug || "", settings: initialData.settings || {} });
+      setArchived(initialData._archived || {});
       prevKeyRef.current = initialData.slug;
     }
-  });
+  }, [initialData.slug, initialData.settings, initialData._archived, reset]);
 
   const effectiveValue = (setting) => {
     const v = settingsValues[setting.id];
@@ -233,6 +276,32 @@ export default function CollectionItemForm({
     <>
     <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="form-container">
       <div className="form-section">
+        {archivedKeys.length > 0 && (
+          <div className="mb-4 rounded-sm border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-start gap-2">
+              <Info className="mt-0.5 shrink-0 text-slate-400" size={16} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-slate-800">{t("collectionsForm.archivedTitle")}</p>
+                <p className="mt-1 text-sm text-slate-600">{t("collectionsForm.archivedDescription")}</p>
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {archivedKeys.map((key) => (
+                    <li key={key} className="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-700">
+                      {humanizeFieldId(key)}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  onClick={openDiscardArchived}
+                  className="mt-3 text-sm font-medium text-pink-600 hover:text-pink-700"
+                >
+                  {t("collectionsForm.discardArchived")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Slug */}
         <div className="form-field">
           <label htmlFor="slug" className="form-label">
@@ -322,6 +391,8 @@ export default function CollectionItemForm({
         onClose={() => setPreviewDraft(null)}
       />
     )}
+
+    {confirmationModal}
     </>
   );
 }

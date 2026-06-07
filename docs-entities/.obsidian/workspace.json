@@ -4,35 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "979892efe589e4fd",
+        "id": "180b3f5815db61a7",
         "type": "tabs",
         "children": [
           {
-            "id": "112c804313efe7d2",
+            "id": "a03dd8e7f9a776d3",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "API Query Layer.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "API Query Layer"
-            }
-          },
-          {
-            "id": "8ccd0da30836ff5f",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Collection Queries.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Collection Queries"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -197,18 +179,25 @@
       "bases:Create new base": false
     }
   },
-  "active": "112c804313efe7d2",
+  "active": "a03dd8e7f9a776d3",
   "lastOpenFiles": [
-    "System Map.md",
+    "Collections System.md",
+    "Global Widget JSON.md",
+    "Export System.md",
+    "Export Queries.md",
+    "Theme Controller.md",
+    "Coupling Hotspots.md",
     "Index.md",
+    "Collection Queries.md",
+    "Active Project Context.md",
+    "API Query Layer.md",
+    "System Map.md",
     "Electron App.md",
     "Admin Menu.md",
-    "Collection Queries.md",
     "Collection Item.md",
     "App Settings Data.md",
     "App Settings.md",
     "Rendering Pipeline.md",
-    "Coupling Hotspots.md",
     "Data Ownership Map.md",
     "Page Editor.md"
   ]

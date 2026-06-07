@@ -256,6 +256,30 @@ describe("update / delete / duplicate / reorder", () => {
     assert.equal(after.settings.legacy_field, "keep-me");
   });
 
+  it("discards archived data (200): strips orphaned keys, _archived empty", async () => {
+    const itemPath = path.join(getProjectDir(PROJECT_FOLDER), "collections", "portfolio", "alpha.json");
+    const raw = await fs.readJSON(itemPath);
+    raw.settings.legacy_field = "drop-me";
+    await fs.writeJSON(itemPath, raw);
+
+    const res = await call(collectionController.discardArchivedItem, {
+      params: { collectionType: "portfolio", itemSlug: "alpha" },
+    });
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json._archived, {});
+
+    const after = await fs.readJSON(itemPath);
+    assert.equal(after.settings.legacy_field, undefined);
+    assert.equal(after.settings.title, "Alpha");
+  });
+
+  it("returns 404 discarding archived on a missing item", async () => {
+    const res = await call(collectionController.discardArchivedItem, {
+      params: { collectionType: "portfolio", itemSlug: "ghost" },
+    });
+    assert.equal(res._status, 404);
+  });
+
   it("returns 404 updating a missing item", async () => {
     const res = await call(collectionController.updateItem, {
       params: { collectionType: "portfolio", itemSlug: "ghost" },

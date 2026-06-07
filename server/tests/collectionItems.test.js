@@ -32,6 +32,7 @@ const {
   deleteCollectionItem,
   bulkDeleteCollectionItems,
   duplicateCollectionItem,
+  discardArchivedCollectionItem,
   reorderCollectionItems,
   readRawCollectionItem,
   resolveCollectionItemLinks,
@@ -529,6 +530,40 @@ describe("write-side storage", () => {
 // ============================================================================
 // resolveCollectionItemLinks (Phase 7 — render-time link resolution)
 // ============================================================================
+
+describe("discardArchivedCollectionItem", () => {
+  beforeEach(async () => {
+    await fs.remove(path.join(TEST_ROOT, "data"));
+  });
+
+  it("strips orphaned keys, keeps schema fields, preserves timestamps", async () => {
+    await setupCollection("p", "portfolio", portfolioSchema(), [
+      itemFile("alpha", {
+        created: "2020-01-01T00:00:00.000Z",
+        updated: "2020-02-02T00:00:00.000Z",
+        settings: { title: "Alpha", legacy_field: "orphan", another_orphan: "x" },
+      }),
+    ]);
+
+    const out = await discardArchivedCollectionItem("pid", "p", "portfolio", "alpha");
+    assert.ok(out);
+    assert.deepEqual(out._archived, {});
+    assert.equal(out.settings.title, "Alpha");
+    // timestamps untouched — discard removes hidden data, not visible content
+    assert.equal(out.created, "2020-01-01T00:00:00.000Z");
+    assert.equal(out.updated, "2020-02-02T00:00:00.000Z");
+
+    const raw = await fs.readJSON(getProjectCollectionItemPath("p", "portfolio", "alpha"));
+    assert.equal(raw.settings.title, "Alpha");
+    assert.equal(raw.settings.legacy_field, undefined);
+    assert.equal(raw.settings.another_orphan, undefined);
+  });
+
+  it("returns null for a missing item", async () => {
+    await setupCollection("p", "portfolio", portfolioSchema());
+    assert.equal(await discardArchivedCollectionItem("pid", "p", "portfolio", "ghost"), null);
+  });
+});
 
 describe("resolveCollectionItemLinks", () => {
   const pagesByUuid = new Map([["page-uuid-1", { slug: "about" }]]);

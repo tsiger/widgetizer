@@ -210,6 +210,28 @@ export async function duplicateItem(req, res) {
   }
 }
 
+export async function discardArchivedItem(req, res) {
+  try {
+    const folder = req.activeProject.folderName;
+    const { collectionType, itemSlug } = req.params;
+    const schema = await collectionService.getCollectionSchema(folder, collectionType);
+    if (!schema) return res.status(404).json({ error: "Collection type not found" });
+
+    const item = await collectionService.discardArchivedCollectionItem(
+      req.activeProject.id,
+      folder,
+      collectionType,
+      itemSlug,
+    );
+    if (!item) return res.status(404).json({ error: "Item not found" });
+    // Media usage may shrink if an archived field held a media reference.
+    await syncCollectionItemMediaUsageOnWrite(req.activeProject.id, collectionType, item.slug, item, null);
+    noStore(res).json(item);
+  } catch (err) {
+    respondError(res, err);
+  }
+}
+
 export async function reorderItems(req, res) {
   try {
     const folder = req.activeProject.folderName;

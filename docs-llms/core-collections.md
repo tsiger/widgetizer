@@ -196,7 +196,7 @@ When a theme bumps `schemaVersion`, existing items may have stale or missing fie
 - Missing required fields are filled with type-appropriate empty defaults; the item is flagged `invalid: true` with `validationErrors`.
 - `schemaVersion` is bumped in memory; nothing is persisted by GET handlers.
 
-**Orphaned values are never dropped silently.** The write path (`buildCollectionItemData` / `writeCollectionItem`) **merges back** on-disk settings keys that are absent from both the current schema and the incoming payload, so an ordinary save cannot lose data in a dropped field. Discarding archived data is **explicit**: the editor shows an "Archived data" notice listing each orphaned field, behind a confirmed **Discard archived data** action — only that removes the keys. This is strictly safer than pages/globals, which keep orphaned settings on disk indefinitely with no cleanup affordance.
+**Orphaned values are never dropped silently.** The write path (`buildCollectionItemData` / `writeCollectionItem`) **merges back** on-disk settings keys that are absent from both the current schema and the incoming payload, so an ordinary save cannot lose data in a dropped field. Discarding archived data is **explicit**: the editor shows a plain-language "Leftover content" notice listing each orphaned field by a friendly name, behind a confirmed **Remove this content** action — only that removes the keys. This is strictly safer than pages/globals, which keep orphaned settings on disk indefinitely with no cleanup affordance.
 
 Switching **themes** runs the same normalization: unknown fields go to `_archived` (kept on disk), missing required fields are filled and the item is flagged `invalid`. No field data is lost without an explicit confirmed discard.
 

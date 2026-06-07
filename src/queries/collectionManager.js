@@ -25,6 +25,7 @@ import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
  * @property {string} uuid
  * @property {string} title
  * @property {Object} settings
+ * @property {Object} [_archived] - values for fields no longer in the schema (kept on disk, not editable)
  * @property {boolean} invalid
  * @property {Array<{fieldId: string, reason: string}>} validationErrors
  * @property {string} created
@@ -196,6 +197,26 @@ export async function duplicateCollectionItem(type, slug) {
     );
   } catch (error) {
     rethrowQueryError(error, "Failed to duplicate item");
+  }
+}
+
+/**
+ * Discard an item's archived (out-of-schema) settings. Removes the stored values
+ * for fields no longer in the collection schema; returns the updated item (with
+ * an empty `_archived`).
+ * @param {string} type - Collection type slug
+ * @param {string} slug - Item slug
+ * @returns {Promise<CollectionItem>}
+ */
+export async function discardArchivedCollectionItem(type, slug) {
+  try {
+    return await apiFetchJson(
+      `/api/collections/${type}/${slug}/discard-archived`,
+      { method: "POST" },
+      { fallbackMessage: "Failed to discard archived data" },
+    );
+  } catch (error) {
+    rethrowQueryError(error, "Failed to discard archived data");
   }
 }
 
