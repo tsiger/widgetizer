@@ -432,14 +432,19 @@ export async function createCollectionPreviewToken(req, res) {
  */
 export async function renderSingleWidget(req, res) {
   try {
-    const { widgetId, widget, themeSettings: rawThemeSettings } = req.body; // Expect themeSettings too
+    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath } = req.body;
     const activeProjectId = req.activeProject.id;
 
-    // Provide sharedGlobals so we can read back enqueued assets after render
+    // Provide sharedGlobals so we can read back enqueued assets after render.
+    // currentCanonicalPath flows from the morph request so a menu-bearing widget
+    // re-rendered by a live update keeps its menu active-state (finding #9). Full
+    // reloads set this the same way in generatePreviewHtml; without it, the morph
+    // would fall back to "" and drop the active item until the next reload.
     const sharedGlobals = {
       renderMode: "preview",
       enqueuedStyles: new Map(),
       enqueuedScripts: new Map(),
+      currentCanonicalPath: typeof currentCanonicalPath === "string" ? currentCanonicalPath : "",
     };
 
     const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null);

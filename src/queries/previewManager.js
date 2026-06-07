@@ -104,7 +104,7 @@ export async function fetchPreview(pageData, themeSettings, previewMode = "edito
  * @returns {Promise<string>} Rendered widget HTML string
  * @throws {Error} If widget rendering fails
  */
-export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
+export async function fetchRenderedWidget(widgetId, widget, themeSettings, currentCanonicalPath = "") {
   try {
     const response = await apiFetch("/api/preview/widget", {
       method: "POST",
@@ -115,6 +115,7 @@ export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
         widgetId,
         widget,
         themeSettings,
+        currentCanonicalPath,
       }),
     });
 
@@ -151,6 +152,9 @@ export async function updatePreview(iframe, newState, oldState) {
 
   const safeOldState = oldState || {};
   const { widgets: newWidgets = {}, globalWidgets: newGlobalWidgets = {}, themeSettings: newThemeSettings } = newState;
+  // Un-prefixed path of the page being morphed, so menu-bearing widgets keep
+  // their active-state on live updates (parity with full reload; finding #9).
+  const currentCanonicalPath = `${newState.page?.slug || ""}.html`;
 
   const {
     widgets: oldWidgets = {},
@@ -201,7 +205,7 @@ export async function updatePreview(iframe, newState, oldState) {
     const widgetData = newWidgets[widgetId];
     if (widgetData) {
       try {
-        const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
+        const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings, currentCanonicalPath);
         iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, "*");
       } catch (error) {
         console.error(`Error updating widget ${widgetId}:`, error);
@@ -212,7 +216,7 @@ export async function updatePreview(iframe, newState, oldState) {
   // Update global widgets if changed
   if ((headerChanged || themeSettingsChanged) && newGlobalWidgets.header) {
     try {
-      const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings);
+      const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings, currentCanonicalPath);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "header", html: renderedHtml } },
         "*",
@@ -244,7 +248,7 @@ export async function updatePreview(iframe, newState, oldState) {
   }
   if ((footerChanged || themeSettingsChanged) && newGlobalWidgets.footer) {
     try {
-      const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings);
+      const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings, currentCanonicalPath);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "footer", html: renderedHtml } },
         "*",

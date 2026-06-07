@@ -158,6 +158,7 @@ before(async () => {
   <h1>{{ widget.settings.heading }}</h1>
   {% if widget.settings.subtitle %}<p>{{ widget.settings.subtitle }}</p>{% endif %}
   {% if widget.settings.cta_link.href != blank %}<a href="{{ widget.settings.cta_link.href }}">{{ widget.settings.cta_link.text }}</a>{% endif %}
+  {% if widget.settings.nav_menu %}{% render 'menu', menu: widget.settings.nav_menu %}{% endif %}
 </section>`,
   );
   await fs.writeFile(
@@ -520,6 +521,32 @@ describe("renderWidget — menu resolution", () => {
 
     assert.ok(html.includes("No Menu"));
     assert.ok(!html.includes("widget-error"));
+  });
+
+  it("applies menu active-state from globals.currentCanonicalPath (single-widget morph path; #9)", async () => {
+    const renderAt = (currentCanonicalPath) =>
+      renderWidget(
+        PROJECT_ID,
+        "hero-active",
+        { type: "test-hero", settings: { heading: "Active", nav_menu: "main-nav" } },
+        RAW_THEME_SETTINGS,
+        "preview",
+        { currentCanonicalPath },
+        null,
+      );
+
+    // On the About page, the matching menu item is marked active. pageUuid items
+    // resolve their canonicalPath via renderWidget's internally-loaded pages, so
+    // currentCanonicalPath is the only thing the morph needs to forward (#9).
+    const onAbout = await renderAt("about-us.html");
+    assert.match(onAbout, /is-active/);
+    assert.match(onAbout, /aria-current="page"/);
+
+    // A path matching no item leaves nothing active — proving the marker is
+    // driven by currentCanonicalPath, which the morph path now provides.
+    const nowhere = await renderAt("does-not-exist.html");
+    assert.doesNotMatch(nowhere, /is-active/);
+    assert.doesNotMatch(nowhere, /aria-current/);
   });
 });
 

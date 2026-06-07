@@ -366,7 +366,7 @@ schema fields/preserves timestamps, and null for a missing item) in
 `collectionItems.test.js`; the endpoint (2 cases — strips on disk with empty
 `_archived`, and 404) in `collectionApi.test.js`.
 
-### 9. Live widget morphs do not get the documented menu active-state context
+### 9. Live widget morphs do not get the documented menu active-state context — ✅ Resolved (2026-06-07)
 
 Simple: full preview/export set `currentCanonicalPath`, but single-widget live
 updates do not.
@@ -393,6 +393,24 @@ wrong menu active state until the preview reloads.
 Suggested fix: include the current page slug/canonical path in the
 `/api/preview/widget` request body, or force full reloads for widgets that render
 menu settings.
+
+**Resolution:** Took the thread-the-value option (no forced reloads). The
+single-widget morph endpoint `renderSingleWidget` (`previewController.js`) now
+reads `currentCanonicalPath` from the request body into its `sharedGlobals`,
+exactly as `generatePreviewHtml` sets it for full renders. The frontend forwards
+it: `fetchRenderedWidget` (`previewManager.js`) gained a `currentCanonicalPath`
+argument it includes in the `/api/preview/widget` body, and `updatePreview`
+computes `` `${newState.page?.slug || ""}.html` `` once and passes it to all three
+morph calls (the changed page widget, header, footer). `pageUuid` menu items
+already resolve their `canonicalPath` because `renderWidget` loads `pagesByUuid`
+internally, so `currentCanonicalPath` really was the only missing piece — menu
+active-state now survives a live morph instead of dropping until the next full
+reload. Test: `rendering.test.js` "applies menu active-state from
+globals.currentCanonicalPath" renders a single menu-bearing widget and asserts
+the active marker shows for a matching path and is absent for a non-matching one
+(the depth/layout path was already covered by `depthRenderSmoke`). No doc change —
+`core-collections.md` already documents `currentCanonicalPath` on every render
+path; the morph now matches it.
 
 ### 10. Collection `menu` fields store a menu UUID but do not render as menu data
 
