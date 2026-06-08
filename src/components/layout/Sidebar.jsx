@@ -175,7 +175,7 @@ export default function Sidebar() {
   };
 
   // Build one nav item per collection type and splice them into the Site section
-  // after Pages/Menus.
+  // directly after Pages.
   const collectionNavItems = (collectionSchemas || []).map((schema) => ({
     id: `collection-${schema.type}`,
     label: schema.displayNamePlural || schema.displayName || schema.type,
@@ -190,8 +190,8 @@ export default function Sidebar() {
       : navigationSections.map((section) => {
           if (section.id !== "site") return section;
           const items = [...section.items];
-          const menusIndex = items.findIndex((item) => item.id === "menus");
-          const insertAt = menusIndex >= 0 ? menusIndex + 1 : items.length;
+          const pagesIndex = items.findIndex((item) => item.id === "pages");
+          const insertAt = pagesIndex >= 0 ? pagesIndex + 1 : 0;
           items.splice(insertAt, 0, ...collectionNavItems);
           return { ...section, items };
         });
