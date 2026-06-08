@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
+import { Save, ChevronDown, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
+import PreviewModeToggle from "../preview/PreviewModeToggle";
 
 export default function EditorTopBar({
   pageName,
@@ -214,26 +215,7 @@ export default function EditorTopBar({
         {children}
 
         {/* Desktop/Mobile switcher */}
-        <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
-          <button
-            onClick={() => handlePreviewModeChange("desktop")}
-            title={t("pageEditor.toolbar.desktopView")}
-            className={`p-1.5 rounded ${
-              previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <Monitor size={18} />
-          </button>
-          <button
-            onClick={() => handlePreviewModeChange("mobile")}
-            title={t("pageEditor.toolbar.mobileView")}
-            className={`p-1.5 rounded ${
-              previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <Smartphone size={18} />
-          </button>
-        </div>
+        <PreviewModeToggle mode={previewMode} onChange={handlePreviewModeChange} />
 
         <button
           onClick={handleOpenPreview}

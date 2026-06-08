@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Monitor, Smartphone, RotateCw, ChevronDown } from "lucide-react";
+import { ArrowLeft, RotateCw, ChevronDown } from "lucide-react";
 import { BASE_URL } from "../../config";
 import { getCollectionItems, getCollectionItem, previewCollectionItem } from "../../queries/collectionManager";
 import useToastStore from "../../stores/toastStore";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import PreviewModeToggle from "../preview/PreviewModeToggle";
+import PreviewStage, { STANDALONE_SANDBOX } from "../preview/PreviewStage";
 
 const DRAFT_VALUE = "__draft__";
 
@@ -33,7 +34,7 @@ export default function CollectionItemPreview({ schema, onClose, draft = null, e
   const [savedItems, setSavedItems] = useState([]);
   const [listLoading, setListLoading] = useState(true);
   const [selected, setSelected] = useState(draft ? DRAFT_VALUE : initialSlug || "");
-  const [device, setDevice] = useState(() => localStorage.getItem("collectionPreviewDevice") || "desktop");
+  const [previewMode, setPreviewMode] = useState(() => localStorage.getItem("editorPreviewMode") || "desktop");
   const [src, setSrc] = useState("");
   const [building, setBuilding] = useState(false);
 
@@ -113,12 +114,10 @@ export default function CollectionItemPreview({ schema, onClose, draft = null, e
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const chooseDevice = (d) => {
-    setDevice(d);
-    localStorage.setItem("collectionPreviewDevice", d);
+  const choosePreviewMode = (mode) => {
+    setPreviewMode(mode);
+    localStorage.setItem("editorPreviewMode", mode);
   };
-
-  const isMobile = device === "mobile";
 
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-slate-100">
@@ -166,47 +165,18 @@ export default function CollectionItemPreview({ schema, onClose, draft = null, e
           </button>
         </div>
 
-        {/* Device toggle (right) */}
-        <div className="flex items-center rounded-md border border-slate-200 bg-slate-50 p-0.5">
-          <button
-            type="button"
-            onClick={() => chooseDevice("desktop")}
-            aria-label={t("collectionsPreview.desktop")}
-            title={t("collectionsPreview.desktop")}
-            className={`rounded px-3 py-1.5 ${!isMobile ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-          >
-            <Monitor size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => chooseDevice("mobile")}
-            aria-label={t("collectionsPreview.mobile")}
-            title={t("collectionsPreview.mobile")}
-            className={`rounded px-3 py-1.5 ${isMobile ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-          >
-            <Smartphone size={16} />
-          </button>
-        </div>
+        {/* Device toggle (right) — shared chrome with the page editor/preview */}
+        <PreviewModeToggle mode={previewMode} onChange={choosePreviewMode} />
       </div>
 
-      {/* Iframe stage */}
-      <div className="relative flex min-h-0 flex-1 justify-center overflow-auto p-4">
-        {building && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100/60">
-            <LoadingSpinner />
-          </div>
-        )}
-        <div
-          className={
-            isMobile
-              ? "h-full overflow-hidden rounded-[2.5rem] border-[10px] border-slate-800 bg-white shadow-xl"
-              : "h-full w-full overflow-hidden bg-white shadow-sm"
-          }
-          style={isMobile ? { width: 390, maxWidth: "100%" } : undefined}
-        >
-          {src && <iframe key={src} src={src} title={t("collectionsForm.preview")} className="h-full w-full border-0" />}
-        </div>
-      </div>
+      {/* Iframe stage — shared with the page editor/preview (no device bezel) */}
+      <PreviewStage
+        src={src}
+        loading={building}
+        isMobile={previewMode === "mobile"}
+        title={t("collectionsForm.preview")}
+        sandbox={STANDALONE_SANDBOX}
+      />
     </div>
   );
 }
