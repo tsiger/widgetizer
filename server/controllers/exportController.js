@@ -8,16 +8,13 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import {
   renderWidget,
   renderPageLayout,
-  renderLiquidTemplate,
-  createBaseRenderContext,
+  renderCollectionItemPage,
   widgetSupportsTransparentHeader,
 } from "../services/renderingService.js";
 import {
   listCollectionSchemas,
   listCollectionItems,
   loadCollectionTemplate,
-  prepareCollectionItemForRender,
-  buildCollectionItemPageData,
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
 import { loadMenuMaps } from "../services/menuResolver.js";
@@ -602,48 +599,28 @@ Per aspera ad astra
           currentCanonicalPath: `${schema.slugPrefix}/${item.slug}.html`,
         };
 
-        // Render header/footer with the item's globals (captures their assets).
-        let itemHeaderHtml = "";
-        let itemFooterHtml = "";
-        if (headerData) {
-          itemHeaderHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null);
-        }
-        if (footerData) {
-          itemFooterHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null);
-        }
-
-        // Resolve item links at depth + sanitize, then render the collection template.
-        const resolvedItem = prepareCollectionItemForRender(item, schema, pagesByUuidForItems, "../", {
-          menuMaps: menuMapsForItems,
-          collectionItemsByUuid: collectionItemsByUuidForItems,
-        });
-        // Page-shaped object (spec Section 13) drives layout title/seo/body class.
-        // Built BEFORE the template render so item templates receive the
-        // documented page/collection/project context, not just item (Finding #5).
-        const itemPageData = buildCollectionItemPageData(schema, resolvedItem, siteUrl);
-        const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, "publish", sharedGlobals);
-        const itemContext = {
-          ...baseContext,
-          item: resolvedItem,
-          collection: schema,
-          page: itemPageData,
-          project: projectData,
-        };
-        const itemContentHtml = await renderLiquidTemplate(projectId, template, itemContext, sharedGlobals);
-
-        let itemHtml = await renderPageLayout(
-          projectId,
-          {
-            headerContent: itemHeaderHtml,
-            mainContent: itemContentHtml,
-            footerContent: itemFooterHtml,
-            bodyClass: `collection-${schema.type} item-${item.slug}`,
-          },
+        // One shared pipeline renders the item page — header/footer + resolved
+        // item + template + layout — identical to the preview path (finding #2).
+        // Everything below (format, storage-path rewrite, markdown) stays
+        // export-specific. itemContentHtml/itemPageData feed the markdown parity.
+        const {
+          html: itemHtmlRendered,
+          mainContentHtml: itemContentHtml,
           itemPageData,
+        } = await renderCollectionItemPage({
+          projectId,
+          schema,
+          item,
+          template,
           rawThemeSettings,
-          "publish",
+          renderMode: "publish",
           sharedGlobals,
-        );
+          headerData,
+          footerData,
+          projectData,
+          siteUrl,
+        });
+        let itemHtml = itemHtmlRendered;
 
         const itemFormat = await formatHtml(itemHtml);
         itemHtml = itemFormat.html;

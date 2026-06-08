@@ -30,6 +30,7 @@ import {
   listCollectionItems,
   getCollectionSchema,
   prepareCollectionItemForRender,
+  buildCollectionItemPageData,
   loadCollectionItemsByUuid,
 } from "./collectionService.js";
 import { loadMenuMaps, resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
@@ -811,6 +812,111 @@ async function renderLiquidTemplate(projectId, templateString, context, sharedGl
 }
 
 /**
+ * Render one collection item into a finished, laid-out HTML page.
+ *
+ * This is the single shared pipeline behind BOTH item-page render paths — the
+ * static export loop (`exportController`) and the in-app preview token
+ * (`previewController`) — so the two can never drift (finding #2 follow-up). It
+ * is the collection-item analogue of how every page render goes through
+ * `renderWidget`. Callers own the parts that legitimately differ: building the
+ * mode-specific `sharedGlobals` and the post-processing (export writes files +
+ * markdown; preview injects the runtime + tokenizes).
+ *
+ * Depth (`outputPathPrefix`), the page map (`pagesByUuid`), and the menu maps are
+ * read off `sharedGlobals`, so the depth used to resolve item links can never
+ * disagree with the depth the layout renders at.
+ *
+ * Step order — resolve item → header/footer → page data → template → layout —
+ * keeps every asset-enqueuing render (header/footer/template) ahead of the layout
+ * that emits the enqueued tags, exactly as both call sites did before.
+ *
+ * @param {object} args
+ * @param {string} args.projectId - Project UUID.
+ * @param {object} args.schema - Normalized collection schema.
+ * @param {object} args.item - Raw item (an export item, or the preview draft item).
+ * @param {string} args.template - The collection type's `template.liquid` source.
+ * @param {object} args.rawThemeSettings - Raw theme settings.
+ * @param {string} args.renderMode - "publish" | "preview".
+ * @param {object} args.sharedGlobals - Caller-built globals (mode-specific). Must
+ *   carry `outputPathPrefix`, `pagesByUuid`, and (when the schema uses `menu`
+ *   settings) `menuMaps` + `collectionItemsByUuid`.
+ * @param {object|null} args.headerData - Global header widget data, or null.
+ * @param {object|null} args.footerData - Global footer widget data, or null.
+ * @param {object} args.projectData - Project object for the item template's `project` context.
+ * @param {string} args.siteUrl - Site URL for canonical/og resolution ("" in preview).
+ * @returns {Promise<{ html: string, mainContentHtml: string, itemPageData: object, resolvedItem: object }>}
+ */
+async function renderCollectionItemPage({
+  projectId,
+  schema,
+  item,
+  template,
+  rawThemeSettings,
+  renderMode,
+  sharedGlobals,
+  headerData,
+  footerData,
+  projectData,
+  siteUrl,
+}) {
+  // Resolve `menu`-type item settings the same way widgets do, when the maps are
+  // present. Both real callers always set them; stay null-safe for any other.
+  const menuDeps =
+    sharedGlobals.menuMaps || sharedGlobals.collectionItemsByUuid
+      ? { menuMaps: sharedGlobals.menuMaps, collectionItemsByUuid: sharedGlobals.collectionItemsByUuid }
+      : null;
+
+  // Resolve item links at the layout's depth + sanitize (render gate, finding #2).
+  const resolvedItem = prepareCollectionItemForRender(
+    item,
+    schema,
+    sharedGlobals.pagesByUuid,
+    sharedGlobals.outputPathPrefix,
+    menuDeps,
+  );
+
+  // Render header/footer with the item's globals so their enqueued assets are
+  // captured before the layout emits them.
+  let headerContent = "";
+  let footerContent = "";
+  if (headerData) {
+    headerContent = await renderWidget(projectId, "header", headerData, rawThemeSettings, renderMode, sharedGlobals, null);
+  }
+  if (footerData) {
+    footerContent = await renderWidget(projectId, "footer", footerData, rawThemeSettings, renderMode, sharedGlobals, null);
+  }
+
+  // Page-shaped object drives the layout title/SEO/body class. Built BEFORE the
+  // template render so the item template receives the documented page/collection/
+  // project context, not just item (finding #5).
+  const itemPageData = buildCollectionItemPageData(schema, resolvedItem, siteUrl);
+  const baseContext = await createBaseRenderContext(projectId, rawThemeSettings, renderMode, sharedGlobals);
+  const mainContentHtml = await renderLiquidTemplate(
+    projectId,
+    template,
+    { ...baseContext, item: resolvedItem, collection: schema, page: itemPageData, project: projectData },
+    sharedGlobals,
+  );
+
+  const html = await renderPageLayout(
+    projectId,
+    {
+      headerContent,
+      mainContent: mainContentHtml,
+      footerContent,
+      // Item-specific body class so a `.page-{slug}` index rule never leaks here.
+      bodyClass: `collection-${schema.type} item-${resolvedItem.slug}`,
+    },
+    itemPageData,
+    rawThemeSettings,
+    renderMode,
+    sharedGlobals,
+  );
+
+  return { html, mainContentHtml, itemPageData, resolvedItem };
+}
+
+/**
  * Render enqueued asset tags from sharedGlobals into HTML.
  * Used by renderSingleWidget so that dynamically enqueued assets
  * are included in the morph response and picked up by the preview runtime.
@@ -891,6 +997,7 @@ export {
   renderWidget,
   renderPageLayout,
   renderLiquidTemplate,
+  renderCollectionItemPage,
   createBaseRenderContext,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,

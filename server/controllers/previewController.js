@@ -12,8 +12,7 @@ import {
   renderPageLayout,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
-  renderLiquidTemplate,
-  createBaseRenderContext,
+  renderCollectionItemPage,
 } from "../services/renderingService.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
@@ -22,8 +21,6 @@ import { generateToken, getToken } from "../services/previewTokenStore.js";
 import {
   getCollectionSchema,
   loadCollectionTemplate,
-  prepareCollectionItemForRender,
-  buildCollectionItemPageData,
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
 import { loadMenuMaps } from "../services/menuResolver.js";
@@ -347,7 +344,6 @@ export async function createCollectionPreviewToken(req, res) {
     // settings (finding #10). Shared with the widget path via menuResolver.
     const menuMaps = await loadMenuMaps(folder);
     const collectionItemsByUuid = await loadCollectionItemsByUuid(folder);
-    const menuDeps = { menuMaps, collectionItemsByUuid };
 
     // Draft item assembled from the (unsaved) form values.
     const safeSlug = (slug && String(slug)) || "preview";
@@ -382,42 +378,23 @@ export async function createCollectionPreviewToken(req, res) {
       currentCanonicalPath: `${schema.slugPrefix}/${safeSlug}.html`,
     };
 
-    const resolvedItem = prepareCollectionItemForRender(draftItem, schema, pagesByUuid, "", menuDeps);
-
-    let headerContent = "";
-    let footerContent = "";
-    if (headerData) {
-      headerContent = await renderWidget(activeProjectId, "header", headerData, rawThemeSettings, "preview", sharedGlobals, null);
-    }
-    if (footerData) {
-      footerContent = await renderWidget(activeProjectId, "footer", footerData, rawThemeSettings, "preview", sharedGlobals, null);
-    }
-
-    // Page-shaped object built BEFORE the template render so the item template
-    // receives the documented page/collection/project context, not just item (#5).
-    const itemPageData = buildCollectionItemPageData(schema, resolvedItem, "");
     const projectData = projectRepo.getProjectById(activeProjectId);
-    const baseContext = await createBaseRenderContext(activeProjectId, rawThemeSettings, "preview", sharedGlobals);
-    const mainContent = await renderLiquidTemplate(
-      activeProjectId,
+    // One shared pipeline renders the item page — header/footer + resolved item +
+    // template + layout — identical to the export path (finding #2). The
+    // preview-specific token injection below stays here.
+    let { html } = await renderCollectionItemPage({
+      projectId: activeProjectId,
+      schema,
+      item: draftItem,
       template,
-      { ...baseContext, item: resolvedItem, collection: schema, page: itemPageData, project: projectData },
-      sharedGlobals,
-    );
-
-    let html = await renderPageLayout(
-      activeProjectId,
-      {
-        headerContent,
-        mainContent,
-        footerContent,
-        bodyClass: `collection-${schema.type} item-${safeSlug}`,
-      },
-      itemPageData,
       rawThemeSettings,
-      "preview",
+      renderMode: "preview",
       sharedGlobals,
-    );
+      headerData,
+      footerData,
+      projectData,
+      siteUrl: "",
+    });
 
     html = injectBaseTag(html);
     html = injectRuntimeScript(html, "standalone");
