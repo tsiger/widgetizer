@@ -163,19 +163,24 @@ export default function CollectionItemForm({
     }
   }, [titleValue, isNew, setValue]);
 
-  // Reset the form when switching to a different item.
-  const prevKeyRef = useRef(initialData.slug);
+  // Re-baseline the form whenever the loaded item changes — both when switching
+  // to a different item AND after a save, which returns fresh server values under
+  // the same slug. Keyed on a snapshot of initialData (not just the slug): a
+  // same-slug save must re-run reset() so react-hook-form's isDirty clears,
+  // otherwise it stays stuck `true` and a later edit can't flip it back, leaving
+  // the save button permanently disabled. Mirrors PageForm.
+  const prevSnapshotRef = useRef(JSON.stringify(initialData));
   useEffect(() => {
-    if (prevKeyRef.current !== initialData.slug) {
-      reset({
-        slug: initialData.slug || "",
-        settings: initialData.settings || {},
-        seo: seoDefaults(initialData.seo),
-      });
-      setArchived(initialData._archived || {});
-      prevKeyRef.current = initialData.slug;
-    }
-  }, [initialData.slug, initialData.settings, initialData.seo, initialData._archived, reset]);
+    const snapshot = JSON.stringify(initialData);
+    if (prevSnapshotRef.current === snapshot) return;
+    prevSnapshotRef.current = snapshot;
+    reset({
+      slug: initialData.slug || "",
+      settings: initialData.settings || {},
+      seo: seoDefaults(initialData.seo),
+    });
+    setArchived(initialData._archived || {});
+  }, [initialData, reset]);
 
   const effectiveValue = (setting) => {
     const v = settingsValues[setting.id];
