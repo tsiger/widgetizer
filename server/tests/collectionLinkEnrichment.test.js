@@ -30,6 +30,7 @@ const {
   cleanupDeletedCollectionItemReferences,
   enrichNewProjectReferences,
   remapDuplicatedProjectUuids,
+  remapCollectionItemLinkRefs,
 } = await import("../utils/linkEnrichment.js");
 const { updateCollectionItemMediaUsage } = await import("../services/mediaUsageService.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
@@ -77,6 +78,17 @@ async function writePage(slug, uuid) {
     uuid,
     widgets: {},
   });
+}
+async function writePageWidgets(slug, uuid, widgets) {
+  await fs.outputJSON(path.join(getProjectPagesDir(PROJECT_FOLDER), `${slug}.json`), {
+    id: slug,
+    slug,
+    uuid,
+    widgets,
+  });
+}
+async function readPage(slug) {
+  return fs.readJSON(path.join(getProjectPagesDir(PROJECT_FOLDER), `${slug}.json`));
 }
 async function writeMenu(menuId, items, uuid = `menu-${menuId}`) {
   await fs.outputJSON(path.join(getProjectMenusDir(PROJECT_FOLDER), `${menuId}.json`), {
@@ -148,6 +160,32 @@ describe("cleanupDeletedCollectionItemReferences — menu refs (#11)", () => {
     assert.equal(menu.items[0].link, "");
     assert.equal(menu.items[1].link, "");
   });
+
+  it("clears a widget link setting pointing at the deleted item", async () => {
+    await writePageWidgets("home", "page-home", {
+      w1: {
+        type: "hero",
+        settings: {
+          cta: { collectionType: "rooms", collectionItemUuid: "item-suite", href: "rooms/suite.html", text: "Suite", target: "_self" },
+          keep: { collectionItemUuid: "item-villa", href: "rooms/villa.html", text: "Villa", target: "_self" },
+        },
+      },
+    });
+    await cleanupDeletedCollectionItemReferences(PROJECT_FOLDER, "item-suite");
+    const page = await readPage("home");
+    assert.deepEqual(page.widgets.w1.settings.cta, { href: "", text: "", target: "_self" });
+    assert.equal(page.widgets.w1.settings.keep.collectionItemUuid, "item-villa"); // untouched
+  });
+
+  it("clears a collection-item link setting pointing at the deleted item", async () => {
+    await writeItem("portfolio", "alpha", {
+      title: "Alpha",
+      related: { collectionType: "rooms", collectionItemUuid: "item-suite", href: "rooms/suite.html", text: "Suite", target: "_self" },
+    });
+    await cleanupDeletedCollectionItemReferences(PROJECT_FOLDER, "item-suite");
+    const item = await readItem("portfolio", "alpha");
+    assert.deepEqual(item.settings.related, { href: "", text: "", target: "_self" });
+  });
 });
 
 describe("enrichNewProjectReferences — collection items", () => {
@@ -192,5 +230,44 @@ describe("remapDuplicatedProjectUuids — collection items", () => {
     const menu = await readMenu("main");
     assert.notEqual(item.uuid, "item-suite"); // item uuid regenerated
     assert.equal(menu.items[0].collectionItemUuid, item.uuid); // menu ref remapped to new uuid
+  });
+
+  it("remaps a widget link setting's collectionItemUuid to the item's new uuid (#11)", async () => {
+    await writeItem("rooms", "suite", { title: "Suite" }); // uuid item-suite
+    await writePageWidgets("home", "page-home", {
+      w1: {
+        type: "hero",
+        settings: { cta: { collectionType: "rooms", collectionItemUuid: "item-suite", href: "rooms/suite.html", text: "Suite", target: "_self" } },
+      },
+    });
+
+    await remapDuplicatedProjectUuids(PROJECT_FOLDER);
+
+    const item = await readItem("rooms", "suite");
+    const page = await readPage("home");
+    assert.notEqual(item.uuid, "item-suite"); // item uuid regenerated
+    assert.equal(page.widgets.w1.settings.cta.collectionItemUuid, item.uuid); // widget ref remapped
+  });
+});
+
+describe("remapCollectionItemLinkRefs — preset link refs (#11)", () => {
+  it("remaps widget + collection-item link collectionItemUuid via the map", async () => {
+    await writePageWidgets("home", "page-home", {
+      w1: {
+        type: "hero",
+        settings: { cta: { collectionType: "rooms", collectionItemUuid: "old-uuid", href: "rooms/suite.html", text: "Suite", target: "_self" } },
+      },
+    });
+    await writeItem("portfolio", "alpha", {
+      title: "Alpha",
+      related: { collectionType: "rooms", collectionItemUuid: "old-uuid", href: "rooms/suite.html", text: "Suite", target: "_self" },
+    });
+
+    await remapCollectionItemLinkRefs(PROJECT_FOLDER, new Map([["old-uuid", "new-uuid"]]));
+
+    const page = await readPage("home");
+    const item = await readItem("portfolio", "alpha");
+    assert.equal(page.widgets.w1.settings.cta.collectionItemUuid, "new-uuid");
+    assert.equal(item.settings.related.collectionItemUuid, "new-uuid");
   });
 });

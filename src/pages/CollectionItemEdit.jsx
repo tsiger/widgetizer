@@ -11,6 +11,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { getCollectionSchema, getCollectionItem, updateCollectionItem } from "../queries/collectionManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function CollectionItemEdit() {
@@ -58,6 +59,7 @@ export default function CollectionItemEdit() {
       const savedName = updated?.title || schema?.displayName || type;
       const activeProject = useProjectStore.getState().activeProject;
       invalidateMediaCache(activeProject?.id);
+      invalidateLinkTargetsCache(activeProject?.id);
 
       if (updated.slug !== slug) {
         navigateSafely(`/collections/${type}/${updated.slug}/edit`, { replace: true });

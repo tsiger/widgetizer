@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import { ChevronDown } from "lucide-react";
 
 export default function Combobox({ options, value, onChange, placeholder }) {
@@ -88,18 +88,30 @@ export default function Combobox({ options, value, onChange, placeholder }) {
       {isOpen && (
         <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
           {filteredOptions.length > 0 ? (
-            filteredOptions.map((option) => (
-              <li
-                key={option.value}
-                onClick={() => handleOptionClick(option)}
-                className="relative cursor-default select-none py-2 pl-3 pr-9 text-slate-900 hover:bg-slate-100"
-              >
-                <span className="block truncate">{option.label}</span>
-              </li>
-            ))
+            // Options may carry an optional `group`; render a header above the
+            // first option of each group. Ungrouped options render flat (no-op).
+            filteredOptions.map((option, idx) => {
+              const showHeader =
+                option.group && (idx === 0 || filteredOptions[idx - 1].group !== option.group);
+              return (
+                <Fragment key={option.value}>
+                  {showHeader && (
+                    <li className="select-none px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      {option.group}
+                    </li>
+                  )}
+                  <li
+                    onClick={() => handleOptionClick(option)}
+                    className="relative cursor-default select-none py-2 pl-3 pr-9 text-slate-900 hover:bg-slate-100"
+                  >
+                    <span className="block truncate">{option.label}</span>
+                  </li>
+                </Fragment>
+              );
+            })
           ) : (
             <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-slate-500">
-              No matching pages found. Type to add a custom link.
+              No matching results. Type to add a custom link.
             </li>
           )}
         </ul>

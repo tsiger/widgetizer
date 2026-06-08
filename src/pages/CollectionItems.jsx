@@ -22,6 +22,7 @@ import {
 import useCollections from "../hooks/useCollections";
 import useCollectionItems from "../hooks/useCollectionItems";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
@@ -116,6 +117,7 @@ export default function CollectionItems() {
 
   const afterMutation = () => {
     invalidateMediaCache(activeProject?.id);
+    invalidateLinkTargetsCache(activeProject?.id);
     refetchItems();
   };
 

@@ -7,6 +7,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { createPage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function PagesAdd() {
@@ -29,6 +30,7 @@ export default function PagesAdd() {
       const activeProject = useProjectStore.getState().activeProject;
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
+        invalidateLinkTargetsCache(activeProject.id);
       }
 
       navigateSafely("/pages");

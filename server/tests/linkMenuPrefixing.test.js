@@ -37,6 +37,40 @@ describe("resolveLinkValue — depth-aware pageUuid href", () => {
   });
 });
 
+const collectionItemsByUuid = new Map([["item-1", { slugPrefix: "portfolio", slug: "alpha" }]]);
+
+describe("resolveLinkValue — depth-aware collectionItemUuid href (#11 parity)", () => {
+  it("resolves collectionItemUuid to slugPrefix/slug.html at the root", () => {
+    const out = resolveLinkValue(
+      { collectionItemUuid: "item-1", collectionType: "portfolio", text: "Alpha" },
+      pagesByUuid,
+      "",
+      collectionItemsByUuid,
+    );
+    assert.equal(out.href, "portfolio/alpha.html");
+  });
+
+  it("prefixes the resolved item href at depth-1", () => {
+    const out = resolveLinkValue(
+      { collectionItemUuid: "item-1", text: "Alpha" },
+      pagesByUuid,
+      "../",
+      collectionItemsByUuid,
+    );
+    assert.equal(out.href, "../portfolio/alpha.html");
+  });
+
+  it("clears a deleted-item link", () => {
+    const out = resolveLinkValue(
+      { collectionItemUuid: "missing", text: "Gone" },
+      pagesByUuid,
+      "../",
+      collectionItemsByUuid,
+    );
+    assert.deepEqual(out, { href: "", text: "", target: "_self" });
+  });
+});
+
 describe("resolveMenuItemLinks — link prefixing + canonicalPath", () => {
   it("pageUuid item: root link un-prefixed, canonicalPath set", () => {
     const [item] = resolveMenuItemLinks([{ pageUuid: "uuid-about", label: "About" }], pagesByUuid, "");

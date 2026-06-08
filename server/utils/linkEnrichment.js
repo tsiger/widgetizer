@@ -50,6 +50,7 @@ function transformWidgetSettings(widgetData, valueTransformer) {
  * write back pages that were modified. Skips header/footer types.
  */
 async function updatePageWidgets(pagesDir, widgetProcessor) {
+  if (!(await fs.pathExists(pagesDir))) return;
   const pageFiles = await fs.readdir(pagesDir);
   for (const pageFile of pageFiles) {
     if (!pageFile.endsWith(".json")) continue;
@@ -389,9 +390,15 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 
   // Step 4: Remap widget references in pages and global widgets
   const remapValue = (value) => {
-    if (isLinkObject(value) && value.pageUuid) {
-      const newUuid = oldToNewUuid.get(value.pageUuid);
-      return newUuid ? { ...value, pageUuid: newUuid } : value;
+    if (isLinkObject(value)) {
+      if (value.pageUuid) {
+        const newUuid = oldToNewUuid.get(value.pageUuid);
+        return newUuid ? { ...value, pageUuid: newUuid } : value;
+      }
+      if (value.collectionItemUuid) {
+        const newItemUuid = oldToNewItemUuid.get(value.collectionItemUuid);
+        return newItemUuid ? { ...value, collectionItemUuid: newItemUuid } : value;
+      }
     }
     if (typeof value === "string" && oldToNewMenuUuid.has(value)) {
       return oldToNewMenuUuid.get(value);
@@ -483,11 +490,12 @@ export async function cleanupDeletedPageReferences(
 }
 
 /**
- * Clean up menu references to deleted collection item page(s) (#11). Clears the
- * link and drops the stable-ref fields (`collectionItemUuid`/`collectionType`)
- * on any menu item pointing at a deleted item. Only menus carry this reference —
- * widget/collection-item link fields point at pages, not items — so only menus
- * are walked.
+ * Clean up references to deleted collection item page(s) (#11) across the project:
+ * menu items, widget/block `link` settings (pages + globals), and collection-item
+ * `link` settings. Clears the link and drops the stable-ref fields
+ * (`collectionItemUuid`/`collectionType`) on anything pointing at a deleted item.
+ * Render-time resolution already clears dead refs; this prunes them from disk so
+ * they never re-surface (parity with `cleanupDeletedPageReferences`).
  * @param {string} projectFolderName - The project folder name
  * @param {string|string[]|Set<string>} deletedItemUuids - uuid(s) of deleted items
  */
@@ -498,9 +506,23 @@ export async function cleanupDeletedCollectionItemReferences(projectFolderName, 
       : new Set(Array.isArray(deletedItemUuids) ? deletedItemUuids : [deletedItemUuids]);
   if (uuids.size === 0) return;
 
+  const pagesDir = getProjectPagesDir(projectFolderName);
   const menusDir = getProjectMenusDir(projectFolderName);
-  if (!(await fs.pathExists(menusDir))) return;
 
+  // Clear widget/block + collection-item `link` settings pointing at a deleted item.
+  const cleanValue = (value) => {
+    if (isLinkObject(value) && value.collectionItemUuid && uuids.has(value.collectionItemUuid)) {
+      return { href: "", text: "", target: "_self" };
+    }
+    return value;
+  };
+  const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
+  await updatePageWidgets(pagesDir, widgetProcessor);
+  await updateGlobalWidgets(pagesDir, widgetProcessor);
+  await updateCollectionItems(projectFolderName, (item) => transformItemSettings(item, cleanValue));
+
+  // Clear menu items pointing at a deleted item (keep the item, drop the ref).
+  if (!(await fs.pathExists(menusDir))) return;
   const menuFiles = await fs.readdir(menusDir);
   for (const menuFile of menuFiles) {
     if (!menuFile.endsWith(".json")) continue;
@@ -557,4 +579,29 @@ export async function remapCollectionItemMenuRefs(projectFolderName, oldToNewIte
       await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
     }
   }
+}
+
+/**
+ * Remap collection-item `collectionItemUuid` references in widget/block and
+ * collection-item `link` settings using an old->new item-uuid map. The link-field
+ * analogue of `remapCollectionItemMenuRefs`, run after preset seeding regenerates
+ * item uuids so a preset's link targets point at the freshly seeded items (#11).
+ * @param {string} projectFolderName - The project folder name
+ * @param {Map<string,string>} oldToNewItemUuid - source uuid -> seeded uuid
+ */
+export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewItemUuid) {
+  if (!oldToNewItemUuid || oldToNewItemUuid.size === 0) return;
+  const pagesDir = getProjectPagesDir(projectFolderName);
+
+  const remapValue = (value) => {
+    if (isLinkObject(value) && value.collectionItemUuid) {
+      const next = oldToNewItemUuid.get(value.collectionItemUuid);
+      if (next) return { ...value, collectionItemUuid: next };
+    }
+    return value;
+  };
+  const widgetProcessor = (widget) => transformWidgetSettings(widget, remapValue);
+  await updatePageWidgets(pagesDir, widgetProcessor);
+  await updateGlobalWidgets(pagesDir, widgetProcessor);
+  await updateCollectionItems(projectFolderName, (item) => transformItemSettings(item, remapValue));
 }

@@ -9,6 +9,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { getCollectionSchema, createCollectionItem } from "../queries/collectionManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 
 export default function CollectionItemAdd() {
@@ -49,6 +50,7 @@ export default function CollectionItemAdd() {
 
       const activeProject = useProjectStore.getState().activeProject;
       invalidateMediaCache(activeProject?.id);
+      invalidateLinkTargetsCache(activeProject?.id);
 
       navigateSafely(`/collections/${type}`);
       return true;

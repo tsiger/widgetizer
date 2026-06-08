@@ -133,19 +133,40 @@ function isLinkObject(value) {
   return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
 }
 
+/** True when a schema declares at least one `link`-type setting. */
+function schemaHasLinkSetting(schema) {
+  return Array.isArray(schema?.settings) && schema.settings.some((s) => s.type === "link");
+}
+
 /**
- * Resolve a single link object's pageUuid to current slug.
- * If pageUuid exists but page is deleted, clears the link.
- * @param {object} linkValue - The link object { pageUuid?, href, text, target }
+ * Resolve a single link object's pageUuid/collectionItemUuid to its current slug.
+ * If the referenced page or collection item is deleted, clears the link.
+ * @param {object} linkValue - The link object { pageUuid?, collectionItemUuid?, collectionType?, href, text, target }
  * @param {Map} pagesByUuid - Map of uuid -> page data
+ * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
+ * @param {Map} [collectionItemsByUuid] - Map of item uuid -> { slugPrefix, slug }
  * @returns {object} Resolved link object
  */
-function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "") {
+function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
   if (!linkValue || typeof linkValue !== "object") {
     return linkValue;
   }
 
-  const { pageUuid } = linkValue;
+  const { pageUuid, collectionItemUuid } = linkValue;
+
+  // Stable reference to a collection item page (#11 parity): resolve its current
+  // slug so renames follow and deletes clear the link, mirroring pageUuid/menus.
+  if (collectionItemUuid) {
+    const entry = collectionItemsByUuid && collectionItemsByUuid.get(collectionItemUuid);
+    if (entry) {
+      return {
+        ...linkValue,
+        href: prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix),
+      };
+    }
+    // Collection item was deleted - clear the link
+    return { href: "", text: "", target: "_self" };
+  }
 
   // If no pageUuid, this is a custom URL - pass through unchanged
   if (!pageUuid) {
@@ -153,7 +174,7 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "") {
   }
 
   // Look up the page by uuid
-  const page = pagesByUuid.get(pageUuid);
+  const page = pagesByUuid?.get(pageUuid);
 
   if (page) {
     // Page exists - update href to current slug, depth-aware for nested pages
@@ -179,8 +200,10 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "") {
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {object} Widget data with resolved links
  */
-function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "") {
-  if (!widgetData || !pagesByUuid || pagesByUuid.size === 0) {
+function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
+  const pagesEmpty = !pagesByUuid || pagesByUuid.size === 0;
+  const itemsEmpty = !collectionItemsByUuid || collectionItemsByUuid.size === 0;
+  if (!widgetData || (pagesEmpty && itemsEmpty)) {
     return widgetData;
   }
 
@@ -191,7 +214,7 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "") 
   if (resolved.settings && typeof resolved.settings === "object") {
     for (const [key, value] of Object.entries(resolved.settings)) {
       if (isLinkObject(value)) {
-        resolved.settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix);
+        resolved.settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
       }
     }
   }
@@ -202,7 +225,7 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "") 
       if (block && block.settings && typeof block.settings === "object") {
         for (const [key, value] of Object.entries(block.settings)) {
           if (isLinkObject(value)) {
-            resolved.blocks[blockId].settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix);
+            resolved.blocks[blockId].settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
           }
         }
       }
@@ -429,16 +452,22 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
       const outputPathPrefix = globals.outputPathPrefix || "";
       const pagesByUuid = globals.pagesByUuid || new Map();
 
-      // Resolve `menu`-type settings on items (finding #10) the same way widgets
-      // do. Load the maps lazily (cached on globals) only when the schema
-      // actually declares a menu setting, so menu-less collections pay no I/O.
+      // Resolve `menu`- and `link`-type settings on items the same way widgets do.
+      // Load lazily (cached on globals): the collection-item map whenever the
+      // schema uses a `menu` OR `link` setting (both can target items), and the
+      // menu maps only for `menu` settings — so plain collections pay no I/O.
       let menuDeps = null;
-      if (schemaHasMenuSetting(schema)) {
-        if (!globals.menuMaps) globals.menuMaps = await loadMenuMaps(collectionProjectFolder);
+      if (schemaHasMenuSetting(schema) || schemaHasLinkSetting(schema)) {
         if (!globals.collectionItemsByUuid) {
           globals.collectionItemsByUuid = await loadCollectionItemsByUuid(collectionProjectFolder);
         }
-        menuDeps = { menuMaps: globals.menuMaps, collectionItemsByUuid: globals.collectionItemsByUuid };
+        if (schemaHasMenuSetting(schema) && !globals.menuMaps) {
+          globals.menuMaps = await loadMenuMaps(collectionProjectFolder);
+        }
+        menuDeps = {
+          menuMaps: globals.menuMaps || new Map(),
+          collectionItemsByUuid: globals.collectionItemsByUuid,
+        };
       }
 
       const excluded = items.filter((item) => item.invalid);
@@ -621,6 +650,12 @@ async function renderWidget(
       schemaHasMenuSetting(schema) ||
       Object.values(blockSchemas).some((bs) => Array.isArray(bs) && bs.some((s) => s.type === "menu"));
 
+    // Whether the widget (or its blocks) has any `link` setting — drives loading
+    // the collection-item map so collectionItemUuid link targets resolve (#11 parity).
+    const hasLinkSettings =
+      schemaHasLinkSetting(schema) ||
+      Object.values(blockSchemas).some((bs) => Array.isArray(bs) && bs.some((s) => s.type === "link"));
+
     // Load menu maps (UUID + slug) — cached in sharedGlobals across widgets.
     let menuMaps;
     if (sharedGlobals && sharedGlobals.menuMaps) {
@@ -630,10 +665,10 @@ async function renderWidget(
       if (sharedGlobals) sharedGlobals.menuMaps = menuMaps;
     }
 
-    // Collection item pages used as stable menu targets (#11). Built only when
-    // this widget has menu settings, cached across widgets in sharedGlobals.
+    // Collection item pages used as stable targets (#11) — for menu settings AND
+    // link settings. Loaded once and cached across widgets in sharedGlobals.
     let collectionItemsByUuid = new Map();
-    if (hasMenuSettings) {
+    if (hasMenuSettings || hasLinkSettings) {
       if (sharedGlobals && sharedGlobals.collectionItemsByUuid) {
         collectionItemsByUuid = sharedGlobals.collectionItemsByUuid;
       } else {
@@ -656,6 +691,7 @@ async function renderWidget(
       { settings: enhancedSettings, blocks: enhancedBlocks },
       pagesByUuid,
       outputPathPrefix,
+      collectionItemsByUuid,
     );
 
     // Sanitize settings based on schema types (text, richtext, link, etc.)

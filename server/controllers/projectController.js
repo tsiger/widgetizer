@@ -30,6 +30,7 @@ import {
   enrichNewProjectReferences,
   remapDuplicatedProjectUuids,
   remapCollectionItemMenuRefs,
+  remapCollectionItemLinkRefs,
 } from "../utils/linkEnrichment.js";
 import { processTemplatesRecursive } from "../utils/templateHelpers.js";
 
@@ -89,9 +90,11 @@ export async function seedPresetCollections(folderName, presetCollectionsDir) {
     }
   }
 
-  // Preset menus may ship stable collection-item references against the preset's
-  // source uuids; remap them to the freshly seeded uuids so the links resolve (#11).
+  // Preset menus and widget/item `link` settings may ship stable collection-item
+  // references against the preset's source uuids; remap them to the freshly seeded
+  // uuids so the links resolve (#11).
   await remapCollectionItemMenuRefs(folderName, oldToNewItemUuid);
+  await remapCollectionItemLinkRefs(folderName, oldToNewItemUuid);
 }
 
 /**

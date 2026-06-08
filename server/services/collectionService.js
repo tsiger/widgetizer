@@ -954,8 +954,17 @@ function isLinkObject(value) {
   return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
 }
 
-function resolveLink(linkValue, pagesByUuid, outputPathPrefix) {
-  const { pageUuid } = linkValue;
+function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null) {
+  const { pageUuid, collectionItemUuid } = linkValue;
+  // Stable reference to a collection item page (#11 parity): resolve its current
+  // slug so renames follow and deletes clear the link.
+  if (collectionItemUuid) {
+    const entry = collectionItemsByUuid && collectionItemsByUuid.get(collectionItemUuid);
+    if (!entry) {
+      return { href: "", text: "", target: "_self" }; // item deleted — clear the link
+    }
+    return { ...linkValue, href: prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix) };
+  }
   if (!pageUuid) {
     // Custom URL — depth-prefix internal-looking hrefs, leave the rest as-is.
     return { ...linkValue, href: prefixInternalHref(linkValue.href, outputPathPrefix) };
@@ -978,12 +987,12 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix) {
  * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
  * @returns {object} resolved clone
  */
-export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix) {
+export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null) {
   if (!item?.settings) return item;
   const resolved = JSON.parse(JSON.stringify(item));
   for (const [key, value] of Object.entries(resolved.settings)) {
     if (isLinkObject(value)) {
-      resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix);
+      resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
     }
   }
   return resolved;
@@ -1011,7 +1020,9 @@ export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix) 
  * @returns {object} resolved + sanitized clone
  */
 export function prepareCollectionItemForRender(item, schema, pagesByUuid, outputPathPrefix, menuDeps = null) {
-  const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix);
+  // Forward the collection-item map so `link` settings that target another
+  // collection item resolve (and clear on delete), parity with pageUuid (#11).
+  const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, menuDeps?.collectionItemsByUuid || null);
   // Resolve menu-type settings the same way widgets do (shared menuResolver), so
   // an item template gets a full menu object instead of a raw UUID string.
   if (menuDeps && menuDeps.menuMaps && resolved && resolved.settings) {

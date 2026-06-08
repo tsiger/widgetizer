@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Palette, Pencil, Trash2, Copy, Search, Check, FileText, CirclePlus, MoreVertical } from "lucide-react";
 import { getAllPages, deletePage, duplicatePage, bulkDeletePages } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
@@ -41,6 +42,7 @@ export default function Pages() {
       }
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
+        invalidateLinkTargetsCache(activeProject.id);
       }
       loadPages();
     } catch (error) {
@@ -134,6 +136,7 @@ export default function Pages() {
       // Invalidate media cache since the duplicate may reference the same images
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
+        invalidateLinkTargetsCache(activeProject.id);
       }
     } catch (error) {
       console.error("Error duplicating page:", error);

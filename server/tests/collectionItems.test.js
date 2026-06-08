@@ -673,6 +673,24 @@ describe("resolveCollectionItemLinks", () => {
     resolveCollectionItemLinks(item2, pagesByUuid, "../");
     assert.equal(item2.settings.cta.href, "contact.html");
   });
+
+  it("resolves a collectionItemUuid link to the item's current slug, depth-prefixed (#11)", () => {
+    const collectionItemsByUuid = new Map([["item-1", { slugPrefix: "rooms", slug: "suite" }]]);
+    const item = {
+      settings: { related: { collectionType: "rooms", collectionItemUuid: "item-1", href: "", text: "Suite", target: "_self" } },
+    };
+    const out = resolveCollectionItemLinks(item, pagesByUuid, "../", collectionItemsByUuid);
+    assert.equal(out.settings.related.href, "../rooms/suite.html");
+    assert.equal(out.settings.related.text, "Suite"); // other fields preserved
+  });
+
+  it("clears a link whose collection item was deleted (#11)", () => {
+    const item = {
+      settings: { related: { collectionType: "rooms", collectionItemUuid: "gone", href: "", text: "X", target: "_self" } },
+    };
+    const out = resolveCollectionItemLinks(item, pagesByUuid, "../", new Map());
+    assert.deepEqual(out.settings.related, { href: "", text: "", target: "_self" });
+  });
 });
 
 // ============================================================================

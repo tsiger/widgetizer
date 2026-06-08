@@ -1,121 +1,71 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 
-import { getAllPages } from "../../../queries/pageManager";
+import useLinkTargets from "../../../hooks/useLinkTargets";
+import { resolveStoredLink } from "../../../utils/linkValueResolver";
 import TextInput from "./TextInput";
 import CheckboxInput from "./CheckboxInput";
 import SettingsField from "../SettingsField";
 import Combobox from "../../ui/Combobox";
 
 export default function LinkInput({ id, value = {}, onChange, setting }) {
-  const [pages, setPages] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Pages + collection item pages, grouped, loaded once per project.
+  const { options, loading } = useLinkTargets();
 
-  useEffect(() => {
-    async function fetchPages() {
-      try {
-        const allPages = await getAllPages();
-        setPages(allPages);
-      } catch (error) {
-        console.error("Failed to load pages:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchPages();
-  }, []);
-
-  // Build combobox options using uuid as value
-  const pageOptions = useMemo(() => {
-    return pages.map((p) => ({ value: p.uuid, label: p.name }));
-  }, [pages]);
-
-  // Create lookup maps for uuid -> page and slug -> page
-  const pagesByUuid = useMemo(() => {
+  // value (uuid) -> option, for resolving the current selection.
+  const optionsByUuid = useMemo(() => {
     const map = new Map();
-    pages.forEach((p) => map.set(p.uuid, p));
+    options.forEach((o) => map.set(o.value, o));
     return map;
-  }, [pages]);
+  }, [options]);
 
-  const pagesBySlug = useMemo(() => {
+  // slug -> page option, to recognize legacy hrefs that match a page.
+  const pageOptionBySlug = useMemo(() => {
     const map = new Map();
-    pages.forEach((p) => map.set(p.slug, p));
+    options.forEach((o) => {
+      if (o.isPage) map.set(o.slug, o);
+    });
     return map;
-  }, [pages]);
+  }, [options]);
 
-  // Resolve the current value - if pageUuid exists, check if page still exists
-  // Also try to match by slug for legacy links without pageUuid
-  const resolvedValue = useMemo(() => {
-    if (isLoading) {
-      return value; // Don't resolve while loading
-    }
+  // Resolve the stored value to a display-ready shape (pure helper, unit-tested):
+  // stable refs get a live href from the target's current slug, and a ref that is
+  // absent from the (possibly stale/partial) options is preserved — never
+  // inferred-deleted — so editing text/target can't drop a still-valid ref.
+  const resolvedValue = useMemo(
+    () => resolveStoredLink(value, optionsByUuid, pageOptionBySlug, loading),
+    [value, optionsByUuid, pageOptionBySlug, loading],
+  );
 
-    const { pageUuid, href = "", text = "", target = "_self" } = value;
-
-    // If we have a pageUuid, look up the page
-    if (pageUuid) {
-      const page = pagesByUuid.get(pageUuid);
-      if (page) {
-        // Page exists - derive href from current slug
-        return {
-          pageUuid,
-          href: `${page.slug}.html`,
-          text,
-          target,
-        };
-      } else {
-        // Page was deleted - clear the link
-        return {
-          href: "",
-          text: "",
-          target: "_self",
-        };
-      }
-    }
-
-    // No pageUuid - try to match by slug (for legacy links or initial load)
-    // Extract slug from href if it looks like an internal page link
-    if (href && href.endsWith(".html") && !href.includes("://") && !href.startsWith("#")) {
-      const slug = href.replace(".html", "");
-      const page = pagesBySlug.get(slug);
-      if (page) {
-        // Found a matching page - return with pageUuid so combobox shows page name
-        return {
-          pageUuid: page.uuid,
-          href,
-          text,
-          target,
-        };
-      }
-    }
-
-    // Custom URL or no match - pass through as-is
-    return { href, text, target };
-  }, [value, pagesByUuid, pagesBySlug, isLoading]);
-
-  // Handle combobox selection - could be a uuid or custom text
+  // On select: store the matching stable ref, always clearing the other two.
   const handleLinkChange = useCallback(
     (selectedValue) => {
-      // Check if the selected value matches a page uuid
-      const page = pagesByUuid.get(selectedValue);
-
-      if (page) {
-        // User selected an internal page
+      const opt = optionsByUuid.get(selectedValue);
+      if (opt?.isPage) {
         onChange({
           ...resolvedValue,
-          pageUuid: page.uuid,
-          href: `${page.slug}.html`,
+          pageUuid: opt.value,
+          collectionType: undefined,
+          collectionItemUuid: undefined,
+          href: `${opt.slug}.html`,
+        });
+      } else if (opt?.isCollectionItem) {
+        onChange({
+          ...resolvedValue,
+          pageUuid: undefined,
+          collectionType: opt.collectionType,
+          collectionItemUuid: opt.value,
+          href: `${opt.slugPrefix}/${opt.slug}.html`,
         });
       } else {
-        // User typed a custom URL - remove pageUuid if present
-         
-        const { pageUuid: _pageUuid, ...rest } = resolvedValue;
-        onChange({
-          ...rest,
-          href: selectedValue,
-        });
+        // Custom URL — drop any stable refs.
+        const rest = { ...resolvedValue };
+        delete rest.pageUuid;
+        delete rest.collectionItemUuid;
+        delete rest.collectionType;
+        onChange({ ...rest, href: selectedValue });
       }
     },
-    [pagesByUuid, resolvedValue, onChange],
+    [optionsByUuid, resolvedValue, onChange],
   );
 
   const handleFieldChange = useCallback(
@@ -125,19 +75,26 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
     [resolvedValue, onChange],
   );
 
-  const { href = "", text = "", target = "_self", pageUuid } = resolvedValue;
+  const { href = "", text = "", target = "_self", pageUuid, collectionItemUuid } = resolvedValue;
   const openInNewTab = target === "_blank";
   const hideText = Boolean(setting?.hide_text);
 
-  // Determine combobox value: use pageUuid if we have one (for internal pages), otherwise href
-  const comboboxValue = pageUuid || href;
+  // Drive the combobox by the ref's uuid only when its option is loaded (so the
+  // label resolves); otherwise fall back to the stored href, so a transient stale
+  // cache shows a path rather than a raw uuid — and never drops the underlying ref.
+  const selectedRefUuid = pageUuid || collectionItemUuid;
+  const comboboxValue = selectedRefUuid && optionsByUuid.has(selectedRefUuid) ? selectedRefUuid : href;
 
   return (
     <div className="space-y-4 rounded-md border border-slate-200 bg-slate-50 p-4">
       {/* Href Input with Combobox */}
-      <SettingsField id={`${id}-href`} label="Link URL" description="Select a page or enter a custom URL.">
+      <SettingsField
+        id={`${id}-href`}
+        label="Link URL"
+        description="Select a page or collection item, or enter a custom URL."
+      >
         <Combobox
-          options={pageOptions}
+          options={options}
           value={comboboxValue}
           onChange={handleLinkChange}
           placeholder="Select a page or type a URL..."
