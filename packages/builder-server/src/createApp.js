@@ -5,17 +5,7 @@ import helmet from "helmet";
 
 import errorHandler from "./middleware/errorHandler.js";
 import { getThemesDir, STATIC_DIST_DIR, STATIC_UTILS_DIR } from "./config.js";
-
-import projectRoutes from "./routes/projects.js";
-import themeRoutes from "./routes/themes.js";
-import pagesRoutes from "./routes/pages.js";
-import menusRoutes from "./routes/menus.js";
-import mediaRoutes from "./routes/media.js";
-import previewRoutes from "./routes/preview.js";
-import exportRoutes from "./routes/export.js";
-import appSettingsRoutes from "./routes/appSettings.js";
-import coreRoutes from "./routes/core.js";
-import { renderPreviewToken } from "./controllers/previewController.js";
+import { setupBuilderServer } from "./setupBuilderServer.js";
 
 function applySharedMiddleware(app) {
   app.use(cors());
@@ -32,19 +22,18 @@ function applySharedMiddleware(app) {
   );
 }
 
-function mountEditorApiRoutes(app) {
+function mountEditorApiRoutes(app, { adapters, plugins } = {}) {
   // JSON body parsing is applied per-router (not globally) so that the page
   // content save route can use a higher limit. See middleware/jsonParser.js.
+  const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderServer({
+    adapters,
+    plugins,
+  });
 
-  app.use("/api/projects", projectRoutes);
-  app.use("/api/themes", themeRoutes);
-  app.use("/api/pages", pagesRoutes);
-  app.use("/api/preview", previewRoutes);
-  app.use("/api/menus", menusRoutes);
-  app.use("/api/media", mediaRoutes);
-  app.use("/api/export", exportRoutes);
-  app.use("/api/settings", appSettingsRoutes);
-app.use("/api/core", coreRoutes);
+  // OSS mounts both scoped routers under /api, reproducing today's URLs
+  // (/api/projects, /api/pages, ...).
+  app.use("/api", actorScopedRouter);
+  app.use("/api", projectScopedRouter);
 
   // Serve theme assets (screenshots) from themes directory
   app.use("/themes", express.static(getThemesDir()));
@@ -53,7 +42,7 @@ app.use("/api/core", coreRoutes);
   app.use("/runtime", express.static(STATIC_UTILS_DIR));
 
   // Token-based preview rendering (MUST be before production catch-all)
-  app.get("/render/:token", renderPreviewToken);
+  app.use("/", previewRouter);
 
   // Health check endpoint
   app.get("/health", (req, res) => {
@@ -84,7 +73,7 @@ function mountEditorUiRoutes(app) {
  *   attaching is inert until then.)
  * @returns {Promise<import('express').Express>} Configured Express app (call .listen() yourself)
  */
-export async function createEditorApp({ adapters } = {}) {
+export async function createEditorApp({ adapters, plugins = [] } = {}) {
   const app = express();
 
   if (process.env.NODE_ENV === "production") {
@@ -100,7 +89,7 @@ export async function createEditorApp({ adapters } = {}) {
     });
   }
 
-  mountEditorApiRoutes(app);
+  mountEditorApiRoutes(app, { adapters, plugins });
   mountEditorUiRoutes(app);
   app.use(errorHandler);
 
