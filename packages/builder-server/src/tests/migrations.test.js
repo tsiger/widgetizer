@@ -54,7 +54,7 @@ describe("runMigrations", () => {
     runMigrations(db);
 
     assert.ok(tableExists(db, DEFAULT_TRACKING_TABLE));
-    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1]);
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1, 2]);
     db.close();
   });
 
@@ -68,7 +68,7 @@ describe("runMigrations", () => {
     }
     // ...tracked under the custom name only.
     assert.ok(tableExists(db, "_widgetizer_migrations"));
-    assert.deepEqual(appliedVersions(db, "_widgetizer_migrations"), [1]);
+    assert.deepEqual(appliedVersions(db, "_widgetizer_migrations"), [1, 2]);
     assert.equal(tableExists(db, DEFAULT_TRACKING_TABLE), false);
     db.close();
   });
@@ -79,7 +79,7 @@ describe("runMigrations", () => {
     // Second run must not throw (e.g. CREATE TABLE projects again) or re-insert.
     runMigrations(db);
 
-    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1]);
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1, 2]);
     db.close();
   });
 
@@ -89,6 +89,37 @@ describe("runMigrations", () => {
       () => runMigrations(db, { trackingTable: "_migrations; DROP TABLE projects" }),
       /Invalid trackingTable name/,
     );
+    db.close();
+  });
+
+  it("v2 adds owner_id to projects, defaulting to 'default'", () => {
+    const db = new Database(":memory:");
+    runMigrations(db);
+
+    db.prepare(
+      "INSERT INTO projects (id, folder_name, name, created, updated) VALUES ('p1','f1','P1','t','t')",
+    ).run();
+    const row = db.prepare("SELECT owner_id FROM projects WHERE id = 'p1'").get();
+    assert.equal(row.owner_id, "default");
+    db.close();
+  });
+
+  it("v2 upgrade preserves existing rows, backfilling owner_id = 'default'", () => {
+    // Simulate a v1 database: projects table without owner_id, v1 recorded as
+    // applied, and a pre-existing row.
+    const db = new Database(":memory:");
+    db.exec(`
+      CREATE TABLE projects (id TEXT PRIMARY KEY, folder_name TEXT NOT NULL, name TEXT);
+      CREATE TABLE _migrations (version INTEGER PRIMARY KEY, description TEXT, applied_at TEXT);
+    `);
+    db.prepare("INSERT INTO _migrations (version, description) VALUES (1, 'init')").run();
+    db.prepare("INSERT INTO projects (id, folder_name, name) VALUES ('old','of','Old')").run();
+
+    runMigrations(db); // applies only v2
+
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1, 2]);
+    const row = db.prepare("SELECT owner_id FROM projects WHERE id = 'old'").get();
+    assert.equal(row.owner_id, "default");
     db.close();
   });
 });

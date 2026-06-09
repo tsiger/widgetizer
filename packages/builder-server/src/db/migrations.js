@@ -80,6 +80,17 @@ const migrations = [
       `);
     },
   },
+  {
+    version: 2,
+    description: "Add owner_id to projects",
+    up(db) {
+      // Opaque owner string (no FK to a users table): OSS sets 'default',
+      // hosted sets the Clerk user id. NOT NULL DEFAULT avoids any
+      // NULL-means-anyone ambiguity; existing rows inherit 'default'.
+      db.exec("ALTER TABLE projects ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'default'");
+      db.exec("CREATE INDEX idx_projects_owner_id ON projects(owner_id)");
+    },
+  },
 ];
 
 export const DEFAULT_TRACKING_TABLE = "_migrations";
