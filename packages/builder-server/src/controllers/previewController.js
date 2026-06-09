@@ -1,20 +1,15 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
+import { getProjectDir, CORE_WIDGETS_DIR, LOCALES_DIR } from "../config.js";
 import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getSetting } from "../db/repositories/settingsRepository.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import { renderWidget, renderPageLayout, renderEnqueuedAssetTags, widgetSupportsTransparentHeader } from "../services/renderingService.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // Inject the runtime script and base tag into rendered HTML
 function injectRuntimeScript(html, previewMode = "editor") {
@@ -115,7 +110,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
 
     try {
       const userLocale = getSetting("general.language") || "en";
-      const localePath = path.join(__dirname, `../../src/locales/${userLocale}.json`);
+      const localePath = path.join(LOCALES_DIR, `${userLocale}.json`);
       if (await fs.pathExists(localePath)) {
         const localeData = JSON.parse(await fs.readFile(localePath, "utf-8"));
         emptyStateTitle = localeData?.preview?.emptyState?.title || emptyStateTitle;

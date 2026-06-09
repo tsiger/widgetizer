@@ -11,7 +11,7 @@
   "main": "electron/main.js",
   "exports": {
     ".": "./src/main.jsx",
-    "./server": "./server/createApp.js"
+    "./server": "./packages/builder-server/src/createApp.js"
   },
   "engines": {
     "node": ">=20.19.5"
@@ -19,20 +19,20 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src server packages",
+    "lint": "eslint src packages",
     "lint:electron": "eslint electron",
     "lint:all": "eslint .",
     "preview": "vite preview",
     "predev:all": "npm rebuild better-sqlite3 && npm run validate:all-locales",
-    "server": "nodemon server/index.js",
-    "start": "node server/index.js",
+    "server": "nodemon packages/builder-server/src/index.js",
+    "start": "node packages/builder-server/src/index.js",
     "dev:frontend": "wait-on http://localhost:3001/health && npm run dev",
     "dev:all": "concurrently \"npm run server\" \"npm run dev:frontend\"",
     "start:prod": "cross-env NODE_ENV=production npm start",
     "preelectron:dev": "npm rebuild better-sqlite3 && npm run validate:all-locales",
     "electron:dev": "concurrently -k \"cross-env NODE_ENV=development npm run server\" \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 ELECTRON_DISABLE_INTERNAL_SERVER=1 VITE_DEV_SERVER_URL=http://localhost:3000 electron .\"",
-    "test": "node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
-    "test:verbose": "VERBOSE=1 node --test --test-reporter ./server/tests/reporter.js server/tests/*.test.js",
+    "test": "node --test --test-reporter ./packages/builder-server/src/tests/reporter.js packages/builder-server/src/tests/*.test.js",
+    "test:verbose": "VERBOSE=1 node --test --test-reporter ./packages/builder-server/src/tests/reporter.js packages/builder-server/src/tests/*.test.js",
     "test:frontend": "vitest run",
     "theme:sync": "node scripts/theme-sync.js",
     "preset:sync": "node scripts/preset-sync.js",

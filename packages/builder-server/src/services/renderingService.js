@@ -1,12 +1,10 @@
 import { Liquid } from "liquidjs";
 import fs from "fs/promises";
 import path from "path";
-import { getProjectDir, CORE_WIDGETS_DIR } from "../config.js";
+import { getProjectDir, CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { listProjectPagesData } from "../controllers/pageController.js";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import {
   ThemeSettingsTag,
   AssetTag,
@@ -32,10 +30,7 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { sanitizeWidgetData } from "./sanitizationService.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const coreSnippetsDir = path.join(__dirname, "../../src/core/snippets");
+const coreSnippetsDir = CORE_SNIPPETS_DIR;
 
 // Cache for LiquidJS engines, keyed by project directory path
 const engineCache = new Map();

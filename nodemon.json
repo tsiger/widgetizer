@@ -1,4 +1,4 @@
 {
   "ignore": ["data/*", "data/**/*"],
-  "watch": ["src/", "server/"]
+  "watch": ["packages/builder-server/src/", "packages/core/src/"]
 }

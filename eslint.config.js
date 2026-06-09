@@ -37,9 +37,9 @@ export default [
       "react/prop-types": "off",
     },
   },
-  // Server (Express backend)
+  // Server (Express backend) — now the @widgetizer/builder-server package
   {
-    files: ["server/**/*.js"],
+    files: ["packages/builder-server/src/**/*.js"],
     languageOptions: {
       globals: globals.node,
       parserOptions: {
@@ -52,10 +52,11 @@ export default [
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
-  // Shared packages (@widgetizer/*) — code consumed by both the React
-  // frontend and the Node backend, so allow both global sets.
+  // Shared packages (@widgetizer/core) — code consumed by both the React
+  // frontend and the Node backend, so allow both global sets. The Node-only
+  // builder-server package is linted by the server block above.
   {
-    files: ["packages/**/*.{js,jsx}"],
+    files: ["packages/core/**/*.{js,jsx}"],
     languageOptions: {
       globals: {
         ...globals.node,

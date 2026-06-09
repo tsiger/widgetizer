@@ -13,18 +13,15 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { Liquid } from "liquidjs";
 
 import { buildFormsManifest } from "../services/formsManifestService.js";
 import { registerHandleizeFilter } from "@widgetizer/core";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// src/core/widgets still lives at the repo root; tests run with cwd = repo root.
 const WIDGET_LIQUID_PATH = join(
-  __dirname,
-  "..",
-  "..",
+  process.cwd(),
   "src",
   "core",
   "widgets",

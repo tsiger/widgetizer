@@ -3,8 +3,8 @@ import fs from "fs-extra";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { v4 as uuidv4 } from "uuid";
-import { processTemplatesRecursive } from "../server/utils/templateHelpers.js";
-import { enrichNewProjectReferences } from "../server/utils/linkEnrichment.js";
+import { processTemplatesRecursive } from "../packages/builder-server/src/utils/templateHelpers.js";
+import { enrichNewProjectReferences } from "../packages/builder-server/src/utils/linkEnrichment.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(__dirname, "..");

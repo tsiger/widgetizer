@@ -23,6 +23,13 @@ export const THEMES_SEED_DIR = process.env.THEMES_ROOT
 
 export const CORE_WIDGETS_DIR = path.join(APP_ROOT, "src", "core", "widgets");
 
+// Core Liquid snippets (read via fs during rendering) and the frontend locale
+// files (read via fs for preview empty-states). Both live at the repo root, so
+// they are resolved from APP_ROOT — not relative to this file, which now lives
+// inside packages/builder-server/.
+export const CORE_SNIPPETS_DIR = path.join(APP_ROOT, "src", "core", "snippets");
+export const LOCALES_DIR = path.join(APP_ROOT, "src", "locales");
+
 // Static paths — served via express.static() or res.sendFile(), so must be real files on disk.
 // In packaged Electron builds these are unpacked from the asar archive.
 export const STATIC_DIST_DIR = path.join(UNPACKED_ROOT, "dist");
