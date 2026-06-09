@@ -167,7 +167,7 @@ function startServer() {
 
   const isDev = getIsDev();
   // Server files live inside app.asar
-  const serverEntry = path.join(appRoot, "packages", "builder-server", "src", "index.js");
+  const serverEntry = path.join(appRoot, "electron", "server-bootstrap.js");
 
   log(`Starting server from: ${serverEntry}`);
   log(`Server will use DATA_ROOT: ${dataRoot}`);

@@ -5,7 +5,8 @@
   "type": "module",
   "main": "./src/index.js",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./env": "./src/env.js"
   },
   "dependencies": {
     "@widgetizer/core": "*"

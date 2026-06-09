@@ -77,9 +77,14 @@ function mountEditorUiRoutes(app) {
 /**
  * Create and configure an Express app for the Widgetizer editor.
  *
+ * @param {{ adapters?: object }} [options] - Adapter set (scope resolver,
+ *   storage, asset storage, publish, limits) constructed by the shell. When
+ *   provided, the adapters are attached to every request as `req.adapters` so
+ *   handlers can use them. (Handlers are migrated to use them incrementally;
+ *   attaching is inert until then.)
  * @returns {Promise<import('express').Express>} Configured Express app (call .listen() yourself)
  */
-export async function createEditorApp() {
+export async function createEditorApp({ adapters } = {}) {
   const app = express();
 
   if (process.env.NODE_ENV === "production") {
@@ -87,6 +92,14 @@ export async function createEditorApp() {
   }
 
   applySharedMiddleware(app);
+
+  if (adapters) {
+    app.use((req, _res, next) => {
+      req.adapters = adapters;
+      next();
+    });
+  }
+
   mountEditorApiRoutes(app);
   mountEditorUiRoutes(app);
   app.use(errorHandler);
