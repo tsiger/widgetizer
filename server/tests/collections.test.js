@@ -292,6 +292,81 @@ describe("validateCollectionSchema — disallowed v1 constructs", () => {
 });
 
 // ============================================================================
+// validateCollectionSchema — table columns (v1: text-only)
+// ============================================================================
+
+describe("validateCollectionSchema — table columns", () => {
+  const withTable = (columns) =>
+    validSchema({
+      settings: [
+        { type: "text", id: "title", label: "Title", usedAsTitle: true },
+        { type: "table", id: "rates", label: "Rates", columns },
+      ],
+    });
+
+  it("accepts a table with valid text columns", () => {
+    const result = validateCollectionSchema(
+      withTable([
+        { id: "label", type: "text", label: "Season" },
+        { id: "price", type: "text", label: "Price" },
+      ]),
+      "portfolio",
+    );
+    assert.equal(result.valid, true, result.errors.join("; "));
+  });
+
+  it("rejects a table with missing/empty columns", () => {
+    assert.equal(validateCollectionSchema(withTable([]), "portfolio").valid, false);
+    assert.equal(validateCollectionSchema(withTable(undefined), "portfolio").valid, false);
+  });
+
+  it("rejects a non-allowlist column type (number until added, gallery/richtext)", () => {
+    for (const type of ["number", "gallery", "richtext"]) {
+      const result = validateCollectionSchema(withTable([{ id: "c", type, label: "C" }]), "portfolio");
+      assert.equal(result.valid, false, `expected column type "${type}" rejected`);
+      assert.ok(result.errors.some((e) => /column type/i.test(e)));
+    }
+  });
+
+  it("rejects duplicate column ids", () => {
+    const result = validateCollectionSchema(
+      withTable([
+        { id: "x", type: "text", label: "X" },
+        { id: "x", type: "text", label: "X2" },
+      ]),
+      "portfolio",
+    );
+    assert.equal(result.valid, false);
+    assert.ok(result.errors.some((e) => /duplicate/i.test(e)));
+  });
+
+  it("rejects reserved / non-pattern column ids", () => {
+    for (const id of ["__proto__", "constructor", "prototype", "", "1bad", "has space", "a-b"]) {
+      const result = validateCollectionSchema(withTable([{ id, type: "text", label: "X" }]), "portfolio");
+      assert.equal(result.valid, false, `expected invalid column id ${JSON.stringify(id)} rejected`);
+    }
+  });
+
+  it("rejects usedAsTitle on a table (must be a text setting)", () => {
+    const result = validateCollectionSchema(
+      validSchema({
+        settings: [
+          {
+            type: "table",
+            id: "rates",
+            label: "Rates",
+            usedAsTitle: true,
+            columns: [{ id: "label", type: "text", label: "L" }],
+          },
+        ],
+      }),
+      "portfolio",
+    );
+    assert.equal(result.valid, false);
+  });
+});
+
+// ============================================================================
 // listCollectionSchemas — filesystem read, skip-invalid, slugPrefix uniqueness
 // ============================================================================
 

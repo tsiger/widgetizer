@@ -222,17 +222,12 @@
             </ul>
           {% endif %}
 
-          {% if item.settings.rates != blank %}
+          {% if item.settings.rates.size > 0 %}
             <div class="aside-divider"></div>
             <span class="aside-title">Pricing</span>
             <table class="rates-table">
-              {%- assign rate_lines = item.settings.rates | strip | split: '
-' -%}
-              {% for line in rate_lines %}
-                {% assign cells = line | split: '|' %}
-                {% if cells.size > 0 and cells[0] != blank %}
-                  <tr><td>{{ cells[0] | strip }}</td><td>{{ cells[1] | strip }}</td></tr>
-                {% endif %}
+              {% for r in item.settings.rates %}
+                <tr><td>{{ r.label }}</td><td>{{ r.price }}</td></tr>
               {% endfor %}
             </table>
             {% if item.settings.rates_note != blank %}<p class="rates-note">{{ item.settings.rates_note }}</p>{% endif %}

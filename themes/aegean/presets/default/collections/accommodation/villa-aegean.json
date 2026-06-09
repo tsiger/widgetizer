@@ -33,7 +33,20 @@
     "amenity_room_service": true,
     "amenity_spa": true,
     "amenity_parking": true,
-    "rates": "Low season (Apr–May, Oct) | €540\nMid season (Jun, Sep) | €720\nHigh season (Jul–Aug) | €980",
+    "rates": [
+      {
+        "label": "Low season (Apr–May, Oct)",
+        "price": "€540"
+      },
+      {
+        "label": "Mid season (Jun, Sep)",
+        "price": "€720"
+      },
+      {
+        "label": "High season (Jul–Aug)",
+        "price": "€980"
+      }
+    ],
     "rates_note": "Rates include breakfast and all taxes. Minimum 4 nights in high season.",
     "book_label": "Check availability",
     "book_link": {

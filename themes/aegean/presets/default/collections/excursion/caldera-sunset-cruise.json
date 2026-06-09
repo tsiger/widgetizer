@@ -34,7 +34,20 @@
     "incl_equipment": true,
     "incl_photos": false,
     "incl_insurance": true,
-    "rates": "Adult | €85\nChild (4–12) | €45\nPrivate group (up to 8) | €640",
+    "rates": [
+      {
+        "label": "Adult",
+        "price": "€85"
+      },
+      {
+        "label": "Child (4–12)",
+        "price": "€45"
+      },
+      {
+        "label": "Private group (up to 8)",
+        "price": "€640"
+      }
+    ],
     "rates_note": "Prices include taxes and dinner. Free for infants under 4. Minimum 2 guests to confirm.",
     "book_label": "Book this excursion",
     "book_link": {

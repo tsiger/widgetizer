@@ -34,7 +34,20 @@
     "incl_equipment": false,
     "incl_photos": true,
     "incl_insurance": true,
-    "rates": "Per person | €95\nNon-drinker | €55\nPrivate group (up to 6) | €520",
+    "rates": [
+      {
+        "label": "Per person",
+        "price": "€95"
+      },
+      {
+        "label": "Non-drinker",
+        "price": "€55"
+      },
+      {
+        "label": "Private group (up to 6)",
+        "price": "€520"
+      }
+    ],
     "rates_note": "Includes 12 tastings and food pairings. Guests must be 18+ to taste. Minimum 2 guests to confirm.",
     "book_label": "Book this excursion",
     "book_link": {

@@ -74,11 +74,18 @@
 
     { "type": "header", "id": "rates_header", "label": "Pricing tiers" },
     {
-      "type": "textarea",
+      "type": "table",
       "id": "rates",
       "label": "Pricing table",
-      "description": "One row per line, formatted as: Tier | Price per person",
-      "default": "Adult | €85\nChild (4–12) | €45\nPrivate group (up to 8) | €640"
+      "columns": [
+        { "id": "label", "type": "text", "label": "Tier" },
+        { "id": "price", "type": "text", "label": "Price" }
+      ],
+      "default": [
+        { "label": "Adult", "price": "€85" },
+        { "label": "Child (4–12)", "price": "€45" },
+        { "label": "Private group (up to 8)", "price": "€640" }
+      ]
     },
     { "type": "text", "id": "rates_note", "label": "Pricing note", "default": "Prices include taxes. Free for infants under 4. Minimum 2 guests to confirm." },
 

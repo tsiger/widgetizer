@@ -439,6 +439,48 @@ The value is a plain `string[]` — loop it directly (no special tag) and resolv
 
 `{% image %}` resolves each path (depth-aware path + media metadata for alt/title) exactly as for a single `image`. Image **alt/title/caption** come from the media record; if a theme wants to display the caption, resolve it from the path with the `media_meta` filter (e.g. `{{ img | media_meta: 'caption' }}`).
 
+### Table
+
+A uniform **repeating-row** field: an ordered list of rows, each with a fixed set of typed **columns** declared in the schema. The author adds / reorders / deletes rows; the user fills each cell in a proper input — no delimiters. Currently a **collection-type** field (v1). **v1 column type: `text` only** (more types are added incrementally).
+
+```json
+{
+  "type": "table",
+  "id": "rates",
+  "label": "Rates",
+  "columns": [
+    { "id": "label", "type": "text", "label": "Season" },
+    { "id": "price", "type": "text", "label": "Price" }
+  ]
+}
+```
+
+The stored value is an **ordered array of row objects**, keyed by column `id`:
+
+```json
+"rates": [
+  { "label": "Low season", "price": "€320" },
+  { "label": "High season", "price": "€560" }
+]
+```
+
+- Each column is a mini setting definition (`id`, `type`, `label`). Column `id`s must be unique, match `^[a-zA-Z][a-zA-Z0-9_]*$`, and not be reserved keys (`__proto__`/`constructor`/`prototype`) — they become row-object keys and Liquid accessors.
+- Empty value is `[]`; row order is authored (drag-to-reorder), preserved on save. Blank rows are never committed; sanitization drops any row whose declared cells are all blank (after `trim`) and strips undeclared keys. A `required` table counts as missing until ≥1 row has a non-blank cell in a declared column.
+
+**Usage in Templates:**
+
+Loop the rows and read cells by column id:
+
+```liquid
+<table>
+  {% for r in item.settings.rates %}
+    <tr><td>{{ r.label }}</td><td>{{ r.price }}</td></tr>
+  {% endfor %}
+</table>
+```
+
+All cells are autoescaped strings.
+
 ### File
 
 A file asset selector for downloadable documents (currently PDF). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.

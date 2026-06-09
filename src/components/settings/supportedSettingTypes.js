@@ -25,6 +25,7 @@ export const SUPPORTED_SETTING_TYPES = [
   "menu",
   "image",
   "gallery",
+  "table",
   "file",
   "link",
   "youtube",

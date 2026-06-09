@@ -18,7 +18,19 @@ import CollectionItemPreview from "./CollectionItemPreview";
 const HEADER_TYPE = "header";
 
 /** A value counts as "missing" for a required field. Mirrors the backend rule. */
-function isMissingValue(value) {
+function isMissingValue(value, setting) {
+  if (setting?.type === "table") {
+    // Column-aware (matches the backend): missing unless a row has a non-blank string in a
+    // declared column. A generic `length === 0` would count a row of stale keys as present.
+    const columns = Array.isArray(setting.columns) ? setting.columns : [];
+    if (!Array.isArray(value) || columns.length === 0) return true;
+    // "Present" must match the sanitizer: a cell counts only if it's a non-blank string
+    // (non-strings sanitize to "", so a number-only row renders empty and isn't "present").
+    return !value.some(
+      (row) =>
+        row && typeof row === "object" && columns.some((c) => typeof row[c.id] === "string" && row[c.id].trim() !== ""),
+    );
+  }
   if (value === undefined || value === null) return true;
   if (typeof value === "string") return value.trim() === "";
   if (Array.isArray(value)) return value.length === 0;
@@ -200,7 +212,7 @@ export default function CollectionItemForm({
   const validateRequired = () => {
     const nextErrors = {};
     for (const setting of fieldSettings) {
-      if (setting.required && isMissingValue(effectiveValue(setting))) {
+      if (setting.required && isMissingValue(effectiveValue(setting), setting)) {
         nextErrors[setting.id] = t("collectionsForm.fieldRequired");
       }
     }

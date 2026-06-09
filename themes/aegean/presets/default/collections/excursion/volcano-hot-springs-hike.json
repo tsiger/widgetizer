@@ -34,7 +34,20 @@
     "incl_equipment": true,
     "incl_photos": false,
     "incl_insurance": true,
-    "rates": "Adult | €55\nChild (6–12) | €30\nPrivate group (up to 8) | €420",
+    "rates": [
+      {
+        "label": "Adult",
+        "price": "€55"
+      },
+      {
+        "label": "Child (6–12)",
+        "price": "€30"
+      },
+      {
+        "label": "Private group (up to 8)",
+        "price": "€420"
+      }
+    ],
     "rates_note": "Sturdy shoes required. Park entry fee included. Minimum 2 guests to confirm.",
     "book_label": "Book this excursion",
     "book_link": {

@@ -223,6 +223,79 @@ describe("gallery field", () => {
 });
 
 // ============================================================================
+// table field — defaults & required (column-aware, normalize + build)
+// ============================================================================
+
+describe("table field", () => {
+  const tableCols = [
+    { id: "label", type: "text" },
+    { id: "price", type: "text" },
+  ];
+  const requiredTableSchema = () =>
+    portfolioSchema({
+      settings: [
+        { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+        { type: "table", id: "rates", label: "Rates", required: true, columns: tableCols },
+      ],
+    });
+
+  it("normalizeCollectionItem fills a missing table to []", () => {
+    const schema = portfolioSchema({
+      settings: [
+        { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+        { type: "table", id: "rates", label: "Rates", columns: tableCols }, // optional
+      ],
+    });
+    const n = normalizeCollectionItem(itemFile("alpha", { settings: { title: "Alpha" } }), schema);
+    assert.deepEqual(n.settings.rates, []);
+    assert.equal(n.invalid, false);
+  });
+
+  it("flags a required table that is empty, all-empty, whitespace-only, or undeclared-only (column-aware)", () => {
+    const schema = requiredTableSchema();
+    const invalidCases = {
+      a: [],
+      b: [{ label: "", price: "" }],
+      c: [{ label: " ", price: "  " }], // whitespace-only
+      d: [{ bogus: "x" }], // only an undeclared key
+      n: [{ price: 99 }], // number-only cell — sanitizer blanks it, so it must not satisfy required
+    };
+    for (const [slug, rates] of Object.entries(invalidCases)) {
+      const n = normalizeCollectionItem(itemFile(slug, { settings: { title: slug.toUpperCase(), rates } }), schema);
+      assert.equal(n.invalid, true, `expected ${JSON.stringify(rates)} to be missing`);
+    }
+  });
+
+  it("accepts a required table with at least one declared non-blank cell", () => {
+    const n = normalizeCollectionItem(
+      itemFile("e", { settings: { title: "E", rates: [{ label: "Low", price: "€10" }] } }),
+      requiredTableSchema(),
+    );
+    assert.equal(n.invalid, false);
+    assert.deepEqual(n.validationErrors, []);
+  });
+
+  it("buildCollectionItemData throws when a required table has no declared non-blank cell", () => {
+    assert.throws(
+      () =>
+        buildCollectionItemData(requiredTableSchema(), {
+          slug: "x",
+          settings: { title: "X", rates: [{ label: " ", price: "" }] },
+        }),
+      (err) => err.name === "CollectionValidationError",
+    );
+  });
+
+  it("buildCollectionItemData succeeds and stores a valid table", () => {
+    const { item } = buildCollectionItemData(requiredTableSchema(), {
+      slug: "y",
+      settings: { title: "Y", rates: [{ label: "Low", price: "€10" }] },
+    });
+    assert.deepEqual(item.settings.rates, [{ label: "Low", price: "€10" }]);
+  });
+});
+
+// ============================================================================
 // listCollectionItems
 // ============================================================================
 

@@ -31,6 +31,45 @@ const RESERVED_SLUG_PREFIXES = new Set(["assets"]);
 // v1 constructs that must be rejected, not silently ignored (Section 1).
 const DISALLOWED_SETTING_KEYS = ["multiple", "repeater", "blocks"];
 
+// `table` column types allowed in v1 (text-only; grows incrementally). A Set, not a
+// hard-coded check, so adding a type later is one entry here + its cell wiring.
+const ALLOWED_TABLE_COLUMN_TYPES = new Set(["text"]);
+// Column ids become row-object keys AND Liquid accessors, so they must be simple and safe.
+const TABLE_COLUMN_ID_RE = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+const RESERVED_COLUMN_IDS = new Set(["__proto__", "constructor", "prototype"]);
+
+/**
+ * Validate a `table` setting's `columns` (shape only; cell-value integrity is the sanitizer's
+ * job). Pushes errors into `errors`. v1: non-empty columns array, each with a unique safe `id`
+ * and a `type` in ALLOWED_TABLE_COLUMN_TYPES.
+ */
+function validateTableColumns(setting, where, errors) {
+  if (!Array.isArray(setting.columns) || setting.columns.length === 0) {
+    errors.push(`${where} (id "${setting.id}") table requires a non-empty \`columns\` array.`);
+    return;
+  }
+  const seen = new Set();
+  setting.columns.forEach((col, ci) => {
+    const cw = `${where}.columns[${ci}]`;
+    if (!col || typeof col !== "object") {
+      errors.push(`${cw} must be an object.`);
+      return;
+    }
+    if (typeof col.id !== "string" || !TABLE_COLUMN_ID_RE.test(col.id) || RESERVED_COLUMN_IDS.has(col.id)) {
+      errors.push(`${cw} has an invalid \`id\` (must match ${TABLE_COLUMN_ID_RE} and not be a reserved key).`);
+    } else if (seen.has(col.id)) {
+      errors.push(`${cw} has a duplicate column id "${col.id}".`);
+    } else {
+      seen.add(col.id);
+    }
+    if (typeof col.type !== "string" || !ALLOWED_TABLE_COLUMN_TYPES.has(col.type)) {
+      errors.push(
+        `${cw} uses unsupported column type "${col.type}" (allowed: ${[...ALLOWED_TABLE_COLUMN_TYPES].join(", ")}).`,
+      );
+    }
+  });
+}
+
 /**
  * Validate and normalize a single collection-type schema (Section 1 rules).
  * Pure function — no filesystem.
@@ -79,6 +118,9 @@ export function validateCollectionSchema(schema, folderName) {
         if (key in setting) {
           errors.push(`${where} (id "${setting.id}") uses \`${key}\`, which is invalid in v1.`);
         }
+      }
+      if (setting.type === "table") {
+        validateTableColumns(setting, where, errors);
       }
       if (setting.usedAsTitle === true && setting.type !== "header") {
         titleSettings.push(setting);
@@ -277,6 +319,7 @@ function emptyDefaultForType(type) {
     case "link":
       return { href: "", target: "_self" };
     case "gallery":
+    case "table":
       return [];
     default:
       return "";
@@ -284,7 +327,21 @@ function emptyDefaultForType(type) {
 }
 
 /** Whether a required field's value should count as missing (flags invalid). */
-function isMissingValue(value, type) {
+function isMissingValue(value, type, columns) {
+  if (type === "table") {
+    // Column-aware: missing unless some row has a non-blank string in a DECLARED column.
+    // Runs on raw (un-sanitized) data, so inspect only declared column ids — stale/unknown
+    // keys (which the sanitizer drops) must not satisfy required. "Present" must match the
+    // sanitizer: a v1 cell survives only if it's a non-blank STRING (non-strings → ""), so a
+    // number-only row like [{ price: 99 }] renders empty and must NOT satisfy required.
+    if (!Array.isArray(value) || !Array.isArray(columns)) return true;
+    return !value.some(
+      (row) =>
+        row &&
+        typeof row === "object" &&
+        columns.some((col) => typeof row[col.id] === "string" && row[col.id].trim() !== ""),
+    );
+  }
   if (type === "gallery") {
     // gallery is a string[] of upload paths. Missing unless at least one entry is a
     // valid upload path. Reuses sanitizeImagePath so "valid path" is consistent across
@@ -374,7 +431,7 @@ export function normalizeCollectionItem(rawItem, schema) {
         ? setting.default
         : emptyDefaultForType(setting.type);
     settings[setting.id] = value;
-    if (setting.required && isMissingValue(value, setting.type)) {
+    if (setting.required && isMissingValue(value, setting.type, setting.columns)) {
       validationErrors.push({ fieldId: setting.id, reason: "required field is empty" });
     }
   }
@@ -649,7 +706,7 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
       value = s.default !== undefined ? s.default : emptyDefaultForType(s.type);
     }
     settings[s.id] = value;
-    if (s.required && isMissingValue(value, s.type)) {
+    if (s.required && isMissingValue(value, s.type, s.columns)) {
       validationErrors.push({ fieldId: s.id, reason: "required field is empty" });
     }
   }

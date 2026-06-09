@@ -118,6 +118,45 @@ function sanitizeGalleryValue(value) {
   return value.map((entry) => sanitizeImagePath(entry)).filter((src) => src !== "");
 }
 
+/** Normalize one table cell by its column type. v1: `text` only (string-or-""). Future column
+ *  types delegate to their existing sanitizer here; `text` needs explicit handling because
+ *  `sanitizeSettingValue` does not coerce text (it's autoescape-safe and returned untouched). */
+function sanitizeTableCell(cell, type) {
+  switch (type) {
+    case "text":
+    default:
+      return typeof cell === "string" ? cell : "";
+  }
+}
+
+/**
+ * Sanitize a `table` value: an ordered array of row objects keyed by declared column id.
+ * Each row is rebuilt from the schema's columns only — unknown/stale keys are dropped, so a
+ * `__proto__`/`constructor` key smuggled into stored row data is never read or copied (no
+ * prototype pollution; declared column ids are validated safe at schema time). Each cell is
+ * normalized by its column type, and fully-empty rows (every declared cell blank after trim)
+ * are dropped, like the gallery's blank-entry filter. Non-array (or missing columns) → [].
+ * @param {*} value
+ * @param {Array<{id: string, type: string}>} columns
+ * @returns {Array<object>}
+ */
+function sanitizeTableValue(value, columns) {
+  if (!Array.isArray(value) || !Array.isArray(columns)) return [];
+  const rows = [];
+  for (const row of value) {
+    if (!row || typeof row !== "object" || Array.isArray(row)) continue;
+    const cleanRow = {};
+    let hasContent = false;
+    for (const col of columns) {
+      const cell = sanitizeTableCell(row[col.id], col.type);
+      cleanRow[col.id] = cell;
+      if (String(cell).trim() !== "") hasContent = true;
+    }
+    if (hasContent) rows.push(cleanRow);
+  }
+  return rows;
+}
+
 /**
  * Sanitize a single setting value based on its schema-declared type.
  * Only richtext and link types need active sanitization:
@@ -408,11 +447,20 @@ export function sanitizeWidgetData(resolvedWidgetData, schema) {
 export function sanitizeCollectionItemData(item, schema) {
   if (!item || !item.settings || !schema) return;
 
-  const typeMap = buildTypeMap(schema.settings);
+  // id -> setting (not just type): a `table` needs its column defs to sanitize cells per column.
+  const settingMap = new Map();
+  if (Array.isArray(schema.settings)) {
+    for (const s of schema.settings) {
+      if (s.id && s.type) settingMap.set(s.id, s);
+    }
+  }
   for (const [key, value] of Object.entries(item.settings)) {
-    const type = typeMap.get(key);
-    if (type) {
-      item.settings[key] = sanitizeSettingValue(value, type);
+    const setting = settingMap.get(key);
+    if (!setting) continue;
+    if (setting.type === "table") {
+      item.settings[key] = sanitizeTableValue(value, setting.columns);
+    } else {
+      item.settings[key] = sanitizeSettingValue(value, setting.type);
     }
   }
 }

@@ -1025,6 +1025,63 @@ describe("gallery sanitization", () => {
 });
 
 // ============================================================================
+// table sanitization (collection items) — via sanitizeCollectionItemData
+// ============================================================================
+
+describe("table sanitization", () => {
+  const schema = {
+    settings: [
+      {
+        id: "rates",
+        type: "table",
+        columns: [
+          { id: "label", type: "text" },
+          { id: "price", type: "text" },
+        ],
+      },
+    ],
+  };
+
+  it("keeps declared cells, drops unknown keys, blanks non-strings, drops empty/whitespace rows", () => {
+    const item = {
+      settings: {
+        rates: [
+          { label: "Low", price: "€10", bogus: "x" }, // unknown key dropped
+          { label: "  ", price: "  " }, // whitespace-only → dropped
+          { label: "", price: "" }, // empty → dropped
+          { label: "High", price: 99 }, // non-string cell → ""
+        ],
+      },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, [
+      { label: "Low", price: "€10" },
+      { label: "High", price: "" },
+    ]);
+  });
+
+  it("normalizes a non-array table to []", () => {
+    const item = { settings: { rates: "not-an-array" } };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, []);
+  });
+
+  it("drops a number-only row — non-string cells sanitize to '' → all-blank → dropped", () => {
+    const item = { settings: { rates: [{ price: 99 }] } };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, []);
+  });
+
+  it("ignores a __proto__ key smuggled into a row (no prototype pollution)", () => {
+    const row = JSON.parse('{ "label": "L", "price": "P", "__proto__": { "polluted": true } }');
+    const item = { settings: { rates: [row] } };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, [{ label: "L", price: "P" }]);
+    assert.equal({}.polluted, undefined, "Object.prototype must not be polluted");
+  });
+});
+
+// ============================================================================
 // stripHtmlTags
 // ============================================================================
 

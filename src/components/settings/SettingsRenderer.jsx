@@ -16,6 +16,7 @@ import {
   MenuSelectInput,
   ImageInput,
   GalleryInput,
+  TableInput,
   LinkInput,
   YouTubeInput,
   IconInput,
@@ -106,6 +107,8 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
       }
       case "gallery":
         return <GalleryInput {...inputProps} />;
+      case "table":
+        return <TableInput {...inputProps} columns={setting.columns} />;
       case "file":
         return <FileInput {...inputProps} />;
       case "link":
