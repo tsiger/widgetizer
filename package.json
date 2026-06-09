@@ -5,6 +5,9 @@
   "author": "Widgetizer",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "electron/main.js",
   "exports": {
     ".": "./src/main.jsx",
