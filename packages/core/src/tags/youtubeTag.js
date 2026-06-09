@@ -1,5 +1,5 @@
 import { Hash } from "liquidjs";
-import { generateIframeHtml, createYouTubeEmbed } from "../../utils/youtubeHelpers.js";
+import { generateIframeHtml, createYouTubeEmbed } from "../utils/youtubeHelpers.js";
 
 export const YouTubeTag = {
   parse(tagToken) {

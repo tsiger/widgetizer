@@ -1,7 +1,7 @@
 /**
  * Liquid Tags Test Suite
  *
- * Tests all custom Liquid tags in src/core/tags/ to ensure they render
+ * Tests all custom Liquid tags in @widgetizer/core to ensure they render
  * correctly in various contexts (preview mode, publish mode, edge cases).
  *
  * Run with: node --test server/tests/tags.test.js
@@ -12,21 +12,23 @@ import assert from "node:assert/strict";
 import { Liquid } from "liquidjs";
 
 // Import all tags
-import { SeoTag } from "../../src/core/tags/SeoTag.js";
-import { FontsTag } from "../../src/core/tags/FontsTag.js";
-import { AssetTag } from "../../src/core/tags/assetTag.js";
-import { ImageTag } from "../../src/core/tags/imageTag.js";
-import { YouTubeTag } from "../../src/core/tags/youtubeTag.js";
-import { EnqueueStyleTag } from "../../src/core/tags/enqueueStyle.js";
-import { EnqueueScriptTag } from "../../src/core/tags/enqueueScript.js";
-import { RenderHeaderAssetsTag } from "../../src/core/tags/renderHeaderAssets.js";
-import { RenderFooterAssetsTag } from "../../src/core/tags/renderFooterAssets.js";
-import { CustomCssTag } from "../../src/core/tags/customCssTag.js";
-import { CustomHeadScriptsTag } from "../../src/core/tags/customHeadScriptsTag.js";
-import { CustomFooterScriptsTag } from "../../src/core/tags/customFooterScriptsTag.js";
-import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
-import { PlaceholderImageTag } from "../../src/core/tags/placeholderImageTag.js";
-import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
+import {
+  SeoTag,
+  FontsTag,
+  AssetTag,
+  ImageTag,
+  YouTubeTag,
+  EnqueueStyleTag,
+  EnqueueScriptTag,
+  RenderHeaderAssetsTag,
+  RenderFooterAssetsTag,
+  CustomCssTag,
+  CustomHeadScriptsTag,
+  CustomFooterScriptsTag,
+  ThemeSettingsTag,
+  PlaceholderImageTag,
+  EnqueuePreloadTag,
+} from "@widgetizer/core";
 
 // ============================================================================
 // Engine Setup

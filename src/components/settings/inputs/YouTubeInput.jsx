@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Play, ExternalLink, Settings, Check, X, AlertCircle } from "lucide-react";
-import { validateYouTubeUrl, createYouTubeEmbed } from "../../../utils/youtubeHelpers";
+import { validateYouTubeUrl, createYouTubeEmbed } from "@widgetizer/core/youtube";
 
 export default function YouTubeInput({ id, label, description, value = null, onChange, setting = {} }) {
   const [url, setUrl] = useState(value?.url || "");

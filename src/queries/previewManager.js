@@ -1,7 +1,7 @@
 import { apiFetch, apiFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
-import fontDefinitions from "../core/config/fonts.json" with { type: "json" };
+import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
 
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 

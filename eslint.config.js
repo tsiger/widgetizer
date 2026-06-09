@@ -52,6 +52,25 @@ export default [
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  // Shared packages (@widgetizer/*) — code consumed by both the React
+  // frontend and the Node backend, so allow both global sets.
+  {
+    files: ["packages/**/*.{js,jsx}"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+    },
+  },
   // Electron (main process + preload)
   {
     files: ["electron/**/*.js"],

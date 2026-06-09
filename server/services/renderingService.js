@@ -7,23 +7,25 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
 import { listProjectPagesData } from "../controllers/pageController.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { ThemeSettingsTag } from "../../src/core/tags/themeSettings.js";
-import { AssetTag } from "../../src/core/tags/assetTag.js";
-import { FontsTag } from "../../src/core/tags/FontsTag.js";
-import { SeoTag } from "../../src/core/tags/SeoTag.js";
-import { EnqueueStyleTag } from "../../src/core/tags/enqueueStyle.js";
-import { EnqueueScriptTag } from "../../src/core/tags/enqueueScript.js";
-import { RenderHeaderAssetsTag } from "../../src/core/tags/renderHeaderAssets.js";
-import { RenderFooterAssetsTag } from "../../src/core/tags/renderFooterAssets.js";
-import { PlaceholderImageTag } from "../../src/core/tags/placeholderImageTag.js";
-import { CustomCssTag } from "../../src/core/tags/customCssTag.js";
-import { CustomHeadScriptsTag } from "../../src/core/tags/customHeadScriptsTag.js";
-import { CustomFooterScriptsTag } from "../../src/core/tags/customFooterScriptsTag.js";
-import { ImageTag } from "../../src/core/tags/imageTag.js";
-import { YouTubeTag } from "../../src/core/tags/youtubeTag.js";
-import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
-import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
-import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.js";
+import {
+  ThemeSettingsTag,
+  AssetTag,
+  FontsTag,
+  SeoTag,
+  EnqueueStyleTag,
+  EnqueueScriptTag,
+  RenderHeaderAssetsTag,
+  RenderFooterAssetsTag,
+  PlaceholderImageTag,
+  CustomCssTag,
+  CustomHeadScriptsTag,
+  CustomFooterScriptsTag,
+  ImageTag,
+  YouTubeTag,
+  EnqueuePreloadTag,
+  registerMediaMetaFilter,
+  registerHandleizeFilter,
+} from "@widgetizer/core";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";

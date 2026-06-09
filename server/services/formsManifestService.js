@@ -30,7 +30,7 @@ const DEFAULT_MAX_LENGTH = {
   radio: 500,
 };
 
-// Mirrors src/core/filters/handleizeFilter.js EXACTLY — no truncation. The Liquid template
+// Mirrors @widgetizer/core filters/handleizeFilter.js EXACTLY — no truncation. The Liquid template
 // applies its own truncation (64 for keys, 200 for option values) via the `truncate` filter
 // to match the hosted contract caps. Truncating here too would silently diverge from the
 // rendered HTML for long labels.

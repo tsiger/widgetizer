@@ -5,6 +5,11 @@
   "type": "module",
   "main": "./src/index.js",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./youtube": "./src/utils/youtubeHelpers.js",
+    "./config/fonts.json": "./src/config/fonts.json"
+  },
+  "dependencies": {
+    "liquidjs": "^10.25.2"
   }
 }

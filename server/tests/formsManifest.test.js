@@ -18,7 +18,7 @@ import { dirname, join } from "node:path";
 import { Liquid } from "liquidjs";
 
 import { buildFormsManifest } from "../services/formsManifestService.js";
-import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.js";
+import { registerHandleizeFilter } from "@widgetizer/core";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const WIDGET_LIQUID_PATH = join(

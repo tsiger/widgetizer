@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, Check, ChevronsUpDown } from "lucide-react";
-import fontDefinitions from "../../../core/config/fonts.json" with { type: "json" };
+import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
 
 const FONT_WEIGHT_NAMES = {
   100: "Thin",
