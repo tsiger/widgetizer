@@ -39,6 +39,14 @@ export async function resolveActiveProject(req, res, next) {
     }
 
     req.activeProject = activeProject;
+    // Also expose the resolved scope so handlers can migrate from
+    // req.activeProject to the shell-agnostic req.scope. OSS is single-tenant,
+    // so the actor is always the local default.
+    req.scope = {
+      actor: { id: "default", kind: "local" },
+      projectId: activeProject.id,
+      folderName: activeProject.folderName,
+    };
     next();
   } catch (error) {
     next(error);
