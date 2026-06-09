@@ -82,15 +82,32 @@ const migrations = [
   },
 ];
 
+export const DEFAULT_TRACKING_TABLE = "_migrations";
+
+// The tracking-table name is a SQL identifier, so it can't be bound as a
+// parameter — it's interpolated. It's operator-supplied config (never user
+// input), but we still validate it as a plain identifier to fail loudly on
+// typos and keep interpolation safe.
+const SAFE_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
 /**
  * Run all pending migrations in order.
  * Each migration is wrapped in a transaction.
  * @param {import('better-sqlite3').Database} db
+ * @param {{ trackingTable?: string }} [options]
+ *   trackingTable — name of the table that records applied versions.
+ *   Defaults to `_migrations` (backward compatible). Hosted passes a
+ *   namespaced name (e.g. `_widgetizer_migrations`) when running these
+ *   migrations against a database it shares with its own migration system.
  */
-export function runMigrations(db) {
+export function runMigrations(db, { trackingTable = DEFAULT_TRACKING_TABLE } = {}) {
+  if (!SAFE_IDENTIFIER.test(trackingTable)) {
+    throw new Error(`Invalid trackingTable name: ${JSON.stringify(trackingTable)}`);
+  }
+
   // Create migrations table if it doesn't exist
   db.exec(`
-    CREATE TABLE IF NOT EXISTS _migrations (
+    CREATE TABLE IF NOT EXISTS ${trackingTable} (
       version INTEGER PRIMARY KEY,
       description TEXT,
       applied_at TEXT DEFAULT (datetime('now'))
@@ -98,7 +115,7 @@ export function runMigrations(db) {
   `);
 
   const appliedVersions = new Set(
-    db.prepare("SELECT version FROM _migrations").all().map((row) => row.version),
+    db.prepare(`SELECT version FROM ${trackingTable}`).all().map((row) => row.version),
   );
 
   for (const migration of migrations) {
@@ -106,7 +123,7 @@ export function runMigrations(db) {
 
     const runMigration = db.transaction(() => {
       migration.up(db);
-      db.prepare("INSERT INTO _migrations (version, description) VALUES (?, ?)").run(
+      db.prepare(`INSERT INTO ${trackingTable} (version, description) VALUES (?, ?)`).run(
         migration.version,
         migration.description,
       );
