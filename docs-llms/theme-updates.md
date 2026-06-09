@@ -343,7 +343,7 @@ Projects track theme update information:
 ### Frontend
 
 - `src/pages/Themes.jsx` - Theme management UI with update buttons
-- `src/stores/themeUpdateStore.js` - Zustand store for sidebar badge
+- `src/stores/themeUpdateStore.js` - Zustand store for admin-menu/theme-entry update badges
 - `src/queries/themeManager.js` - API client functions
 
 ### Backend

@@ -127,11 +127,13 @@ A rich text editor with basic formatting (bold, italic, link, lists). The value 
 
 **Usage in Templates:**
 
-Output directly in Liquid templates—the value is already HTML:
+Render richtext with `| raw` in Liquid templates. Richtext values are sanitized by
+DOMPurify before rendering, and Liquid autoescape would otherwise escape the
+allowed HTML tags:
 
 ```liquid
 <div class="content">
-  {{ widget.settings.description }}
+  {{ widget.settings.description | raw }}
 </div>
 ```
 
@@ -496,7 +498,7 @@ A file asset selector for downloadable documents (currently PDF). The value is t
 - **Upload**: Direct file upload from the OS file picker (accepts PDF)
 - **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets
 - **Selected State**: Displays filename and extension badge with a clear button
-- **No Metadata Editing**: File assets do not have alt text or title metadata
+- **No Inline Metadata Editing**: `FileInput` itself does not expose metadata editing. File assets still have media-record metadata such as alt/title, managed from the Media Library drawer.
 
 ```json
 {
@@ -606,20 +608,22 @@ Each menu has a stable `uuid` that never changes, even when the menu is renamed.
 
 ### Link
 
-A compound control for creating links. This is useful for buttons, banners, or any call-to-action element. It allows the user to select an internal page or specify a custom URL. The value is an object containing the link's `href`, `text`, `target`, and optionally `pageUuid`.
+A compound control for creating links. This is useful for buttons, banners, or any call-to-action element. It allows the user to select an internal page, a collection item page, or specify a custom URL. The value is an object containing the link's `href`, `text`, `target`, and optional stable-reference fields (`pageUuid` for pages, or `collectionItemUuid` + `collectionType` for collection item pages).
 
-- **`href`** (string): The URL for the link. This can be a relative path to an internal page (e.g., `about.html`) or an absolute URL.
+- **`href`** (string): The URL for the link. This can be a relative path to an internal page (e.g., `about.html`), a collection item page (e.g., `products/example.html`), or an absolute URL.
 - **`text`** (string): The display text for the link (e.g., "Learn More").
 - **`target`** (string): The link target, either `_self` to open in the same tab or `_blank` to open in a new tab.
 - **`pageUuid`** (string, optional): For internal page links, stores the page's stable UUID. This ensures links remain valid even when pages are renamed—the system automatically resolves the UUID to the current page slug at render time.
+- **`collectionItemUuid`** (string, optional): For collection item page links, stores the item's stable UUID. The editor/runtime resolves it to the current `{slugPrefix}/{slug}.html` path.
+- **`collectionType`** (string, optional): Stored with `collectionItemUuid` so the link keeps enough collection context for editor display and cleanup.
 
 **Schema Properties:**
 
 - **`hide_text`** (boolean, optional): If `true`, hides the link text field in the editor UI. Useful for links that wrap entire cards or icons where no visible label is rendered.
 
-**How Internal Page Links Work:**
+**How Internal Link References Work:**
 
-The `pageUuid` system ensures links remain valid even when pages are renamed or deleted:
+Stable references ensure internal links remain valid when pages or collection items are renamed:
 
 1. **Project Creation**: When a project is created from a theme, all internal page links in widget settings and menus are automatically enriched with `pageUuid`. This includes links defined in theme templates and schema defaults.
 
@@ -627,13 +631,18 @@ The `pageUuid` system ensures links remain valid even when pages are renamed or 
    - The `pageUuid` - the stable identifier that never changes
    - The `href` - the current slug-based filename (e.g., `services.html`)
 
-3. **Rendering/Export**: The system resolves `pageUuid` to the current page slug. If a page was renamed, links automatically point to the new filename.
+   When the user selects a collection item page, the system stores:
+   - The `collectionItemUuid` - the stable item identifier
+   - The `collectionType` - the collection that owns the item
+   - The `href` - the current collection-item URL (e.g., `products/example.html`)
+
+3. **Rendering/Export**: The system resolves `pageUuid` or `collectionItemUuid` to the current slug. If a page or collection item was renamed, links automatically point to the new filename.
 
 4. **Page Deletion Cleanup**: When a page is deleted, all widget link settings referencing its `pageUuid` are automatically cleaned up — the link is cleared (`href: ""`) and `pageUuid` is removed from the JSON file. This applies to page widgets, global widgets (header/footer), and menu items.
 
 5. **Project Cloning**: When a project is cloned, all page UUIDs are regenerated, and all widget/menu `pageUuid` references are updated to point to the new UUIDs.
 
-The UI for this setting type provides a choice between selecting from a list of existing pages or entering a custom URL, along with inputs for the link text and a toggle for the target.
+The UI for this setting type provides a choice between selecting from existing pages, selecting eligible collection item pages, or entering a custom URL, along with inputs for the link text and a toggle for the target.
 
 ```json
 {

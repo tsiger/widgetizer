@@ -72,13 +72,13 @@ The frontend component provides a clean interface for theme management.
 
 - Themes lives at `/themes` inside `ProjectPickerLayout` (the admin shell).
 - It can be opened without an active project.
-- If an active project exists, the page uses it to mark that project's theme card as active.
+- Theme cards show an "In use" indicator when one or more projects currently use that theme. The tooltip lists the project names.
 
 ### Key Features
 
 - **Theme Grid**: Displays all available themes in a responsive grid layout.
 - **Upload Functionality**: Drag-and-drop interface for uploading new theme ZIP files.
-- **Active Theme Indicator**: Visual indication of which theme is currently active for the current active project.
+- **In-Use Theme Indicator**: Visual indication of which themes are used by one or more projects.
 - **Update Indicators**: Shows when themes have pending updates available.
 - **Per-Theme Update Buttons**: Allows updating individual themes.
 - **Theme Deletion**: Three-dot menu on each card with "Delete"; when a theme is used by one or more projects, the delete action is disabled up front and the UI shows that the theme is in use.
@@ -119,10 +119,10 @@ The component manages local state for:
 
 **Global State:**
 
-- `useThemeUpdateStore`: Zustand store for sidebar badge count
+- `useThemeUpdateStore`: Zustand store for admin-menu theme update badges
   - `updateCount`: Number of themes with pending updates
   - `fetchUpdateCount()`: Refreshes the count from API
-- `useProjectStore`: Supplies the current active project so the UI can highlight the active theme
+- Theme data includes `projectsUsingTheme`, which drives the "In use" indicator and deletion safeguards
 
 ### Upload Process
 

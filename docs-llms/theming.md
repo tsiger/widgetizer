@@ -1382,7 +1382,7 @@ Authoring rules (enforced at runtime and at theme upload):
 - `type` must match the folder name and be `^[a-z0-9-]+$`; `slugPrefix` must be `^[a-z0-9-]+$` (defaults to `type`).
 - **Exactly one** non-`header` setting must declare `usedAsTitle: true` (must be a `text` field) — it's the display name and the slug source.
 - `defaultSort` ∈ `manual` \| `created_desc` \| `created_asc` \| `title_asc` \| `title_desc`.
-- Only setting types in `supportedSettingTypes.js` are allowed; `multiple`/`blocks`/repeater/relationship/taxonomy fields are rejected. The `gallery` type (a repeating image+caption field) is supported; a *generic* repeater is not.
+- Only setting types in `supportedSettingTypes.js` are allowed; `multiple`/`blocks`/repeater/relationship/taxonomy fields are rejected. The `gallery` type is supported as an ordered array of uploaded image-path strings; image captions live on media records, not inside the gallery value. A *generic* repeater is not supported.
 - Two collections can't share a `slugPrefix`, and a `slugPrefix` can't be a reserved output dir (`assets`).
 - SEO is **not** a schema concern: `hasItemPages` items get a built-in page-shaped `seo` object and the same SEO editor pages use (Finding #12). Don't declare `seo_*` fields or `usedAsOgImage`.
 - Labels support `tTheme:` locale keys, same as widget schemas.

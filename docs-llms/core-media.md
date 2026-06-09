@@ -334,7 +334,7 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 | `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns media metadata from SQLite. |
 | `POST` | `/api/media/projects/:projectId/media` | `upload.array("files", 10)` | `uploadProjectMedia` | Handles file uploads. |
 | `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. Prevents deletion if file is in use. |
-| `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. Prevents deletion if any files are in use. |
+| `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes selected unused files and skips any files currently in use, returning warnings for skipped files. |
 | `PUT` | `/api/media/projects/:projectId/media/:fileId/metadata` |  | `updateMediaMetadata` | Updates the metadata for a single file. |
 | `GET` | `/api/media/projects/:projectId/media/:fileId/usage` |  | `getMediaFileUsage` | Returns usage information for a specific media file. |
 | `POST` | `/api/media/projects/:projectId/refresh-usage` |  | `refreshMediaUsage` | Manually refreshes usage tracking for all media files in the project. |
@@ -371,9 +371,9 @@ The backend uses Express.js with `multer` for file handling and `sharp` for imag
 - **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
   1.  The controller loads the target file entry (or entries) from SQLite.
   2.  It resolves filesystem paths for originals and generated variants.
-  3.  **Usage Check**: It verifies that the file(s) are not currently in use by checking the `usedIn` array. If any files are in use, deletion is prevented with an error response.
-  4.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
-  5.  It deletes metadata rows from SQLite (`media_files`, with cascade to `media_sizes` + `media_usage`).
+  3.  **Usage Check**: Single-file delete is blocked when that file is in use. Bulk delete partitions the selection into deletable files and in-use files; it deletes the unused files and returns `filesInUse` warnings for skipped files. If every selected file is in use, the response succeeds with `deletedCount: 0` plus the skipped-file warnings.
+  4.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem for each deletable file.
+  5.  It deletes metadata rows from SQLite (`media_files`, with cascade to `media_sizes` + `media_usage`) for each deleted file.
 - **Metadata Update (`updateMediaMetadata`)**:
   1.  The controller loads the file from SQLite by `fileId`.
   2.  It updates persisted metadata columns (`alt`, `title`, `caption`). `caption` is

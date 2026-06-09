@@ -137,6 +137,18 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[theme-presets-tracker.md](theme-presets-tracker.md)** - Preset Status Tracker
+
+**Purpose**: Working tracker for preset IDs, production status, and shipped Arch presets **When to use**:
+
+- Checking which preset IDs already exist
+- Updating preset production/completion status
+- Auditing which presets have synced files, generated images, and screenshots
+
+**Key topics**: Preset status table, preset IDs, completion tracking, generated asset checklist
+
+---
+
 ### **[core-widgets.md](core-widgets.md)** - Core Widgets System
 
 **Purpose**: Explains the built-in, theme-agnostic widgets that ship with Widgetizer **When to use**:
@@ -307,7 +319,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing theme management UI
 - Troubleshooting theme installation
 
-**Key topics**: Theme display, admin-shell routing, upload process, validation, active-project theme badge, theme presets, preset API, deletion safeguards, theme locale behavior, site icon snippet
+**Key topics**: Theme display, admin-shell routing, upload process, validation, in-use theme indicator, admin-menu update badges, theme presets, preset API, deletion safeguards, theme locale behavior, site icon snippet
 
 ---
 
