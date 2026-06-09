@@ -6,6 +6,13 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",
+    "./errors": "./src/errors.js",
+    "./adapters": "./src/adapters.js",
+    "./test-helpers/storage": "./test-helpers/storageConformance.js",
+    "./test-helpers/asset-storage": "./test-helpers/assetStorageConformance.js",
+    "./test-helpers/publish": "./test-helpers/publishConformance.js",
+    "./test-helpers/limits": "./test-helpers/limitsConformance.js",
+    "./test-helpers/scope-resolver": "./test-helpers/scopeResolverConformance.js",
     "./youtube": "./src/utils/youtubeHelpers.js",
     "./config/fonts.json": "./src/config/fonts.json"
   },

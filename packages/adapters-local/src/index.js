@@ -1,4 +1,10 @@
-// @widgetizer/adapters-local — package entry point.
-// Scaffold: contents are filled in by subsequent slices of Sprint 1.2.
-// (Empty for now; nothing imports this yet.)
-export {};
+// @widgetizer/adapters-local — OSS implementations of the @widgetizer/core
+// adapter contracts. Consumed ONLY by the OSS shells (web + electron); hosted
+// never imports this package. That structural separation protects the
+// OSS/hosted boundary.
+//
+export { LocalStorageAdapter } from "./LocalStorageAdapter.js";
+export { LocalAssetStorageAdapter } from "./LocalAssetStorageAdapter.js";
+export { LocalScopeResolver, LocalPreviewScopeResolver } from "./LocalScopeResolver.js";
+export { LocalPublishAdapter } from "./LocalPublishAdapter.js";
+export { LocalLimitsAdapter } from "./LocalLimitsAdapter.js";

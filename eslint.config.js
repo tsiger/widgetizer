@@ -37,9 +37,13 @@ export default [
       "react/prop-types": "off",
     },
   },
-  // Server (Express backend) — now the @widgetizer/builder-server package
+  // Node packages: the Express backend (@widgetizer/builder-server) and the
+  // OSS local adapters (@widgetizer/adapters-local).
   {
-    files: ["packages/builder-server/src/**/*.js"],
+    files: [
+      "packages/builder-server/src/**/*.js",
+      "packages/adapters-local/src/**/*.js",
+    ],
     languageOptions: {
       globals: globals.node,
       parserOptions: {

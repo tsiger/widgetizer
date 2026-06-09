@@ -1,0 +1,77 @@
+// Runner-agnostic conformance suite for the AssetStorageAdapter contract.
+// See storageConformance.js for the calling convention.
+//
+// `makeAdapter()` returns a fresh adapter over isolated storage.
+// `makeScope(id)` returns a distinct Scope per id.
+// `makeStream(buffer)` wraps a Buffer as the streaming upload source the
+// implementation expects (e.g. Readable.from for Node, a web stream for cloud).
+
+export function runAssetStorageAdapterConformance({
+  describe,
+  it,
+  assert,
+  name,
+  makeAdapter,
+  makeScope,
+  makeStream,
+}) {
+  describe(`AssetStorageAdapter conformance: ${name}`, () => {
+    async function collect(streamOrNull) {
+      if (streamOrNull == null) return null;
+      const chunks = [];
+      for await (const c of streamOrNull) chunks.push(Buffer.from(c));
+      return Buffer.concat(chunks);
+    }
+
+    it("upload then download round-trips the bytes", async () => {
+      const a = makeAdapter();
+      const scope = makeScope("a");
+      const bytes = Buffer.from("PNGDATA");
+      const res = await a.upload(scope, "images/logo.png", makeStream(bytes));
+      assert.equal(res.key, "images/logo.png");
+      assert.equal(res.sizeBytes, bytes.byteLength);
+      assert.equal(typeof res.contentType, "string");
+      const got = await collect(await a.download(scope, "images/logo.png"));
+      assert.equal(got.toString(), "PNGDATA");
+    });
+
+    it("download of a missing key returns null", async () => {
+      const a = makeAdapter();
+      assert.equal(await a.download(makeScope("a"), "nope.png"), null);
+    });
+
+    it("delete removes the asset", async () => {
+      const a = makeAdapter();
+      const scope = makeScope("a");
+      await a.upload(scope, "x.bin", makeStream(Buffer.from("1")));
+      await a.delete(scope, "x.bin");
+      assert.equal(await a.download(scope, "x.bin"), null);
+    });
+
+    it("list returns keys under a prefix", async () => {
+      const a = makeAdapter();
+      const scope = makeScope("a");
+      await a.upload(scope, "images/a.png", makeStream(Buffer.from("1")));
+      await a.upload(scope, "images/b.png", makeStream(Buffer.from("1")));
+      await a.upload(scope, "docs/c.pdf", makeStream(Buffer.from("1")));
+      const images = await a.list(scope, "images/");
+      assert.deepEqual(images.sort(), ["images/a.png", "images/b.png"]);
+    });
+
+    it("getUrl returns the same string for editor and published contexts", async () => {
+      const a = makeAdapter();
+      const scope = makeScope("a");
+      const editor = a.getUrl(scope, "images/logo.png", { context: "editor" });
+      const published = a.getUrl(scope, "images/logo.png", { context: "published" });
+      assert.equal(typeof editor, "string");
+      assert.ok(editor.includes("images/logo.png"));
+      assert.equal(editor, published);
+    });
+
+    it("scopes are isolated", async () => {
+      const a = makeAdapter();
+      await a.upload(makeScope("one"), "s.bin", makeStream(Buffer.from("one")));
+      assert.equal(await a.download(makeScope("two"), "s.bin"), null);
+    });
+  });
+}
