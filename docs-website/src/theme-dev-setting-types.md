@@ -180,6 +180,24 @@ In Liquid templates, output directly (it's already HTML):
 }
 ```
 
+**`gallery`** — A repeatable list of images with media library access. The user adds any number of images — **selecting existing ones from the media library** or uploading new — then drag-reorders them. The stored value is an ordered array of upload-path strings (`["/uploads/images/a.jpg", ...]`). Per-image alt/title/caption live on the media record, not in the gallery.
+
+```json
+{
+  "id": "photos",
+  "type": "gallery",
+  "label": "Photo Gallery"
+}
+```
+
+In Liquid, loop the array and resolve each path with `{% image %}`:
+
+```liquid
+{% for img in widget.settings.photos %}
+  {% if img != blank %}<figure>{% image src: img, size: 'large' %}</figure>{% endif %}
+{% endfor %}
+```
+
 **`youtube`** — YouTube embed with URL/ID input and embed options.
 
 ```json
@@ -279,6 +297,34 @@ Optional properties:
   "type": "icon",
   "label": "Card Icon"
 }
+```
+
+# Collection-Type Fields
+
+These types are available in **collection-type schemas** (`collection-types/<type>/schema.json`), not in `theme.json` or widget schemas.
+
+**`table`** — A uniform repeating-row field: an ordered list of rows, each with a fixed set of `columns` declared in the schema. The author adds, reorders, and deletes rows; each cell is a normal input (no delimiters). The stored value is an array of row objects keyed by column id. **v1 column type: `text` only** (more types are added over time).
+
+```json
+{
+  "id": "rates",
+  "type": "table",
+  "label": "Rates",
+  "columns": [
+    { "id": "label", "type": "text", "label": "Season" },
+    { "id": "price", "type": "text", "label": "Price" }
+  ]
+}
+```
+
+Column `id`s must be unique, match `^[a-zA-Z][a-zA-Z0-9_]*$`, and not be reserved keys (`__proto__`, `constructor`, `prototype`). Blank rows are dropped on save; a `required` table needs at least one row with a non-blank cell. In Liquid, loop the rows and read cells by column id:
+
+```liquid
+<table>
+  {% for r in item.settings.rates %}
+    <tr><td>{{ r.label }}</td><td>{{ r.price }}</td></tr>
+  {% endfor %}
+</table>
 ```
 
 # Where Settings Are Used
