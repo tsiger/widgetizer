@@ -1,12 +1,12 @@
-import path from "path";
+import { isWithinDirectory as coreIsWithin } from "@widgetizer/core/pathSecurity";
 
 /**
  * Check whether `filePath` is contained within `allowedBase`.
  *
- * Unlike the naive `filePath.startsWith(allowedBase)` pattern, this
- * correctly rejects sibling directories that share the same prefix
- * (e.g. `/data/publish-evil` would pass a startsWith check against
- * `/data/publish` but is not actually inside it).
+ * Thin wrapper over @widgetizer/core/pathSecurity (the single implementation).
+ * Preserves this module's historical `(filePath, allowedBase)` argument order
+ * and its "the base directory is NOT within itself" semantics (`allowEqual:
+ * false`) — many call sites and pathSecurity.test.js depend on both.
  *
  * Both paths should already be resolved (`path.resolve`) before calling.
  *
@@ -15,6 +15,5 @@ import path from "path";
  * @returns {boolean} true when filePath is inside allowedBase
  */
 export function isWithinDirectory(filePath, allowedBase) {
-  const rel = path.relative(allowedBase, filePath);
-  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel);
+  return coreIsWithin(allowedBase, filePath, { allowEqual: false });
 }

@@ -10,7 +10,6 @@ export default {
   },
   files: [
     "dist",
-    "server",
     // OSS shell server assembly — the only backend file under app/ (the rest of
     // app/ is frontend source already bundled into dist/ by Vite). It composes
     // the @widgetizer/* backend packages, which are bundled via dependencies.

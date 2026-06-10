@@ -44,3 +44,44 @@ export async function buildOssApp() {
 
   return createEditorApp({ adapters });
 }
+
+/**
+ * Build the OSS app, bind it, publish the bound port to the environment (so
+ * self-referencing preview/render URLs use the real port), and announce.
+ *
+ * Shared by both entry points; they differ only in the default port and what
+ * happens on ready: web mode (server.js) uses 3001 and no callback; Electron
+ * (electron/server-bootstrap.js) uses 0 (ephemeral, collision-free) and an
+ * onReady that posts the port back to the parent process.
+ *
+ * @param {{ defaultPort: number|string, onReady?: (port: number) => void }} options
+ * @returns {Promise<import('http').Server>}
+ */
+export async function startOssServer({ defaultPort, onReady } = {}) {
+  const app = await buildOssApp();
+
+  // PORT=0 → OS assigns an ephemeral port at bind time. Otherwise use the
+  // requested/default port.
+  const requestedPort = parseInt(process.env.PORT || String(defaultPort), 10);
+
+  const server = app.listen(requestedPort, "127.0.0.1", () => {
+    const { port } = server.address();
+
+    process.env.PORT = String(port);
+    if (!process.env.SERVER_URL) {
+      process.env.SERVER_URL = `http://127.0.0.1:${port}`;
+    }
+
+    console.log(`Server is running on ${process.env.SERVER_URL}`);
+    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+
+    onReady?.(port);
+  });
+
+  server.on("error", (err) => {
+    console.error(`Server failed to start on port ${requestedPort}: ${err.message}`);
+    process.exit(1);
+  });
+
+  return server;
+}

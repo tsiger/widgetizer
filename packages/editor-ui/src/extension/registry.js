@@ -8,8 +8,6 @@
 // the unknown-key warning; truly unknown keys are ignored with a dev warning
 // (forward compatibility — adding extension points never breaks old plugins).
 
-const CONSUMED_KEYS = ["navItems", "routes", "commands"];
-
 const KNOWN_KEYS = new Set([
   "name",
   "version",
@@ -63,4 +61,4 @@ export function buildRegistry(plugins = [], { warn = defaultWarn } = {}) {
   return { navItems, routes, commands };
 }
 
-export { CONSUMED_KEYS, KNOWN_KEYS };
+export { KNOWN_KEYS };

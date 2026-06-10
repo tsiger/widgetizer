@@ -17,6 +17,7 @@
     "./youtube": "./src/utils/youtubeHelpers.js",
     "./blockLimits": "./src/utils/blockLimits.js",
     "./mimeTypes": "./src/utils/mimeTypes.js",
+    "./pathSecurity": "./src/utils/pathSecurity.js",
     "./config/fonts.json": "./src/config/fonts.json",
     "./locales/*": "./src/locales/*"
   },
