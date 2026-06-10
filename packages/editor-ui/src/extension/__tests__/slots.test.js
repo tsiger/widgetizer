@@ -8,6 +8,8 @@ describe("slots", () => {
       "sidebarFooter",
       "topbarLeft",
       "topbarRight",
+      "topbarBanner",
+      "overlay",
       "publishConfirmation",
     ]);
   });

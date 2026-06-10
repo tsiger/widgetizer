@@ -3,12 +3,17 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, FolderOpen, Palette, Pencil, Settings2 } from "lucide-react";
 import useThemeUpdateStore from "../../stores/themeUpdateStore";
+import useProjectStore from "../../stores/projectStore";
 
-export default function AdminMenu({ activeProject }) {
+// Shell chrome injected into the editor's `topbarRight` slot. Reads the active
+// project from the store directly so it stays a self-sufficient slot node (no
+// props threaded from Layout, which lives in editor-ui).
+export default function AdminMenu() {
   const { t } = useTranslation();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
+  const activeProject = useProjectStore((state) => state.activeProject);
   const updateCount = useThemeUpdateStore((state) => state.updateCount);
   const fetchUpdateCount = useThemeUpdateStore((state) => state.fetchUpdateCount);
 

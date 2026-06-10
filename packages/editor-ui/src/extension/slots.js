@@ -9,6 +9,8 @@ export const SLOT_NAMES = Object.freeze([
   "sidebarFooter",
   "topbarLeft",
   "topbarRight",
+  "topbarBanner",
+  "overlay",
   "publishConfirmation",
 ]);
 

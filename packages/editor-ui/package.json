@@ -48,7 +48,9 @@
     "./hooks/useFormatDate": "./src/hooks/useFormatDate.js",
     "./hooks/useMediaUpload": "./src/hooks/useMediaUpload.js",
     "./hooks/useConfirmationAction": "./src/hooks/useConfirmationAction.js",
-    "./components/*": "./src/components/*"
+    "./hooks/useGuardedFormPage": "./src/hooks/useGuardedFormPage.jsx",
+    "./components/*": "./src/components/*",
+    "./pages/*": "./src/pages/*"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

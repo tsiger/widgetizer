@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
-import { navigationSections } from "../../config/navigation";
 import { getAllPages } from "../../queries/pageManager";
 import SidebarMeta from "./SidebarMeta";
+import { useNavItems } from "../../extension/PluginProvider.jsx";
+import { groupNavItems } from "../../extension/builtinNav.js";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -12,6 +13,10 @@ export default function Sidebar() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const hasActiveProject = !!activeProject;
   const [hasPages, setHasPages] = useState(false);
+
+  // Nav comes from the plugin registry (built-in items + any plugin items),
+  // bucketed into ordered sections by their `group`.
+  const sections = groupNavItems(useNavItems());
 
   useEffect(() => {
     let isCancelled = false;
@@ -148,26 +153,12 @@ export default function Sidebar() {
     );
   };
 
-  const renderSection = (section) => {
-    if (section.position === "bottom") {
-      return (
-        <div key={section.id} className="border-t border-slate-800 pt-4">
-          <h3 className="ml-2 mb-2 hidden text-xs font-bold uppercase text-slate-500 md:block">{t(section.titleKey)}</h3>
-          <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
-        </div>
-      );
-    }
-
-    return (
-      <div key={section.id} className="mb-4 border-b border-slate-800 pb-4">
-        {section.titleKey && <h3 className="ml-2 mb-2 hidden text-xs font-bold uppercase text-slate-500 md:block">{t(section.titleKey)}</h3>}
-        <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
-      </div>
-    );
-  };
-
-  const topSections = navigationSections.filter((section) => section.position !== "bottom");
-  const bottomSections = navigationSections.filter((section) => section.position === "bottom");
+  const renderSection = (section) => (
+    <div key={section.id} className="mb-4 border-b border-slate-800 pb-4">
+      {section.titleKey && <h3 className="ml-2 mb-2 hidden text-xs font-bold uppercase text-slate-500 md:block">{t(section.titleKey)}</h3>}
+      <ul className="space-y-2 md:space-y-1">{section.items.map(renderNavItem)}</ul>
+    </div>
+  );
 
   return (
     <div className="fixed left-0 top-0 flex h-screen w-[72px] flex-col overflow-y-auto bg-slate-900 text-white md:w-[var(--sidebar-width)]">
@@ -179,11 +170,10 @@ export default function Sidebar() {
           <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="mx-auto h-12 w-12 md:hidden" />
         </div>
 
-        {topSections.map(renderSection)}
+        {sections.map(renderSection)}
       </div>
 
       <div className="px-2 pb-4 md:px-[var(--shell-inset)]">
-        {bottomSections.map(renderSection)}
         <SidebarMeta />
       </div>
     </div>
