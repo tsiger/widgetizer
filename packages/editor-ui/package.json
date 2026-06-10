@@ -12,7 +12,12 @@
     "./lib/activeProjectId": "./src/lib/activeProjectId.js",
     "./lib/uploadRequest": "./src/lib/uploadRequest.js",
     "./queries/pageManager": "./src/queries/pageManager.js",
-    "./queries/menuManager": "./src/queries/menuManager.js"
+    "./queries/menuManager": "./src/queries/menuManager.js",
+    "./queries/projectManager": "./src/queries/projectManager.js",
+    "./queries/themeManager": "./src/queries/themeManager.js",
+    "./queries/mediaManager": "./src/queries/mediaManager.js",
+    "./queries/exportManager": "./src/queries/exportManager.js",
+    "./queries/appSettingsManager": "./src/queries/appSettingsManager.js"
   },
   "dependencies": {
     "@widgetizer/core": "*"
