@@ -52,6 +52,14 @@ function humanizeFieldId(id) {
     .replace(/^\w/, (c) => c.toUpperCase());
 }
 
+/** Today's date as a local "YYYY-MM-DD" — used to pre-fill a new item's date field. */
+function todayISO() {
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
 /** Page-shaped SEO form defaults for a collection item (Finding #12). Mirrors
  *  the page SEO shape; items default og_type to "article" (they are content). */
 function seoDefaults(seo = {}) {
@@ -125,6 +133,15 @@ export default function CollectionItemForm({
   const allSettings = Array.isArray(schema?.settings) ? schema.settings : [];
   const fieldSettings = allSettings.filter((s) => s.type !== HEADER_TYPE);
   const titleSetting = fieldSettings.find((s) => s.usedAsTitle);
+  const dateSetting = fieldSettings.find((s) => s.usedAsDate);
+
+  // New items pre-fill the publication date (the usedAsDate field) with today as a
+  // convenience — it stays editable, and only this one field is seeded.
+  const buildDefaultSettings = () => {
+    const s = { ...(initialData.settings || {}) };
+    if (isNew && dateSetting && !s[dateSetting.id]) s[dateSetting.id] = todayISO();
+    return s;
+  };
 
   const {
     register,
@@ -137,7 +154,7 @@ export default function CollectionItemForm({
   } = useForm({
     defaultValues: {
       slug: initialData.slug || "",
-      settings: initialData.settings || {},
+      settings: buildDefaultSettings(),
       seo: seoDefaults(initialData.seo),
     },
   });

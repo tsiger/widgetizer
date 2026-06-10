@@ -16,6 +16,13 @@
         "enable_reveal_animations": {
           "label": "Enable scroll reveal animations",
           "description": "Animate elements as they scroll into view"
+        },
+        "content_header": {
+          "label": "Content"
+        },
+        "date_format": {
+          "label": "Date format",
+          "description": "How dates (e.g. on news articles) are shown on your published site."
         }
       }
     },

@@ -243,6 +243,7 @@ The `settings.global` object defines customizable options organized into logical
 - `header`: Visual divider to group related settings into sections
 - `text`: Single-line text input. _(Can be used with `outputAsCssVar` if its value is a valid CSS value, like a color or size.)_
 - `number`: Numeric input with optional `min`/`max`.
+- `date`: Native date picker. Value is a date-only `YYYY-MM-DD` string. Render on the published site with the `| format_date` filter, which honors the theme's **Date format** setting (`date_format`) and is timezone-safe. A `date` field can drive collection sorting via the `usedAsDate` flag — see [Collections](core-collections.md).
 - `textarea`: Multi-line text input field. _(Can be used with `outputAsCssVar` if its value is a valid CSS value.)_
 - `richtext`: Rich text editor with basic formatting (bold, italic, links, lists). Value is HTML, sanitized via DOMPurify.
 - `code`: Code editor with syntax highlighting (`language`: css/html/javascript). Output is intentionally raw.

@@ -296,6 +296,39 @@ describe("table field", () => {
 });
 
 // ============================================================================
+// date field (write coercion) — P2 regression
+// ============================================================================
+
+describe("date field (write coercion)", () => {
+  const dateSchema = () =>
+    portfolioSchema({
+      defaultSort: "date_desc",
+      settings: [
+        { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+        { type: "date", id: "date", label: "Date", usedAsDate: true },
+      ],
+    });
+
+  it("coerces a malformed date to '' on write (never persisted as-is)", () => {
+    for (const bad of ["2026-13-40", "not-a-date", "2026-02-30"]) {
+      const { item } = buildCollectionItemData(dateSchema(), {
+        slug: "x",
+        settings: { title: "X", date: bad },
+      });
+      assert.equal(item.settings.date, "", `expected ${bad} coerced to ""`);
+    }
+  });
+
+  it("keeps a valid date value", () => {
+    const { item } = buildCollectionItemData(dateSchema(), {
+      slug: "y",
+      settings: { title: "Y", date: "2026-06-05" },
+    });
+    assert.equal(item.settings.date, "2026-06-05");
+  });
+});
+
+// ============================================================================
 // listCollectionItems
 // ============================================================================
 
@@ -349,6 +382,48 @@ describe("listCollectionItems", () => {
 
     result = await listCollectionItems("p", "portfolio", { sort: "title_desc" });
     assert.deepEqual(result.map((i) => i.title), ["Zebra", "Apple"]);
+  });
+
+  it("sorts by date_desc / date_asc via the usedAsDate field, missing dates last", async () => {
+    const dateSchema = portfolioSchema({
+      defaultSort: "date_desc",
+      settings: [
+        { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+        { type: "date", id: "date", label: "Date", usedAsDate: true },
+      ],
+    });
+    const items = [
+      itemFile("mar", { settings: { title: "Mar", date: "2026-03-15" } }),
+      itemFile("jan", { settings: { title: "Jan", date: "2026-01-10" } }),
+      itemFile("feb", { settings: { title: "Feb", date: "2026-02-20" } }),
+      // No date → sorts to the END regardless of direction (even though created is newest).
+      itemFile("none", { settings: { title: "None" }, created: "2026-12-31T00:00:00.000Z" }),
+    ];
+    await setupCollection("p", "portfolio", dateSchema, items);
+
+    let result = await listCollectionItems("p", "portfolio");
+    assert.deepEqual(result.map((i) => i.slug), ["mar", "feb", "jan", "none"]);
+
+    result = await listCollectionItems("p", "portfolio", { sort: "date_asc" });
+    assert.deepEqual(result.map((i) => i.slug), ["jan", "feb", "mar", "none"]);
+  });
+
+  it("treats a malformed stored date as undated (sorts to the end)", async () => {
+    const dateSchema = portfolioSchema({
+      defaultSort: "date_desc",
+      settings: [
+        { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+        { type: "date", id: "date", label: "Date", usedAsDate: true },
+      ],
+    });
+    const items = [
+      itemFile("good", { settings: { title: "Good", date: "2026-05-01" } }),
+      // malformed value written straight to disk (bypasses buildCollectionItemData)
+      itemFile("bad", { settings: { title: "Bad", date: "2026-13-40" } }),
+    ];
+    await setupCollection("p", "portfolio", dateSchema, items);
+    const result = await listCollectionItems("p", "portfolio");
+    assert.deepEqual(result.map((i) => i.slug), ["good", "bad"]);
   });
 
   it("honors manual order: ordered first, then unordered by created_desc, stale ignored", async () => {

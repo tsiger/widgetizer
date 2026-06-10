@@ -15,8 +15,6 @@ The system has three layers:
 
 Collections are **per-project content** like pages and menus. Schemas are **theme-owned** (replaced on theme update); item data is **protected user content** (never touched by updates).
 
-The shipped Arch theme includes two example collection types: `portfolio` (`hasItemPages: true`) and `team` (`hasItemPages: false`). The Aegean theme ships two more — `accommodation` and `excursion`, both `hasItemPages: true` **with** a `template.liquid` — and is the working reference for item pages.
-
 ---
 
 ## 1. Architecture & Storage Layout
@@ -55,7 +53,7 @@ Because new-project creation, theme-sync, project ZIP import/export, and project
 
 A collection type reuses existing setting types (the same ones widgets and `theme.json` use), with a few collection-specific top-level fields and three field-level flags.
 
-**Example** (`themes/arch/collection-types/portfolio/schema.json`):
+**Example schema** (a `portfolio` type with item pages):
 
 ```json
 {
@@ -94,12 +92,13 @@ A collection type reuses existing setting types (the same ones widgets and `them
 | `slugPrefix`        | string  | URL prefix when `hasItemPages: true` (e.g. `portfolio/foo.html`); defaults to `type` |
 | `hasItemPages`      | boolean | If true, export generates an individual HTML page per item (see §8)              |
 | `sortable`          | boolean | If true, users can manually reorder items via a drag handle                      |
-| `defaultSort`       | string  | `manual` \| `created_desc` \| `created_asc` \| `title_asc` \| `title_desc`        |
+| `defaultSort`       | string  | `manual` \| `created_desc` \| `created_asc` \| `title_asc` \| `title_desc` \| `date_desc` \| `date_asc` |
 | `settings`          | array   | Field definitions reusing existing setting types                                 |
 
 ### Field-level flags
 
 - **`usedAsTitle: true`** — marks the field used as the item's display name in listings and as the source for auto-generated slugs. **Exactly one non-`header` setting must declare this**, and it must be a `text` field.
+- **`usedAsDate: true`** — marks a `date` field as the collection's sort key for `defaultSort: date_desc`/`date_asc` (and the `| collection: sort: ...` filter option). **At most one** non-`header` setting may declare it, and it must be a `date` field. Items with no value in that field sort to the **end**. Optional — only needed for date-ordered collections (e.g. a blog).
 - **`required: true`** — enforced on save and on export.
 
 For multiple images, use the `gallery` field type — an ordered list of image upload paths (a `string[]`; the `image` type holds a single value). Per-image `alt`/`title`/`caption` live on the media record, not the gallery. See [Setting Types](theming-setting-types.md). A *generic* repeater (arbitrary repeating blocks) remains deferred — see "Out of Scope".
@@ -115,8 +114,9 @@ Item-page SEO is **at parity with page SEO** (Finding #12), not a schema-field c
 - `type` and folder name must match and use `^[a-z0-9-]+$`.
 - `slugPrefix` must be `^[a-z0-9-]+$`; defaults to `type` when omitted.
 - Exactly one non-`header` setting must declare `usedAsTitle: true`, and it must be `type: "text"`.
-- `defaultSort` must be one of the five allowed values (defaults to `manual`).
-- `settings` may only use setting types in `src/components/settings/supportedSettingTypes.js` (`SUPPORTED_SETTING_TYPES`) — the single source of truth shared by the renderer and the backend validator: `header`, `text`, `number`, `textarea`, `richtext`, `code`, `color`, `range`, `select`, `checkbox`, `radio`, `font_picker`, `menu`, `image`, `gallery`, `table`, `file`, `link`, `youtube`, `icon`. (`table` is a uniform repeating-row field — see [Setting Types](theming-setting-types.md); v1 columns are `text`-only.)
+- At most one non-`header` setting may declare `usedAsDate: true`, and it must be `type: "date"`. `defaultSort: date_desc`/`date_asc` requires a `usedAsDate` field to exist.
+- `defaultSort` must be one of the seven allowed values — `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc` (defaults to `manual`).
+- `settings` may only use setting types in `src/components/settings/supportedSettingTypes.js` (`SUPPORTED_SETTING_TYPES`) — the single source of truth shared by the renderer and the backend validator: `header`, `text`, `number`, `date`, `textarea`, `richtext`, `code`, `color`, `range`, `select`, `checkbox`, `radio`, `font_picker`, `menu`, `image`, `gallery`, `table`, `file`, `link`, `youtube`, `icon`. (`table` is a uniform repeating-row field — see [Setting Types](theming-setting-types.md); v1 columns are `text`-only.)
 - `multiple`, `blocks`, repeater, relationship, and taxonomy fields are **rejected**, not silently ignored.
 - Two collections in the same project cannot share a `slugPrefix`; a `slugPrefix` cannot collide with an export-owned root directory (`assets`).
 - At runtime, invalid schemas are **skipped** from the sidebar/API and logged with their folder path. Theme upload **rejects** the whole upload if any schema is invalid.
@@ -326,9 +326,7 @@ The filter intentionally bypasses the per-widget settings sandbox — collection
 
 ## 8. Individual Item Pages (Export)
 
-Opt-in via `hasItemPages: true`. The theme must ship `template.liquid` for that type; collections that only render inside widgets (e.g. Arch's `team`) leave `hasItemPages: false` and need no template.
-
-> **Theme content note:** Arch's `portfolio` schema sets `hasItemPages: true` but does not yet ship a `template.liquid`; exporting a project with `portfolio` items fails fast with a clear "no template.liquid" error (see below). The export *code path* is complete — the Aegean theme's `accommodation` and `excursion` types ship `template.liquid` and exercise it end to end; the Arch template is the remaining authoring step.
+Opt-in via `hasItemPages: true`. The theme must ship `template.liquid` for that type; collections that only render inside widgets (e.g. a list-only `team` type) leave `hasItemPages: false` and need no template.
 
 The template renders **inside** the theme's main layout (header/footer/main slots), exactly like page templates. Available context: `item` (`id`, `uuid`, `slug`, `url`, `created`, `updated`, `settings.*`), `collection` (the schema), `page` (the page-shaped object below), plus the usual `project`/`theme`/`mediaFiles`/`imagePath`/`filePath`/`site_icons`. It is rendered through `renderLiquidTemplate(projectId, templateString, context, sharedGlobals)` — a helper exported from `renderingService.js` that runs an ad-hoc template string through the cached per-project engine. Both item-page render paths — the export loop and the in-app preview — build the finished page through **one** shared `renderCollectionItemPage()` in `renderingService.js` (resolve item → header/footer → page-shaped data → template → layout), so the two can never drift (the page-render analogue of how every widget goes through `renderWidget`); each caller supplies only its mode-specific `sharedGlobals` and post-processing (export: format/storage-rewrite/markdown/write; preview: token injection). Schema-declared `menu` settings resolve to a full menu object (`items[]` with depth-aware `link` + `canonicalPath`), the same shape widgets receive (finding #10), so an item template can `{% render 'menu', menu: item.settings.<id> %}`.
 

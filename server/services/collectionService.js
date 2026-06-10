@@ -22,11 +22,11 @@ import { isSupportedSettingType } from "../../src/components/settings/supportedS
 import { isAtomicTmpFile, writeJsonAtomic } from "../utils/atomicFs.js";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { prefixInternalHref } from "../utils/linkPrefixer.js";
-import { sanitizeCollectionItemData, sanitizeImagePath, stripHtmlTags } from "./sanitizationService.js";
+import { sanitizeCollectionItemData, sanitizeDateValue, sanitizeImagePath, stripHtmlTags } from "./sanitizationService.js";
 import { resolveMenuSettings } from "./menuResolver.js";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
-const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc"];
+const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc", "date_desc", "date_asc"];
 const RESERVED_SLUG_PREFIXES = new Set(["assets"]);
 // v1 constructs that must be rejected, not silently ignored (Section 1).
 const DISALLOWED_SETTING_KEYS = ["multiple", "repeater", "blocks"];
@@ -99,6 +99,7 @@ export function validateCollectionSchema(schema, folderName) {
 
   // --- settings array + per-setting checks ---
   let titleSettings = [];
+  let dateSettings = [];
   if (!Array.isArray(schema.settings)) {
     errors.push("`settings` must be an array.");
   } else {
@@ -125,6 +126,9 @@ export function validateCollectionSchema(schema, folderName) {
       if (setting.usedAsTitle === true && setting.type !== "header") {
         titleSettings.push(setting);
       }
+      if (setting.usedAsDate === true && setting.type !== "header") {
+        dateSettings.push(setting);
+      }
     });
   }
 
@@ -137,9 +141,21 @@ export function validateCollectionSchema(schema, folderName) {
     errors.push("`usedAsTitle` must be on a `text` setting.");
   }
 
+  // --- usedAsDate: at most one, must be a date setting ---
+  if (dateSettings.length > 1) {
+    errors.push(
+      `At most one non-header setting may declare \`usedAsDate: true\` (found ${dateSettings.length}).`,
+    );
+  } else if (dateSettings.length === 1 && dateSettings[0].type !== "date") {
+    errors.push("`usedAsDate` must be on a `date` setting.");
+  }
+
   // --- defaultSort ---
   if (schema.defaultSort !== undefined && !ALLOWED_SORTS.includes(schema.defaultSort)) {
     errors.push(`\`defaultSort\` must be one of: ${ALLOWED_SORTS.join(", ")}.`);
+  }
+  if ((schema.defaultSort === "date_desc" || schema.defaultSort === "date_asc") && dateSettings.length === 0) {
+    errors.push("`defaultSort: date_desc|date_asc` requires a `usedAsDate` field.");
   }
 
   // --- slugPrefix (effective = explicit or type) ---
@@ -497,7 +513,31 @@ async function applyManualOrder(items, projectFolderName, collectionType) {
   return [...ordered, ...remaining];
 }
 
-async function sortItems(items, sort, projectFolderName, collectionType) {
+/**
+ * Compare two items by their `usedAsDate` field for date_asc / date_desc sorting.
+ * Items with a missing, blank, or **malformed** date always sort to the END
+ * (independent of direction); exact ties and the all-missing case fall back to
+ * newest-created-first. `YYYY-MM-DD` strings compare lexicographically == chronologically.
+ */
+function compareByDate(a, b, dateField, dir) {
+  // Validate, don't just check non-empty: a malformed value (e.g. "2026-13-40" from a
+  // legacy or hand-edited file) must be treated as undated and sort to the END rather
+  // than as a huge date. New writes are already coerced in buildCollectionItemData.
+  const av = dateField ? sanitizeDateValue(a.settings?.[dateField]) : "";
+  const bv = dateField ? sanitizeDateValue(b.settings?.[dateField]) : "";
+  const aHas = av !== "";
+  const bHas = bv !== "";
+  if (aHas && bHas) {
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return byCreatedDesc(a, b);
+  }
+  if (aHas) return -1; // dated items precede undated ones
+  if (bHas) return 1;
+  return byCreatedDesc(a, b);
+}
+
+async function sortItems(items, sort, projectFolderName, collectionType, schema) {
   switch (sort) {
     case "manual":
       return applyManualOrder(items, projectFolderName, collectionType);
@@ -507,6 +547,12 @@ async function sortItems(items, sort, projectFolderName, collectionType) {
       return items.sort((a, b) => String(a.title).localeCompare(String(b.title)));
     case "title_desc":
       return items.sort((a, b) => String(b.title).localeCompare(String(a.title)));
+    case "date_asc":
+    case "date_desc": {
+      const dateField = (schema?.settings || []).find((s) => s.usedAsDate)?.id;
+      const dir = sort === "date_asc" ? 1 : -1;
+      return items.sort((a, b) => compareByDate(a, b, dateField, dir));
+    }
     case "created_desc":
     default:
       return items.sort(byCreatedDesc);
@@ -576,7 +622,7 @@ export async function listCollectionItems(projectFolderName, collectionType, opt
   let items = [...byUuid.values()].map((e) => normalizeCollectionItem(e.raw, schema));
 
   const sort = options.sort ?? schema.defaultSort ?? "manual";
-  items = await sortItems(items, sort, projectFolderName, collectionType);
+  items = await sortItems(items, sort, projectFolderName, collectionType, schema);
 
   const offset = options.offset ?? 0;
   if (offset) items = items.slice(offset);
@@ -705,6 +751,11 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
     } else {
       value = s.default !== undefined ? s.default : emptyDefaultForType(s.type);
     }
+    // Date is a sort key, so it must be valid at the data layer — not just at render
+    // like other types. Coerce a malformed value to "" here so garbage is never
+    // persisted and never sorts as if it were a real date. A bad value on a *required*
+    // date field then correctly fails the emptiness check below.
+    if (s.type === "date") value = sanitizeDateValue(value);
     settings[s.id] = value;
     if (s.required && isMissingValue(value, s.type, s.columns)) {
       validationErrors.push({ fieldId: s.id, reason: "required field is empty" });

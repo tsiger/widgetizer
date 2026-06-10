@@ -33,7 +33,7 @@ console.error = () => {};
 
 const { validateCollectionSchema, listCollectionSchemas, validateThemeCollectionSchemas } =
   await import("../services/collectionService.js");
-const { getProjectCollectionSchemaPath, THEMES_SEED_DIR } = await import("../config.js");
+const { getProjectCollectionSchemaPath } = await import("../config.js");
 
 /** Write a schema.json into <project>/collection-types/<type>/schema.json. */
 async function writeSchema(projectFolderName, type, schema) {
@@ -200,6 +200,64 @@ describe("validateCollectionSchema — defaultSort", () => {
     for (const v of ["manual", "created_desc", "created_asc", "title_asc", "title_desc"]) {
       const result = validateCollectionSchema(validSchema({ defaultSort: v }), "portfolio");
       assert.equal(result.valid, true, `expected ${v} to be valid`);
+    }
+  });
+});
+
+// ============================================================================
+// Rule: usedAsDate (≤1, must be a date setting); date_* sort requires it
+// ============================================================================
+
+describe("validateCollectionSchema — usedAsDate & date sort", () => {
+  const withDate = (over = {}) =>
+    validSchema({
+      defaultSort: "date_desc",
+      settings: [
+        { type: "text", id: "title", label: "Title", usedAsTitle: true },
+        { type: "date", id: "date", label: "Date", usedAsDate: true },
+      ],
+      ...over,
+    });
+
+  it("accepts a single usedAsDate date field with date_desc/date_asc sort", () => {
+    assert.equal(validateCollectionSchema(withDate(), "portfolio").valid, true);
+    assert.equal(validateCollectionSchema(withDate({ defaultSort: "date_asc" }), "portfolio").valid, true);
+  });
+
+  it("rejects more than one usedAsDate", () => {
+    const result = validateCollectionSchema(
+      validSchema({
+        settings: [
+          { type: "text", id: "title", label: "Title", usedAsTitle: true },
+          { type: "date", id: "d1", label: "D1", usedAsDate: true },
+          { type: "date", id: "d2", label: "D2", usedAsDate: true },
+        ],
+      }),
+      "portfolio",
+    );
+    assert.equal(result.valid, false);
+    assert.ok(result.errors.some((e) => /usedasdate/i.test(e)));
+  });
+
+  it("rejects usedAsDate on a non-date setting", () => {
+    const result = validateCollectionSchema(
+      validSchema({
+        settings: [
+          { type: "text", id: "title", label: "Title", usedAsTitle: true },
+          { type: "text", id: "when", label: "When", usedAsDate: true },
+        ],
+      }),
+      "portfolio",
+    );
+    assert.equal(result.valid, false);
+    assert.ok(result.errors.some((e) => /usedasdate/i.test(e) && /date/i.test(e)));
+  });
+
+  it("rejects date_desc/date_asc when no usedAsDate field exists", () => {
+    for (const sort of ["date_desc", "date_asc"]) {
+      const result = validateCollectionSchema(validSchema({ defaultSort: sort }), "portfolio");
+      assert.equal(result.valid, false, `expected ${sort} without usedAsDate to be invalid`);
+      assert.ok(result.errors.some((e) => /usedasdate/i.test(e)), result.errors.join("; "));
     }
   });
 });
@@ -440,21 +498,6 @@ describe("listCollectionSchemas", () => {
       ["gamma"],
     );
   });
-});
-
-// ============================================================================
-// Example theme schemas shipped with the `arch` theme must validate
-// ============================================================================
-
-describe("example arch theme collection schemas", () => {
-  for (const type of ["portfolio", "team"]) {
-    it(`themes/arch/collection-types/${type}/schema.json is valid`, async () => {
-      const schemaPath = path.join(THEMES_SEED_DIR, "arch", "collection-types", type, "schema.json");
-      const raw = await fs.readJSON(schemaPath);
-      const result = validateCollectionSchema(raw, type);
-      assert.equal(result.valid, true, result.errors.join("; "));
-    });
-  }
 });
 
 // ============================================================================

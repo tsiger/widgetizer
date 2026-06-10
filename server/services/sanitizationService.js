@@ -157,6 +157,27 @@ function sanitizeTableValue(value, columns) {
   return rows;
 }
 
+const DATE_ONLY_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/**
+ * Coerce a value to a valid "YYYY-MM-DD" calendar date string, or "" otherwise.
+ * Rejects bad format and impossible dates (2026-13-40, 2026-02-30). Date-only and
+ * timezone-agnostic — never constructs a Date from the raw string for the value
+ * itself (Date.UTC is used only to count days in the month).
+ */
+export function sanitizeDateValue(value) {
+  if (typeof value !== "string") return "";
+  const m = DATE_ONLY_REGEX.exec(value);
+  if (!m) return "";
+  const year = Number(m[1]);
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  if (month < 1 || month > 12 || day < 1) return "";
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (day > daysInMonth) return "";
+  return value;
+}
+
 /**
  * Sanitize a single setting value based on its schema-declared type.
  * Only richtext and link types need active sanitization:
@@ -174,6 +195,7 @@ function sanitizeSettingValue(value, type) {
   // so an image setting is always a safe string ("" or a valid path) everywhere.
   if (type === "gallery") return sanitizeGalleryValue(value);
   if (type === "image") return sanitizeImageSettingValue(value);
+  if (type === "date") return sanitizeDateValue(value);
   if (value == null) return value;
 
   switch (type) {
@@ -329,6 +351,9 @@ function sanitizeThemeSettingValue(value, schema) {
       break;
     case "code":
       sanitized = value;
+      break;
+    case "date":
+      sanitized = sanitizeDateValue(value);
       break;
     case "video":
     case "audio":

@@ -6,6 +6,7 @@ import {
   TextareaInput,
   CodeInput,
   ColorInput,
+  DateInput,
   RangeInput,
   RichTextInput,
   SelectInput,
@@ -79,6 +80,8 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
         return <TextInput {...inputProps} />;
       case "number":
         return <TextInput {...inputProps} type="number" />;
+      case "date":
+        return <DateInput {...inputProps} />;
       case "textarea":
         return <TextareaInput {...inputProps} />;
       case "richtext":

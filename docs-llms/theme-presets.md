@@ -112,18 +112,18 @@ presets/{id}/
 {
   "files": [
     {
-      "filename": "aegean-01.jpg",
-      "originalName": "aegean-01.jpg",
+      "filename": "photo-01.jpg",
+      "originalName": "photo-01.jpg",
       "type": "image/jpeg",
       "size": 292379,
-      "path": "/uploads/images/aegean-01.jpg",
+      "path": "/uploads/images/photo-01.jpg",
       "width": 1776, "height": 1178,
       "alt": "", "title": "",
       "sizes": {
-        "large":  { "path": "/uploads/images/aegean-01-large.jpg",  "width": 1776, "height": 1178 },
-        "medium": { "path": "/uploads/images/aegean-01-medium.jpg", "width": 1024, "height": 679 },
-        "small":  { "path": "/uploads/images/aegean-01-small.jpg",  "width": 480,  "height": 318 },
-        "thumb":  { "path": "/uploads/images/aegean-01-thumb.jpg",  "width": 150,  "height": 99 }
+        "large":  { "path": "/uploads/images/photo-01-large.jpg",  "width": 1776, "height": 1178 },
+        "medium": { "path": "/uploads/images/photo-01-medium.jpg", "width": 1024, "height": 679 },
+        "small":  { "path": "/uploads/images/photo-01-small.jpg",  "width": 480,  "height": 318 },
+        "thumb":  { "path": "/uploads/images/photo-01-thumb.jpg",  "width": 150,  "height": 99 }
       }
     }
   ]
@@ -134,7 +134,7 @@ At project creation `seedPresetMedia` (in `projectController.js`):
 - copies `media/images/*` verbatim into the project's `uploads/images/` — the `/uploads/images/...` paths are identical across projects, so the image-field values shipped in preset templates and collection items resolve as-is;
 - registers each manifest entry in the media DB (`media_files` + `media_sizes`) with a **fresh, project-scoped UUID** (avoids primary-key collisions across projects) so the media library lists them and usage tracking / export pick them up.
 
-Themes/presets without a `media/` folder are unaffected (the step is skipped). Resolved via `mediaDir` from `resolvePresetPaths`. The image **field values** that reference these files are authored normally inside the preset's `templates/*.json` and `collections/<type>/*.json` (e.g. `"featured_image": "/uploads/images/aegean-18.jpg"`). See also [core-media.md](core-media.md).
+Themes/presets without a `media/` folder are unaffected (the step is skipped). Resolved via `mediaDir` from `resolvePresetPaths`. The image **field values** that reference these files are authored normally inside the preset's `templates/*.json` and `collections/<type>/*.json` (e.g. `"featured_image": "/uploads/images/photo-18.jpg"`). See also [core-media.md](core-media.md).
 
 ## Files to modify
 

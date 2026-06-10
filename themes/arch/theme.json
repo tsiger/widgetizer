@@ -30,6 +30,27 @@
           "label": "tTheme:global.general.settings.enable_reveal_animations.label",
           "default": false,
           "description": "tTheme:global.general.settings.enable_reveal_animations.description"
+        },
+        {
+          "type": "header",
+          "id": "content_header",
+          "label": "tTheme:global.general.settings.content_header.label"
+        },
+        {
+          "type": "select",
+          "id": "date_format",
+          "label": "tTheme:global.general.settings.date_format.label",
+          "description": "tTheme:global.general.settings.date_format.description",
+          "default": "MMMM D, YYYY",
+          "options": [
+            { "value": "MMMM D, YYYY", "label": "December 31, 2026" },
+            { "value": "D MMMM YYYY", "label": "31 December 2026" },
+            { "value": "MMM D, YYYY", "label": "Dec 31, 2026" },
+            { "value": "D MMM YYYY", "label": "31 Dec 2026" },
+            { "value": "MM/DD/YYYY", "label": "12/31/2026" },
+            { "value": "DD/MM/YYYY", "label": "31/12/2026" },
+            { "value": "YYYY-MM-DD", "label": "2026-12-31" }
+          ]
         }
       ],
       "colors": [

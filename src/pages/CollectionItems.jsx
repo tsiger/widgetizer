@@ -28,6 +28,7 @@ import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { resolveLucideIcon } from "../utils/lucideIcon";
+import { formatDateOnly, toDateOnlyFormat } from "../core/utils/dateFormat";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
 import Table from "../components/ui/Table";
@@ -38,7 +39,7 @@ export default function CollectionItems() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { type } = useParams();
-  const { formatDate } = useFormatDate();
+  const { formatDate, dateFormat } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
 
@@ -54,6 +55,9 @@ export default function CollectionItems() {
   const menuRef = useRef(null);
 
   const schema = (schemas || []).find((s) => s.type === type) || null;
+  // When the type has a publication date (usedAsDate), the list shows it (date-only,
+  // honoring the app date-format preference) instead of the generic `updated` column.
+  const dateField = (schema?.settings || []).find((s) => s.usedAsDate)?.id || null;
   const displayName = schema?.displayName || type;
   const displayNamePlural = schema?.displayNamePlural || displayName;
 
@@ -327,7 +331,11 @@ export default function CollectionItems() {
         </div>
       </td>
       <td className="py-3 px-4 whitespace-nowrap">
-        <div className="text-slate-600 text-sm">{formatDate(item.updated)}</div>
+        <div className="text-slate-600 text-sm">
+          {dateField
+            ? formatDateOnly(item.settings?.[dateField], toDateOnlyFormat(dateFormat)) || "—"
+            : formatDate(item.updated)}
+        </div>
       </td>
       <td className="py-3 px-4 text-right">{renderRowActions(item)}</td>
     </>
@@ -350,7 +358,7 @@ export default function CollectionItems() {
       )}
     </IconButton>,
     t("collections.headers.title"),
-    t("collections.headers.updated"),
+    dateField ? t("collections.headers.date") : t("collections.headers.updated"),
     t("collections.headers.actions"),
   ];
 

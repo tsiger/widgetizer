@@ -67,6 +67,28 @@ A numeric input field.
 }
 ```
 
+### Date
+
+A native date picker. The stored value is a date-only string in `YYYY-MM-DD` format (or `""` when unset) — no time component, timezone-agnostic.
+
+```json
+{
+  "id": "published",
+  "type": "date",
+  "label": "Publication date"
+}
+```
+
+**Sorting (collection types):** a `date` field can be flagged `usedAsDate: true` to become a collection's sort key — `defaultSort: date_desc`/`date_asc` then orders items by it (items with no value sort last). See [Collections](core-collections.md).
+
+**Rendering on the published site:** format the value with the `| format_date` filter, which is timezone-safe and honors the theme's **Date format** setting, so users control the display visually without editing templates:
+
+```liquid
+<time datetime="{{ item.settings.published }}">{{ item.settings.published | format_date }}</time>
+```
+
+Pass an explicit token to override the theme setting for one call — `{{ value | format_date: 'D MMM YYYY' }}`. A blank or invalid value formats to `""`. Supported tokens: `MMMM D, YYYY`, `D MMMM YYYY`, `MMM D, YYYY`, `D MMM YYYY`, `MM/DD/YYYY`, `DD/MM/YYYY`, `YYYY-MM-DD`.
+
 ### Textarea
 
 A multi-line text input field.

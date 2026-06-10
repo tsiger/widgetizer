@@ -1,0 +1,63 @@
+{%- comment -%}
+  News article page. Exported at news/{slug}.html (one directory deep, so internal
+  links use ../). Renders inside the Arch layout (header / main / footer). The date
+  is formatted with the theme's `date_format` setting via the `format_date` filter.
+  SEO (title / description / og / canonical) is wired automatically for hasItemPages
+  items — no SEO markup needed here.
+{%- endcomment -%}
+<article class="widget widget-news-article">
+  <style>
+    .widget-news-article .news-back {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      color: var(--text-muted);
+    }
+    .widget-news-article .news-back:hover {
+      color: var(--accent);
+    }
+    .widget-news-article .news-meta {
+      color: var(--text-muted);
+    }
+    .widget-news-article .news-figure {
+      margin: 0;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .widget-news-article .news-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+  </style>
+
+  <div class="widget-container">
+    <div class="widget-content content-flow widget-content-md widget-content-align-start">
+      <a class="news-back w-label t-xs t-uppercase" href="../index.html">&larr; Back to home</a>
+
+      <h1 class="w-headline reveal reveal-up">{{ item.settings.title }}</h1>
+
+      {% if item.settings.date != blank %}
+        <p class="news-meta w-meta t-sm reveal reveal-up">
+          <time datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
+        </p>
+      {% endif %}
+
+      {% if item.settings.excerpt != blank %}
+        <p class="w-body t-lg t-muted reveal reveal-up">{{ item.settings.excerpt }}</p>
+      {% endif %}
+
+      {% if item.settings.featured_image != blank %}
+        <figure class="news-figure reveal reveal-up">
+          {% image src: item.settings.featured_image, size: 'large', class: 'news-image', srcset: true, sizes: '(max-width: 800px) 100vw, 800px', alt: item.settings.title %}
+        </figure>
+      {% endif %}
+
+      {% if item.settings.body != blank %}
+        <div class="w-body w-rte reveal reveal-up">{{ item.settings.body | raw }}</div>
+      {% endif %}
+    </div>
+  </div>
+</article>

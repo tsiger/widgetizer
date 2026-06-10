@@ -13,6 +13,7 @@ export const SUPPORTED_SETTING_TYPES = [
   "header",
   "text",
   "number",
+  "date",
   "textarea",
   "richtext",
   "code",

@@ -5,9 +5,7 @@
 > editor (theme authors define blocks; end users arrange them) instead of a fixed
 > `template.liquid`. Nothing here is decided; the open forks in §7 are the things to sleep on.
 > Builds on the existing collections system, the widget **blocks** model, and the page editor.
-> **Aegean** is the playground theme for all collections work (Arch's `portfolio` type is
-> being retired). For *when* to build this, see the verdict in §8 — short version: when the
-> hosted SaaS needs it.
+> For *when* to build this, see the verdict in §8 — short version: when the hosted SaaS needs it.
 
 ## 1. The idea in one line
 
@@ -76,7 +74,7 @@ reinforces "this is the page editor pointed at an item template," not a new buil
 Theme side — what the theme author ships (proposed; does not exist yet):
 
 ```
-themes/aegean/collection-types/accommodation/
+themes/<theme>/collection-types/accommodation/
 ├── schema.json          # item DATA — the fields a user fills per item (UNCHANGED)
 ├── item.liquid          # the item-page SHELL — outer markup + a {% blocks %} slot
 ├── template.json        # DEFAULT block arrangement (starter layout)
@@ -140,7 +138,7 @@ data/projects/<folder>/collections/accommodation/_template.json   # ordered bloc
 ```
 
 Optional DX nicety: theme-wide reusable visual blocks (text, divider, spacer — same everywhere)
-could live once at `themes/aegean/collection-blocks/` instead of being duplicated per type, while
+could live once at `themes/<theme>/collection-blocks/` instead of being duplicated per type, while
 data blocks (gallery, rates) stay per-type because they read that type's fields.
 
 ## 5. DX and UX
@@ -269,7 +267,7 @@ answer now:
   paying customer controls item layout.
 
 **Verdict: later, when the SaaS needs it** (a better trigger than any calendar date). Meanwhile,
-the first fixed `template.liquid` written for Aegean doubles as the design study — where the
+the first fixed `template.liquid` written for a real collection type doubles as the design study — where the
 template *wants* to be sliced into blocks is the best possible input to fork §7.1.
 
 ## See Also

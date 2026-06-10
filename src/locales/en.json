@@ -33,6 +33,7 @@
     "headers": {
       "title": "Title",
       "updated": "Updated",
+      "date": "Date",
       "actions": "Actions"
     },
     "noItemsFound": "No items found",

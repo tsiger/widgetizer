@@ -25,6 +25,7 @@ import { EnqueuePreloadTag } from "../../src/core/tags/enqueuePreload.js";
 import { registerMediaMetaFilter } from "../../src/core/filters/mediaMetaFilter.js";
 import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.js";
 import { registerCollectionFilter } from "../../src/core/filters/collectionFilter.js";
+import { registerDateFilter } from "../../src/core/filters/dateFilter.js";
 import { registerSafeUrlFilter } from "../../src/core/filters/safeUrlFilter.js";
 import {
   listCollectionItems,
@@ -95,6 +96,7 @@ function configureLiquidEngine(engine) {
   registerMediaMetaFilter(engine);
   registerHandleizeFilter(engine);
   registerCollectionFilter(engine);
+  registerDateFilter(engine);
   registerSafeUrlFilter(engine);
 }
 
@@ -427,6 +429,12 @@ async function createBaseRenderContext(projectId, rawThemeSettings, renderMode =
   // active-state matching (Phase 16).
   if (globals.outputPathPrefix === undefined) globals.outputPathPrefix = outputPathPrefix;
   if (globals.currentCanonicalPath === undefined) globals.currentCanonicalPath = "";
+  // Published date format (theme-owned, set via the `date_format` theme setting).
+  // Consumed by the `format_date` filter; when a theme defines no such setting the
+  // filter falls back to its own default, so we only set this when present.
+  if (globals.dateFormat === undefined && processedThemeSettings?.general?.date_format) {
+    globals.dateFormat = processedThemeSettings.general.date_format;
+  }
 
   // Collection items loader for the `| collection` filter (Phase 8). Attached
   // once per render; results cached per (type, options) on `globals` so multiple
