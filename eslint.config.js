@@ -3,6 +3,10 @@ import globals from "globals";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import requireScopeArg from "./eslint-rules/require-scope-arg.js";
+
+// Local-only plugin housing repo-specific lint rules.
+const local = { rules: { "require-scope-arg": requireScopeArg } };
 
 export default [
   { ignores: ["dist", "dist-electron"] },
@@ -51,9 +55,11 @@ export default [
         sourceType: "module",
       },
     },
+    plugins: { local },
     rules: {
       ...js.configs.recommended.rules,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "local/require-scope-arg": "error",
     },
   },
   // Shared packages (@widgetizer/core) — code consumed by both the React
@@ -86,9 +92,11 @@ export default [
         sourceType: "module",
       },
     },
+    plugins: { local },
     rules: {
       ...js.configs.recommended.rules,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "local/require-scope-arg": "error",
     },
   },
   // Electron (main process + preload)
