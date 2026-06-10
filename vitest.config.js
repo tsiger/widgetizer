@@ -1,8 +1,19 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import { resolve } from "path";
 
 export default defineConfig({
   plugins: [react()],
+  // Mirror vite.config.js so module resolution matches the build (vitest does
+  // not read vite.config.js when a vitest.config.js is present).
+  resolve: {
+    alias: [
+      {
+        find: /^@widgetizer\/editor-ui$/,
+        replacement: resolve(import.meta.dirname, "packages/editor-ui/src/index.js"),
+      },
+    ],
+  },
   test: {
     environment: "node",
     include: [

@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Scan the @widgetizer/editor-ui package source for utility classes. Additive
+   to Tailwind v4's automatic detection of this project tree (the package
+   resolves via a workspace symlink, which auto-detection does not follow), so
+   classes in editor-ui components survive purge once the UI moves there. */
+@source "../packages/editor-ui/src";
+
 @layer base {
   :root {
     --shell-inset: 18px;
