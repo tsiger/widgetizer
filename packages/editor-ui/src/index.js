@@ -7,3 +7,12 @@
 export { buildRegistry } from "./extension/registry.js";
 export { createHookRunner, HOOK_EVENTS } from "./extension/hooks.js";
 export { SLOT_NAMES, resolveSlot } from "./extension/slots.js";
+export {
+  PluginProvider,
+  SlotOutlet,
+  useNavItems,
+  useCommands,
+  usePluginRoutes,
+  useHookRunner,
+  useSlot,
+} from "./extension/PluginProvider.jsx";

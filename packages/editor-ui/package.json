@@ -9,5 +9,9 @@
   },
   "dependencies": {
     "@widgetizer/core": "*"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
   }
 }

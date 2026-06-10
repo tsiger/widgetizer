@@ -16,14 +16,15 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    setupFiles: ["./vitest.setup.js"],
     include: [
-      "src/**/*.test.js",
+      "src/**/*.test.{js,jsx}",
       "scripts/__tests__/*.test.js",
       // Only packages whose tests use Vitest. @widgetizer/builder-server uses
       // the Node test runner (npm test), so it is intentionally excluded here.
       "packages/core/src/**/*.test.js",
       "packages/adapters-local/src/**/*.test.js",
-      "packages/editor-ui/src/**/*.test.js",
+      "packages/editor-ui/src/**/*.test.{js,jsx}",
     ],
   },
 });
