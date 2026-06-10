@@ -111,6 +111,7 @@ A rich text editor with basic formatting (bold, italic, link, lists). The value 
 
 - **`placeholder`** (string, optional): Placeholder text shown when the editor is empty.
 - **`allow_source`** (boolean, optional): If `true`, shows an HTML source toggle button for advanced editing. Defaults to `false`.
+- **`allow_headings`** (boolean, optional): If `true`, adds H2/H3/H4 buttons to the toolbar (for long-form bodies like blog posts). Defaults to `false`, so simple richtext fields stay minimal. The heading tags are in the richtext sanitizer allowlist and styled by the theme's `w-rte` container; H1 is intentionally excluded (reserved for the page/item title). Levels live in one place (`HEADING_LEVELS` in `RichTextInput.jsx`) so more can be added later.
 
 ```json
 {

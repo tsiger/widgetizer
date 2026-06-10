@@ -103,10 +103,18 @@ describe("sanitizeRichText", () => {
     assert.ok(result.includes("Content inside div"));
   });
 
-  it("strips <h1>-<h6> tags (not in allowed list)", () => {
-    const result = sanitizeRichText("<h1>Title</h1><h3>Subtitle</h3>");
-    assert.doesNotMatch(result, /<h[1-6]/i);
-    assert.ok(result.includes("Title"));
+  it("keeps <h2>-<h4>, strips <h1>/<h5>/<h6> (heading allowlist)", () => {
+    const result = sanitizeRichText(
+      "<h1>One</h1><h2>Two</h2><h3>Three</h3><h4>Four</h4><h5>Five</h5><h6>Six</h6>",
+    );
+    // h2-h4 are allowed (emitted by the allow_headings editor option).
+    assert.match(result, /<h2>Two<\/h2>/);
+    assert.match(result, /<h3>Three<\/h3>/);
+    assert.match(result, /<h4>Four<\/h4>/);
+    // h1 / h5 / h6 are not in the allowlist — tags stripped, text preserved.
+    assert.doesNotMatch(result, /<h1|<h5|<h6/i);
+    assert.ok(result.includes("One"));
+    assert.ok(result.includes("Five"));
   });
 
   // --- Dangerous attributes are stripped ---

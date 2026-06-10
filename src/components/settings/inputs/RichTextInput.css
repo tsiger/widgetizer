@@ -158,14 +158,43 @@
   margin-top: 0.5em;
 }
 
+.richtext-editor .tiptap h2,
+.richtext-editor .tiptap h3,
+.richtext-editor .tiptap h4 {
+  font-weight: 600;
+  line-height: 1.25;
+  color: #0f172a; /* slate-900 */
+  margin: 0.75em 0 0.25em;
+}
+
+.richtext-editor .tiptap h2 {
+  font-size: 1.4em;
+}
+
+.richtext-editor .tiptap h3 {
+  font-size: 1.2em;
+}
+
+.richtext-editor .tiptap h4 {
+  font-size: 1.05em;
+}
+
+.richtext-editor .tiptap > :first-child {
+  margin-top: 0;
+}
+
+/* Match the theme's rich-text link rule (.w-rte a): accent color, no underline,
+   underline on hover — so the editor reads the same as the published article. */
 .richtext-editor .tiptap a {
   color: #db2777; /* pink-600 */
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
+  transition: text-decoration 0.15s ease;
 }
 
 .richtext-editor .tiptap a:hover {
   color: #be185d; /* pink-700 */
+  text-decoration: underline;
 }
 
 /* Placeholder */

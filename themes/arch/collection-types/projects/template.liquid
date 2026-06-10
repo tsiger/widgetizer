@@ -5,50 +5,59 @@
 {%- endcomment -%}
 <article class="widget widget-project">
   <style>
-    .widget-project .project-back {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-xs);
-      color: var(--text-muted);
-    }
-    .widget-project .project-back:hover {
-      color: var(--accent);
-    }
-    .widget-project .project-meta {
-      color: var(--text-muted);
-    }
-    .widget-project .project-figure {
-      margin: 0;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-    .widget-project .project-image {
-      display: block;
-      width: 100%;
-      height: auto;
-      aspect-ratio: 16 / 10;
-      object-fit: cover;
-    }
-    .widget-project .project-gallery {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: var(--space-md);
-    }
-    .widget-project .project-gallery-img {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: var(--radius-md);
-    }
-    @media (min-width: 750px) {
-      .widget-project .project-gallery {
-        grid-template-columns: 1fr 1fr;
+    .widget-project {
+      & .project-back {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        color: var(--text-muted);
+
+        &:hover {
+          color: var(--accent);
+        }
+      }
+
+      & .project-meta {
+        margin-block-start: var(--space-xs);
+        color: var(--text-muted);
+      }
+
+      & .project-figure {
+        margin: var(--space-xl) 0 0;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      & .project-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+      }
+
+      & .project-gallery {
+        margin-block-start: var(--space-xl);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+
+        @media (min-width: 750px) {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      & .project-gallery-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-md);
       }
     }
   </style>
 
   <div class="widget-container">
-    <div class="widget-content content-flow widget-content-md widget-content-align-start">
+    <div class="widget-content content-flow widget-content-md">
       <a class="project-back w-label t-xs t-uppercase" href="../index.html">&larr; Back to home</a>
 
       <h1 class="w-headline reveal reveal-up">{{ item.settings.title }}</h1>

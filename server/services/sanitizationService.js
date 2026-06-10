@@ -19,7 +19,7 @@ export function stripHtmlTags(value) {
  * Text and textarea fields are handled by LiquidJS autoescape (outputEscape: "escape").
  */
 const RICHTEXT_CONFIG = {
-  ALLOWED_TAGS: ["p", "strong", "em", "a", "br", "span", "ul", "ol", "li"],
+  ALLOWED_TAGS: ["p", "h2", "h3", "h4", "strong", "em", "a", "br", "span", "ul", "ol", "li"],
   ALLOWED_ATTR: ["href", "target", "rel", "class"],
   ALLOW_DATA_ATTR: false,
 };

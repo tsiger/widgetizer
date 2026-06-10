@@ -85,7 +85,14 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
       case "textarea":
         return <TextareaInput {...inputProps} />;
       case "richtext":
-        return <RichTextInput {...inputProps} placeholder={setting.placeholder} allowSource={setting.allow_source} />;
+        return (
+          <RichTextInput
+            {...inputProps}
+            placeholder={setting.placeholder}
+            allowSource={setting.allow_source}
+            allowHeadings={setting.allow_headings}
+          />
+        );
       case "code":
         return <CodeInput {...inputProps} language={language || "html"} rows={setting.rows || 10} allowExpand={allowExpand} resizable={resizable} />;
       case "color":

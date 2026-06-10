@@ -671,6 +671,16 @@ b {
    -------------------------------------------------------------------------- */
 
 .w-rte {
+  & h2,
+  & h3,
+  & h4 {
+    margin-block: var(--space-lg) var(--space-sm);
+
+    &:first-child {
+      margin-block-start: 0;
+    }
+  }
+
   & p {
     margin-block-end: var(--space-md);
 

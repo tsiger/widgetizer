@@ -19,10 +19,19 @@ import {
   Check,
   List,
   ListOrdered,
+  Heading2,
+  Heading3,
+  Heading4,
 } from "lucide-react";
 import "./RichTextInput.css";
 
-function MenuBar({ editor, isSourceMode, onToggleSource, allowSource }) {
+// Heading levels exposed when `allowHeadings` is on. To offer more later, add the
+// level here and its lucide icon below — H1 is intentionally omitted (reserved for
+// the page/article title).
+const HEADING_LEVELS = [2, 3, 4];
+const HEADING_ICONS = { 2: Heading2, 3: Heading3, 4: Heading4 };
+
+function MenuBar({ editor, isSourceMode, onToggleSource, allowSource, allowHeadings }) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
 
@@ -95,6 +104,25 @@ function MenuBar({ editor, isSourceMode, onToggleSource, allowSource }) {
       <div className="richtext-menubar">
         {!isSourceMode && (
           <>
+            {allowHeadings && (
+              <>
+                {HEADING_LEVELS.map((level) => {
+                  const Icon = HEADING_ICONS[level];
+                  return (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
+                      className={`richtext-menubar-button ${editor.isActive("heading", { level }) ? "is-active" : ""}`}
+                      title={`Heading ${level}`}
+                    >
+                      <Icon size={16} />
+                    </button>
+                  );
+                })}
+                <div className="richtext-menubar-divider" />
+              </>
+            )}
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleBold().run()}
@@ -170,7 +198,14 @@ function MenuBar({ editor, isSourceMode, onToggleSource, allowSource }) {
   );
 }
 
-export default function RichTextInput({ id, value = "", onChange, placeholder = "", allowSource = false }) {
+export default function RichTextInput({
+  id,
+  value = "",
+  onChange,
+  placeholder = "",
+  allowSource = false,
+  allowHeadings = false,
+}) {
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [sourceValue, setSourceValue] = useState(value);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -181,7 +216,7 @@ export default function RichTextInput({ id, value = "", onChange, placeholder = 
     extensions: [
       StarterKit.configure({
         // Enable basic formatting and lists
-        heading: false,
+        heading: allowHeadings ? { levels: HEADING_LEVELS } : false,
         bulletList: true,
         orderedList: true,
         listItem: true,
@@ -283,6 +318,7 @@ export default function RichTextInput({ id, value = "", onChange, placeholder = 
         isSourceMode={isSourceMode}
         onToggleSource={handleToggleSource}
         allowSource={allowSource}
+        allowHeadings={allowHeadings}
       />
       {isSourceMode ? (
         <textarea

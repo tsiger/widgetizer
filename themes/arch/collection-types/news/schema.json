@@ -20,6 +20,6 @@
       "description": "Short teaser shown in listings and at the top of the article."
     },
     { "type": "image", "id": "featured_image", "label": "Featured image" },
-    { "type": "richtext", "id": "body", "label": "Body" }
+    { "type": "richtext", "id": "body", "label": "Body", "allow_headings": true }
   ]
 }
