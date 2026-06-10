@@ -10,7 +10,9 @@
     "./lib/apiBase": "./src/lib/apiBase.js",
     "./lib/apiFetch": "./src/lib/apiFetch.js",
     "./lib/activeProjectId": "./src/lib/activeProjectId.js",
-    "./lib/uploadRequest": "./src/lib/uploadRequest.js"
+    "./lib/uploadRequest": "./src/lib/uploadRequest.js",
+    "./queries/pageManager": "./src/queries/pageManager.js",
+    "./queries/menuManager": "./src/queries/menuManager.js"
   },
   "dependencies": {
     "@widgetizer/core": "*"
