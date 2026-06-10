@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 
 // blockLimits is a frontend util (src/utils) shared with this backend test.
 // Temporary cross-boundary reference until shared utils land in @widgetizer/core.
-import { hasReachedMaxBlocks } from "../../../../src/utils/blockLimits.js";
+import { hasReachedMaxBlocks } from "@widgetizer/core/blockLimits";
 
 // ============================================================================
 // hasReachedMaxBlocks

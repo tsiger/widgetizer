@@ -14,6 +14,7 @@
     "./test-helpers/limits": "./test-helpers/limitsConformance.js",
     "./test-helpers/scope-resolver": "./test-helpers/scopeResolverConformance.js",
     "./youtube": "./src/utils/youtubeHelpers.js",
+    "./blockLimits": "./src/utils/blockLimits.js",
     "./config/fonts.json": "./src/config/fonts.json"
   },
   "dependencies": {

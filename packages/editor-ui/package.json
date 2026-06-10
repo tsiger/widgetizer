@@ -17,10 +17,21 @@
     "./queries/themeManager": "./src/queries/themeManager.js",
     "./queries/mediaManager": "./src/queries/mediaManager.js",
     "./queries/exportManager": "./src/queries/exportManager.js",
-    "./queries/appSettingsManager": "./src/queries/appSettingsManager.js"
+    "./queries/appSettingsManager": "./src/queries/appSettingsManager.js",
+    "./queries/previewManager": "./src/queries/previewManager.js",
+    "./stores/projectStore": "./src/stores/projectStore.js",
+    "./stores/pageStore": "./src/stores/pageStore.js",
+    "./stores/themeStore": "./src/stores/themeStore.js",
+    "./stores/widgetStore": "./src/stores/widgetStore.js",
+    "./stores/saveStore": "./src/stores/saveStore.js",
+    "./stores/toastStore": "./src/stores/toastStore.js",
+    "./stores/themeUpdateStore": "./src/stores/themeUpdateStore.js",
+    "./stores/iconsStore": "./src/stores/iconsStore.js"
   },
   "dependencies": {
-    "@widgetizer/core": "*"
+    "@widgetizer/core": "*",
+    "zundo": "^2.3.0",
+    "zustand": "^5.0.3"
   },
   "peerDependencies": {
     "react": ">=19",
