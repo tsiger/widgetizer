@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../config", () => ({
+vi.mock("../config", () => ({
   API_URL: vi.fn((path) => `http://api.test${path}`),
 }));
 

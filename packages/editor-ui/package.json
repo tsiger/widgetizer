@@ -5,7 +5,12 @@
   "type": "module",
   "main": "./src/index.js",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./lib/config": "./src/lib/config.js",
+    "./lib/apiBase": "./src/lib/apiBase.js",
+    "./lib/apiFetch": "./src/lib/apiFetch.js",
+    "./lib/activeProjectId": "./src/lib/activeProjectId.js",
+    "./lib/uploadRequest": "./src/lib/uploadRequest.js"
   },
   "dependencies": {
     "@widgetizer/core": "*"
