@@ -82,6 +82,36 @@ export default [
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  // @widgetizer/editor-ui — React UI package (shared by both shells). Browser +
+  // Node globals; JSX enabled for the components that land in 1.5e. No
+  // react-refresh rule (it is a library, not an HMR entry point).
+  {
+    files: ["packages/editor-ui/src/**/*.{js,jsx}"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+      parserOptions: {
+        ecmaVersion: "latest",
+        ecmaFeatures: { jsx: true },
+        sourceType: "module",
+      },
+    },
+    settings: { react: { version: "19.0" } },
+    plugins: {
+      react,
+      "react-hooks": reactHooks,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...react.configs.recommended.rules,
+      ...react.configs["jsx-runtime"].rules,
+      ...reactHooks.configs.recommended.rules,
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "react/prop-types": "off",
+    },
+  },
   // OSS shell (web entry + shared server assembly), Node ESM.
   {
     files: ["server.js", "app/**/*.js"],
