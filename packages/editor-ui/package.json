@@ -58,7 +58,12 @@
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@tiptap/extension-link": "^3.18.0",
+    "@tiptap/pm": "^3.18.0",
+    "@tiptap/react": "^3.18.0",
+    "@tiptap/starter-kit": "^3.18.0",
     "@widgetizer/core": "*",
+    "dompurify": "^3.3.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.563.0",
     "prismjs": "^1.30.0",
@@ -77,5 +82,9 @@
     "react": ">=19",
     "react-dom": ">=19",
     "react-router-dom": ">=7"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "vitest": "^4.0.18"
   }
 }
