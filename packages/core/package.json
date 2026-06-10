@@ -6,6 +6,7 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",
+    "./package.json": "./package.json",
     "./errors": "./src/errors.js",
     "./adapters": "./src/adapters.js",
     "./test-helpers/storage": "./test-helpers/storageConformance.js",

@@ -15,7 +15,8 @@ export default {
     // app/ is frontend source already bundled into dist/ by Vite). It composes
     // the @widgetizer/* backend packages, which are bundled via dependencies.
     "app/server-common.js",
-    "src/core",
+    // src/core data dirs (widgets/snippets/assets) moved into @widgetizer/core
+    // in Sprint 1.6 — they ride along via the @widgetizer/core dependency.
     "src/utils",
     "themes",
     "!themes/widgetizer/**",
@@ -27,7 +28,9 @@ export default {
     "themes/**",
     "!themes/widgetizer/**",
     "dist/**",
-    "src/core/assets/**",
+    // Core placeholder SVGs are served via res.sendFile, which needs real files
+    // on disk (not inside the asar). They live in @widgetizer/core since 1.6.
+    "node_modules/@widgetizer/core/src/assets/**",
     "src/utils/previewRuntime.js",
     "node_modules/sharp/**",
     "node_modules/@img/sharp-*/**",

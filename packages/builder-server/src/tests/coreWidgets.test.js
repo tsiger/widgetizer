@@ -24,8 +24,10 @@ import os from "os";
 const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-core-widgets-${Date.now()}`);
 const TEST_CORE_WIDGETS_DIR = path.join(TEST_ROOT, "src", "core", "widgets");
 
-// CORE_WIDGETS_DIR is derived from APP_ROOT: path.join(APP_ROOT, "src", "core", "widgets")
-// APP_ROOT defaults to process.cwd() unless APP_ROOT env var is set.
+// CORE_WIDGETS_DIR is normally resolved from the @widgetizer/core package; the
+// CORE_WIDGETS_DIR env var overrides it so this suite runs against an isolated
+// fixture dir instead of the real core widgets.
+process.env.CORE_WIDGETS_DIR = TEST_CORE_WIDGETS_DIR;
 process.env.APP_ROOT = TEST_ROOT;
 process.env.DATA_ROOT = path.join(TEST_ROOT, "data");
 process.env.THEMES_ROOT = path.join(TEST_ROOT, "themes");

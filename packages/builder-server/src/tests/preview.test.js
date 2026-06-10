@@ -22,8 +22,10 @@ const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-preview-test-${Date.now()}`
 const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
 const TEST_THEMES_DIR = path.join(TEST_ROOT, "themes");
 
-// APP_ROOT drives CORE_WIDGETS_DIR (APP_ROOT/src/core/widgets); isolate it so core
-// widget asset serving can be tested without touching the real repo source tree.
+// CORE_WIDGETS_DIR is normally resolved from the @widgetizer/core package; the
+// CORE_WIDGETS_DIR env var overrides it to an isolated dir so core widget asset
+// serving can be tested without touching the real package source tree.
+process.env.CORE_WIDGETS_DIR = path.join(TEST_ROOT, "src", "core", "widgets");
 process.env.APP_ROOT = TEST_ROOT;
 process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
