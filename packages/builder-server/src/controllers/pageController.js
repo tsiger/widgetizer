@@ -95,15 +95,13 @@ export async function readGlobalWidgetData(projectId, widgetType) {
   }
 }
 
-async function persistPageWithMediaTracking({ projectId, projectFolderName, pageId, pageData, previousPageId = null }) {
-  const pagePath = getPagePath(projectFolderName, pageId);
-  await fs.outputFile(pagePath, JSON.stringify(pageData, null, 2));
+async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, previousPageId = null }) {
+  await storage.write(scope, `pages/${pageId}.json`, JSON.stringify(pageData, null, 2));
 
   if (previousPageId && previousPageId !== pageId) {
-    const previousPath = getPagePath(projectFolderName, previousPageId);
     try {
-      if (await fs.pathExists(previousPath)) {
-        await fs.remove(previousPath);
+      if (await storage.exists(scope, `pages/${previousPageId}.json`)) {
+        await storage.delete(scope, `pages/${previousPageId}.json`);
       }
     } catch (unlinkError) {
       console.warn(`Failed to delete old page file ${previousPageId} after slug change: ${unlinkError.message}`);
@@ -111,18 +109,17 @@ async function persistPageWithMediaTracking({ projectId, projectFolderName, page
   }
 
   try {
-    await syncPageMediaUsageOnWrite(projectId, pageId, pageData, previousPageId);
+    await syncPageMediaUsageOnWrite(scope.projectId, pageId, pageData, previousPageId);
   } catch (usageError) {
     console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
   }
 }
 
-async function deletePageWithMediaTracking({ projectId, projectFolderName, pageId }) {
-  const pagePath = getPagePath(projectFolderName, pageId);
-  await fs.remove(pagePath);
+async function deletePageWithMediaTracking({ scope, storage, pageId }) {
+  await storage.delete(scope, `pages/${pageId}.json`);
 
   try {
-    await syncPageMediaUsageOnDelete(projectId, pageId);
+    await syncPageMediaUsageOnDelete(scope.projectId, pageId);
   } catch (usageError) {
     console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
   }
@@ -137,17 +134,16 @@ async function deletePageWithMediaTracking({ projectId, projectFolderName, pageI
 export async function getPage(req, res) {
   try {
     const { id } = req.params; // This is the slug
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
     // Try to find the page in the project's pages directory
-    const pagePath = getPagePath(projectFolderName, id);
+    const pageData = await storage.read(scope, `pages/${id}.json`);
     // Check if page exists
-    if (!(await fs.pathExists(pagePath))) {
+    if (pageData == null) {
       return res.status(404).json({ error: "Page not found" });
     }
-    const pageData = await fs.readFile(pagePath, "utf8");
-    return res.json(JSON.parse(pageData));
+    return res.json(JSON.parse(pageData.toString("utf8")));
   } catch (error) {
     console.error("Error getting page:", error);
     res.status(500).json({ error: "Failed to get page" });
@@ -173,8 +169,8 @@ export async function updatePage(req, res) {
       if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
     }
 
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
     // Fallback: If slug is missing/empty, generate from name
     if (!desiredNewSlug || typeof desiredNewSlug !== "string" || desiredNewSlug.trim() === "") {
@@ -187,7 +183,7 @@ export async function updatePage(req, res) {
       );
       desiredNewSlug = await generateUniqueSlug(
         pageData.name,
-        (slug) => fs.pathExists(getPagePath(projectFolderName, slug)),
+        (slug) => storage.exists(scope, `pages/${slug}.json`),
       );
     } else {
       // Sanitize the provided slug through the shared helper
@@ -199,15 +195,13 @@ export async function updatePage(req, res) {
       }
     }
 
-    const oldPath = getPagePath(projectFolderName, oldSlug);
     let finalNewSlug = oldSlug; // Assume slug doesn't change initially
 
     // Check if the desired slug (after potential generation/sanitization) is different from the old one
     if (oldSlug !== desiredNewSlug) {
       // For explicit slug changes, check if the new slug already exists (conflict)
       if (pageData.slug && typeof pageData.slug === "string" && pageData.slug.trim() !== "") {
-        const existingPath = getPagePath(projectFolderName, desiredNewSlug);
-        if (await fs.pathExists(existingPath)) {
+        if (await storage.exists(scope, `pages/${desiredNewSlug}.json`)) {
           return res.status(409).json({
             error: "Slug already exists",
             message: `A page with the slug "${desiredNewSlug}" already exists. Please choose a different slug.`,
@@ -227,16 +221,16 @@ export async function updatePage(req, res) {
     let existingUuid = null;
     let existingWidgets = {};
     try {
-      const oldData = JSON.parse(await fs.readFile(oldPath, "utf8"));
-      originalCreationDate = oldData.created || originalCreationDate;
-      existingUuid = oldData.uuid || null; // Preserve stable uuid across renames
-      existingWidgets = oldData.widgets || {}; // Preserve widgets if not included in request
-    } catch (readError) {
-      if (readError.code !== "ENOENT") {
-        // Only warn if it's not a 'file not found' error
-        console.warn(`Could not read old page file ${oldPath} during update: ${readError.message}`);
+      const oldBuf = await storage.read(scope, `pages/${oldSlug}.json`);
+      if (oldBuf != null) {
+        const oldData = JSON.parse(oldBuf.toString("utf8"));
+        originalCreationDate = oldData.created || originalCreationDate;
+        existingUuid = oldData.uuid || null; // Preserve stable uuid across renames
+        existingWidgets = oldData.widgets || {}; // Preserve widgets if not included in request
       }
       // If old file doesn't exist (e.g. first save after create error, or manual rename), allow creation
+    } catch (readError) {
+      console.warn(`Could not read old page file ${oldSlug} during update: ${readError.message}`);
     }
 
     // Construct the final page data for saving
@@ -252,8 +246,8 @@ export async function updatePage(req, res) {
     };
 
     await persistPageWithMediaTracking({
-      projectId: activeProject.id,
-      projectFolderName,
+      scope,
+      storage,
       pageId: finalNewSlug,
       pageData: finalUpdatedPageData,
       previousPageId: oldSlug,
@@ -279,11 +273,12 @@ export async function updatePage(req, res) {
 export async function getAllPages(req, res) {
   // No validation needed for this route
   try {
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
 
-    // Use the helper function to get page data
-    const pages = await listProjectPagesData(projectFolderName);
+    // listProjectPagesData stays filesystem-based (it also serves the OSS-internal
+    // render wrapper and exportProjectToDir, which have no req.adapters). Reading
+    // the page list via storage is deferred to the helper-migration follow-up.
+    const pages = await listProjectPagesData(scope.folderName);
 
     res.json(pages);
   } catch (error) {
@@ -301,36 +296,34 @@ export async function getAllPages(req, res) {
  */
 export async function deletePage(req, res) {
   try {
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
     const pageId = req.params.id;
-    const pagePath = getPagePath(projectFolderName, pageId);
 
-    // Check if file exists before deleting
-    if (!(await fs.pathExists(pagePath))) {
+    // Read the page (existence + UUID for reference cleanup) before deleting
+    const pageBuf = await storage.read(scope, `pages/${pageId}.json`);
+    if (pageBuf == null) {
       return res.status(404).json({ error: "Page not found" });
     }
 
-    // Read the page to get its UUID before deleting (needed for reference cleanup)
     let deletedPageUuid = null;
     try {
-      const pageData = JSON.parse(await fs.readFile(pagePath, "utf8"));
-      deletedPageUuid = pageData.uuid || null;
+      deletedPageUuid = JSON.parse(pageBuf.toString("utf8")).uuid || null;
     } catch (readError) {
       console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
     }
 
     await deletePageWithMediaTracking({
-      projectId: activeProject.id,
-      projectFolderName,
+      scope,
+      storage,
       pageId,
     });
 
     // Clean up orphaned references in menus and widget links
     if (deletedPageUuid) {
       try {
-        await cleanupDeletedPageReferences(projectFolderName, deletedPageUuid);
+        await cleanupDeletedPageReferences(scope.folderName, deletedPageUuid);
       } catch (cleanupError) {
         console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
       }
@@ -352,8 +345,8 @@ export async function deletePage(req, res) {
  */
 export async function bulkDeletePages(req, res) {
   const { pageIds } = req.body;
-  const { activeProject } = req;
-  const projectFolderName = activeProject.folderName;
+  const { scope } = req;
+  const { storage } = req.adapters;
 
   const results = {
     deleted: [],
@@ -366,25 +359,23 @@ export async function bulkDeletePages(req, res) {
   // Process each page deletion
   for (const pageId of pageIds) {
     try {
-      const pagePath = getPagePath(projectFolderName, pageId);
-
-      // Check if file exists before deleting
-      if (!(await fs.pathExists(pagePath))) {
+      // Read the page (existence + UUID for reference cleanup) before deleting
+      const pageBuf = await storage.read(scope, `pages/${pageId}.json`);
+      if (pageBuf == null) {
         results.notFound.push(pageId);
         continue;
       }
 
-      // Read the page to get its UUID before deleting (needed for reference cleanup)
       try {
-        const pageData = JSON.parse(await fs.readFile(pagePath, "utf8"));
+        const pageData = JSON.parse(pageBuf.toString("utf8"));
         if (pageData.uuid) deletedUuids.push(pageData.uuid);
       } catch (readError) {
         console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
 
       await deletePageWithMediaTracking({
-        projectId: activeProject.id,
-        projectFolderName,
+        scope,
+        storage,
         pageId,
       });
 
@@ -398,7 +389,7 @@ export async function bulkDeletePages(req, res) {
   // Clean up orphaned references for all deleted pages
   for (const uuid of deletedUuids) {
     try {
-      await cleanupDeletedPageReferences(projectFolderName, uuid);
+      await cleanupDeletedPageReferences(scope.folderName, uuid);
     } catch (cleanupError) {
       console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
     }
@@ -441,7 +432,8 @@ export async function bulkDeletePages(req, res) {
 export async function createPage(req, res) {
   try {
     const pageData = req.body; // Get all data including SEO
-    const { activeProject } = req;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
@@ -455,16 +447,14 @@ export async function createPage(req, res) {
       return res.status(400).json({ error: "Page name is required." });
     }
 
-    const projectFolderName = activeProject.folderName;
-
     // Use submitted slug if provided, otherwise generate from name
     let slug;
     if (pageData.slug && pageData.slug.trim()) {
       // User provided a slug, ensure it's unique
-      slug = await generateUniqueSlug(pageData.slug, (slug) => fs.pathExists(getPagePath(projectFolderName, slug)), { fallback: "page" });
+      slug = await generateUniqueSlug(pageData.slug, (slug) => storage.exists(scope, `pages/${slug}.json`), { fallback: "page" });
     } else {
       // No slug provided, generate from name
-      slug = await generateUniqueSlug(pageData.name, (slug) => fs.pathExists(getPagePath(projectFolderName, slug)));
+      slug = await generateUniqueSlug(pageData.name, (slug) => storage.exists(scope, `pages/${slug}.json`));
     }
 
     const newPage = {
@@ -477,12 +467,10 @@ export async function createPage(req, res) {
       updated: new Date().toISOString(),
     };
 
-    const pagesDir = getProjectPagesDir(projectFolderName);
-    await fs.ensureDir(pagesDir);
-
+    // storage.write creates parent directories as needed.
     await persistPageWithMediaTracking({
-      projectId: activeProject.id,
-      projectFolderName,
+      scope,
+      storage,
       pageId: slug,
       pageData: newPage,
     });
@@ -514,8 +502,8 @@ export async function savePageContent(req, res) {
       if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
     }
 
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
     // Validate essential data
     if (!pageData.slug || !pageData.name || !pageData.widgets) {
@@ -524,19 +512,20 @@ export async function savePageContent(req, res) {
 
     // Read existing data to preserve timestamps etc.
     let existingData = {};
+    let loadedExisting = false;
     try {
-      const pagePath = getPagePath(projectFolderName, id);
-      const data = await fs.readFile(pagePath, "utf8");
-      existingData = JSON.parse(data);
+      const buf = await storage.read(scope, `pages/${id}.json`);
+      if (buf != null) {
+        existingData = JSON.parse(buf.toString("utf8"));
+        loadedExisting = true;
+      }
     } catch (err) {
-      if (err.code !== "ENOENT") {
-        console.warn(`Error reading existing page data for ${id}:`, err);
-        // Decide if this should be a fatal error
-      }
-      // If file doesn't exist, set default created timestamp
-      if (!existingData.created) {
-        existingData.created = new Date().toISOString();
-      }
+      console.warn(`Error reading existing page data for ${id}:`, err);
+      // Decide if this should be a fatal error
+    }
+    // If the file didn't exist (or couldn't be read/parsed), set default created timestamp
+    if (!loadedExisting && !existingData.created) {
+      existingData.created = new Date().toISOString();
     }
 
     // Combine existing data with new content, preserving all fields including SEO
@@ -550,8 +539,8 @@ export async function savePageContent(req, res) {
     };
 
     await persistPageWithMediaTracking({
-      projectId: activeProject.id,
-      projectFolderName,
+      scope,
+      storage,
       pageId: pageData.slug,
       pageData: updatedPageData,
       previousPageId: id,
@@ -574,27 +563,29 @@ export async function savePageContent(req, res) {
 export async function duplicatePage(req, res) {
   try {
     const originalPageId = req.params.id;
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    // Read the original page data
-    const originalPagePath = getPagePath(projectFolderName, originalPageId);
-    const originalPageData = JSON.parse(await fs.readFile(originalPagePath, "utf8"));
+    // Read the original page data (missing original propagates to the 500 handler,
+    // matching the pre-storage behavior of a failed filesystem read).
+    const originalBuf = await storage.read(scope, `pages/${originalPageId}.json`);
+    if (originalBuf == null) {
+      throw new Error(`Original page not found: ${originalPageId}`);
+    }
+    const originalPageData = JSON.parse(originalBuf.toString("utf8"));
 
     // Read all existing page files to find existing copy names
-    const pagesDir = getProjectPagesDir(projectFolderName);
-    const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
-    const pageJsonFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
+    const pageJsonFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
 
     const existingPageNames = await Promise.all(
-      pageJsonFiles.map(async (fileEntry) => {
-        const data = await fs.readFile(path.join(pagesDir, fileEntry.name), "utf8");
-        return JSON.parse(data).name;
+      pageJsonFiles.map(async (name) => {
+        const buf = await storage.read(scope, `pages/${name}`);
+        return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
       }),
     );
 
     const newName = generateCopyName(originalPageData.name, existingPageNames);
-    const newSlug = await generateUniqueSlug(newName, (slug) => fs.pathExists(getPagePath(projectFolderName, slug)));
+    const newSlug = await generateUniqueSlug(newName, (slug) => storage.exists(scope, `pages/${slug}.json`));
 
     // Create the new page data
     const newPage = {
@@ -608,8 +599,8 @@ export async function duplicatePage(req, res) {
     };
 
     await persistPageWithMediaTracking({
-      projectId: activeProject.id,
-      projectFolderName,
+      scope,
+      storage,
       pageId: newSlug,
       pageData: newPage,
     });

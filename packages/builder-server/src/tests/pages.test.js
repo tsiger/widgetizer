@@ -47,6 +47,11 @@ const {
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb } = await import("../db/index.js");
+const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
+
+// The page handlers operate on req.adapters.storage over req.scope. Use the real
+// OSS storage adapter against the isolated test data root, matching production.
+const pageStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
 
 // ============================================================================
 // Global teardown
@@ -76,6 +81,12 @@ function mockReq({ params = {}, body = {} } = {}) {
     params,
     body,
     activeProject,
+    scope: {
+      actor: { id: "default", kind: "local" },
+      projectId: activeProject.id,
+      folderName: activeProject.folderName,
+    },
+    adapters: { storage: pageStorage },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };

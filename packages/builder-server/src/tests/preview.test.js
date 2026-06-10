@@ -44,6 +44,10 @@ const { writeMediaFile } = await import("../controllers/mediaController.js");
 
 const { getGlobalWidgets, saveGlobalWidget, serveAsset } = await import("../controllers/previewController.js");
 const { closeDb } = await import("../db/index.js");
+const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
+
+// getGlobalWidgets/saveGlobalWidget operate on req.adapters.storage over req.scope.
+const previewStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
 
 // ============================================================================
 // Test constants
@@ -74,6 +78,12 @@ function mockReq({ params = {}, body = {}, headers = {}, activeProject = { id: P
     body,
     headers,
     activeProject,
+    scope: {
+      actor: { id: "default", kind: "local" },
+      projectId: activeProject.id,
+      folderName: activeProject.folderName,
+    },
+    adapters: { storage: previewStorage },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };

@@ -302,40 +302,36 @@ export async function renderSingleWidget(req, res) {
  */
 export async function getGlobalWidgets(req, res) {
   try {
-    const activeProjectId = req.activeProject.id;
-    const projectFolderName = await getProjectFolderName(activeProjectId);
-    const projectDir = getProjectDir(projectFolderName);
+    const { scope } = req;
+    const { storage } = req.adapters;
     // Global widgets *data* is stored in pages/global, not widgets/global
-    const globalPagesDir = path.join(projectDir, "pages", "global");
 
     // Read header.json and footer.json
     const globalWidgets = {};
 
-    const headerPath = path.join(globalPagesDir, "header.json");
-    if (await fs.pathExists(headerPath)) {
+    const headerBuf = await storage.read(scope, "pages/global/header.json");
+    if (headerBuf != null) {
       try {
-        const headerContent = await fs.readFile(headerPath, "utf-8");
-        globalWidgets.header = JSON.parse(headerContent);
+        globalWidgets.header = JSON.parse(headerBuf.toString("utf8"));
       } catch (readError) {
-        console.error(`Error reading global header data for project ${activeProjectId}:`, readError);
+        console.error(`Error reading global header data for project ${scope.projectId}:`, readError);
         globalWidgets.header = null; // Set to null on read/parse error
       }
     } else {
-      console.warn(`Global header data file not found for project ${activeProjectId}.`);
+      console.warn(`Global header data file not found for project ${scope.projectId}.`);
       globalWidgets.header = null;
     }
 
-    const footerPath = path.join(globalPagesDir, "footer.json");
-    if (await fs.pathExists(footerPath)) {
+    const footerBuf = await storage.read(scope, "pages/global/footer.json");
+    if (footerBuf != null) {
       try {
-        const footerContent = await fs.readFile(footerPath, "utf-8");
-        globalWidgets.footer = JSON.parse(footerContent);
+        globalWidgets.footer = JSON.parse(footerBuf.toString("utf8"));
       } catch (readError) {
-        console.error(`Error reading global footer data for project ${activeProjectId}:`, readError);
+        console.error(`Error reading global footer data for project ${scope.projectId}:`, readError);
         globalWidgets.footer = null; // Set to null on read/parse error
       }
     } else {
-      console.warn(`Global footer data file not found for project ${activeProjectId}.`);
+      console.warn(`Global footer data file not found for project ${scope.projectId}.`);
       globalWidgets.footer = null;
     }
 
@@ -369,21 +365,15 @@ export async function saveGlobalWidget(req, res) {
       return res.status(400).json({ error: "Invalid widget type" });
     }
 
-    const activeProjectId = req.activeProject.id;
-    const projectFolderName = await getProjectFolderName(activeProjectId);
-    const projectDir = getProjectDir(projectFolderName);
-    const globalPagesDir = path.join(projectDir, "pages", "global");
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    // Ensure global directory exists
-    await fs.ensureDir(globalPagesDir);
-
-    // Save the widget
-    const filePath = path.join(globalPagesDir, `${type}.json`);
-    await fs.outputFile(filePath, JSON.stringify(widgetData, null, 2));
+    // Save the widget — storage.write creates parent directories as needed.
+    await storage.write(scope, `pages/global/${type}.json`, JSON.stringify(widgetData, null, 2));
 
     // Update media usage
     try {
-      await updateGlobalWidgetMediaUsage(activeProjectId, `global:${type}`, widgetData);
+      await updateGlobalWidgetMediaUsage(scope.projectId, `global:${type}`, widgetData);
     } catch (usageError) {
       console.error("Error updating media usage for global widget:", usageError);
       // Don't fail the save if usage update fails, but log it
