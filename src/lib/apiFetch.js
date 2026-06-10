@@ -1,5 +1,6 @@
 import { API_URL } from "../config";
 import { getActiveProjectId } from "./activeProjectId";
+import { getApiBase } from "./apiBase";
 
 export class ApiError extends Error {
   constructor(message, { status = 0, statusText = "", code, data } = {}) {
@@ -98,4 +99,19 @@ export async function parseJsonResponse(response, { fallbackMessage = "Request f
 export async function apiFetchJson(path, options = {}, config = {}) {
   const response = await apiFetch(path, options);
   return parseJsonResponse(response, config);
+}
+
+// --- Project-scoped editor calls -------------------------------------------
+// `editorFetch`/`editorFetchJson` prepend the configurable apiBase (see
+// apiBase.js): OSS `/api`, hosted `/api/projects/${projectId}`. Editor query
+// managers pass project-relative paths (e.g. `/pages`, `/menus`, `/preview`),
+// so the same code serves both shells. Actor-scoped / shell calls keep using
+// `apiFetch` with absolute paths.
+
+export function editorFetch(path, options = {}) {
+  return apiFetch(`${getApiBase()}${path}`, options);
+}
+
+export function editorFetchJson(path, options = {}, config = {}) {
+  return apiFetchJson(`${getApiBase()}${path}`, options, config);
 }

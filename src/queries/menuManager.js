@@ -1,4 +1,4 @@
-import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
+import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} MenuItem
@@ -26,7 +26,7 @@ import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
  */
 export async function getAllMenus() {
   try {
-    return await apiFetchJson("/api/menus", {}, { fallbackMessage: "Failed to get menus" });
+    return await editorFetchJson("/menus", {}, { fallbackMessage: "Failed to get menus" });
   } catch (error) {
     console.error("Error getting menus:", error);
     rethrowQueryError(error, "Failed to get menus");
@@ -44,7 +44,7 @@ export async function getAllMenus() {
  */
 export async function createMenu(menuData) {
   try {
-    return await apiFetchJson("/api/menus", {
+    return await editorFetchJson("/menus", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export async function createMenu(menuData) {
  */
 export async function deleteMenu(id) {
   try {
-    return await apiFetchJson(`/api/menus/${id}`, {
+    return await editorFetchJson(`/menus/${id}`, {
       method: "DELETE",
     }, { fallbackMessage: "Failed to delete menu" });
   } catch (error) {
@@ -81,7 +81,7 @@ export async function deleteMenu(id) {
  */
 export async function getMenu(id) {
   try {
-    return await apiFetchJson(`/api/menus/${id}`, {}, { fallbackMessage: "Failed to get menu" });
+    return await editorFetchJson(`/menus/${id}`, {}, { fallbackMessage: "Failed to get menu" });
   } catch (error) {
     console.error("Error getting menu:", error);
     rethrowQueryError(error, "Failed to get menu");
@@ -100,7 +100,7 @@ export async function getMenu(id) {
  */
 export async function updateMenu(id, menuData) {
   try {
-    return await apiFetchJson(`/api/menus/${id}`, {
+    return await editorFetchJson(`/menus/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export async function updateMenu(id, menuData) {
  */
 export async function duplicateMenu(id) {
   try {
-    return await apiFetchJson(`/api/menus/${id}/duplicate`, {
+    return await editorFetchJson(`/menus/${id}/duplicate`, {
       method: "POST",
     }, { fallbackMessage: "Failed to duplicate menu" });
   } catch (error) {

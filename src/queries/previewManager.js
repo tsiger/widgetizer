@@ -1,4 +1,4 @@
-import { apiFetch, apiFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
+import { apiFetchJson, editorFetch, editorFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
@@ -45,7 +45,7 @@ function extractFonts(settings) {
  */
 export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor") {
   try {
-    return await apiFetchJson("/api/preview/token", {
+    return await editorFetchJson("/preview/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -72,7 +72,7 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
  */
 export async function fetchPreview(pageData, themeSettings, previewMode = "editor") {
   try {
-    const response = await apiFetch("/api/preview", {
+    const response = await editorFetch("/preview", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +106,7 @@ export async function fetchPreview(pageData, themeSettings, previewMode = "edito
  */
 export async function fetchRenderedWidget(widgetId, widget, themeSettings) {
   try {
-    const response = await apiFetch("/api/preview/widget", {
+    const response = await editorFetch("/preview/widget", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -424,7 +424,7 @@ let customCodeTimer = null;
  */
 export async function getGlobalWidgets() {
   try {
-    return await apiFetchJson("/api/preview/global-widgets", {}, {
+    return await editorFetchJson("/preview/global-widgets", {}, {
       fallbackMessage: "Failed to fetch global widgets",
     });
   } catch (error) {
@@ -442,7 +442,7 @@ export async function getGlobalWidgets() {
  */
 export async function saveGlobalWidget(type, widget) {
   try {
-    return await apiFetchJson(`/api/preview/global-widgets/${type}`, {
+    return await editorFetchJson(`/preview/global-widgets/${type}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

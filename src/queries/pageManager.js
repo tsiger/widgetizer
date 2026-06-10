@@ -1,4 +1,4 @@
-import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
+import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} Page
@@ -19,7 +19,7 @@ import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
  */
 export async function getAllPages() {
   try {
-    return await apiFetchJson("/api/pages", {}, { fallbackMessage: "Failed to get pages" });
+    return await editorFetchJson("/pages", {}, { fallbackMessage: "Failed to get pages" });
   } catch (error) {
     rethrowQueryError(error, "Failed to get pages");
   }
@@ -33,7 +33,7 @@ export async function getAllPages() {
  */
 export async function deletePage(pageId) {
   try {
-    return await apiFetchJson(`/api/pages/${pageId}`, {
+    return await editorFetchJson(`/pages/${pageId}`, {
       method: "DELETE",
     }, { fallbackMessage: "Failed to delete page" });
   } catch (error) {
@@ -49,7 +49,7 @@ export async function deletePage(pageId) {
  */
 export async function bulkDeletePages(pageIds) {
   try {
-    return await apiFetchJson("/api/pages/bulk-delete", {
+    return await editorFetchJson("/pages/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export async function bulkDeletePages(pageIds) {
  */
 export async function getPage(id) {
   try {
-    return await apiFetchJson(`/api/pages/${id}`, {}, { fallbackMessage: "Failed to get page" });
+    return await editorFetchJson(`/pages/${id}`, {}, { fallbackMessage: "Failed to get page" });
   } catch (error) {
     console.error("Error getting page:", error);
     rethrowQueryError(error, "Failed to get page");
@@ -89,7 +89,7 @@ export async function getPage(id) {
  */
 export async function updatePage(id, pageData) {
   try {
-    return await apiFetchJson(`/api/pages/${id}`, {
+    return await editorFetchJson(`/pages/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export async function updatePage(id, pageData) {
  */
 export async function createPage(pageData) {
   try {
-    return await apiFetchJson("/api/pages", {
+    return await editorFetchJson("/pages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -139,7 +139,7 @@ export async function createPage(pageData) {
  */
 export async function savePageContent(pageId, pageData) {
   try {
-    return await apiFetchJson(`/api/pages/${pageId}/content`, {
+    return await editorFetchJson(`/pages/${pageId}/content`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -161,7 +161,7 @@ export async function savePageContent(pageId, pageData) {
  */
 export async function duplicatePage(pageId) {
   try {
-    return await apiFetchJson(`/api/pages/${pageId}/duplicate`, {
+    return await editorFetchJson(`/pages/${pageId}/duplicate`, {
       method: "POST",
     }, { fallbackMessage: "Failed to duplicate page" });
   } catch (error) {
