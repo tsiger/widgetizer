@@ -10,7 +10,8 @@ import { join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const localesDir = join(__dirname, "..", "src", "locales");
+// Frontend locales moved into @widgetizer/core in Sprint 1.5f.
+const localesDir = join(__dirname, "..", "packages", "core", "src", "locales");
 
 function flattenKeys(obj, prefix = "") {
   const keys = [];

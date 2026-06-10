@@ -13,7 +13,6 @@ export default {
     "server",
     "src/core",
     "src/utils",
-    "src/locales",
     "themes",
     "!themes/widgetizer/**",
     "electron",

@@ -113,9 +113,11 @@ export default [
       "react/prop-types": "off",
     },
   },
-  // OSS shell (web entry + shared server assembly), Node ESM.
+  // OSS shell (web entry + shared server assembly), Node ESM. Scoped to the
+  // top level of app/ — the React frontend shell under app/src/ has its own
+  // browser+JSX block below.
   {
-    files: ["server.js", "app/**/*.js"],
+    files: ["server.js", "app/*.js"],
     languageOptions: {
       globals: globals.node,
       parserOptions: {
@@ -128,6 +130,39 @@ export default [
       ...js.configs.recommended.rules,
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "local/require-scope-arg": "error",
+    },
+  },
+  // OSS frontend shell (app/src/) — React, shared by web + Electron. Mirrors the
+  // src/** block (browser globals, JSX, react-refresh) now that the shell lives
+  // here after the Sprint 1.5f extraction.
+  {
+    files: ["app/src/**/*.{js,jsx}"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        __APP_VERSION__: "readonly",
+      },
+      parserOptions: {
+        ecmaVersion: "latest",
+        ecmaFeatures: { jsx: true },
+        sourceType: "module",
+      },
+    },
+    settings: { react: { version: "19.0" } },
+    plugins: {
+      react,
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...react.configs.recommended.rules,
+      ...react.configs["jsx-runtime"].rules,
+      ...reactHooks.configs.recommended.rules,
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "react/jsx-no-target-blank": "off",
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      "react/prop-types": "off",
     },
   },
   // Electron (main process + preload)

@@ -15,7 +15,8 @@
     "./test-helpers/scope-resolver": "./test-helpers/scopeResolverConformance.js",
     "./youtube": "./src/utils/youtubeHelpers.js",
     "./blockLimits": "./src/utils/blockLimits.js",
-    "./config/fonts.json": "./src/config/fonts.json"
+    "./config/fonts.json": "./src/config/fonts.json",
+    "./locales/*": "./src/locales/*"
   },
   "dependencies": {
     "liquidjs": "^10.25.2"

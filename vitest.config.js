@@ -19,6 +19,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.js"],
     include: [
       "src/**/*.test.{js,jsx}",
+      "app/src/**/*.test.{js,jsx}",
       "scripts/__tests__/*.test.js",
       // Only packages whose tests use Vitest. @widgetizer/builder-server uses
       // the Node test runner (npm test), so it is intentionally excluded here.

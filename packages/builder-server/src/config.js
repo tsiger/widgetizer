@@ -1,5 +1,8 @@
 import path from "path";
+import { createRequire } from "node:module";
 import { getMediaCategory } from "./utils/mimeTypes.js";
+
+const require = createRequire(import.meta.url);
 
 // Base directories with environment variable support.
 // APP_ROOT is set by Electron to the app.asar path, or defaults to cwd for non-Electron use.
@@ -23,12 +26,16 @@ export const THEMES_SEED_DIR = process.env.THEMES_ROOT
 
 export const CORE_WIDGETS_DIR = path.join(APP_ROOT, "src", "core", "widgets");
 
-// Core Liquid snippets (read via fs during rendering) and the frontend locale
-// files (read via fs for preview empty-states). Both live at the repo root, so
-// they are resolved from APP_ROOT — not relative to this file, which now lives
-// inside packages/builder-server/.
+// Core Liquid snippets are read via fs during rendering; they still live at the
+// repo root, resolved from APP_ROOT (not relative to this file, which lives
+// inside packages/builder-server/).
 export const CORE_SNIPPETS_DIR = path.join(APP_ROOT, "src", "core", "snippets");
-export const LOCALES_DIR = path.join(APP_ROOT, "src", "locales");
+
+// Frontend locale files (read via fs for preview empty-states) moved into
+// @widgetizer/core in Sprint 1.5f. Resolve the directory through the package's
+// own exports so it works in both web (workspace symlink) and packaged Electron
+// (bundled under node_modules/@widgetizer/core) without guessing an APP_ROOT path.
+export const LOCALES_DIR = path.dirname(require.resolve("@widgetizer/core/locales/en.json"));
 
 // Static paths — served via express.static() or res.sendFile(), so must be real files on disk.
 // In packaged Electron builds these are unpacked from the asar archive.
