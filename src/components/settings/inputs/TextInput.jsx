@@ -1,24 +1,4 @@
-/**
- * TextInput component
- * Renders a standard text input with support for different input types
- */
-export default function TextInput({ id, value = "", onChange, placeholder = "", type = "text", min, max, step }) {
-  return (
-    <input
-      type={type}
-      id={id}
-      value={value}
-      onChange={(e) => {
-        const newValue = type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value;
-        onChange(newValue);
-      }}
-      placeholder={placeholder}
-      className="form-input"
-      {...(type === "number" && {
-        min: min,
-        max: max,
-        step: step,
-      })}
-    />
-  );
-}
+/* eslint-disable react-refresh/only-export-components -- re-export shim, removed in 1.5f */
+// Moved to @widgetizer/editor-ui in Sprint 1.5e-4 (re-export shim; removed in 1.5f).
+export { default } from "@widgetizer/editor-ui/components/settings/inputs/TextInput.jsx";
+export * from "@widgetizer/editor-ui/components/settings/inputs/TextInput.jsx";

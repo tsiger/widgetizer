@@ -1,44 +1,4 @@
-import { useState } from "react";
-import { useThemeLocale } from "../../hooks/useThemeLocale";
-import SettingsGroup from "./SettingsGroup";
-
-/**
- * SettingsPanel component
- * Renders a panel with vertical tabs for different setting groups
- */
-export default function SettingsPanel({ schema = {}, values = {}, onChange, errors = {} }) {
-  const { tTheme } = useThemeLocale();
-  const [activeTab, setActiveTab] = useState(Object.keys(schema)[0] || "");
-
-  if (Object.keys(schema).length === 0) {
-    return <div className="p-4 text-slate-500">No settings available</div>;
-  }
-
-  return (
-    <div className="flex border-t border-slate-200">
-      {/* Vertical tabs sidebar */}
-      <div className="w-60 border-r border-slate-200 shrink-0">
-        <div className="sticky top-0">
-          {Object.keys(schema).map((tabKey) => (
-            <button
-              key={tabKey}
-              className={`w-full text-left px-4 py-3 text-sm font-medium border-l-2 ${
-                activeTab === tabKey
-                  ? "border-pink-500 bg-pink-50 text-pink-600"
-                  : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-800"
-              }`}
-              onClick={() => setActiveTab(tabKey)}
-            >
-              {tTheme("tTheme:global." + tabKey + ".name")}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content area */}
-      <div className="flex-1 px-6 pb-6 min-h-[400px]">
-        <SettingsGroup settings={schema[activeTab]} values={values} onChange={onChange} errors={errors} resizable />
-      </div>
-    </div>
-  );
-}
+/* eslint-disable react-refresh/only-export-components -- re-export shim, removed in 1.5f */
+// Moved to @widgetizer/editor-ui in Sprint 1.5e-4 (re-export shim; removed in 1.5f).
+export { default } from "@widgetizer/editor-ui/components/settings/SettingsPanel.jsx";
+export * from "@widgetizer/editor-ui/components/settings/SettingsPanel.jsx";

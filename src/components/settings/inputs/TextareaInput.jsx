@@ -1,16 +1,4 @@
-/**
- * TextareaInput component
- * Renders a multiline text input
- */
-export default function TextareaInput({ id, value = "", onChange, placeholder = "", rows = 6 }) {
-  return (
-    <textarea
-      id={id}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      rows={rows}
-      className="form-textarea"
-    />
-  );
-}
+/* eslint-disable react-refresh/only-export-components -- re-export shim, removed in 1.5f */
+// Moved to @widgetizer/editor-ui in Sprint 1.5e-4 (re-export shim; removed in 1.5f).
+export { default } from "@widgetizer/editor-ui/components/settings/inputs/TextareaInput.jsx";
+export * from "@widgetizer/editor-ui/components/settings/inputs/TextareaInput.jsx";

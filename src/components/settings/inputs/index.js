@@ -1,16 +1,2 @@
-export { default as CheckboxInput } from "./CheckboxInput";
-export { default as CodeInput } from "./CodeInput";
-export { default as ColorInput } from "./ColorInput";
-export { default as FileInput } from "./FileInput";
-export { default as FontPickerInput } from "./FontPickerInput";
-export { default as ImageInput } from "./ImageInput";
-export { default as MenuSelectInput } from "./MenuSelectInput";
-export { default as RadioInput } from "./RadioInput";
-export { default as RangeInput } from "./RangeInput";
-export { default as RichTextInput } from "./RichTextInput";
-export { default as SelectInput } from "./SelectInput";
-export { default as TextareaInput } from "./TextareaInput";
-export { default as TextInput } from "./TextInput";
-export { default as LinkInput } from "./LinkInput";
-export { default as YouTubeInput } from "./YouTubeInput";
-export { default as IconInput } from "./IconInput";
+// Moved to @widgetizer/editor-ui in Sprint 1.5e-4 (re-export shim; removed in 1.5f).
+export * from "@widgetizer/editor-ui/components/settings/inputs/index.js";

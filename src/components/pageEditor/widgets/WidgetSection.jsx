@@ -1,3 +1,4 @@
-export default function WidgetSection({ children, className = "" }) {
-  return <div className={`mb-4 ${className}`}>{children}</div>;
-}
+/* eslint-disable react-refresh/only-export-components -- re-export shim, removed in 1.5f */
+// Moved to @widgetizer/editor-ui in Sprint 1.5e-4 (re-export shim; removed in 1.5f).
+export { default } from "@widgetizer/editor-ui/components/pageEditor/widgets/WidgetSection.jsx";
+export * from "@widgetizer/editor-ui/components/pageEditor/widgets/WidgetSection.jsx";

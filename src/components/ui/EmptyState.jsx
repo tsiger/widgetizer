@@ -1,18 +1,4 @@
-/**
- * Empty state component for displaying when no data is available
- * Provides consistent messaging and call-to-action patterns
- */
-
-export default function EmptyState({ icon, title, description, action, className = "", ...props }) {
-  return (
-    <div className={`empty-state ${className}`} {...props}>
-      {icon && <div className="empty-state-icon">{icon}</div>}
-
-      {title && <h3 className="empty-state-title">{title}</h3>}
-
-      {description && <p className="empty-state-description">{description}</p>}
-
-      {action && action}
-    </div>
-  );
-}
+/* eslint-disable react-refresh/only-export-components -- re-export shim, removed in 1.5f */
+// Moved to @widgetizer/editor-ui in Sprint 1.5e-4 (re-export shim; removed in 1.5f).
+export { default } from "@widgetizer/editor-ui/components/ui/EmptyState.jsx";
+export * from "@widgetizer/editor-ui/components/ui/EmptyState.jsx";

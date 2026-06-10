@@ -1,0 +1,286 @@
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
+import { ImageOff, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useThemeLocale } from "../../hooks/useThemeLocale";
+import { API_URL } from "../../lib/config";
+import { getActiveProjectId } from "../../lib/activeProjectId";
+
+export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
+  const { t } = useTranslation();
+  const { tTheme } = useThemeLocale();
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  // Track the widget type whose preview 404'd, so the placeholder shows in place of a broken image.
+  const [brokenPreviewType, setBrokenPreviewType] = useState(null);
+
+  // Helper to update search and reset focus in one action
+  const updateSearch = useCallback((value) => {
+    setSearchTerm(value);
+    setFocusedIndex(-1);
+  }, []);
+
+  const availableWidgets = Object.values(widgetSchemas)
+    .filter((schema) => schema.type !== "header" && schema.type !== "footer")
+    .sort((a, b) => (tTheme(a.displayName) || a.type).localeCompare(tTheme(b.displayName) || b.type));
+
+  const filteredWidgets = availableWidgets.filter((schema) => {
+    const name = tTheme(schema.displayName) || schema.type;
+    const aliases = schema.aliases || [];
+    const searchLower = searchTerm.toLowerCase();
+
+    return (
+      name.toLowerCase().includes(searchLower) || aliases.some((alias) => alias.toLowerCase().includes(searchLower))
+    );
+  });
+
+  // Handle keyboard navigation
+  /* eslint-disable react-hooks/preserve-manual-memoization */
+  const handleKeyDown = useCallback(
+    (event) => {
+      if (!isOpen) return;
+
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setFocusedIndex((prev) => {
+            const nextIndex = prev < filteredWidgets.length - 1 ? prev + 1 : 0;
+            return nextIndex;
+          });
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setFocusedIndex((prev) => {
+            const nextIndex = prev > 0 ? prev - 1 : filteredWidgets.length - 1;
+            return nextIndex;
+          });
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (focusedIndex >= 0 && focusedIndex < filteredWidgets.length) {
+            onSelectWidget(filteredWidgets[focusedIndex].type, position);
+            onClose();
+          } else if (filteredWidgets.length === 1) {
+            // If only one result and nothing focused, select it
+            onSelectWidget(filteredWidgets[0].type, position);
+            onClose();
+          }
+          break;
+        case "Escape":
+          event.preventDefault();
+          onClose();
+          break;
+        case "Tab":
+          // Allow tab to close and move focus naturally
+          onClose();
+          break;
+        default:
+          break;
+      }
+    },
+    [isOpen, focusedIndex, filteredWidgets, onSelectWidget, position, onClose],
+  );
+  /* eslint-enable react-hooks/preserve-manual-memoization */
+
+  // Preview pane appears once at least one widget in the theme ships a preview.png
+  const hasAnyPreview = availableWidgets.some((s) => s.hasPreview);
+  const projectId = getActiveProjectId();
+
+  // Scroll focused item into view
+  useEffect(() => {
+    if (focusedIndex >= 0 && listRef.current) {
+      const focusedElement = listRef.current.children[focusedIndex];
+      if (focusedElement) {
+        focusedElement.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [focusedIndex]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        triggerRef?.current &&
+        !triggerRef.current.contains(event.target)
+      ) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      // Reset search and focus when dropdown opens (intentional UX behavior)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      updateSearch("");
+      // Add a small delay to ensure the dropdown is fully rendered
+      const timer = setTimeout(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        // Focus the search input
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 10);
+
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose, triggerRef, updateSearch]);
+
+  // Calculate position relative to trigger (using useLayoutEffect to avoid accessing refs during render)
+  const [style, setStyle] = useState({
+    position: "fixed",
+    top: 100,
+    left: 100,
+    zIndex: 1000,
+  });
+
+  useLayoutEffect(() => {
+    if (!isOpen || !triggerRef?.current) {
+      return;
+    }
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    // w-56 (224px) list + optional w-64 (256px) preview pane
+    const dropdownWidth = hasAnyPreview ? 480 : 224;
+
+    // Position the dropdown outside the sidebar — width matches the responsive sidebar (w-60 / 2xl:w-70)
+    const sidebarWidth = window.innerWidth >= 1536 ? 280 : 240;
+    let leftPosition = sidebarWidth - 24; // Position closer to sidebar edge
+
+    // If it would go off the right edge of the screen, position to the left instead
+    if (leftPosition + dropdownWidth > window.innerWidth) {
+      leftPosition = triggerRect.left - dropdownWidth - 12;
+    }
+
+    // Make sure it doesn't go off the left edge either
+    if (leftPosition < 12) {
+      leftPosition = 12;
+    }
+
+    // For vertical positioning, check if there's enough space below
+    let topPosition = triggerRect.top;
+    const estimatedDropdownHeight = 300; // Generous estimate
+
+    // If dropdown would go off screen, position it above the trigger
+    if (triggerRect.top + estimatedDropdownHeight > window.innerHeight - 20) {
+      topPosition = triggerRect.top - estimatedDropdownHeight - 10;
+    }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStyle({
+      position: "fixed",
+      top: Math.max(12, topPosition), // Don't go above top of screen
+      left: leftPosition,
+      zIndex: 1000,
+    });
+  }, [isOpen, triggerRef, hasAnyPreview]);
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      {/* Invisible overlay to catch clicks outside dropdown */}
+      <div className="fixed inset-0" style={{ zIndex: 9998 }} onClick={onClose} />
+
+      <div
+        ref={dropdownRef}
+        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg flex"
+        style={{
+          ...style,
+          position: "fixed", // Force fixed positioning
+          zIndex: 9999, // Higher z-index
+        }}
+      >
+        <div className={`flex flex-col ${hasAnyPreview ? "w-56 border-r border-slate-200" : "w-56"}`}>
+          <div className={`px-3 py-2 border-b border-slate-100 bg-slate-50 ${hasAnyPreview ? "rounded-tl-lg" : "rounded-t-lg"}`}>
+            <h3 className="text-sm font-medium text-slate-700 text-left mb-2">{t("pageEditor.actions.addWidget")}</h3>
+            <div className="relative">
+              <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder={t("common.search")}
+                value={searchTerm}
+                onChange={(e) => updateSearch(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-full text-sm pl-8 pr-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-controls="widget-selector-list"
+                aria-activedescendant={
+                  focusedIndex >= 0 ? `widget-option-${filteredWidgets[focusedIndex]?.type}` : undefined
+                }
+              />
+            </div>
+          </div>
+
+          <div ref={listRef} id="widget-selector-list" className="max-h-64 overflow-y-auto" role="listbox">
+            {filteredWidgets.length > 0 ? (
+              filteredWidgets.map((schema, index) => (
+                <button
+                  key={schema.type}
+                  id={`widget-option-${schema.type}`}
+                  role="option"
+                  aria-selected={focusedIndex === index}
+                  className={`w-full px-3 py-2 text-left transition-colors group border-b border-transparent last:border-0 ${
+                    focusedIndex === index ? "bg-pink-50 border-pink-100" : "hover:bg-slate-50 hover:border-slate-100"
+                  }`}
+                  onClick={() => {
+                    onSelectWidget(schema.type, position);
+                    onClose();
+                  }}
+                  onMouseEnter={() => setFocusedIndex(index)}
+                >
+                  <div
+                    className={`text-sm font-medium ${
+                      focusedIndex === index ? "text-pink-600" : "text-slate-800 group-hover:text-pink-600"
+                    }`}
+                  >
+                    {tTheme(schema.displayName) || schema.type}
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-4 text-center text-sm text-slate-500">{t("pageEditor.noWidgetsFound")}</div>
+            )}
+          </div>
+        </div>
+
+        {hasAnyPreview && (() => {
+          const focusedWidget = focusedIndex >= 0 ? filteredWidgets[focusedIndex] : null;
+          const showImage =
+            focusedWidget?.hasPreview && projectId && focusedWidget.type !== brokenPreviewType;
+          return (
+            <div className="w-64 bg-slate-50 rounded-r-lg flex flex-col items-center justify-center p-3">
+              {showImage ? (
+                <img
+                  src={API_URL(`/api/preview/assets/${projectId}/widgets/${focusedWidget.type}/preview.png`)}
+                  alt={tTheme(focusedWidget.displayName) || focusedWidget.type}
+                  onError={() => setBrokenPreviewType(focusedWidget.type)}
+                  className="max-w-full max-h-56 object-contain rounded shadow-sm bg-white"
+                />
+              ) : (
+                <div className="flex flex-col items-center text-center text-slate-400 px-2">
+                  <ImageOff size={28} strokeWidth={1.5} />
+                  <p className="text-xs mt-2 leading-snug">
+                    {focusedWidget
+                      ? t("pageEditor.widgetPreview.missing", "No preview yet")
+                      : t("pageEditor.widgetPreview.hint", "Hover a widget to preview")}
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+    </>
+  );
+}
