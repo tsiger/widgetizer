@@ -11,6 +11,7 @@ import { describe, it, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import Database from "better-sqlite3";
 import { ConflictError } from "@widgetizer/core/errors";
+import { LocalScopeResolver } from "@widgetizer/adapters-local";
 import errorHandler from "../middleware/errorHandler.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 import { initDb, closeDb } from "../db/index.js";
@@ -60,7 +61,7 @@ describe("resolveActiveProject attaches req.scope", () => {
     ).run();
     projectRepo.setActiveProjectId("p1");
 
-    const req = { method: "GET", headers: {}, params: {} };
+    const req = { method: "GET", headers: {}, params: {}, adapters: { scopeResolver: new LocalScopeResolver(db) } };
     let nexted = false;
     await resolveActiveProject(req, fakeRes(), () => {
       nexted = true;

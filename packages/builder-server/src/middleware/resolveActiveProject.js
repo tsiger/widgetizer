@@ -1,34 +1,47 @@
 import * as projectRepo from "../db/repositories/projectRepository.js";
 
 /**
- * Express middleware that resolves the active project and attaches it to req.
- * Returns 404 if no active project is found.
- * After this middleware, handlers can access req.activeProject directly.
+ * Express middleware that resolves the request scope and attaches it to req.
+ *
+ * Scope resolution is DELEGATED to the injected `req.adapters.scopeResolver`.
+ * This is the seam that lets hosted swap in a Clerk-backed CloudScopeResolver:
+ * OSS wires LocalScopeResolver (singleton active project), hosted wires its own.
+ * The middleware itself only owns HTTP-layer policy (the write-guard) and the
+ * convenience of loading the full project row for handlers that still read
+ * `req.activeProject`.
+ *
+ * After this middleware: `req.scope` (the resolver's scope) and
+ * `req.activeProject` (the full project row) are both available.
  */
 const WRITE_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 
 export async function resolveActiveProject(req, res, next) {
   try {
-    const activeProjectId = projectRepo.getActiveProjectId();
-
-    if (!activeProjectId) {
-      return res.status(404).json({ error: "No active project found" });
+    let scope;
+    try {
+      scope = await req.adapters.scopeResolver.resolveScope(req);
+    } catch (err) {
+      // Preserve OSS's existing 404 response shape for the "no active project"
+      // cases (NO_ACTIVE_PROJECT / PROJECT_NOT_FOUND). Any other resolver error
+      // (hosted: AuthenticationError 401 / AuthorizationError 403, or an
+      // unexpected failure) flows to errorHandler, which maps
+      // WidgetizerError.statusCode.
+      if (err?.code === "NO_ACTIVE_PROJECT" || err?.code === "PROJECT_NOT_FOUND") {
+        return res.status(404).json({ error: "No active project found" });
+      }
+      return next(err);
     }
 
-    const activeProject = projectRepo.getProjectById(activeProjectId);
-
-    if (!activeProject) {
-      return res.status(404).json({ error: "No active project found" });
-    }
-
-    // Guard: reject writes if the frontend's project doesn't match
+    // HTTP-layer write-guard (policy, not scope resolution): reject writes whose
+    // client/route project id disagrees with the resolved scope. Kept here, not
+    // in the resolver, because it is request-shape policy.
     if (WRITE_METHODS.includes(req.method)) {
       const clientProjectId = req.headers["x-project-id"];
       const routeProjectId = req.params?.projectId;
 
       if (
-        (clientProjectId && clientProjectId !== activeProject.id) ||
-        (routeProjectId && routeProjectId !== activeProject.id)
+        (clientProjectId && clientProjectId !== scope.projectId) ||
+        (routeProjectId && routeProjectId !== scope.projectId)
       ) {
         return res.status(409).json({
           error: "Project mismatch",
@@ -38,15 +51,14 @@ export async function resolveActiveProject(req, res, next) {
       }
     }
 
+    // Load the full project row for handlers that still read req.activeProject.
+    const activeProject = projectRepo.getProjectById(scope.projectId);
+    if (!activeProject) {
+      return res.status(404).json({ error: "No active project found" });
+    }
+
     req.activeProject = activeProject;
-    // Also expose the resolved scope so handlers can migrate from
-    // req.activeProject to the shell-agnostic req.scope. OSS is single-tenant,
-    // so the actor is always the local default.
-    req.scope = {
-      actor: { id: "default", kind: "local" },
-      projectId: activeProject.id,
-      folderName: activeProject.folderName,
-    };
+    req.scope = scope;
     next();
   } catch (error) {
     next(error);

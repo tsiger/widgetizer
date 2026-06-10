@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { LOCAL_ACTOR } from "@widgetizer/core/adapters";
 import { getActiveProject } from "../queries/projectManager";
 
 /**
@@ -23,8 +24,6 @@ import { getActiveProject } from "../queries/projectManager";
  * @property {boolean} loading
  * @property {string|null} error
  */
-
-const LOCAL_ACTOR = { id: "default", kind: "local" };
 
 /** Derive the editor scope from a project record. */
 function deriveScope(project) {

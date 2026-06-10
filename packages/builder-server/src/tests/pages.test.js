@@ -46,12 +46,14 @@ const {
 } = await import("../controllers/pageController.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { closeDb } = await import("../db/index.js");
-const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
+const { closeDb, getDb } = await import("../db/index.js");
+const { LocalStorageAdapter, LocalScopeResolver } = await import("@widgetizer/adapters-local");
 
 // The page handlers operate on req.adapters.storage over req.scope. Use the real
 // OSS storage adapter against the isolated test data root, matching production.
 const pageStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
+// resolveActiveProject now delegates scope resolution to the injected resolver.
+const scopeResolver = new LocalScopeResolver(getDb());
 
 // ============================================================================
 // Global teardown
@@ -280,7 +282,7 @@ describe("createPage", () => {
     const original = await projectRepo.readProjectsData();
     await projectRepo.writeProjectsData({ ...original, activeProjectId: null });
 
-    const req = {};
+    const req = { adapters: { scopeResolver } };
     const res = mockRes();
     let nextCalled = false;
     await resolveActiveProject(req, res, () => { nextCalled = true; });

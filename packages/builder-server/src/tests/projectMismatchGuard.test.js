@@ -28,7 +28,12 @@ process.env.NODE_ENV = "test";
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { resolveActiveProject } = await import("../middleware/resolveActiveProject.js");
-const { closeDb } = await import("../db/index.js");
+const { closeDb, getDb } = await import("../db/index.js");
+const { LocalScopeResolver } = await import("@widgetizer/adapters-local");
+
+// resolveActiveProject delegates scope resolution to the injected resolver; the
+// OSS one reads the active project from the same singleton db the repo writes to.
+const scopeResolver = new LocalScopeResolver(getDb());
 
 // ============================================================================
 // Test constants
@@ -43,7 +48,7 @@ const OTHER_PROJECT_ID = "other-project-uuid";
 // ============================================================================
 
 function mockReq({ method = "GET", headers = {}, params = {} } = {}) {
-  return { method, headers, params };
+  return { method, headers, params, adapters: { scopeResolver } };
 }
 
 function mockRes() {

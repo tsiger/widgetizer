@@ -1,6 +1,5 @@
 import { NotFoundError } from "@widgetizer/core/errors";
-
-const LOCAL_ACTOR = Object.freeze({ id: "default", kind: "local" });
+import { LOCAL_ACTOR } from "@widgetizer/core/adapters";
 
 // Reads the OSS schema directly via the injected db handle (rather than
 // importing @widgetizer/builder-server repositories) so adapters-local stays

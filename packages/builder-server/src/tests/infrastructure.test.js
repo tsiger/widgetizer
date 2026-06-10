@@ -187,9 +187,31 @@ describe("jsonParser", () => {
   });
 });
 
+// A minimal adapter set that satisfies setupBuilderServer's required-keys check.
+// These stubs are never invoked by the /health or trust-proxy assertions below;
+// they exist only so app assembly passes validation.
+function fakeAdapters() {
+  return {
+    scopeResolver: { resolveScope: async () => ({}) },
+    previewScopeResolver: { resolveScope: async () => ({}) },
+    storage: {},
+    assetStorage: {},
+    publish: {},
+    limits: {},
+  };
+}
+
 describe("createEditorApp", () => {
+  it("throws when no adapters are provided", async () => {
+    await assert.rejects(() => createEditorApp(), /requires an adapters set/);
+  });
+
+  it("throws when the adapter set is incomplete", async () => {
+    await assert.rejects(() => createEditorApp({ adapters: { storage: {} } }), /missing required adapter/);
+  });
+
   it("serves the health endpoint", async () => {
-    const app = await createEditorApp();
+    const app = await createEditorApp({ adapters: fakeAdapters() });
     const { server, baseUrl } = await startServer(app);
 
     try {
@@ -209,7 +231,7 @@ describe("createEditorApp", () => {
     process.env.NODE_ENV = "production";
 
     try {
-      const app = await createEditorApp();
+      const app = await createEditorApp({ adapters: fakeAdapters() });
       assert.equal(app.get("trust proxy"), 1);
     } finally {
       process.env.NODE_ENV = originalEnv;

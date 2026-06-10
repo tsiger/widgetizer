@@ -35,7 +35,11 @@ const { createMenu, getMenu, getAllMenus, getMenuById, updateMenu, deleteMenu, d
   await import("../controllers/menuController.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { closeDb } = await import("../db/index.js");
+const { closeDb, getDb } = await import("../db/index.js");
+const { LocalScopeResolver } = await import("@widgetizer/adapters-local");
+
+// resolveActiveProject now delegates scope resolution to the injected resolver.
+const scopeResolver = new LocalScopeResolver(getDb());
 
 // ============================================================================
 // Test constants
@@ -705,7 +709,7 @@ describe("Edge cases", () => {
     const backup = await projectRepo.readProjectsData();
     await projectRepo.writeProjectsData({ ...backup, activeProjectId: null });
 
-    const req = {};
+    const req = { adapters: { scopeResolver } };
     const res = mockRes();
     let nextCalled = false;
     await resolveActiveProject(req, res, () => { nextCalled = true; });
@@ -724,7 +728,7 @@ describe("Edge cases", () => {
     const backup = await projectRepo.readProjectsData();
     await projectRepo.writeProjectsData({ ...backup, activeProjectId: null });
 
-    const req = {};
+    const req = { adapters: { scopeResolver } };
     const res = mockRes();
     let nextCalled = false;
     await resolveActiveProject(req, res, () => { nextCalled = true; });
@@ -742,7 +746,7 @@ describe("Edge cases", () => {
     const backup = await projectRepo.readProjectsData();
     await projectRepo.writeProjectsData({ ...backup, activeProjectId: null });
 
-    const req = {};
+    const req = { adapters: { scopeResolver } };
     const res = mockRes();
     let nextCalled = false;
     await resolveActiveProject(req, res, () => { nextCalled = true; });

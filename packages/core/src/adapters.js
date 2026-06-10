@@ -66,6 +66,15 @@
  */
 
 /**
+ * The OSS single-tenant actor. There is no auth in OSS, so every request acts as
+ * this frozen local default. Shared here (rather than re-declared per package) so
+ * the scope resolver, the editor store, and any other caller reference one
+ * canonical literal. Hosted constructs its own cloud actor per request instead.
+ * @type {Actor}
+ */
+export const LOCAL_ACTOR = Object.freeze({ id: "default", kind: "local" });
+
+/**
  * Canonical limit keys. Frozen so callers reference constants, not strings.
  * @readonly
  */
