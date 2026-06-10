@@ -6,5 +6,9 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@widgetizer/core": "*",
+    "liquidjs": "^10.25.2"
   }
 }
