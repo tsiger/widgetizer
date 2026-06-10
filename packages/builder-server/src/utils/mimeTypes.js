@@ -1,46 +1,13 @@
 /**
- * Centralized MIME type definitions and helpers.
+ * MIME helpers for builder-server.
  *
- * All extension-to-MIME mappings, allowed upload types, and MIME
- * classification logic live here so the rest of the codebase can
- * import from a single source of truth.
+ * The extension→MIME map and `getContentType` now live in @widgetizer/core
+ * (the single source of truth shared with the local asset adapter, which had
+ * drifted from this copy). Re-exported here so this module's many importers
+ * don't churn. The upload-validation constants and classification below are
+ * builder-server concerns and stay here.
  */
-
-// ---------------------------------------------------------------------------
-// Extension → MIME mapping (superset used for serving static files)
-// ---------------------------------------------------------------------------
-
-const CONTENT_TYPES = {
-  // Documents
-  ".html": "text/html",
-  ".css": "text/css",
-  ".js": "application/javascript",
-  ".pdf": "application/pdf",
-
-  // Images
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".gif": "image/gif",
-  ".svg": "image/svg+xml",
-  ".webp": "image/webp",
-
-  // Fonts
-  ".woff": "font/woff",
-  ".woff2": "font/woff2",
-  ".ttf": "font/ttf",
-  ".eot": "application/vnd.ms-fontobject",
-};
-
-/**
- * Resolve a file extension to its MIME type.
- * @param {string} ext  Lowercase extension including the dot, e.g. ".png"
- * @param {string} [fallback="application/octet-stream"]
- * @returns {string}
- */
-export function getContentType(ext, fallback = "application/octet-stream") {
-  return CONTENT_TYPES[ext] || fallback;
-}
+export { CONTENT_TYPES, getContentType } from "@widgetizer/core/mimeTypes";
 
 // ---------------------------------------------------------------------------
 // Upload validation

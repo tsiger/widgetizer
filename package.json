@@ -10,7 +10,6 @@
   ],
   "main": "electron/main.js",
   "exports": {
-    ".": "./src/main.jsx",
     "./server": "./packages/builder-server/src/createApp.js"
   },
   "engines": {

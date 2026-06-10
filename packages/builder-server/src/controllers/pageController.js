@@ -577,12 +577,21 @@ export async function duplicatePage(req, res) {
     // Read all existing page files to find existing copy names
     const pageJsonFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
 
-    const existingPageNames = await Promise.all(
-      pageJsonFiles.map(async (name) => {
-        const buf = await storage.read(scope, `pages/${name}`);
-        return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
-      }),
-    );
+    const existingPageNames = (
+      await Promise.all(
+        pageJsonFiles.map(async (name) => {
+          try {
+            const buf = await storage.read(scope, `pages/${name}`);
+            return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
+          } catch {
+            // Skip unreadable entries rather than failing the whole duplicate:
+            // e.g. a directory named `*.json` (EISDIR) or a file removed in a
+            // list/read race. Mirrors the old isFile() prefilter.
+            return null;
+          }
+        }),
+      )
+    ).filter(Boolean);
 
     const newName = generateCopyName(originalPageData.name, existingPageNames);
     const newSlug = await generateUniqueSlug(newName, (slug) => storage.exists(scope, `pages/${slug}.json`));

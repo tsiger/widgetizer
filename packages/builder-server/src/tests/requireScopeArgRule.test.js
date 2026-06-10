@@ -58,4 +58,11 @@ describe("local/require-scope-arg", () => {
   it("ignores methods that are not scope-aware", () => {
     assert.deepEqual(lint(`storage.configure(options); assetStorage.init();`), []);
   });
+
+  it("does not crash when an object is named like an Object.prototype member", () => {
+    // `hasOwnProperty` in object position must not bracket-index into
+    // Object.prototype and blow up the rule. No crash, no report.
+    assert.deepEqual(lint(`Object.prototype.hasOwnProperty.call(obj, key);`), []);
+    assert.deepEqual(lint(`x.toString.call(obj);`), []);
+  });
 });

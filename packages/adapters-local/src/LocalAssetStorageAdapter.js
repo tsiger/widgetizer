@@ -2,20 +2,11 @@ import fs from "fs/promises";
 import { createReadStream, createWriteStream } from "node:fs";
 import { pipeline } from "node:stream/promises";
 import path from "path";
+import { getContentType } from "@widgetizer/core/mimeTypes";
 import { assertWithin } from "./internal/paths.js";
 
-const CONTENT_TYPES = {
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".gif": "image/gif",
-  ".webp": "image/webp",
-  ".avif": "image/avif",
-  ".svg": "image/svg+xml",
-};
-
 function contentTypeFor(key) {
-  return CONTENT_TYPES[path.extname(key).toLowerCase()] || "application/octet-stream";
+  return getContentType(path.extname(key).toLowerCase());
 }
 
 /**

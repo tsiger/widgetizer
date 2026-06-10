@@ -763,6 +763,20 @@ describe("duplicatePage", () => {
     assert.notEqual(res._json.uuid, page.uuid);
   });
 
+  it("succeeds when a directory named *.json sits in pages/ (F8 — no EISDIR 500)", async () => {
+    const page = await createTestPage("Dir Hazard");
+    // A directory whose name ends in .json passes the .endsWith(".json") filter;
+    // reading it as a file would throw EISDIR and 500 the whole duplicate.
+    const pagesDir = getProjectPagesDir(activeProject.folderName);
+    await fs.ensureDir(path.join(pagesDir, "evil.json"));
+
+    const res = await callController(duplicatePage, { params: { id: page.slug } });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.equal(res._json.name, "Dir Hazard (Copy)");
+
+    await fs.remove(path.join(pagesDir, "evil.json"));
+  });
+
   it("generates a new slug for the copy", async () => {
     const page = await createTestPage("Slug Page");
 

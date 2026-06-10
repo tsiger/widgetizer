@@ -51,7 +51,11 @@ export default {
 
         const method = callee.property.name;
         const obj = adapterName(callee.object);
-        if (!obj || !SCOPE_AWARE_METHODS[obj] || !SCOPE_AWARE_METHODS[obj].has(method)) return;
+        // Object.hasOwn (not a bare index) so an object named like an
+        // Object.prototype member (`toString`, `hasOwnProperty`, …) resolves to
+        // undefined instead of an inherited function — bracket-indexing those
+        // would return a function with no `.has`, crashing the whole lint run.
+        if (!obj || !Object.hasOwn(SCOPE_AWARE_METHODS, obj) || !SCOPE_AWARE_METHODS[obj].has(method)) return;
 
         const first = node.arguments[0];
         if (!first || first.type !== "Identifier" || first.name !== "scope") {
