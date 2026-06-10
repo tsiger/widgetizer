@@ -9,9 +9,5 @@
   },
   "dependencies": {
     "@widgetizer/core": "*"
-  },
-  "devDependencies": {
-    "better-sqlite3": "^12.6.2",
-    "vitest": "^4.0.18"
   }
 }

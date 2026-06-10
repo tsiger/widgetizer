@@ -23,8 +23,5 @@
   },
   "dependencies": {
     "liquidjs": "^10.25.2"
-  },
-  "devDependencies": {
-    "vitest": "^4.0.18"
   }
 }

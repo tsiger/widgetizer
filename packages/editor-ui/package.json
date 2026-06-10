@@ -82,9 +82,5 @@
     "react": ">=19",
     "react-dom": ">=19",
     "react-router-dom": ">=7"
-  },
-  "devDependencies": {
-    "@testing-library/react": "^16.3.2",
-    "vitest": "^4.0.18"
   }
 }
