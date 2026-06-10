@@ -6,6 +6,7 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",
+    "./tailwind-preset": "./src/styles/preset.css",
     "./lib/config": "./src/lib/config.js",
     "./lib/apiBase": "./src/lib/apiBase.js",
     "./lib/apiFetch": "./src/lib/apiFetch.js",
