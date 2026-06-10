@@ -1,23 +1,2 @@
-const WORKSPACE_ROUTE_MAP = [
-  ["/pages", "/pages"],
-  ["/menus", "/menus"],
-  ["/media", "/media"],
-  ["/settings", "/settings"],
-  ["/export-site", "/export-site"],
-];
-
-export function resolveWorkspaceDestination(rawPath) {
-  if (!rawPath || typeof rawPath !== "string") {
-    return "/pages";
-  }
-
-  const normalizedPath = rawPath.trim();
-
-  for (const [prefix, destination] of WORKSPACE_ROUTE_MAP) {
-    if (normalizedPath === prefix || normalizedPath.startsWith(`${prefix}/`) || normalizedPath.startsWith(`${prefix}?`)) {
-      return destination;
-    }
-  }
-
-  return "/pages";
-}
+// Moved to @widgetizer/editor-ui in Sprint 1.5e-3c (re-export shim; removed in 1.5f).
+export * from "@widgetizer/editor-ui/utils/projectNavigation";

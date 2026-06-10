@@ -26,10 +26,19 @@
     "./stores/saveStore": "./src/stores/saveStore.js",
     "./stores/toastStore": "./src/stores/toastStore.js",
     "./stores/themeUpdateStore": "./src/stores/themeUpdateStore.js",
-    "./stores/iconsStore": "./src/stores/iconsStore.js"
+    "./stores/iconsStore": "./src/stores/iconsStore.js",
+    "./utils/copyNameSort": "./src/utils/copyNameSort.js",
+    "./utils/dateFormatter": "./src/utils/dateFormatter.js",
+    "./utils/mediaValidation": "./src/utils/mediaValidation.js",
+    "./utils/previewLinkUtils": "./src/utils/previewLinkUtils.js",
+    "./utils/projectNavigation": "./src/utils/projectNavigation.js",
+    "./utils/slugUtils": "./src/utils/slugUtils.js",
+    "./utils/uploadFeedback": "./src/utils/uploadFeedback.js",
+    "./utils/uploadValidation": "./src/utils/uploadValidation.js"
   },
   "dependencies": {
     "@widgetizer/core": "*",
+    "slugify": "^1.6.6",
     "zundo": "^2.3.0",
     "zustand": "^5.0.3"
   },
