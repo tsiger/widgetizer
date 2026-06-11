@@ -9,7 +9,8 @@ import { renderWidget, renderPageLayout, widgetSupportsTransparentHeader } from 
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { formatHtml, formatXml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
+import { formatHtml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
+import { buildSitemap, buildRobotsTxt } from "../services/seoArtifacts.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import { buildFormsManifest } from "../services/formsManifestService.js";
@@ -178,60 +179,17 @@ export async function exportProjectToDir(projectId, options = {}) {
       throw err;
     }
 
-    // --- Generate sitemap.xml and robots.txt ---
+    // --- Generate sitemap.xml and robots.txt (shared pure builders) ---
     if (siteUrl && siteUrl.trim() !== "") {
       try {
-        // Validate URL format first
-        new URL(siteUrl); // Will throw if invalid
-
-        // 1. Generate sitemap.xml
-        const sitemapUrls = pagesDataArray
-          .filter((page) => !page.seo?.robots?.includes("noindex")) // Filter out 'noindex' pages
-          .map((page) => {
-            const isHomepage = page.slug === "index" || page.slug === "home";
-            const pageUrl = isHomepage
-              ? new URL("/", siteUrl).href
-              : new URL(`${page.slug}.html`, siteUrl).href;
-            const lastMod = page.updated || page.gcreated || new Date().toISOString();
-            return `
-  <url>
-    <loc>${pageUrl}</loc>
-    <lastmod>${lastMod.split("T")[0]}</lastmod>
-  </url>`;
-          });
-
-        const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapUrls.join("")}
-</urlset>`;
-
-        const sitemapResult = await formatXml(sitemapContent);
-        await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapResult.xml);
-
-        // 2. Generate robots.txt
-        const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
-        const disallowPaths = Array.from(
-          new Set(
-            pagesDataArray
-              .filter((page) => page.seo?.robots?.includes("noindex"))
-              .map((page) => {
-                const pageId = page.id || page.slug;
-                if (!pageId) return null;
-                const filename = pageId === "index" || pageId === "home" ? "index.html" : `${pageId}.html`;
-                return `/${filename}`;
-              })
-              .filter(Boolean),
-          ),
-        );
-        const robotsLines = [
-          "User-agent: *",
-          "Allow: /",
-          ...disallowPaths.map((path) => `Disallow: ${path}`),
-          "",
-          `Sitemap: ${sitemapUrl}`,
-        ];
-        const robotsContent = robotsLines.join("\n");
-
-        await fs.writeFile(path.join(outputDir, "robots.txt"), robotsContent);
+        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl);
+        if (sitemapXml) {
+          await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapXml);
+        }
+        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl);
+        if (robotsTxt) {
+          await fs.writeFile(path.join(outputDir, "robots.txt"), robotsTxt);
+        }
       } catch (err) {
         console.warn(`Skipping sitemap/robots generation due to invalid siteUrl: ${siteUrl}`, err.message);
       }
