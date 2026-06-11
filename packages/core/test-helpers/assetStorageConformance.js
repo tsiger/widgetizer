@@ -58,14 +58,19 @@ export function runAssetStorageAdapterConformance({
       assert.deepEqual(images.sort(), ["images/a.png", "images/b.png"]);
     });
 
-    it("getUrl returns the same string for editor and published contexts", async () => {
+    it("getUrl returns a key-bearing string for each context", async () => {
       const a = makeAdapter();
       const scope = makeScope("a");
       const editor = a.getUrl(scope, "images/logo.png", { context: "editor" });
       const published = a.getUrl(scope, "images/logo.png", { context: "published" });
+      // Both contexts must yield a usable URL containing the key. The contract
+      // deliberately allows them to DIFFER (OSS serves one URL for both; the
+      // cloud adapter auth-proxies the editor URL and serves a CDN URL when
+      // published), so this no longer requires editor === published.
       assert.equal(typeof editor, "string");
+      assert.equal(typeof published, "string");
       assert.ok(editor.includes("images/logo.png"));
-      assert.equal(editor, published);
+      assert.ok(published.includes("images/logo.png"));
     });
 
     it("scopes are isolated", async () => {
