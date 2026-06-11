@@ -1,5 +1,4 @@
 import fs from "fs-extra";
-import { createReadStream } from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
@@ -8,15 +7,13 @@ import slugify from "slugify";
 import DOMPurify from "isomorphic-dompurify";
 import {
   getProjectDir,
-  getProjectImagesDir,
   getThemeJsonPath,
-  getMediaDir,
 } from "../config.js";
 import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
-import { handleProjectResolutionError, PROJECT_ERROR_CODES } from "../utils/projectErrors.js";
+import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 
 import { stripHtmlTags } from "../services/sanitizationService.js";
@@ -91,6 +88,27 @@ function decodeFileName(filename) {
   }
 }
 
+// The adapter key for a media file (the original) and its sizes. The original
+// lives under its category subdir; generated sizes are always images. Mirrors
+// the historical disk layout, minus the `/uploads/` URL prefix.
+function deleteMediaAssets(assetStorage, scope, file) {
+  const subdir = getMediaCategory(file.type) === "file" ? "files" : "images";
+  const keys = [`${subdir}/${file.filename}`];
+  if (file.sizes) {
+    for (const sizeName in file.sizes) {
+      const size = file.sizes[sizeName];
+      if (size && size.path) keys.push(`images/${path.basename(size.path)}`);
+    }
+  }
+  return Promise.all(
+    keys.map((key) =>
+      Promise.resolve(assetStorage.delete(scope, key)).catch((err) =>
+        console.warn(`Could not delete media asset ${key}: ${err.message}`),
+      ),
+    ),
+  );
+}
+
 
 /**
  * Writes media metadata to SQLite for a project (full replacement).
@@ -119,61 +137,12 @@ export async function atomicUpdateMediaFile(projectId, transformFn) {
   return mediaData;
 }
 
-// Configure multer storage
-const storage = multer.diskStorage({
-  destination: async function (req, file, cb) {
-    try {
-      const { projectId } = req.scope;
-      const projectFolderName = await getProjectFolderName(projectId);
-      const projectDir = getProjectDir(projectFolderName);
-
-      if (!(await fs.pathExists(projectDir))) {
-        const error = new Error(`Project directory not found for ${projectId}`);
-        error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
-        throw error;
-      }
-      const targetDir = getMediaDir(projectFolderName, file.mimetype);
-
-      await fs.ensureDir(targetDir);
-      cb(null, targetDir);
-    } catch (error) {
-      cb(error);
-    }
-  },
-  filename: async function (req, file, cb) {
-    try {
-      const decodedName = decodeFileName(file.originalname);
-      const extension = path.extname(decodedName);
-      const nameWithoutExt = path.basename(decodedName, extension);
-      let cleanName = slugify(nameWithoutExt, { lower: true, strict: true, trim: true });
-      // Truncate to avoid exceeding OS path/filename limits
-      if (cleanName.length > 100) {
-        cleanName = cleanName.slice(0, 100);
-      }
-      const { projectId } = req.scope;
-      const projectFolderName = await getProjectFolderName(projectId);
-      const projectDir = getProjectDir(projectFolderName);
-
-      if (!(await fs.pathExists(projectDir))) {
-        const error = new Error(`Project directory not found for ${projectId}`);
-        error.code = PROJECT_ERROR_CODES.PROJECT_DIR_MISSING;
-        throw error;
-      }
-
-      const targetDir = getMediaDir(projectFolderName, file.mimetype);
-
-      let finalName = `${cleanName}${extension}`;
-      let counter = 1;
-      while (await fs.pathExists(path.join(targetDir, finalName))) {
-        finalName = `${cleanName}-${counter}${extension}`;
-        counter++;
-      }
-      cb(null, finalName);
-    } catch (error) {
-      cb(error);
-    }
-  },
-});
+// Files are buffered in memory (file.buffer); their bytes are persisted through
+// the injected assetStorage adapter (local FS in OSS, R2 in hosted) rather than
+// written straight to a hard-coded data dir. This keeps media tenant-isolated
+// and cloud-portable. The final filename + collision handling moved into
+// uploadProjectMedia (it needs the adapter to dedup against the store).
+const storage = multer.memoryStorage();
 
 // Configure multer file filter
 const fileFilter = (req, file, cb) => {
@@ -239,7 +208,9 @@ export async function getProjectMedia(req, res) {
 export async function uploadProjectMedia(req, res) {
   try {
 
-    const { projectId } = req.scope;
+    const scope = req.scope;
+    const { projectId } = scope;
+    const assetStorage = req.adapters.assetStorage;
     const files = req.files;
 
     if (!Array.isArray(files) || files.length === 0) {
@@ -255,20 +226,43 @@ export async function uploadProjectMedia(req, res) {
     // Validate project ownership
     await getProjectFolderName(projectId);
 
+    // Sequential pre-pass: assign a collision-free filename to each file. The
+    // old multer disk-filename callback deduped against the upload dir; now we
+    // dedup against the adapter's existing keys (+ names assigned this request).
+    // Tests pass file.filename directly, bypassing this.
+    const listedNames = {};
+    async function uniqueName(subdir, originalname) {
+      if (!listedNames[subdir]) {
+        const keys = await Promise.resolve(assetStorage.list(scope, `${subdir}/`)).catch(() => []);
+        listedNames[subdir] = new Set(keys.map((k) => path.basename(k)));
+      }
+      const taken = listedNames[subdir];
+      const decoded = decodeFileName(originalname);
+      const ext = path.extname(decoded);
+      let base = slugify(path.basename(decoded, ext), { lower: true, strict: true, trim: true }) || "file";
+      if (base.length > 100) base = base.slice(0, 100);
+      let name = `${base}${ext}`;
+      let counter = 1;
+      while (taken.has(name)) name = `${base}-${counter++}${ext}`;
+      taken.add(name);
+      return name;
+    }
+
+    const prepared = [];
+    for (const file of files) {
+      const subdir = getMediaCategory(file.mimetype) === "file" ? "files" : "images";
+      const filename = file.filename || (await uniqueName(subdir, file.originalname));
+      prepared.push({ file, subdir, filename });
+    }
+
     // Process files in parallel instead of sequentially
-    const filePromises = files.map(async (file) => {
+    const filePromises = prepared.map(async ({ file, subdir, filename }) => {
       try {
         // Check file size against limit
         const maxSizeMB = maxImageSizeMB || 5;
         const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
         if (file.size > maxSizeBytes) {
-          // File exceeds limit, reject it and delete temp file
-          try {
-            await fs.unlink(file.path);
-          } catch (unlinkError) {
-            console.warn(`Could not delete oversized temp file ${file.path}: ${unlinkError.message}`);
-          }
           return {
             success: false,
             file: {
@@ -280,14 +274,17 @@ export async function uploadProjectMedia(req, res) {
         }
 
         // --- File is within size limit, proceed with processing ---
+        // memoryStorage gives file.buffer; direct-controller tests pass file.path.
+        let sourceBuffer = file.buffer;
+        if (!sourceBuffer && file.path) sourceBuffer = await fs.readFile(file.path);
+        if (!sourceBuffer) throw new Error("No file content received");
+
         const fileId = uuidv4();
-        const category = getMediaCategory(file.mimetype);
-        const uploadSubdir = category === "file" ? "files" : "images";
-        const uploadPath = `/uploads/${uploadSubdir}/${file.filename}`;
+        const uploadPath = `/uploads/${subdir}/${filename}`;
 
         const fileInfo = {
           id: fileId,
-          filename: file.filename,
+          filename,
           originalName: file.originalname,
           type: file.mimetype,
           size: file.size,
@@ -297,22 +294,17 @@ export async function uploadProjectMedia(req, res) {
           sizes: {}, // Initialize sizes object
         };
 
+        // The bytes that get stored as the "original" (possibly recompressed /
+        // sanitized below).
+        let originalBuffer = sourceBuffer;
+
         // Process image files (thumbnails, dimensions etc.)
         if (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") {
-          const useBufferBackedSource =
-            process.platform === "win32"
-            && ["image/gif", "image/webp"].includes(file.mimetype);
-          const imageSource = useBufferBackedSource
-            ? await fs.readFile(file.path)
-            : file.path;
-          const image = sharp(imageSource, {
-            limitInputPixels: 100_000_000,
-          });
+          const image = sharp(sourceBuffer, { limitInputPixels: 100_000_000 });
           const metadata = await image.metadata();
 
           // Safety: reject images with extreme dimensions (always enforced)
           if (metadata.width > 10_000 || metadata.height > 10_000) {
-            try { await fs.unlink(file.path); } catch { /* ignore cleanup failure */ }
             return {
               success: false,
               file: {
@@ -326,20 +318,15 @@ export async function uploadProjectMedia(req, res) {
           fileInfo.width = metadata.width;
           fileInfo.height = metadata.height;
 
-          // Generate image sizes in parallel
+          // Generate image sizes in parallel, each uploaded through the adapter.
           const sizePromises = Object.entries(imageSizes).map(async ([sizeName, sizeConfig]) => {
             if (sizeConfig.width >= metadata.width) return null;
 
-            const resizedFilename = `${path.basename(
-              file.filename,
-              path.extname(file.filename),
-            )}-${sizeName}${path.extname(file.filename)}`;
-            const resizedPath = path.join(path.dirname(file.path), resizedFilename);
+            const ext = path.extname(filename);
+            const resizedFilename = `${path.basename(filename, ext)}-${sizeName}${ext}`;
 
             // Preserve original format while applying quality settings
             const resizeOp = image.clone().resize({ width: sizeConfig.width });
-
-            // Apply quality based on original format
             if (file.mimetype === "image/jpeg") {
               resizeOp.jpeg({ quality: sizeConfig.quality });
             } else if (file.mimetype === "image/png") {
@@ -348,14 +335,15 @@ export async function uploadProjectMedia(req, res) {
               resizeOp.webp({ quality: sizeConfig.quality });
             }
 
-            const resizedImageInfo = await resizeOp.toFile(resizedPath);
+            const { data, info } = await resizeOp.toBuffer({ resolveWithObject: true });
+            await assetStorage.upload(scope, `images/${resizedFilename}`, data);
 
             return {
               sizeName,
               data: {
                 path: `/uploads/images/${resizedFilename}`,
-                width: resizedImageInfo.width,
-                height: resizedImageInfo.height,
+                width: info.width,
+                height: info.height,
               },
             };
           });
@@ -367,17 +355,15 @@ export async function uploadProjectMedia(req, res) {
             }
           });
 
-          // Compress original in-place when it's smaller than the largest enabled size.
-          // In this case the original is what gets served (via imageTag fallback),
-          // so applying the quality setting reduces file size without changing dimensions.
-          // GIFs are excluded to preserve animation frames.
+          // Recompress the original when it's no larger than the largest enabled
+          // size (it gets served via the imageTag fallback), reducing file size
+          // without changing dimensions. GIFs are excluded (animation frames).
           if (file.mimetype !== "image/gif") {
             const largestEnabledWidth = Math.max(...Object.values(imageSizes).map((s) => s.width));
 
             if (metadata.width <= largestEnabledWidth) {
               const quality = Math.max(...Object.values(imageSizes).map((s) => s.quality));
-              const tempPath = file.path + ".tmp";
-              const compressOp = sharp(imageSource);
+              const compressOp = sharp(sourceBuffer);
 
               if (file.mimetype === "image/jpeg") {
                 compressOp.jpeg({ quality });
@@ -387,18 +373,20 @@ export async function uploadProjectMedia(req, res) {
                 compressOp.webp({ quality });
               }
 
-              await compressOp.toFile(tempPath);
-              await fs.rename(tempPath, file.path);
-
-              const stats = await fs.stat(file.path);
-              fileInfo.size = stats.size;
+              originalBuffer = await compressOp.toBuffer();
+              fileInfo.size = originalBuffer.length;
             }
           }
         } else if (file.mimetype === "image/svg+xml") {
-          const svgContent = await fs.readFile(file.path, "utf-8");
-          const sanitizedSvg = DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } });
-          await fs.writeFile(file.path, sanitizedSvg);
+          const sanitizedSvg = DOMPurify.sanitize(sourceBuffer.toString("utf-8"), {
+            USE_PROFILES: { svg: true },
+          });
+          originalBuffer = Buffer.from(sanitizedSvg, "utf-8");
+          fileInfo.size = originalBuffer.length;
         }
+
+        // Persist the original bytes through the adapter.
+        await assetStorage.upload(scope, `${subdir}/${filename}`, originalBuffer);
 
         return {
           success: true,
@@ -406,12 +394,6 @@ export async function uploadProjectMedia(req, res) {
         };
       } catch (error) {
         console.error(`Failed to process file ${file.originalname}:`, error);
-        // Clean up the file on error
-        try {
-          await fs.unlink(file.path);
-        } catch (unlinkError) {
-          console.warn(`Could not delete failed temp file ${file.path}: ${unlinkError.message}`);
-        }
         return {
           success: false,
           file: {
@@ -521,10 +503,12 @@ export async function deleteProjectMedia(req, res) {
   try {
 
     const { fileId } = req.params;
-    const { projectId } = req.scope;
+    const scope = req.scope;
+    const { projectId } = scope;
+    const assetStorage = req.adapters.assetStorage;
 
-    // Validate project ownership and get folder name for filesystem ops
-    const projectFolderName = await getProjectFolderName(projectId);
+    // Validate project ownership
+    await getProjectFolderName(projectId);
 
     // Get the specific file from DB (scoped to project)
     const fileToDelete = mediaRepo.getMediaFileById(projectId, fileId);
@@ -541,36 +525,8 @@ export async function deleteProjectMedia(req, res) {
       });
     }
 
-    // Remove the physical files from storage
-    const fileDir = getMediaDir(projectFolderName, fileToDelete.type);
-
-    // 1. Delete the original file
-    const originalFilePath = path.join(fileDir, fileToDelete.filename);
-    try {
-      if (await fs.pathExists(originalFilePath)) {
-        await fs.unlink(originalFilePath);
-      }
-    } catch (err) {
-      console.warn(`Could not delete original file ${originalFilePath}: ${err.message}`);
-    }
-
-    // 2. Delete all generated sizes (for images)
-    if (fileToDelete.sizes) {
-      for (const sizeName in fileToDelete.sizes) {
-        const size = fileToDelete.sizes[sizeName];
-        if (size && size.path) {
-          const sizeFilename = path.basename(size.path);
-          const sizeFilePath = path.join(getProjectImagesDir(projectFolderName), sizeFilename);
-          try {
-            if (await fs.pathExists(sizeFilePath)) {
-              await fs.unlink(sizeFilePath);
-            }
-          } catch (err) {
-            console.warn(`Could not delete sized file ${sizeFilePath}: ${err.message}`);
-          }
-        }
-      }
-    }
+    // Remove the original + every generated size through the storage adapter.
+    await deleteMediaAssets(assetStorage, scope, fileToDelete);
 
     // Remove metadata from DB (cascade deletes sizes + usage, scoped to project)
     mediaRepo.deleteMediaFile(projectId, fileId);
@@ -594,49 +550,42 @@ export async function serveProjectMedia(req, res) {
   try {
     const { projectId, fileId, filename } = req.params;
 
-    let filePath;
-
-    // If we have a filename directly, resolve path from the route
+    // Resolve the adapter key (path under uploads/, e.g. images/foo.jpg).
+    let key;
     if (filename) {
-      const projectFolderName = await getProjectFolderName(projectId);
       // Determine subdirectory from the request path (uploads/images/ or uploads/files/)
       const isFilesRoute = req.path && req.path.includes("/uploads/files/");
-      const subdir = isFilesRoute ? "files" : "images";
-      filePath = path.join(getProjectDir(projectFolderName), "uploads", subdir, filename);
-    }
-    // Otherwise, look up the file by ID
-    else if (fileId) {
-      // Read media metadata
+      key = `${isFilesRoute ? "files" : "images"}/${filename}`;
+    } else if (fileId) {
       const mediaData = await readMediaFile(projectId);
-
-      // Find the file
       const fileInfo = mediaData.files.find((file) => file.id === fileId);
       if (!fileInfo) {
         return res.status(404).json({ error: "File not found" });
       }
-
-      const projectFolderName = await getProjectFolderName(projectId);
-      filePath = path.join(getProjectDir(projectFolderName), fileInfo.path);
+      key = fileInfo.path.replace(/^\/uploads\//, "");
     }
 
-    if (!filePath) {
+    if (!key) {
       return res.status(400).json({ error: "Invalid request" });
     }
 
-    // Check if file exists
-    try {
-      await fs.access(filePath);
-    } catch {
+    // This route is project-id-in-path (browser-native loads can't carry the
+    // X-Project-Id header), so resolveActiveProject may not have run — build the
+    // scope from the project, preserving any actor already resolved.
+    const folderName = await getProjectFolderName(projectId);
+    const scope = { ...(req.scope || {}), projectId, folderName };
+
+    const stream = await req.adapters.assetStorage.download(scope, key);
+    if (!stream) {
       return res.status(404).json({ error: "File not found" });
     }
 
-    // Determine content type
-    const ext = path.extname(filePath).toLowerCase();
-    res.setHeader("Content-Type", getContentType(ext));
-
-    // Stream the file
-    const fileStream = createReadStream(filePath);
-    fileStream.pipe(res);
+    res.setHeader("Content-Type", getContentType(path.extname(key).toLowerCase()));
+    stream.on("error", (err) => {
+      console.error("Error streaming project media:", err);
+      if (!res.headersSent) res.status(500).json({ error: "Failed to serve project media" });
+    });
+    stream.pipe(res);
   } catch (error) {
     console.error("Error serving project media:", error);
     if (handleProjectResolutionError(res, error)) return;
@@ -654,15 +603,17 @@ export async function serveProjectMedia(req, res) {
 export async function bulkDeleteProjectMedia(req, res) {
   try {
 
-    const { projectId } = req.scope;
+    const scope = req.scope;
+    const { projectId } = scope;
+    const assetStorage = req.adapters.assetStorage;
     const { fileIds } = req.body; // Expect an array of file IDs
 
     if (!Array.isArray(fileIds) || fileIds.length === 0) {
       return res.status(400).json({ error: "fileIds must be a non-empty array" });
     }
 
-    // Validate project ownership and get folder name
-    const projectFolderName = await getProjectFolderName(projectId);
+    // Validate project ownership
+    await getProjectFolderName(projectId);
 
     // Read all media to check usage (needed for in-use validation)
     const mediaData = mediaRepo.getMediaFiles(projectId);
@@ -699,33 +650,8 @@ export async function bulkDeleteProjectMedia(req, res) {
       return res.status(404).json({ error: "No matching files found to delete" });
     }
 
-    // Asynchronously delete all associated physical files
-    const deletePromises = filesToDelete.map(async (file) => {
-      const fileDir = getMediaDir(projectFolderName, file.type);
-
-      const originalFilePath = path.join(fileDir, file.filename);
-      try {
-        if (await fs.pathExists(originalFilePath)) await fs.unlink(originalFilePath);
-      } catch (err) {
-        console.warn(`Could not delete original file ${originalFilePath}: ${err.message}`);
-      }
-      if (file.sizes) {
-        for (const sizeName in file.sizes) {
-          const size = file.sizes[sizeName];
-          if (size && size.path) {
-            const sizeFilename = path.basename(size.path);
-            const sizeFilePath = path.join(getProjectImagesDir(projectFolderName), sizeFilename);
-            try {
-              if (await fs.pathExists(sizeFilePath)) await fs.unlink(sizeFilePath);
-            } catch (err) {
-              console.warn(`Could not delete sized file ${sizeFilePath}: ${err.message}`);
-            }
-          }
-        }
-      }
-    });
-
-    await Promise.all(deletePromises);
+    // Remove every original + size through the storage adapter.
+    await Promise.all(filesToDelete.map((file) => deleteMediaAssets(assetStorage, scope, file)));
 
     // Batch delete from DB (cascade handles sizes + usage, scoped to project)
     mediaRepo.deleteMediaFiles(projectId, filesToDelete.map((f) => f.id));

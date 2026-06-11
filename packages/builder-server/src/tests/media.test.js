@@ -63,6 +63,12 @@ const {
   refreshMediaUsage,
 } = await import("../controllers/mediaController.js");
 const { closeDb } = await import("../db/index.js");
+const { LocalAssetStorageAdapter } = await import("@widgetizer/adapters-local");
+
+// Real local asset adapter, rooted at the test data dir — so the byte-I/O the
+// controllers now do through req.adapters.assetStorage lands at the same on-disk
+// location the suite asserts against (DATA_DIR/projects/<folder>/uploads/...).
+const testAssetStorage = new LocalAssetStorageAdapter({ dataRoot: TEST_DATA_DIR });
 
 // ============================================================================
 // Test constants
@@ -95,8 +101,12 @@ function mockReq({ params = {}, body = {}, files = null, file = null, scope } = 
     file,
     // Migrated management handlers read the active project from req.scope (set by
     // resolveActiveProject in real routes); derive it from params here so these
-    // direct-controller tests exercise the same code path.
-    scope: scope ?? { projectId: params.projectId },
+    // direct-controller tests exercise the same code path. folderName is what the
+    // asset adapter needs to resolve the on-disk uploads dir.
+    scope: scope ?? { projectId: params.projectId, folderName: PROJECT_FOLDER },
+    // setupBuilderServer attaches req.adapters per-router in real routes; inject
+    // the real local asset adapter here so byte-I/O hits the test data dir.
+    adapters: { assetStorage: testAssetStorage },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
