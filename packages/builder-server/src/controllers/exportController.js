@@ -685,7 +685,7 @@ Per aspera ad astra
  * @returns {Promise<void>}
  */
 export async function exportProject(req, res) {
-  const { projectId } = req.params;
+  const { projectId } = req.scope;
 
   try {
 
@@ -898,7 +898,7 @@ export async function downloadExport(req, res) {
 export async function getExportHistory(req, res) {
   try {
 
-    const { projectId } = req.params;
+    const { projectId } = req.scope;
 
     if (!projectId) {
       return res.status(400).json({ error: "Project ID is required" });
@@ -944,7 +944,8 @@ export async function getExportHistory(req, res) {
 export async function deleteExport(req, res) {
   try {
 
-    const { projectId, version } = req.params;
+    const { version } = req.params;
+    const { projectId } = req.scope;
 
     if (!projectId || !version) {
       return res.status(400).json({ error: "Project ID and version are required" });

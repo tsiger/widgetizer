@@ -61,22 +61,6 @@ router.post(
   projectController.duplicateProject,
 );
 
-// GET /api/projects/:projectId/widgets - Get project widgets
-router.get(
-  "/:projectId/widgets",
-  [param("projectId").notEmpty().withMessage("Project ID is required.")],
-  validateRequest,
-  projectController.getProjectWidgets,
-);
-
-// GET /api/projects/:projectId/icons - Get project icons
-router.get(
-  "/:projectId/icons",
-  [param("projectId").notEmpty().withMessage("Project ID is required.")],
-  validateRequest,
-  projectController.getProjectIcons,
-);
-
 // POST /api/projects/:projectId/export - Export project as ZIP
 router.post(
   "/:projectId/export",

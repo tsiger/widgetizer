@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { apiFetch } from "../lib/apiFetch";
+import { editorFetch } from "../lib/apiFetch";
 
 /**
  * Zustand store for caching project icon sets.
@@ -56,7 +56,7 @@ const useIconsStore = create((set, get) => ({
     }));
 
     try {
-      const res = await apiFetch(`/api/projects/${projectId}/icons`);
+      const res = await editorFetch("/icons");
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }

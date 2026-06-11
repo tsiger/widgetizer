@@ -1,4 +1,5 @@
-import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
+import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
+import { getApiBase } from "../lib/apiBase";
 import { uploadFormData } from "../lib/uploadRequest";
 
 /**
@@ -64,7 +65,7 @@ export async function getProjectMedia(projectId, forceRefresh = false) {
   // Create a new fetch promise
   const fetchPromise = (async () => {
     try {
-      const data = await apiFetchJson(`/api/media/projects/${projectId}/media`, {}, {
+      const data = await editorFetchJson("/media", {}, {
         fallbackMessage: "Failed to get media files",
       });
 
@@ -147,7 +148,7 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
   });
 
   try {
-    const response = await uploadFormData(`/api/media/projects/${projectId}/media`, formData, { onProgress });
+    const response = await uploadFormData(`${getApiBase()}/media`, formData, { onProgress });
     const responseJson = response.data || {};
 
     // Update the cache with newly uploaded files
@@ -189,7 +190,7 @@ export async function uploadProjectMedia(projectId, files, onProgress) {
  */
 export async function deleteProjectMedia(projectId, fileId) {
   try {
-    const data = await apiFetchJson(`/api/media/projects/${projectId}/media/${fileId}`, {
+    const data = await editorFetchJson(`/media/${fileId}`, {
       method: "DELETE",
     }, { fallbackMessage: "Failed to delete file" });
 
@@ -212,7 +213,7 @@ export async function deleteProjectMedia(projectId, fileId) {
  */
 export async function deleteMultipleMedia(projectId, fileIds) {
   try {
-    const data = await apiFetchJson(`/api/media/projects/${projectId}/media/bulk-delete`, {
+    const data = await editorFetchJson("/media/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -234,14 +235,13 @@ export async function deleteMultipleMedia(projectId, fileIds) {
 /**
  * Get usage information for a specific media file.
  * Shows which pages and content blocks reference this file.
- * @param {string} projectId - The ID of the project
  * @param {string} fileId - The ID of the file to check
  * @returns {Promise<{usedIn: Array<{type: string, id: string, title: string}>, usageCount: number}>} Usage details
  * @throws {Error} If the usage check fails
  */
-export async function getMediaFileUsage(projectId, fileId) {
+export async function getMediaFileUsage(fileId) {
   try {
-    return await apiFetchJson(`/api/media/projects/${projectId}/media/${fileId}/usage`, {}, {
+    return await editorFetchJson(`/media/${fileId}/usage`, {}, {
       fallbackMessage: "Failed to get media usage",
     });
   } catch (error) {
@@ -250,15 +250,14 @@ export async function getMediaFileUsage(projectId, fileId) {
 }
 
 /**
- * Refresh media usage tracking for a project.
+ * Refresh media usage tracking for the active project.
  * Scans all pages and content to rebuild the usage index.
- * @param {string} projectId - The ID of the project to refresh
  * @returns {Promise<{success: boolean, filesUpdated: number}>} Refresh result
  * @throws {Error} If the refresh operation fails
  */
-export async function refreshMediaUsage(projectId) {
+export async function refreshMediaUsage() {
   try {
-    return await apiFetchJson(`/api/media/projects/${projectId}/refresh-usage`, {
+    return await editorFetchJson("/media/refresh-usage", {
       method: "POST",
     }, { fallbackMessage: "Failed to refresh media usage" });
   } catch (error) {

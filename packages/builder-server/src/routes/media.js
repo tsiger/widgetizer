@@ -20,29 +20,33 @@ const router = express.Router();
 router.use(standardJsonParser);
 router.use(resolveActiveProject);
 
-// Get all media for a project
-router.get(
-  "/projects/:projectId/media",
-  [
-    param("projectId")
-      .notEmpty()
-      .withMessage("Project ID is required")
-      .trim()
-      .isLength({ min: 1 })
-      .withMessage("Project ID cannot be empty"),
-  ],
-  validateRequest,
-  getProjectMedia,
-);
+// --- Active-project-scoped media management. These are XHR/fetch calls that
+// carry the X-Project-Id header, so the active project is resolved via
+// req.scope and the project id stays out of the path (hosted serves the same
+// routes under /api/projects/:projectId via the project-scoped router). ---
 
-// Upload media to a project
-router.post(
-  "/projects/:projectId/media",
-  [param("projectId").notEmpty()],
-  validateRequest,
-  upload.array("files", 10),
-  uploadProjectMedia,
-);
+// Get all media for the active project
+router.get("/", getProjectMedia);
+
+// Upload media to the active project
+router.post("/", upload.array("files", 10), uploadProjectMedia);
+
+// Bulk delete media files
+router.post("/bulk-delete", [body("fileIds").isArray({ min: 1 })], validateRequest, bulkDeleteProjectMedia);
+
+// Refresh media usage tracking
+router.post("/refresh-usage", refreshMediaUsage);
+
+// Get media file usage
+router.get("/:fileId/usage", [param("fileId").notEmpty()], validateRequest, getMediaFileUsage);
+
+// Delete a media file
+router.delete("/:fileId", [param("fileId").notEmpty()], validateRequest, deleteProjectMedia);
+
+// --- Project-id-in-path routes. Browser-native loads (<img src>, downloads)
+// and the metadata editor cannot carry the X-Project-Id header, so these keep
+// the project id in the URL and read req.params.projectId directly. The hosted
+// shell serves media via the cloud asset adapter's getUrl instead. ---
 
 // Update media metadata
 router.put(
@@ -57,33 +61,6 @@ router.put(
   validateRequest,
   updateMediaMetadata,
 );
-
-// Delete a media file
-router.delete(
-  "/projects/:projectId/media/:fileId",
-  [param("projectId").notEmpty(), param("fileId").notEmpty()],
-  validateRequest,
-  deleteProjectMedia,
-);
-
-// Bulk delete media files
-router.post(
-  "/projects/:projectId/media/bulk-delete",
-  [param("projectId").notEmpty(), body("fileIds").isArray({ min: 1 })],
-  validateRequest,
-  bulkDeleteProjectMedia,
-);
-
-// Get media file usage
-router.get(
-  "/projects/:projectId/media/:fileId/usage",
-  [param("projectId").notEmpty(), param("fileId").notEmpty()],
-  validateRequest,
-  getMediaFileUsage,
-);
-
-// Refresh media usage tracking
-router.post("/projects/:projectId/refresh-usage", [param("projectId").notEmpty()], validateRequest, refreshMediaUsage);
 
 // Serve a media file by ID
 router.get(

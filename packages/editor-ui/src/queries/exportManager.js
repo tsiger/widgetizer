@@ -1,5 +1,5 @@
 import { API_URL } from "../lib/config";
-import { apiFetchJson, rethrowQueryError } from "../lib/apiFetch";
+import { apiFetchJson, editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
 
 /**
  * @typedef {Object} ExportResult
@@ -32,7 +32,7 @@ export async function exportProjectAPI(projectId, options = {}) {
   }
 
   try {
-    return await apiFetchJson(`/api/export/${projectId}`, {
+    return await editorFetchJson("/export", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export async function getExportHistory(projectId) {
   }
 
   try {
-    return await apiFetchJson(`/api/export/history/${projectId}`, {
+    return await editorFetchJson("/export/history", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export async function deleteExportAPI(projectId, version) {
   }
 
   try {
-    return await apiFetchJson(`/api/export/${projectId}/${version}`, {
+    return await editorFetchJson(`/export/${version}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

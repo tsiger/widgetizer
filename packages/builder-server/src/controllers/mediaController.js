@@ -123,7 +123,7 @@ export async function atomicUpdateMediaFile(projectId, transformFn) {
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
-      const { projectId } = req.params;
+      const { projectId } = req.scope;
       const projectFolderName = await getProjectFolderName(projectId);
       const projectDir = getProjectDir(projectFolderName);
 
@@ -150,7 +150,7 @@ const storage = multer.diskStorage({
       if (cleanName.length > 100) {
         cleanName = cleanName.slice(0, 100);
       }
-      const { projectId } = req.params;
+      const { projectId } = req.scope;
       const projectFolderName = await getProjectFolderName(projectId);
       const projectDir = getProjectDir(projectFolderName);
 
@@ -200,7 +200,7 @@ export const upload = multer({
 export async function getProjectMedia(req, res) {
   try {
 
-    const { projectId } = req.params;
+    const { projectId } = req.scope;
 
     if (!projectId) {
       return res.status(400).json({ error: "Project ID is required" });
@@ -239,7 +239,7 @@ export async function getProjectMedia(req, res) {
 export async function uploadProjectMedia(req, res) {
   try {
 
-    const { projectId } = req.params;
+    const { projectId } = req.scope;
     const files = req.files;
 
     if (!Array.isArray(files) || files.length === 0) {
@@ -520,7 +520,8 @@ export async function updateMediaMetadata(req, res) {
 export async function deleteProjectMedia(req, res) {
   try {
 
-    const { projectId, fileId } = req.params;
+    const { fileId } = req.params;
+    const { projectId } = req.scope;
 
     // Validate project ownership and get folder name for filesystem ops
     const projectFolderName = await getProjectFolderName(projectId);
@@ -653,7 +654,7 @@ export async function serveProjectMedia(req, res) {
 export async function bulkDeleteProjectMedia(req, res) {
   try {
 
-    const { projectId } = req.params;
+    const { projectId } = req.scope;
     const { fileIds } = req.body; // Expect an array of file IDs
 
     if (!Array.isArray(fileIds) || fileIds.length === 0) {
@@ -760,7 +761,8 @@ export async function bulkDeleteProjectMedia(req, res) {
 export async function getMediaFileUsage(req, res) {
   try {
 
-    const { projectId, fileId } = req.params;
+    const { fileId } = req.params;
+    const { projectId } = req.scope;
     const usage = await getMediaUsage(projectId, fileId);
     res.json(usage);
   } catch (error) {
@@ -784,7 +786,7 @@ export async function getMediaFileUsage(req, res) {
 export async function refreshMediaUsage(req, res) {
   try {
 
-    const { projectId } = req.params;
+    const { projectId } = req.scope;
     const result = await refreshAllMediaUsage(projectId);
     res.json(result);
   } catch (error) {

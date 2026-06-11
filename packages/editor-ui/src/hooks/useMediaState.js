@@ -89,7 +89,7 @@ export default function useMediaState() {
     if (!activeProject) return;
 
     try {
-      await refreshMediaUsage(activeProject.id);
+      await refreshMediaUsage();
       await loadMediaFiles(true); // Force reload to get updated usage data
       showToast("Media usage tracking refreshed", "success");
     } catch {

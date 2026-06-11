@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../lib/apiFetch", () => ({
-  apiFetchJson: vi.fn(),
+  editorFetchJson: vi.fn(),
   isApiError: vi.fn((error) => error?.name === "ApiError"),
   rethrowQueryError: vi.fn((error, fallbackMessage) => {
     if (error?.name === "ApiError") {
@@ -11,25 +11,29 @@ vi.mock("../../lib/apiFetch", () => ({
   }),
 }));
 
+vi.mock("../../lib/apiBase", () => ({
+  getApiBase: vi.fn(() => "/api"),
+}));
+
 vi.mock("../../lib/uploadRequest", () => ({
   uploadFormData: vi.fn(),
 }));
 
 describe("mediaManager", () => {
-  let apiFetchJson;
+  let editorFetchJson;
   let uploadFormData;
 
   beforeEach(async () => {
     vi.resetModules();
-    ({ apiFetchJson } = await import("../../lib/apiFetch"));
+    ({ editorFetchJson } = await import("../../lib/apiFetch"));
     ({ uploadFormData } = await import("../../lib/uploadRequest"));
-    apiFetchJson.mockReset();
+    editorFetchJson.mockReset();
     uploadFormData.mockReset();
   });
 
   it("caches successful media fetches per project", async () => {
     const mediaData = { files: [{ id: "1", originalName: "photo.jpg" }] };
-    apiFetchJson.mockResolvedValue(mediaData);
+    editorFetchJson.mockResolvedValue(mediaData);
 
     const { getProjectMedia } = await import("../mediaManager");
 
@@ -38,9 +42,9 @@ describe("mediaManager", () => {
 
     expect(first).toEqual(mediaData);
     expect(second).toEqual(mediaData);
-    expect(apiFetchJson).toHaveBeenCalledTimes(1);
-    expect(apiFetchJson).toHaveBeenCalledWith(
-      "/api/media/projects/project-1/media",
+    expect(editorFetchJson).toHaveBeenCalledTimes(1);
+    expect(editorFetchJson).toHaveBeenCalledWith(
+      "/media",
       {},
       { fallbackMessage: "Failed to get media files" },
     );
@@ -50,7 +54,7 @@ describe("mediaManager", () => {
     const existingData = { files: [{ id: "1", originalName: "existing.jpg" }] };
     const uploadedFile = { id: "2", originalName: "new.jpg" };
 
-    apiFetchJson.mockResolvedValue(existingData);
+    editorFetchJson.mockResolvedValue(existingData);
     uploadFormData.mockResolvedValue({
       status: 201,
       data: {
@@ -67,8 +71,9 @@ describe("mediaManager", () => {
 
     expect(uploadResult.processedFiles).toEqual([uploadedFile]);
     expect(cachedAfterUpload.files).toEqual([...existingData.files, uploadedFile]);
-    expect(apiFetchJson).toHaveBeenCalledTimes(1);
+    expect(editorFetchJson).toHaveBeenCalledTimes(1);
     expect(uploadFormData).toHaveBeenCalledTimes(1);
+    expect(uploadFormData).toHaveBeenCalledWith("/api/media", expect.anything(), expect.anything());
   });
 
   it("returns normalized rejected-file payloads from upload errors", async () => {
@@ -94,7 +99,7 @@ describe("mediaManager", () => {
   });
 
   it("invalidates cache after deleting a media file", async () => {
-    apiFetchJson
+    editorFetchJson
       .mockResolvedValueOnce({ files: [{ id: "1", originalName: "before.jpg" }] })
       .mockResolvedValueOnce({ success: true, message: "Deleted" })
       .mockResolvedValueOnce({ files: [{ id: "2", originalName: "after.jpg" }] });
@@ -106,6 +111,12 @@ describe("mediaManager", () => {
     const refreshed = await getProjectMedia("project-1");
 
     expect(refreshed.files).toEqual([{ id: "2", originalName: "after.jpg" }]);
-    expect(apiFetchJson).toHaveBeenCalledTimes(3);
+    expect(editorFetchJson).toHaveBeenCalledTimes(3);
+    expect(editorFetchJson).toHaveBeenNthCalledWith(
+      2,
+      "/media/file-1",
+      { method: "DELETE" },
+      { fallbackMessage: "Failed to delete file" },
+    );
   });
 });

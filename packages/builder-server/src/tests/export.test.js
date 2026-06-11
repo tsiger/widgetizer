@@ -97,11 +97,15 @@ after(async () => {
 // Mock helpers
 // ============================================================================
 
-function mockReq({ params = {}, body = {}, file = null } = {}) {
+function mockReq({ params = {}, body = {}, file = null, scope } = {}) {
   return {
     params,
     body,
     file,
+    // exportProject/getExportHistory/deleteExport read the active project from
+    // req.scope (set by resolveActiveProject in real routes); derive it from
+    // params here so these direct-controller tests exercise the same path.
+    scope: scope ?? { projectId: params.projectId },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };

@@ -542,7 +542,7 @@ export async function duplicateProject(req, res) {
  */
 export async function getProjectWidgets(req, res) {
   try {
-    const { projectId } = req.params;
+    const { projectId } = req.scope;
 
     const project = projectRepo.getProjectById(projectId);
     if (!project) {
@@ -654,7 +654,7 @@ export async function getProjectWidgets(req, res) {
  */
 export async function getProjectIcons(req, res) {
   try {
-    const { projectId } = req.params;
+    const { projectId } = req.scope;
 
     const project = projectRepo.getProjectById(projectId);
     if (!project) {

@@ -18,17 +18,22 @@ const router = express.Router();
 router.use(standardJsonParser);
 router.use(resolveActiveProject);
 
-// Route to trigger the exporting process for a project
-// POST /api/export/:projectId
-router.post("/:projectId", exportProject);
+// Active-project-scoped export actions: XHR/fetch calls carry the X-Project-Id
+// header, so the active project is resolved via req.scope and stays out of the
+// path. The serve/download routes below are browser-native and stay keyed by
+// exportDir.
 
-// Route to get export history for a project
-// GET /api/export/history/:projectId
-router.get("/history/:projectId", getExportHistory);
+// Route to trigger the exporting process for the active project
+// POST /api/export
+router.post("/", exportProject);
+
+// Route to get export history for the active project
+// GET /api/export/history
+router.get("/history", getExportHistory);
 
 // Route to delete a specific export
-// DELETE /api/export/:projectId/:version
-router.delete("/:projectId/:version", deleteExport);
+// DELETE /api/export/:version
+router.delete("/:version", deleteExport);
 
 // Route to get export files info
 // GET /api/export/files/:exportDir

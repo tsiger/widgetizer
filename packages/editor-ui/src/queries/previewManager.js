@@ -1,4 +1,4 @@
-import { apiFetchJson, editorFetch, editorFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
+import { editorFetch, editorFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
@@ -470,7 +470,7 @@ export async function getProjectWidgets() {
   }
 
   try {
-    return await apiFetchJson(`/api/projects/${activeProject.id}/widgets`, {}, {
+    return await editorFetchJson("/widgets", {}, {
       fallbackMessage: "Failed to get project widgets",
     });
   } catch (error) {
