@@ -48,8 +48,11 @@ export function EditorShell({ apiBase, project, scope, plugins = [], slots = {} 
 }
 
 // The editor route children (relative paths), gated by RequireActiveProject so
-// editor-scoped stores reset on project switch. Both shells render the same set.
-function editorRouteChildren() {
+// editor-scoped stores reset on project switch. Both shells render the same
+// built-in set; plugin-contributed `routes` are merged into the same gated group
+// (so e.g. a hosted Forms/Analytics nav item has a route to render).
+function editorRouteChildren(plugins = []) {
+  const pluginRoutes = plugins.flatMap((p) => (Array.isArray(p?.routes) ? p.routes : []));
   return [
     {
       element: <RequireActiveProject />,
@@ -65,6 +68,7 @@ function editorRouteChildren() {
         { path: "media", element: <Media /> },
         { path: "settings", element: <Settings /> },
         { path: "export-site", element: <ExportSite /> },
+        ...pluginRoutes,
       ],
     },
   ];
@@ -94,6 +98,6 @@ export function createEditorRoutes({
     path,
     element: <EditorShell apiBase={apiBase} project={project} scope={scope} plugins={plugins} slots={slots} />,
     errorElement,
-    children: editorRouteChildren(),
+    children: editorRouteChildren(plugins),
   };
 }
