@@ -31,7 +31,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
 
-  const { type, id, label, description, required, options, min, max, step, unit, allow_alpha, language, size, compact } =
+  const { type, id, label, description, required, options, min, max, step, unit, allow_alpha, language, size, compact, layout } =
     setting || {};
 
   // Translate options (select/radio) via theme locale
@@ -92,6 +92,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
             allowSource={setting.allow_source}
             allowHeadings={setting.allow_headings}
             allowImages={setting.allow_images}
+            minHeight={setting.min_height}
           />
         );
       case "code":
@@ -114,7 +115,9 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
       case "image": {
         // `size` replaces legacy `compact` for image width; prefer `size` when both exist
         const imageSize = size || (compact ? "narrow" : "full");
-        return <ImageInput {...inputProps} size={imageSize} />;
+        // `layout` ("stacked" default | "row") drives the editor's input shape — a big
+        // full-width preview vs. a compact thumbnail with the controls beside it.
+        return <ImageInput {...inputProps} size={imageSize} layout={layout} framed={layout === "row"} />;
       }
       case "gallery":
         return <GalleryInput {...inputProps} />;

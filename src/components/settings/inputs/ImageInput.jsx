@@ -17,8 +17,10 @@ import { IMAGE_ACCEPT, validateFileSizes } from "../../../utils/uploadValidation
  * @param {"full"|"narrow"} [size="full"] — Constrains overall width: `narrow` caps at 14rem (e.g. favicon in theme settings).
  * @param {"stacked"|"row"} [layout="stacked"] — `stacked` puts a full-width preview above the controls; `row` renders a
  *   fixed 100×100 thumbnail on the left with the controls in a column beside it (the compact GalleryInput row).
+ * @param {boolean} [framed=false] — Wraps a `row` input in the same bordered/bg card gallery rows use. GalleryInput
+ *   leaves this off (it supplies its own card around drag + image + trash); a standalone row image turns it on.
  */
-export default function ImageInput({ id, value = "", onChange, size = "full", layout = "stacked" }) {
+export default function ImageInput({ id, value = "", onChange, size = "full", layout = "stacked", framed = false }) {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -139,7 +141,11 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
     }
   };
 
-  const rootClassName = isRow ? "flex items-start gap-3 w-full" : isNarrow ? "w-full max-w-56" : "w-full";
+  const rootClassName = isRow
+    ? `flex items-start gap-3 w-full${framed ? " rounded-md border border-slate-200 bg-slate-50 p-3" : ""}`
+    : isNarrow
+      ? "w-full max-w-56"
+      : "w-full";
   // In `row` layout the media box is a fixed 100×100 square; otherwise it spans the full width at video aspect.
   const boxSizeClassName = isRow ? "w-[100px] h-[100px] shrink-0" : "w-full aspect-video";
   const mediaClassName = `relative ${boxSizeClassName} bg-slate-100 rounded-sm flex items-center justify-center group overflow-hidden`;
@@ -216,7 +222,11 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
       disabled={uploading}
       className="rounded p-5 text-sm font-medium text-pink-600 transition-colors hover:text-pink-700 hover:underline disabled:opacity-50"
     >
-      {t("components.mediaSelector.orBrowseLibrary")}
+      {/* "…or choose from library" only reads right next to the Upload box; once a
+          thumbnail replaces it, drop the "…or". */}
+      {value && currentImageFile
+        ? t("components.mediaSelector.browseLibrary")
+        : t("components.mediaSelector.orBrowseLibrary")}
     </button>
   ) : (
     <Button

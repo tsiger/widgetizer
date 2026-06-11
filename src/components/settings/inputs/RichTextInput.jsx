@@ -224,6 +224,7 @@ export default function RichTextInput({
   allowSource = false,
   allowHeadings = false,
   allowImages = false,
+  minHeight,
 }) {
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [sourceValue, setSourceValue] = useState(value);
@@ -397,6 +398,7 @@ export default function RichTextInput({
       <div
         className={`richtext-editor ${isSourceMode ? "is-source-mode" : ""} ${isExpanded ? "is-hidden" : ""}`}
         id={id}
+        style={minHeight ? { "--richtext-min-height": `${minHeight}px` } : undefined}
       >
         {!isExpanded && renderEditor(false)}
       </div>

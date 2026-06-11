@@ -141,7 +141,7 @@
 /* Editor content area */
 .richtext-editor .tiptap {
   padding: 0.5rem 0.75rem;
-  min-height: 5rem;
+  min-height: var(--richtext-min-height, 5rem);
   max-height: 12rem;
   overflow-y: auto;
   outline: none;

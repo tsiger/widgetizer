@@ -43,6 +43,8 @@ export default function SeoFields({ register, setValue, ogImage }) {
         <ImageInput
           id="seo-og-image"
           value={ogImage}
+          layout="row"
+          framed
           onChange={(value) =>
             setValue("seo.og_image", value, {
               shouldDirty: true,
