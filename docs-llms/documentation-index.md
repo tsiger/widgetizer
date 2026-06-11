@@ -161,6 +161,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[core-form-widget.md](core-form-widget.md)** - Form Widget & Forms Manifest
+
+**Purpose**: Documents the `core-form` contact/inquiry widget and the export-time `widgetizer.forms.json` manifest it pairs with for the Widgetizer Hosted forms service **When to use**:
+
+- Understanding the markup contract the hosted Worker recognises (`data-widgetizer-form`, honeypot, Turnstile placeholder, status element)
+- Configuring form widgets (fields, choices, consent, info/social sidebar blocks)
+- Understanding how form/field/option identifiers are auto-derived from labels at export time
+- Troubleshooting export-time form validation errors (label collisions, per-site/field/option limits)
+
+**Key topics**: Form widget settings/blocks, derived identifier model (handleize), honeypot & Turnstile contract, manifest emitter (`buildFormsManifest`), per-site/field/option limits, export pipeline wiring, layout recipes
+
+---
+
 ## 🏛️ Platform Architecture
 
 ### **[core-security.md](core-security.md)** - Platform Security
@@ -401,11 +414,11 @@ Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `t
 
 ### **Frontend Developers**
 
-Primary docs: `core-page-editor.md`, `core-projects.md`, `core-pages.md` Secondary: `core-media.md`, `core-appSettings.md`
+Primary docs: `core-page-editor.md`, `core-projects.md`, `core-pages.md` Secondary: `core-media.md`, `core-appSettings.md`, `core-form-widget.md`
 
 ### **Backend Developers**
 
-Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `core-pages.md`, `core-menus.md`, `core-appSettings.md`, `core-collections.md`
+Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `core-pages.md`, `core-menus.md`, `core-appSettings.md`, `core-collections.md`, `core-form-widget.md`
 
 ### **System Architects**
 

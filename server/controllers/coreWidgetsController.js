@@ -32,13 +32,17 @@ export async function getCoreWidgets() {
       widgetFolders.push(entry);
     }
 
-    // Process each widget folder to read its schema.json
+    // Process each widget folder to read its schema.json (and flag preview.png)
     const widgetSchemas = await Promise.all(
       widgetFolders.map(async (folder) => {
         try {
-          const schemaPath = path.join(CORE_WIDGETS_DIR, folder.name, "schema.json");
-          const content = await fs.readFile(schemaPath, "utf8");
-          return JSON.parse(content);
+          const widgetDir = path.join(CORE_WIDGETS_DIR, folder.name);
+          const content = await fs.readFile(path.join(widgetDir, "schema.json"), "utf8");
+          const schema = JSON.parse(content);
+          if (await fs.pathExists(path.join(widgetDir, "preview.png"))) {
+            schema.hasPreview = true;
+          }
+          return schema;
         } catch (error) {
           console.error(`Error loading schema for core widget ${folder.name}:`, error);
           return null;
@@ -61,11 +65,16 @@ export async function getCoreWidgets() {
  */
 export async function getCoreWidget(widgetName) {
   try {
-    const schemaPath = path.join(CORE_WIDGETS_DIR, widgetName, "schema.json");
+    const widgetDir = path.join(CORE_WIDGETS_DIR, widgetName);
+    const schemaPath = path.join(widgetDir, "schema.json");
 
     if (await fs.pathExists(schemaPath)) {
       const content = await fs.readFile(schemaPath, "utf8");
-      return JSON.parse(content);
+      const schema = JSON.parse(content);
+      if (await fs.pathExists(path.join(widgetDir, "preview.png"))) {
+        schema.hasPreview = true;
+      }
+      return schema;
     }
 
     return null;

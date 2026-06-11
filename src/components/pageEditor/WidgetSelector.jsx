@@ -1,7 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
-import { Search } from "lucide-react";
+import { ImageOff, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
+import { API_URL } from "../../config";
+import { getActiveProjectId } from "../../lib/activeProjectId";
 
 export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
   const { t } = useTranslation();
@@ -11,6 +13,8 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
   const listRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [focusedIndex, setFocusedIndex] = useState(-1);
+  // Track the widget type whose preview 404'd, so the placeholder shows in place of a broken image.
+  const [brokenPreviewType, setBrokenPreviewType] = useState(null);
 
   // Helper to update search and reset focus in one action
   const updateSearch = useCallback((value) => {
@@ -33,6 +37,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
   });
 
   // Handle keyboard navigation
+  /* eslint-disable react-hooks/preserve-manual-memoization */
   const handleKeyDown = useCallback(
     (event) => {
       if (!isOpen) return;
@@ -77,6 +82,11 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     },
     [isOpen, focusedIndex, filteredWidgets, onSelectWidget, position, onClose],
   );
+  /* eslint-enable react-hooks/preserve-manual-memoization */
+
+  // Preview pane appears once at least one widget in the theme ships a preview.png
+  const hasAnyPreview = availableWidgets.some((s) => s.hasPreview);
+  const projectId = getActiveProjectId();
 
   // Scroll focused item into view
   useEffect(() => {
@@ -138,7 +148,8 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
     }
 
     const triggerRect = triggerRef.current.getBoundingClientRect();
-    const dropdownWidth = 224; // w-56 = 224px
+    // w-56 (224px) list + optional w-64 (256px) preview pane
+    const dropdownWidth = hasAnyPreview ? 480 : 224;
 
     // Position the dropdown outside the sidebar — width matches the responsive sidebar (w-60 / 2xl:w-70)
     const sidebarWidth = window.innerWidth >= 1536 ? 280 : 240;
@@ -170,7 +181,7 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
       left: leftPosition,
       zIndex: 1000,
     });
-  }, [isOpen, triggerRef]);
+  }, [isOpen, triggerRef, hasAnyPreview]);
 
   if (!isOpen) return null;
 
@@ -181,65 +192,94 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
 
       <div
         ref={dropdownRef}
-        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg w-56 flex flex-col"
+        className="bg-white border-2 border-slate-300 rounded-lg shadow-lg flex"
         style={{
           ...style,
           position: "fixed", // Force fixed positioning
           zIndex: 9999, // Higher z-index
         }}
       >
-        <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
-          <h3 className="text-sm font-medium text-slate-700 text-left mb-2">{t("pageEditor.actions.addWidget")}</h3>
-          <div className="relative">
-            <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400" />
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder={t("common.search")}
-              value={searchTerm}
-              onChange={(e) => updateSearch(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full text-sm pl-8 pr-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
-              role="combobox"
-              aria-expanded={isOpen}
-              aria-controls="widget-selector-list"
-              aria-activedescendant={
-                focusedIndex >= 0 ? `widget-option-${filteredWidgets[focusedIndex]?.type}` : undefined
-              }
-            />
+        <div className={`flex flex-col ${hasAnyPreview ? "w-56 border-r border-slate-200" : "w-56"}`}>
+          <div className={`px-3 py-2 border-b border-slate-100 bg-slate-50 ${hasAnyPreview ? "rounded-tl-lg" : "rounded-t-lg"}`}>
+            <h3 className="text-sm font-medium text-slate-700 text-left mb-2">{t("pageEditor.actions.addWidget")}</h3>
+            <div className="relative">
+              <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder={t("common.search")}
+                value={searchTerm}
+                onChange={(e) => updateSearch(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-full text-sm pl-8 pr-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-controls="widget-selector-list"
+                aria-activedescendant={
+                  focusedIndex >= 0 ? `widget-option-${filteredWidgets[focusedIndex]?.type}` : undefined
+                }
+              />
+            </div>
+          </div>
+
+          <div ref={listRef} id="widget-selector-list" className="max-h-64 overflow-y-auto" role="listbox">
+            {filteredWidgets.length > 0 ? (
+              filteredWidgets.map((schema, index) => (
+                <button
+                  key={schema.type}
+                  id={`widget-option-${schema.type}`}
+                  role="option"
+                  aria-selected={focusedIndex === index}
+                  className={`w-full px-3 py-2 text-left transition-colors group border-b border-transparent last:border-0 ${
+                    focusedIndex === index ? "bg-pink-50 border-pink-100" : "hover:bg-slate-50 hover:border-slate-100"
+                  }`}
+                  onClick={() => {
+                    onSelectWidget(schema.type, position);
+                    onClose();
+                  }}
+                  onMouseEnter={() => setFocusedIndex(index)}
+                >
+                  <div
+                    className={`text-sm font-medium ${
+                      focusedIndex === index ? "text-pink-600" : "text-slate-800 group-hover:text-pink-600"
+                    }`}
+                  >
+                    {tTheme(schema.displayName) || schema.type}
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-4 text-center text-sm text-slate-500">{t("pageEditor.noWidgetsFound")}</div>
+            )}
           </div>
         </div>
 
-        <div ref={listRef} id="widget-selector-list" className="max-h-64 overflow-y-auto" role="listbox">
-          {filteredWidgets.length > 0 ? (
-            filteredWidgets.map((schema, index) => (
-              <button
-                key={schema.type}
-                id={`widget-option-${schema.type}`}
-                role="option"
-                aria-selected={focusedIndex === index}
-                className={`w-full px-3 py-2 text-left transition-colors group border-b border-transparent last:border-0 ${
-                  focusedIndex === index ? "bg-pink-50 border-pink-100" : "hover:bg-slate-50 hover:border-slate-100"
-                }`}
-                onClick={() => {
-                  onSelectWidget(schema.type, position);
-                  onClose();
-                }}
-                onMouseEnter={() => setFocusedIndex(index)}
-              >
-                <div
-                  className={`text-sm font-medium ${
-                    focusedIndex === index ? "text-pink-600" : "text-slate-800 group-hover:text-pink-600"
-                  }`}
-                >
-                  {tTheme(schema.displayName) || schema.type}
+        {hasAnyPreview && (() => {
+          const focusedWidget = focusedIndex >= 0 ? filteredWidgets[focusedIndex] : null;
+          const showImage =
+            focusedWidget?.hasPreview && projectId && focusedWidget.type !== brokenPreviewType;
+          return (
+            <div className="w-64 bg-slate-50 rounded-r-lg flex flex-col items-center justify-center p-3">
+              {showImage ? (
+                <img
+                  src={API_URL(`/api/preview/assets/${projectId}/widgets/${focusedWidget.type}/preview.png`)}
+                  alt={tTheme(focusedWidget.displayName) || focusedWidget.type}
+                  onError={() => setBrokenPreviewType(focusedWidget.type)}
+                  className="max-w-full max-h-56 object-contain rounded shadow-sm bg-white"
+                />
+              ) : (
+                <div className="flex flex-col items-center text-center text-slate-400 px-2">
+                  <ImageOff size={28} strokeWidth={1.5} />
+                  <p className="text-xs mt-2 leading-snug">
+                    {focusedWidget
+                      ? t("pageEditor.widgetPreview.missing", "No preview yet")
+                      : t("pageEditor.widgetPreview.hint", "Hover a widget to preview")}
+                  </p>
                 </div>
-              </button>
-            ))
-          ) : (
-            <div className="px-3 py-4 text-center text-sm text-slate-500">{t("pageEditor.noWidgetsFound")}</div>
-          )}
-        </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </>
   );
