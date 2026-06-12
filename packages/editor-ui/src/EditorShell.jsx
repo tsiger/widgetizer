@@ -4,6 +4,7 @@ import { builtinNavPlugin } from "./extension/builtinNav.js";
 import Layout from "./components/layout/Layout.jsx";
 import RequireActiveProject from "./components/layout/RequireActiveProject.jsx";
 import { setApiBase } from "./lib/apiBase.js";
+import { RouteBaseProvider } from "./lib/routeBase.jsx";
 import useProjectStore from "./stores/projectStore.js";
 
 import Pages from "./pages/Pages.jsx";
@@ -35,7 +36,7 @@ import ExportSite from "./pages/ExportSite.jsx";
 // passes as `children`. EditorShell uses it with the editor's own Layout; hosted
 // uses it with the hosted dashboard Layout so the editor's section routes render
 // natively in the dashboard chrome (the native-merge goal — no embedded shell).
-export function EditorProvider({ apiBase, project, scope, plugins = [], slots = {}, children }) {
+export function EditorProvider({ apiBase, routeBase = "", project, scope, plugins = [], slots = {}, children }) {
   const allPlugins = useMemo(() => [builtinNavPlugin, ...plugins], [plugins]);
 
   useEffect(() => {
@@ -48,14 +49,14 @@ export function EditorProvider({ apiBase, project, scope, plugins = [], slots = 
 
   return (
     <PluginProvider plugins={allPlugins} slots={slots}>
-      {children}
+      <RouteBaseProvider base={routeBase}>{children}</RouteBaseProvider>
     </PluginProvider>
   );
 }
 
-export function EditorShell({ apiBase, project, scope, plugins = [], slots = {} }) {
+export function EditorShell({ apiBase, routeBase, project, scope, plugins = [], slots = {} }) {
   return (
-    <EditorProvider apiBase={apiBase} project={project} scope={scope} plugins={plugins} slots={slots}>
+    <EditorProvider apiBase={apiBase} routeBase={routeBase} project={project} scope={scope} plugins={plugins} slots={slots}>
       <Layout />
     </EditorProvider>
   );
@@ -101,6 +102,7 @@ function editorRouteChildren(plugins = []) {
  */
 export function createEditorRoutes({
   path = "/",
+  routeBase,
   errorElement,
   apiBase,
   project,
@@ -110,7 +112,9 @@ export function createEditorRoutes({
 } = {}) {
   return {
     path,
-    element: <EditorShell apiBase={apiBase} project={project} scope={scope} plugins={plugins} slots={slots} />,
+    element: (
+      <EditorShell apiBase={apiBase} routeBase={routeBase} project={project} scope={scope} plugins={plugins} slots={slots} />
+    ),
     errorElement,
     children: editorRouteChildren(plugins),
   };

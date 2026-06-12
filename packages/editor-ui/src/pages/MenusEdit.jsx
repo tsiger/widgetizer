@@ -11,11 +11,13 @@ import Button from "../components/ui/Button";
 import useToastStore from "../stores/toastStore";
 import { getMenu, updateMenu } from "../queries/menuManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
+import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function MenusEdit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const editorPath = useEditorPath();
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,7 +82,7 @@ export default function MenusEdit() {
     <PageLayout title={getDirtyTitle(t("menusEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => navigate("/menus")} icon={<ChevronLeft size={18} />}>
+          <Button variant="secondary" onClick={() => navigate(editorPath("/menus"))} icon={<ChevronLeft size={18} />}>
             {t("menusEdit.backToList")}
           </Button>
         </div>
@@ -92,7 +94,7 @@ export default function MenusEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("menusEdit.saveChanges")}
-          onCancel={() => navigateSafely("/menus")}
+          onCancel={() => navigateSafely(editorPath("/menus"))}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

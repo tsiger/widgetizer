@@ -14,10 +14,12 @@ import Button, { IconButton } from "../components/ui/Button";
 import Table from "../components/ui/Table";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function Pages() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const editorPath = useEditorPath();
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,7 +52,7 @@ export default function Pages() {
   };
 
   const handleNewPage = () => {
-    navigate("/pages/add");
+    navigate(editorPath("/pages/add"));
   };
 
   const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
@@ -277,7 +279,7 @@ export default function Pages() {
                   </td>
                   <td className={`py-3 px-4 ${isSelected ? "bg-pink-50" : ""}`}>
                     <Link
-                      to={`/page-editor?pageId=${page.id}`}
+                      to={editorPath(`/page-editor?pageId=${page.id}`)}
                       className="block w-full min-w-0 rounded-sm font-medium text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
                     >
                       <span className="block truncate">{page.name}</span>
@@ -307,7 +309,7 @@ export default function Pages() {
                       {openMenuId === page.id && (
                         <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
                           <Link
-                            to={`/page-editor?pageId=${page.id}`}
+                            to={editorPath(`/page-editor?pageId=${page.id}`)}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -315,7 +317,7 @@ export default function Pages() {
                             {t("pages.actions.design")}
                           </Link>
                           <Link
-                            to={`/pages/${page.id}/edit`}
+                            to={editorPath(`/pages/${page.id}/edit`)}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -361,7 +363,7 @@ export default function Pages() {
           <FileText className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("pages.noPagesYet")}</h2>
           <p className="text-slate-600 mb-4">{t("pages.createFirstPage")}</p>
-          <Link to="/pages/add">
+          <Link to={editorPath("/pages/add")}>
             <Button variant="primary" icon={<CirclePlus size={18} />}>
               {t("pages.newPage")}
             </Button>

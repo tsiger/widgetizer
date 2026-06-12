@@ -15,6 +15,7 @@ import { sortItemsByCopyName } from "../utils/copyNameSort";
 
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
+import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function Menus() {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ export default function Menus() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const editorPath = useEditorPath();
   const location = useLocation();
   const { formatDate } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
@@ -69,7 +71,7 @@ export default function Menus() {
   };
 
   const handleNewMenu = () => {
-    navigate("/menus/add");
+    navigate(editorPath("/menus/add"));
   };
 
   const handleDelete = async (data) => {
@@ -148,7 +150,7 @@ export default function Menus() {
                 <>
                   <td className="py-3 px-4">
                     <Link
-                      to={`/menus/${menu.id}/structure`}
+                      to={editorPath(`/menus/${menu.id}/structure`)}
                       className="block w-full min-w-0 rounded-sm font-semibold text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
                       title={menu.name}
                     >
@@ -179,7 +181,7 @@ export default function Menus() {
                       {openMenuId === menu.id && (
                         <div className="absolute right-0 top-full z-10 mt-1 w-60 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
                           <Link
-                            to={`/menus/${menu.id}/structure`}
+                            to={editorPath(`/menus/${menu.id}/structure`)}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -187,7 +189,7 @@ export default function Menus() {
                             {t("menus.actions.editStructure")}
                           </Link>
                           <Link
-                            to={`/menus/edit/${menu.id}`}
+                            to={editorPath(`/menus/edit/${menu.id}`)}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >
@@ -231,7 +233,7 @@ export default function Menus() {
           <ListTree className="mx-auto mb-4 text-slate-400" size={48} />
           <h2 className="text-xl font-semibold mb-2">{t("menus.emptyTitle", "No menus yet")}</h2>
           <p className="text-slate-600 mb-4">{t("menus.emptyDescription", "Create your first menu")}</p>
-          <Link to="/menus/add">
+          <Link to={editorPath("/menus/add")}>
             <Button onClick={handleNewMenu} variant="primary" icon={<CirclePlus size={18} />}>
               {t("menus.newMenu")}
             </Button>

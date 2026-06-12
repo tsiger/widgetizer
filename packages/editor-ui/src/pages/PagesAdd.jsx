@@ -8,6 +8,7 @@ import useProjectStore from "../stores/projectStore";
 import { createPage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
+import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function PagesAdd() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function PagesAdd() {
   const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
+  const editorPath = useEditorPath();
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
@@ -31,7 +33,7 @@ export default function PagesAdd() {
         invalidateMediaCache(activeProject.id);
       }
 
-      navigateSafely("/pages");
+      navigateSafely(editorPath("/pages"));
       return true;
     } catch (err) {
       showToast(err.message || t("pagesAdd.toasts.createError"), "error");
@@ -47,7 +49,7 @@ export default function PagesAdd() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("pagesAdd.create")}
-        onCancel={() => navigateSafely("/pages")}
+        onCancel={() => navigateSafely(editorPath("/pages"))}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
       />

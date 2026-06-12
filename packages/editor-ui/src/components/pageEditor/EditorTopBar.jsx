@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
+import { useEditorPath } from "../../lib/routeBase.jsx";
 
 export default function EditorTopBar({
   pageName,
@@ -21,6 +22,7 @@ export default function EditorTopBar({
   });
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const editorPath = useEditorPath();
 
   // Force re-render when undo/redo happens
   const [, forceUpdate] = useState(0);
@@ -119,7 +121,7 @@ export default function EditorTopBar({
   }, [isDropdownOpen]);
 
   const handlePageChange = (pageId) => {
-    navigate(`/page-editor?pageId=${pageId}`);
+    navigate(editorPath(`/page-editor?pageId=${pageId}`));
     setIsDropdownOpen(false);
   };
 
@@ -146,7 +148,7 @@ export default function EditorTopBar({
   const hasMultiplePages = pages.length > 1;
   
   const handleNewPage = () => {
-    navigate("/pages/add");
+    navigate(editorPath("/pages/add"));
     setIsDropdownOpen(false);
   };
 
@@ -154,7 +156,7 @@ export default function EditorTopBar({
     <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate("/pages")}
+          onClick={() => navigate(editorPath("/pages"))}
           className="flex items-center gap-2 px-3 h-9 rounded-sm text-sm bg-slate-200 hover:bg-slate-300 text-slate-800"
           title={t("pageEditor.toolbar.backToPages")}
         >

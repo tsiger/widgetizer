@@ -6,6 +6,7 @@ import MenuForm from "../components/menus/MenuForm";
 import useToastStore from "../stores/toastStore";
 import { createMenu } from "../queries/menuManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
+import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function MenusAdd() {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ export default function MenusAdd() {
   const [isDirty, setIsDirty] = useState(false);
 
   const showToast = useToastStore((state) => state.showToast);
+  const editorPath = useEditorPath();
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
@@ -23,7 +25,7 @@ export default function MenusAdd() {
       const newMenu = await createMenu(formData);
       showToast(t("menusAdd.toasts.createSuccess", { name: newMenu.name }), "success");
 
-      navigateSafely(`/menus/${newMenu.id}/structure`);
+      navigateSafely(editorPath(`/menus/${newMenu.id}/structure`));
       return true;
     } catch (err) {
       showToast(err.message || t("menusAdd.toasts.createError"), "error");
@@ -39,7 +41,7 @@ export default function MenusAdd() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         submitLabel={t("menusAdd.create")}
-        onCancel={() => navigateSafely("/menus")}
+        onCancel={() => navigateSafely(editorPath("/menus"))}
         onDirtyChange={setIsDirty}
         isDirty={isDirty}
       />

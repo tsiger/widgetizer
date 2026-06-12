@@ -13,11 +13,13 @@ import useProjectStore from "../stores/projectStore";
 import { getPage, updatePage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
+import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function PagesEdit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const editorPath = useEditorPath();
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,7 +62,7 @@ export default function PagesEdit() {
         const savedName = result.data?.name || formData.name;
         // Navigate with guard bypass if the slug changed
         if (formData.slug !== id) {
-          navigateSafely(`/pages/${formData.slug}/edit`, { replace: true });
+          navigateSafely(editorPath(`/pages/${formData.slug}/edit`), { replace: true });
           showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: savedName }), "success");
         } else {
           showToast(t("pagesEdit.toasts.updateSuccess", { name: savedName }), "success");
@@ -101,7 +103,7 @@ export default function PagesEdit() {
     <PageLayout title={getDirtyTitle(t("pagesEdit.title"))}>
       {showSuccessActions && (
         <div className="mb-4 flex flex-wrap gap-3">
-          <Button variant="secondary" onClick={() => navigate("/pages")} icon={<ChevronLeft size={18} />}>
+          <Button variant="secondary" onClick={() => navigate(editorPath("/pages"))} icon={<ChevronLeft size={18} />}>
             {t("pagesEdit.backToList")}
           </Button>
         </div>
@@ -113,7 +115,7 @@ export default function PagesEdit() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("pagesEdit.saveChanges")}
-          onCancel={() => navigateSafely("/pages")}
+          onCancel={() => navigateSafely(editorPath("/pages"))}
           onDirtyChange={setIsDirty}
           isDirty={isDirty}
         />

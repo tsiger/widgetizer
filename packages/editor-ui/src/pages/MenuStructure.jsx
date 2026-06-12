@@ -11,11 +11,13 @@ import { getMenu, updateMenu } from "../queries/menuManager";
 
 import useToastStore from "../stores/toastStore";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
+import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function MenuStructure() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const editorPath = useEditorPath();
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -155,7 +157,7 @@ export default function MenuStructure() {
       title={getDirtyTitle(menu.name)}
       description={t("menuStructure.description")}
       additionalButtons={
-        <Button variant="secondary" onClick={() => navigate("/menus")}>
+        <Button variant="secondary" onClick={() => navigate(editorPath("/menus"))}>
           {t("forms.common.cancel")}
         </Button>
       }
