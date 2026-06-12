@@ -17,4 +17,4 @@ export {
   useSlot,
 } from "./extension/PluginProvider.jsx";
 export { builtinNavPlugin, NAV_GROUPS, groupNavItems } from "./extension/builtinNav.js";
-export { EditorShell, createEditorRoutes } from "./EditorShell.jsx";
+export { EditorShell, EditorProvider, createEditorRoutes } from "./EditorShell.jsx";

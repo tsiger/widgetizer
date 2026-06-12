@@ -29,7 +29,13 @@ import ExportSite from "./pages/ExportSite.jsx";
 //
 // @param {{ apiBase?: string, project?: object, scope?: object,
 //           plugins?: Array<object>, slots?: Record<string, React.ReactNode> }} props
-export function EditorShell({ apiBase, project, scope, plugins = [], slots = {} }) {
+// EditorProvider is the chrome-agnostic core: it registers plugins (incl. the
+// built-in nav) into a <PluginProvider> and binds the two per-shell singletons
+// (api base, active project) on mount, then renders whatever chrome the host
+// passes as `children`. EditorShell uses it with the editor's own Layout; hosted
+// uses it with the hosted dashboard Layout so the editor's section routes render
+// natively in the dashboard chrome (the native-merge goal — no embedded shell).
+export function EditorProvider({ apiBase, project, scope, plugins = [], slots = {}, children }) {
   const allPlugins = useMemo(() => [builtinNavPlugin, ...plugins], [plugins]);
 
   useEffect(() => {
@@ -42,8 +48,16 @@ export function EditorShell({ apiBase, project, scope, plugins = [], slots = {} 
 
   return (
     <PluginProvider plugins={allPlugins} slots={slots}>
-      <Layout />
+      {children}
     </PluginProvider>
+  );
+}
+
+export function EditorShell({ apiBase, project, scope, plugins = [], slots = {} }) {
+  return (
+    <EditorProvider apiBase={apiBase} project={project} scope={scope} plugins={plugins} slots={slots}>
+      <Layout />
+    </EditorProvider>
   );
 }
 

@@ -163,7 +163,6 @@ export function ensureThemesDirectory() {
 
 async function _ensureThemesDirectoryOnce() {
   const userThemesDir = getThemesDir();
-  const alreadyExists = await fs.pathExists(userThemesDir);
 
   try {
     await fs.mkdir(userThemesDir, { recursive: true });
@@ -172,25 +171,29 @@ async function _ensureThemesDirectoryOnce() {
     throw new Error("Failed to create themes directory");
   }
 
-  // Provision default themes on first access
-  if (!alreadyExists) {
-    try {
-      const seedExists = await fs.pathExists(THEMES_SEED_DIR);
-      if (seedExists) {
-        const seedThemes = await fs.readdir(THEMES_SEED_DIR, { withFileTypes: true });
-        for (const entry of seedThemes) {
-          if (entry.isDirectory()) {
-            const src = path.join(THEMES_SEED_DIR, entry.name);
-            const dest = path.join(userThemesDir, entry.name);
-            await fs.copy(src, dest);
-          }
-        }
-        console.log(`[ensureThemesDirectory] Provisioned default themes`);
+  // Provision any seed theme that isn't installed yet. Per-theme (not
+  // skip-if-dir-exists) so this self-heals an empty/partial themes dir left by an
+  // earlier failed seed (e.g. THEMES_SEED_DIR was missing) and picks up
+  // newly-added seed themes.
+  try {
+    const seedExists = await fs.pathExists(THEMES_SEED_DIR);
+    if (seedExists) {
+      const seedThemes = await fs.readdir(THEMES_SEED_DIR, { withFileTypes: true });
+      let provisioned = 0;
+      for (const entry of seedThemes) {
+        if (!entry.isDirectory()) continue;
+        const dest = path.join(userThemesDir, entry.name);
+        if (await fs.pathExists(dest)) continue; // already installed
+        await fs.copy(path.join(THEMES_SEED_DIR, entry.name), dest);
+        provisioned += 1;
       }
-    } catch (error) {
-      console.warn(`[ensureThemesDirectory] Failed to provision default themes: ${error.message}`);
-      // Non-fatal — user can still upload themes manually
+      if (provisioned > 0) {
+        console.log(`[ensureThemesDirectory] Provisioned ${provisioned} default theme(s)`);
+      }
     }
+  } catch (error) {
+    console.warn(`[ensureThemesDirectory] Failed to provision default themes: ${error.message}`);
+    // Non-fatal — user can still upload themes manually
   }
 }
 
@@ -596,55 +599,58 @@ export async function resolvePresetPaths(themeId, presetId) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
+/**
+ * Pure helper: list a theme's presets (id/name/description + isDefault +
+ * hasScreenshot), or `{ default: null, presets: [] }` when the theme has no
+ * presets.json. Throws an Error with `code: "THEME_NOT_FOUND"` if the theme is
+ * absent. Reusable by any shell (no req/res) — exported from the package barrel.
+ * @param {string} themeId
+ */
+export async function listThemePresets(themeId) {
+  const themeDir = getThemeDir(themeId);
+  try {
+    await fs.access(themeDir);
+  } catch {
+    const err = new Error(`Theme '${themeId}' not found`);
+    err.code = "THEME_NOT_FOUND";
+    throw err;
+  }
+
+  // Read presets from the theme source directory (latest/ if it exists, root
+  // otherwise) so presets delivered via theme updates are visible.
+  const sourceDir = await getThemeSourceDir(themeId);
+  const presetsJsonPath = path.join(sourceDir, "presets", "presets.json");
+
+  try {
+    const presetsData = JSON.parse(await fs.readFile(presetsJsonPath, "utf8"));
+    const enrichedPresets = await Promise.all(
+      (presetsData.presets || []).map(async (preset) => {
+        let hasScreenshot = false;
+        try {
+          await fs.access(path.join(sourceDir, "presets", preset.id, "screenshot.png"));
+          hasScreenshot = true;
+        } catch {
+          // No preset screenshot
+        }
+        return { ...preset, isDefault: preset.id === presetsData.default, hasScreenshot };
+      }),
+    );
+    return { default: presetsData.default, presets: enrichedPresets };
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return { default: null, presets: [] };
+    }
+    throw error;
+  }
+}
+
 export async function getThemePresets(req, res) {
   try {
-    const { id } = req.params;
-    const themeDir = getThemeDir(id);
-    try {
-      await fs.access(themeDir);
-    } catch {
-      return res.status(404).json({ error: `Theme '${id}' not found` });
-    }
-
-    // Read presets from the theme source directory (latest/ if it exists, root otherwise).
-    // This ensures presets delivered via theme updates are visible.
-    const sourceDir = await getThemeSourceDir(id);
-    const presetsJsonPath = path.join(sourceDir, "presets", "presets.json");
-
-    try {
-      const content = await fs.readFile(presetsJsonPath, "utf8");
-      const presetsData = JSON.parse(content);
-
-      const enrichedPresets = await Promise.all(
-        (presetsData.presets || []).map(async (preset) => {
-          let hasScreenshot = false;
-          const presetDir = path.join(sourceDir, "presets", preset.id);
-          try {
-            await fs.access(path.join(presetDir, "screenshot.png"));
-            hasScreenshot = true;
-          } catch {
-            // No preset screenshot
-          }
-
-          return {
-            ...preset,
-            isDefault: preset.id === presetsData.default,
-            hasScreenshot,
-          };
-        }),
-      );
-
-      res.json({
-        default: presetsData.default,
-        presets: enrichedPresets,
-      });
-    } catch (error) {
-      if (error.code === "ENOENT") {
-        return res.json({ default: null, presets: [] });
-      }
-      throw error;
-    }
+    res.json(await listThemePresets(req.params.id));
   } catch (error) {
+    if (error.code === "THEME_NOT_FOUND") {
+      return res.status(404).json({ error: error.message });
+    }
     res.status(500).json({ error: `Failed to get theme presets: ${error.message}` });
   }
 }
@@ -659,77 +665,80 @@ export async function getThemePresets(req, res) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
+/**
+ * Pure helper: list installed themes with their metadata (id, name, version,
+ * widget/preset counts, update status). Does NOT include project-usage data
+ * (that needs the DB and would leak across tenants in a multi-tenant shell), so
+ * it is safe to expose from any shell. Exported from the package barrel.
+ * @returns {Promise<Array<object>>}
+ */
+export async function listThemes() {
+  const userThemesDir = getThemesDir();
+
+  // Ensure user themes directory exists (provisions default themes on first access)
+  await ensureThemesDirectory();
+
+  const themes = await fs.readdir(userThemesDir);
+
+  const themesList = await Promise.all(
+    themes.map(async (themeId) => {
+      try {
+        const { sourceDir, theme } = await readThemeSourceMetadata(themeId);
+
+        const versions = await getThemeVersions(themeId);
+        const latestVersion = getLatestVersion(versions);
+
+        let widgetCount = 0;
+        try {
+          const entries = await fs.readdir(path.join(sourceDir, "widgets"), { withFileTypes: true });
+          widgetCount = entries.filter((entry) => entry.isDirectory() && entry.name !== "global").length;
+        } catch (widgetDirError) {
+          console.warn(`Could not read widgets directory for theme ${themeId}:`, widgetDirError.message);
+        }
+
+        let presetCount = 0;
+        try {
+          const presetsData = JSON.parse(
+            await fs.readFile(path.join(sourceDir, "presets", "presets.json"), "utf8"),
+          );
+          presetCount = (presetsData.presets || []).length;
+        } catch {
+          // No presets or invalid file
+        }
+
+        return {
+          id: themeId,
+          name: theme.name,
+          description: theme.description,
+          version: theme.version,
+          versions,
+          latestVersion,
+          hasPendingUpdate: hasAvailableUpdate(theme.version, latestVersion),
+          widgets: widgetCount,
+          presets: presetCount,
+          author: theme.author,
+        };
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return themesList.filter((theme) => theme !== null);
+}
+
 export async function getAllThemes(req, res) {
   try {
-    const userThemesDir = getThemesDir();
     const projects = getAllProjects();
-
-    // Ensure user themes directory exists (provisions default themes on first access)
-    await ensureThemesDirectory();
-
-    const themes = await fs.readdir(userThemesDir);
-
-    const themesList = await Promise.all(
-      themes.map(async (themeId) => {
-        try {
-          const { sourceDir, theme } = await readThemeSourceMetadata(themeId);
-
-          // Get all available versions for this theme
-          const versions = await getThemeVersions(themeId);
-          const latestVersion = getLatestVersion(versions);
-
-          // Count widgets programmatically from the widgets directory
-          let widgetCount = 0;
-          const widgetsDir = path.join(sourceDir, "widgets");
-
-          try {
-            const entries = await fs.readdir(widgetsDir, { withFileTypes: true });
-            // Count widget folders (excluding 'global' directory)
-            widgetCount = entries.filter((entry) => entry.isDirectory() && entry.name !== "global").length;
-          } catch (widgetDirError) {
-            // If widgets directory doesn't exist or can't be read, count is 0
-            console.warn(`Could not read widgets directory for theme ${themeId}:`, widgetDirError.message);
-          }
-
-          // Count presets if presets.json exists (read from source dir, not root)
-          let presetCount = 0;
-          try {
-            const presetsJsonPath = path.join(sourceDir, "presets", "presets.json");
-            const presetsContent = await fs.readFile(presetsJsonPath, "utf8");
-            const presetsData = JSON.parse(presetsContent);
-            presetCount = (presetsData.presets || []).length;
-          } catch {
-            // No presets or invalid file
-          }
-
-          // Check if theme has pending updates
-          const hasPendingUpdate = hasAvailableUpdate(theme.version, latestVersion);
-          const projectsUsingTheme = projects
-            .filter((project) => project.theme === themeId)
-            .map((project) => ({ id: project.id, name: project.name }));
-
-          return {
-            id: themeId,
-            name: theme.name,
-            description: theme.description,
-            version: theme.version, // Version from the source (latest or base)
-            versions, // All available versions
-            latestVersion, // Latest available version
-            hasPendingUpdate, // True if newest version > current source version
-            widgets: widgetCount,
-            presets: presetCount,
-            author: theme.author,
-            projectsUsingTheme,
-            projectsUsingThemeCount: projectsUsingTheme.length,
-          };
-        } catch {
-          return null;
-        }
-      }),
-    );
-
-    const validThemes = themesList.filter((theme) => theme !== null);
-    res.json(validThemes);
+    const themes = await listThemes();
+    // Re-attach project-usage data (OSS single-tenant view).
+    const withUsage = themes.map((theme) => {
+      const projectsUsingTheme = projects
+        .filter((project) => project.theme === theme.id)
+        .map((project) => ({ id: project.id, name: project.name }));
+      return { ...theme, projectsUsingTheme, projectsUsingThemeCount: projectsUsingTheme.length };
+    });
+    res.json(withUsage);
   } catch {
     res.status(500).json({ error: "Failed to load themes" });
   }

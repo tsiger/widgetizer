@@ -6,8 +6,6 @@ import {
   DATA_DIR,
   APP_ROOT,
   getProjectDir,
-  getProjectPagesDir,
-  getProjectMenusDir,
   getThemeDir,
 } from "../config.js";
 import { randomUUID } from "crypto";
@@ -20,8 +18,8 @@ import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageSe
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { enrichNewProjectReferences, remapDuplicatedProjectUuids } from "../utils/linkEnrichment.js";
-import { processTemplatesRecursive } from "../utils/templateHelpers.js";
+import { remapDuplicatedProjectUuids } from "../utils/linkEnrichment.js";
+import { scaffoldProjectContent } from "../utils/projectScaffold.js";
 
 import multer from "multer";
 import { readAppSettingsFile } from "./appSettingsController.js";
@@ -175,41 +173,16 @@ export async function createProject(req, res) {
       providedFolderName,
     );
 
-    // Use the permanent folderName for directory creation
-    const projectDir = getProjectDir(folderName);
-    await fs.ensureDir(projectDir);
-
     if (!theme) {
       throw new Error("Theme is required");
     }
 
-    // Ensure seed themes are provisioned (idempotent no-op if already done)
-    await themeController.ensureThemesDirectory();
-
-    // Copy theme and get the version that was copied
-    let themeVersion;
-    try {
-      // First copy theme assets (excluding templates)
-      themeVersion = await themeController.copyThemeToProject(theme, projectDir, ["templates"]);
-    } catch (error) {
-      await fs.remove(projectDir);
-      throw new Error(`Failed to copy theme: ${error.message}`);
-    }
-
-    // Resolve preset paths (templates, menus, settings overrides)
-    const { templatesDir: resolvedTemplatesDir, menusDir: presetMenusDir, settingsOverrides } =
-      await themeController.resolvePresetPaths(theme, preset);
-
-    // If preset has custom menus, replace root menus with preset menus
-    if (presetMenusDir) {
-      const projectMenusDir = getProjectMenusDir(folderName);
-      try {
-        await fs.remove(projectMenusDir);
-        await fs.copy(presetMenusDir, projectMenusDir);
-      } catch (error) {
-        console.warn(`[ProjectController] Failed to apply preset menus: ${error.message}`);
-      }
-    }
+    // Use the permanent folderName for directory creation, then scaffold the
+    // project content (theme copy + templates → pages + link enrichment). The
+    // dir-explicit scaffold lives in utils/projectScaffold so other shells can
+    // reuse it against a per-user dir.
+    const projectDir = getProjectDir(folderName);
+    const themeVersion = await scaffoldProjectContent({ projectDir, theme, preset });
 
     const newProject = {
       id: randomUUID(), // ✅ Generate stable UUID
@@ -225,57 +198,6 @@ export async function createProject(req, res) {
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
-
-    try {
-      // Then handle templates separately, recursively
-      const pagesDir = getProjectPagesDir(folderName);
-      const themeTemplatesDir = resolvedTemplatesDir;
-
-      await processTemplatesRecursive(themeTemplatesDir, pagesDir, async (template, slug, targetPath) => {
-        const initializedPage = {
-          ...template,
-          ...(template.type !== "header" && template.type !== "footer"
-            ? {
-                uuid: randomUUID(),
-                id: slug,
-                slug,
-                created: new Date().toISOString(),
-                updated: new Date().toISOString(),
-              }
-            : {}),
-        };
-        await fs.outputFile(targetPath, JSON.stringify(initializedPage, null, 2));
-      });
-
-      await enrichNewProjectReferences(folderName);
-    } catch (error) {
-      await fs.remove(projectDir);
-      throw new Error(`Failed to process templates: ${error.message}`);
-    }
-
-    // Apply preset settings overrides to project's theme.json
-    if (settingsOverrides) {
-      try {
-        const projectThemeJsonPath = path.join(projectDir, "theme.json");
-        const themeJsonStr = await fs.readFile(projectThemeJsonPath, "utf8");
-        const themeJson = JSON.parse(themeJsonStr);
-
-        if (themeJson.settings && themeJson.settings.global) {
-          for (const group of Object.values(themeJson.settings.global)) {
-            if (!Array.isArray(group)) continue;
-            for (const item of group) {
-              if (item.id && settingsOverrides[item.id] !== undefined) {
-                item.default = settingsOverrides[item.id];
-              }
-            }
-          }
-        }
-
-        await fs.writeFile(projectThemeJsonPath, JSON.stringify(themeJson, null, 2));
-      } catch (error) {
-        console.warn(`[ProjectController] Failed to apply preset settings overrides: ${error.message}`);
-      }
-    }
 
     // Track if we're setting this as active (only happens if no active project exists)
     const currentActiveId = projectRepo.getActiveProjectId();

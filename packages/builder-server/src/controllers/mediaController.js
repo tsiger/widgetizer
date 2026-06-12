@@ -5,10 +5,7 @@ import multer from "multer";
 import sharp from "sharp";
 import slugify from "slugify";
 import DOMPurify from "isomorphic-dompurify";
-import {
-  getProjectDir,
-  getThemeJsonPath,
-} from "../config.js";
+import { getThemeJsonPath } from "../config.js";
 import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
@@ -175,17 +172,13 @@ export async function getProjectMedia(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
-    const projectFolderName = await getProjectFolderName(projectId);
+    // Validate the project exists + is owned (throws → mapped below). This
+    // replaces a former on-disk projectDir existence check, which assumed the
+    // global DATA_DIR and so 404'd under hosted's per-user storage; media
+    // metadata comes from the DB, not that dir.
+    await getProjectFolderName(projectId);
 
-    // Ensure project exists
-    const projectDir = getProjectDir(projectFolderName);
-    if (!(await fs.pathExists(projectDir))) {
-      return res.status(404).json({ error: "Project not found" });
-    }
-
-    // Read media metadata
     const mediaData = await readMediaFile(projectId);
-
     res.json(mediaData);
   } catch (error) {
     console.error(`Error getting project media for project ${req.params.projectId}:`, error);

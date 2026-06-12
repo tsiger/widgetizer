@@ -26,3 +26,14 @@ export { sanitizeWidgetData } from "./services/sanitizationService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "./config.js";
+
+// Project-creation building blocks for hosted's "create site with editor" flow.
+// scaffoldProjectContent is the dir-explicit core of createProject (theme copy +
+// templates → pages + link enrichment) so hosted can scaffold into a per-user
+// dir; listThemes/listThemePresets back the theme/preset picker (the actor-scoped
+// /themes router is not mounted in hosted). See the stage-2 plan §"create flow".
+export { scaffoldProjectContent } from "./utils/projectScaffold.js";
+export { listThemes, listThemePresets } from "./controllers/themeController.js";
+// Global app settings (image sizes, dev mode, export limits) — the editor's
+// client reads these via GET /api/settings; hosted exposes a read-only route.
+export { readAppSettingsFile } from "./controllers/appSettingsController.js";
