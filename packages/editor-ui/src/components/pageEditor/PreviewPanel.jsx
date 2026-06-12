@@ -5,12 +5,14 @@ import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../q
 import usePageStore from "../../stores/pageStore";
 import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
-import { BASE_URL } from "../../lib/config";
+import { getPreviewRenderBase } from "../../lib/previewBase";
 import SelectionOverlay from "./SelectionOverlay";
 
-// Build the preview URL from a token
+// Build the preview URL from a token. The base defaults to today's behaviour
+// (VITE_API_URL || "") but a nested host overrides it via setPreviewRenderBase()
+// so the iframe loads from a proxied, same-origin path.
 function buildPreviewUrl(token) {
-  return `${BASE_URL}/render/${token}`;
+  return `${getPreviewRenderBase()}/render/${token}`;
 }
 
 /**

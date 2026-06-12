@@ -22,7 +22,7 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 // stage-2 plan §7.
 export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
-export { sanitizeWidgetData } from "./services/sanitizationService.js";
+export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizationService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";

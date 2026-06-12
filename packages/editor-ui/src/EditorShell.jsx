@@ -4,6 +4,7 @@ import { builtinNavPlugin } from "./extension/builtinNav.js";
 import Layout from "./components/layout/Layout.jsx";
 import RequireActiveProject from "./components/layout/RequireActiveProject.jsx";
 import { setApiBase } from "./lib/apiBase.js";
+import { setPreviewRenderBase } from "./lib/previewBase.js";
 import { RouteBaseProvider } from "./lib/routeBase.jsx";
 import useProjectStore from "./stores/projectStore.js";
 
@@ -36,12 +37,16 @@ import ExportSite from "./pages/ExportSite.jsx";
 // passes as `children`. EditorShell uses it with the editor's own Layout; hosted
 // uses it with the hosted dashboard Layout so the editor's section routes render
 // natively in the dashboard chrome (the native-merge goal — no embedded shell).
-export function EditorProvider({ apiBase, routeBase = "", project, scope, plugins = [], slots = {}, children }) {
+export function EditorProvider({ apiBase, previewRenderBase, routeBase = "", project, scope, plugins = [], slots = {}, children }) {
   const allPlugins = useMemo(() => [builtinNavPlugin, ...plugins], [plugins]);
 
   useEffect(() => {
     if (apiBase !== undefined) setApiBase(apiBase);
   }, [apiBase]);
+
+  useEffect(() => {
+    if (previewRenderBase !== undefined) setPreviewRenderBase(previewRenderBase);
+  }, [previewRenderBase]);
 
   useEffect(() => {
     if (project) useProjectStore.getState().seedProject(project, scope ?? null);
@@ -54,9 +59,17 @@ export function EditorProvider({ apiBase, routeBase = "", project, scope, plugin
   );
 }
 
-export function EditorShell({ apiBase, routeBase, project, scope, plugins = [], slots = {} }) {
+export function EditorShell({ apiBase, previewRenderBase, routeBase, project, scope, plugins = [], slots = {} }) {
   return (
-    <EditorProvider apiBase={apiBase} routeBase={routeBase} project={project} scope={scope} plugins={plugins} slots={slots}>
+    <EditorProvider
+      apiBase={apiBase}
+      previewRenderBase={previewRenderBase}
+      routeBase={routeBase}
+      project={project}
+      scope={scope}
+      plugins={plugins}
+      slots={slots}
+    >
       <Layout />
     </EditorProvider>
   );
@@ -103,6 +116,7 @@ function editorRouteChildren(plugins = []) {
 export function createEditorRoutes({
   path = "/",
   routeBase,
+  previewRenderBase,
   errorElement,
   apiBase,
   project,
@@ -113,7 +127,15 @@ export function createEditorRoutes({
   return {
     path,
     element: (
-      <EditorShell apiBase={apiBase} routeBase={routeBase} project={project} scope={scope} plugins={plugins} slots={slots} />
+      <EditorShell
+        apiBase={apiBase}
+        previewRenderBase={previewRenderBase}
+        routeBase={routeBase}
+        project={project}
+        scope={scope}
+        plugins={plugins}
+        slots={slots}
+      />
     ),
     errorElement,
     children: editorRouteChildren(plugins),
