@@ -274,11 +274,29 @@ export async function getAllPages(req, res) {
   // No validation needed for this route
   try {
     const { scope } = req;
+    const { storage } = req.adapters;
 
-    // listProjectPagesData stays filesystem-based (it also serves the OSS-internal
-    // render wrapper and exportProjectToDir, which have no req.adapters). Reading
-    // the page list via storage is deferred to the helper-migration follow-up.
-    const pages = await listProjectPagesData(scope.folderName);
+    // Read the page list via the storage adapter so it resolves the same scope
+    // (and tenant-namespaced path) as every other page handler — `getProjectDir`
+    // would resolve a different root in shells that namespace per actor. The
+    // `global/` subdir is skipped because it isn't a `.json` entry. (The
+    // dir-based listProjectPagesData stays exported for the OSS-internal render
+    // wrapper and exportProjectToDir, which run without req.adapters.)
+    const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
+    const pages = (
+      await Promise.all(
+        pageFiles.map(async (name) => {
+          const pageId = name.replace(/\.json$/, "");
+          try {
+            const buf = await storage.read(scope, `pages/${name}`);
+            return buf == null ? null : { ...JSON.parse(buf.toString("utf8")), id: pageId };
+          } catch (readError) {
+            console.error(`Error reading or parsing page file ${name}:`, readError);
+            return null;
+          }
+        }),
+      )
+    ).filter((page) => page !== null);
 
     res.json(pages);
   } catch (error) {

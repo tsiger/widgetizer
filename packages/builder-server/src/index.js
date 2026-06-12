@@ -25,7 +25,7 @@ export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData } from "./services/sanitizationService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
-export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "./config.js";
+export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
 
 // Project-creation building blocks for hosted's "create site with editor" flow.
 // scaffoldProjectContent is the dir-explicit core of createProject (theme copy +

@@ -1,7 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
-import { getProjectMenusDir, getMenuPath } from "../config.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -41,31 +40,27 @@ function allItemsHaveLabels(items) {
  */
 export async function getAllMenus(req, res) {
   try {
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const menusDir = getProjectMenusDir(projectFolderName);
+    const menuFiles = (await storage.list(scope, "menus")).filter((file) => file.endsWith(".json"));
+    const menus = (
+      await Promise.all(
+        menuFiles.map(async (file) => {
+          const buf = await storage.read(scope, `menus/${file}`);
+          if (buf == null) return null;
+          const menu = JSON.parse(buf.toString("utf8"));
 
-    if (!(await fs.pathExists(menusDir))) {
-      return res.json([]);
-    }
+          // Lazy backfill: add uuid to existing menus that don't have one
+          if (!menu.uuid) {
+            menu.uuid = randomUUID();
+            await storage.write(scope, `menus/${file}`, JSON.stringify(menu, null, 2));
+          }
 
-    const menuFiles = (await fs.readdir(menusDir)).filter((file) => file.endsWith(".json"));
-    const menus = await Promise.all(
-      menuFiles.map(async (file) => {
-        const filePath = path.join(menusDir, file);
-        const menuData = await fs.readFile(filePath, "utf8");
-        const menu = JSON.parse(menuData);
-
-        // Lazy backfill: add uuid to existing menus that don't have one
-        if (!menu.uuid) {
-          menu.uuid = randomUUID();
-          await fs.outputFile(filePath, JSON.stringify(menu, null, 2));
-        }
-
-        return menu;
-      }),
-    );
+          return menu;
+        }),
+      )
+    ).filter((menu) => menu !== null);
 
     res.json(menus);
   } catch (error) {
@@ -92,15 +87,11 @@ export async function createMenu(req, res) {
       return res.status(400).json({ error: "Menu title is required. HTML tags are not allowed." });
     }
 
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
-
-    const menusDir = getProjectMenusDir(projectFolderName);
-    await fs.ensureDir(menusDir);
+    const { scope } = req;
+    const { storage } = req.adapters;
 
     // Generate unique ID from the sanitized name (server-side only)
-    const menuId = await generateUniqueSlug(name, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug)));
-    const menuPath = getMenuPath(projectFolderName, menuId);
+    const menuId = await generateUniqueSlug(name, (slug) => storage.exists(scope, `menus/${slug}.json`));
 
     const newMenu = {
       id: menuId,
@@ -112,7 +103,7 @@ export async function createMenu(req, res) {
       updated: new Date().toISOString(),
     };
 
-    await fs.outputFile(menuPath, JSON.stringify(newMenu, null, 2));
+    await storage.write(scope, `menus/${menuId}.json`, JSON.stringify(newMenu, null, 2));
 
     res.status(201).json(newMenu);
   } catch (error) {
@@ -130,11 +121,10 @@ export async function createMenu(req, res) {
 export async function deleteMenu(req, res) {
   try {
     const { id } = req.params;
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const menuPath = getMenuPath(projectFolderName, id);
-    await fs.remove(menuPath);
+    await storage.delete(scope, `menus/${id}.json`);
     res.json({ success: true });
   } catch (error) {
     console.error("Error deleting menu:", error);
@@ -151,16 +141,15 @@ export async function deleteMenu(req, res) {
 export async function getMenu(req, res) {
   try {
     const { id } = req.params;
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const menuPath = getMenuPath(projectFolderName, id);
-    if (!(await fs.pathExists(menuPath))) {
+    const buf = await storage.read(scope, `menus/${id}.json`);
+    if (buf == null) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
-    const menuData = await fs.readFile(menuPath, "utf8");
-    res.json(JSON.parse(menuData));
+    res.json(JSON.parse(buf.toString("utf8")));
   } catch (error) {
     console.error("Error getting menu:", error);
     res.status(500).json({ error: "Failed to get menu" });
@@ -193,12 +182,12 @@ export async function updateMenu(req, res) {
       return res.status(400).json({ error: "Menu title is required. HTML tags are not allowed." });
     }
 
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const menuPath = getMenuPath(projectFolderName, menuId);
-
-    if (!(await fs.pathExists(menuPath))) {
+    // Read existing menu to preserve uuid (also serves as the existence check)
+    const existingBuf = await storage.read(scope, `menus/${menuId}.json`);
+    if (existingBuf == null) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
@@ -212,8 +201,7 @@ export async function updateMenu(req, res) {
       }
     }
 
-    // Read existing menu to preserve uuid
-    const existingMenu = JSON.parse(await fs.readFile(menuPath, "utf8"));
+    const existingMenu = JSON.parse(existingBuf.toString("utf8"));
 
     const dataToSave = {
       ...menuData,
@@ -222,7 +210,7 @@ export async function updateMenu(req, res) {
       updated: new Date().toISOString(),
     };
 
-    await fs.outputFile(menuPath, JSON.stringify(dataToSave, null, 2));
+    await storage.write(scope, `menus/${menuId}.json`, JSON.stringify(dataToSave, null, 2));
 
     res.json(dataToSave);
   } catch (error) {
@@ -294,32 +282,28 @@ function generateNewMenuItemIds(items) {
 export async function duplicateMenu(req, res) {
   try {
     const { id } = req.params;
-    const { activeProject } = req;
-    const projectFolderName = activeProject.folderName;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const originalMenuPath = getMenuPath(projectFolderName, id);
-
-    // Check if original menu exists
-    if (!(await fs.pathExists(originalMenuPath))) {
+    // Read the original menu (also the existence check)
+    const originalBuf = await storage.read(scope, `menus/${id}.json`);
+    if (originalBuf == null) {
       return res.status(404).json({ error: "Menu not found" });
     }
-
-    // Read the original menu
-    const originalMenuData = await fs.readFile(originalMenuPath, "utf8");
-    const originalMenu = JSON.parse(originalMenuData);
+    const originalMenu = JSON.parse(originalBuf.toString("utf8"));
 
     // Gather existing menu names for copy-number logic
-    const menusDir = getProjectMenusDir(projectFolderName);
-    const menuFiles = (await fs.readdir(menusDir)).filter((f) => f.endsWith(".json"));
-
-    const existingMenuNames = await Promise.all(
-      menuFiles.map(async (f) => {
-        const data = JSON.parse(await fs.readFile(path.join(menusDir, f), "utf8"));
-        return data.name;
-      }),
-    );
+    const menuFiles = (await storage.list(scope, "menus")).filter((f) => f.endsWith(".json"));
+    const existingMenuNames = (
+      await Promise.all(
+        menuFiles.map(async (f) => {
+          const buf = await storage.read(scope, `menus/${f}`);
+          return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
+        }),
+      )
+    ).filter((name) => name != null);
     const newName = generateCopyName(originalMenu.name, existingMenuNames);
-    const newMenuId = await generateUniqueSlug(newName, (slug) => fs.pathExists(getMenuPath(projectFolderName, slug)));
+    const newMenuId = await generateUniqueSlug(newName, (slug) => storage.exists(scope, `menus/${slug}.json`));
 
     // Create the duplicated menu with new data
     const duplicatedMenu = {
@@ -333,8 +317,7 @@ export async function duplicateMenu(req, res) {
     };
 
     // Save the new menu
-    const newMenuPath = getMenuPath(projectFolderName, newMenuId);
-    await fs.outputFile(newMenuPath, JSON.stringify(duplicatedMenu, null, 2));
+    await storage.write(scope, `menus/${newMenuId}.json`, JSON.stringify(duplicatedMenu, null, 2));
 
     res.status(201).json(duplicatedMenu);
   } catch (error) {

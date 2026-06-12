@@ -36,8 +36,11 @@ const { createMenu, getMenu, getAllMenus, getMenuById, updateMenu, deleteMenu, d
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb, getDb } = await import("../db/index.js");
-const { LocalScopeResolver } = await import("@widgetizer/adapters-local");
+const { LocalStorageAdapter, LocalScopeResolver } = await import("@widgetizer/adapters-local");
 
+// The menu handlers operate on req.adapters.storage over req.scope. Use the real
+// OSS storage adapter against the isolated test data root, matching production.
+const menuStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
 // resolveActiveProject now delegates scope resolution to the injected resolver.
 const scopeResolver = new LocalScopeResolver(getDb());
 
@@ -79,6 +82,12 @@ function mockReq({ params = {}, body = {} } = {}) {
     params,
     body,
     activeProject,
+    scope: {
+      actor: { id: "default", kind: "local" },
+      projectId: activeProject.id,
+      folderName: activeProject.folderName,
+    },
+    adapters: { storage: menuStorage },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
