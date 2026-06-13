@@ -101,7 +101,7 @@ A collection type reuses existing setting types (the same ones widgets and `them
 - **`usedAsDate: true`** — marks a `date` field as the collection's sort key for `defaultSort: date_desc`/`date_asc` (and the `| collection: sort: ...` filter option). **At most one** non-`header` setting may declare it, and it must be a `date` field. Items with no value in that field sort to the **end**. Optional — only needed for date-ordered collections (e.g. a blog).
 - **`required: true`** — enforced on save and on export.
 
-For multiple images, use the `gallery` field type — an ordered list of image upload paths (a `string[]`; the `image` type holds a single value). Per-image `alt`/`title`/`caption` live on the media record, not the gallery. See [Setting Types](theming-setting-types.md). A *generic* repeater (arbitrary repeating blocks) remains deferred — see "Out of Scope".
+For multiple images, use the `gallery` field type — an ordered list of image upload paths (a `string[]`; the `image` type holds a single value). Per-image `alt`/`title`/`caption` live on the media record, not the gallery. See [Setting Types](theming-setting-types.md).
 
 ### SEO (item pages)
 
@@ -376,17 +376,11 @@ Two lower-severity decisions worth keeping: SeoTag **preserves** current social-
 
 ---
 
-## 11. Out of Scope (Future Phase 3)
+## 11. Out of Scope
 
-Deferred, with the v1 data model already forward-compatible:
+Deliberately deferred:
 
-- Cross-collection relationships (Portfolio item → Category) — v1 items already carry stable `uuid`s.
-- Taxonomies (categories, tags).
-- Generic repeater / blocks-in-collections field type. (The `gallery` repeating-image type shipped — see [Setting Types](theming-setting-types.md); only a *generic* repeater remains deferred.)
 - `{% collection ... as items %}` tag form (per-block scoping, cursor pagination).
-- Draft/publish states, per-item undo/redo and autosave. (Item preview shipped — see §9 "Item preview".)
-- **Forms inside collection templates** — open question, deferred. Interim behavior: item templates should not contain hosted `<form>` markup (the forms manifest scans page widget JSON, not Liquid templates). Authors who need a form on an item page link to a real page that hosts it. Other interactive widgets (sliders, accordions) work fine inside item templates as long as their JS ships via a widget used on at least one page.
-- Project-defined collection types (collections stay theme-defined in v1).
 
 ---
 
