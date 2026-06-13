@@ -6,6 +6,7 @@ import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
 import { useEditorPath } from "../../lib/routeBase.jsx";
+import { getStandalonePreviewPath } from "../../lib/previewBase.js";
 
 export default function EditorTopBar({
   pageName,
@@ -140,7 +141,11 @@ export default function EditorTopBar({
       return;
     }
 
-    const previewUrl = new URL(`/preview/${pageId}`, window.location.origin).toString();
+    // Open the standalone preview app in a new tab. The path defaults to the OSS
+    // /preview/:pageId route; an embedding host overrides it (setStandalonePreviewPath)
+    // to point at its own preview surface. That page hosts PreviewPanel in an
+    // iframe and handles in-preview link navigation (NAVIGATE_PREVIEW).
+    const previewUrl = new URL(getStandalonePreviewPath(pageId), window.location.origin).toString();
     const previewWindow = window.open(previewUrl, "widgetizer-preview");
     previewWindow?.focus();
   }, [pageId]);

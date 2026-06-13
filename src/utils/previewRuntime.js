@@ -17,7 +17,13 @@ function postToParent(data) {
 // ── Preview Mode ────────────────────────────────────────────────────────────
 
 function getPreviewMode() {
-  const script = document.querySelector('script[src*="previewRuntime.js"][data-preview-mode]');
+  // Detect by the data-preview-mode attribute, which only the runtime's own
+  // <script> tag carries — NOT by the script's filename. Embedding hosts serve
+  // this runtime under their own path (e.g. /api/preview/runtime.js), so a
+  // filename match (src*="previewRuntime.js") would miss and silently fall back
+  // to "editor", leaving the standalone preview with the editor hover/selection
+  // overlay active.
+  const script = document.querySelector("script[data-preview-mode]");
   const mode = script?.dataset?.previewMode;
   return mode === "standalone" ? "standalone" : "editor";
 }

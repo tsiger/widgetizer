@@ -464,28 +464,23 @@ export async function duplicateProject(req, res) {
  */
 export async function getProjectWidgets(req, res) {
   try {
-    const { projectId } = req.scope;
-
-    const project = projectRepo.getProjectById(projectId);
-    if (!project) {
-      return res.status(404).json({ error: "Project not found" });
-    }
-
-    const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName);
-    const widgetsBaseDir = path.join(projectRootDir, "widgets");
-    const globalWidgetsDir = path.join(widgetsBaseDir, "global");
+    const { scope } = req;
+    const { storage } = req.adapters;
 
     // Import core widgets controller
     const { getCoreWidgets } = await import("./coreWidgetsController.js");
 
-    // Check if theme opts out of core widgets
+    // Check if the theme opts out of core widgets. Read theme.json through the
+    // storage adapter so this resolves the right project dir under any backend
+    // (the OSS global dir, or hosted's per-user dir) — not a global DATA_DIR path.
     let includeCoreWidgets = true;
     try {
-      const themeJsonPath = path.join(projectRootDir, "theme.json");
-      const themeJson = JSON.parse(await fs.readFile(themeJsonPath, "utf8"));
-      if (themeJson.useCoreWidgets === false) {
-        includeCoreWidgets = false;
+      const themeBuf = await storage.read(scope, "theme.json");
+      if (themeBuf != null) {
+        const themeJson = JSON.parse(themeBuf.toString("utf8"));
+        if (themeJson.useCoreWidgets === false) {
+          includeCoreWidgets = false;
+        }
       }
     } catch (error) {
       console.warn(
@@ -494,18 +489,20 @@ export async function getProjectWidgets(req, res) {
       // If there's an error reading theme.json, default to including core widgets
     }
 
-    // Helper function to process a widget folder (reads schema.json, flags preview.png)
-    async function processWidgetFolder(folderPath) {
+    // Helper: read one widget folder's schema.json (flagging a sibling
+    // preview.png) via the storage adapter. A non-directory entry yields a
+    // failing read here, which is caught and dropped.
+    async function processWidgetFolder(folderRelPath) {
       try {
-        const schemaPath = path.join(folderPath, "schema.json");
-        const content = await fs.readFile(schemaPath, "utf8");
-        const schema = JSON.parse(content);
-        if (await fs.pathExists(path.join(folderPath, "preview.png"))) {
+        const buf = await storage.read(scope, `${folderRelPath}/schema.json`);
+        if (buf == null) return null;
+        const schema = JSON.parse(buf.toString("utf8"));
+        if (await storage.exists(scope, `${folderRelPath}/preview.png`)) {
           schema.hasPreview = true;
         }
         return schema;
       } catch (error) {
-        console.warn(`[ProjectController] Failed to parse schema for widget at ${folderPath}: ${error.message}`);
+        console.warn(`[ProjectController] Failed to parse schema for widget at ${folderRelPath}: ${error.message}`);
         // Silently handle widget schema parsing errors
       }
       return null;
@@ -524,39 +521,16 @@ export async function getProjectWidgets(req, res) {
       }
     }
 
-    // Process widget folders (new structure: widgets/widget-name/schema.json)
-    try {
-      const topLevelEntries = await fs.readdir(widgetsBaseDir, { withFileTypes: true });
-      const widgetFolders = topLevelEntries
-        .filter((entry) => entry.isDirectory() && entry.name !== "global")
-        .map((entry) => path.join(widgetsBaseDir, entry.name));
+    // Theme widget folders (new structure: widgets/<name>/schema.json),
+    // excluding the global/ subdir which is handled separately below.
+    const widgetEntries = await storage.list(scope, "widgets");
+    const widgetFolders = widgetEntries.filter((name) => name !== "global").map((name) => `widgets/${name}`);
+    allSchemas = allSchemas.concat(await Promise.all(widgetFolders.map(processWidgetFolder)));
 
-      const folderSchemas = await Promise.all(widgetFolders.map(processWidgetFolder));
-      allSchemas = allSchemas.concat(folderSchemas);
-    } catch (err) {
-      // Ignore if widgetsBaseDir doesn't exist
-      if (err.code !== "ENOENT") {
-        console.warn(`[ProjectController] Failed to read widget directory: ${err.message}`);
-        // Silently handle other directory reading errors
-      }
-    }
-
-    // Process global widget folders (widgets/global/widget-name/schema.json)
-    try {
-      const globalEntries = await fs.readdir(globalWidgetsDir, { withFileTypes: true });
-      const globalFolders = globalEntries
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => path.join(globalWidgetsDir, entry.name));
-
-      const globalSchemas = await Promise.all(globalFolders.map(processWidgetFolder));
-      allSchemas = allSchemas.concat(globalSchemas);
-    } catch (err) {
-      // Ignore if globalWidgetsDir doesn't exist
-      if (err.code !== "ENOENT") {
-        console.warn(`[ProjectController] Failed to read global widget directory: ${err.message}`);
-        // Silently handle other directory reading errors
-      }
-    }
+    // Global widget folders (widgets/global/<name>/schema.json)
+    const globalEntries = await storage.list(scope, "widgets/global");
+    const globalFolders = globalEntries.map((name) => `widgets/global/${name}`);
+    allSchemas = allSchemas.concat(await Promise.all(globalFolders.map(processWidgetFolder)));
 
     // Filter out nulls (files without schemas or errors)
     const validSchemas = allSchemas.filter((schema) => schema !== null);

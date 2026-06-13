@@ -20,3 +20,21 @@ export function setPreviewRenderBase(base) {
 export function getPreviewRenderBase() {
   return _previewRenderBase;
 }
+
+// Builds the URL the top-bar "Preview" button opens (in a new tab) for a given
+// page id. The OSS shell serves the standalone preview app at /preview/:pageId,
+// which is the default. An embedding host mounts that surface elsewhere (hosted
+// uses /sites/:siteId/preview/:pageId) and overrides this so the button — and
+// the in-preview link navigation, which routes to the same shape — targets the
+// host's route. The standalone preview page itself hosts PreviewPanel in an
+// iframe and handles NAVIGATE_PREVIEW (the OSS architecture). Registry (not
+// context) so EditorTopBar's click handler can read it without prop-drilling.
+let _standalonePreviewPath = (pageId) => `/preview/${pageId}`;
+
+export function setStandalonePreviewPath(builder) {
+  _standalonePreviewPath = typeof builder === "function" ? builder : (pageId) => `/preview/${pageId}`;
+}
+
+export function getStandalonePreviewPath(pageId) {
+  return _standalonePreviewPath(pageId);
+}
