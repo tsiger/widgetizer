@@ -394,6 +394,15 @@ V1 is **implemented**. Key deliverables:
 - Arch theme: `resource-list` widget uses the `file` setting type
 - Shared `media.maxFileSizeMB` upload limit (no separate file limit in V1)
 
+### Audio (MP3) — added
+
+MP3 audio was added as a second file type on the same architecture:
+
+- `audio/mpeg`/`audio/mp3` allowlisted; `.mp3` → `audio/mpeg` in `getContentType` for correct serving/export headers
+- Stored in `uploads/files/` like other files (no separate storage category) — export copying, usage tracking, richtext linking, and `/uploads/files/` → `assets/files/` rewriting all apply unchanged
+- Media Library gains a dedicated **Audio** filter (MIME-based, `audio/`) with a `Music` icon. `file`/Files stays "any non-image asset," so `audio` is a focused subset — which keeps non-image pickers (e.g. the richtext "Link to file" picker, `filterType="file"`) able to reach audio. `MediaSelectorDrawer` supports `filterType="audio"` for an audio-only picker (used by the planned audio widget)
+- `media.maxFileSizeMB` default raised from 5 MB to **50 MB** (audio runs larger than PDFs/images); still a shared limit (no per-type cap yet)
+
 ---
 
 **See also:**

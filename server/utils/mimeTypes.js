@@ -17,6 +17,9 @@ const CONTENT_TYPES = {
   ".js": "application/javascript",
   ".pdf": "application/pdf",
 
+  // Audio
+  ".mp3": "audio/mpeg",
+
   // Images
   ".png": "image/png",
   ".jpg": "image/jpeg",
@@ -54,6 +57,9 @@ export const ALLOWED_MIME_TYPES = [
   "image/webp",
   "image/svg+xml",
   "application/pdf",
+  // Audio. `audio/mpeg` is the standard for .mp3; some browsers/OSes report `audio/mp3`.
+  "audio/mpeg",
+  "audio/mp3",
 ];
 
 /** MIME types that indicate a ZIP archive (used for theme / project imports). */

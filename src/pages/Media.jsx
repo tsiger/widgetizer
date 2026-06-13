@@ -28,7 +28,7 @@ export default function Media() {
   const { settings } = useAppSettings();
   // Use our custom hooks to manage different aspects of media functionality
   const mediaState = useMediaState();
-  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 5;
+  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 50;
   const [usageTitleMap, setUsageTitleMap] = useState({});
 
   // Lightbox state

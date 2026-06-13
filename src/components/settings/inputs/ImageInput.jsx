@@ -62,7 +62,7 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
     const file = event.target.files[0];
     if (!file || !activeProject) return;
 
-    const limitMB = settings?.media?.maxFileSizeMB ?? 5;
+    const limitMB = settings?.media?.maxFileSizeMB ?? 50;
     const { valid, rejected } = validateFileSizes([file], { maxSizeMB: limitMB });
     if (rejected.length > 0) {
       showRejectedFiles(showToast, rejected);

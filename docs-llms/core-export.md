@@ -161,7 +161,7 @@ When the `/api/export/:projectId` endpoint is called, the following steps are ex
         - Images are copied to `assets/images/` (not `uploads/images/`)
         - Falls back to copying all images if media tracking fails
       - **Export Optimization**: Logs how many images were copied vs. skipped, often reducing export size significantly
-      - **File Asset Copying**: Uses the same usage-based approach for non-image file assets (PDFs):
+      - **File Asset Copying**: Uses the same usage-based approach for non-image file assets (PDFs, MP3s):
         - Reads media metadata and filters files where `path` starts with `/uploads/files/` and `usedIn` is non-empty
         - Copies used files to `assets/files/` in the export output
         - No size variants to process (files have no generated sizes)

@@ -526,12 +526,12 @@ All cells are autoescaped strings.
 
 ### File
 
-A file asset selector for downloadable documents (currently PDF). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
+A file asset selector for downloadable non-image assets (currently PDF and MP3). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
 
 **Features:**
 
-- **Upload**: Direct file upload from the OS file picker (accepts PDF)
-- **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets
+- **Upload**: Direct file upload from the OS file picker (accepts PDF, MP3)
+- **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets (documents + audio)
 - **Selected State**: Displays filename and extension badge with a clear button
 - **No Inline Metadata Editing**: `FileInput` itself does not expose metadata editing. File assets still have media-record metadata such as alt/title, managed from the Media Library drawer.
 

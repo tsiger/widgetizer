@@ -11,7 +11,7 @@ The Media Library is designed to handle file uploads, storage, and metadata mana
 - **Location**: Uploaded files are physically stored on the server's filesystem, scoped per project:
 - **Images**: `data/projects/{folderName}/uploads/images/`
 - **Files** (PDFs, etc.): `data/projects/{folderName}/uploads/files/`
-- **Routing**: The `getMediaDir(projectFolderName, mimeType)` function uses `getMediaCategory()` to route uploads to the correct subdirectory — `images/` for image MIME types, `files/` for everything else (currently PDF).
+- **Routing**: The `getMediaDir(projectFolderName, mimeType)` function uses `getMediaCategory()` to route uploads to the correct subdirectory — `images/` for image MIME types, `files/` for everything else (currently PDF and MP3).
 - **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
 - **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original using `-{size}` suffixes (e.g., `photo-thumb.jpg`, `photo-small.jpg`).
 - **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. Public delivery then falls back to the best available size or the original only when no `large` variant exists.
@@ -138,7 +138,7 @@ The media library automatically tracks which pages and global widgets are using 
   - **Global widgets** (header/footer) are saved or updated (scans settings for media paths)
 - **Delete Protection**: Files with a non-empty `usedIn` array cannot be deleted
 - **Manual Refresh**: Users can manually refresh usage tracking to recalculate all relationships
-- **Media Types Tracked**: Images and file assets (PDFs) are tracked across pages, global widgets, theme settings, and **collection items**
+- **Media Types Tracked**: Images and file assets (PDFs, MP3s) are tracked across pages, global widgets, theme settings, and **collection items**
 - **Recursive Scanning**: The usage scanner recurses into nested objects (e.g. link settings with `{ href: "/uploads/files/brochure.pdf", ... }`) and arrays (e.g. `gallery` settings, whose value is an ordered array of image upload paths) so media paths inside link fields and gallery entries are tracked for deletion protection and export
 - **Embedded paths in strings**: A string value is scanned for **embedded** `/uploads/(images|files)/…` substrings, not just values that are exactly a path — so an image inserted into a `richtext` body (`<img src="/uploads/images/photo-large.jpg">`) is tracked like any other reference. Over-matching is harmless: it only marks an asset used.
 - **Variant-aware matching**: A referenced path is matched against each media record's original `path` **and** its generated size variants (`sizes.{small,medium,large,…}.path`). So when a richtext image embeds the `large` variant, usage still resolves to the parent record and export copies the asset (`recordMediaPaths()` in `mediaUsageService.js`).
@@ -159,14 +159,15 @@ The system uses centralized configuration for media types and MIME handling on b
 **Frontend** (`src/config.js`):
 - `MEDIA_TYPES` defines allowed file extensions for the upload UI:
   - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
+  - `audio`: `.mp3`
   - `file`: `.pdf`
 
 **Backend** (`server/utils/mimeTypes.js`):
 All server-side MIME definitions live in a single module:
-- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`)
+- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`, `audio/mpeg`/`audio/mp3`)
 - `ZIP_MIME_TYPES` — MIME types for ZIP archive validation (`application/zip`, `application/x-zip-compressed`), used by project import and theme upload
-- `getContentType(ext)` — resolves a file extension (e.g. `".png"`, `".pdf"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
-- `getMediaCategory(mimeType)` — classifies a MIME type into an asset category: returns `"image"` for image MIME types, `"file"` for everything else (currently PDF). Used by `getMediaDir()` to route uploads to the correct subdirectory.
+- `getContentType(ext)` — resolves a file extension (e.g. `".png"`, `".pdf"`, `".mp3"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
+- `getMediaCategory(mimeType)` — classifies a MIME type into an asset category: returns `"image"` for image MIME types, `"file"` for everything else (currently PDF and MP3 — audio is stored alongside other files and differentiated in the UI by MIME, not by a separate storage category). Used by `getMediaDir()` to route uploads to the correct subdirectory.
 
 This ensures consistency across all server code — upload validation, file serving, and export content-type resolution all use the same definitions.
 
@@ -195,7 +196,7 @@ Manages core media state and data loading:
 - **State Management**: Files list, loading states, view mode, search filtering
 - **Data Loading**: Fetches project media on mount using `getProjectMedia`
 - **View Persistence**: Saves view mode preference to localStorage
-- **Type Filtering**: Supports filtering the media list by type (`all`, `image`, `file`)
+- **Type Filtering**: Supports filtering the media list by type (`all`, `image`, `audio`, `file` — `file` is any non-image asset, so `audio` is a focused subset of it)
 - **Search Filtering**: Real-time filename filtering
 - **Usage Refresh**: Manual usage tracking refresh functionality
 
@@ -263,7 +264,7 @@ A specialized drawer component that allows users to browse and select existing m
 The `MediaSelectorDrawer` is integrated into:
 
 - **`ImageInput`**: Browse for existing images when setting image widget properties or theme-level image settings like favicons
-- **`FileInput`**: Browse for existing file assets (PDFs) when setting file widget properties
+- **`FileInput`**: Browse for existing file assets (PDFs, MP3s) when setting file widget properties
 - **`SeoFields`** (page and collection item forms): selects the SEO social image (`seo.og_image`) indirectly through `ImageInput`
 
 #### `ImageInput` Modes (`src/components/settings/inputs/ImageInput.jsx`)
@@ -285,11 +286,11 @@ In all modes the empty state is a click-to-upload dropzone, a filled preview sho
 
 #### `FileInput` Component (`src/components/settings/inputs/FileInput.jsx`)
 
-A filename-oriented setting input for selecting uploaded file assets (PDFs). Modeled after `ImageInput` but without image-specific features like preview thumbnails or metadata editing.
+A filename-oriented setting input for selecting uploaded file assets (PDFs, MP3s — any non-image asset). Modeled after `ImageInput` but without image-specific features like preview thumbnails or metadata editing.
 
 **Key Features:**
 
-- **Upload**: Triggers OS file dialog accepting only file types (PDF)
+- **Upload**: Triggers OS file dialog accepting non-image asset types (PDF, MP3)
 - **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"`
 - **Selected State**: Displays filename, extension badge, and a clear button
 - **No image preview**: Shows a file icon instead of a thumbnail

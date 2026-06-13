@@ -62,7 +62,7 @@ Custom error-handling middleware (`server/middleware/errorHandler.js`) registere
 File-size and image-dimension safety limits are enforced inline in each upload handler:
 
 - **Image dimensions**: Sharp `limitInputPixels` (100M pixels) in mediaController and `siteIconHelpers.js` (site-icon generation during render/export)
-- **File sizes**: Media uploads are checked per-file against the `media.maxFileSizeMB` app setting in mediaController (after multer receives the file; default 5MB); ZIP uploads use multer `fileSize` limits derived from `export.maxImportSizeMB` in projectController and themeController
+- **File sizes**: Media uploads are checked per-file against the `media.maxFileSizeMB` app setting in mediaController (after multer receives the file; default 50MB); ZIP uploads use multer `fileSize` limits derived from `export.maxImportSizeMB` in projectController and themeController
 - **Request body sizes**: Express JSON body limits applied per-router via `server/middleware/jsonParser.js` (2 MB standard, 10 MB for page-content saves)
 
 ### 8. Project Import/Export & Theme Upload Security
