@@ -698,6 +698,40 @@
       }
     }
   },
+  "audio_player": {
+    "name": "Audio Player",
+    "settings": {
+      "show_volume": {
+        "label": "Show volume control"
+      },
+      "show_speed": {
+        "label": "Show playback speed"
+      },
+      "show_download": {
+        "label": "Show download button"
+      }
+    },
+    "blocks": {
+      "track": {
+        "name": "Track",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "artist": {
+            "label": "Artist"
+          },
+          "audio": {
+            "label": "Audio file",
+            "description": "Select or upload an MP3."
+          },
+          "cover": {
+            "label": "Cover image"
+          }
+        }
+      }
+    }
+  },
   "accordion": {
     "name": "Accordion",
     "settings": {
