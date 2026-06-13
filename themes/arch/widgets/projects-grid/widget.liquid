@@ -1,16 +1,18 @@
 {% comment %}
-  News Grid — lists items from the `news` collection as a card grid.
+  Projects Grid — lists items from the `projects` collection as a card grid.
   Content comes from the collection (not blocks). `limit: 0` shows all items.
+  Each card shows its featured image when one is set (omitted otherwise).
 {% endcomment %}
+{% comment %} No sort override: honor the collection's manual order (_order.json). {% endcomment %}
 {% if widget.settings.limit and widget.settings.limit > 0 %}
-  {% assign news_items = 'news' | collection: limit: widget.settings.limit, sort: widget.settings.sort %}
+  {% assign project_items = 'projects' | collection: limit: widget.settings.limit %}
 {% else %}
-  {% assign news_items = 'news' | collection: sort: widget.settings.sort %}
+  {% assign project_items = 'projects' | collection %}
 {% endif %}
 
 {% comment %} View-all placement: header top-right when alignment is "start", else centered below the grid. {% endcomment %}
 {% assign has_items = false %}
-{% if news_items.size > 0 %}{% assign has_items = true %}{% endif %}
+{% if project_items.size > 0 %}{% assign has_items = true %}{% endif %}
 {% assign show_view_all = false %}
 {% if widget.settings.view_all_link.href != blank and has_items %}{% assign show_view_all = true %}{% endif %}
 {% assign view_all_in_header = false %}
@@ -29,10 +31,10 @@
 
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-news-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
-  style="--card-image-ratio: {{ widget.settings.aspect_ratio | default: '16 / 9' }};{% unless widget.settings.color_scheme == 'standard-primary' %}--widget-bg-color: var(--bg-primary);{% endunless %}"
+  class="widget widget-type-projects-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  style="--card-image-ratio: {{ widget.settings.aspect_ratio | default: '4 / 3' }};{% unless widget.settings.color_scheme == 'standard-primary' %}--widget-bg-color: var(--bg-primary);{% endunless %}"
   data-widget-id="{{ widget.id }}"
-  data-widget-type="news-grid"
+  data-widget-type="projects-grid"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <style>
@@ -121,9 +123,9 @@
         {% endif %}
       {% endif %}
 
-      {% if news_items.size > 0 %}
+      {% if project_items.size > 0 %}
         <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
-          {% for item in news_items %}
+          {% for item in project_items %}
             {% comment %} Promote the first card to h1 only when the widget has no title and is first on the page. {% endcomment %}
             {% assign current_card_level = card_heading_level %}
             {% if has_widget_title == false and widget.index == 1 %}
@@ -134,23 +136,29 @@
               {% endif %}
             {% endif %}
 
+            {% comment %} Combined client / year meta line. {% endcomment %}
+            {% assign has_client = false %}
+            {% if widget.settings.show_client and item.settings.client != blank %}{% assign has_client = true %}{% endif %}
+            {% assign has_year = false %}
+            {% if widget.settings.show_year and item.settings.year != blank %}{% assign has_year = true %}{% endif %}
+
             <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
-              {% if widget.settings.show_image and item.settings.featured_image != blank %}
+              {% if item.settings.featured_image != blank %}
                 {% image src: item.settings.featured_image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
               {% endif %}
               <div class="widget-card-content">
-                {% if widget.settings.show_date and item.settings.date != blank %}
-                  <time class="w-meta t-sm" datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
-                {% endif %}
                 <{{ current_card_level }} class="w-title t-xl">
                   {% if item.url %}<a href="{{ item.url }}">{{ item.settings.title }}</a>{% else %}{{ item.settings.title }}{% endif %}
                 </{{ current_card_level }}>
-                {% if widget.settings.show_excerpt and item.settings.excerpt != blank %}
-                  <p class="w-body t-sm">{{ item.settings.excerpt }}</p>
+                {% if has_client or has_year %}
+                  <span class="w-meta t-sm">{% if has_client %}{{ item.settings.client }}{% endif %}{% if has_client and has_year %} &middot; {% endif %}{% if has_year %}{{ item.settings.year }}{% endif %}</span>
+                {% endif %}
+                {% if widget.settings.show_summary and item.settings.summary != blank %}
+                  <p class="w-body t-sm">{{ item.settings.summary }}</p>
                 {% endif %}
                 {% if widget.settings.show_read_more and item.url %}
                   <div class="widget-card-footer">
-                    <a href="{{ item.url }}" class="widget-button widget-button-secondary" aria-label="Read more: {{ item.settings.title }}">Read more</a>
+                    <a href="{{ item.url }}" class="widget-button widget-button-secondary" aria-label="View project: {{ item.settings.title }}">View project</a>
                   </div>
                 {% endif %}
               </div>
@@ -162,7 +170,7 @@
           <div class="widget-actions grid-view-all reveal reveal-up">{{ view_all_button | raw }}</div>
         {% endif %}
       {% else %}
-        <p class="w-body t-muted">No news items yet. Add some under News.</p>
+        <p class="w-body t-muted">No projects yet. Add some under Projects.</p>
       {% endif %}
     </div>
   </div>

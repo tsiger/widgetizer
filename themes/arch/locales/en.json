@@ -1680,6 +1680,30 @@
       }
     }
   },
+  "projects_grid": {
+    "name": "Projects Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "show_summary": {
+        "label": "Show summary"
+      },
+      "show_client": {
+        "label": "Show client"
+      },
+      "show_year": {
+        "label": "Show year"
+      },
+      "show_read_more": {
+        "label": "Show 'View project' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
+      }
+    }
+  },
   "project_showcase": {
     "name": "Project Showcase",
     "settings": {
