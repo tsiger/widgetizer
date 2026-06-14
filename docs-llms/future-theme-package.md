@@ -1,9 +1,72 @@
 # Theme Packaging Script (`theme-package`) — Spec
 
-> **Status: PLANNED — not yet implemented.**
-> This document is a design spec. It records the agreed model, the CLI, the
-> algorithm, and — importantly — the *decisions and the reasoning behind them*
-> so the design does not get re-litigated when we build it. No code exists yet.
+> **Status: PARTIAL / CORRECTED.**
+> `theme-package` as described here is still planned and not implemented.
+> A different, narrower helper now exists: `scripts/theme-update-delta.js`,
+> wired as `npm run theme:update-delta`.
+> This document originally assumed bundled app releases would not need source-tree
+> update folders. That assumption was wrong for the current runtime.
+
+## Current Correction
+
+We have **not** built the `theme-package` script described in this document.
+
+What exists now is:
+
+```bash
+npm run theme:update-delta -- themes/arch --dry-run
+```
+
+That helper is for **bundled Arch releases inside the Widgetizer app**. It writes
+directly into the source theme:
+
+```
+themes/arch/updates/<app-version>/
+```
+
+so the update folder ships inside the app bundle.
+
+The original `theme-package` spec was trying to solve a different problem:
+
+```
+Generate a distributable/uploadable theme package from git tags.
+Output: dist-themes/<id>/
+```
+
+The document's important wrong assumption was:
+
+> Bundled themes do not need source-tree deltas because the app ships
+> `themes/<id>` as the latest full theme.
+
+That is not true under the current runtime. Existing installs already have an
+installed user-data theme at:
+
+```
+data/themes/<id>/
+```
+
+Updating the Electron/web app changes the bundled seed theme under `themes/<id>/`,
+but it does **not** overwrite the user's existing `data/themes/<id>/` root. The
+runtime currently knows how to seed/apply bundled theme updates by syncing seed
+update folders:
+
+```
+themes/<id>/updates/<version>/
+  -> data/themes/<id>/updates/<version>/
+  -> data/themes/<id>/latest/
+```
+
+Therefore, until a separate bundled-root sync model is implemented, bundled Arch
+app releases need source-tree update folders such as:
+
+```
+themes/arch/updates/0.9.9/
+themes/arch/updates/0.9.10/
+```
+
+`theme:update-delta` exists to generate those folders from git diff history. The
+future `theme-package` script remains useful for downloadable/uploadable theme
+bundles, but it is not the tool we just built.
 
 ## Purpose
 
@@ -12,10 +75,13 @@ per-release delta folders) from a theme's normal git history. It is the authorin
 counterpart to the runtime [theme update system](theme-updates.md): the update
 system *consumes* the base+deltas layout; this script *produces* it.
 
-It must work in two settings:
+It must work in two repository layouts:
 
-1. **Bundled themes** developed inside the widgetizer monorepo (`themes/<id>/`).
+1. **Monorepo themes** developed inside Widgetizer (`themes/<id>/`).
 2. **Standalone themes** developed in their own separate git repos.
+
+This is separate from the app-bundled Arch release workflow documented in
+[Bundled App Theme Updates](theme-updates.md#bundled-app-theme-updates).
 
 ## The load-bearing model
 
@@ -31,6 +97,10 @@ the distributable bundle is a pure function of those tags.**
 This is the standard "source vs. build artifact" split. The deltas are a packaging
 concern computed from history; they are never hand-authored or stored in the source
 tree.
+
+This model applies to the future `theme-package` distributable bundle. It does not
+describe the current `theme:update-delta` helper, which intentionally writes
+`themes/arch/updates/<version>/` for app-bundled Arch releases.
 
 ### Why this model (and not hand-authored deltas)
 
@@ -108,6 +178,11 @@ the next delta *before* committing to a tag.
 Default output: **`dist-themes/<id>/`** at the repo root — a **sibling of `themes/`**,
 not inside `themes/<id>/` alongside `assets`/`locales`.
 
+This decision applies to the planned `theme-package` distributable bundle output.
+It does not apply to the `theme:update-delta` helper used for bundled app releases,
+which deliberately writes `themes/arch/updates/<version>/` so the app package can
+carry the seed update folder.
+
 **Why:** `themes/<id>/` is exactly what three systems treat as "the theme":
 
 - `theme-sync.js` watches it as `srcDir` and copies it into `data/`
@@ -164,13 +239,20 @@ should be the bundle" — does not hold. The update system reads a plain
   still sees an update;
 - `applyThemeUpdate` copies wholesale from root.
 
-The base+delta layout is only *required* at one moment: a user uploading a theme
-**zip over an existing install**, where `uploadTheme` enforces matching base versions.
-That is a distribution-time event, not a repo-state requirement. So:
+The base+delta layout is required for a user uploading a theme **zip over an
+existing install**, where `uploadTheme` enforces matching base versions. That is a
+distribution-time event, not a repo-state requirement.
 
-- Bundled themes don't need deltas at all — on app upgrade the new `themes/<id>/`
-  (root = latest) re-seeds and a wholesale apply produces the same result a composed
-  `latest/` would.
+The original version of this document incorrectly extended that reasoning to the
+bundled Electron/app update flow. Current runtime reality is different:
+
+- Uploadable theme packages can live in `dist-themes/<id>/` and do not need to be
+  committed into `themes/<id>/`.
+- App-bundled Arch updates currently need source-tree seed deltas under
+  `themes/arch/updates/<version>/`, because app updates do not overwrite an existing
+  installed `data/themes/arch/` root.
+- If a future runtime adds a bundled-root sync path, this may change; that would be
+  a runtime behavior change, not the `theme-package` script described here.
 - Inverting would re-commit the build artifact (reintroducing every D5 downside,
   permanently baked into the repo layout), split the dev loop from what ships
   (`themes/` goes stale and drifts), create a "don't edit the obvious folder"

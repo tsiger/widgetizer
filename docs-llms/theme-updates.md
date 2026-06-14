@@ -236,6 +236,72 @@ User customizations live in each setting's `value` field (written by the editor;
 }
 ```
 
+## Bundled App Theme Updates
+
+Arch currently ships with the Widgetizer app, so app releases and Arch releases are version-aligned for the normal Electron/web-app update path:
+
+```
+Widgetizer 0.9.8 ships Arch 0.9.8
+Widgetizer 0.9.9 ships Arch 0.9.9
+Widgetizer 0.9.10 ships Arch 0.9.10
+```
+
+In this bundled flow, `themes/arch/` remains the full latest source theme that ships with the app. Existing user projects do not read directly from that bundled source; they use the installed runtime copy under `data/themes/arch/` and project files under `data/projects/<folder>/`. Therefore, a bundled app release that contains a theme update must also ship a seed update folder:
+
+```
+themes/arch/
+  theme.json              # latest full source, e.g. 0.9.9
+  widgets/
+  assets/
+  updates/
+    0.9.9/
+      theme.json          # required, version must be 0.9.9
+      ...changed files...
+```
+
+When the updated app runs, `buildLatestSnapshot` syncs seed update folders from `themes/arch/updates/` into `data/themes/arch/updates/`, then builds the runtime snapshot:
+
+```
+data/themes/arch/latest/
+```
+
+`latest/` is runtime-only. It is built under `data/themes/{name}/latest/` and should not be created or committed under `themes/{name}/latest/`.
+
+### Bundled Delta Helper
+
+Use `theme:update-delta` to generate the source-tree update folder from git history instead of hand-copying changed files:
+
+```bash
+npm run theme:update-delta -- themes/arch --dry-run
+npm run theme:update-delta -- themes/arch
+```
+
+Defaults:
+
+- Target version comes from `package.json`.
+- Baseline tag defaults to the highest semver app tag below the target version.
+- Output goes to `themes/arch/updates/<package.json version>/`.
+
+Explicit form:
+
+```bash
+npm run theme:update-delta -- themes/arch --from 0.9.8 --version 0.9.9 --dry-run
+npm run theme:update-delta -- themes/arch --from 0.9.8 --version 0.9.9
+```
+
+The script prints a message like:
+
+```
+Detected app version 0.9.9 from package.json.
+Using baseline tag: 0.9.8 (0.9.8)
+Version progression: 0.9.8 -> 0.9.9 (patch release).
+We will continue with arch update 0.9.9.
+```
+
+Real generation is blocked unless `themes/arch/theme.json` already matches the target version. For example, if `package.json` is `0.9.9`, then `themes/arch/theme.json` must also say `0.9.9`; the generated `themes/arch/updates/0.9.9/theme.json` must also say `0.9.9`. `buildLatestSnapshot` validates that each update folder's `theme.json` version matches the folder name.
+
+The helper does not build `latest/`, does not apply updates to projects, and does not change runtime behavior. It only creates the seed `updates/<version>/` folder that the existing runtime update system consumes.
+
 ## User Workflow
 
 ### 1. Theme Author Publishes Update
@@ -352,6 +418,10 @@ Projects track theme update information:
 - `server/services/themeUpdateService.js` - Project update logic and settings merge
 - `server/utils/semver.js` - Version parsing and comparison
 - `server/utils/updateStatus.js` - Shared update-status shaping on top of semver comparison
+
+### Scripts
+
+- `scripts/theme-update-delta.js` - Builds source-tree bundled update folders such as `themes/arch/updates/0.9.9/` from git diff history
 
 ---
 
