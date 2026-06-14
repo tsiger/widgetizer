@@ -264,6 +264,9 @@ function printPlan({ copies, deletions, skippedDeletions, skippedStatuses }, out
       console.log(`  ${change.status} ${change.relPath} (${change.reason})`);
     }
   }
+
+  log("Note: the plan is built from git-tracked changes (tag vs working tree).");
+  log("      Brand-new files that are not yet 'git add'-ed will NOT appear above.");
 }
 
 async function writePlan(plan, themeDir, outputDir, force) {
