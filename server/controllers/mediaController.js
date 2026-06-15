@@ -638,9 +638,40 @@ export async function serveProjectMedia(req, res) {
     const ext = path.extname(filePath).toLowerCase();
     res.setHeader("Content-Type", getContentType(ext));
 
-    // Stream the file
-    const fileStream = createReadStream(filePath);
-    fileStream.pipe(res);
+    // Advertise + honor byte-range requests so audio/video can seek (HTTP 206).
+    // Without this, media plays from the start (off a 200) but seeking snaps back to 0.
+    const { size: fileSize } = await fs.stat(filePath);
+    res.setHeader("Accept-Ranges", "bytes");
+
+    const rangeHeader = req.headers.range;
+    const match = rangeHeader ? /^bytes=(\d*)-(\d*)$/.exec(rangeHeader.trim()) : null;
+    if (match && (match[1] !== "" || match[2] !== "")) {
+      let start;
+      let end;
+      if (match[1] === "") {
+        // Suffix range: final N bytes.
+        start = Math.max(0, fileSize - parseInt(match[2], 10));
+        end = fileSize - 1;
+      } else {
+        start = parseInt(match[1], 10);
+        end = match[2] === "" ? fileSize - 1 : Math.min(parseInt(match[2], 10), fileSize - 1);
+      }
+
+      if (start > end || start >= fileSize) {
+        res.status(416).setHeader("Content-Range", `bytes */${fileSize}`).end();
+        return;
+      }
+
+      res.status(206);
+      res.setHeader("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+      res.setHeader("Content-Length", end - start + 1);
+      createReadStream(filePath, { start, end }).pipe(res);
+      return;
+    }
+
+    // No (or malformed) range — stream the full file.
+    res.setHeader("Content-Length", fileSize);
+    createReadStream(filePath).pipe(res);
   } catch (error) {
     console.error("Error serving project media:", error);
     if (handleProjectResolutionError(res, error)) return;

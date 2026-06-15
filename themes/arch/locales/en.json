@@ -701,6 +701,9 @@
   "audio_player": {
     "name": "Audio Player",
     "settings": {
+      "show_covers": {
+        "label": "Show cover art"
+      },
       "show_volume": {
         "label": "Show volume control"
       },

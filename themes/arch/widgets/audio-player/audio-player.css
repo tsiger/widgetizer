@@ -52,6 +52,14 @@
   }
 }
 
+/* Covers hidden (widget setting) — drop the cover column so panel + playlist fill the width. */
+.widget-audio-player .ap.ap--no-covers.is-enhanced {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "panel"
+    "playlist";
+}
+
 /* ── Cover art ────────────────────────────────────────────────────────── */
 .widget-audio-player .ap-cover {
   grid-area: cover;
@@ -117,6 +125,7 @@
   display: flex;
   gap: var(--space-xs);
   margin-block-start: var(--space-xs);
+  font-variant-numeric: tabular-nums;
 }
 
 .widget-audio-player .ap-time-sep {
@@ -212,6 +221,7 @@
 
 .widget-audio-player .ap-volume {
   inline-size: 8rem;
+  --ap-fill: 100%;
 }
 
 /* ── Range inputs (seek + volume) ─────────────────────────────────────── */
@@ -225,12 +235,30 @@
 .widget-audio-player .ap-seek {
   inline-size: 100%;
   display: block;
+  --ap-fill: 0%;
 }
 .widget-audio-player .ap-seek::-webkit-slider-runnable-track,
 .widget-audio-player .ap-volume::-webkit-slider-runnable-track {
   block-size: 0.4rem;
   border-radius: 999px;
   background-color: var(--border-color);
+}
+/* Elapsed/level fill: accent up to the thumb, track color after. JS sets --ap-fill
+   per slider (seek = play position, volume = level). WebKit/Blink via gradient;
+   Firefox uses its native ::-moz-range-progress and ignores --ap-fill. */
+.widget-audio-player .ap-seek::-webkit-slider-runnable-track,
+.widget-audio-player .ap-volume::-webkit-slider-runnable-track {
+  background-image: linear-gradient(
+    to right,
+    var(--accent) var(--ap-fill),
+    transparent var(--ap-fill)
+  );
+}
+.widget-audio-player .ap-seek::-moz-range-progress,
+.widget-audio-player .ap-volume::-moz-range-progress {
+  block-size: 0.4rem;
+  border-radius: 999px;
+  background-color: var(--accent);
 }
 .widget-audio-player .ap-seek::-moz-range-track,
 .widget-audio-player .ap-volume::-moz-range-track {
@@ -323,9 +351,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.widget-audio-player .ap-track.is-active .ap-track-index {
-  display: none;
-}
 
 .widget-audio-player .ap-track-thumb {
   flex-shrink: 0;
@@ -387,7 +412,7 @@
   block-size: 1.6rem;
 }
 
-.widget-audio-player .ap-track.is-active .ap-track-eq {
+.widget-audio-player .ap.is-playing .ap-track.is-active .ap-track-eq {
   display: flex;
 }
 

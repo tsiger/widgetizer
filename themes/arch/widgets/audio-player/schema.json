@@ -48,6 +48,12 @@
     },
     {
       "type": "checkbox",
+      "id": "show_covers",
+      "label": "tTheme:audio_player.settings.show_covers.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
       "id": "show_volume",
       "label": "tTheme:audio_player.settings.show_volume.label",
       "default": true
@@ -63,6 +69,11 @@
       "id": "show_download",
       "label": "tTheme:audio_player.settings.show_download.label",
       "default": true
+    },
+    {
+      "type": "header",
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
     },
     {
       "type": "select",

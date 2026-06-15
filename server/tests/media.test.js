@@ -87,12 +87,13 @@ after(async () => {
 // Mock helpers
 // ============================================================================
 
-function mockReq({ params = {}, body = {}, files = null, file = null } = {}) {
+function mockReq({ params = {}, body = {}, files = null, file = null, headers = {} } = {}) {
   return {
     params,
     body,
     files,
     file,
+    headers,
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -139,8 +140,8 @@ function mockRes() {
   return res;
 }
 
-async function callController(fn, { params, body, files, file } = {}) {
-  const req = mockReq({ params, body, files, file });
+async function callController(fn, { params, body, files, file, headers } = {}) {
+  const req = mockReq({ params, body, files, file, headers });
   const res = mockRes();
   await fn(req, res);
   return res;
@@ -1172,7 +1173,9 @@ describe("serveProjectMedia", () => {
 
     await serveProjectMedia(req, res);
 
+    assert.equal(res._status, 200);
     assert.equal(res._headers["Content-Type"], "image/jpeg");
+    assert.equal(res._headers["Accept-Ranges"], "bytes");
   });
 
   it("returns 404 for nonexistent filename", async () => {
@@ -1188,6 +1191,7 @@ describe("serveProjectMedia", () => {
     });
     const res = mockRes();
     await serveProjectMedia(req, res);
+    assert.equal(res._status, 200);
     assert.equal(res._headers["Content-Type"], "image/jpeg");
   });
 
@@ -1203,6 +1207,89 @@ describe("serveProjectMedia", () => {
       params: { projectId: PROJECT_ID },
     });
     assert.equal(res._status, 400);
+  });
+});
+
+// ============================================================================
+// serveProjectMedia — HTTP range requests (audio/video seeking)
+// ============================================================================
+
+describe("serveProjectMedia range requests", () => {
+  const RANGE_SIZE = 200;
+
+  before(async () => {
+    const filesDir = path.join(getProjectDir(PROJECT_FOLDER), "uploads", "files");
+    await fs.ensureDir(filesDir);
+    await fs.writeFile(path.join(filesDir, "range-test.mp3"), Buffer.alloc(RANGE_SIZE, 7));
+    await writeMediaFile(PROJECT_ID, {
+      files: [
+        {
+          id: "range-1",
+          filename: "range-test.mp3",
+          type: "audio/mpeg",
+          path: "/uploads/files/range-test.mp3",
+        },
+      ],
+    });
+  });
+
+  async function serveRange(range) {
+    const req = mockReq({
+      params: { projectId: PROJECT_ID, fileId: "range-1" },
+      headers: range ? { range } : {},
+    });
+    const res = mockRes();
+    await serveProjectMedia(req, res);
+    return res;
+  }
+
+  it("serves full file with 200 + Accept-Ranges + Content-Length when no Range header", async () => {
+    const res = await serveRange(null);
+    assert.equal(res._status, 200);
+    assert.equal(res._headers["Accept-Ranges"], "bytes");
+    assert.equal(res._headers["Content-Length"], RANGE_SIZE);
+  });
+
+  it("returns 206 with Content-Range/Content-Length for bytes=0-99", async () => {
+    const res = await serveRange("bytes=0-99");
+    assert.equal(res._status, 206);
+    assert.equal(res._headers["Content-Range"], `bytes 0-99/${RANGE_SIZE}`);
+    assert.equal(res._headers["Content-Length"], 100);
+    assert.equal(res._headers["Accept-Ranges"], "bytes");
+  });
+
+  it("returns 206 for an open-ended range bytes=100-", async () => {
+    const res = await serveRange("bytes=100-");
+    assert.equal(res._status, 206);
+    assert.equal(res._headers["Content-Range"], `bytes 100-199/${RANGE_SIZE}`);
+    assert.equal(res._headers["Content-Length"], 100);
+  });
+
+  it("returns 206 for a suffix range bytes=-100 (final N bytes)", async () => {
+    const res = await serveRange("bytes=-100");
+    assert.equal(res._status, 206);
+    assert.equal(res._headers["Content-Range"], `bytes 100-199/${RANGE_SIZE}`);
+    assert.equal(res._headers["Content-Length"], 100);
+  });
+
+  it("clamps an over-large end to the last byte", async () => {
+    const res = await serveRange("bytes=150-9999");
+    assert.equal(res._status, 206);
+    assert.equal(res._headers["Content-Range"], `bytes 150-199/${RANGE_SIZE}`);
+    assert.equal(res._headers["Content-Length"], 50);
+  });
+
+  it("returns 416 for an unsatisfiable range past the end", async () => {
+    const res = await serveRange("bytes=500-600");
+    assert.equal(res._status, 416);
+    assert.equal(res._headers["Content-Range"], `bytes */${RANGE_SIZE}`);
+  });
+
+  it("falls back to a full 200 response for a malformed Range header", async () => {
+    const res = await serveRange("bytes=abc");
+    assert.equal(res._status, 200);
+    assert.equal(res._headers["Content-Length"], RANGE_SIZE);
+    assert.equal(res._headers["Accept-Ranges"], "bytes");
   });
 });
 

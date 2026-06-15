@@ -55,6 +55,17 @@
       if (nextBtn) nextBtn.disabled = currentIndex >= tracks.length - 1;
     };
 
+    // Paint the elapsed portion of a range input (WebKit/Blink gradient fill via
+    // --ap-fill; Firefox uses native ::-moz-range-progress and ignores it).
+    const setFill = (el) => {
+      if (!el) return;
+      const max = parseFloat(el.max) || 0;
+      const pct = max > 0 ? (parseFloat(el.value) / max) * 100 : 0;
+      el.style.setProperty("--ap-fill", `${pct}%`);
+    };
+    const updateSeekFill = () => setFill(seek);
+    const updateVolumeFill = () => setFill(volume);
+
     const loadTrack = (index, autoplay) => {
       if (index < 0 || index >= tracks.length) return;
       currentIndex = index;
@@ -89,6 +100,7 @@
         seek.value = 0;
         seek.max = 0;
         seek.disabled = true;
+        updateSeekFill();
       }
       if (timeCurrent) timeCurrent.textContent = "0:00";
       if (timeDuration) timeDuration.textContent = "0:00";
@@ -156,16 +168,21 @@
       if (seek && isFinite(audio.duration)) {
         seek.max = audio.duration;
         seek.disabled = false;
+        updateSeekFill();
       }
       if (timeDuration) timeDuration.textContent = formatTime(audio.duration);
     });
     audio.addEventListener("timeupdate", () => {
-      if (!isSeeking && seek) seek.value = audio.currentTime;
+      if (!isSeeking && seek) {
+        seek.value = audio.currentTime;
+        updateSeekFill();
+      }
       if (timeCurrent) timeCurrent.textContent = formatTime(audio.currentTime);
     });
     if (seek) {
       seek.addEventListener("input", () => {
         isSeeking = true;
+        updateSeekFill();
         if (timeCurrent) timeCurrent.textContent = formatTime(parseFloat(seek.value));
       });
       seek.addEventListener("change", () => {
@@ -181,10 +198,12 @@
 
     if (volume) {
       audio.volume = parseFloat(volume.value);
+      updateVolumeFill();
       volume.addEventListener("input", () => {
         audio.volume = parseFloat(volume.value);
         audio.muted = audio.volume === 0;
         ap.classList.toggle("is-muted", audio.muted);
+        updateVolumeFill();
       });
     }
     if (muteBtn) {

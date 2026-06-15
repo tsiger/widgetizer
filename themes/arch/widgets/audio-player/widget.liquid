@@ -8,6 +8,7 @@
 {% enqueue_script src: "audio-player.js", priority: 30, defer: true %}
 
 {% assign track_count = widget.blocksOrder.size %}
+{% assign show_covers = widget.settings.show_covers %}
 {% assign has_heading = false %}
 {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
   {% assign has_heading = true %}
@@ -57,16 +58,18 @@
     {% endif %}
 
     <div class="widget-content">
-      <div class="ap{% if track_count <= 1 %} ap--single{% endif %} reveal reveal-up">
+      <div class="ap{% if track_count <= 1 %} ap--single{% endif %}{% unless show_covers %} ap--no-covers{% endunless %} reveal reveal-up">
         {% comment %} Single shared audio element. `controls` is the no-JS fallback; JS hides it. {% endcomment %}
         <audio class="ap-audio" preload="metadata" controls{% if first_url != blank %} src="{{ first_url }}"{% endif %}></audio>
 
+        {% if show_covers %}
         <div class="ap-cover">
           <img class="ap-cover-img" alt=""{% if first_cover != blank %} src="{{ first_cover }}"{% else %} hidden{% endif %} />
           <span class="ap-cover-fallback"{% if first_cover != blank %} hidden{% endif %} aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12" /><circle cx="6" cy="18" r="3" /><circle cx="16" cy="16" r="3" /></svg>
           </span>
         </div>
+        {% endif %}
 
         <div class="ap-panel">
           <div class="ap-now">
@@ -128,7 +131,7 @@
             {% endif %}
             {% assign t_cover = '' %}
             {% if block.settings.cover != blank %}
-              {% capture t_cover %}{% image src: block.settings.cover, size: 'thumb', output: 'url' %}{% endcapture %}
+              {% capture t_cover %}{% image src: block.settings.cover, size: 'small', output: 'url' %}{% endcapture %}
               {% assign t_cover = t_cover | strip %}
             {% endif %}
             <li class="ap-track-item" data-block-id="{{ blockId }}">
@@ -142,6 +145,7 @@
                 aria-label="Play {{ block.settings.title | escape }}"
               >
                 <span class="ap-track-index" aria-hidden="true">{{ forloop.index }}</span>
+                {% if show_covers %}
                 <span class="ap-track-thumb" aria-hidden="true">
                   {% if t_cover != blank %}
                     <img src="{{ t_cover }}" alt="" />
@@ -149,6 +153,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12" /><circle cx="6" cy="18" r="3" /><circle cx="16" cy="16" r="3" /></svg>
                   {% endif %}
                 </span>
+                {% endif %}
                 <span class="ap-track-text">
                   <span class="ap-track-title w-title t-base" data-setting="title">{{ block.settings.title }}</span>
                   {% if block.settings.artist != blank %}
