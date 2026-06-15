@@ -2707,7 +2707,7 @@ b {
       inset-block-start: calc(100% - 0.4rem);
       inset-inline-start: 0;
       min-width: 22rem;
-      background-color: var(--color-white);
+      background-color: var(--bg-primary);
       border: var(--border-width-thin) solid var(--border-color);
       border-radius: var(--radius-md);
       max-height: none;
@@ -2775,7 +2775,7 @@ b {
         inset-block-start: -0.8rem;
         inset-inline-start: calc(100% - 0.4rem);
         min-width: 22rem;
-        background-color: var(--color-white);
+        background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
         border-radius: var(--radius-md);
         padding-block: var(--space-xs);
