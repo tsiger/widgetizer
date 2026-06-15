@@ -5,14 +5,19 @@ import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../q
 import usePageStore from "../../stores/pageStore";
 import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
-import { getPreviewRenderBase } from "../../lib/previewBase";
+import { getPreviewRenderBase, getPreviewTargetOrigin } from "../../lib/previewBase";
 import SelectionOverlay from "./SelectionOverlay";
 
 // Build the preview URL from a token. The base defaults to today's behaviour
 // (VITE_API_URL || "") but a nested host overrides it via setPreviewRenderBase()
 // so the iframe loads from a proxied, same-origin path.
 function buildPreviewUrl(token) {
-  return `${getPreviewRenderBase()}/render/${token}`;
+  // Pass the editor's origin to the preview runtime so it can verify inbound
+  // control messages and target its replies — the no-referrer policy strips
+  // document.referrer, so the URL is the only channel for it.
+  const url = `${getPreviewRenderBase()}/render/${token}`;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}parentOrigin=${encodeURIComponent(window.location.origin)}`;
 }
 
 /**
@@ -244,7 +249,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         if (iframeRef.current?.contentWindow) {
           iframeRef.current.contentWindow.postMessage(
             { type: "RESTORE_SCROLL", payload: { scrollY: pending.scrollY } },
-            "*",
+            getPreviewTargetOrigin(),
           );
         }
 
@@ -275,7 +280,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
     iframeRef.current.contentWindow.postMessage(
       { type: "SET_WIDGET_METADATA", payload: { metadata, widgetOrder } },
-      "*",
+      getPreviewTargetOrigin(),
     );
   }, [page, globalWidgets, schemas, tTheme, initialLoadComplete, previewReadyKey]);
 
@@ -403,7 +408,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           iframeRef.current.contentWindow.postMessage(
             { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId, changes, fieldTypes } },
-            "*",
+            getPreviewTargetOrigin(),
           );
         }
       });
@@ -453,7 +458,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
 
           iframeRef.current.contentWindow.postMessage(
             { type: "UPDATE_WIDGET_SETTINGS", payload: { widgetId: globalWidgetKey, changes, fieldTypes } },
-            "*",
+            getPreviewTargetOrigin(),
           );
         }
       });
@@ -473,7 +478,7 @@ const PreviewPanel = forwardRef(function PreviewPanel(
         }
         iframeRef.current.contentWindow.postMessage(
           { type: "UPDATE_BODY_CLASS", payload: { className: "transparent-header", enabled: shouldBeTransparent } },
-          "*",
+          getPreviewTargetOrigin(),
         );
       }
     }

@@ -21,6 +21,21 @@ export function getPreviewRenderBase() {
   return _previewRenderBase;
 }
 
+// The concrete origin the inline preview iframe runs on, derived from the render
+// base. Editor→preview postMessage targets this instead of "*", so a message
+// can't be delivered to an unexpected origin if the iframe ever navigates away.
+// A relative/empty base (same-origin prod + OSS standalone) resolves to this
+// window's origin; an absolute base (split dev via VITE_API_URL) to that origin.
+// Falls back to "*" only if the base can't be parsed, so a misconfig can never
+// silence the bridge.
+export function getPreviewTargetOrigin() {
+  try {
+    return new URL(_previewRenderBase || "", window.location.href).origin;
+  } catch {
+    return "*";
+  }
+}
+
 // Builds the URL the top-bar "Preview" button opens (in a new tab) for a given
 // page id. The OSS shell serves the standalone preview app at /preview/:pageId,
 // which is the default. An embedding host mounts that surface elsewhere (hosted

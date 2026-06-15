@@ -10,8 +10,17 @@ and cross-origin contentDocument access issues.
 
 // ── PostMessage ─────────────────────────────────────────────────────────────
 
+// The editor frames this runtime and passes its own origin on the iframe URL
+// (?parentOrigin=…). We can't read it from document.referrer because the editor
+// sends `Referrer-Policy: no-referrer`. We use it to (a) target replies to the
+// editor instead of "*", and (b) reject control messages — notably the
+// script/HTML-injecting UPDATE_CUSTOM_SCRIPTS / MORPH_WIDGET — from any other
+// window. Empty when absent (legacy/standalone load): we then fall back to
+// today's permissive behaviour so the preview never silently goes deaf.
+const PARENT_ORIGIN = new URLSearchParams(window.location.search).get("parentOrigin") || "";
+
 function postToParent(data) {
-  window.parent.postMessage(data, "*");
+  window.parent.postMessage(data, PARENT_ORIGIN || "*");
 }
 
 // ── Preview Mode ────────────────────────────────────────────────────────────
@@ -824,6 +833,12 @@ function setupOverlayClickHandler() {
 // ── Message Handler ─────────────────────────────────────────────────────────
 
 function handleMessage(event) {
+  // Only obey commands from the editor that framed us. Without this, any window
+  // able to reach this iframe could post UPDATE_CUSTOM_SCRIPTS / MORPH_WIDGET and
+  // run code/inject HTML in the preview's origin. Enforced only when the editor
+  // told us its origin (see PARENT_ORIGIN); absent → permissive fallback.
+  if (PARENT_ORIGIN && event.origin !== PARENT_ORIGIN) return;
+
   const { type, payload } = event.data;
 
   switch (type) {

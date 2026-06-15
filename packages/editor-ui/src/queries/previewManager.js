@@ -2,6 +2,7 @@ import { editorFetch, editorFetchJson, rethrowQueryError, throwApiError } from "
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import fontDefinitions from "@widgetizer/core/config/fonts.json" with { type: "json" };
+import { getPreviewTargetOrigin } from "../lib/previewBase";
 
 const ALL_FONTS_LIST = [...fontDefinitions.system, ...fontDefinitions.google];
 
@@ -202,7 +203,7 @@ export async function updatePreview(iframe, newState, oldState) {
     if (widgetData) {
       try {
         const renderedHtml = await fetchRenderedWidget(widgetId, widgetData, newThemeSettings);
-        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, "*");
+        iframe.contentWindow.postMessage({ type: "MORPH_WIDGET", payload: { widgetId, html: renderedHtml } }, getPreviewTargetOrigin());
       } catch (error) {
         console.error(`Error updating widget ${widgetId}:`, error);
       }
@@ -215,7 +216,7 @@ export async function updatePreview(iframe, newState, oldState) {
       const renderedHtml = await fetchRenderedWidget("header", newGlobalWidgets.header, newThemeSettings);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "header", html: renderedHtml } },
-        "*",
+        getPreviewTargetOrigin(),
       );
     } catch (error) {
       console.error("Error updating header:", error);
@@ -239,7 +240,7 @@ export async function updatePreview(iframe, newState, oldState) {
 
     iframe.contentWindow.postMessage(
       { type: "UPDATE_BODY_CLASS", payload: { className: "transparent-header", enabled: shouldBeTransparent } },
-      "*",
+      getPreviewTargetOrigin(),
     );
   }
   if ((footerChanged || themeSettingsChanged) && newGlobalWidgets.footer) {
@@ -247,7 +248,7 @@ export async function updatePreview(iframe, newState, oldState) {
       const renderedHtml = await fetchRenderedWidget("footer", newGlobalWidgets.footer, newThemeSettings);
       iframe.contentWindow.postMessage(
         { type: "MORPH_WIDGET", payload: { widgetId: "footer", html: renderedHtml } },
-        "*",
+        getPreviewTargetOrigin(),
       );
     } catch (error) {
       console.error("Error updating footer:", error);
@@ -332,26 +333,26 @@ function updateThemeSettings(iframe, settings) {
   const variables = settingsToCssVariables(settings);
   const fontsMetadata = extractFonts(settings);
 
-  iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, "*");
+  iframe.contentWindow.postMessage({ type: "UPDATE_CSS_VARIABLES", payload: variables }, getPreviewTargetOrigin());
 
   if (Object.keys(fontsMetadata).length > 0) {
     const fontsPayload = Object.fromEntries(
       Object.entries(fontsMetadata).map(([name, weightsSet]) => [name, Array.from(weightsSet)]),
     );
-    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, "*");
+    iframe.contentWindow.postMessage({ type: "LOAD_FONTS", payload: fontsPayload }, getPreviewTargetOrigin());
   }
 
   const styleClasses = extractStyleClasses(settings);
   if (Object.keys(styleClasses).length > 0) {
-    iframe.contentWindow.postMessage({ type: "UPDATE_STYLE_CLASSES", payload: styleClasses }, "*");
+    iframe.contentWindow.postMessage({ type: "UPDATE_STYLE_CLASSES", payload: styleClasses }, getPreviewTargetOrigin());
   }
 
   // Debounce custom code (CSS / scripts) to avoid excessive re-execution
   clearTimeout(customCodeTimer);
   customCodeTimer = setTimeout(() => {
     const { css, scripts } = extractCustomCode(settings);
-    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_CSS", payload: css }, "*");
-    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_SCRIPTS", payload: scripts }, "*");
+    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_CSS", payload: css }, getPreviewTargetOrigin());
+    iframe.contentWindow?.postMessage({ type: "UPDATE_CUSTOM_SCRIPTS", payload: scripts }, getPreviewTargetOrigin());
   }, 300);
 }
 
@@ -491,5 +492,5 @@ export function scrollElementIntoView(iframe, widgetId, blockId = null) {
     return;
   }
 
-  iframe.contentWindow.postMessage({ type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } }, "*");
+  iframe.contentWindow.postMessage({ type: "SCROLL_TO_ELEMENT", payload: { widgetId, blockId } }, getPreviewTargetOrigin());
 }
