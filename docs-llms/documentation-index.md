@@ -467,6 +467,10 @@ Design notes for making collection item-page layouts user-composable in the page
 
 Exploration notes for exposing Widgetizer functionality over MCP.
 
+### **[future-copy-paste-widget.md](future-copy-paste-widget.md)** - Widget Copy/Paste (planned)
+
+Feasibility + plan for copy/paste of widgets in the editor (same and across pages). Low effort — reuses the existing duplicate path; verdict and key files recorded.
+
 ### **[mvp-oss-form-widget.md](mvp-oss-form-widget.md)** - Hosted Forms / Core Form Widget
 
 Plan and decisions for the `core-form` widget and the export-time `widgetizer.forms.json` manifest.
