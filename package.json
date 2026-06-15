@@ -73,7 +73,7 @@
     "html-validate": "^10.7.0",
     "i18next": "^25.6.3",
     "isomorphic-dompurify": "^2.25.0",
-    "liquidjs": "^10.25.2",
+    "liquidjs": "^10.26.0",
     "lucide-react": "^0.563.0",
     "multer": "^2.1.1",
     "prettier": "^3.5.3",
