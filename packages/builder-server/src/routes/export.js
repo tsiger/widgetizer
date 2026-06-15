@@ -75,8 +75,16 @@ router.get("/view/:exportDir/*filePath", (req, res) => {
 // cross-tenant read of the GLOBAL publish dir in any multi-tenant mount.
 function exportDirBelongsToScope(req, exportDir) {
   const folderName = req.scope?.folderName;
-  if (!folderName) return false;
-  return exportDir === folderName || exportDir.startsWith(`${folderName}-v`);
+  if (!folderName || typeof exportDir !== "string") return false;
+  // Reject any path separator or parent-segment token first: exportDir must be a
+  // single directory name. Without this, "<folder>-v1/../<otherTenant>-v1" would
+  // pass the prefix check and path.join would normalize it back INTO the publish
+  // dir (inside isWithinDirectory's bound), reaching a sibling tenant's export.
+  if (exportDir.includes("/") || exportDir.includes("\\") || exportDir.includes("..")) return false;
+  if (exportDir === folderName) return true;
+  // Anchored suffix: exactly `<folderName>-v<digits>` (the exportProject naming).
+  const prefix = `${folderName}-v`;
+  return exportDir.startsWith(prefix) && /^\d+$/.test(exportDir.slice(prefix.length));
 }
 
 function serveExportFile(req, res) {

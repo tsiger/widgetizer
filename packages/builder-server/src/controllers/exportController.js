@@ -737,6 +737,21 @@ async function findEntryFile(exportDir) {
   }
 }
 
+// TI-02/SA-13: an export dir belongs to the actor only when it is the active
+// project's own bundle. Reject any separator / parent-segment token first (a
+// "<folder>-v1/../<otherTenant>-v1" would otherwise pass a bare prefix check and
+// path.join would normalize it back INTO the publish dir, inside isWithinDirectory's
+// bound), then anchor to `<folderName>-v<digits>` (the exportProject naming).
+// Byte-neutral for OSS: the single active project's own request always matches.
+function exportDirBelongsToScope(req, exportDir) {
+  const folderName = req.scope?.folderName;
+  if (!folderName || typeof exportDir !== "string") return false;
+  if (exportDir.includes("/") || exportDir.includes("\\") || exportDir.includes("..")) return false;
+  if (exportDir === folderName) return true;
+  const prefix = `${folderName}-v`;
+  return exportDir.startsWith(prefix) && /^\d+$/.test(exportDir.slice(prefix.length));
+}
+
 /**
  * Retrieves information about an export directory, including the entry file.
  * @param {import('express').Request} req - Express request object with exportDir in params
@@ -750,11 +765,8 @@ export async function getExportFiles(req, res) {
     if (!exportDir) {
       return res.status(400).json({ error: "Export directory is required" });
     }
-    // TI-02/SA-13: bind to the owner-resolved scope (mirrors routes/export.js) so
-    // a caller cannot read a sibling tenant's bundle from the global publish dir.
-    // Byte-neutral for OSS: legit export dirs are `<folderName>` / `<folderName>-v<n>`.
-    const scopeFolderName = req.scope?.folderName;
-    if (!scopeFolderName || !(exportDir === scopeFolderName || exportDir.startsWith(`${scopeFolderName}-v`))) {
+    // TI-02/SA-13: bind to the owner-resolved scope (see exportDirBelongsToScope).
+    if (!exportDirBelongsToScope(req, exportDir)) {
       return res.status(404).json({ error: "Export directory not found" });
     }
 
@@ -801,11 +813,8 @@ export async function downloadExport(req, res) {
     if (!exportDir) {
       return res.status(400).json({ error: "Export directory is required" });
     }
-    // TI-02/SA-13: bind to the owner-resolved scope (mirrors routes/export.js) so
-    // a caller cannot read a sibling tenant's bundle from the global publish dir.
-    // Byte-neutral for OSS: legit export dirs are `<folderName>` / `<folderName>-v<n>`.
-    const scopeFolderName = req.scope?.folderName;
-    if (!scopeFolderName || !(exportDir === scopeFolderName || exportDir.startsWith(`${scopeFolderName}-v`))) {
+    // TI-02/SA-13: bind to the owner-resolved scope (see exportDirBelongsToScope).
+    if (!exportDirBelongsToScope(req, exportDir)) {
       return res.status(404).json({ error: "Export directory not found" });
     }
 
