@@ -105,7 +105,9 @@ function mockReq({ params = {}, body = {}, file = null, scope } = {}) {
     // exportProject/getExportHistory/deleteExport read the active project from
     // req.scope (set by resolveActiveProject in real routes); derive it from
     // params here so these direct-controller tests exercise the same path.
-    scope: scope ?? { projectId: params.projectId },
+    // folderName mirrors what resolveActiveProject sets — the export serve/
+    // download handlers now bind exportDir to it (TI-02/SA-13).
+    scope: scope ?? { projectId: params.projectId, folderName: PROJECT_FOLDER },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -147,8 +149,8 @@ function mockRes() {
   return res;
 }
 
-async function callController(fn, { params, body, file } = {}) {
-  const req = mockReq({ params, body, file });
+async function callController(fn, { params, body, file, scope } = {}) {
+  const req = mockReq({ params, body, file, scope });
   const res = mockRes();
   await fn(req, res);
   return res;
@@ -997,6 +999,7 @@ describe("getExportFiles", () => {
   it("returns index.html as entry file when it exists", async () => {
     const res = await callController(getExportFiles, {
       params: { exportDir: testExportDir },
+      scope: { projectId: PROJECT_ID, folderName: testExportDir },
     });
     assert.equal(res._status, 200);
     assert.ok(res._json.success);
@@ -1037,6 +1040,7 @@ describe("getExportFiles", () => {
 
     const res = await callController(getExportFiles, {
       params: { exportDir: noIndexDir },
+      scope: { projectId: PROJECT_ID, folderName: noIndexDir },
     });
     assert.equal(res._json.entryFile, "home.html");
 
@@ -1052,6 +1056,7 @@ describe("getExportFiles", () => {
 
     const res = await callController(getExportFiles, {
       params: { exportDir: noSpecialDir },
+      scope: { projectId: PROJECT_ID, folderName: noSpecialDir },
     });
     assert.ok(res._json.entryFile.endsWith(".html"), "Should return some HTML file");
 
@@ -1080,7 +1085,10 @@ describe("downloadExport", () => {
   });
 
   it("sets correct ZIP response headers", async () => {
-    const req = mockReq({ params: { exportDir: testExportDir } });
+    const req = mockReq({
+      params: { exportDir: testExportDir },
+      scope: { projectId: PROJECT_ID, folderName: testExportDir },
+    });
     const res = mockRes();
 
     // downloadExport pipes to res as a stream — we need a writable mock

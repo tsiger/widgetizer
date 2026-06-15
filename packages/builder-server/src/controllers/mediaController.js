@@ -452,6 +452,16 @@ export async function updateMediaMetadata(req, res) {
   try {
 
     const { projectId, fileId } = req.params;
+    // TI-03: bind the inner :projectId to the owner-resolved scope. This route is
+    // path-in-path (.../media/projects/:projectId/media/:fileId/metadata); the
+    // router-level resolveActiveProject owner-checks the OUTER/stashed id before
+    // the inner :projectId binds, so without this a caller could target another
+    // tenant's project id in the leaf and overwrite their media metadata. OSS
+    // standalone is byte-neutral: its single active project's id always equals
+    // req.params.projectId, so the guard never fires for legitimate edits.
+    if (req.scope && projectId !== req.scope.projectId) {
+      return res.status(403).json({ error: "Project mismatch" });
+    }
     const alt = stripHtmlTags(req.body.alt);
     const title = stripHtmlTags(req.body.title);
     // Validate project ownership

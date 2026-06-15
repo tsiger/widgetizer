@@ -750,6 +750,13 @@ export async function getExportFiles(req, res) {
     if (!exportDir) {
       return res.status(400).json({ error: "Export directory is required" });
     }
+    // TI-02/SA-13: bind to the owner-resolved scope (mirrors routes/export.js) so
+    // a caller cannot read a sibling tenant's bundle from the global publish dir.
+    // Byte-neutral for OSS: legit export dirs are `<folderName>` / `<folderName>-v<n>`.
+    const scopeFolderName = req.scope?.folderName;
+    if (!scopeFolderName || !(exportDir === scopeFolderName || exportDir.startsWith(`${scopeFolderName}-v`))) {
+      return res.status(404).json({ error: "Export directory not found" });
+    }
 
     const userPublishDir = getPublishDir();
     const fullPath = path.join(userPublishDir, exportDir);
@@ -793,6 +800,13 @@ export async function downloadExport(req, res) {
 
     if (!exportDir) {
       return res.status(400).json({ error: "Export directory is required" });
+    }
+    // TI-02/SA-13: bind to the owner-resolved scope (mirrors routes/export.js) so
+    // a caller cannot read a sibling tenant's bundle from the global publish dir.
+    // Byte-neutral for OSS: legit export dirs are `<folderName>` / `<folderName>-v<n>`.
+    const scopeFolderName = req.scope?.folderName;
+    if (!scopeFolderName || !(exportDir === scopeFolderName || exportDir.startsWith(`${scopeFolderName}-v`))) {
+      return res.status(404).json({ error: "Export directory not found" });
     }
 
     const userPublishDir = getPublishDir();
