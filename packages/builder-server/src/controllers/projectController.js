@@ -550,26 +550,21 @@ export async function getProjectWidgets(req, res) {
  */
 export async function getProjectIcons(req, res) {
   try {
-    const { projectId } = req.scope;
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const project = projectRepo.getProjectById(projectId);
-    if (!project) {
-      return res.status(404).json({ error: "Project not found" });
+    // Read the icon set through the storage adapter so the project directory is
+    // resolved scope-aware: OSS reads DATA_DIR/projects/<folder>/assets/icons.json
+    // (unchanged), while hosted reads the per-user project dir. The previous
+    // getProjectDir() built the OSS global path, which doesn't exist under
+    // hosted's per-user storage — so the icon picker came up empty there.
+    const content = await storage.read(scope, "assets/icons.json");
+    if (content == null) {
+      // No icon set for this project — return the empty structure.
+      return res.json({ icons: {} });
     }
-
-    const projectFolderName = project.folderName;
-    const projectRootDir = getProjectDir(projectFolderName);
-    const iconsPath = path.join(projectRootDir, "assets", "icons.json");
-
-    if (await fs.pathExists(iconsPath)) {
-      const content = await fs.readFile(iconsPath, "utf8");
-      const iconsData = JSON.parse(content);
-      // Return the full icons object (including prefix and icons map)
-      res.json(iconsData);
-    } else {
-      // Return empty structure if no icons file exists
-      res.json({ icons: {} });
-    }
+    // Full icons object (prefix + icons map).
+    res.json(JSON.parse(content.toString("utf8")));
   } catch (error) {
     console.error("Error getting project icons:", error);
     res.status(500).json({ error: "Failed to get project icons" });
