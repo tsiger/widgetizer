@@ -1,7 +1,31 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import DOMPurify from "dompurify";
 import useProjectStore from "../../../stores/projectStore";
 import useIconsStore from "../../../stores/iconsStore";
 import { Search } from "lucide-react";
+
+// An icon's `body` is raw SVG markup read verbatim from the project's
+// assets/icons.json, which is tenant-authored (notably via project ZIP import,
+// which copies icons.json without content validation). Injecting it with
+// dangerouslySetInnerHTML in the editor origin would allow stored XSS, so we
+// sanitize with the SVG profile first — mirroring the SVG-upload sanitization
+// in useMediaUpload.js. (Published sites render icons via Liquid `| raw` by
+// design; that is the tenant's own cross-origin site, not the editor origin.)
+function sanitizeIconBody(body) {
+  // `body` is an SVG *inner fragment* (no <svg> root — the <svg> element below
+  // supplies it). DOMPurify's svg profile parses its input as a standalone
+  // document, so a bare <path>/<g> fragment sanitized on its own is dropped
+  // entirely (blank icon). Wrap it in an <svg> so the children parse in SVG
+  // context, then return the cleaned inner markup — this preserves legitimate
+  // icon shapes while stripping <script>, event handlers, and smuggled HTML
+  // (e.g. `</svg><img onerror=…>`).
+  const sanitized = DOMPurify.sanitize(`<svg>${body || ""}</svg>`, {
+    USE_PROFILES: { svg: true, svgFilters: true },
+    RETURN_DOM: true,
+  });
+  const svg = sanitized.querySelector("svg");
+  return svg ? svg.innerHTML : "";
+}
 
 /**
  * IconInput Component
@@ -230,7 +254,7 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
               strokeLinecap="round"
               strokeLinejoin="round"
               className="w-5 h-5 text-slate-600"
-              dangerouslySetInnerHTML={{ __html: selectedIcon.body }}
+              dangerouslySetInnerHTML={{ __html: sanitizeIconBody(selectedIcon.body) }}
             />
           ) : (
             <span className="text-[10px] uppercase tracking-wide text-slate-400">None</span>
@@ -339,7 +363,7 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 className={`w-6 h-6 ${isSelected ? "text-pink-600" : "text-slate-600"}`}
-                                dangerouslySetInnerHTML={{ __html: icon.body }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeIconBody(icon.body) }}
                               />
                             </button>
                           );
