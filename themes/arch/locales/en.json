@@ -275,6 +275,9 @@
             "highlight_secondary": "Highlight Secondary"
           }
         },
+        "content_color_scheme": {
+          "label": "Content color scheme"
+        },
         "top_spacing": {
           "label": "Top spacing",
           "options": {
