@@ -444,3 +444,14 @@
   font-size: 0.875rem;
   resize: none;
 }
+
+/* === Page editor right sidebar only (.page-editor-settings) ===
+   Smaller inline body text + tighter Expand button. The expanded modal and the
+   Theme Settings page / collection editor keep their defaults. */
+.page-editor-settings .richtext-editor:not(.richtext-editor-expanded) .tiptap {
+  font-size: 0.75rem;
+}
+
+.page-editor-settings .richtext-expand-button {
+  margin-top: 0.25rem;
+}

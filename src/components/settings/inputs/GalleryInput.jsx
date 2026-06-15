@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -61,7 +61,7 @@ function signature(entries) {
   return JSON.stringify(Array.isArray(entries) ? entries : []);
 }
 
-function GalleryRow({ row, inputId, onSrcChange, onRemove }) {
+function GalleryRow({ row, inputId, onSrcChange, onRemove, compact }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: row.uid,
   });
@@ -74,6 +74,32 @@ function GalleryRow({ row, inputId, onSrcChange, onRemove }) {
     zIndex: isDragging ? 50 : 1,
   };
 
+  // Narrow right sidebar: a vertical card — drag handle + remove on a compact top
+  // bar, full-width preview below. The horizontal row (thumbnail + controls beside
+  // it) doesn't fit the ~200px panel.
+  if (compact) {
+    return (
+      <div ref={setNodeRef} style={style} className="p-2 bg-slate-50 border border-slate-200 rounded-md">
+        <div className="mb-2 flex items-center justify-between">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab flex items-center text-slate-400 hover:text-slate-600"
+            aria-label="Reorder image"
+          >
+            <GripVertical size={16} />
+          </div>
+          <IconButton type="button" variant="danger" size="sm" onClick={onRemove} title="Remove image">
+            <Trash2 size={16} />
+          </IconButton>
+        </div>
+
+        <ImageInput id={inputId} value={row.src} onChange={onSrcChange} layout="stacked" />
+      </div>
+    );
+  }
+
+  // Wider hosts (theme Settings page, collection editor): the original horizontal row.
   return (
     <div
       ref={setNodeRef}
@@ -116,6 +142,15 @@ export default function GalleryInput({ id, value, onChange }) {
   // signature, which can't tell our echo from a reset to identical content.
   const echoExpected = useRef(false);
 
+  // Compact (vertical-card) layout only inside the page-editor right sidebar.
+  // Wider hosts (theme Settings page, collection editor) keep the horizontal row.
+  const rootRef = useRef(null);
+  const [compact, setCompact] = useState(false);
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCompact(!!rootRef.current?.closest(".page-editor-settings"));
+  }, []);
+
   useEffect(() => {
     if (!mounted.current) {
       mounted.current = true; // initial rows already derived from value
@@ -157,7 +192,7 @@ export default function GalleryInput({ id, value, onChange }) {
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div ref={rootRef} className="flex flex-col gap-3">
       {rows.length > 0 && (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={rows.map((r) => r.uid)} strategy={verticalListSortingStrategy}>
@@ -169,6 +204,7 @@ export default function GalleryInput({ id, value, onChange }) {
                   inputId={`${id}-${row.uid}`}
                   onSrcChange={(src) => setSrc(row.uid, src)}
                   onRemove={() => removeRow(row.uid)}
+                  compact={compact}
                 />
               ))}
             </div>
@@ -176,7 +212,7 @@ export default function GalleryInput({ id, value, onChange }) {
         </DndContext>
       )}
 
-      <Button type="button" variant="secondary" size="sm" onClick={handleAdd} className="self-start">
+      <Button type="button" variant="secondary" size="sm" onClick={handleAdd} className="self-start settings-action-btn">
         <Plus size={16} className="mr-1" />
         Add image
       </Button>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Play, ExternalLink, Settings, Check, X, AlertCircle } from "lucide-react";
 import { validateYouTubeUrl, createYouTubeEmbed } from "../../../utils/youtubeHelpers";
 
@@ -75,14 +75,28 @@ export default function YouTubeInput({ id, label, description, value = null, onC
     [embedData?.options, defaultOptions, onChange],
   );
 
-  // Handle URL input change with debouncing
+  // Keep the latest processor in a ref so the debounce effect below doesn't depend
+  // on processUrl's identity. `onChange` (from SettingsPanel) isn't memoized, so
+  // processUrl is recreated every render; depending on it re-armed the debounce on
+  // every render and re-emitted onChange, permanently re-marking the widget
+  // modified (the "unsaved changes after save" bug).
+  const processUrlRef = useRef(processUrl);
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      processUrl(url);
-    }, 500);
+    processUrlRef.current = processUrl;
+  }, [processUrl]);
 
+  // Re-process only when the user actually edits the URL field — skip the mount
+  // run, where `url` is just the initial value already reflected in state. Emitting
+  // onChange there wrote the value back and marked the widget modified for nothing.
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    const timeoutId = setTimeout(() => processUrlRef.current(url), 500);
     return () => clearTimeout(timeoutId);
-  }, [url, processUrl]);
+  }, [url]);
 
   // Update embed options
   const updateOptions = useCallback(

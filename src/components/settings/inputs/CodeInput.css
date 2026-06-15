@@ -284,3 +284,12 @@
   min-height: 20rem;
   max-height: none;
 }
+
+/* === Page editor right sidebar only (.page-editor-settings) ===
+   Smaller code text in the inline editor (not the expanded modal). Both the
+   textarea and the highlight <pre> must match so the cursor stays aligned. The
+   Theme Settings page / collection editor keep their defaults. */
+.page-editor-settings .code-input-container:not(.code-input-container-expanded) .code-textarea,
+.page-editor-settings .code-input-container:not(.code-input-container-expanded) .code-pre {
+  font-size: 12px !important;
+}

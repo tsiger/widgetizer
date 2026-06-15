@@ -233,7 +233,7 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
       onClick={handleOpenMediaSelector}
       disabled={uploading}
       variant="secondary"
-      className="w-full"
+      className="w-full settings-action-btn"
       type="button"
     >
       {t("components.mediaSelector.browseLibrary")}

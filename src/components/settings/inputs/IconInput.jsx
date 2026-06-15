@@ -325,7 +325,7 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
                               onClick={() => handleIconClick(icon.name)}
                               title={icon.name}
                               className={`
-                                flex items-center justify-center rounded-md border transition-all
+                                icon-grid-button flex items-center justify-center rounded-md border transition-all
                                 hover:bg-slate-50 hover:border-slate-400
                                 ${isSelected ? "bg-pink-50 border-pink-500 ring-1 ring-pink-500" : "border-slate-100"}
                               `}
