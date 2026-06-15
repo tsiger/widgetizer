@@ -86,4 +86,16 @@ export const LIMIT_KEYS = Object.freeze({
   CUSTOM_DOMAIN_ALLOWED: "CUSTOM_DOMAIN_ALLOWED",
   ANALYTICS_TIER: "ANALYTICS_TIER",
   FORM_SUBMISSIONS_PER_MONTH: "FORM_SUBMISSIONS_PER_MONTH",
+  // Per-page widget count ceiling — guards the render/save loops against an
+  // attacker persisting tens of thousands of widgets in one page (SA-04).
+  MAX_WIDGETS_PER_PAGE: "MAX_WIDGETS_PER_PAGE",
 });
+
+/**
+ * Default DoS-protection ceiling for widgets per page (security-audit SA-04).
+ * The hosted limits adapter returns this for LIMIT_KEYS.MAX_WIDGETS_PER_PAGE;
+ * OSS stays unbounded (Infinity). It also serves as the hard clamp the render
+ * loops apply as a safety net against already-persisted oversized pages. Set far
+ * above any realistic page (real pages have tens of widgets).
+ */
+export const MAX_WIDGETS_PER_PAGE = 5000;

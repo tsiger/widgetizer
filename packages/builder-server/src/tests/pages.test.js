@@ -656,6 +656,56 @@ describe("savePageContent", () => {
     assert.equal(res._status, 400);
     assert.match(res._json.error, /missing required/i);
   });
+
+  // SA-04: the widget-count ceiling comes from the limits adapter. Inject a tiny
+  // cap so we can exercise the boundary without persisting thousands of widgets.
+  function makeWidgets(n) {
+    const widgets = {};
+    const widgetsOrder = [];
+    for (let i = 0; i < n; i++) {
+      widgets[`w${i}`] = { type: "text", settings: {} };
+      widgetsOrder.push(`w${i}`);
+    }
+    return { widgets, widgetsOrder };
+  }
+
+  it("rejects a page whose widget count exceeds the adapter limit (SA-04)", async () => {
+    const page = await createTestPage("Too Many Widgets");
+    const req = mockReq({
+      params: { id: page.slug },
+      body: { name: "Too Many Widgets", slug: page.slug, ...makeWidgets(4) },
+    });
+    req.adapters.limits = { getLimit: async () => 3 }; // cap below the 4 widgets
+    const res = mockRes();
+    await savePageContent(req, res);
+    assert.equal(res._status, 422);
+    assert.match(res._json.error, /too many widgets/i);
+  });
+
+  it("allows a page exactly at the widget cap (SA-04)", async () => {
+    const page = await createTestPage("At Cap");
+    const req = mockReq({
+      params: { id: page.slug },
+      body: { name: "At Cap", slug: page.slug, ...makeWidgets(3) },
+    });
+    req.adapters.limits = { getLimit: async () => 3 };
+    const res = mockRes();
+    await savePageContent(req, res);
+    assert.equal(res._status, 200);
+    assert.equal(res._json.success, true);
+  });
+
+  it("stays unbounded when the adapter reports Infinity (OSS) (SA-04)", async () => {
+    const page = await createTestPage("Unbounded");
+    const req = mockReq({
+      params: { id: page.slug },
+      body: { name: "Unbounded", slug: page.slug, ...makeWidgets(50) },
+    });
+    req.adapters.limits = { getLimit: async () => Infinity };
+    const res = mockRes();
+    await savePageContent(req, res);
+    assert.equal(res._status, 200);
+  });
 });
 
 // ---------------------------------------------------------------------------

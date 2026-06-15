@@ -5,6 +5,7 @@ import path from "path";
 import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
 import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 
@@ -526,6 +527,24 @@ export async function savePageContent(req, res) {
     // Validate essential data
     if (!pageData.slug || !pageData.name || !pageData.widgets) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
+    }
+
+    // SA-04: cap the per-page widget count before persisting. Without this an
+    // authenticated owner could store tens of thousands of widgets in one page,
+    // which then re-renders on every publish/preview (unbounded CPU/work). The
+    // ceiling comes from the limits adapter (hosted: a platform constant; OSS:
+    // Infinity → unbounded). Count the larger of the order array and the widget
+    // map so an oversized map without a matching order is still rejected.
+    const widgetCount = Math.max(
+      Array.isArray(pageData.widgetsOrder) ? pageData.widgetsOrder.length : 0,
+      pageData.widgets && typeof pageData.widgets === "object" ? Object.keys(pageData.widgets).length : 0,
+    );
+    const widgetCap = await req.adapters?.limits?.getLimit?.(req.scope, LIMIT_KEYS.MAX_WIDGETS_PER_PAGE);
+    const maxWidgets = typeof widgetCap === "number" && widgetCap > 0 ? widgetCap : MAX_WIDGETS_PER_PAGE;
+    if (Number.isFinite(maxWidgets) && widgetCount > maxWidgets) {
+      return res
+        .status(422)
+        .json({ error: `Too many widgets on this page (${widgetCount}); the maximum is ${maxWidgets}.` });
     }
 
     // Read existing data to preserve timestamps etc.
