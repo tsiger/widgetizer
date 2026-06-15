@@ -8,7 +8,7 @@ import useFormatDate from "../../hooks/useFormatDate";
 import Table from "../ui/Table";
 import Badge from "../ui/Badge";
 import { Loader2, ExternalLink, Trash2, Calendar, Download, Package, MoreVertical } from "lucide-react";
-import { API_URL } from "../../lib/config";
+import { getApiBase } from "../../lib/apiBase";
 
 export default function ExportHistoryTable({
   exportHistory,
@@ -67,13 +67,13 @@ export default function ExportHistoryTable({
       const result = await getExportEntryFile(exportPath);
       const entryFile = result.entryFile || "index.html";
 
-      const viewUrl = API_URL(`/api/export/view/${exportPath}/${entryFile}`);
+      const viewUrl = `${getApiBase()}/export/view/${exportPath}/${entryFile}`;
       window.open(viewUrl, "_blank");
     } catch (error) {
       console.error("Error getting entry file:", error);
       // Fallback to index.html - handle both Windows and Unix paths
       const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
-      const viewUrl = API_URL(`/api/export/view/${exportPath}/index.html`);
+      const viewUrl = `${getApiBase()}/export/view/${exportPath}/index.html`;
       window.open(viewUrl, "_blank");
     }
   };

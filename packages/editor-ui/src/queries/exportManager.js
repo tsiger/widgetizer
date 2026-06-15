@@ -1,5 +1,5 @@
-import { API_URL } from "../lib/config";
-import { apiFetchJson, editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
+import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
+import { getApiBase } from "../lib/apiBase";
 
 /**
  * @typedef {Object} ExportResult
@@ -110,7 +110,7 @@ export async function getExportEntryFile(exportDir) {
   }
 
   try {
-    return await apiFetchJson(`/api/export/files/${exportDir}`, {
+    return await editorFetchJson(`/export/files/${exportDir}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export function downloadExportZip(exportDir) {
   }
 
   // Create a temporary link to trigger download
-  const downloadUrl = API_URL(`/api/export/download/${exportDir}`);
+  const downloadUrl = `${getApiBase()}/export/download/${exportDir}`;
   const link = document.createElement("a");
   link.href = downloadUrl;
   link.download = `${exportDir}.zip`;
