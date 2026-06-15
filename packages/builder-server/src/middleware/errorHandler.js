@@ -2,6 +2,12 @@
 
  
 const errorHandler = (err, req, res, _next) => {
+  // Multer's per-file size cap (SA-02): an upload part exceeded the limit
+  // mid-stream (before the whole file was buffered). Map to 413.
+  if (err?.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({ message: "File too large", code: "LIMIT_FILE_SIZE" });
+  }
+
   // Errors carrying a numeric statusCode (WidgetizerError from @widgetizer/core,
   // thrown by adapters/handlers) map directly to that status. Otherwise fall
   // back to any status already set on the response, else 500.

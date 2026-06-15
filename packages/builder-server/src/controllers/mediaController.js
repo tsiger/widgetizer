@@ -6,6 +6,7 @@ import sharp from "sharp";
 import slugify from "slugify";
 import DOMPurify from "isomorphic-dompurify";
 import { getThemeJsonPath } from "../config.js";
+import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
@@ -150,12 +151,39 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Initialize multer WITHOUT static limits
+// Base multer config (shared by uploadWithLimit). The per-file size cap is NOT
+// set here — it is applied per-request by uploadWithLimit from the limits adapter.
 export const upload = multer({
   storage,
   fileFilter,
-  // No 'limits' object here anymore
 });
+
+// Platform fallback when no limits adapter is wired (kept in sync with hosted's
+// CloudLimitsAdapter MAX_UPLOAD_SIZE_BYTES).
+const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+/**
+ * Per-request multer for the media upload route. Sources the per-file size cap
+ * from the injected limits adapter and enforces it as a streaming multer limit,
+ * so an oversize part is rejected BEFORE the whole file is buffered into memory
+ * (SA-02 — the old module-level upload had no fileSize limit and the size check
+ * ran only after buffering, enabling a heap-exhaustion DoS). resolveActiveProject
+ * runs first (router-level), so req.scope + req.adapters are present here.
+ * Byte-neutral for OSS: LocalLimitsAdapter returns the same configured max the
+ * post-buffer check already enforced — over-size files now fail fast (413).
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+export async function uploadWithLimit(req, res, next) {
+  try {
+    const cap = await req.adapters?.limits?.getLimit?.(req.scope, LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES);
+    const fileSize = Number.isFinite(cap) ? cap : DEFAULT_MAX_UPLOAD_BYTES;
+    multer({ storage, fileFilter, limits: { fileSize, files: 10 } }).array("files", 10)(req, res, next);
+  } catch (err) {
+    next(err);
+  }
+}
 
 /**
  * Retrieves all media files metadata for a project.

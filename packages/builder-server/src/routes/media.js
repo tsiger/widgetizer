@@ -7,7 +7,7 @@ import {
   uploadProjectMedia,
   deleteProjectMedia,
   serveProjectMedia,
-  upload,
+  uploadWithLimit,
   bulkDeleteProjectMedia,
   updateMediaMetadata,
   getMediaFileUsage,
@@ -28,8 +28,9 @@ router.use(resolveActiveProject);
 // Get all media for the active project
 router.get("/", getProjectMedia);
 
-// Upload media to the active project
-router.post("/", upload.array("files", 10), uploadProjectMedia);
+// Upload media to the active project (per-request multer with a fileSize cap
+// sourced from the limits adapter — SA-02).
+router.post("/", uploadWithLimit, uploadProjectMedia);
 
 // Bulk delete media files
 router.post("/bulk-delete", [body("fileIds").isArray({ min: 1 })], validateRequest, bulkDeleteProjectMedia);
