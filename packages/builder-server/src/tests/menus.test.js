@@ -550,6 +550,42 @@ describe("updateMenu", () => {
     assert.equal(res._status, 400);
     assert.match(res._json.error, /title.*required/i);
   });
+
+  // SA-20: bound attacker-controlled menu-item trees before the recursive walks.
+  function labelledItems(n) {
+    return Array.from({ length: n }, (_, i) => ({ label: `Item ${i}`, link: `/p${i}`, items: [] }));
+  }
+  function deepChain(depth) {
+    let node = { label: "leaf", link: "/x", items: [] };
+    for (let i = 0; i < depth - 1; i++) node = { label: `L${i}`, link: "/x", items: [node] };
+    return [node];
+  }
+  async function updateWithCap(body, cap) {
+    const req = mockReq({ params: { id: "original-name" }, body });
+    if (cap !== undefined) req.adapters.limits = { getLimit: async () => cap };
+    const res = mockRes();
+    await updateMenu(req, res);
+    return res;
+  }
+
+  it("rejects a menu with more items than the adapter limit (SA-20)", async () => {
+    const res = await updateWithCap({ name: "Original Name", items: labelledItems(5) }, 3);
+    assert.equal(res._status, 422);
+    assert.match(res._json.error, /too many items/i);
+  });
+
+  it("rejects a menu nested deeper than MAX_MENU_DEPTH (SA-20)", async () => {
+    // 40 > 32; node count (40) is under the default cap, so depth is what trips.
+    const res = await updateWithCap({ name: "Original Name", items: deepChain(40) }, 1000);
+    assert.equal(res._status, 422);
+    assert.match(res._json.error, /too deep/i);
+  });
+
+  it("allows a menu within both ceilings (SA-20)", async () => {
+    const res = await updateWithCap({ name: "Original Name", items: labelledItems(3) }, 10);
+    assert.equal(res._status, 200);
+    assert.equal(res._json.items.length, 3);
+  });
 });
 
 // ============================================================================

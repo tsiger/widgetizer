@@ -89,6 +89,9 @@ export const LIMIT_KEYS = Object.freeze({
   // Per-page widget count ceiling — guards the render/save loops against an
   // attacker persisting tens of thousands of widgets in one page (SA-04).
   MAX_WIDGETS_PER_PAGE: "MAX_WIDGETS_PER_PAGE",
+  // Total menu-item node count ceiling — guards the recursive menu sanitize/
+  // render walks against an attacker persisting a huge menu tree (SA-20).
+  MAX_MENU_ITEMS: "MAX_MENU_ITEMS",
 });
 
 /**
@@ -99,3 +102,19 @@ export const LIMIT_KEYS = Object.freeze({
  * above any realistic page (real pages have tens of widgets).
  */
 export const MAX_WIDGETS_PER_PAGE = 5000;
+
+/**
+ * Default DoS-protection ceiling for total menu-item nodes (security-audit
+ * SA-20). Hosted returns this for LIMIT_KEYS.MAX_MENU_ITEMS; OSS stays unbounded
+ * (Infinity). Far above any realistic menu (real menus have tens of items).
+ */
+export const MAX_MENU_ITEMS = 1000;
+
+/**
+ * Hard cap on menu-tree nesting depth (security-audit SA-20). Applied at both
+ * save (reject deeper trees) and render (the link-resolution walk stops here),
+ * so the recursive menu walks can never blow the stack on a hostile/legacy
+ * tree. Tier-independent — the nav template only renders three levels, so any
+ * realistic menu is far shallower than this.
+ */
+export const MAX_MENU_DEPTH = 32;

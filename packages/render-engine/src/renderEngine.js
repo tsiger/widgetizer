@@ -20,6 +20,7 @@ import {
   registerMediaMetaFilter,
   registerHandleizeFilter,
 } from "@widgetizer/core";
+import { MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 
 /**
  * @typedef {object} RenderDeps
@@ -211,8 +212,15 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid) {
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {Array} Menu items with resolved links
  */
-function resolveMenuItemLinks(menuItems, pagesByUuid) {
+function resolveMenuItemLinks(menuItems, pagesByUuid, depth = 1) {
   if (!menuItems || !Array.isArray(menuItems) || pagesByUuid.size === 0) {
+    return menuItems;
+  }
+
+  // SA-20: cap recursion depth so rendering a hostile/legacy menu tree (e.g.
+  // one persisted before the save-time depth guard existed) can never blow the
+  // call stack. Levels beyond the cap are returned unresolved rather than walked.
+  if (depth > MAX_MENU_DEPTH) {
     return menuItems;
   }
 
@@ -234,7 +242,7 @@ function resolveMenuItemLinks(menuItems, pagesByUuid) {
 
     // Recursively resolve children
     if (item.items && Array.isArray(item.items) && item.items.length > 0) {
-      resolved.items = resolveMenuItemLinks(item.items, pagesByUuid);
+      resolved.items = resolveMenuItemLinks(item.items, pagesByUuid, depth + 1);
     }
 
     return resolved;

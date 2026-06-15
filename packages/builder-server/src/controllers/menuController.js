@@ -2,11 +2,50 @@ import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { LIMIT_KEYS, MAX_MENU_ITEMS, MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 
 /**
- * Recursively sanitize menu items — strip HTML from labels and links.
+ * SA-20: bound an attacker-controlled menu-item tree BEFORE the recursive
+ * sanitize/label/clone walks run. Walked ITERATIVELY (explicit stack) so the
+ * measurement itself can never blow the call stack, and bails as soon as either
+ * ceiling is crossed so the work is O(maxItems), not O(tree).
+ *
+ * @param {Array} items - the menu item tree
+ * @param {number} maxItems - node-count ceiling (Infinity for unbounded OSS)
+ * @returns {{ ok: true } | { ok: false, reason: "items"|"depth" }}
+ */
+function validateMenuTree(items, maxItems) {
+  if (!Array.isArray(items)) return { ok: true };
+  let count = 0;
+  const stack = items.map((item) => [item, 1]);
+  while (stack.length > 0) {
+    const [item, depth] = stack.pop();
+    count += 1;
+    if (Number.isFinite(maxItems) && count > maxItems) return { ok: false, reason: "items" };
+    if (depth > MAX_MENU_DEPTH) return { ok: false, reason: "depth" };
+    if (item && Array.isArray(item.items)) {
+      for (const child of item.items) stack.push([child, depth + 1]);
+    }
+  }
+  return { ok: true };
+}
+
+/**
+ * Resolve the menu-item ceiling from the injected limits adapter, falling back
+ * to the shared default when no adapter is wired (e.g. direct-controller tests).
+ * @param {import('express').Request} req
+ */
+async function resolveMaxMenuItems(req) {
+  const cap = await req.adapters?.limits?.getLimit?.(req.scope, LIMIT_KEYS.MAX_MENU_ITEMS);
+  return typeof cap === "number" && cap > 0 ? cap : MAX_MENU_ITEMS;
+}
+
+/**
+ * Recursively sanitize menu items — strip HTML from labels and links. The tree
+ * is depth/count-bounded by validateMenuTree before this runs, so the recursion
+ * is safe (depth <= MAX_MENU_DEPTH).
  * @param {Array} items - Array of menu item objects
  * @returns {Array} Sanitized items
  */
@@ -193,6 +232,19 @@ export async function updateMenu(req, res) {
 
     // Sanitize menu item labels and links
     if (Array.isArray(menuData.items)) {
+      // SA-20: bound the tree before the recursive walks run. Without this an
+      // owner could persist a huge/deeply-nested menu that re-pays its
+      // sanitize/DOMPurify/render cost on every save and render.
+      const maxItems = await resolveMaxMenuItems(req);
+      const check = validateMenuTree(menuData.items, maxItems);
+      if (!check.ok) {
+        const msg =
+          check.reason === "depth"
+            ? `Menu nesting is too deep (maximum ${MAX_MENU_DEPTH} levels).`
+            : `Menu has too many items (maximum ${maxItems}).`;
+        return res.status(422).json({ error: msg });
+      }
+
       menuData.items = sanitizeMenuItems(menuData.items);
 
       // Validate: every item must have a label
@@ -291,6 +343,19 @@ export async function duplicateMenu(req, res) {
       return res.status(404).json({ error: "Menu not found" });
     }
     const originalMenu = JSON.parse(originalBuf.toString("utf8"));
+
+    // SA-20: bound the loaded tree before the recursive clone/id-regeneration.
+    // Defends against duplicating a menu that was persisted oversized before the
+    // save-time guard existed (legacy data).
+    const maxItems = await resolveMaxMenuItems(req);
+    const check = validateMenuTree(originalMenu.items, maxItems);
+    if (!check.ok) {
+      const msg =
+        check.reason === "depth"
+          ? `Menu nesting is too deep (maximum ${MAX_MENU_DEPTH} levels).`
+          : `Menu has too many items (maximum ${maxItems}).`;
+      return res.status(422).json({ error: msg });
+    }
 
     // Gather existing menu names for copy-number logic
     const menuFiles = (await storage.list(scope, "menus")).filter((f) => f.endsWith(".json"));
