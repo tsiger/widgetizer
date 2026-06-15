@@ -81,17 +81,17 @@
             {% if block.settings.title != blank %}
               <span class="w-title t-xl t-heading-font" data-setting="title">{{ block.settings.title }}</span>
             {% endif %}
-            {% if block.settings.text != blank %}
+            {% unless block.settings.text | rte_blank %}
               <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
-            {% endif %}
+            {% endunless %}
 
           {% when 'text_block' %}
             {% if block.settings.title != blank %}
               <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
             {% endif %}
-            {% if block.settings.text != blank %}
+            {% unless block.settings.text | rte_blank %}
               <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
-            {% endif %}
+            {% endunless %}
 
           {% when 'menu_block' %}
             {% if block.settings.title != blank %}

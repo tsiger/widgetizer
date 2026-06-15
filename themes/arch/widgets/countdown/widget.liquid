@@ -139,11 +139,11 @@
           {% endif %}
         </div>
 
-        {% if widget.settings.text != blank %}
+        {% unless widget.settings.text | rte_blank %}
           <div class="countdown-text w-body w-rte t-base reveal reveal-up">
             {{ widget.settings.text | raw }}
           </div>
-        {% endif %}
+        {% endunless %}
 
         {% if widget.settings.button.text != blank %}
           <div class="countdown-button">

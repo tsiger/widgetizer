@@ -129,11 +129,11 @@
                 <{{ item_heading_level }} class="features-split-item-title w-title t-2xl" data-setting="title">
                   {{ block.settings.title }}
                 </{{ item_heading_level }}>
-                {% if block.settings.description != blank %}
+                {% unless block.settings.description | rte_blank %}
                   <div class="features-split-item-description w-body w-rte t-sm" data-setting="description">
                     {{ block.settings.description | raw }}
                   </div>
-                {% endif %}
+                {% endunless %}
               </div>
             </li>
           {% endfor %}

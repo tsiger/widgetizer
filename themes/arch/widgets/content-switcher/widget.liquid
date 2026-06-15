@@ -226,9 +226,9 @@
                       <div class="switcher-item-price" data-setting="price">{{ block.settings.price }}</div>
                     {% endif %}
 
-                    {% if block.settings.text != blank %}
+                    {% unless block.settings.text | rte_blank %}
                       <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
-                    {% endif %}
+                    {% endunless %}
                   </div>
 
                   {% if block.settings.link.href != blank %}
@@ -288,9 +288,9 @@
                       <div class="switcher-item-price" data-setting="price">{{ block.settings.price }}</div>
                     {% endif %}
 
-                    {% if block.settings.text != blank %}
+                    {% unless block.settings.text | rte_blank %}
                       <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
-                    {% endif %}
+                    {% endunless %}
                   </div>
 
                   {% if block.settings.link.href != blank %}
@@ -350,9 +350,9 @@
                       <div class="switcher-item-price" data-setting="price">{{ block.settings.price }}</div>
                     {% endif %}
 
-                    {% if block.settings.text != blank %}
+                    {% unless block.settings.text | rte_blank %}
                       <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
-                    {% endif %}
+                    {% endunless %}
                   </div>
 
                   {% if block.settings.link.href != blank %}

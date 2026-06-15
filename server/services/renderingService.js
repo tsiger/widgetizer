@@ -27,6 +27,7 @@ import { registerHandleizeFilter } from "../../src/core/filters/handleizeFilter.
 import { registerCollectionFilter } from "../../src/core/filters/collectionFilter.js";
 import { registerDateFilter } from "../../src/core/filters/dateFilter.js";
 import { registerSafeUrlFilter } from "../../src/core/filters/safeUrlFilter.js";
+import { registerRteFilters } from "../../src/core/filters/rteFilter.js";
 import { resolveRichtextMediaInWidgetData } from "../../src/core/utils/richtextMedia.js";
 import {
   listCollectionItems,
@@ -99,6 +100,7 @@ function configureLiquidEngine(engine) {
   registerCollectionFilter(engine);
   registerDateFilter(engine);
   registerSafeUrlFilter(engine);
+  registerRteFilters(engine);
 }
 
 // Global engine for fallback/static use if needed (optional, can be removed if strictly per-request)

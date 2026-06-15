@@ -118,9 +118,9 @@
               {% if block.settings.location != blank %}
                 <p class="w-meta" data-setting="location">{{ block.settings.location }}</p>
               {% endif %}
-              {% if block.settings.description != blank %}
+              {% unless block.settings.description | rte_blank %}
                 <div class="w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
-              {% endif %}
+              {% endunless %}
               {% if block.settings.button_link.text != blank %}
                 <div class="widget-card-footer">
                   <a

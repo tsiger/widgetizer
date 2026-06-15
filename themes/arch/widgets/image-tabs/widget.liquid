@@ -203,9 +203,9 @@
                 {% if block.settings.title != blank %}
                   <{{ tab_heading_level }} class="image-tabs-tab-title w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ tab_heading_level }}>
                 {% endif %}
-                {% if block.settings.description != blank %}
+                {% unless block.settings.description | rte_blank %}
                   <div class="image-tabs-tab-description w-body w-rte" data-setting="description">{{ block.settings.description | raw }}</div>
-                {% endif %}
+                {% endunless %}
               </button>
             </li>
             {% assign first_tab = false %}

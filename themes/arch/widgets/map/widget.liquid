@@ -244,11 +244,11 @@
                   {% if block.settings.title != blank %}
                     <h3 class="map-sidebar-title w-title t-xl" data-setting="title">{{ block.settings.title }}</h3>
                   {% endif %}
-                  {% if block.settings.text != blank %}
+                  {% unless block.settings.text | rte_blank %}
                     <div class="map-sidebar-text w-body w-rte" data-setting="text">
                       {{ block.settings.text | raw }}
                     </div>
-                  {% endif %}
+                  {% endunless %}
                 </div>
               {% elsif block.type == 'social' %}
                 <div class="social-links" data-block-id="{{ blockId }}">
