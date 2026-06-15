@@ -16,6 +16,7 @@ import useToastStore from "../stores/toastStore";
  *   setExportHistory: Function,
  *   loadingHistory: boolean,
  *   maxVersionsToKeep: number,
+ *   developerMode: boolean,
  *   loadExportHistory: (projectId: string) => Promise<void>
  * }} Export state and actions
  */
@@ -24,6 +25,7 @@ export default function useExportState() {
   const [exportHistory, setExportHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [maxVersionsToKeep, setMaxVersionsToKeep] = useState(10);
+  const [developerMode, setDeveloperMode] = useState(false);
 
   const activeProject = useProjectStore((state) => state.activeProject);
   const showToast = useToastStore((state) => state.showToast);
@@ -46,6 +48,7 @@ export default function useExportState() {
       if (result.maxVersionsToKeep) {
         setMaxVersionsToKeep(result.maxVersionsToKeep);
       }
+      setDeveloperMode(Boolean(result.developerMode));
     } catch (error) {
       if (useProjectStore.getState().activeProject?.id !== projectId) return;
       console.error("Failed to load export history:", error);
@@ -76,6 +79,7 @@ export default function useExportState() {
         if (result.maxVersionsToKeep) {
           setMaxVersionsToKeep(result.maxVersionsToKeep);
         }
+        setDeveloperMode(Boolean(result.developerMode));
       })
       .catch((err) => {
         if (!gate.isCurrent(token)) return;
@@ -97,6 +101,7 @@ export default function useExportState() {
     setExportHistory,
     loadingHistory,
     maxVersionsToKeep,
+    developerMode,
     loadExportHistory,
   };
 }

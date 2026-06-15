@@ -643,7 +643,14 @@
         "created": "Created",
         "size": "Size",
         "status": "Status",
+        "issues": "Issues",
         "actions": "Actions"
+      },
+      "issues": {
+        "found": "Issues found",
+        "none": "—",
+        "foundTooltip": "Open the HTML & accessibility validation report",
+        "noneTooltip": "No issues report (validation runs only in Developer mode)"
       },
       "tooltips": {
         "view": "View site",

@@ -1180,23 +1180,32 @@ export async function getExportHistory(req, res) {
       exports.map(async (record) => {
         const dir = resolveOutputDir(record.outputDir);
         let sizeBytes = null;
+        // Whether this export carries an HTML-validation report. The report is
+        // only written when developer mode was on AND issues were found, so its
+        // presence reliably means "issues found"; its absence means clean OR
+        // not validated (we can't tell which without a stored column).
+        let hasIssuesReport = false;
         if (dir && (await fs.pathExists(dir))) {
           try {
             sizeBytes = await getDirectorySize(dir);
           } catch (err) {
             console.warn(`Could not compute size for export ${record.outputDir}:`, err.message);
           }
+          hasIssuesReport = await fs.pathExists(path.join(dir, "__export__issues.html"));
         }
-        return { ...record, sizeBytes };
+        return { ...record, sizeBytes, hasIssuesReport };
       }),
     );
 
-    // Get the configured limit for exports to show
+    // Get the configured limit for exports to show + whether developer mode is on
+    // (the latter gates the Issues column in the history UI).
     let maxExports = 10; // default fallback
+    let developerMode = false;
     try {
       const { getSetting } = await import("./appSettingsController.js");
       const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
       maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
+      developerMode = Boolean(await getSetting("developer.enabled"));
     } catch (error) {
       console.warn("Could not load app settings for export display limit, using default of 10. Error:", error.message);
     }
@@ -1206,6 +1215,7 @@ export async function getExportHistory(req, res) {
       exports: exportsWithSize,
       totalExports: exportsWithSize.length,
       maxVersionsToKeep: maxExports,
+      developerMode,
     });
   } catch (error) {
     if (handleProjectResolutionError(res, error)) return;
