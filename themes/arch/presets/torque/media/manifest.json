@@ -1,0 +1,813 @@
+{
+  "files": [
+    {
+      "filename": "contact-banner.webp",
+      "originalName": "contact-banner.webp",
+      "type": "image/webp",
+      "size": 58128,
+      "path": "/uploads/images/contact-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A clean service-advisor counter with a tablet, pen cup, and brochures in a warm welcoming shop lobby.",
+      "title": "The service desk",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/contact-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/contact-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/contact-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "team-eli.webp",
+      "originalName": "team-eli.webp",
+      "type": "image/webp",
+      "size": 71296,
+      "path": "/uploads/images/team-eli.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Eli Bennett, Torque EV-certified technician, standing in front of a concrete shop wall with the bay visible behind him.",
+      "title": "Eli Bennett",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-eli-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-eli-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-jordan.webp",
+      "originalName": "team-jordan.webp",
+      "type": "image/webp",
+      "size": 91700,
+      "path": "/uploads/images/team-jordan.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Jordan Patel, Torque lead technician, standing in front of a concrete shop wall.",
+      "title": "Jordan Patel",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-jordan-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-jordan-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-alicia.webp",
+      "originalName": "team-alicia.webp",
+      "type": "image/webp",
+      "size": 80224,
+      "path": "/uploads/images/team-alicia.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Alicia Wood, Torque service advisor, standing in front of a concrete shop wall with the bay interior behind her.",
+      "title": "Alicia Wood",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-alicia-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-alicia-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-marcus.webp",
+      "originalName": "team-marcus.webp",
+      "type": "image/webp",
+      "size": 94192,
+      "path": "/uploads/images/team-marcus.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Marcus Chen, Torque owner and ASE master technician, standing in front of the shop entrance.",
+      "title": "Marcus Chen — owner",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-marcus-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-marcus-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "about-shop-story.webp",
+      "originalName": "about-shop-story.webp",
+      "type": "image/webp",
+      "size": 47582,
+      "path": "/uploads/images/about-shop-story.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "The Torque shop lobby — a light wood counter with a small potted plant, the bay interior visible through the doorway.",
+      "title": "The Torque lobby",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-shop-story-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/about-shop-story-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "about-banner.webp",
+      "originalName": "about-banner.webp",
+      "type": "image/webp",
+      "size": 80212,
+      "path": "/uploads/images/about-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Wide interior view of the Torque shop with clean epoxy floors, organized tool walls, and a technician walking through the bay.",
+      "title": "Inside the shop",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "special-road-trip.webp",
+      "originalName": "special-road-trip.webp",
+      "type": "image/webp",
+      "size": 64576,
+      "path": "/uploads/images/special-road-trip.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Smiling technician with a tablet standing beside a packed white crossover SUV with the rear hatch open.",
+      "title": "Pre-road-trip inspection",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/special-road-trip-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/special-road-trip-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "special-tire-changeover.webp",
+      "originalName": "special-tire-changeover.webp",
+      "type": "image/webp",
+      "size": 51544,
+      "path": "/uploads/images/special-tire-changeover.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Smiling technician rolling a fresh tire toward a wheel-mounting machine, stacked tires in the background.",
+      "title": "Seasonal tire changeover",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/special-tire-changeover-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/special-tire-changeover-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "special-winter-check.webp",
+      "originalName": "special-winter-check.webp",
+      "type": "image/webp",
+      "size": 83848,
+      "path": "/uploads/images/special-winter-check.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Technician performing a battery-load test at the open hood of a car, snow visible through the shop windows.",
+      "title": "Winter Ready Check",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/special-winter-check-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/special-winter-check-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "specials-banner.webp",
+      "originalName": "specials-banner.webp",
+      "type": "image/webp",
+      "size": 71564,
+      "path": "/uploads/images/specials-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A late-model silver sedan parked just inside the open bay door of a clean bright service shop.",
+      "title": "Rolling into the shop",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/specials-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/specials-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/specials-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "service-tires-1.webp",
+      "originalName": "service-tires.webp",
+      "type": "image/webp",
+      "size": 92860,
+      "path": "/uploads/images/service-tires-1.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Technician mounting a passenger-car tire onto a modern wheel-balancer, stacked all-season tires in the background.",
+      "title": "Tire service",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-tires-1-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-tires-1-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-tires-1-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "service-engine-1.webp",
+      "originalName": "service-engine.webp",
+      "type": "image/webp",
+      "size": 145588,
+      "path": "/uploads/images/service-engine-1.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Technician leaning over an open hood, working on a late-model engine under bright shop lighting.",
+      "title": "Engine service",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-engine-1-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-engine-1-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-engine-1-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "service-brakes-1.webp",
+      "originalName": "service-brakes.webp",
+      "type": "image/webp",
+      "size": 135982,
+      "path": "/uploads/images/service-brakes-1.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Technician kneeling at a raised car's brake rotor, a fresh rotor and tools on a rolling service cart beside him.",
+      "title": "Brake service",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-brakes-1-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-brakes-1-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-brakes-1-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "service-diagnostics-1.webp",
+      "originalName": "service-diagnostics.webp",
+      "type": "image/webp",
+      "size": 86352,
+      "path": "/uploads/images/service-diagnostics-1.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Smiling technician using a handheld diagnostic scan tool at the open door of a late-model car in the service bay.",
+      "title": "Diagnostics in progress",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-diagnostics-1-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-diagnostics-1-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-diagnostics-1-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "services-banner.webp",
+      "originalName": "services-banner.webp",
+      "type": "image/webp",
+      "size": 67016,
+      "path": "/uploads/images/services-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Laptop diagnostic scan tool with OBD cable and a ratchet wrench laid out on a clean grey workbench.",
+      "title": "Tools ready for the job",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/services-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/services-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/services-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "testimonial-heather.webp",
+      "originalName": "testimonial-heather.webp",
+      "type": "image/webp",
+      "size": 28486,
+      "path": "/uploads/images/testimonial-heather.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Heather B., repeat Torque client, at home in a bright warm kitchen.",
+      "title": "Heather B., Laurelhurst",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-heather-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-heather-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-kenji.webp",
+      "originalName": "testimonial-kenji.webp",
+      "type": "image/webp",
+      "size": 22762,
+      "path": "/uploads/images/testimonial-kenji.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Kenji S., Torque client, outdoors with a soft urban background.",
+      "title": "Kenji S., Woodstock",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-kenji-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-kenji-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-javier.webp",
+      "originalName": "testimonial-javier.webp",
+      "type": "image/webp",
+      "size": 29682,
+      "path": "/uploads/images/testimonial-javier.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Javier R., Torque fleet client, outdoors in warm golden-hour light.",
+      "title": "Javier R., Richmond",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-javier-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-javier-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-dana.webp",
+      "originalName": "testimonial-dana.webp",
+      "type": "image/webp",
+      "size": 33794,
+      "path": "/uploads/images/testimonial-dana.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Dana L., Torque client, in her living room with a calm honest smile.",
+      "title": "Dana L., Sellwood",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-dana-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-dana-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-priya.webp",
+      "originalName": "testimonial-priya.webp",
+      "type": "image/webp",
+      "size": 26046,
+      "path": "/uploads/images/testimonial-priya.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Priya M., Torque client, at home with soft interior light behind her.",
+      "title": "Priya M., Eastmoreland",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-priya-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-priya-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-aaron.webp",
+      "originalName": "testimonial-aaron.webp",
+      "type": "image/webp",
+      "size": 29676,
+      "path": "/uploads/images/testimonial-aaron.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Aaron W., Torque client, outdoors with a warm natural smile.",
+      "title": "Aaron W., Hawthorne",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-aaron-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-aaron-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "inspection-report.webp",
+      "originalName": "inspection-report.webp",
+      "type": "image/webp",
+      "size": 68288,
+      "path": "/uploads/images/inspection-report.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "Two hands holding a phone showing a digital vehicle inspection report with photo thumbnails and clean data cards.",
+      "title": "Digital inspection report",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/inspection-report-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/inspection-report-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "shop-tour.webp",
+      "originalName": "shop-tour.webp",
+      "type": "image/webp",
+      "size": 127610,
+      "path": "/uploads/images/shop-tour.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "Technician walking down the main bay aisle of the Torque shop — cars on lifts on one side, red tool chests on the other.",
+      "title": "Walking the bay line",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/shop-tour-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/shop-tour-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "service-tires.webp",
+      "originalName": "service-tires.webp",
+      "type": "image/webp",
+      "size": 92860,
+      "path": "/uploads/images/service-tires.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Technician mounting a passenger-car tire onto a modern wheel-balancer, stacked all-season tires in the background.",
+      "title": "Tire service",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-tires-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-tires-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-tires-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "service-engine.webp",
+      "originalName": "service-engine.webp",
+      "type": "image/webp",
+      "size": 145588,
+      "path": "/uploads/images/service-engine.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Technician leaning over an open hood, working on a late-model engine under bright shop lighting.",
+      "title": "Engine service",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-engine-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-engine-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-engine-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "service-brakes.webp",
+      "originalName": "service-brakes.webp",
+      "type": "image/webp",
+      "size": 135982,
+      "path": "/uploads/images/service-brakes.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Technician kneeling at a raised car's brake rotor, a fresh rotor and tools on a rolling service cart beside him.",
+      "title": "Brake service",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-brakes-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-brakes-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-brakes-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "service-diagnostics.webp",
+      "originalName": "service-diagnostics.webp",
+      "type": "image/webp",
+      "size": 86352,
+      "path": "/uploads/images/service-diagnostics.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Smiling technician using a handheld diagnostic scan tool at the open door of a late-model car in the service bay.",
+      "title": "Diagnostics in progress",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/service-diagnostics-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/service-diagnostics-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/service-diagnostics-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "hero.webp",
+      "originalName": "hero.webp",
+      "type": "image/webp",
+      "size": 175256,
+      "path": "/uploads/images/hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Technician in a navy polo standing beside a silver crossover SUV on a hydraulic lift in a clean modern service bay.",
+      "title": "Inside the Torque service bay",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "torque-logo-light.png",
+      "originalName": "torque-logo-light.png",
+      "type": "image/png",
+      "size": 4989,
+      "path": "/uploads/images/torque-logo-light.png",
+      "width": 674,
+      "height": 127,
+      "alt": "Torque logo — white wordmark variant with an orange accent detail, for use on dark backgrounds.",
+      "title": "Torque logo (white)",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/torque-logo-light-small.png",
+          "width": 480,
+          "height": 90
+        },
+        "thumb": {
+          "path": "/uploads/images/torque-logo-light-thumb.png",
+          "width": 150,
+          "height": 28
+        }
+      }
+    },
+    {
+      "filename": "torque-logo-dark.png",
+      "originalName": "torque-logo-dark.png",
+      "type": "image/png",
+      "size": 4864,
+      "path": "/uploads/images/torque-logo-dark.png",
+      "width": 674,
+      "height": 127,
+      "alt": "Torque logo — charcoal wordmark with an orange accent detail, for use on light backgrounds.",
+      "title": "Torque logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/torque-logo-dark-small.png",
+          "width": 480,
+          "height": 90
+        },
+        "thumb": {
+          "path": "/uploads/images/torque-logo-dark-thumb.png",
+          "width": 150,
+          "height": 28
+        }
+      }
+    }
+  ]
+}

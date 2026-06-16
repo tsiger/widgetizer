@@ -27,7 +27,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "new_clients_steps": {
       "type": "steps",
@@ -80,14 +83,21 @@
           }
         }
       },
-      "blocksOrder": ["step-booking", "step-consultation", "step-service", "step-finish", "step-between"]
+      "blocksOrder": [
+        "step-booking",
+        "step-consultation",
+        "step-service",
+        "step-finish",
+        "step-between"
+      ]
     },
     "new_clients_color_process": {
       "type": "image-text",
       "settings": {
         "image_position": "end",
         "text_position": "center",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/color-consult.webp"
       },
       "blocks": {
         "color-eyebrow": {
@@ -128,7 +138,12 @@
           }
         }
       },
-      "blocksOrder": ["color-eyebrow", "color-heading", "color-body", "color-button"]
+      "blocksOrder": [
+        "color-eyebrow",
+        "color-heading",
+        "color-body",
+        "color-button"
+      ]
     },
     "new_clients_faq": {
       "type": "accordion",
@@ -200,7 +215,16 @@
           }
         }
       },
-      "blocksOrder": ["faq-sidebar", "faq-pick-stylist", "faq-what-to-bring", "faq-same-day-color", "faq-how-far-ahead", "faq-walkins", "faq-if-unhappy", "faq-textured"]
+      "blocksOrder": [
+        "faq-sidebar",
+        "faq-pick-stylist",
+        "faq-what-to-bring",
+        "faq-same-day-color",
+        "faq-how-far-ahead",
+        "faq-walkins",
+        "faq-if-unhappy",
+        "faq-textured"
+      ]
     },
     "new_clients_closing": {
       "type": "action-bar",
@@ -229,11 +253,20 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["new_clients_intro", "new_clients_steps", "new_clients_color_process", "new_clients_faq", "new_clients_closing"],
+  "widgetsOrder": [
+    "new_clients_intro",
+    "new_clients_steps",
+    "new_clients_color_process",
+    "new_clients_faq",
+    "new_clients_closing"
+  ],
   "id": "new-clients",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:28:19.007Z",
+  "updated": "2026-04-24T09:35:33.270Z"
 }

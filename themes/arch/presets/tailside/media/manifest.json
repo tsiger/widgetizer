@@ -1,0 +1,264 @@
+{
+  "files": [
+    {
+      "filename": "new-patients-welcome.webp",
+      "originalName": "new-patients-welcome.webp",
+      "type": "image/webp",
+      "size": 111584,
+      "path": "/uploads/images/new-patients-welcome.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Client seated in the Tailside waiting room with his golden retriever beside him and a pet carrier at his feet",
+      "title": "Waiting room welcome",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/new-patients-welcome-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/new-patients-welcome-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-welcome-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "team-sam-patel.webp",
+      "originalName": "team-sam-patel.webp",
+      "type": "image/webp",
+      "size": 71852,
+      "path": "/uploads/images/team-sam-patel.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Sam Patel in clinic scrubs with a cardigan, standing at the front of the Tailside clinic",
+      "title": "Sam Patel",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-sam-patel-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-sam-patel-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-jordan-brooks.webp",
+      "originalName": "team-jordan-brooks.webp",
+      "type": "image/webp",
+      "size": 73916,
+      "path": "/uploads/images/team-jordan-brooks.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Jordan Brooks in a white lab coat with a stethoscope standing beside a small terrier on the exam table",
+      "title": "Jordan Brooks",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-jordan-brooks-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-jordan-brooks-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-maya-rivera.webp",
+      "originalName": "team-maya-rivera.webp",
+      "type": "image/webp",
+      "size": 59142,
+      "path": "/uploads/images/team-maya-rivera.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Maya Rivera in clinic scrubs holding a patient clipboard, smiling in the treatment room",
+      "title": "Maya Rivera",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-maya-rivera-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-maya-rivera-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-avery-chen.webp",
+      "originalName": "team-avery-chen.webp",
+      "type": "image/webp",
+      "size": 67038,
+      "path": "/uploads/images/team-avery-chen.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Avery Chen in clinic scrubs with a stethoscope and Tailside name badge, standing in the exam room",
+      "title": "Avery Chen",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-avery-chen-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-avery-chen-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "about-clinic-team.webp",
+      "originalName": "about-clinic-team.webp",
+      "type": "image/webp",
+      "size": 91690,
+      "path": "/uploads/images/about-clinic-team.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Four Tailside team members in matching clinic scrubs standing together in the exam room, smiling at the camera",
+      "title": "The Tailside team",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-clinic-team-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-clinic-team-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-clinic-team-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "services-checkup.webp",
+      "originalName": "services-checkup.webp",
+      "type": "image/webp",
+      "size": 120310,
+      "path": "/uploads/images/services-checkup.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Veterinarian carefully examining a grey tabby cat on the exam table while the cat’s owner stands nearby",
+      "title": "Wellness check",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/services-checkup-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/services-checkup-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/services-checkup-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-logo-light.png",
+      "originalName": "tailside-logo-light.png",
+      "type": "image/png",
+      "size": 25029,
+      "path": "/uploads/images/tailside-logo-light.png",
+      "width": 800,
+      "height": 252,
+      "alt": "Tailside Veterinary Care logo in a light color variant for use on dark backgrounds",
+      "title": "Tailside Veterinary Care logo (light)",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/tailside-logo-light-small.png",
+          "width": 480,
+          "height": 151
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-logo-light-thumb.png",
+          "width": 150,
+          "height": 47
+        }
+      }
+    },
+    {
+      "filename": "tailside-logo-dark.png",
+      "originalName": "tailside-logo-dark.png",
+      "type": "image/png",
+      "size": 31319,
+      "path": "/uploads/images/tailside-logo-dark.png",
+      "width": 800,
+      "height": 252,
+      "alt": "Tailside Veterinary Care logo with a dog and cat silhouette mark beside the Tailside wordmark",
+      "title": "Tailside Veterinary Care logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/tailside-logo-dark-small.png",
+          "width": 480,
+          "height": 151
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-logo-dark-thumb.png",
+          "width": 150,
+          "height": 47
+        }
+      }
+    },
+    {
+      "filename": "home-hero-exam-room.webp",
+      "originalName": "home-hero-exam-room.webp",
+      "type": "image/webp",
+      "size": 148218,
+      "path": "/uploads/images/home-hero-exam-room.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Veterinarian in teal scrubs gently examining a calm tan mixed-breed dog on an exam table in a warm, well-lit clinic room",
+      "title": "Gentle exam",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-hero-exam-room-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/home-hero-exam-room-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/home-hero-exam-room-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

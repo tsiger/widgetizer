@@ -6,7 +6,8 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Inquire",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
@@ -14,6 +15,10 @@
     "transparent_on_hero": true,
     "color_scheme": "standard-primary",
     "center_nav": true,
-    "logoMaxWidth": 180
-  }
+    "logoImage": "/uploads/images/everafterdark.png",
+    "logoMaxWidth": 180,
+    "transparent_logo": "/uploads/images/everafterwhite.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

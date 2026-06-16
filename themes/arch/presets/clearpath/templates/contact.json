@@ -38,7 +38,11 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "details": {
       "type": "contact-details",
@@ -48,7 +52,7 @@
         "description": "",
         "heading_alignment": "start",
         "layout": "first-featured",
-        "color_scheme": "standard-primary"
+        "color_scheme": "highlight-primary"
       },
       "blocks": {
         "info": {
@@ -80,7 +84,12 @@
           }
         }
       },
-      "blocksOrder": ["info", "reach", "availability", "where"]
+      "blocksOrder": [
+        "info",
+        "reach",
+        "availability",
+        "where"
+      ]
     },
     "faq": {
       "type": "accordion",
@@ -131,11 +140,21 @@
           }
         }
       },
-      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "sidebar"]
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4",
+        "sidebar"
+      ]
     }
   },
-  "widgetsOrder": ["intro", "details", "faq"],
+  "widgetsOrder": [
+    "intro",
+    "details",
+    "faq"
+  ],
   "id": "contact",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z"
+  "created": "2026-04-22T18:20:05.342Z",
+  "updated": "2026-04-23T08:41:33.995Z"
 }

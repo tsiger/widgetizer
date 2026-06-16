@@ -6,13 +6,17 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Start a project",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": false,
     "color_scheme": "highlight-primary",
-    "logoMaxWidth": 180
-  }
+    "logoImage": "/uploads/images/codebase-logo.png",
+    "logoMaxWidth": 160
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

@@ -13,7 +13,8 @@
         "overlay_color": "#08264599",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/rooms-banner-v2.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -110,10 +111,12 @@
             "title": "Olive",
             "description": "<p>Our flagship room. Corner of the villa with two windows, a stone terrace of its own, and the best light in the house at golden hour.</p>",
             "button_link": {
-              "text": "Learn more",
+              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
+              "text": "Learn more",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/room-olive.webp"
           }
         },
         "rm-fig": {
@@ -123,10 +126,12 @@
             "title": "Fig",
             "description": "<p>Overlooking the walled garden. A slightly smaller room with a window that opens over the fig tree it's named for. Quiet at all hours.</p>",
             "button_link": {
-              "text": "Learn more",
+              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
+              "text": "Learn more",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/room-fig.webp"
           }
         },
         "rm-jasmine": {
@@ -136,10 +141,12 @@
             "title": "Jasmine",
             "description": "<p>A stone terrace sheltered by jasmine and bougainvillea. A small writing desk by the window. Our favorite room for slow mornings.</p>",
             "button_link": {
-              "text": "Learn more",
+              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
+              "text": "Learn more",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/room-jasmine.webp"
           }
         },
         "rm-thyme": {
@@ -149,10 +156,12 @@
             "title": "Thyme",
             "description": "<p>Ground-floor room opening straight onto the garden path. Shadier and cooler than the upstairs rooms — perfect for July and August.</p>",
             "button_link": {
-              "text": "Learn more",
+              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
+              "text": "Learn more",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/room-thyme.webp"
           }
         },
         "rm-sage": {
@@ -162,10 +171,12 @@
             "title": "Sage",
             "description": "<p>Overlooking the olive orchard. A single large window, a hand-built stone bench below it, and the widest bed in the villa.</p>",
             "button_link": {
-              "text": "Learn more",
+              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
+              "text": "Learn more",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/room-sage.webp"
           }
         },
         "rm-lemon": {
@@ -175,10 +186,12 @@
             "title": "Lemon",
             "description": "<p>Our smallest room and most affordable. Sun-washed all afternoon, with a small balcony that looks down into the lemon tree.</p>",
             "button_link": {
-              "text": "Learn more",
+              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
+              "text": "Learn more",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/room-lemon.webp"
           }
         }
       },
@@ -199,7 +212,8 @@
         "color_scheme": "standard-primary",
         "content_color_scheme": "none",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/featured-jasmine.webp"
       },
       "blocks": {
         "fj-eyebrow": {
@@ -248,16 +262,17 @@
             "link": {
               "text": "Book Jasmine",
               "href": "room-jasmine.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
             },
             "style": "primary",
             "size": "medium",
             "link_2": {
-              "text": "Learn more",
+              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
+              "text": "Learn more",
               "target": "_self"
-            },
-            "style_2": "secondary"
+            }
           }
         }
       },
@@ -377,13 +392,15 @@
             "link": {
               "text": "Check availability",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
             },
             "style": "primary",
             "link_2": {
               "text": "See the villa",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4b2088ef-edd6-4f41-9a6c-9fc64f433d55"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -406,6 +423,6 @@
     "closing_cta"
   ],
   "id": "rooms",
-  "created": "2026-04-21T16:00:00.000Z",
-  "updated": "2026-04-21T18:00:00.000Z"
+  "created": "2026-04-22T08:53:25.060Z",
+  "updated": "2026-04-22T10:06:15.005Z"
 }

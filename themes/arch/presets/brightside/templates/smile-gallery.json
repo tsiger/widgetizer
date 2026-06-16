@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/smile-gallery-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -25,8 +25,8 @@
         "title": "Whitening Transformation",
         "description": "",
         "heading_alignment": "center",
-        "before_image": "",
-        "after_image": "",
+        "before_image": "/uploads/images/smile-gallery-before.webp",
+        "after_image": "/uploads/images/smile-gallery-after.webp",
         "before_label": "Before",
         "after_label": "After",
         "orientation": "horizontal",
@@ -52,68 +52,78 @@
         "img-1": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-1.webp",
             "caption": "Teeth whitening — 3 shades brighter"
           }
         },
         "img-2": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-2.webp",
             "caption": "Invisalign — 12-month result"
           }
         },
         "img-3": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-3.webp",
             "caption": "Porcelain veneers — full smile makeover"
           }
         },
         "img-4": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-4.webp",
             "caption": "Dental implant — single tooth replacement"
           }
         },
         "img-5": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-5.webp",
             "caption": "Crown restoration — cracked molar"
           }
         },
         "img-6": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-6.webp",
             "caption": "Composite bonding — chipped front tooth"
           }
         },
         "img-7": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-7.webp",
             "caption": "Invisalign — gap closure"
           }
         },
         "img-8": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-8.webp",
             "caption": "Bridge — three-tooth restoration"
           }
         },
         "img-9": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/smile-gallery-result-9.webp",
             "caption": "Whitening — coffee stain removal"
           }
         }
       },
-      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6", "img-7", "img-8", "img-9"]
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6",
+        "img-7",
+        "img-8",
+        "img-9"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -137,18 +147,27 @@
             "link": {
               "text": "Book a Consultation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "before_after", "gallery", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "before_after",
+    "gallery",
+    "cta"
+  ],
   "id": "smile-gallery",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T12:01:48.320Z",
+  "updated": "2026-04-16T13:08:32.697Z"
 }

@@ -13,7 +13,8 @@
         "overlay_color": "#0a0a0c80",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -45,14 +46,20 @@
             "link": {
               "text": "Book a consult",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
     },
     "styles_marquee": {
       "type": "scrolling-text",
@@ -105,7 +112,11 @@
           }
         }
       },
-      "blocksOrder": ["eo-eyebrow", "eo-heading", "eo-body"]
+      "blocksOrder": [
+        "eo-eyebrow",
+        "eo-heading",
+        "eo-body"
+      ]
     },
     "artists_showcase": {
       "type": "sliding-panels",
@@ -128,8 +139,10 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+            },
+            "image": "/uploads/images/artist-rafael.webp"
           }
         },
         "sp-2": {
@@ -140,8 +153,10 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+            },
+            "image": "/uploads/images/artist-saoirse.webp"
           }
         },
         "sp-3": {
@@ -152,8 +167,10 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+            },
+            "image": "/uploads/images/artist-elena.webp"
           }
         },
         "sp-4": {
@@ -164,8 +181,10 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+            },
+            "image": "/uploads/images/artist-jules.webp"
           }
         },
         "sp-5": {
@@ -176,8 +195,10 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+            },
+            "image": "/uploads/images/artist-kiko.webp"
           }
         },
         "sp-6": {
@@ -188,12 +209,21 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+            },
+            "image": "/uploads/images/artist-indra.webp"
           }
         }
       },
-      "blocksOrder": ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5", "sp-6"]
+      "blocksOrder": [
+        "sp-1",
+        "sp-2",
+        "sp-3",
+        "sp-4",
+        "sp-5",
+        "sp-6"
+      ]
     },
     "work_wall": {
       "type": "masonry-gallery",
@@ -211,20 +241,93 @@
         "bottom_spacing": "auto"
       },
       "blocks": {
-        "ww-01": { "type": "item", "settings": {} },
-        "ww-02": { "type": "item", "settings": {} },
-        "ww-03": { "type": "item", "settings": {} },
-        "ww-04": { "type": "item", "settings": {} },
-        "ww-05": { "type": "item", "settings": {} },
-        "ww-06": { "type": "item", "settings": {} },
-        "ww-07": { "type": "item", "settings": {} },
-        "ww-08": { "type": "item", "settings": {} },
-        "ww-09": { "type": "item", "settings": {} },
-        "ww-10": { "type": "item", "settings": {} },
-        "ww-11": { "type": "item", "settings": {} },
-        "ww-12": { "type": "item", "settings": {} }
+        "ww-01": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-01.webp"
+          }
+        },
+        "ww-02": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-02.webp"
+          }
+        },
+        "ww-03": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-03.webp"
+          }
+        },
+        "ww-04": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-04.webp"
+          }
+        },
+        "ww-05": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-06.webp"
+          }
+        },
+        "ww-06": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-07.webp"
+          }
+        },
+        "ww-07": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-08.webp"
+          }
+        },
+        "ww-08": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-05.webp"
+          }
+        },
+        "ww-09": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-09.webp"
+          }
+        },
+        "ww-10": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-10.webp"
+          }
+        },
+        "ww-11": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-11.webp"
+          }
+        },
+        "ww-12": {
+          "type": "item",
+          "settings": {
+            "image": "/uploads/images/work-12.webp"
+          }
+        }
       },
-      "blocksOrder": ["ww-01", "ww-02", "ww-03", "ww-04", "ww-05", "ww-06", "ww-07", "ww-08", "ww-09", "ww-10", "ww-11", "ww-12"]
+      "blocksOrder": [
+        "ww-01",
+        "ww-02",
+        "ww-03",
+        "ww-04",
+        "ww-05",
+        "ww-06",
+        "ww-07",
+        "ww-08",
+        "ww-09",
+        "ww-10",
+        "ww-11",
+        "ww-12"
+      ]
     },
     "credibility": {
       "type": "image-callout",
@@ -232,7 +335,8 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-credibility.webp"
       },
       "blocks": {
         "cb-kicker": {
@@ -262,7 +366,7 @@
         "cb-features": {
           "type": "features",
           "settings": {
-            "features": "+ NYC Department of Health licensed\n+ Autoclave-sterilised equipment, every time\n+ Single-use needles and ink cups\n+ Written aftercare, balm, and a phone number for the first two weeks\n+ Free touch-ups on every tattoo in the first year"
+            "features": "+ NYC Department of Health licensed\n+ Autoclave-sterilised equipment, every time\n+ Single-use needles and ink cups"
           }
         },
         "cb-button": {
@@ -271,14 +375,21 @@
             "link": {
               "text": "More on the Visit page",
               "href": "visit.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "451a3a44-daa2-4efd-a6c3-06ea5f2273b1"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cb-kicker", "cb-heading", "cb-text", "cb-features", "cb-button"]
+      "blocksOrder": [
+        "cb-kicker",
+        "cb-heading",
+        "cb-text",
+        "cb-features",
+        "cb-button"
+      ]
     },
     "studio_tiles": {
       "type": "bento-grid",
@@ -303,7 +414,8 @@
             "col_span": 3,
             "row_span": 2,
             "text_color": "light",
-            "alignment": "start"
+            "alignment": "start",
+            "image": "/uploads/images/home-studio-tile.webp"
           }
         },
         "bt-years": {
@@ -331,7 +443,11 @@
           }
         }
       },
-      "blocksOrder": ["bt-main", "bt-years", "bt-roster"]
+      "blocksOrder": [
+        "bt-main",
+        "bt-years",
+        "bt-roster"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -364,14 +480,19 @@
             "link": {
               "text": "Start an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -385,6 +506,6 @@
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T15:30:23.101Z",
+  "updated": "2026-04-20T15:54:01.628Z"
 }

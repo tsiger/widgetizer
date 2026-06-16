@@ -15,15 +15,16 @@
         "slide-1": {
           "type": "slide",
           "settings": {
-            "image": "",
-            "heading_text": "42 Beacon St — Beacon Hill",
+            "image": "/uploads/images/hero-slide-1.webp",
+            "heading_text": "Very soon :)",
             "heading_size": "5xl",
             "text_content": "$3,200,000 · 4 Bed · 3.5 Bath · 3,400 sqft",
             "text_size": "lg",
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -34,7 +35,7 @@
         "slide-2": {
           "type": "slide",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/hero-slide-2.webp",
             "heading_text": "185 Commonwealth Ave — Back Bay",
             "heading_size": "5xl",
             "text_content": "$2,850,000 · 3 Bed · 2.5 Bath · 2,800 sqft",
@@ -42,7 +43,8 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -53,7 +55,7 @@
         "slide-3": {
           "type": "slide",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/hero-slide-3.webp",
             "heading_text": "7 Rutland Square — South End",
             "heading_size": "5xl",
             "text_content": "$1,975,000 · 3 Bed · 2 Bath · 2,200 sqft",
@@ -61,7 +63,8 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -70,7 +73,11 @@
           }
         }
       },
-      "blocksOrder": ["slide-1", "slide-2", "slide-3"]
+      "blocksOrder": [
+        "slide-1",
+        "slide-2",
+        "slide-3"
+      ]
     },
     "trust": {
       "type": "trust-bar",
@@ -118,7 +125,12 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
     },
     "listings": {
       "type": "card-grid",
@@ -139,52 +151,59 @@
         "prop-1": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/listing-1-1.webp",
             "subtitle": "Beacon Hill",
             "title": "42 Beacon St",
             "description": "<p>4 Bed · 3.5 Bath · 3,400 sqft<br><strong>$3,200,000</strong></p>",
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
             }
           }
         },
         "prop-2": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/listing-2.webp",
             "subtitle": "South End",
             "title": "7 Rutland Square",
             "description": "<p>3 Bed · 2 Bath · 2,200 sqft<br><strong>$1,975,000</strong></p>",
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
             }
           }
         },
         "prop-3": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/listing-3.webp",
             "subtitle": "Cambridge",
             "title": "18 Brattle St",
             "description": "<p>5 Bed · 4 Bath · 4,100 sqft<br><strong>$4,500,000</strong></p>",
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
             }
           }
         }
       },
-      "blocksOrder": ["prop-1", "prop-2", "prop-3"]
+      "blocksOrder": [
+        "prop-1",
+        "prop-2",
+        "prop-3"
+      ]
     },
     "agent": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/agent-portrait.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -220,14 +239,20 @@
             "link": {
               "text": "About Sarah",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "89853daf-fc71-40e0-b8ac-d7016599f885"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["agent-eyebrow", "agent-heading", "agent-text", "agent-button"]
+      "blocksOrder": [
+        "agent-eyebrow",
+        "agent-heading",
+        "agent-text",
+        "agent-button"
+      ]
     },
     "testimonials": {
       "type": "testimonials",
@@ -246,7 +271,7 @@
           "type": "quote",
           "settings": {
             "quote": "Sarah found us our dream home in Beacon Hill after three other agents told us it was impossible in our budget. Her off-market connections made all the difference.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-1.webp",
             "name": "Daniel & Maria K.",
             "title": "Buyers, Beacon Hill",
             "rating": "5"
@@ -256,7 +281,7 @@
           "type": "quote",
           "settings": {
             "quote": "We sold 12% above asking in just 9 days. Sarah's staging recommendations and pricing strategy were spot on. We couldn't be happier.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-2.webp",
             "name": "Robert H.",
             "title": "Seller, Back Bay",
             "rating": "5"
@@ -266,14 +291,18 @@
           "type": "quote",
           "settings": {
             "quote": "As first-time buyers, we were nervous about every step. Sarah walked us through everything with patience and expertise. She genuinely cares.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-3.webp",
             "name": "Jessica T.",
             "title": "Buyer, Somerville",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2", "review-3"]
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
     },
     "buyer_seller": {
       "type": "icon-card-grid",
@@ -299,8 +328,8 @@
             "title": "First-Time Buyers",
             "description": "<p>Step-by-step guidance from pre-approval to closing day. We make the process simple and transparent.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -312,8 +341,8 @@
             "title": "Ready to Sell",
             "description": "<p>Strategic pricing, professional staging, and marketing that maximizes your home's value and minimizes time on market.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -325,14 +354,18 @@
             "title": "Property Investors",
             "description": "<p>Market analysis, portfolio strategy, and deal sourcing for investors looking to build wealth through Boston real estate.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["card-1", "card-2", "card-3"]
+      "blocksOrder": [
+        "card-1",
+        "card-2",
+        "card-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -363,18 +396,31 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "53852415-e1bc-4371-a530-0ffe7fd78310"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "trust", "listings", "agent", "testimonials", "buyer_seller", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "trust",
+    "listings",
+    "agent",
+    "testimonials",
+    "buyer_seller",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-08T16:00:00.000Z",
-  "updated": "2026-04-08T16:00:00.000Z"
+  "created": "2026-04-17T08:48:00.626Z",
+  "updated": "2026-04-22T11:46:08.343Z"
 }

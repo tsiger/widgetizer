@@ -1,0 +1,1038 @@
+{
+  "files": [
+    {
+      "filename": "contact-reception.webp",
+      "originalName": "contact-reception.webp",
+      "type": "image/webp",
+      "size": 19946,
+      "path": "/uploads/images/contact-reception.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Receptionist at a desk with a monitor and tablet check-in",
+      "title": "Front desk",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/contact-reception-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/contact-reception-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "contact-hero.webp",
+      "originalName": "contact-hero.webp",
+      "type": "image/webp",
+      "size": 23132,
+      "path": "/uploads/images/contact-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Clinic hallway with framed certificates leading to a treatment room",
+      "title": "Contact us",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/contact-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/contact-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/contact-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-9.webp",
+      "originalName": "smile-gallery-result-9.webp",
+      "type": "image/webp",
+      "size": 31272,
+      "path": "/uploads/images/smile-gallery-result-9.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Wide, white smile after full cosmetic treatment",
+      "title": "Final smile result",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-9-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-9-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-8.webp",
+      "originalName": "smile-gallery-result-8.webp",
+      "type": "image/webp",
+      "size": 21204,
+      "path": "/uploads/images/smile-gallery-result-8.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Close-up of lower front teeth with dental restorations",
+      "title": "Restoration result",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-8-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-8-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-7.webp",
+      "originalName": "smile-gallery-result-7.webp",
+      "type": "image/webp",
+      "size": 55438,
+      "path": "/uploads/images/smile-gallery-result-7.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Bright, symmetrical smile after cosmetic dental work",
+      "title": "Smile transformation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-7-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-7-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-6.webp",
+      "originalName": "smile-gallery-result-6.webp",
+      "type": "image/webp",
+      "size": 50216,
+      "path": "/uploads/images/smile-gallery-result-6.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Close-up of a healthy, natural-looking smile",
+      "title": "Cosmetic result",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-6-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-6-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-5.webp",
+      "originalName": "smile-gallery-result-5.webp",
+      "type": "image/webp",
+      "size": 32896,
+      "path": "/uploads/images/smile-gallery-result-5.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Aligned teeth with natural color after orthodontic treatment",
+      "title": "After orthodontics",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-5-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-5-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-4.webp",
+      "originalName": "smile-gallery-result-4.webp",
+      "type": "image/webp",
+      "size": 32488,
+      "path": "/uploads/images/smile-gallery-result-4.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Close-up of teeth with crowding and discoloration before orthodontics",
+      "title": "Before orthodontics",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-4-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-4-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-3.webp",
+      "originalName": "smile-gallery-result-3.webp",
+      "type": "image/webp",
+      "size": 49594,
+      "path": "/uploads/images/smile-gallery-result-3.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Even, white smile after veneer treatment",
+      "title": "Veneer result",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-3-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-3-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-2.webp",
+      "originalName": "smile-gallery-result-2.webp",
+      "type": "image/webp",
+      "size": 58056,
+      "path": "/uploads/images/smile-gallery-result-2.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Natural smile with slight discoloration before treatment",
+      "title": "Before whitening",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-2-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-2-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-result-1.webp",
+      "originalName": "smile-gallery-result-1.webp",
+      "type": "image/webp",
+      "size": 37934,
+      "path": "/uploads/images/smile-gallery-result-1.webp",
+      "width": 896,
+      "height": 592,
+      "alt": "Bright white smile close-up after whitening treatment",
+      "title": "Whitening result",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/smile-gallery-result-1-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-result-1-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-after.webp",
+      "originalName": "smile-gallery-after.webp",
+      "type": "image/webp",
+      "size": 46610,
+      "path": "/uploads/images/smile-gallery-after.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Close-up of a natural, even smile after cosmetic treatment",
+      "title": "Smile result",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/smile-gallery-after-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/smile-gallery-after-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-after-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-before.webp",
+      "originalName": "smile-gallery-before.webp",
+      "type": "image/webp",
+      "size": 107728,
+      "path": "/uploads/images/smile-gallery-before.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Close-up of stained and uneven teeth before treatment",
+      "title": "Before smile makeover",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/smile-gallery-before-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/smile-gallery-before-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-before-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "smile-gallery-hero.webp",
+      "originalName": "smile-gallery-hero.webp",
+      "type": "image/webp",
+      "size": 45812,
+      "path": "/uploads/images/smile-gallery-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Close-up of a bright, confident smile",
+      "title": "Smile gallery",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/smile-gallery-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/smile-gallery-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/smile-gallery-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "new-patients-step-4.webp",
+      "originalName": "new-patients-step-4.webp",
+      "type": "image/webp",
+      "size": 31054,
+      "path": "/uploads/images/new-patients-step-4.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Dentist and patient reviewing dental X-rays on a screen",
+      "title": "Review your plan",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/new-patients-step-4-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-step-4-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "new-patients-step-3.webp",
+      "originalName": "new-patients-step-3.webp",
+      "type": "image/webp",
+      "size": 40038,
+      "path": "/uploads/images/new-patients-step-3.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Patient receiving dental treatment with digital monitor",
+      "title": "Treatment in progress",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/new-patients-step-3-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-step-3-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "new-patients-step-2.webp",
+      "originalName": "new-patients-step-2.webp",
+      "type": "image/webp",
+      "size": 37048,
+      "path": "/uploads/images/new-patients-step-2.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Dentist performing an examination on a patient",
+      "title": "Your first exam",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/new-patients-step-2-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-step-2-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "new-patients-step-1.webp",
+      "originalName": "new-patients-step-1.webp",
+      "type": "image/webp",
+      "size": 29424,
+      "path": "/uploads/images/new-patients-step-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Patient filling out forms on a tablet in the waiting room",
+      "title": "Book online",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/new-patients-step-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-step-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "new-patients-welcome.webp",
+      "originalName": "new-patients-welcome.webp",
+      "type": "image/webp",
+      "size": 37068,
+      "path": "/uploads/images/new-patients-welcome.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Dental receptionist handing paperwork to a new patient",
+      "title": "Welcome to the clinic",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/new-patients-welcome-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-welcome-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "new-patients-hero.webp",
+      "originalName": "new-patients-hero.webp",
+      "type": "image/webp",
+      "size": 43880,
+      "path": "/uploads/images/new-patients-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Reception counter with welcome tablet and business cards",
+      "title": "New patients",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/new-patients-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/new-patients-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/new-patients-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "services-technology.webp",
+      "originalName": "services-technology.webp",
+      "type": "image/webp",
+      "size": 34130,
+      "path": "/uploads/images/services-technology.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Modern treatment room with dental chair and panoramic X-ray display",
+      "title": "Advanced technology",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/services-technology-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/services-technology-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "services-hero.webp",
+      "originalName": "services-hero.webp",
+      "type": "image/webp",
+      "size": 38760,
+      "path": "/uploads/images/services-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Dental mirror and explorer tools on a white surface with gloved hand",
+      "title": "Our services",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/services-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/services-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/services-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "about-gallery-exterior.webp",
+      "originalName": "about-gallery-exterior.webp",
+      "type": "image/webp",
+      "size": 77588,
+      "path": "/uploads/images/about-gallery-exterior.webp",
+      "width": 1200,
+      "height": 672,
+      "alt": "Dental clinic storefront with blue awning and glass windows",
+      "title": "Clinic exterior",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-gallery-exterior-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-gallery-exterior-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-gallery-exterior-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "about-gallery-lounge.webp",
+      "originalName": "about-gallery-lounge.webp",
+      "type": "image/webp",
+      "size": 82220,
+      "path": "/uploads/images/about-gallery-lounge.webp",
+      "width": 1200,
+      "height": 672,
+      "alt": "Sunlit patient waiting area with blue chairs and coffee station",
+      "title": "Waiting lounge",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-gallery-lounge-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-gallery-lounge-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-gallery-lounge-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "about-gallery-sterilization.webp",
+      "originalName": "about-gallery-sterilization.webp",
+      "type": "image/webp",
+      "size": 79232,
+      "path": "/uploads/images/about-gallery-sterilization.webp",
+      "width": 1200,
+      "height": 672,
+      "alt": "Sterilization room with autoclave and organized instrument trays",
+      "title": "Sterilization room",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-gallery-sterilization-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-gallery-sterilization-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-gallery-sterilization-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "about-gallery-reception.webp",
+      "originalName": "about-gallery-reception.webp",
+      "type": "image/webp",
+      "size": 41248,
+      "path": "/uploads/images/about-gallery-reception.webp",
+      "width": 1200,
+      "height": 672,
+      "alt": "White reception desk with monitors and organized file shelves",
+      "title": "Reception desk",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-gallery-reception-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-gallery-reception-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-gallery-reception-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "about-gallery-treatment.webp",
+      "originalName": "about-gallery-treatment.webp",
+      "type": "image/webp",
+      "size": 56330,
+      "path": "/uploads/images/about-gallery-treatment.webp",
+      "width": 1200,
+      "height": 672,
+      "alt": "Treatment room with dental chair, overhead light, and blue accent wall",
+      "title": "Treatment room",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-gallery-treatment-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-gallery-treatment-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-gallery-treatment-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "about-gallery-lobby.webp",
+      "originalName": "about-gallery-lobby.webp",
+      "type": "image/webp",
+      "size": 58820,
+      "path": "/uploads/images/about-gallery-lobby.webp",
+      "width": 1200,
+      "height": 672,
+      "alt": "Modern dental office lobby with grey armchairs and blue accent wall",
+      "title": "Patient lobby",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-gallery-lobby-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-gallery-lobby-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-gallery-lobby-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "about-profile-lena.webp",
+      "originalName": "about-profile-lena.webp",
+      "type": "image/webp",
+      "size": 13272,
+      "path": "/uploads/images/about-profile-lena.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Dr. Lena, dentist in a white coat, smiling",
+      "title": "Dr. Lena",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/about-profile-lena-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-profile-marcus.webp",
+      "originalName": "about-profile-marcus.webp",
+      "type": "image/webp",
+      "size": 12136,
+      "path": "/uploads/images/about-profile-marcus.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Dr. Marcus, dentist with glasses in a white coat, smiling",
+      "title": "Dr. Marcus",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/about-profile-marcus-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-profile-elena.webp",
+      "originalName": "about-profile-elena.webp",
+      "type": "image/webp",
+      "size": 12854,
+      "path": "/uploads/images/about-profile-elena.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Dr. Elena, dentist in a white coat, smiling",
+      "title": "Dr. Elena",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/about-profile-elena-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-story.webp",
+      "originalName": "about-story.webp",
+      "type": "image/webp",
+      "size": 61476,
+      "path": "/uploads/images/about-story.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Dental clinic building with landscaped entrance",
+      "title": "Our story",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-story-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/about-story-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "about-hero.webp",
+      "originalName": "about-hero.webp",
+      "type": "image/webp",
+      "size": 86310,
+      "path": "/uploads/images/about-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Modern dental clinic building exterior on a city street",
+      "title": "Our practice",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/about-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/about-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "home-avatar-james.webp",
+      "originalName": "home-avatar-james.webp",
+      "type": "image/webp",
+      "size": 16242,
+      "path": "/uploads/images/home-avatar-james.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "James, a smiling male patient",
+      "title": "James",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/home-avatar-james-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "home-avatar-sarah.webp",
+      "originalName": "home-avatar-sarah.webp",
+      "type": "image/webp",
+      "size": 9240,
+      "path": "/uploads/images/home-avatar-sarah.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Sarah, a smiling female patient",
+      "title": "Sarah",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/home-avatar-sarah-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "home-avatar-michael.webp",
+      "originalName": "home-avatar-michael.webp",
+      "type": "image/webp",
+      "size": 15884,
+      "path": "/uploads/images/home-avatar-michael.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Michael, a smiling male patient in a blue shirt",
+      "title": "Michael",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/home-avatar-michael-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "home-dentist.webp",
+      "originalName": "home-dentist.webp",
+      "type": "image/webp",
+      "size": 24552,
+      "path": "/uploads/images/home-dentist.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Dentist with arms crossed smiling in a treatment room",
+      "title": "Our lead dentist",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/home-dentist-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/home-dentist-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "home-after.webp",
+      "originalName": "home-after.webp",
+      "type": "image/webp",
+      "size": 76806,
+      "path": "/uploads/images/home-after.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Close-up of a bright, healthy smile after dental treatment",
+      "title": "After treatment",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-after-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/home-after-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/home-after-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "home-before.webp",
+      "originalName": "home-before.webp",
+      "type": "image/webp",
+      "size": 71154,
+      "path": "/uploads/images/home-before.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Close-up of stained and discolored teeth before treatment",
+      "title": "Before treatment",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-before-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/home-before-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/home-before-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "home-hero.webp",
+      "originalName": "home-hero.webp",
+      "type": "image/webp",
+      "size": 134298,
+      "path": "/uploads/images/home-hero.webp",
+      "width": 1920,
+      "height": 1080,
+      "alt": "Patient smiling during a dental examination",
+      "title": "Welcome to Brightside",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-hero-medium.webp",
+          "width": 1024,
+          "height": 576
+        },
+        "small": {
+          "path": "/uploads/images/home-hero-small.webp",
+          "width": 480,
+          "height": 270
+        },
+        "thumb": {
+          "path": "/uploads/images/home-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brightsidelogolight.png",
+      "originalName": "brightside_logo_light.png",
+      "type": "image/png",
+      "size": 8403,
+      "path": "/uploads/images/brightsidelogolight.png",
+      "width": 755,
+      "height": 137,
+      "alt": "Brightside Dental logo in blue and teal for dark backgrounds",
+      "title": "Brightside logo light",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/brightsidelogolight-small.png",
+          "width": 480,
+          "height": 87
+        },
+        "thumb": {
+          "path": "/uploads/images/brightsidelogolight-thumb.png",
+          "width": 150,
+          "height": 27
+        }
+      }
+    }
+  ]
+}

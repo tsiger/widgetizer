@@ -13,7 +13,8 @@
         "overlay_color": "#121722cc",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -42,7 +43,11 @@
           }
         }
       },
-      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
     },
     "shop_story": {
       "type": "image-text",
@@ -52,7 +57,8 @@
         "color_scheme": "standard-primary",
         "content_color_scheme": "none",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-shop-story.webp"
       },
       "blocks": {
         "ss-eyebrow": {
@@ -111,7 +117,14 @@
           }
         }
       },
-      "blocksOrder": ["ss-eyebrow", "ss-heading", "ss-body-1", "ss-body-2", "ss-body-3", "ss-button"]
+      "blocksOrder": [
+        "ss-eyebrow",
+        "ss-heading",
+        "ss-body-1",
+        "ss-body-2",
+        "ss-body-3",
+        "ss-button"
+      ]
     },
     "milestones": {
       "type": "timeline",
@@ -168,7 +181,13 @@
           }
         }
       },
-      "blocksOrder": ["ms-2012", "ms-2015", "ms-2018", "ms-2021", "ms-2024"]
+      "blocksOrder": [
+        "ms-2012",
+        "ms-2015",
+        "ms-2018",
+        "ms-2021",
+        "ms-2024"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -193,7 +212,8 @@
             "name": "Marcus Chen",
             "role": "Owner · Master Technician",
             "specialty": "Engine & transmission",
-            "bio": "Founded Torque in 2012. ASE Master Technician since 2013, L1 Advanced Engine Performance certified. 24 years on the tools."
+            "bio": "Founded Torque in 2012. ASE Master Technician since 2013, L1 Advanced Engine Performance certified. 24 years on the tools.",
+            "photo": "/uploads/images/team-marcus.webp"
           }
         },
         "tm-alicia": {
@@ -202,7 +222,8 @@
             "name": "Alicia Wood",
             "role": "Service Advisor",
             "specialty": "Scheduling & quotes",
-            "bio": "The voice on the phone and the face at the counter. Eight years at Torque, nine before that at a dealer service department. Knows every customer by name."
+            "bio": "The voice on the phone and the face at the counter. Eight years at Torque, nine before that at a dealer service department. Knows every customer by name.",
+            "photo": "/uploads/images/team-alicia.webp"
           }
         },
         "tm-jordan": {
@@ -211,7 +232,8 @@
             "name": "Jordan Patel",
             "role": "Lead Technician",
             "specialty": "Diagnostics & electrical",
-            "bio": "ASE-certified in six areas including electrical and engine performance. Runs the scan tools and the tricky diagnostic jobs. Six years at Torque."
+            "bio": "ASE-certified in six areas including electrical and engine performance. Runs the scan tools and the tricky diagnostic jobs. Six years at Torque.",
+            "photo": "/uploads/images/team-jordan.webp"
           }
         },
         "tm-eli": {
@@ -220,11 +242,17 @@
             "name": "Eli Bennett",
             "role": "Technician · EV Certified",
             "specialty": "Hybrid & EV service",
-            "bio": "ASE-certified with current high-voltage certifications for hybrid and EV service. Four years at Torque. Handles Tesla, Rivian, and every major hybrid platform."
+            "bio": "ASE-certified with current high-voltage certifications for hybrid and EV service. Four years at Torque. Handles Tesla, Rivian, and every major hybrid platform.",
+            "photo": "/uploads/images/team-eli.webp"
           }
         }
       },
-      "blocksOrder": ["tm-marcus", "tm-alicia", "tm-jordan", "tm-eli"]
+      "blocksOrder": [
+        "tm-marcus",
+        "tm-alicia",
+        "tm-jordan",
+        "tm-eli"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -257,7 +285,8 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             },
             "style": "primary",
             "link_2": {
@@ -270,7 +299,11 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -281,6 +314,6 @@
     "closing_cta"
   ],
   "id": "about",
-  "created": "2026-04-21T12:00:00.000Z",
-  "updated": "2026-04-21T12:00:00.000Z"
+  "created": "2026-04-21T13:01:43.944Z",
+  "updated": "2026-04-21T13:27:31.713Z"
 }

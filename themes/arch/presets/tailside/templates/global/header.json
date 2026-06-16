@@ -2,21 +2,25 @@
   "type": "header",
   "settings": {
     "logoText": "Tailside",
-    "logoMaxWidth": 200,
     "contactDetailsLine1": "(555) 555-0100",
     "contactDetailsLine2": "Tue-Sat appointments",
     "contact_position": "logo",
-    "headerNavigation": "main-menu",
+    "headerNavigation": "2ffd7bfd-5c1b-4378-82a3-5e238acb1d8e",
     "center_nav": false,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book a visit",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": false,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/tailside-logo-dark.png",
+    "logoMaxWidth": 200
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

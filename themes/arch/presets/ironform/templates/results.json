@@ -2,8 +2,8 @@
   "name": "Results",
   "slug": "results",
   "id": "results",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T14:12:33.346Z",
+  "updated": "2026-04-22T16:59:51.162Z",
   "widgets": {
     "page_header": {
       "type": "banner",
@@ -13,7 +13,8 @@
         "content_width": "medium",
         "alignment": "start",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "image": "/uploads/images/hero-results.webp"
       },
       "blocks": {
         "header-eyebrow": {
@@ -40,7 +41,11 @@
           }
         }
       },
-      "blocksOrder": ["header-eyebrow", "header-heading", "header-text"]
+      "blocksOrder": [
+        "header-eyebrow",
+        "header-heading",
+        "header-text"
+      ]
     },
     "results_stats": {
       "type": "key-figures",
@@ -81,7 +86,11 @@
           }
         }
       },
-      "blocksOrder": ["stat-kg", "stat-completion", "stat-rating"]
+      "blocksOrder": [
+        "stat-kg",
+        "stat-completion",
+        "stat-rating"
+      ]
     },
     "transformation_gallery": {
       "type": "masonry-gallery",
@@ -97,60 +106,77 @@
           "type": "item",
           "settings": {
             "title": "James K.",
-            "category": "12-Week Transformation"
+            "category": "12-Week Transformation",
+            "image": "/uploads/images/gallery-1.webp"
           }
         },
         "gallery-2": {
           "type": "item",
           "settings": {
             "title": "Marcus L.",
-            "category": "1-on-1 Training"
+            "category": "1-on-1 Training",
+            "image": "/uploads/images/gallery-2.webp"
           }
         },
         "gallery-3": {
           "type": "item",
           "settings": {
             "title": "Dan M.",
-            "category": "Online Coaching"
+            "category": "Online Coaching",
+            "image": "/uploads/images/gallery-3.webp"
           }
         },
         "gallery-4": {
           "type": "item",
           "settings": {
             "title": "Tom D.",
-            "category": "12-Week Transformation"
+            "category": "12-Week Transformation",
+            "image": "/uploads/images/gallery-5.webp"
           }
         },
         "gallery-5": {
           "type": "item",
           "settings": {
             "title": "Ryan H.",
-            "category": "1-on-1 Training"
+            "category": "1-on-1 Training",
+            "image": "/uploads/images/gallery-4.webp"
           }
         },
         "gallery-6": {
           "type": "item",
           "settings": {
             "title": "Chris W.",
-            "category": "Online Coaching"
+            "category": "Online Coaching",
+            "image": "/uploads/images/gallery-6.webp"
           }
         },
         "gallery-7": {
           "type": "item",
           "settings": {
             "title": "Steve B.",
-            "category": "12-Week Transformation"
+            "category": "12-Week Transformation",
+            "image": "/uploads/images/gallery-7.webp"
           }
         },
         "gallery-8": {
           "type": "item",
           "settings": {
             "title": "Paul N.",
-            "category": "1-on-1 Training"
+            "category": "1-on-1 Training",
+            "image": "/uploads/images/gallery-8.webp"
           }
         }
       },
-      "blocksOrder": ["gallery-1", "gallery-2", "gallery-3", "gallery-4", "gallery-5", "gallery-6", "gallery-7", "gallery-8"]
+      "blocksOrder": [
+        "gallery-1",
+        "gallery-2",
+        "gallery-3",
+        "gallery-4",
+        "gallery-5",
+        "gallery-6",
+        "gallery-7",
+        "gallery-8"
+      ]
     },
     "client_stories": {
       "type": "testimonials",
@@ -202,7 +228,12 @@
           }
         }
       },
-      "blocksOrder": ["quote-1", "quote-2", "quote-3", "quote-4"]
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3",
+        "quote-4"
+      ]
     },
     "results_cta": {
       "type": "action-bar",
@@ -231,15 +262,26 @@
             "link": {
               "href": "book.html",
               "text": "Book Your Free Session",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-btn"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-btn"
+      ]
     }
   },
-  "widgetsOrder": ["page_header", "results_stats", "transformation_gallery", "client_stories", "results_cta"]
+  "widgetsOrder": [
+    "page_header",
+    "results_stats",
+    "transformation_gallery",
+    "client_stories",
+    "results_cta"
+  ]
 }

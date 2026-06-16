@@ -1,15 +1,17 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Ledgerworks CPA PLLC. All rights reserved.</p>",
-    "layout": "first-featured",
+    "copyright": "© 2026 Ledgerworks CPA PLLC. All rights reserved.",
+    "layout": "equal",
     "color_scheme": "highlight-primary"
   },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
-        "text": "<p>Accounting, tax, and advisory for small businesses and the self-employed. Based in Austin, serving clients nationwide.</p>"
+        "text": "<p>Accounting, tax, and advisory for small businesses and the self-employed. Based in Austin, serving clients nationwide.</p>",
+        "logo": "/uploads/images/ledgerworks-light.png",
+        "logo_width": 200
       }
     },
     "text_block_1": {
@@ -23,7 +25,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Navigate",
-        "menu": "footer-menu"
+        "menu": "2bbd0b06-0e6a-4b41-9d77-9e7ec0caa0f4"
       }
     },
     "social_block_1": {
@@ -33,5 +35,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

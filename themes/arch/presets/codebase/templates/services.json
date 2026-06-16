@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["si-eyebrow", "si-heading", "si-text"]
+      "blocksOrder": [
+        "si-eyebrow",
+        "si-heading",
+        "si-text"
+      ]
     },
     "service_areas": {
       "type": "icon-card-grid",
@@ -89,7 +93,12 @@
           }
         }
       },
-      "blocksOrder": ["sa-1", "sa-2", "sa-3", "sa-4"]
+      "blocksOrder": [
+        "sa-1",
+        "sa-2",
+        "sa-3",
+        "sa-4"
+      ]
     },
     "specialties": {
       "type": "numbered-service-list",
@@ -149,7 +158,14 @@
           }
         }
       },
-      "blocksOrder": ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5", "sp-6"]
+      "blocksOrder": [
+        "sp-1",
+        "sp-2",
+        "sp-3",
+        "sp-4",
+        "sp-5",
+        "sp-6"
+      ]
     },
     "engagement_modes": {
       "type": "pricing",
@@ -176,7 +192,8 @@
             "button_link": {
               "text": "Inquire about a sprint",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "featured": false
           }
@@ -191,7 +208,8 @@
             "button_link": {
               "text": "Inquire about a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "featured": true
           }
@@ -206,13 +224,18 @@
             "button_link": {
               "text": "Inquire about a retainer",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "featured": false
           }
         }
       },
-      "blocksOrder": ["e-sprint", "e-project", "e-retainer"]
+      "blocksOrder": [
+        "e-sprint",
+        "e-project",
+        "e-retainer"
+      ]
     },
     "services_faq": {
       "type": "accordion",
@@ -280,7 +303,15 @@
           }
         }
       },
-      "blocksOrder": ["sf-sidebar", "sf-1", "sf-2", "sf-3", "sf-4", "sf-5", "sf-6"]
+      "blocksOrder": [
+        "sf-sidebar",
+        "sf-1",
+        "sf-2",
+        "sf-3",
+        "sf-4",
+        "sf-5",
+        "sf-6"
+      ]
     },
     "services_cta": {
       "type": "action-bar",
@@ -313,18 +344,30 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["sc-heading", "sc-text", "sc-button"]
+      "blocksOrder": [
+        "sc-heading",
+        "sc-text",
+        "sc-button"
+      ]
     }
   },
-  "widgetsOrder": ["services_intro", "service_areas", "specialties", "engagement_modes", "services_faq", "services_cta"],
+  "widgetsOrder": [
+    "services_intro",
+    "service_areas",
+    "specialties",
+    "engagement_modes",
+    "services_faq",
+    "services_cta"
+  ],
   "id": "services",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T11:33:30.988Z",
+  "updated": "2026-04-20T11:36:55.339Z"
 }

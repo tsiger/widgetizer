@@ -6,17 +6,22 @@
     "contactDetailsLine1": "",
     "contactDetailsLine2": "",
     "contact_position": "logo",
-    "headerNavigation": "main-menu",
+    "headerNavigation": "cd22b748-5056-4df1-9a9d-d49760bc6b57",
     "center_nav": false,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Start a project",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
     },
     "ctaButtonStyle": "primary",
     "full_width": false,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "highlight-primary"
-  }
+    "color_scheme": "highlight-primary",
+    "logoImage": "/uploads/images/pixelcraft-logo-light.png",
+    "transparent_logo": ""
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

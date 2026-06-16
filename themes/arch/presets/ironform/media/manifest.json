@@ -1,0 +1,432 @@
+{
+  "files": [
+    {
+      "filename": "ironform-logo-light.png",
+      "originalName": "ironform-logo-light.png",
+      "type": "image/png",
+      "size": 5012,
+      "path": "/uploads/images/ironform-logo-light.png",
+      "width": 608,
+      "height": 128,
+      "alt": "",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/ironform-logo-light-small.png",
+          "width": 480,
+          "height": 101
+        },
+        "thumb": {
+          "path": "/uploads/images/ironform-logo-light-thumb.png",
+          "width": 150,
+          "height": 32
+        }
+      }
+    },
+    {
+      "filename": "ironform-logo-dark.png",
+      "originalName": "ironform-logo-dark.png",
+      "type": "image/png",
+      "size": 7098,
+      "path": "/uploads/images/ironform-logo-dark.png",
+      "width": 608,
+      "height": 128,
+      "alt": "",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/ironform-logo-dark-small.png",
+          "width": 480,
+          "height": 101
+        },
+        "thumb": {
+          "path": "/uploads/images/ironform-logo-dark-thumb.png",
+          "width": 150,
+          "height": 32
+        }
+      }
+    },
+    {
+      "filename": "hero-book.webp",
+      "originalName": "hero-book.webp",
+      "type": "image/webp",
+      "size": 149606,
+      "path": "/uploads/images/hero-book.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Personal trainer taking notes during a consultation with a client at a desk",
+      "title": "Book a Free Consultation",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-book-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-book-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-book-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "gallery-8.webp",
+      "originalName": "gallery-8.webp",
+      "type": "image/webp",
+      "size": 40752,
+      "path": "/uploads/images/gallery-8.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Fully stocked dumbbell rack in a private gym with warm ambient lighting",
+      "title": "Private Training Studio Equipment",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-8-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-8-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-7.webp",
+      "originalName": "gallery-7.webp",
+      "type": "image/webp",
+      "size": 23088,
+      "path": "/uploads/images/gallery-7.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Athlete completing an overhead barbell press at full lockout in a dark gym",
+      "title": "Overhead Press — 12-Week Transformation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-7-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-7-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "gallery-6.webp",
+      "originalName": "gallery-6.webp",
+      "type": "image/webp",
+      "size": 59108,
+      "path": "/uploads/images/gallery-6.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Trainer monitoring a client's pace on a treadmill during a conditioning session",
+      "title": "Cardio Conditioning — Online Coaching",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-6-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-6-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-5.webp",
+      "originalName": "gallery-5.webp",
+      "type": "image/webp",
+      "size": 32576,
+      "path": "/uploads/images/gallery-5.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Athlete performing a kettlebell swing at chest height in a private gym",
+      "title": "Kettlebell Swing — 1-on-1 Training",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-5-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-5-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "gallery-4.webp",
+      "originalName": "gallery-4.webp",
+      "type": "image/webp",
+      "size": 42656,
+      "path": "/uploads/images/gallery-4.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Close-up of chalked hands gripping a loaded barbell before a lift",
+      "title": "Deadlift Grip — 12-Week Transformation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-4-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-4-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-3.webp",
+      "originalName": "gallery-3.webp",
+      "type": "image/webp",
+      "size": 51016,
+      "path": "/uploads/images/gallery-3.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Athlete performing pull-ups on a wall-mounted bar viewed from behind",
+      "title": "Pull-Ups — Online Coaching",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-3-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-3-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "gallery-2.webp",
+      "originalName": "gallery-2.webp",
+      "type": "image/webp",
+      "size": 44430,
+      "path": "/uploads/images/gallery-2.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Trainer coaching a client through a dumbbell row exercise on a bench",
+      "title": "Dumbbell Row — 1-on-1 Training",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-2-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-2-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-1.webp",
+      "originalName": "gallery-1.webp",
+      "type": "image/webp",
+      "size": 31608,
+      "path": "/uploads/images/gallery-1.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Client performing a barbell squat under dramatic overhead lighting in a dark gym",
+      "title": "Barbell Squat — 12-Week Transformation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-1-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-1-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "hero-results.webp",
+      "originalName": "hero-results.webp",
+      "type": "image/webp",
+      "size": 216094,
+      "path": "/uploads/images/hero-results.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Athlete deadlifting a heavy barbell from behind in a dark gym",
+      "title": "Client Training Results",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-results-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-results-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-results-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hero-training.webp",
+      "originalName": "hero-training.webp",
+      "type": "image/webp",
+      "size": 179688,
+      "path": "/uploads/images/hero-training.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Loaded barbell on the floor of a dark private gym lit by a single overhead light",
+      "title": "Private Training Studio",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-training-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-training-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-training-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "client-testimonial.webp",
+      "originalName": "client-testimonial.webp",
+      "type": "image/webp",
+      "size": 41964,
+      "path": "/uploads/images/client-testimonial.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Fit male client smiling outdoors in casual athletic wear",
+      "title": "Client Testimonial",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/client-testimonial-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/client-testimonial-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "trainer-in-session.webp",
+      "originalName": "trainer-in-session.webp",
+      "type": "image/webp",
+      "size": 39804,
+      "path": "/uploads/images/trainer-in-session.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Personal trainer correcting a client's form during a barbell exercise in the gym",
+      "title": "1-on-1 Coaching Session",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/trainer-in-session-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/trainer-in-session-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "trainer-portrait.webp",
+      "originalName": "trainer-portrait.webp",
+      "type": "image/webp",
+      "size": 30686,
+      "path": "/uploads/images/trainer-portrait.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Portrait of personal trainer Alex Rowe against a dark concrete wall",
+      "title": "Alex Rowe — Personal Trainer",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/trainer-portrait-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/trainer-portrait-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "hero.webp",
+      "originalName": "hero.webp",
+      "type": "image/webp",
+      "size": 81414,
+      "path": "/uploads/images/hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Personal trainer standing with arms crossed beside a barbell rack in a dark private gym",
+      "title": "Alex Rowe — Personal Trainer",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

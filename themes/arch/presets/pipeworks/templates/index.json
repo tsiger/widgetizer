@@ -13,7 +13,8 @@
         "overlay_color": "#1d2a389e",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/hero-home.webp"
       },
       "blocks": {
         "hero-rating": {
@@ -59,14 +60,21 @@
             "link_2": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             },
             "style_2": "secondary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["hero-rating", "hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-rating",
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "credentials": {
       "type": "trust-bar",
@@ -122,7 +130,13 @@
           }
         }
       },
-      "blocksOrder": ["cr-1", "cr-2", "cr-3", "cr-4", "cr-5"]
+      "blocksOrder": [
+        "cr-1",
+        "cr-2",
+        "cr-3",
+        "cr-4",
+        "cr-5"
+      ]
     },
     "services": {
       "type": "card-grid",
@@ -152,8 +166,10 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+            },
+            "image": "/uploads/images/services-emergency.webp"
           }
         },
         "sv-heaters": {
@@ -165,8 +181,10 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+            },
+            "image": "/uploads/images/services-water-heaters.webp"
           }
         },
         "sv-drain": {
@@ -178,8 +196,10 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+            },
+            "image": "/uploads/images/services-drain-sewer.webp"
           }
         },
         "sv-install": {
@@ -191,12 +211,19 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+            },
+            "image": "/uploads/images/services-install.webp"
           }
         }
       },
-      "blocksOrder": ["sv-emergency", "sv-heaters", "sv-drain", "sv-install"]
+      "blocksOrder": [
+        "sv-emergency",
+        "sv-heaters",
+        "sv-drain",
+        "sv-install"
+      ]
     },
     "how_it_works": {
       "type": "numbered-cards",
@@ -243,7 +270,12 @@
           }
         }
       },
-      "blocksOrder": ["hw-1", "hw-2", "hw-3", "hw-4"]
+      "blocksOrder": [
+        "hw-1",
+        "hw-2",
+        "hw-3",
+        "hw-4"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -295,7 +327,12 @@
           }
         }
       },
-      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+      "blocksOrder": [
+        "st-1",
+        "st-2",
+        "st-3",
+        "st-4"
+      ]
     },
     "reviews": {
       "type": "testimonials",
@@ -318,7 +355,8 @@
             "quote": "Called at 10pm on a Sunday with a leaking supply line flooding the laundry. Dani was at our door in 40 minutes with the parts and had it fixed by midnight. Quoted me before he started. Paid exactly what he quoted.",
             "name": "Melissa R.",
             "title": "Sellwood · Emergency repair, 2025",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-melissa.webp"
           }
         },
         "r-2": {
@@ -327,7 +365,8 @@
             "quote": "Got three quotes on replacing our 19-year-old water heater. Pipeworks wasn't the cheapest, but they were the only ones who walked me through tank vs. tankless honestly — including why tankless wasn't right for our setup. Installed the next morning.",
             "name": "Tom K.",
             "title": "Eastmoreland · Water heater replace, 2024",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-tom.webp"
           }
         },
         "r-3": {
@@ -336,7 +375,8 @@
             "quote": "Kitchen drain had been slow for months. Two other plumbers snaked it and charged us, and it came back both times. Pipeworks ran a camera, found a root, and hydro-jetted the line. Hasn't backed up since.",
             "name": "Priya S.",
             "title": "Hawthorne · Drain & sewer, 2025",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-priya.webp"
           }
         },
         "r-4": {
@@ -345,7 +385,8 @@
             "quote": "We own a small restaurant on Division. When a supply line under the sink burst during service, they had someone there in under an hour and we were back open for dinner. Fair price for an emergency call-out.",
             "name": "Javier L.",
             "title": "Richmond · Light commercial, 2024",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-javier.webp"
           }
         },
         "r-5": {
@@ -354,7 +395,8 @@
             "quote": "Repiped a 1920s bungalow. Marcus walked through the whole house on day one, marked every wall he'd need to open, and gave us a fixed price. Finished in three days, cleaned up perfectly, patched the drywall like it never happened.",
             "name": "Anne B.",
             "title": "Laurelhurst · Whole-house repipe, 2024",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-david.webp"
           }
         },
         "r-6": {
@@ -367,7 +409,14 @@
           }
         }
       },
-      "blocksOrder": ["r-1", "r-2", "r-3", "r-4", "r-5", "r-6"]
+      "blocksOrder": [
+        "r-1",
+        "r-2",
+        "r-3",
+        "r-4",
+        "r-5",
+        "r-6"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -406,14 +455,19 @@
             "link_2": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -426,6 +480,6 @@
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-21T10:00:00.000Z",
-  "updated": "2026-04-21T10:00:00.000Z"
+  "created": "2026-04-21T10:55:45.450Z",
+  "updated": "2026-04-21T11:54:59.938Z"
 }

@@ -5,17 +5,21 @@
     "contactDetailsLine1": "(555) 234-5678",
     "contactDetailsLine2": "247 Elm Street, Brooklyn",
     "contact_position": "menu",
-    "logoMaxWidth": 130,
-    "center_nav": true,
     "ctaButtonLink": {
       "href": "reservations.html",
       "text": "Reserve a Table",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/logo.png",
+    "logoMaxWidth": 130,
+    "center_nav": true
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

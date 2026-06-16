@@ -10,7 +10,8 @@
         "fullwidth": true,
         "content_width": "wide",
         "alignment": "start",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/gym-floor-hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -41,20 +42,27 @@
             "link": {
               "href": "pricing.html",
               "text": "Start Free Trial",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c3fb2f51-af25-43f7-9068-f7b5a572dede"
             },
             "style": "primary",
             "size": "large",
             "link_2": {
               "href": "classes.html",
               "text": "View Classes",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "08cd32d1-95b3-4a71-aa82-56d17265bb5a"
             },
             "style_2": "secondary"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
     },
     "trust_strip": {
       "type": "trust-bar",
@@ -102,7 +110,12 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
     },
     "programs_grid": {
       "type": "card-grid",
@@ -125,39 +138,73 @@
           "type": "card",
           "settings": {
             "title": "Strength Training",
-            "description": "<p>Build raw power with barbell programs, progressive overload coaching, and structured periodization.</p>"
+            "description": "<p>Build raw power with barbell programs, progressive overload coaching, and structured periodization.</p>",
+            "image": "/uploads/images/strength-class.webp",
+            "subtitle": "",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "program-2": {
           "type": "card",
           "settings": {
             "title": "HIIT",
-            "description": "<p>High-intensity intervals that torch calories and build endurance. 45-minute classes, maximum output.</p>"
+            "description": "<p>High-intensity intervals that torch calories and build endurance. 45-minute classes, maximum output.</p>",
+            "image": "/uploads/images/hiit-class.webp",
+            "subtitle": "",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "program-3": {
           "type": "card",
           "settings": {
             "title": "Boxing",
-            "description": "<p>Technical striking, heavy bag work, and conditioning drills. No experience needed.</p>"
+            "description": "<p>Technical striking, heavy bag work, and conditioning drills. No experience needed.</p>",
+            "image": "/uploads/images/boxing-class.webp",
+            "subtitle": "",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "program-4": {
           "type": "card",
           "settings": {
             "title": "Yoga & Mobility",
-            "description": "<p>Restore, stretch, and move better. Essential recovery for hard-training athletes.</p>"
+            "description": "<p>Restore, stretch, and move better. Essential recovery for hard-training athletes.</p>",
+            "image": "/uploads/images/yoga-class.webp",
+            "subtitle": "",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["program-1", "program-2", "program-3", "program-4"]
+      "blocksOrder": [
+        "program-1",
+        "program-2",
+        "program-3",
+        "program-4"
+      ]
     },
     "facility_split": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
         "text_position": "center",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/facility-interior.webp"
       },
       "blocks": {
         "facility-eyebrow": {
@@ -188,14 +235,20 @@
             "link": {
               "href": "about.html",
               "text": "Learn More",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "895b8f13-4c0c-4aad-9241-6dc15e8e3eb1"
             },
             "style": "secondary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["facility-eyebrow", "facility-heading", "facility-text", "facility-button"]
+      "blocksOrder": [
+        "facility-eyebrow",
+        "facility-heading",
+        "facility-text",
+        "facility-button"
+      ]
     },
     "stats_section": {
       "type": "key-figures",
@@ -240,7 +293,12 @@
           }
         }
       },
-      "blocksOrder": ["stat-1", "stat-2", "stat-3", "stat-4"]
+      "blocksOrder": [
+        "stat-1",
+        "stat-2",
+        "stat-3",
+        "stat-4"
+      ]
     },
     "member_reviews": {
       "type": "testimonials",
@@ -283,7 +341,11 @@
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2", "review-3"]
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
     },
     "trial_cta": {
       "type": "action-bar",
@@ -312,18 +374,31 @@
             "link": {
               "href": "pricing.html",
               "text": "Start Free Trial",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c3fb2f51-af25-43f7-9068-f7b5a572dede"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero_banner", "trust_strip", "programs_grid", "facility_split", "stats_section", "member_reviews", "trial_cta"],
+  "widgetsOrder": [
+    "hero_banner",
+    "trust_strip",
+    "programs_grid",
+    "facility_split",
+    "stats_section",
+    "member_reviews",
+    "trial_cta"
+  ],
   "id": "index",
-  "created": "2026-04-14T10:00:00.000Z",
-  "updated": "2026-04-14T10:00:00.000Z"
+  "created": "2026-04-19T11:06:05.097Z",
+  "updated": "2026-04-19T11:09:37.309Z"
 }

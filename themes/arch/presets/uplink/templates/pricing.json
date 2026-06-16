@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/banner-pricing.webp"
       },
       "blocks": {
         "intro_eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["intro_eyebrow", "intro_heading", "intro_text"]
+      "blocksOrder": [
+        "intro_eyebrow",
+        "intro_heading",
+        "intro_text"
+      ]
     },
     "pricing_tiers": {
       "type": "pricing",
@@ -68,7 +73,8 @@
             "button_link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
             },
             "featured": false
           }
@@ -83,7 +89,8 @@
             "button_link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
             },
             "featured": true
           }
@@ -98,13 +105,18 @@
             "button_link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
             },
             "featured": false
           }
         }
       },
-      "blocksOrder": ["tier_essentials", "tier_professional", "tier_enterprise"]
+      "blocksOrder": [
+        "tier_essentials",
+        "tier_professional",
+        "tier_enterprise"
+      ]
     },
     "pricing_included": {
       "type": "numbered-service-list",
@@ -125,39 +137,70 @@
           "type": "service",
           "settings": {
             "title": "Fixed onboarding fee",
-            "description": "<p>A one-time flat fee sized by environment complexity — not an hourly surprise. You see the number before you sign.</p>"
+            "description": "<p>A one-time flat fee sized by environment complexity — not an hourly surprise. You see the number before you sign.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "inc_response": {
           "type": "service",
           "settings": {
             "title": "15-minute response SLA",
-            "description": "<p>Business-hours tickets get a named engineer inside fifteen minutes. Measured monthly and reported transparently in your quarterly review.</p>"
+            "description": "<p>Business-hours tickets get a named engineer inside fifteen minutes. Measured monthly and reported transparently in your quarterly review.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "inc_documentation": {
           "type": "service",
           "settings": {
             "title": "Documentation you can read",
-            "description": "<p>A living document of your environment — network, identities, backups, vendors — maintained by us and available to you at any time. Portability is a feature, not a threat.</p>"
+            "description": "<p>A living document of your environment — network, identities, backups, vendors — maintained by us and available to you at any time. Portability is a feature, not a threat.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "inc_no_lock": {
           "type": "service",
           "settings": {
             "title": "No multi-year lock-in",
-            "description": "<p>Annual agreements with a thirty-day exit clause. If we aren't earning our retainer, you leave with your documentation and credentials intact.</p>"
+            "description": "<p>Annual agreements with a thirty-day exit clause. If we aren't earning our retainer, you leave with your documentation and credentials intact.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "inc_named": {
           "type": "service",
           "settings": {
             "title": "A named team, not a pool",
-            "description": "<p>You meet the engineers on day one and they stay on the account. Tickets don't bounce to whoever picked up the phone.</p>"
+            "description": "<p>You meet the engineers on day one and they stay on the account. Tickets don't bounce to whoever picked up the phone.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["inc_onboarding", "inc_response", "inc_documentation", "inc_no_lock", "inc_named"]
+      "blocksOrder": [
+        "inc_onboarding",
+        "inc_response",
+        "inc_documentation",
+        "inc_no_lock",
+        "inc_named"
+      ]
     },
     "pricing_testimonials": {
       "type": "testimonial-slider",
@@ -175,7 +218,8 @@
             "quote": "We switched because every other quote came in as 'contact us' — Uplink showed us the number on the first call. Six quarters in, we're paying roughly what they said we would.",
             "name": "Priya Desai",
             "title": "Director of Operations, Holloway & Reed LLP",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/avatar-pricing-1.webp"
           }
         },
         "quote_2": {
@@ -184,7 +228,8 @@
             "quote": "The Professional tier covered everything our cyber-insurance renewal was asking about. We stopped paying a separate security vendor and our premium actually came down.",
             "name": "Daniel Okafor",
             "title": "IT Manager, Meridian Professional Services",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/avatar-pricing-2.webp"
           }
         },
         "quote_3": {
@@ -193,11 +238,16 @@
             "quote": "I wanted published pricing because I was tired of being the office manager stuck on the phone comparing MSP proposals. Uplink made that part of the decision boring, which is exactly what I needed.",
             "name": "Rebecca Lindquist",
             "title": "Office Manager, Arbor Dental Group",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/avatar-pricing-3.webp"
           }
         }
       },
-      "blocksOrder": ["quote_1", "quote_2", "quote_3"]
+      "blocksOrder": [
+        "quote_1",
+        "quote_2",
+        "quote_3"
+      ]
     },
     "pricing_faq": {
       "type": "accordion",
@@ -258,7 +308,14 @@
           }
         }
       },
-      "blocksOrder": ["faq_sidebar", "faq_seat", "faq_servers", "faq_projects", "faq_minimum", "faq_custom"]
+      "blocksOrder": [
+        "faq_sidebar",
+        "faq_seat",
+        "faq_servers",
+        "faq_projects",
+        "faq_minimum",
+        "faq_custom"
+      ]
     },
     "pricing_closing": {
       "type": "banner",
@@ -295,18 +352,30 @@
             "link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["closing_heading", "closing_text", "closing_button"]
+      "blocksOrder": [
+        "closing_heading",
+        "closing_text",
+        "closing_button"
+      ]
     }
   },
-  "widgetsOrder": ["pricing_intro", "pricing_tiers", "pricing_included", "pricing_testimonials", "pricing_faq", "pricing_closing"],
+  "widgetsOrder": [
+    "pricing_intro",
+    "pricing_tiers",
+    "pricing_included",
+    "pricing_testimonials",
+    "pricing_faq",
+    "pricing_closing"
+  ],
   "id": "pricing",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T11:30:26.688Z",
+  "updated": "2026-04-23T12:01:17.546Z"
 }

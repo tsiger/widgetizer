@@ -2,15 +2,16 @@
   "name": "Home",
   "slug": "index",
   "id": "index",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T12:39:31.887Z",
+  "updated": "2026-04-22T12:58:41.292Z",
   "widgets": {
     "hero_banner": {
       "type": "banner",
       "settings": {
         "height": "large",
         "alignment": "center",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -43,20 +44,27 @@
             "link": {
               "href": "arrangements.html",
               "text": "Shop Arrangements",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3b23031c-8329-4235-ad2d-31456729b579"
             },
             "style": "primary",
             "link_2": {
               "href": "events.html",
               "text": "Plan an Event",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "011cdb22-a4f5-4a31-bf75-aa96c347d9f2"
             },
             "style_2": "secondary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
     },
     "welcome_strip": {
       "type": "scrolling-text",
@@ -88,7 +96,8 @@
           "settings": {
             "subtitle": "Romance",
             "title": "Weddings",
-            "description": "<p>Ceremonial arrangements, bridal bouquets, and full event florals for your perfect day.</p>"
+            "description": "<p>Ceremonial arrangements, bridal bouquets, and full event florals for your perfect day.</p>",
+            "image": "/uploads/images/category-wedding.webp"
           }
         },
         "card-birthday": {
@@ -96,7 +105,8 @@
           "settings": {
             "subtitle": "Celebration",
             "title": "Birthdays",
-            "description": "<p>Bright, joyful bouquets to mark another year of life and the people who fill it.</p>"
+            "description": "<p>Bright, joyful bouquets to mark another year of life and the people who fill it.</p>",
+            "image": "/uploads/images/category-birthday.webp"
           }
         },
         "card-sympathy": {
@@ -104,7 +114,8 @@
           "settings": {
             "subtitle": "Tribute",
             "title": "Sympathy",
-            "description": "<p>Gentle, meaningful arrangements to express condolences and honour those we love.</p>"
+            "description": "<p>Gentle, meaningful arrangements to express condolences and honour those we love.</p>",
+            "image": "/uploads/images/category-sympathy.webp"
           }
         },
         "card-corporate": {
@@ -112,7 +123,8 @@
           "settings": {
             "subtitle": "Professional",
             "title": "Corporate",
-            "description": "<p>Lobby displays, meeting room arrangements, and gifts that reflect your brand.</p>"
+            "description": "<p>Lobby displays, meeting room arrangements, and gifts that reflect your brand.</p>",
+            "image": "/uploads/images/category-corporate.webp"
           }
         },
         "card-seasonal": {
@@ -120,7 +132,8 @@
           "settings": {
             "subtitle": "Seasonal",
             "title": "Seasonal Collections",
-            "description": "<p>Limited-edition arrangements built around what's freshest and most beautiful right now.</p>"
+            "description": "<p>Limited-edition arrangements built around what's freshest and most beautiful right now.</p>",
+            "image": "/uploads/images/category-seasonal.webp"
           }
         },
         "card-everyday": {
@@ -128,17 +141,26 @@
           "settings": {
             "subtitle": "Everyday",
             "title": "Just Because",
-            "description": "<p>Sometimes the best occasion is no occasion at all. Fresh blooms for any moment of the week.</p>"
+            "description": "<p>Sometimes the best occasion is no occasion at all. Fresh blooms for any moment of the week.</p>",
+            "image": "/uploads/images/category-everyday.webp"
           }
         }
       },
-      "blocksOrder": ["card-wedding", "card-birthday", "card-sympathy", "card-corporate", "card-seasonal", "card-everyday"]
+      "blocksOrder": [
+        "card-wedding",
+        "card-birthday",
+        "card-sympathy",
+        "card-corporate",
+        "card-seasonal",
+        "card-everyday"
+      ]
     },
     "story_section": {
       "type": "image-text",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/story.webp"
       },
       "blocks": {
         "story-eyebrow": {
@@ -169,14 +191,20 @@
             "link": {
               "href": "about.html",
               "text": "Our Story",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "b1d6b58f-1287-4a00-a667-4544e06ffe8a"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text", "story-button"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text",
+        "story-button"
+      ]
     },
     "testimonials_section": {
       "type": "testimonials",
@@ -217,7 +245,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
     },
     "seasonal_countdown": {
       "type": "countdown",
@@ -231,7 +263,8 @@
         "button": {
           "href": "contact.html",
           "text": "Pre-Order Now",
-          "target": "_self"
+          "target": "_self",
+          "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
         },
         "show_seconds": false,
         "style": "minimal",
@@ -265,15 +298,28 @@
             "link": {
               "href": "contact.html",
               "text": "Get in Touch",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero_banner", "welcome_strip", "collection_grid", "story_section", "testimonials_section", "seasonal_countdown", "order_cta"]
+  "widgetsOrder": [
+    "hero_banner",
+    "welcome_strip",
+    "collection_grid",
+    "story_section",
+    "testimonials_section",
+    "seasonal_countdown",
+    "order_cta"
+  ]
 }

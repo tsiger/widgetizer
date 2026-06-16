@@ -8,13 +8,17 @@
     "ctaButtonLink": {
       "href": "menu.html",
       "text": "Drinks & Bites",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
     },
     "ctaButtonStyle": "secondary",
     "center_nav": false,
     "full_width": true,
     "sticky": false,
     "transparent_on_hero": true,
-    "color_scheme": "highlight-primary"
-  }
+    "color_scheme": "highlight-primary",
+    "logoImage": "/uploads/images/corkwelllogolight-1.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

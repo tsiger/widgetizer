@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/contact-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -30,7 +30,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "class_grid": {
       "type": "icon-card-grid",
@@ -56,8 +59,8 @@
             "title": "Vinyasa Flow",
             "description": "<p>Dynamic, breath-led sequences that build heat, endurance, and focus. Expect sun salutations, standing flows, and creative transitions. Intermediate pace with modifications offered for all levels.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -69,8 +72,8 @@
             "title": "Hatha",
             "description": "<p>A slower-paced practice with longer holds in each posture. Build strength, alignment, and body awareness through foundational poses and conscious breathing. Perfect for beginners and experienced practitioners alike.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -82,8 +85,8 @@
             "title": "Yin",
             "description": "<p>Deep, passive stretches held for three to five minutes at a time. Release tension stored in connective tissue, calm the nervous system, and cultivate a meditative stillness. Mostly floor-based and deeply restorative.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -95,8 +98,8 @@
             "title": "Pilates Mat",
             "description": "<p>Core-centered movement that strengthens from the inside out. Controlled, precise exercises improve posture, stability, and body control. No equipment needed — just a mat and your focus.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -108,8 +111,8 @@
             "title": "Prenatal",
             "description": "<p>Gentle, supportive practice designed for expecting mothers at any trimester. Ease discomfort, build strength for labor, and connect with your changing body in a safe, nurturing environment.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -121,14 +124,21 @@
             "title": "Meditation",
             "description": "<p>Guided sitting practice to quiet the mind and deepen self-awareness. Sessions include breath work, body scans, and mindfulness techniques. No experience needed — just show up and breathe.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["class-1", "class-2", "class-3", "class-4", "class-5", "class-6"]
+      "blocksOrder": [
+        "class-1",
+        "class-2",
+        "class-3",
+        "class-4",
+        "class-5",
+        "class-6"
+      ]
     },
     "what_to_expect": {
       "type": "features-split",
@@ -178,7 +188,12 @@
           }
         }
       },
-      "blocksOrder": ["feature-1", "feature-2", "feature-3", "feature-4"]
+      "blocksOrder": [
+        "feature-1",
+        "feature-2",
+        "feature-3",
+        "feature-4"
+      ]
     },
     "pricing": {
       "type": "rich-text",
@@ -216,19 +231,25 @@
             "link": {
               "text": "Get Started",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["pricing-heading", "pricing-text", "pricing-note", "pricing-button"]
+      "blocksOrder": [
+        "pricing-heading",
+        "pricing-text",
+        "pricing-note",
+        "pricing-button"
+      ]
     },
     "instructor": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/classes-instructor.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -264,14 +285,20 @@
             "link": {
               "text": "About Our Team",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2d9fff43-ced5-4bf9-a1b8-abd87ebd97f8"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["instructor-eyebrow", "instructor-heading", "instructor-text", "instructor-button"]
+      "blocksOrder": [
+        "instructor-eyebrow",
+        "instructor-heading",
+        "instructor-text",
+        "instructor-button"
+      ]
     },
     "faq": {
       "type": "accordion",
@@ -321,11 +348,24 @@
           }
         }
       },
-      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+      "blocksOrder": [
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4",
+        "faq-5"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "class_grid", "what_to_expect", "pricing", "instructor", "faq"],
+  "widgetsOrder": [
+    "hero",
+    "class_grid",
+    "what_to_expect",
+    "pricing",
+    "instructor",
+    "faq"
+  ],
   "id": "classes",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-17T11:59:16.447Z",
+  "updated": "2026-04-17T12:07:57.319Z"
 }

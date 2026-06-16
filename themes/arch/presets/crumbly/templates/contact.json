@@ -25,7 +25,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-text"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text"
+      ]
     },
     "contact_map": {
       "type": "map",
@@ -35,7 +38,12 @@
         "height": "medium",
         "show_address": true,
         "sidebar_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "directions_link": {
+          "href": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.25280949928!2d-74.11976373946229!3d40.69766374859258!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1234567890",
+          "text": "Directions",
+          "target": "_self"
+        }
       },
       "blocks": {
         "info-1": {
@@ -60,13 +68,18 @@
           }
         }
       },
-      "blocksOrder": ["info-1", "info-2", "info-3"]
+      "blocksOrder": [
+        "info-1",
+        "info-2",
+        "info-3"
+      ]
     },
     "custom_orders": {
       "type": "image-callout",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/contact-cakes.webp"
       },
       "blocks": {
         "custom-heading": {
@@ -87,8 +100,8 @@
           "type": "button",
           "settings": {
             "link": {
-              "text": "Email Us About a Cake",
               "href": "mailto:cakes@example.com",
+              "text": "Email Us About a Cake",
               "target": "_self"
             },
             "style": "primary",
@@ -96,11 +109,19 @@
           }
         }
       },
-      "blocksOrder": ["custom-heading", "custom-text", "custom-button"]
+      "blocksOrder": [
+        "custom-heading",
+        "custom-text",
+        "custom-button"
+      ]
     }
   },
-  "widgetsOrder": ["contact_intro", "contact_map", "custom_orders"],
+  "widgetsOrder": [
+    "contact_intro",
+    "contact_map",
+    "custom_orders"
+  ],
   "id": "contact",
-  "created": "2026-04-03T14:00:00.000Z",
-  "updated": "2026-04-03T14:00:00.000Z"
+  "created": "2026-04-16T14:40:08.888Z",
+  "updated": "2026-04-16T15:44:15.480Z"
 }

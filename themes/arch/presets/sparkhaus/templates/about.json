@@ -10,7 +10,8 @@
         "content_color_scheme": "none",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-founder.webp"
       },
       "blocks": {
         "ab-eyebrow": {
@@ -32,12 +33,16 @@
         "ab-body": {
           "type": "text",
           "settings": {
-            "text": "<p>Sparkhaus opened in Denver in 2017 with one van, two cleaners, and a spreadsheet. Eight years later we're a team of nine — still small, still local, still intentionally choosing to not turn into a franchise.</p><p>We pay our cleaners as full-time W-2 employees with benefits, because cleaning is skilled work and good people don't stay at places that treat it otherwise. We keep the service area tight — Denver proper and the immediate metro — because a 45-minute drive to a cleaning job is 45 minutes the cleaner isn't paid to stand in.</p><p>It's boring-but-deliberate operations. You feel the results in the work.</p>",
+            "text": "<p>Sparkhaus opened in Denver in 2017 with one van, two cleaners, and a spreadsheet. Eight years later we're a team of nine — still small, still local, still intentionally choosing to not turn into a franchise.</p><p>We pay our cleaners as full-time W-2 employees with benefits, because cleaning is skilled work and good people don't stay at places that treat it otherwise. We keep the service area tight — Denver proper and the immediate metro — because a 45-minute drive to a cleaning job is 45 minutes the cleaner isn't paid to stand in. </p><p>It's boring-but-deliberate operations. You feel the results in the work.</p>",
             "size": "base"
           }
         }
       },
-      "blocksOrder": ["ab-eyebrow", "ab-heading", "ab-body"]
+      "blocksOrder": [
+        "ab-eyebrow",
+        "ab-heading",
+        "ab-body"
+      ]
     },
     "credibility": {
       "type": "image-callout",
@@ -45,7 +50,8 @@
         "image_position": "start",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-credibility.webp"
       },
       "blocks": {
         "cb-kicker": {
@@ -78,7 +84,12 @@
           }
         }
       },
-      "blocksOrder": ["cb-kicker", "cb-heading", "cb-text", "cb-features"]
+      "blocksOrder": [
+        "cb-kicker",
+        "cb-heading",
+        "cb-text",
+        "cb-features"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -103,7 +114,8 @@
             "name": "Amara Osei",
             "role": "Founder & Operations",
             "specialty": "Founded Sparkhaus · 2017",
-            "bio": "Started Sparkhaus after running cleaning operations for a boutique hotel. Runs scheduling, hiring, and the client-relationship side of the business. Still personally interviews every cleaner before they join the team."
+            "bio": "Started Sparkhaus after running cleaning operations for a boutique hotel. Runs scheduling, hiring, and the client-relationship side of the business. Still personally interviews every cleaner before they join the team.",
+            "photo": "/uploads/images/team-amara.webp"
           }
         },
         "tm-lead-1": {
@@ -112,7 +124,8 @@
             "name": "Daniela Reyes",
             "role": "Lead cleaner, deep cleans",
             "specialty": "With Sparkhaus · 7 years",
-            "bio": "Leads deep-clean and move-in/out bookings. Seven-year veteran. The one you want for the jobs nobody else wants to take on. Fluent in Spanish; speaks more English than she lets on."
+            "bio": "Leads deep-clean and move-in/out bookings. Seven-year veteran. The one you want for the jobs nobody else wants to take on. Fluent in Spanish; speaks more English than she lets on.",
+            "photo": "/uploads/images/team-daniela.webp"
           }
         },
         "tm-lead-2": {
@@ -121,7 +134,8 @@
             "name": "Chris Pham",
             "role": "Lead cleaner, recurring",
             "specialty": "With Sparkhaus · 5 years",
-            "bio": "Anchors 40 biweekly and weekly clients across Capitol Hill and Congress Park. Clients request him back by name. Previously ran hospital housekeeping — knows infection-control cleaning cold."
+            "bio": "Anchors 40 biweekly and weekly clients across Capitol Hill and Congress Park. Clients request him back by name. Previously ran hospital housekeeping — knows infection-control cleaning cold.",
+            "photo": "/uploads/images/team-chris.webp"
           }
         },
         "tm-lead-3": {
@@ -130,11 +144,17 @@
             "name": "Tess Kowalski",
             "role": "Lead cleaner, post-construction",
             "specialty": "With Sparkhaus · 4 years",
-            "bio": "Runs post-construction crews. Started in commercial janitorial, moved to high-end residential renovations. Calm under pressure, thorough on the details, respectful of finishes."
+            "bio": "Runs post-construction crews. Started in commercial janitorial, moved to high-end residential renovations. Calm under pressure, thorough on the details, respectful of finishes.",
+            "photo": "/uploads/images/team-tess.webp"
           }
         }
       },
-      "blocksOrder": ["tm-founder", "tm-lead-1", "tm-lead-2", "tm-lead-3"]
+      "blocksOrder": [
+        "tm-founder",
+        "tm-lead-1",
+        "tm-lead-2",
+        "tm-lead-3"
+      ]
     },
     "operating_stats": {
       "type": "key-figures",
@@ -190,7 +210,12 @@
           }
         }
       },
-      "blocksOrder": ["os-1", "os-2", "os-3", "os-4"]
+      "blocksOrder": [
+        "os-1",
+        "os-2",
+        "os-3",
+        "os-4"
+      ]
     },
     "history": {
       "type": "timeline",
@@ -239,7 +264,12 @@
           }
         }
       },
-      "blocksOrder": ["h-1", "h-2", "h-3", "h-4"]
+      "blocksOrder": [
+        "h-1",
+        "h-2",
+        "h-3",
+        "h-4"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -272,18 +302,30 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["ac-heading", "ac-text", "ac-button"]
+      "blocksOrder": [
+        "ac-heading",
+        "ac-text",
+        "ac-button"
+      ]
     }
   },
-  "widgetsOrder": ["opener", "credibility", "team", "operating_stats", "history", "about_cta"],
+  "widgetsOrder": [
+    "opener",
+    "credibility",
+    "team",
+    "operating_stats",
+    "history",
+    "about_cta"
+  ],
   "id": "about",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T17:16:38.068Z",
+  "updated": "2026-04-20T17:32:31.802Z"
 }

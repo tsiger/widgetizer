@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/schedule-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,7 +24,9 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "schedule": {
       "type": "card-grid",
@@ -44,94 +46,107 @@
         "card-weekday-am": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/schedule-morning.webp",
             "subtitle": "Mon — Fri",
             "title": "Morning Classes",
             "description": "<p>6:30 AM Vinyasa Flow<br>9:00 AM Hatha<br>Start your day grounded and energized.</p>",
             "button_link": {
               "text": "Book a Morning Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             }
           }
         },
         "card-weekday-mid": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/schedule-midday.webp",
             "subtitle": "Mon — Fri",
             "title": "Midday Reset",
             "description": "<p>12:00 PM Yin or Meditation<br>A quiet pause in the middle of your day.</p>",
             "button_link": {
               "text": "Book a Midday Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             }
           }
         },
         "card-weekday-pm": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/schedule-evening.webp",
             "subtitle": "Mon — Fri",
             "title": "Evening Flow",
             "description": "<p>5:30 PM Vinyasa Flow<br>7:00 PM Pilates Mat<br>Unwind and move after work.</p>",
             "button_link": {
               "text": "Book an Evening Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             }
           }
         },
         "card-saturday": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/schedule-saturday.webp",
             "subtitle": "Saturday",
             "title": "Weekend Practice",
             "description": "<p>8:00 AM Vinyasa Flow<br>9:30 AM Hatha<br>11:00 AM Prenatal<br>4:00 PM Yin</p>",
             "button_link": {
               "text": "Book Saturday",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             }
           }
         },
         "card-sunday": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/schedule-sunday.webp",
             "subtitle": "Sunday",
             "title": "Slow Sunday",
             "description": "<p>9:00 AM Hatha<br>10:30 AM Meditation<br>4:00 PM Yin<br>A gentle close to the week.</p>",
             "button_link": {
               "text": "Book Sunday",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             }
           }
         },
         "card-private": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/schedule-private.webp",
             "subtitle": "By Appointment",
             "title": "Private Sessions",
             "description": "<p>One-on-one instruction tailored to your goals. Available with any of our instructors, any day of the week.</p>",
             "button_link": {
               "text": "Request a Session",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             }
           }
         }
       },
-      "blocksOrder": ["card-weekday-am", "card-weekday-mid", "card-weekday-pm", "card-saturday", "card-sunday", "card-private"]
+      "blocksOrder": [
+        "card-weekday-am",
+        "card-weekday-mid",
+        "card-weekday-pm",
+        "card-saturday",
+        "card-sunday",
+        "card-private"
+      ]
     },
     "intro_class": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/schedule-beginner.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -158,14 +173,19 @@
             "link": {
               "text": "Book an Intro Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-text", "intro-button"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text",
+        "intro-button"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -189,12 +209,14 @@
             "link": {
               "text": "Request a Private Session",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "link_2": {
               "text": "Contact Us",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -202,11 +224,19 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "schedule", "intro_class", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "schedule",
+    "intro_class",
+    "cta"
+  ],
   "id": "schedule",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-17T11:59:16.455Z",
+  "updated": "2026-04-17T12:09:29.349Z"
 }

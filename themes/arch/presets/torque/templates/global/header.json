@@ -6,17 +6,22 @@
     "contactDetailsLine1": "(555) 408-2170",
     "contactDetailsLine2": "ASE Certified",
     "contact_position": "menu",
-    "headerNavigation": "main-menu",
+    "headerNavigation": "511171a8-f78c-43ee-98d7-0b7a1b7172ba",
     "center_nav": true,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book service",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
     },
     "ctaButtonStyle": "primary",
     "full_width": false,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/torque-logo-dark.png",
+    "transparent_logo": "/uploads/images/torque-logo-light.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

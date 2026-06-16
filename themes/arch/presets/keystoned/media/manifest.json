@@ -1,0 +1,983 @@
+{
+  "files": [
+    {
+      "filename": "property-gallery-garden.webp",
+      "originalName": "property-gallery-garden.webp",
+      "type": "image/webp",
+      "size": 142704,
+      "path": "/uploads/images/property-gallery-garden.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Private bluestone patio with teak chairs, hydrangeas, and gas lanterns",
+      "title": "Private garden",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/property-gallery-garden-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/property-gallery-garden-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "property-gallery-dining.webp",
+      "originalName": "property-gallery-dining.webp",
+      "type": "image/webp",
+      "size": 57736,
+      "path": "/uploads/images/property-gallery-dining.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Formal dining room with wainscoting, walnut table, and a brass chandelier",
+      "title": "Dining room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/property-gallery-dining-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/property-gallery-dining-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "property-gallery-bath.webp",
+      "originalName": "property-gallery-bath.webp",
+      "type": "image/webp",
+      "size": 66724,
+      "path": "/uploads/images/property-gallery-bath.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Marble primary spa bath with gilded mirror, walnut vanity, and clawfoot tub",
+      "title": "Primary bath",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/property-gallery-bath-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/property-gallery-bath-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "property-gallery-bedroom.webp",
+      "originalName": "property-gallery-bedroom.webp",
+      "type": "image/webp",
+      "size": 50062,
+      "path": "/uploads/images/property-gallery-bedroom.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Serene bedroom with sheer linen drapes, tall windows, and a marble fireplace",
+      "title": "Primary bedroom",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/property-gallery-bedroom-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/property-gallery-bedroom-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "property-gallery-kitchen.webp",
+      "originalName": "property-gallery-kitchen.webp",
+      "type": "image/webp",
+      "size": 42722,
+      "path": "/uploads/images/property-gallery-kitchen.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Chef's kitchen with walnut cabinets, marble island, pendant lights, and gas range",
+      "title": "Chef's kitchen",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/property-gallery-kitchen-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/property-gallery-kitchen-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "property-gallery-living.webp",
+      "originalName": "property-gallery-living.webp",
+      "type": "image/webp",
+      "size": 67292,
+      "path": "/uploads/images/property-gallery-living.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Sunlit living room with marble fireplace, wide-plank pine floors, and shuttered windows",
+      "title": "Living room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/property-gallery-living-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/property-gallery-living-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "property-overview.webp",
+      "originalName": "property-overview.webp",
+      "type": "image/webp",
+      "size": 73498,
+      "path": "/uploads/images/property-overview.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Period living room with original gilt mirror above a marble mantel",
+      "title": "A home with character",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/property-overview-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/property-overview-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "property-hero.webp",
+      "originalName": "property-hero.webp",
+      "type": "image/webp",
+      "size": 372894,
+      "path": "/uploads/images/property-hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "42 Beacon Street Federal-style brick townhouse facade at twilight with gas lantern",
+      "title": "42 Beacon Street",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/property-hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/property-hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/property-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "keystonedlight.png",
+      "originalName": "keystoned_light.png",
+      "type": "image/png",
+      "size": 4559,
+      "path": "/uploads/images/keystonedlight.png",
+      "width": 765,
+      "height": 142,
+      "alt": "Keystoned real estate logo in white for dark backgrounds",
+      "title": "Keystoned logo light",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/keystonedlight-small.png",
+          "width": 480,
+          "height": 89
+        },
+        "thumb": {
+          "path": "/uploads/images/keystonedlight-thumb.png",
+          "width": 150,
+          "height": 28
+        }
+      }
+    },
+    {
+      "filename": "keystoneddark.png",
+      "originalName": "keystoned_dark.png",
+      "type": "image/png",
+      "size": 4360,
+      "path": "/uploads/images/keystoneddark.png",
+      "width": 765,
+      "height": 142,
+      "alt": "Keystoned real estate logo in wine brown",
+      "title": "Keystoned logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/keystoneddark-small.png",
+          "width": 480,
+          "height": 89
+        },
+        "thumb": {
+          "path": "/uploads/images/keystoneddark-thumb.png",
+          "width": 150,
+          "height": 28
+        }
+      }
+    },
+    {
+      "filename": "step-close.webp",
+      "originalName": "step-close.webp",
+      "type": "image/webp",
+      "size": 45680,
+      "path": "/uploads/images/step-close.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hands exchanging a house-shaped key over a signed real estate contract",
+      "title": "Closing day",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-close-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-close-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-execute.webp",
+      "originalName": "step-execute.webp",
+      "type": "image/webp",
+      "size": 61832,
+      "path": "/uploads/images/step-execute.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Agent placing a Sold rider on a For Sale sign in front of a home at sunset",
+      "title": "Going to market",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-execute-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-execute-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-strategy.webp",
+      "originalName": "step-strategy.webp",
+      "type": "image/webp",
+      "size": 37644,
+      "path": "/uploads/images/step-strategy.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Printed neighborhood market report with charts and a pen on a desk",
+      "title": "Pricing strategy",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-strategy-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-strategy-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-consult.webp",
+      "originalName": "step-consult.webp",
+      "type": "image/webp",
+      "size": 56520,
+      "path": "/uploads/images/step-consult.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Agent and client reviewing property listings on a laptop at a cafe table",
+      "title": "Initial consultation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-consult-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-consult-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "sellers-staging.webp",
+      "originalName": "sellers-staging.webp",
+      "type": "image/webp",
+      "size": 69400,
+      "path": "/uploads/images/sellers-staging.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Bright, newly staged living room with flowers and neutral decor ready for an open house",
+      "title": "Home staging",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/sellers-staging-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/sellers-staging-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "buyers-tour.webp",
+      "originalName": "buyers-tour.webp",
+      "type": "image/webp",
+      "size": 44728,
+      "path": "/uploads/images/buyers-tour.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Young couple joyfully exploring a sunlit empty apartment with city views",
+      "title": "Home buyer tour",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/buyers-tour-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/buyers-tour-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "callout-expertise.webp",
+      "originalName": "callout-expertise.webp",
+      "type": "image/webp",
+      "size": 114442,
+      "path": "/uploads/images/callout-expertise.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Aerial view of a Beacon Hill neighborhood at golden hour with church steeple and harbor",
+      "title": "Boston expertise",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/callout-expertise-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/callout-expertise-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "neighborhood-somerville.webp",
+      "originalName": "neighborhood-somerville.webp",
+      "type": "image/webp",
+      "size": 138084,
+      "path": "/uploads/images/neighborhood-somerville.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Somerville main street with local shops, murals, and triple-decker houses",
+      "title": "Somerville",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/neighborhood-somerville-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/neighborhood-somerville-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "neighborhood-brookline.webp",
+      "originalName": "neighborhood-brookline.webp",
+      "type": "image/webp",
+      "size": 163086,
+      "path": "/uploads/images/neighborhood-brookline.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Residential Brookline street with Tudor-style homes and mature landscaping",
+      "title": "Brookline",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/neighborhood-brookline-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/neighborhood-brookline-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "neighborhood-cambridge.webp",
+      "originalName": "neighborhood-cambridge.webp",
+      "type": "image/webp",
+      "size": 168854,
+      "path": "/uploads/images/neighborhood-cambridge.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Harvard Square sidewalk with bookshops, brick storefronts, and tree canopy",
+      "title": "Cambridge",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/neighborhood-cambridge-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/neighborhood-cambridge-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "neighborhood-south-end.webp",
+      "originalName": "neighborhood-south-end.webp",
+      "type": "image/webp",
+      "size": 177958,
+      "path": "/uploads/images/neighborhood-south-end.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "South End Victorian row houses with sidewalk seating and a small park",
+      "title": "South End",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/neighborhood-south-end-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/neighborhood-south-end-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "neighborhood-back-bay.webp",
+      "originalName": "neighborhood-back-bay.webp",
+      "type": "image/webp",
+      "size": 190736,
+      "path": "/uploads/images/neighborhood-back-bay.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Back Bay brownstones lined along Commonwealth Avenue in autumn",
+      "title": "Back Bay",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/neighborhood-back-bay-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/neighborhood-back-bay-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "neighborhood-beacon-hill.webp",
+      "originalName": "neighborhood-beacon-hill.webp",
+      "type": "image/webp",
+      "size": 164092,
+      "path": "/uploads/images/neighborhood-beacon-hill.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Beacon Hill brick sidewalk lit by gas lanterns with American flags on row houses",
+      "title": "Beacon Hill",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/neighborhood-beacon-hill-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/neighborhood-beacon-hill-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-6.webp",
+      "originalName": "listing-6.webp",
+      "type": "image/webp",
+      "size": 152460,
+      "path": "/uploads/images/listing-6.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Classic white colonial home with black shutters and a circular driveway",
+      "title": "Suburban colonial",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-6-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-6-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-5.webp",
+      "originalName": "listing-5.webp",
+      "type": "image/webp",
+      "size": 78464,
+      "path": "/uploads/images/listing-5.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Rooftop terrace with outdoor seating, planters, and city skyline at dusk",
+      "title": "Rooftop terrace",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-5-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-5-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-4.webp",
+      "originalName": "listing-4.webp",
+      "type": "image/webp",
+      "size": 143772,
+      "path": "/uploads/images/listing-4.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Renovated brownstone with glass penthouse addition in the South End",
+      "title": "Renovated brownstone",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-4-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-4-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-3-1.webp",
+      "originalName": "listing-3.webp",
+      "type": "image/webp",
+      "size": 50706,
+      "path": "/uploads/images/listing-3-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Spacious living room with hardwood floors, white built-in bookshelves, and fireplace",
+      "title": "Spacious living room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-3-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-3-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-2-1.webp",
+      "originalName": "listing-2.webp",
+      "type": "image/webp",
+      "size": 50982,
+      "path": "/uploads/images/listing-2-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Modern chef's kitchen with walnut cabinetry, white marble island, and brass fixtures",
+      "title": "Modern kitchen",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-2-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-2-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "testimonial-4.webp",
+      "originalName": "testimonial-4.webp",
+      "type": "image/webp",
+      "size": 20494,
+      "path": "/uploads/images/testimonial-4.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Smiling woman in a cream sweater, warm indoor portrait",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-4-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "agent-headshot.webp",
+      "originalName": "agent-headshot.webp",
+      "type": "image/webp",
+      "size": 17114,
+      "path": "/uploads/images/agent-headshot.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Sarah Caldwell, real estate agent, in a navy blazer, smiling professional headshot",
+      "title": "Sarah Caldwell",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/agent-headshot-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-3.webp",
+      "originalName": "testimonial-3.webp",
+      "type": "image/webp",
+      "size": 20240,
+      "path": "/uploads/images/testimonial-3.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Older man in a light blue shirt smiling in a garden setting",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-2.webp",
+      "originalName": "testimonial-2.webp",
+      "type": "image/webp",
+      "size": 14610,
+      "path": "/uploads/images/testimonial-2.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Professional woman in a grey blazer smiling in a bright office",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-1.webp",
+      "originalName": "testimonial-1.webp",
+      "type": "image/webp",
+      "size": 13820,
+      "path": "/uploads/images/testimonial-1.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Smiling man in a grey polo outdoors, happy real estate client",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "agent-portrait.webp",
+      "originalName": "agent-portrait.webp",
+      "type": "image/webp",
+      "size": 47980,
+      "path": "/uploads/images/agent-portrait.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Sarah Caldwell standing on a Beacon Hill brownstone stoop with autumn foliage",
+      "title": "Meet Sarah",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/agent-portrait-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/agent-portrait-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-3.webp",
+      "originalName": "listing-3.webp",
+      "type": "image/webp",
+      "size": 50706,
+      "path": "/uploads/images/listing-3.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Spacious living room with hardwood floors, white built-in bookshelves, and fireplace",
+      "title": "Spacious living room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-3-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-3-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-2.webp",
+      "originalName": "listing-2.webp",
+      "type": "image/webp",
+      "size": 50982,
+      "path": "/uploads/images/listing-2.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Modern chef's kitchen with walnut cabinetry, white marble island, and brass fixtures",
+      "title": "Modern kitchen",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-2-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-2-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "listing-1-1.webp",
+      "originalName": "listing-1.webp",
+      "type": "image/webp",
+      "size": 140470,
+      "path": "/uploads/images/listing-1-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Victorian brownstone facade with red front door and white bay windows",
+      "title": "42 Beacon St, Beacon Hill",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-1-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-1-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "hero-slide-3.webp",
+      "originalName": "hero-slide-3.webp",
+      "type": "image/webp",
+      "size": 612634,
+      "path": "/uploads/images/hero-slide-3.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Charming brownstone townhouse on a tree-lined street in autumn",
+      "title": "Classic brownstone",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-slide-3-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-slide-3-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-slide-3-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hero-slide-2.webp",
+      "originalName": "hero-slide-2.webp",
+      "type": "image/webp",
+      "size": 285650,
+      "path": "/uploads/images/hero-slide-2.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Modern penthouse living room with floor-to-ceiling windows and Boston skyline at night",
+      "title": "Penthouse with skyline views",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-slide-2-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-slide-2-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-slide-2-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hero-slide-1.webp",
+      "originalName": "hero-slide-1.webp",
+      "type": "image/webp",
+      "size": 585390,
+      "path": "/uploads/images/hero-slide-1.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Stately colonial home facade illuminated at dusk with warm window light",
+      "title": "Luxury home exterior",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-slide-1-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-slide-1-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-slide-1-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "listing-1.webp",
+      "originalName": "listing-1.webp",
+      "type": "image/webp",
+      "size": 140470,
+      "path": "/uploads/images/listing-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Victorian brownstone facade with red front door and white bay windows",
+      "title": "42 Beacon St, Beacon Hill",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/listing-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/listing-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    }
+  ]
+}

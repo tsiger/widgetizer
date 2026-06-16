@@ -9,7 +9,8 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/about-clinic-team.webp"
       },
       "blocks": {
         "intro-kicker": {
@@ -43,7 +44,8 @@
             "link": {
               "href": "new-patients.html",
               "text": "New patient info",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "74dc9f13-f8f3-4803-a680-1d15e63e661e"
             },
             "style": "primary",
             "size": "large"
@@ -129,7 +131,8 @@
             "name": "Dr. Avery Chen",
             "role": "Veterinarian",
             "specialty": "Preventive care and internal medicine",
-            "bio": "Avery helps families understand what changed, what matters most, and what to watch for next."
+            "bio": "Avery helps families understand what changed, what matters most, and what to watch for next.",
+            "photo": "/uploads/images/team-avery-chen.webp"
           }
         },
         "maya-rivera": {
@@ -138,7 +141,8 @@
             "name": "Maya Rivera",
             "role": "Veterinary Nurse",
             "specialty": "Patient comfort and recovery",
-            "bio": "Maya keeps visits organized and helps anxious pets settle into the room."
+            "bio": "Maya keeps visits organized and helps anxious pets settle into the room.",
+            "photo": "/uploads/images/team-maya-rivera.webp"
           }
         },
         "dr-jordan": {
@@ -147,7 +151,8 @@
             "name": "Dr. Jordan Brooks",
             "role": "Veterinarian",
             "specialty": "Dental health and senior pets",
-            "bio": "Jordan focuses on clear care plans for pets with changing needs."
+            "bio": "Jordan focuses on clear care plans for pets with changing needs.",
+            "photo": "/uploads/images/team-jordan-brooks.webp"
           }
         },
         "sam-patel": {
@@ -156,7 +161,8 @@
             "name": "Sam Patel",
             "role": "Client Care",
             "specialty": "Scheduling and follow-up",
-            "bio": "Sam helps route questions, records, reminders, and appointment requests."
+            "bio": "Sam helps route questions, records, reminders, and appointment requests.",
+            "photo": "/uploads/images/team-sam-patel.webp"
           }
         }
       },
@@ -197,7 +203,8 @@
             "link": {
               "href": "contact.html",
               "text": "Contact the clinic",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
             },
             "style": "primary",
             "size": "medium"
@@ -218,6 +225,6 @@
     "about_cta"
   ],
   "id": "about",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:30:57.836Z",
+  "updated": "2026-04-24T11:05:54.983Z"
 }

@@ -8,7 +8,8 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/home-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -31,20 +32,26 @@
             "link": {
               "text": "View Our Menu",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
             },
             "style": "primary",
             "link_2": {
               "text": "Our Story",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "8cf40a5f-4ec3-4bc8-ac6c-e737b34d323a"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "marquee": {
       "type": "scrolling-text",
@@ -64,7 +71,8 @@
       "type": "image-callout",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/intro-sourcing.webp"
       },
       "blocks": {
         "intro-heading": {
@@ -93,14 +101,20 @@
             "link": {
               "text": "Learn About Our Process",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "8cf40a5f-4ec3-4bc8-ac6c-e737b34d323a"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-text", "intro-features", "intro-button"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text",
+        "intro-features",
+        "intro-button"
+      ]
     },
     "drinks": {
       "type": "image-tabs",
@@ -117,25 +131,32 @@
           "type": "tab",
           "settings": {
             "title": "Espresso",
-            "description": "<p>Bold, concentrated, and perfectly extracted. The foundation of everything we do — from a straight double shot to a velvety flat white. Our house blend balances chocolate and citrus notes, pulled fresh to order.</p>"
+            "description": "<p>Bold, concentrated, and perfectly extracted. The foundation of everything we do — from a straight double shot to a velvety flat white. Our house blend balances chocolate and citrus notes, pulled fresh to order.</p>",
+            "image": "/uploads/images/tab-espresso.webp"
           }
         },
         "tab-2": {
           "type": "tab",
           "settings": {
             "title": "Pour Over",
-            "description": "<p>Single-origin, hand-poured. The purest way to taste what makes each bean unique. We rotate origins weekly and dial in every morning. Ask your barista what's on — they'll talk your ear off about it.</p>"
+            "description": "<p>Single-origin, hand-poured. The purest way to taste what makes each bean unique. We rotate origins weekly and dial in every morning. Ask your barista what's on — they'll talk your ear off about it.</p>",
+            "image": "/uploads/images/tab-pourover.webp"
           }
         },
         "tab-3": {
           "type": "tab",
           "settings": {
             "title": "Cold Brew",
-            "description": "<p>Steeped for 20 hours. Smooth, bold, and naturally sweet — no bitterness in sight. Served over ice, on tap. Our most popular order when the temperature climbs above 70°F.</p>"
+            "description": "<p>Steeped for 20 hours. Smooth, bold, and naturally sweet — no bitterness in sight. Served over ice, on tap. Our most popular order when the temperature climbs above 70°F.</p>",
+            "image": "/uploads/images/tab-coldbrew.webp"
           }
         }
       },
-      "blocksOrder": ["tab-1", "tab-2", "tab-3"]
+      "blocksOrder": [
+        "tab-1",
+        "tab-2",
+        "tab-3"
+      ]
     },
     "testimonials": {
       "type": "testimonial-slider",
@@ -151,7 +172,8 @@
             "quote": "I've been coming here every morning for two years and the consistency is remarkable. The baristas know my order and my name. That matters more than you'd think.",
             "name": "Rachel T.",
             "title": "Daily regular",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/team-kai.webp"
           }
         },
         "quote-2": {
@@ -160,7 +182,8 @@
             "quote": "Best pour over in the city, hands down. You can tell they actually care about the sourcing — the Ethiopian single-origin was a revelation.",
             "name": "Marcus W.",
             "title": "Coffee enthusiast",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/team-sam.webp"
           }
         },
         "quote-3": {
@@ -169,11 +192,16 @@
             "quote": "Great wifi, amazing pastries, and coffee that's worth the detour. My go-to spot for remote work days.",
             "name": "Jen S.",
             "title": "Remote worker",
-            "rating": "4"
+            "rating": "4",
+            "avatar": "/uploads/images/team-lena.webp"
           }
         }
       },
-      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -197,24 +225,36 @@
             "link": {
               "text": "See the Menu",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
             },
             "style": "primary",
             "link_2": {
               "text": "Find Us",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2845e053-7b6d-4204-8b0f-0bd5b5982357"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "marquee", "intro", "drinks", "testimonials", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "marquee",
+    "intro",
+    "drinks",
+    "testimonials",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-03T12:00:00.000Z",
-  "updated": "2026-04-03T12:00:00.000Z"
+  "created": "2026-04-16T10:30:13.564Z",
+  "updated": "2026-04-16T10:37:55.736Z"
 }

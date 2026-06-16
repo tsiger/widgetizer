@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Pawlish Dog Grooming. All rights reserved.</p>",
+    "copyright": "© 2026 Pawlish Dog Grooming. All rights reserved.",
     "layout": "equal",
     "color_scheme": "highlight-primary"
   },
@@ -9,8 +9,9 @@
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
-        "logo_width": 180,
-        "text": "<p>Calm grooming for dogs in the neighborhood. Open Tuesday through Saturday by appointment.</p>"
+        "text": "<p>Calm grooming for dogs in the neighborhood. Open Tuesday through Saturday by appointment.</p>",
+        "logo": "/uploads/images/pawlish-logo-ligh.png",
+        "logo_width": 180
       }
     },
     "text_block_1": {
@@ -34,5 +35,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

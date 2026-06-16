@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-hero.webp",
         "height": "medium",
         "fullwidth": true,
         "alignment": "center",
@@ -42,12 +42,14 @@
             "link": {
               "text": "Book Appointment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
             },
             "link_2": {
               "text": "Meet Our Team",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "b452a9e0-3ad2-4480-9f52-e4058edc22d1"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -55,7 +57,12 @@
           }
         }
       },
-      "blocksOrder": ["hero-rating", "hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-rating",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "trust_strip": {
       "type": "trust-bar",
@@ -103,7 +110,12 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
     },
     "services": {
       "type": "icon-card-grid",
@@ -129,8 +141,8 @@
             "title": "Checkups & Cleaning",
             "description": "<p>Routine exams, professional cleaning, and preventive care to keep your teeth and gums healthy for life.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -142,8 +154,8 @@
             "title": "Teeth Whitening",
             "description": "<p>Professional in-office and take-home whitening treatments for a brighter, more confident smile.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -155,8 +167,8 @@
             "title": "Dental Implants",
             "description": "<p>Permanent tooth replacement that looks, feels, and functions like natural teeth. Restored confidence.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -168,8 +180,8 @@
             "title": "Invisalign",
             "description": "<p>Clear aligners that straighten your teeth discreetly. No metal brackets, no wires — just results.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -181,8 +193,8 @@
             "title": "Crowns & Bridges",
             "description": "<p>Custom-crafted restorations that repair damaged teeth and fill gaps with natural-looking results.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -194,14 +206,21 @@
             "title": "Emergency Care",
             "description": "<p>Toothache, broken tooth, or dental trauma? We offer same-day emergency appointments when you need us most.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4", "svc-5", "svc-6"]
+      "blocksOrder": [
+        "svc-1",
+        "svc-2",
+        "svc-3",
+        "svc-4",
+        "svc-5",
+        "svc-6"
+      ]
     },
     "before_after": {
       "type": "comparison-slider",
@@ -210,21 +229,21 @@
         "title": "See the Difference",
         "description": "",
         "heading_alignment": "center",
-        "before_image": "",
-        "after_image": "",
+        "before_image": "/uploads/images/home-before.webp",
+        "after_image": "/uploads/images/home-after.webp",
         "before_label": "Before",
         "after_label": "After",
         "orientation": "horizontal",
         "initial_position": 25,
         "show_labels": true,
-        "content_width": "wide",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "content_width": "wide"
       }
     },
     "about_teaser": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-dentist.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -260,14 +279,20 @@
             "link": {
               "text": "About Us",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "b452a9e0-3ad2-4480-9f52-e4058edc22d1"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["about-eyebrow", "about-heading", "about-text", "about-button"]
+      "blocksOrder": [
+        "about-eyebrow",
+        "about-heading",
+        "about-text",
+        "about-button"
+      ]
     },
     "testimonials": {
       "type": "testimonials",
@@ -286,7 +311,7 @@
           "type": "quote",
           "settings": {
             "quote": "I've avoided the dentist for years out of pure anxiety. Dr. Rhodes and her team made me feel so safe and comfortable that I actually look forward to my visits now. Best decision I ever made.",
-            "avatar": "",
+            "avatar": "/uploads/images/home-avatar-michael.webp",
             "name": "Michael T.",
             "title": "Patient since 2023",
             "rating": "5"
@@ -296,7 +321,7 @@
           "type": "quote",
           "settings": {
             "quote": "The Invisalign results speak for themselves — my teeth are straighter than I ever imagined. The whole process was smooth, well-explained, and faster than expected.",
-            "avatar": "",
+            "avatar": "/uploads/images/home-avatar-sarah.webp",
             "name": "Sarah K.",
             "title": "Invisalign patient",
             "rating": "5"
@@ -306,14 +331,18 @@
           "type": "quote",
           "settings": {
             "quote": "Broke a tooth on a Saturday morning and they got me in the same day. Professional, calm, and they fixed it beautifully. This is what emergency care should look like.",
-            "avatar": "",
+            "avatar": "/uploads/images/home-avatar-james.webp",
             "name": "James R.",
             "title": "Emergency visit",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2", "review-3"]
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -345,18 +374,31 @@
             "link": {
               "text": "Book Your First Visit",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "trust_strip", "services", "before_after", "about_teaser", "testimonials", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "trust_strip",
+    "services",
+    "before_after",
+    "about_teaser",
+    "testimonials",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T12:01:48.317Z",
+  "updated": "2026-04-16T13:09:09.772Z"
 }

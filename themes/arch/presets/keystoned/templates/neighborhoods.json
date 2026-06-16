@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/hero-slide-2.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -32,7 +32,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "areas": {
       "type": "card-grid",
@@ -53,25 +56,26 @@
         "area-1": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/neighborhood-beacon-hill.webp",
             "title": "Beacon Hill",
             "description": "<p>Historic Federal-style row houses, gaslit streets, and a tight-knit community minutes from the Common. Median home price: $1.8M.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
-            }
+            },
+            "subtitle": ""
           }
         },
         "area-2": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/neighborhood-back-bay.webp",
             "title": "Back Bay",
             "description": "<p>Grand Victorian brownstones along tree-lined Commonwealth Avenue. World-class shopping on Newbury Street. Median: $2.4M.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -79,12 +83,12 @@
         "area-3": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/neighborhood-south-end.webp",
             "title": "South End",
             "description": "<p>Boston's most vibrant dining and arts scene, with beautifully restored Victorian row houses. Median: $1.4M.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -92,12 +96,12 @@
         "area-4": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/neighborhood-cambridge.webp",
             "title": "Cambridge",
             "description": "<p>Home to Harvard and MIT, with a rich mix of academic charm, independent shops, and excellent schools. Median: $1.6M.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -105,12 +109,12 @@
         "area-5": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/neighborhood-brookline.webp",
             "title": "Brookline",
             "description": "<p>Family-friendly suburb with top-rated schools, beautiful parks, and easy access to downtown Boston. Median: $1.3M.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -118,23 +122,30 @@
         "area-6": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/neighborhood-somerville.webp",
             "title": "Somerville",
             "description": "<p>Creative, walkable, and rapidly evolving. A favorite for young professionals and investors alike. Median: $850K.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["area-1", "area-2", "area-3", "area-4", "area-5", "area-6"]
+      "blocksOrder": [
+        "area-1",
+        "area-2",
+        "area-3",
+        "area-4",
+        "area-5",
+        "area-6"
+      ]
     },
     "expertise": {
       "type": "image-callout",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/callout-expertise.webp",
         "image_position": "start",
         "color_scheme": "highlight-primary"
       },
@@ -165,14 +176,20 @@
             "link": {
               "text": "About Sarah",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "89853daf-fc71-40e0-b8ac-d7016599f885"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["exp-heading", "exp-text", "exp-features", "exp-button"]
+      "blocksOrder": [
+        "exp-heading",
+        "exp-text",
+        "exp-features",
+        "exp-button"
+      ]
     },
     "testimonials": {
       "type": "testimonials",
@@ -191,7 +208,7 @@
           "type": "quote",
           "settings": {
             "quote": "Sarah knew the South End market inside and out. She found us a place we never would have seen on Zillow — an off-market gem two blocks from our favorite restaurant.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-4.webp",
             "name": "Emily & James W.",
             "title": "Buyers, South End",
             "rating": "5"
@@ -201,14 +218,17 @@
           "type": "quote",
           "settings": {
             "quote": "Her pricing strategy for our Brookline home was perfect. We had three offers over asking within the first weekend. She really understands the local market.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-2.webp",
             "name": "Patricia M.",
             "title": "Seller, Brookline",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2"]
+      "blocksOrder": [
+        "review-1",
+        "review-2"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -230,18 +250,28 @@
             "link": {
               "text": "Free Consultation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "53852415-e1bc-4371-a530-0ffe7fd78310"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "areas", "expertise", "testimonials", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "areas",
+    "expertise",
+    "testimonials",
+    "cta"
+  ],
   "id": "neighborhoods",
-  "created": "2026-04-08T16:00:00.000Z",
-  "updated": "2026-04-08T16:00:00.000Z"
+  "created": "2026-04-17T08:48:00.627Z",
+  "updated": "2026-04-17T10:02:03.048Z"
 }

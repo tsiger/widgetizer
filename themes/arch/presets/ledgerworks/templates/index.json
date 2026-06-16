@@ -7,8 +7,9 @@
       "settings": {
         "image_position": "end",
         "color_scheme": "standard-primary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "top_spacing": "none",
+        "bottom_spacing": "none",
+        "image": "/uploads/images/home-hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -40,20 +41,27 @@
             "link": {
               "text": "Book a free consultation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "style": "primary",
             "link_2": {
               "text": "See services",
               "href": "services.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "credentials_strip": {
       "type": "trust-bar",
@@ -109,7 +117,13 @@
           }
         }
       },
-      "blocksOrder": ["credential-1", "credential-2", "credential-3", "credential-4", "credential-5"]
+      "blocksOrder": [
+        "credential-1",
+        "credential-2",
+        "credential-3",
+        "credential-4",
+        "credential-5"
+      ]
     },
     "services_overview": {
       "type": "numbered-service-list",
@@ -134,7 +148,8 @@
             "link": {
               "text": "Tax services",
               "href": "services.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
             }
           }
         },
@@ -146,7 +161,8 @@
             "link": {
               "text": "Bookkeeping services",
               "href": "services.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
             }
           }
         },
@@ -158,7 +174,8 @@
             "link": {
               "text": "Advisory services",
               "href": "services.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
             }
           }
         },
@@ -170,12 +187,18 @@
             "link": {
               "text": "Audit support",
               "href": "services.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
             }
           }
         }
       },
-      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4"]
+      "blocksOrder": [
+        "svc-1",
+        "svc-2",
+        "svc-3",
+        "svc-4"
+      ]
     },
     "industries_switcher": {
       "type": "content-switcher",
@@ -201,8 +224,8 @@
             "title": "Monthly close, done right",
             "text": "<p>Reconciled books by the 10th of each month, clean financials you can share with lenders or investors, and a CPA on the account — not a bookkeeper.</p>",
             "link": {
-              "text": "Small business services",
-              "href": "services.html",
+              "href": "",
+              "text": "",
               "target": "_self"
             },
             "target_option": "1"
@@ -221,7 +244,13 @@
           "settings": {
             "title": "Sales tax across states",
             "text": "<p>Nexus tracking, registration, and filings in every state where you owe — so selling into a new market doesn't come with a compliance headache.</p>",
-            "target_option": "1"
+            "target_option": "1",
+            "link": {
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2",
+              "href": "services.html",
+              "text": "Small business services",
+              "target": "_self"
+            }
           }
         },
         "ind-2a": {
@@ -230,8 +259,8 @@
             "title": "Quarterly estimates",
             "text": "<p>Stop guessing what you owe the IRS. We calculate quarterly estimated payments and adjust as your income changes through the year.</p>",
             "link": {
-              "text": "Self-employed services",
-              "href": "services.html",
+              "href": "",
+              "text": "",
               "target": "_self"
             },
             "target_option": "2"
@@ -250,7 +279,13 @@
           "settings": {
             "title": "Retirement that keeps more",
             "text": "<p>SEP-IRA, Solo 401(k), and defined-benefit plans for the self-employed — picked, set up, and funded to cut your tax bill where it counts.</p>",
-            "target_option": "2"
+            "target_option": "2",
+            "link": {
+              "href": "services.html",
+              "text": "Self-employed services",
+              "target": "_self",
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+            }
           }
         },
         "ind-3a": {
@@ -259,8 +294,8 @@
             "title": "Form 990 & compliance",
             "text": "<p>Annual 990 preparation, grant-fund tracking, and board-ready financials. We keep your exempt status clean and your trustees informed.</p>",
             "link": {
-              "text": "Nonprofit services",
-              "href": "services.html",
+              "href": "",
+              "text": "",
               "target": "_self"
             },
             "target_option": "3"
@@ -279,11 +314,27 @@
           "settings": {
             "title": "Grant & restricted funds",
             "text": "<p>Fund-level accounting that keeps restricted grant dollars separate, reportable, and defensible — the way funders expect to see them.</p>",
-            "target_option": "3"
+            "target_option": "3",
+            "link": {
+              "href": "services.html",
+              "text": "Nonprofit services",
+              "target": "_self",
+              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+            }
           }
         }
       },
-      "blocksOrder": ["ind-1a", "ind-1b", "ind-1c", "ind-2a", "ind-2b", "ind-2c", "ind-3a", "ind-3b", "ind-3c"]
+      "blocksOrder": [
+        "ind-1a",
+        "ind-1b",
+        "ind-1c",
+        "ind-2a",
+        "ind-2b",
+        "ind-2c",
+        "ind-3a",
+        "ind-3b",
+        "ind-3c"
+      ]
     },
     "approach": {
       "type": "image-text",
@@ -293,7 +344,8 @@
         "content_color_scheme": "none",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-approach.webp"
       },
       "blocks": {
         "approach-eyebrow": {
@@ -325,14 +377,20 @@
             "link": {
               "text": "Meet the team",
               "href": "team.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "8d5b51ef-223b-450a-9c89-ecd35565c155"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["approach-eyebrow", "approach-heading", "approach-text", "approach-button"]
+      "blocksOrder": [
+        "approach-eyebrow",
+        "approach-heading",
+        "approach-text",
+        "approach-button"
+      ]
     },
     "process": {
       "type": "steps",
@@ -376,7 +434,12 @@
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
     },
     "client_testimonial": {
       "type": "testimonial-hero",
@@ -384,7 +447,9 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "logo": "",
+        "author_image": "/uploads/images/home-testimonial.webp"
       },
       "blocks": {
         "quote-label": {
@@ -412,7 +477,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-label", "quote-heading", "quote-attribution"]
+      "blocksOrder": [
+        "quote-label",
+        "quote-heading",
+        "quote-attribution"
+      ]
     },
     "home_faq": {
       "type": "accordion",
@@ -424,7 +493,7 @@
         "heading_alignment": "start",
         "style": "separated",
         "allow_multiple": false,
-        "sidebar_position": "start",
+        "sidebar_position": "end",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"
@@ -480,7 +549,15 @@
           }
         }
       },
-      "blocksOrder": ["faq-sidebar-info", "faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6"]
+      "blocksOrder": [
+        "faq-sidebar-info",
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4",
+        "faq-5",
+        "faq-6"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -513,14 +590,19 @@
             "link": {
               "text": "Book a 30-min call",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -535,6 +617,6 @@
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T08:03:30.089Z",
+  "updated": "2026-04-20T08:52:43.465Z"
 }

@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/banner-contact-hero.webp"
       },
       "blocks": {
         "intro-eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "contact_details": {
       "type": "rich-text",
@@ -82,7 +87,11 @@
           }
         }
       },
-      "blocksOrder": ["details-heading", "details-body", "details-cta"]
+      "blocksOrder": [
+        "details-heading",
+        "details-body",
+        "details-cta"
+      ]
     },
     "contact_faq": {
       "type": "accordion",
@@ -134,7 +143,13 @@
           }
         }
       },
-      "blocksOrder": ["cfaq-01", "cfaq-02", "cfaq-03", "cfaq-04", "cfaq-info"]
+      "blocksOrder": [
+        "cfaq-01",
+        "cfaq-02",
+        "cfaq-03",
+        "cfaq-04",
+        "cfaq-info"
+      ]
     },
     "contact_closing": {
       "type": "testimonial-hero",
@@ -142,7 +157,8 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "author_image": "/uploads/images/testimonial-elena-feature.webp"
       },
       "blocks": {
         "c-quote": {
@@ -171,11 +187,20 @@
           }
         }
       },
-      "blocksOrder": ["c-quote", "c-name", "c-role"]
+      "blocksOrder": [
+        "c-quote",
+        "c-name",
+        "c-role"
+      ]
     }
   },
-  "widgetsOrder": ["contact_intro", "contact_details", "contact_faq", "contact_closing"],
+  "widgetsOrder": [
+    "contact_intro",
+    "contact_details",
+    "contact_faq",
+    "contact_closing"
+  ],
   "id": "contact",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T09:38:18.151Z",
+  "updated": "2026-04-23T10:21:24.445Z"
 }

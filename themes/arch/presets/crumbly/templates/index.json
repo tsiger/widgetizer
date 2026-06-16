@@ -22,18 +22,21 @@
             "button_link": {
               "text": "See Our Menu",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
             },
             "button_style": "primary",
             "button_link_2": {
               "text": "Order a Cake",
               "href": "custom-cakes.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
             },
             "button_style_2": "secondary",
             "button_size": "medium",
             "overlay_color": "#2e1f2ecc",
-            "color_scheme": "highlight-primary"
+            "color_scheme": "highlight-primary",
+            "image": "/uploads/images/slide-1.webp"
           }
         },
         "slide-2": {
@@ -46,16 +49,21 @@
             "button_link": {
               "text": "Start Your Order",
               "href": "custom-cakes.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
             },
             "button_style": "primary",
             "button_size": "medium",
             "overlay_color": "#2e1f2ecc",
-            "color_scheme": "highlight-primary"
+            "color_scheme": "highlight-primary",
+            "image": "/uploads/images/slide-2.webp"
           }
         }
       },
-      "blocksOrder": ["slide-1", "slide-2"]
+      "blocksOrder": [
+        "slide-1",
+        "slide-2"
+      ]
     },
     "trust_bar": {
       "type": "trust-bar",
@@ -95,7 +103,11 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3"
+      ]
     },
     "categories": {
       "type": "sliding-panels",
@@ -114,8 +126,10 @@
             "button_link": {
               "text": "See Menu",
               "href": "menu.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
+            },
+            "image": "/uploads/images/panel-bread.webp"
           }
         },
         "panel-2": {
@@ -126,8 +140,10 @@
             "button_link": {
               "text": "See Menu",
               "href": "menu.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
+            },
+            "image": "/uploads/images/panel-pastries.webp"
           }
         },
         "panel-3": {
@@ -138,8 +154,10 @@
             "button_link": {
               "text": "Order a Cake",
               "href": "custom-cakes.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
+            },
+            "image": "/uploads/images/panel-cakes.webp"
           }
         },
         "panel-4": {
@@ -150,18 +168,26 @@
             "button_link": {
               "text": "See Menu",
               "href": "menu.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
+            },
+            "image": "/uploads/images/panel-cookies.webp"
           }
         }
       },
-      "blocksOrder": ["panel-1", "panel-2", "panel-3", "panel-4"]
+      "blocksOrder": [
+        "panel-1",
+        "panel-2",
+        "panel-3",
+        "panel-4"
+      ]
     },
     "cake_teaser": {
       "type": "image-callout",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/cake-teaser.webp"
       },
       "blocks": {
         "cake-heading": {
@@ -190,20 +216,27 @@
             "link": {
               "text": "Start Your Order",
               "href": "custom-cakes.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cake-heading", "cake-text", "cake-features", "cake-button"]
+      "blocksOrder": [
+        "cake-heading",
+        "cake-text",
+        "cake-features",
+        "cake-button"
+      ]
     },
     "testimonial": {
       "type": "testimonial-hero",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "author_image": "/uploads/images/testimonial-couple.webp"
       },
       "blocks": {
         "quote-text": {
@@ -229,7 +262,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-text", "quote-name", "quote-role"]
+      "blocksOrder": [
+        "quote-text",
+        "quote-name",
+        "quote-role"
+      ]
     },
     "recent_bakes": {
       "type": "project-showcase",
@@ -248,32 +285,41 @@
           "type": "project",
           "settings": {
             "title": "Classic Sourdough",
-            "description": "24-hour ferment"
+            "description": "24-hour ferment",
+            "image": "/uploads/images/bake-sourdough.webp"
           }
         },
         "bake-2": {
           "type": "project",
           "settings": {
             "title": "Almond Croissants",
-            "description": "Frangipane filled"
+            "description": "Frangipane filled",
+            "image": "/uploads/images/bake-croissants.webp"
           }
         },
         "bake-3": {
           "type": "project",
           "settings": {
             "title": "Lemon Layer Cake",
-            "description": "Olive oil & citrus"
+            "description": "Olive oil & citrus",
+            "image": "/uploads/images/bake-lemon-cake.webp"
           }
         },
         "bake-4": {
           "type": "project",
           "settings": {
             "title": "Chocolate Chip Cookies",
-            "description": "Brown butter & sea salt"
+            "description": "Brown butter & sea salt",
+            "image": "/uploads/images/bake-cookies.webp"
           }
         }
       },
-      "blocksOrder": ["bake-1", "bake-2", "bake-3", "bake-4"]
+      "blocksOrder": [
+        "bake-1",
+        "bake-2",
+        "bake-3",
+        "bake-4"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -303,18 +349,31 @@
             "link": {
               "text": "Find the Bakery",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "trust_bar", "categories", "cake_teaser", "testimonial", "recent_bakes", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "trust_bar",
+    "categories",
+    "cake_teaser",
+    "testimonial",
+    "recent_bakes",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-03T14:00:00.000Z",
-  "updated": "2026-04-03T14:00:00.000Z"
+  "created": "2026-04-16T14:40:08.896Z",
+  "updated": "2026-04-16T14:47:36.693Z"
 }

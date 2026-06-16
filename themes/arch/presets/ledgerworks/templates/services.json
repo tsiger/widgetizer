@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-text"
+      ]
     },
     "services_detail": {
       "type": "numbered-service-list",
@@ -94,7 +98,14 @@
           }
         }
       },
-      "blocksOrder": ["d-svc-1", "d-svc-2", "d-svc-3", "d-svc-4", "d-svc-5", "d-svc-6"]
+      "blocksOrder": [
+        "d-svc-1",
+        "d-svc-2",
+        "d-svc-3",
+        "d-svc-4",
+        "d-svc-5",
+        "d-svc-6"
+      ]
     },
     "pricing_tiers": {
       "type": "pricing",
@@ -121,7 +132,8 @@
             "button_link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "featured": false
           }
@@ -136,7 +148,8 @@
             "button_link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "featured": true
           }
@@ -151,13 +164,18 @@
             "button_link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "featured": false
           }
         }
       },
-      "blocksOrder": ["tier-1", "tier-2", "tier-3"]
+      "blocksOrder": [
+        "tier-1",
+        "tier-2",
+        "tier-3"
+      ]
     },
     "what_to_expect": {
       "type": "accordion",
@@ -218,7 +236,14 @@
           }
         }
       },
-      "blocksOrder": ["exp-sidebar", "exp-1", "exp-2", "exp-3", "exp-4", "exp-5"]
+      "blocksOrder": [
+        "exp-sidebar",
+        "exp-1",
+        "exp-2",
+        "exp-3",
+        "exp-4",
+        "exp-5"
+      ]
     },
     "services_cta": {
       "type": "action-bar",
@@ -251,18 +276,29 @@
             "link": {
               "text": "Book a call",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["svc-cta-heading", "svc-cta-text", "svc-cta-button"]
+      "blocksOrder": [
+        "svc-cta-heading",
+        "svc-cta-text",
+        "svc-cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["services_intro", "services_detail", "pricing_tiers", "what_to_expect", "services_cta"],
+  "widgetsOrder": [
+    "services_intro",
+    "services_detail",
+    "pricing_tiers",
+    "what_to_expect",
+    "services_cta"
+  ],
   "id": "services",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T08:03:30.094Z",
+  "updated": "2026-04-20T08:03:30.094Z"
 }

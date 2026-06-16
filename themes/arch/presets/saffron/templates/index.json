@@ -10,7 +10,8 @@
         "overlay_color": "#1a1c2bcc",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "image": "/uploads/images/home-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -33,20 +34,26 @@
             "link": {
               "text": "View Our Menu",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "48c12fdc-0376-4b43-ad94-c2d5d20439de"
             },
             "style": "primary",
             "link_2": {
               "text": "Reserve a Table",
               "href": "reservations.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
             },
             "style_2": "secondary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "intro_section": {
       "type": "split-content",
@@ -83,7 +90,11 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-text"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-text"
+      ]
     },
     "featured_dishes": {
       "type": "priced-list",
@@ -93,7 +104,8 @@
         "description": "A taste of what's on our menu this season — crafted daily with the freshest local ingredients.",
         "heading_alignment": "center",
         "layout": "single-column",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "eyebrow_uppercase": false
       },
       "blocks": {
         "dish-1": {
@@ -129,13 +141,19 @@
           }
         }
       },
-      "blocksOrder": ["dish-1", "dish-2", "dish-3", "dish-4"]
+      "blocksOrder": [
+        "dish-1",
+        "dish-2",
+        "dish-3",
+        "dish-4"
+      ]
     },
     "experience_callout": {
       "type": "image-callout",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/experience-callout.webp"
       },
       "blocks": {
         "exp-heading": {
@@ -164,14 +182,20 @@
             "link": {
               "text": "Book a Table",
               "href": "reservations.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["exp-heading", "exp-text", "exp-features", "exp-button"]
+      "blocksOrder": [
+        "exp-heading",
+        "exp-text",
+        "exp-features",
+        "exp-button"
+      ]
     },
     "testimonials": {
       "type": "testimonials",
@@ -213,7 +237,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
     },
     "cta_banner": {
       "type": "action-bar",
@@ -235,24 +263,36 @@
             "link": {
               "text": "Reserve a Table",
               "href": "reservations.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
             },
             "style": "primary",
             "link_2": {
               "text": "View Menu",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "48c12fdc-0376-4b43-ad94-c2d5d20439de"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero_banner", "intro_section", "featured_dishes", "experience_callout", "testimonials", "cta_banner"],
+  "widgetsOrder": [
+    "hero_banner",
+    "intro_section",
+    "featured_dishes",
+    "experience_callout",
+    "testimonials",
+    "cta_banner"
+  ],
   "id": "index",
-  "created": "2026-04-03T10:00:00.000Z",
-  "updated": "2026-04-03T10:00:00.000Z"
+  "created": "2026-04-17T13:40:23.915Z",
+  "updated": "2026-04-17T14:15:41.917Z"
 }

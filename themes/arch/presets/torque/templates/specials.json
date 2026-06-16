@@ -13,7 +13,8 @@
         "overlay_color": "#121722cc",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/specials-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -42,7 +43,11 @@
           }
         }
       },
-      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
     },
     "current_specials": {
       "type": "card-grid",
@@ -72,8 +77,10 @@
             "button_link": {
               "text": "Book the check",
               "href": "contact.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+            },
+            "image": "/uploads/images/special-winter-check.webp"
           }
         },
         "sp-tires": {
@@ -85,8 +92,10 @@
             "button_link": {
               "text": "Book the swap",
               "href": "contact.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+            },
+            "image": "/uploads/images/special-tire-changeover.webp"
           }
         },
         "sp-roadtrip": {
@@ -98,12 +107,18 @@
             "button_link": {
               "text": "Book the inspection",
               "href": "contact.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+            },
+            "image": "/uploads/images/special-road-trip.webp"
           }
         }
       },
-      "blocksOrder": ["sp-winter", "sp-tires", "sp-roadtrip"]
+      "blocksOrder": [
+        "sp-winter",
+        "sp-tires",
+        "sp-roadtrip"
+      ]
     },
     "countdown_offer": {
       "type": "countdown",
@@ -119,7 +134,8 @@
         "button": {
           "text": "Book the check",
           "href": "contact.html",
-          "target": "_self"
+          "target": "_self",
+          "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
         },
         "show_seconds": false,
         "style": "cards",
@@ -191,7 +207,14 @@
           }
         }
       },
-      "blocksOrder": ["bn-winter", "bn-summer", "bn-newcustomer", "bn-fleet", "bn-referral", "bn-student"]
+      "blocksOrder": [
+        "bn-winter",
+        "bn-summer",
+        "bn-newcustomer",
+        "bn-fleet",
+        "bn-referral",
+        "bn-student"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -224,7 +247,8 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             },
             "style": "primary",
             "link_2": {
@@ -237,7 +261,11 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -248,6 +276,6 @@
     "closing_cta"
   ],
   "id": "specials",
-  "created": "2026-04-21T12:00:00.000Z",
-  "updated": "2026-04-21T12:00:00.000Z"
+  "created": "2026-04-21T13:01:43.950Z",
+  "updated": "2026-04-21T13:26:40.126Z"
 }

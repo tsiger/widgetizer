@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Everafter Studio. All rights reserved.</p>",
+    "copyright": "© 2026 Everafter Studio. All rights reserved.",
     "layout": "equal",
     "color_scheme": "highlight-primary"
   },
@@ -10,6 +10,7 @@
       "type": "logo_text",
       "settings": {
         "text": "<p>Boutique wedding planning and design. Based in the Hudson Valley, working across New York, New England, and abroad.</p>",
+        "logo": "/uploads/images/everafterwhite.png",
         "logo_width": 190
       }
     },
@@ -24,7 +25,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Explore",
-        "menu": "footer-menu"
+        "menu": "400ffcd1-caa2-4403-a94a-79d3c1b42c2d"
       }
     },
     "social_block_1": {
@@ -34,5 +35,10 @@
       }
     }
   },
-  "blocksOrder": ["social_block_1", "text_block_1", "menu_block_1", "logo_text_1"]
+  "blocksOrder": [
+    "social_block_1",
+    "text_block_1",
+    "menu_block_1",
+    "logo_text_1"
+  ]
 }

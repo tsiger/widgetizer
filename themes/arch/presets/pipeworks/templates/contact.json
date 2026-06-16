@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/contact-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
     },
     "details": {
       "type": "contact-details",
@@ -84,7 +89,12 @@
           }
         }
       },
-      "blocksOrder": ["cd-emergency", "cd-standard", "cd-email", "cd-shop"]
+      "blocksOrder": [
+        "cd-emergency",
+        "cd-standard",
+        "cd-email",
+        "cd-shop"
+      ]
     },
     "shop_map": {
       "type": "map",
@@ -111,7 +121,9 @@
           }
         }
       },
-      "blocksOrder": ["info-shop"]
+      "blocksOrder": [
+        "info-shop"
+      ]
     },
     "contact_faqs": {
       "type": "accordion",
@@ -172,7 +184,14 @@
           }
         }
       },
-      "blocksOrder": ["cf-1", "cf-2", "cf-3", "cf-4", "cf-5", "cf-sidebar"]
+      "blocksOrder": [
+        "cf-1",
+        "cf-2",
+        "cf-3",
+        "cf-4",
+        "cf-5",
+        "cf-sidebar"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -218,7 +237,11 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -229,6 +252,6 @@
     "closing_cta"
   ],
   "id": "contact",
-  "created": "2026-04-21T10:00:00.000Z",
-  "updated": "2026-04-21T10:00:00.000Z"
+  "created": "2026-04-21T10:55:45.448Z",
+  "updated": "2026-04-21T11:42:49.847Z"
 }

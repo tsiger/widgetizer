@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-hero.webp",
         "height": "medium",
         "fullwidth": true,
         "alignment": "start",
@@ -44,12 +44,14 @@
             "link": {
               "text": "Book a Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "link_2": {
               "text": "View Schedule",
               "href": "schedule.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "aaed89bf-c559-4847-8a12-73391021a817"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -57,7 +59,12 @@
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "marquee": {
       "type": "scrolling-text",
@@ -101,14 +108,19 @@
             "link": {
               "text": "Explore Our Classes",
               "href": "classes.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c1dc1c45-96cd-4f10-8a12-04a8470efe83"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-text", "intro-button"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text",
+        "intro-button"
+      ]
     },
     "classes": {
       "type": "icon-card-grid",
@@ -134,8 +146,8 @@
             "title": "Vinyasa Flow",
             "description": "<p>Dynamic, breath-led sequences that build heat and focus. Move through poses with intention and find your rhythm.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -147,8 +159,8 @@
             "title": "Hatha",
             "description": "<p>Slower-paced practice with longer holds. Build strength and alignment through foundational postures and conscious breathing.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -160,8 +172,8 @@
             "title": "Yin",
             "description": "<p>Deep, passive stretches held for minutes at a time. Release tension in connective tissue and cultivate stillness.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -173,8 +185,8 @@
             "title": "Pilates Mat",
             "description": "<p>Core-centered movement that strengthens from the inside out. Controlled, precise exercises for posture and stability.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -186,8 +198,8 @@
             "title": "Prenatal",
             "description": "<p>Gentle, supportive practice designed for expecting mothers. Ease discomfort, build strength, and prepare for birth.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -199,19 +211,26 @@
             "title": "Meditation",
             "description": "<p>Guided sitting practice to quiet the mind and deepen awareness. No experience needed — just show up and breathe.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["class-1", "class-2", "class-3", "class-4", "class-5", "class-6"]
+      "blocksOrder": [
+        "class-1",
+        "class-2",
+        "class-3",
+        "class-4",
+        "class-5",
+        "class-6"
+      ]
     },
     "studio": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-studio.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -247,14 +266,20 @@
             "link": {
               "text": "Visit Us",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["studio-eyebrow", "studio-heading", "studio-text", "studio-button"]
+      "blocksOrder": [
+        "studio-eyebrow",
+        "studio-heading",
+        "studio-text",
+        "studio-button"
+      ]
     },
     "process": {
       "type": "steps",
@@ -290,7 +315,11 @@
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ]
     },
     "stats": {
       "type": "trust-bar",
@@ -330,7 +359,11 @@
           }
         }
       },
-      "blocksOrder": ["stat-1", "stat-2", "stat-3"]
+      "blocksOrder": [
+        "stat-1",
+        "stat-2",
+        "stat-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -362,18 +395,32 @@
             "link": {
               "text": "Book Your Free Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "marquee", "intro", "classes", "studio", "process", "stats", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "marquee",
+    "intro",
+    "classes",
+    "studio",
+    "process",
+    "stats",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-17T11:59:16.454Z",
+  "updated": "2026-04-17T12:04:41.975Z"
 }

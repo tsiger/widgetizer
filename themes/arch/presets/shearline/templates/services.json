@@ -27,7 +27,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "services_pricing_cuts": {
       "type": "priced-list",
@@ -73,7 +76,12 @@
           }
         }
       },
-      "blocksOrder": ["cut-womens", "cut-mens", "cut-kids", "cut-fringe"]
+      "blocksOrder": [
+        "cut-womens",
+        "cut-mens",
+        "cut-kids",
+        "cut-fringe"
+      ]
     },
     "services_pricing_color": {
       "type": "priced-list",
@@ -120,7 +128,12 @@
           }
         }
       },
-      "blocksOrder": ["color-single", "color-gloss", "color-highlights", "color-balayage"]
+      "blocksOrder": [
+        "color-single",
+        "color-gloss",
+        "color-highlights",
+        "color-balayage"
+      ]
     },
     "services_pricing_treatments": {
       "type": "priced-list",
@@ -166,7 +179,12 @@
           }
         }
       },
-      "blocksOrder": ["treat-olaplex", "treat-keratin", "treat-deep-cond", "treat-scalp"]
+      "blocksOrder": [
+        "treat-olaplex",
+        "treat-keratin",
+        "treat-deep-cond",
+        "treat-scalp"
+      ]
     },
     "services_included": {
       "type": "icon-card-grid",
@@ -191,7 +209,11 @@
             "icon": "user",
             "title": "Full consultation",
             "description": "<p>Every visit starts with your stylist looking at what your hair is actually doing.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-wash": {
@@ -200,7 +222,11 @@
             "icon": "droplets",
             "title": "Shampoo & scalp",
             "description": "<p>Included with every cut or color.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-finish": {
@@ -209,7 +235,11 @@
             "icon": "razor",
             "title": "Precision finish",
             "description": "<p>Dry cut refinements after the blow-out.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-style": {
@@ -218,7 +248,11 @@
             "icon": "wand",
             "title": "Styling",
             "description": "<p>Finished the way you can redo at home.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-ammonia-free": {
@@ -227,7 +261,11 @@
             "icon": "leaf",
             "title": "Ammonia-free options",
             "description": "<p>Available for every color service on request.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-sensitive": {
@@ -236,7 +274,11 @@
             "icon": "heart",
             "title": "Gentle on sensitive scalps",
             "description": "<p>Speak up at consultation; we adjust.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-gloss": {
@@ -245,7 +287,11 @@
             "icon": "sparkles",
             "title": "Gloss finish",
             "description": "<p>Free with every color appointment.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-timing": {
@@ -254,11 +300,24 @@
             "icon": "clock",
             "title": "Honest timing",
             "description": "<p>We text a real ETA, not a guess.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["inc-consult", "inc-wash", "inc-finish", "inc-style", "inc-ammonia-free", "inc-sensitive", "inc-gloss", "inc-timing"]
+      "blocksOrder": [
+        "inc-consult",
+        "inc-wash",
+        "inc-finish",
+        "inc-style",
+        "inc-ammonia-free",
+        "inc-sensitive",
+        "inc-gloss",
+        "inc-timing"
+      ]
     },
     "services_pricing_faq": {
       "type": "accordion",
@@ -316,7 +375,14 @@
           }
         }
       },
-      "blocksOrder": ["faq-sidebar", "faq-single-price", "faq-from", "faq-color-consult", "faq-long-hair", "faq-gender-pricing"]
+      "blocksOrder": [
+        "faq-sidebar",
+        "faq-single-price",
+        "faq-from",
+        "faq-color-consult",
+        "faq-long-hair",
+        "faq-gender-pricing"
+      ]
     },
     "services_closing": {
       "type": "action-bar",
@@ -345,11 +411,22 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["services_intro", "services_pricing_cuts", "services_pricing_color", "services_pricing_treatments", "services_included", "services_pricing_faq", "services_closing"],
+  "widgetsOrder": [
+    "services_intro",
+    "services_pricing_cuts",
+    "services_pricing_color",
+    "services_pricing_treatments",
+    "services_included",
+    "services_pricing_faq",
+    "services_closing"
+  ],
   "id": "services",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:28:19.008Z",
+  "updated": "2026-04-24T08:48:52.784Z"
 }

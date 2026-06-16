@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-hero.webp",
         "height": "medium",
         "fullwidth": true,
         "alignment": "center",
@@ -36,7 +36,8 @@
             "link": {
               "text": "Our Practice Areas",
               "href": "services.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "e89a590f-4b60-4048-bf6e-16d45d1ef613"
             },
             "style": "primary",
             "size": "medium"
@@ -160,7 +161,7 @@
     "about_teaser": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-firm-interior.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -196,7 +197,8 @@
             "link": {
               "text": "About the Firm",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "00f5c5e2-0362-4b35-ba40-55ecefef043f"
             },
             "style": "secondary",
             "size": "medium"
@@ -227,7 +229,7 @@
           "type": "quote",
           "settings": {
             "quote": "Greystone guided us through a complex commercial lease dispute that could have crippled our business. Their preparation was extraordinary and the outcome exceeded our expectations.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-1.webp",
             "name": "Margaret L.",
             "title": "Business litigation client",
             "rating": "5"
@@ -237,7 +239,7 @@
           "type": "quote",
           "settings": {
             "quote": "When my father passed without a will, the firm handled the probate with compassion and efficiency. They made an overwhelming process feel manageable at every step.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-2.webp",
             "name": "David H.",
             "title": "Estate planning client",
             "rating": "5"
@@ -278,7 +280,8 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c887d105-141a-4f16-abb3-6c711cb6aa6a"
             },
             "style": "primary",
             "size": "medium"
@@ -360,6 +363,6 @@
     "cta"
   ],
   "id": "index",
-  "created": "2026-04-08T10:00:00.000Z",
-  "updated": "2026-04-08T10:00:00.000Z"
+  "created": "2026-04-16T19:37:17.441Z",
+  "updated": "2026-04-17T08:02:39.066Z"
 }

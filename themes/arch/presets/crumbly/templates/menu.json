@@ -10,6 +10,7 @@
         "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "auto",
+        "image": "/uploads/images/menu-hero.webp",
         "vertical_alignment": "end"
       },
       "blocks": {
@@ -28,7 +29,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "breads": {
       "type": "priced-list",
@@ -81,7 +85,13 @@
           }
         }
       },
-      "blocksOrder": ["bread-1", "bread-2", "bread-3", "bread-4", "bread-5"]
+      "blocksOrder": [
+        "bread-1",
+        "bread-2",
+        "bread-3",
+        "bread-4",
+        "bread-5"
+      ]
     },
     "pastries": {
       "type": "priced-list",
@@ -142,7 +152,14 @@
           }
         }
       },
-      "blocksOrder": ["pastry-1", "pastry-2", "pastry-3", "pastry-4", "pastry-5", "pastry-6"]
+      "blocksOrder": [
+        "pastry-1",
+        "pastry-2",
+        "pastry-3",
+        "pastry-4",
+        "pastry-5",
+        "pastry-6"
+      ]
     },
     "cakes": {
       "type": "priced-list",
@@ -187,7 +204,12 @@
           }
         }
       },
-      "blocksOrder": ["cake-1", "cake-2", "cake-3", "cake-4"]
+      "blocksOrder": [
+        "cake-1",
+        "cake-2",
+        "cake-3",
+        "cake-4"
+      ]
     },
     "cookies": {
       "type": "priced-list",
@@ -232,13 +254,19 @@
           }
         }
       },
-      "blocksOrder": ["cookie-1", "cookie-2", "cookie-3", "cookie-4"]
+      "blocksOrder": [
+        "cookie-1",
+        "cookie-2",
+        "cookie-3",
+        "cookie-4"
+      ]
     },
     "custom_cta": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/custom-orders.webp"
       },
       "blocks": {
         "custom-eyebrow": {
@@ -270,18 +298,31 @@
             "link": {
               "text": "Place a Custom Order",
               "href": "custom-cakes.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["custom-eyebrow", "custom-heading", "custom-text", "custom-button"]
+      "blocksOrder": [
+        "custom-eyebrow",
+        "custom-heading",
+        "custom-text",
+        "custom-button"
+      ]
     }
   },
-  "widgetsOrder": ["menu_hero", "breads", "pastries", "cakes", "cookies", "custom_cta"],
+  "widgetsOrder": [
+    "menu_hero",
+    "breads",
+    "pastries",
+    "cakes",
+    "cookies",
+    "custom_cta"
+  ],
   "id": "menu",
-  "created": "2026-04-03T14:00:00.000Z",
-  "updated": "2026-04-03T14:00:00.000Z"
+  "created": "2026-04-16T14:40:08.897Z",
+  "updated": "2026-04-16T14:56:20.794Z"
 }

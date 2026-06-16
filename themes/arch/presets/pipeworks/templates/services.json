@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/services-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
     },
     "specialties": {
       "type": "numbered-service-list",
@@ -77,7 +82,8 @@
             "link": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         },
@@ -89,7 +95,8 @@
             "link": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         },
@@ -101,7 +108,8 @@
             "link": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         },
@@ -113,7 +121,8 @@
             "link": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         },
@@ -125,12 +134,20 @@
             "link": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         }
       },
-      "blocksOrder": ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5", "sp-6"]
+      "blocksOrder": [
+        "sp-1",
+        "sp-2",
+        "sp-3",
+        "sp-4",
+        "sp-5",
+        "sp-6"
+      ]
     },
     "pricing": {
       "type": "priced-list",
@@ -211,7 +228,16 @@
           }
         }
       },
-      "blocksOrder": ["pr-1", "pr-2", "pr-3", "pr-4", "pr-5", "pr-6", "pr-7", "pr-8"]
+      "blocksOrder": [
+        "pr-1",
+        "pr-2",
+        "pr-3",
+        "pr-4",
+        "pr-5",
+        "pr-6",
+        "pr-7",
+        "pr-8"
+      ]
     },
     "compare_heater": {
       "type": "comparison-table",
@@ -235,7 +261,8 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         },
@@ -248,7 +275,8 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         },
@@ -260,7 +288,8 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             }
           }
         },
@@ -393,7 +422,15 @@
           }
         }
       },
-      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "q-5", "q-6", "q-sidebar"]
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4",
+        "q-5",
+        "q-6",
+        "q-sidebar"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -432,14 +469,19 @@
             "link_2": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -451,6 +493,6 @@
     "closing_cta"
   ],
   "id": "services",
-  "created": "2026-04-21T10:00:00.000Z",
-  "updated": "2026-04-21T10:00:00.000Z"
+  "created": "2026-04-21T10:55:45.456Z",
+  "updated": "2026-04-21T11:39:14.456Z"
 }

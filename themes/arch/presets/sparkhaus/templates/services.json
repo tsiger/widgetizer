@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["op-eyebrow", "op-heading", "op-body"]
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-body"
+      ]
     },
     "recurring_plans": {
       "type": "pricing",
@@ -61,7 +65,8 @@
             "button_link": {
               "text": "Start weekly",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
             },
             "featured": false
           }
@@ -76,7 +81,8 @@
             "button_link": {
               "text": "Start biweekly",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
             },
             "featured": true
           }
@@ -91,13 +97,18 @@
             "button_link": {
               "text": "Start monthly",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
             },
             "featured": false
           }
         }
       },
-      "blocksOrder": ["rp-weekly", "rp-biweekly", "rp-monthly"]
+      "blocksOrder": [
+        "rp-weekly",
+        "rp-biweekly",
+        "rp-monthly"
+      ]
     },
     "add_ons": {
       "type": "priced-list",
@@ -178,7 +189,16 @@
           }
         }
       },
-      "blocksOrder": ["ao-1", "ao-2", "ao-3", "ao-4", "ao-5", "ao-6", "ao-7", "ao-8"]
+      "blocksOrder": [
+        "ao-1",
+        "ao-2",
+        "ao-3",
+        "ao-4",
+        "ao-5",
+        "ao-6",
+        "ao-7",
+        "ao-8"
+      ]
     },
     "whats_included": {
       "type": "icon-list",
@@ -263,7 +283,16 @@
           }
         }
       },
-      "blocksOrder": ["wi-1", "wi-2", "wi-3", "wi-4", "wi-5", "wi-6", "wi-7", "wi-8"]
+      "blocksOrder": [
+        "wi-1",
+        "wi-2",
+        "wi-3",
+        "wi-4",
+        "wi-5",
+        "wi-6",
+        "wi-7",
+        "wi-8"
+      ]
     },
     "services_faq": {
       "type": "accordion",
@@ -331,7 +360,15 @@
           }
         }
       },
-      "blocksOrder": ["sf-sidebar", "sf-1", "sf-2", "sf-3", "sf-4", "sf-5", "sf-6"]
+      "blocksOrder": [
+        "sf-sidebar",
+        "sf-1",
+        "sf-2",
+        "sf-3",
+        "sf-4",
+        "sf-5",
+        "sf-6"
+      ]
     },
     "services_cta": {
       "type": "action-bar",
@@ -364,18 +401,30 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["sc-heading", "sc-text", "sc-button"]
+      "blocksOrder": [
+        "sc-heading",
+        "sc-text",
+        "sc-button"
+      ]
     }
   },
-  "widgetsOrder": ["opener", "recurring_plans", "add_ons", "whats_included", "services_faq", "services_cta"],
+  "widgetsOrder": [
+    "opener",
+    "recurring_plans",
+    "add_ons",
+    "whats_included",
+    "services_faq",
+    "services_cta"
+  ],
   "id": "services",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T17:16:38.074Z",
+  "updated": "2026-04-20T17:31:39.352Z"
 }

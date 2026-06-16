@@ -10,7 +10,8 @@
         "content_color_scheme": "none",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-founder.webp"
       },
       "blocks": {
         "fi-eyebrow": {
@@ -37,7 +38,11 @@
           }
         }
       },
-      "blocksOrder": ["fi-eyebrow", "fi-heading", "fi-text"]
+      "blocksOrder": [
+        "fi-eyebrow",
+        "fi-heading",
+        "fi-text"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -93,7 +98,12 @@
           }
         }
       },
-      "blocksOrder": ["k-1", "k-2", "k-3", "k-4"]
+      "blocksOrder": [
+        "k-1",
+        "k-2",
+        "k-3",
+        "k-4"
+      ]
     },
     "history": {
       "type": "timeline",
@@ -150,7 +160,13 @@
           }
         }
       },
-      "blocksOrder": ["h-1", "h-2", "h-3", "h-4", "h-5"]
+      "blocksOrder": [
+        "h-1",
+        "h-2",
+        "h-3",
+        "h-4",
+        "h-5"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -175,7 +191,8 @@
             "name": "Clara Marche",
             "role": "Founder & Lead Planner",
             "specialty": "Full-service",
-            "bio": "Clara founded Everafter in 2016 and leads the studio's full-service engagements. Trained in hospitality, trained further by nine years of weddings, she is the planner most couples meet on their discovery call."
+            "bio": "Clara founded Everafter in 2016 and leads the studio's full-service engagements. Trained in hospitality, trained further by nine years of weddings, she is the planner most couples meet on their discovery call.",
+            "photo": "/uploads/images/team-clara.webp"
           }
         },
         "p-2": {
@@ -184,7 +201,8 @@
             "name": "Sena Okafor",
             "role": "Senior Planner",
             "specialty": "Partial & destination",
-            "bio": "Sena leads partial-planning engagements and runs the studio's destination practice. Based between Hudson and Lisbon, she speaks four languages and has coordinated weddings on three continents."
+            "bio": "Sena leads partial-planning engagements and runs the studio's destination practice. Based between Hudson and Lisbon, she speaks four languages and has coordinated weddings on three continents.",
+            "photo": "/uploads/images/team-sena.webp"
           }
         },
         "p-3": {
@@ -193,7 +211,8 @@
             "name": "Theo Arden",
             "role": "Design & Floral Lead",
             "specialty": "Design direction",
-            "bio": "Theo leads creative direction for every engagement — moodboards, moodshifts, florals, tablescapes, installation. Trained at a London flower school; grew up in a family of set designers."
+            "bio": "Theo leads creative direction for every engagement — moodboards, moodshifts, florals, tablescapes, installation. Trained at a London flower school; grew up in a family of set designers.",
+            "photo": "/uploads/images/team-theo.webp"
           }
         },
         "p-4": {
@@ -202,11 +221,17 @@
             "name": "Maren Vallee",
             "role": "Logistics & Day-of Lead",
             "specialty": "Day-of coordination",
-            "bio": "Maren runs the day-of team and every day-of-coordination engagement. The person vendors call first. The person timelines answer to. The calm you feel when everything is handled."
+            "bio": "Maren runs the day-of team and every day-of-coordination engagement. The person vendors call first. The person timelines answer to. The calm you feel when everything is handled.",
+            "photo": "/uploads/images/team-maren.webp"
           }
         }
       },
-      "blocksOrder": ["p-1", "p-2", "p-3", "p-4"]
+      "blocksOrder": [
+        "p-1",
+        "p-2",
+        "p-3",
+        "p-4"
+      ]
     },
     "press": {
       "type": "trust-bar",
@@ -221,13 +246,54 @@
         "bottom_spacing": "small"
       },
       "blocks": {
-        "pr-1": { "type": "item", "settings": { "icon": "star", "title": "Brides",                   "text": "Real wedding feature" } },
-        "pr-2": { "type": "item", "settings": { "icon": "star", "title": "Vogue Weddings",            "text": "Planner to watch, 2024" } },
-        "pr-3": { "type": "item", "settings": { "icon": "star", "title": "Magnolia Rouge",            "text": "Editorial feature" } },
-        "pr-4": { "type": "item", "settings": { "icon": "star", "title": "Martha Stewart Weddings",   "text": "Design spotlight" } },
-        "pr-5": { "type": "item", "settings": { "icon": "star", "title": "Hudson Valley Magazine",    "text": "Studio profile" } }
+        "pr-1": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Brides",
+            "text": "Real wedding feature"
+          }
+        },
+        "pr-2": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Vogue Weddings",
+            "text": "Planner to watch, 2024"
+          }
+        },
+        "pr-3": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Magnolia Rouge",
+            "text": "Editorial feature"
+          }
+        },
+        "pr-4": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Martha Stewart Weddings",
+            "text": "Design spotlight"
+          }
+        },
+        "pr-5": {
+          "type": "item",
+          "settings": {
+            "icon": "star",
+            "title": "Hudson Valley Magazine",
+            "text": "Studio profile"
+          }
+        }
       },
-      "blocksOrder": ["pr-1", "pr-2", "pr-3", "pr-4", "pr-5"]
+      "blocksOrder": [
+        "pr-1",
+        "pr-2",
+        "pr-3",
+        "pr-4",
+        "pr-5"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -260,18 +326,30 @@
             "link": {
               "text": "Begin an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["ac-heading", "ac-text", "ac-button"]
+      "blocksOrder": [
+        "ac-heading",
+        "ac-text",
+        "ac-button"
+      ]
     }
   },
-  "widgetsOrder": ["founder_intro", "stats", "history", "team", "press", "about_cta"],
+  "widgetsOrder": [
+    "founder_intro",
+    "stats",
+    "history",
+    "team",
+    "press",
+    "about_cta"
+  ],
   "id": "about",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T09:47:37.538Z",
+  "updated": "2026-04-20T10:33:55.678Z"
 }

@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/property-hero.webp",
         "height": "medium",
         "fullwidth": true,
         "alignment": "start",
@@ -111,7 +111,7 @@
     "overview": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/property-overview.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -174,42 +174,42 @@
         "img-1": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/property-gallery-living.webp",
             "caption": "Living room with fireplace"
           }
         },
         "img-2": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/property-gallery-kitchen.webp",
             "caption": "Chef's kitchen"
           }
         },
         "img-3": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/property-gallery-bedroom.webp",
             "caption": "Primary bedroom"
           }
         },
         "img-4": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/property-gallery-bath.webp",
             "caption": "Primary bath"
           }
         },
         "img-5": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/property-gallery-dining.webp",
             "caption": "Dining room"
           }
         },
         "img-6": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/property-gallery-garden.webp",
             "caption": "Private garden"
           }
         }
@@ -443,5 +443,5 @@
   ],
   "id": "property-details",
   "created": "2026-04-17T10:00:00.000Z",
-  "updated": "2026-04-17T10:00:00.000Z"
+  "updated": "2026-04-17T11:05:10.122Z"
 }

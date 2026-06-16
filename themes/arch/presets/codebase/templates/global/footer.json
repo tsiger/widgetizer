@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Codebase Studio. All rights reserved.</p>",
+    "copyright": "© 2026 Codebase Studio. All rights reserved.",
     "layout": "first-featured",
     "color_scheme": "highlight-primary"
   },
@@ -10,6 +10,7 @@
       "type": "logo_text",
       "settings": {
         "text": "<p>A product engineering studio building web applications, dashboards, and design systems for teams that care about craft. Based in Berlin, working with teams across Europe and North America.</p>",
+        "logo": "/uploads/images/codebase-logo.png",
         "logo_width": 180
       }
     },
@@ -24,7 +25,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Pages",
-        "menu": "footer-menu"
+        "menu": "9db66eb5-d6ac-4f2b-bced-5ec5cd6070f1"
       }
     },
     "social_block_1": {
@@ -34,5 +35,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

@@ -9,7 +9,8 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/services-checkup.webp"
       },
       "blocks": {
         "intro-kicker": {
@@ -43,7 +44,8 @@
             "link": {
               "href": "contact.html",
               "text": "Ask about a visit",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
             },
             "style": "primary",
             "size": "large"
@@ -300,7 +302,8 @@
             "link": {
               "href": "contact.html",
               "text": "Contact the clinic",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
             },
             "style": "primary",
             "size": "medium"
@@ -322,6 +325,6 @@
     "services_cta"
   ],
   "id": "services",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:30:57.842Z",
+  "updated": "2026-04-24T10:57:53.896Z"
 }

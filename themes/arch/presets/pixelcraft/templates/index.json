@@ -13,7 +13,8 @@
         "overlay_color": "#0a0a0ab8",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -47,13 +48,15 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
             },
             "style": "primary",
             "link_2": {
               "text": "See the work",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
             },
             "style_2": "secondary",
             "size": "large"
@@ -108,8 +111,10 @@
             "link": {
               "text": "Read the case",
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+            },
+            "image": "/uploads/images/work-vance-oak.webp"
           }
         },
         "bw-orion": {
@@ -125,8 +130,10 @@
             "link": {
               "text": "Read the case",
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+            },
+            "image": "/uploads/images/work-orion.webp"
           }
         },
         "bw-hearth": {
@@ -142,8 +149,10 @@
             "link": {
               "text": "Read the case",
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+            },
+            "image": "/uploads/images/work-hearth.webp"
           }
         },
         "bw-sidereal": {
@@ -159,8 +168,10 @@
             "link": {
               "text": "Read the case",
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+            },
+            "image": "/uploads/images/work-sidereal.webp"
           }
         },
         "bw-cordage": {
@@ -176,8 +187,10 @@
             "link": {
               "text": "Read the case",
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+            },
+            "image": "/uploads/images/work-cordage.webp"
           }
         },
         "bw-northlake": {
@@ -193,8 +206,10 @@
             "link": {
               "text": "Read the case",
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+            },
+            "image": "/uploads/images/work-northlake.webp"
           }
         }
       },
@@ -273,7 +288,8 @@
             "quote": "Pixelcraft spent a full week just looking at our shop before they drew a single thing. By the time we saw sketches, they already understood the brand better than I did. The identity they made is the one we'd hoped we could articulate ourselves.",
             "name": "Nina Vance",
             "title": "Co-founder · Vance & Oak",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-nina.webp"
           }
         },
         "r-2": {
@@ -282,7 +298,8 @@
             "quote": "We went through three agencies before landing here. Pixelcraft is the only studio that pushed back on our brief — and the final magazine redesign is the one that's actually winning us subscribers, not just awards.",
             "name": "Marcus Kay",
             "title": "Editor-in-Chief · Orion Quarterly",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-marcus.webp"
           }
         },
         "r-3": {
@@ -291,7 +308,8 @@
             "quote": "Small studio, big taste. They take the time to do the work right and they tell you honestly when you're asking for the wrong thing. That's rarer than it should be.",
             "name": "Isla Okafor",
             "title": "Founder · Hearth Coffee",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-isla.webp"
           }
         },
         "r-4": {
@@ -300,7 +318,8 @@
             "quote": "The type family they drew for us is going to carry our imprint for the next decade. I've commissioned type from four studios before and none felt this considered.",
             "name": "Theo Reyes",
             "title": "Publisher · Cordage Press",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-theo.webp"
           }
         }
       },
@@ -342,13 +361,15 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
             },
             "style": "primary",
             "link_2": {
               "text": "See the work",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -361,7 +382,7 @@
         "cta-button"
       ]
     },
-    "disciplines_marquee_two": {
+    "widget_d9b499e8-ad40-4e75-801d-3273f1e08871": {
       "type": "scrolling-text",
       "settings": {
         "text": "Brand Identity — Editorial Design — Packaging — Typography — Print — Digital — Art Direction",
@@ -373,12 +394,13 @@
         "text_color": "#d1f600",
         "top_spacing": "none",
         "bottom_spacing": "auto"
-      }
+      },
+      "blocks": {},
+      "blocksOrder": []
     },
-    "phases_list": {
+    "widget_0b1ae9f7-17e9-4353-8892-8b95f1c33b95": {
       "type": "numbered-service-list",
       "settings": {
-        "eyebrow": "How we work",
         "eyebrow_uppercase": true,
         "title": "Three phases.",
         "heading_alignment": "start",
@@ -386,49 +408,65 @@
         "show_dividers": true,
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "eyebrow": "How we work"
       },
       "blocks": {
-        "ph-listen": {
+        "block_79b9c75d-b302-44cf-b4fe-21e08b79321a": {
           "type": "service",
           "settings": {
             "title": "Listen",
-            "description": "<p>We read the brief, read your existing materials, and talk to your team and your customers before we open Illustrator.</p>"
+            "description": "<p>We read the brief, read your existing materials, and talk to your team and your customers before we open Illustrator.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
-        "ph-sketch": {
+        "block_7548fa57-51e9-45f3-8cca-de9ee2ccb695": {
           "type": "service",
           "settings": {
             "title": "Sketch",
-            "description": "<p>We show directions early and narrow down together. You see the ideas that didn't work as well as the ones that did.</p>"
+            "description": "<p>We show directions early and narrow down together. You see the ideas that didn't work as well as the ones that did.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
-        "ph-ship": {
+        "block_6660f750-dd85-481a-bf74-ee8b5e7d8182": {
           "type": "service",
           "settings": {
             "title": "Ship",
-            "description": "<p>We build the system, package the files, and brief your team so the work has legs after we leave.</p>"
+            "description": "<p>We turn strategy into execution with focused initiatives across We build the system, package the files, and brief your team so the work has legs after we leave.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         }
       },
       "blocksOrder": [
-        "ph-listen",
-        "ph-sketch",
-        "ph-ship"
+        "block_79b9c75d-b302-44cf-b4fe-21e08b79321a",
+        "block_7548fa57-51e9-45f3-8cca-de9ee2ccb695",
+        "block_6660f750-dd85-481a-bf74-ee8b5e7d8182"
       ]
     }
   },
   "widgetsOrder": [
     "hero",
     "disciplines_marquee",
-    "disciplines_marquee_two",
+    "widget_d9b499e8-ad40-4e75-801d-3273f1e08871",
     "selected_work",
     "pace_split",
     "reviews",
-    "phases_list",
+    "widget_0b1ae9f7-17e9-4353-8892-8b95f1c33b95",
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-21T14:00:00.000Z",
-  "updated": "2026-04-21T16:32:04.771Z"
+  "created": "2026-04-21T14:21:02.380Z",
+  "updated": "2026-04-21T16:08:38.310Z"
 }

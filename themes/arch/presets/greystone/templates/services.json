@@ -57,13 +57,13 @@
         "svc-1": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/service-business-litigation.webp",
             "subtitle": "Civil",
             "title": "Business Litigation",
             "description": "<p>Contract disputes, partnership conflicts, fraud claims, and commercial torts. We represent businesses and individuals in state and federal courts with strategic, results-oriented advocacy.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -71,13 +71,13 @@
         "svc-2": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/service-estate-planning.webp",
             "subtitle": "Trusts & Estates",
             "title": "Estate Planning",
             "description": "<p>Wills, revocable and irrevocable trusts, powers of attorney, and probate administration. We help you protect your assets and provide for your family's future.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -85,13 +85,13 @@
         "svc-3": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/service-real-estate.webp",
             "subtitle": "Property",
             "title": "Real Estate Law",
             "description": "<p>Residential and commercial transactions, title disputes, zoning matters, and landlord-tenant issues. Thorough representation from due diligence through closing.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -99,13 +99,13 @@
         "svc-4": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/service-family-law.webp",
             "subtitle": "Domestic",
             "title": "Family Law",
             "description": "<p>Divorce, child custody, spousal support, and prenuptial agreements. Discreet, compassionate counsel for families navigating difficult transitions.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -113,13 +113,13 @@
         "svc-5": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/service-employment.webp",
             "subtitle": "Workplace",
             "title": "Employment Law",
             "description": "<p>Wrongful termination, discrimination, harassment, and wage disputes. We represent employees and employers in negotiations, mediations, and litigation.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -127,13 +127,13 @@
         "svc-6": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/service-personal-injury.webp",
             "subtitle": "Injury",
             "title": "Personal Injury",
             "description": "<p>Motor vehicle accidents, premises liability, and medical malpractice. We fight for fair compensation so you can focus on recovery.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -151,7 +151,7 @@
     "why_greystone": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-firm-interior.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -265,7 +265,8 @@
             "link": {
               "text": "Free Consultation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c887d105-141a-4f16-abb3-6c711cb6aa6a"
             },
             "style": "primary",
             "size": "medium"
@@ -286,6 +287,6 @@
     "cta"
   ],
   "id": "services",
-  "created": "2026-04-08T10:00:00.000Z",
-  "updated": "2026-04-08T10:00:00.000Z"
+  "created": "2026-04-16T19:37:17.447Z",
+  "updated": "2026-04-16T19:45:04.363Z"
 }

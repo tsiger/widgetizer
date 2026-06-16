@@ -10,7 +10,8 @@
         "overlay_color": "#151e22cc",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "auto"
+        "top_spacing": "auto",
+        "image": "/uploads/images/about-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -28,14 +29,18 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "story": {
       "type": "image-text",
       "settings": {
         "image_position": "end",
         "text_position": "center",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/founders-story.webp"
       },
       "blocks": {
         "story-eyebrow": {
@@ -62,7 +67,11 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text"
+      ]
     },
     "philosophy": {
       "type": "icon-list",
@@ -103,7 +112,11 @@
           }
         }
       },
-      "blocksOrder": ["value-1", "value-2", "value-3"]
+      "blocksOrder": [
+        "value-1",
+        "value-2",
+        "value-3"
+      ]
     },
     "founders": {
       "type": "profile-grid",
@@ -122,7 +135,8 @@
             "name": "Nico Ferrara",
             "role": "Head Bartender / Co-Founder",
             "specialty": "Cocktails & Spirits",
-            "bio": "Former bar manager at two of New York's best cocktail bars. Nico brings classical technique and a love of obscure amari to everything he mixes. He'll make you a perfect Negroni, but he'd rather make you something you've never tried."
+            "bio": "Former bar manager at two of New York's best cocktail bars. Nico brings classical technique and a love of obscure amari to everything he mixes. He'll make you a perfect Negroni, but he'd rather make you something you've never tried.",
+            "photo": "/uploads/images/team-nico.webp"
           }
         },
         "profile-2": {
@@ -131,18 +145,23 @@
             "name": "Jules Moreau",
             "role": "Sommelier / Co-Founder",
             "specialty": "Natural Wine",
-            "bio": "Trained in Burgundy, radicalized in the Jura. Jules spent years working harvests across Europe before landing in Brooklyn. She curates the wine list with the same philosophy she learned from small producers — trust the land, trust the process."
+            "bio": "Trained in Burgundy, radicalized in the Jura. Jules spent years working harvests across Europe before landing in Brooklyn. She curates the wine list with the same philosophy she learned from small producers — trust the land, trust the process.",
+            "photo": "/uploads/images/team-jules.webp"
           }
         }
       },
-      "blocksOrder": ["profile-1", "profile-2"]
+      "blocksOrder": [
+        "profile-1",
+        "profile-2"
+      ]
     },
     "sourcing": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
         "text_position": "center",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/wine-farming.webp"
       },
       "blocks": {
         "sourcing-eyebrow": {
@@ -174,14 +193,20 @@
             "link": {
               "text": "See the Wine List",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["sourcing-eyebrow", "sourcing-heading", "sourcing-text", "sourcing-button"]
+      "blocksOrder": [
+        "sourcing-eyebrow",
+        "sourcing-heading",
+        "sourcing-text",
+        "sourcing-button"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -203,18 +228,29 @@
             "link": {
               "text": "Find the Bar",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "story", "philosophy", "founders", "sourcing", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "story",
+    "philosophy",
+    "founders",
+    "sourcing",
+    "cta"
+  ],
   "id": "about",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T13:48:06.369Z",
+  "updated": "2026-04-16T13:54:21.206Z"
 }

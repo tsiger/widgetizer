@@ -2,15 +2,16 @@
   "name": "Arrangements",
   "slug": "arrangements",
   "id": "arrangements",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T12:39:31.880Z",
+  "updated": "2026-04-22T12:56:45.255Z",
   "widgets": {
     "page_header": {
       "type": "banner",
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/arrangements-banner.webp"
       },
       "blocks": {
         "page-heading": {
@@ -29,7 +30,10 @@
           }
         }
       },
-      "blocksOrder": ["page-heading", "page-text"]
+      "blocksOrder": [
+        "page-heading",
+        "page-text"
+      ]
     },
     "bouquets": {
       "type": "priced-list",
@@ -73,7 +77,12 @@
           }
         }
       },
-      "blocksOrder": ["item-petite", "item-classic", "item-statement", "item-luxury"]
+      "blocksOrder": [
+        "item-petite",
+        "item-classic",
+        "item-statement",
+        "item-luxury"
+      ]
     },
     "seasonal_collection": {
       "type": "priced-list",
@@ -110,7 +119,11 @@
           }
         }
       },
-      "blocksOrder": ["item-dahlia", "item-peony", "item-tulip"]
+      "blocksOrder": [
+        "item-dahlia",
+        "item-peony",
+        "item-tulip"
+      ]
     },
     "gallery_section": {
       "type": "gallery",
@@ -127,41 +140,54 @@
         "img-1": {
           "type": "image",
           "settings": {
-            "caption": "Spring Bridal Bouquet"
+            "caption": "Spring Bridal Bouquet",
+            "image": "/uploads/images/gallery-1.webp"
           }
         },
         "img-2": {
           "type": "image",
           "settings": {
-            "caption": "Seasonal Statement Arrangement"
+            "caption": "Seasonal Statement Arrangement",
+            "image": "/uploads/images/gallery-2.webp"
           }
         },
         "img-3": {
           "type": "image",
           "settings": {
-            "caption": "Corporate Lobby Display"
+            "caption": "Corporate Lobby Display",
+            "image": "/uploads/images/gallery-3.webp"
           }
         },
         "img-4": {
           "type": "image",
           "settings": {
-            "caption": "Birthday Celebration Bouquet"
+            "caption": "Birthday Celebration Bouquet",
+            "image": "/uploads/images/gallery-4.webp"
           }
         },
         "img-5": {
           "type": "image",
           "settings": {
-            "caption": "Sympathy Arrangement"
+            "caption": "Sympathy Arrangement",
+            "image": "/uploads/images/gallery-6.webp"
           }
         },
         "img-6": {
           "type": "image",
           "settings": {
-            "caption": "Dahlia Autumn Collection"
+            "caption": "Dahlia Autumn Collection",
+            "image": "/uploads/images/gallery-5.webp"
           }
         }
       },
-      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6"
+      ]
     },
     "custom_cta": {
       "type": "action-bar",
@@ -190,15 +216,26 @@
             "link": {
               "href": "contact.html",
               "text": "Request a Custom Order",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["page_header", "bouquets", "seasonal_collection", "gallery_section", "custom_cta"]
+  "widgetsOrder": [
+    "page_header",
+    "bouquets",
+    "seasonal_collection",
+    "gallery_section",
+    "custom_cta"
+  ]
 }

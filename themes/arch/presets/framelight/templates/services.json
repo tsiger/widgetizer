@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/banner-services-hero.webp"
       },
       "blocks": {
         "intro-eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "services_categories": {
       "type": "image-tabs",
@@ -60,32 +65,41 @@
           "type": "tab",
           "settings": {
             "title": "Editorial",
-            "description": "<p>Features and profiles for magazines, books, and independent publications. Shot in natural light, over unhurried mornings, with a small footprint on set.</p>"
+            "description": "<p>Features and profiles for magazines, books, and independent publications. Shot in natural light, over unhurried mornings, with a small footprint on set.</p>",
+            "image": "/uploads/images/category-editorial.webp"
           }
         },
         "tab-portrait": {
           "type": "tab",
           "settings": {
             "title": "Portrait",
-            "description": "<p>Individual and small-group portraiture for founders, creatives, and private clients. Studio or on location. One strong frame is worth more than fifty adequate ones.</p>"
+            "description": "<p>Individual and small-group portraiture for founders, creatives, and private clients. Studio or on location. One strong frame is worth more than fifty adequate ones.</p>",
+            "image": "/uploads/images/category-portrait.webp"
           }
         },
         "tab-lifestyle": {
           "type": "tab",
           "settings": {
             "title": "Lifestyle",
-            "description": "<p>Families, couples, and documentary commissions. Unposed, patient, and built around the real rhythm of the day rather than a shot list.</p>"
+            "description": "<p>Families, couples, and documentary commissions. Unposed, patient, and built around the real rhythm of the day rather than a shot list.</p>",
+            "image": "/uploads/images/category-lifestyle.webp"
           }
         },
         "tab-commercial": {
           "type": "tab",
           "settings": {
             "title": "Commercial",
-            "description": "<p>Small brand campaigns, still-life, and look books for independent makers. Editorial in spirit, practical in delivery, licensed cleanly.</p>"
+            "description": "<p>Small brand campaigns, still-life, and look books for independent makers. Editorial in spirit, practical in delivery, licensed cleanly.</p>",
+            "image": "/uploads/images/category-commercial.webp"
           }
         }
       },
-      "blocksOrder": ["tab-editorial", "tab-portrait", "tab-lifestyle", "tab-commercial"]
+      "blocksOrder": [
+        "tab-editorial",
+        "tab-portrait",
+        "tab-lifestyle",
+        "tab-commercial"
+      ]
     },
     "services_offerings": {
       "type": "numbered-service-list",
@@ -129,7 +143,12 @@
           }
         }
       },
-      "blocksOrder": ["svc-01", "svc-02", "svc-03", "svc-04"]
+      "blocksOrder": [
+        "svc-01",
+        "svc-02",
+        "svc-03",
+        "svc-04"
+      ]
     },
     "services_process": {
       "type": "steps",
@@ -146,39 +165,50 @@
           "type": "step",
           "settings": {
             "title": "Inquiry",
-            "description": "<p>You send a few lines about what you have in mind — who the shoot is for, a rough timeline, where it might happen. I reply within two working days.</p>"
+            "description": "<p>You send a few lines about what you have in mind — who the shoot is for, a rough timeline, where it might happen. I reply within two working days.</p>",
+            "image": "/uploads/images/step-01-inquiry.webp"
           }
         },
         "step-02": {
           "type": "step",
           "settings": {
             "title": "Brief",
-            "description": "<p>A short call or exchange of notes. We talk through references, logistics, and any hard constraints. You get a written brief and a proposed date.</p>"
+            "description": "<p>A short call or exchange of notes. We talk through references, logistics, and any hard constraints. You get a written brief and a proposed date.</p>",
+            "image": "/uploads/images/step-02-brief.webp"
           }
         },
         "step-03": {
           "type": "step",
           "settings": {
             "title": "Shoot",
-            "description": "<p>The session itself. Unhurried, quiet, with minimal crew. Medium format, film or digital depending on the brief, always natural or window light by default.</p>"
+            "description": "<p>The session itself. Unhurried, quiet, with minimal crew. Medium format, film or digital depending on the brief, always natural or window light by default.</p>",
+            "image": "/uploads/images/step-03-shoot.webp"
           }
         },
         "step-04": {
           "type": "step",
           "settings": {
             "title": "Edit",
-            "description": "<p>I spend more time editing than shooting. You receive a curated selection within three weeks, with an option to request minor revisions to the final set.</p>"
+            "description": "<p>I spend more time editing than shooting. You receive a curated selection within three weeks, with an option to request minor revisions to the final set.</p>",
+            "image": "/uploads/images/step-04-edit.webp"
           }
         },
         "step-05": {
           "type": "step",
           "settings": {
             "title": "Deliver",
-            "description": "<p>Final files via a private gallery, plus prints or a linen-bound album if that's part of the project. Licenses are simple, written, and specific to your use.</p>"
+            "description": "<p>Final files via a private gallery, plus prints or a linen-bound album if that's part of the project. Licenses are simple, written, and specific to your use.</p>",
+            "image": "/uploads/images/step-05-deliver.webp"
           }
         }
       },
-      "blocksOrder": ["step-01", "step-02", "step-03", "step-04", "step-05"]
+      "blocksOrder": [
+        "step-01",
+        "step-02",
+        "step-03",
+        "step-04",
+        "step-05"
+      ]
     },
     "services_faq": {
       "type": "accordion",
@@ -230,7 +260,13 @@
           }
         }
       },
-      "blocksOrder": ["faq-01", "faq-02", "faq-03", "faq-04", "faq-info"]
+      "blocksOrder": [
+        "faq-01",
+        "faq-02",
+        "faq-03",
+        "faq-04",
+        "faq-info"
+      ]
     },
     "services_closing": {
       "type": "banner",
@@ -267,18 +303,30 @@
             "link": {
               "text": "Inquire",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-body", "close-cta"]
+      "blocksOrder": [
+        "close-heading",
+        "close-body",
+        "close-cta"
+      ]
     }
   },
-  "widgetsOrder": ["services_intro", "services_categories", "services_offerings", "services_process", "services_faq", "services_closing"],
+  "widgetsOrder": [
+    "services_intro",
+    "services_categories",
+    "services_offerings",
+    "services_process",
+    "services_faq",
+    "services_closing"
+  ],
   "id": "services",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T09:38:18.156Z",
+  "updated": "2026-04-23T10:22:42.420Z"
 }

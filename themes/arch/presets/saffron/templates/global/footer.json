@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Saffron Restaurant. All rights reserved.</p>",
+    "copyright": "© 2026 Saffron Restaurant. All rights reserved.",
     "color_scheme": "highlight-secondary",
     "layout": "equal"
   },
@@ -10,6 +10,7 @@
       "type": "logo_text",
       "settings": {
         "text": "<p>A neighborhood restaurant celebrating local flavors, seasonal ingredients, and the art of gathering around a shared table.</p>",
+        "logo": "/uploads/images/logo.png",
         "logo_width": 140
       }
     },
@@ -33,5 +34,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

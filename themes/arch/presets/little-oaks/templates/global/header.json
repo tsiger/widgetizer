@@ -5,16 +5,20 @@
     "contactDetailsLine1": "(555) 482-3100",
     "contactDetailsLine2": "140 Maple Lane, Asheville",
     "contact_position": "logo",
-    "logoMaxWidth": 160,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Schedule a Tour",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "0db30ea7-c4f3-4513-a160-34d01f823fe8"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": false,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/little-oaks-dark.png",
+    "logoMaxWidth": 160
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

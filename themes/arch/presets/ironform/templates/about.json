@@ -2,8 +2,8 @@
   "name": "About",
   "slug": "about",
   "id": "about",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T14:12:33.339Z",
+  "updated": "2026-04-22T16:55:22.496Z",
   "widgets": {
     "trainer_opener": {
       "type": "image-text",
@@ -11,7 +11,8 @@
         "image_position": "end",
         "text_position": "center",
         "color_scheme": "standard-primary",
-        "content_color_scheme": "none"
+        "content_color_scheme": "none",
+        "image": "/uploads/images/trainer-portrait.webp"
       },
       "blocks": {
         "opener-eyebrow": {
@@ -43,14 +44,20 @@
             "link": {
               "href": "book.html",
               "text": "Book a Session",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["opener-eyebrow", "opener-heading", "opener-body", "opener-cta"]
+      "blocksOrder": [
+        "opener-eyebrow",
+        "opener-heading",
+        "opener-body",
+        "opener-cta"
+      ]
     },
     "credentials": {
       "type": "timeline",
@@ -102,7 +109,13 @@
           }
         }
       },
-      "blocksOrder": ["cred-1", "cred-2", "cred-3", "cred-4", "cred-5"]
+      "blocksOrder": [
+        "cred-1",
+        "cred-2",
+        "cred-3",
+        "cred-4",
+        "cred-5"
+      ]
     },
     "philosophy": {
       "type": "image-text",
@@ -110,7 +123,8 @@
         "image_position": "start",
         "text_position": "center",
         "color_scheme": "standard-primary",
-        "content_color_scheme": "none"
+        "content_color_scheme": "none",
+        "image": "/uploads/images/trainer-in-session.webp"
       },
       "blocks": {
         "phil-eyebrow": {
@@ -143,13 +157,19 @@
           }
         }
       },
-      "blocksOrder": ["phil-eyebrow", "phil-heading", "phil-body", "phil-features"]
+      "blocksOrder": [
+        "phil-eyebrow",
+        "phil-heading",
+        "phil-body",
+        "phil-features"
+      ]
     },
     "featured_client": {
       "type": "testimonial-hero",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "author_image": "/uploads/images/client-testimonial.webp"
       },
       "blocks": {
         "client-quote": {
@@ -175,7 +195,11 @@
           }
         }
       },
-      "blocksOrder": ["client-quote", "client-name", "client-context"]
+      "blocksOrder": [
+        "client-quote",
+        "client-name",
+        "client-context"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -204,15 +228,26 @@
             "link": {
               "href": "book.html",
               "text": "Book a Free Consultation",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-btn"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-btn"
+      ]
     }
   },
-  "widgetsOrder": ["trainer_opener", "credentials", "philosophy", "featured_client", "about_cta"]
+  "widgetsOrder": [
+    "trainer_opener",
+    "credentials",
+    "philosophy",
+    "featured_client",
+    "about_cta"
+  ]
 }

@@ -10,6 +10,7 @@
         "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "none",
+        "image": "/uploads/images/about-hero.webp",
         "bottom_spacing": "none"
       },
       "blocks": {
@@ -28,13 +29,17 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "origin": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/about-founder.webp"
       },
       "blocks": {
         "origin-eyebrow": {
@@ -61,7 +66,11 @@
           }
         }
       },
-      "blocksOrder": ["origin-eyebrow", "origin-heading", "origin-text"]
+      "blocksOrder": [
+        "origin-eyebrow",
+        "origin-heading",
+        "origin-text"
+      ]
     },
     "process": {
       "type": "steps",
@@ -77,32 +86,41 @@
           "type": "step",
           "settings": {
             "title": "Source",
-            "description": "<p>We build direct relationships with small-lot farmers in Ethiopia, Colombia, and Guatemala. We visit the farms, cup the harvests, and choose only what excites us.</p>"
+            "description": "<p>We build direct relationships with small-lot farmers in Ethiopia, Colombia, and Guatemala. We visit the farms, cup the harvests, and choose only what excites us.</p>",
+            "image": "/uploads/images/step-source.webp"
           }
         },
         "step-2": {
           "type": "step",
           "settings": {
             "title": "Roast",
-            "description": "<p>Every batch is roasted in-house on our Probat roaster. Light to medium profiles that honor the origin — never over-roasted, never bitter.</p>"
+            "description": "<p>Every batch is roasted in-house on our Probat roaster. Light to medium profiles that honor the origin — never over-roasted, never bitter.</p>",
+            "image": "/uploads/images/step-roast.webp"
           }
         },
         "step-3": {
           "type": "step",
           "settings": {
             "title": "Dial In",
-            "description": "<p>Each morning, we dial in every grinder and every method. Water temp, grind size, dose — it all matters, and we adjust until it's right.</p>"
+            "description": "<p>Each morning, we dial in every grinder and every method. Water temp, grind size, dose — it all matters, and we adjust until it's right.</p>",
+            "image": "/uploads/images/step-dialin.webp"
           }
         },
         "step-4": {
           "type": "step",
           "settings": {
             "title": "Serve",
-            "description": "<p>Your coffee is brewed to order by baristas who care about the craft. We'll happily talk you through the menu — no question is too basic.</p>"
+            "description": "<p>Your coffee is brewed to order by baristas who care about the craft. We'll happily talk you through the menu — no question is too basic.</p>",
+            "image": "/uploads/images/step-serve.webp"
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -148,7 +166,12 @@
           }
         }
       },
-      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+      "blocksOrder": [
+        "figure-1",
+        "figure-2",
+        "figure-3",
+        "figure-4"
+      ]
     },
     "team": {
       "type": "team-highlight",
@@ -166,32 +189,41 @@
           "type": "member",
           "settings": {
             "name": "Sam Chen",
-            "role": "Founder & Head Roaster"
+            "role": "Founder & Head Roaster",
+            "photo": "/uploads/images/team-sam.webp"
           }
         },
         "member-2": {
           "type": "member",
           "settings": {
             "name": "Maya Torres",
-            "role": "Lead Barista"
+            "role": "Lead Barista",
+            "photo": "/uploads/images/team-maya.webp"
           }
         },
         "member-3": {
           "type": "member",
           "settings": {
             "name": "Kai Okonkwo",
-            "role": "Pastry Chef"
+            "role": "Pastry Chef",
+            "photo": "/uploads/images/team-kai.webp"
           }
         },
         "member-4": {
           "type": "member",
           "settings": {
             "name": "Lena Bergström",
-            "role": "Green Buyer"
+            "role": "Green Buyer",
+            "photo": "/uploads/images/team-lena.webp"
           }
         }
       },
-      "blocksOrder": ["member-1", "member-2", "member-3", "member-4"]
+      "blocksOrder": [
+        "member-1",
+        "member-2",
+        "member-3",
+        "member-4"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -215,24 +247,36 @@
             "link": {
               "text": "Find Us",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2845e053-7b6d-4204-8b0f-0bd5b5982357"
             },
             "style": "primary",
             "link_2": {
               "text": "View Menu",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["about_hero", "origin", "process", "stats", "team", "about_cta"],
+  "widgetsOrder": [
+    "about_hero",
+    "origin",
+    "process",
+    "stats",
+    "team",
+    "about_cta"
+  ],
   "id": "about",
-  "created": "2026-04-03T12:00:00.000Z",
-  "updated": "2026-04-03T12:00:00.000Z"
+  "created": "2026-04-16T10:30:13.558Z",
+  "updated": "2026-04-16T10:39:39.183Z"
 }

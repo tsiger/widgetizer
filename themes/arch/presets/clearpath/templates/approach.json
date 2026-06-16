@@ -38,7 +38,11 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "phases": {
       "type": "checkerboard",
@@ -73,29 +77,54 @@
             "description": "<p>Eight to twelve weeks. Weekly sessions with the decision-makers who need to carry the work forward. The role shifts from advisor to standing peer — present when useful, quiet when not.</p>"
           }
         },
-        "card-spacer-1": {
+        "block_e460073b-0299-4d4e-8210-fa2f360cb335": {
           "type": "card",
           "settings": {
-            "title": "",
-            "description": ""
+            "title": "Feature Title",
+            "description": "<p>A short description of this feature or service.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "#",
+              "target": "_self"
+            },
+            "image": "/uploads/images/approach-diagnose.webp"
           }
         },
-        "card-spacer-2": {
+        "block_4f68a8e7-89f6-427e-b343-1973dfa330b0": {
           "type": "card",
           "settings": {
-            "title": "",
-            "description": ""
+            "title": "Feature Title",
+            "description": "<p>A short description of this feature or service.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "#",
+              "target": "_self"
+            },
+            "image": "/uploads/images/approach-deploy.webp"
           }
         },
-        "card-spacer-3": {
+        "block_af24d5e5-19f7-420f-b30e-da3b43016bab": {
           "type": "card",
           "settings": {
-            "title": "",
-            "description": ""
+            "title": "Feature Title",
+            "description": "<p>A short description of this feature or service.</p>",
+            "button_link": {
+              "text": "Learn More",
+              "href": "#",
+              "target": "_self"
+            },
+            "image": "/uploads/images/approach-design.webp"
           }
         }
       },
-      "blocksOrder": ["card-diagnose", "card-spacer-1", "card-deploy", "card-spacer-2", "card-design", "card-spacer-3"]
+      "blocksOrder": [
+        "card-diagnose",
+        "block_e460073b-0299-4d4e-8210-fa2f360cb335",
+        "card-deploy",
+        "block_4f68a8e7-89f6-427e-b343-1973dfa330b0",
+        "card-design",
+        "block_af24d5e5-19f7-420f-b30e-da3b43016bab"
+      ]
     },
     "engagement_faq": {
       "type": "accordion",
@@ -154,12 +183,19 @@
           }
         }
       },
-      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "q-5", "sidebar"]
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4",
+        "q-5",
+        "sidebar"
+      ]
     },
     "closing": {
       "type": "banner",
       "settings": {
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "center",
@@ -189,18 +225,28 @@
             "link": {
               "text": "Start a conversation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-body", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-body",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["intro", "phases", "engagement_faq", "closing"],
+  "widgetsOrder": [
+    "intro",
+    "phases",
+    "engagement_faq",
+    "closing"
+  ],
   "id": "approach",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z"
+  "created": "2026-04-22T18:20:05.336Z",
+  "updated": "2026-04-23T08:26:28.855Z"
 }

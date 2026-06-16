@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>(c) 2026 Tailside Animal Clinic. All rights reserved.</p>",
+    "copyright": "(c) 2026 Tailside Animal Clinic. All rights reserved.",
     "layout": "equal",
     "color_scheme": "highlight-primary"
   },
@@ -10,8 +10,9 @@
       "type": "logo_text",
       "settings": {
         "logo_text": "Tailside",
-        "logo_width": 190,
-        "text": "<p>Small-animal veterinary care for dogs and cats, built around clear guidance and calm visits.</p>"
+        "text": "<p>Small-animal veterinary care for dogs and cats, built around clear guidance and calm visits.</p>",
+        "logo": "/uploads/images/tailside-logo-light.png",
+        "logo_width": 190
       }
     },
     "text_block_1": {
@@ -32,7 +33,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Quick Links",
-        "menu": "footer-menu"
+        "menu": "82344b4d-2371-441b-b699-411035a8792b"
       }
     }
   },

@@ -8,13 +8,17 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book Now",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
     },
     "ctaButtonStyle": "secondary",
     "center_nav": false,
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": false,
-    "color_scheme": "standard-secondary"
-  }
+    "color_scheme": "standard-secondary",
+    "logoImage": "/uploads/images/velvet-touch.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

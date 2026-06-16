@@ -1,0 +1,475 @@
+{
+  "files": [
+    {
+      "filename": "olympiclight.png",
+      "originalName": "olympic_light.png",
+      "type": "image/png",
+      "size": 3979,
+      "path": "/uploads/images/olympiclight.png",
+      "width": 676,
+      "height": 123,
+      "alt": "",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/olympiclight-small.png",
+          "width": 480,
+          "height": 87
+        },
+        "thumb": {
+          "path": "/uploads/images/olympiclight-thumb.png",
+          "width": 150,
+          "height": 27
+        }
+      }
+    },
+    {
+      "filename": "olympicdark.png",
+      "originalName": "olympic_dark.png",
+      "type": "image/png",
+      "size": 3868,
+      "path": "/uploads/images/olympicdark.png",
+      "width": 676,
+      "height": 123,
+      "alt": "",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/olympicdark-small.png",
+          "width": 480,
+          "height": 87
+        },
+        "thumb": {
+          "path": "/uploads/images/olympicdark-thumb.png",
+          "width": 150,
+          "height": 27
+        }
+      }
+    },
+    {
+      "filename": "trainer-coaching.webp",
+      "originalName": "trainer-coaching.webp",
+      "type": "image/webp",
+      "size": 63550,
+      "path": "/uploads/images/trainer-coaching.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Two trainers spotting a member on a kettlebell swing with attentive form cues",
+      "title": "One-on-one coaching",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/trainer-coaching-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/trainer-coaching-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "classes-hero-1.webp",
+      "originalName": "classes-hero.webp",
+      "type": "image/webp",
+      "size": 190432,
+      "path": "/uploads/images/classes-hero-1.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Group HIIT class working out in unison in front of a mirrored wall with warm lighting",
+      "title": "Group HIIT class",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/classes-hero-1-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/classes-hero-1-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/classes-hero-1-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "classes-hero.webp",
+      "originalName": "classes-hero.webp",
+      "type": "image/webp",
+      "size": 190432,
+      "path": "/uploads/images/classes-hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Group HIIT class working out in unison in front of a mirrored wall with warm lighting",
+      "title": "Group HIIT class",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/classes-hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/classes-hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/classes-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "trainer-4.webp",
+      "originalName": "trainer-4.webp",
+      "type": "image/webp",
+      "size": 49976,
+      "path": "/uploads/images/trainer-4.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Female trainer in athletic wear smiling in a bright gym space",
+      "title": "Trainer",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/trainer-4-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/trainer-4-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "trainer-3.webp",
+      "originalName": "trainer-3.webp",
+      "type": "image/webp",
+      "size": 46758,
+      "path": "/uploads/images/trainer-3.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Male trainer with a beard in a black polo, professional gym portrait",
+      "title": "Trainer",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/trainer-3-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/trainer-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "trainer-2.webp",
+      "originalName": "trainer-2.webp",
+      "type": "image/webp",
+      "size": 37808,
+      "path": "/uploads/images/trainer-2.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Female trainer in a black tank top standing confidently on the gym floor",
+      "title": "Trainer",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/trainer-2-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/trainer-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "trainer-1.webp",
+      "originalName": "trainer-1.webp",
+      "type": "image/webp",
+      "size": 49394,
+      "path": "/uploads/images/trainer-1.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Male trainer in a black tee with arms crossed, smiling in the gym",
+      "title": "Head trainer",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/trainer-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/trainer-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "values-results.webp",
+      "originalName": "values-results.webp",
+      "type": "image/webp",
+      "size": 46854,
+      "path": "/uploads/images/values-results.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Strong member doing pull-ups in a bright industrial gym",
+      "title": "Results",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/values-results-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/values-results-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "values-discipline.webp",
+      "originalName": "values-discipline.webp",
+      "type": "image/webp",
+      "size": 52806,
+      "path": "/uploads/images/values-discipline.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Close-up of chalked hands gripping a loaded barbell, chalk dust in the air",
+      "title": "Discipline",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/values-discipline-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/values-discipline-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "values-community.webp",
+      "originalName": "values-community.webp",
+      "type": "image/webp",
+      "size": 52172,
+      "path": "/uploads/images/values-community.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Group of six members fist-bumping and laughing together after a workout",
+      "title": "Community",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/values-community-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/values-community-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gym-story.webp",
+      "originalName": "gym-story.webp",
+      "type": "image/webp",
+      "size": 130784,
+      "path": "/uploads/images/gym-story.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Industrial gym storefront at dusk with glass facade and members visible inside",
+      "title": "Our gym",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gym-story-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/gym-story-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "facility-interior.webp",
+      "originalName": "facility-interior.webp",
+      "type": "image/webp",
+      "size": 123224,
+      "path": "/uploads/images/facility-interior.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Modern gym floor with cable machines, dumbbell racks, and weight benches",
+      "title": "Our facility",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/facility-interior-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/facility-interior-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "boxing-class.webp",
+      "originalName": "boxing-class.webp",
+      "type": "image/webp",
+      "size": 47394,
+      "path": "/uploads/images/boxing-class.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Female boxer training on a heavy bag with a coach watching in a large industrial gym",
+      "title": "Boxing training",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/boxing-class-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/boxing-class-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "yoga-class.webp",
+      "originalName": "yoga-class.webp",
+      "type": "image/webp",
+      "size": 58270,
+      "path": "/uploads/images/yoga-class.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Yoga class in warrior pose by floor-to-ceiling windows in a sunlit studio",
+      "title": "Yoga class",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/yoga-class-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/yoga-class-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "hiit-class.webp",
+      "originalName": "hiit-class.webp",
+      "type": "image/webp",
+      "size": 62300,
+      "path": "/uploads/images/hiit-class.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Four athletes doing battle rope slams in a concrete-walled training space",
+      "title": "HIIT training",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/hiit-class-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/hiit-class-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "strength-class.webp",
+      "originalName": "strength-class.webp",
+      "type": "image/webp",
+      "size": 50698,
+      "path": "/uploads/images/strength-class.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Coach demonstrating a barbell deadlift to a small strength training class",
+      "title": "Strength coaching",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/strength-class-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/strength-class-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gym-floor-hero.webp",
+      "originalName": "gym-floor-hero.webp",
+      "type": "image/webp",
+      "size": 297484,
+      "path": "/uploads/images/gym-floor-hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Spacious gym at sunset with members squatting, deadlifting, and training on the main floor",
+      "title": "Train with us",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/gym-floor-hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/gym-floor-hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/gym-floor-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

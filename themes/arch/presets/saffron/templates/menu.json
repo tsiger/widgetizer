@@ -9,7 +9,8 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "image": "/uploads/images/menu-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -27,7 +28,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "starters": {
       "type": "priced-list",
@@ -80,7 +84,13 @@
           }
         }
       },
-      "blocksOrder": ["starter-1", "starter-2", "starter-3", "starter-4", "starter-5"]
+      "blocksOrder": [
+        "starter-1",
+        "starter-2",
+        "starter-3",
+        "starter-4",
+        "starter-5"
+      ]
     },
     "mains": {
       "type": "priced-list",
@@ -157,7 +167,16 @@
           }
         }
       },
-      "blocksOrder": ["main-1", "main-2", "main-3", "main-4", "main-5", "main-6", "main-7", "main-8"]
+      "blocksOrder": [
+        "main-1",
+        "main-2",
+        "main-3",
+        "main-4",
+        "main-5",
+        "main-6",
+        "main-7",
+        "main-8"
+      ]
     },
     "desserts": {
       "type": "priced-list",
@@ -202,13 +221,19 @@
           }
         }
       },
-      "blocksOrder": ["dessert-1", "dessert-2", "dessert-3", "dessert-4"]
+      "blocksOrder": [
+        "dessert-1",
+        "dessert-2",
+        "dessert-3",
+        "dessert-4"
+      ]
     },
     "drinks_section": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/drinks-bar.webp"
       },
       "blocks": {
         "drinks-eyebrow": {
@@ -240,14 +265,20 @@
             "link": {
               "text": "Ask About Pairings",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0f2a1ee4-bebb-49a5-ba2f-4299af559fdc"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["drinks-eyebrow", "drinks-heading", "drinks-text", "drinks-button"]
+      "blocksOrder": [
+        "drinks-eyebrow",
+        "drinks-heading",
+        "drinks-text",
+        "drinks-button"
+      ]
     },
     "menu_cta": {
       "type": "action-bar",
@@ -269,18 +300,29 @@
             "link": {
               "text": "Reserve a Table",
               "href": "reservations.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["menu_hero", "starters", "mains", "desserts", "drinks_section", "menu_cta"],
+  "widgetsOrder": [
+    "menu_hero",
+    "starters",
+    "mains",
+    "desserts",
+    "drinks_section",
+    "menu_cta"
+  ],
   "id": "menu",
-  "created": "2026-04-03T10:00:00.000Z",
-  "updated": "2026-04-03T10:00:00.000Z"
+  "created": "2026-04-17T13:40:23.916Z",
+  "updated": "2026-04-17T13:49:32.884Z"
 }

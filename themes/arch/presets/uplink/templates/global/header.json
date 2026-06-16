@@ -6,17 +6,22 @@
     "contactDetailsLine1": "(555) 010-0123",
     "contactDetailsLine2": "Mon–Fri, 8am–6pm ET",
     "contact_position": "menu",
-    "headerNavigation": "main-menu",
+    "headerNavigation": "99b55d41-d0bd-46f2-8d98-477391533add",
     "center_nav": true,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book Assessment",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/uplink-logo-dark.png",
+    "transparent_logo": "/uploads/images/uplink-logo-white.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

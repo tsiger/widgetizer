@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/services-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,7 +24,9 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "services": {
       "type": "card-grid",
@@ -45,13 +47,13 @@
         "card-1": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/services-swedish.webp",
             "subtitle": "60 min",
             "title": "Swedish Massage",
             "description": "<p>Gentle, flowing strokes to ease tension and promote deep relaxation. Our most popular treatment for first-time visitors.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -59,13 +61,13 @@
         "card-2": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/services-deep-tissue.webp",
             "subtitle": "60 min",
             "title": "Deep Tissue",
             "description": "<p>Targeted pressure to release chronic muscle tension. Ideal for athletes, desk workers, and anyone carrying deep-seated stress.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -73,13 +75,13 @@
         "card-3": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/services-hot-stone.webp",
             "subtitle": "75 min",
             "title": "Hot Stone",
             "description": "<p>Heated basalt stones placed along the body's meridians, combined with flowing massage technique. Deeply warming and restorative.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -87,13 +89,13 @@
         "card-4": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/services-facial.webp",
             "subtitle": "60 min",
             "title": "Signature Facial",
             "description": "<p>A custom facial tailored to your skin's needs. Cleansing, exfoliation, extractions, mask, and hydration using organic products.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -101,13 +103,13 @@
         "card-5": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/services-scrub.webp",
             "subtitle": "45 min",
             "title": "Body Scrub",
             "description": "<p>Full-body exfoliation with natural sugar and essential oils. Leaves skin luminous, soft, and deeply nourished.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -115,19 +117,26 @@
         "card-6": {
           "type": "card",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/services-process.webp",
             "subtitle": "120 min",
             "title": "Couples Retreat",
             "description": "<p>Side-by-side massages in our private couples suite with ambient lighting and a complimentary champagne toast.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["card-1", "card-2", "card-3", "card-4", "card-5", "card-6"]
+      "blocksOrder": [
+        "card-1",
+        "card-2",
+        "card-3",
+        "card-4",
+        "card-5",
+        "card-6"
+      ]
     },
     "why_us": {
       "type": "trust-bar",
@@ -167,12 +176,16 @@
           }
         }
       },
-      "blocksOrder": ["why-1", "why-2", "why-3"]
+      "blocksOrder": [
+        "why-1",
+        "why-2",
+        "why-3"
+      ]
     },
     "process": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/gallery-therapist.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -237,14 +250,23 @@
             "link": {
               "text": "Book Your Visit",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["process-eyebrow", "process-heading", "process-step-1", "process-step-2", "process-step-3", "process-step-4", "process-button"]
+      "blocksOrder": [
+        "process-eyebrow",
+        "process-heading",
+        "process-step-1",
+        "process-step-2",
+        "process-step-3",
+        "process-step-4",
+        "process-button"
+      ]
     },
     "pricing": {
       "type": "pricing",
@@ -268,7 +290,8 @@
             "button_link": {
               "text": "Book Essential",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "featured": false
           }
@@ -283,7 +306,8 @@
             "button_link": {
               "text": "Book Signature",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "featured": true
           }
@@ -298,13 +322,18 @@
             "button_link": {
               "text": "Book Luxe",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "featured": false
           }
         }
       },
-      "blocksOrder": ["plan-1", "plan-2", "plan-3"]
+      "blocksOrder": [
+        "plan-1",
+        "plan-2",
+        "plan-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -326,12 +355,14 @@
             "link": {
               "text": "Call Us",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "link_2": {
               "text": "View Treatments",
               "href": "treatments.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "6a888bfe-038c-416d-9bfc-276872010f2d"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -339,11 +370,21 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "services", "why_us", "process", "pricing", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "services",
+    "why_us",
+    "process",
+    "pricing",
+    "cta"
+  ],
   "id": "services",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-19T11:19:49.758Z",
+  "updated": "2026-04-19T15:24:10.450Z"
 }

@@ -8,7 +8,8 @@
         "image_position": "start",
         "color_scheme": "standard-secondary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/copy.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -42,14 +43,20 @@
             "link": {
               "text": "Inquire",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-body", "hero-cta"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-body",
+        "hero-cta"
+      ]
     },
     "home_gallery": {
       "type": "masonry-gallery",
@@ -65,17 +72,90 @@
         "color_scheme": "standard-primary"
       },
       "blocks": {
-        "g-01": { "type": "item", "settings": { "title": "Alcove", "category": "Portrait" } },
-        "g-02": { "type": "item", "settings": { "title": "Camel & cream", "category": "Editorial" } },
-        "g-03": { "type": "item", "settings": { "title": "Window light", "category": "Portrait" } },
-        "g-04": { "type": "item", "settings": { "title": "Long grass", "category": "Lifestyle" } },
-        "g-05": { "type": "item", "settings": { "title": "Stone threshold", "category": "Still life" } },
-        "g-06": { "type": "item", "settings": { "title": "Unposed", "category": "Family" } },
-        "g-07": { "type": "item", "settings": { "title": "Silk fold", "category": "Still life" } },
-        "g-08": { "type": "item", "settings": { "title": "Lime wash", "category": "Interior" } },
-        "g-09": { "type": "item", "settings": { "title": "Silver & linen", "category": "Portrait" } }
+        "g-01": {
+          "type": "item",
+          "settings": {
+            "title": "Alcove",
+            "category": "Portrait",
+            "image": "/uploads/images/gallery-01-editorial-portrait.webp"
+          }
+        },
+        "g-02": {
+          "type": "item",
+          "settings": {
+            "title": "Camel & cream",
+            "category": "Editorial",
+            "image": "/uploads/images/gallery-02-environmental.webp"
+          }
+        },
+        "g-03": {
+          "type": "item",
+          "settings": {
+            "title": "Window light",
+            "category": "Portrait",
+            "image": "/uploads/images/gallery-03-still-life-detail.webp"
+          }
+        },
+        "g-04": {
+          "type": "item",
+          "settings": {
+            "title": "Long grass",
+            "category": "Lifestyle",
+            "image": "/uploads/images/gallery-05-architectural-doorway.webp"
+          }
+        },
+        "g-05": {
+          "type": "item",
+          "settings": {
+            "title": "Stone threshold",
+            "category": "Still life",
+            "image": "/uploads/images/gallery-04-lifestyle-couple.webp"
+          }
+        },
+        "g-06": {
+          "type": "item",
+          "settings": {
+            "title": "Unposed",
+            "category": "Family",
+            "image": "/uploads/images/gallery-06-family-moment.webp"
+          }
+        },
+        "g-07": {
+          "type": "item",
+          "settings": {
+            "title": "Silk fold",
+            "category": "Still life",
+            "image": "/uploads/images/gallery-07-editorial-textile.webp"
+          }
+        },
+        "g-08": {
+          "type": "item",
+          "settings": {
+            "title": "Lime wash",
+            "category": "Interior",
+            "image": "/uploads/images/gallery-08-interior-figure.webp"
+          }
+        },
+        "g-09": {
+          "type": "item",
+          "settings": {
+            "title": "Silver & linen",
+            "category": "Portrait",
+            "image": "/uploads/images/gallery-09-portrait-window.webp"
+          }
+        }
       },
-      "blocksOrder": ["g-01", "g-02", "g-03", "g-04", "g-05", "g-06", "g-07", "g-08", "g-09"]
+      "blocksOrder": [
+        "g-01",
+        "g-02",
+        "g-03",
+        "g-04",
+        "g-05",
+        "g-06",
+        "g-07",
+        "g-08",
+        "g-09"
+      ]
     },
     "home_about": {
       "type": "split-content",
@@ -119,7 +199,8 @@
             "link": {
               "text": "About the studio",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d67fe916-c47d-4ec2-a18a-88f20c62de60"
             },
             "style": "secondary",
             "size": "medium",
@@ -128,14 +209,20 @@
           }
         }
       },
-      "blocksOrder": ["about-eyebrow", "about-heading", "about-body", "about-link"]
+      "blocksOrder": [
+        "about-eyebrow",
+        "about-heading",
+        "about-body",
+        "about-link"
+      ]
     },
     "home_feature_image": {
       "type": "image",
       "settings": {
         "fullwidth": true,
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/feature-home-editorial.webp"
       }
     },
     "home_testimonial": {
@@ -144,7 +231,8 @@
         "image_position": "end",
         "color_scheme": "highlight-secondary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "author_image": "/uploads/images/testimonial-sarah-feature.webp"
       },
       "blocks": {
         "quote-text": {
@@ -173,7 +261,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-text", "quote-name", "quote-role"]
+      "blocksOrder": [
+        "quote-text",
+        "quote-name",
+        "quote-role"
+      ]
     },
     "home_projects": {
       "type": "project-showcase",
@@ -194,30 +286,37 @@
           "type": "project",
           "settings": {
             "title": "The Long Room — editorial",
-            "description": "A quiet feature for an independent magazine, shot over two mornings."
+            "description": "A quiet feature for an independent magazine, shot over two mornings.",
+            "image": "/uploads/images/project-01-editorial-magazine.webp"
           }
         },
         "p-02": {
           "type": "project",
           "settings": {
             "title": "Halverson — brand campaign",
-            "description": "A still-life and portrait series for a small homewares studio."
+            "description": "A still-life and portrait series for a small homewares studio.",
+            "image": "/uploads/images/project-02-brand-campaign.webp"
           }
         },
         "p-03": {
           "type": "project",
           "settings": {
             "title": "Mendel family — session",
-            "description": "A morning with a family on a quiet stretch of coast."
+            "description": "A morning with a family on a quiet stretch of coast.",
+            "image": "/uploads/images/project-03-family-session.webp"
           }
         }
       },
-      "blocksOrder": ["p-01", "p-02", "p-03"]
+      "blocksOrder": [
+        "p-01",
+        "p-02",
+        "p-03"
+      ]
     },
     "home_closing": {
       "type": "banner",
       "settings": {
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "center",
@@ -249,18 +348,31 @@
             "link": {
               "text": "Inquire",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-body", "close-cta"]
+      "blocksOrder": [
+        "close-heading",
+        "close-body",
+        "close-cta"
+      ]
     }
   },
-  "widgetsOrder": ["home_hero", "home_gallery", "home_about", "home_feature_image", "home_testimonial", "home_projects", "home_closing"],
+  "widgetsOrder": [
+    "home_hero",
+    "home_gallery",
+    "home_about",
+    "home_feature_image",
+    "home_testimonial",
+    "home_projects",
+    "home_closing"
+  ],
   "id": "index",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T09:38:18.156Z",
+  "updated": "2026-04-23T11:13:04.131Z"
 }

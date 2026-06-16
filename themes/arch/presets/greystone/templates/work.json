@@ -55,7 +55,7 @@
         "case-1": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/case-1.webp",
             "title": "$2.4M Business Dispute Resolution",
             "description": "Secured a favorable settlement in a complex multi-party commercial dispute involving breach of fiduciary duty.",
             "link": {
@@ -68,7 +68,7 @@
         "case-2": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/case-2.webp",
             "title": "Commercial Lease Negotiation",
             "description": "Negotiated lease terms saving our client over $800K across a 10-year commercial tenancy in Midtown Manhattan.",
             "link": {
@@ -81,7 +81,7 @@
         "case-3": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/case-3.webp",
             "title": "Partnership Dissolution",
             "description": "Managed the dissolution of a five-partner professional services firm while preserving client relationships and asset value.",
             "link": {
@@ -94,7 +94,7 @@
         "case-4": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/case-4.webp",
             "title": "Residential Property Defense",
             "description": "Successfully defended a homeowner against an adverse possession claim on a historic Brooklyn brownstone.",
             "link": {
@@ -107,7 +107,7 @@
         "case-5": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/case-5.webp",
             "title": "Estate Dispute Mediation",
             "description": "Resolved a contentious multi-million dollar estate dispute through mediation, avoiding protracted litigation for all parties.",
             "link": {
@@ -120,7 +120,7 @@
         "case-6": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/case-6.webp",
             "title": "Employment Discrimination Case",
             "description": "Won a significant judgment for a wrongful termination and discrimination case, setting a precedent in the district.",
             "link": {
@@ -138,97 +138,6 @@
         "case-4",
         "case-5",
         "case-6"
-      ]
-    },
-    "testimonials": {
-      "type": "testimonials",
-      "settings": {
-        "eyebrow": "",
-        "title": "Client Testimonials",
-        "description": "",
-        "heading_alignment": "center",
-        "layout": "grid",
-        "columns_desktop": 3,
-        "card_layout": "box",
-        "color_scheme": "standard-secondary"
-      },
-      "blocks": {
-        "review-1": {
-          "type": "quote",
-          "settings": {
-            "quote": "After a year of getting nowhere with another firm, Greystone took our case and resolved it in four months. The difference in preparation and strategy was night and day.",
-            "avatar": "",
-            "name": "Robert K.",
-            "title": "Commercial litigation client",
-            "rating": "5"
-          }
-        },
-        "review-2": {
-          "type": "quote",
-          "settings": {
-            "quote": "They explained every step clearly and never made me feel rushed. When the other side pushed back, Greystone was ready. I couldn't have asked for better representation.",
-            "avatar": "",
-            "name": "Susan M.",
-            "title": "Real estate client",
-            "rating": "5"
-          }
-        },
-        "review-3": {
-          "type": "quote",
-          "settings": {
-            "quote": "Compassionate, thorough, and incredibly effective. They handled my family's estate matter with the care it deserved during a very difficult time.",
-            "avatar": "",
-            "name": "Thomas R.",
-            "title": "Probate client",
-            "rating": "5"
-          }
-        }
-      },
-      "blocksOrder": [
-        "review-1",
-        "review-2",
-        "review-3"
-      ]
-    },
-    "closing": {
-      "type": "rich-text",
-      "settings": {
-        "text_alignment": "center",
-        "content_width": "medium",
-        "color_scheme": "highlight-primary"
-      },
-      "blocks": {
-        "closing-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Every Case Is Unique",
-            "size": "2xl"
-          }
-        },
-        "closing-text": {
-          "type": "text",
-          "settings": {
-            "text": "<p>We'd welcome the opportunity to learn about yours and discuss how we can help.</p>",
-            "size": "lg"
-          }
-        },
-        "closing-button": {
-          "type": "button",
-          "settings": {
-            "link": {
-              "text": "Contact Us",
-              "href": "contact.html",
-              "target": "_self"
-            },
-            "style": "primary",
-            "size": "medium"
-          }
-        }
-      },
-      "blocksOrder": [
-        "closing-heading",
-        "closing-text",
-        "closing-button"
       ]
     },
     "stats": {
@@ -288,6 +197,98 @@
         "fig-3",
         "fig-4"
       ]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "",
+        "title": "Client Testimonials",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "After a year of getting nowhere with another firm, Greystone took our case and resolved it in four months. The difference in preparation and strategy was night and day.",
+            "avatar": "/uploads/images/testimonial-3.webp",
+            "name": "Robert K.",
+            "title": "Commercial litigation client",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "They explained every step clearly and never made me feel rushed. When the other side pushed back, Greystone was ready. I couldn't have asked for better representation.",
+            "avatar": "/uploads/images/testimonial-4.webp",
+            "name": "Susan M.",
+            "title": "Real estate client",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Compassionate, thorough, and incredibly effective. They handled my family's estate matter with the care it deserved during a very difficult time.",
+            "avatar": "/uploads/images/testimonial-5.webp",
+            "name": "Thomas R.",
+            "title": "Probate client",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
+    },
+    "closing": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "closing-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Every Case Is Unique",
+            "size": "2xl"
+          }
+        },
+        "closing-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We'd welcome the opportunity to learn about yours and discuss how we can help.</p>",
+            "size": "lg"
+          }
+        },
+        "closing-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Contact Us",
+              "href": "contact.html",
+              "target": "_self",
+              "pageUuid": "c887d105-141a-4f16-abb3-6c711cb6aa6a"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "closing-heading",
+        "closing-text",
+        "closing-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -298,6 +299,6 @@
     "closing"
   ],
   "id": "work",
-  "created": "2026-04-08T10:00:00.000Z",
-  "updated": "2026-04-08T10:00:00.000Z"
+  "created": "2026-04-16T19:37:17.452Z",
+  "updated": "2026-04-16T19:47:32.547Z"
 }

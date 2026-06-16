@@ -8,13 +8,18 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Free Estimate",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "0e3a754c-6297-4860-a3ce-ddb1e518ff10"
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,
     "full_width": false,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/greenfieldlogodark.png",
+    "transparent_logo": "/uploads/images/greenfieldlogolight.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

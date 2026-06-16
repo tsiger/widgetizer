@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["w-eyebrow", "w-heading", "w-text"]
+      "blocksOrder": [
+        "w-eyebrow",
+        "w-heading",
+        "w-text"
+      ]
     },
     "projects": {
       "type": "project-showcase",
@@ -57,46 +61,77 @@
           "type": "project",
           "settings": {
             "title": "Northlight — Revenue intelligence dashboard",
-            "description": "A reporting platform for a Series B analytics company. React, TypeScript, ClickHouse, Tailwind. 14 weeks, end-to-end."
+            "description": "A reporting platform for a Series B analytics company. React, TypeScript, ClickHouse, Tailwind. 14 weeks, end-to-end.",
+            "image": "/uploads/images/work-01-1.webp"
           }
         },
         "pr-02": {
           "type": "project",
           "settings": {
             "title": "Quanta — SaaS onboarding rewrite",
-            "description": "Rebuilt the self-serve onboarding for a growth-stage B2B SaaS. Activation up 38% in the first quarter. Next.js, Postgres, Stripe."
+            "description": "Rebuilt the self-serve onboarding for a growth-stage B2B SaaS. Activation up 38% in the first quarter. Next.js, Postgres, Stripe.",
+            "image": "/uploads/images/work-02-1.webp"
           }
         },
         "pr-03": {
           "type": "project",
           "settings": {
             "title": "Fieldwork — Field-ops mobile web app",
-            "description": "A durable, offline-first progressive web app for technicians in the field. React, IndexedDB, and a Rust-powered sync layer."
+            "description": "A durable, offline-first progressive web app for technicians in the field. React, IndexedDB, and a Rust-powered sync layer.",
+            "image": "/uploads/images/work-03-1.webp"
           }
         },
         "pr-04": {
           "type": "project",
           "settings": {
             "title": "Arbor — Design system & documentation site",
-            "description": "Shared component library, token system, and docs platform for a thirty-person product org. Storybook + MDX + custom Markdown pipeline."
+            "description": "Shared component library, token system, and docs platform for a thirty-person product org. Storybook + MDX + custom Markdown pipeline.",
+            "image": "/uploads/images/work-04-1.webp"
           }
         },
         "pr-05": {
           "type": "project",
           "settings": {
             "title": "Cartograph — Internal CMS for editorial teams",
-            "description": "Custom content management system for a digital publisher. Role-based publishing, scheduled releases, full audit log. Remix + Postgres."
+            "description": "Custom content management system for a digital publisher. Role-based publishing, scheduled releases, full audit log. Remix + Postgres.",
+            "image": "/uploads/images/work-05-1.webp"
           }
         },
         "pr-06": {
           "type": "project",
           "settings": {
             "title": "Parallel — Billing & subscription platform",
-            "description": "Stripe-integrated billing system with multi-currency, proration, and VAT-compliant invoicing for a European SaaS."
+            "description": "Stripe-integrated billing system with multi-currency, proration, and VAT-compliant invoicing for a European SaaS.",
+            "image": "/uploads/images/work-06-1.webp"
+          }
+        },
+        "block_fbb120c5-b9c3-4ec2-bf25-99cd38187405": {
+          "type": "project",
+          "settings": {
+            "title": "Parallel — Billing & subscription platform",
+            "description": "Stripe-integrated billing system with multi-currency, proration, and VAT-compliant invoicing for a European SaaS.",
+            "image": "/uploads/images/work-08-1.webp"
+          }
+        },
+        "block_2a0a15bb-d2f8-4c04-a37d-b390bedbe5cf": {
+          "type": "project",
+          "settings": {
+            "title": "Parallel — Billing & subscription platform",
+            "description": "Stripe-integrated billing system with multi-currency, proration, and VAT-compliant invoicing for a European SaaS.",
+            "image": "/uploads/images/work-07-1.webp"
           }
         }
       },
-      "blocksOrder": ["pr-01", "pr-02", "pr-03", "pr-04", "pr-05", "pr-06"]
+      "blocksOrder": [
+        "pr-01",
+        "pr-02",
+        "pr-03",
+        "pr-04",
+        "pr-05",
+        "pr-06",
+        "block_2a0a15bb-d2f8-4c04-a37d-b390bedbe5cf",
+        "block_fbb120c5-b9c3-4ec2-bf25-99cd38187405"
+      ]
     },
     "quotes": {
       "type": "testimonials",
@@ -151,7 +186,12 @@
           }
         }
       },
-      "blocksOrder": ["q-1", "q-2", "q-3", "q-4"]
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4"
+      ]
     },
     "work_cta": {
       "type": "action-bar",
@@ -184,18 +224,28 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["wc-heading", "wc-text", "wc-button"]
+      "blocksOrder": [
+        "wc-heading",
+        "wc-text",
+        "wc-button"
+      ]
     }
   },
-  "widgetsOrder": ["work_intro", "projects", "quotes", "work_cta"],
+  "widgetsOrder": [
+    "work_intro",
+    "projects",
+    "quotes",
+    "work_cta"
+  ],
   "id": "work",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T11:33:30.990Z",
+  "updated": "2026-04-20T12:07:27.350Z"
 }

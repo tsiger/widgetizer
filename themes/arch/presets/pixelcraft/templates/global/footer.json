@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Pixelcraft Studio. A small studio in Brooklyn.</p>",
+    "copyright": "© 2026 Pixelcraft Studio. A small studio in Brooklyn.",
     "layout": "first-featured",
     "color_scheme": "highlight-secondary"
   },
@@ -11,7 +11,8 @@
       "settings": {
         "logo_text": "Pixelcraft",
         "logo_width": 160,
-        "text": "<p>A small Brooklyn design studio working with founders, brands, and people who make things.</p>"
+        "text": "<p>A small Brooklyn design studio working with founders, brands, and people who make things.</p>",
+        "logo": "/uploads/images/pixelcraft-logo-light.png"
       }
     },
     "text_block_1": {
@@ -25,7 +26,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Navigate",
-        "menu": "footer-menu"
+        "menu": "f6101341-8b68-416d-a6ca-4be3106b1f12"
       }
     },
     "social_block_1": {

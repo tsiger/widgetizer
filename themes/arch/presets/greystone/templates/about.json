@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/about-building-1.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,12 +24,14 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "story": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/about-firm-story.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -67,7 +69,12 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text-1",
+        "story-text-2"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -84,7 +91,7 @@
         "atty-1": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/attorney-1.webp",
             "name": "Richard Greystone",
             "role": "Managing Partner",
             "specialty": "Business Litigation, Real Estate",
@@ -95,7 +102,7 @@
         "atty-2": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/attorney-2.webp",
             "name": "Catherine Park",
             "role": "Senior Associate",
             "specialty": "Estate Planning, Probate",
@@ -106,7 +113,7 @@
         "atty-3": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/attorney-3.webp",
             "name": "James Whitfield",
             "role": "Associate",
             "specialty": "Employment Law, Family Law",
@@ -115,7 +122,11 @@
           }
         }
       },
-      "blocksOrder": ["atty-1", "atty-2", "atty-3"]
+      "blocksOrder": [
+        "atty-1",
+        "atty-2",
+        "atty-3"
+      ]
     },
     "approach": {
       "type": "accordion",
@@ -166,7 +177,13 @@
           }
         }
       },
-      "blocksOrder": ["q-1", "q-2", "q-3", "q-4", "sidebar-info"]
+      "blocksOrder": [
+        "q-1",
+        "q-2",
+        "q-3",
+        "q-4",
+        "sidebar-info"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -197,14 +214,19 @@
             "link": {
               "text": "Schedule a Call",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c887d105-141a-4f16-abb3-6c711cb6aa6a"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     },
     "history": {
       "type": "timeline",
@@ -250,11 +272,23 @@
           }
         }
       },
-      "blocksOrder": ["era-1", "era-2", "era-3", "era-4"]
+      "blocksOrder": [
+        "era-1",
+        "era-2",
+        "era-3",
+        "era-4"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "story", "history", "team", "approach", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "story",
+    "history",
+    "team",
+    "approach",
+    "cta"
+  ],
   "id": "about",
-  "created": "2026-04-08T10:00:00.000Z",
-  "updated": "2026-04-08T10:00:00.000Z"
+  "created": "2026-04-16T19:37:17.410Z",
+  "updated": "2026-04-17T08:07:23.011Z"
 }

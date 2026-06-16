@@ -8,13 +8,18 @@
     "ctaButtonLink": {
       "href": "menu.html",
       "text": "View Menu",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
     },
     "ctaButtonStyle": "primary",
     "center_nav": true,
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/brewlinedark.png",
+    "transparent_logo": "/uploads/images/brewlinetransparent.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

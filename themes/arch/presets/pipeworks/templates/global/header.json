@@ -6,17 +6,22 @@
     "contactDetailsLine1": "(555) 203-9844 · 24/7 emergency",
     "contactDetailsLine2": "Licensed · Insured · Bonded",
     "contact_position": "menu",
-    "headerNavigation": "main-menu",
+    "headerNavigation": "ae4ac9ed-3cea-4adf-b606-67bf1223dd62",
     "center_nav": false,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Get a quote",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/pipeworks-logo-dark.png",
+    "transparent_logo": "/uploads/images/pipeworks-logo-white.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

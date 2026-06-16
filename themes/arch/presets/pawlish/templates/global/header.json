@@ -2,7 +2,6 @@
   "type": "header",
   "settings": {
     "logoText": "Pawlish",
-    "logoMaxWidth": 200,
     "contactDetailsLine1": "(555) 020-0184",
     "contactDetailsLine2": "Open Tue – Sat",
     "contact_position": "logo",
@@ -17,6 +16,11 @@
     "full_width": false,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/pawlish-logo-dark.png",
+    "transparent_logo": "/uploads/images/pawlish-logo-ligh.png",
+    "logoMaxWidth": 200
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

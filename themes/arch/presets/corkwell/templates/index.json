@@ -7,11 +7,12 @@
       "settings": {
         "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         "video_title": "Inside Corkwell",
-        "overlay_color": "#151e22cc",
+        "overlay_color": "#151d217a",
         "height": "large",
         "fullwidth": true,
         "play_button_style": "light",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "image": "/uploads/images/home-hero.webp"
       }
     },
     "intro": {
@@ -37,7 +38,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-text"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text"
+      ]
     },
     "what_we_pour": {
       "type": "checkerboard",
@@ -57,7 +61,8 @@
             "button_link": {
               "text": "See the Wine List",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
             }
           }
         },
@@ -65,7 +70,13 @@
           "type": "card",
           "settings": {
             "title": "",
-            "description": ""
+            "description": "",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/checker-wine.webp"
           }
         },
         "checker-3": {
@@ -76,7 +87,8 @@
             "button_link": {
               "text": "View Cocktails",
               "href": "menu.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
             }
           }
         },
@@ -84,11 +96,22 @@
           "type": "card",
           "settings": {
             "title": "",
-            "description": ""
+            "description": "",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/checker-cocktails.webp"
           }
         }
       },
-      "blocksOrder": ["checker-1", "checker-2", "checker-3", "checker-4"]
+      "blocksOrder": [
+        "checker-1",
+        "checker-2",
+        "checker-3",
+        "checker-4"
+      ]
     },
     "featured": {
       "type": "priced-list",
@@ -133,13 +156,19 @@
           }
         }
       },
-      "blocksOrder": ["drink-1", "drink-2", "drink-3", "drink-4"]
+      "blocksOrder": [
+        "drink-1",
+        "drink-2",
+        "drink-3",
+        "drink-4"
+      ]
     },
     "space_callout": {
       "type": "image-callout",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/space-callout.webp"
       },
       "blocks": {
         "space-heading": {
@@ -168,14 +197,20 @@
             "link": {
               "text": "See What's On",
               "href": "events.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "481c0638-5dfa-4c5c-bc5b-e101e7c194d9"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["space-heading", "space-text", "space-features", "space-button"]
+      "blocksOrder": [
+        "space-heading",
+        "space-text",
+        "space-features",
+        "space-button"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -205,18 +240,30 @@
             "link": {
               "text": "Find Us",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "intro", "what_we_pour", "featured", "space_callout", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "intro",
+    "what_we_pour",
+    "featured",
+    "space_callout",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T13:48:06.377Z",
+  "updated": "2026-04-16T14:17:19.646Z"
 }

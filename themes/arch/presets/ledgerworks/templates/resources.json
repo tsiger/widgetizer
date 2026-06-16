@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["r-eyebrow", "r-heading", "r-text"]
+      "blocksOrder": [
+        "r-eyebrow",
+        "r-heading",
+        "r-text"
+      ]
     },
     "tax_deadlines": {
       "type": "timeline",
@@ -107,7 +111,15 @@
           }
         }
       },
-      "blocksOrder": ["d-1", "d-2", "d-3", "d-4", "d-5", "d-6", "d-7"]
+      "blocksOrder": [
+        "d-1",
+        "d-2",
+        "d-3",
+        "d-4",
+        "d-5",
+        "d-6",
+        "d-7"
+      ]
     },
     "resources_faq": {
       "type": "accordion",
@@ -189,7 +201,17 @@
           }
         }
       },
-      "blocksOrder": ["r-sidebar", "rf-1", "rf-2", "rf-3", "rf-4", "rf-5", "rf-6", "rf-7", "rf-8"]
+      "blocksOrder": [
+        "r-sidebar",
+        "rf-1",
+        "rf-2",
+        "rf-3",
+        "rf-4",
+        "rf-5",
+        "rf-6",
+        "rf-7",
+        "rf-8"
+      ]
     },
     "downloads": {
       "type": "resource-list",
@@ -237,7 +259,12 @@
           }
         }
       },
-      "blocksOrder": ["dl-1", "dl-2", "dl-3", "dl-4"]
+      "blocksOrder": [
+        "dl-1",
+        "dl-2",
+        "dl-3",
+        "dl-4"
+      ]
     },
     "resources_cta": {
       "type": "action-bar",
@@ -270,18 +297,29 @@
             "link": {
               "text": "Book a call",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["rc-heading", "rc-text", "rc-button"]
+      "blocksOrder": [
+        "rc-heading",
+        "rc-text",
+        "rc-button"
+      ]
     }
   },
-  "widgetsOrder": ["resources_intro", "tax_deadlines", "resources_faq", "downloads", "resources_cta"],
+  "widgetsOrder": [
+    "resources_intro",
+    "tax_deadlines",
+    "resources_faq",
+    "downloads",
+    "resources_cta"
+  ],
   "id": "resources",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T08:03:30.092Z",
+  "updated": "2026-04-20T08:12:18.599Z"
 }

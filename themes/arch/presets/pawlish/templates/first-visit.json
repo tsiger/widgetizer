@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/firstvisit-hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -61,42 +62,48 @@
           "type": "step",
           "settings": {
             "title": "Drop-off",
-            "description": "<p>Five-minute intake. We look at your dog, you tell us what you want, we set expectations on time and price. No surprises at pickup.</p>"
+            "description": "<p>Five-minute intake. We look at your dog, you tell us what you want, we set expectations on time and price. No surprises at pickup.</p>",
+            "image": "/uploads/images/first-visit-step-dropoff.webp"
           }
         },
         "step-settling": {
           "type": "step",
           "settings": {
             "title": "Settling in",
-            "description": "<p>Your dog meets the room. Water, a quiet corner, no rush. Most dogs settle within ten minutes — we don't start until they're ready.</p>"
+            "description": "<p>Your dog meets the room. Water, a quiet corner, no rush. Most dogs settle within ten minutes — we don't start until they're ready.</p>",
+            "image": "/uploads/images/first-visit-step-settling.webp"
           }
         },
         "step-bath": {
           "type": "step",
           "settings": {
             "title": "Bath",
-            "description": "<p>Hypoallergenic shampoo by default. Switch to medicated, scent-free, or whitening on request, no charge.</p>"
+            "description": "<p>Hypoallergenic shampoo by default. Switch to medicated, scent-free, or whitening on request, no charge.</p>",
+            "image": "/uploads/images/first-visit-step-bath.webp"
           }
         },
         "step-dry": {
           "type": "step",
           "settings": {
             "title": "Hand dry",
-            "description": "<p>Low-noise forced-air, never crate. About 20–40 minutes depending on coat. Senior or anxious dogs work in shorter sessions with breaks.</p>"
+            "description": "<p>Low-noise forced-air, never crate. About 20–40 minutes depending on coat. Senior or anxious dogs work in shorter sessions with breaks.</p>",
+            "image": "/uploads/images/first-visit-step-dry.webp"
           }
         },
         "step-groom": {
           "type": "step",
           "settings": {
             "title": "The groom",
-            "description": "<p>The cut, the trim, the nails, the ears. We work to your breed standard, not a default style.</p>"
+            "description": "<p>The cut, the trim, the nails, the ears. We work to your breed standard, not a default style.</p>",
+            "image": "/uploads/images/first-visit-step-groom.webp"
           }
         },
         "step-pickup": {
           "type": "step",
           "settings": {
             "title": "Pickup",
-            "description": "<p>Written notes on what we noticed, your dog smelling like a dog (not perfume), one happy human. We'll text when ready.</p>"
+            "description": "<p>Written notes on what we noticed, your dog smelling like a dog (not perfume), one happy human. We'll text when ready.</p>",
+            "image": "/uploads/images/first-visit-step-pickup.webp"
           }
         }
       },
@@ -151,7 +158,7 @@
             "description": "<p>Written notes at every pickup — skin, nails, behavior, anything off. The hot spot you hadn't noticed. The nail quick that's getting too long. The ear that needs a recheck.</p>"
           }
         },
-        "diff-pace-image": {
+        "block_104dad68-27c9-452c-ba1f-929e13556321": {
           "type": "card",
           "settings": {
             "title": "",
@@ -160,10 +167,11 @@
               "href": "",
               "text": "",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/firstvisit-diff-pace.webp"
           }
         },
-        "diff-honest-image": {
+        "block_1525964d-7eb4-4678-b4e9-8f1da5b48a84": {
           "type": "card",
           "settings": {
             "title": "",
@@ -172,10 +180,11 @@
               "href": "",
               "text": "",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/firstvisit-diff-honest.webp"
           }
         },
-        "diff-notes-image": {
+        "block_242b518d-ba0e-4dab-985a-8549c8c29ac9": {
           "type": "card",
           "settings": {
             "title": "",
@@ -184,17 +193,18 @@
               "href": "",
               "text": "",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/firstvisit-diff-notes.webp"
           }
         }
       },
       "blocksOrder": [
         "diff-pace",
-        "diff-pace-image",
+        "block_104dad68-27c9-452c-ba1f-929e13556321",
         "diff-honest",
-        "diff-honest-image",
+        "block_1525964d-7eb4-4678-b4e9-8f1da5b48a84",
         "diff-notes",
-        "diff-notes-image"
+        "block_242b518d-ba0e-4dab-985a-8549c8c29ac9"
       ]
     },
     "firstvisit_bring": {
@@ -219,7 +229,12 @@
           "settings": {
             "icon": "vaccine",
             "title": "Vaccination records",
-            "description": "Rabies and DHPP, current. Email ahead or bring a photo on your phone."
+            "description": "Rabies and DHPP, current. Email ahead or bring a photo on your phone.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "bring-history": {
@@ -227,7 +242,12 @@
           "settings": {
             "icon": "clipboard-list",
             "title": "Recent groom history",
-            "description": "When was the last cut, where, and what was done."
+            "description": "When was the last cut, where, and what was done.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "bring-sensitivities": {
@@ -235,7 +255,12 @@
           "settings": {
             "icon": "paw",
             "title": "Sensitivities or fears",
-            "description": "Anxious moments, hot spots, no-touch zones."
+            "description": "Anxious moments, hot spots, no-touch zones.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "bring-time": {
@@ -243,7 +268,12 @@
           "settings": {
             "icon": "clock",
             "title": "Two- to three-hour window",
-            "description": "Drop-off and pickup, not stay-and-wait — your dog settles better without you."
+            "description": "Drop-off and pickup, not stay-and-wait — your dog settles better without you.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
@@ -258,7 +288,8 @@
       "type": "image-callout",
       "settings": {
         "image_position": "start",
-        "color_scheme": "highlight-secondary"
+        "color_scheme": "highlight-secondary",
+        "image": "/uploads/images/firstvisit-meet.webp"
       },
       "blocks": {
         "meet-heading": {
@@ -427,6 +458,6 @@
     "firstvisit_close"
   ],
   "id": "first-visit",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T15:00:00.000Z"
+  "created": "2026-04-23T13:59:56.910Z",
+  "updated": "2026-04-23T15:22:08.908Z"
 }

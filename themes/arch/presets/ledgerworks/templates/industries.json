@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["ind-eyebrow", "ind-heading", "ind-text"]
+      "blocksOrder": [
+        "ind-eyebrow",
+        "ind-heading",
+        "ind-text"
+      ]
     },
     "industries_grid": {
       "type": "icon-card-grid",
@@ -105,7 +109,14 @@
           }
         }
       },
-      "blocksOrder": ["card-1", "card-2", "card-3", "card-4", "card-5", "card-6"]
+      "blocksOrder": [
+        "card-1",
+        "card-2",
+        "card-3",
+        "card-4",
+        "card-5",
+        "card-6"
+      ]
     },
     "how_we_adapt": {
       "type": "features-split",
@@ -158,7 +169,12 @@
           }
         }
       },
-      "blocksOrder": ["adapt-1", "adapt-2", "adapt-3", "adapt-4"]
+      "blocksOrder": [
+        "adapt-1",
+        "adapt-2",
+        "adapt-3",
+        "adapt-4"
+      ]
     },
     "industry_testimonials": {
       "type": "testimonials",
@@ -204,7 +220,11 @@
           }
         }
       },
-      "blocksOrder": ["t-1", "t-2", "t-3"]
+      "blocksOrder": [
+        "t-1",
+        "t-2",
+        "t-3"
+      ]
     },
     "industries_cta": {
       "type": "action-bar",
@@ -237,18 +257,29 @@
             "link": {
               "text": "Book a call",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["i-cta-heading", "i-cta-text", "i-cta-button"]
+      "blocksOrder": [
+        "i-cta-heading",
+        "i-cta-text",
+        "i-cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["industries_intro", "industries_grid", "how_we_adapt", "industry_testimonials", "industries_cta"],
+  "widgetsOrder": [
+    "industries_intro",
+    "industries_grid",
+    "how_we_adapt",
+    "industry_testimonials",
+    "industries_cta"
+  ],
   "id": "industries",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T08:03:30.090Z",
+  "updated": "2026-04-20T08:03:30.090Z"
 }

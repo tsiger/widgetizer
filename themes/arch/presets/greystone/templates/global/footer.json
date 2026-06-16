@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Greystone Law. All rights reserved.</p>",
+    "copyright": "© 2026 Greystone Law. All rights reserved.",
     "color_scheme": "highlight-secondary",
     "layout": "equal"
   },
@@ -10,7 +10,9 @@
       "type": "logo_text",
       "settings": {
         "logo_text": "Greystone",
-        "text": "<p>Experienced counsel for individuals and businesses navigating complex legal challenges.</p>"
+        "text": "<p>Experienced counsel for individuals and businesses navigating complex legal challenges.</p>",
+        "logo": "/uploads/images/greystonelight.png",
+        "logo_width": 170
       }
     },
     "text_block_1": {

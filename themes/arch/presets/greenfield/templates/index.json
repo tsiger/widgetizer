@@ -15,7 +15,7 @@
         "slide-1": {
           "type": "slide",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/hero-slide-2.webp",
             "heading_text": "Custom Landscapes That Last",
             "heading_size": "5xl",
             "text_content": "Design, installation, and year-round care for residential and commercial properties.",
@@ -23,7 +23,8 @@
             "button_link": {
               "text": "See Our Work",
               "href": "portfolio.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "6f6e1b9e-39bc-44bc-ab44-166671d70475"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -34,7 +35,7 @@
         "slide-2": {
           "type": "slide",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/hero-slide-1.webp",
             "heading_text": "From Bare Dirt to Backyard Retreat",
             "heading_size": "5xl",
             "text_content": "Complete landscape transformations — patios, plantings, lawns, and more.",
@@ -42,7 +43,8 @@
             "button_link": {
               "text": "Our Services",
               "href": "services.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d25937fe-225e-46e6-b712-a9b30900f2b3"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -53,7 +55,7 @@
         "slide-3": {
           "type": "slide",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/hero-slide-3.webp",
             "heading_text": "Portland's Trusted Landscapers",
             "heading_size": "5xl",
             "text_content": "Licensed, insured, and growing Portland's landscapes since 2004.",
@@ -61,7 +63,8 @@
             "button_link": {
               "text": "Free Estimate",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0e3a754c-6297-4860-a3ce-ddb1e518ff10"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -70,7 +73,11 @@
           }
         }
       },
-      "blocksOrder": ["slide-2", "slide-1", "slide-3"]
+      "blocksOrder": [
+        "slide-2",
+        "slide-1",
+        "slide-3"
+      ]
     },
     "trust": {
       "type": "trust-bar",
@@ -118,7 +125,12 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
     },
     "services": {
       "type": "icon-card-grid",
@@ -144,8 +156,8 @@
             "title": "Landscape Design",
             "description": "<p>Custom plans tailored to your property, style, and budget. From concept sketches to detailed planting guides.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -157,8 +169,8 @@
             "title": "Hardscaping",
             "description": "<p>Patios, retaining walls, walkways, fire pits, and outdoor living spaces built to last through Pacific Northwest weather.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -170,8 +182,8 @@
             "title": "Tree & Lawn Care",
             "description": "<p>Pruning, lawn installation, sodding, aeration, and ongoing maintenance to keep your property green year-round.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -183,14 +195,19 @@
             "title": "Seasonal Services",
             "description": "<p>Spring cleanup, fall leaf removal, winter prep, and seasonal planting rotations. We keep your landscape sharp all year.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4"]
+      "blocksOrder": [
+        "svc-1",
+        "svc-2",
+        "svc-3",
+        "svc-4"
+      ]
     },
     "before_after": {
       "type": "comparison-slider",
@@ -199,8 +216,8 @@
         "title": "See the Difference",
         "description": "",
         "heading_alignment": "center",
-        "before_image": "",
-        "after_image": "",
+        "before_image": "/uploads/images/before-1.webp",
+        "after_image": "/uploads/images/after-1.webp",
         "before_label": "Before",
         "after_label": "After",
         "orientation": "horizontal",
@@ -212,7 +229,7 @@
     "about_teaser": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-team.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -248,14 +265,20 @@
             "link": {
               "text": "About Us",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "8042c826-00ad-44b9-b584-e02a4a0341e6"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["about-eyebrow", "about-heading", "about-text", "about-button"]
+      "blocksOrder": [
+        "about-eyebrow",
+        "about-heading",
+        "about-text",
+        "about-button"
+      ]
     },
     "testimonials": {
       "type": "testimonials",
@@ -274,7 +297,7 @@
           "type": "quote",
           "settings": {
             "quote": "They turned our overgrown backyard into an actual outdoor living space. The patio, plantings, and lighting are exactly what we dreamed of. Worth every penny.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-1.webp",
             "name": "Lisa & Mark D.",
             "title": "Backyard redesign, Alberta Arts",
             "rating": "5"
@@ -284,7 +307,7 @@
           "type": "quote",
           "settings": {
             "quote": "Greenfield designed a native plant garden that's beautiful AND low-maintenance. Two years in and it practically takes care of itself. They really know Portland plants.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-2.webp",
             "name": "Joan P.",
             "title": "Native garden, Sellwood",
             "rating": "5"
@@ -294,14 +317,18 @@
           "type": "quote",
           "settings": {
             "quote": "Our commercial property looks incredible since the landscaping upgrade. Multiple tenants have commented on the improvement. Professional crew, always on schedule.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-3.webp",
             "name": "Robert A.",
             "title": "Commercial landscape, Lloyd District",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2", "review-3"]
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -332,18 +359,31 @@
             "link": {
               "text": "Get a Free Estimate",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0e3a754c-6297-4860-a3ce-ddb1e518ff10"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "trust", "services", "before_after", "about_teaser", "testimonials", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "trust",
+    "services",
+    "before_after",
+    "about_teaser",
+    "testimonials",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-08T20:00:00.000Z",
-  "updated": "2026-04-08T20:00:00.000Z"
+  "created": "2026-04-16T15:55:26.876Z",
+  "updated": "2026-04-16T17:57:19.571Z"
 }
