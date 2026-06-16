@@ -1744,6 +1744,33 @@
       }
     }
   },
+  "services_grid": {
+    "name": "Services Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "show_icon": {
+        "label": "Show icon"
+      },
+      "show_summary": {
+        "label": "Show summary"
+      },
+      "show_price": {
+        "label": "Show price"
+      },
+      "show_duration": {
+        "label": "Show duration"
+      },
+      "show_read_more": {
+        "label": "Show 'View service' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
+      }
+    }
+  },
   "project_showcase": {
     "name": "Project Showcase",
     "settings": {
