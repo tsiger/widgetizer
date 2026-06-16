@@ -83,6 +83,7 @@ function seedStores(widgetsOverride = {}, widgetsOrderOverride = null) {
     selectedThemeGroup: null,
     hoveredWidgetId: null,
     hoveredBlockId: null,
+    widgetClipboard: null,
   });
 }
 
@@ -154,10 +155,11 @@ describe("selection state", () => {
     expect(state.hoveredBlockId).toBeNull();
   });
 
-  it("resetForProjectChange clears schemas and selection state", () => {
+  it("resetForProjectChange clears schemas, selection state, and clipboard", () => {
     const store = useWidgetStore.getState();
     store.setSelectedWidgetId("w-1");
     store.setSelectedBlockId("b-1");
+    store.copyWidget("w-1");
     getActiveProjectId.mockReturnValue("project-b");
     store.resetForProjectChange();
 
@@ -166,6 +168,7 @@ describe("selection state", () => {
     expect(state.selectedWidgetId).toBeNull();
     expect(state.selectedBlockId).toBeNull();
     expect(state.loadedProjectId).toBe("project-b");
+    expect(state.widgetClipboard).toBeNull();
   });
 
   it("setHoveredWidget sets both widget and block hover", () => {
@@ -303,6 +306,90 @@ describe("duplicateWidget", () => {
 
   it("returns null for nonexistent widget", () => {
     expect(useWidgetStore.getState().duplicateWidget("nope")).toBeNull();
+  });
+});
+
+// ============================================================================
+// copyWidget / pasteWidget
+// ============================================================================
+
+describe("copyWidget", () => {
+  beforeEach(() => seedStores());
+
+  it("stores a deep clone of the widget in the clipboard", () => {
+    const result = useWidgetStore.getState().copyWidget("w-1");
+    expect(result).toBe(true);
+
+    const clip = useWidgetStore.getState().widgetClipboard;
+    expect(clip.type).toBe("test-widget");
+    expect(clip.settings.title).toBe("Hello");
+    expect(clip.blocksOrder).toEqual(["b-1", "b-2"]);
+  });
+
+  it("is not affected by later mutations to the source widget", () => {
+    useWidgetStore.getState().copyWidget("w-1");
+    useWidgetStore.getState().updateWidgetSettings("w-1", "title", "Changed");
+
+    expect(useWidgetStore.getState().widgetClipboard.settings.title).toBe("Hello");
+  });
+
+  it("returns false and leaves the clipboard empty for a nonexistent widget", () => {
+    const result = useWidgetStore.getState().copyWidget("nope");
+    expect(result).toBe(false);
+    expect(useWidgetStore.getState().widgetClipboard).toBeNull();
+  });
+
+  it("does nothing for a global widget id (header/footer are not page widgets)", () => {
+    const result = useWidgetStore.getState().copyWidget("header");
+    expect(result).toBe(false);
+    expect(useWidgetStore.getState().widgetClipboard).toBeNull();
+  });
+});
+
+describe("pasteWidget", () => {
+  beforeEach(() => seedStores());
+
+  it("inserts the clipboard widget at the given position with a new widget id", () => {
+    useWidgetStore.getState().copyWidget("w-1");
+    const newId = useWidgetStore.getState().pasteWidget(0);
+
+    expect(newId).toMatch(/^widget_/);
+    expect(newId).not.toBe("w-1");
+
+    const page = usePageStore.getState().page;
+    expect(page.widgetsOrder[0]).toBe(newId);
+    expect(page.widgets[newId].type).toBe("test-widget");
+    expect(page.widgets[newId].settings.title).toBe("Hello");
+  });
+
+  it("regenerates block ids in the pasted widget", () => {
+    useWidgetStore.getState().copyWidget("w-1");
+    const newId = useWidgetStore.getState().pasteWidget(999);
+    const copy = usePageStore.getState().page.widgets[newId];
+
+    expect(copy.blocksOrder).not.toContain("b-1");
+    expect(copy.blocksOrder).not.toContain("b-2");
+    expect(copy.blocksOrder.length).toBe(2);
+  });
+
+  it("selects the pasted widget", () => {
+    useWidgetStore.getState().copyWidget("w-1");
+    const newId = useWidgetStore.getState().pasteWidget(0);
+    expect(useWidgetStore.getState().selectedWidgetId).toBe(newId);
+  });
+
+  it("can paste the same clipboard multiple times into independent widgets", () => {
+    useWidgetStore.getState().copyWidget("w-1");
+    const firstId = useWidgetStore.getState().pasteWidget(999);
+    const secondId = useWidgetStore.getState().pasteWidget(999);
+
+    expect(firstId).not.toBe(secondId);
+    const page = usePageStore.getState().page;
+    expect(page.widgets[firstId].blocksOrder).not.toEqual(page.widgets[secondId].blocksOrder);
+  });
+
+  it("returns null when the clipboard is empty", () => {
+    expect(useWidgetStore.getState().pasteWidget(0)).toBeNull();
   });
 });
 

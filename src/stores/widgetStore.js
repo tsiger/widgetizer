@@ -127,6 +127,7 @@ const useWidgetStore = create((set, get) => ({
   loadedProjectId: null,
   loading: false,
   error: null,
+  widgetClipboard: null,
 
   // Actions
   loadSchemas: async () => {
@@ -169,6 +170,7 @@ const useWidgetStore = create((set, get) => ({
       loadedProjectId: getActiveProjectId(),
       loading: false,
       error: null,
+      widgetClipboard: null,
     });
   },
 
@@ -213,6 +215,39 @@ const useWidgetStore = create((set, get) => ({
       ...page,
       widgets: { ...page.widgets, [newWidgetId]: newWidget },
       widgetsOrder: insertIdAfter(currentOrder, widgetId, newWidgetId),
+    });
+
+    set({ ...getWidgetSelectionState(newWidgetId), ...getClearedHoverState() });
+    markStructureChanged();
+    return newWidgetId;
+  },
+
+  copyWidget: (widgetId) => {
+    const { page } = usePageStore.getState();
+    // Page widgets only — global widgets (header/footer) are singletons and live
+    // outside page.widgets, so they're naturally excluded.
+    if (!page || !page.widgets[widgetId]) return false;
+
+    set({ widgetClipboard: JSON.parse(JSON.stringify(page.widgets[widgetId])) });
+    return true;
+  },
+
+  pasteWidget: (position) => {
+    const { widgetClipboard } = get();
+    if (!widgetClipboard) return null;
+
+    const pageStore = usePageStore.getState();
+    const { page } = pageStore;
+    if (!page) return null;
+
+    const newWidgetId = get().generateWidgetId();
+    const newWidget = cloneWidgetWithNewBlockIds(widgetClipboard, () => get().generateBlockId());
+    const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
+
+    pageStore.setPage({
+      ...page,
+      widgets: { ...page.widgets, [newWidgetId]: newWidget },
+      widgetsOrder: insertIdAtPosition(currentOrder, newWidgetId, position),
     });
 
     set({ ...getWidgetSelectionState(newWidgetId), ...getClearedHoverState() });

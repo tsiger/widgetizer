@@ -27,6 +27,7 @@ import useWidgetStore, { hasReachedMaxBlocks } from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
 import { scrollElementIntoView } from "../../queries/previewManager";
 import WidgetSelector from "./WidgetSelector";
+import WidgetContextMenu from "./WidgetContextMenu";
 import BlockSelector from "./blocks/BlockSelector";
 
 export default function WidgetList({
@@ -59,9 +60,21 @@ export default function WidgetList({
   const [activeBlockTriggerKey, setActiveBlockTriggerKey] = useState(null);
   const [blockInsertPosition, setBlockInsertPosition] = useState(null);
 
+  // Widget context menu state: { widgetId, x, y } | null
+  const [contextMenu, setContextMenu] = useState(null);
+
   const { globalWidgets } = usePageStore();
-  const { deleteWidget, duplicateWidget, reorderWidgets, reorderBlocks, setHoveredWidget, updateWidgetSettings } =
-    useWidgetStore();
+  const {
+    deleteWidget,
+    duplicateWidget,
+    copyWidget,
+    pasteWidget,
+    reorderWidgets,
+    reorderBlocks,
+    setHoveredWidget,
+    updateWidgetSettings,
+    widgetClipboard,
+  } = useWidgetStore();
   const { setStructureModified, markWidgetModified } = useAutoSave();
   const { header: headerWidget, footer: footerWidget } = globalWidgets;
 
@@ -126,6 +139,35 @@ export default function WidgetList({
   const handleDuplicateWidget = (widgetId) => {
     duplicateWidget(widgetId);
     setStructureModified(true);
+  };
+
+  // Handle widget copy (stores a deep clone in the in-memory clipboard)
+  const handleCopyWidget = (widgetId) => {
+    copyWidget(widgetId);
+  };
+
+  // Handle widget paste (inserts the clipboard widget at the given position)
+  const handlePasteWidget = (position) => {
+    pasteWidget(position);
+    setStructureModified(true);
+  };
+
+  // Paste from the context menu: insert immediately after the target widget.
+  // Reads live order from the store to avoid a stale-closure position.
+  const handlePasteAfter = (widgetId) => {
+    const order = usePageStore.getState().page?.widgetsOrder || [];
+    const idx = order.indexOf(widgetId);
+    pasteWidget(idx === -1 ? order.length : idx + 1);
+    setStructureModified(true);
+  };
+
+  // Widget context menu open/close
+  const openWidgetContextMenu = (widgetId, x, y) => {
+    setContextMenu({ widgetId, x, y });
+  };
+
+  const closeWidgetContextMenu = () => {
+    setContextMenu(null);
   };
 
   // Handle widget rename
@@ -277,8 +319,7 @@ export default function WidgetList({
                           isModified={isModified}
                           isDraggingAny={activeId !== null}
                           onWidgetSelect={onWidgetSelect}
-                          onDeleteClick={handleDeleteWidget}
-                          onDuplicateClick={handleDuplicateWidget}
+                          onOpenContextMenu={openWidgetContextMenu}
                           selectedBlockId={selectedBlockId}
                           onBlockSelect={onBlockSelect}
                           onBlocksReorder={reorderBlocks}
@@ -339,7 +380,6 @@ export default function WidgetList({
                       isModified={modifiedWidgets.has(activeId)}
                       isOverlay={true}
                       isDraggingAny={true}
-                      onDeleteClick={handleDeleteWidget}
                     />
                   </div>
                 ) : null}
@@ -405,6 +445,8 @@ export default function WidgetList({
           addWidget(type, position);
           setStructureModified(true);
         }}
+        hasClipboard={!!widgetClipboard}
+        onPasteWidget={handlePasteWidget}
         position={insertPosition}
         triggerRef={widgetTriggerRef}
       />
@@ -445,6 +487,19 @@ export default function WidgetList({
         }}
         triggerRef={blockTriggerRef}
       />
+
+      {contextMenu && (
+        <WidgetContextMenu
+          isOpen={true}
+          anchor={{ x: contextMenu.x, y: contextMenu.y }}
+          canPaste={!!widgetClipboard}
+          onClose={closeWidgetContextMenu}
+          onCopy={() => handleCopyWidget(contextMenu.widgetId)}
+          onPaste={() => handlePasteAfter(contextMenu.widgetId)}
+          onDuplicate={() => handleDuplicateWidget(contextMenu.widgetId)}
+          onDelete={() => handleDeleteWidget(contextMenu.widgetId)}
+        />
+      )}
     </div>
   );
 }

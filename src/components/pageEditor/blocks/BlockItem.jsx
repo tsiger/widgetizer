@@ -1,4 +1,4 @@
-import { GripVertical, Copy, Trash2 } from "lucide-react";
+import { GripVertical, CopyPlus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../../hooks/useThemeLocale";
 import useWidgetStore from "../../../stores/widgetStore";
@@ -75,7 +75,7 @@ export default function BlockItem({
           disabled={isAtMaxBlocks}
           title={isAtMaxBlocks ? t("pageEditor.actions.maxBlocksReached") : t("pageEditor.actions.duplicateBlock")}
         >
-          <Copy size={12} />
+          <CopyPlus size={12} />
         </button>
 
         <button

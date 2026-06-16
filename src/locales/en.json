@@ -505,7 +505,11 @@
       "unsavedChanges": "Unsaved changes",
       "addBlock": "Add block",
       "addWidget": "Add widget",
+      "widgetActions": "Widget actions",
       "duplicateWidget": "Duplicate widget",
+      "copyWidget": "Copy widget",
+      "pasteWidget": "Paste widget",
+      "pasteWidgetAfter": "Paste after this widget",
       "deleteWidget": "Delete widget",
       "rename": "Double-click to rename"
     },

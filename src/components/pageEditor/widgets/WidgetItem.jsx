@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { GripVertical, Trash2, Copy, Plus } from "lucide-react";
+import { GripVertical, EllipsisVertical, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../../hooks/useThemeLocale";
 import { DndContext, closestCenter } from "@dnd-kit/core";
@@ -20,8 +20,7 @@ export default function WidgetItem({
   isOverlay = false,
   onWidgetSelect,
   dragHandleProps = {},
-  onDeleteClick,
-  onDuplicateClick,
+  onOpenContextMenu,
   onBlockSelect,
   selectedBlockId,
   onAddBlockClick,
@@ -109,6 +108,13 @@ export default function WidgetItem({
             onWidgetSelect(widgetId);
           }
         }}
+        onContextMenu={(e) => {
+          if (isOverlay || !onOpenContextMenu) return;
+          e.preventDefault();
+          e.stopPropagation();
+          if (onHover) onHover(null);
+          onOpenContextMenu(widgetId, e.clientX, e.clientY);
+        }}
         {...dragHandleProps}
       >
         <div className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -143,30 +149,23 @@ export default function WidgetItem({
             ></div>
           )}
         </div>
-        <div className="flex opacity-0 group-hover:opacity-100 transition-opacity duration-200 gap-1">
-          <button
-            className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-white/80 transition-colors"
-            title={t("pageEditor.actions.duplicateWidget")}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onHover) onHover(null); // Clear hover before action
-              if (onDuplicateClick) onDuplicateClick(widgetId);
-            }}
-          >
-            <Copy size={14} />
-          </button>
-          <button
-            className="p-1.5 text-slate-400 hover:text-red-600 rounded-md hover:bg-white/80 transition-colors"
-            title={t("pageEditor.actions.deleteWidget")}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onHover) onHover(null); // Clear hover before action
-              if (onDeleteClick) onDeleteClick(widgetId);
-            }}
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+        {!isOverlay && (
+          <div className="flex opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <button
+              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md hover:bg-white/80 transition-colors"
+              title={t("pageEditor.actions.widgetActions")}
+              aria-label={t("pageEditor.actions.widgetActions")}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onHover) onHover(null); // Clear hover before action
+                const rect = e.currentTarget.getBoundingClientRect();
+                if (onOpenContextMenu) onOpenContextMenu(widgetId, rect.left, rect.bottom + 2);
+              }}
+            >
+              <EllipsisVertical size={14} />
+            </button>
+          </div>
+        )}
       </div>
 
       {hasBlocks && isSelected && !isCollapsed && !isOverlay && (
