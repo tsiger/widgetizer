@@ -47,6 +47,13 @@
         }
       }
 
+      {% comment %} Single-column "blog feed" mode: force one card per row at every width
+         (the base grid otherwise drops to 2 columns in the 750–990px band). The
+         widget-content-md wrapper keeps it at a centered, readable measure. {% endcomment %}
+      & .news-grid-single {
+        grid-template-columns: 1fr;
+      }
+
       & .grid-header-text {
         display: flex;
         flex-direction: column;
@@ -99,7 +106,7 @@
       </div>
     {% endif %}
 
-    <div class="widget-content">
+    <div class="widget-content{% if widget.settings.columns_desktop == 1 %} widget-content-md{% endif %}">
       {% comment %} Heading level: respects the page-wide hierarchy (one h1). {% endcomment %}
       {% assign has_widget_title = false %}
       {% if widget.settings.title != blank %}
@@ -122,7 +129,7 @@
       {% endif %}
 
       {% if news_items.size > 0 %}
-        <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
+        <ul class="widget-card-grid widget-grid{% if widget.settings.columns_desktop == 1 %} news-grid-single{% endif %}" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
           {% for item in news_items %}
             {% comment %} Promote the first card to h1 only when the widget has no title and is first on the page. {% endcomment %}
             {% assign current_card_level = card_heading_level %}

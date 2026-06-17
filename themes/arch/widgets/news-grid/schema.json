@@ -72,7 +72,7 @@
       "id": "columns_desktop",
       "label": "tTheme:global.widgets.settings.columns_desktop.label",
       "default": 3,
-      "min": 2,
+      "min": 1,
       "max": 5,
       "step": 1
     },
