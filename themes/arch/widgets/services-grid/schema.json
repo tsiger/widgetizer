@@ -114,6 +114,45 @@
     },
     {
       "type": "header",
+      "id": "icon_header",
+      "label": "tTheme:global.widgets.settings.icon_header.label"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "tTheme:global.widgets.settings.icon_style.label",
+      "default": "plain",
+      "options": [
+        { "value": "plain", "label": "tTheme:global.widgets.settings.icon_style.options.plain" },
+        { "value": "outline", "label": "tTheme:global.widgets.settings.icon_style.options.outline" },
+        { "value": "filled", "label": "tTheme:global.widgets.settings.icon_style.options.filled" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "tTheme:global.widgets.settings.icon_size.label",
+      "default": "lg",
+      "options": [
+        { "value": "sm", "label": "tTheme:global.widgets.settings.icon_size.options.sm" },
+        { "value": "md", "label": "tTheme:global.widgets.settings.icon_size.options.md" },
+        { "value": "lg", "label": "tTheme:global.widgets.settings.icon_size.options.lg" },
+        { "value": "xl", "label": "tTheme:global.widgets.settings.icon_size.options.xl" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_shape",
+      "label": "tTheme:global.widgets.settings.icon_shape.label",
+      "default": "circle",
+      "options": [
+        { "value": "sharp", "label": "tTheme:global.widgets.settings.icon_shape.options.sharp" },
+        { "value": "rounded", "label": "tTheme:global.widgets.settings.icon_shape.options.rounded" },
+        { "value": "circle", "label": "tTheme:global.widgets.settings.icon_shape.options.circle" }
+      ]
+    },
+    {
+      "type": "header",
       "id": "appearance_header",
       "label": "tTheme:global.widgets.settings.appearance_header.label"
     },

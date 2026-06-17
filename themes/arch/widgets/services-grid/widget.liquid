@@ -49,11 +49,6 @@
         }
       }
 
-      & .service-card-icon {
-        color: var(--accent);
-        margin-block-end: var(--space-xs);
-      }
-
       & .grid-header-text {
         display: flex;
         flex-direction: column;
@@ -153,7 +148,7 @@
               {% endif %}
               <div class="widget-card-content">
                 {% if widget.settings.show_icon and item.settings.icon != blank %}
-                  <div class="service-card-icon">{% render 'icon', icon: item.settings.icon, size: 'lg' %}</div>
+                  {% render 'icon', icon: item.settings.icon, class: 'w-icon', style: widget.settings.icon_style, size: widget.settings.icon_size, shape: widget.settings.icon_shape %}
                 {% endif %}
                 <{{ current_card_level }} class="w-title t-xl">
                   {% if item.url %}<a href="{{ item.url }}">{{ item.settings.title }}</a>{% else %}{{ item.settings.title }}{% endif %}
