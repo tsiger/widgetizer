@@ -1,0 +1,10 @@
+{
+  "slug": "stop-shipping-unused-css",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Stop Shipping CSS Nobody Sees",
+    "date": "2026-02-11",
+    "excerpt": "Most marketing sites load a stylesheet two or three times larger than the page actually uses.",
+    "body": "<p>When a site feels slow on a phone, the cause is rarely a single big image. More often it is a pile of styles and scripts loaded on every page whether they are needed or not.</p><p>Here is the habit we follow on every Codebase build.</p><ul><li>Split CSS so each page loads only the components it renders.</li><li>Defer scripts that are not needed for the first paint.</li><li>Measure on a real mid range Android, not a top end laptop.</li></ul><p>The result is usually a page that feels instant, even on a tired connection.</p>"
+  }
+}

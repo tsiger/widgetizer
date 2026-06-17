@@ -1,0 +1,10 @@
+{
+  "slug": "how-we-handle-a-handoff",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "How We Hand a Project Back to You",
+    "date": "2026-03-30",
+    "excerpt": "A good launch is not the end of our job, it is the moment your team takes the wheel without fear.",
+    "body": "<p>People sometimes ask what happens after we ship. The honest answer is that the last week of every build is about you, not us.</p><p>We record a short walkthrough of how to edit each page type, write a plain language guide to the parts that are not obvious, and sit down with whoever will own the site after we leave.</p><p>Our developers, Mara and Devin, treat the handoff as a feature. If your team cannot confidently update the homepage on their own, we have not finished.</p>"
+  }
+}

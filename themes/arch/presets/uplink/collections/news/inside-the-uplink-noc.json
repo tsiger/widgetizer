@@ -1,0 +1,10 @@
+{
+  "slug": "inside-the-uplink-noc",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "A Night in the Uplink Operations Room",
+    "date": "2026-03-20",
+    "excerpt": "What our engineers are actually doing while your business sleeps and your systems keep running.",
+    "body": "<p>Most clients only think about IT when something breaks. The quieter truth is that a lot of the work happens overnight, when nobody is watching.</p><p>While offices are dark, our monitoring tools are checking backups, installing patches, and flagging anything that looks unusual. An engineer is on hand to step in before a small warning becomes a morning emergency.</p><p>We sat with the overnight team recently. The best shifts, they said, are the boring ones. When nothing dramatic happens, it usually means the careful work earlier did its job.</p>"
+  }
+}

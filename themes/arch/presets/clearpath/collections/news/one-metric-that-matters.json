@@ -1,0 +1,10 @@
+{
+  "slug": "one-metric-that-matters",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Pick One Number Before You Pick Ten",
+    "date": "2026-02-19",
+    "excerpt": "Most small teams track too much and act on too little, so we start clients with a single guiding metric.",
+    "body": "<p>When a new client shows us their dashboard, it usually has dozens of numbers on it. The problem is not data. The problem is that nothing on the screen tells the team what to do next.</p><p>We ask one question early on. If you could only watch a single number for the next quarter, what would it be? The answer forces a real conversation about what the business is trying to achieve right now.</p><p><strong>Choose a number you can influence weekly.</strong> A metric you cannot move within a quarter belongs on an annual review, not a Monday standup.</p><p>Once that one number is clear, the supporting metrics almost choose themselves.</p>"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "now-booking-q3-projects",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "We Are Now Booking Q3 Projects",
+    "date": "2026-05-20",
+    "excerpt": "Our build calendar opens for July starts, and the earliest slots tend to go to the projects we scope first.",
+    "body": "<p>We keep our project list short on purpose. Two or three builds at a time means the team that scopes your site is the same team that ships it.</p><p>July and August are open now. A typical engagement starts with a one week discovery sprint, where we map your pages, content, and the third party tools you actually use day to day.</p><p>If you have a launch date in mind, tell us early. The work that happens before the first line of code is what keeps the later weeks calm.</p>"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "phishing-warning-signs",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Five Signs an Email Is Trying to Trick You",
+    "date": "2026-02-16",
+    "excerpt": "Most breaches we clean up started with one convincing message, and the warning signs are easier to spot than you think.",
+    "body": "<p>The most expensive incidents we handle rarely begin with clever hacking. They begin with a member of staff clicking a link in an email that looked entirely normal.</p><p>Train your team to pause when they see any of these.</p><ul><li>An urgent demand to act right now or lose access</li><li>A sender address that is almost right but slightly off</li><li>A request to move money or share a password</li><li>Spelling that is close but not quite professional</li><li>A link whose real destination does not match the text</li></ul><p>When something feels off, the safest move is to stop and check by phone. A thirty-second call has saved several of our clients from a very bad week.</p>"
+  }
+}
