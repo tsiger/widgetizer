@@ -6,6 +6,8 @@ The `PageEditor` is the primary component for building and editing pages within 
 
 The editor's interface is divided into three main columns: a component list on the left, a live preview in the center, and a settings panel on the right. It supports a real-time preview that updates as you modify widgets and settings.
 
+> **Library note.** The page editor now ships inside the `@widgetizer/editor-ui` package (`packages/editor-ui/src/`), mounted by the OSS shell and embeddable in a host. Its API calls route through the `apiBase` singleton via `editorFetch` (auto-injecting `X-Project-Id`) and its internal links resolve through `useEditorPath`, so the editor is host-agnostic. See [Packages & Adapter Architecture](core-packages.md#the-editor-ui-library-seams).
+
 ## Component Structure
 
 The `PageEditor` is composed of several specialized child components, each with a distinct responsibility:

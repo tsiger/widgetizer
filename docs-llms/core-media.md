@@ -313,6 +313,8 @@ A filename-oriented setting input for selecting uploaded file assets (PDFs). Mod
 
 The backend uses Express.js with `multer` for file handling and `sharp` for image processing.
 
+> **Adapter note.** After the workspaces/adapter refactor, media binary I/O routes through the `AssetStorageAdapter` over the request's `scope` (the OSS adapter reads/writes the local `uploads/` paths described above; a hosted host swaps in cloud object storage). The upload size cap is no longer a fixed app setting alone: `uploadWithLimit` reads `MAX_UPLOAD_SIZE_BYTES` from the `LimitsAdapter` and enforces it as a **streaming** multer `limits.fileSize`, so oversize uploads are rejected mid-stream with a `413` (the `errorHandler` maps multer's `LIMIT_FILE_SIZE`). OSS returns `Infinity` for this key unless overridden by app settings; hosted returns a finite ceiling. See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
+
 ### API Routes (`server/routes/media.js`)
 
 | Method | Endpoint | Middleware | Controller Function | Description |

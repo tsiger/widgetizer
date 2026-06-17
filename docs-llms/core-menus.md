@@ -9,6 +9,8 @@ Each menu is stored as an individual JSON file within the active project's direc
 - **Location**: `/data/projects/<folderName>/menus/`
 - **Filename**: The filename is a "slugified" version of the menu's name (e.g., `main-menu.json`).
 
+> **Adapter note.** After the workspaces refactor, menu JSON I/O routes through the `StorageAdapter` over the request's `scope`. `menuController` also depth/count-caps menu trees before any recursive walk: a hard `MAX_MENU_DEPTH = 32` and a `MAX_MENU_ITEMS` ceiling from the `LimitsAdapter` (over-cap → `422`; OSS = unbounded, hosted = finite). This is distinct from the theme-level nesting convention. See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
+
 A typical menu JSON file (`main-menu.json`) has the following structure:
 
 ```json

@@ -103,6 +103,30 @@ Optional security boundary that runs the preview iframe on a separate origin fro
 
 **Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js`, eliminating cross-origin `contentDocument` access. The preview loads same-origin and `postMessage` uses `"*"`.
 
+### 11. Cross-Tenant Safety (Multi-Tenant Host Contract)
+
+After the workspaces/adapter refactor, `@widgetizer/builder-server` is adapter-agnostic and can be embedded in a multi-tenant host (Widgetizer Hosted) that injects cloud adapters. These controls are the contract the OSS code must uphold so one tenant's data, paths, or limits can never reach another. See [Packages & Adapter Architecture](core-packages.md) for the adapter/`Scope`/`LIMIT_KEYS` detail.
+
+**Authz happens at the resolver, not bolted onto routes.** The ownership check (`WHERE owner_id = actor.id`) lives in the `ScopeResolver`. `resolveActiveProject` then sets `req.scope` / `req.activeProject`; controllers read those instead of resolving projects themselves. On write requests, the [write-guard](#10-project-switch-isolation) (`X-Project-Id` header or `:projectId` param vs `scope.projectId`) returns `409 PROJECT_MISMATCH`.
+
+**Path/isolation guards** (each rejects path separators and `..`):
+
+- **`serveAsset`** (previewController) uses a folder allow-list `{ assets, widgets }` — anything else is rejected (SA-01).
+- **Media-metadata route** owner-checks the inner `:projectId` before returning metadata (TI-03).
+- **Export serve** binds to `req.scope.folderName` via `exportDirBelongsToScope()`: it rejects separators/`..`, then anchors the directory suffix to `<folderName>-v<digits>` (an anchored allowlist, not a prefix match) (TI-02/SA-13). See [Site Exporting](core-export.md#export-storage).
+
+**DoS limit keys** (enforced via the `LimitsAdapter` over `scope`; **OSS `LocalLimitsAdapter` returns `Infinity` so OSS stays unbounded/byte-neutral, hosted `CloudLimitsAdapter` returns finite ceilings**):
+
+- `MAX_WIDGETS_PER_PAGE` — `savePageContent` returns `422` over-cap.
+- `MAX_MENU_ITEMS` + `MAX_MENU_DEPTH = 32` — `menuController` validates iteratively before recursive walks (`422`); render-engine's `resolveMenuItemLinks` is depth-capped.
+- `MAX_UPLOAD_SIZE_BYTES` — `mediaController.uploadWithLimit` enforces it as a streaming multer `limits.fileSize`; the `errorHandler` maps `LIMIT_FILE_SIZE` → `413`. See [Media Library](core-media.md#3-backend-implementation).
+
+**Tenant SVG icon sanitization.** `IconInput.jsx`'s `sanitizeIconBody()` runs the DOMPurify SVG profile, applied at both `dangerouslySetInnerHTML` sinks. It wraps the body in `<svg>` first so the SVG profile does not blank bare fragments.
+
+**PostMessage origin scoping.** The preview bridge uses `getPreviewTargetOrigin()` (the resolved peer origin) instead of `"*"` (`previewBase.js` / `PreviewPanel.jsx`), so editor↔preview messages cannot leak across origins when isolation is enabled.
+
+**LiquidJS floor.** `liquidjs` is pinned to `^10.26.0` in `@widgetizer/core` + `@widgetizer/render-engine`, which fixes the GHSA RCE/SSTI and the `strip_html` ReDoS.
+
 ---
 
 ## Configuration

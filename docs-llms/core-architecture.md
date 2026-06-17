@@ -2,6 +2,25 @@
 
 This document maps the architecture of the Widgetizer app, showing how frontend components connect to queries, routes, controllers, and utilities.
 
+> **Note on file paths.** After the workspaces/adapter refactor, the old monolithic `src/` (frontend) + `server/` (backend) layout has moved into npm workspace packages and shell directories. The `src/...` and `server/...` paths used throughout this doc now live under packages and shells — see **Packages & Shells** below for the mapping. The frontend React code is now `@widgetizer/editor-ui` (`packages/editor-ui/src/`); the backend is `@widgetizer/builder-server` (`packages/builder-server/src/`); rendering moved to the pure `@widgetizer/render-engine`. The deep adapter/DI detail lives in **[Packages & Adapter Architecture](core-packages.md)**; this section is the orientation map.
+
+---
+
+## Packages & Shells
+
+The repo is an npm workspace (`"workspaces": ["packages/*"]`). Five packages plus three thin shells:
+
+- **Packages:** `@widgetizer/core` (shared FE/BE primitives + adapter contracts + error types + conformance suites), `@widgetizer/render-engine` (pure LiquidJS rendering over a `deps` bag), `@widgetizer/builder-server` (Express 5 backend — routes/controllers/services/SQLite), `@widgetizer/editor-ui` (mountable React editor), `@widgetizer/adapters-local` (OSS local-FS + SQLite adapter implementations).
+- **Shells:** `app/` (OSS frontend + server assembly — `app/server-common.js` builds the six local adapters and calls `createEditorApp({ adapters })`; `app/src/main.jsx` FE entry, `app/src/App.jsx` composes routes via `createEditorRoutes`); `electron/` (`electron/main.js` forks `electron/server-bootstrap.js` → `startOssServer`); `server.js` (repo-root web entry → `startOssServer`). `src/` now holds backend-runtime assets only (`src/utils/previewRuntime.js`).
+
+**Key invariant:** `adapters-local` is consumed only by the OSS shells, never by `builder-server`. The backend is adapter-agnostic and receives adapters by injection; hosted swaps in cloud adapters without forking the server. Full detail in [Packages & Adapter Architecture](core-packages.md).
+
+### DI assembly & scoped routers
+
+`setupBuilderServer({ adapters, plugins })` returns three routers — `actorScopedRouter` (`/projects /themes /settings /core`), `projectScopedRouter` (`/pages /menus /media /preview /export /widgets /icons`), and `previewRouter` (`GET /render/:token`). `createEditorApp({ adapters, plugins })` wires both scoped routers under `/api` and the preview router at `/`, plus helmet/cors/JSON-limits/error-handler. `initDb({ getConnection })` injects the SQLite connection. Required adapter keys: `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
+
+The `resolveActiveProject` middleware (in builder-server) delegates to `req.adapters.scopeResolver.resolveScope(req)`, sets `req.scope` (`{ actor, projectId, folderName }`) and `req.activeProject`, and enforces a write-guard: on POST/PUT/PATCH/DELETE a mismatching `X-Project-Id` header or `:projectId` param vs `scope.projectId` → `409 PROJECT_MISMATCH`. `req.adapters` is attached per-router. OSS mounts the actor + project routers both under `/api`; hosted mounts the project router under `/api/projects/:projectId`. See [Packages & Adapter Architecture](core-packages.md) for the adapter contracts, `Scope` shape, and `LIMIT_KEYS`.
+
 ---
 
 ## Routing & Shell Structure
@@ -427,6 +446,8 @@ When a project theme update is applied successfully, the frontend invalidates th
 | `renderPageLayout()`        | Render full page layout                 |
 | `createBaseRenderContext()` | Create context with theme, media, icons |
 | `getOrCreateEngine()`       | Get cached Liquid engine                |
+
+After the refactor, the actual LiquidJS rendering lives in the pure `@widgetizer/render-engine` package, which takes a per-project `deps` bag and never resolves projects or touches SQLite. `renderingService.js` is the thin wrapper: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary) and assembles the bag, preserving the historical `(projectId, …)` signatures above. See [Packages & Adapter Architecture](core-packages.md#render-engine-purity).
 
 ### Hook Used
 

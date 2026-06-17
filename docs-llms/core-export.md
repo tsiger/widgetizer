@@ -284,6 +284,8 @@ Export records in SQLite store only the relative directory name (e.g. `my-projec
 
 The `GET /api/export/view/:exportDir` and `GET /api/export/view/:exportDir/*filePath` routes apply `isWithinDirectory()` checks against the publish directory to prevent path traversal.
 
+After the adapter refactor, export serving is **scope/adapter-bound**: export routes resolve through `req.scope`, and `exportDirBelongsToScope()` binds the served directory to `req.scope.folderName` — it rejects path separators/`..` and then anchors the suffix to `<folderName>-v<digits>` (an anchored allowlist, not a prefix match). This prevents one tenant from serving another tenant's export directory. See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
+
 ## Security Considerations
 
 All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.

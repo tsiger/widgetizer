@@ -328,6 +328,19 @@ Notes:
 - **Blocked window close** (`will-prevent-unload`) — forces close when a stuck `beforeunload` handler tries to block it.
 - **Uncaught exceptions** — logs the error and shows a dialog, but skips the dialog during app quit to prevent blocking shutdown.
 
+## Packaging Workspace Packages into the asar
+
+After the workspaces refactor (see [Packages & Adapter Architecture](core-packages.md)), the backend lives in npm workspace packages. electron-builder bundles them with a few non-obvious rules:
+
+- **`dependencies`, not workspaces, drive bundling.** `@widgetizer/core`, `@widgetizer/builder-server`, `@widgetizer/render-engine`, and `@widgetizer/adapters-local` are bundled into the asar **only because they are listed in the OSS `package.json` `dependencies`**. Being npm workspaces is *not* enough for electron-builder's dependency collector.
+- **`@widgetizer/editor-ui` is deliberately excluded.** It is frontend-only; Vite compiles it into `dist/`, so it must not be collected as a runtime dependency.
+- **Three path-resolution patterns** in `packages/builder-server/src/config.js`:
+  1. **fs-read-from-asar** via `require.resolve("@widgetizer/core/...")` — used for locales and core widgets/snippets. Works because Electron patches `fs` to read inside the asar.
+  2. **asar-UNPACKED + `UNPACKED_ROOT`** — statically-served files that need real disk: `dist`, core `assets` placeholder SVGs, and `previewRuntime.js` are unpacked and resolved off `UNPACKED_ROOT`.
+  3. **seed dirs off `THEMES_ROOT`** — bundled themes.
+- **`@widgetizer/core/src/assets` are asar-unpacked** via `electron/builder.config.mjs` `asarUnpack` (placeholder SVGs are served from disk, not the asar).
+- **sharp arch fix.** `prepare-mac-sharp.cjs` had a bug where its arch-prune step pruned the non-last arch, breaking Mac builds. It was fixed so sharp installs for both `arm64` and `x64`.
+
 ## Technical Notes
 
 - **asar enabled**: The app is packaged into `app.asar`, with native modules and themes unpacked in `app.asar.unpacked` for compatibility.

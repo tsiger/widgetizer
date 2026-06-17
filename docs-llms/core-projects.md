@@ -40,7 +40,7 @@ The application uses `react-router-dom` to handle navigation between these pages
 
 Project state is managed by a central **Zustand store** defined in `src/stores/projectStore.js`. This store is the single source of truth for the currently active project and provides actions to interact with it.
 
-Data fetching and backend communication are handled by utility functions in `src/queries/projectManager.js`.
+Data fetching and backend communication are handled by utility functions in `src/queries/projectManager.js`. After the workspaces refactor, these editor client calls route through the editor-ui `apiBase` singleton via `editorFetch` (which injects `X-Project-Id`), and internal links resolve through `useEditorPath`, so the same code runs unchanged in the OSS SPA and embedded in a host. See [Packages & Adapter Architecture](core-packages.md#the-editor-ui-library-seams).
 
 ### The `projectManager.js` Utility
 
@@ -71,7 +71,7 @@ This file contains functions that make API calls to the backend:
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
-9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, `menus/`, `snippets/`, `theme.json`, and `locales/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into the installed themes directory (`data/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files.
+9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, `menus/`, `snippets/`, `theme.json`, and `locales/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into the installed themes directory (`data/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files. After the workspaces refactor, the dir-explicit core of this step (theme copy + preset application + template/menu processing) is extracted into `scaffoldProjectContent({ projectDir, theme, preset })` (`packages/builder-server/src/utils/projectScaffold.js`, re-exported from the package index) so a host can scaffold project content without going through the OSS controller. See [Packages & Adapter Architecture](core-packages.md).
 9b. **Preset Application**: If a preset was selected during creation, the system applies preset overrides after the theme copy:
     - **Templates**: If the preset has its own `templates/` directory, those templates are used instead of the root theme templates for the `processTemplatesRecursive` step.
     - **Menus**: If the preset has its own `menus/` directory, the root menus already copied into the project are removed and replaced with the preset's menus. This happens before menu enrichment (step 10).

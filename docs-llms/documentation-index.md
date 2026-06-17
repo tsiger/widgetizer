@@ -128,7 +128,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Reviewing protection against common vulnerabilities
 - Configuring the application for a production environment
 
-**Key topics**: Rate Limiting, HTTP Security Headers, CORS Whitelisting, Input Validation, Global Error Handling, Environment Configuration
+**Key topics**: Input Validation, HTTP Security Headers, CORS, SVG Sanitization, Global Error Handling, Project-Switch Isolation, cross-tenant safety contract (resolver authz, isolation guards, DoS limit keys + 413, tenant SVG sanitization, postMessage origin scoping, liquidjs floor), Environment Configuration
 
 ---
 
@@ -301,6 +301,20 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🗺️ Architecture & Reference
 
+### **[core-packages.md](core-packages.md)** - Packages & Adapter Architecture
+
+**Purpose**: Reference for the npm-workspace package layout, the adapter contracts, the dependency-injection assembly, and the editor-ui library seams introduced by the workspaces/adapter refactor **When to use**:
+
+- Understanding the five packages and the OSS/hosted boundary
+- Working with the adapter contracts, `Scope` shape, `LIMIT_KEYS`, or error types
+- Wiring or mounting the backend (`setupBuilderServer`, `createEditorApp`, `initDb`) or embedding the editor (`EditorProvider`, `createEditorRoutes`)
+- Building a new adapter implementation against the conformance suites
+- Tracing render-engine purity or the `require-scope-arg` lint rule
+
+**Key topics**: Five packages, OSS/hosted boundary, adapter contracts (Storage/AssetStorage/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` + constants, error types + status codes, conformance suites, `setupBuilderServer`/`createEditorApp`/`initDb`, `resolveActiveProject`/`req.scope`/`req.adapters`/write-guard, editor-ui seams (apiBase/editorFetch, useEditorPath/routeBase, EditorProvider/EditorShell, extension registry/hooks/slots, tailwind preset), render-engine deps bag, `require-scope-arg`
+
+---
+
 ### **[core-architecture.md](core-architecture.md)** - Application Architecture
 
 **Purpose**: Comprehensive documentation of the app's architecture across all major sections **When to use**:
@@ -310,7 +324,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Planning refactoring or improvements
 - Finding where specific functionality is implemented
 
-**Key topics**: Admin vs site shell routing, Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor architecture; improvement opportunities
+**Key topics**: Workspace package layout & shells, DI assembly (`setupBuilderServer`/`createEditorApp`/`initDb`) and scoped routers, `req.scope`/`req.adapters`/write-guard, admin vs site shell routing, Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor architecture; improvement opportunities (deep adapter detail in [core-packages.md](core-packages.md))
 
 ---
 
@@ -371,7 +385,7 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 - Understanding runtime paths and app packaging
 - Code signing and distribution
 
-**Key topics**: Development workflow, production build, runtime paths, app icons, distribution, code signing
+**Key topics**: Development workflow, production build, runtime paths, app icons, distribution, code signing, asar bundling of workspace packages (dependencies vs workspaces, editor-ui exclusion, three path-resolution patterns, sharp arch fix)
 
 ---
 
