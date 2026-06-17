@@ -46,8 +46,7 @@
             "link": {
               "text": "Get a quote in 2 minutes",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"
@@ -178,8 +177,7 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+              "target": "_self"
             },
             "image": "/uploads/images/clean-standard.webp"
           }
@@ -193,8 +191,7 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+              "target": "_self"
             },
             "image": "/uploads/images/clean-deep.webp"
           }
@@ -208,8 +205,7 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+              "target": "_self"
             },
             "image": "/uploads/images/clean-movein.webp"
           }
@@ -223,8 +219,7 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+              "target": "_self"
             },
             "image": "/uploads/images/clean-postconstruction.webp"
           }
@@ -462,8 +457,7 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

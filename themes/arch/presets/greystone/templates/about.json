@@ -214,8 +214,7 @@
             "link": {
               "text": "Schedule a Call",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "c887d105-141a-4f16-abb3-6c711cb6aa6a"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

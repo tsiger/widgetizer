@@ -11,8 +11,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Check availability",
-      "target": "_self",
-      "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

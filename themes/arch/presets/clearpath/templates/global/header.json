@@ -11,8 +11,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Start a conversation",
-      "target": "_self",
-      "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
+      "target": "_self"
     },
     "ctaButtonStyle": "secondary",
     "full_width": true,

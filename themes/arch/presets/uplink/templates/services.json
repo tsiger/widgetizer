@@ -373,8 +373,7 @@
             "link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

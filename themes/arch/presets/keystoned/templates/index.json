@@ -23,8 +23,7 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self",
-              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -43,8 +42,7 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self",
-              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -63,8 +61,7 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self",
-              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -158,8 +155,7 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self",
-              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
+              "target": "_self"
             }
           }
         },
@@ -173,8 +169,7 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self",
-              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
+              "target": "_self"
             }
           }
         },
@@ -188,8 +183,7 @@
             "button_link": {
               "text": "View Property",
               "href": "properties.html",
-              "target": "_self",
-              "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
+              "target": "_self"
             }
           }
         }
@@ -239,8 +233,7 @@
             "link": {
               "text": "About Sarah",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "89853daf-fc71-40e0-b8ac-d7016599f885"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -396,8 +389,7 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "53852415-e1bc-4371-a530-0ffe7fd78310"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

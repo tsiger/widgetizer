@@ -41,15 +41,13 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "See our work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -173,8 +171,7 @@
             "link": {
               "text": "Meet the team",
               "href": "team.html",
-              "target": "_self",
-              "pageUuid": "3ee4f9dc-0fc8-4c3d-ac09-c16f764d892b"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -212,8 +209,7 @@
             "description": "A reporting platform for a Series B analytics company. React, TypeScript, ClickHouse. Shipped in 14 weeks.",
             "link": {
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+              "target": "_self"
             },
             "image": "/uploads/images/work-07-1.webp"
           }
@@ -225,8 +221,7 @@
             "description": "Rebuilt the onboarding for a growth-stage SaaS. Activation up 38% in the first quarter. Next.js, Postgres, Stripe.",
             "link": {
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+              "target": "_self"
             },
             "image": "/uploads/images/work-06-1.webp"
           }
@@ -238,8 +233,7 @@
             "description": "A durable, offline-first PWA for technicians in the field. React, IndexedDB, Rust-powered sync layer.",
             "link": {
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+              "target": "_self"
             },
             "image": "/uploads/images/work-03-1.webp"
           }
@@ -251,8 +245,7 @@
             "description": "A shared component library and documentation platform for a thirty-person product team.",
             "link": {
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+              "target": "_self"
             },
             "image": "/uploads/images/work-02-1.webp"
           }
@@ -447,8 +440,7 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

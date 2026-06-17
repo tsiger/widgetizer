@@ -48,15 +48,13 @@
             "link": {
               "href": "book.html",
               "text": "Book a Session",
-              "target": "_self",
-              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "href": "results.html",
               "text": "See Results",
-              "target": "_self",
-              "pageUuid": "06d3db22-861f-4453-8044-7b6156d3c383"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "large"
@@ -181,8 +179,7 @@
             "link": {
               "href": "about.html",
               "text": "About Me",
-              "target": "_self",
-              "pageUuid": "f8f34c66-1b3e-42b2-8a91-c88679c2f531"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -311,8 +308,7 @@
             "link": {
               "href": "book.html",
               "text": "Book Your Free Session",
-              "target": "_self",
-              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"

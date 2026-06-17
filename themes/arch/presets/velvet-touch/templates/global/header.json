@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book Now",
-      "target": "_self",
-      "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
+      "target": "_self"
     },
     "ctaButtonStyle": "secondary",
     "center_nav": false,

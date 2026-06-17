@@ -280,8 +280,7 @@
             "link": {
               "text": "Read the full study",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -344,15 +343,13 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "Read the studio notes",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "ec034dd7-93af-4567-8b14-4df65bef2988"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

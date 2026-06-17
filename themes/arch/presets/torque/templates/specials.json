@@ -77,8 +77,7 @@
             "button_link": {
               "text": "Book the check",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "image": "/uploads/images/special-winter-check.webp"
           }
@@ -92,8 +91,7 @@
             "button_link": {
               "text": "Book the swap",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "image": "/uploads/images/special-tire-changeover.webp"
           }
@@ -107,8 +105,7 @@
             "button_link": {
               "text": "Book the inspection",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "image": "/uploads/images/special-road-trip.webp"
           }
@@ -134,8 +131,7 @@
         "button": {
           "text": "Book the check",
           "href": "contact.html",
-          "target": "_self",
-          "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+          "target": "_self"
         },
         "show_seconds": false,
         "style": "cards",
@@ -247,8 +243,7 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {

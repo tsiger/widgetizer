@@ -40,16 +40,14 @@
             "link": {
               "href": "contact.html",
               "text": "Schedule a Tour",
-              "target": "_self",
-              "pageUuid": "0db30ea7-c4f3-4513-a160-34d01f823fe8"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium",
             "link_2": {
               "href": "programs.html",
               "text": "Our Programs",
-              "target": "_self",
-              "pageUuid": "7eb7c903-fe62-4659-92d6-5fb45eac910b"
+              "target": "_self"
             },
             "style_2": "secondary"
           }
@@ -213,8 +211,7 @@
             "link": {
               "href": "about.html",
               "text": "Our Philosophy",
-              "target": "_self",
-              "pageUuid": "971871ec-99b1-4fcf-991c-c7b53eb88f46"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -355,8 +352,7 @@
             "link": {
               "href": "contact.html",
               "text": "Schedule a Tour",
-              "target": "_self",
-              "pageUuid": "0db30ea7-c4f3-4513-a160-34d01f823fe8"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

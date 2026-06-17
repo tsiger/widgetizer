@@ -224,8 +224,7 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

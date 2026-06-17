@@ -11,8 +11,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Get a quote",
-      "target": "_self",
-      "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

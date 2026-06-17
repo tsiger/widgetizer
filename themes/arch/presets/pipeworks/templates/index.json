@@ -60,8 +60,7 @@
             "link_2": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "large"
@@ -166,8 +165,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+              "target": "_self"
             },
             "image": "/uploads/images/services-emergency.webp"
           }
@@ -181,8 +179,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+              "target": "_self"
             },
             "image": "/uploads/images/services-water-heaters.webp"
           }
@@ -196,8 +193,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+              "target": "_self"
             },
             "image": "/uploads/images/services-drain-sewer.webp"
           }
@@ -211,8 +207,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "987b2986-22f9-43a4-95e7-f54c54d17cfc"
+              "target": "_self"
             },
             "image": "/uploads/images/services-install.webp"
           }
@@ -455,8 +450,7 @@
             "link_2": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "menu.html",
       "text": "Drinks & Bites",
-      "target": "_self",
-      "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
+      "target": "_self"
     },
     "ctaButtonStyle": "secondary",
     "center_nav": false,

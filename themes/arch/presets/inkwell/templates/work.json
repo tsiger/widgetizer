@@ -73,8 +73,7 @@
             "button_link": {
               "text": "With Rafael",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             }
           }
         },
@@ -98,8 +97,7 @@
             "button_link": {
               "text": "With Jules",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             }
           }
         },
@@ -278,8 +276,7 @@
             "link": {
               "text": "Start an inquiry",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

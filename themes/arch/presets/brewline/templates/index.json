@@ -32,15 +32,13 @@
             "link": {
               "text": "View Our Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "Our Story",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "8cf40a5f-4ec3-4bc8-ac6c-e737b34d323a"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -101,8 +99,7 @@
             "link": {
               "text": "Learn About Our Process",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "8cf40a5f-4ec3-4bc8-ac6c-e737b34d323a"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -225,15 +222,13 @@
             "link": {
               "text": "See the Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "Find Us",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2845e053-7b6d-4204-8b0f-0bd5b5982357"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

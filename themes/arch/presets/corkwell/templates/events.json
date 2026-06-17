@@ -48,8 +48,7 @@
         "button": {
           "text": "Reserve a Spot",
           "href": "contact.html",
-          "target": "_self",
-          "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
+          "target": "_self"
         },
         "color_scheme": "highlight-primary",
         "text": "<p>An evening exploring 12 natural wines from small European producers. Tickets include all pours and a cheese plate.</p>"
@@ -134,8 +133,7 @@
             "link": {
               "text": "Inquire About Private Events",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"

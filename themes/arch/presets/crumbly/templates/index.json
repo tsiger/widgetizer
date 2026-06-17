@@ -22,15 +22,13 @@
             "button_link": {
               "text": "See Our Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_link_2": {
               "text": "Order a Cake",
               "href": "custom-cakes.html",
-              "target": "_self",
-              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
+              "target": "_self"
             },
             "button_style_2": "secondary",
             "button_size": "medium",
@@ -49,8 +47,7 @@
             "button_link": {
               "text": "Start Your Order",
               "href": "custom-cakes.html",
-              "target": "_self",
-              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -126,8 +123,7 @@
             "button_link": {
               "text": "See Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
+              "target": "_self"
             },
             "image": "/uploads/images/panel-bread.webp"
           }
@@ -140,8 +136,7 @@
             "button_link": {
               "text": "See Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
+              "target": "_self"
             },
             "image": "/uploads/images/panel-pastries.webp"
           }
@@ -154,8 +149,7 @@
             "button_link": {
               "text": "Order a Cake",
               "href": "custom-cakes.html",
-              "target": "_self",
-              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
+              "target": "_self"
             },
             "image": "/uploads/images/panel-cakes.webp"
           }
@@ -168,8 +162,7 @@
             "button_link": {
               "text": "See Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "92046f0e-aa91-4961-bbb2-75162fca8d8e"
+              "target": "_self"
             },
             "image": "/uploads/images/panel-cookies.webp"
           }
@@ -216,8 +209,7 @@
             "link": {
               "text": "Start Your Order",
               "href": "custom-cakes.html",
-              "target": "_self",
-              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -349,8 +341,7 @@
             "link": {
               "text": "Find the Bakery",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

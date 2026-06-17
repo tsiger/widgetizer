@@ -193,8 +193,7 @@
             "link": {
               "text": "See the Wine List",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -228,8 +227,7 @@
             "link": {
               "text": "Find the Bar",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

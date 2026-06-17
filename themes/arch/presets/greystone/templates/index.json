@@ -36,8 +36,7 @@
             "link": {
               "text": "Our Practice Areas",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "e89a590f-4b60-4048-bf6e-16d45d1ef613"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -197,8 +196,7 @@
             "link": {
               "text": "About the Firm",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "00f5c5e2-0362-4b35-ba40-55ecefef043f"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -280,8 +278,7 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "c887d105-141a-4f16-abb3-6c711cb6aa6a"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

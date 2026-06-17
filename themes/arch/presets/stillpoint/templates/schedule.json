@@ -53,8 +53,7 @@
             "button_link": {
               "text": "Book a Morning Class",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             }
           }
         },
@@ -68,8 +67,7 @@
             "button_link": {
               "text": "Book a Midday Class",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             }
           }
         },
@@ -83,8 +81,7 @@
             "button_link": {
               "text": "Book an Evening Class",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             }
           }
         },
@@ -98,8 +95,7 @@
             "button_link": {
               "text": "Book Saturday",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             }
           }
         },
@@ -113,8 +109,7 @@
             "button_link": {
               "text": "Book Sunday",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             }
           }
         },
@@ -128,8 +123,7 @@
             "button_link": {
               "text": "Request a Session",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             }
           }
         }
@@ -173,8 +167,7 @@
             "link": {
               "text": "Book an Intro Class",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -209,14 +202,12 @@
             "link": {
               "text": "Request a Private Session",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             },
             "link_2": {
               "text": "Contact Us",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             },
             "style": "primary",
             "style_2": "secondary",

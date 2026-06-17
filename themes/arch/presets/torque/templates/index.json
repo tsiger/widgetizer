@@ -54,8 +54,7 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
@@ -166,8 +165,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+              "target": "_self"
             },
             "image": "/uploads/images/service-diagnostics.webp"
           }
@@ -181,8 +179,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+              "target": "_self"
             },
             "image": "/uploads/images/service-brakes.webp"
           }
@@ -196,8 +193,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+              "target": "_self"
             },
             "image": "/uploads/images/service-engine.webp"
           }
@@ -211,8 +207,7 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+              "target": "_self"
             },
             "image": "/uploads/images/service-tires.webp"
           }
@@ -456,8 +451,7 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {

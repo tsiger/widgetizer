@@ -202,8 +202,7 @@
             "link": {
               "text": "Inquire About Events",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "0f2a1ee4-bebb-49a5-ba2f-4299af559fdc"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

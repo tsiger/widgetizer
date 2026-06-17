@@ -41,15 +41,13 @@
             "link": {
               "text": "Book a free consultation",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "See services",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -148,8 +146,7 @@
             "link": {
               "text": "Tax services",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+              "target": "_self"
             }
           }
         },
@@ -161,8 +158,7 @@
             "link": {
               "text": "Bookkeeping services",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+              "target": "_self"
             }
           }
         },
@@ -174,8 +170,7 @@
             "link": {
               "text": "Advisory services",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+              "target": "_self"
             }
           }
         },
@@ -187,8 +182,7 @@
             "link": {
               "text": "Audit support",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+              "target": "_self"
             }
           }
         }
@@ -246,7 +240,6 @@
             "text": "<p>Nexus tracking, registration, and filings in every state where you owe — so selling into a new market doesn't come with a compliance headache.</p>",
             "target_option": "1",
             "link": {
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2",
               "href": "services.html",
               "text": "Small business services",
               "target": "_self"
@@ -283,8 +276,7 @@
             "link": {
               "href": "services.html",
               "text": "Self-employed services",
-              "target": "_self",
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+              "target": "_self"
             }
           }
         },
@@ -318,8 +310,7 @@
             "link": {
               "href": "services.html",
               "text": "Nonprofit services",
-              "target": "_self",
-              "pageUuid": "2c9e8582-597f-4b29-abe6-37002a264bc2"
+              "target": "_self"
             }
           }
         }
@@ -377,8 +368,7 @@
             "link": {
               "text": "Meet the team",
               "href": "team.html",
-              "target": "_self",
-              "pageUuid": "8d5b51ef-223b-450a-9c89-ecd35565c155"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -590,8 +580,7 @@
             "link": {
               "text": "Book a 30-min call",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

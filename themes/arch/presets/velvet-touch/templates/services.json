@@ -250,8 +250,7 @@
             "link": {
               "text": "Book Your Visit",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -290,8 +289,7 @@
             "button_link": {
               "text": "Book Essential",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
+              "target": "_self"
             },
             "featured": false
           }
@@ -306,8 +304,7 @@
             "button_link": {
               "text": "Book Signature",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
+              "target": "_self"
             },
             "featured": true
           }
@@ -322,8 +319,7 @@
             "button_link": {
               "text": "Book Luxe",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
+              "target": "_self"
             },
             "featured": false
           }
@@ -355,14 +351,12 @@
             "link": {
               "text": "Call Us",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
+              "target": "_self"
             },
             "link_2": {
               "text": "View Treatments",
               "href": "treatments.html",
-              "target": "_self",
-              "pageUuid": "6a888bfe-038c-416d-9bfc-276872010f2d"
+              "target": "_self"
             },
             "style": "primary",
             "style_2": "secondary",

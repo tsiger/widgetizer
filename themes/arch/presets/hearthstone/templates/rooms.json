@@ -111,7 +111,6 @@
             "title": "Olive",
             "description": "<p>Our flagship room. Corner of the villa with two windows, a stone terrace of its own, and the best light in the house at golden hour.</p>",
             "button_link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Learn more",
               "target": "_self"
@@ -126,7 +125,6 @@
             "title": "Fig",
             "description": "<p>Overlooking the walled garden. A slightly smaller room with a window that opens over the fig tree it's named for. Quiet at all hours.</p>",
             "button_link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Learn more",
               "target": "_self"
@@ -141,7 +139,6 @@
             "title": "Jasmine",
             "description": "<p>A stone terrace sheltered by jasmine and bougainvillea. A small writing desk by the window. Our favorite room for slow mornings.</p>",
             "button_link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Learn more",
               "target": "_self"
@@ -156,7 +153,6 @@
             "title": "Thyme",
             "description": "<p>Ground-floor room opening straight onto the garden path. Shadier and cooler than the upstairs rooms — perfect for July and August.</p>",
             "button_link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Learn more",
               "target": "_self"
@@ -171,7 +167,6 @@
             "title": "Sage",
             "description": "<p>Overlooking the olive orchard. A single large window, a hand-built stone bench below it, and the widest bed in the villa.</p>",
             "button_link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Learn more",
               "target": "_self"
@@ -186,7 +181,6 @@
             "title": "Lemon",
             "description": "<p>Our smallest room and most affordable. Sun-washed all afternoon, with a small balcony that looks down into the lemon tree.</p>",
             "button_link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Learn more",
               "target": "_self"
@@ -262,13 +256,11 @@
             "link": {
               "text": "Book Jasmine",
               "href": "room-jasmine.html",
-              "target": "_self",
-              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium",
             "link_2": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Learn more",
               "target": "_self"
@@ -392,15 +384,13 @@
             "link": {
               "text": "Check availability",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "See the villa",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "4b2088ef-edd6-4f41-9a6c-9fc64f433d55"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

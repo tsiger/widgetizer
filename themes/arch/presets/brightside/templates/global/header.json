@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book Appointment",
-      "target": "_self",
-      "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,

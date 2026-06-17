@@ -247,8 +247,7 @@
             "link_2": {
               "text": "See the work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

@@ -44,8 +44,7 @@
             "link": {
               "text": "See the approach",
               "href": "approach.html",
-              "target": "_self",
-              "pageUuid": "acb5a167-ec4b-4d8d-a299-800923189bd6"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -212,8 +211,7 @@
             "link": {
               "text": "Read more engagements",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "11fd7dfa-2edb-418b-a16b-ee6f63e435c3"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -302,8 +300,7 @@
             "link": {
               "text": "Start a conversation",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

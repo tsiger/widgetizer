@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book a Class",
-      "target": "_self",
-      "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "center_nav": true,

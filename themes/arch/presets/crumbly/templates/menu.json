@@ -298,8 +298,7 @@
             "link": {
               "text": "Place a Custom Order",
               "href": "custom-cakes.html",
-              "target": "_self",
-              "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

@@ -11,8 +11,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Start a project",
-      "target": "_self",
-      "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": false,

@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "menu.html",
       "text": "View Menu",
-      "target": "_self",
-      "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "center_nav": true,

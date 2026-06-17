@@ -453,8 +453,7 @@
             "link": {
               "href": "about.html",
               "text": "Meet Our Trainers",
-              "target": "_self",
-              "pageUuid": "895b8f13-4c0c-4aad-9241-6dc15e8e3eb1"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "large"
@@ -495,8 +494,7 @@
             "link": {
               "href": "pricing.html",
               "text": "Get Started",
-              "target": "_self",
-              "pageUuid": "c3fb2f51-af25-43f7-9068-f7b5a572dede"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"

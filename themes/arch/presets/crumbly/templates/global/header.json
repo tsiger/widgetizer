@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "custom-cakes.html",
       "text": "Order a Cake",
-      "target": "_self",
-      "pageUuid": "c49e0b71-0aaa-40ae-87bd-93fdba52e024"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,

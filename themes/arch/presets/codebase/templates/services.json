@@ -192,8 +192,7 @@
             "button_link": {
               "text": "Inquire about a sprint",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "featured": false
           }
@@ -208,8 +207,7 @@
             "button_link": {
               "text": "Inquire about a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "featured": true
           }
@@ -224,8 +222,7 @@
             "button_link": {
               "text": "Inquire about a retainer",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "featured": false
           }
@@ -344,8 +341,7 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

@@ -279,14 +279,12 @@
             "link": {
               "text": "Book Appointment",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
+              "target": "_self"
             },
             "link_2": {
               "text": "Call (212) 555-0312",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
+              "target": "_self"
             },
             "style": "primary",
             "style_2": "secondary",

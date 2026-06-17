@@ -46,6 +46,18 @@ async function walkJson(dir) {
   return out;
 }
 
+// Internal-link references are re-derived from the link's href (slug) at project
+// creation (enrichNewProjectReferences). A demo's per-project pageUuid is stale in
+// a preset, so strip it here, just like the page's own uuid.
+function stripLinkPageUuids(node) {
+  if (Array.isArray(node)) {
+    node.forEach(stripLinkPageUuids);
+  } else if (node && typeof node === "object") {
+    if ("href" in node && "pageUuid" in node) delete node.pageUuid;
+    for (const key of Object.keys(node)) stripLinkPageUuids(node[key]);
+  }
+}
+
 async function main() {
   const { project, theme = "arch", preset } = parseArgs(process.argv);
   if (!project) fail("Usage: node scripts/sync-preset-templates.js --project <folder> --preset <id> [--theme arch]");
@@ -70,6 +82,7 @@ async function main() {
     const rel = path.relative(pagesDir, pageFile);
     const page = await fs.readJSON(pageFile);
     delete page.uuid; // per-instance id, regenerated when a project is created
+    stripLinkPageUuids(page); // pageUuid is re-derived from href at creation; a demo's is stale in a preset
 
     const targetPath = path.join(templatesDir, rel);
     await fs.ensureDir(path.dirname(targetPath));
