@@ -48,6 +48,27 @@
       "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "card",
+      "options": [
+        { "value": "card", "label": "tTheme:global.widgets.settings.layout.options.card" },
+        { "value": "overlay", "label": "tTheme:global.widgets.settings.layout.options.overlay" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "text_display",
+      "label": "tTheme:global.widgets.settings.text_display.label",
+      "description": "tTheme:global.widgets.settings.text_display.description",
+      "default": "always",
+      "options": [
+        { "value": "hover", "label": "tTheme:global.widgets.settings.text_display.options.hover" },
+        { "value": "always", "label": "tTheme:global.widgets.settings.text_display.options.always" }
+      ]
+    },
+    {
       "type": "number",
       "id": "limit",
       "label": "tTheme:news_grid.settings.limit.label",
@@ -98,6 +119,7 @@
       "type": "checkbox",
       "id": "show_image",
       "label": "tTheme:news_grid.settings.show_image.label",
+      "description": "tTheme:global.widgets.settings.card_layout_only.description",
       "default": true
     },
     {
@@ -116,6 +138,7 @@
       "type": "checkbox",
       "id": "show_read_more",
       "label": "tTheme:news_grid.settings.show_read_more.label",
+      "description": "tTheme:global.widgets.settings.card_layout_only.description",
       "default": true
     },
     {

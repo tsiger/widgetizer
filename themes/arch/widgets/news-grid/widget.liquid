@@ -91,6 +91,71 @@
           border: var(--border-width-thin) solid var(--border-color);
         }
       }
+
+      {% comment %} Overlay layout: the image fills the card, text sits on top of a
+         bottom-up gradient. Placed last so it overrides the card color-scheme rules
+         above at equal specificity. {% endcomment %}
+      & .news-grid-overlay {
+        & .widget-card {
+          position: relative;
+          padding: 0;
+          overflow: hidden;
+          border: none;
+          background: none;
+
+          &:hover .widget-card-image {
+            transform: scale(1.05);
+          }
+
+          &:hover .news-overlay {
+            opacity: 1;
+          }
+        }
+
+        & .widget-card-image {
+          width: 100%;
+          height: 100%;
+          aspect-ratio: {% if widget.settings.aspect_ratio == 'auto' %}4 / 3{% else %}var(--card-image-ratio){% endif %};
+          object-fit: cover;
+          display: block;
+          margin: 0;
+          border-radius: 0;
+          transition: transform var(--transition-speed-normal) ease;
+        }
+
+        & .news-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
+          display: flex;
+          align-items: flex-end;
+          padding: var(--space-lg);
+          opacity: {% if widget.settings.text_display == 'hover' %}0{% else %}1{% endif %};
+          transition: opacity var(--transition-speed-normal) ease;
+        }
+
+        & .news-overlay-content {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-sm);
+          color: #ffffff;
+        }
+
+        & .news-overlay .w-title {
+          color: #ffffff;
+        }
+
+        & .news-overlay .w-meta,
+        & .news-overlay .w-body {
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        & .widget-card-link {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+        }
+      }
     }
   </style>
 
@@ -129,7 +194,9 @@
       {% endif %}
 
       {% if news_items.size > 0 %}
-        <ul class="widget-card-grid widget-grid{% if widget.settings.columns_desktop == 1 %} news-grid-single{% endif %}" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
+        {% assign is_overlay = false %}
+        {% if widget.settings.layout == 'overlay' %}{% assign is_overlay = true %}{% endif %}
+        <ul class="widget-card-grid widget-grid{% if is_overlay %} news-grid-overlay{% endif %}{% if widget.settings.columns_desktop == 1 and is_overlay == false %} news-grid-single{% endif %}" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
           {% for item in news_items %}
             {% comment %} Promote the first card to h1 only when the widget has no title and is first on the page. {% endcomment %}
             {% assign current_card_level = card_heading_level %}
@@ -141,27 +208,52 @@
               {% endif %}
             {% endif %}
 
-            <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
-              {% if widget.settings.show_image and item.settings.featured_image != blank %}
-                {% image src: item.settings.featured_image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
-              {% endif %}
-              <div class="widget-card-content">
-                {% if widget.settings.show_date and item.settings.date != blank %}
-                  <time class="w-meta t-sm" datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
+            {% if is_overlay %}
+              {% comment %} Overlay layout: image fills the card, the whole card is the link. {% endcomment %}
+              <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
+                {% if item.settings.featured_image != blank %}
+                  {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: '(max-width: 749px) 100vw, 50vw', class: 'widget-card-image' %}
+                {% else %}
+                  {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
                 {% endif %}
-                <{{ current_card_level }} class="w-title t-xl">
-                  {% if item.url %}<a href="{{ item.url }}">{{ item.settings.title }}</a>{% else %}{{ item.settings.title }}{% endif %}
-                </{{ current_card_level }}>
-                {% if widget.settings.show_excerpt and item.settings.excerpt != blank %}
-                  <p class="w-body t-sm">{{ item.settings.excerpt }}</p>
-                {% endif %}
-                {% if widget.settings.show_read_more and item.url %}
-                  <div class="widget-card-footer">
-                    <a href="{{ item.url }}" class="widget-button widget-button-secondary" aria-label="Read more: {{ item.settings.title }}">Read more</a>
+                <div class="news-overlay">
+                  <div class="news-overlay-content">
+                    {% if widget.settings.show_date and item.settings.date != blank %}
+                      <time class="w-meta t-sm" datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
+                    {% endif %}
+                    <{{ current_card_level }} class="w-title t-xl">{{ item.settings.title }}</{{ current_card_level }}>
+                    {% if widget.settings.show_excerpt and item.settings.excerpt != blank %}
+                      <p class="w-body t-sm">{{ item.settings.excerpt }}</p>
+                    {% endif %}
                   </div>
+                </div>
+                {% if item.url %}
+                  <a href="{{ item.url }}" class="widget-card-link" aria-label="{{ item.settings.title }}"></a>
                 {% endif %}
-              </div>
-            </li>
+              </li>
+            {% else %}
+              <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
+                {% if widget.settings.show_image and item.settings.featured_image != blank %}
+                  {% image src: item.settings.featured_image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
+                {% endif %}
+                <div class="widget-card-content">
+                  {% if widget.settings.show_date and item.settings.date != blank %}
+                    <time class="w-meta t-sm" datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
+                  {% endif %}
+                  <{{ current_card_level }} class="w-title t-xl">
+                    {% if item.url %}<a href="{{ item.url }}">{{ item.settings.title }}</a>{% else %}{{ item.settings.title }}{% endif %}
+                  </{{ current_card_level }}>
+                  {% if widget.settings.show_excerpt and item.settings.excerpt != blank %}
+                    <p class="w-body t-sm">{{ item.settings.excerpt }}</p>
+                  {% endif %}
+                  {% if widget.settings.show_read_more and item.url %}
+                    <div class="widget-card-footer">
+                      <a href="{{ item.url }}" class="widget-button widget-button-secondary" aria-label="Read more: {{ item.settings.title }}">Read more</a>
+                    </div>
+                  {% endif %}
+                </div>
+              </li>
+            {% endif %}
           {% endfor %}
         </ul>
 
