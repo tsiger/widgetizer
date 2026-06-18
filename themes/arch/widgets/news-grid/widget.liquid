@@ -196,6 +196,15 @@
       {% if news_items.size > 0 %}
         {% assign is_overlay = false %}
         {% if widget.settings.layout == 'overlay' %}{% assign is_overlay = true %}{% endif %}
+        {% comment %} Column-aware image sizing. At 1 column the content is capped at
+           widget-content-md (800px); above that the card width scales with the column
+           count at ≥990px (the grid is 2-up in the 750–989 band and 1-up below). {% endcomment %}
+        {% if widget.settings.columns_desktop == 1 %}
+          {% assign card_sizes = '(max-width: 749px) 100vw, 800px' %}
+        {% else %}
+          {% assign desktop_vw = 100 | divided_by: widget.settings.columns_desktop %}
+          {% assign card_sizes = '(max-width: 749px) 100vw, (max-width: 989px) 50vw, ' | append: desktop_vw | append: 'vw' %}
+        {% endif %}
         <ul class="widget-card-grid widget-grid{% if is_overlay %} news-grid-overlay{% endif %}{% if widget.settings.columns_desktop == 1 and is_overlay == false %} news-grid-single{% endif %}" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
           {% for item in news_items %}
             {% comment %} Promote the first card to h1 only when the widget has no title and is first on the page. {% endcomment %}
@@ -212,7 +221,7 @@
               {% comment %} Overlay layout: image fills the card, the whole card is the link. {% endcomment %}
               <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
                 {% if item.settings.featured_image != blank %}
-                  {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: '(max-width: 749px) 100vw, 50vw', class: 'widget-card-image' %}
+                  {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
                 {% else %}
                   {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
                 {% endif %}
@@ -234,7 +243,7 @@
             {% else %}
               <li class="widget-card reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-collection-item="{{ item.slug }}">
                 {% if widget.settings.show_image and item.settings.featured_image != blank %}
-                  {% image src: item.settings.featured_image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
+                  {% image src: item.settings.featured_image, size: 'large', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
                 {% endif %}
                 <div class="widget-card-content">
                   {% if widget.settings.show_date and item.settings.date != blank %}
