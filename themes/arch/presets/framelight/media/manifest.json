@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "framelight-news-autumn-family-sessions-open.webp",
+      "originalName": "framelight-news-autumn-family-sessions-open.webp",
+      "type": "image/webp",
+      "size": 214880,
+      "path": "/uploads/images/framelight-news-autumn-family-sessions-open.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Autumn Family Sessions Are Open Early This Year",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-news-autumn-family-sessions-open-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/framelight-news-autumn-family-sessions-open-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-news-autumn-family-sessions-open-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "framelight-news-framelight-portraits-for-the-shelter.webp",
+      "originalName": "framelight-news-framelight-portraits-for-the-shelter.webp",
+      "type": "image/webp",
+      "size": 140856,
+      "path": "/uploads/images/framelight-news-framelight-portraits-for-the-shelter.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Free Portraits for the Animal Shelter",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-news-framelight-portraits-for-the-shelter-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/framelight-news-framelight-portraits-for-the-shelter-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-news-framelight-portraits-for-the-shelter-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "framelight-news-inside-our-edit-room.webp",
+      "originalName": "framelight-news-inside-our-edit-room.webp",
+      "type": "image/webp",
+      "size": 231938,
+      "path": "/uploads/images/framelight-news-inside-our-edit-room.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Look Inside Our Edit Room",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-news-inside-our-edit-room-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/framelight-news-inside-our-edit-room-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-news-inside-our-edit-room-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "framelight-news-introducing-golden-hour-mini-sessions.webp",
+      "originalName": "framelight-news-introducing-golden-hour-mini-sessions.webp",
+      "type": "image/webp",
+      "size": 101554,
+      "path": "/uploads/images/framelight-news-introducing-golden-hour-mini-sessions.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Introducing Golden Hour Mini Sessions",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-news-introducing-golden-hour-mini-sessions-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/framelight-news-introducing-golden-hour-mini-sessions-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-news-introducing-golden-hour-mini-sessions-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "framelight-news-what-to-wear-for-portraits.webp",
+      "originalName": "framelight-news-what-to-wear-for-portraits.webp",
+      "type": "image/webp",
+      "size": 155284,
+      "path": "/uploads/images/framelight-news-what-to-wear-for-portraits.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "What to Actually Wear for Portraits",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-news-what-to-wear-for-portraits-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/framelight-news-what-to-wear-for-portraits-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-news-what-to-wear-for-portraits-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "framelight-projects-drift-bicycles-campaign.webp",
+      "originalName": "framelight-projects-drift-bicycles-campaign.webp",
+      "type": "image/webp",
+      "size": 307712,
+      "path": "/uploads/images/framelight-projects-drift-bicycles-campaign.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Spring Campaign for Drift Bicycles",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-projects-drift-bicycles-campaign-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/framelight-projects-drift-bicycles-campaign-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-projects-drift-bicycles-campaign-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "framelight-projects-harvest-quarterly-editorial.webp",
+      "originalName": "framelight-projects-harvest-quarterly-editorial.webp",
+      "type": "image/webp",
+      "size": 260648,
+      "path": "/uploads/images/framelight-projects-harvest-quarterly-editorial.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Editorial Feature for Harvest Quarterly",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-projects-harvest-quarterly-editorial-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/framelight-projects-harvest-quarterly-editorial-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-projects-harvest-quarterly-editorial-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "framelight-projects-lantern-festival-coverage.webp",
+      "originalName": "framelight-projects-lantern-festival-coverage.webp",
+      "type": "image/webp",
+      "size": 163426,
+      "path": "/uploads/images/framelight-projects-lantern-festival-coverage.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Event Coverage for the Lantern Night Market",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-projects-lantern-festival-coverage-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/framelight-projects-lantern-festival-coverage-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-projects-lantern-festival-coverage-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "framelight-projects-marlow-executive-portraits.webp",
+      "originalName": "framelight-projects-marlow-executive-portraits.webp",
+      "type": "image/webp",
+      "size": 47148,
+      "path": "/uploads/images/framelight-projects-marlow-executive-portraits.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Executive Portraits for Marlow and Finch",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-projects-marlow-executive-portraits-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/framelight-projects-marlow-executive-portraits-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-projects-marlow-executive-portraits-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "framelight-projects-northpeak-product-catalog.webp",
+      "originalName": "framelight-projects-northpeak-product-catalog.webp",
+      "type": "image/webp",
+      "size": 82726,
+      "path": "/uploads/images/framelight-projects-northpeak-product-catalog.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Product Catalog for Northpeak Outdoors",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/framelight-projects-northpeak-product-catalog-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/framelight-projects-northpeak-product-catalog-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/framelight-projects-northpeak-product-catalog-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "home-fw.webp",
       "originalName": "home-fw.webp",
       "type": "image/webp",

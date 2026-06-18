@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "stillpoint-news-breathing-when-the-mind-races.webp",
+      "originalName": "stillpoint-news-breathing-when-the-mind-races.webp",
+      "type": "image/webp",
+      "size": 91066,
+      "path": "/uploads/images/stillpoint-news-breathing-when-the-mind-races.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "One Breath to Steady a Racing Mind",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/stillpoint-news-breathing-when-the-mind-races-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/stillpoint-news-breathing-when-the-mind-races-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/stillpoint-news-breathing-when-the-mind-races-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "stillpoint-news-five-years-of-stillpoint.webp",
+      "originalName": "stillpoint-news-five-years-of-stillpoint.webp",
+      "type": "image/webp",
+      "size": 96622,
+      "path": "/uploads/images/stillpoint-news-five-years-of-stillpoint.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Five Years of Stillpoint",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/stillpoint-news-five-years-of-stillpoint-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/stillpoint-news-five-years-of-stillpoint-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/stillpoint-news-five-years-of-stillpoint-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "stillpoint-news-how-our-teachers-trained.webp",
+      "originalName": "stillpoint-news-how-our-teachers-trained.webp",
+      "type": "image/webp",
+      "size": 98610,
+      "path": "/uploads/images/stillpoint-news-how-our-teachers-trained.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The Long Road Our Teachers Walked",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/stillpoint-news-how-our-teachers-trained-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/stillpoint-news-how-our-teachers-trained-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/stillpoint-news-how-our-teachers-trained-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "stillpoint-news-new-restorative-evening-class.webp",
+      "originalName": "stillpoint-news-new-restorative-evening-class.webp",
+      "type": "image/webp",
+      "size": 118314,
+      "path": "/uploads/images/stillpoint-news-new-restorative-evening-class.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A New Restorative Class for Tired Evenings",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/stillpoint-news-new-restorative-evening-class-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/stillpoint-news-new-restorative-evening-class-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/stillpoint-news-new-restorative-evening-class-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "stillpoint-news-spring-equinox-workshop.webp",
+      "originalName": "stillpoint-news-spring-equinox-workshop.webp",
+      "type": "image/webp",
+      "size": 101840,
+      "path": "/uploads/images/stillpoint-news-spring-equinox-workshop.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Spring Equinox Morning Workshop",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/stillpoint-news-spring-equinox-workshop-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/stillpoint-news-spring-equinox-workshop-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/stillpoint-news-spring-equinox-workshop-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "stillpointlight.png",
       "originalName": "stillpoint_light.png",
       "type": "image/png",

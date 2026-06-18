@@ -1,0 +1,12 @@
+{
+  "slug": "lumen-analytics-dashboard",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Operations Dashboard for Lumen Logistics",
+    "summary": "We replaced a wall of spreadsheets with a live dashboard that shows fleet status at a glance.",
+    "description": "<p>Lumen's dispatch team tracked 200 vehicles across a dozen shared spreadsheets that were always slightly out of date. A driver could be stuck on the side of a highway for an hour before anyone at the desk knew, because the sheet that would have shown it had not been refreshed since morning.</p><h2>Where they started</h2><p>The spreadsheets were not the real problem; the lag was. Numbers came from two separate systems, the telematics platform and the order system, and a person had to copy between them. By the time the picture was assembled it described the past, not the present.</p><h2>What we did</h2><p>We built a single dashboard that pulls directly from both the telematics and order systems, so there is no manual copying and nothing to fall behind. The screen shows a live map of the fleet, flags delays as they happen, and lets managers export a clean daily report for the morning review.</p><ul><li>A live fleet map fed by the telematics system</li><li>Delay alerts that surface a stalled route in real time</li><li>One-click daily reports for managers</li><li>A direct link to the order system, with no re-keying</li></ul><p>A real challenge was the telematics feed, which dropped signal in low-coverage areas and would have made the map flicker. We added a short buffer that holds the last known position and marks it as stale rather than blanking it, so dispatchers always see something honest instead of a vehicle vanishing.</p><h2>The result</h2><p><strong>Dispatchers now spot a stalled route in seconds instead of finding out at the end of the shift, and on-time delivery rose four points in three months.</strong> The dozen spreadsheets were retired, and the morning report that used to take an hour to assemble is now a single export.</p>",
+    "client": "Lumen Logistics",
+    "year": "2026",
+    "featured_image": "/uploads/images/codebase-projects-lumen-analytics-dashboard.webp"
+  }
+}

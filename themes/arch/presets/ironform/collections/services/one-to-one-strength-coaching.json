@@ -1,0 +1,13 @@
+{
+  "slug": "one-to-one-strength-coaching",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "One-to-One Strength Coaching",
+    "icon": "barbell",
+    "summary": "Private sessions built around your goals, your schedule, and where your body actually is right now.",
+    "description": "<p>We start with an honest assessment of your movement, your history, and what you want out of training. From there we build a plan you can repeat, not one that only works on a good day.</p><h2>How coaching works</h2><p>Every rep is coached in person, so your form gets checked and corrected as you go. That direct feedback is the difference between guessing whether a lift felt right and knowing it did, and it is where most of the progress comes from. The plan adjusts as you get stronger, so it keeps meeting you where you actually are.</p><ul><li>An assessment of how you move and what you are working with</li><li>A repeatable plan built around your goals and schedule</li><li>Hands-on coaching and technique checks on every lift</li></ul><p>Most clients train with us once or twice a week, which is usually enough to keep technique sharp and progress steady. We fit the sessions around your week rather than asking you to rearrange your life.</p><h3>Who it suits</h3><p>This works for people who want a plan built around their body and goals, whether they are new to lifting or returning after a break. If you have niggles or a history worth working around, we account for that from the start.</p><p>Come in ready to give us an honest picture of your training and any aches or limits. The more we know up front, the better we can build something that holds up over the long run.</p>",
+    "price": "From $55 per session",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/ironform-services-one-to-one-strength-coaching.webp"
+  }
+}

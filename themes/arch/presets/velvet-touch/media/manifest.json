@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "velvet-touch-news-five-hundred-spa-days-given.webp",
+      "originalName": "velvet-touch-news-five-hundred-spa-days-given.webp",
+      "type": "image/webp",
+      "size": 83326,
+      "path": "/uploads/images/velvet-touch-news-five-hundred-spa-days-given.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Five Hundred Spa Days Given to Caregivers",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-news-five-hundred-spa-days-given-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-news-five-hundred-spa-days-given-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-news-five-hundred-spa-days-given-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-news-new-hot-stone-massage.webp",
+      "originalName": "velvet-touch-news-new-hot-stone-massage.webp",
+      "type": "image/webp",
+      "size": 108946,
+      "path": "/uploads/images/velvet-touch-news-new-hot-stone-massage.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A New Hot Stone Massage Joins the Menu",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-news-new-hot-stone-massage-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-news-new-hot-stone-massage-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-news-new-hot-stone-massage-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-news-skincare-between-facials.webp",
+      "originalName": "velvet-touch-news-skincare-between-facials.webp",
+      "type": "image/webp",
+      "size": 68600,
+      "path": "/uploads/images/velvet-touch-news-skincare-between-facials.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "What to Actually Do for Your Skin Between Facials",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-news-skincare-between-facials-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-news-skincare-between-facials-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-news-skincare-between-facials-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-news-spring-renewal-day-package.webp",
+      "originalName": "velvet-touch-news-spring-renewal-day-package.webp",
+      "type": "image/webp",
+      "size": 108524,
+      "path": "/uploads/images/velvet-touch-news-spring-renewal-day-package.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Spring Renewal Day to Shake Off Winter",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-news-spring-renewal-day-package-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-news-spring-renewal-day-package-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-news-spring-renewal-day-package-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-news-the-hands-behind-the-calm.webp",
+      "originalName": "velvet-touch-news-the-hands-behind-the-calm.webp",
+      "type": "image/webp",
+      "size": 113366,
+      "path": "/uploads/images/velvet-touch-news-the-hands-behind-the-calm.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The Hands Behind the Calm",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-news-the-hands-behind-the-calm-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-news-the-hands-behind-the-calm-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-news-the-hands-behind-the-calm-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-services-aromatherapy-bath.webp",
+      "originalName": "velvet-touch-services-aromatherapy-bath.webp",
+      "type": "image/webp",
+      "size": 135712,
+      "path": "/uploads/images/velvet-touch-services-aromatherapy-bath.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Aromatherapy Soak",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-services-aromatherapy-bath-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-services-aromatherapy-bath-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-services-aromatherapy-bath-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-services-body-scrub.webp",
+      "originalName": "velvet-touch-services-body-scrub.webp",
+      "type": "image/webp",
+      "size": 201558,
+      "path": "/uploads/images/velvet-touch-services-body-scrub.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Sea Salt Body Scrub",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-services-body-scrub-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-services-body-scrub-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-services-body-scrub-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-services-facial-treatment.webp",
+      "originalName": "velvet-touch-services-facial-treatment.webp",
+      "type": "image/webp",
+      "size": 137284,
+      "path": "/uploads/images/velvet-touch-services-facial-treatment.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Signature Facial",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-services-facial-treatment-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-services-facial-treatment-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-services-facial-treatment-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-services-hot-stone-therapy.webp",
+      "originalName": "velvet-touch-services-hot-stone-therapy.webp",
+      "type": "image/webp",
+      "size": 125728,
+      "path": "/uploads/images/velvet-touch-services-hot-stone-therapy.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Hot Stone Therapy",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-services-hot-stone-therapy-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-services-hot-stone-therapy-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-services-hot-stone-therapy-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "velvet-touch-services-swedish-massage.webp",
+      "originalName": "velvet-touch-services-swedish-massage.webp",
+      "type": "image/webp",
+      "size": 101934,
+      "path": "/uploads/images/velvet-touch-services-swedish-massage.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Swedish Massage",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/velvet-touch-services-swedish-massage-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/velvet-touch-services-swedish-massage-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/velvet-touch-services-swedish-massage-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "velvet-touch.png",
       "originalName": "velvet-touch.png",
       "type": "image/png",

@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "clearpath-news-five-years-of-clearpath.webp",
+      "originalName": "clearpath-news-five-years-of-clearpath.webp",
+      "type": "image/webp",
+      "size": 100362,
+      "path": "/uploads/images/clearpath-news-five-years-of-clearpath.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Five Years In, and Still Independent",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clearpath-news-five-years-of-clearpath-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/clearpath-news-five-years-of-clearpath-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/clearpath-news-five-years-of-clearpath-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "clearpath-news-how-clearpath-prepares.webp",
+      "originalName": "clearpath-news-how-clearpath-prepares.webp",
+      "type": "image/webp",
+      "size": 77338,
+      "path": "/uploads/images/clearpath-news-how-clearpath-prepares.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "What We Do Before We Ever Meet You",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clearpath-news-how-clearpath-prepares-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/clearpath-news-how-clearpath-prepares-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/clearpath-news-how-clearpath-prepares-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "clearpath-news-one-metric-that-matters.webp",
+      "originalName": "clearpath-news-one-metric-that-matters.webp",
+      "type": "image/webp",
+      "size": 46700,
+      "path": "/uploads/images/clearpath-news-one-metric-that-matters.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Pick One Number Before You Pick Ten",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clearpath-news-one-metric-that-matters-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/clearpath-news-one-metric-that-matters-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/clearpath-news-one-metric-that-matters-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "clearpath-news-quarterly-strategy-sprints.webp",
+      "originalName": "clearpath-news-quarterly-strategy-sprints.webp",
+      "type": "image/webp",
+      "size": 60922,
+      "path": "/uploads/images/clearpath-news-quarterly-strategy-sprints.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Introducing Our Quarterly Strategy Sprints",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clearpath-news-quarterly-strategy-sprints-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/clearpath-news-quarterly-strategy-sprints-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/clearpath-news-quarterly-strategy-sprints-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "clearpath-news-spring-planning-clinic.webp",
+      "originalName": "clearpath-news-spring-planning-clinic.webp",
+      "type": "image/webp",
+      "size": 93486,
+      "path": "/uploads/images/clearpath-news-spring-planning-clinic.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Join Our Free Spring Planning Clinic",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clearpath-news-spring-planning-clinic-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/clearpath-news-spring-planning-clinic-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/clearpath-news-spring-planning-clinic-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "clearpath-logo-light.png",
       "originalName": "clearpath-logo-light.png",
       "type": "image/png",

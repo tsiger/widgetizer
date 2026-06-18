@@ -1,0 +1,13 @@
+{
+  "slug": "full-gym-membership",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Full Gym Membership",
+    "icon": "barbell",
+    "summary": "Open access to the whole floor for members who want to train on their own terms.",
+    "description": "<p>One membership covers the full strength floor, free weights, machines, and the conditioning area. Come in when it suits you and use whatever the session calls for, with no separate fees for different parts of the gym.</p><h2>What is included</h2><p>Full access means you are never boxed into one corner of the building. If you are chasing strength, building conditioning, or mixing both, everything you need is part of the same membership.</p><ul><li>The full strength floor and free weights</li><li>Resistance and cardio machines</li><li>The conditioning area, open to all members</li></ul><p>New members get a short induction so you know where everything is and how to use it safely. We will show you around, point out how the key equipment works, and make sure you feel settled before you are training on your own.</p><h3>Training on your own terms</h3><p>After the induction the gym is yours, with no caps on how often you visit. You set your own schedule and pace, and you are welcome as often as you like.</p><p>If you ever want a hand adjusting a machine or checking a movement, our staff are around and happy to help. A membership is the foundation, and you can add coaching or classes later if you decide you want more structure.</p>",
+    "price": "$45 per month",
+    "duration": "Open access",
+    "featured_image": "/uploads/images/olympic-services-full-gym-membership.webp"
+  }
+}

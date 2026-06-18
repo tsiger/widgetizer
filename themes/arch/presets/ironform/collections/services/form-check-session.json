@@ -1,0 +1,13 @@
+{
+  "slug": "form-check-session",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Form Check Session",
+    "icon": "certificate",
+    "summary": "A single deep-dive on your main lifts for self-trained lifters who want a second set of eyes.",
+    "description": "<p>Bring the lifts you already do and we will pull them apart. This is a single deep-dive built for self-trained lifters who suspect something is off but cannot see it from the inside.</p><h2>How the session works</h2><p>We film your sets, walk through what is happening, and give you cues you can actually use under the bar. Rather than overhauling everything at once, we focus on the few changes that will make the biggest difference to how the lift feels and holds up.</p><ul><li>Video of your main lifts from useful angles</li><li>A clear breakdown of what is working and what is not</li><li>Simple cues and drills you can take straight to your next session</li></ul><p>You leave with a short list of fixes and drills, plus the video for reference, so you are not relying on memory once you are back training alone. The aim is to give you tools you can apply yourself, not a dependence on being watched.</p><h3>Who it suits</h3><p>It works best for anyone training solo who wants a second set of eyes on the squat, bench, deadlift, or whichever lifts matter most to them. You do not need to be advanced; you just need lifts you want to sharpen.</p><p>Warm up as you normally would and bring lifts you are comfortable performing so we see your real technique. Loads that let you keep good form tell us more than a maximal attempt.</p>",
+    "price": "$70 one off",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/ironform-services-form-check-session.webp"
+  }
+}

@@ -6,7 +6,7 @@
     "contactDetailsLine1": "hello@example.com",
     "contactDetailsLine2": "(555) 203-9844",
     "contact_position": "logo",
-    "headerNavigation": "30ebd95f-9f20-4cde-97a8-b1ea5fcb3d84",
+    "headerNavigation": "main-menu",
     "center_nav": false,
     "ctaButtonLink": {
       "href": "contact.html",

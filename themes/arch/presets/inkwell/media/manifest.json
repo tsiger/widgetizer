@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "inkwell-news-flash-day-for-the-new-year.webp",
+      "originalName": "inkwell-news-flash-day-for-the-new-year.webp",
+      "type": "image/webp",
+      "size": 146576,
+      "path": "/uploads/images/inkwell-news-flash-day-for-the-new-year.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Flash Day to Kick Off the Year",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/inkwell-news-flash-day-for-the-new-year-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/inkwell-news-flash-day-for-the-new-year-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/inkwell-news-flash-day-for-the-new-year-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "inkwell-news-how-a-custom-piece-is-built.webp",
+      "originalName": "inkwell-news-how-a-custom-piece-is-built.webp",
+      "type": "image/webp",
+      "size": 95454,
+      "path": "/uploads/images/inkwell-news-how-a-custom-piece-is-built.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How a Custom Piece Comes Together",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/inkwell-news-how-a-custom-piece-is-built-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/inkwell-news-how-a-custom-piece-is-built-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/inkwell-news-how-a-custom-piece-is-built-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "inkwell-news-how-to-care-for-fresh-ink.webp",
+      "originalName": "inkwell-news-how-to-care-for-fresh-ink.webp",
+      "type": "image/webp",
+      "size": 153128,
+      "path": "/uploads/images/inkwell-news-how-to-care-for-fresh-ink.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Care for Fresh Ink",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/inkwell-news-how-to-care-for-fresh-ink-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/inkwell-news-how-to-care-for-fresh-ink-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/inkwell-news-how-to-care-for-fresh-ink-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "inkwell-news-ten-years-of-inkwell.webp",
+      "originalName": "inkwell-news-ten-years-of-inkwell.webp",
+      "type": "image/webp",
+      "size": 144622,
+      "path": "/uploads/images/inkwell-news-ten-years-of-inkwell.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Ten Years in the Same Storefront",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/inkwell-news-ten-years-of-inkwell-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/inkwell-news-ten-years-of-inkwell-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/inkwell-news-ten-years-of-inkwell-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "inkwell-news-welcoming-a-new-resident-artist.webp",
+      "originalName": "inkwell-news-welcoming-a-new-resident-artist.webp",
+      "type": "image/webp",
+      "size": 110426,
+      "path": "/uploads/images/inkwell-news-welcoming-a-new-resident-artist.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Welcoming Sol to the Inkwell Chairs",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/inkwell-news-welcoming-a-new-resident-artist-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/inkwell-news-welcoming-a-new-resident-artist-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/inkwell-news-welcoming-a-new-resident-artist-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "contact-happens-next.webp",
       "originalName": "contact-happens-next.webp",
       "type": "image/webp",

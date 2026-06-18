@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "olympic-news-fifteen-years-of-olympic.webp",
+      "originalName": "olympic-news-fifteen-years-of-olympic.webp",
+      "type": "image/webp",
+      "size": 174298,
+      "path": "/uploads/images/olympic-news-fifteen-years-of-olympic.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Fifteen Years of Olympic",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-news-fifteen-years-of-olympic-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/olympic-news-fifteen-years-of-olympic-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-news-fifteen-years-of-olympic-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "olympic-news-new-free-weights-area.webp",
+      "originalName": "olympic-news-new-free-weights-area.webp",
+      "type": "image/webp",
+      "size": 216488,
+      "path": "/uploads/images/olympic-news-new-free-weights-area.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Our Expanded Free Weights Area Is Open",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-news-new-free-weights-area-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/olympic-news-new-free-weights-area-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-news-new-free-weights-area-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "olympic-news-new-year-induction-week.webp",
+      "originalName": "olympic-news-new-year-induction-week.webp",
+      "type": "image/webp",
+      "size": 191758,
+      "path": "/uploads/images/olympic-news-new-year-induction-week.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Free Induction Week for New Members",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-news-new-year-induction-week-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/olympic-news-new-year-induction-week-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-news-new-year-induction-week-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "olympic-news-stop-skipping-leg-day.webp",
+      "originalName": "olympic-news-stop-skipping-leg-day.webp",
+      "type": "image/webp",
+      "size": 122456,
+      "path": "/uploads/images/olympic-news-stop-skipping-leg-day.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Simpler Way to Stop Skipping Leg Day",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-news-stop-skipping-leg-day-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/olympic-news-stop-skipping-leg-day-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-news-stop-skipping-leg-day-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "olympic-news-the-people-who-open-up-at-six.webp",
+      "originalName": "olympic-news-the-people-who-open-up-at-six.webp",
+      "type": "image/webp",
+      "size": 114274,
+      "path": "/uploads/images/olympic-news-the-people-who-open-up-at-six.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The People Who Open Up at Six",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-news-the-people-who-open-up-at-six-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/olympic-news-the-people-who-open-up-at-six-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-news-the-people-who-open-up-at-six-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "olympic-services-24-hour-access.webp",
+      "originalName": "olympic-services-24-hour-access.webp",
+      "type": "image/webp",
+      "size": 195606,
+      "path": "/uploads/images/olympic-services-24-hour-access.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "24 Hour Access",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-services-24-hour-access-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/olympic-services-24-hour-access-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-services-24-hour-access-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "olympic-services-fitness-assessment.webp",
+      "originalName": "olympic-services-fitness-assessment.webp",
+      "type": "image/webp",
+      "size": 165126,
+      "path": "/uploads/images/olympic-services-fitness-assessment.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Fitness Assessment",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-services-fitness-assessment-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/olympic-services-fitness-assessment-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-services-fitness-assessment-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "olympic-services-full-gym-membership.webp",
+      "originalName": "olympic-services-full-gym-membership.webp",
+      "type": "image/webp",
+      "size": 271334,
+      "path": "/uploads/images/olympic-services-full-gym-membership.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Full Gym Membership",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-services-full-gym-membership-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/olympic-services-full-gym-membership-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-services-full-gym-membership-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "olympic-services-group-fitness-classes.webp",
+      "originalName": "olympic-services-group-fitness-classes.webp",
+      "type": "image/webp",
+      "size": 118310,
+      "path": "/uploads/images/olympic-services-group-fitness-classes.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Group Fitness Classes",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-services-group-fitness-classes-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/olympic-services-group-fitness-classes-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-services-group-fitness-classes-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "olympic-services-personal-training.webp",
+      "originalName": "olympic-services-personal-training.webp",
+      "type": "image/webp",
+      "size": 130056,
+      "path": "/uploads/images/olympic-services-personal-training.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Personal Training",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/olympic-services-personal-training-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/olympic-services-personal-training-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/olympic-services-personal-training-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "olympiclight.png",
       "originalName": "olympic_light.png",
       "type": "image/png",
