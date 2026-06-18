@@ -111,6 +111,11 @@
     {% endif %}
 
     <div class="widget-content">
+      {% comment %} Column-aware image sizing: card width scales with the column count at ≥990px
+         (the grid is 2-up in the 750–989 band and 1-up below). Carousel items use the same
+         per-column width. {% endcomment %}
+      {% assign desktop_vw = 100 | divided_by: widget.settings.columns_desktop %}
+      {% assign card_sizes = '(max-width: 749px) 100vw, (max-width: 989px) 50vw, ' | append: desktop_vw | append: 'vw' %}
       {% if widget.settings.layout == 'carousel' %}
         <div class="carousel-container reveal reveal-up">
           <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
@@ -132,7 +137,7 @@
                 data-caption="{{ block.settings.caption }}"
               >
                 {% if block.settings.image != blank %}
-                  {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
+                  {% image src: block.settings.image, size: 'medium', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
                 {% else %}
                   {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
                 {% endif %}
@@ -159,7 +164,7 @@
               data-caption="{{ block.settings.caption }}"
             >
               {% if block.settings.image != blank %}
-                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
+                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
               {% else %}
                 {% placeholder_image aspect: 'landscape', class: 'widget-card-image' %}
               {% endif %}

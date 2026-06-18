@@ -123,6 +123,10 @@
         {% endif %}
       {% endif %}
 
+      {% comment %} Column-aware image sizing: each image cell ≈ container / columns at ≥990px
+         (the grid is 2-up in the 750–989 band and 1-up below). {% endcomment %}
+      {% assign desktop_vw = 100 | divided_by: widget.settings.columns_desktop %}
+      {% assign card_sizes = '(max-width: 749px) 100vw, (max-width: 989px) 50vw, ' | append: desktop_vw | append: 'vw' %}
       <ul
         class="checkerboard-grid widget-grid"
         style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};"
@@ -142,7 +146,7 @@
           <li class="checkerboard-item reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
             {% if block.settings.image != blank %}
               <div class="checkerboard-item-image">
-                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px' %}
+                {% image src: block.settings.image, size: 'medium', srcset: true, sizes: card_sizes %}
               </div>
             {% else %}
               <div class="checkerboard-item-content">
