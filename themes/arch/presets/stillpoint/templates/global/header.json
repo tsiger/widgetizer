@@ -8,13 +8,17 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book a Class",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
     },
     "ctaButtonStyle": "primary",
     "center_nav": true,
     "full_width": true,
-    "sticky": false,
+    "sticky": true,
     "transparent_on_hero": false,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/stillpointdark.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

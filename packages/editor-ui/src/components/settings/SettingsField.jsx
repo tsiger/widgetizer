@@ -4,7 +4,7 @@ import FormField from "../ui/FormField";
  * SettingsField component
  * Wraps any input with a label and description
  */
-export default function SettingsField({ label, id, description, children, error, type }) {
+export default function SettingsField({ label, id, description, children, error, type, required = false }) {
   const isCheckbox = type === "checkbox";
 
   // Handle toggle switch style layout
@@ -12,7 +12,7 @@ export default function SettingsField({ label, id, description, children, error,
     return (
       <FormField help={description} error={error}>
         <div className="flex items-center justify-between">
-          <label htmlFor={id} className="form-label cursor-pointer">
+          <label htmlFor={id} className={`form-label cursor-pointer ${required ? "form-label-required" : ""}`}>
             {label}
           </label>
           {children}
@@ -23,7 +23,7 @@ export default function SettingsField({ label, id, description, children, error,
 
   // Handle standard layout
   return (
-    <FormField id={id} label={label} help={description} error={error}>
+    <FormField id={id} label={label} help={description} error={error} required={required}>
       {children}
     </FormField>
   );

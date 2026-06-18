@@ -9,7 +9,8 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "image": "/uploads/images/about-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -27,13 +28,17 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "founders_story": {
       "type": "image-text",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/founders.webp"
       },
       "blocks": {
         "founders-eyebrow": {
@@ -72,13 +77,19 @@
           }
         }
       },
-      "blocksOrder": ["founders-eyebrow", "founders-heading", "founders-text", "founders-button"]
+      "blocksOrder": [
+        "founders-eyebrow",
+        "founders-heading",
+        "founders-text",
+        "founders-button"
+      ]
     },
     "philosophy": {
       "type": "image-callout",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/philosophy.webp"
       },
       "blocks": {
         "phil-heading": {
@@ -102,7 +113,11 @@
           }
         }
       },
-      "blocksOrder": ["phil-heading", "phil-text", "phil-features"]
+      "blocksOrder": [
+        "phil-heading",
+        "phil-text",
+        "phil-features"
+      ]
     },
     "key_figures": {
       "type": "key-figures",
@@ -148,7 +163,12 @@
           }
         }
       },
-      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+      "blocksOrder": [
+        "figure-1",
+        "figure-2",
+        "figure-3",
+        "figure-4"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -158,9 +178,9 @@
         "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
+        "color_scheme": "standard-secondary",
         "image_style": "full",
-        "aspect_ratio": "1 / 1",
-        "color_scheme": "standard-secondary"
+        "aspect_ratio": "1 / 1"
       },
       "blocks": {
         "profile-1": {
@@ -169,7 +189,8 @@
             "name": "Marco Reyes",
             "role": "Executive Chef",
             "specialty": "Modern European cuisine",
-            "bio": "Trained in Bologna and Buenos Aires, Marco brings a global perspective to every plate. His cooking is rooted in tradition but never afraid to surprise."
+            "bio": "Trained in Bologna and Buenos Aires, Marco brings a global perspective to every plate. His cooking is rooted in tradition but never afraid to surprise.",
+            "photo": "/uploads/images/team-marc.webp"
           }
         },
         "profile-2": {
@@ -178,7 +199,8 @@
             "name": "Elena Reyes",
             "role": "General Manager",
             "specialty": "Hospitality & wine",
-            "bio": "Elena runs the front of house with warmth and precision. A certified sommelier, she curates our wine list and trains every member of the team."
+            "bio": "Elena runs the front of house with warmth and precision. A certified sommelier, she curates our wine list and trains every member of the team.",
+            "photo": "/uploads/images/team-elena.webp"
           }
         },
         "profile-3": {
@@ -187,11 +209,16 @@
             "name": "Aisha Okafor",
             "role": "Pastry Chef",
             "specialty": "French-African fusion desserts",
-            "bio": "Aisha joined Saffron in 2018, bringing her signature blend of French technique and West African flavors to the dessert menu."
+            "bio": "Aisha joined Saffron in 2018, bringing her signature blend of French technique and West African flavors to the dessert menu.",
+            "photo": "/uploads/images/team-aisha.webp"
           }
         }
       },
-      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+      "blocksOrder": [
+        "profile-1",
+        "profile-2",
+        "profile-3"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -213,18 +240,29 @@
             "link": {
               "text": "Reserve a Table",
               "href": "reservations.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["about_hero", "founders_story", "philosophy", "key_figures", "team", "about_cta"],
+  "widgetsOrder": [
+    "about_hero",
+    "founders_story",
+    "philosophy",
+    "key_figures",
+    "team",
+    "about_cta"
+  ],
   "id": "about",
-  "created": "2026-04-03T10:00:00.000Z",
-  "updated": "2026-04-03T10:00:00.000Z"
+  "created": "2026-04-17T13:40:23.908Z",
+  "updated": "2026-04-17T13:49:04.551Z"
 }

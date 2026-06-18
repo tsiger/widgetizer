@@ -149,11 +149,11 @@
                 {% if block.settings.title != blank %}
                   <{{ current_card_level }} class="w-title t-2xl" data-setting="title">{{ block.settings.title }}</{{ current_card_level }}>
                 {% endif %}
-                {% if block.settings.description != blank %}
+                {% unless block.settings.description | rte_blank %}
                   <div class="w-body w-rte t-sm" data-setting="description">
                     {{ block.settings.description | raw }}
                   </div>
-                {% endif %}
+                {% endunless %}
                 {% if block.settings.button_link.text != blank %}
                   <a
                     href="{{ block.settings.button_link.href }}"

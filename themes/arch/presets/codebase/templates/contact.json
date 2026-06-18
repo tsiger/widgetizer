@@ -167,7 +167,11 @@
           }
         }
       },
-      "blocksOrder": ["wn-1", "wn-2", "wn-3"]
+      "blocksOrder": [
+        "wn-1",
+        "wn-2",
+        "wn-3"
+      ]
     },
     "contact_faq": {
       "type": "accordion",
@@ -221,11 +225,21 @@
           }
         }
       },
-      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4"]
+      "blocksOrder": [
+        "cf-sidebar",
+        "cf-1",
+        "cf-2",
+        "cf-3",
+        "cf-4"
+      ]
     }
   },
-  "widgetsOrder": ["inquire_opener", "what_happens_next", "contact_faq"],
+  "widgetsOrder": [
+    "inquire_opener",
+    "what_happens_next",
+    "contact_faq"
+  ],
   "id": "contact",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T11:33:30.983Z",
+  "updated": "2026-04-20T11:36:01.960Z"
 }

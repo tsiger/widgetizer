@@ -2,15 +2,16 @@
   "name": "Contact",
   "slug": "contact",
   "id": "contact",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T12:39:31.881Z",
+  "updated": "2026-04-22T12:58:18.586Z",
   "widgets": {
     "page_header": {
       "type": "banner",
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/contact-banner.webp"
       },
       "blocks": {
         "page-heading": {
@@ -29,7 +30,10 @@
           }
         }
       },
-      "blocksOrder": ["page-heading", "page-text"]
+      "blocksOrder": [
+        "page-heading",
+        "page-text"
+      ]
     },
     "contact_info": {
       "type": "contact-details",
@@ -66,7 +70,12 @@
           }
         }
       },
-      "blocksOrder": ["info-1", "hours-1", "visit-1", "social-1"]
+      "blocksOrder": [
+        "info-1",
+        "hours-1",
+        "visit-1",
+        "social-1"
+      ]
     },
     "faq": {
       "type": "accordion",
@@ -114,8 +123,18 @@
           }
         }
       },
-      "blocksOrder": ["q-same-day", "q-custom", "q-event", "q-preorder", "sidebar-contact"]
+      "blocksOrder": [
+        "q-same-day",
+        "q-custom",
+        "q-event",
+        "q-preorder",
+        "sidebar-contact"
+      ]
     }
   },
-  "widgetsOrder": ["page_header", "contact_info", "faq"]
+  "widgetsOrder": [
+    "page_header",
+    "contact_info",
+    "faq"
+  ]
 }

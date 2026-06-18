@@ -156,6 +156,41 @@ describe("validateHtml", () => {
     assert.ok(langIssue, "should flag missing lang attribute");
   });
 
+  it("flags an image with no alt text via the WCAG subset (wcag/h37)", async () => {
+    const html =
+      '<!DOCTYPE html><html lang="en"><head><title>Test</title></head><body><img src="x.png"></body></html>';
+    const result = await validateHtml(html, "test-page");
+    const altIssue = result.issues.find((i) => i.ruleId === "wcag/h37");
+    assert.ok(altIssue, "should flag missing alt text with wcag/h37");
+    assert.equal(altIssue.severity, "error");
+  });
+
+  it("flags an image with empty alt text (widgetizer/img-empty-alt)", async () => {
+    const html =
+      '<!DOCTYPE html><html lang="en"><head><title>Test</title></head><body><img src="x.png" alt="" width="10" height="10"></body></html>';
+    const result = await validateHtml(html, "test-page");
+    const emptyAlt = result.issues.find((i) => i.ruleId === "widgetizer/img-empty-alt");
+    assert.ok(emptyAlt, "should flag empty alt text");
+    assert.equal(emptyAlt.severity, "warning");
+  });
+
+  it("does not flag an image that has real alt text", async () => {
+    const html =
+      '<!DOCTYPE html><html lang="en"><head><title>Test</title></head><body><img src="x.png" alt="A cat" width="10" height="10"></body></html>';
+    const result = await validateHtml(html, "test-page");
+    const emptyAlt = result.issues.find((i) => i.ruleId === "widgetizer/img-empty-alt");
+    assert.equal(emptyAlt, undefined, "non-empty alt must not be flagged");
+  });
+
+  it("flags an empty heading as a warning (empty-heading)", async () => {
+    const html =
+      '<!DOCTYPE html><html lang="en"><head><title>Test</title></head><body><h2></h2></body></html>';
+    const result = await validateHtml(html, "test-page");
+    const emptyHeading = result.issues.find((i) => i.ruleId === "empty-heading");
+    assert.ok(emptyHeading, "should flag empty heading");
+    assert.equal(emptyHeading.severity, "warning");
+  });
+
   it("returns structured issue objects", async () => {
     const html = "<html><head><title>Test</title></head><body></body></html>";
     const result = await validateHtml(html, "test-page");

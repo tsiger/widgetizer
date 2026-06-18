@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/contact-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,12 +24,14 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "contact_info": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/contact-reception.webp",
         "image_position": "start",
         "text_position": "flex-start",
         "content_color_scheme": "none",
@@ -70,7 +72,12 @@
           }
         }
       },
-      "blocksOrder": ["contact-heading", "contact-text", "contact-details", "contact-button"]
+      "blocksOrder": [
+        "contact-heading",
+        "contact-text",
+        "contact-details",
+        "contact-button"
+      ]
     },
     "hours": {
       "type": "schedule-table",
@@ -143,7 +150,16 @@
           }
         }
       },
-      "blocksOrder": ["day-mon", "day-tue", "day-wed", "day-thu", "day-fri", "day-sat", "day-sun", "info-emergency"]
+      "blocksOrder": [
+        "day-mon",
+        "day-tue",
+        "day-wed",
+        "day-thu",
+        "day-fri",
+        "day-sat",
+        "day-sun",
+        "info-emergency"
+      ]
     },
     "map": {
       "type": "map",
@@ -172,11 +188,19 @@
           "settings": {}
         }
       },
-      "blocksOrder": ["info-getting-here", "social-1"]
+      "blocksOrder": [
+        "info-getting-here",
+        "social-1"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "contact_info", "hours", "map"],
+  "widgetsOrder": [
+    "hero",
+    "contact_info",
+    "hours",
+    "map"
+  ],
   "id": "contact",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T12:01:48.313Z",
+  "updated": "2026-04-16T13:12:04.324Z"
 }

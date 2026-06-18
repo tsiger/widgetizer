@@ -5,7 +5,7 @@
     "story": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/agent-headshot.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -44,7 +44,12 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text-1",
+        "story-text-2"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -99,7 +104,12 @@
           }
         }
       },
-      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+      "blocksOrder": [
+        "fig-1",
+        "fig-2",
+        "fig-3",
+        "fig-4"
+      ]
     },
     "testimonials": {
       "type": "testimonial-slider",
@@ -113,7 +123,7 @@
           "type": "quote",
           "settings": {
             "quote": "Sarah made selling our family home of 30 years feel manageable. She handled everything with grace and got us a price we never expected. We're so grateful.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-2.webp",
             "name": "Margaret & Paul D.",
             "title": "Sellers, Beacon Hill",
             "rating": "5"
@@ -123,7 +133,7 @@
           "type": "quote",
           "settings": {
             "quote": "We looked at 40 homes before finding the right one. Sarah never rushed us, never pushed, and was there for every single showing. That patience is rare.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-3.webp",
             "name": "Michael T.",
             "title": "Buyer, Cambridge",
             "rating": "5"
@@ -133,7 +143,7 @@
           "type": "quote",
           "settings": {
             "quote": "As an investor, I need an agent who understands numbers. Sarah's market analysis is sharp and her deal-sourcing is the best I've worked with in Boston.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-1.webp",
             "name": "Anthony R.",
             "title": "Investor, Multiple properties",
             "rating": "5"
@@ -143,14 +153,19 @@
           "type": "quote",
           "settings": {
             "quote": "First-time buyers with a million questions. Sarah answered every one and made the entire process feel less scary. We'd recommend her to anyone.",
-            "avatar": "",
+            "avatar": "/uploads/images/testimonial-4.webp",
             "name": "Priya & James L.",
             "title": "Buyers, Somerville",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2", "review-3", "review-4"]
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3",
+        "review-4"
+      ]
     },
     "faq": {
       "type": "accordion",
@@ -201,7 +216,13 @@
           }
         }
       },
-      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-5"]
+      "blocksOrder": [
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4",
+        "faq-5"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -232,18 +253,29 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "53852415-e1bc-4371-a530-0ffe7fd78310"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["story", "stats", "testimonials", "faq", "cta"],
+  "widgetsOrder": [
+    "story",
+    "stats",
+    "testimonials",
+    "faq",
+    "cta"
+  ],
   "id": "about",
-  "created": "2026-04-08T16:00:00.000Z",
-  "updated": "2026-04-08T16:00:00.000Z"
+  "created": "2026-04-17T08:48:00.618Z",
+  "updated": "2026-04-17T09:58:18.987Z"
 }

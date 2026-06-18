@@ -10,7 +10,8 @@
         "content_color_scheme": "none",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/team-intro.webp"
       },
       "blocks": {
         "si-eyebrow": {
@@ -42,14 +43,20 @@
             "link": {
               "text": "See our work",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["si-eyebrow", "si-heading", "si-text", "si-button"]
+      "blocksOrder": [
+        "si-eyebrow",
+        "si-heading",
+        "si-text",
+        "si-button"
+      ]
     },
     "team_grid": {
       "type": "profile-grid",
@@ -74,7 +81,8 @@
             "name": "Mira Hartmann",
             "role": "Co-founder, Principal Engineer",
             "specialty": "Product engineering · TypeScript",
-            "bio": "Founded Codebase in 2019. Ten years at Stripe before that, shipping core billing and internal product platforms. Leads the studio's most architecturally complex engagements."
+            "bio": "Founded Codebase in 2019. Ten years at Stripe before that, shipping core billing and internal product platforms. Leads the studio's most architecturally complex engagements.",
+            "photo": "/uploads/images/team-mira.webp"
           }
         },
         "tm-2": {
@@ -83,7 +91,8 @@
             "name": "Alex Kowalski",
             "role": "Co-founder, Principal Designer",
             "specialty": "Product design · design systems",
-            "bio": "Leads product design across every engagement. Previously at Figma and a handful of consumer startups. Runs the studio's design-system practice and does most of the client-facing discovery work."
+            "bio": "Leads product design across every engagement. Previously at Figma and a handful of consumer startups. Runs the studio's design-system practice and does most of the client-facing discovery work.",
+            "photo": "/uploads/images/team-alex.webp"
           }
         },
         "tm-3": {
@@ -92,7 +101,8 @@
             "name": "Yuki Tanaka",
             "role": "Senior Engineer",
             "specialty": "Front-end · dashboard UX",
-            "bio": "Senior front-end engineer focused on data-dense interfaces. Previously built reporting tools at Linear. Knows more about virtual scroll than is reasonable."
+            "bio": "Senior front-end engineer focused on data-dense interfaces. Previously built reporting tools at Linear. Knows more about virtual scroll than is reasonable.",
+            "photo": "/uploads/images/team-yuki.webp"
           }
         },
         "tm-4": {
@@ -101,7 +111,8 @@
             "name": "Dimitri Andreou",
             "role": "Senior Engineer",
             "specialty": "Back-end · Rust, Postgres",
-            "bio": "Senior back-end engineer. Rust and Postgres by preference, Node when the project needs it. Previously at Supabase and a European fintech infrastructure team."
+            "bio": "Senior back-end engineer. Rust and Postgres by preference, Node when the project needs it. Previously at Supabase and a European fintech infrastructure team.",
+            "photo": "/uploads/images/team-dimitri.webp"
           }
         },
         "tm-5": {
@@ -110,7 +121,8 @@
             "name": "Imani Okonkwo",
             "role": "Senior Engineer",
             "specialty": "Full-stack · MVP sprints",
-            "bio": "Full-stack senior engineer and the lead on most of the studio's MVP sprints. Previously shipped zero-to-one products at two Y Combinator startups."
+            "bio": "Full-stack senior engineer and the lead on most of the studio's MVP sprints. Previously shipped zero-to-one products at two Y Combinator startups.",
+            "photo": "/uploads/images/team-imani.webp"
           }
         },
         "tm-6": {
@@ -119,7 +131,8 @@
             "name": "Luca Bianchi",
             "role": "Engineer",
             "specialty": "TypeScript infrastructure",
-            "bio": "Engineer with a focus on monorepo tooling, typed APIs, and the ergonomics of long-lived codebases. Joined from a Turin-based platform engineering team in 2023."
+            "bio": "Engineer with a focus on monorepo tooling, typed APIs, and the ergonomics of long-lived codebases. Joined from a Turin-based platform engineering team in 2023.",
+            "photo": "/uploads/images/team-luca.webp"
           }
         },
         "tm-7": {
@@ -128,7 +141,8 @@
             "name": "Sarah Holm",
             "role": "Engineer",
             "specialty": "Full-stack · auth & permissions",
-            "bio": "Full-stack engineer with a specialty in auth and fine-grained permissions. Previously built IAM infrastructure at a compliance SaaS. The person you want on the account-security conversation."
+            "bio": "Full-stack engineer with a specialty in auth and fine-grained permissions. Previously built IAM infrastructure at a compliance SaaS. The person you want on the account-security conversation.",
+            "photo": "/uploads/images/team-sarah.webp"
           }
         },
         "tm-8": {
@@ -137,11 +151,21 @@
             "name": "Theo Laurent",
             "role": "Product Designer",
             "specialty": "Product design · research",
-            "bio": "Product designer with a research background. Runs the studio's early-stage discovery and user-research work. Writes design documentation your engineers will actually read."
+            "bio": "Product designer with a research background. Runs the studio's early-stage discovery and user-research work. Writes design documentation your engineers will actually read.",
+            "photo": "/uploads/images/team-theo.webp"
           }
         }
       },
-      "blocksOrder": ["tm-1", "tm-2", "tm-3", "tm-4", "tm-5", "tm-6", "tm-7", "tm-8"]
+      "blocksOrder": [
+        "tm-1",
+        "tm-2",
+        "tm-3",
+        "tm-4",
+        "tm-5",
+        "tm-6",
+        "tm-7",
+        "tm-8"
+      ]
     },
     "studio_stats": {
       "type": "key-figures",
@@ -197,7 +221,12 @@
           }
         }
       },
-      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+      "blocksOrder": [
+        "st-1",
+        "st-2",
+        "st-3",
+        "st-4"
+      ]
     },
     "studio_history": {
       "type": "timeline",
@@ -254,7 +283,13 @@
           }
         }
       },
-      "blocksOrder": ["sh-1", "sh-2", "sh-3", "sh-4", "sh-5"]
+      "blocksOrder": [
+        "sh-1",
+        "sh-2",
+        "sh-3",
+        "sh-4",
+        "sh-5"
+      ]
     },
     "team_cta": {
       "type": "action-bar",
@@ -287,18 +322,29 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["tc-heading", "tc-text", "tc-button"]
+      "blocksOrder": [
+        "tc-heading",
+        "tc-text",
+        "tc-button"
+      ]
     }
   },
-  "widgetsOrder": ["studio_intro", "team_grid", "studio_stats", "studio_history", "team_cta"],
+  "widgetsOrder": [
+    "studio_intro",
+    "team_grid",
+    "studio_stats",
+    "studio_history",
+    "team_cta"
+  ],
   "id": "team",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T11:33:30.989Z",
+  "updated": "2026-04-20T11:51:40.497Z"
 }

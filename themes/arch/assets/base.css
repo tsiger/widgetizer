@@ -671,11 +671,33 @@ b {
    -------------------------------------------------------------------------- */
 
 .w-rte {
+  & h2,
+  & h3,
+  & h4 {
+    margin-block: var(--space-lg) var(--space-sm);
+
+    &:first-child {
+      margin-block-start: 0;
+    }
+  }
+
   & p {
     margin-block-end: var(--space-md);
 
     &:last-child {
       margin-block-end: 0;
+    }
+  }
+
+  & img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-block: var(--space-lg);
+    border-radius: var(--radius-md);
+
+    &:first-child {
+      margin-block-start: 0;
     }
   }
 
@@ -982,11 +1004,20 @@ b {
   background-color: var(--bg-primary);
   border: var(--card-border);
   border-radius: var(--radius-md);
-  padding: calc(var(--space-lg) * var(--spacing-scale));
+  /* Card padding tracks the desktop column count, mirroring the grid gap: it
+     drops by --space-xs per column past 2, floored at --space-md (16px), so dense
+     grids don't waste card width on padding. Set --card-padding on a widget's
+     .widget-card to opt out and force a fixed value. */
+  --card-padding-auto: var(--space-lg);
+  padding: calc(var(--card-padding, var(--card-padding-auto)) * var(--spacing-scale));
   transition: border-color var(--transition-speed-normal);
 
   @media (min-width: 750px) {
-    padding: calc(var(--space-xl) * var(--spacing-scale));
+    --card-padding-auto: var(--space-xl);
+  }
+
+  @media (min-width: 990px) {
+    --card-padding-auto: max(var(--space-md), calc(var(--space-xl) - (var(--grid-cols-desktop, 2) - 2) * var(--space-xs)));
   }
 }
 
@@ -1042,6 +1073,13 @@ b {
   object-fit: cover;
   border-radius: var(--radius-md);
   margin-block-end: var(--space-lg);
+}
+
+/* Rounded corners: halve the card image's radius so the nested image doesn't
+   share the card's larger radius (the concentric-corners look). Sharp and
+   slightly-rounded keep --radius-md (0 / 6px). */
+.corner-rounded .widget-card-image {
+  border-radius: calc(var(--radius-md) / 2);
 }
 
 /* Card Icon */
@@ -2669,7 +2707,7 @@ b {
       inset-block-start: calc(100% - 0.4rem);
       inset-inline-start: 0;
       min-width: 22rem;
-      background-color: var(--color-white);
+      background-color: var(--bg-primary);
       border: var(--border-width-thin) solid var(--border-color);
       border-radius: var(--radius-md);
       max-height: none;
@@ -2737,7 +2775,7 @@ b {
         inset-block-start: -0.8rem;
         inset-inline-start: calc(100% - 0.4rem);
         min-width: 22rem;
-        background-color: var(--color-white);
+        background-color: var(--bg-primary);
         border: var(--border-width-thin) solid var(--border-color);
         border-radius: var(--radius-md);
         padding-block: var(--space-xs);

@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/hero-slide-2.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -32,7 +32,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "gallery": {
       "type": "project-showcase",
@@ -51,59 +54,90 @@
         "proj-1": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/project-courtyard.webp",
             "title": "Modern Courtyard — Pearl District",
             "description": "Minimalist courtyard with clean-lined planters, ornamental grasses, and a recirculating water feature.",
-            "link": { "text": "", "href": "", "target": "_self" }
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
           }
         },
         "proj-2": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/project-backyard.webp",
             "title": "Full Backyard Redesign — Alberta Arts",
             "description": "Multi-level deck, stone patio, fire pit, and lush border plantings on a 5,000 sqft residential lot.",
-            "link": { "text": "", "href": "", "target": "_self" }
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
           }
         },
         "proj-3": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/project-firepit.webp",
             "title": "Patio & Fire Pit — Lake Oswego",
             "description": "Flagstone patio with integrated seating wall, gas fire pit, and low-voltage landscape lighting.",
-            "link": { "text": "", "href": "", "target": "_self" }
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
           }
         },
         "proj-4": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/project-native.webp",
             "title": "Native Plant Garden — Sellwood",
             "description": "Pacific Northwest native species garden replacing a high-maintenance lawn. Ferns, salal, and Oregon grape.",
-            "link": { "text": "", "href": "", "target": "_self" }
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
           }
         },
         "proj-5": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/project-commercial.webp",
             "title": "Commercial Entry — Lloyd District",
             "description": "Professional landscape for a 4-story office building. Boxwood hedges, ornamental trees, and seasonal color beds.",
-            "link": { "text": "", "href": "", "target": "_self" }
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
           }
         },
         "proj-6": {
           "type": "project",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/project-retaining.webp",
             "title": "Retaining Wall & Terracing — West Hills",
             "description": "Engineered natural stone retaining wall system with tiered planting beds on a steep hillside property.",
-            "link": { "text": "", "href": "", "target": "_self" }
+            "link": {
+              "text": "",
+              "href": "",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["proj-1", "proj-2", "proj-3", "proj-4", "proj-5", "proj-6"]
+      "blocksOrder": [
+        "proj-1",
+        "proj-2",
+        "proj-3",
+        "proj-4",
+        "proj-5",
+        "proj-6"
+      ]
     },
     "before_after": {
       "type": "comparison-slider",
@@ -112,8 +146,8 @@
         "title": "Overgrown to Oasis",
         "description": "",
         "heading_alignment": "center",
-        "before_image": "",
-        "after_image": "",
+        "before_image": "/uploads/images/before-2.webp",
+        "after_image": "/uploads/images/after-2.webp",
         "before_label": "Before",
         "after_label": "After",
         "orientation": "horizontal",
@@ -151,18 +185,28 @@
             "link": {
               "text": "Schedule a Visit",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0e3a754c-6297-4860-a3ce-ddb1e518ff10"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "gallery", "before_after", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "gallery",
+    "before_after",
+    "cta"
+  ],
   "id": "portfolio",
-  "created": "2026-04-08T20:00:00.000Z",
-  "updated": "2026-04-08T20:00:00.000Z"
+  "created": "2026-04-16T15:55:26.878Z",
+  "updated": "2026-04-16T16:06:33.398Z"
 }

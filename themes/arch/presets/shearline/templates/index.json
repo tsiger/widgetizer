@@ -10,10 +10,11 @@
         "content_width": "medium",
         "alignment": "center",
         "vertical_alignment": "end",
-        "overlay_color": "#0a1e385e",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/hero.webp",
+        "overlay_color": "#0a1e385e"
       },
       "blocks": {
         "opener-eyebrow": {
@@ -60,7 +61,12 @@
           }
         }
       },
-      "blocksOrder": ["opener-eyebrow", "opener-heading", "opener-subtitle", "opener-buttons"]
+      "blocksOrder": [
+        "opener-eyebrow",
+        "opener-heading",
+        "opener-subtitle",
+        "opener-buttons"
+      ]
     },
     "home_services_teaser": {
       "type": "card-grid",
@@ -87,7 +93,8 @@
               "text": "See pricing",
               "href": "services.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-card-womens.webp"
           }
         },
         "svc-mens": {
@@ -99,7 +106,8 @@
               "text": "See pricing",
               "href": "services.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-card-mens.webp"
           }
         },
         "svc-single-color": {
@@ -111,7 +119,8 @@
               "text": "See pricing",
               "href": "services.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-card-color.webp"
           }
         },
         "svc-balayage": {
@@ -123,7 +132,8 @@
               "text": "See pricing",
               "href": "services.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-card-balayage.webp"
           }
         },
         "svc-treatments": {
@@ -135,7 +145,8 @@
               "text": "See pricing",
               "href": "services.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-card-treatments.webp"
           }
         },
         "svc-blowout": {
@@ -147,11 +158,19 @@
               "text": "See pricing",
               "href": "services.html",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-card-blowout.webp"
           }
         }
       },
-      "blocksOrder": ["svc-womens", "svc-mens", "svc-single-color", "svc-balayage", "svc-treatments", "svc-blowout"]
+      "blocksOrder": [
+        "svc-womens",
+        "svc-mens",
+        "svc-single-color",
+        "svc-balayage",
+        "svc-treatments",
+        "svc-blowout"
+      ]
     },
     "home_stylists": {
       "type": "profile-grid",
@@ -175,7 +194,8 @@
             "role": "Lead Stylist & Founder",
             "specialty": "Precision bobs, fringe, short cuts",
             "bio": "Twelve years at the chair, trained at a Vidal Sassoon academy. Rowan built Shearline around one idea — a cut that still looks good three weeks later.",
-            "instagram": "https://instagram.com/"
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-rowan.webp"
           }
         },
         "stylist-sloane": {
@@ -185,7 +205,8 @@
             "role": "Senior Colorist",
             "specialty": "Balayage, blonding, color correction",
             "bio": "Nine years specializing in color. Sloane is the person to book for balayage that grows out beautifully and for the rescues when someone else got it wrong.",
-            "instagram": "https://instagram.com/"
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-sloane.webp"
           }
         },
         "stylist-mara": {
@@ -195,7 +216,8 @@
             "role": "Stylist",
             "specialty": "Textured & curly hair, long layers",
             "bio": "Seven years focused on curly and textured hair — from defined coils to loose waves. If another stylist has told you your hair is hard to cut, book with Mara.",
-            "instagram": "https://instagram.com/"
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-mara.webp"
           }
         },
         "stylist-theo": {
@@ -205,11 +227,17 @@
             "role": "Stylist",
             "specialty": "Men's cuts, fades, beard work",
             "bio": "Eight years in men's grooming. Theo works the whole range — quiet executive cuts, skin fades, textured crops, and the beards that come with them.",
-            "instagram": "https://instagram.com/"
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-theo.webp"
           }
         }
       },
-      "blocksOrder": ["stylist-rowan", "stylist-sloane", "stylist-mara", "stylist-theo"]
+      "blocksOrder": [
+        "stylist-rowan",
+        "stylist-sloane",
+        "stylist-mara",
+        "stylist-theo"
+      ]
     },
     "home_recent_work": {
       "type": "masonry-gallery",
@@ -226,42 +254,88 @@
       "blocks": {
         "work-01": {
           "type": "item",
-          "settings": { "title": "Eliza", "category": "Short cut" }
+          "settings": {
+            "title": "Eliza",
+            "category": "Short cut",
+            "image": "/uploads/images/work-home-1.webp"
+          }
         },
         "work-02": {
           "type": "item",
-          "settings": { "title": "Nadia", "category": "Balayage" }
+          "settings": {
+            "title": "Nadia",
+            "category": "Balayage",
+            "image": "/uploads/images/work-home-2.webp"
+          }
         },
         "work-03": {
           "type": "item",
-          "settings": { "title": "Iris", "category": "Long & Lengths" }
+          "settings": {
+            "title": "Iris",
+            "category": "Long & Lengths",
+            "image": "/uploads/images/work-home-3.webp"
+          }
         },
         "work-04": {
           "type": "item",
-          "settings": { "title": "Marco", "category": "Men's" }
+          "settings": {
+            "title": "Marco",
+            "category": "Men's",
+            "image": "/uploads/images/work-home-5.webp"
+          }
         },
         "work-05": {
           "type": "item",
-          "settings": { "title": "Ayo", "category": "Textured" }
+          "settings": {
+            "title": "Ayo",
+            "category": "Textured",
+            "image": "/uploads/images/work-home-4.webp"
+          }
         },
         "work-06": {
           "type": "item",
-          "settings": { "title": "Juno", "category": "Color" }
+          "settings": {
+            "title": "Juno",
+            "category": "Color",
+            "image": "/uploads/images/work-home-6.webp"
+          }
         },
         "work-07": {
           "type": "item",
-          "settings": { "title": "Clara", "category": "Editorial" }
+          "settings": {
+            "title": "Clara",
+            "category": "Editorial",
+            "image": "/uploads/images/work-home-7.webp"
+          }
         },
         "work-08": {
           "type": "item",
-          "settings": { "title": "Dev", "category": "Men's" }
+          "settings": {
+            "title": "Dev",
+            "category": "Men's",
+            "image": "/uploads/images/work-home-8.webp"
+          }
         },
         "work-09": {
           "type": "item",
-          "settings": { "title": "Maren", "category": "Short cut" }
+          "settings": {
+            "title": "Maren",
+            "category": "Short cut",
+            "image": "/uploads/images/work-home-9.webp"
+          }
         }
       },
-      "blocksOrder": ["work-01", "work-02", "work-03", "work-04", "work-05", "work-06", "work-07", "work-08", "work-09"]
+      "blocksOrder": [
+        "work-01",
+        "work-02",
+        "work-03",
+        "work-04",
+        "work-05",
+        "work-06",
+        "work-07",
+        "work-08",
+        "work-09"
+      ]
     },
     "home_philosophy": {
       "type": "image-callout",
@@ -269,7 +343,8 @@
         "image_position": "start",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/philosophy-scene.webp"
       },
       "blocks": {
         "philosophy-eyebrow": {
@@ -310,7 +385,12 @@
           }
         }
       },
-      "blocksOrder": ["philosophy-eyebrow", "philosophy-heading", "philosophy-body", "philosophy-button"]
+      "blocksOrder": [
+        "philosophy-eyebrow",
+        "philosophy-heading",
+        "philosophy-body",
+        "philosophy-button"
+      ]
     },
     "home_voices": {
       "type": "testimonials",
@@ -353,7 +433,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-long-color", "quote-textured", "quote-mens"]
+      "blocksOrder": [
+        "quote-long-color",
+        "quote-textured",
+        "quote-mens"
+      ]
     },
     "home_closing": {
       "type": "action-bar",
@@ -391,11 +475,23 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-text", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-text",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["home_opener", "home_services_teaser", "home_stylists", "home_recent_work", "home_philosophy", "home_voices", "home_closing"],
+  "widgetsOrder": [
+    "home_opener",
+    "home_services_teaser",
+    "home_stylists",
+    "home_recent_work",
+    "home_philosophy",
+    "home_voices",
+    "home_closing"
+  ],
   "id": "index",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:28:19.006Z",
+  "updated": "2026-04-24T09:42:35.721Z"
 }

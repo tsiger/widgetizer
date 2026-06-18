@@ -224,11 +224,11 @@
               {% if block.settings.title != blank %}
                 <{{ current_heading_level }} class="w-title t-3xl" data-setting="title">{{ block.settings.title }}</{{ current_heading_level }}>
               {% endif %}
-              {% if block.settings.description != blank %}
+              {% unless block.settings.description | rte_blank %}
                 <div class="w-body w-rte" data-setting="description">
                   {{ block.settings.description | raw }}
                 </div>
-              {% endif %}
+              {% endunless %}
               {% if block.settings.button_link.text != blank %}
                 <div>
                   <a

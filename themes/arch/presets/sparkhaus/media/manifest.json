@@ -1,0 +1,403 @@
+{
+  "files": [
+    {
+      "filename": "contact-opener.webp",
+      "originalName": "contact-opener.webp",
+      "type": "image/webp",
+      "size": 87328,
+      "path": "/uploads/images/contact-opener.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Sparkhaus cleaner arriving at a Denver front door with a neatly organised supplies tote",
+      "title": "Arriving for your clean",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/contact-opener-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/contact-opener-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "team-tess.webp",
+      "originalName": "team-tess.webp",
+      "type": "image/webp",
+      "size": 13996,
+      "path": "/uploads/images/team-tess.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Tess Kowalski, lead cleaner for post-construction jobs at Sparkhaus",
+      "title": "Tess Kowalski",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-tess-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-chris.webp",
+      "originalName": "team-chris.webp",
+      "type": "image/webp",
+      "size": 17476,
+      "path": "/uploads/images/team-chris.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Chris Pham, lead cleaner for recurring clients at Sparkhaus",
+      "title": "Chris Pham",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-chris-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-daniela.webp",
+      "originalName": "team-daniela.webp",
+      "type": "image/webp",
+      "size": 19074,
+      "path": "/uploads/images/team-daniela.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Daniela Reyes, lead cleaner for deep cleans and move-in/out at Sparkhaus",
+      "title": "Daniela Reyes",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-daniela-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-amara.webp",
+      "originalName": "team-amara.webp",
+      "type": "image/webp",
+      "size": 13774,
+      "path": "/uploads/images/team-amara.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Amara Osei, founder and operations lead at Sparkhaus",
+      "title": "Amara Osei",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-amara-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-credibility.webp",
+      "originalName": "about-credibility.webp",
+      "type": "image/webp",
+      "size": 63108,
+      "path": "/uploads/images/about-credibility.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Neatly arranged Sparkhaus cleaning supplies — folded white service cloth, eco-friendly cleaner, blue rubber gloves, and insurance card on a pale worktop",
+      "title": "Professional, trade-ready supplies",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-credibility-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/about-credibility-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-founder.webp",
+      "originalName": "about-founder.webp",
+      "type": "image/webp",
+      "size": 42470,
+      "path": "/uploads/images/about-founder.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Amara Osei, founder of Sparkhaus, at her Denver desk reviewing a client schedule",
+      "title": "Amara Osei, founder",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-founder-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/about-founder-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "clean-postconstruction.webp",
+      "originalName": "clean-postconstruction.webp",
+      "type": "image/webp",
+      "size": 51544,
+      "path": "/uploads/images/clean-postconstruction.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Freshly renovated kitchen being wiped down after construction, with a HEPA vacuum visible",
+      "title": "Post-construction clean",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clean-postconstruction-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/clean-postconstruction-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/clean-postconstruction-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "clean-movein.webp",
+      "originalName": "clean-movein.webp",
+      "type": "image/webp",
+      "size": 29944,
+      "path": "/uploads/images/clean-movein.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Empty apartment with freshly mopped hardwood floors and open wiped cabinets, ready for move-in",
+      "title": "Move-in / out clean",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clean-movein-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/clean-movein-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/clean-movein-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "clean-deep.webp",
+      "originalName": "clean-deep.webp",
+      "type": "image/webp",
+      "size": 64674,
+      "path": "/uploads/images/clean-deep.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Close-up of a sparkling oven interior being wiped down with a microfibre cloth",
+      "title": "Deep clean",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clean-deep-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/clean-deep-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/clean-deep-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "clean-standard.webp",
+      "originalName": "clean-standard.webp",
+      "type": "image/webp",
+      "size": 78712,
+      "path": "/uploads/images/clean-standard.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Tidy living room with vacuum lines on the rug, folded throw and cleared coffee table",
+      "title": "Standard clean",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/clean-standard-medium.webp",
+          "width": 1024,
+          "height": 683
+        },
+        "small": {
+          "path": "/uploads/images/clean-standard-small.webp",
+          "width": 480,
+          "height": 320
+        },
+        "thumb": {
+          "path": "/uploads/images/clean-standard-thumb.webp",
+          "width": 150,
+          "height": 100
+        }
+      }
+    },
+    {
+      "filename": "after.webp",
+      "originalName": "after.webp",
+      "type": "image/webp",
+      "size": 73680,
+      "path": "/uploads/images/after.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Spotless kitchen after a Sparkhaus clean — clear counters, empty sink, gleaming stovetop",
+      "title": "After Sparkhaus cleaned",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/after-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/after-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/after-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "before.webp",
+      "originalName": "before.webp",
+      "type": "image/webp",
+      "size": 115400,
+      "path": "/uploads/images/before.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Lived-in kitchen before cleaning — dirty plates, coffee rings, breadcrumbs on the counter",
+      "title": "Before cleaning",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/before-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/before-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/before-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "home-hero.webp",
+      "originalName": "home-hero.webp",
+      "type": "image/webp",
+      "size": 214636,
+      "path": "/uploads/images/home-hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Sunlit, freshly cleaned living room with tall bay windows, a linen sofa, and a spring-green throw cushion",
+      "title": "Your home, fresh",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/home-hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/home-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "sparkhauslight.png",
+      "originalName": "sparkhaus_light.png",
+      "type": "image/png",
+      "size": 11518,
+      "path": "/uploads/images/sparkhauslight.png",
+      "width": 1020,
+      "height": 207,
+      "alt": "Sparkhaus logo on dark background — blue-to-green gradient house with light wordmark",
+      "title": "Sparkhaus (light)",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/sparkhauslight-small.png",
+          "width": 480,
+          "height": 97
+        },
+        "thumb": {
+          "path": "/uploads/images/sparkhauslight-thumb.png",
+          "width": 150,
+          "height": 30
+        }
+      }
+    },
+    {
+      "filename": "sparkhaus.png",
+      "originalName": "sparkhaus.png",
+      "type": "image/png",
+      "size": 17151,
+      "path": "/uploads/images/sparkhaus.png",
+      "width": 1020,
+      "height": 207,
+      "alt": "Sparkhaus logo — blue-to-green gradient house with slate wordmark",
+      "title": "Sparkhaus",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/sparkhaus-small.png",
+          "width": 480,
+          "height": 97
+        },
+        "thumb": {
+          "path": "/uploads/images/sparkhaus-thumb.png",
+          "width": 150,
+          "height": 30
+        }
+      }
+    }
+  ]
+}

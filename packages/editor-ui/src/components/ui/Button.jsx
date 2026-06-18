@@ -25,6 +25,7 @@ const Button = forwardRef(
       iconPosition = "left",
       loading = false,
       disabled = false,
+      type = "button",
       className = "",
       children,
       ...props
@@ -66,7 +67,7 @@ const Button = forwardRef(
       .join(" ");
 
     return (
-      <button ref={ref} className={buttonClass} disabled={disabled || loading} {...props}>
+      <button ref={ref} type={type} className={buttonClass} disabled={disabled || loading} {...props}>
         {loading && <LoadingSpinner />}
         {!loading && icon && iconPosition === "left" && icon}
         {children}
@@ -82,7 +83,7 @@ Button.displayName = "Button";
  * Icon-only button component
  */
 export const IconButton = forwardRef(
-  ({ variant = "neutral", size = "md", className = "", children, ...props }, ref) => {
+  ({ variant = "neutral", size = "md", type = "button", className = "", children, ...props }, ref) => {
     const variantClasses = {
       primary: "text-pink-600 hover:bg-pink-50 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)] focus:ring-pink-500",
       neutral: "text-gray-600 hover:bg-gray-100 hover:shadow-[0_2px_0_rgba(0,0,0,0.1)] focus:ring-pink-500",
@@ -105,7 +106,7 @@ export const IconButton = forwardRef(
       .join(" ");
 
     return (
-      <button ref={ref} className={buttonClass} {...props}>
+      <button ref={ref} type={type} className={buttonClass} {...props}>
         {children}
       </button>
     );

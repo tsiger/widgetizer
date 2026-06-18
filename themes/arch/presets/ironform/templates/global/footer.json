@@ -1,8 +1,8 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Ironform Personal Training. All rights reserved.</p>",
-    "layout": "first-featured",
+    "copyright": "© 2026 Ironform Personal Training. All rights reserved.",
+    "layout": "equal",
     "color_scheme": "highlight-secondary"
   },
   "blocks": {
@@ -10,7 +10,9 @@
       "type": "logo_text",
       "settings": {
         "logo_text": "Ironform",
-        "text": "<p>Private personal training and online coaching. Built for people serious about change.</p>"
+        "text": "<p>Private personal training and online coaching. Built for people serious about change.</p>",
+        "logo": "/uploads/images/ironform-logo-light.png",
+        "logo_width": 190
       }
     },
     "text_block_1": {
@@ -24,7 +26,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Quick Links",
-        "menu": "footer-menu"
+        "menu": "71e1d6b3-33c7-480a-a5de-c65fd1d44573"
       }
     },
     "social_block_1": {
@@ -34,5 +36,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

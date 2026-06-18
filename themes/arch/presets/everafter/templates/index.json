@@ -13,15 +13,10 @@
         "overlay_color": "#1a14128a",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-hero.webp"
       },
       "blocks": {
-        "hero-rating": {
-          "type": "rating",
-          "settings": {
-            "rating": "5"
-          }
-        },
         "hero-eyebrow": {
           "type": "text",
           "settings": {
@@ -51,14 +46,27 @@
             "link": {
               "text": "Begin an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "style": "primary",
             "size": "large"
           }
+        },
+        "block_abf332d4-4a1b-4d48-8c52-51d7308309e5": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
         }
       },
-      "blocksOrder": ["hero-rating", "hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+      "blocksOrder": [
+        "block_abf332d4-4a1b-4d48-8c52-51d7308309e5",
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
     },
     "press_strip": {
       "type": "trust-bar",
@@ -106,7 +114,12 @@
           }
         }
       },
-      "blocksOrder": ["press-1", "press-2", "press-3", "press-4"]
+      "blocksOrder": [
+        "press-1",
+        "press-2",
+        "press-3",
+        "press-4"
+      ]
     },
     "approach": {
       "type": "image-text",
@@ -116,7 +129,8 @@
         "content_color_scheme": "none",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-approach.webp"
       },
       "blocks": {
         "approach-eyebrow": {
@@ -148,14 +162,20 @@
             "link": {
               "text": "Meet the studio",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d9aea695-be94-429c-b758-4a027e86c258"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["approach-eyebrow", "approach-heading", "approach-text", "approach-button"]
+      "blocksOrder": [
+        "approach-eyebrow",
+        "approach-heading",
+        "approach-text",
+        "approach-button"
+      ]
     },
     "services_tease": {
       "type": "icon-card-grid",
@@ -183,7 +203,12 @@
             "icon": "sparkles",
             "subtitle": "From $18,000",
             "title": "Full-service design & planning",
-            "description": "<p>From the first conversation to the last goodbye. Full creative direction, vendor curation, month-by-month planning, and flawless day-of execution — twelve months of careful work, co-authored with you.</p>"
+            "description": "<p>From the first conversation to the last goodbye. Full creative direction, vendor curation, month-by-month planning, and flawless day-of execution — twelve months of careful work, co-authored with you.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "tier-2": {
@@ -192,7 +217,12 @@
             "icon": "puzzle",
             "subtitle": "From $7,500",
             "title": "Partial planning",
-            "description": "<p>For couples who've started the work and want a studio to lift the design, shape the vendor team, and own the final stretch. Design direction, curation, and month-by-month support for the last six months.</p>"
+            "description": "<p>For couples who've started the work and want a studio to lift the design, shape the vendor team, and own the final stretch. Design direction, curation, and month-by-month support for the last six months.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "tier-3": {
@@ -201,11 +231,20 @@
             "icon": "calendar-event",
             "subtitle": "From $3,500",
             "title": "Day-of coordination",
-            "description": "<p>You've done the planning. We take the reins the month before — timeline, vendor confirmations, logistics — and run the day itself, so you don't lift a finger when it arrives.</p>"
+            "description": "<p>You've done the planning. We take the reins the month before — timeline, vendor confirmations, logistics — and run the day itself, so you don't lift a finger when it arrives.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["tier-1", "tier-2", "tier-3"]
+      "blocksOrder": [
+        "tier-1",
+        "tier-2",
+        "tier-3"
+      ]
     },
     "portfolio_tease": {
       "type": "masonry-gallery",
@@ -227,75 +266,96 @@
           "type": "item",
           "settings": {
             "title": "Rose & Daniel",
-            "category": "Stone Barns · June 2025"
+            "category": "Stone Barns · June 2025",
+            "image": "/uploads/images/portfolio-01.webp"
           }
         },
         "gal-2": {
           "type": "item",
           "settings": {
             "title": "Mei & Arjun",
-            "category": "Windham Peak · September 2024"
+            "category": "Windham Peak · September 2024",
+            "image": "/uploads/images/portfolio-02.webp"
           }
         },
         "gal-3": {
           "type": "item",
           "settings": {
             "title": "Elena & Tomás",
-            "category": "Tuscany · May 2024"
+            "category": "Tuscany · May 2024",
+            "image": "/uploads/images/portfolio-03.webp"
           }
         },
         "gal-4": {
           "type": "item",
           "settings": {
             "title": "Hannah & Ben",
-            "category": "Private residence · October 2024"
+            "category": "Private residence · October 2024",
+            "image": "/uploads/images/portfolio-05.webp"
           }
         },
         "gal-5": {
           "type": "item",
           "settings": {
             "title": "Cora & Ian",
-            "category": "Kaaterskill · August 2023"
+            "category": "Kaaterskill · August 2023",
+            "image": "/uploads/images/portfolio-06.webp"
           }
         },
         "gal-6": {
           "type": "item",
           "settings": {
             "title": "Sofia & Lucas",
-            "category": "Hudson River · July 2024"
+            "category": "Hudson River · July 2024",
+            "image": "/uploads/images/portfolio-04.webp"
           }
         },
         "gal-7": {
           "type": "item",
           "settings": {
             "title": "Naomi & Vihaan",
-            "category": "Catskill farm · September 2023"
+            "category": "Catskill farm · September 2023",
+            "image": "/uploads/images/portfolio-09.webp"
           }
         },
         "gal-8": {
           "type": "item",
           "settings": {
             "title": "Bea & Jasper",
-            "category": "Rhinebeck · October 2023"
+            "category": "Rhinebeck · October 2023",
+            "image": "/uploads/images/portfolio-08.webp"
           }
         },
         "gal-9": {
           "type": "item",
           "settings": {
             "title": "Lin & Matteo",
-            "category": "Amalfi · June 2023"
+            "category": "Amalfi · June 2023",
+            "image": "/uploads/images/portfolio-07.webp"
           }
         }
       },
-      "blocksOrder": ["gal-1", "gal-2", "gal-3", "gal-4", "gal-5", "gal-6", "gal-7", "gal-8", "gal-9"]
+      "blocksOrder": [
+        "gal-1",
+        "gal-2",
+        "gal-3",
+        "gal-4",
+        "gal-5",
+        "gal-6",
+        "gal-7",
+        "gal-8",
+        "gal-9"
+      ]
     },
     "client_quote": {
       "type": "testimonial-hero",
       "settings": {
-        "image_position": "start",
+        "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "logo": "/uploads/images/portfolio-09.webp",
+        "author_image": "/uploads/images/home-testimonial.webp"
       },
       "blocks": {
         "q-label": {
@@ -323,7 +383,11 @@
           }
         }
       },
-      "blocksOrder": ["q-label", "q-heading", "q-attrib"]
+      "blocksOrder": [
+        "q-label",
+        "q-heading",
+        "q-attrib"
+      ]
     },
     "process": {
       "type": "steps",
@@ -367,7 +431,12 @@
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -400,14 +469,19 @@
             "link": {
               "text": "Begin an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -421,6 +495,6 @@
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T09:47:37.543Z",
+  "updated": "2026-04-20T10:40:54.114Z"
 }

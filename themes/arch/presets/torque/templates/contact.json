@@ -13,7 +13,8 @@
         "overlay_color": "#121722cc",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/contact-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -42,7 +43,11 @@
           }
         }
       },
-      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
     },
     "details": {
       "type": "contact-details",
@@ -85,7 +90,12 @@
           }
         }
       },
-      "blocksOrder": ["cd-book", "cd-phone", "cd-hours", "cd-shop"]
+      "blocksOrder": [
+        "cd-book",
+        "cd-phone",
+        "cd-hours",
+        "cd-shop"
+      ]
     },
     "shop_map": {
       "type": "map",
@@ -112,7 +122,9 @@
           }
         }
       },
-      "blocksOrder": ["info-shop"]
+      "blocksOrder": [
+        "info-shop"
+      ]
     },
     "booking_faqs": {
       "type": "accordion",
@@ -173,7 +185,14 @@
           }
         }
       },
-      "blocksOrder": ["bf-1", "bf-2", "bf-3", "bf-4", "bf-5", "bf-sidebar"]
+      "blocksOrder": [
+        "bf-1",
+        "bf-2",
+        "bf-3",
+        "bf-4",
+        "bf-5",
+        "bf-sidebar"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -219,7 +238,11 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -230,6 +253,6 @@
     "closing_cta"
   ],
   "id": "contact",
-  "created": "2026-04-21T12:00:00.000Z",
-  "updated": "2026-04-21T12:00:00.000Z"
+  "created": "2026-04-21T13:01:43.945Z",
+  "updated": "2026-04-21T13:27:44.466Z"
 }

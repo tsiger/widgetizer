@@ -63,7 +63,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Understanding setting properties and behaviors
 - Implementing CSS variable output
 
-**Key topics**: Setting types (color, text, range, select, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys)
+**Key topics**: Setting types (color, text, range, select, date, gallery, table, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle` / `usedAsDate`)
 
 ---
 
@@ -128,7 +128,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Reviewing protection against common vulnerabilities
 - Configuring the application for a production environment
 
-**Key topics**: Input Validation, HTTP Security Headers, CORS, SVG Sanitization, Global Error Handling, Project-Switch Isolation, cross-tenant safety contract (resolver authz, isolation guards, DoS limit keys + 413, tenant SVG sanitization, postMessage origin scoping, liquidjs floor), Environment Configuration
+**Key topics**: Input Validation, HTTP Security Headers, CORS, SVG Sanitization, Global Error Handling, Project-Switch Isolation, cross-tenant safety contract (resolver authz, isolation guards, DoS limit keys + 413, tenant SVG sanitization, postMessage origin scoping, liquidjs floor), Link & URL safety (`sanitizeHref` / `safe_url` filter, image-path allowlist, default button type), Environment Configuration
 
 ---
 
@@ -186,6 +186,20 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[core-collections.md](core-collections.md)** - Collections (CMS) System
+
+**Purpose**: Theme-defined content types (News, Projects, Services, …) with managed items and optional per-item pages **When to use**:
+
+- Authoring or understanding collection-type schemas (fields, `slugPrefix`, `hasItemPages`, `usedAsTitle` / `usedAsDate`)
+- Working with the scope-first `collectionService` and the collection routes
+- Using the `| collection` Liquid filter in templates
+- Understanding item-page depth prefixing, SEO, and export output
+- Tracing collection limits and tenant isolation
+
+**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix` / `prefixInternalHref`), per-item SEO, export output, `MAX_COLLECTION_ITEMS` / `MAX_COLLECTIONS`, sanitization, item preview
+
+---
+
 ### **[core-page-editor.md](core-page-editor.md)** - Visual Page Editor
 
 **Purpose**: Central page editing interface and component orchestration **When to use**:
@@ -224,7 +238,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Managing media library interfaces
 - Understanding usage tracking and deletion protection
 
-**Key topics**: File storage (images and file assets), metadata management, upload workflows, thumbnail generation, bulk operations, usage tracking (with recursive link scanning), deletion protection, file setting input, Copy URL
+**Key topics**: File storage (images, file assets, MP3 audio), metadata management, upload workflows, thumbnail generation, byte-range (HTTP 206) streaming for audio/video, bulk operations, usage tracking (with recursive link scanning), deletion protection, file setting input, Copy URL
 
 ---
 
@@ -344,7 +358,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **Theme Developers**
 
-Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md`, `theme-presets.md` Secondary: `core-export.md`, `core-menus.md`
+Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md`, `theme-presets.md` Secondary: `core-export.md`, `core-menus.md`, `core-collections.md`
 
 ### **Frontend Developers**
 
@@ -360,7 +374,7 @@ Primary docs: `theming.md`, `core-projects.md`, `core-hooks.md`, `core-architect
 
 ### **Content Managers / End-Users**
 
-Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`, `core-menus.md`
+Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`, `core-menus.md`, `core-collections.md`
 
 ---
 

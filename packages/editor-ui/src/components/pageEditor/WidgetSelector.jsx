@@ -1,11 +1,20 @@
 import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
-import { ImageOff, Search } from "lucide-react";
+import { ClipboardPaste, ImageOff, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { API_URL } from "../../lib/config";
 import { getActiveProjectId } from "../../lib/activeProjectId";
 
-export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelectWidget, position, triggerRef }) {
+export default function WidgetSelector({
+  isOpen,
+  onClose,
+  widgetSchemas,
+  onSelectWidget,
+  hasClipboard = false,
+  onPasteWidget,
+  position,
+  triggerRef,
+}) {
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
   const dropdownRef = useRef(null);
@@ -221,6 +230,20 @@ export default function WidgetSelector({ isOpen, onClose, widgetSchemas, onSelec
               />
             </div>
           </div>
+
+          {hasClipboard && onPasteWidget && (
+            <button
+              type="button"
+              className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm font-medium text-pink-600 border-b border-slate-100 hover:bg-pink-50 transition-colors"
+              onClick={() => {
+                onPasteWidget(position);
+                onClose();
+              }}
+            >
+              <ClipboardPaste size={14} />
+              <span>{t("pageEditor.actions.pasteWidget")}</span>
+            </button>
+          )}
 
           <div ref={listRef} id="widget-selector-list" className="max-h-64 overflow-y-auto" role="listbox">
             {filteredWidgets.length > 0 ? (

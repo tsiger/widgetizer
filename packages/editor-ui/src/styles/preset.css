@@ -50,7 +50,7 @@
   }
 
   .form-label-required::after {
-    @apply text-red-500 ml-1;
+    @apply text-pink-500 ml-1;
     content: "*";
   }
 

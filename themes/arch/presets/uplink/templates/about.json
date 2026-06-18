@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/hero1.webp"
       },
       "blocks": {
         "intro_eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["intro_eyebrow", "intro_heading", "intro_text"]
+      "blocksOrder": [
+        "intro_eyebrow",
+        "intro_heading",
+        "intro_text"
+      ]
     },
     "about_story": {
       "type": "image-text",
@@ -51,7 +56,8 @@
         "color_scheme": "standard-primary",
         "content_color_scheme": "none",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-story.webp"
       },
       "blocks": {
         "story_eyebrow": {
@@ -80,7 +86,11 @@
           }
         }
       },
-      "blocksOrder": ["story_eyebrow", "story_heading", "story_body"]
+      "blocksOrder": [
+        "story_eyebrow",
+        "story_heading",
+        "story_body"
+      ]
     },
     "about_team": {
       "type": "profile-grid",
@@ -105,7 +115,8 @@
             "name": "Marcus Whitfield",
             "role": "Founder & Principal",
             "specialty": "Network & security architecture",
-            "bio": "Seventeen years in managed IT. Still the one on the other end of the line when something is genuinely on fire."
+            "bio": "Seventeen years in managed IT. Still the one on the other end of the line when something is genuinely on fire.",
+            "photo": "/uploads/images/team-founder-1.webp"
           }
         },
         "profile_2": {
@@ -114,7 +125,8 @@
             "name": "Nadia Saleh",
             "role": "Operations Lead",
             "specialty": "Client success & onboarding",
-            "bio": "Runs the engagement side of every account. Translates between engineers and office managers for a living."
+            "bio": "Runs the engagement side of every account. Translates between engineers and office managers for a living.",
+            "photo": "/uploads/images/team-founder-2.webp"
           }
         },
         "profile_3": {
@@ -123,7 +135,8 @@
             "name": "Owen Pritchard",
             "role": "Senior Systems Engineer",
             "specialty": "Microsoft 365 & Azure",
-            "bio": "Microsoft Certified Solutions Expert. Migrations, identity, and the kind of Intune policy that doesn't lock you out."
+            "bio": "Microsoft Certified Solutions Expert. Migrations, identity, and the kind of Intune policy that doesn't lock you out.",
+            "photo": "/uploads/images/team-engineer-1.webp"
           }
         },
         "profile_4": {
@@ -132,7 +145,8 @@
             "name": "Yuki Tanaka",
             "role": "Security Engineer",
             "specialty": "EDR, email filtering, awareness training",
-            "bio": "Handles the security stack and the insurance-renewal evidence packets. Calm when things go sideways."
+            "bio": "Handles the security stack and the insurance-renewal evidence packets. Calm when things go sideways.",
+            "photo": "/uploads/images/team-engineer-2.webp"
           }
         },
         "profile_5": {
@@ -141,7 +155,8 @@
             "name": "Darius Coleman",
             "role": "Helpdesk Lead",
             "specialty": "End-user support & triage",
-            "bio": "Runs the helpdesk queue and the fifteen-minute SLA. Nine out of ten tickets never touch an engineer."
+            "bio": "Runs the helpdesk queue and the fifteen-minute SLA. Nine out of ten tickets never touch an engineer.",
+            "photo": "/uploads/images/team-support-1.webp"
           }
         },
         "profile_6": {
@@ -150,11 +165,19 @@
             "name": "Ines Marchetti",
             "role": "Field Engineer",
             "specialty": "Networking & hardware",
-            "bio": "On-site work — switch refreshes, office relocations, cabling. Does the kind of install where the cable tray is still neat a year later."
+            "bio": "On-site work — switch refreshes, office relocations, cabling. Does the kind of install where the cable tray is still neat a year later.",
+            "photo": "/uploads/images/team-support-2.webp"
           }
         }
       },
-      "blocksOrder": ["profile_1", "profile_2", "profile_3", "profile_4", "profile_5", "profile_6"]
+      "blocksOrder": [
+        "profile_1",
+        "profile_2",
+        "profile_3",
+        "profile_4",
+        "profile_5",
+        "profile_6"
+      ]
     },
     "about_certs": {
       "type": "logo-cloud",
@@ -177,46 +200,83 @@
           "type": "logo",
           "settings": {
             "name": "Microsoft Solutions Partner",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo1.png"
           }
         },
         "cert_cisco": {
           "type": "logo",
           "settings": {
             "name": "Cisco Meraki Partner",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo2.png"
           }
         },
         "cert_fortinet": {
           "type": "logo",
           "settings": {
             "name": "Fortinet Partner",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo3.png"
           }
         },
         "cert_sentinel": {
           "type": "logo",
           "settings": {
             "name": "SentinelOne Partner",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo4.png"
           }
         },
         "cert_comptia": {
           "type": "logo",
           "settings": {
             "name": "CompTIA Network+ & Security+",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo5.png"
           }
         },
         "cert_google": {
           "type": "logo",
           "settings": {
             "name": "Google Workspace Partner",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo6.png"
           }
         }
       },
-      "blocksOrder": ["cert_ms", "cert_cisco", "cert_fortinet", "cert_sentinel", "cert_comptia", "cert_google"]
+      "blocksOrder": [
+        "cert_ms",
+        "cert_cisco",
+        "cert_fortinet",
+        "cert_sentinel",
+        "cert_comptia",
+        "cert_google"
+      ]
     },
     "about_values": {
       "type": "split-content",
@@ -301,7 +361,16 @@
           }
         }
       },
-      "blocksOrder": ["values_eyebrow", "values_heading", "values_1_title", "values_1_body", "values_2_title", "values_2_body", "values_3_title", "values_3_body"]
+      "blocksOrder": [
+        "values_eyebrow",
+        "values_heading",
+        "values_1_title",
+        "values_1_body",
+        "values_2_title",
+        "values_2_body",
+        "values_3_title",
+        "values_3_body"
+      ]
     },
     "about_testimonial": {
       "type": "testimonial-hero",
@@ -309,7 +378,9 @@
         "image_position": "start",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "logo": "",
+        "author_image": "/uploads/images/testimonial-about.webp"
       },
       "blocks": {
         "testimonial_quote": {
@@ -338,7 +409,11 @@
           }
         }
       },
-      "blocksOrder": ["testimonial_quote", "testimonial_name", "testimonial_role"]
+      "blocksOrder": [
+        "testimonial_quote",
+        "testimonial_name",
+        "testimonial_role"
+      ]
     },
     "about_closing": {
       "type": "banner",
@@ -375,18 +450,31 @@
             "link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["closing_heading", "closing_text", "closing_button"]
+      "blocksOrder": [
+        "closing_heading",
+        "closing_text",
+        "closing_button"
+      ]
     }
   },
-  "widgetsOrder": ["about_intro", "about_story", "about_team", "about_certs", "about_values", "about_testimonial", "about_closing"],
+  "widgetsOrder": [
+    "about_intro",
+    "about_story",
+    "about_team",
+    "about_certs",
+    "about_values",
+    "about_testimonial",
+    "about_closing"
+  ],
   "id": "about",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T11:30:26.675Z",
+  "updated": "2026-04-23T12:20:40.850Z"
 }

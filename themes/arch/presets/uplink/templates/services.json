@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/banner-services.webp"
       },
       "blocks": {
         "intro_eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["intro_eyebrow", "intro_heading", "intro_text"]
+      "blocksOrder": [
+        "intro_eyebrow",
+        "intro_heading",
+        "intro_text"
+      ]
     },
     "services_pillars": {
       "type": "image-tabs",
@@ -62,39 +67,50 @@
           "type": "tab",
           "settings": {
             "title": "Helpdesk",
-            "description": "<p>A named team your staff can call, chat, or email — answered inside fifteen minutes during business hours, with after-hours escalation for outages. We triage, resolve, and document every ticket so you have a real record of what happened.</p>"
+            "description": "<p>A named team your staff can call, chat, or email — answered inside fifteen minutes during business hours, with after-hours escalation for outages. We triage, resolve, and document every ticket so you have a real record of what happened.</p>",
+            "image": "/uploads/images/service-helpdesk.webp"
           }
         },
         "tab_networking": {
           "type": "tab",
           "settings": {
             "title": "Managed networking",
-            "description": "<p>Switches, access points, firewalls, and VPN — procured, configured, monitored, and patched. We run the LAN as a single managed system with real-time alerts instead of a pile of vendor portals.</p>"
+            "description": "<p>Switches, access points, firewalls, and VPN — procured, configured, monitored, and patched. We run the LAN as a single managed system with real-time alerts instead of a pile of vendor portals.</p>",
+            "image": "/uploads/images/service-networking.webp"
           }
         },
         "tab_security": {
           "type": "tab",
           "settings": {
             "title": "Cybersecurity",
-            "description": "<p>Endpoint detection, email filtering, multi-factor enforcement, security awareness training, and quarterly vulnerability reviews. Aligned to the controls your cyber-insurance renewal is going to ask about.</p>"
+            "description": "<p>Endpoint detection, email filtering, multi-factor enforcement, security awareness training, and quarterly vulnerability reviews. Aligned to the controls your cyber-insurance renewal is going to ask about.</p>",
+            "image": "/uploads/images/service-security.webp"
           }
         },
         "tab_cloud": {
           "type": "tab",
           "settings": {
             "title": "Cloud & productivity",
-            "description": "<p>Microsoft 365 or Google Workspace — identity, licensing, SharePoint or Drive, and Intune or MDM device enrollment. Migrations handled in stages so nobody loses access to their inbox mid-week.</p>"
+            "description": "<p>Microsoft 365 or Google Workspace — identity, licensing, SharePoint or Drive, and Intune or MDM device enrollment. Migrations handled in stages so nobody loses access to their inbox mid-week.</p>",
+            "image": "/uploads/images/service-cloud.webp"
           }
         },
         "tab_backup": {
           "type": "tab",
           "settings": {
             "title": "Backup & disaster recovery",
-            "description": "<p>Backups of workstations, servers, and cloud mailboxes, tested on a schedule — not just configured and forgotten. Documented recovery runbooks so a ransomware event turns into a rebuild, not a ransom.</p>"
+            "description": "<p>Backups of workstations, servers, and cloud mailboxes, tested on a schedule — not just configured and forgotten. Documented recovery runbooks so a ransomware event turns into a rebuild, not a ransom.</p>",
+            "image": "/uploads/images/service-backup.webp"
           }
         }
       },
-      "blocksOrder": ["tab_helpdesk", "tab_networking", "tab_security", "tab_cloud", "tab_backup"]
+      "blocksOrder": [
+        "tab_helpdesk",
+        "tab_networking",
+        "tab_security",
+        "tab_cloud",
+        "tab_backup"
+      ]
     },
     "services_included": {
       "type": "numbered-service-list",
@@ -147,7 +163,13 @@
           }
         }
       },
-      "blocksOrder": ["inc_monitoring", "inc_patching", "inc_assets", "inc_review", "inc_vcio"]
+      "blocksOrder": [
+        "inc_monitoring",
+        "inc_patching",
+        "inc_assets",
+        "inc_review",
+        "inc_vcio"
+      ]
     },
     "services_industries": {
       "type": "logo-cloud",
@@ -170,46 +192,83 @@
           "type": "logo",
           "settings": {
             "name": "Meridian Professional Services",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo1.png"
           }
         },
         "logo_2": {
           "type": "logo",
           "settings": {
             "name": "Arbor Dental Group",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo2.png"
           }
         },
         "logo_3": {
           "type": "logo",
           "settings": {
             "name": "Holloway & Reed LLP",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo3.png"
           }
         },
         "logo_4": {
           "type": "logo",
           "settings": {
             "name": "Northbrook Nonprofit Alliance",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo4.png"
           }
         },
         "logo_5": {
           "type": "logo",
           "settings": {
             "name": "Cedar Creek Imaging",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo5.png"
           }
         },
         "logo_6": {
           "type": "logo",
           "settings": {
             "name": "Fairlane Architects",
-            "link": { "href": "", "text": "", "target": "_self" }
+            "link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            },
+            "image": "/uploads/images/logo6.png"
           }
         }
       },
-      "blocksOrder": ["logo_1", "logo_2", "logo_3", "logo_4", "logo_5", "logo_6"]
+      "blocksOrder": [
+        "logo_1",
+        "logo_2",
+        "logo_3",
+        "logo_4",
+        "logo_5",
+        "logo_6"
+      ]
     },
     "services_faq": {
       "type": "accordion",
@@ -270,17 +329,24 @@
           }
         }
       },
-      "blocksOrder": ["faq_sidebar", "faq_1", "faq_2", "faq_3", "faq_4", "faq_5"]
+      "blocksOrder": [
+        "faq_sidebar",
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_4",
+        "faq_5"
+      ]
     },
     "services_closing": {
       "type": "banner",
       "settings": {
-        "height": "medium",
+        "height": "auto",
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "center",
         "vertical_alignment": "center",
-        "color_scheme": "highlight-primary",
+        "color_scheme": "highlight-secondary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"
       },
@@ -307,18 +373,30 @@
             "link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["closing_heading", "closing_text", "closing_button"]
+      "blocksOrder": [
+        "closing_heading",
+        "closing_text",
+        "closing_button"
+      ]
     }
   },
-  "widgetsOrder": ["services_intro", "services_pillars", "services_included", "services_industries", "services_faq", "services_closing"],
+  "widgetsOrder": [
+    "services_intro",
+    "services_pillars",
+    "services_included",
+    "services_industries",
+    "services_faq",
+    "services_closing"
+  ],
   "id": "services",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T11:30:26.689Z",
+  "updated": "2026-04-23T12:51:05.436Z"
 }

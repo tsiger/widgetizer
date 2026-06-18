@@ -1,0 +1,609 @@
+{
+  "files": [
+    {
+      "filename": "logo.png",
+      "originalName": "logo.png",
+      "type": "image/png",
+      "size": 3532,
+      "path": "/uploads/images/logo.png",
+      "width": 516,
+      "height": 106,
+      "alt": "Saffron logo wordmark in gold",
+      "title": "Saffron logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/logo-small.png",
+          "width": 480,
+          "height": 99
+        },
+        "thumb": {
+          "path": "/uploads/images/logo-thumb.png",
+          "width": 150,
+          "height": 31
+        }
+      }
+    },
+    {
+      "filename": "private-event.webp",
+      "originalName": "private-event.webp",
+      "type": "image/webp",
+      "size": 43988,
+      "path": "/uploads/images/private-event.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Intimate candlelit dining table set with flowers and place settings for a private event",
+      "title": "Private events",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/private-event-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/private-event-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-chefs-table.webp",
+      "originalName": "space-chefs-table.webp",
+      "type": "image/webp",
+      "size": 54680,
+      "path": "/uploads/images/space-chefs-table.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Chef's table facing an open kitchen with brass pendant lights and plated courses",
+      "title": "Chef's table",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-chefs-table-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-chefs-table-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-private-dining.webp",
+      "originalName": "space-private-dining.webp",
+      "type": "image/webp",
+      "size": 29648,
+      "path": "/uploads/images/space-private-dining.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Private dining room with a long table, candlelit place settings, and framed art",
+      "title": "Private dining room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-private-dining-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-private-dining-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-patio.webp",
+      "originalName": "space-patio.webp",
+      "type": "image/webp",
+      "size": 131296,
+      "path": "/uploads/images/space-patio.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Intimate outdoor patio with string lights, bistro tables, and plants at blue hour",
+      "title": "The patio",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-patio-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-patio-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-bar.webp",
+      "originalName": "space-bar.webp",
+      "type": "image/webp",
+      "size": 50374,
+      "path": "/uploads/images/space-bar.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Mahogany bar with backlit spirit shelves, pendant lights, and two cocktails on the counter",
+      "title": "The bar",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-bar-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-bar-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-kitchen.webp",
+      "originalName": "space-kitchen.webp",
+      "type": "image/webp",
+      "size": 55118,
+      "path": "/uploads/images/space-kitchen.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Open kitchen with chefs working over an open flame range and stainless prep counter",
+      "title": "Open kitchen",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-kitchen-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-kitchen-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-dining-room.webp",
+      "originalName": "space-dining-room.webp",
+      "type": "image/webp",
+      "size": 50268,
+      "path": "/uploads/images/space-dining-room.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Warm dining room with brick walls, Edison pendant lights, and wood tables at dusk",
+      "title": "Dining room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-dining-room-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-dining-room-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "food-chocolate-fondant.webp",
+      "originalName": "food-chocolate-fondant.webp",
+      "type": "image/webp",
+      "size": 70000,
+      "path": "/uploads/images/food-chocolate-fondant.webp",
+      "width": 800,
+      "height": 992,
+      "alt": "Warm chocolate fondant with molten center and caramel-drizzled vanilla ice cream",
+      "title": "Chocolate fondant",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/food-chocolate-fondant-small.webp",
+          "width": 480,
+          "height": 595
+        },
+        "thumb": {
+          "path": "/uploads/images/food-chocolate-fondant-thumb.webp",
+          "width": 150,
+          "height": 186
+        }
+      }
+    },
+    {
+      "filename": "food-pappardelle.webp",
+      "originalName": "food-pappardelle.webp",
+      "type": "image/webp",
+      "size": 106814,
+      "path": "/uploads/images/food-pappardelle.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Pappardelle with slow-braised beef ragù and shaved parmesan in a terracotta bowl",
+      "title": "Pappardelle al ragù",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/food-pappardelle-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/food-pappardelle-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "food-cocktails.webp",
+      "originalName": "food-cocktails.webp",
+      "type": "image/webp",
+      "size": 73646,
+      "path": "/uploads/images/food-cocktails.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Two crystal cocktails — an old fashioned and a citrus coupe — on a dark bar",
+      "title": "Cocktails",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/food-cocktails-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/food-cocktails-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "food-lamb-shank.webp",
+      "originalName": "food-lamb-shank.webp",
+      "type": "image/webp",
+      "size": 118510,
+      "path": "/uploads/images/food-lamb-shank.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Braised lamb shank over polenta with carrots and pearl onions in a rustic bowl",
+      "title": "Braised lamb shank",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/food-lamb-shank-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/food-lamb-shank-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "food-halibut.webp",
+      "originalName": "food-halibut.webp",
+      "type": "image/webp",
+      "size": 53812,
+      "path": "/uploads/images/food-halibut.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Pan-seared halibut over saffron risotto with charred onion and caper butter",
+      "title": "Halibut with saffron risotto",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/food-halibut-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/food-halibut-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "food-beet-burrata.webp",
+      "originalName": "food-beet-burrata.webp",
+      "type": "image/webp",
+      "size": 87486,
+      "path": "/uploads/images/food-beet-burrata.webp",
+      "width": 800,
+      "height": 992,
+      "alt": "Roasted beet and burrata plated on a slate board with walnuts and herbs",
+      "title": "Beet & burrata",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/food-beet-burrata-small.webp",
+          "width": 480,
+          "height": 595
+        },
+        "thumb": {
+          "path": "/uploads/images/food-beet-burrata-thumb.webp",
+          "width": 150,
+          "height": 186
+        }
+      }
+    },
+    {
+      "filename": "gallery-hero.webp",
+      "originalName": "gallery-hero.webp",
+      "type": "image/webp",
+      "size": 324374,
+      "path": "/uploads/images/gallery-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Overhead view of a rustic wooden table set with wine, bread, and plated dishes",
+      "title": "Gallery",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/gallery-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/gallery-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "drinks-bar.webp",
+      "originalName": "drinks-bar.webp",
+      "type": "image/webp",
+      "size": 39088,
+      "path": "/uploads/images/drinks-bar.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Amber stirred cocktail with orange peel in a coupe glass on a dark bar",
+      "title": "Signature cocktail",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/drinks-bar-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/drinks-bar-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "menu-hero.webp",
+      "originalName": "menu-hero.webp",
+      "type": "image/webp",
+      "size": 118370,
+      "path": "/uploads/images/menu-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Chefs plating courses on the pass in a dimly lit restaurant kitchen",
+      "title": "Our menu",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/menu-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/menu-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/menu-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "team-aisha.webp",
+      "originalName": "team-aisha.webp",
+      "type": "image/webp",
+      "size": 21932,
+      "path": "/uploads/images/team-aisha.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Aisha, pastry chef in whites and apron, smiling in the bakery kitchen",
+      "title": "Aisha",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-aisha-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-elena.webp",
+      "originalName": "team-elena.webp",
+      "type": "image/webp",
+      "size": 19736,
+      "path": "/uploads/images/team-elena.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Elena, general manager in a navy blazer, smiling in the dining room",
+      "title": "Elena",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-elena-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-marc.webp",
+      "originalName": "team-marc.webp",
+      "type": "image/webp",
+      "size": 20918,
+      "path": "/uploads/images/team-marc.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Marc, executive chef in whites, smiling in the open kitchen",
+      "title": "Marc",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-marc-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "philosophy.webp",
+      "originalName": "philosophy.webp",
+      "type": "image/webp",
+      "size": 81834,
+      "path": "/uploads/images/philosophy.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hands holding a wooden crate of fresh heirloom tomatoes, herbs, and greens",
+      "title": "Sourced with care",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/philosophy-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/philosophy-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "founders.webp",
+      "originalName": "founders.webp",
+      "type": "image/webp",
+      "size": 48370,
+      "path": "/uploads/images/founders.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Chef and manager couple smiling in the restaurant's open kitchen",
+      "title": "Our founders",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/founders-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/founders-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "about-hero.webp",
+      "originalName": "about-hero.webp",
+      "type": "image/webp",
+      "size": 110052,
+      "path": "/uploads/images/about-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Saffron restaurant storefront at twilight with string lights and sidewalk tables",
+      "title": "Our restaurant",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/about-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/about-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "experience-callout.webp",
+      "originalName": "experience-callout.webp",
+      "type": "image/webp",
+      "size": 37244,
+      "path": "/uploads/images/experience-callout.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Dim restaurant dining room with candlelit tables, exposed brick, and a couple seated in the background",
+      "title": "The dining experience",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/experience-callout-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/experience-callout-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "home-hero.webp",
+      "originalName": "home-hero.webp",
+      "type": "image/webp",
+      "size": 160658,
+      "path": "/uploads/images/home-hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Candlelit table set with a plated fish dish, wine glasses, and a cheese board in a warm dining room",
+      "title": "An evening at Saffron",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/home-hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/home-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

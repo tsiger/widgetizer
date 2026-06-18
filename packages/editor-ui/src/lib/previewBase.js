@@ -53,3 +53,20 @@ export function setStandalonePreviewPath(builder) {
 export function getStandalonePreviewPath(pageId) {
   return _standalonePreviewPath(pageId);
 }
+
+// Same mechanism for a collection ITEM page's standalone preview. The OSS shell
+// serves it at /preview/collection/:slugPrefix/:slug (the default); an embedding
+// host overrides it (hosted uses /sites/:siteId/preview/collection/...). Kept
+// separate from the page builder because the path is keyed by (slugPrefix, slug),
+// not a pageId. Registry (not context) so the collection pages' click handlers
+// can read it without prop-drilling.
+const DEFAULT_COLLECTION_PREVIEW_PATH = (slugPrefix, slug) => `/preview/collection/${slugPrefix}/${slug}`;
+let _standaloneCollectionPreviewPath = DEFAULT_COLLECTION_PREVIEW_PATH;
+
+export function setStandaloneCollectionPreviewPath(builder) {
+  _standaloneCollectionPreviewPath = typeof builder === "function" ? builder : DEFAULT_COLLECTION_PREVIEW_PATH;
+}
+
+export function getStandaloneCollectionPreviewPath(slugPrefix, slug) {
+  return _standaloneCollectionPreviewPath(slugPrefix, slug);
+}

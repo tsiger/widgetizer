@@ -6,17 +6,22 @@
     "contactDetailsLine1": "+30 22840 00 00 00",
     "contactDetailsLine2": "hello@example.com",
     "contact_position": "logo",
-    "headerNavigation": "main-menu",
+    "headerNavigation": "be0c466a-a83e-4074-97a1-644904dd408f",
     "center_nav": false,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Check availability",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/hearthstone-logo-dark.png",
+    "transparent_logo": "/uploads/images/hearthstone-logo-light.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

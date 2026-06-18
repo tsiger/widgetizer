@@ -13,7 +13,8 @@
         "overlay_color": "#0a0a0ab8",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/contact-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -90,8 +91,8 @@
           "type": "button",
           "settings": {
             "link": {
-              "text": "Email us",
               "href": "mailto:hello@example.com",
+              "text": "Email us",
               "target": "_self"
             },
             "style": "primary",
@@ -238,15 +239,16 @@
           "type": "button",
           "settings": {
             "link": {
-              "text": "Email us",
               "href": "mailto:hello@example.com",
+              "text": "Email us",
               "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "See the work",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -267,6 +269,6 @@
     "closing_cta"
   ],
   "id": "contact",
-  "created": "2026-04-21T14:00:00.000Z",
-  "updated": "2026-04-21T16:32:04.776Z"
+  "created": "2026-04-21T14:21:02.379Z",
+  "updated": "2026-04-21T15:41:07.097Z"
 }

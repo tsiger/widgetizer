@@ -1,0 +1,885 @@
+{
+  "files": [
+    {
+      "filename": "services-banner-v2.webp",
+      "originalName": "services-banner-v2.webp",
+      "type": "image/webp",
+      "size": 7392,
+      "path": "/uploads/images/services-banner-v2.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Flat vector illustration of two black service-discipline glyphs — stacked bars and a book — on a warm cream background.",
+      "title": "Services page illustration (alt)",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/services-banner-v2-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/services-banner-v2-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/services-banner-v2-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-logo-light.png",
+      "originalName": "pixelcraft-logo-light.png",
+      "type": "image/png",
+      "size": 3445,
+      "path": "/uploads/images/pixelcraft-logo-light.png",
+      "width": 604,
+      "height": 134,
+      "alt": "Pixelcraft logo — chartreuse pixel-grid mark beside a cream wordmark, for use on dark backgrounds.",
+      "title": "Pixelcraft logo (light)",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/pixelcraft-logo-light-small.png",
+          "width": 480,
+          "height": 106
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-logo-light-thumb.png",
+          "width": 150,
+          "height": 33
+        }
+      }
+    },
+    {
+      "filename": "contact-banner.webp",
+      "originalName": "contact-banner.webp",
+      "type": "image/webp",
+      "size": 13088,
+      "path": "/uploads/images/contact-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Flat vector illustration of a black envelope with a bright chartreuse letter emerging from it, on a warm cream background.",
+      "title": "Contact page illustration",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/contact-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/contact-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/contact-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "team-rafe.webp",
+      "originalName": "team-rafe.webp",
+      "type": "image/webp",
+      "size": 79946,
+      "path": "/uploads/images/team-rafe.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Rafe Mendoza, Pixelcraft senior designer, in a deep-ink tee against the studio's warm plaster wall.",
+      "title": "Rafe Mendoza",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-rafe-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-rafe-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "team-morgan.webp",
+      "originalName": "team-morgan.webp",
+      "type": "image/webp",
+      "size": 137664,
+      "path": "/uploads/images/team-morgan.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Morgan Ellison, Pixelcraft co-founder and design director, in a cream sweater against the studio's warm plaster wall.",
+      "title": "Morgan Ellison",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/team-morgan-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/team-morgan-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "about-banner.webp",
+      "originalName": "about-banner.webp",
+      "type": "image/webp",
+      "size": 12380,
+      "path": "/uploads/images/about-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Flat vector illustration of a large black stylized closing quotation mark with two chartreuse dots, on a warm cream background.",
+      "title": "About page illustration",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/about-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/about-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "services-banner.webp",
+      "originalName": "services-banner.webp",
+      "type": "image/webp",
+      "size": 15888,
+      "path": "/uploads/images/services-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Flat vector illustration of four service-discipline glyphs — stacked bars, a book, a phone, and a chartreuse letter form — with the word \"Services\" in the corner.",
+      "title": "Services page illustration",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/services-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/services-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/services-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "featured-orion.webp",
+      "originalName": "featured-orion.webp",
+      "type": "image/webp",
+      "size": 41864,
+      "path": "/uploads/images/featured-orion.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "Orion Quarterly case-study photograph — a freshly printed issue held in two hands, the cover showing a bold geometric composition with chartreuse accents.",
+      "title": "Orion Quarterly — Case study",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/featured-orion-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/featured-orion-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "work-margot.webp",
+      "originalName": "work-margot.webp",
+      "type": "image/webp",
+      "size": 208192,
+      "path": "/uploads/images/work-margot.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Margot & Sons stationery — a letterhead, business card, and compliments slip arranged on a cream linen surface with a minimal mark on each.",
+      "title": "Margot & Sons — Identity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-margot-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/work-margot-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "work-little-iron.webp",
+      "originalName": "work-little-iron.webp",
+      "type": "image/webp",
+      "size": 64432,
+      "path": "/uploads/images/work-little-iron.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Little Iron Bakery packaging — a cream paper bakery bag printed with a minimal geometric mark, on a wooden counter.",
+      "title": "Little Iron Bakery — Packaging",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-little-iron-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/work-little-iron-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "work-field-notes.webp",
+      "originalName": "work-field-notes.webp",
+      "type": "image/webp",
+      "size": 211964,
+      "path": "/uploads/images/work-field-notes.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Field Notes No. 12 editorial — a booklet held open in two hands, showing a bold letterform feature and dense typographic columns.",
+      "title": "Field Notes No. 12 — Editorial",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-field-notes-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/work-field-notes-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/work-field-notes-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "work-tenny.webp",
+      "originalName": "work-tenny.webp",
+      "type": "image/webp",
+      "size": 121148,
+      "path": "/uploads/images/work-tenny.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Tenny Bros. identity — a muted-green delivery van with a minimal white wordmark on the side, parked on an urban street.",
+      "title": "Tenny Bros. — Identity",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-tenny-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/work-tenny-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/work-tenny-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "work-clay-room.webp",
+      "originalName": "work-clay-room.webp",
+      "type": "image/webp",
+      "size": 42100,
+      "path": "/uploads/images/work-clay-room.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "The Clay Room packaging — a hand holding a small cream product card with a minimal mark and horizontal accent lines in warm studio light.",
+      "title": "The Clay Room — Packaging",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-clay-room-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-clay-room-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-aster.webp",
+      "originalName": "work-aster.webp",
+      "type": "image/webp",
+      "size": 60944,
+      "path": "/uploads/images/work-aster.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Aster Type Foundry specimen poster — a printed sheet of a custom alphabet with a single chartreuse accent square on a soft cream wall.",
+      "title": "Aster Type Foundry — Type",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-aster-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-aster-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-foldline.webp",
+      "originalName": "work-foldline.webp",
+      "type": "image/webp",
+      "size": 67054,
+      "path": "/uploads/images/work-foldline.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Foldline digital work — a laptop and two phones displaying a soft-pastel-blocked marketing site layout in warm studio light.",
+      "title": "Foldline — Digital",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-foldline-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/work-foldline-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/work-foldline-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "work-parson-blake.webp",
+      "originalName": "work-parson-blake.webp",
+      "type": "image/webp",
+      "size": 69152,
+      "path": "/uploads/images/work-parson-blake.webp",
+      "width": 960,
+      "height": 1280,
+      "alt": "Parson & Blake stationery — printed letterhead and business cards in cream and deep ink, arranged on a light wood surface.",
+      "title": "Parson & Blake — Identity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-parson-blake-small.webp",
+          "width": 480,
+          "height": 640
+        },
+        "thumb": {
+          "path": "/uploads/images/work-parson-blake-thumb.webp",
+          "width": 150,
+          "height": 200
+        }
+      }
+    },
+    {
+      "filename": "work-northlake-1.webp",
+      "originalName": "work-northlake.webp",
+      "type": "image/webp",
+      "size": 119838,
+      "path": "/uploads/images/work-northlake-1.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Northlake Zoo wayfinding sign — a deep-green cut-metal panel with a minimal mark and a pattern of horizontal bars mounted on a concrete wall.",
+      "title": "Northlake Zoo — Wayfinding",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-northlake-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-northlake-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-sidereal-1.webp",
+      "originalName": "work-sidereal.webp",
+      "type": "image/webp",
+      "size": 110710,
+      "path": "/uploads/images/work-sidereal-1.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Sidereal Studio identity — a stack of charcoal business cards with a small mark in the top-left and a minimal contact block on the top card.",
+      "title": "Sidereal Studio — Identity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-sidereal-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-sidereal-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-cordage-1.webp",
+      "originalName": "work-cordage.webp",
+      "type": "image/webp",
+      "size": 142736,
+      "path": "/uploads/images/work-cordage-1.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Cordage Press type specimen — a printed sheet of custom typeface characters arranged in a dense grid, resting on a cream painted floor.",
+      "title": "Cordage Press — Type",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-cordage-1-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/work-cordage-1-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/work-cordage-1-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "work-hearth-1.webp",
+      "originalName": "work-hearth.webp",
+      "type": "image/webp",
+      "size": 27546,
+      "path": "/uploads/images/work-hearth-1.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Hearth Coffee packaging — three matte cream coffee bags with navy, coral, and amber geometric labels in warm studio light.",
+      "title": "Hearth Coffee — Packaging",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-hearth-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-hearth-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-orion-1.webp",
+      "originalName": "work-orion.webp",
+      "type": "image/webp",
+      "size": 74846,
+      "path": "/uploads/images/work-orion-1.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Orion Quarterly editorial spread lying open on a wooden surface with a bold geometric feature shape on the left page and columned copy on the right.",
+      "title": "Orion Quarterly — Editorial",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-orion-1-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/work-orion-1-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/work-orion-1-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "work-vance-oak-1.webp",
+      "originalName": "work-vance-oak.webp",
+      "type": "image/webp",
+      "size": 53550,
+      "path": "/uploads/images/work-vance-oak-1.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Vance & Oak wine-shop identity — a bottle with a cream label and a single bold serif initial letter on a warm cream plaster wall.",
+      "title": "Vance & Oak — Identity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-vance-oak-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-vance-oak-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-banner.webp",
+      "originalName": "work-banner.webp",
+      "type": "image/webp",
+      "size": 11502,
+      "path": "/uploads/images/work-banner.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Flat vector illustration of seven overlapping rounded black squares with two chartreuse accent squares on a warm cream background.",
+      "title": "Work page illustration",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-banner-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/work-banner-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/work-banner-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "testimonial-theo.webp",
+      "originalName": "testimonial-theo.webp",
+      "type": "image/webp",
+      "size": 30860,
+      "path": "/uploads/images/testimonial-theo.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Theo Reyes, publisher at Cordage Press, smiling among shelves of books.",
+      "title": "Theo Reyes, Cordage Press",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-theo-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-theo-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-isla.webp",
+      "originalName": "testimonial-isla.webp",
+      "type": "image/webp",
+      "size": 32050,
+      "path": "/uploads/images/testimonial-isla.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Isla Okafor, founder of Hearth Coffee, smiling warmly inside her coffee shop.",
+      "title": "Isla Okafor, Hearth Coffee",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-isla-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-isla-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-marcus.webp",
+      "originalName": "testimonial-marcus.webp",
+      "type": "image/webp",
+      "size": 23908,
+      "path": "/uploads/images/testimonial-marcus.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Marcus Kay, editor-in-chief of Orion Quarterly, smiling in the magazine's editorial office.",
+      "title": "Marcus Kay, Orion Quarterly",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-marcus-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-marcus-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-nina.webp",
+      "originalName": "testimonial-nina.webp",
+      "type": "image/webp",
+      "size": 31228,
+      "path": "/uploads/images/testimonial-nina.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Nina Vance, co-founder of Vance & Oak, smiling warmly in front of the shop's wine-bottle wall.",
+      "title": "Nina Vance, Vance & Oak",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-nina-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-nina-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-northlake.webp",
+      "originalName": "work-northlake.webp",
+      "type": "image/webp",
+      "size": 119838,
+      "path": "/uploads/images/work-northlake.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Northlake Zoo wayfinding sign — a deep-green cut-metal panel with a minimal mark and a pattern of horizontal bars mounted on a concrete wall.",
+      "title": "Northlake Zoo — Wayfinding",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-northlake-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-northlake-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-cordage.webp",
+      "originalName": "work-cordage.webp",
+      "type": "image/webp",
+      "size": 142736,
+      "path": "/uploads/images/work-cordage.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Cordage Press type specimen — a printed sheet of custom typeface characters arranged in a dense grid, resting on a cream painted floor.",
+      "title": "Cordage Press — Type",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-cordage-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/work-cordage-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/work-cordage-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "work-sidereal.webp",
+      "originalName": "work-sidereal.webp",
+      "type": "image/webp",
+      "size": 110710,
+      "path": "/uploads/images/work-sidereal.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Sidereal Studio identity — a stack of charcoal business cards with a small mark in the top-left and a minimal contact block on the top card.",
+      "title": "Sidereal Studio — Identity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-sidereal-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-sidereal-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-hearth.webp",
+      "originalName": "work-hearth.webp",
+      "type": "image/webp",
+      "size": 27546,
+      "path": "/uploads/images/work-hearth.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Hearth Coffee packaging — three matte cream coffee bags with navy, coral, and amber geometric labels in warm studio light.",
+      "title": "Hearth Coffee — Packaging",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-hearth-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-hearth-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "work-orion.webp",
+      "originalName": "work-orion.webp",
+      "type": "image/webp",
+      "size": 74846,
+      "path": "/uploads/images/work-orion.webp",
+      "width": 1280,
+      "height": 960,
+      "alt": "Orion Quarterly editorial spread lying open on a wooden surface with a bold geometric feature shape on the left page and columned copy on the right.",
+      "title": "Orion Quarterly — Editorial",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/work-orion-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/work-orion-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/work-orion-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "work-vance-oak.webp",
+      "originalName": "work-vance-oak.webp",
+      "type": "image/webp",
+      "size": 53550,
+      "path": "/uploads/images/work-vance-oak.webp",
+      "width": 1024,
+      "height": 1024,
+      "alt": "Vance & Oak wine-shop identity — a bottle with a cream label and a single bold serif initial letter on a warm cream plaster wall.",
+      "title": "Vance & Oak — Identity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/work-vance-oak-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/work-vance-oak-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "hero.webp",
+      "originalName": "hero.webp",
+      "type": "image/webp",
+      "size": 28364,
+      "path": "/uploads/images/hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Flat vector illustration of overlapping black circles, chartreuse shapes, and a black letter-like form on a warm cream background.",
+      "title": "Home hero illustration",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

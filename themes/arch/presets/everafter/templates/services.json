@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["s-eyebrow", "s-heading", "s-text"]
+      "blocksOrder": [
+        "s-eyebrow",
+        "s-heading",
+        "s-text"
+      ]
     },
     "tiers": {
       "type": "pricing",
@@ -61,7 +65,8 @@
             "button_link": {
               "text": "Inquire about day-of",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "featured": false
           }
@@ -76,7 +81,8 @@
             "button_link": {
               "text": "Inquire about partial",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "featured": true
           }
@@ -91,21 +97,18 @@
             "button_link": {
               "text": "Inquire about full-service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "featured": false
           }
         }
       },
-      "blocksOrder": ["tier-day", "tier-partial", "tier-full"]
-    },
-    "services_break_image": {
-      "type": "image",
-      "settings": {
-        "fullwidth": true,
-        "top_spacing": "none",
-        "bottom_spacing": "none"
-      }
+      "blocksOrder": [
+        "tier-day",
+        "tier-partial",
+        "tier-full"
+      ]
     },
     "whats_included": {
       "type": "numbered-service-list",
@@ -126,46 +129,83 @@
           "type": "service",
           "settings": {
             "title": "Design direction",
-            "description": "<p>We translate \"we like it warm, not too traditional, with room for a little strangeness\" into a coherent visual plan — moodboards, colour stories, material palettes, floral direction, and signage language.</p>"
+            "description": "<p>We translate \"we like it warm, not too traditional, with room for a little strangeness\" into a coherent visual plan — moodboards, colour stories, material palettes, floral direction, and signage language.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "w-2": {
           "type": "service",
           "settings": {
             "title": "Vendor curation",
-            "description": "<p>Florist, photographer, caterer, music, stationery, rentals, hair and makeup, officiant. We know the good ones, and we know which of the good ones will suit you specifically.</p>"
+            "description": "<p>Florist, photographer, caterer, music, stationery, rentals, hair and makeup, officiant. We know the good ones, and we know which of the good ones will suit you specifically.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "w-3": {
           "type": "service",
           "settings": {
             "title": "Timeline & logistics",
-            "description": "<p>A minute-by-minute day-of plan tested against reality — not a spreadsheet that falls apart when the first shuttle is late. We build it, vendors sign on to it, and we run it.</p>"
+            "description": "<p>A minute-by-minute day-of plan tested against reality — not a spreadsheet that falls apart when the first shuttle is late. We build it, vendors sign on to it, and we run it.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "w-4": {
           "type": "service",
           "settings": {
             "title": "Budget shepherding",
-            "description": "<p>Honest numbers, tradeoffs flagged early, no surprise line items at month ten. We'll tell you what the Saturday in June actually costs before you fall in love with the Saturday in June.</p>"
+            "description": "<p>Honest numbers, tradeoffs flagged early, no surprise line items at month ten. We'll tell you what the Saturday in June actually costs before you fall in love with the Saturday in June.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "w-5": {
           "type": "service",
           "settings": {
             "title": "Day-of execution",
-            "description": "<p>A lead planner and a dedicated assistant on the ground, fully on point, fully on the line. If something goes sideways, you find out about it weeks later in a funny story.</p>"
+            "description": "<p>A lead planner and a dedicated assistant on the ground, fully on point, fully on the line. If something goes sideways, you find out about it weeks later in a funny story.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "w-6": {
           "type": "service",
           "settings": {
             "title": "Post-wedding wrap",
-            "description": "<p>Vendor payments settled, rentals returned, gratuity distributed, thank-you lists sorted. The quiet final week that keeps the whole thing from dragging into the following month.</p>"
+            "description": "<p>Vendor payments settled, rentals returned, gratuity distributed, thank-you lists sorted. The quiet final week that keeps the whole thing from dragging into the following month.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["w-1", "w-2", "w-3", "w-4", "w-5", "w-6"]
+      "blocksOrder": [
+        "w-1",
+        "w-2",
+        "w-3",
+        "w-4",
+        "w-5",
+        "w-6"
+      ]
     },
     "services_faq": {
       "type": "accordion",
@@ -233,7 +273,15 @@
           }
         }
       },
-      "blocksOrder": ["faq-sidebar", "faq-1", "faq-2", "faq-3", "faq-4", "faq-5", "faq-6"]
+      "blocksOrder": [
+        "faq-sidebar",
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4",
+        "faq-5",
+        "faq-6"
+      ]
     },
     "services_cta": {
       "type": "action-bar",
@@ -266,18 +314,41 @@
             "link": {
               "text": "Begin an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["sc-heading", "sc-text", "sc-button"]
+      "blocksOrder": [
+        "sc-heading",
+        "sc-text",
+        "sc-button"
+      ]
+    },
+    "widget_572c4ad6-a2f3-4f92-b96a-f9b5d7957e34": {
+      "type": "image",
+      "settings": {
+        "fullwidth": true,
+        "top_spacing": "none",
+        "bottom_spacing": "none",
+        "image": "/uploads/images/services-break.webp"
+      },
+      "blocks": {},
+      "blocksOrder": []
     }
   },
-  "widgetsOrder": ["services_intro", "tiers", "services_break_image", "whats_included", "services_faq", "services_cta"],
+  "widgetsOrder": [
+    "services_intro",
+    "tiers",
+    "widget_572c4ad6-a2f3-4f92-b96a-f9b5d7957e34",
+    "whats_included",
+    "services_faq",
+    "services_cta"
+  ],
   "id": "services",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T09:47:37.546Z",
+  "updated": "2026-04-20T10:30:49.876Z"
 }

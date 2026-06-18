@@ -18,6 +18,11 @@
     "./blockLimits": "./src/utils/blockLimits.js",
     "./mimeTypes": "./src/utils/mimeTypes.js",
     "./pathSecurity": "./src/utils/pathSecurity.js",
+    "./urlSafety": "./src/utils/urlSafety.js",
+    "./richtextMedia": "./src/utils/richtextMedia.js",
+    "./linkPrefixer": "./src/utils/linkPrefixer.js",
+    "./dateFormat": "./src/utils/dateFormat.js",
+    "./config/settingTypes": "./src/config/settingTypes.js",
     "./config/fonts.json": "./src/config/fonts.json",
     "./locales/*": "./src/locales/*"
   },

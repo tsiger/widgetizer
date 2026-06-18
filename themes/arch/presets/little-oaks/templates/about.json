@@ -27,14 +27,18 @@
           }
         }
       },
-      "blocksOrder": ["about-heading", "about-text"]
+      "blocksOrder": [
+        "about-heading",
+        "about-text"
+      ]
     },
     "story_section": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
         "text_position": "center",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/story-founding.webp"
       },
       "blocks": {
         "story-eyebrow": {
@@ -60,7 +64,11 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text"
+      ]
     },
     "values_grid": {
       "type": "icon-card-grid",
@@ -112,7 +120,12 @@
           }
         }
       },
-      "blocksOrder": ["value-1", "value-2", "value-3", "value-4"]
+      "blocksOrder": [
+        "value-1",
+        "value-2",
+        "value-3",
+        "value-4"
+      ]
     },
     "staff_grid": {
       "type": "profile-grid",
@@ -123,10 +136,10 @@
         "description": "Every teacher at Little Oaks holds a degree in early childhood education and brings years of hands-on classroom experience.",
         "heading_alignment": "center",
         "image_style": "full",
-        "aspect_ratio": "1 / 1",
         "columns_desktop": 4,
         "layout": "grid",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "aspect_ratio": "1 / 1"
       },
       "blocks": {
         "staff-1": {
@@ -135,7 +148,8 @@
             "name": "Claire Whitfield",
             "role": "Director",
             "specialty": "Early Childhood Education",
-            "bio": "M.Ed. in Early Childhood Development. 18 years in childcare. Co-founded Little Oaks because she believed Asheville needed a better option for families."
+            "bio": "M.Ed. in Early Childhood Development. 18 years in childcare. Co-founded Little Oaks because she believed Asheville needed a better option for families.",
+            "photo": "/uploads/images/staff-1.webp"
           }
         },
         "staff-2": {
@@ -144,7 +158,8 @@
             "name": "Rosa Gutierrez",
             "role": "Lead Preschool Teacher",
             "specialty": "Literacy & Language",
-            "bio": "B.A. in Early Education. 10 years of preschool teaching. Brings music, storytelling, and bilingual learning into every day."
+            "bio": "B.A. in Early Education. 10 years of preschool teaching. Brings music, storytelling, and bilingual learning into every day.",
+            "photo": "/uploads/images/staff-2.webp"
           }
         },
         "staff-3": {
@@ -153,7 +168,8 @@
             "name": "David Kowalski",
             "role": "Toddler Room Lead",
             "specialty": "Sensory & Movement",
-            "bio": "B.S. in Child Development. 7 years with toddlers. Believes in messy play, outdoor time, and letting children move at their own speed."
+            "bio": "B.S. in Child Development. 7 years with toddlers. Believes in messy play, outdoor time, and letting children move at their own speed.",
+            "photo": "/uploads/images/staff-3.webp"
           }
         },
         "staff-4": {
@@ -162,11 +178,17 @@
             "name": "Aisha Thompson",
             "role": "Infant Care Specialist",
             "specialty": "Infant Development",
-            "bio": "Certified Infant Care Specialist. 9 years caring for the youngest children. Calm, patient, and deeply attentive to each baby's cues."
+            "bio": "Certified Infant Care Specialist. 9 years caring for the youngest children. Calm, patient, and deeply attentive to each baby's cues.",
+            "photo": "/uploads/images/staff-4.webp"
           }
         }
       },
-      "blocksOrder": ["staff-1", "staff-2", "staff-3", "staff-4"]
+      "blocksOrder": [
+        "staff-1",
+        "staff-2",
+        "staff-3",
+        "staff-4"
+      ]
     },
     "about_reviews": {
       "type": "testimonials",
@@ -198,7 +220,10 @@
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2"]
+      "blocksOrder": [
+        "review-1",
+        "review-2"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -229,18 +254,30 @@
             "link": {
               "href": "contact.html",
               "text": "Schedule a Tour",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0db30ea7-c4f3-4513-a160-34d01f823fe8"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["about_hero", "story_section", "values_grid", "staff_grid", "about_reviews", "about_cta"],
+  "widgetsOrder": [
+    "about_hero",
+    "story_section",
+    "values_grid",
+    "staff_grid",
+    "about_reviews",
+    "about_cta"
+  ],
   "id": "about",
-  "created": "2026-04-14T14:00:00.000Z",
-  "updated": "2026-04-14T14:00:00.000Z"
+  "created": "2026-04-17T16:20:56.782Z",
+  "updated": "2026-04-17T16:46:23.866Z"
 }

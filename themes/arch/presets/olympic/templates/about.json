@@ -10,7 +10,8 @@
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "center",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/gym-floor-hero.webp"
       },
       "blocks": {
         "about-heading": {
@@ -28,14 +29,18 @@
           }
         }
       },
-      "blocksOrder": ["about-heading", "about-text"]
+      "blocksOrder": [
+        "about-heading",
+        "about-text"
+      ]
     },
     "story_section": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
         "text_position": "center",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/gym-story.webp"
       },
       "blocks": {
         "story-eyebrow": {
@@ -61,7 +66,11 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text"
+      ]
     },
     "values_process": {
       "type": "steps",
@@ -77,25 +86,32 @@
           "type": "step",
           "settings": {
             "title": "Community First",
-            "description": "<p>Training is better together. We build genuine connections between members because accountability and camaraderie drive results that motivation alone cannot sustain.</p>"
+            "description": "<p>Training is better together. We build genuine connections between members because accountability and camaraderie drive results that motivation alone cannot sustain.</p>",
+            "image": "/uploads/images/values-community.webp"
           }
         },
         "value-2": {
           "type": "step",
           "settings": {
             "title": "Discipline Over Hype",
-            "description": "<p>No gimmicks, no shortcuts. We believe in progressive overload, consistent effort, and smart programming. The basics work when you commit to them.</p>"
+            "description": "<p>No gimmicks, no shortcuts. We believe in progressive overload, consistent effort, and smart programming. The basics work when you commit to them.</p>",
+            "image": "/uploads/images/values-discipline.webp"
           }
         },
         "value-3": {
           "type": "step",
           "settings": {
             "title": "Results You Can Measure",
-            "description": "<p>Every program is structured around measurable progress. We track, we adjust, and we celebrate when our members hit milestones they once thought impossible.</p>"
+            "description": "<p>Every program is structured around measurable progress. We track, we adjust, and we celebrate when our members hit milestones they once thought impossible.</p>",
+            "image": "/uploads/images/values-results.webp"
           }
         }
       },
-      "blocksOrder": ["value-1", "value-2", "value-3"]
+      "blocksOrder": [
+        "value-1",
+        "value-2",
+        "value-3"
+      ]
     },
     "trainers_grid": {
       "type": "profile-grid",
@@ -118,7 +134,8 @@
             "name": "Jason Reeves",
             "role": "Head Coach",
             "specialty": "Strength & Conditioning",
-            "bio": "CSCS certified with 12 years of coaching. Former collegiate powerlifter. Specializes in barbell programming and athletic performance."
+            "bio": "CSCS certified with 12 years of coaching. Former collegiate powerlifter. Specializes in barbell programming and athletic performance.",
+            "photo": "/uploads/images/trainer-1.webp"
           }
         },
         "trainer-2": {
@@ -127,7 +144,8 @@
             "name": "Maya Santos",
             "role": "HIIT & Boxing Coach",
             "specialty": "High-Intensity Training",
-            "bio": "NASM certified personal trainer and amateur boxing competitor. Runs Olympic's most popular HIIT and boxing classes."
+            "bio": "NASM certified personal trainer and amateur boxing competitor. Runs Olympic's most popular HIIT and boxing classes.",
+            "photo": "/uploads/images/trainer-2.webp"
           }
         },
         "trainer-3": {
@@ -136,7 +154,8 @@
             "name": "Tom Eriksen",
             "role": "CrossFit Coach",
             "specialty": "Functional Fitness",
-            "bio": "CrossFit Level 3 trainer and USAW Sports Performance Coach. Competed in regional CrossFit events for six consecutive years."
+            "bio": "CrossFit Level 3 trainer and USAW Sports Performance Coach. Competed in regional CrossFit events for six consecutive years.",
+            "photo": "/uploads/images/trainer-3.webp"
           }
         },
         "trainer-4": {
@@ -145,11 +164,17 @@
             "name": "Priya Anand",
             "role": "Yoga & Mobility Coach",
             "specialty": "Recovery & Movement",
-            "bio": "RYT-500 certified yoga instructor with a background in physical therapy. Designs mobility programs for strength athletes."
+            "bio": "RYT-500 certified yoga instructor with a background in physical therapy. Designs mobility programs for strength athletes.",
+            "photo": "/uploads/images/trainer-4.webp"
           }
         }
       },
-      "blocksOrder": ["trainer-1", "trainer-2", "trainer-3", "trainer-4"]
+      "blocksOrder": [
+        "trainer-1",
+        "trainer-2",
+        "trainer-3",
+        "trainer-4"
+      ]
     },
     "about_reviews": {
       "type": "testimonials",
@@ -181,7 +206,10 @@
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2"]
+      "blocksOrder": [
+        "review-1",
+        "review-2"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -210,18 +238,30 @@
             "link": {
               "href": "pricing.html",
               "text": "Start Free Trial",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "c3fb2f51-af25-43f7-9068-f7b5a572dede"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["about_hero", "story_section", "values_process", "trainers_grid", "about_reviews", "about_cta"],
+  "widgetsOrder": [
+    "about_hero",
+    "story_section",
+    "values_process",
+    "trainers_grid",
+    "about_reviews",
+    "about_cta"
+  ],
   "id": "about",
-  "created": "2026-04-14T10:00:00.000Z",
-  "updated": "2026-04-14T10:00:00.000Z"
+  "created": "2026-04-19T11:06:05.089Z",
+  "updated": "2026-04-19T14:13:53.847Z"
 }

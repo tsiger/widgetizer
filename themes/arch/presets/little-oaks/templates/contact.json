@@ -27,7 +27,10 @@
           }
         }
       },
-      "blocksOrder": ["contact-heading", "contact-text"]
+      "blocksOrder": [
+        "contact-heading",
+        "contact-text"
+      ]
     },
     "location_map": {
       "type": "map",
@@ -45,7 +48,7 @@
           "type": "info",
           "settings": {
             "title": "Hours",
-            "text": "<p>Monday\u2013Friday: 7 AM \u2013 6 PM</p><p>Saturday\u2013Sunday: Closed</p>"
+            "text": "<p>Monday–Friday: 7 AM – 6 PM</p><p>Saturday–Sunday: Closed</p>"
           }
         },
         "map-visit": {
@@ -56,7 +59,10 @@
           }
         }
       },
-      "blocksOrder": ["map-hours", "map-visit"]
+      "blocksOrder": [
+        "map-hours",
+        "map-visit"
+      ]
     },
     "contact_faq": {
       "type": "accordion",
@@ -99,14 +105,19 @@
           }
         }
       },
-      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4"]
+      "blocksOrder": [
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4"
+      ]
     },
     "contact_cta": {
       "type": "action-bar",
       "settings": {
         "color_scheme": "highlight-primary",
-        "top_spacing": "small",
-        "bottom_spacing": "small"
+        "bottom_spacing": "small",
+        "top_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
@@ -137,11 +148,20 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["contact_hero", "location_map", "contact_faq", "contact_cta"],
+  "widgetsOrder": [
+    "contact_hero",
+    "location_map",
+    "contact_faq",
+    "contact_cta"
+  ],
   "id": "contact",
-  "created": "2026-04-14T14:00:00.000Z",
-  "updated": "2026-04-14T14:00:00.000Z"
+  "created": "2026-04-17T16:20:56.783Z",
+  "updated": "2026-04-17T16:46:30.692Z"
 }

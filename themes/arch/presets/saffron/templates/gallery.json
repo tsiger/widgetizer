@@ -9,7 +9,8 @@
         "alignment": "center",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "image": "/uploads/images/gallery-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -27,7 +28,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "food_gallery": {
       "type": "masonry-gallery",
@@ -35,56 +39,69 @@
         "eyebrow": "The Food",
         "title": "From Our Kitchen",
         "heading_alignment": "center",
-        "alignment": "center",
         "columns_desktop": 3,
         "gap": "medium",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "alignment": "center"
       },
       "blocks": {
         "food-1": {
           "type": "item",
           "settings": {
             "title": "Roasted Beet & Burrata",
-            "category": "Seasonal"
+            "category": "Seasonal",
+            "image": "/uploads/images/food-beet-burrata.webp"
           }
         },
         "food-2": {
           "type": "item",
           "settings": {
             "title": "Pan-Seared Halibut",
-            "category": "Signature"
+            "category": "Signature",
+            "image": "/uploads/images/food-halibut.webp"
           }
         },
         "food-3": {
           "type": "item",
           "settings": {
             "title": "Braised Lamb Shank",
-            "category": "Signature"
+            "category": "Signature",
+            "image": "/uploads/images/food-lamb-shank.webp"
           }
         },
         "food-4": {
           "type": "item",
           "settings": {
             "title": "Handmade Pappardelle",
-            "category": "Seasonal"
+            "category": "Seasonal",
+            "image": "/uploads/images/food-pappardelle.webp"
           }
         },
         "food-5": {
           "type": "item",
           "settings": {
             "title": "Dark Chocolate Fondant",
-            "category": "Dessert"
+            "category": "Dessert",
+            "image": "/uploads/images/food-chocolate-fondant.webp"
           }
         },
         "food-6": {
           "type": "item",
           "settings": {
             "title": "Seasonal Cocktails",
-            "category": "Bar"
+            "category": "Bar",
+            "image": "/uploads/images/food-cocktails.webp"
           }
         }
       },
-      "blocksOrder": ["food-1", "food-2", "food-3", "food-4", "food-5", "food-6"]
+      "blocksOrder": [
+        "food-1",
+        "food-2",
+        "food-3",
+        "food-4",
+        "food-5",
+        "food-6"
+      ]
     },
     "space_gallery": {
       "type": "gallery",
@@ -102,47 +119,61 @@
         "space-1": {
           "type": "image",
           "settings": {
-            "caption": "Main dining room"
+            "caption": "Main dining room",
+            "image": "/uploads/images/space-dining-room.webp"
           }
         },
         "space-2": {
           "type": "image",
           "settings": {
-            "caption": "Open kitchen"
+            "caption": "Open kitchen",
+            "image": "/uploads/images/space-kitchen.webp"
           }
         },
         "space-3": {
           "type": "image",
           "settings": {
-            "caption": "Bar area"
+            "caption": "Bar area",
+            "image": "/uploads/images/space-bar.webp"
           }
         },
         "space-4": {
           "type": "image",
           "settings": {
-            "caption": "Outdoor patio"
+            "caption": "Outdoor patio",
+            "image": "/uploads/images/space-patio.webp"
           }
         },
         "space-5": {
           "type": "image",
           "settings": {
-            "caption": "Private dining room"
+            "caption": "Private dining room",
+            "image": "/uploads/images/space-private-dining.webp"
           }
         },
         "space-6": {
           "type": "image",
           "settings": {
-            "caption": "Chef's table"
+            "caption": "Chef's table",
+            "image": "/uploads/images/space-chefs-table.webp"
           }
         }
       },
-      "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
+      "blocksOrder": [
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6"
+      ]
     },
     "events_section": {
       "type": "image-callout",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/private-event.webp"
       },
       "blocks": {
         "events-heading": {
@@ -171,18 +202,29 @@
             "link": {
               "text": "Inquire About Events",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0f2a1ee4-bebb-49a5-ba2f-4299af559fdc"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["events-heading", "events-text", "events-features", "events-button"]
+      "blocksOrder": [
+        "events-heading",
+        "events-text",
+        "events-features",
+        "events-button"
+      ]
     }
   },
-  "widgetsOrder": ["gallery_hero", "food_gallery", "space_gallery", "events_section"],
+  "widgetsOrder": [
+    "gallery_hero",
+    "food_gallery",
+    "space_gallery",
+    "events_section"
+  ],
   "id": "gallery",
-  "created": "2026-04-03T10:00:00.000Z",
-  "updated": "2026-04-03T10:00:00.000Z"
+  "created": "2026-04-17T13:40:23.910Z",
+  "updated": "2026-04-17T13:51:16.541Z"
 }

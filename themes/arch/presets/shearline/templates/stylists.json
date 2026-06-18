@@ -27,7 +27,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "stylists_roster": {
       "type": "profile-grid",
@@ -51,7 +54,8 @@
             "specialty": "Precision bobs, fringe, short cuts",
             "bio": "Twelve years at the chair. Trained at a Vidal Sassoon academy in London, then spent four years in a studio on the Lower East Side before opening Shearline in 2019. ",
             "instagram": "https://instagram.com/",
-            "email": "hello@example.com"
+            "email": "hello@example.com",
+            "photo": "/uploads/images/stylist-rowan.webp"
           }
         },
         "stylist-sloane": {
@@ -62,7 +66,8 @@
             "specialty": "Balayage, blonding, color correction",
             "bio": "Nine years specializing in color, certified in Redken and Goldwell. Sloane is the person to book for balayage that grows out beautifully — no hard lines, no brassy shift at week six. ",
             "instagram": "https://instagram.com/",
-            "email": "hello@example.com"
+            "email": "hello@example.com",
+            "photo": "/uploads/images/stylist-sloane.webp"
           }
         },
         "stylist-mara": {
@@ -73,11 +78,16 @@
             "specialty": "Textured & curly hair, long layers",
             "bio": "Mara trained with a curl specialist in Atlanta and carries that approach here — dry cutting, curl-by-curl shape work, and finishes that respect the texture instead of fighting it. ",
             "instagram": "https://instagram.com/",
-            "email": "hello@example.com"
+            "email": "hello@example.com",
+            "photo": "/uploads/images/stylist-mara.webp"
           }
         }
       },
-      "blocksOrder": ["stylist-rowan", "stylist-sloane", "stylist-mara"]
+      "blocksOrder": [
+        "stylist-rowan",
+        "stylist-sloane",
+        "stylist-mara"
+      ]
     },
     "stylists_how_to_pick": {
       "type": "icon-card-grid",
@@ -93,7 +103,9 @@
         "icon_style": "filled",
         "icon_size": "xl",
         "icon_shape": "sharp",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "featured_image_position": "end",
+        "featured_image": "/uploads/images/work-home-9.webp"
       },
       "blocks": {
         "pick-short": {
@@ -102,7 +114,11 @@
             "icon": "razor",
             "title": "Short cuts & precision",
             "description": "<p>Book with Rowan.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "pick-color": {
@@ -111,7 +127,11 @@
             "icon": "sparkles",
             "title": "Color, balayage, blonding",
             "description": "<p>Book with Sloane.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "pick-textured": {
@@ -120,7 +140,11 @@
             "icon": "wand",
             "title": "Textured, curly, long hair",
             "description": "<p>Book with Mara.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "pick-mens": {
@@ -129,11 +153,20 @@
             "icon": "user",
             "title": "Men's cuts & fades",
             "description": "<p>Book with Theo.</p>",
-            "button_link": { "text": "", "href": "", "target": "_self" }
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["pick-short", "pick-color", "pick-textured", "pick-mens"]
+      "blocksOrder": [
+        "pick-short",
+        "pick-color",
+        "pick-textured",
+        "pick-mens"
+      ]
     },
     "stylists_closing": {
       "type": "action-bar",
@@ -168,11 +201,19 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["stylists_intro", "stylists_roster", "stylists_how_to_pick", "stylists_closing"],
+  "widgetsOrder": [
+    "stylists_intro",
+    "stylists_roster",
+    "stylists_how_to_pick",
+    "stylists_closing"
+  ],
   "id": "stylists",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:28:19.008Z",
+  "updated": "2026-04-24T09:29:12.052Z"
 }

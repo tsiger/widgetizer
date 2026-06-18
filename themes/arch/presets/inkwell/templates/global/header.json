@@ -6,13 +6,18 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book a consult",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
     "color_scheme": "standard-primary",
-    "logoMaxWidth": 100
-  }
+    "logoImage": "/uploads/images/inkwell-dark.png",
+    "logoMaxWidth": 100,
+    "transparent_logo": "/uploads/images/inkwell-light.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

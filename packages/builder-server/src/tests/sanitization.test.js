@@ -17,9 +17,12 @@ import assert from "node:assert/strict";
 import {
   sanitizeRichText,
   sanitizeWidgetData,
+  sanitizeCollectionItemData,
   stripHtmlTags,
   sanitizeCssValue,
   sanitizeThemeSettings,
+  sanitizeImagePath,
+  sanitizeImageSettingValue,
 } from "../services/sanitizationService.js";
 
 // ============================================================================
@@ -77,9 +80,39 @@ describe("sanitizeRichText", () => {
     assert.doesNotMatch(result, /<iframe/i);
   });
 
-  it("strips <img> tags (not in allowed list)", () => {
-    const result = sanitizeRichText('<img src="x" onerror="alert(1)">');
-    assert.doesNotMatch(result, /<img/i);
+  it("keeps <img> only when the field opts in (allow_images), with alt and stripped handlers", () => {
+    const html = '<img src="/uploads/images/photo-large.jpg" alt="A cat" onerror="alert(1)">';
+    const result = sanitizeRichText(html, { allowImages: true });
+    assert.match(result, /<img/i);
+    assert.match(result, /src="\/uploads\/images\/photo-large\.jpg"/);
+    assert.match(result, /alt="A cat"/);
+    assert.doesNotMatch(result, /onerror/i);
+  });
+
+  it("strips ALL <img> when the field does not allow images (default — the opt-in contract)", () => {
+    // Same markup, no allow_images: <img> is not in the allowlist and is removed
+    // regardless of src — so source-mode / imported / API content can't sneak images
+    // into a field the theme author never opted into.
+    const html = '<p>x</p><img src="/uploads/images/photo-large.jpg" alt="A cat"><p>y</p>';
+    assert.doesNotMatch(sanitizeRichText(html), /<img/i);
+    assert.doesNotMatch(sanitizeRichText(html, { allowImages: false }), /<img/i);
+    assert.match(sanitizeRichText(html), /<p>x<\/p>/, "surrounding content is preserved");
+  });
+
+  it("with allow_images, drops <img> whose src is not a valid in-project upload path", () => {
+    for (const src of [
+      "https://evil.com/pixel.gif", // external
+      "data:image/png;base64,AAAA", // data URI
+      "javascript:alert(1)", // dangerous scheme
+      "/etc/passwd", // non-upload absolute
+      "/uploads/images/../secret.png", // directory traversal
+      "/uploads/images/a b.png", // space
+      "/uploads/images/a.png?x=1", // query string
+    ]) {
+      const result = sanitizeRichText(`<p>x</p><img src="${src}" alt="y">`, { allowImages: true });
+      assert.doesNotMatch(result, /<img/i, `expected <img src="${src}"> to be dropped`);
+      assert.match(result, /<p>x<\/p>/, "surrounding content is preserved");
+    }
   });
 
   it("strips <style> tags", () => {
@@ -100,10 +133,28 @@ describe("sanitizeRichText", () => {
     assert.ok(result.includes("Content inside div"));
   });
 
-  it("strips <h1>-<h6> tags (not in allowed list)", () => {
-    const result = sanitizeRichText("<h1>Title</h1><h3>Subtitle</h3>");
-    assert.doesNotMatch(result, /<h[1-6]/i);
-    assert.ok(result.includes("Title"));
+  it("with allow_headings, keeps <h2>-<h4> and strips <h1>/<h5>/<h6>", () => {
+    const result = sanitizeRichText(
+      "<h1>One</h1><h2>Two</h2><h3>Three</h3><h4>Four</h4><h5>Five</h5><h6>Six</h6>",
+      { allowHeadings: true },
+    );
+    // h2-h4 are allowed (emitted by the allow_headings editor option).
+    assert.match(result, /<h2>Two<\/h2>/);
+    assert.match(result, /<h3>Three<\/h3>/);
+    assert.match(result, /<h4>Four<\/h4>/);
+    // h1 / h5 / h6 are never in the allowlist — tags stripped, text preserved.
+    assert.doesNotMatch(result, /<h1|<h5|<h6/i);
+    assert.ok(result.includes("One"));
+    assert.ok(result.includes("Five"));
+  });
+
+  it("strips ALL headings when the field does not allow them (default — opt-in contract)", () => {
+    // Same as images: allow_headings is enforced at the sanitizer, not just the UI.
+    const html = "<h2>Two</h2><p>Body</p><h3>Three</h3>";
+    const result = sanitizeRichText(html);
+    assert.doesNotMatch(result, /<h2|<h3|<h4/i);
+    assert.match(result, /<p>Body<\/p>/);
+    assert.ok(result.includes("Two") && result.includes("Three"), "heading text is preserved");
   });
 
   // --- Dangerous attributes are stripped ---
@@ -288,6 +339,34 @@ describe("sanitizeWidgetData — link fields", () => {
     };
     sanitizeWidgetData(data, schema);
     assert.equal(data.settings.cta_link.href, "");
+  });
+
+  it("blocks tab/newline/CR-obfuscated dangerous protocols", () => {
+    // Browsers strip these control chars while resolving the scheme, so each of
+    // these executes as javascript:/vbscript: despite the interleaved char.
+    const hrefs = [
+      "java\tscript:alert(1)",
+      "java\nscript:alert(1)",
+      "java\rscript:alert(1)",
+      "\tjavascript:alert(1)",
+      "vb\rscript:MsgBox(1)",
+    ];
+    for (const href of hrefs) {
+      const data = { settings: { cta_link: { text: "Evil", href } } };
+      sanitizeWidgetData(data, schema);
+      assert.equal(data.settings.cta_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
+  });
+
+  it("blocks leading C0-control / null obfuscated protocols", () => {
+    // WHATWG URL preprocessing strips leading C0-or-space, so these resolve to
+    // javascript: in a browser even though they are not contiguous schemes.
+    const hrefs = ["\x01javascript:alert(1)", "\x00javascript:alert(1)", "\x1Fjavascript:alert(1)"];
+    for (const href of hrefs) {
+      const data = { settings: { cta_link: { text: "Evil", href } } };
+      sanitizeWidgetData(data, schema);
+      assert.equal(data.settings.cta_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
   });
 
   it("preserves text field — does not sanitize (left for autoescape)", () => {
@@ -647,6 +726,406 @@ describe("sanitizeWidgetData — schema edge cases", () => {
     assert.doesNotMatch(data.blocks.card_1.settings.description, /<script/i);
     assert.doesNotMatch(data.blocks.card_2.settings.description, /<script/i);
     assert.match(data.blocks.card_3.settings.description, /<p>Three<\/p>/);
+  });
+});
+
+// ============================================================================
+// sanitizeCollectionItemData — collection item settings (mirrors widget rules)
+// ============================================================================
+
+describe("sanitizeCollectionItemData", () => {
+  const schema = {
+    settings: [
+      { id: "title", type: "text" },
+      { id: "description", type: "richtext" },
+      { id: "summary", type: "textarea" },
+      { id: "book_link", type: "link" },
+      { id: "embed", type: "code" },
+    ],
+  };
+
+  it("sanitizes richtext fields (strips <script>, keeps safe tags)", () => {
+    const item = {
+      settings: { description: '<p>Stay with us</p><script>steal()</script>' },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.doesNotMatch(item.settings.description, /<script/i);
+    assert.match(item.settings.description, /<p>Stay with us<\/p>/);
+  });
+
+  it("strips event-handler attributes from richtext", () => {
+    const item = {
+      settings: { description: '<p>Hi</p><img src=x onerror="alert(1)">' },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.doesNotMatch(item.settings.description, /<img/i);
+    assert.doesNotMatch(item.settings.description, /onerror/i);
+  });
+
+  it("blocks javascript: protocol in link hrefs", () => {
+    const item = {
+      settings: { book_link: { text: "Book", href: "javascript:alert(1)" } },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.book_link.href, "");
+  });
+
+  it("blocks data: and vbscript: protocols in link hrefs", () => {
+    const item1 = { settings: { book_link: { href: "data:text/html,<script>x</script>" } } };
+    const item2 = { settings: { book_link: { href: "vbscript:msgbox(1)" } } };
+    sanitizeCollectionItemData(item1, schema);
+    sanitizeCollectionItemData(item2, schema);
+    assert.equal(item1.settings.book_link.href, "");
+    assert.equal(item2.settings.book_link.href, "");
+  });
+
+  it("blocks tab/newline/CR-obfuscated protocols in link hrefs", () => {
+    const hrefs = ["java\tscript:alert(1)", "java\nscript:alert(1)", "vb\rscript:msgbox(1)"];
+    for (const href of hrefs) {
+      const item = { settings: { book_link: { href } } };
+      sanitizeCollectionItemData(item, schema);
+      assert.equal(item.settings.book_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
+  });
+
+  it("blocks leading C0-control / null obfuscated protocols in link hrefs", () => {
+    const hrefs = ["\x01javascript:alert(1)", "\x00javascript:alert(1)"];
+    for (const href of hrefs) {
+      const item = { settings: { book_link: { href } } };
+      sanitizeCollectionItemData(item, schema);
+      assert.equal(item.settings.book_link.href, "", `expected blocked for ${JSON.stringify(href)}`);
+    }
+  });
+
+  it("passes through safe http/mailto/tel link hrefs", () => {
+    const item = { settings: { book_link: { href: "https://example.com/book" } } };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.book_link.href, "https://example.com/book");
+  });
+
+  it("leaves text and textarea fields untouched (LiquidJS autoescape handles them)", () => {
+    const item = {
+      settings: {
+        title: "<img src=x onerror=alert(1)>",
+        summary: '<script>alert("xss")</script>',
+      },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.title, "<img src=x onerror=alert(1)>");
+    assert.equal(item.settings.summary, '<script>alert("xss")</script>');
+  });
+
+  it("leaves code fields untouched (intentionally raw)", () => {
+    const item = {
+      settings: { embed: '<iframe src="https://maps.example/embed"></iframe>' },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.embed, '<iframe src="https://maps.example/embed"></iframe>');
+  });
+
+  it("leaves settings not declared in the schema untouched", () => {
+    const item = { settings: { stray: '<script>alert(1)</script>' } };
+    sanitizeCollectionItemData(item, schema);
+    assert.equal(item.settings.stray, '<script>alert(1)</script>');
+  });
+
+  it("handles null/missing item, settings, schema, and values gracefully", () => {
+    // none of these should throw
+    sanitizeCollectionItemData(null, schema);
+    sanitizeCollectionItemData({}, schema);
+    sanitizeCollectionItemData({ settings: { description: null } }, schema);
+    sanitizeCollectionItemData({ settings: { description: "<p>x</p>" } }, null);
+    assert.ok(true);
+  });
+});
+
+// ============================================================================
+// sanitizeImagePath — reusable upload-image-path guard (shared by gallery)
+// ============================================================================
+
+describe("sanitizeImagePath", () => {
+  it("keeps a valid /uploads/images/ path", () => {
+    assert.equal(sanitizeImagePath("/uploads/images/photo.jpg"), "/uploads/images/photo.jpg");
+  });
+
+  it("trims surrounding whitespace", () => {
+    assert.equal(sanitizeImagePath("  /uploads/images/photo.jpg  "), "/uploads/images/photo.jpg");
+  });
+
+  it("blanks dangerous, external, or non-upload strings", () => {
+    assert.equal(sanitizeImagePath("javascript:alert(1)"), "");
+    assert.equal(sanitizeImagePath("https://evil.example/x.jpg"), "");
+    assert.equal(sanitizeImagePath("/uploads/images/../../etc/passwd"), "");
+    assert.equal(sanitizeImagePath("/uploads/files/doc.pdf"), ""); // files aren't images
+    assert.equal(sanitizeImagePath("/default-logo.png"), ""); // theme asset, not an upload
+  });
+
+  it("blanks non-string input", () => {
+    assert.equal(sanitizeImagePath(null), "");
+    assert.equal(sanitizeImagePath(undefined), "");
+    assert.equal(sanitizeImagePath(42), "");
+    assert.equal(sanitizeImagePath({ src: "x" }), "");
+  });
+});
+
+// ============================================================================
+// sanitizeImageSettingValue — plain `image` setting guard (broader than gallery's)
+// ============================================================================
+
+describe("sanitizeImageSettingValue", () => {
+  it("keeps a library upload path", () => {
+    assert.equal(sanitizeImageSettingValue("/uploads/images/photo.jpg"), "/uploads/images/photo.jpg");
+  });
+
+  it("keeps a non-upload in-project theme asset path (unlike the strict gallery guard)", () => {
+    assert.equal(sanitizeImageSettingValue("/default-logo.png"), "/default-logo.png");
+    assert.equal(sanitizeImageSettingValue("/assets/logo.svg"), "/assets/logo.svg");
+    assert.equal(sanitizeImagePath("/default-logo.png"), ""); // contrast: strict guard blanks it
+  });
+
+  it("trims surrounding whitespace", () => {
+    assert.equal(sanitizeImageSettingValue("  /uploads/images/photo.jpg  "), "/uploads/images/photo.jpg");
+  });
+
+  it("blanks schemes, external / protocol-relative URLs, traversal, and relative paths", () => {
+    assert.equal(sanitizeImageSettingValue("javascript:alert(1)"), "");
+    assert.equal(sanitizeImageSettingValue("data:text/html,<script>x</script>"), "");
+    assert.equal(sanitizeImageSettingValue("https://evil.example/x.jpg"), "");
+    assert.equal(sanitizeImageSettingValue("//evil.example/x.jpg"), "");
+    assert.equal(sanitizeImageSettingValue("/uploads/images/../../etc/passwd"), "");
+    assert.equal(sanitizeImageSettingValue("uploads/images/x.jpg"), ""); // relative, no leading slash
+  });
+
+  it("blanks HTML attribute-breakout payloads — the {% image %} fallback src is unescaped", () => {
+    // basename of these reaches a raw <img src="..."> (imageTag.js); a surviving quote/space/<>
+    // would break out of the attribute → XSS. The allowlist rejects them.
+    assert.equal(sanitizeImageSettingValue('/uploads/images/x" onerror="alert(1).jpg'), "");
+    assert.equal(sanitizeImageSettingValue("/uploads/images/x<svg onload=alert(1)>.jpg"), "");
+    assert.equal(sanitizeImageSettingValue("/uploads/images/a b.jpg"), ""); // whitespace
+    assert.equal(sanitizeImageSettingValue("/uploads/images/back\\slash.jpg"), "");
+    assert.equal(sanitizeImageSettingValue("/uploads/images/x'.jpg"), ""); // single quote
+  });
+
+  it("blanks non-strings and keeps an empty value as \"\"", () => {
+    assert.equal(sanitizeImageSettingValue(""), "");
+    assert.equal(sanitizeImageSettingValue(null), "");
+    assert.equal(sanitizeImageSettingValue(42), "");
+    assert.equal(sanitizeImageSettingValue({ src: "x" }), "");
+  });
+});
+
+// ============================================================================
+// image setting sanitization via the exported entry points (widget + theme)
+// ============================================================================
+
+describe("image setting sanitization (entry points)", () => {
+  it("blanks a dangerous image value in a widget setting, keeps a valid upload", () => {
+    const schema = { settings: [{ id: "img", type: "image" }, { id: "bg", type: "image" }], blocks: [] };
+    const data = { settings: { img: "javascript:alert(1)", bg: "/uploads/images/ok.jpg" } };
+    sanitizeWidgetData(data, schema);
+    assert.equal(data.settings.img, "");
+    assert.equal(data.settings.bg, "/uploads/images/ok.jpg");
+  });
+
+  it("normalizes a widget/collection image null to \"\" (uniform invariant, handled before the null guard)", () => {
+    const wData = { settings: { img: null } };
+    sanitizeWidgetData(wData, { settings: [{ id: "img", type: "image" }], blocks: [] });
+    assert.equal(wData.settings.img, "");
+
+    const item = { settings: { featured: null } };
+    sanitizeCollectionItemData(item, { settings: [{ id: "featured", type: "image" }] });
+    assert.equal(item.settings.featured, "");
+  });
+
+  it("blanks a dangerous theme image value, keeps uploads and theme-asset paths", () => {
+    const themeData = {
+      settings: {
+        global: {
+          branding: [
+            { type: "image", id: "evil", value: "https://evil.example/x.jpg", default: "" },
+            { type: "image", id: "logo", value: "/uploads/images/logo.png", default: "" },
+            { type: "image", id: "fallback", value: "/default-logo.png", default: "" },
+          ],
+        },
+      },
+    };
+    const { data } = sanitizeThemeSettings(themeData);
+    const byId = Object.fromEntries(data.settings.global.branding.map((s) => [s.id, s.value]));
+    assert.equal(byId.evil, "");
+    assert.equal(byId.logo, "/uploads/images/logo.png");
+    assert.equal(byId.fallback, "/default-logo.png");
+  });
+
+  it("blanks a dangerous image value in a collection-item setting (third entry point)", () => {
+    const item = {
+      settings: { featured: '/uploads/images/x" onerror="alert(1).jpg', ok: "/uploads/images/ok.jpg" },
+    };
+    sanitizeCollectionItemData(item, {
+      settings: [{ id: "featured", type: "image" }, { id: "ok", type: "image" }],
+    });
+    assert.equal(item.settings.featured, "");
+    assert.equal(item.settings.ok, "/uploads/images/ok.jpg");
+  });
+
+  it("reverts an invalid or null theme image to the default, but preserves an explicit clear", () => {
+    const themeData = {
+      settings: {
+        global: {
+          branding: [
+            { type: "image", id: "bad", value: "javascript:alert(1)", default: "/default-logo.png" },
+            { type: "image", id: "cleared", value: "", default: "/default-logo.png" },
+            // null must NOT win over the default (it bypasses the switch via the null guard);
+            // handled before the guard so it reverts like any other invalid value.
+            { type: "image", id: "nulled", value: null, default: "/default-logo.png" },
+          ],
+        },
+      },
+    };
+    const { data } = sanitizeThemeSettings(themeData);
+    const byId = Object.fromEntries(data.settings.global.branding.map((s) => [s.id, s.value]));
+    assert.equal(byId.bad, "/default-logo.png"); // reverted to default, not erased
+    assert.equal(byId.cleared, ""); // explicit clear preserved
+    assert.equal(byId.nulled, "/default-logo.png"); // null reverts, doesn't wipe the default
+  });
+});
+
+// ============================================================================
+// gallery sanitization — via the exported entry points (the switch helpers are
+// private). The value is a string[] of upload paths. Same rule everywhere: drop
+// blank/invalid (or non-string) entries; normalize non-array (incl. null/undefined) to [].
+// ============================================================================
+
+describe("gallery sanitization", () => {
+  const widgetSchema = { settings: [{ id: "gallery", type: "gallery" }], blocks: [] };
+
+  it("keeps valid upload paths, drops blank/invalid entries (widget)", () => {
+    const data = {
+      settings: {
+        gallery: [
+          "/uploads/images/a.jpg",
+          "javascript:alert(1)",
+          "../../etc/passwd",
+          "https://evil.example/x.jpg",
+          "",
+        ],
+      },
+    };
+    sanitizeWidgetData(data, widgetSchema);
+    assert.deepEqual(data.settings.gallery, ["/uploads/images/a.jpg"]);
+  });
+
+  it("drops a legacy { src, caption } object entry — NOT coerced to its src", () => {
+    // Locks the "no legacy handling / no coercion" decision: an old object-shaped entry
+    // is removed, never converted to a string.
+    const data = {
+      settings: {
+        gallery: [{ src: "/uploads/images/legacy.jpg", caption: "old" }, "/uploads/images/new.jpg"],
+      },
+    };
+    sanitizeWidgetData(data, widgetSchema);
+    assert.deepEqual(data.settings.gallery, ["/uploads/images/new.jpg"]);
+  });
+
+  it("normalizes a non-array gallery to [] (widget)", () => {
+    const data = { settings: { gallery: "not-an-array" } };
+    sanitizeWidgetData(data, widgetSchema);
+    assert.deepEqual(data.settings.gallery, []);
+  });
+
+  it("normalizes a null/undefined gallery to [] — handled before the null guard (widget)", () => {
+    const d1 = { settings: { gallery: null } };
+    const d2 = { settings: { gallery: undefined } };
+    sanitizeWidgetData(d1, widgetSchema);
+    sanitizeWidgetData(d2, widgetSchema);
+    assert.deepEqual(d1.settings.gallery, []);
+    assert.deepEqual(d2.settings.gallery, []);
+  });
+
+  it("sanitizes a gallery in a collection item", () => {
+    const item = {
+      settings: {
+        gallery: ["/uploads/images/room.jpg", "data:text/html,<script>x</script>"],
+      },
+    };
+    sanitizeCollectionItemData(item, { settings: [{ id: "gallery", type: "gallery" }] });
+    assert.deepEqual(item.settings.gallery, ["/uploads/images/room.jpg"]);
+  });
+
+  it("sanitizes a gallery value in theme settings (and does not mutate the input)", () => {
+    const themeData = {
+      settings: {
+        global: {
+          media: [
+            {
+              type: "gallery",
+              id: "showcase",
+              value: ["/uploads/images/t.jpg", "javascript:alert(1)"],
+            },
+          ],
+        },
+      },
+    };
+    const { data } = sanitizeThemeSettings(themeData);
+    assert.deepEqual(data.settings.global.media[0].value, ["/uploads/images/t.jpg"]);
+    // input untouched (sanitizeThemeSettings clones)
+    assert.equal(themeData.settings.global.media[0].value.length, 2);
+  });
+});
+
+// ============================================================================
+// table sanitization (collection items) — via sanitizeCollectionItemData
+// ============================================================================
+
+describe("table sanitization", () => {
+  const schema = {
+    settings: [
+      {
+        id: "rates",
+        type: "table",
+        columns: [
+          { id: "label", type: "text" },
+          { id: "price", type: "text" },
+        ],
+      },
+    ],
+  };
+
+  it("keeps declared cells, drops unknown keys, blanks non-strings, drops empty/whitespace rows", () => {
+    const item = {
+      settings: {
+        rates: [
+          { label: "Low", price: "€10", bogus: "x" }, // unknown key dropped
+          { label: "  ", price: "  " }, // whitespace-only → dropped
+          { label: "", price: "" }, // empty → dropped
+          { label: "High", price: 99 }, // non-string cell → ""
+        ],
+      },
+    };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, [
+      { label: "Low", price: "€10" },
+      { label: "High", price: "" },
+    ]);
+  });
+
+  it("normalizes a non-array table to []", () => {
+    const item = { settings: { rates: "not-an-array" } };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, []);
+  });
+
+  it("drops a number-only row — non-string cells sanitize to '' → all-blank → dropped", () => {
+    const item = { settings: { rates: [{ price: 99 }] } };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, []);
+  });
+
+  it("ignores a __proto__ key smuggled into a row (no prototype pollution)", () => {
+    const row = JSON.parse('{ "label": "L", "price": "P", "__proto__": { "polluted": true } }');
+    const item = { settings: { rates: [row] } };
+    sanitizeCollectionItemData(item, schema);
+    assert.deepEqual(item.settings.rates, [{ label: "L", price: "P" }]);
+    assert.equal({}.polluted, undefined, "Object.prototype must not be polluted");
   });
 });
 

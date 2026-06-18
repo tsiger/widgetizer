@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Brightside Dental. All rights reserved.</p>",
+    "copyright": "© 2026 Brightside Dental. All rights reserved.",
     "color_scheme": "highlight-secondary"
   },
   "blocks": {
@@ -10,6 +10,7 @@
       "settings": {
         "logo_text": "Brightside",
         "text": "<p>Modern family dentistry in Midtown Manhattan. Gentle care, advanced technology, and smiles that last.</p>",
+        "logo": "/uploads/images/brightsidelogolight.png",
         "logo_width": 180
       }
     },
@@ -33,5 +34,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

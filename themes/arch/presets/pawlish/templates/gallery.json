@@ -13,6 +13,7 @@
         "color_scheme": "highlight-secondary",
         "top_spacing": "none",
         "bottom_spacing": "none",
+        "image": "/uploads/images/gallery-hero.webp",
         "overlay_color": "#0a1e388a"
       },
       "blocks": {
@@ -66,98 +67,112 @@
           "type": "item",
           "settings": {
             "title": "Maple",
-            "category": "Goldendoodle · teddy"
+            "category": "Goldendoodle · teddy",
+            "image": "/uploads/images/gallery-cut-1.webp"
           }
         },
         "item-otis": {
           "type": "item",
           "settings": {
             "title": "Otis",
-            "category": "Schnauzer · hand-strip"
+            "category": "Schnauzer · hand-strip",
+            "image": "/uploads/images/gallery-cut-2.webp"
           }
         },
         "item-koda": {
           "type": "item",
           "settings": {
             "title": "Koda",
-            "category": "Husky · de-shed"
+            "category": "Husky · de-shed",
+            "image": "/uploads/images/gallery-cut-3.webp"
           }
         },
         "item-luna": {
           "type": "item",
           "settings": {
             "title": "Luna",
-            "category": "Cavalier · tidy"
+            "category": "Cavalier · tidy",
+            "image": "/uploads/images/gallery-cut-5.webp"
           }
         },
         "item-biscuit": {
           "type": "item",
           "settings": {
             "title": "Biscuit",
-            "category": "Cockapoo · puppy cut"
+            "category": "Cockapoo · puppy cut",
+            "image": "/uploads/images/gallery-cut-4.webp"
           }
         },
         "item-marlow": {
           "type": "item",
           "settings": {
             "title": "Marlow",
-            "category": "Senior lab · bath"
+            "category": "Senior lab · bath",
+            "image": "/uploads/images/gallery-cut-6.webp"
           }
         },
         "item-finn": {
           "type": "item",
           "settings": {
             "title": "Finn",
-            "category": "Wire fox terrier · hand-strip"
+            "category": "Wire fox terrier · hand-strip",
+            "image": "/uploads/images/gallery-cut-7.webp"
           }
         },
         "item-ziggy": {
           "type": "item",
           "settings": {
             "title": "Ziggy",
-            "category": "Sheltie · brush-out"
+            "category": "Sheltie · brush-out",
+            "image": "/uploads/images/gallery-cut-8.webp"
           }
         },
         "item-arlo": {
           "type": "item",
           "settings": {
             "title": "Arlo",
-            "category": "Bichon · round head"
+            "category": "Bichon · round head",
+            "image": "/uploads/images/gallery-cut-9.webp"
           }
         },
         "item-pepper": {
           "type": "item",
           "settings": {
             "title": "Pepper",
-            "category": "Yorkie · short cut"
+            "category": "Yorkie · short cut",
+            "image": "/uploads/images/gallery-cut-11.webp"
           }
         },
         "item-hank": {
           "type": "item",
           "settings": {
             "title": "Hank",
-            "category": "Bernedoodle · long teddy"
+            "category": "Bernedoodle · long teddy",
+            "image": "/uploads/images/gallery-cut-10.webp"
           }
         },
         "item-rosie": {
           "type": "item",
           "settings": {
             "title": "Rosie",
-            "category": "Border collie · groom"
+            "category": "Border collie · groom",
+            "image": "/uploads/images/gallery-cut-12.webp"
           }
         },
         "item-gus": {
           "type": "item",
           "settings": {
             "title": "Gus",
-            "category": "Bedlington · trim"
+            "category": "Bedlington · trim",
+            "image": "/uploads/images/gallery-cut-13.webp"
           }
         },
         "item-ivy": {
           "type": "item",
           "settings": {
             "title": "Ivy",
-            "category": "Cavachon · puppy cut"
+            "category": "Cavachon · puppy cut",
+            "image": "/uploads/images/gallery-cut-14.webp"
           }
         }
       },
@@ -219,6 +234,6 @@
     "gallery_close"
   ],
   "id": "gallery",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T15:00:00.000Z"
+  "created": "2026-04-23T13:59:56.910Z",
+  "updated": "2026-04-23T15:19:27.882Z"
 }

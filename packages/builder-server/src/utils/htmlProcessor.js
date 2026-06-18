@@ -38,6 +38,19 @@ const htmlValidator = new HtmlValidate({
     "doctype-style": "off", // Prettier outputs lowercase <!doctype html>
     "void-style": "off", // Prettier outputs self-closing <meta />
     "element-permitted-content": "off", // Widgets use <style> inside header/sections
+
+    // --- Accessibility (a small hand-picked WCAG subset) ---
+    // Surfaced in the dev-mode export report alongside the recommended HTML
+    // checks. Clear-cut failures are errors; structural rules that are noisier
+    // on widget-composed markup are warnings so they never read as hard errors.
+    "wcag/h37": "error", // images must have alt text
+    "wcag/h30": "error", // links must have discernible text
+    "wcag/h32": "error", // forms must have a submit button
+    "input-missing-label": "error", // form controls must have a label
+    "no-dup-id": "error", // element ids must be unique
+    "heading-level": "warn", // do not skip heading levels
+    "empty-heading": "warn", // headings must not be empty
+    "no-autoplay": "warn", // avoid autoplaying media
   },
 });
 
@@ -78,6 +91,59 @@ export async function formatXml(xml) {
 // ============================================================================
 
 /**
+ * Build a source-context snippet (2 lines before/after) for a 1-based line.
+ * @param {string[]} htmlLines
+ * @param {number} lineNum
+ * @returns {Array<{num: number, code: string, isError: boolean}>}
+ */
+function buildSourceSnippet(htmlLines, lineNum) {
+  const startLine = Math.max(0, lineNum - 3);
+  const endLine = Math.min(htmlLines.length - 1, lineNum + 1);
+  const snippet = [];
+  for (let i = startLine; i <= endLine; i++) {
+    snippet.push({ num: i + 1, code: htmlLines[i] || "", isError: i === lineNum - 1 });
+  }
+  return snippet;
+}
+
+/**
+ * Flag <img> tags that carry an empty/whitespace-only alt attribute.
+ *
+ * html-validate's wcag/h37 only fires when alt is entirely MISSING — but
+ * Widgetizer's {% image %} tag always emits an alt attribute, so an image with
+ * no alt metadata renders as `alt=""`. An empty alt is valid HTML (it marks an
+ * image decorative), so this is a warning, not an error: decorative images are
+ * fine, but it surfaces images that likely just need alt text.
+ * @param {string} html
+ * @param {string[]} htmlLines
+ * @returns {Array} issue objects matching the validateHtml shape
+ */
+function findEmptyAltIssues(html, htmlLines) {
+  const issues = [];
+  const imgRe = /<img\b[^>]*>/gi;
+  const emptyAltRe = /\balt\s*=\s*(['"])\s*\1/;
+  let match;
+  while ((match = imgRe.exec(html)) !== null) {
+    if (!emptyAltRe.test(match[0])) continue;
+    // 1-based line/column from the match offset.
+    const before = html.slice(0, match.index);
+    const line = before.split("\n").length;
+    const column = match.index - before.lastIndexOf("\n");
+    issues.push({
+      line,
+      column,
+      severity: "warning",
+      message:
+        "Image has empty alt text. Add descriptive alt text, or leave it empty only if the image is purely decorative.",
+      ruleId: "widgetizer/img-empty-alt",
+      ruleUrl: null,
+      sourceSnippet: buildSourceSnippet(htmlLines, line),
+    });
+  }
+  return issues;
+}
+
+/**
  * Validates HTML and returns structured issues with source snippets
  * @param {string} html - HTML string to validate
  * @param {string} pageId - Page identifier for the report
@@ -87,33 +153,12 @@ export async function validateHtml(html, pageId) {
   try {
     const report = await htmlValidator.validateString(html);
 
-    if (!report || !Array.isArray(report.results) || report.results.length === 0) {
-      return { issues: [], errorCount: 0, warningCount: 0 };
-    }
-
-    const messages = report.results[0].messages || [];
-    if (messages.length === 0) {
-      return { issues: [], errorCount: 0, warningCount: 0 };
-    }
-
     // Split HTML into lines for source snippets
     const htmlLines = html.split("\n");
 
+    const messages = report?.results?.[0]?.messages || [];
     const issues = messages.map((msg) => {
       const lineNum = msg.line || 0;
-      // Get surrounding lines for context (2 before, 2 after)
-      const startLine = Math.max(0, lineNum - 3);
-      const endLine = Math.min(htmlLines.length - 1, lineNum + 1);
-      const sourceSnippet = [];
-
-      for (let i = startLine; i <= endLine; i++) {
-        sourceSnippet.push({
-          num: i + 1,
-          code: htmlLines[i] || "",
-          isError: i === lineNum - 1,
-        });
-      }
-
       return {
         line: lineNum,
         column: msg.column || 0,
@@ -121,9 +166,16 @@ export async function validateHtml(html, pageId) {
         message: msg.message || "Unknown issue",
         ruleId: msg.ruleId || "unknown",
         ruleUrl: msg.ruleUrl || null,
-        sourceSnippet,
+        sourceSnippet: buildSourceSnippet(htmlLines, lineNum),
       };
     });
+
+    // Append Widgetizer's own checks (empty alt) — these run even when
+    // html-validate finds nothing, so they're outside the early returns above.
+    issues.push(...findEmptyAltIssues(html, htmlLines));
+
+    // Stable order: by line, then column, so synthetic and native issues interleave naturally.
+    issues.sort((a, b) => a.line - b.line || a.column - b.column);
 
     return {
       issues,

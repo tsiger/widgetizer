@@ -2,15 +2,16 @@
   "name": "Events",
   "slug": "events",
   "id": "events",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T12:39:31.882Z",
+  "updated": "2026-04-22T12:57:26.284Z",
   "widgets": {
     "page_header": {
       "type": "banner",
       "settings": {
         "height": "medium",
         "alignment": "center",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/events-banner.webp"
       },
       "blocks": {
         "page-eyebrow": {
@@ -37,7 +38,11 @@
           }
         }
       },
-      "blocksOrder": ["page-eyebrow", "page-heading", "page-text"]
+      "blocksOrder": [
+        "page-eyebrow",
+        "page-heading",
+        "page-text"
+      ]
     },
     "intro_text": {
       "type": "rich-text",
@@ -67,14 +72,19 @@
             "link": {
               "href": "contact.html",
               "text": "Start Planning",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-text", "intro-button"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text",
+        "intro-button"
+      ]
     },
     "occasions_grid": {
       "type": "card-grid",
@@ -136,7 +146,14 @@
           }
         }
       },
-      "blocksOrder": ["card-weddings", "card-corporate", "card-birthday", "card-sympathy", "card-baby", "card-seasonal"]
+      "blocksOrder": [
+        "card-weddings",
+        "card-corporate",
+        "card-birthday",
+        "card-sympathy",
+        "card-baby",
+        "card-seasonal"
+      ]
     },
     "event_dates": {
       "type": "event-list",
@@ -158,7 +175,8 @@
             "button_link": {
               "href": "contact.html",
               "text": "Pre-Order",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             }
           }
         },
@@ -173,7 +191,8 @@
             "button_link": {
               "href": "contact.html",
               "text": "Pre-Order",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             }
           }
         },
@@ -188,7 +207,8 @@
             "button_link": {
               "href": "contact.html",
               "text": "Book a Consult",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             }
           }
         },
@@ -203,12 +223,18 @@
             "button_link": {
               "href": "contact.html",
               "text": "Pre-Order",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             }
           }
         }
       },
-      "blocksOrder": ["event-valentines", "event-mothers", "event-wedding", "event-christmas"]
+      "blocksOrder": [
+        "event-valentines",
+        "event-mothers",
+        "event-wedding",
+        "event-christmas"
+      ]
     },
     "testimonials_events": {
       "type": "testimonials",
@@ -249,7 +275,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-wedding", "quote-corporate", "quote-birthday"]
+      "blocksOrder": [
+        "quote-wedding",
+        "quote-corporate",
+        "quote-birthday"
+      ]
     },
     "events_cta": {
       "type": "action-bar",
@@ -278,15 +308,27 @@
             "link": {
               "href": "contact.html",
               "text": "Request a Consultation",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["page_header", "intro_text", "occasions_grid", "event_dates", "testimonials_events", "events_cta"]
+  "widgetsOrder": [
+    "page_header",
+    "intro_text",
+    "occasions_grid",
+    "event_dates",
+    "testimonials_events",
+    "events_cta"
+  ]
 }

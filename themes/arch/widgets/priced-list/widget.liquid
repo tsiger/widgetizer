@@ -170,9 +170,9 @@
                   {% if block.settings.name != blank %}
                     <{{ item_heading_level }} class="priced-item-name w-title t-xl" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
                   {% endif %}
-                  {% if block.settings.description != blank %}
+                  {% unless block.settings.description | rte_blank %}
                     <div class="priced-item-description w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
-                  {% endif %}
+                  {% endunless %}
                 </div>
                 <div class="priced-item-right">
                   {% if block.settings.price != blank %}
@@ -199,9 +199,9 @@
                 {% if block.settings.name != blank %}
                   <{{ item_heading_level }} class="priced-item-name w-title t-xl" data-setting="name">{{ block.settings.name }}</{{ item_heading_level }}>
                 {% endif %}
-                {% if block.settings.description != blank %}
+                {% unless block.settings.description | rte_blank %}
                   <div class="priced-item-description w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
-                {% endif %}
+                {% endunless %}
               </div>
               <div class="priced-item-right">
                 {% if block.settings.price != blank %}

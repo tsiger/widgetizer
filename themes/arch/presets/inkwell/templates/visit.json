@@ -39,7 +39,11 @@
           }
         }
       },
-      "blocksOrder": ["vo-eyebrow", "vo-heading", "vo-body"]
+      "blocksOrder": [
+        "vo-eyebrow",
+        "vo-heading",
+        "vo-body"
+      ]
     },
     "session_day": {
       "type": "image-callout",
@@ -47,7 +51,8 @@
         "image_position": "start",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/visit-session.webp"
       },
       "blocks": {
         "sd-kicker": {
@@ -80,7 +85,12 @@
           }
         }
       },
-      "blocksOrder": ["sd-kicker", "sd-heading", "sd-text", "sd-features"]
+      "blocksOrder": [
+        "sd-kicker",
+        "sd-heading",
+        "sd-text",
+        "sd-features"
+      ]
     },
     "space_tiles": {
       "type": "bento-grid",
@@ -105,7 +115,8 @@
             "col_span": 3,
             "row_span": 2,
             "text_color": "light",
-            "alignment": "start"
+            "alignment": "start",
+            "image": "/uploads/images/visit-space-tile.webp"
           }
         },
         "st-licensed": {
@@ -133,7 +144,11 @@
           }
         }
       },
-      "blocksOrder": ["st-main", "st-licensed", "st-station"]
+      "blocksOrder": [
+        "st-main",
+        "st-licensed",
+        "st-station"
+      ]
     },
     "studio_faq": {
       "type": "accordion",
@@ -215,7 +230,17 @@
           }
         }
       },
-      "blocksOrder": ["fq-sidebar", "fq-1", "fq-2", "fq-3", "fq-4", "fq-5", "fq-6", "fq-7", "fq-8"]
+      "blocksOrder": [
+        "fq-sidebar",
+        "fq-1",
+        "fq-2",
+        "fq-3",
+        "fq-4",
+        "fq-5",
+        "fq-6",
+        "fq-7",
+        "fq-8"
+      ]
     },
     "find_us": {
       "type": "map",
@@ -249,7 +274,10 @@
           }
         }
       },
-      "blocksOrder": ["fu-transit", "fu-parking"]
+      "blocksOrder": [
+        "fu-transit",
+        "fu-parking"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -282,18 +310,30 @@
             "link": {
               "text": "Start an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["vc-heading", "vc-text", "vc-button"]
+      "blocksOrder": [
+        "vc-heading",
+        "vc-text",
+        "vc-button"
+      ]
     }
   },
-  "widgetsOrder": ["opener", "session_day", "space_tiles", "studio_faq", "find_us", "cta"],
+  "widgetsOrder": [
+    "opener",
+    "session_day",
+    "space_tiles",
+    "studio_faq",
+    "find_us",
+    "cta"
+  ],
   "id": "visit",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T15:30:23.103Z",
+  "updated": "2026-04-20T16:00:52.311Z"
 }

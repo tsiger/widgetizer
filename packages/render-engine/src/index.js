@@ -8,6 +8,11 @@
 export {
   renderWidget,
   renderPageLayout,
+  renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
 } from "./renderEngine.js";
+
+// Pure `menu`-type setting resolver (Collections finding #10), shared by
+// collection-item rendering and — once 741abfb8 is folded in — widget rendering.
+export { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";

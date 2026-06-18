@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/gallery-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,7 +24,9 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "gallery": {
       "type": "gallery",
@@ -43,68 +45,78 @@
         "img-1": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-treatment-room.webp",
             "caption": "Treatment room"
           }
         },
         "img-2": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-oils.webp",
             "caption": "Essential oils"
           }
         },
         "img-3": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-lounge.webp",
             "caption": "Relaxation lounge"
           }
         },
         "img-4": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-stones.webp",
             "caption": "Hot stone preparation"
           }
         },
         "img-5": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-products.webp",
             "caption": "Skincare products"
           }
         },
         "img-6": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/treatments-couples-1.webp",
             "caption": "Couples suite"
           }
         },
         "img-7": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-candles.webp",
             "caption": "Reception area"
           }
         },
         "img-8": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-courtyard.webp",
             "caption": "Candles and ambiance"
           }
         },
         "img-9": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-therapist.webp",
             "caption": "Garden courtyard"
           }
         }
       },
-      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6", "img-7", "img-8", "img-9"]
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6",
+        "img-7",
+        "img-8",
+        "img-9"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -126,18 +138,26 @@
             "link": {
               "text": "Book a Treatment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "gallery", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "gallery",
+    "cta"
+  ],
   "id": "gallery",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-19T11:19:49.751Z",
+  "updated": "2026-04-19T15:22:20.201Z"
 }

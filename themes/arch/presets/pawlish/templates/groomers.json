@@ -13,6 +13,7 @@
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
         "bottom_spacing": "auto",
+        "image": "/uploads/images/hero-groom.webp",
         "overlay_color": "#0a1e388a"
       },
       "blocks": {
@@ -52,7 +53,8 @@
       "type": "image-text",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/groomers-intro.webp"
       },
       "blocks": {
         "intro-eyebrow": {
@@ -121,7 +123,8 @@
             "role": "Lead groomer & founder",
             "specialty": "Doodles · hand-stripping · anxious dogs",
             "bio": "Twelve years in two other shops before opening Pawlish in 2017. Specializes in doodle teddy cuts, terrier hand-stripping, and the slow work nervous dogs need. NDGAA certified. The person to ask if your dog has been turned away elsewhere.",
-            "instagram": "pawlishgrooming"
+            "instagram": "pawlishgrooming",
+            "photo": "/uploads/images/groomer-mara.webp"
           }
         },
         "groomer-dani": {
@@ -131,7 +134,8 @@
             "role": "Senior groomer",
             "specialty": "Double coats · de-shed · large breeds",
             "bio": "Nine years grooming, four with Pawlish. Handles huskies, malamutes, shepherds, and large retrievers — the double coats nobody else wants. IPG certified. Strong, calm, patient with the big dogs.",
-            "instagram": "danigroomsdogs"
+            "instagram": "danigroomsdogs",
+            "photo": "/uploads/images/groomer-dani.webp"
           }
         },
         "groomer-rae": {
@@ -141,7 +145,8 @@
             "role": "Groomer",
             "specialty": "Small breeds · puppies · sanitary trims",
             "bio": "Vet tech background, three years grooming. The right person for puppies, small breeds, and any dog whose first grooming experience needs to land well. Working toward NDGAA Master Groomer.",
-            "instagram": ""
+            "instagram": "",
+            "photo": "/uploads/images/groomer-rae.webp"
           }
         },
         "groomer-jules": {
@@ -151,7 +156,8 @@
             "role": "Groomer & bath tech",
             "specialty": "Bath services · walk-in nails · seniors",
             "bio": "Five years at Pawlish, runs the bath station and walk-in nail service. Pet First Aid & CPR certified. The gentle hand most senior dogs settle into immediately.",
-            "instagram": ""
+            "instagram": "",
+            "photo": "/uploads/images/groomer-jules.webp"
           }
         }
       },
@@ -184,7 +190,12 @@
           "settings": {
             "icon": "paw",
             "title": "Never sedated",
-            "description": "If a dog can't be groomed without sedation, we don't groom them."
+            "description": "If a dog can't be groomed without sedation, we don't groom them.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "promise-breaks": {
@@ -192,7 +203,12 @@
           "settings": {
             "icon": "clock",
             "title": "Breaks built in",
-            "description": "Senior and anxious dogs work in shorter blocks."
+            "description": "Senior and anxious dogs work in shorter blocks.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "promise-no-crate": {
@@ -200,7 +216,12 @@
           "settings": {
             "icon": "home",
             "title": "No crate dryers",
-            "description": "Hand-dried with low-noise forced-air, every dog."
+            "description": "Hand-dried with low-noise forced-air, every dog.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "promise-notes": {
@@ -208,7 +229,12 @@
           "settings": {
             "icon": "clipboard-text",
             "title": "Notes at pickup",
-            "description": "Skin, nails, anything off — written down."
+            "description": "Skin, nails, anything off — written down.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
@@ -223,7 +249,9 @@
       "type": "testimonial-hero",
       "settings": {
         "image_position": "start",
-        "color_scheme": "highlight-secondary"
+        "color_scheme": "highlight-secondary",
+        "logo": "",
+        "author_image": "/uploads/images/groomer-quote-portrait.webp"
       },
       "blocks": {
         "quote-text": {
@@ -318,6 +346,6 @@
     "groomers_close"
   ],
   "id": "groomers",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T15:00:00.000Z"
+  "created": "2026-04-23T13:59:56.911Z",
+  "updated": "2026-04-23T15:17:52.109Z"
 }

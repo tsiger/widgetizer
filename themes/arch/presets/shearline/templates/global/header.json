@@ -17,6 +17,10 @@
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/shearline-logo-dark.png",
+    "transparent_logo": "/uploads/images/shearline-logo-light-v2.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

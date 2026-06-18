@@ -39,7 +39,11 @@
           }
         }
       },
-      "blocksOrder": ["wo-eyebrow", "wo-heading", "wo-body"]
+      "blocksOrder": [
+        "wo-eyebrow",
+        "wo-heading",
+        "wo-body"
+      ]
     },
     "mosaic": {
       "type": "checkerboard",
@@ -57,7 +61,9 @@
       "blocks": {
         "m-1": {
           "type": "card",
-          "settings": {}
+          "settings": {
+            "image": "/uploads/images/work-01.webp"
+          }
         },
         "m-2": {
           "type": "card",
@@ -67,17 +73,22 @@
             "button_link": {
               "text": "With Rafael",
               "href": "artists.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
             }
           }
         },
         "m-3": {
           "type": "card",
-          "settings": {}
+          "settings": {
+            "image": "/uploads/images/work-02.webp"
+          }
         },
         "m-4": {
           "type": "card",
-          "settings": {}
+          "settings": {
+            "image": "/uploads/images/work-03.webp"
+          }
         },
         "m-5": {
           "type": "card",
@@ -87,16 +98,26 @@
             "button_link": {
               "text": "With Jules",
               "href": "artists.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
             }
           }
         },
         "m-6": {
           "type": "card",
-          "settings": {}
+          "settings": {
+            "image": "/uploads/images/work-04.webp"
+          }
         }
       },
-      "blocksOrder": ["m-1", "m-2", "m-3", "m-4", "m-5", "m-6"]
+      "blocksOrder": [
+        "m-1",
+        "m-2",
+        "m-3",
+        "m-4",
+        "m-5",
+        "m-6"
+      ]
     },
     "archive": {
       "type": "masonry-gallery",
@@ -114,28 +135,117 @@
         "bottom_spacing": "auto"
       },
       "blocks": {
-        "a-01": { "type": "item", "settings": { "title": "Hannya mask", "category": "Japanese · Rafael" } },
-        "a-02": { "type": "item", "settings": { "title": "Botanical half-sleeve", "category": "Fine line · Saoirse" } },
-        "a-03": { "type": "item", "settings": { "title": "Woodcut wolf", "category": "Blackwork · Jules" } },
-        "a-04": { "type": "item", "settings": { "title": "Photorealistic panther", "category": "Realism · Elena" } },
-        "a-05": { "type": "item", "settings": { "title": "Swallow pair", "category": "American trad · Kiko" } },
-        "a-06": { "type": "item", "settings": { "title": "Sacred geometry back piece", "category": "Dotwork · Indra" } },
-        "a-07": { "type": "item", "settings": { "title": "Koi sleeve", "category": "Japanese · Rafael" } },
-        "a-08": { "type": "item", "settings": { "title": "Minimal floral", "category": "Fine line · Saoirse" } },
-        "a-09": { "type": "item", "settings": { "title": "Engraved ornament", "category": "Blackwork · Jules" } },
-        "a-10": { "type": "item", "settings": { "title": "Architectural portrait", "category": "Realism · Elena" } },
-        "a-11": { "type": "item", "settings": { "title": "Rose and dagger", "category": "Neotraditional · Kiko" } },
-        "a-12": { "type": "item", "settings": { "title": "Mandala chest piece", "category": "Dotwork · Indra" } },
-        "a-13": { "type": "item", "settings": { "title": "Dragon and peonies", "category": "Japanese · Rafael" } },
-        "a-14": { "type": "item", "settings": { "title": "Script and filigree", "category": "Fine line · Saoirse" } },
-        "a-15": { "type": "item", "settings": { "title": "Baroque ornament", "category": "Blackwork · Jules" } },
-        "a-16": { "type": "item", "settings": { "title": "Hound portrait", "category": "Realism · Elena" } },
-        "a-17": { "type": "item", "settings": { "title": "Anchor and rope", "category": "American trad · Kiko" } },
-        "a-18": { "type": "item", "settings": { "title": "Geometric bicep band", "category": "Dotwork · Indra" } },
-        "a-19": { "type": "item", "settings": { "title": "Architectural facade", "category": "Fine line · Saoirse" } },
-        "a-20": { "type": "item", "settings": { "title": "Wave and wind back piece", "category": "Japanese · Rafael" } }
+        "a-01": {
+          "type": "item",
+          "settings": {
+            "title": "Hannya mask",
+            "category": "Japanese · Rafael",
+            "image": "/uploads/images/work-01.webp"
+          }
+        },
+        "a-02": {
+          "type": "item",
+          "settings": {
+            "title": "Botanical half-sleeve",
+            "category": "Fine line · Saoirse",
+            "image": "/uploads/images/work-02.webp"
+          }
+        },
+        "a-03": {
+          "type": "item",
+          "settings": {
+            "title": "Woodcut wolf",
+            "category": "Blackwork · Jules",
+            "image": "/uploads/images/work-03.webp"
+          }
+        },
+        "a-04": {
+          "type": "item",
+          "settings": {
+            "title": "Photorealistic panther",
+            "category": "Realism · Elena",
+            "image": "/uploads/images/work-04.webp"
+          }
+        },
+        "a-05": {
+          "type": "item",
+          "settings": {
+            "title": "Swallow pair",
+            "category": "American trad · Kiko",
+            "image": "/uploads/images/work-05.webp"
+          }
+        },
+        "a-06": {
+          "type": "item",
+          "settings": {
+            "title": "Sacred geometry back piece",
+            "category": "Dotwork · Indra",
+            "image": "/uploads/images/work-06.webp"
+          }
+        },
+        "a-07": {
+          "type": "item",
+          "settings": {
+            "title": "Koi sleeve",
+            "category": "Japanese · Rafael",
+            "image": "/uploads/images/work-07.webp"
+          }
+        },
+        "a-08": {
+          "type": "item",
+          "settings": {
+            "title": "Minimal floral",
+            "category": "Fine line · Saoirse",
+            "image": "/uploads/images/work-02.webp"
+          }
+        },
+        "a-09": {
+          "type": "item",
+          "settings": {
+            "title": "Engraved ornament",
+            "category": "Blackwork · Jules",
+            "image": "/uploads/images/work-09.webp"
+          }
+        },
+        "a-10": {
+          "type": "item",
+          "settings": {
+            "title": "Architectural portrait",
+            "category": "Realism · Elena",
+            "image": "/uploads/images/work-10.webp"
+          }
+        },
+        "a-11": {
+          "type": "item",
+          "settings": {
+            "title": "Rose and dagger",
+            "category": "Neotraditional · Kiko",
+            "image": "/uploads/images/work-11.webp"
+          }
+        },
+        "a-12": {
+          "type": "item",
+          "settings": {
+            "title": "Mandala chest piece",
+            "category": "Dotwork · Indra",
+            "image": "/uploads/images/work-12.webp"
+          }
+        }
       },
-      "blocksOrder": ["a-01", "a-02", "a-03", "a-04", "a-05", "a-06", "a-07", "a-08", "a-09", "a-10", "a-11", "a-12", "a-13", "a-14", "a-15", "a-16", "a-17", "a-18", "a-19", "a-20"]
+      "blocksOrder": [
+        "a-01",
+        "a-02",
+        "a-03",
+        "a-04",
+        "a-05",
+        "a-06",
+        "a-07",
+        "a-08",
+        "a-09",
+        "a-10",
+        "a-11",
+        "a-12"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -168,18 +278,28 @@
             "link": {
               "text": "Start an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["wc-heading", "wc-text", "wc-button"]
+      "blocksOrder": [
+        "wc-heading",
+        "wc-text",
+        "wc-button"
+      ]
     }
   },
-  "widgetsOrder": ["opener", "mosaic", "archive", "cta"],
+  "widgetsOrder": [
+    "opener",
+    "mosaic",
+    "archive",
+    "cta"
+  ],
   "id": "work",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T15:30:23.104Z",
+  "updated": "2026-04-20T16:00:18.275Z"
 }

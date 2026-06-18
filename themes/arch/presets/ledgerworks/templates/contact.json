@@ -57,49 +57,13 @@
             "alignment": "start",
             "position": "left"
           }
-        },
-        "c-right-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Visit the office",
-            "size": "2xl",
-            "position": "right"
-          }
-        },
-        "c-right-address": {
-          "type": "text",
-          "settings": {
-            "text": "<p>1420 Guadalupe Street, Suite 210</p><p>Austin, TX 78701</p>",
-            "size": "base",
-            "position": "right"
-          }
-        },
-        "c-right-hours-heading": {
-          "type": "heading",
-          "settings": {
-            "text": "Office hours",
-            "size": "2xl",
-            "position": "right"
-          }
-        },
-        "c-right-hours": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Monday – Friday, 9am – 5pm Central</p><p>Evenings & weekends by appointment during tax season</p>",
-            "size": "base",
-            "position": "right"
-          }
         }
       },
       "blocksOrder": [
         "c-eyebrow",
         "c-heading",
         "c-text-left",
-        "c-buttons",
-        "c-right-heading",
-        "c-right-address",
-        "c-right-hours-heading",
-        "c-right-hours"
+        "c-buttons"
       ]
     },
     "office_map": {
@@ -122,8 +86,8 @@
         "map-parking": {
           "type": "info",
           "settings": {
-            "title": "Parking",
-            "text": "<p>Two-hour street parking on Guadalupe.</p><p>Paid garage entrance on 15th Street, one block north.</p>"
+            "title": "Visit the office",
+            "text": "<p>1420 Guadalupe Street, Suite 210</p><p>Austin, TX 78701</p>"
           }
         },
         "map-transit": {
@@ -132,9 +96,20 @@
             "title": "Getting here",
             "text": "<p>CapMetro bus routes 7, 20, and 803 stop within two blocks.</p><p>Three blocks from UT Austin campus.</p>"
           }
+        },
+        "block_36e01e0f-4976-4241-9f85-6471674129d1": {
+          "type": "info",
+          "settings": {
+            "title": "Parking",
+            "text": "<p>Two-hour street parking on Guadalupe.</p><p>Paid garage entrance on 15th Street, one block north.</p>"
+          }
         }
       },
-      "blocksOrder": ["map-parking", "map-transit"]
+      "blocksOrder": [
+        "map-parking",
+        "block_36e01e0f-4976-4241-9f85-6471674129d1",
+        "map-transit"
+      ]
     },
     "contact_faq": {
       "type": "accordion",
@@ -188,11 +163,21 @@
           }
         }
       },
-      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4"]
+      "blocksOrder": [
+        "cf-sidebar",
+        "cf-1",
+        "cf-2",
+        "cf-3",
+        "cf-4"
+      ]
     }
   },
-  "widgetsOrder": ["contact_opener", "office_map", "contact_faq"],
+  "widgetsOrder": [
+    "contact_opener",
+    "office_map",
+    "contact_faq"
+  ],
   "id": "contact",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T08:03:30.086Z",
+  "updated": "2026-04-20T08:05:32.680Z"
 }

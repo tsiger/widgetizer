@@ -8,13 +8,18 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Free Consultation",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "c887d105-141a-4f16-abb3-6c711cb6aa6a"
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,
     "full_width": false,
     "sticky": true,
     "transparent_on_hero": false,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/greystonedark.png",
+    "logoMaxWidth": 170
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

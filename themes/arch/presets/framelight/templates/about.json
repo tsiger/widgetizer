@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/banner-about-hero.webp"
       },
       "blocks": {
         "intro-eyebrow": {
@@ -32,7 +33,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading"
+      ]
     },
     "about_bio": {
       "type": "image-text",
@@ -40,7 +44,8 @@
         "image_position": "start",
         "text_position": "flex-end",
         "color_scheme": "standard-primary",
-        "content_color_scheme": "none"
+        "content_color_scheme": "none",
+        "image": "/uploads/images/photographer-portrait-studio.webp"
       },
       "blocks": {
         "bio-heading": {
@@ -69,7 +74,11 @@
           }
         }
       },
-      "blocksOrder": ["bio-heading", "bio-body-1", "bio-body-2"]
+      "blocksOrder": [
+        "bio-heading",
+        "bio-body-1",
+        "bio-body-2"
+      ]
     },
     "about_bts": {
       "type": "video-popup",
@@ -80,7 +89,8 @@
         "fullwidth": true,
         "play_button_style": "light",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/video-poster-behind-scenes.webp"
       }
     },
     "about_testimonial": {
@@ -89,7 +99,8 @@
         "image_position": "start",
         "color_scheme": "highlight-secondary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "author_image": "/uploads/images/testimonial-james-feature.webp"
       },
       "blocks": {
         "t-quote": {
@@ -118,7 +129,11 @@
           }
         }
       },
-      "blocksOrder": ["t-quote", "t-name", "t-role"]
+      "blocksOrder": [
+        "t-quote",
+        "t-name",
+        "t-role"
+      ]
     },
     "about_philosophy": {
       "type": "split-content",
@@ -157,7 +172,11 @@
           }
         }
       },
-      "blocksOrder": ["phil-eyebrow", "phil-heading", "phil-body"]
+      "blocksOrder": [
+        "phil-eyebrow",
+        "phil-heading",
+        "phil-body"
+      ]
     },
     "about_closing": {
       "type": "banner",
@@ -194,18 +213,30 @@
             "link": {
               "text": "Inquire",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-body", "close-cta"]
+      "blocksOrder": [
+        "close-heading",
+        "close-body",
+        "close-cta"
+      ]
     }
   },
-  "widgetsOrder": ["about_intro", "about_bio", "about_bts", "about_testimonial", "about_philosophy", "about_closing"],
+  "widgetsOrder": [
+    "about_intro",
+    "about_bio",
+    "about_bts",
+    "about_testimonial",
+    "about_philosophy",
+    "about_closing"
+  ],
   "id": "about",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T09:38:18.151Z",
+  "updated": "2026-04-23T10:20:13.223Z"
 }

@@ -13,7 +13,8 @@
         "overlay_color": "#08264599",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -56,7 +57,8 @@
         "color_scheme": "standard-primary",
         "content_color_scheme": "none",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/villa-founder.webp"
       },
       "blocks": {
         "fs-eyebrow": {
@@ -263,45 +265,6 @@
         "ms-now"
       ]
     },
-    "hosts": {
-      "type": "team-highlight",
-      "settings": {
-        "eyebrow": "Your hosts",
-        "eyebrow_uppercase": true,
-        "title": "The people answering the email.",
-        "description": "Two of us. No reception desk. No concierge. We answer the email, check you in, make breakfast, and point you at the best beach.",
-        "heading_alignment": "start",
-        "columns_desktop": 2,
-        "image_ratio": "portrait",
-        "color_scheme": "standard-secondary",
-        "top_spacing": "auto",
-        "bottom_spacing": "auto"
-      },
-      "blocks": {
-        "host-eleni": {
-          "type": "member",
-          "settings": {
-            "name": "Eleni Andreou",
-            "role": "Owner · Property & logistics",
-            "specialty": "Knows every beach, boat captain, and taverna",
-            "bio": "Grew up in Athens, studied food writing in Rome, moved to Paros with Yannis in 2011 and hasn't missed a city since. Makes breakfast every morning and the occasional evening dinner for guests who ask."
-          }
-        },
-        "host-yannis": {
-          "type": "member",
-          "settings": {
-            "name": "Yannis Moraitis",
-            "role": "Innkeeper · Breakfast",
-            "specialty": "Runs the kitchen, the garden, and the email",
-            "bio": "Fifth-generation Parian. Grew up in and around the villa. Runs the property side of things — airport transfers, the pool, fixing whatever needs fixing, and pointing guests at the best walks."
-          }
-        }
-      },
-      "blocksOrder": [
-        "host-eleni",
-        "host-yannis"
-      ]
-    },
     "closing_cta": {
       "type": "action-bar",
       "settings": {
@@ -333,13 +296,15 @@
             "link": {
               "text": "Check availability",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
             },
             "style": "primary",
             "link_2": {
               "text": "See the rooms",
               "href": "rooms.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "a48394e3-2466-42d0-b762-30b88a4b8346"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -351,6 +316,47 @@
         "cta-text",
         "cta-button"
       ]
+    },
+    "widget_8d8fc76f-9a29-40db-a55d-d806707f544d": {
+      "type": "team-highlight",
+      "settings": {
+        "eyebrow": "Your hosts",
+        "eyebrow_uppercase": true,
+        "title": "The people answering the email.",
+        "description": "Two of us. No reception desk. No concierge. We answer the email, check you in, make breakfast, and point you at the best beach.",
+        "heading_alignment": "start",
+        "columns_desktop": 2,
+        "image_ratio": "portrait",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "block_14f31971-afd8-4655-847d-34b0903ac2e6": {
+          "type": "member",
+          "settings": {
+            "name": "Eleni Andreou",
+            "role": "Owner · Property & logistics",
+            "photo": "/uploads/images/team-eleni.webp",
+            "specialty": "Knows every beach, boat captain, and taverna",
+            "bio": "Grew up in Athens, studied food writing in Rome, moved to Paros with Yannis in 2011 and hasn't missed a city since. Makes breakfast every morning and the occasional evening dinner for guests who ask."
+          }
+        },
+        "block_52ce75d5-dd27-40b8-992f-1d5f6bd2feb9": {
+          "type": "member",
+          "settings": {
+            "name": "Yannis Moraitis",
+            "role": "Innkeeper · Breakfast",
+            "photo": "/uploads/images/team-yannis.webp",
+            "specialty": "Runs the kitchen, the garden, and the email",
+            "bio": "Fifth-generation Parian. Grew up in and around the villa. Runs the property side of things — airport transfers, the pool, fixing whatever needs fixing, and pointing guests at the best walks."
+          }
+        }
+      },
+      "blocksOrder": [
+        "block_14f31971-afd8-4655-847d-34b0903ac2e6",
+        "block_52ce75d5-dd27-40b8-992f-1d5f6bd2feb9"
+      ]
     }
   },
   "widgetsOrder": [
@@ -358,10 +364,10 @@
     "founder_story",
     "differently",
     "milestones",
-    "hosts",
+    "widget_8d8fc76f-9a29-40db-a55d-d806707f544d",
     "closing_cta"
   ],
   "id": "about",
-  "created": "2026-04-21T16:00:00.000Z",
-  "updated": "2026-04-22T08:48:21.280Z"
+  "created": "2026-04-22T08:53:25.053Z",
+  "updated": "2026-04-22T10:23:57.113Z"
 }

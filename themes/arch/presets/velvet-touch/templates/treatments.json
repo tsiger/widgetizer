@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/treatments-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,12 +24,14 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "massage": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/treatments-massage.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -71,19 +73,26 @@
             "link": {
               "text": "Book a Massage",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["massage-eyebrow", "massage-heading", "massage-text", "massage-features", "massage-button"]
+      "blocksOrder": [
+        "massage-eyebrow",
+        "massage-heading",
+        "massage-text",
+        "massage-features",
+        "massage-button"
+      ]
     },
     "facials": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/treatments-facials.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -125,19 +134,26 @@
             "link": {
               "text": "Book a Facial",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["facials-eyebrow", "facials-heading", "facials-text", "facials-features", "facials-button"]
+      "blocksOrder": [
+        "facials-eyebrow",
+        "facials-heading",
+        "facials-text",
+        "facials-features",
+        "facials-button"
+      ]
     },
     "body": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/treatments-body.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -179,19 +195,26 @@
             "link": {
               "text": "Book a Body Treatment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["body-eyebrow", "body-heading", "body-text", "body-features", "body-button"]
+      "blocksOrder": [
+        "body-eyebrow",
+        "body-heading",
+        "body-text",
+        "body-features",
+        "body-button"
+      ]
     },
     "couples": {
       "type": "image-callout",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/treatments-couples.webp",
         "image_position": "end",
         "color_scheme": "highlight-primary"
       },
@@ -216,18 +239,29 @@
             "link": {
               "text": "Book a Couples Session",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["couples-heading", "couples-text", "couples-button"]
+      "blocksOrder": [
+        "couples-heading",
+        "couples-text",
+        "couples-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "massage", "facials", "body", "couples"],
+  "widgetsOrder": [
+    "hero",
+    "massage",
+    "facials",
+    "body",
+    "couples"
+  ],
   "id": "treatments",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-19T11:19:49.760Z",
+  "updated": "2026-04-19T15:21:00.144Z"
 }

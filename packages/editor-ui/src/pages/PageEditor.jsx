@@ -14,6 +14,7 @@ import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
+import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
 
 export default function PageEditor() {
   const { t } = useTranslation();
@@ -39,6 +40,9 @@ export default function PageEditor() {
 
   // Add navigation guard
   useNavigationGuard();
+
+  // Delete / Backspace removes the selected widget or block
+  useDeleteKeyShortcut();
 
   // Load initial data — the project-scoped boundary in RequireActiveProject
   // remounts this component on project switch, so no manual reset is needed.

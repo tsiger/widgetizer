@@ -2,7 +2,7 @@
   "type": "footer",
   "settings": {
     "copyright": "",
-    "layout": "first-featured",
+    "layout": "equal",
     "color_scheme": "highlight-primary"
   },
   "blocks": {
@@ -10,8 +10,9 @@
       "type": "logo_text",
       "settings": {
         "logo_text": "Shearline",
-        "logo_width": 120,
-        "text": "<p>Hair salon. Tuesday through Saturday, by appointment. No walk-ins for color.</p>"
+        "logo_width": 180,
+        "text": "<p>Hair salon. Tuesday through Saturday, by appointment. No walk-ins for color.</p>",
+        "logo": "/uploads/images/shearline-logo-light.png"
       }
     },
     "text_block_1": {
@@ -35,5 +36,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

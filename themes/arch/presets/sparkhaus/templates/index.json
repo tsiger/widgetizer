@@ -13,15 +13,10 @@
         "overlay_color": "#1a2530a8",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-hero.webp"
       },
       "blocks": {
-        "hero-rating": {
-          "type": "rating",
-          "settings": {
-            "rating": "5"
-          }
-        },
         "hero-eyebrow": {
           "type": "text",
           "settings": {
@@ -51,14 +46,27 @@
             "link": {
               "text": "Get a quote in 2 minutes",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
             },
             "style": "primary",
             "size": "large"
           }
+        },
+        "block_3a296350-9943-401a-a9b8-5d5a8c3e7798": {
+          "type": "rating",
+          "settings": {
+            "rating": "5"
+          }
         }
       },
-      "blocksOrder": ["hero-rating", "hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+      "blocksOrder": [
+        "block_3a296350-9943-401a-a9b8-5d5a8c3e7798",
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
     },
     "credentials": {
       "type": "trust-bar",
@@ -114,7 +122,13 @@
           }
         }
       },
-      "blocksOrder": ["cr-1", "cr-2", "cr-3", "cr-4", "cr-5"]
+      "blocksOrder": [
+        "cr-1",
+        "cr-2",
+        "cr-3",
+        "cr-4",
+        "cr-5"
+      ]
     },
     "before_after": {
       "type": "comparison-slider",
@@ -131,7 +145,9 @@
         "show_labels": true,
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "before_image": "/uploads/images/before.webp",
+        "after_image": "/uploads/images/after.webp"
       }
     },
     "what_we_clean": {
@@ -162,8 +178,10 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+            },
+            "image": "/uploads/images/clean-standard.webp"
           }
         },
         "wc-deep": {
@@ -175,8 +193,10 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+            },
+            "image": "/uploads/images/clean-deep.webp"
           }
         },
         "wc-movein": {
@@ -188,8 +208,10 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+            },
+            "image": "/uploads/images/clean-movein.webp"
           }
         },
         "wc-postconstruction": {
@@ -201,12 +223,19 @@
             "button_link": {
               "text": "See what's included",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "c891745e-754b-4dd0-857e-eb5b2e5360b0"
+            },
+            "image": "/uploads/images/clean-postconstruction.webp"
           }
         }
       },
-      "blocksOrder": ["wc-standard", "wc-deep", "wc-movein", "wc-postconstruction"]
+      "blocksOrder": [
+        "wc-standard",
+        "wc-deep",
+        "wc-movein",
+        "wc-postconstruction"
+      ]
     },
     "how_it_works": {
       "type": "numbered-cards",
@@ -254,7 +283,12 @@
           }
         }
       },
-      "blocksOrder": ["h-1", "h-2", "h-3", "h-4"]
+      "blocksOrder": [
+        "h-1",
+        "h-2",
+        "h-3",
+        "h-4"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -310,7 +344,12 @@
           }
         }
       },
-      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+      "blocksOrder": [
+        "st-1",
+        "st-2",
+        "st-3",
+        "st-4"
+      ]
     },
     "reviews": {
       "type": "testimonials",
@@ -383,7 +422,14 @@
           }
         }
       },
-      "blocksOrder": ["r-1", "r-2", "r-3", "r-4", "r-5", "r-6"]
+      "blocksOrder": [
+        "r-1",
+        "r-2",
+        "r-3",
+        "r-4",
+        "r-5",
+        "r-6"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -416,14 +462,19 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -437,6 +488,6 @@
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T17:16:38.073Z",
+  "updated": "2026-04-20T17:42:00.557Z"
 }

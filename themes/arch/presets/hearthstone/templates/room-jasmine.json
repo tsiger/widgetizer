@@ -13,7 +13,8 @@
         "overlay_color": "#08264599",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/jasmine-hero.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -123,42 +124,48 @@
           "type": "item",
           "settings": {
             "title": "The bed and stone-framed window",
-            "category": "Interior"
+            "category": "Interior",
+            "image": "/uploads/images/jasmine-bed.webp"
           }
         },
         "rg-02": {
           "type": "item",
           "settings": {
             "title": "The terrace at mid-afternoon",
-            "category": "Terrace"
+            "category": "Terrace",
+            "image": "/uploads/images/jasmine-exterior.webp"
           }
         },
         "rg-03": {
           "type": "item",
           "settings": {
             "title": "Writing desk by the window",
-            "category": "Interior"
+            "category": "Interior",
+            "image": "/uploads/images/jasmine-desk.webp"
           }
         },
         "rg-04": {
           "type": "item",
           "settings": {
             "title": "Hand-thrown ceramic tile",
-            "category": "Details"
+            "category": "Details",
+            "image": "/uploads/images/jasmine-tile.webp"
           }
         },
         "rg-05": {
           "type": "item",
           "settings": {
             "title": "Jasmine climbing the terrace",
-            "category": "Exterior"
+            "category": "Exterior",
+            "image": "/uploads/images/jasmine-terrace.webp"
           }
         },
         "rg-06": {
           "type": "item",
           "settings": {
             "title": "Morning light on the linen",
-            "category": "Interior"
+            "category": "Interior",
+            "image": "/uploads/images/jasmine-linen.webp"
           }
         }
       },
@@ -440,5 +447,5 @@
   ],
   "id": "room-jasmine",
   "created": "2026-04-21T18:00:00.000Z",
-  "updated": "2026-04-21T18:00:00.000Z"
+  "updated": "2026-04-22T10:01:10.632Z"
 }

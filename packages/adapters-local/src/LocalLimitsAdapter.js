@@ -42,6 +42,8 @@ export class LocalLimitsAdapter {
       case LIMIT_KEYS.FORM_SUBMISSIONS_PER_MONTH:
       case LIMIT_KEYS.MAX_WIDGETS_PER_PAGE:
       case LIMIT_KEYS.MAX_MENU_ITEMS:
+      case LIMIT_KEYS.MAX_COLLECTION_ITEMS:
+      case LIMIT_KEYS.MAX_COLLECTIONS:
         return Infinity; // single-user OSS: unbounded
       case LIMIT_KEYS.CUSTOM_DOMAIN_ALLOWED:
         return true;

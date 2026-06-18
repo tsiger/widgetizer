@@ -315,11 +315,11 @@
                 </button>
               </div>
 
-              {% if block.settings.description != blank %}
+              {% unless block.settings.description | rte_blank %}
                 <div class="image-hotspot-tooltip-description w-body w-rte" data-setting="description">
                   {{ block.settings.description | raw }}
                 </div>
-              {% endif %}
+              {% endunless %}
 
               {% if block.settings.button_link.href != blank and block.settings.button_link.text != blank %}
                 <div class="image-hotspot-tooltip-footer">

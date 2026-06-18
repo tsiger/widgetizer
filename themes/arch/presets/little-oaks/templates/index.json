@@ -8,7 +8,8 @@
         "image_position": "end",
         "color_scheme": "standard-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/hero-children-playing.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -39,20 +40,27 @@
             "link": {
               "href": "contact.html",
               "text": "Schedule a Tour",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0db30ea7-c4f3-4513-a160-34d01f823fe8"
             },
             "style": "primary",
             "size": "medium",
             "link_2": {
               "href": "programs.html",
               "text": "Our Programs",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "7eb7c903-fe62-4659-92d6-5fb45eac910b"
             },
             "style_2": "secondary"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-button"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
     },
     "credentials_strip": {
       "type": "trust-bar",
@@ -100,7 +108,12 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
     },
     "programs_overview": {
       "type": "card-grid",
@@ -123,43 +136,53 @@
           "type": "card",
           "settings": {
             "title": "Infants",
-            "subtitle": "6 weeks \u2013 12 months",
-            "description": "<p>A gentle, secure environment where babies explore through sensory play, tummy time, and one-on-one bonding with dedicated caregivers.</p>"
+            "subtitle": "6 weeks – 12 months",
+            "description": "<p>A gentle, secure environment where babies explore through sensory play, tummy time, and one-on-one bonding with dedicated caregivers.</p>",
+            "image": "/uploads/images/infant-room.webp"
           }
         },
         "program-2": {
           "type": "card",
           "settings": {
             "title": "Toddlers",
-            "subtitle": "1 \u2013 2 years",
-            "description": "<p>Active discovery through music, movement, art, and early language. Structured routines that build confidence and independence.</p>"
+            "subtitle": "1 – 2 years",
+            "description": "<p>Active discovery through music, movement, art, and early language. Structured routines that build confidence and independence.</p>",
+            "image": "/uploads/images/toddler-room.webp"
           }
         },
         "program-3": {
           "type": "card",
           "settings": {
             "title": "Preschool",
-            "subtitle": "3 \u2013 4 years",
-            "description": "<p>Play-based learning in literacy, math, science, and social skills. Circle time, creative projects, and outdoor exploration every day.</p>"
+            "subtitle": "3 – 4 years",
+            "description": "<p>Play-based learning in literacy, math, science, and social skills. Circle time, creative projects, and outdoor exploration every day.</p>",
+            "image": "/uploads/images/preschool-class.webp"
           }
         },
         "program-4": {
           "type": "card",
           "settings": {
             "title": "Pre-K",
-            "subtitle": "4 \u2013 5 years",
-            "description": "<p>Kindergarten readiness with structured academics, problem-solving, and collaborative projects that build school-ready skills.</p>"
+            "subtitle": "4 – 5 years",
+            "description": "<p>Kindergarten readiness with structured academics, problem-solving, and collaborative projects that build school-ready skills.</p>",
+            "image": "/uploads/images/teaching-philosophy.webp"
           }
         }
       },
-      "blocksOrder": ["program-1", "program-2", "program-3", "program-4"]
+      "blocksOrder": [
+        "program-1",
+        "program-2",
+        "program-3",
+        "program-4"
+      ]
     },
     "philosophy_section": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
         "text_position": "center",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/teaching-philosophy-1.webp"
       },
       "blocks": {
         "philosophy-eyebrow": {
@@ -190,14 +213,20 @@
             "link": {
               "href": "about.html",
               "text": "Our Philosophy",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "971871ec-99b1-4fcf-991c-c7b53eb88f46"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["philosophy-eyebrow", "philosophy-heading", "philosophy-text", "philosophy-button"]
+      "blocksOrder": [
+        "philosophy-eyebrow",
+        "philosophy-heading",
+        "philosophy-text",
+        "philosophy-button"
+      ]
     },
     "stats_section": {
       "type": "key-figures",
@@ -243,7 +272,12 @@
           }
         }
       },
-      "blocksOrder": ["stat-1", "stat-2", "stat-3", "stat-4"]
+      "blocksOrder": [
+        "stat-1",
+        "stat-2",
+        "stat-3",
+        "stat-4"
+      ]
     },
     "parent_reviews": {
       "type": "testimonials",
@@ -270,7 +304,7 @@
         "review-2": {
           "type": "quote",
           "settings": {
-            "quote": "Both of our boys went through Little Oaks. The structure, the outdoor time, the way they handle transitions between age groups \u2014 it is thoughtful and consistent. We could not have asked for better care.",
+            "quote": "Both of our boys went through Little Oaks. The structure, the outdoor time, the way they handle transitions between age groups — it is thoughtful and consistent. We could not have asked for better care.",
             "name": "Michael and Sarah Dunn",
             "title": "Parents of two graduates",
             "rating": "5"
@@ -279,14 +313,18 @@
         "review-3": {
           "type": "quote",
           "settings": {
-            "quote": "My son started in the infant room and is now in Pre-K. He reads, counts, and has best friends he has known since he was a baby. Little Oaks is not just childcare \u2014 it is a community.",
+            "quote": "My son started in the infant room and is now in Pre-K. He reads, counts, and has best friends he has known since he was a baby. Little Oaks is not just childcare — it is a community.",
             "name": "Angela Park",
             "title": "Parent of a 5-year-old",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["review-1", "review-2", "review-3"]
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
     },
     "tour_cta": {
       "type": "action-bar",
@@ -317,18 +355,31 @@
             "link": {
               "href": "contact.html",
               "text": "Schedule a Tour",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0db30ea7-c4f3-4513-a160-34d01f823fe8"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero_split", "credentials_strip", "programs_overview", "philosophy_section", "stats_section", "parent_reviews", "tour_cta"],
+  "widgetsOrder": [
+    "hero_split",
+    "credentials_strip",
+    "programs_overview",
+    "philosophy_section",
+    "stats_section",
+    "parent_reviews",
+    "tour_cta"
+  ],
   "id": "index",
-  "created": "2026-04-14T14:00:00.000Z",
-  "updated": "2026-04-14T14:00:00.000Z"
+  "created": "2026-04-17T16:20:56.787Z",
+  "updated": "2026-04-17T16:46:11.578Z"
 }

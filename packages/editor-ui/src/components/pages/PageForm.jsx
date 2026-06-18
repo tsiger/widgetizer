@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import useToastStore from "../../stores/toastStore";
+import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
 
@@ -21,6 +22,10 @@ export default function PageForm({
   const isNew = !initialData.id;
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
+
+  // Sticky action bar: the shadow shows only while the bar floats over scrollable
+  // content. Re-checked when "More settings" expands/collapses the SEO block.
+  const { sentinelRef, isStuck } = useStickyActionBar([showMoreSettings]);
 
   const {
     register,
@@ -107,9 +112,9 @@ export default function PageForm({
   };
 
   return (
-    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="form-container">
+    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="space-y-6">
       {/* Main Page Data */}
-      <div className="form-section">
+      <div className="max-w-xl form-section">
         <div className="form-field">
           <label htmlFor="name" className="form-label">
             {t("forms.page.titleLabel")} <span className="text-pink-500">*</span>
@@ -161,7 +166,7 @@ export default function PageForm({
       <button
         type="button"
         onClick={() => setShowMoreSettings(!showMoreSettings)}
-        className="flex items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
+        className="flex max-w-xl items-center gap-1 text-sm text-pink-500 hover:text-pink-700 mt-2 mb-4"
       >
         {showMoreSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         {t("forms.project.moreSettings")}
@@ -169,7 +174,7 @@ export default function PageForm({
 
       {/* SEO Fields - Collapsible */}
       {showMoreSettings && (
-        <div className="form-section">
+        <div className="max-w-xl form-section">
           <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>
 
           <div className="form-field">
@@ -226,7 +231,13 @@ export default function PageForm({
         </div>
       )}
 
-      <div className="form-actions-separated justify-end">
+      <div
+        className={`sticky bottom-0 z-10 -mx-6 -mb-4 flex justify-end gap-2 rounded-b-md border-t bg-white px-6 py-4 transition-shadow duration-200 ${
+          isStuck
+            ? "border-slate-200 shadow-[0_-12px_24px_-4px_rgba(15,23,42,0.18)] after:absolute after:left-0 after:right-0 after:top-full after:h-10 after:bg-white after:content-['']"
+            : "border-transparent"
+        }`}
+      >
         {onCancel && (
           <Button type="button" onClick={onCancel} variant="secondary">
             {t("forms.common.cancel")}
@@ -237,6 +248,7 @@ export default function PageForm({
           {isDirtyProp && <span className="w-2 h-2 bg-pink-500 rounded-full -mt-2" />}
         </Button>
       </div>
+      <div ref={sentinelRef} aria-hidden="true" className="h-px" />
     </form>
   );
 }

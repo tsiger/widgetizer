@@ -27,7 +27,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "work_by_category": {
       "type": "project-showcase",
@@ -48,46 +51,59 @@
           "type": "project",
           "settings": {
             "title": "Short cuts",
-            "description": "Bobs, pixies, undercuts"
+            "description": "Bobs, pixies, undercuts",
+            "image": "/uploads/images/work-tab-short-cuts.webp"
           }
         },
         "project-long-lengths": {
           "type": "project",
           "settings": {
             "title": "Long & Lengths",
-            "description": "Layered, lived-in, movement with weight"
+            "description": "Layered, lived-in, movement with weight",
+            "image": "/uploads/images/work-tab-long-lengths.webp"
           }
         },
         "project-color-balayage": {
           "type": "project",
           "settings": {
             "title": "Color & Balayage",
-            "description": "Hand-painted, foil, dimensional blonding"
+            "description": "Hand-painted, foil, dimensional blonding",
+            "image": "/uploads/images/work-tab-color-balayage.webp"
           }
         },
         "project-mens": {
           "type": "project",
           "settings": {
             "title": "Men's",
-            "description": "Classic cuts, skin fades, crops, beards"
+            "description": "Classic cuts, skin fades, crops, beards",
+            "image": "/uploads/images/work-tab-mens.webp"
           }
         },
         "project-editorial-events": {
           "type": "project",
           "settings": {
             "title": "Editorial & Events",
-            "description": "Bridal, shoots, event styling"
+            "description": "Bridal, shoots, event styling",
+            "image": "/uploads/images/work-tab-editorial-events.webp"
           }
         },
-        "project-editorial-events-2": {
+        "block_cbfa0178-4915-4eca-b0b5-c17e9c00477a": {
           "type": "project",
           "settings": {
             "title": "Editorial & Events",
-            "description": "Bridal, shoots, event styling"
+            "description": "Bridal, shoots, event styling",
+            "image": "/uploads/images/work-gallery-06.webp"
           }
         }
       },
-      "blocksOrder": ["project-short-cuts", "project-long-lengths", "project-color-balayage", "project-mens", "project-editorial-events", "project-editorial-events-2"]
+      "blocksOrder": [
+        "project-short-cuts",
+        "project-long-lengths",
+        "project-color-balayage",
+        "project-mens",
+        "project-editorial-events",
+        "block_cbfa0178-4915-4eca-b0b5-c17e9c00477a"
+      ]
     },
     "work_gallery": {
       "type": "masonry-gallery",
@@ -102,23 +118,144 @@
         "color_scheme": "standard-secondary"
       },
       "blocks": {
-        "gallery-01": { "type": "item", "settings": { "title": "Lena", "category": "Short cut" } },
-        "gallery-02": { "type": "item", "settings": { "title": "Priya", "category": "Short cut" } },
-        "gallery-03": { "type": "item", "settings": { "title": "Jess", "category": "Short cut" } },
-        "gallery-04": { "type": "item", "settings": { "title": "Iris", "category": "Long & Lengths" } },
-        "gallery-05": { "type": "item", "settings": { "title": "Sana", "category": "Long & Lengths" } },
-        "gallery-06": { "type": "item", "settings": { "title": "Clara", "category": "Long & Lengths" } },
-        "gallery-07": { "type": "item", "settings": { "title": "Nadia", "category": "Balayage" } },
-        "gallery-08": { "type": "item", "settings": { "title": "Juno", "category": "Color" } },
-        "gallery-09": { "type": "item", "settings": { "title": "Harper", "category": "Color" } },
-        "gallery-10": { "type": "item", "settings": { "title": "Marco", "category": "Men's" } },
-        "gallery-11": { "type": "item", "settings": { "title": "Dev", "category": "Men's" } },
-        "gallery-12": { "type": "item", "settings": { "title": "Omari", "category": "Men's" } },
-        "gallery-13": { "type": "item", "settings": { "title": "Noor", "category": "Editorial" } },
-        "gallery-14": { "type": "item", "settings": { "title": "Elena", "category": "Editorial" } },
-        "gallery-15": { "type": "item", "settings": { "title": "Wren", "category": "Editorial" } }
+        "gallery-01": {
+          "type": "item",
+          "settings": {
+            "title": "Lena",
+            "category": "Short cut",
+            "image": "/uploads/images/work-gallery-01.webp"
+          }
+        },
+        "gallery-02": {
+          "type": "item",
+          "settings": {
+            "title": "Priya",
+            "category": "Short cut",
+            "image": "/uploads/images/work-gallery-02.webp"
+          }
+        },
+        "gallery-03": {
+          "type": "item",
+          "settings": {
+            "title": "Jess",
+            "category": "Short cut",
+            "image": "/uploads/images/work-gallery-03.webp"
+          }
+        },
+        "gallery-04": {
+          "type": "item",
+          "settings": {
+            "title": "Iris",
+            "category": "Long & Lengths",
+            "image": "/uploads/images/work-gallery-05.webp"
+          }
+        },
+        "gallery-05": {
+          "type": "item",
+          "settings": {
+            "title": "Sana",
+            "category": "Long & Lengths",
+            "image": "/uploads/images/work-gallery-04.webp"
+          }
+        },
+        "gallery-06": {
+          "type": "item",
+          "settings": {
+            "title": "Clara",
+            "category": "Long & Lengths",
+            "image": "/uploads/images/work-gallery-05.webp"
+          }
+        },
+        "gallery-07": {
+          "type": "item",
+          "settings": {
+            "title": "Nadia",
+            "category": "Balayage",
+            "image": "/uploads/images/work-gallery-06.webp"
+          }
+        },
+        "gallery-08": {
+          "type": "item",
+          "settings": {
+            "title": "Juno",
+            "category": "Color",
+            "image": "/uploads/images/work-gallery-09.webp"
+          }
+        },
+        "gallery-09": {
+          "type": "item",
+          "settings": {
+            "title": "Harper",
+            "category": "Color",
+            "image": "/uploads/images/work-gallery-07.webp"
+          }
+        },
+        "gallery-10": {
+          "type": "item",
+          "settings": {
+            "title": "Marco",
+            "category": "Men's",
+            "image": "/uploads/images/work-gallery-11.webp"
+          }
+        },
+        "gallery-11": {
+          "type": "item",
+          "settings": {
+            "title": "Dev",
+            "category": "Men's",
+            "image": "/uploads/images/work-gallery-08.webp"
+          }
+        },
+        "gallery-12": {
+          "type": "item",
+          "settings": {
+            "title": "Omari",
+            "category": "Men's",
+            "image": "/uploads/images/work-gallery-10.webp"
+          }
+        },
+        "gallery-13": {
+          "type": "item",
+          "settings": {
+            "title": "Noor",
+            "category": "Editorial",
+            "image": "/uploads/images/work-gallery-12.webp"
+          }
+        },
+        "gallery-14": {
+          "type": "item",
+          "settings": {
+            "title": "Elena",
+            "category": "Editorial",
+            "image": "/uploads/images/work-gallery-14.webp"
+          }
+        },
+        "gallery-15": {
+          "type": "item",
+          "settings": {
+            "title": "Wren",
+            "category": "Editorial",
+            "image": "/uploads/images/work-gallery-15.webp"
+          }
+        }
       },
-      "blocksOrder": ["gallery-01", "gallery-02", "gallery-03", "gallery-04", "gallery-05", "gallery-06", "gallery-07", "gallery-08", "gallery-09", "gallery-10", "gallery-11", "gallery-12", "gallery-13", "gallery-14", "gallery-15"]
+      "blocksOrder": [
+        "gallery-01",
+        "gallery-02",
+        "gallery-03",
+        "gallery-04",
+        "gallery-05",
+        "gallery-06",
+        "gallery-07",
+        "gallery-08",
+        "gallery-09",
+        "gallery-10",
+        "gallery-11",
+        "gallery-12",
+        "gallery-13",
+        "gallery-14",
+        "gallery-15"
+      ]
     },
     "work_closing": {
       "type": "action-bar",
@@ -147,11 +284,19 @@
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["work_intro", "work_by_category", "work_gallery", "work_closing"],
+  "widgetsOrder": [
+    "work_intro",
+    "work_by_category",
+    "work_gallery",
+    "work_closing"
+  ],
   "id": "work",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:28:19.009Z",
+  "updated": "2026-04-24T09:32:54.072Z"
 }

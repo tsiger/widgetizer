@@ -127,6 +127,27 @@ After the workspaces/adapter refactor, `@widgetizer/builder-server` is adapter-a
 
 **LiquidJS floor.** `liquidjs` is pinned to `^10.26.0` in `@widgetizer/core` + `@widgetizer/render-engine`, which fixes the GHSA RCE/SSTI and the `strip_html` ReDoS.
 
+### 12. Link & URL Safety
+
+Author-entered URLs and image paths are constrained so widget / menu / collection content can't smuggle a dangerous scheme or an out-of-project path into the rendered HTML. The helpers live in `@widgetizer/core` (shared with the render engine's filter) and `@widgetizer/builder-server` (server-side sanitization).
+
+**`sanitizeHref` (core)** — `packages/core/src/utils/urlSafety.js` blocks the `javascript:`, `data:`, and `vbscript:` schemes. It first runs `normalize()`, which reproduces a browser's pre-scheme preprocessing — strips embedded tab/LF/CR and trims leading/trailing C0-control-or-space — so obfuscated schemes (an embedded tab inside `javascript`, a leading control char) cannot bypass the contiguous-scheme test. Returns the href unchanged when safe, `""` when dangerous.
+
+**`safe_url` Liquid filter (core)** — `packages/core/src/filters/safeUrlFilter.js` applies `sanitizeHref` to an author-controlled URL a theme emits directly into an attribute (coercing non-strings to `""`). Use it for plain text/URL values; the `link` setting type and menu links are already sanitized server-side:
+
+```liquid
+<a href="{{ social.facebook_url | safe_url }}">…</a>
+```
+
+**Image-path allowlist (builder-server)** — `packages/builder-server/src/services/sanitizationService.js` blanks any image path that isn't a safe in-project path, rejecting schemes, external / protocol-relative (`//…`) URLs, traversal (`..`), and characters that could break out of an unescaped `<img src>` (quotes, `<`, `>`, whitespace):
+
+- `sanitizeImagePath` — strict: requires `/uploads/images/…`. Used for every **gallery** entry and for collection required-field validation.
+- `sanitizeImageSettingValue` — broader: allows any safe in-project absolute path, so a non-upload theme asset like `/default-logo.png` survives. Used for plain `image` settings.
+
+**Default button type** — the shared `Button` component (`packages/editor-ui/src/components/ui/Button.jsx`) defaults to `type="button"`, so a button inside a `<form>` never submits it by accident; callers opt into `type="submit"` explicitly.
+
+These complement §1: autoescape on every `{{ }}`, DOMPurify on richtext before `| raw`, and these URL / image guards on the few author-controlled values that reach an attribute.
+
 ---
 
 ## Configuration

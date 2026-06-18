@@ -590,6 +590,117 @@ The UI for this setting type provides a choice between selecting from a list of 
 }
 ```
 
+### Date
+
+A native date picker. The stored value is a calendar-date string (`"YYYY-MM-DD"`) or `""` when unset — date-only, no time, timezone-agnostic.
+
+```json
+{
+  "id": "published_on",
+  "type": "date",
+  "label": "tTheme:news.fields.published_on.label",
+  "description": "tTheme:news.fields.published_on.description"
+}
+```
+
+**Collection sorting:** inside a collection-type schema a `date` field may be flagged `"usedAsDate": true` to mark it as the type's sort key; the type's `defaultSort` can then be `"date_desc"` / `"date_asc"` (items with a missing/blank date sort last). See [Collections](core-collections.md).
+
+**Usage in Templates:**
+
+Render with the `format_date` filter, which honours the theme's **Date format** global setting (implemented in `packages/core/src/filters/dateFilter.js`). Pass an explicit token to override:
+
+```liquid
+{{ item.settings.published_on | format_date }}
+{{ item.settings.published_on | format_date: 'D MMM YYYY' }}
+```
+
+Supported format tokens: `MMMM D, YYYY`, `D MMMM YYYY`, `MMM D, YYYY`, `D MMM YYYY`, `MM/DD/YYYY`, `DD/MM/YYYY`, `YYYY-MM-DD`. A blank or unrecognised value formats to `""`.
+
+### Gallery
+
+A repeatable list of images: where `image` stores one path, `gallery` stores an **ordered array** of upload-path strings (`["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`). The empty value is `[]`. It composes the same image picker as the `image` type per row, with drag-to-reorder.
+
+```json
+{
+  "id": "photos",
+  "type": "gallery",
+  "label": "tTheme:portfolio.fields.photos.label",
+  "description": "tTheme:portfolio.fields.photos.description"
+}
+```
+
+**Features:**
+
+- Add / remove / drag-reorder image rows
+- Each row reuses the `image` input (Upload / Browse media library)
+- Authoring order is preserved
+
+**Notes:**
+
+- Each entry is a single `/uploads/images/…` path (filename segment only — no directory traversal, spaces, or query strings). **Render sanitization drops blank entries and any path that fails the image-path allowlist** (`isSafeImagePath`), so the store keeps what the editor wrote while the renderer emits only safe paths. See [Link & URL Safety](core-security.md).
+- Image alt/title/caption live on the **media record**, not in the gallery value.
+
+**Usage in Templates:**
+
+Loop directly, guard each entry, and resolve with the existing `{% image %}` tag:
+
+```liquid
+{% for src in widget.settings.photos %}
+  {% if src != blank %}
+    {% image src: src, size: 'large' %}
+  {% endif %}
+{% endfor %}
+```
+
+### Table
+
+A uniform repeating-row field: an **ordered array of row objects**, each keyed by the column `id`s declared in the schema. The empty value is `[]`. In v1 every column is `text`.
+
+**Additional Properties:**
+
+- **`columns`** (array, required): the row shape. Each column is `{ "id": string, "type": "text", "label": string }`. `id` must match `^[a-zA-Z][a-zA-Z0-9_]*$` and must not be a reserved name (`__proto__`, `constructor`, `prototype`). The `columns` array must be non-empty.
+
+```json
+{
+  "id": "rates",
+  "type": "table",
+  "label": "tTheme:pricing.fields.rates.label",
+  "columns": [
+    { "id": "label", "type": "text", "label": "tTheme:pricing.fields.rates.cols.label" },
+    { "id": "price", "type": "text", "label": "tTheme:pricing.fields.rates.cols.price" }
+  ]
+}
+```
+
+**Example stored value:**
+
+```json
+[
+  { "label": "Basic", "price": "$10" },
+  { "label": "Pro", "price": "$25" }
+]
+```
+
+**Features:**
+
+- Add / remove / drag-reorder rows
+- Cells typed per the declared columns (v1: text only)
+- **Render sanitization drops blank rows and any undeclared keys**; the editor never commits a row whose declared cells are all blank.
+
+**Usage in Templates:**
+
+Loop rows and read cells by their column `id` (all cells are autoescaped strings):
+
+```liquid
+<table>
+  {% for r in item.settings.rates %}
+    <tr><td>{{ r.label }}</td><td>{{ r.price }}</td></tr>
+  {% endfor %}
+</table>
+```
+
+> **v1 scope:** `table`, along with the `usedAsTitle` / `usedAsDate` flags, is designed for **collection-type** schemas (see [Collections](core-collections.md)); mechanically the input renders anywhere settings do. Column types beyond `text` are a planned extension.
+
 ---
 
 **See also:**

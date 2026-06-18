@@ -13,7 +13,8 @@
         "overlay_color": "#0a0a0ab8",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -198,13 +199,15 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
             },
             "style": "primary",
             "link_2": {
               "text": "See the work",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -217,7 +220,7 @@
         "cta-button"
       ]
     },
-    "team_highlight": {
+    "widget_32121bc7-84e1-4445-9c3e-4873577d7909": {
       "type": "team-highlight",
       "settings": {
         "eyebrow": "Who we are",
@@ -232,24 +235,26 @@
         "bottom_spacing": "auto"
       },
       "blocks": {
-        "tm-morgan": {
+        "block_df8c3b1a-909a-4354-82a6-004f1327107f": {
           "type": "member",
           "settings": {
-            "name": "Morgan Ellison",
-            "role": "Co-founder · Design Director"
+            "name": "David Carter",
+            "role": "CEO & Founder",
+            "photo": "/uploads/images/team-morgan.webp"
           }
         },
-        "tm-rafe": {
+        "block_7d88daf0-521c-4942-bba9-18286c8c4beb": {
           "type": "member",
           "settings": {
-            "name": "Rafe Mendoza",
-            "role": "Senior Designer"
+            "name": "Sarah Thompson",
+            "role": "CMO & Co-founder",
+            "photo": "/uploads/images/team-rafe.webp"
           }
         }
       },
       "blocksOrder": [
-        "tm-morgan",
-        "tm-rafe"
+        "block_df8c3b1a-909a-4354-82a6-004f1327107f",
+        "block_7d88daf0-521c-4942-bba9-18286c8c4beb"
       ]
     }
   },
@@ -257,10 +262,10 @@
     "page_opener",
     "manifesto",
     "milestones",
-    "team_highlight",
+    "widget_32121bc7-84e1-4445-9c3e-4873577d7909",
     "closing_cta"
   ],
   "id": "about",
-  "created": "2026-04-21T14:00:00.000Z",
-  "updated": "2026-04-21T16:32:04.776Z"
+  "created": "2026-04-21T14:21:02.377Z",
+  "updated": "2026-04-21T16:00:34.268Z"
 }

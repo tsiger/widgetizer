@@ -1,15 +1,17 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Sparkhaus Cleaning. All rights reserved.</p>",
-    "layout": "first-featured",
-    "color_scheme": "highlight-primary"
+    "copyright": "© 2026 Sparkhaus Cleaning. All rights reserved.",
+    "layout": "equal",
+    "color_scheme": "highlight-secondary"
   },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
-        "text": "<p>A local residential cleaning service in Denver and the surrounding metro. Licensed, bonded, insured, and background-checked. Eco-friendly by default.</p>"
+        "text": "<p>A local residential cleaning service in Denver and the surrounding metro. Licensed, bonded, insured, and background-checked. Eco-friendly by default.</p>",
+        "logo": "/uploads/images/sparkhauslight.png",
+        "logo_width": 160
       }
     },
     "text_block_1": {
@@ -23,7 +25,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Navigate",
-        "menu": "footer-menu"
+        "menu": "ce346f37-91e5-41d4-a945-26ad4db6b50d"
       }
     },
     "social_block_1": {
@@ -33,5 +35,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

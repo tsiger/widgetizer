@@ -1,17 +1,18 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Velvet Touch Day Spa. All rights reserved.</p>",
-    "layout": "equal",
-    "color_scheme": "highlight-secondary"
+    "copyright": "© 2026 Velvet Touch Day Spa. All rights reserved.",
+    "color_scheme": "highlight-secondary",
+    "layout": "equal"
   },
   "blocks": {
     "logo_text_1": {
       "type": "logo_text",
       "settings": {
         "logo_text": "Velvet Touch",
-        "logo_width": 160,
-        "text": "<p>A boutique day spa offering massage therapy, facials, and body treatments in an intimate, luxurious setting.</p>"
+        "text": "<p>A boutique day spa offering massage therapy, facials, and body treatments in an intimate, luxurious setting.</p>",
+        "logo": "/uploads/images/velvet-touch.png",
+        "logo_width": 160
       }
     },
     "text_block_1": {
@@ -34,5 +35,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

@@ -47,14 +47,28 @@ export class LocalAssetStorageAdapter {
     return { key, sizeBytes: size, contentType: contentTypeFor(key) };
   }
 
-  async download(scope, key) {
+  async download(scope, key, { start, end } = {}) {
     const target = this.#resolve(scope, key);
     try {
       await fs.access(target);
     } catch {
       return null;
     }
+    // Optional byte range (audio/video seek → HTTP 206); full stream otherwise.
+    if (Number.isInteger(start) && Number.isInteger(end)) {
+      return createReadStream(target, { start, end });
+    }
     return createReadStream(target);
+  }
+
+  async stat(scope, key) {
+    const target = this.#resolve(scope, key);
+    try {
+      const { size } = await fs.stat(target);
+      return { size };
+    } catch {
+      return null;
+    }
   }
 
   async delete(scope, key) {

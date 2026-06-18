@@ -2,8 +2,8 @@
   "name": "Home",
   "slug": "index",
   "id": "index",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T14:12:33.345Z",
+  "updated": "2026-04-22T17:12:58.443Z",
   "widgets": {
     "hero_banner": {
       "type": "banner",
@@ -14,8 +14,9 @@
         "alignment": "start",
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
-        "overlay_color": "#1412108f",
-        "top_spacing": "none"
+        "overlay_color": "#1412100f",
+        "top_spacing": "none",
+        "image": "/uploads/images/hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -47,20 +48,27 @@
             "link": {
               "href": "book.html",
               "text": "Book a Session",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
             },
             "style": "primary",
             "link_2": {
               "href": "results.html",
               "text": "See Results",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "06d3db22-861f-4453-8044-7b6156d3c383"
             },
             "style_2": "secondary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-btn"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-btn"
+      ]
     },
     "scrolling_strip": {
       "type": "scrolling-text",
@@ -121,7 +129,12 @@
           }
         }
       },
-      "blocksOrder": ["stat-years", "stat-clients", "stat-rating", "stat-retention"]
+      "blocksOrder": [
+        "stat-years",
+        "stat-clients",
+        "stat-rating",
+        "stat-retention"
+      ]
     },
     "trainer_intro": {
       "type": "image-text",
@@ -129,7 +142,8 @@
         "image_position": "end",
         "text_position": "center",
         "color_scheme": "standard-secondary",
-        "content_color_scheme": "none"
+        "content_color_scheme": "none",
+        "image": "/uploads/images/trainer-portrait.webp"
       },
       "blocks": {
         "intro-eyebrow": {
@@ -167,14 +181,21 @@
             "link": {
               "href": "about.html",
               "text": "About Me",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f8f34c66-1b3e-42b2-8a91-c88679c2f531"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body", "intro-features", "intro-cta"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-body",
+        "intro-features",
+        "intro-cta"
+      ]
     },
     "programs": {
       "type": "numbered-service-list",
@@ -210,7 +231,11 @@
           }
         }
       },
-      "blocksOrder": ["service-1", "service-2", "service-3"]
+      "blocksOrder": [
+        "service-1",
+        "service-2",
+        "service-3"
+      ]
     },
     "social_proof": {
       "type": "testimonials",
@@ -253,7 +278,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
     },
     "home_cta": {
       "type": "action-bar",
@@ -282,15 +311,28 @@
             "link": {
               "href": "book.html",
               "text": "Book Your Free Session",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-btn"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-btn"
+      ]
     }
   },
-  "widgetsOrder": ["hero_banner", "scrolling_strip", "proof_stats", "trainer_intro", "programs", "social_proof", "home_cta"]
+  "widgetsOrder": [
+    "hero_banner",
+    "scrolling_strip",
+    "proof_stats",
+    "trainer_intro",
+    "programs",
+    "social_proof",
+    "home_cta"
+  ]
 }

@@ -8,12 +8,17 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book a consultation",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": false,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/ledgerworks-dark.png",
+    "logoMaxWidth": 170
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

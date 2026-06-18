@@ -1,0 +1,820 @@
+{
+  "files": [
+    {
+      "filename": "brewlinetransparent.png",
+      "originalName": "brewline_transparent.png",
+      "type": "image/png",
+      "size": 7696,
+      "path": "/uploads/images/brewlinetransparent.png",
+      "width": 800,
+      "height": 157,
+      "alt": "Brewline logo in green and white for dark backgrounds",
+      "title": "Brewline logo transparent",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/brewlinetransparent-small.png",
+          "width": 480,
+          "height": 94
+        },
+        "thumb": {
+          "path": "/uploads/images/brewlinetransparent-thumb.png",
+          "width": 150,
+          "height": 29
+        }
+      }
+    },
+    {
+      "filename": "brewlinelight.png",
+      "originalName": "brewline_light.png",
+      "type": "image/png",
+      "size": 7009,
+      "path": "/uploads/images/brewlinelight.png",
+      "width": 800,
+      "height": 157,
+      "alt": "Brewline logo in green",
+      "title": "Brewline logo light",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/brewlinelight-small.png",
+          "width": 480,
+          "height": 94
+        },
+        "thumb": {
+          "path": "/uploads/images/brewlinelight-thumb.png",
+          "width": 150,
+          "height": 29
+        }
+      }
+    },
+    {
+      "filename": "brewlinedark.png",
+      "originalName": "brewline_dark.png",
+      "type": "image/png",
+      "size": 15152,
+      "path": "/uploads/images/brewlinedark.png",
+      "width": 800,
+      "height": 157,
+      "alt": "Brewline logo in brown",
+      "title": "Brewline logo dark",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/brewlinedark-small.png",
+          "width": 480,
+          "height": 94
+        },
+        "thumb": {
+          "path": "/uploads/images/brewlinedark-thumb.png",
+          "width": 150,
+          "height": 29
+        }
+      }
+    },
+    {
+      "filename": "gallery-hero.webp",
+      "originalName": "gallery-hero.webp",
+      "type": "image/webp",
+      "size": 99336,
+      "path": "/uploads/images/gallery-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Group of people cupping and tasting coffee together at a workshop",
+      "title": "Coffee cupping session",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/gallery-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/gallery-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "community.webp",
+      "originalName": "community.webp",
+      "type": "image/webp",
+      "size": 72062,
+      "path": "/uploads/images/community.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "People working on laptops at a large shared table surrounded by plants",
+      "title": "Community table",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/community-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/community-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-community-table.webp",
+      "originalName": "space-community-table.webp",
+      "type": "image/webp",
+      "size": 58648,
+      "path": "/uploads/images/space-community-table.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Wall display of colorful single-origin coffee bags from various regions",
+      "title": "Bean wall display",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-community-table-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/space-community-table-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "space-beans-wall.webp",
+      "originalName": "space-beans-wall.webp",
+      "type": "image/webp",
+      "size": 63152,
+      "path": "/uploads/images/space-beans-wall.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Cozy outdoor patio with bistro table, string lights, and potted plants",
+      "title": "The patio",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-beans-wall-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-beans-wall-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-patio.webp",
+      "originalName": "space-patio.webp",
+      "type": "image/webp",
+      "size": 134246,
+      "path": "/uploads/images/space-patio.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Roasted coffee beans tumbling out of a drum roaster",
+      "title": "Drum roaster in action",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-patio-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-patio-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-roast-1.webp",
+      "originalName": "step-roast.webp",
+      "type": "image/webp",
+      "size": 36372,
+      "path": "/uploads/images/step-roast-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Sunlit window seat with a laptop and steaming coffee cup",
+      "title": "Window workspace",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-roast-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-roast-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-window.webp",
+      "originalName": "space-window.webp",
+      "type": "image/webp",
+      "size": 40694,
+      "path": "/uploads/images/space-window.webp",
+      "width": 800,
+      "height": 992,
+      "alt": "Barista behind the counter with espresso machine and pastry display case",
+      "title": "The counter",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-window-small.webp",
+          "width": 480,
+          "height": 595
+        },
+        "thumb": {
+          "path": "/uploads/images/space-window-thumb.webp",
+          "width": 150,
+          "height": 186
+        }
+      }
+    },
+    {
+      "filename": "space-counter.webp",
+      "originalName": "space-counter.webp",
+      "type": "image/webp",
+      "size": 62466,
+      "path": "/uploads/images/space-counter.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Bright minimalist cafe interior with espresso machine and coffee bag shelves",
+      "title": "Our gallery",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-counter-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-counter-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-lavender.webp",
+      "originalName": "gallery-lavender.webp",
+      "type": "image/webp",
+      "size": 34924,
+      "path": "/uploads/images/gallery-lavender.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Lavender latte with art in a purple cup on a marble board",
+      "title": "Lavender latte",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-lavender-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-lavender-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-roasting.webp",
+      "originalName": "gallery-roasting.webp",
+      "type": "image/webp",
+      "size": 115418,
+      "path": "/uploads/images/gallery-roasting.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Coffee beans cooling in a roaster tray with steam",
+      "title": "Roaster cooling tray",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-roasting-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-roasting-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-coldbrew-tap.webp",
+      "originalName": "gallery-coldbrew-tap.webp",
+      "type": "image/webp",
+      "size": 21528,
+      "path": "/uploads/images/gallery-coldbrew-tap.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Nitro cold brew pouring from a tap into a glass",
+      "title": "Nitro cold brew on tap",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-coldbrew-tap-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-coldbrew-tap-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-espresso.webp",
+      "originalName": "gallery-espresso.webp",
+      "type": "image/webp",
+      "size": 24382,
+      "path": "/uploads/images/gallery-espresso.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Espresso extracting from a portafilter into a cup",
+      "title": "Espresso extraction",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-espresso-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-espresso-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-latteart.webp",
+      "originalName": "gallery-latteart.webp",
+      "type": "image/webp",
+      "size": 39924,
+      "path": "/uploads/images/gallery-latteart.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Latte with rosetta art on a dark saucer",
+      "title": "Latte art",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-latteart-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-latteart-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-pourover.webp",
+      "originalName": "gallery-pourover.webp",
+      "type": "image/webp",
+      "size": 46434,
+      "path": "/uploads/images/gallery-pourover.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Barista brewing multiple pour-overs in a sunlit kitchen",
+      "title": "Pour-over station",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/gallery-pourover-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-pourover-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "retail-beans.webp",
+      "originalName": "retail-beans.webp",
+      "type": "image/webp",
+      "size": 37926,
+      "path": "/uploads/images/retail-beans.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Three bags of specialty coffee beans on a wooden shelf",
+      "title": "Retail coffee bags",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/retail-beans-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/retail-beans-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "menu-hero.webp",
+      "originalName": "menu-hero.webp",
+      "type": "image/webp",
+      "size": 136878,
+      "path": "/uploads/images/menu-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Flat lay of lattes, croissant, granola bowl, and coffee beans on a wooden table",
+      "title": "Our menu",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/menu-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/menu-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/menu-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "team-maya.webp",
+      "originalName": "team-maya.webp",
+      "type": "image/webp",
+      "size": 18688,
+      "path": "/uploads/images/team-maya.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Maya, barista wearing an apron, smiling in the cafe",
+      "title": "Maya",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-maya-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "step-serve.webp",
+      "originalName": "step-serve.webp",
+      "type": "image/webp",
+      "size": 34068,
+      "path": "/uploads/images/step-serve.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Barista handing a latte with leaf art to a customer",
+      "title": "Serving the perfect cup",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-serve-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-serve-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-dialin.webp",
+      "originalName": "step-dialin.webp",
+      "type": "image/webp",
+      "size": 37944,
+      "path": "/uploads/images/step-dialin.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hands adjusting the grind setting on a coffee grinder",
+      "title": "Dialing in the grind",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-dialin-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-dialin-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-roast.webp",
+      "originalName": "step-roast.webp",
+      "type": "image/webp",
+      "size": 36372,
+      "path": "/uploads/images/step-roast.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Roasted coffee beans tumbling out of a drum roaster",
+      "title": "Roasting the beans",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-roast-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-roast-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "step-source.webp",
+      "originalName": "step-source.webp",
+      "type": "image/webp",
+      "size": 86982,
+      "path": "/uploads/images/step-source.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hands picking ripe red coffee cherries on a hillside farm",
+      "title": "Sourcing coffee cherries",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/step-source-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/step-source-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "about-founder.webp",
+      "originalName": "about-founder.webp",
+      "type": "image/webp",
+      "size": 47646,
+      "path": "/uploads/images/about-founder.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Brewline founder with arms crossed, standing next to a coffee roasting machine",
+      "title": "Our founder",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-founder-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/about-founder-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "about-hero.webp",
+      "originalName": "about-hero.webp",
+      "type": "image/webp",
+      "size": 150452,
+      "path": "/uploads/images/about-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Freshly roasted coffee beans cooling with steam rising",
+      "title": "Freshly roasted beans",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/about-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/about-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "team-lena.webp",
+      "originalName": "team-lena.webp",
+      "type": "image/webp",
+      "size": 24492,
+      "path": "/uploads/images/team-lena.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Lena, roaster with glasses, standing in front of coffee sacks and cupping bowls",
+      "title": "Lena",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-lena-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-kai.webp",
+      "originalName": "team-kai.webp",
+      "type": "image/webp",
+      "size": 20438,
+      "path": "/uploads/images/team-kai.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Kai, baker in a white apron, smiling in the kitchen",
+      "title": "Kai",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-kai-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-sam.webp",
+      "originalName": "team-sam.webp",
+      "type": "image/webp",
+      "size": 21224,
+      "path": "/uploads/images/team-sam.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Sam, barista wearing a dark apron, smiling in the coffee shop",
+      "title": "Sam",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-sam-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "tab-coldbrew.webp",
+      "originalName": "tab-coldbrew.webp",
+      "type": "image/webp",
+      "size": 65514,
+      "path": "/uploads/images/tab-coldbrew.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Iced cold brew coffee with lemon and mint garnish",
+      "title": "Cold brew",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/tab-coldbrew-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/tab-coldbrew-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "tab-pourover.webp",
+      "originalName": "tab-pourover.webp",
+      "type": "image/webp",
+      "size": 25660,
+      "path": "/uploads/images/tab-pourover.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hot water pouring over coffee grounds in a ceramic V60 dripper",
+      "title": "Pour-over brewing",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/tab-pourover-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/tab-pourover-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "tab-espresso.webp",
+      "originalName": "tab-espresso.webp",
+      "type": "image/webp",
+      "size": 32532,
+      "path": "/uploads/images/tab-espresso.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Espresso with golden crema in a white cup on marble",
+      "title": "Espresso",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/tab-espresso-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/tab-espresso-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "intro-sourcing.webp",
+      "originalName": "intro-sourcing.webp",
+      "type": "image/webp",
+      "size": 60772,
+      "path": "/uploads/images/intro-sourcing.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Green unroasted coffee beans in a burlap sack",
+      "title": "Green coffee beans",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/intro-sourcing-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/intro-sourcing-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "home-hero.webp",
+      "originalName": "home-hero.webp",
+      "type": "image/webp",
+      "size": 76104,
+      "path": "/uploads/images/home-hero.webp",
+      "width": 1200,
+      "height": 896,
+      "alt": "Barista pouring steamed milk into a latte with leaf art on a wooden counter",
+      "title": "Latte art pour",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-hero-medium.webp",
+          "width": 1024,
+          "height": 765
+        },
+        "small": {
+          "path": "/uploads/images/home-hero-small.webp",
+          "width": 480,
+          "height": 358
+        },
+        "thumb": {
+          "path": "/uploads/images/home-hero-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    }
+  ]
+}

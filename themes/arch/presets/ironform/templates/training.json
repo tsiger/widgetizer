@@ -2,8 +2,8 @@
   "name": "Training",
   "slug": "training",
   "id": "training",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T14:12:33.348Z",
+  "updated": "2026-04-22T16:58:31.698Z",
   "widgets": {
     "page_header": {
       "type": "banner",
@@ -13,7 +13,8 @@
         "content_width": "medium",
         "alignment": "start",
         "color_scheme": "highlight-primary",
-        "top_spacing": "none"
+        "top_spacing": "none",
+        "image": "/uploads/images/hero-training.webp"
       },
       "blocks": {
         "header-eyebrow": {
@@ -40,7 +41,11 @@
           }
         }
       },
-      "blocksOrder": ["header-eyebrow", "header-heading", "header-text"]
+      "blocksOrder": [
+        "header-eyebrow",
+        "header-heading",
+        "header-text"
+      ]
     },
     "services_detail": {
       "type": "numbered-service-list",
@@ -58,32 +63,57 @@
           "type": "service",
           "settings": {
             "title": "Personalised Training Plan",
-            "description": "<p>Designed around your goals, schedule, and starting point. No templates — your plan is built from scratch and updated as you progress.</p>"
+            "description": "<p>Designed around your goals, schedule, and starting point. No templates — your plan is built from scratch and updated as you progress.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "service-2": {
           "type": "service",
           "settings": {
             "title": "Nutrition Guidance",
-            "description": "<p>Practical eating frameworks aligned with your training. No extreme diets — sustainable habits that fuel real, lasting progress.</p>"
+            "description": "<p>Practical eating frameworks aligned with your training. No extreme diets — sustainable habits that fuel real, lasting progress.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "service-3": {
           "type": "service",
           "settings": {
             "title": "Progress Tracking",
-            "description": "<p>Weekly check-ins, body composition measurements, and performance benchmarks. You always know exactly where you stand and what's next.</p>"
+            "description": "<p>Weekly check-ins, body composition measurements, and performance benchmarks. You always know exactly where you stand and what's next.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         },
         "service-4": {
           "type": "service",
           "settings": {
             "title": "Direct Coach Access",
-            "description": "<p>Questions answered fast. Adjustments made in real time. No waiting until next week's session to sort out what's not working.</p>"
+            "description": "<p>Questions answered fast. Adjustments made in real time. No waiting until next week's session to sort out what's not working.</p>",
+            "link": {
+              "href": "",
+              "text": "Learn More",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["service-1", "service-2", "service-3", "service-4"]
+      "blocksOrder": [
+        "service-1",
+        "service-2",
+        "service-3",
+        "service-4"
+      ]
     },
     "how_it_works": {
       "type": "steps",
@@ -124,7 +154,12 @@
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
     },
     "training_philosophy": {
       "type": "image-text",
@@ -132,7 +167,8 @@
         "image_position": "start",
         "text_position": "center",
         "color_scheme": "standard-primary",
-        "content_color_scheme": "none"
+        "content_color_scheme": "none",
+        "image": "/uploads/images/trainer-in-session.webp"
       },
       "blocks": {
         "phil-eyebrow": {
@@ -165,7 +201,12 @@
           }
         }
       },
-      "blocksOrder": ["phil-eyebrow", "phil-heading", "phil-body", "phil-features"]
+      "blocksOrder": [
+        "phil-eyebrow",
+        "phil-heading",
+        "phil-body",
+        "phil-features"
+      ]
     },
     "training_faq": {
       "type": "accordion",
@@ -215,7 +256,13 @@
           }
         }
       },
-      "blocksOrder": ["faq-1", "faq-2", "faq-3", "faq-4", "faq-sidebar"]
+      "blocksOrder": [
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4",
+        "faq-sidebar"
+      ]
     },
     "training_cta": {
       "type": "action-bar",
@@ -236,15 +283,26 @@
             "link": {
               "href": "book.html",
               "text": "Book Now",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
             },
             "style": "primary",
             "size": "large"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-btn"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-btn"
+      ]
     }
   },
-  "widgetsOrder": ["page_header", "services_detail", "how_it_works", "training_philosophy", "training_faq", "training_cta"]
+  "widgetsOrder": [
+    "page_header",
+    "services_detail",
+    "how_it_works",
+    "training_philosophy",
+    "training_faq",
+    "training_cta"
+  ]
 }

@@ -40,6 +40,25 @@ export function runAssetStorageAdapterConformance({
       assert.equal(await a.download(makeScope("a"), "nope.png"), null);
     });
 
+    it("stat returns the byte size, or null for a missing key", async () => {
+      const a = makeAdapter();
+      const scope = makeScope("a");
+      const bytes = Buffer.from("0123456789");
+      await a.upload(scope, "audio/clip.mp3", makeStream(bytes));
+      const st = await a.stat(scope, "audio/clip.mp3");
+      assert.equal(st.size, bytes.byteLength);
+      assert.equal(await a.stat(scope, "nope.mp3"), null);
+    });
+
+    it("download honors a byte range (audio/video seek → HTTP 206)", async () => {
+      const a = makeAdapter();
+      const scope = makeScope("a");
+      await a.upload(scope, "audio/clip.mp3", makeStream(Buffer.from("0123456789")));
+      // Inclusive range [2, 5] → "2345".
+      const got = await collect(await a.download(scope, "audio/clip.mp3", { start: 2, end: 5 }));
+      assert.equal(got.toString(), "2345");
+    });
+
     it("delete removes the asset", async () => {
       const a = makeAdapter();
       const scope = makeScope("a");

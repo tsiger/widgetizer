@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>\u00a9 2026 Greenfield Landscaping. All rights reserved.</p>",
+    "copyright": "© 2026 Greenfield Landscaping. All rights reserved.",
     "color_scheme": "highlight-secondary"
   },
   "blocks": {
@@ -32,5 +32,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

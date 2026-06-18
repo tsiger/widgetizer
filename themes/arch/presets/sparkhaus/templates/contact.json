@@ -10,7 +10,8 @@
         "content_color_scheme": "none",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/contact-opener.webp"
       },
       "blocks": {
         "ct-eyebrow": {
@@ -46,8 +47,8 @@
             },
             "style": "primary",
             "link_2": {
-              "text": "Email hello@sparkhaus.com",
-              "href": "mailto:hello@sparkhaus.com",
+              "href": "mailto:hello@example.com",
+              "text": "Email hello@example.com",
               "target": "_self"
             },
             "style_2": "secondary",
@@ -55,7 +56,12 @@
           }
         }
       },
-      "blocksOrder": ["ct-eyebrow", "ct-heading", "ct-body", "ct-buttons"]
+      "blocksOrder": [
+        "ct-eyebrow",
+        "ct-heading",
+        "ct-body",
+        "ct-buttons"
+      ]
     },
     "what_well_ask": {
       "type": "icon-list",
@@ -116,7 +122,13 @@
           }
         }
       },
-      "blocksOrder": ["wa-1", "wa-2", "wa-3", "wa-4", "wa-5"]
+      "blocksOrder": [
+        "wa-1",
+        "wa-2",
+        "wa-3",
+        "wa-4",
+        "wa-5"
+      ]
     },
     "whats_next": {
       "type": "features-split",
@@ -161,7 +173,11 @@
           }
         }
       },
-      "blocksOrder": ["wn-1", "wn-2", "wn-3"]
+      "blocksOrder": [
+        "wn-1",
+        "wn-2",
+        "wn-3"
+      ]
     },
     "service_area": {
       "type": "map",
@@ -195,7 +211,10 @@
           }
         }
       },
-      "blocksOrder": ["sa-areas", "sa-outside"]
+      "blocksOrder": [
+        "sa-areas",
+        "sa-outside"
+      ]
     },
     "contact_faq": {
       "type": "accordion",
@@ -256,11 +275,24 @@
           }
         }
       },
-      "blocksOrder": ["cf-sidebar", "cf-1", "cf-2", "cf-3", "cf-4", "cf-5"]
+      "blocksOrder": [
+        "cf-sidebar",
+        "cf-1",
+        "cf-2",
+        "cf-3",
+        "cf-4",
+        "cf-5"
+      ]
     }
   },
-  "widgetsOrder": ["opener", "what_well_ask", "whats_next", "service_area", "contact_faq"],
+  "widgetsOrder": [
+    "opener",
+    "what_well_ask",
+    "whats_next",
+    "service_area",
+    "contact_faq"
+  ],
   "id": "contact",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T17:16:38.070Z",
+  "updated": "2026-04-20T17:33:05.625Z"
 }

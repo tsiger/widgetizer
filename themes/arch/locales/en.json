@@ -16,6 +16,13 @@
         "enable_reveal_animations": {
           "label": "Enable scroll reveal animations",
           "description": "Animate elements as they scroll into view"
+        },
+        "content_header": {
+          "label": "Content"
+        },
+        "date_format": {
+          "label": "Date format",
+          "description": "How dates (e.g. on news articles) are shown on your published site."
         }
       }
     },
@@ -267,6 +274,9 @@
             "highlight_primary": "Highlight Primary",
             "highlight_secondary": "Highlight Secondary"
           }
+        },
+        "content_color_scheme": {
+          "label": "Content color scheme"
         },
         "top_spacing": {
           "label": "Top spacing",
@@ -691,6 +701,43 @@
       }
     }
   },
+  "audio_player": {
+    "name": "Audio Player",
+    "settings": {
+      "show_covers": {
+        "label": "Show cover art"
+      },
+      "show_volume": {
+        "label": "Show volume control"
+      },
+      "show_speed": {
+        "label": "Show playback speed"
+      },
+      "show_download": {
+        "label": "Show download button"
+      }
+    },
+    "blocks": {
+      "track": {
+        "name": "Track",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "artist": {
+            "label": "Artist"
+          },
+          "audio": {
+            "label": "Audio file",
+            "description": "Select or upload an MP3."
+          },
+          "cover": {
+            "label": "Cover image"
+          }
+        }
+      }
+    }
+  },
   "accordion": {
     "name": "Accordion",
     "settings": {
@@ -799,6 +846,39 @@
     "blocks": {
       "card": {
         "settings": {}
+      }
+    }
+  },
+  "news_grid": {
+    "name": "News Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "sort": {
+        "label": "Sort by",
+        "options": {
+          "date_desc": "Newest first",
+          "date_asc": "Oldest first",
+          "title_asc": "Title A-Z",
+          "title_desc": "Title Z-A"
+        }
+      },
+      "show_image": {
+        "label": "Show image"
+      },
+      "show_date": {
+        "label": "Show date"
+      },
+      "show_excerpt": {
+        "label": "Show excerpt"
+      },
+      "show_read_more": {
+        "label": "Show 'Read more' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
       }
     }
   },
@@ -1637,6 +1717,57 @@
             "label": "Email"
           }
         }
+      }
+    }
+  },
+  "projects_grid": {
+    "name": "Projects Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "show_summary": {
+        "label": "Show summary"
+      },
+      "show_client": {
+        "label": "Show client"
+      },
+      "show_year": {
+        "label": "Show year"
+      },
+      "show_read_more": {
+        "label": "Show 'View project' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
+      }
+    }
+  },
+  "services_grid": {
+    "name": "Services Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "show_icon": {
+        "label": "Show icon"
+      },
+      "show_summary": {
+        "label": "Show summary"
+      },
+      "show_price": {
+        "label": "Show price"
+      },
+      "show_duration": {
+        "label": "Show duration"
+      },
+      "show_read_more": {
+        "label": "Show 'View service' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
       }
     }
   },

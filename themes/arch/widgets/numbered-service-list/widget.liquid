@@ -182,9 +182,9 @@
                 </div>
 
                 <div class="service-description-wrap">
-                  {% if block.settings.description != blank %}
+                  {% unless block.settings.description | rte_blank %}
                     <div class="w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
-                  {% endif %}
+                  {% endunless %}
                 </div>
 
                 {% if has_link %}

@@ -6,6 +6,8 @@ import { getAllPages } from "../../queries/pageManager";
 import SidebarMeta from "./SidebarMeta";
 import { useNavItems } from "../../extension/PluginProvider.jsx";
 import { groupNavItems } from "../../extension/builtinNav.js";
+import useCollections from "../../hooks/useCollections";
+import { resolveLucideIcon } from "../../utils/lucideIcon";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -13,10 +15,33 @@ export default function Sidebar() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const hasActiveProject = !!activeProject;
   const [hasPages, setHasPages] = useState(false);
+  const { schemas: collectionSchemas } = useCollections();
 
-  // Nav comes from the plugin registry (built-in items + any plugin items),
-  // bucketed into ordered sections by their `group`.
-  const sections = groupNavItems(useNavItems());
+  // Nav comes from the plugin registry (built-in items + any plugin items). One
+  // dynamic nav item per collection type (theme-defined) is spliced into the flat
+  // list directly after Pages, then the whole list is bucketed into ordered
+  // sections by `group`. Collection items carry a pre-resolved `label`
+  // (displayNamePlural) instead of an i18n `labelKey`, and are tagged group "site".
+  const navItems = useNavItems();
+  const collectionNavItems = (collectionSchemas || []).map((schema) => ({
+    id: `collection-${schema.type}`,
+    label: schema.displayNamePlural || schema.displayName || schema.type,
+    path: `/collections/${schema.type}`,
+    icon: resolveLucideIcon(schema.icon),
+    requiresProject: true,
+    group: "site",
+  }));
+  const mergedNavItems =
+    collectionNavItems.length === 0
+      ? navItems
+      : (() => {
+          const merged = [...navItems];
+          const pagesIndex = merged.findIndex((item) => item.id === "pages");
+          const insertAt = pagesIndex >= 0 ? pagesIndex + 1 : merged.length;
+          merged.splice(insertAt, 0, ...collectionNavItems);
+          return merged;
+        })();
+  const sections = groupNavItems(mergedNavItems);
 
   useEffect(() => {
     let isCancelled = false;
@@ -112,6 +137,11 @@ export default function Sidebar() {
     </Link>
   );
 
+  // Nav items declare a label two ways: a `labelKey` (built-in items, run through
+  // i18n) or a pre-resolved `label` string (dynamic collection items, whose text
+  // is the theme-authored displayNamePlural).
+  const resolveLabel = (item) => (item.labelKey ? t(item.labelKey) : item.label);
+
   const renderNavItem = (item) => {
     const Icon = item.icon;
     const disabled = (item.requiresProject && !hasActiveProject) || (item.action === "openSitePreview" && !canOpenSitePreview);
@@ -135,7 +165,7 @@ export default function Sidebar() {
             <div className={iconClass("__none__", disabled)}>
               <Icon size={20} />
             </div>
-            <span className={navLabelClass("__none__", disabled)}>{t(item.labelKey)}</span>
+            <span className={navLabelClass("__none__", disabled)}>{resolveLabel(item)}</span>
           </button>
         </li>
       );
@@ -147,7 +177,7 @@ export default function Sidebar() {
           <div className={iconClass(item.path, disabled)}>
             <Icon size={20} />
           </div>
-          <span className={navLabelClass(item.path, disabled)}>{t(item.labelKey)}</span>
+          <span className={navLabelClass(item.path, disabled)}>{resolveLabel(item)}</span>
         </NavLink>
       </li>
     );

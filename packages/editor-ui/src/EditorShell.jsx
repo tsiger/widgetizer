@@ -4,7 +4,7 @@ import { builtinNavPlugin } from "./extension/builtinNav.js";
 import Layout from "./components/layout/Layout.jsx";
 import RequireActiveProject from "./components/layout/RequireActiveProject.jsx";
 import { setApiBase } from "./lib/apiBase.js";
-import { setPreviewRenderBase, setStandalonePreviewPath } from "./lib/previewBase.js";
+import { setPreviewRenderBase, setStandalonePreviewPath, setStandaloneCollectionPreviewPath } from "./lib/previewBase.js";
 import { RouteBaseProvider } from "./lib/routeBase.jsx";
 import useProjectStore from "./stores/projectStore.js";
 
@@ -19,6 +19,9 @@ import MenuStructure from "./pages/MenuStructure.jsx";
 import Media from "./pages/Media.jsx";
 import Settings from "./pages/Settings.jsx";
 import ExportSite from "./pages/ExportSite.jsx";
+import CollectionItems from "./pages/CollectionItems.jsx";
+import CollectionItemAdd from "./pages/CollectionItemAdd.jsx";
+import CollectionItemEdit from "./pages/CollectionItemEdit.jsx";
 
 // The mountable editor surface (design doc §5). Because `useBlocker`/navigation
 // guards require a single data-router context, EditorShell does NOT own a
@@ -41,6 +44,7 @@ export function EditorProvider({
   apiBase,
   previewRenderBase,
   standalonePreviewPath,
+  standaloneCollectionPreviewPath,
   routeBase = "",
   project,
   scope,
@@ -63,6 +67,10 @@ export function EditorProvider({
   }, [standalonePreviewPath]);
 
   useEffect(() => {
+    if (standaloneCollectionPreviewPath !== undefined) setStandaloneCollectionPreviewPath(standaloneCollectionPreviewPath);
+  }, [standaloneCollectionPreviewPath]);
+
+  useEffect(() => {
     if (project) useProjectStore.getState().seedProject(project, scope ?? null);
   }, [project, scope]);
 
@@ -77,6 +85,7 @@ export function EditorShell({
   apiBase,
   previewRenderBase,
   standalonePreviewPath,
+  standaloneCollectionPreviewPath,
   routeBase,
   project,
   scope,
@@ -88,6 +97,7 @@ export function EditorShell({
       apiBase={apiBase}
       previewRenderBase={previewRenderBase}
       standalonePreviewPath={standalonePreviewPath}
+      standaloneCollectionPreviewPath={standaloneCollectionPreviewPath}
       routeBase={routeBase}
       project={project}
       scope={scope}
@@ -118,6 +128,9 @@ function editorRouteChildren(plugins = []) {
         { path: "menus/edit/:id", element: <MenusEdit /> },
         { path: "menus/:id/structure", element: <MenuStructure /> },
         { path: "media", element: <Media /> },
+        { path: "collections/:type", element: <CollectionItems /> },
+        { path: "collections/:type/add", element: <CollectionItemAdd /> },
+        { path: "collections/:type/:slug/edit", element: <CollectionItemEdit /> },
         { path: "settings", element: <Settings /> },
         { path: "export-site", element: <ExportSite /> },
         ...pluginRoutes,
@@ -142,6 +155,7 @@ export function createEditorRoutes({
   routeBase,
   previewRenderBase,
   standalonePreviewPath,
+  standaloneCollectionPreviewPath,
   errorElement,
   apiBase,
   project,
@@ -156,6 +170,7 @@ export function createEditorRoutes({
         apiBase={apiBase}
         previewRenderBase={previewRenderBase}
         standalonePreviewPath={standalonePreviewPath}
+        standaloneCollectionPreviewPath={standaloneCollectionPreviewPath}
         routeBase={routeBase}
         project={project}
         scope={scope}

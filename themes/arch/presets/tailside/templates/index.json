@@ -9,7 +9,8 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/home-hero-exam-room.webp"
       },
       "blocks": {
         "hero-kicker": {
@@ -43,13 +44,15 @@
             "link": {
               "href": "contact.html",
               "text": "Book a visit",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
             },
             "style": "primary",
             "link_2": {
               "href": "services.html",
               "text": "View services",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "e15b0596-c0a9-470c-888b-e26e9c17eddc"
             },
             "style_2": "secondary",
             "size": "large"
@@ -288,7 +291,8 @@
             "link": {
               "href": "contact.html",
               "text": "Contact Tailside",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
             },
             "style": "primary",
             "size": "medium"
@@ -310,6 +314,6 @@
     "home_cta"
   ],
   "id": "index",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:30:57.840Z",
+  "updated": "2026-04-24T10:58:06.752Z"
 }

@@ -11,7 +11,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { getContentType as coreGet } from "@widgetizer/core/mimeTypes";
-import { getContentType as builderGet } from "../utils/mimeTypes.js";
+import { getContentType as builderGet, ALLOWED_MIME_TYPES } from "../utils/mimeTypes.js";
 
 describe("MIME single source of truth", () => {
   it("builder-server re-exports core's getContentType (same function)", () => {
@@ -28,7 +28,19 @@ describe("MIME single source of truth", () => {
     assert.equal(builderGet(".pdf"), "application/pdf");
   });
 
+  it("knows .mp3 (audio)", () => {
+    assert.equal(coreGet(".mp3"), "audio/mpeg");
+    assert.equal(builderGet(".mp3"), "audio/mpeg");
+  });
+
   it("falls back to octet-stream for unknown extensions", () => {
     assert.equal(coreGet(".nope"), "application/octet-stream");
+  });
+});
+
+describe("MIME upload allowlist", () => {
+  it("accepts mp3 audio uploads (audio/mpeg + audio/mp3)", () => {
+    assert.ok(ALLOWED_MIME_TYPES.includes("audio/mpeg"));
+    assert.ok(ALLOWED_MIME_TYPES.includes("audio/mp3"));
   });
 });

@@ -25,7 +25,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-text"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text"
+      ]
     },
     "booking_details": {
       "type": "split-content",
@@ -75,7 +78,13 @@
           }
         }
       },
-      "blocksOrder": ["walkins-heading", "walkins-text", "groups-heading", "groups-text", "groups-features"]
+      "blocksOrder": [
+        "walkins-heading",
+        "walkins-text",
+        "groups-heading",
+        "groups-text",
+        "groups-features"
+      ]
     },
     "hours": {
       "type": "card-grid",
@@ -95,7 +104,12 @@
           "settings": {
             "subtitle": "Monday — Thursday",
             "title": "Weeknight Dinner",
-            "description": "<p>5:00 PM – 10:00 PM<br>Walk-ins welcome. Reservations recommended for parties of 4+.</p>"
+            "description": "<p>5:00 PM – 10:00 PM<br>Walk-ins welcome. Reservations recommended for parties of 4+.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "hours-2": {
@@ -103,7 +117,12 @@
           "settings": {
             "subtitle": "Friday — Saturday",
             "title": "Weekend Dinner",
-            "description": "<p>5:00 PM – 11:00 PM<br>Reservations strongly recommended. Last seating at 9:30 PM.</p>"
+            "description": "<p>5:00 PM – 11:00 PM<br>Reservations strongly recommended. Last seating at 9:30 PM.</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "hours-3": {
@@ -111,11 +130,20 @@
           "settings": {
             "subtitle": "Sunday",
             "title": "Brunch & Dinner",
-            "description": "<p>Brunch: 10:00 AM – 3:00 PM (no reservations needed)<br>Dinner: 5:00 PM – 9:00 PM</p>"
+            "description": "<p>Brunch: 10:00 AM – 3:00 PM (no reservations needed)<br>Dinner: 5:00 PM – 9:00 PM</p>",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
-      "blocksOrder": ["hours-1", "hours-2", "hours-3"]
+      "blocksOrder": [
+        "hours-1",
+        "hours-2",
+        "hours-3"
+      ]
     },
     "reservations_cta": {
       "type": "action-bar",
@@ -152,11 +180,20 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["reservations_intro", "booking_details", "hours", "reservations_cta"],
+  "widgetsOrder": [
+    "reservations_intro",
+    "booking_details",
+    "hours",
+    "reservations_cta"
+  ],
   "id": "reservations",
-  "created": "2026-04-03T10:00:00.000Z",
-  "updated": "2026-04-03T10:00:00.000Z"
+  "created": "2026-04-17T13:40:23.917Z",
+  "updated": "2026-04-17T13:42:07.820Z"
 }

@@ -2,6 +2,8 @@ export const IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/
 
 export const FILE_MIME_TYPES = ["application/pdf"];
 
+export const AUDIO_MIME_TYPES = ["audio/mpeg", "audio/mp3"];
+
 export const ZIP_MIME_TYPES = ["application/zip", "application/x-zip-compressed"];
 
 export const IMAGE_ACCEPT = {
@@ -16,9 +18,21 @@ export const FILE_ACCEPT = {
   "application/pdf": [".pdf"],
 };
 
-/** Combined accept object for the main Media Library uploader (images + files). */
+export const AUDIO_ACCEPT = {
+  "audio/mpeg": [".mp3"],
+};
+
+/** Any non-image asset (documents + audio) — i.e. what the `file` category covers. Shared
+ *  by every `filterType="file"` surface (the media drawer uploader and `FileInput`). */
+export const NON_IMAGE_ACCEPT = {
+  ...FILE_ACCEPT,
+  ...AUDIO_ACCEPT,
+};
+
+/** Combined accept object for the main Media Library uploader (images + audio + files). */
 export const MEDIA_ACCEPT = {
   ...IMAGE_ACCEPT,
+  ...AUDIO_ACCEPT,
   ...FILE_ACCEPT,
 };
 

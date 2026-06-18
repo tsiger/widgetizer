@@ -19,8 +19,14 @@ import {
   EnqueuePreloadTag,
   registerMediaMetaFilter,
   registerHandleizeFilter,
+  registerSafeUrlFilter,
+  registerRteFilters,
+  registerDateFilter,
+  registerCollectionFilter,
 } from "@widgetizer/core";
-import { MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
+import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
+import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
+import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
 /**
  * @typedef {object} RenderDeps
@@ -91,6 +97,10 @@ function configureLiquidEngine(engine) {
   // Register custom filters
   registerMediaMetaFilter(engine);
   registerHandleizeFilter(engine);
+  registerSafeUrlFilter(engine);
+  registerRteFilters(engine);
+  registerDateFilter(engine);
+  registerCollectionFilter(engine);
 }
 
 /**
@@ -126,19 +136,41 @@ function isLinkObject(value) {
   return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
 }
 
+/** True when a schema declares at least one `link`-type setting. */
+function schemaHasLinkSetting(schema) {
+  return Array.isArray(schema?.settings) && schema.settings.some((s) => s.type === "link");
+}
+
 /**
- * Resolve a single link object's pageUuid to current slug.
- * If pageUuid exists but page is deleted, clears the link.
- * @param {object} linkValue - The link object { pageUuid?, href, text, target }
+ * Resolve a single link object's pageUuid/collectionItemUuid to its current slug.
+ * If the target exists but was deleted, clears the link. Resolved internal hrefs
+ * are depth-prefixed (outputPathPrefix) so they stay valid from nested item pages.
+ * @param {object} linkValue - The link object { pageUuid?, collectionItemUuid?, collectionType?, href, text, target }
  * @param {Map} pagesByUuid - Map of uuid -> page data
+ * @param {string} [outputPathPrefix] - "" at root, "../" for nested item pages
+ * @param {Map} [collectionItemsByUuid] - Map of item uuid -> { slugPrefix, slug }
  * @returns {object} Resolved link object
  */
-function resolveLinkValue(linkValue, pagesByUuid) {
+function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
   if (!linkValue || typeof linkValue !== "object") {
     return linkValue;
   }
 
-  const { pageUuid } = linkValue;
+  const { pageUuid, collectionItemUuid } = linkValue;
+
+  // Stable reference to a collection item page (#11 parity): resolve its current
+  // slug so renames follow and deletes clear the link, mirroring pageUuid/menus.
+  if (collectionItemUuid) {
+    const entry = collectionItemsByUuid && collectionItemsByUuid.get(collectionItemUuid);
+    if (entry) {
+      return {
+        ...linkValue,
+        href: prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix),
+      };
+    }
+    // Collection item was deleted - clear the link
+    return { href: "", text: "", target: "_self" };
+  }
 
   // If no pageUuid, this is a custom URL - pass through unchanged
   if (!pageUuid) {
@@ -146,13 +178,13 @@ function resolveLinkValue(linkValue, pagesByUuid) {
   }
 
   // Look up the page by uuid
-  const page = pagesByUuid.get(pageUuid);
+  const page = pagesByUuid?.get(pageUuid);
 
   if (page) {
-    // Page exists - update href to current slug
+    // Page exists - update href to current slug, depth-aware for nested pages
     return {
       ...linkValue,
-      href: `${page.slug}.html`,
+      href: prefixInternalHref(`${page.slug}.html`, outputPathPrefix),
     };
   } else {
     // Page was deleted - clear the link
@@ -172,8 +204,10 @@ function resolveLinkValue(linkValue, pagesByUuid) {
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {object} Widget data with resolved links
  */
-function resolveWidgetPageLinks(widgetData, pagesByUuid) {
-  if (!widgetData || !pagesByUuid || pagesByUuid.size === 0) {
+function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
+  const pagesEmpty = !pagesByUuid || pagesByUuid.size === 0;
+  const itemsEmpty = !collectionItemsByUuid || collectionItemsByUuid.size === 0;
+  if (!widgetData || (pagesEmpty && itemsEmpty)) {
     return widgetData;
   }
 
@@ -184,7 +218,7 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid) {
   if (resolved.settings && typeof resolved.settings === "object") {
     for (const [key, value] of Object.entries(resolved.settings)) {
       if (isLinkObject(value)) {
-        resolved.settings[key] = resolveLinkValue(value, pagesByUuid);
+        resolved.settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
       }
     }
   }
@@ -195,7 +229,7 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid) {
       if (block && block.settings && typeof block.settings === "object") {
         for (const [key, value] of Object.entries(block.settings)) {
           if (isLinkObject(value)) {
-            resolved.blocks[blockId].settings[key] = resolveLinkValue(value, pagesByUuid);
+            resolved.blocks[blockId].settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
           }
         }
       }
@@ -205,66 +239,11 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid) {
   return resolved;
 }
 
-/**
- * Recursively resolve page links in menu items.
- * Each menu item may have a pageUuid that needs to be resolved to current slug.
- * @param {Array} menuItems - Array of menu items
- * @param {Map} pagesByUuid - Map of uuid -> page data
- * @returns {Array} Menu items with resolved links
- */
-function resolveMenuItemLinks(menuItems, pagesByUuid, depth = 1) {
-  if (!menuItems || !Array.isArray(menuItems) || pagesByUuid.size === 0) {
-    return menuItems;
-  }
-
-  // SA-20: cap recursion depth so rendering a hostile/legacy menu tree (e.g.
-  // one persisted before the save-time depth guard existed) can never blow the
-  // call stack. Levels beyond the cap are returned unresolved rather than walked.
-  if (depth > MAX_MENU_DEPTH) {
-    return menuItems;
-  }
-
-  return menuItems.map((item) => {
-    const resolved = { ...item };
-
-    // If item has pageUuid, resolve to current slug
-    if (item.pageUuid) {
-      const page = pagesByUuid.get(item.pageUuid);
-      if (page) {
-        // Page exists - update link to current slug
-        resolved.link = `${page.slug}.html`;
-      } else {
-        // Page was deleted - clear the link
-        resolved.link = "";
-        delete resolved.pageUuid;
-      }
-    }
-
-    // Recursively resolve children
-    if (item.items && Array.isArray(item.items) && item.items.length > 0) {
-      resolved.items = resolveMenuItemLinks(item.items, pagesByUuid, depth + 1);
-    }
-
-    return resolved;
-  });
-}
-
-/**
- * Resolve page links in a menu object.
- * @param {object} menuData - Menu data with items array
- * @param {Map} pagesByUuid - Map of uuid -> page data
- * @returns {object} Menu data with resolved links
- */
-function resolveMenuPageLinks(menuData, pagesByUuid) {
-  if (!menuData || !menuData.items) {
-    return menuData;
-  }
-
-  return {
-    ...menuData,
-    items: resolveMenuItemLinks(menuData.items, pagesByUuid),
-  };
-}
+// Widget `menu`-type setting resolution is delegated to the shared ./menuResolver
+// (resolveMenuSettings) — the single source of truth shared with collection-item
+// rendering. The former inline resolveMenuItemLinks/resolveMenuPageLinks (pageUuid
+// only, no depth-prefix or collection-item targets) were removed in that
+// consolidation (master 741abfb8 follow-up).
 
 /**
  * Load all pages for a project and return a map of uuid -> page data.
@@ -353,14 +332,21 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   const apiUrl =
     renderMode === "preview" ? process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}` : "";
 
+  // Depth-aware output prefix for static export. Collection item pages render one
+  // directory deep ({slugPrefix}/{slug}.html), so their asset/link hrefs need an
+  // `outputPathPrefix` (e.g. "../") to resolve from the nested location. Root pages
+  // (and all preview rendering) use "" — behaviour is unchanged for them. The caller
+  // passes it in via sharedGlobals; default empty.
+  const outputPathPrefix = (sharedGlobals && sharedGlobals.outputPathPrefix) || "";
+
   // Determine image base path based on render mode
   // Publish mode uses assets/images/ for consistent CSS path resolution
   const imageBasePath =
-    renderMode === "publish" ? "assets/images" : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
+    renderMode === "publish" ? `${outputPathPrefix}assets/images` : `${apiUrl}/api/media/projects/${projectId}/uploads/images`;
 
   // Determine file base path based on render mode (for PDF and other file assets)
   const fileBasePath =
-    renderMode === "publish" ? "assets/files" : `${apiUrl}/api/media/projects/${projectId}/uploads/files`;
+    renderMode === "publish" ? `${outputPathPrefix}assets/files` : `${apiUrl}/api/media/projects/${projectId}/uploads/files`;
 
   const siteIconSrc = processedThemeSettings?.general?.favicon || "";
 
@@ -475,6 +461,35 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   if (!globals.icons) {
     globals.icons = flatIcons;
     globals.iconPrefix = projectIcons.prefix || "";
+  }
+
+  // Expose depth-aware path globals (defaults keep pages at the export root).
+  // `outputPathPrefix` prefixes relative asset/link URLs; `currentCanonicalPath`
+  // is the un-prefixed path of the page being rendered, used for menu
+  // active-state matching.
+  if (globals.outputPathPrefix === undefined) globals.outputPathPrefix = outputPathPrefix;
+  if (globals.currentCanonicalPath === undefined) globals.currentCanonicalPath = "";
+  // Published date format (theme-owned, set via the `date_format` theme setting).
+  // Consumed by the `format_date` filter; when a theme defines no such setting the
+  // filter falls back to its own default, so we only set this when present.
+  if (globals.dateFormat === undefined && processedThemeSettings?.general?.date_format) {
+    globals.dateFormat = processedThemeSettings.general.date_format;
+  }
+
+  // Collection items loader for the `| collection` filter. The shell supplies a
+  // scope-aware factory (`deps.buildCollectionItemsLoader`) — the engine never
+  // imports the collection service or touches storage itself. Attached once per
+  // render; results cached per (type, options) on `globals` so multiple widgets
+  // reading the same collection only hit storage once. The cache is per-render
+  // (scoped to `globals`) because `outputPathPrefix` differs across output depths,
+  // so a root page and a nested item page must not share a `url`.
+  if (typeof deps.buildCollectionItemsLoader === "function" && !globals.getCollectionItems) {
+    if (!globals.collectionCache) globals.collectionCache = new Map();
+    globals.getCollectionItems = deps.buildCollectionItemsLoader({
+      globals,
+      imageBasePath,
+      fileBasePath,
+    });
   }
 
   // Return the base context
@@ -606,29 +621,6 @@ async function renderWidget(
       }
     }
 
-    // Handle menu settings - check schema for menu type settings
-    const menuSettingIds = new Set();
-    if (Array.isArray(schema.settings)) {
-      schema.settings.forEach((setting) => {
-        if (setting.type === "menu") {
-          menuSettingIds.add(setting.id);
-        }
-      });
-    }
-
-    // Also collect menu-type setting IDs from block schemas
-    const blockMenuSettingIds = {};
-    for (const [blockType, blockSettings] of Object.entries(blockSchemas)) {
-      if (Array.isArray(blockSettings)) {
-        blockSettings.forEach((setting) => {
-          if (setting.type === "menu") {
-            if (!blockMenuSettingIds[blockType]) blockMenuSettingIds[blockType] = new Set();
-            blockMenuSettingIds[blockType].add(setting.id);
-          }
-        });
-      }
-    }
-
     // Load menu maps (UUID and slug-based) — cached in sharedGlobals across widgets
     let menuMaps;
     if (sharedGlobals && sharedGlobals.menuMaps) {
@@ -640,55 +632,64 @@ async function renderWidget(
       }
     }
 
-    // Resolve menu-type settings: try UUID first, fall back to slug-based ID
-    for (const [key, value] of Object.entries(enhancedSettings)) {
-      if (menuSettingIds.has(key)) {
-        try {
-          if (value) {
-            const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
-            // Resolve page links in menu items (pageUuid -> current slug)
-            enhancedSettings[key] = resolveMenuPageLinks(menuData, pagesByUuid) || { items: [] };
-          } else {
-            enhancedSettings[key] = { items: [] }; // Ensure empty menu if no value set
-          }
-        } catch (err) {
-          console.error(`Error loading menu data for setting ${key}:`, err);
-          enhancedSettings[key] = { items: [] }; // Fallback to empty menu on error
-        }
+    // Depth-aware prefix for links/menus emitted by this widget ("" for root pages
+    // and all preview, "../" when rendering inside a nested collection item page).
+    const outputPathPrefix = (sharedGlobals && sharedGlobals.outputPathPrefix) || "";
+
+    // Whether the widget (or its blocks) declares any `menu` or `link` setting.
+    // Both setting types can target a collection item (collectionItemUuid), so
+    // either drives loading the item uuid -> { slugPrefix, slug } map (#11 parity
+    // with pageUuid). Loaded once via the shell-supplied deps hook (the engine
+    // imports no backend code) and cached across widgets on sharedGlobals;
+    // non-collection callers skip the load.
+    const hasMenuSettings =
+      schemaHasMenuSetting(schema) ||
+      Object.values(blockSchemas).some((bs) => Array.isArray(bs) && bs.some((s) => s.type === "menu"));
+    const hasLinkSettings =
+      schemaHasLinkSetting(schema) ||
+      Object.values(blockSchemas).some((bs) => Array.isArray(bs) && bs.some((s) => s.type === "link"));
+    let collectionItemsByUuid = (sharedGlobals && sharedGlobals.collectionItemsByUuid) || null;
+    if ((hasMenuSettings || hasLinkSettings) && !collectionItemsByUuid && typeof deps.loadCollectionItemsByUuid === "function") {
+      try {
+        collectionItemsByUuid = await deps.loadCollectionItemsByUuid();
+        if (sharedGlobals) sharedGlobals.collectionItemsByUuid = collectionItemsByUuid;
+      } catch (err) {
+        console.warn(`Could not load collection items for link/menu resolution: ${err.message}`);
       }
     }
 
-    // Resolve menu-type settings inside blocks
-    for (const [blockId, block] of Object.entries(enhancedBlocks)) {
-      const menuIds = block.type && blockMenuSettingIds[block.type];
-      if (!menuIds || !block.settings) continue;
-      for (const settingId of menuIds) {
-        const value = block.settings[settingId];
-        try {
-          if (value) {
-            const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
-            block.settings[settingId] = resolveMenuPageLinks(menuData, pagesByUuid) || { items: [] };
-          } else {
-            block.settings[settingId] = { items: [] };
-          }
-        } catch (err) {
-          console.error(`Error loading menu data for block ${blockId} setting ${settingId}:`, err);
-          block.settings[settingId] = { items: [] };
-        }
+    // Resolve `menu`-type settings (widget + blocks) into full menu objects via the
+    // shared menuResolver — the single source of truth shared with collection-item
+    // rendering: depth-aware links, collection-item targets (#11), and custom-link
+    // sanitization. A missing/empty value or unknown menu yields { items: [] }.
+    const menuDeps = { menuMaps, pagesByUuid, collectionItemsByUuid: collectionItemsByUuid || new Map(), outputPathPrefix };
+    resolveMenuSettings(enhancedSettings, schema.settings, menuDeps);
+    for (const block of Object.values(enhancedBlocks)) {
+      if (block && block.type && block.settings && Array.isArray(blockSchemas[block.type])) {
+        resolveMenuSettings(block.settings, blockSchemas[block.type], menuDeps);
       }
     }
 
-    // Resolve page links (pageUuid -> current slug) in widget settings and blocks
-    // This ensures internal links stay valid even after page renames
+    // Resolve page/collection-item links (uuid -> current slug, depth-aware) in
+    // widget settings and blocks, so internal links survive renames.
     const resolvedWidgetData = resolveWidgetPageLinks(
       { settings: enhancedSettings, blocks: enhancedBlocks },
       pagesByUuid,
+      outputPathPrefix,
+      collectionItemsByUuid,
     );
 
     // Sanitize settings based on schema types (text, richtext, link, etc.)
     // This runs after link resolution so resolved URLs are also validated.
     // resolvedWidgetData is already a deep clone, safe to mutate in place.
     deps.sanitizeWidgetData(resolvedWidgetData, schema);
+
+    // Base context first: it carries the mode-aware media bases (imagePath/filePath),
+    // which resolve embedded media paths inside richtext settings before the template
+    // renders — so a richtext <img> loads in both preview and export with no per-template
+    // wiring. Runs on the already-sanitized clone; stored values keep their portable path.
+    const baseContext = await createBaseRenderContext(deps, rawThemeSettings, renderMode, sharedGlobals);
+    resolveRichtextMediaInWidgetData(resolvedWidgetData, schema, baseContext.imagePath, baseContext.filePath);
 
     // Create widget context for template
     const widgetContext = {
@@ -699,9 +700,6 @@ async function renderWidget(
       blocksOrder: blocksOrder || [],
       index: index, // 1-based index of widget in page (null for global widgets or when not provided)
     };
-
-    // Get base render context (use shared globals if provided)
-    const baseContext = await createBaseRenderContext(deps, rawThemeSettings, renderMode, sharedGlobals);
 
     // Merge with widget-specific context
     const renderContext = {
@@ -806,6 +804,123 @@ async function renderPageLayout(
 }
 
 /**
+ * Render a single collection item's page: header/footer + resolved item +
+ * the collection type's template + the page layout — the item-page equivalent
+ * of the page render path, sharing `renderWidget`/`renderPageLayout` so the
+ * output matches pages exactly. Depth (`outputPathPrefix`), the page map
+ * (`pagesByUuid`), and the collection-item map (`collectionItemsByUuid`) are read
+ * off `sharedGlobals`; menu maps are loaded lazily here (engine-internal,
+ * fs-based) when absent, so the depth used to resolve item links can never
+ * disagree with the depth the layout renders at.
+ *
+ * The collection-specific item resolution + page-data shaping live in
+ * builder-server `collectionService`, so the shell injects them as
+ * `prepareItem` / `buildItemPageData` callbacks — the engine imports no backend
+ * code and stays storage/scope-free.
+ *
+ * @param {RenderDeps} deps
+ * @param {object} args
+ * @param {object} args.schema - Normalized collection schema.
+ * @param {object} args.item - Raw/normalized item (export or preview).
+ * @param {string} args.template - The collection type's `template.liquid` source.
+ * @param {object} args.rawThemeSettings - Raw theme settings.
+ * @param {string} args.renderMode - "publish" | "preview".
+ * @param {object} args.sharedGlobals - Caller-built globals (mode-specific). Must
+ *   carry `outputPathPrefix`; the caller supplies `pagesByUuid` +
+ *   `collectionItemsByUuid` when item links/menus must resolve.
+ * @param {object|null} args.headerData - Global header widget data, or null.
+ * @param {object|null} args.footerData - Global footer widget data, or null.
+ * @param {object} args.projectData - Project object for the item template's `project` context.
+ * @param {string} args.siteUrl - Site URL for canonical/og resolution ("" in preview).
+ * @param {Function} args.prepareItem - collectionService.prepareCollectionItemForRender
+ * @param {Function} args.buildItemPageData - collectionService.buildCollectionItemPageData
+ * @returns {Promise<{ html: string, mainContentHtml: string, itemPageData: object, resolvedItem: object }>}
+ */
+async function renderCollectionItemPage(
+  deps,
+  {
+    schema,
+    item,
+    template,
+    rawThemeSettings,
+    renderMode,
+    sharedGlobals,
+    headerData,
+    footerData,
+    projectData,
+    siteUrl,
+    prepareItem,
+    buildItemPageData,
+  },
+) {
+  // Resolve `menu`-type item settings the same way widgets do, when the maps are
+  // present. Menu maps are engine-internal (fs-based) — load them lazily if the
+  // caller didn't supply them, so prep below sees the same maps the layout will.
+  if (!sharedGlobals.menuMaps) sharedGlobals.menuMaps = await loadMenuMaps(deps);
+  const menuDeps =
+    sharedGlobals.menuMaps || sharedGlobals.collectionItemsByUuid
+      ? { menuMaps: sharedGlobals.menuMaps, collectionItemsByUuid: sharedGlobals.collectionItemsByUuid }
+      : null;
+
+  // Base context first: its mode-aware media bases (imagePath/filePath) resolve
+  // embedded media paths in the item's richtext fields during prep below.
+  const baseContext = await createBaseRenderContext(deps, rawThemeSettings, renderMode, sharedGlobals);
+
+  // Resolve item links at the layout's depth + sanitize + resolve richtext media.
+  const resolvedItem = prepareItem(item, schema, sharedGlobals.pagesByUuid, sharedGlobals.outputPathPrefix, menuDeps, {
+    imagePath: baseContext.imagePath,
+    filePath: baseContext.filePath,
+  });
+
+  // Render header/footer with the item's globals so their enqueued assets are
+  // captured before the layout emits them.
+  let headerContent = "";
+  let footerContent = "";
+  if (headerData) {
+    headerContent = await renderWidget(deps, "header", headerData, rawThemeSettings, renderMode, sharedGlobals, null);
+  }
+  if (footerData) {
+    footerContent = await renderWidget(deps, "footer", footerData, rawThemeSettings, renderMode, sharedGlobals, null);
+  }
+
+  // Page-shaped object drives the layout title/SEO/body class. Built BEFORE the
+  // template render so the item template receives the page/collection/project
+  // context, not just item.
+  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl);
+
+  // Render the collection type's template.liquid against the item context.
+  const themeSnippetsDir = path.join(deps.projectDir, "snippets");
+  const engine = getOrCreateEngine(deps.projectDir, themeSnippetsDir, deps.coreSnippetsDir);
+  const itemRenderContext = {
+    ...baseContext,
+    item: resolvedItem,
+    collection: schema,
+    page: itemPageData,
+    project: projectData,
+  };
+  const mainContentHtml = await engine.parseAndRender(template, itemRenderContext, {
+    globals: itemRenderContext.globals,
+  });
+
+  // Item-specific body class so a `.page-{slug}` index rule never leaks here.
+  const html = await renderPageLayout(
+    deps,
+    {
+      headerContent,
+      mainContent: mainContentHtml,
+      footerContent,
+      extraBodyClasses: `collection-${schema.type} item-${resolvedItem.slug}`,
+    },
+    itemPageData,
+    rawThemeSettings,
+    renderMode,
+    sharedGlobals,
+  );
+
+  return { html, mainContentHtml, itemPageData, resolvedItem };
+}
+
+/**
  * Render enqueued asset tags from sharedGlobals into HTML.
  * Used by renderSingleWidget so that dynamically enqueued assets
  * are included in the morph response and picked up by the preview runtime.
@@ -882,4 +997,10 @@ async function widgetSupportsTransparentHeader(deps, widgetType) {
   }
 }
 
-export { renderWidget, renderPageLayout, renderEnqueuedAssetTags, widgetSupportsTransparentHeader };
+export {
+  renderWidget,
+  renderPageLayout,
+  renderCollectionItemPage,
+  renderEnqueuedAssetTags,
+  widgetSupportsTransparentHeader,
+};

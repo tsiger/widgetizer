@@ -1,7 +1,13 @@
 import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
-import { getProjectPagesDir, getProjectMenusDir } from "../config.js";
+import { getProjectPagesDir, getProjectMenusDir, getProjectDir } from "../config.js";
+import { syncCollectionItemMediaUsageOnWrite } from "../services/mediaUsageService.js";
+
+/** The per-tenant collections root, a sibling of pages/ under the project dir. */
+function collectionsDirFor(projectFolderName) {
+  return path.join(getProjectDir(projectFolderName), "collections");
+}
 
 // ---------------------------------------------------------------------------
 // Shared building blocks (internal)
@@ -109,6 +115,64 @@ function processMenuItems(items, itemTransformer) {
     }
     return processed;
   });
+}
+
+/**
+ * Apply a value transformer to every top-level setting value of a collection
+ * item. Returns a clone plus whether anything changed. v1 item settings are
+ * flat (no repeaters), so a single pass suffices.
+ */
+function transformItemSettings(item, valueTransformer) {
+  if (!item?.settings || typeof item.settings !== "object") return { item, changed: false };
+  const settings = {};
+  let changed = false;
+  for (const [key, value] of Object.entries(item.settings)) {
+    const next = valueTransformer(value);
+    settings[key] = next;
+    if (next !== value) changed = true;
+  }
+  return { item: { ...item, settings }, changed };
+}
+
+/**
+ * Walk every collection item file under collections/<type>/<slug>.json, run it
+ * through `itemTransformer(item, type, slug) => { item, changed }`, and write
+ * back those that changed. Returns the touched items. fs-based like the rest of
+ * this OSS-internal enrichment module; the collection type/slug come from
+ * directory entries under the per-tenant project root (never request input).
+ */
+async function updateCollectionItems(collectionsDir, itemTransformer) {
+  if (!(await fs.pathExists(collectionsDir))) return [];
+
+  const touched = [];
+  const typeEntries = await fs.readdir(collectionsDir, { withFileTypes: true });
+  for (const typeEntry of typeEntries) {
+    if (!typeEntry.isDirectory()) continue;
+    const type = typeEntry.name;
+    const typeDir = path.join(collectionsDir, type);
+    let names;
+    try {
+      names = await fs.readdir(typeDir);
+    } catch {
+      continue;
+    }
+    for (const name of names) {
+      if (!name.endsWith(".json") || name === "_order.json") continue;
+      const slug = name.replace(/\.json$/, "");
+      const itemPath = path.join(typeDir, name);
+      try {
+        const item = JSON.parse(await fs.readFile(itemPath, "utf8"));
+        const { item: nextItem, changed } = itemTransformer(item, type, slug);
+        if (changed) {
+          await fs.outputFile(itemPath, JSON.stringify(nextItem, null, 2));
+          touched.push({ type, slug, item: nextItem });
+        }
+      } catch (error) {
+        console.warn(`[linkEnrichment] Failed to process collection item ${type}/${name}: ${error.message}`);
+      }
+    }
+  }
+  return touched;
 }
 
 // ---------------------------------------------------------------------------
@@ -235,6 +299,16 @@ export async function enrichNewProjectReferences(pagesDir, menusDir) {
   } catch (error) {
     console.warn(`[linkEnrichment] Failed to enrich widget links: ${error.message}`);
   }
+
+  // Step 5: Enrich seeded collection items (slug-format links -> pageUuid).
+  // Media usage is rebuilt by the project-creation structural refresh. The
+  // collections dir is a sibling of pages/ under the project root.
+  try {
+    const collectionsDir = path.join(pagesDir, "..", "collections");
+    await updateCollectionItems(collectionsDir, (item) => transformItemSettings(item, enrichValue));
+  } catch (error) {
+    console.warn(`[linkEnrichment] Failed to enrich collection item links: ${error.message}`);
+  }
 }
 
 /**
@@ -248,8 +322,18 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 
   const oldToNewUuid = new Map();
   const oldToNewMenuUuid = new Map();
+  const oldToNewItemUuid = new Map();
 
-  // Step 1: Regenerate page UUIDs and build mapping
+  // Step 1: Regenerate collection item UUIDs FIRST, building the old->new map so
+  // the menu/link passes below can remap stable collection-item references (#11).
+  // Every item gets a fresh identity in the duplicated project (always rewritten).
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => {
+    const newUuid = randomUUID();
+    if (item.uuid) oldToNewItemUuid.set(item.uuid, newUuid);
+    return { item: { ...item, uuid: newUuid }, changed: true };
+  });
+
+  // Step 2: Regenerate page UUIDs and build mapping
   const pageFiles = await fs.readdir(pagesDir);
   for (const pageFile of pageFiles) {
     if (!pageFile.endsWith(".json")) continue;
@@ -291,6 +375,11 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
           const newUuid = oldToNewUuid.get(item.pageUuid);
           if (newUuid) item.pageUuid = newUuid;
         }
+        // Stable collection-item references (#11) follow the regenerated uuids.
+        if (item.collectionItemUuid) {
+          const newItemUuid = oldToNewItemUuid.get(item.collectionItemUuid);
+          if (newItemUuid) item.collectionItemUuid = newItemUuid;
+        }
         return item;
       });
 
@@ -298,11 +387,17 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     }
   }
 
-  // Step 3: Remap widget references in pages and global widgets
+  // Step 4: Remap widget references in pages and global widgets
   const remapValue = (value) => {
-    if (isLinkObject(value) && value.pageUuid) {
-      const newUuid = oldToNewUuid.get(value.pageUuid);
-      return newUuid ? { ...value, pageUuid: newUuid } : value;
+    if (isLinkObject(value)) {
+      if (value.pageUuid) {
+        const newUuid = oldToNewUuid.get(value.pageUuid);
+        return newUuid ? { ...value, pageUuid: newUuid } : value;
+      }
+      if (value.collectionItemUuid) {
+        const newItemUuid = oldToNewItemUuid.get(value.collectionItemUuid);
+        return newItemUuid ? { ...value, collectionItemUuid: newItemUuid } : value;
+      }
     }
     if (typeof value === "string" && oldToNewMenuUuid.has(value)) {
       return oldToNewMenuUuid.get(value);
@@ -314,6 +409,12 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+
+  // Step 5: Remap link references inside collection item settings (item uuids
+  // were already regenerated in Step 1; this only fixes pageUuid/menu/item refs).
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
+    transformItemSettings(item, remapValue),
+  );
 }
 
 /**
@@ -322,8 +423,10 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
  * and menu items, writing back only files that were actually modified.
  * @param {string} projectFolderName - The project folder name
  * @param {string} deletedPageUuid - The UUID of the deleted page
+ * @param {string|null} [projectId=null] - When provided, refreshes media usage
+ *   for any collection item whose link settings were cleared.
  */
-export async function cleanupDeletedPageReferences(projectFolderName, deletedPageUuid) {
+export async function cleanupDeletedPageReferences(projectFolderName, deletedPageUuid, projectId = null) {
   const pagesDir = getProjectPagesDir(projectFolderName);
   const menusDir = getProjectMenusDir(projectFolderName);
 
@@ -364,4 +467,139 @@ export async function cleanupDeletedPageReferences(projectFolderName, deletedPag
       }
     }
   }
+
+  // Clean collection item link settings, then keep media usage in sync for each
+  // touched item (a cleared link may have removed an upload reference).
+  const touched = await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
+    transformItemSettings(item, cleanValue),
+  );
+  if (projectId) {
+    for (const { type, slug, item } of touched) {
+      try {
+        await syncCollectionItemMediaUsageOnWrite(projectId, type, slug, item, null);
+      } catch (error) {
+        console.warn(`[linkEnrichment] Failed to sync media usage for ${type}/${slug}: ${error.message}`);
+      }
+    }
+  }
+}
+
+/**
+ * Clean up references to deleted collection item page(s) (#11) across the project:
+ * menu items, widget/block `link` settings (pages + globals), and collection-item
+ * `link` settings. Clears the link and drops the stable-ref fields
+ * (`collectionItemUuid`/`collectionType`) on anything pointing at a deleted item.
+ * Render-time resolution already clears dead refs; this prunes them from disk so
+ * they never re-surface (parity with `cleanupDeletedPageReferences`).
+ * @param {string} projectFolderName - The project folder name
+ * @param {string|string[]|Set<string>} deletedItemUuids - uuid(s) of deleted items
+ */
+export async function cleanupDeletedCollectionItemReferences(projectFolderName, deletedItemUuids) {
+  const uuids =
+    deletedItemUuids instanceof Set
+      ? deletedItemUuids
+      : new Set(Array.isArray(deletedItemUuids) ? deletedItemUuids : [deletedItemUuids]);
+  if (uuids.size === 0) return;
+
+  const pagesDir = getProjectPagesDir(projectFolderName);
+  const menusDir = getProjectMenusDir(projectFolderName);
+
+  // Clear widget/block + collection-item `link` settings pointing at a deleted item.
+  const cleanValue = (value) => {
+    if (isLinkObject(value) && value.collectionItemUuid && uuids.has(value.collectionItemUuid)) {
+      return { href: "", text: "", target: "_self" };
+    }
+    return value;
+  };
+  const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
+  await updatePageWidgets(pagesDir, widgetProcessor);
+  await updateGlobalWidgets(pagesDir, widgetProcessor);
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
+    transformItemSettings(item, cleanValue),
+  );
+
+  // Clear menu items pointing at a deleted item (keep the item, drop the ref).
+  if (!(await fs.pathExists(menusDir))) return;
+  const menuFiles = await fs.readdir(menusDir);
+  for (const menuFile of menuFiles) {
+    if (!menuFile.endsWith(".json")) continue;
+
+    const menuPath = path.join(menusDir, menuFile);
+    const menu = JSON.parse(await fs.readFile(menuPath, "utf8"));
+
+    const cleanedItems = processMenuItems(menu.items, (item) => {
+      if (item.collectionItemUuid && uuids.has(item.collectionItemUuid)) {
+        item.link = "";
+        delete item.collectionItemUuid;
+        delete item.collectionType;
+      }
+      return item;
+    });
+
+    if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
+      menu.items = cleanedItems;
+      await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+    }
+  }
+}
+
+/**
+ * Remap menu items' `collectionItemUuid` references from preset-source uuids to
+ * the freshly seeded uuids (#11). Used by preset seeding: a preset's menus may
+ * ship stable collection-item refs against the preset's own item uuids, which are
+ * regenerated on seed, so the refs must follow.
+ * @param {string} projectFolderName - The project folder name
+ * @param {Map<string,string>} oldToNewItemUuid - source uuid -> seeded uuid
+ */
+export async function remapCollectionItemMenuRefs(projectFolderName, oldToNewItemUuid) {
+  if (!oldToNewItemUuid || oldToNewItemUuid.size === 0) return;
+  const menusDir = getProjectMenusDir(projectFolderName);
+  if (!(await fs.pathExists(menusDir))) return;
+
+  const menuFiles = await fs.readdir(menusDir);
+  for (const menuFile of menuFiles) {
+    if (!menuFile.endsWith(".json")) continue;
+
+    const menuPath = path.join(menusDir, menuFile);
+    const menu = JSON.parse(await fs.readFile(menuPath, "utf8"));
+
+    const remapped = processMenuItems(menu.items, (item) => {
+      if (item.collectionItemUuid) {
+        const next = oldToNewItemUuid.get(item.collectionItemUuid);
+        if (next) item.collectionItemUuid = next;
+      }
+      return item;
+    });
+
+    if (JSON.stringify(remapped) !== JSON.stringify(menu.items)) {
+      menu.items = remapped;
+      await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+    }
+  }
+}
+
+/**
+ * Remap widget/block + collection-item `link` settings' `collectionItemUuid`
+ * references from preset-source uuids to the freshly seeded uuids (#11). The
+ * `link`-setting twin of remapCollectionItemMenuRefs, used by preset seeding.
+ * @param {string} projectFolderName - The project folder name
+ * @param {Map<string,string>} oldToNewItemUuid - source uuid -> seeded uuid
+ */
+export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewItemUuid) {
+  if (!oldToNewItemUuid || oldToNewItemUuid.size === 0) return;
+  const pagesDir = getProjectPagesDir(projectFolderName);
+
+  const remapValue = (value) => {
+    if (isLinkObject(value) && value.collectionItemUuid) {
+      const next = oldToNewItemUuid.get(value.collectionItemUuid);
+      if (next) return { ...value, collectionItemUuid: next };
+    }
+    return value;
+  };
+  const widgetProcessor = (widget) => transformWidgetSettings(widget, remapValue);
+  await updatePageWidgets(pagesDir, widgetProcessor);
+  await updateGlobalWidgets(pagesDir, widgetProcessor);
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
+    transformItemSettings(item, remapValue),
+  );
 }

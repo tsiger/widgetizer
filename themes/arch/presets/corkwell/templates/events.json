@@ -10,7 +10,8 @@
         "overlay_color": "#151e22cc",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "auto"
+        "top_spacing": "auto",
+        "image": "/uploads/images/events-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -28,7 +29,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "next_tasting": {
       "type": "countdown",
@@ -36,7 +40,6 @@
         "eyebrow": "Coming Up",
         "title": "Spring Natural Wine Tasting",
         "description": "",
-        "text": "<p>An evening exploring 12 natural wines from small European producers. Tickets include all pours and a cheese plate.</p>",
         "heading_alignment": "center",
         "target_date": "2027-06-15 19:00",
         "expired_message": "This event has passed. Follow us for the next one.",
@@ -45,9 +48,11 @@
         "button": {
           "text": "Reserve a Spot",
           "href": "contact.html",
-          "target": "_self"
+          "target": "_self",
+          "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
         },
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "text": "<p>An evening exploring 12 natural wines from small European producers. Tickets include all pours and a cheese plate.</p>"
       }
     },
     "regulars": {
@@ -89,13 +94,18 @@
           }
         }
       },
-      "blocksOrder": ["event-1", "event-2", "event-3"]
+      "blocksOrder": [
+        "event-1",
+        "event-2",
+        "event-3"
+      ]
     },
     "private_hire": {
       "type": "image-callout",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/private-hire.webp"
       },
       "blocks": {
         "hire-heading": {
@@ -124,14 +134,20 @@
             "link": {
               "text": "Inquire About Private Events",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["hire-heading", "hire-text", "hire-features", "hire-button"]
+      "blocksOrder": [
+        "hire-heading",
+        "hire-text",
+        "hire-features",
+        "hire-button"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -168,11 +184,21 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "next_tasting", "regulars", "private_hire", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "next_tasting",
+    "regulars",
+    "private_hire",
+    "cta"
+  ],
   "id": "events",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T13:48:06.372Z",
+  "updated": "2026-04-16T13:57:21.974Z"
 }

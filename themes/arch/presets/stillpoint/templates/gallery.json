@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/gallery-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,7 +24,9 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "gallery": {
       "type": "gallery",
@@ -43,89 +45,102 @@
         "img-1": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-vinyasa.webp",
             "caption": "Morning vinyasa flow"
           }
         },
         "img-2": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-sunrise.webp",
             "caption": "Sunrise through the studio windows"
           }
         },
         "img-3": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-yin.webp",
             "caption": "Yin class in session"
           }
         },
         "img-4": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-workshop.webp",
             "caption": "Community workshop"
           }
         },
         "img-5": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-props.webp",
             "caption": "Props and equipment"
           }
         },
         "img-6": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-meditation.webp",
             "caption": "Meditation session"
           }
         },
         "img-7": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-pilates.webp",
             "caption": "Pilates mat class"
           }
         },
         "img-8": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-outdoor.webp",
             "caption": "Summer outdoor practice"
           }
         },
         "img-9": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-courtyard.webp",
             "caption": "Studio courtyard"
           }
         },
         "img-10": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-tea.webp",
             "caption": "Tea and conversation after class"
           }
         },
         "img-11": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-prenatal.webp",
             "caption": "Prenatal class"
           }
         },
         "img-12": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/gallery-seasonal.webp",
             "caption": "Seasonal workshop"
           }
         }
       },
-      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6", "img-7", "img-8", "img-9", "img-10", "img-11", "img-12"]
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6",
+        "img-7",
+        "img-8",
+        "img-9",
+        "img-10",
+        "img-11",
+        "img-12"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -149,18 +164,26 @@
             "link": {
               "text": "Try a Free Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "gallery", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "gallery",
+    "cta"
+  ],
   "id": "gallery",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-17T11:59:16.450Z",
+  "updated": "2026-04-17T12:39:47.108Z"
 }

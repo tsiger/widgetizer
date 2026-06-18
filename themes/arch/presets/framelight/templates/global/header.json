@@ -2,21 +2,25 @@
   "type": "header",
   "settings": {
     "logoText": "Framelight",
-    "logoMaxWidth": 120,
+    "logoMaxWidth": 180,
     "contactDetailsLine1": "hello@example.com",
     "contactDetailsLine2": "By appointment",
     "contact_position": "menu",
-    "headerNavigation": "main-menu",
+    "headerNavigation": "6184cf63-2331-4c3b-91d2-99d366b32374",
     "center_nav": true,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Inquire",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "highlight-primary"
-  }
+    "color_scheme": "highlight-primary",
+    "logoImage": "/uploads/images/framelight-logo-white.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

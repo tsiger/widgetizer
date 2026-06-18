@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/about-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -21,7 +21,7 @@
     "story": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/about-story.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -59,7 +59,12 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text-1",
+        "story-text-2"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -70,15 +75,15 @@
         "heading_alignment": "center",
         "columns_desktop": 3,
         "layout": "grid",
+        "color_scheme": "standard-secondary",
         "image_style": "full",
-        "aspect_ratio": "1 / 1",
-        "color_scheme": "standard-secondary"
+        "aspect_ratio": "1 / 1"
       },
       "blocks": {
         "profile-1": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/about-profile-elena.webp",
             "name": "Dr. Elena Rhodes",
             "role": "Lead Dentist",
             "specialty": "General & Cosmetic",
@@ -89,7 +94,7 @@
         "profile-2": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/about-profile-marcus.webp",
             "name": "Dr. Marcus Chen",
             "role": "Associate Dentist",
             "specialty": "Pediatric & Orthodontic",
@@ -100,7 +105,7 @@
         "profile-3": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/about-profile-lena.webp",
             "name": "Dr. Lena Okafor",
             "role": "Associate Dentist",
             "specialty": "Oral Surgery & Implants",
@@ -109,7 +114,11 @@
           }
         }
       },
-      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+      "blocksOrder": [
+        "profile-1",
+        "profile-2",
+        "profile-3"
+      ]
     },
     "values": {
       "type": "trust-bar",
@@ -120,8 +129,8 @@
         "alignment": "centered",
         "show_dividers": false,
         "color_scheme": "highlight-primary",
-        "top_spacing": "small",
-        "bottom_spacing": "small"
+        "bottom_spacing": "small",
+        "top_spacing": "small"
       },
       "blocks": {
         "value-1": {
@@ -149,7 +158,11 @@
           }
         }
       },
-      "blocksOrder": ["value-1", "value-2", "value-3"]
+      "blocksOrder": [
+        "value-1",
+        "value-2",
+        "value-3"
+      ]
     },
     "office": {
       "type": "gallery",
@@ -168,47 +181,54 @@
         "img-1": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-lobby.webp",
             "caption": "Lobby"
           }
         },
         "img-2": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-treatment.webp",
             "caption": "Treatment room"
           }
         },
         "img-3": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-reception.webp",
             "caption": "Reception"
           }
         },
         "img-4": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-sterilization.webp",
             "caption": "Sterilization area"
           }
         },
         "img-5": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-lounge.webp",
             "caption": "Patient lounge"
           }
         },
         "img-6": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-exterior.webp",
             "caption": "Exterior"
           }
         }
       },
-      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -232,18 +252,29 @@
             "link": {
               "text": "Book Appointment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "story", "team", "values", "office", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "story",
+    "team",
+    "values",
+    "office",
+    "cta"
+  ],
   "id": "about",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T12:01:48.312Z",
+  "updated": "2026-04-16T13:12:17.737Z"
 }

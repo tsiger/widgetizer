@@ -1,0 +1,598 @@
+{
+  "files": [
+    {
+      "filename": "greystonelight.png",
+      "originalName": "greystone_light.png",
+      "type": "image/png",
+      "size": 4897,
+      "path": "/uploads/images/greystonelight.png",
+      "width": 719,
+      "height": 110,
+      "alt": "Greystone law firm logo in cream for dark backgrounds",
+      "title": "Greystone logo light",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/greystonelight-small.png",
+          "width": 480,
+          "height": 73
+        },
+        "thumb": {
+          "path": "/uploads/images/greystonelight-thumb.png",
+          "width": 150,
+          "height": 23
+        }
+      }
+    },
+    {
+      "filename": "greystonedark.png",
+      "originalName": "greystone_dark.png",
+      "type": "image/png",
+      "size": 4711,
+      "path": "/uploads/images/greystonedark.png",
+      "width": 719,
+      "height": 110,
+      "alt": "Greystone law firm logo in dark charcoal",
+      "title": "Greystone logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/greystonedark-small.png",
+          "width": 480,
+          "height": 73
+        },
+        "thumb": {
+          "path": "/uploads/images/greystonedark-thumb.png",
+          "width": 150,
+          "height": 23
+        }
+      }
+    },
+    {
+      "filename": "about-building-1.webp",
+      "originalName": "about-building.webp",
+      "type": "image/webp",
+      "size": 226486,
+      "path": "/uploads/images/about-building-1.webp",
+      "width": 1920,
+      "height": 600,
+      "alt": "Upward view of a classical limestone law firm building with fluted columns",
+      "title": "Our building",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-building-1-medium.webp",
+          "width": 1024,
+          "height": 320
+        },
+        "small": {
+          "path": "/uploads/images/about-building-1-small.webp",
+          "width": 480,
+          "height": 150
+        },
+        "thumb": {
+          "path": "/uploads/images/about-building-1-thumb.webp",
+          "width": 150,
+          "height": 47
+        }
+      }
+    },
+    {
+      "filename": "testimonial-5.webp",
+      "originalName": "testimonial-5.webp",
+      "type": "image/webp",
+      "size": 14842,
+      "path": "/uploads/images/testimonial-5.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Distinguished older man in a navy blazer smiling, professional portrait",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-5-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-4.webp",
+      "originalName": "testimonial-4.webp",
+      "type": "image/webp",
+      "size": 16760,
+      "path": "/uploads/images/testimonial-4.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Smiling professional woman in a cream blouse in an office setting",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-4-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-3.webp",
+      "originalName": "testimonial-3.webp",
+      "type": "image/webp",
+      "size": 14880,
+      "path": "/uploads/images/testimonial-3.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Smiling man in a light blue shirt, professional client portrait",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "case-6.webp",
+      "originalName": "case-6.webp",
+      "type": "image/webp",
+      "size": 66572,
+      "path": "/uploads/images/case-6.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Empty courtroom interior with judges bench, flags, and wooden pews",
+      "title": "Courtroom",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/case-6-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/case-6-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "case-5.webp",
+      "originalName": "case-5.webp",
+      "type": "image/webp",
+      "size": 32232,
+      "path": "/uploads/images/case-5.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hand signing a formal contract with a fountain pen under warm light",
+      "title": "Contract execution",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/case-5-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/case-5-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "case-4.webp",
+      "originalName": "case-4.webp",
+      "type": "image/webp",
+      "size": 141714,
+      "path": "/uploads/images/case-4.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Row of historic brownstone townhouses on a tree-lined street",
+      "title": "Residential real estate",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/case-4-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/case-4-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "case-3.webp",
+      "originalName": "case-3.webp",
+      "type": "image/webp",
+      "size": 45820,
+      "path": "/uploads/images/case-3.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Attorneys shaking hands over financial documents in a settlement meeting",
+      "title": "Settlement handshake",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/case-3-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/case-3-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "case-2.webp",
+      "originalName": "case-2.webp",
+      "type": "image/webp",
+      "size": 44918,
+      "path": "/uploads/images/case-2.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Stack of organized case files with reading glasses on a mahogany desk",
+      "title": "Case preparation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/case-2-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/case-2-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "case-1.webp",
+      "originalName": "case-1.webp",
+      "type": "image/webp",
+      "size": 75110,
+      "path": "/uploads/images/case-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Modern glass office tower at sunset with warm reflections",
+      "title": "Corporate office tower",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/case-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/case-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-family-law.webp",
+      "originalName": "service-family-law.webp",
+      "type": "image/webp",
+      "size": 92266,
+      "path": "/uploads/images/service-family-law.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Wooden bench under an autumn tree in a peaceful park setting",
+      "title": "Family law",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-family-law-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-family-law-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-employment.webp",
+      "originalName": "service-employment.webp",
+      "type": "image/webp",
+      "size": 31026,
+      "path": "/uploads/images/service-employment.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Modern corporate lobby with marble floors and double elevator doors",
+      "title": "Employment law",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-employment-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-employment-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-personal-injury.webp",
+      "originalName": "service-personal-injury.webp",
+      "type": "image/webp",
+      "size": 29726,
+      "path": "/uploads/images/service-personal-injury.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Judges gavel resting on a wooden sounding block",
+      "title": "Personal injury",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-personal-injury-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-personal-injury-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-real-estate.webp",
+      "originalName": "service-real-estate.webp",
+      "type": "image/webp",
+      "size": 162134,
+      "path": "/uploads/images/service-real-estate.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Aerial view of a brownstone neighborhood in autumn",
+      "title": "Real estate law",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-real-estate-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-real-estate-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-estate-planning.webp",
+      "originalName": "service-estate-planning.webp",
+      "type": "image/webp",
+      "size": 48704,
+      "path": "/uploads/images/service-estate-planning.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Legal document with gold wax seal and fountain pen on a leather desk",
+      "title": "Estate planning",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-estate-planning-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-estate-planning-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "service-business-litigation.webp",
+      "originalName": "service-business-litigation.webp",
+      "type": "image/webp",
+      "size": 71484,
+      "path": "/uploads/images/service-business-litigation.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Attorneys reviewing charts and financial reports at a meeting table",
+      "title": "Business litigation",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/service-business-litigation-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/service-business-litigation-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "attorney-3.webp",
+      "originalName": "attorney-3.webp",
+      "type": "image/webp",
+      "size": 11816,
+      "path": "/uploads/images/attorney-3.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Associate attorney in a navy blazer and light blue shirt, professional portrait",
+      "title": "Associate attorney",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/attorney-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "attorney-2.webp",
+      "originalName": "attorney-2.webp",
+      "type": "image/webp",
+      "size": 10950,
+      "path": "/uploads/images/attorney-2.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Female attorney in a navy blazer and ivory blouse, professional portrait",
+      "title": "Attorney portrait",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/attorney-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "attorney-1.webp",
+      "originalName": "attorney-1.webp",
+      "type": "image/webp",
+      "size": 17054,
+      "path": "/uploads/images/attorney-1.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Senior partner in a charcoal suit and gold tie, professional portrait",
+      "title": "Senior partner",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/attorney-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-firm-story.webp",
+      "originalName": "about-firm-story.webp",
+      "type": "image/webp",
+      "size": 53374,
+      "path": "/uploads/images/about-firm-story.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Leather portfolio, fountain pen, and legal document under a brass desk lamp",
+      "title": "Our firms story",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-firm-story-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/about-firm-story-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "testimonial-2.webp",
+      "originalName": "testimonial-2.webp",
+      "type": "image/webp",
+      "size": 19720,
+      "path": "/uploads/images/testimonial-2.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Smiling man in a dark polo shirt outdoors, happy client",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-1.webp",
+      "originalName": "testimonial-1.webp",
+      "type": "image/webp",
+      "size": 31082,
+      "path": "/uploads/images/testimonial-1.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Smiling woman in a grey sweater outdoors, happy client",
+      "title": "Client testimonial",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/testimonial-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "home-firm-interior.webp",
+      "originalName": "home-firm-interior.webp",
+      "type": "image/webp",
+      "size": 49386,
+      "path": "/uploads/images/home-firm-interior.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Traditional law office with leather chair, bankers lamp, and bookshelves of legal volumes",
+      "title": "Our office",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/home-firm-interior-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/home-firm-interior-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "home-hero.webp",
+      "originalName": "home-hero.webp",
+      "type": "image/webp",
+      "size": 161338,
+      "path": "/uploads/images/home-hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Elegant conference room with city skyline view at dusk",
+      "title": "Trusted counsel for over 30 years",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/home-hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/home-hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/home-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

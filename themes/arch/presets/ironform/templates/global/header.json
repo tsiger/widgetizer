@@ -9,12 +9,17 @@
     "ctaButtonLink": {
       "href": "book.html",
       "text": "Book a Session",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "highlight-primary"
-  }
+    "color_scheme": "highlight-primary",
+    "logoImage": "/uploads/images/ironform-logo-light.png",
+    "transparent_logo": ""
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

@@ -11,6 +11,7 @@
         "fullwidth": true,
         "top_spacing": "auto",
         "content_width": "narrow",
+        "image": "/uploads/images/cakes-hero.webp",
         "vertical_alignment": "end"
       },
       "blocks": {
@@ -29,7 +30,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "process": {
       "type": "numbered-cards",
@@ -73,7 +77,12 @@
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
     },
     "options": {
       "type": "comparison-table",
@@ -164,7 +173,19 @@
           }
         }
       },
-      "blocksOrder": ["col-small", "col-medium", "col-large", "feat-servings", "feat-layers", "feat-price", "feat-flavors", "feat-decoration", "feat-tasting", "feat-delivery", "feat-turnaround"]
+      "blocksOrder": [
+        "col-small",
+        "col-medium",
+        "col-large",
+        "feat-servings",
+        "feat-layers",
+        "feat-price",
+        "feat-flavors",
+        "feat-decoration",
+        "feat-tasting",
+        "feat-delivery",
+        "feat-turnaround"
+      ]
     },
     "cake_gallery": {
       "type": "gallery",
@@ -181,35 +202,46 @@
         "cake-img-1": {
           "type": "image",
           "settings": {
-            "caption": "Three-tier wedding cake with wildflowers"
+            "caption": "Three-tier wedding cake with wildflowers",
+            "image": "/uploads/images/cake-wedding.webp"
           }
         },
         "cake-img-2": {
           "type": "image",
           "settings": {
-            "caption": "Chocolate ganache birthday cake"
+            "caption": "Chocolate ganache birthday cake",
+            "image": "/uploads/images/cake-chocolate.webp"
           }
         },
         "cake-img-3": {
           "type": "image",
           "settings": {
-            "caption": "Naked cake with seasonal berries"
+            "caption": "Naked cake with seasonal berries",
+            "image": "/uploads/images/cake-naked.webp"
           }
         },
         "cake-img-4": {
           "type": "image",
           "settings": {
-            "caption": "Pastel buttercream baby shower cake"
+            "caption": "Pastel buttercream baby shower cake",
+            "image": "/uploads/images/cake-pastel.webp"
           }
         },
         "cake-img-5": {
           "type": "image",
           "settings": {
-            "caption": "Lemon drizzle celebration cake"
+            "caption": "Lemon drizzle celebration cake",
+            "image": "/uploads/images/cake-lemon.webp"
           }
         }
       },
-      "blocksOrder": ["cake-img-1", "cake-img-2", "cake-img-3", "cake-img-4", "cake-img-5"]
+      "blocksOrder": [
+        "cake-img-1",
+        "cake-img-2",
+        "cake-img-3",
+        "cake-img-4",
+        "cake-img-5"
+      ]
     },
     "cakes_cta": {
       "type": "action-bar",
@@ -239,18 +271,29 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["cakes_hero", "process", "options", "cake_gallery", "cakes_cta"],
+  "widgetsOrder": [
+    "cakes_hero",
+    "process",
+    "options",
+    "cake_gallery",
+    "cakes_cta"
+  ],
   "id": "custom-cakes",
-  "created": "2026-04-03T14:00:00.000Z",
-  "updated": "2026-04-03T14:00:00.000Z"
+  "created": "2026-04-16T14:40:08.889Z",
+  "updated": "2026-04-16T14:56:03.941Z"
 }

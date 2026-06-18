@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Hearthstone Villa · Paros, Greece</p>",
+    "copyright": "© 2026 Hearthstone Villa · Paros, Greece",
     "layout": "equal",
     "color_scheme": "highlight-primary"
   },
@@ -11,7 +11,8 @@
       "settings": {
         "logo_text": "Hearthstone",
         "logo_width": 230,
-        "text": "<p>A small stone villa on the Aegean. Six rooms, family-run, open April through October.</p>"
+        "text": "<p>A small stone villa on the Aegean. Six rooms, family-run, open April through October.</p>",
+        "logo": "/uploads/images/hearthstone-logo-light.png"
       }
     },
     "text_block_1": {
@@ -25,7 +26,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Explore",
-        "menu": "footer-menu"
+        "menu": "4e479913-346b-4e87-912e-552964e43d45"
       }
     },
     "social_block_1": {

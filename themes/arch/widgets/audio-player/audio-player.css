@@ -1,0 +1,451 @@
+/**
+ * Audio Player widget styles.
+ * Class-scoped (shared across instances). Colors come from the section's
+ * color-scheme tokens (--text-*, --accent, --bg-*, --border-color), so the
+ * player adapts to all four schemes automatically.
+ *
+ * Progressive enhancement: until audio-player.js adds `.is-enhanced`, the
+ * native <audio controls> is the player and the custom transport/seek are
+ * hidden. Once enhanced, the two-column album layout takes over.
+ */
+
+.widget-audio-player .ap-audio {
+  inline-size: 100%;
+  margin-block-start: var(--space-md);
+}
+
+.widget-audio-player .ap-transport,
+.widget-audio-player .ap-seek-row {
+  display: none;
+}
+
+/* ── Enhanced (JS active) ─────────────────────────────────────────────── */
+.widget-audio-player .ap.is-enhanced {
+  display: grid;
+  gap: var(--space-lg) var(--space-xl);
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "cover"
+    "panel"
+    "playlist";
+}
+
+.widget-audio-player .ap.is-enhanced .ap-audio {
+  display: none;
+}
+
+.widget-audio-player .ap.is-enhanced .ap-transport {
+  display: flex;
+}
+
+.widget-audio-player .ap.is-enhanced .ap-seek-row {
+  display: block;
+}
+
+@media (min-width: 750px) {
+  .widget-audio-player .ap.is-enhanced {
+    grid-template-columns: minmax(0, 30rem) 1fr;
+    grid-template-areas:
+      "cover panel"
+      "cover playlist";
+    align-items: start;
+  }
+}
+
+/* Covers hidden (widget setting) — drop the cover column so panel + playlist fill the width. */
+.widget-audio-player .ap.ap--no-covers.is-enhanced {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "panel"
+    "playlist";
+}
+
+/* ── Cover art ────────────────────────────────────────────────────────── */
+.widget-audio-player .ap-cover {
+  grid-area: cover;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  inline-size: 100%;
+  max-inline-size: 30rem;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-secondary);
+  border: var(--border-width-thin) solid var(--border-color);
+}
+
+.widget-audio-player .ap-cover-img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.widget-audio-player .ap-cover-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.widget-audio-player .ap-cover-fallback svg {
+  inline-size: 35%;
+  block-size: auto;
+}
+
+/* The base rules above set display:block/flex, which would override the `hidden`
+   attribute — these restore it so a cover-less track shows the fallback, never a
+   broken/empty <img> or an overlapping placeholder. */
+.widget-audio-player .ap-cover-img[hidden],
+.widget-audio-player .ap-cover-fallback[hidden] {
+  display: none;
+}
+
+/* ── Panel (now playing + controls) ───────────────────────────────────── */
+.widget-audio-player .ap-panel {
+  grid-area: panel;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.widget-audio-player .ap-now-title {
+  margin: 0;
+}
+
+.widget-audio-player .ap-now-artist {
+  margin-block-start: var(--space-xs);
+}
+
+/* ── Seek bar + time ──────────────────────────────────────────────────── */
+.widget-audio-player .ap-times {
+  display: flex;
+  gap: var(--space-xs);
+  margin-block-start: var(--space-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-audio-player .ap-time-sep {
+  color: var(--text-muted);
+}
+.widget-audio-player .ap-time-duration {
+  color: var(--text-muted);
+}
+
+/* ── Transport controls ───────────────────────────────────────────────── */
+.widget-audio-player .ap-transport {
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.widget-audio-player .ap-btn {
+  --ap-btn-size: 4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ap-btn-size);
+  block-size: var(--ap-btn-size);
+  padding: 0;
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-full, 999px);
+  background-color: transparent;
+  color: var(--text-content);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-speed-fast),
+    color var(--transition-speed-fast),
+    border-color var(--transition-speed-fast);
+}
+
+.widget-audio-player .ap-btn svg {
+  inline-size: 45%;
+  block-size: auto;
+}
+
+.widget-audio-player .ap-btn:hover {
+  border-color: var(--text-content);
+}
+
+.widget-audio-player .ap-btn:focus-visible {
+  outline: var(--border-width-medium) solid var(--accent);
+  outline-offset: 0.2rem;
+}
+
+.widget-audio-player .ap-btn--primary {
+  --ap-btn-size: 5.2rem;
+  background-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.widget-audio-player .ap-btn--primary:hover {
+  filter: brightness(1.08);
+  border-color: var(--accent);
+}
+
+.widget-audio-player .ap-speed {
+  inline-size: auto;
+  padding-inline: var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--typography-body_font_bold-weight);
+  letter-spacing: 0.02em;
+}
+
+/* Play/pause + mute icon toggling via state classes */
+.widget-audio-player .ap-icon-pause,
+.widget-audio-player .ap.is-playing .ap-icon-play {
+  display: none;
+}
+.widget-audio-player .ap.is-playing .ap-icon-pause {
+  display: block;
+}
+
+.widget-audio-player .ap-icon-muted,
+.widget-audio-player .ap.is-muted .ap-icon-volume {
+  display: none;
+}
+.widget-audio-player .ap.is-muted .ap-icon-muted {
+  display: block;
+}
+
+/* ── Volume ───────────────────────────────────────────────────────────── */
+.widget-audio-player .ap-volume-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.widget-audio-player .ap-volume {
+  inline-size: 8rem;
+  --ap-fill: 100%;
+}
+
+/* ── Range inputs (seek + volume) ─────────────────────────────────────── */
+.widget-audio-player .ap-seek,
+.widget-audio-player .ap-volume {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.widget-audio-player .ap-seek {
+  inline-size: 100%;
+  display: block;
+  --ap-fill: 0%;
+}
+.widget-audio-player .ap-seek::-webkit-slider-runnable-track,
+.widget-audio-player .ap-volume::-webkit-slider-runnable-track {
+  block-size: 0.4rem;
+  border-radius: 999px;
+  background-color: var(--border-color);
+}
+/* Elapsed/level fill: accent up to the thumb, track color after. JS sets --ap-fill
+   per slider (seek = play position, volume = level). WebKit/Blink via gradient;
+   Firefox uses its native ::-moz-range-progress and ignores --ap-fill. */
+.widget-audio-player .ap-seek::-webkit-slider-runnable-track,
+.widget-audio-player .ap-volume::-webkit-slider-runnable-track {
+  background-image: linear-gradient(
+    to right,
+    var(--accent) var(--ap-fill),
+    transparent var(--ap-fill)
+  );
+}
+.widget-audio-player .ap-seek::-moz-range-progress,
+.widget-audio-player .ap-volume::-moz-range-progress {
+  block-size: 0.4rem;
+  border-radius: 999px;
+  background-color: var(--accent);
+}
+.widget-audio-player .ap-seek::-moz-range-track,
+.widget-audio-player .ap-volume::-moz-range-track {
+  block-size: 0.4rem;
+  border-radius: 999px;
+  background-color: var(--border-color);
+}
+.widget-audio-player .ap-seek::-webkit-slider-thumb,
+.widget-audio-player .ap-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  margin-block-start: -0.5rem;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: none;
+}
+.widget-audio-player .ap-seek::-moz-range-thumb,
+.widget-audio-player .ap-volume::-moz-range-thumb {
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--accent);
+}
+.widget-audio-player .ap-seek:focus-visible,
+.widget-audio-player .ap-volume:focus-visible {
+  outline: var(--border-width-medium) solid var(--accent);
+  outline-offset: 0.4rem;
+}
+.widget-audio-player .ap-seek[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Playlist ─────────────────────────────────────────────────────────── */
+.widget-audio-player .ap-playlist {
+  grid-area: playlist;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-block-size: 36rem;
+  overflow-y: auto;
+}
+
+.widget-audio-player .ap--single .ap-playlist {
+  display: none;
+}
+
+.widget-audio-player .ap-track {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-speed-fast),
+    border-color var(--transition-speed-fast);
+}
+
+.widget-audio-player .ap-track:hover {
+  background-color: var(--bg-secondary);
+}
+
+.widget-audio-player .ap-track:focus-visible {
+  outline: var(--border-width-medium) solid var(--accent);
+  outline-offset: 0.2rem;
+}
+
+.widget-audio-player .ap-track.is-active {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.widget-audio-player .ap-track-index {
+  flex-shrink: 0;
+  inline-size: 2rem;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+
+.widget-audio-player .ap-track-thumb {
+  flex-shrink: 0;
+  inline-size: 4rem;
+  block-size: 4rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  border: var(--border-width-thin) solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.widget-audio-player .ap-track-thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.widget-audio-player .ap-track-thumb svg {
+  inline-size: 45%;
+  block-size: auto;
+}
+
+.widget-audio-player .ap-track-text {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-audio-player .ap-track-title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-audio-player .ap-track.is-active .ap-track-title {
+  color: var(--accent);
+}
+
+.widget-audio-player .ap-track-artist {
+  margin-block-start: 0.2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Active-track equalizer (animates only while playing) */
+.widget-audio-player .ap-track-eq {
+  flex-shrink: 0;
+  display: none;
+  align-items: flex-end;
+  gap: 0.3rem;
+  inline-size: 1.8rem;
+  block-size: 1.6rem;
+}
+
+.widget-audio-player .ap.is-playing .ap-track.is-active .ap-track-eq {
+  display: flex;
+}
+
+.widget-audio-player .ap-track-eq i {
+  flex: 1;
+  block-size: 35%;
+  background-color: var(--accent);
+  border-radius: 999px;
+}
+
+.widget-audio-player .ap.is-playing .ap-track.is-active .ap-track-eq i {
+  animation: ap-eq 0.9s ease-in-out infinite;
+}
+.widget-audio-player .ap.is-playing .ap-track.is-active .ap-track-eq i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.widget-audio-player .ap.is-playing .ap-track.is-active .ap-track-eq i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes ap-eq {
+  0%,
+  100% {
+    block-size: 30%;
+  }
+  50% {
+    block-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget-audio-player .ap.is-playing .ap-track.is-active .ap-track-eq i {
+    animation: none;
+    block-size: 60%;
+  }
+}

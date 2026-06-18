@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/services-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -42,8 +42,8 @@
             "title": "Checkups & Cleaning",
             "description": "<p>Regular exams with digital X-rays, professional cleaning, and early detection of cavities, gum disease, and oral health issues. The foundation of a healthy smile.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -55,8 +55,8 @@
             "title": "Teeth Whitening",
             "description": "<p>Professional-grade whitening that's faster and more effective than over-the-counter options. In-office treatment takes about an hour, or use our custom take-home trays.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -68,8 +68,8 @@
             "title": "Dental Implants",
             "description": "<p>Titanium implants that fuse with your jawbone for a permanent, natural-feeling tooth replacement. We handle the full process from consultation to final restoration.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -81,8 +81,8 @@
             "title": "Invisalign",
             "description": "<p>Custom clear aligners that gradually straighten your teeth without the look or feel of traditional braces. We're a certified Invisalign provider with hundreds of completed cases.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -94,8 +94,8 @@
             "title": "Crowns & Bridges",
             "description": "<p>Custom porcelain restorations designed to match your natural teeth. Repair cracks, strengthen weakened teeth, or bridge gaps with lasting results.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
@@ -107,14 +107,21 @@
             "title": "Emergency Care",
             "description": "<p>Severe pain, a broken tooth, or a knocked-out tooth can't wait. We reserve same-day slots for dental emergencies — call us and we'll get you in.</p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
             }
           }
         }
       },
-      "blocksOrder": ["svc-1", "svc-2", "svc-3", "svc-4", "svc-5", "svc-6"]
+      "blocksOrder": [
+        "svc-1",
+        "svc-2",
+        "svc-3",
+        "svc-4",
+        "svc-5",
+        "svc-6"
+      ]
     },
     "process": {
       "type": "numbered-cards",
@@ -159,12 +166,17 @@
           }
         }
       },
-      "blocksOrder": ["step-1", "step-2", "step-3", "step-4"]
+      "blocksOrder": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ]
     },
     "technology": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/services-technology.webp",
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -201,7 +213,12 @@
           }
         }
       },
-      "blocksOrder": ["tech-eyebrow", "tech-heading", "tech-text", "tech-features"]
+      "blocksOrder": [
+        "tech-eyebrow",
+        "tech-heading",
+        "tech-text",
+        "tech-features"
+      ]
     },
     "insurance": {
       "type": "rich-text",
@@ -234,15 +251,19 @@
           }
         }
       },
-      "blocksOrder": ["ins-heading", "ins-text", "ins-note"]
+      "blocksOrder": [
+        "ins-heading",
+        "ins-text",
+        "ins-note"
+      ]
     },
     "cta": {
       "type": "action-bar",
       "settings": {
         "fullwidth": false,
         "color_scheme": "highlight-primary",
-        "top_spacing": "small",
-        "bottom_spacing": "small"
+        "bottom_spacing": "small",
+        "top_spacing": "small"
       },
       "blocks": {
         "cta-heading": {
@@ -258,12 +279,14 @@
             "link": {
               "text": "Book Appointment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
             },
             "link_2": {
               "text": "Call (212) 555-0312",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -271,11 +294,21 @@
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "overview", "process", "technology", "insurance", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "overview",
+    "process",
+    "technology",
+    "insurance",
+    "cta"
+  ],
   "id": "services",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T12:01:48.319Z",
+  "updated": "2026-04-16T13:09:01.103Z"
 }

@@ -2,14 +2,6 @@
   "name": "Home",
   "slug": "index",
   "widgets": {
-    "home_hero_image": {
-      "type": "image",
-      "settings": {
-        "fullwidth": true,
-        "top_spacing": "none",
-        "bottom_spacing": "small"
-      }
-    },
     "thesis": {
       "type": "split-content",
       "settings": {
@@ -52,7 +44,8 @@
             "link": {
               "text": "See the approach",
               "href": "approach.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "acb5a167-ec4b-4d8d-a299-800923189bd6"
             },
             "style": "secondary",
             "size": "medium",
@@ -61,7 +54,12 @@
           }
         }
       },
-      "blocksOrder": ["thesis-eyebrow", "thesis-heading", "thesis-body", "thesis-link"]
+      "blocksOrder": [
+        "thesis-eyebrow",
+        "thesis-heading",
+        "thesis-body",
+        "thesis-link"
+      ]
     },
     "client_logos": {
       "type": "logo-cloud",
@@ -80,14 +78,57 @@
         "bottom_spacing": "auto"
       },
       "blocks": {
-        "logo-1": { "type": "logo", "settings": { "name": "Northwind Operations" } },
-        "logo-2": { "type": "logo", "settings": { "name": "Halverson Group" } },
-        "logo-3": { "type": "logo", "settings": { "name": "Fieldstone & Co." } },
-        "logo-4": { "type": "logo", "settings": { "name": "Mercer Logistics" } },
-        "logo-5": { "type": "logo", "settings": { "name": "Atlas Products" } },
-        "logo-6": { "type": "logo", "settings": { "name": "Yardstick Retail" } }
+        "logo-1": {
+          "type": "logo",
+          "settings": {
+            "name": "Northwind Operations",
+            "image": "/uploads/images/logo1.png"
+          }
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {
+            "name": "Halverson Group",
+            "image": "/uploads/images/logo2.png"
+          }
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {
+            "name": "Fieldstone & Co.",
+            "image": "/uploads/images/logo3.png"
+          }
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {
+            "name": "Mercer Logistics",
+            "image": "/uploads/images/logo4.png"
+          }
+        },
+        "logo-5": {
+          "type": "logo",
+          "settings": {
+            "name": "Atlas Products",
+            "image": "/uploads/images/logo5.png"
+          }
+        },
+        "logo-6": {
+          "type": "logo",
+          "settings": {
+            "name": "Yardstick Retail",
+            "image": "/uploads/images/logo6.png"
+          }
+        }
       },
-      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5", "logo-6"]
+      "blocksOrder": [
+        "logo-1",
+        "logo-2",
+        "logo-3",
+        "logo-4",
+        "logo-5",
+        "logo-6"
+      ]
     },
     "how_i_work": {
       "type": "numbered-service-list",
@@ -124,7 +165,11 @@
           }
         }
       },
-      "blocksOrder": ["phase-1", "phase-2", "phase-3"]
+      "blocksOrder": [
+        "phase-1",
+        "phase-2",
+        "phase-3"
+      ]
     },
     "featured_case": {
       "type": "split-content",
@@ -167,7 +212,8 @@
             "link": {
               "text": "Read more engagements",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "11fd7dfa-2edb-418b-a16b-ee6f63e435c3"
             },
             "style": "secondary",
             "size": "medium",
@@ -176,13 +222,19 @@
           }
         }
       },
-      "blocksOrder": ["case-eyebrow", "case-heading", "case-body", "case-link"]
+      "blocksOrder": [
+        "case-eyebrow",
+        "case-heading",
+        "case-body",
+        "case-link"
+      ]
     },
     "client_quote": {
       "type": "testimonial-hero",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "author_image": "/uploads/images/home-testimonial-portrait.webp"
       },
       "blocks": {
         "quote": {
@@ -211,12 +263,16 @@
           }
         }
       },
-      "blocksOrder": ["quote", "author-name", "author-role"]
+      "blocksOrder": [
+        "quote",
+        "author-name",
+        "author-role"
+      ]
     },
     "closing": {
       "type": "banner",
       "settings": {
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "center",
@@ -246,18 +302,42 @@
             "link": {
               "text": "Start a conversation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-body", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-body",
+        "close-button"
+      ]
+    },
+    "widget_a683be88-10ab-4742-a9cc-f2b93e39840c": {
+      "type": "image",
+      "settings": {
+        "fullwidth": true,
+        "top_spacing": "none",
+        "bottom_spacing": "small",
+        "image": "/uploads/images/home-hero.webp"
+      },
+      "blocks": {},
+      "blocksOrder": []
     }
   },
-  "widgetsOrder": ["home_hero_image", "thesis", "client_logos", "how_i_work", "featured_case", "client_quote", "closing"],
+  "widgetsOrder": [
+    "widget_a683be88-10ab-4742-a9cc-f2b93e39840c",
+    "thesis",
+    "client_logos",
+    "how_i_work",
+    "featured_case",
+    "client_quote",
+    "closing"
+  ],
   "id": "index",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z"
+  "created": "2026-04-22T18:20:05.354Z",
+  "updated": "2026-04-23T08:35:12.807Z"
 }

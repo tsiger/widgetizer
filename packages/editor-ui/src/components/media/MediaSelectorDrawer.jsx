@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { X, Search, FileText } from "lucide-react";
+import { X, Search, FileText, Music } from "lucide-react";
 import { API_URL } from "../../lib/config";
 import { getProjectMedia } from "../../queries/mediaManager";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -10,16 +11,28 @@ import useMediaUpload from "../../hooks/useMediaUpload";
 import useAppSettings from "../../hooks/useAppSettings";
 import useToastStore from "../../stores/toastStore";
 import { showRejectedFiles } from "../../utils/uploadFeedback";
-import { IMAGE_ACCEPT, FILE_ACCEPT, mapDropzoneRejections } from "../../utils/uploadValidation";
+import { IMAGE_ACCEPT, AUDIO_ACCEPT, NON_IMAGE_ACCEPT, MEDIA_ACCEPT, mapDropzoneRejections } from "../../utils/uploadValidation";
 
-export default function MediaSelectorDrawer({ visible, onClose, onSelect, activeProject, filterType = "all" }) {
+/**
+ * @param {boolean} [elevated=false] — Raises the drawer above an unusually high-z host
+ *   (e.g. the richtext editor's expand overlay at z-1000). Default keeps the standard
+ *   z-40/z-50 used everywhere else.
+ */
+export default function MediaSelectorDrawer({
+  visible,
+  onClose,
+  onSelect,
+  activeProject,
+  filterType = "all",
+  elevated = false,
+}) {
   const { t } = useTranslation();
   const [mediaFiles, setMediaFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const showToast = useToastStore((state) => state.showToast);
   const { settings } = useAppSettings();
-  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 5;
+  const maxSizeMB = settings?.media?.maxFileSizeMB ?? 50;
 
   // Initialize media upload hook
   const { uploading, uploadProgress, handleUpload } = useMediaUpload({
@@ -73,7 +86,11 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
       if (filterType === "image") {
         return matchesSearch && file.type && file.type.startsWith("image/");
       }
+      if (filterType === "audio") {
+        return matchesSearch && file.type && file.type.startsWith("audio/");
+      }
       if (filterType === "file") {
+        // Any non-image asset (documents + audio) — so the richtext "Link to file" picker reaches audio.
         return matchesSearch && file.type && !file.type.startsWith("image/");
       }
 
@@ -105,16 +122,33 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
     showRejectedFiles(showToast, mapDropzoneRejections(fileRejections));
   };
 
+  // Restrict the in-drawer uploader to the active filter's types (and label it to match).
+  const uploadAccept =
+    filterType === "image" ? IMAGE_ACCEPT
+      : filterType === "audio" ? AUDIO_ACCEPT
+        // "file" = any non-image asset (documents + audio), matching the file filter, so a
+        // new MP3 can be uploaded from a filterType="file" picker, not just selected.
+        : filterType === "file" ? NON_IMAGE_ACCEPT
+          : MEDIA_ACCEPT;
+  const supportedLabel =
+    filterType === "image" ? t("components.mediaUploader.supportedImages")
+      : filterType === "audio" ? t("components.mediaUploader.supportedAudio")
+        : filterType === "file" ? t("components.mediaUploader.supportedFiles")
+          : t("components.mediaUploader.supportedFormats");
+
   if (!visible) return null;
 
-  return (
+  // Portaled to <body> so the fixed overlay escapes any ancestor stacking context
+  // (e.g. a @dnd-kit sortable row's position/z-index, which would otherwise let
+  // sibling rows paint on top of the overlay).
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ease-in-out"
+      className={`fixed inset-0 bg-black/50 ${elevated ? "z-[1100]" : "z-40"} transition-opacity duration-300 ease-in-out`}
       onClick={onClose}
       aria-hidden={!visible}
     >
       <div
-        className="fixed inset-y-0 right-0 w-full max-w-2xl bg-white shadow-xl z-50 transition-transform duration-300 ease-in-out transform translate-x-0 flex flex-col"
+        className={`fixed inset-y-0 right-0 w-full max-w-2xl bg-white shadow-xl ${elevated ? "z-[1101]" : "z-50"} transition-transform duration-300 ease-in-out transform translate-x-0 flex flex-col`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -147,11 +181,11 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
               onReject={handleUploaderReject}
               uploading={uploading}
               uploadProgress={uploadProgress}
-              accept={filterType === "file" ? FILE_ACCEPT : IMAGE_ACCEPT}
+              accept={uploadAccept}
               multiple={true}
               maxSize={maxSizeMB * 1024 * 1024}
               title={t("components.mediaSelector.upload")}
-              maxSizeText={`${filterType === "file" ? t("components.mediaUploader.supportedFiles") : t("components.mediaUploader.supportedImages")} - ${maxSizeMB}MB max`}
+              maxSizeText={`${supportedLabel} - ${maxSizeMB}MB max`}
             />
           </div>
         </div>
@@ -188,7 +222,11 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
                         />
                       ) : (
                         <div className="flex flex-col items-center gap-1">
-                          <FileText className="text-slate-400" size={32} />
+                          {file.type?.startsWith("audio/") ? (
+                            <Music className="text-slate-400" size={32} />
+                          ) : (
+                            <FileText className="text-slate-400" size={32} />
+                          )}
                           <span className="text-xs font-medium text-slate-500 uppercase">
                             {file.filename?.split(".").pop()}
                           </span>
@@ -207,6 +245,7 @@ export default function MediaSelectorDrawer({ visible, onClose, onSelect, active
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

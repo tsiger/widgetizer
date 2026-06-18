@@ -13,6 +13,7 @@
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
         "bottom_spacing": "auto",
+        "image": "/uploads/images/hero-home.webp",
         "overlay_color": "#0a1e3899"
       },
       "blocks": {
@@ -74,7 +75,8 @@
         "text_position": "center",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-promise.webp"
       },
       "blocks": {
         "promise-eyebrow": {
@@ -166,7 +168,12 @@
             "icon": "wand",
             "subtitle": "From $55",
             "title": "Full groom",
-            "description": "Bath, hand-dry, breed-aware cut, nails, ears."
+            "description": "Bath, hand-dry, breed-aware cut, nails, ears.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "svc-bath-tidy": {
@@ -175,7 +182,12 @@
             "icon": "bath",
             "subtitle": "From $35",
             "title": "Bath & tidy",
-            "description": "The clean-up between full grooms — keeps your dog comfortable."
+            "description": "The clean-up between full grooms — keeps your dog comfortable.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "svc-deshed": {
@@ -184,7 +196,12 @@
             "icon": "wind",
             "subtitle": "From $40",
             "title": "De-shed",
-            "description": "Undercoat work for double-coated breeds. Bath included."
+            "description": "Undercoat work for double-coated breeds. Bath included.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "svc-hand-strip": {
@@ -193,7 +210,12 @@
             "icon": "shield",
             "subtitle": "From $60",
             "title": "Hand-stripping",
-            "description": "Traditional coat work for terriers and schnauzers."
+            "description": "Traditional coat work for terriers and schnauzers.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "svc-nail-ear": {
@@ -202,7 +224,12 @@
             "icon": "paw",
             "subtitle": "From $18",
             "title": "Nails & ears",
-            "description": "Walk-in service. No appointment needed during open hours."
+            "description": "Walk-in service. No appointment needed during open hours.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "svc-puppy": {
@@ -211,7 +238,12 @@
             "icon": "heart",
             "subtitle": "From $35",
             "title": "Puppy first groom",
-            "description": "Under six months. Bath, light tidy, lots of breaks."
+            "description": "Under six months. Bath, light tidy, lots of breaks.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
@@ -238,7 +270,9 @@
         "orientation": "horizontal",
         "initial_position": 35,
         "show_labels": true,
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "before_image": "/uploads/images/home-opener-before.webp",
+        "after_image": "/uploads/images/home-opener-after.webp"
       }
     },
     "home_testimonials": {
@@ -347,6 +381,6 @@
     "home_close"
   ],
   "id": "index",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T14:38:47.000Z"
+  "created": "2026-04-23T13:59:56.911Z",
+  "updated": "2026-04-23T15:03:30.488Z"
 }

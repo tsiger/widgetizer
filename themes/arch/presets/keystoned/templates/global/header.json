@@ -8,13 +8,18 @@
     "ctaButtonLink": {
       "href": "properties.html",
       "text": "View Properties",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/keystoneddark.png",
+    "transparent_logo": "/uploads/images/keystonedlight.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

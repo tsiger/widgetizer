@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Framelight. Photography by appointment.</p>",
+    "copyright": "© 2026 Framelight. Photography by appointment.",
     "layout": "equal",
     "color_scheme": "standard-secondary"
   },
@@ -17,7 +17,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Explore",
-        "menu": "footer-menu"
+        "menu": "d55fb0b9-3e3a-4408-a7c6-cddb5b15a924"
       }
     },
     "social_block_1": {
@@ -27,5 +27,9 @@
       }
     }
   },
-  "blocksOrder": ["text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

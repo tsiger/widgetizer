@@ -10,6 +10,7 @@
         "color_scheme": "highlight-primary",
         "fullwidth": true,
         "top_spacing": "auto",
+        "image": "/uploads/images/about-hero.webp",
         "content_width": "narrow",
         "vertical_alignment": "end"
       },
@@ -29,13 +30,17 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "origin": {
       "type": "image-text",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/about-founder.webp"
       },
       "blocks": {
         "origin-eyebrow": {
@@ -62,7 +67,11 @@
           }
         }
       },
-      "blocksOrder": ["origin-eyebrow", "origin-heading", "origin-text"]
+      "blocksOrder": [
+        "origin-eyebrow",
+        "origin-heading",
+        "origin-text"
+      ]
     },
     "values": {
       "type": "features-split",
@@ -103,7 +112,11 @@
           }
         }
       },
-      "blocksOrder": ["value-1", "value-2", "value-3"]
+      "blocksOrder": [
+        "value-1",
+        "value-2",
+        "value-3"
+      ]
     },
     "stats": {
       "type": "key-figures",
@@ -149,7 +162,12 @@
           }
         }
       },
-      "blocksOrder": ["figure-1", "figure-2", "figure-3", "figure-4"]
+      "blocksOrder": [
+        "figure-1",
+        "figure-2",
+        "figure-3",
+        "figure-4"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -168,7 +186,8 @@
             "name": "Nina Kowalski",
             "role": "Founder & Head Baker",
             "specialty": "Sourdough & artisan bread",
-            "bio": "Third-generation baker with an inherited sourdough starter and an obsession with crust. Nina opens the bakery at 4 AM and wouldn't have it any other way."
+            "bio": "Third-generation baker with an inherited sourdough starter and an obsession with crust. Nina opens the bakery at 4 AM and wouldn't have it any other way.",
+            "photo": "/uploads/images/team-nina.webp"
           }
         },
         "profile-2": {
@@ -177,7 +196,8 @@
             "name": "Jordan Bell",
             "role": "Pastry Chef",
             "specialty": "Laminated doughs & viennoiserie",
-            "bio": "Trained in Paris, happiest elbow-deep in croissant dough. Jordan's almond croissants have a cult following for a reason."
+            "bio": "Trained in Paris, happiest elbow-deep in croissant dough. Jordan's almond croissants have a cult following for a reason.",
+            "photo": "/uploads/images/team-jordan.webp"
           }
         },
         "profile-3": {
@@ -186,11 +206,16 @@
             "name": "Priya Sharma",
             "role": "Cake Decorator",
             "specialty": "Custom cakes & celebration designs",
-            "bio": "Priya turns sugar, flour, and butter into edible art. If you've seen a Crumbly wedding cake, her hands built it."
+            "bio": "Priya turns sugar, flour, and butter into edible art. If you've seen a Crumbly wedding cake, her hands built it.",
+            "photo": "/uploads/images/team-priya.webp"
           }
         }
       },
-      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+      "blocksOrder": [
+        "profile-1",
+        "profile-2",
+        "profile-3"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -212,18 +237,29 @@
             "link": {
               "text": "Find the Bakery",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["about_hero", "origin", "values", "stats", "team", "about_cta"],
+  "widgetsOrder": [
+    "about_hero",
+    "origin",
+    "values",
+    "stats",
+    "team",
+    "about_cta"
+  ],
   "id": "about",
-  "created": "2026-04-03T14:00:00.000Z",
-  "updated": "2026-04-03T14:00:00.000Z"
+  "created": "2026-04-16T14:40:08.886Z",
+  "updated": "2026-04-16T14:50:20.414Z"
 }

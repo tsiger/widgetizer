@@ -1,0 +1,460 @@
+{
+  "files": [
+    {
+      "filename": "little-oaks-green.png",
+      "originalName": "little-oaks-green.png",
+      "type": "image/png",
+      "size": 6025,
+      "path": "/uploads/images/little-oaks-green.png",
+      "width": 706,
+      "height": 160,
+      "alt": "Little Oaks logo in green for dark backgrounds",
+      "title": "Little Oaks logo light",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/little-oaks-green-small.png",
+          "width": 480,
+          "height": 109
+        },
+        "thumb": {
+          "path": "/uploads/images/little-oaks-green-thumb.png",
+          "width": 150,
+          "height": 34
+        }
+      }
+    },
+    {
+      "filename": "little-oaks-dark.png",
+      "originalName": "little-oaks-dark.png",
+      "type": "image/png",
+      "size": 5697,
+      "path": "/uploads/images/little-oaks-dark.png",
+      "width": 706,
+      "height": 160,
+      "alt": "Little Oaks logo in dark charcoal with a sage oak sprout icon",
+      "title": "Little Oaks logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/little-oaks-dark-small.png",
+          "width": 480,
+          "height": 109
+        },
+        "thumb": {
+          "path": "/uploads/images/little-oaks-dark-thumb.png",
+          "width": 150,
+          "height": 34
+        }
+      }
+    },
+    {
+      "filename": "outdoor-play.webp",
+      "originalName": "outdoor-play.webp",
+      "type": "image/webp",
+      "size": 167972,
+      "path": "/uploads/images/outdoor-play.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Children playing on a wooden playset, in a sandbox, and tending to a garden bed",
+      "title": "Outdoor play",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/outdoor-play-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/outdoor-play-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "checkerboard-garden.webp",
+      "originalName": "checkerboard-garden.webp",
+      "type": "image/webp",
+      "size": 77984,
+      "path": "/uploads/images/checkerboard-garden.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Young child watering vegetable seedlings in a raised garden bed near a playground",
+      "title": "Garden exploration",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/checkerboard-garden-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/checkerboard-garden-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "checkerboard-blocks.webp",
+      "originalName": "checkerboard-blocks.webp",
+      "type": "image/webp",
+      "size": 77136,
+      "path": "/uploads/images/checkerboard-blocks.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Toddler building a wooden block castle surrounded by colorful shapes on a hardwood floor",
+      "title": "Block play",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/checkerboard-blocks-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/checkerboard-blocks-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "checkerboard-reading.webp",
+      "originalName": "checkerboard-reading.webp",
+      "type": "image/webp",
+      "size": 68488,
+      "path": "/uploads/images/checkerboard-reading.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Two children lying on a rug reading a picture book together in a sunlit library corner",
+      "title": "Reading time",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/checkerboard-reading-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/checkerboard-reading-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "checkerboard-art-1.webp",
+      "originalName": "checkerboard-art.webp",
+      "type": "image/webp",
+      "size": 82036,
+      "path": "/uploads/images/checkerboard-art-1.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Child's colorful finger painting of flowers and a sun with a paint-covered hand reaching in",
+      "title": "Art & creativity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/checkerboard-art-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/checkerboard-art-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "checkerboard-art.webp",
+      "originalName": "checkerboard-art.webp",
+      "type": "image/webp",
+      "size": 82036,
+      "path": "/uploads/images/checkerboard-art.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Child's colorful finger painting of flowers and a sun with a paint-covered hand reaching in",
+      "title": "Art & creativity",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/checkerboard-art-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/checkerboard-art-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "staff-4.webp",
+      "originalName": "staff-4.webp",
+      "type": "image/webp",
+      "size": 24228,
+      "path": "/uploads/images/staff-4.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Caregiver smiling in a soft, sunlit infant room",
+      "title": "Infant caregiver",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/staff-4-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/staff-4-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "staff-3.webp",
+      "originalName": "staff-3.webp",
+      "type": "image/webp",
+      "size": 59722,
+      "path": "/uploads/images/staff-3.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Male teacher in a sage shirt smiling in front of a wall of children's drawings",
+      "title": "Teacher",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/staff-3-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/staff-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "staff-2.webp",
+      "originalName": "staff-2.webp",
+      "type": "image/webp",
+      "size": 44514,
+      "path": "/uploads/images/staff-2.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Teacher smiling in a bright classroom with blocks and learning materials",
+      "title": "Lead teacher",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/staff-2-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/staff-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "staff-1.webp",
+      "originalName": "staff-1.webp",
+      "type": "image/webp",
+      "size": 56008,
+      "path": "/uploads/images/staff-1.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Teacher in a cream cardigan smiling in a classroom with children's art in the background",
+      "title": "Head teacher",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/staff-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/staff-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "story-founding.webp",
+      "originalName": "story-founding.webp",
+      "type": "image/webp",
+      "size": 283496,
+      "path": "/uploads/images/story-founding.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Cozy craftsman bungalow with a picket fence, mature oak tree, and children's garden out front",
+      "title": "Our founding home",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/story-founding-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/story-founding-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "teaching-philosophy-1.webp",
+      "originalName": "teaching-philosophy.webp",
+      "type": "image/webp",
+      "size": 79908,
+      "path": "/uploads/images/teaching-philosophy-1.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Child's hands planting a small seedling in a terracotta pot with garden tools on a wooden table",
+      "title": "Learning through nature",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/teaching-philosophy-1-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/teaching-philosophy-1-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "teaching-philosophy.webp",
+      "originalName": "teaching-philosophy.webp",
+      "type": "image/webp",
+      "size": 79908,
+      "path": "/uploads/images/teaching-philosophy.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Child's hands planting a small seedling in a terracotta pot with garden tools on a wooden table",
+      "title": "Learning through nature",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/teaching-philosophy-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/teaching-philosophy-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "preschool-class.webp",
+      "originalName": "preschool-class.webp",
+      "type": "image/webp",
+      "size": 72616,
+      "path": "/uploads/images/preschool-class.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Teacher reading a picture book to a circle of preschool children in a bright, art-filled classroom",
+      "title": "Preschool class",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/preschool-class-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/preschool-class-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "toddler-room.webp",
+      "originalName": "toddler-room.webp",
+      "type": "image/webp",
+      "size": 64134,
+      "path": "/uploads/images/toddler-room.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Teacher and two toddlers finger painting at a little wooden table in a bright classroom",
+      "title": "Toddler room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/toddler-room-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/toddler-room-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "infant-room.webp",
+      "originalName": "infant-room.webp",
+      "type": "image/webp",
+      "size": 41538,
+      "path": "/uploads/images/infant-room.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Caregiver holding a baby in a bright, calm infant room with cribs and a changing area",
+      "title": "Infant room",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/infant-room-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/infant-room-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "hero-children-playing.webp",
+      "originalName": "hero-children-playing.webp",
+      "type": "image/webp",
+      "size": 68346,
+      "path": "/uploads/images/hero-children-playing.webp",
+      "width": 960,
+      "height": 720,
+      "alt": "Three children playing with colorful building blocks together on a classroom rug",
+      "title": "Where little ones grow",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/hero-children-playing-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/hero-children-playing-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    }
+  ]
+}

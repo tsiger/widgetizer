@@ -21,7 +21,7 @@ export default function PageLayout({ title, description, children, buttonProps, 
           </div>
         </div>
       )}
-      <div className="bg-white rounded-md border border-gray-200 p-4">{children}</div>
+      <div className="bg-white rounded-md border border-gray-200 p-6">{children}</div>
     </div>
   );
 }

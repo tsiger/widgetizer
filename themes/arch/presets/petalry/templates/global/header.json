@@ -8,12 +8,17 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Order Now",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/petalry-logo-dark.png",
+    "transparent_logo": "/uploads/images/petalry-logo-light.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

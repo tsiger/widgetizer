@@ -13,7 +13,8 @@
         "overlay_color": "#121722cc",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/services-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -70,7 +71,8 @@
             "button_link": {
               "text": "Book a diagnostic",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             }
           }
         },
@@ -82,7 +84,8 @@
             "button_link": {
               "text": "Book brake service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             }
           }
         },
@@ -94,7 +97,8 @@
             "button_link": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             }
           }
         },
@@ -106,68 +110,73 @@
             "button_link": {
               "text": "Book tire service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             }
           }
         },
-        "cat-diagnostics-img": {
+        "block_8742790d-f040-4728-ae06-14a8aabffa8b": {
           "type": "card",
           "settings": {
             "title": "",
-            "description": "",
+            "description": "<p></p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-diagnostics-1.webp"
           }
         },
-        "cat-brakes-img": {
+        "block_1fff4759-b384-4a9c-984c-85f0709327f1": {
           "type": "card",
           "settings": {
             "title": "",
-            "description": "",
+            "description": "<p></p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-brakes-1.webp"
           }
         },
-        "cat-engine-img": {
+        "block_692dc7d3-9057-476c-8053-d709d1961fdb": {
           "type": "card",
           "settings": {
             "title": "",
-            "description": "",
+            "description": "<p></p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-engine-1.webp"
           }
         },
-        "cat-tires-img": {
+        "block_ee00e463-4528-448e-80d6-3b7474129e04": {
           "type": "card",
           "settings": {
             "title": "",
-            "description": "",
+            "description": "<p></p>",
             "button_link": {
-              "text": "",
               "href": "",
+              "text": "",
               "target": "_self"
-            }
+            },
+            "image": "/uploads/images/service-tires-1.webp"
           }
         }
       },
       "blocksOrder": [
-        "cat-diagnostics-img",
+        "block_8742790d-f040-4728-ae06-14a8aabffa8b",
         "cat-diagnostics",
-        "cat-brakes-img",
+        "block_1fff4759-b384-4a9c-984c-85f0709327f1",
         "cat-brakes",
         "cat-engine",
-        "cat-engine-img",
+        "block_692dc7d3-9057-476c-8053-d709d1961fdb",
         "cat-tires",
-        "cat-tires-img"
+        "block_ee00e463-4528-448e-80d6-3b7474129e04"
       ]
     },
     "pricing": {
@@ -282,7 +291,8 @@
             "link": {
               "text": "Book basic",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             }
           }
         },
@@ -295,7 +305,8 @@
             "link": {
               "text": "Book complete",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             }
           }
         },
@@ -307,7 +318,8 @@
             "link": {
               "text": "Book pre-purchase",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             }
           }
         },
@@ -497,7 +509,8 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             },
             "style": "primary",
             "link_2": {
@@ -526,6 +539,6 @@
     "closing_cta"
   ],
   "id": "services",
-  "created": "2026-04-21T12:00:00.000Z",
-  "updated": "2026-04-21T13:46:25.300Z"
+  "created": "2026-04-21T13:01:43.949Z",
+  "updated": "2026-04-21T13:25:59.078Z"
 }

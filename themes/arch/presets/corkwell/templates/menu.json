@@ -10,7 +10,8 @@
         "overlay_color": "#151e22cc",
         "color_scheme": "highlight-primary",
         "fullwidth": true,
-        "top_spacing": "auto"
+        "top_spacing": "auto",
+        "image": "/uploads/images/menu-hero.webp"
       },
       "blocks": {
         "hero-heading": {
@@ -28,7 +29,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "cocktails": {
       "type": "priced-list",
@@ -89,7 +93,14 @@
           }
         }
       },
-      "blocksOrder": ["cocktail-1", "cocktail-2", "cocktail-3", "cocktail-4", "cocktail-5", "cocktail-6"]
+      "blocksOrder": [
+        "cocktail-1",
+        "cocktail-2",
+        "cocktail-3",
+        "cocktail-4",
+        "cocktail-5",
+        "cocktail-6"
+      ]
     },
     "wine": {
       "type": "content-switcher",
@@ -162,7 +173,14 @@
           }
         }
       },
-      "blocksOrder": ["wine-1", "wine-2", "wine-3", "wine-4", "wine-5", "wine-6"]
+      "blocksOrder": [
+        "wine-1",
+        "wine-2",
+        "wine-3",
+        "wine-4",
+        "wine-5",
+        "wine-6"
+      ]
     },
     "small_plates": {
       "type": "priced-list",
@@ -223,7 +241,14 @@
           }
         }
       },
-      "blocksOrder": ["plate-1", "plate-2", "plate-3", "plate-4", "plate-5", "plate-6"]
+      "blocksOrder": [
+        "plate-1",
+        "plate-2",
+        "plate-3",
+        "plate-4",
+        "plate-5",
+        "plate-6"
+      ]
     },
     "desserts": {
       "type": "priced-list",
@@ -260,7 +285,11 @@
           }
         }
       },
-      "blocksOrder": ["dessert-1", "dessert-2", "dessert-3"]
+      "blocksOrder": [
+        "dessert-1",
+        "dessert-2",
+        "dessert-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -290,18 +319,30 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "cocktails", "wine", "small_plates", "desserts", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "cocktails",
+    "wine",
+    "small_plates",
+    "desserts",
+    "cta"
+  ],
   "id": "menu",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-16T13:48:06.379Z",
+  "updated": "2026-04-16T13:55:01.889Z"
 }

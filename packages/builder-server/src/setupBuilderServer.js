@@ -9,6 +9,7 @@ import previewRoutes from "./routes/preview.js";
 import exportRoutes from "./routes/export.js";
 import widgetsRoutes from "./routes/widgets.js";
 import iconsRoutes from "./routes/icons.js";
+import collectionsRoutes from "./routes/collections.js";
 import appSettingsRoutes from "./routes/appSettings.js";
 import coreRoutes from "./routes/core.js";
 import { renderPreviewToken } from "./controllers/previewController.js";
@@ -86,6 +87,7 @@ export function setupBuilderServer({ adapters, plugins = [] } = {}) {
   projectScopedRouter.use("/export", exportRoutes);
   projectScopedRouter.use("/widgets", widgetsRoutes);
   projectScopedRouter.use("/icons", iconsRoutes);
+  projectScopedRouter.use("/collections", collectionsRoutes);
 
   // Backend plugins may contribute additional project-scoped routes. They get
   // the SAME pipeline as built-in project routes — JSON parsing and scope

@@ -30,3 +30,7 @@ export * from "./tags/youtubeTag.js";
 // ---- Liquid filters ----
 export * from "./filters/handleizeFilter.js";
 export * from "./filters/mediaMetaFilter.js";
+export * from "./filters/safeUrlFilter.js";
+export * from "./filters/rteFilter.js";
+export * from "./filters/dateFilter.js";
+export * from "./filters/collectionFilter.js";

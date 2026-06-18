@@ -11,6 +11,7 @@
         "fullwidth": true,
         "top_spacing": "auto",
         "content_width": "narrow",
+        "image": "/uploads/images/gallery-hero.webp",
         "vertical_alignment": "end"
       },
       "blocks": {
@@ -29,7 +30,10 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading", "hero-text"]
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text"
+      ]
     },
     "bakes": {
       "type": "bento-grid",
@@ -49,7 +53,8 @@
             "col_span": 2,
             "row_span": 2,
             "text_color": "light",
-            "overlay_color": "#2e1f2e99"
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-croissants.webp"
           }
         },
         "bento-2": {
@@ -60,7 +65,8 @@
             "col_span": 1,
             "row_span": 1,
             "text_color": "light",
-            "overlay_color": "#2e1f2e99"
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bake-croissants-1.webp"
           }
         },
         "bento-3": {
@@ -71,7 +77,8 @@
             "col_span": 1,
             "row_span": 1,
             "text_color": "light",
-            "overlay_color": "#2e1f2e99"
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-cinnamon.webp"
           }
         },
         "bento-4": {
@@ -82,7 +89,8 @@
             "col_span": 1,
             "row_span": 1,
             "text_color": "light",
-            "overlay_color": "#2e1f2e99"
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-cakes.webp"
           }
         },
         "bento-5": {
@@ -93,11 +101,18 @@
             "col_span": 1,
             "row_span": 1,
             "text_color": "light",
-            "overlay_color": "#2e1f2e99"
+            "overlay_color": "#2e1f2e99",
+            "image": "/uploads/images/bento-cookies-1.webp"
           }
         }
       },
-      "blocksOrder": ["bento-hero", "bento-2", "bento-3", "bento-4", "bento-5"]
+      "blocksOrder": [
+        "bento-hero",
+        "bento-2",
+        "bento-3",
+        "bento-4",
+        "bento-5"
+      ]
     },
     "bakery_gallery": {
       "type": "gallery",
@@ -115,41 +130,54 @@
         "space-1": {
           "type": "image",
           "settings": {
-            "caption": "The display case"
+            "caption": "The display case",
+            "image": "/uploads/images/space-display.webp"
           }
         },
         "space-2": {
           "type": "image",
           "settings": {
-            "caption": "Dough shaping"
+            "caption": "Dough shaping",
+            "image": "/uploads/images/space-shaping.webp"
           }
         },
         "space-3": {
           "type": "image",
           "settings": {
-            "caption": "Our deck oven"
+            "caption": "Our deck oven",
+            "image": "/uploads/images/space-oven.webp"
           }
         },
         "space-4": {
           "type": "image",
           "settings": {
-            "caption": "Café seating"
+            "caption": "Café seating",
+            "image": "/uploads/images/space-cafe.webp"
           }
         },
         "space-5": {
           "type": "image",
           "settings": {
-            "caption": "Flour-dusted hands"
+            "caption": "Flour-dusted hands",
+            "image": "/uploads/images/space-hands.webp"
           }
         },
         "space-6": {
           "type": "image",
           "settings": {
-            "caption": "The bread wall"
+            "caption": "The bread wall",
+            "image": "/uploads/images/space-bread-wall.webp"
           }
         }
       },
-      "blocksOrder": ["space-1", "space-2", "space-3", "space-4", "space-5", "space-6"]
+      "blocksOrder": [
+        "space-1",
+        "space-2",
+        "space-3",
+        "space-4",
+        "space-5",
+        "space-6"
+      ]
     },
     "events": {
       "type": "event-list",
@@ -171,7 +199,8 @@
             "button_link": {
               "text": "Reserve a Spot",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
             }
           }
         },
@@ -186,7 +215,8 @@
             "button_link": {
               "text": "Sign Up",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
             }
           }
         },
@@ -201,16 +231,26 @@
             "button_link": {
               "text": "Get Tickets",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
             }
           }
         }
       },
-      "blocksOrder": ["event-1", "event-2", "event-3"]
+      "blocksOrder": [
+        "event-1",
+        "event-2",
+        "event-3"
+      ]
     }
   },
-  "widgetsOrder": ["gallery_hero", "bakes", "bakery_gallery", "events"],
+  "widgetsOrder": [
+    "gallery_hero",
+    "bakes",
+    "bakery_gallery",
+    "events"
+  ],
   "id": "gallery",
-  "created": "2026-04-03T14:00:00.000Z",
-  "updated": "2026-04-03T14:00:00.000Z"
+  "created": "2026-04-16T14:40:08.891Z",
+  "updated": "2026-04-16T14:56:14.073Z"
 }

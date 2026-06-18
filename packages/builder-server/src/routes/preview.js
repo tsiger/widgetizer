@@ -2,6 +2,7 @@ import express from "express";
 import {
   generatePreview,
   createPreviewToken,
+  createCollectionPreviewToken,
   renderSingleWidget,
   getGlobalWidgets,
   saveGlobalWidget,
@@ -19,6 +20,9 @@ router.post("/", generatePreview);
 
 // POST /api/preview/token - Create a preview token for src-based rendering
 router.post("/token", createPreviewToken);
+
+// POST /api/preview/collection - Create a render token for a collection item (navigable site preview)
+router.post("/collection", createCollectionPreviewToken);
 
 // POST /api/preview/widget - Render a single widget
 router.post("/widget", renderSingleWidget);

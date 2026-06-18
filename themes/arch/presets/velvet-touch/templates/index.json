@@ -5,7 +5,7 @@
     "hero": {
       "type": "split-hero",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-hero.webp",
         "image_position": "start",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
@@ -41,12 +41,14 @@
             "link": {
               "text": "View Treatments",
               "href": "treatments.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "6a888bfe-038c-416d-9bfc-276872010f2d"
             },
             "link_2": {
               "text": "Book Now",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -54,7 +56,12 @@
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "trust_strip": {
       "type": "trust-bar",
@@ -102,7 +109,12 @@
           }
         }
       },
-      "blocksOrder": ["trust-1", "trust-2", "trust-3", "trust-4"]
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
     },
     "treatments": {
       "type": "sliding-panels",
@@ -116,62 +128,71 @@
         "panel-1": {
           "type": "panel",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/home-panel-massage.webp",
             "title": "Massage Therapy",
             "subtitle": "Swedish, deep tissue, hot stone & more",
             "button_link": {
               "text": "Learn More",
               "href": "treatments.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "6a888bfe-038c-416d-9bfc-276872010f2d"
             }
           }
         },
         "panel-2": {
           "type": "panel",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/home-panel-facials.webp",
             "title": "Facials",
             "subtitle": "Signature, express, anti-aging & hydrating",
             "button_link": {
               "text": "Learn More",
               "href": "treatments.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "6a888bfe-038c-416d-9bfc-276872010f2d"
             }
           }
         },
         "panel-3": {
           "type": "panel",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/home-panel-body.webp",
             "title": "Body Treatments",
             "subtitle": "Scrubs, wraps, and full-body rituals",
             "button_link": {
               "text": "Learn More",
               "href": "treatments.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "6a888bfe-038c-416d-9bfc-276872010f2d"
             }
           }
         },
         "panel-4": {
           "type": "panel",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/home-philosophy.webp",
             "title": "Couples Packages",
             "subtitle": "Side-by-side treatments with champagne",
             "button_link": {
               "text": "Learn More",
               "href": "treatments.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "6a888bfe-038c-416d-9bfc-276872010f2d"
             }
           }
         }
       },
-      "blocksOrder": ["panel-1", "panel-2", "panel-3", "panel-4"]
+      "blocksOrder": [
+        "panel-1",
+        "panel-2",
+        "panel-3",
+        "panel-4"
+      ]
     },
     "about_teaser": {
       "type": "image-callout",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/home-philosophy-1.webp",
         "image_position": "end",
         "color_scheme": "standard-primary"
       },
@@ -205,14 +226,20 @@
             "link": {
               "text": "About Us",
               "href": "about.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "e0bcc851-93ff-4946-8c76-a423a6d15f20"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["teaser-eyebrow", "teaser-heading", "teaser-text", "teaser-button"]
+      "blocksOrder": [
+        "teaser-eyebrow",
+        "teaser-heading",
+        "teaser-text",
+        "teaser-button"
+      ]
     },
     "testimonials": {
       "type": "testimonial-slider",
@@ -226,7 +253,7 @@
           "type": "quote",
           "settings": {
             "quote": "The hot stone massage changed how I sleep. I came in with months of tension and left feeling like a completely different person. The therapist knew exactly where to focus without me having to say a word.",
-            "avatar": "",
+            "avatar": "/uploads/images/home-avatar-sophia.webp",
             "name": "Rachel M.",
             "title": "Regular client since 2022",
             "rating": "5"
@@ -236,7 +263,7 @@
           "type": "quote",
           "settings": {
             "quote": "I've been to a lot of spas and Velvet Touch is genuinely special. The attention to detail — the warm towels, the tea afterward, the way they remember your preferences — it all adds up to something rare.",
-            "avatar": "",
+            "avatar": "/uploads/images/home-avatar-david.webp",
             "name": "David K.",
             "title": "Monthly member",
             "rating": "5"
@@ -246,14 +273,18 @@
           "type": "quote",
           "settings": {
             "quote": "My first facial here was revelatory. My skin looked better for weeks. The products they use are incredible — clean, natural, and you can actually feel the difference. I won't go anywhere else now.",
-            "avatar": "",
+            "avatar": "/uploads/images/home-avatar-rachel.webp",
             "name": "Sophia L.",
             "title": "Facial client",
             "rating": "5"
           }
         }
       },
-      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -283,18 +314,30 @@
             "link": {
               "text": "Book an Appointment",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d241bc12-6e4e-4b1e-b3af-5d2355d5eae6"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "trust_strip", "treatments", "about_teaser", "testimonials", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "trust_strip",
+    "treatments",
+    "about_teaser",
+    "testimonials",
+    "cta"
+  ],
   "id": "index",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-19T11:19:49.757Z",
+  "updated": "2026-04-19T15:17:07.988Z"
 }

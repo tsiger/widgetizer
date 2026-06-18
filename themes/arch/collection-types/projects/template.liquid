@@ -1,0 +1,111 @@
+{%- comment -%}
+  Project page. Exported at projects/{slug}.html (one directory deep, so internal
+  links use ../). Renders inside the Arch layout (header / main / footer). An
+  image/gallery-led case study. SEO is wired automatically for hasItemPages items.
+{%- endcomment -%}
+<article class="widget widget-project">
+  <style>
+    .widget-project {
+      & .project-back {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        color: var(--text-muted);
+
+        &:hover {
+          color: var(--accent);
+        }
+      }
+
+      & .project-meta {
+        margin-block-start: var(--space-xs);
+        color: var(--text-muted);
+      }
+
+      & .project-figure {
+        margin: var(--space-xl) 0 0;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      & .project-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+      }
+
+      & .project-gallery {
+        margin-block-start: var(--space-xl);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+
+        @media (min-width: 750px) {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      & .project-gallery-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-md);
+      }
+    }
+  </style>
+
+  <div class="widget-container">
+    <div class="widget-content content-flow widget-content-md">
+      <a class="project-back w-label t-xs t-uppercase" href="../index.html">&larr; Back to home</a>
+
+      <h1 class="w-headline reveal reveal-up">{{ item.settings.title }}</h1>
+
+      {% if item.settings.client != blank or item.settings.year != blank %}
+        <p class="project-meta w-meta t-sm reveal reveal-up">
+          {%- if item.settings.client != blank -%}{{ item.settings.client }}{%- endif -%}
+          {%- if item.settings.client != blank and item.settings.year != blank %} &middot; {% endif -%}
+          {%- if item.settings.year != blank -%}{{ item.settings.year }}{%- endif -%}
+        </p>
+      {% endif %}
+
+      {% if item.settings.summary != blank %}
+        <p class="w-body t-lg t-muted reveal reveal-up">{{ item.settings.summary }}</p>
+      {% endif %}
+
+      {% if item.settings.featured_image != blank %}
+        <figure class="project-figure reveal reveal-up">
+          {% image src: item.settings.featured_image, size: 'large', class: 'project-image', srcset: true, sizes: '(max-width: 800px) 100vw, 800px', alt: item.settings.title %}
+        </figure>
+      {% endif %}
+
+      {% if item.settings.description != blank %}
+        <div class="w-body w-rte reveal reveal-up">{{ item.settings.description | raw }}</div>
+      {% endif %}
+
+      {% assign gallery = item.settings.gallery %}
+      {% if gallery.size > 0 %}
+        <div class="project-gallery reveal reveal-up">
+          {% for img in gallery %}
+            {% if img != blank %}
+              {% image src: img, size: 'medium', class: 'project-gallery-img', srcset: true, sizes: '(max-width: 750px) 100vw, 50vw' %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if item.settings.external_url.href != blank %}
+        <div class="widget-actions reveal reveal-up">
+          <a
+            class="widget-button widget-button-primary"
+            href="{{ item.settings.external_url.href }}"
+            {% if item.settings.external_url.target == '_blank' %}target="_blank" rel="noopener"{% endif %}
+          >
+            {{ item.settings.external_url.text | default: 'Visit project' }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</article>

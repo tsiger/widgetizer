@@ -14,7 +14,8 @@
           "type": "image",
           "settings": {
             "width": 100,
-            "position": "left"
+            "position": "left",
+            "image": "/uploads/images/about-portrait.webp"
           }
         },
         "intro-eyebrow": {
@@ -45,7 +46,12 @@
           }
         }
       },
-      "blocksOrder": ["portrait", "intro-eyebrow", "intro-heading", "intro-body"]
+      "blocksOrder": [
+        "portrait",
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "credentials": {
       "type": "trust-bar",
@@ -93,7 +99,12 @@
           }
         }
       },
-      "blocksOrder": ["cred-1", "cred-2", "cred-3", "cred-4"]
+      "blocksOrder": [
+        "cred-1",
+        "cred-2",
+        "cred-3",
+        "cred-4"
+      ]
     },
     "beliefs": {
       "type": "rich-text",
@@ -138,7 +149,12 @@
           }
         }
       },
-      "blocksOrder": ["beliefs-heading", "beliefs-body-1", "beliefs-body-2", "beliefs-body-3"]
+      "blocksOrder": [
+        "beliefs-heading",
+        "beliefs-body-1",
+        "beliefs-body-2",
+        "beliefs-body-3"
+      ]
     },
     "journey": {
       "type": "timeline",
@@ -184,13 +200,20 @@
           }
         }
       },
-      "blocksOrder": ["stop-1", "stop-2", "stop-3", "stop-4"]
+      "blocksOrder": [
+        "stop-1",
+        "stop-2",
+        "stop-3",
+        "stop-4"
+      ]
     },
     "peer_quote": {
       "type": "testimonial-hero",
       "settings": {
-        "image_position": "start",
-        "color_scheme": "standard-secondary"
+        "image_position": "end",
+        "color_scheme": "standard-secondary",
+        "logo": "",
+        "author_image": "/uploads/images/about-testimonial-portrait.webp"
       },
       "blocks": {
         "quote": {
@@ -219,12 +242,16 @@
           }
         }
       },
-      "blocksOrder": ["quote", "author-name", "author-role"]
+      "blocksOrder": [
+        "quote",
+        "author-name",
+        "author-role"
+      ]
     },
     "closing": {
       "type": "banner",
       "settings": {
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "center",
@@ -254,18 +281,30 @@
             "link": {
               "text": "Start a conversation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-body", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-body",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["intro", "credentials", "beliefs", "journey", "peer_quote", "closing"],
+  "widgetsOrder": [
+    "intro",
+    "credentials",
+    "beliefs",
+    "journey",
+    "peer_quote",
+    "closing"
+  ],
   "id": "about",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z"
+  "created": "2026-04-22T18:20:05.330Z",
+  "updated": "2026-04-23T08:26:08.703Z"
 }

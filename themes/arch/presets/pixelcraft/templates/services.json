@@ -13,7 +13,8 @@
         "overlay_color": "#0a0a0aad",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/services-banner-v2.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -250,7 +251,8 @@
             "link": {
               "text": "Request a sprint",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
             }
           }
         },
@@ -263,7 +265,8 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
             }
           }
         },
@@ -275,7 +278,8 @@
             "link": {
               "text": "Discuss a retainer",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
             }
           }
         },
@@ -373,13 +377,15 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
             },
             "style": "primary",
             "link_2": {
               "text": "See the work",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
             },
             "style_2": "secondary",
             "size": "medium"
@@ -403,6 +409,6 @@
     "closing_cta"
   ],
   "id": "services",
-  "created": "2026-04-21T14:00:00.000Z",
-  "updated": "2026-04-21T16:32:04.775Z"
+  "created": "2026-04-21T14:21:02.380Z",
+  "updated": "2026-04-21T16:18:08.519Z"
 }

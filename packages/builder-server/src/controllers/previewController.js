@@ -5,7 +5,20 @@ import { getContentType } from "../utils/mimeTypes.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getSetting } from "../db/repositories/settingsRepository.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { renderWidget, renderPageLayout, renderEnqueuedAssetTags, widgetSupportsTransparentHeader } from "../services/renderingService.js";
+import {
+  renderWidget,
+  renderPageLayout,
+  renderCollectionItemPage,
+  renderEnqueuedAssetTags,
+  widgetSupportsTransparentHeader,
+} from "../services/renderingService.js";
+import {
+  getCollectionSchema,
+  loadCollectionTemplate,
+  loadCollectionItemsByUuid,
+} from "../services/collectionService.js";
+import { readProjectThemeData } from "./themeController.js";
+import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
@@ -34,6 +47,16 @@ function injectBaseTag(html) {
   return html.replace(/<\/head>/i, `${baseTag}\n</head>`);
 }
 
+// Derive the scope-aware collection capability for the render path from the
+// request, so the `| collection` filter can read items through the same storage
+// adapter the API path uses. Null when scope/storage are unavailable (the filter
+// then returns []), keeping non-collection previews unchanged.
+function collectionDepsFromReq(req) {
+  const storage = req?.adapters?.storage;
+  const scope = req?.scope;
+  return storage && scope ? { storage, scope } : null;
+}
+
 
 /**
  * Core rendering logic for preview HTML generation.
@@ -43,7 +66,7 @@ function injectBaseTag(html) {
  * @param {string} previewMode - "editor" or "standalone"
  * @returns {Promise<string>} Rendered HTML string
  */
-async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
+async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDeps = null) {
   const activeProjectId = projectRepo.getActiveProjectId();
 
   if (!activeProjectId) {
@@ -77,6 +100,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         "preview",
         sharedGlobals,
         null,
+        collectionDeps,
       );
     } catch (error) {
       console.error("Error rendering header widget:", error);
@@ -100,6 +124,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         "preview",
         sharedGlobals,
         widgetIndex,
+        collectionDeps,
       );
       mainContent += renderedWidgetHtml;
     }
@@ -165,6 +190,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
         "preview",
         sharedGlobals,
         null,
+        collectionDeps,
       );
     } catch (error) {
       console.error("Error rendering footer widget:", error);
@@ -190,6 +216,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
     rawThemeSettings,
     "preview",
     sharedGlobals,
+    collectionDeps,
   );
 
   renderedHtml = injectBaseTag(renderedHtml);
@@ -207,7 +234,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode) {
 export async function generatePreview(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDepsFromReq(req));
     res.send(html);
   } catch (error) {
     console.error("Error generating preview:", error);
@@ -228,7 +255,7 @@ export async function generatePreview(req, res) {
 export async function createPreviewToken(req, res) {
   try {
     const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode);
+    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDepsFromReq(req));
     const token = generateToken(html);
     res.json({ token });
   } catch (error) {
@@ -257,6 +284,138 @@ export function renderPreviewToken(req, res) {
 }
 
 /**
+ * Builds a render token for a single collection item, rendered through its theme
+ * template.liquid inside the layout (header/footer/main) — the same pipeline export
+ * uses, in "preview" mode. The body carries the settings to render; the navigable
+ * site preview (CollectionItemPagePreview) loads the saved item and passes those in,
+ * so this backs the unified, browsable item preview.
+ *
+ * Collection reads go through the scope-aware storage adapter (collectionDepsFromReq),
+ * so the item/template/schema are tenant-isolated exactly like the API path. The
+ * single shared `renderCollectionItemPage` pipeline (engine + injected collection
+ * helpers) is the same one export drives — no preview-only render fork.
+ *
+ * Body: { collectionType, slug, settings }. Returns { token }; the caller points an
+ * iframe at GET /render/:token (shared token store with page previews).
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<void>}
+ */
+export async function createCollectionPreviewToken(req, res) {
+  try {
+    // Collections are read through the same scope-aware adapter the API path uses.
+    const collectionDeps = collectionDepsFromReq(req);
+    if (!collectionDeps) {
+      return res.status(404).json({ error: "No active project found" });
+    }
+    const { storage, scope } = collectionDeps;
+
+    const { collectionType, slug, settings } = req.body || {};
+    if (!collectionType) {
+      return res.status(400).json({ error: "collectionType is required" });
+    }
+
+    // Schema must exist; template is required to render an item page.
+    const schema = await getCollectionSchema(storage, scope, collectionType);
+    if (!schema) {
+      return res.status(404).json({ error: `Collection "${collectionType}" not found.` });
+    }
+    const template = await loadCollectionTemplate(storage, scope, collectionType);
+    if (!template) {
+      return res.status(400).json({
+        error: "Preview unavailable",
+        message: `This collection has no template.liquid, so its items have no page to preview. Enable hasItemPages and add a template to ${collectionType}.`,
+      });
+    }
+
+    const activeProjectId = scope.projectId;
+    const projectData = projectRepo.getProjectById(activeProjectId);
+    if (!projectData) {
+      return res.status(404).json({ error: "No active project found" });
+    }
+    const folder = projectData.folderName;
+
+    const rawThemeSettings = await readProjectThemeData(activeProjectId);
+    const headerData = await readGlobalWidgetData(folder, "header");
+    const footerData = await readGlobalWidgetData(folder, "footer");
+
+    // uuid -> page map so pageUuid links inside the item resolve to slugs.
+    // listProjectPagesData reads data/projects/<folder>/pages, so it takes the
+    // FOLDER name (not the UUID) — matching the export path.
+    const pages = await listProjectPagesData(folder);
+    const pagesByUuid = new Map();
+    for (const page of pages || []) {
+      if (page.uuid) pagesByUuid.set(page.uuid, page);
+    }
+    // Stable collection-item refs for resolving `menu`/`link`-type item settings
+    // that target another item. Menu maps are loaded lazily inside the render.
+    const collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope);
+
+    // Assemble the item to render from the posted settings (the navigable preview
+    // passes the saved item's settings).
+    const safeSlug = (slug && String(slug)) || "preview";
+    const now = new Date().toISOString();
+    const previewItem = {
+      id: safeSlug,
+      uuid: "preview",
+      slug: safeSlug,
+      schemaVersion: schema.schemaVersion,
+      created: now,
+      updated: now,
+      settings: settings || {},
+    };
+
+    const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
+    // Preview is served at a single URL (root), so no depth prefixing: assets
+    // resolve via absolute API URLs in preview mode (outputPathPrefix === "").
+    const sharedGlobals = {
+      projectId: activeProjectId,
+      apiUrl,
+      renderMode: "preview",
+      themeSettingsRaw: rawThemeSettings,
+      enqueuedStyles: new Map(),
+      enqueuedScripts: new Map(),
+      collectionCache: new Map(),
+      pagesByUuid,
+      collectionItemsByUuid,
+      outputPathPrefix: "",
+      currentCanonicalPath: `${schema.slugPrefix}/${safeSlug}.html`,
+    };
+
+    // One shared pipeline renders the item page — header/footer + resolved item +
+    // template + layout — identical to the export path.
+    let { html } = await renderCollectionItemPage(
+      activeProjectId,
+      {
+        schema,
+        item: previewItem,
+        template,
+        rawThemeSettings,
+        renderMode: "preview",
+        sharedGlobals,
+        headerData,
+        footerData,
+        projectData,
+        siteUrl: "",
+      },
+      collectionDeps,
+    );
+
+    html = injectBaseTag(html);
+    html = injectRuntimeScript(html, "standalone");
+
+    const token = generateToken(html);
+    res.json({ token });
+  } catch (error) {
+    console.error("Error creating collection preview:", error);
+    if (error.status === 404 || isProjectResolutionError(error)) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Failed to create collection preview", message: error.message });
+  }
+}
+
+/**
  * Renders a single widget HTML for real-time preview updates.
  * @param {import('express').Request} req - Express request object with widgetId, widget data, and themeSettings in body
  * @param {import('express').Response} res - Express response object (sends HTML)
@@ -274,7 +433,7 @@ export async function renderSingleWidget(req, res) {
       enqueuedScripts: new Map(),
     };
 
-    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null);
+    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null, collectionDepsFromReq(req));
 
     // Append enqueued asset tags so the preview runtime can load them on morph
     const assetTags = renderEnqueuedAssetTags(sharedGlobals);

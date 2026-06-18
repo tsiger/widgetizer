@@ -27,7 +27,10 @@
           }
         }
       },
-      "blocksOrder": ["intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "contact_details": {
       "type": "contact-details",
@@ -59,7 +62,11 @@
           }
         }
       },
-      "blocksOrder": ["info-book", "info-find", "info-color-consult"]
+      "blocksOrder": [
+        "info-book",
+        "info-find",
+        "info-color-consult"
+      ]
     },
     "contact_map": {
       "type": "map",
@@ -88,11 +95,18 @@
           }
         }
       },
-      "blocksOrder": ["info-parking", "info-access"]
+      "blocksOrder": [
+        "info-parking",
+        "info-access"
+      ]
     }
   },
-  "widgetsOrder": ["contact_intro", "contact_details", "contact_map"],
+  "widgetsOrder": [
+    "contact_intro",
+    "contact_details",
+    "contact_map"
+  ],
   "id": "contact",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T10:00:00.000Z"
+  "created": "2026-04-23T15:28:19.000Z",
+  "updated": "2026-04-24T08:45:30.591Z"
 }

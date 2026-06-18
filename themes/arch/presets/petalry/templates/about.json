@@ -2,15 +2,16 @@
   "name": "About",
   "slug": "about",
   "id": "about",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z",
+  "created": "2026-04-22T12:39:31.878Z",
+  "updated": "2026-04-22T12:58:00.589Z",
   "widgets": {
     "page_header": {
       "type": "banner",
       "settings": {
         "height": "small",
         "alignment": "center",
-        "color_scheme": "highlight-primary"
+        "color_scheme": "highlight-primary",
+        "image": "/uploads/images/about-banner.webp"
       },
       "blocks": {
         "page-heading": {
@@ -29,13 +30,17 @@
           }
         }
       },
-      "blocksOrder": ["page-heading", "page-text"]
+      "blocksOrder": [
+        "page-heading",
+        "page-text"
+      ]
     },
     "story_section": {
       "type": "image-text",
       "settings": {
         "image_position": "start",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/about-story.webp"
       },
       "blocks": {
         "story-eyebrow": {
@@ -68,7 +73,12 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text-1",
+        "story-text-2"
+      ]
     },
     "studio_figures": {
       "type": "key-figures",
@@ -107,7 +117,11 @@
           }
         }
       },
-      "blocksOrder": ["fig-years", "fig-arrangements", "fig-events"]
+      "blocksOrder": [
+        "fig-years",
+        "fig-arrangements",
+        "fig-events"
+      ]
     },
     "community_testimonials": {
       "type": "testimonials",
@@ -148,7 +162,11 @@
           }
         }
       },
-      "blocksOrder": ["quote-1", "quote-2", "quote-3"]
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
     },
     "about_cta": {
       "type": "action-bar",
@@ -177,15 +195,26 @@
             "link": {
               "href": "contact.html",
               "text": "Get in Touch",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["page_header", "story_section", "studio_figures", "community_testimonials", "about_cta"]
+  "widgetsOrder": [
+    "page_header",
+    "story_section",
+    "studio_figures",
+    "community_testimonials",
+    "about_cta"
+  ]
 }

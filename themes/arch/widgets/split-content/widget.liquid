@@ -141,6 +141,7 @@
                 {% endif %}
 
               {% when 'text' %}
+                {% unless block.settings.text | rte_blank %}
                 {% assign size_class = 't-' | append: block.settings.size %}
                 {% assign style_class = '' %}
                 {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' t-uppercase' %}{% endif %}
@@ -148,6 +149,7 @@
                 <div class="w-body w-rte {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ delay }}" data-block-id="{{ blockId }}" data-setting="text">
                   {{ block.settings.text | raw }}
                 </div>
+                {% endunless %}
 
               {% when 'features' %}
                 {% if block.settings.features != blank %}

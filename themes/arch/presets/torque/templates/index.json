@@ -13,7 +13,8 @@
         "overlay_color": "#121722cc",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/hero.webp"
       },
       "blocks": {
         "hero-rating": {
@@ -53,7 +54,8 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             },
             "style": "primary",
             "link_2": {
@@ -164,8 +166,10 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+            },
+            "image": "/uploads/images/service-diagnostics.webp"
           }
         },
         "sv-brakes": {
@@ -177,8 +181,10 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+            },
+            "image": "/uploads/images/service-brakes.webp"
           }
         },
         "sv-engine": {
@@ -190,8 +196,10 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+            },
+            "image": "/uploads/images/service-engine.webp"
           }
         },
         "sv-tires": {
@@ -203,8 +211,10 @@
             "button_link": {
               "text": "See details",
               "href": "services.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "94a0a30a-505b-44e7-893e-53d2d6cff924"
+            },
+            "image": "/uploads/images/service-tires.webp"
           }
         }
       },
@@ -351,7 +361,8 @@
             "quote": "Took my Subaru in for a check-engine light thinking I was looking at a big bill. They diagnosed it, showed me the scan, and it turned out to be a $40 sensor. Most shops would have told me I needed a new catalytic converter. These guys are honest.",
             "name": "Aaron W.",
             "title": "Hawthorne · 2019 Subaru Outback",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-aaron.webp"
           }
         },
         "r-2": {
@@ -360,7 +371,8 @@
             "quote": "Dealer quoted me $2,400 for brake work on our minivan. Torque quoted $1,150 for the same pads, rotors, and labor — with a 2-year warranty. Done in four hours and they gave us a loaner. Won't go back to the dealer.",
             "name": "Priya M.",
             "title": "Eastmoreland · 2021 Honda Odyssey",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-priya.webp"
           }
         },
         "r-3": {
@@ -369,7 +381,8 @@
             "quote": "I am genuinely terrible at car stuff. What I appreciated was that Marcus sat with me at a monitor and walked through the digital inspection report photo by photo. Didn't push anything extra. Fixed what needed fixing.",
             "name": "Dana L.",
             "title": "Sellwood · 2017 Toyota RAV4",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-dana.webp"
           }
         },
         "r-4": {
@@ -378,7 +391,8 @@
             "quote": "Our small business runs three delivery vans. Torque handles all of them on a rotating schedule, same-day turnaround when we need it. Fleet pricing is fair and they remember every vehicle's history.",
             "name": "Javier R.",
             "title": "Richmond · 3-vehicle fleet",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-javier.webp"
           }
         },
         "r-5": {
@@ -387,7 +401,8 @@
             "quote": "Bought a used Forester and brought it in for a pre-purchase inspection. They found two things the seller didn't disclose and saved me from a bad buy. Best $165 I've spent in years.",
             "name": "Kenji S.",
             "title": "Woodstock · Pre-purchase inspection",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-kenji.webp"
           }
         },
         "r-6": {
@@ -396,7 +411,8 @@
             "quote": "Fourth time in two years — oil changes, a battery, and a set of tires. Always on time, always explained, always priced right. I send family here now.",
             "name": "Heather B.",
             "title": "Laurelhurst · Repeat customer since 2023",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/testimonial-heather.webp"
           }
         }
       },
@@ -440,7 +456,8 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
             },
             "style": "primary",
             "link_2": {
@@ -462,12 +479,13 @@
     "shop_tour": {
       "type": "image-text",
       "settings": {
-        "image_position": "end",
+        "image_position": "start",
         "text_position": "center",
         "color_scheme": "standard-primary",
         "content_color_scheme": "none",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/shop-tour.webp"
       },
       "blocks": {
         "st-eyebrow": {
@@ -531,7 +549,8 @@
         "image_position": "start",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/inspection-report.webp"
       },
       "blocks": {
         "ir-eyebrow": {
@@ -599,6 +618,6 @@
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-21T12:00:00.000Z",
-  "updated": "2026-04-21T13:45:56.454Z"
+  "created": "2026-04-21T13:01:43.946Z",
+  "updated": "2026-04-21T13:24:13.686Z"
 }

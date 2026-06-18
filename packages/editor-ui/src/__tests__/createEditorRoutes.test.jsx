@@ -28,6 +28,9 @@ describe("createEditorRoutes", () => {
       "menus/edit/:id",
       "menus/:id/structure",
       "media",
+      "collections/:type",
+      "collections/:type/add",
+      "collections/:type/:slug/edit",
       "settings",
       "export-site",
     ]);

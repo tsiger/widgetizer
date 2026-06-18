@@ -14,6 +14,7 @@ export default function ExportSite() {
     setExportHistory,
     loadingHistory,
     maxVersionsToKeep,
+    developerMode,
     loadExportHistory,
   } = useExportState();
   const hasExports = exportHistory.length > 0;
@@ -33,6 +34,7 @@ export default function ExportSite() {
             exportHistory={exportHistory}
             loadingHistory={loadingHistory}
             maxVersionsToKeep={maxVersionsToKeep}
+            developerMode={developerMode}
             activeProject={activeProject}
             setExportHistory={setExportHistory}
           />

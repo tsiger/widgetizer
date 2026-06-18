@@ -141,7 +141,7 @@
 /* Editor content area */
 .richtext-editor .tiptap {
   padding: 0.5rem 0.75rem;
-  min-height: 5rem;
+  min-height: var(--richtext-min-height, 5rem);
   max-height: 12rem;
   overflow-y: auto;
   outline: none;
@@ -158,14 +158,59 @@
   margin-top: 0.5em;
 }
 
+.richtext-editor .tiptap h2,
+.richtext-editor .tiptap h3,
+.richtext-editor .tiptap h4 {
+  font-weight: 600;
+  line-height: 1.25;
+  color: #0f172a; /* slate-900 */
+  margin: 0.75em 0 0.25em;
+}
+
+.richtext-editor .tiptap h2 {
+  font-size: 1.4em;
+}
+
+.richtext-editor .tiptap h3 {
+  font-size: 1.2em;
+}
+
+.richtext-editor .tiptap h4 {
+  font-size: 1.05em;
+}
+
+.richtext-editor .tiptap > :first-child {
+  margin-top: 0;
+}
+
+/* Block images inserted from the Media Library — responsive, never overflow.
+   ProseMirror adds .ProseMirror-selectednode when the image is selected, so the
+   outline doubles as the affordance for deleting it. */
+.richtext-editor .tiptap img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 0.375rem;
+}
+
+.richtext-editor .tiptap img.ProseMirror-selectednode {
+  outline: 2px solid #db2777; /* pink-600 */
+  outline-offset: 2px;
+}
+
+/* Match the theme's rich-text link rule (.w-rte a): accent color, no underline,
+   underline on hover — so the editor reads the same as the published article. */
 .richtext-editor .tiptap a {
   color: #db2777; /* pink-600 */
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
+  transition: text-decoration 0.15s ease;
 }
 
 .richtext-editor .tiptap a:hover {
   color: #be185d; /* pink-700 */
+  text-decoration: underline;
 }
 
 /* Placeholder */
@@ -398,4 +443,15 @@
   padding: 1rem 1.25rem;
   font-size: 0.875rem;
   resize: none;
+}
+
+/* === Page editor right sidebar only (.page-editor-settings) ===
+   Smaller inline body text + tighter Expand button. The expanded modal and the
+   Theme Settings page / collection editor keep their defaults. */
+.page-editor-settings .richtext-editor:not(.richtext-editor-expanded) .tiptap {
+  font-size: 0.75rem;
+}
+
+.page-editor-settings .richtext-expand-button {
+  margin-top: 0.25rem;
 }

@@ -5,7 +5,7 @@
     "hero": {
       "type": "banner",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/about-hero.webp",
         "height": "small",
         "fullwidth": true,
         "alignment": "center",
@@ -24,12 +24,14 @@
           }
         }
       },
-      "blocksOrder": ["hero-heading"]
+      "blocksOrder": [
+        "hero-heading"
+      ]
     },
     "story": {
       "type": "image-text",
       "settings": {
-        "image": "",
+        "image": "/uploads/images/about-founder.webp",
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
@@ -67,7 +69,12 @@
           }
         }
       },
-      "blocksOrder": ["story-eyebrow", "story-heading", "story-text-1", "story-text-2"]
+      "blocksOrder": [
+        "story-eyebrow",
+        "story-heading",
+        "story-text-1",
+        "story-text-2"
+      ]
     },
     "values": {
       "type": "features-split",
@@ -109,7 +116,11 @@
           }
         }
       },
-      "blocksOrder": ["value-1", "value-2", "value-3"]
+      "blocksOrder": [
+        "value-1",
+        "value-2",
+        "value-3"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -126,7 +137,7 @@
         "profile-1": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/about-profile-sarah.webp",
             "name": "Sarah Chen",
             "role": "Founder & Lead Instructor",
             "specialty": "Vinyasa & Yin",
@@ -137,7 +148,7 @@
         "profile-2": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/about-profile-marcus.webp",
             "name": "Marcus Rivera",
             "role": "Pilates Instructor",
             "specialty": "Mat Pilates & Hatha",
@@ -148,7 +159,7 @@
         "profile-3": {
           "type": "profile",
           "settings": {
-            "photo": "",
+            "photo": "/uploads/images/about-profile-priya.webp",
             "name": "Priya Nair",
             "role": "Yoga Instructor",
             "specialty": "Prenatal & Meditation",
@@ -157,7 +168,11 @@
           }
         }
       },
-      "blocksOrder": ["profile-1", "profile-2", "profile-3"]
+      "blocksOrder": [
+        "profile-1",
+        "profile-2",
+        "profile-3"
+      ]
     },
     "studio_gallery": {
       "type": "gallery",
@@ -176,47 +191,54 @@
         "img-1": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-practice-room.webp",
             "caption": "Main practice room"
           }
         },
         "img-2": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-entrance.webp",
             "caption": "Studio entrance"
           }
         },
         "img-3": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-changing.webp",
             "caption": "Changing area"
           }
         },
         "img-4": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-props.webp",
             "caption": "Props wall"
           }
         },
         "img-5": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-courtyard.webp",
             "caption": "Courtyard"
           }
         },
         "img-6": {
           "type": "image",
           "settings": {
-            "image": "",
+            "image": "/uploads/images/about-gallery-tea.webp",
             "caption": "Tea corner"
           }
         }
       },
-      "blocksOrder": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+      "blocksOrder": [
+        "img-1",
+        "img-2",
+        "img-3",
+        "img-4",
+        "img-5",
+        "img-6"
+      ]
     },
     "cta": {
       "type": "action-bar",
@@ -248,18 +270,30 @@
             "link": {
               "text": "Book a Class",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
-  "widgetsOrder": ["hero", "story", "values", "team", "studio_gallery", "cta"],
+  "widgetsOrder": [
+    "hero",
+    "story",
+    "values",
+    "team",
+    "studio_gallery",
+    "cta"
+  ],
   "id": "about",
-  "created": "2026-04-07T10:00:00.000Z",
-  "updated": "2026-04-07T10:00:00.000Z"
+  "created": "2026-04-17T11:59:16.446Z",
+  "updated": "2026-04-17T12:06:30.588Z"
 }

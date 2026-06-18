@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["p-eyebrow", "p-heading", "p-text"]
+      "blocksOrder": [
+        "p-eyebrow",
+        "p-heading",
+        "p-text"
+      ]
     },
     "gallery": {
       "type": "masonry-gallery",
@@ -52,24 +56,153 @@
         "bottom_spacing": "auto"
       },
       "blocks": {
-        "w-01": { "type": "item", "settings": { "title": "Rose & Daniel",  "category": "Stone Barns · June 2025" } },
-        "w-02": { "type": "item", "settings": { "title": "Mei & Arjun",    "category": "Windham Peak · September 2024" } },
-        "w-03": { "type": "item", "settings": { "title": "Elena & Tomás",  "category": "Tuscany · May 2024" } },
-        "w-04": { "type": "item", "settings": { "title": "Hannah & Ben",   "category": "Private residence · October 2024" } },
-        "w-05": { "type": "item", "settings": { "title": "Cora & Ian",     "category": "Kaaterskill · August 2023" } },
-        "w-06": { "type": "item", "settings": { "title": "Sofia & Lucas",  "category": "Hudson River · July 2024" } },
-        "w-07": { "type": "item", "settings": { "title": "Naomi & Vihaan", "category": "Catskill farm · September 2023" } },
-        "w-08": { "type": "item", "settings": { "title": "Bea & Jasper",   "category": "Rhinebeck · October 2023" } },
-        "w-09": { "type": "item", "settings": { "title": "Lin & Matteo",   "category": "Amalfi · June 2023" } },
-        "w-10": { "type": "item", "settings": { "title": "Juno & Aria",    "category": "Brooklyn loft · February 2024" } },
-        "w-11": { "type": "item", "settings": { "title": "Celeste & Theo", "category": "Vermont inn · October 2022" } },
-        "w-12": { "type": "item", "settings": { "title": "Maeve & Oisín",  "category": "Connemara · August 2024" } },
-        "w-13": { "type": "item", "settings": { "title": "Priya & Noor",   "category": "Garrison · September 2022" } },
-        "w-14": { "type": "item", "settings": { "title": "Odette & Rémy",  "category": "Provence · June 2024" } },
-        "w-15": { "type": "item", "settings": { "title": "Vera & Kiran",   "category": "Olana · October 2024" } },
-        "w-16": { "type": "item", "settings": { "title": "Anaïs & Mateo",  "category": "Oaxaca · March 2025" } }
+        "w-01": {
+          "type": "item",
+          "settings": {
+            "title": "Rose & Daniel",
+            "category": "Stone Barns · June 2025",
+            "image": "/uploads/images/portfolio-01.webp"
+          }
+        },
+        "w-02": {
+          "type": "item",
+          "settings": {
+            "title": "Mei & Arjun",
+            "category": "Windham Peak · September 2024",
+            "image": "/uploads/images/portfolio-02.webp"
+          }
+        },
+        "w-03": {
+          "type": "item",
+          "settings": {
+            "title": "Elena & Tomás",
+            "category": "Tuscany · May 2024",
+            "image": "/uploads/images/portfolio-03.webp"
+          }
+        },
+        "w-04": {
+          "type": "item",
+          "settings": {
+            "title": "Hannah & Ben",
+            "category": "Private residence · October 2024",
+            "image": "/uploads/images/portfolio-05.webp"
+          }
+        },
+        "w-05": {
+          "type": "item",
+          "settings": {
+            "title": "Cora & Ian",
+            "category": "Kaaterskill · August 2023",
+            "image": "/uploads/images/portfolio-06.webp"
+          }
+        },
+        "w-06": {
+          "type": "item",
+          "settings": {
+            "title": "Sofia & Lucas",
+            "category": "Hudson River · July 2024",
+            "image": "/uploads/images/portfolio-04.webp"
+          }
+        },
+        "w-07": {
+          "type": "item",
+          "settings": {
+            "title": "Naomi & Vihaan",
+            "category": "Catskill farm · September 2023",
+            "image": "/uploads/images/portfolio-09.webp"
+          }
+        },
+        "w-08": {
+          "type": "item",
+          "settings": {
+            "title": "Bea & Jasper",
+            "category": "Rhinebeck · October 2023",
+            "image": "/uploads/images/portfolio-08.webp"
+          }
+        },
+        "w-09": {
+          "type": "item",
+          "settings": {
+            "title": "Lin & Matteo",
+            "category": "Amalfi · June 2023",
+            "image": "/uploads/images/portfolio-07.webp"
+          }
+        },
+        "w-10": {
+          "type": "item",
+          "settings": {
+            "title": "Juno & Aria",
+            "category": "Brooklyn loft · February 2024",
+            "image": "/uploads/images/portfolio-12.webp"
+          }
+        },
+        "w-11": {
+          "type": "item",
+          "settings": {
+            "title": "Celeste & Theo",
+            "category": "Vermont inn · October 2022",
+            "image": "/uploads/images/portfolio-11.webp"
+          }
+        },
+        "w-12": {
+          "type": "item",
+          "settings": {
+            "title": "Maeve & Oisín",
+            "category": "Connemara · August 2024",
+            "image": "/uploads/images/portfolio-10.webp"
+          }
+        },
+        "w-13": {
+          "type": "item",
+          "settings": {
+            "title": "Priya & Noor",
+            "category": "Garrison · September 2022",
+            "image": "/uploads/images/portfolio-13.webp"
+          }
+        },
+        "w-14": {
+          "type": "item",
+          "settings": {
+            "title": "Odette & Rémy",
+            "category": "Provence · June 2024",
+            "image": "/uploads/images/portfolio-14.webp"
+          }
+        },
+        "w-15": {
+          "type": "item",
+          "settings": {
+            "title": "Vera & Kiran",
+            "category": "Olana · October 2024",
+            "image": "/uploads/images/portfolio-15.webp"
+          }
+        },
+        "w-16": {
+          "type": "item",
+          "settings": {
+            "title": "Anaïs & Mateo",
+            "category": "Oaxaca · March 2025",
+            "image": "/uploads/images/portfolio-16.webp"
+          }
+        }
       },
-      "blocksOrder": ["w-01", "w-02", "w-03", "w-04", "w-05", "w-06", "w-07", "w-08", "w-09", "w-10", "w-11", "w-12", "w-13", "w-14", "w-15", "w-16"]
+      "blocksOrder": [
+        "w-01",
+        "w-02",
+        "w-03",
+        "w-04",
+        "w-05",
+        "w-06",
+        "w-07",
+        "w-08",
+        "w-09",
+        "w-10",
+        "w-11",
+        "w-12",
+        "w-13",
+        "w-14",
+        "w-15",
+        "w-16"
+      ]
     },
     "couple_voices": {
       "type": "testimonials",
@@ -93,7 +226,8 @@
             "quote": "They held the whole day together with such grace we forgot we were getting married — we just got to be present. Every photograph from that day has something they put in frame.",
             "name": "Rose & Daniel",
             "title": "Stone Barns, June 2025",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/home-testimonial.webp"
           }
         },
         "t-2": {
@@ -102,7 +236,8 @@
             "quote": "We found the studio on a whim after a friend mentioned them. Eighteen months later they handed us the wedding we didn't know we were allowed to ask for.",
             "name": "Elena & Tomás",
             "title": "Tuscany, May 2024",
-            "rating": "5"
+            "rating": "5",
+            "avatar": "/uploads/images/portfolio-06.webp"
           }
         },
         "t-3": {
@@ -124,7 +259,12 @@
           }
         }
       },
-      "blocksOrder": ["t-1", "t-2", "t-3", "t-4"]
+      "blocksOrder": [
+        "t-1",
+        "t-2",
+        "t-3",
+        "t-4"
+      ]
     },
     "portfolio_cta": {
       "type": "action-bar",
@@ -157,18 +297,28 @@
             "link": {
               "text": "Begin an inquiry",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["pc-heading", "pc-text", "pc-button"]
+      "blocksOrder": [
+        "pc-heading",
+        "pc-text",
+        "pc-button"
+      ]
     }
   },
-  "widgetsOrder": ["portfolio_intro", "gallery", "couple_voices", "portfolio_cta"],
+  "widgetsOrder": [
+    "portfolio_intro",
+    "gallery",
+    "couple_voices",
+    "portfolio_cta"
+  ],
   "id": "portfolio",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T09:47:37.545Z",
+  "updated": "2026-04-20T10:32:56.524Z"
 }

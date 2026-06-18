@@ -1,9 +1,12 @@
 export { default as CheckboxInput } from "./CheckboxInput";
 export { default as CodeInput } from "./CodeInput";
 export { default as ColorInput } from "./ColorInput";
+export { default as DateInput } from "./DateInput";
 export { default as FileInput } from "./FileInput";
 export { default as FontPickerInput } from "./FontPickerInput";
+export { default as GalleryInput } from "./GalleryInput";
 export { default as ImageInput } from "./ImageInput";
+export { default as TableInput } from "./TableInput";
 export { default as MenuSelectInput } from "./MenuSelectInput";
 export { default as RadioInput } from "./RadioInput";
 export { default as RangeInput } from "./RangeInput";

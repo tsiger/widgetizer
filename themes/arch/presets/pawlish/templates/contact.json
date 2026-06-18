@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/contact-hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -51,7 +52,8 @@
       "type": "image-callout",
       "settings": {
         "image_position": "end",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/contact-callout.webp"
       },
       "blocks": {
         "callout-heading": {
@@ -147,7 +149,12 @@
         "address": "1842 Linden Ave",
         "height": "large",
         "show_address": true,
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "directions_link": {
+          "href": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.25280949928!2d-74.11976373946229!3d40.69766374859258!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1234567890",
+          "text": "Directions",
+          "target": "_self"
+        }
       }
     }
   },
@@ -158,6 +165,6 @@
     "contact_map"
   ],
   "id": "contact",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T15:00:00.000Z"
+  "created": "2026-04-23T13:59:56.908Z",
+  "updated": "2026-04-23T15:22:59.358Z"
 }

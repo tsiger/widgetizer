@@ -5,15 +5,17 @@ import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../qu
 import useToastStore from "../../stores/toastStore";
 import useConfirmationAction from "../../hooks/useConfirmationAction";
 import useFormatDate from "../../hooks/useFormatDate";
+import { formatFileSize } from "../../utils/formatFileSize";
 import Table from "../ui/Table";
 import Badge from "../ui/Badge";
-import { Loader2, ExternalLink, Trash2, Calendar, Download, Package, MoreVertical } from "lucide-react";
+import { Loader2, ExternalLink, Trash2, Calendar, Download, Package, MoreVertical, AlertTriangle } from "lucide-react";
 import { getApiBase } from "../../lib/apiBase";
 
 export default function ExportHistoryTable({
   exportHistory,
   loadingHistory,
   maxVersionsToKeep,
+  developerMode,
   activeProject,
   setExportHistory,
 }) {
@@ -78,6 +80,13 @@ export default function ExportHistoryTable({
     }
   };
 
+  const handleViewIssues = (exportRecord) => {
+    // The report is served from the export dir via the existing view route.
+    const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
+    const reportUrl = `${getApiBase()}/export/view/${exportPath}/__export__issues.html`;
+    window.open(reportUrl, "_blank");
+  };
+
   const handleDownloadExport = (exportRecord) => {
     try {
       // Extract just the directory name - handle both Windows and Unix paths
@@ -121,7 +130,9 @@ export default function ExportHistoryTable({
             headers={[
               t("exportSite.history.headers.version"),
               t("exportSite.history.headers.created"),
+              t("exportSite.history.headers.size"),
               t("exportSite.history.headers.status"),
+              ...(developerMode ? [t("exportSite.history.headers.issues")] : []),
               t("exportSite.history.headers.actions"),
             ]}
             data={exportHistory}
@@ -144,6 +155,9 @@ export default function ExportHistoryTable({
                   </div>
                 </td>
                 <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="text-sm text-slate-600">{formatFileSize(exportRecord.sizeBytes)}</span>
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
                   <Badge
                     variant={exportRecord.status === "success" ? "success" : "error"}
                     className="inline-flex whitespace-nowrap px-3 py-0.5 text-xs font-semibold"
@@ -151,6 +165,26 @@ export default function ExportHistoryTable({
                     {exportRecord.status.charAt(0).toUpperCase() + exportRecord.status.slice(1)}
                   </Badge>
                 </td>
+                {developerMode && (
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    {exportRecord.hasIssuesReport ? (
+                      <button
+                        type="button"
+                        onClick={() => handleViewIssues(exportRecord)}
+                        title={t("exportSite.history.issues.foundTooltip")}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 transition-colors hover:text-amber-700"
+                      >
+                        <AlertTriangle size={14} />
+                        {t("exportSite.history.issues.found")}
+                        <ExternalLink size={12} />
+                      </button>
+                    ) : (
+                      <span className="text-sm text-slate-400" title={t("exportSite.history.issues.noneTooltip")}>
+                        {t("exportSite.history.issues.none")}
+                      </span>
+                    )}
+                  </td>
+                )}
                 <td className="py-3 px-4 whitespace-nowrap text-right">
                   <div className="relative inline-flex items-center justify-end" ref={openMenuVersion === exportRecord.version ? menuRef : null}>
                     <IconButton

@@ -11,8 +11,7 @@ export default function SortableWidgetItem({
   isModified,
   isDraggingAny,
   onWidgetSelect,
-  onDeleteClick,
-  onDuplicateClick,
+  onOpenContextMenu,
   selectedBlockId,
   onBlockSelect,
   onBlocksReorder,
@@ -90,8 +89,7 @@ export default function SortableWidgetItem({
         isDraggingAny={isDraggingAny}
         onWidgetSelect={onWidgetSelect}
         dragHandleProps={dragHandleProps}
-        onDeleteClick={onDeleteClick}
-        onDuplicateClick={onDuplicateClick}
+        onOpenContextMenu={onOpenContextMenu}
         selectedBlockId={selectedBlockId}
         onBlockSelect={onBlockSelect}
         onBlocksReorder={onBlocksReorder}

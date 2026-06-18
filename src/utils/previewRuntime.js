@@ -67,6 +67,13 @@ function getStandalonePreviewTarget(href) {
     return `/preview/${htmlMatch[1]}`;
   }
 
+  // Nested collection item URLs (e.g. "rooms/suite-caldera.html") route to the
+  // item preview keyed by slugPrefix; the route resolves prefix -> type.
+  const itemMatch = withoutQuery.match(/^\/?([^/]+)\/([^/]+)\.html$/);
+  if (itemMatch) {
+    return `/preview/collection/${itemMatch[1]}/${itemMatch[2]}`;
+  }
+
   return null;
 }
 

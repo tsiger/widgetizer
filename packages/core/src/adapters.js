@@ -46,7 +46,11 @@
  * content types, URL semantics, and storage targets differ.
  * @typedef {Object} AssetStorageAdapter
  * @property {(scope: Scope, key: string, stream: unknown) => Promise<{ key: string, sizeBytes: number, contentType: string }>} upload
- * @property {(scope: Scope, key: string) => Promise<unknown | null>} download
+ * @property {(scope: Scope, key: string, range?: { start: number, end: number }) => Promise<unknown | null>} download
+ *   Returns a readable stream of the asset, or null if absent. With an inclusive
+ *   `{ start, end }` byte range, returns just that slice (powers HTTP 206 media seeking).
+ * @property {(scope: Scope, key: string) => Promise<{ size: number } | null>} stat
+ *   Byte size of the asset (for Content-Length / Content-Range), or null if absent.
  * @property {(scope: Scope, key: string) => Promise<void>} delete
  * @property {(scope: Scope, prefix: string) => Promise<string[]>} list
  * @property {(scope: Scope, key: string, opts: { context: 'editor' | 'published' }) => string} getUrl
@@ -92,6 +96,12 @@ export const LIMIT_KEYS = Object.freeze({
   // Total menu-item node count ceiling — guards the recursive menu sanitize/
   // render walks against an attacker persisting a huge menu tree (SA-20).
   MAX_MENU_ITEMS: "MAX_MENU_ITEMS",
+  // Per-collection item-count ceiling — guards the collection write path and the
+  // export-time enumeration against a tenant persisting unbounded items.
+  MAX_COLLECTION_ITEMS: "MAX_COLLECTION_ITEMS",
+  // Collection-type count ceiling per project (defense against amplification of
+  // the export-time per-collection enumeration). OSS stays unbounded.
+  MAX_COLLECTIONS: "MAX_COLLECTIONS",
 });
 
 /**

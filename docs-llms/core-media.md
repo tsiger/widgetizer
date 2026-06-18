@@ -145,16 +145,30 @@ The system uses centralized configuration for media types and MIME handling on b
 **Frontend** (`src/config.js`):
 - `MEDIA_TYPES` defines allowed file extensions for the upload UI:
   - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
-  - `file`: `.pdf`
+  - `file`: `.pdf`, `.mp3` (accept lists enforced by `uploadValidation.js`)
 
 **Backend** (`server/utils/mimeTypes.js`):
 All server-side MIME definitions live in a single module:
-- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`)
+- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`, `audio/mpeg`, `audio/mp3`)
 - `ZIP_MIME_TYPES` — MIME types for ZIP archive validation (`application/zip`, `application/x-zip-compressed`), used by project import and theme upload
 - `getContentType(ext)` — resolves a file extension (e.g. `".png"`, `".pdf"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
-- `getMediaCategory(mimeType)` — classifies a MIME type into an asset category: returns `"image"` for image MIME types, `"file"` for everything else (currently PDF). Used by `getMediaDir()` to route uploads to the correct subdirectory.
+- `getMediaCategory(mimeType)` — classifies a MIME type into an asset category: returns `"image"` for image MIME types, `"file"` for everything else (currently PDF and MP3 audio). Used by `getMediaDir()` to route uploads to the correct subdirectory.
 
 This ensures consistency across all server code — upload validation, file serving, and export content-type resolution all use the same definitions.
+
+### Audio Files & Range Requests
+
+`.mp3` audio is an accepted upload type. Audio is **not** a separate storage category: `getMediaCategory()` returns `"file"` for any non-image MIME, so audio binaries live under `uploads/files/` alongside PDFs, with `width/height: null` and `sizes: {}` (no variants, no resizing). In the media UI the type filter groups audio under **file** (the `all` / `image` / `file` filter treats everything non-image as "file").
+
+- **Accepted MIME types:** `audio/mpeg` and `audio/mp3` are in `ALLOWED_MIME_TYPES`; the extension map resolves `.mp3 → audio/mpeg`. Front-end upload validation (`uploadValidation.js`) accepts `.mp3` for `file` inputs.
+- **The Arch theme's `audio-player` widget** points each `track` block's `file` setting at an uploaded `.mp3` (with an `image` cover), so audio playback is theme-rendered — there is no core audio widget.
+
+**Byte-range streaming (HTTP 206).** `serveProjectMedia` honours `Range` requests so an `<audio>` / `<video>` element can seek without downloading the whole file:
+
+- Always sends `Accept-Ranges: bytes`.
+- Parses a single `bytes=start-end` range (including the suffix form `bytes=-N` for the final N bytes); an unsatisfiable range returns `416` with `Content-Range: bytes */<size>`.
+- A valid range streams the slice as `206 Partial Content` with `Content-Range: bytes start-end/<size>`; a missing or malformed range streams the full file (`200`).
+- The slice is read through the adapter — `req.adapters.assetStorage.download(scope, key, { start, end })` — so the same handler serves local files (OSS) and ranged object-storage GETs (hosted R2). See [Packages & Adapter Architecture](core-packages.md).
 
 ## 2. Frontend Implementation (`src/pages/Media.jsx`)
 

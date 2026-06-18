@@ -34,7 +34,11 @@
           }
         }
       },
-      "blocksOrder": ["t-eyebrow", "t-heading", "t-text"]
+      "blocksOrder": [
+        "t-eyebrow",
+        "t-heading",
+        "t-text"
+      ]
     },
     "team_grid": {
       "type": "profile-grid",
@@ -59,7 +63,8 @@
             "name": "Elena Marsh",
             "role": "Managing Partner",
             "specialty": "CPA, MBA",
-            "bio": "Elena founded Ledgerworks in 2007 after a decade in mid-market audit. She leads tax and advisory engagements and sets the standard for how every engagement is staffed."
+            "bio": "Elena founded Ledgerworks in 2007 after a decade in mid-market audit. She leads tax and advisory engagements and sets the standard for how every engagement is staffed.",
+            "photo": "/uploads/images/team-elena.webp"
           }
         },
         "p-2": {
@@ -68,7 +73,8 @@
             "name": "Marcus Ochoa",
             "role": "Partner, Tax",
             "specialty": "CPA, EA",
-            "bio": "Marcus runs the tax practice. Enrolled agent, full IRS representation rights, and the person you want in the room if a notice arrives with a number on it."
+            "bio": "Marcus runs the tax practice. Enrolled agent, full IRS representation rights, and the person you want in the room if a notice arrives with a number on it.",
+            "photo": "/uploads/images/team-marcus.webp"
           }
         },
         "p-3": {
@@ -77,7 +83,8 @@
             "name": "Hana Lindqvist",
             "role": "Senior Accountant",
             "specialty": "CPA",
-            "bio": "Hana leads the monthly-close team. QuickBooks ProAdvisor, Xero Certified, and the reason your books are reconciled by the 10th every month."
+            "bio": "Hana leads the monthly-close team. QuickBooks ProAdvisor, Xero Certified, and the reason your books are reconciled by the 10th every month.",
+            "photo": "/uploads/images/team-hana.webp"
           }
         },
         "p-4": {
@@ -86,11 +93,17 @@
             "name": "Jordan Bellamy",
             "role": "Client Services Lead",
             "specialty": "MBA",
-            "bio": "Jordan runs client onboarding, handles the engagement-letter process, and is usually the first person you talk to after a discovery call."
+            "bio": "Jordan runs client onboarding, handles the engagement-letter process, and is usually the first person you talk to after a discovery call.",
+            "photo": "/uploads/images/team-jordan.webp"
           }
         }
       },
-      "blocksOrder": ["p-1", "p-2", "p-3", "p-4"]
+      "blocksOrder": [
+        "p-1",
+        "p-2",
+        "p-3",
+        "p-4"
+      ]
     },
     "team_stats": {
       "type": "key-figures",
@@ -146,7 +159,12 @@
           }
         }
       },
-      "blocksOrder": ["fig-1", "fig-2", "fig-3", "fig-4"]
+      "blocksOrder": [
+        "fig-1",
+        "fig-2",
+        "fig-3",
+        "fig-4"
+      ]
     },
     "firm_history": {
       "type": "timeline",
@@ -195,7 +213,12 @@
           }
         }
       },
-      "blocksOrder": ["hist-1", "hist-2", "hist-3", "hist-4"]
+      "blocksOrder": [
+        "hist-1",
+        "hist-2",
+        "hist-3",
+        "hist-4"
+      ]
     },
     "credentials_reprise": {
       "type": "trust-bar",
@@ -251,7 +274,13 @@
           }
         }
       },
-      "blocksOrder": ["c-1", "c-2", "c-3", "c-4", "c-5"]
+      "blocksOrder": [
+        "c-1",
+        "c-2",
+        "c-3",
+        "c-4",
+        "c-5"
+      ]
     },
     "team_cta": {
       "type": "action-bar",
@@ -284,18 +313,30 @@
             "link": {
               "text": "Book a call",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["tc-heading", "tc-text", "tc-button"]
+      "blocksOrder": [
+        "tc-heading",
+        "tc-text",
+        "tc-button"
+      ]
     }
   },
-  "widgetsOrder": ["team_intro", "team_grid", "team_stats", "firm_history", "credentials_reprise", "team_cta"],
+  "widgetsOrder": [
+    "team_intro",
+    "team_grid",
+    "team_stats",
+    "firm_history",
+    "credentials_reprise",
+    "team_cta"
+  ],
   "id": "team",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T08:03:30.095Z",
+  "updated": "2026-04-20T08:53:55.210Z"
 }

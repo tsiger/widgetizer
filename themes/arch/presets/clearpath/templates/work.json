@@ -38,7 +38,11 @@
           }
         }
       },
-      "blocksOrder": ["intro-eyebrow", "intro-heading", "intro-body"]
+      "blocksOrder": [
+        "intro-eyebrow",
+        "intro-heading",
+        "intro-body"
+      ]
     },
     "case_ops": {
       "type": "image-text",
@@ -46,7 +50,8 @@
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/work-case-1.webp"
       },
       "blocks": {
         "eyebrow": {
@@ -75,7 +80,11 @@
           }
         }
       },
-      "blocksOrder": ["eyebrow", "heading", "body"]
+      "blocksOrder": [
+        "eyebrow",
+        "heading",
+        "body"
+      ]
     },
     "case_product": {
       "type": "image-text",
@@ -83,7 +92,8 @@
         "image_position": "end",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard-secondary"
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/work-case-2.webp"
       },
       "blocks": {
         "eyebrow": {
@@ -112,7 +122,11 @@
           }
         }
       },
-      "blocksOrder": ["eyebrow", "heading", "body"]
+      "blocksOrder": [
+        "eyebrow",
+        "heading",
+        "body"
+      ]
     },
     "case_services": {
       "type": "image-text",
@@ -120,7 +134,8 @@
         "image_position": "start",
         "text_position": "center",
         "content_color_scheme": "none",
-        "color_scheme": "standard-primary"
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/work-case-3.webp"
       },
       "blocks": {
         "eyebrow": {
@@ -149,7 +164,11 @@
           }
         }
       },
-      "blocksOrder": ["eyebrow", "heading", "body"]
+      "blocksOrder": [
+        "eyebrow",
+        "heading",
+        "body"
+      ]
     },
     "full_logos": {
       "type": "logo-cloud",
@@ -168,21 +187,78 @@
         "bottom_spacing": "auto"
       },
       "blocks": {
-        "logo-1": { "type": "logo", "settings": { "name": "Northwind Operations" } },
-        "logo-2": { "type": "logo", "settings": { "name": "Halverson Group" } },
-        "logo-3": { "type": "logo", "settings": { "name": "Fieldstone & Co." } },
-        "logo-4": { "type": "logo", "settings": { "name": "Mercer Logistics" } },
-        "logo-5": { "type": "logo", "settings": { "name": "Atlas Products" } },
-        "logo-6": { "type": "logo", "settings": { "name": "Yardstick Retail" } },
-        "logo-7": { "type": "logo", "settings": { "name": "Penrose Studio" } },
-        "logo-8": { "type": "logo", "settings": { "name": "Brookline Labs" } }
+        "logo-1": {
+          "type": "logo",
+          "settings": {
+            "name": "Northwind Operations",
+            "image": "/uploads/images/logo1.png"
+          }
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {
+            "name": "Halverson Group",
+            "image": "/uploads/images/logo2.png"
+          }
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {
+            "name": "Fieldstone & Co.",
+            "image": "/uploads/images/logo3.png"
+          }
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {
+            "name": "Mercer Logistics",
+            "image": "/uploads/images/logo4.png"
+          }
+        },
+        "logo-5": {
+          "type": "logo",
+          "settings": {
+            "name": "Atlas Products",
+            "image": "/uploads/images/logo5.png"
+          }
+        },
+        "logo-6": {
+          "type": "logo",
+          "settings": {
+            "name": "Yardstick Retail",
+            "image": "/uploads/images/logo6.png"
+          }
+        },
+        "logo-7": {
+          "type": "logo",
+          "settings": {
+            "name": "Penrose Studio",
+            "image": "/uploads/images/logo7.png"
+          }
+        },
+        "logo-8": {
+          "type": "logo",
+          "settings": {
+            "name": "Brookline Labs",
+            "image": "/uploads/images/logo8.png"
+          }
+        }
       },
-      "blocksOrder": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5", "logo-6", "logo-7", "logo-8"]
+      "blocksOrder": [
+        "logo-1",
+        "logo-2",
+        "logo-3",
+        "logo-4",
+        "logo-5",
+        "logo-6",
+        "logo-7",
+        "logo-8"
+      ]
     },
     "closing": {
       "type": "banner",
       "settings": {
-        "height": "small",
+        "height": "auto",
         "fullwidth": true,
         "content_width": "medium",
         "alignment": "center",
@@ -212,18 +288,30 @@
             "link": {
               "text": "Start a conversation",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["close-heading", "close-body", "close-button"]
+      "blocksOrder": [
+        "close-heading",
+        "close-body",
+        "close-button"
+      ]
     }
   },
-  "widgetsOrder": ["intro", "case_ops", "case_product", "case_services", "full_logos", "closing"],
+  "widgetsOrder": [
+    "intro",
+    "case_ops",
+    "case_product",
+    "case_services",
+    "full_logos",
+    "closing"
+  ],
   "id": "work",
-  "created": "2026-04-22T10:00:00.000Z",
-  "updated": "2026-04-22T10:00:00.000Z"
+  "created": "2026-04-22T18:20:05.358Z",
+  "updated": "2026-04-23T08:34:39.357Z"
 }

@@ -94,9 +94,9 @@
                   {% if block.settings.title != blank %}
                     <{{ item_heading_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                   {% endif %}
-                  {% if block.settings.description != blank %}
+                  {% unless block.settings.description | rte_blank %}
                     <div class="w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
-                  {% endif %}
+                  {% endunless %}
                 </div>
               </li>
             {% endfor %}
@@ -117,9 +117,9 @@
                 {% if block.settings.title != blank %}
                   <{{ item_heading_level }} class="w-title t-xl" data-setting="title">{{ block.settings.title }}</{{ item_heading_level }}>
                 {% endif %}
-                {% if block.settings.description != blank %}
+                {% unless block.settings.description | rte_blank %}
                   <div class="w-body w-rte t-sm" data-setting="description">{{ block.settings.description | raw }}</div>
-                {% endif %}
+                {% endunless %}
               </div>
             </li>
           {% endfor %}

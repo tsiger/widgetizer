@@ -8,12 +8,18 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Get a quote",
-      "target": "_self"
+      "target": "_self",
+      "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
-  }
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/sparkhaus.png",
+    "logoMaxWidth": 160,
+    "transparent_logo": "/uploads/images/sparkhauslight.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
 }

@@ -6,6 +6,7 @@ import {
   TextareaInput,
   CodeInput,
   ColorInput,
+  DateInput,
   RangeInput,
   RichTextInput,
   SelectInput,
@@ -13,8 +14,10 @@ import {
   RadioInput,
   FileInput,
   FontPickerInput,
+  GalleryInput,
   MenuSelectInput,
   ImageInput,
+  TableInput,
   LinkInput,
   YouTubeInput,
   IconInput,
@@ -28,7 +31,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
 
-  const { type, id, label, description, options, min, max, step, unit, allow_alpha, language, size, compact } =
+  const { type, id, label, description, required, options, min, max, step, unit, allow_alpha, language, size, compact, layout } =
     setting || {};
 
   // Translate options (select/radio) via theme locale
@@ -77,10 +80,21 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
         return <TextInput {...inputProps} />;
       case "number":
         return <TextInput {...inputProps} type="number" />;
+      case "date":
+        return <DateInput {...inputProps} />;
       case "textarea":
         return <TextareaInput {...inputProps} />;
       case "richtext":
-        return <RichTextInput {...inputProps} placeholder={setting.placeholder} allowSource={setting.allow_source} />;
+        return (
+          <RichTextInput
+            {...inputProps}
+            placeholder={setting.placeholder}
+            allowSource={setting.allow_source}
+            allowHeadings={setting.allow_headings}
+            allowImages={setting.allow_images}
+            minHeight={setting.min_height}
+          />
+        );
       case "code":
         return <CodeInput {...inputProps} language={language || "html"} rows={setting.rows || 10} allowExpand={allowExpand} resizable={resizable} />;
       case "color":
@@ -101,8 +115,14 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
       case "image": {
         // `size` replaces legacy `compact` for image width; prefer `size` when both exist
         const imageSize = size || (compact ? "narrow" : "full");
-        return <ImageInput {...inputProps} size={imageSize} />;
+        // `layout` ("stacked" default | "row") drives the editor's input shape — a big
+        // full-width preview vs. a compact thumbnail with the controls beside it.
+        return <ImageInput {...inputProps} size={imageSize} layout={layout} framed={layout === "row"} />;
       }
+      case "gallery":
+        return <GalleryInput {...inputProps} />;
+      case "table":
+        return <TableInput {...inputProps} columns={setting.columns} />;
       case "file":
         return <FileInput {...inputProps} />;
       case "link":
@@ -127,7 +147,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
 
   return (
     <div className={`setting-type-${type}`}>
-      <SettingsField id={id} label={displayLabel} description={translatedDescription} error={error} type={type}>
+      <SettingsField id={id} label={displayLabel} description={translatedDescription} error={error} type={type} required={required}>
         {renderInput()}
       </SettingsField>
     </div>

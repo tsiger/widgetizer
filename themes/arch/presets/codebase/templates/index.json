@@ -8,7 +8,8 @@
         "image_position": "end",
         "color_scheme": "standard-secondary",
         "top_spacing": "none",
-        "bottom_spacing": "none"
+        "bottom_spacing": "none",
+        "image": "/uploads/images/home-hero.webp"
       },
       "blocks": {
         "hero-eyebrow": {
@@ -40,20 +41,27 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "style": "primary",
             "link_2": {
               "text": "See our work",
               "href": "work.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
     },
     "clients": {
       "type": "logo-cloud",
@@ -72,16 +80,57 @@
         "bottom_spacing": "small"
       },
       "blocks": {
-        "l-1": { "type": "logo", "settings": { "name": "Northlight" } },
-        "l-2": { "type": "logo", "settings": { "name": "Quanta" } },
-        "l-3": { "type": "logo", "settings": { "name": "Fieldwork" } },
-        "l-4": { "type": "logo", "settings": { "name": "Arbor" } },
-        "l-5": { "type": "logo", "settings": { "name": "Cartograph" } },
-        "l-6": { "type": "logo", "settings": { "name": "Parallel" } },
-        "l-7": { "type": "logo", "settings": { "name": "Halcyon" } },
-        "l-8": { "type": "logo", "settings": { "name": "Steppe" } }
+        "l-1": {
+          "type": "logo",
+          "settings": {
+            "name": "Northlight",
+            "image": "/uploads/images/logo01.png"
+          }
+        },
+        "l-2": {
+          "type": "logo",
+          "settings": {
+            "name": "Quanta",
+            "image": "/uploads/images/logo02.png"
+          }
+        },
+        "l-3": {
+          "type": "logo",
+          "settings": {
+            "name": "Fieldwork",
+            "image": "/uploads/images/logo03.png"
+          }
+        },
+        "l-4": {
+          "type": "logo",
+          "settings": {
+            "name": "Arbor",
+            "image": "/uploads/images/logo04.png"
+          }
+        },
+        "l-5": {
+          "type": "logo",
+          "settings": {
+            "name": "Cartograph",
+            "image": "/uploads/images/logo05.png"
+          }
+        },
+        "l-6": {
+          "type": "logo",
+          "settings": {
+            "name": "Parallel",
+            "image": "/uploads/images/logo06.png"
+          }
+        }
       },
-      "blocksOrder": ["l-1", "l-2", "l-3", "l-4", "l-5", "l-6", "l-7", "l-8"]
+      "blocksOrder": [
+        "l-1",
+        "l-2",
+        "l-3",
+        "l-4",
+        "l-5",
+        "l-6"
+      ]
     },
     "how_we_work": {
       "type": "image-text",
@@ -91,7 +140,8 @@
         "content_color_scheme": "none",
         "color_scheme": "standard-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/home-approach.webp"
       },
       "blocks": {
         "hw-eyebrow": {
@@ -123,14 +173,20 @@
             "link": {
               "text": "Meet the team",
               "href": "team.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "3ee4f9dc-0fc8-4c3d-ac09-c16f764d892b"
             },
             "style": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["hw-eyebrow", "hw-heading", "hw-text", "hw-button"]
+      "blocksOrder": [
+        "hw-eyebrow",
+        "hw-heading",
+        "hw-text",
+        "hw-button"
+      ]
     },
     "featured_work": {
       "type": "project-showcase",
@@ -156,8 +212,10 @@
             "description": "A reporting platform for a Series B analytics company. React, TypeScript, ClickHouse. Shipped in 14 weeks.",
             "link": {
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+            },
+            "image": "/uploads/images/work-07-1.webp"
           }
         },
         "p-2": {
@@ -167,8 +225,10 @@
             "description": "Rebuilt the onboarding for a growth-stage SaaS. Activation up 38% in the first quarter. Next.js, Postgres, Stripe.",
             "link": {
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+            },
+            "image": "/uploads/images/work-06-1.webp"
           }
         },
         "p-3": {
@@ -178,8 +238,10 @@
             "description": "A durable, offline-first PWA for technicians in the field. React, IndexedDB, Rust-powered sync layer.",
             "link": {
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+            },
+            "image": "/uploads/images/work-03-1.webp"
           }
         },
         "p-4": {
@@ -189,12 +251,19 @@
             "description": "A shared component library and documentation platform for a thirty-person product team.",
             "link": {
               "href": "work.html",
-              "target": "_self"
-            }
+              "target": "_self",
+              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+            },
+            "image": "/uploads/images/work-02-1.webp"
           }
         }
       },
-      "blocksOrder": ["p-1", "p-2", "p-3", "p-4"]
+      "blocksOrder": [
+        "p-1",
+        "p-2",
+        "p-3",
+        "p-4"
+      ]
     },
     "big_quote": {
       "type": "testimonial-hero",
@@ -202,7 +271,9 @@
         "image_position": "end",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "logo": "/uploads/images/sample.png",
+        "author_image": "/uploads/images/home-testimonial.webp"
       },
       "blocks": {
         "bq-label": {
@@ -230,7 +301,11 @@
           }
         }
       },
-      "blocksOrder": ["bq-label", "bq-heading", "bq-attrib"]
+      "blocksOrder": [
+        "bq-label",
+        "bq-heading",
+        "bq-attrib"
+      ]
     },
     "services_tease": {
       "type": "icon-card-grid",
@@ -244,10 +319,10 @@
         "columns_desktop": 4,
         "card_layout": "flat",
         "alignment": "start",
-        "icon_style": "outline",
-        "icon_size": "lg",
+        "icon_style": "plain",
+        "icon_size": "xl",
         "icon_shape": "sharp",
-        "color_scheme": "standard-primary",
+        "color_scheme": "standard-secondary",
         "top_spacing": "auto",
         "bottom_spacing": "auto"
       },
@@ -285,7 +360,12 @@
           }
         }
       },
-      "blocksOrder": ["s-1", "s-2", "s-3", "s-4"]
+      "blocksOrder": [
+        "s-1",
+        "s-2",
+        "s-3",
+        "s-4"
+      ]
     },
     "process": {
       "type": "steps",
@@ -329,7 +409,12 @@
           }
         }
       },
-      "blocksOrder": ["st-1", "st-2", "st-3", "st-4"]
+      "blocksOrder": [
+        "st-1",
+        "st-2",
+        "st-3",
+        "st-4"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -362,14 +447,19 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
             },
             "style": "primary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -383,6 +473,6 @@
     "closing_cta"
   ],
   "id": "index",
-  "created": "2026-04-20T10:00:00.000Z",
-  "updated": "2026-04-20T10:00:00.000Z"
+  "created": "2026-04-20T11:33:30.986Z",
+  "updated": "2026-04-20T13:02:23.226Z"
 }

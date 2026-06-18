@@ -1,9 +1,11 @@
+{%- assign copyright_html = widget.settings.copyright | default: '' -%}
+{%- assign copyright_text = copyright_html | rte_text -%}
 <footer
   id="{{ widget.id }}"
   class="widget widget-footer widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}"
   data-widget-id="{{ widget.id }}"
   data-widget-type="footer"
-  style="{% unless widget.settings.color_scheme == 'standard-primary' %}--widget-bg-color: var(--bg-primary);{% endunless %}{% if widget.settings.copyright == blank %} padding-block: 8rem;{% endif %}"
+  style="{% unless widget.settings.color_scheme == 'standard-primary' %}--widget-bg-color: var(--bg-primary);{% endunless %}{% if copyright_text == blank %} padding-block: 8rem;{% endif %}"
 >
   {% if widget.settings.layout != 'equal' %}
   <style>
@@ -32,17 +34,17 @@
             {% elsif block.settings.logo_text != blank %}
               <span class="footer-logo-text w-title t-xl t-heading-font" data-setting="logo_text">{{ block.settings.logo_text }}</span>
             {% endif %}
-            {% if block.settings.text != blank %}
+            {% unless block.settings.text | rte_blank %}
               <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
-            {% endif %}
+            {% endunless %}
 
           {% when 'text_block' %}
             {% if block.settings.title != blank %}
               <h3 class="w-title t-lg" data-setting="title">{{ block.settings.title }}</h3>
             {% endif %}
-            {% if block.settings.text != blank %}
+            {% unless block.settings.text | rte_blank %}
               <div class="w-body w-rte t-sm" data-setting="text">{{ block.settings.text | raw }}</div>
-            {% endif %}
+            {% endunless %}
 
           {% when 'menu_block' %}
             {% if block.settings.title != blank %}
@@ -100,9 +102,9 @@
       {% endfor %}
     </div>
 
-    {% if widget.settings.copyright != blank %}
+    {% if copyright_text != blank %}
       <div class="footer-copyright w-rte" data-setting="copyright">
-        {{ widget.settings.copyright | raw }}
+        {{ copyright_html | raw }}
       </div>
     {% endif %}
   </div>

@@ -26,9 +26,19 @@ export function getStandalonePreviewTarget(href) {
     return `/preview/${htmlMatch[1]}`;
   }
 
+  // Nested collection item URLs (e.g. "rooms/suite-caldera.html") route to the
+  // item preview keyed by slugPrefix; the route resolves prefix -> type.
+  const itemMatch = withoutQuery.match(/^\/?([^/]+)\/([^/]+)\.html$/);
+  if (itemMatch) {
+    return `/preview/collection/${itemMatch[1]}/${itemMatch[2]}`;
+  }
+
   return null;
 }
 
 export function isStandalonePreviewNavigationUrl(url) {
-  return typeof url === "string" && /^\/preview\/[^/?#]+$/.test(url);
+  // Accept flat page routes (/preview/about) and nested collection item routes
+  // (/preview/collection/rooms/suite-caldera). Query strings and hashes are still
+  // rejected.
+  return typeof url === "string" && /^\/preview\/(?:[^/?#]+|collection\/[^/?#]+\/[^/?#]+)$/.test(url);
 }

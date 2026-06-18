@@ -1,0 +1,161 @@
+{
+  "type": "news-grid",
+  "displayName": "tTheme:news_grid.name",
+  "aliases": ["blog", "articles", "latest news", "posts", "news", "press"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "tTheme:global.widgets.settings.eyebrow.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "eyebrow_uppercase",
+      "label": "tTheme:global.widgets.settings.eyebrow_uppercase.label",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "tTheme:global.widgets.settings.title.label",
+      "default": "Latest News"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "tTheme:global.widgets.settings.description.label",
+      "default": "Updates, articles and announcements."
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "tTheme:global.widgets.settings.alignment.label",
+      "default": "center",
+      "options": [
+        { "value": "start", "label": "tTheme:global.widgets.settings.alignment.options.start" },
+        { "value": "center", "label": "tTheme:global.widgets.settings.alignment.options.center" }
+      ]
+    },
+    {
+      "type": "link",
+      "id": "view_all_link",
+      "label": "tTheme:news_grid.settings.view_all_link.label",
+      "default": { "text": "View all news", "href": "", "target": "_self" }
+    },
+    {
+      "type": "header",
+      "id": "display_header",
+      "label": "tTheme:global.widgets.settings.display_header.label"
+    },
+    {
+      "type": "number",
+      "id": "limit",
+      "label": "tTheme:news_grid.settings.limit.label",
+      "description": "tTheme:news_grid.settings.limit.description",
+      "default": 3,
+      "min": 0
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "label": "tTheme:news_grid.settings.sort.label",
+      "default": "date_desc",
+      "options": [
+        { "value": "date_desc", "label": "tTheme:news_grid.settings.sort.options.date_desc" },
+        { "value": "date_asc", "label": "tTheme:news_grid.settings.sort.options.date_asc" },
+        { "value": "title_asc", "label": "tTheme:news_grid.settings.sort.options.title_asc" },
+        { "value": "title_desc", "label": "tTheme:news_grid.settings.sort.options.title_desc" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "tTheme:global.widgets.settings.columns_desktop.label",
+      "default": 3,
+      "min": 2,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "header",
+      "id": "cards_header",
+      "label": "tTheme:global.widgets.settings.cards_header.label"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "tTheme:global.widgets.settings.aspect_ratio.label",
+      "default": "16 / 9",
+      "options": [
+        { "value": "auto", "label": "tTheme:global.widgets.settings.aspect_ratio.options.auto" },
+        { "value": "1 / 1", "label": "tTheme:global.widgets.settings.aspect_ratio.options.1 / 1" },
+        { "value": "4 / 3", "label": "tTheme:global.widgets.settings.aspect_ratio.options.4 / 3" },
+        { "value": "3 / 2", "label": "tTheme:global.widgets.settings.aspect_ratio.options.3 / 2" },
+        { "value": "16 / 9", "label": "tTheme:global.widgets.settings.aspect_ratio.options.16 / 9" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "tTheme:news_grid.settings.show_image.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "tTheme:news_grid.settings.show_date.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "tTheme:news_grid.settings.show_excerpt.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_read_more",
+      "label": "tTheme:news_grid.settings.show_read_more.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "id": "appearance_header",
+      "label": "tTheme:global.widgets.settings.appearance_header.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "tTheme:global.widgets.settings.color_scheme.label",
+      "default": "standard-primary",
+      "options": [
+        { "value": "standard-primary", "label": "tTheme:global.widgets.settings.color_scheme.options.standard_primary" },
+        { "value": "standard-secondary", "label": "tTheme:global.widgets.settings.color_scheme.options.standard_secondary" },
+        { "value": "highlight-primary", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_primary" },
+        { "value": "highlight-secondary", "label": "tTheme:global.widgets.settings.color_scheme.options.highlight_secondary" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "label": "tTheme:global.widgets.settings.top_spacing.label",
+      "default": "auto",
+      "options": [
+        { "value": "auto", "label": "tTheme:global.widgets.settings.top_spacing.options.auto" },
+        { "value": "small", "label": "tTheme:global.widgets.settings.top_spacing.options.small" },
+        { "value": "none", "label": "tTheme:global.widgets.settings.top_spacing.options.none" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bottom_spacing",
+      "label": "tTheme:global.widgets.settings.bottom_spacing.label",
+      "default": "auto",
+      "options": [
+        { "value": "auto", "label": "tTheme:global.widgets.settings.bottom_spacing.options.auto" },
+        { "value": "small", "label": "tTheme:global.widgets.settings.bottom_spacing.options.small" },
+        { "value": "none", "label": "tTheme:global.widgets.settings.bottom_spacing.options.none" }
+      ]
+    }
+  ]
+}

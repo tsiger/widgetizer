@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectPagesDir, getProjectThemeJsonPath } from "../config.js";
+import { getProjectPagesDir, getProjectThemeJsonPath, getProjectDir } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
@@ -128,16 +128,13 @@ function extractMediaPathsFromThemeSettings(themeData) {
   const globalSettings = themeData?.settings?.global;
   if (!globalSettings || typeof globalSettings !== "object") return Array.from(mediaPaths);
 
-  function addIfMediaPath(value) {
-    const normalized = normalizeMediaPath(value);
-    if (normalized) mediaPaths.add(normalized);
-  }
-
   Object.values(globalSettings).forEach((items) => {
     if (!Array.isArray(items)) return;
     items.forEach((item) => {
-      if (item.value !== undefined) addIfMediaPath(item.value);
-      else if (item.default !== undefined && typeof item.default === "string") addIfMediaPath(item.default);
+      // Walk the live value (falling back to the schema default), recursing into
+      // arrays/objects via collectMediaPaths so a gallery setting's entry srcs are
+      // tracked exactly like page/global/collection settings already are.
+      collectMediaPaths(item.value !== undefined ? item.value : item.default, mediaPaths);
     });
   });
 
@@ -280,6 +277,79 @@ export async function syncPageMediaUsageOnDelete(projectId, pageId) {
   return removePageFromMediaUsage(projectId, pageId);
 }
 
+// ============================================================================
+// Collection items (spec Section 8) — source string `collection:{type}/{slug}`.
+// Media usage is SQLite metadata keyed by projectId (mediaRepo), exactly like
+// pages/globals — NOT scope/storage. Callers pass scope.projectId.
+// ============================================================================
+
+/** Build the media-usage source string for a collection item. */
+function collectionSource(collectionType, itemSlug) {
+  return `collection:${collectionType}/${itemSlug}`;
+}
+
+/**
+ * Extract tracked upload paths from a collection item's settings (recurses into
+ * nested objects/arrays like link settings) plus its SEO social image. Mirrors
+ * page/global extraction.
+ * @param {object} itemData - raw collection item ({ settings, seo })
+ * @returns {string[]} unique media paths
+ */
+export function extractMediaPathsFromCollectionItem(itemData) {
+  const mediaPaths = new Set();
+  if (itemData?.settings && typeof itemData.settings === "object") {
+    Object.values(itemData.settings).forEach((value) => collectMediaPaths(value, mediaPaths));
+  }
+  // SEO social image (Finding #12 — parity with page media tracking).
+  if (itemData?.seo?.og_image && typeof itemData.seo.og_image === "string") {
+    const normalized = normalizeMediaPath(itemData.seo.og_image);
+    if (normalized) mediaPaths.add(normalized);
+  }
+  return Array.from(mediaPaths);
+}
+
+/** Full usage refresh for one collection item under `collection:{type}/{slug}`. */
+export async function updateCollectionItemMediaUsage(projectId, collectionType, itemSlug, itemData) {
+  try {
+    const mediaPaths = extractMediaPathsFromCollectionItem(itemData);
+    const mediaData = await readMediaFile(projectId);
+    const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
+    mediaRepo.updateMediaUsageForSource(projectId, collectionSource(collectionType, itemSlug), matchedFileIds);
+    return { success: true, mediaPaths };
+  } catch (error) {
+    console.error(`Error updating collection item media usage (${collectionType}/${itemSlug}):`, error);
+    throw error;
+  }
+}
+
+/** Remove one collection item's source from media usage entirely. */
+export async function removeCollectionItemFromMediaUsage(projectId, collectionType, itemSlug) {
+  try {
+    mediaRepo.updateMediaUsageForSource(projectId, collectionSource(collectionType, itemSlug), []);
+    return { success: true };
+  } catch (error) {
+    console.error(`Error removing collection item from media usage (${collectionType}/${itemSlug}):`, error);
+    throw error;
+  }
+}
+
+/**
+ * Keep collection-item media usage in sync after a write. On rename
+ * (previousItemSlug !== itemSlug) the old source is removed first.
+ */
+export async function syncCollectionItemMediaUsageOnWrite(
+  projectId,
+  collectionType,
+  itemSlug,
+  itemData,
+  previousItemSlug = null,
+) {
+  if (previousItemSlug && previousItemSlug !== itemSlug) {
+    await removeCollectionItemFromMediaUsage(projectId, collectionType, previousItemSlug);
+  }
+  return updateCollectionItemMediaUsage(projectId, collectionType, itemSlug, itemData);
+}
+
 /**
  * Get usage information for a specific media file.
  * @param {string} projectId - The project's UUID
@@ -398,6 +468,39 @@ export async function refreshAllMediaUsage(projectId) {
       }
     }
 
+    // Also scan collection items (collections/<type>/<slug>.json). This is the
+    // safety-net full rescan; it reads via fs like the page/global/theme scans
+    // above (the OSS refresh path is adapter-agnostic). The collection type comes
+    // from a directory entry under the per-tenant project root — not request
+    // input — and is only ever re-joined under that same root.
+    let collectionItemCount = 0;
+    const collectionsDir = path.join(getProjectDir(projectFolderName), "collections");
+    if (await fs.pathExists(collectionsDir)) {
+      const typeEntries = await fs.readdir(collectionsDir, { withFileTypes: true });
+      for (const typeEntry of typeEntries) {
+        if (!typeEntry.isDirectory()) continue;
+        const collectionType = typeEntry.name;
+        const typeDir = path.join(collectionsDir, collectionType);
+        const itemNames = (await fs.readdir(typeDir)).filter((n) => n.endsWith(".json") && n !== "_order.json");
+        for (const itemName of itemNames) {
+          const itemSlug = itemName.replace(".json", "");
+          try {
+            const itemData = JSON.parse(await fs.readFile(path.join(typeDir, itemName), "utf8"));
+            addUsageForPaths(
+              extractMediaPathsFromCollectionItem(itemData),
+              collectionSource(collectionType, itemSlug),
+            );
+            collectionItemCount++;
+          } catch (error) {
+            console.warn(
+              `Error processing collection item ${collectionType}/${itemSlug} for media usage:`,
+              error.message,
+            );
+          }
+        }
+      }
+    }
+
     // Convert Sets to arrays and write via replaceMediaUsage (only touches media_usage table)
     const finalUsageMap = new Map();
     for (const [fileId, usageSet] of usageMap) {
@@ -407,7 +510,7 @@ export async function refreshAllMediaUsage(projectId) {
 
     return {
       success: true,
-      message: `Refreshed usage tracking for ${pageFiles.length} pages, global widgets, and theme settings`,
+      message: `Refreshed usage tracking for ${pageFiles.length} pages, ${collectionItemCount} collection items, global widgets, and theme settings`,
     };
   } catch (error) {
     console.error("Error refreshing media usage:", error);

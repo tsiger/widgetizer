@@ -5,7 +5,13 @@ import { getProjectDir, getPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "
 import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
-import { renderWidget, renderPageLayout, widgetSupportsTransparentHeader } from "../services/renderingService.js";
+import { renderWidget, renderPageLayout, renderCollectionItemPage, widgetSupportsTransparentHeader } from "../services/renderingService.js";
+import {
+  listCollectionSchemas,
+  listCollectionItems,
+  loadCollectionTemplate,
+  loadCollectionItemsByUuid,
+} from "../services/collectionService.js";
 import { readProjectThemeData } from "./themeController.js";
 import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -41,6 +47,22 @@ async function getAppVersion() {
 function resolveOutputDir(outputDir) {
   if (!outputDir) return null;
   return path.join(getPublishDir(), path.basename(outputDir));
+}
+
+// Recursively sum the byte size of every file under a directory. Cheap for the
+// small static sites this targets; used to surface an export's total size.
+async function getDirectorySize(dirPath) {
+  let total = 0;
+  const entries = await fs.readdir(dirPath, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      total += await getDirectorySize(full);
+    } else if (entry.isFile()) {
+      total += (await fs.stat(full)).size;
+    }
+  }
+  return total;
 }
 
 // Helper function to record an export and trim old versions
@@ -128,7 +150,7 @@ export async function cleanupProjectExports(projectId) {
  * @param {boolean} [options.exportMarkdown=false] - Also export pages as markdown
  * @returns {Promise<{outputDir: string, version: number, exportDirName: string, exportRecord: object}>}
  */
-export async function exportProjectToDir(projectId, options = {}) {
+export async function exportProjectToDir(projectId, options = {}, collectionDeps = null) {
   const { exportMarkdown = false } = options;
 
   if (!projectId) {
@@ -152,19 +174,18 @@ export async function exportProjectToDir(projectId, options = {}) {
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images");
 
-    // Ensure output directories exist
-    await fs.ensureDir(outputDir);
-    await fs.ensureDir(outputAssetsDir);
-    await fs.ensureDir(outputImagesDir);
+    // The scope-aware collection capability (storage adapter + scope) the export
+    // route supplies; absent for legacy/test callers → no collections enumerated.
+    const collectionStorage = collectionDeps?.storage || null;
+    const collectionScope = collectionDeps?.scope || null;
+    const collectionsEnabled = !!(collectionStorage && collectionScope);
+
+    // --- Read-only setup + ALL fail-fast validation BEFORE any disk write, so a
+    // blocked export (missing homepage / invalid collection items / missing
+    // template) leaves no output directory, favicon, or manifest behind. Nothing
+    // below touches disk until the "validation passed" marker. ---
     const rawThemeSettings = await readProjectThemeData(projectId);
     const processedThemeSettings = preprocessThemeSettings(rawThemeSettings);
-    const generatedSiteIcons = await generateExportSiteIcons({
-      outputDir,
-      projectDir,
-      projectName: projectData.name,
-      siteTitle: projectData.siteTitle,
-      siteIconSrc: processedThemeSettings?.general?.favicon || "",
-    });
 
     // Fetch list of page data using the helper function
     const pagesDataArray = await listProjectPagesData(projectFolderName);
@@ -179,14 +200,75 @@ export async function exportProjectToDir(projectId, options = {}) {
       throw err;
     }
 
-    // --- Generate sitemap.xml and robots.txt (shared pure builders) ---
+    // Two-pass collection validation (fail-fast): gather every invalid item across
+    // all collections up front and refuse the export with a full per-item-per-field
+    // error list. Also preflight templates. No HTML is written when this trips.
+    // `manifestCollections` (every collection) feeds manifest.json; `itemPagesForSeo`
+    // (valid items of hasItemPages collections, in listing order) feeds sitemap/robots
+    // and the item-page render loop.
+    const collectionSchemas = collectionsEnabled ? await listCollectionSchemas(collectionStorage, collectionScope) : [];
+    const manifestCollections = [];
+    const itemPagesForSeo = [];
+    const invalidCollectionItems = [];
+    const missingTemplates = [];
+    for (const schema of collectionSchemas) {
+      const items = await listCollectionItems(collectionStorage, collectionScope, schema.type);
+      manifestCollections.push({ type: schema.type, itemPages: !!schema.hasItemPages, itemCount: items.length });
+      for (const item of items) {
+        if (item.invalid) {
+          invalidCollectionItems.push({ collection: schema.type, slug: item.slug, errors: item.validationErrors });
+        }
+      }
+      if (schema.hasItemPages) {
+        const validItems = items.filter((item) => !item.invalid);
+        itemPagesForSeo.push({ slugPrefix: schema.slugPrefix, items: validItems });
+        // A hasItemPages collection with renderable items but no template.liquid
+        // must fail BEFORE any disk write, not midway with partial artifacts.
+        if (validItems.length > 0) {
+          const template = await loadCollectionTemplate(collectionStorage, collectionScope, schema.type);
+          if (template === null) missingTemplates.push(schema.type);
+        }
+      }
+    }
+    if (invalidCollectionItems.length > 0) {
+      const err = new Error(
+        `Export blocked: ${invalidCollectionItems.length} collection item(s) have validation errors. Fix them before exporting.`,
+      );
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: invalid collection items";
+      err.validationErrors = invalidCollectionItems;
+      throw err;
+    }
+    if (missingTemplates.length > 0) {
+      const err = new Error(
+        `Export blocked: collection(s) ${missingTemplates.join(", ")} have hasItemPages: true with renderable items but no template.liquid. Add the template before exporting.`,
+      );
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: missing collection template";
+      throw err;
+    }
+
+    // --- Validation passed: from here on, disk writes are safe ---
+    await fs.ensureDir(outputDir);
+    await fs.ensureDir(outputAssetsDir);
+    await fs.ensureDir(outputImagesDir);
+    const generatedSiteIcons = await generateExportSiteIcons({
+      outputDir,
+      projectDir,
+      projectName: projectData.name,
+      siteTitle: projectData.siteTitle,
+      siteIconSrc: processedThemeSettings?.general?.favicon || "",
+    });
+
+    // --- Generate sitemap.xml and robots.txt (shared pure builders; collection
+    // item pages included via itemPagesForSeo) ---
     if (siteUrl && siteUrl.trim() !== "") {
       try {
-        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl);
+        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo);
         if (sitemapXml) {
           await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapXml);
         }
-        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl);
+        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo);
         if (robotsTxt) {
           await fs.writeFile(path.join(outputDir, "robots.txt"), robotsTxt);
         }
@@ -246,7 +328,7 @@ export async function exportProjectToDir(projectId, options = {}) {
 
       // Render header if exists (for each page to capture enqueued assets)
       if (headerData) {
-        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null);
+        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, collectionDeps);
       }
 
       // Render page-specific widgets sequentially
@@ -272,13 +354,14 @@ export async function exportProjectToDir(projectId, options = {}) {
             "publish",
             sharedGlobals,
             widgetIndex,
+            collectionDeps,
           );
         }
       }
 
       // Render footer if exists
       if (footerData) {
-        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null);
+        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, collectionDeps);
       }
 
       // Determine if transparent header should be active for this page
@@ -305,6 +388,7 @@ export async function exportProjectToDir(projectId, options = {}) {
         rawThemeSettings,
         "publish",
         sharedGlobals,
+        collectionDeps,
       );
 
       // Format HTML using Prettier
@@ -398,6 +482,164 @@ Per aspera ad astra
           await fs.outputFile(path.join(outputDir, mdFilename), frontmatter + markdownContent);
         } catch (mdError) {
           console.warn(`Could not generate markdown for ${pageData.id}: ${mdError.message}`);
+        }
+      }
+    }
+
+    // --- Render collection item pages (spec Section 13) ---
+    // For each hasItemPages collection, render every valid item to
+    // {slugPrefix}/{itemSlug}.html with fresh per-item globals (no asset bleed),
+    // the full header/footer/layout wrap, and the same HTML post-processing pages
+    // receive — at outputPathPrefix "../" since items live one dir deep. Runs
+    // BEFORE the validation report so item-page issues are included in it.
+    if (collectionsEnabled) {
+      // uuid -> page map for resolving item links (built once, shared across items).
+      const pagesByUuidForItems = new Map();
+      for (const page of pagesDataArray) {
+        if (page.uuid) pagesByUuidForItems.set(page.uuid, page);
+      }
+      // Stable collection-item refs for resolving `menu`/`link`-type item settings
+      // that target another item — loaded once, shared across every item. (Menu
+      // maps are loaded lazily inside renderCollectionItemPage.)
+      const collectionItemsByUuidForItems = await loadCollectionItemsByUuid(collectionStorage, collectionScope);
+      const itemAppVersion = await getAppVersion();
+      const itemEasterEgg = `<!--\nMade with Widgetizer v${itemAppVersion}\nPer aspera ad astra\n-->\n`;
+
+      for (const schema of collectionSchemas) {
+        if (!schema.hasItemPages) continue;
+
+        const items = await listCollectionItems(collectionStorage, collectionScope, schema.type);
+        const validItems = items.filter((item) => !item.invalid);
+        if (validItems.length === 0) continue;
+
+        // Template existence was preflighted in the two-pass validation; re-check
+        // defensively so a race can never write partial output.
+        const template = await loadCollectionTemplate(collectionStorage, collectionScope, schema.type);
+        if (template === null) {
+          const err = new Error(
+            `Collection "${schema.type}" has hasItemPages: true but no template.liquid file at collection-types/${schema.type}/template.liquid`,
+          );
+          err.statusCode = 400;
+          err.errorTitle = "Export failed: missing collection template";
+          throw err;
+        }
+
+        const collectionOutputDir = path.join(outputDir, schema.slugPrefix);
+        await fs.ensureDir(collectionOutputDir);
+
+        for (const item of validItems) {
+          // Fresh globals per item so enqueued assets never bleed between items.
+          const sharedGlobals = {
+            projectId,
+            apiUrl: "",
+            renderMode: "publish",
+            themeSettingsRaw: rawThemeSettings,
+            siteIcons: generatedSiteIcons,
+            enqueuedStyles: new Map(),
+            enqueuedScripts: new Map(),
+            collectionCache: new Map(),
+            pagesByUuid: pagesByUuidForItems,
+            collectionItemsByUuid: collectionItemsByUuidForItems,
+            exportVersion: version,
+            outputPathPrefix: "../",
+            currentCanonicalPath: `${schema.slugPrefix}/${item.slug}.html`,
+          };
+
+          // One shared pipeline renders the item page — header/footer + resolved
+          // item + template + layout — identical to the page path. Everything
+          // below (format, storage-path rewrite, markdown) stays export-specific.
+          const {
+            html: itemHtmlRendered,
+            mainContentHtml: itemContentHtml,
+            itemPageData,
+          } = await renderCollectionItemPage(
+            projectId,
+            {
+              schema,
+              item,
+              template,
+              rawThemeSettings,
+              renderMode: "publish",
+              sharedGlobals,
+              headerData,
+              footerData,
+              projectData,
+              siteUrl,
+            },
+            collectionDeps,
+          );
+          let itemHtml = itemHtmlRendered;
+
+          const itemFormat = await formatHtml(itemHtml);
+          itemHtml = itemFormat.html;
+          if (!itemFormat.success) {
+            console.warn(`Could not format HTML for ${schema.slugPrefix}/${item.slug}.html: ${itemFormat.error}.`);
+          }
+
+          // Storage-path rewrite at the item's depth ("../").
+          itemHtml = itemHtml
+            .replaceAll("/uploads/images/", "../assets/images/")
+            .replaceAll("/uploads/files/", "../assets/files/");
+
+          if (devModeEnabled) {
+            const validation = await validateHtml(itemHtml, `${schema.slugPrefix}/${item.slug}`);
+            if (validation.issues.length > 0) {
+              validationIssues.push({
+                page: `${schema.slugPrefix}/${item.slug}`,
+                filename: `${schema.slugPrefix}/${item.slug}.html`,
+                issues: validation.issues,
+              });
+            }
+          }
+
+          itemHtml = itemEasterEgg + itemHtml;
+
+          // Markdown alternate link → the item's .md (same dir; absolute when siteUrl valid).
+          if (exportMarkdown) {
+            let mdHref = `${item.slug}.md`;
+            if (validSiteUrl) {
+              try {
+                mdHref = new URL(`${schema.slugPrefix}/${item.slug}.md`, siteUrl).href;
+              } catch { /* fall back to relative */ }
+            }
+            itemHtml = itemHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
+          }
+
+          await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.html`), itemHtml);
+
+          // Markdown parity: content-only .md alongside the item HTML.
+          if (exportMarkdown) {
+            try {
+              const turndown = new TurndownService({
+                headingStyle: "atx",
+                codeBlockStyle: "fenced",
+                bulletListMarker: "-",
+              });
+              turndown.remove(["style", "script", "noscript", "form", "input", "button", "select", "textarea"]);
+              const cleanHtml = itemContentHtml
+                .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+                .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+                .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
+                .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
+              const itemMarkdown = turndown.turndown(cleanHtml);
+              const frontmatter = [
+                "---",
+                `title: ${itemPageData.name || item.slug}`,
+                `description: ${itemPageData.seo?.description || ""}`,
+                `collection: ${schema.type}`,
+                `slug: ${item.slug}`,
+                "source_url:",
+                `  html: '${item.slug}.html'`,
+                `  md: '${item.slug}.md'`,
+                "---",
+                "",
+                "",
+              ].join("\n");
+              await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.md`), frontmatter + itemMarkdown);
+            } catch (mdError) {
+              console.warn(`Could not generate markdown for ${schema.slugPrefix}/${item.slug}: ${mdError.message}`);
+            }
+          }
         }
       }
     }
@@ -608,6 +850,7 @@ Per aspera ad astra
       exportVersion: version,
       exportedAt: new Date().toISOString(),
       projectName: projectData.name,
+      collections: manifestCollections,
     };
     await fs.writeFile(path.join(outputDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
@@ -651,7 +894,12 @@ export async function exportProject(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
-    const result = await exportProjectToDir(projectId, req.body || {});
+    // Pass the scope-aware collection capability so `| collection` filters in
+    // exported pages read items through the same storage adapter as the API path.
+    // Kept separate from `req.body` options so a client can't inject it.
+    const collectionDeps =
+      req.adapters?.storage && req.scope ? { storage: req.adapters.storage, scope: req.scope } : null;
+    const result = await exportProjectToDir(projectId, req.body || {}, collectionDeps);
 
     res.json({
       success: true,
@@ -890,21 +1138,48 @@ export async function getExportHistory(req, res) {
 
     const exports = exportRepo.getExports(projectId);
 
-    // Get the configured limit for exports to show
+    // Attach the on-disk total size per export (null when the directory is gone, e.g. a
+    // failed export or one cleaned up by retention). Computed on read — no stored column.
+    const exportsWithSize = await Promise.all(
+      exports.map(async (record) => {
+        const dir = resolveOutputDir(record.outputDir);
+        let sizeBytes = null;
+        // Whether this export carries an HTML-validation report. The report is
+        // only written when developer mode was on AND issues were found, so its
+        // presence reliably means "issues found"; its absence means clean OR
+        // not validated (we can't tell which without a stored column).
+        let hasIssuesReport = false;
+        if (dir && (await fs.pathExists(dir))) {
+          try {
+            sizeBytes = await getDirectorySize(dir);
+          } catch (err) {
+            console.warn(`Could not compute size for export ${record.outputDir}:`, err.message);
+          }
+          hasIssuesReport = await fs.pathExists(path.join(dir, "__export__issues.html"));
+        }
+        return { ...record, sizeBytes, hasIssuesReport };
+      }),
+    );
+
+    // Get the configured limit for exports to show + whether developer mode is on
+    // (the latter gates the Issues column in the history UI).
     let maxExports = 10; // default fallback
+    let developerMode = false;
     try {
       const { getSetting } = await import("./appSettingsController.js");
       const maxVersionsSetting = await getSetting("export.maxVersionsToKeep");
       maxExports = parseInt(maxVersionsSetting || "10", 10) || 10;
+      developerMode = Boolean(await getSetting("developer.enabled"));
     } catch (error) {
       console.warn("Could not load app settings for export display limit, using default of 10. Error:", error.message);
     }
 
     res.json({
       success: true,
-      exports,
-      totalExports: exports.length,
+      exports: exportsWithSize,
+      totalExports: exportsWithSize.length,
       maxVersionsToKeep: maxExports,
+      developerMode,
     });
   } catch (error) {
     if (handleProjectResolutionError(res, error)) return;

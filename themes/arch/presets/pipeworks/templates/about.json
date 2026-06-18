@@ -12,7 +12,8 @@
         "vertical_alignment": "center",
         "color_scheme": "highlight-primary",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-banner.webp"
       },
       "blocks": {
         "op-eyebrow": {
@@ -41,7 +42,11 @@
           }
         }
       },
-      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+      "blocksOrder": [
+        "op-eyebrow",
+        "op-heading",
+        "op-text"
+      ]
     },
     "founder_story": {
       "type": "image-text",
@@ -51,7 +56,8 @@
         "color_scheme": "standard-primary",
         "content_color_scheme": "none",
         "top_spacing": "auto",
-        "bottom_spacing": "auto"
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/about-founder.webp"
       },
       "blocks": {
         "fs-eyebrow": {
@@ -110,7 +116,14 @@
           }
         }
       },
-      "blocksOrder": ["fs-eyebrow", "fs-heading", "fs-body-1", "fs-body-2", "fs-body-3", "fs-button"]
+      "blocksOrder": [
+        "fs-eyebrow",
+        "fs-heading",
+        "fs-body-1",
+        "fs-body-2",
+        "fs-body-3",
+        "fs-button"
+      ]
     },
     "milestones": {
       "type": "timeline",
@@ -167,7 +180,13 @@
           }
         }
       },
-      "blocksOrder": ["ms-1998", "ms-2003", "ms-2010", "ms-2019", "ms-2024"]
+      "blocksOrder": [
+        "ms-1998",
+        "ms-2003",
+        "ms-2010",
+        "ms-2019",
+        "ms-2024"
+      ]
     },
     "team": {
       "type": "profile-grid",
@@ -192,7 +211,8 @@
             "name": "Marcus Chen",
             "role": "Owner · Master Plumber",
             "specialty": "Repipes & gas lines",
-            "bio": "Third-generation plumber. 22 years on the trucks, master license since 2003. CSLB #1048293."
+            "bio": "Third-generation plumber. 22 years on the trucks, master license since 2003. CSLB #1048293.",
+            "photo": "/uploads/images/team-marcus.webp"
           }
         },
         "tm-dani": {
@@ -201,7 +221,8 @@
             "name": "Dani Alvarez",
             "role": "Lead Technician",
             "specialty": "Water heaters",
-            "bio": "Journey plumber, 11 years with Pipeworks. Tank, tankless, and heat-pump heater specialist. On-call captain for after-hours."
+            "bio": "Journey plumber, 11 years with Pipeworks. Tank, tankless, and heat-pump heater specialist. On-call captain for after-hours.",
+            "photo": "/uploads/images/team-dani.webp"
           }
         },
         "tm-reese": {
@@ -210,7 +231,8 @@
             "name": "Reese Okafor",
             "role": "Technician",
             "specialty": "Drain & sewer",
-            "bio": "Journey plumber, 6 years on the crew. Runs the hydro jetter and the sewer camera — rarely leaves a drain without knowing why it clogged."
+            "bio": "Journey plumber, 6 years on the crew. Runs the hydro jetter and the sewer camera — rarely leaves a drain without knowing why it clogged.",
+            "photo": "/uploads/images/team-reese.webp"
           }
         },
         "tm-jamie": {
@@ -219,11 +241,17 @@
             "name": "Jamie Park",
             "role": "Apprentice · Dispatch",
             "specialty": "Scheduling & quotes",
-            "bio": "Apprentice plumber and the voice you hear when you call. Four years with the company. Answers the phone in under four rings."
+            "bio": "Apprentice plumber and the voice you hear when you call. Four years with the company. Answers the phone in under four rings.",
+            "photo": "/uploads/images/team-jamie.webp"
           }
         }
       },
-      "blocksOrder": ["tm-marcus", "tm-dani", "tm-reese", "tm-jamie"]
+      "blocksOrder": [
+        "tm-marcus",
+        "tm-dani",
+        "tm-reese",
+        "tm-jamie"
+      ]
     },
     "closing_cta": {
       "type": "action-bar",
@@ -262,14 +290,19 @@
             "link_2": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self"
+              "target": "_self",
+              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
             },
             "style_2": "secondary",
             "size": "medium"
           }
         }
       },
-      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
     }
   },
   "widgetsOrder": [
@@ -280,6 +313,6 @@
     "closing_cta"
   ],
   "id": "about",
-  "created": "2026-04-21T10:00:00.000Z",
-  "updated": "2026-04-21T10:00:00.000Z"
+  "created": "2026-04-21T10:55:45.447Z",
+  "updated": "2026-04-21T11:42:35.431Z"
 }

@@ -606,16 +606,59 @@ export async function serveProjectMedia(req, res) {
     const folderName = await getProjectFolderName(projectId);
     const scope = { ...(req.scope || {}), projectId, folderName };
 
+    const stat = await req.adapters.assetStorage.stat(scope, key);
+    if (!stat) {
+      return res.status(404).json({ error: "File not found" });
+    }
+    const fileSize = stat.size;
+
+    res.setHeader("Content-Type", getContentType(path.extname(key).toLowerCase()));
+    res.setHeader("Accept-Ranges", "bytes");
+
+    const onStreamError = (err) => {
+      console.error("Error streaming project media:", err);
+      if (!res.headersSent) res.status(500).json({ error: "Failed to serve project media" });
+    };
+
+    // Honor byte-range requests so audio/video can seek (HTTP 206). Without this,
+    // media plays from the start (off a 200) but seeking snaps back to 0.
+    const rangeHeader = req.headers.range;
+    const match = rangeHeader ? /^bytes=(\d*)-(\d*)$/.exec(rangeHeader.trim()) : null;
+    if (match && (match[1] !== "" || match[2] !== "")) {
+      let start;
+      let end;
+      if (match[1] === "") {
+        // Suffix range: final N bytes.
+        start = Math.max(0, fileSize - parseInt(match[2], 10));
+        end = fileSize - 1;
+      } else {
+        start = parseInt(match[1], 10);
+        end = match[2] === "" ? fileSize - 1 : Math.min(parseInt(match[2], 10), fileSize - 1);
+      }
+
+      if (start > end || start >= fileSize) {
+        return res.status(416).setHeader("Content-Range", `bytes */${fileSize}`).end();
+      }
+
+      const rangeStream = await req.adapters.assetStorage.download(scope, key, { start, end });
+      if (!rangeStream) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      res.status(206);
+      res.setHeader("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+      res.setHeader("Content-Length", end - start + 1);
+      rangeStream.on("error", onStreamError);
+      rangeStream.pipe(res);
+      return;
+    }
+
+    // No (or malformed) range — stream the full file.
     const stream = await req.adapters.assetStorage.download(scope, key);
     if (!stream) {
       return res.status(404).json({ error: "File not found" });
     }
-
-    res.setHeader("Content-Type", getContentType(path.extname(key).toLowerCase()));
-    stream.on("error", (err) => {
-      console.error("Error streaming project media:", err);
-      if (!res.headersSent) res.status(500).json({ error: "Failed to serve project media" });
-    });
+    res.setHeader("Content-Length", fileSize);
+    stream.on("error", onStreamError);
     stream.pipe(res);
   } catch (error) {
     console.error("Error serving project media:", error);

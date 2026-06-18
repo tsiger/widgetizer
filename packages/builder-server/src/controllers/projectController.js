@@ -6,6 +6,7 @@ import {
   DATA_DIR,
   APP_ROOT,
   getProjectDir,
+  getProjectImagesDir,
   getThemeDir,
 } from "../config.js";
 import { randomUUID } from "crypto";
@@ -18,7 +19,11 @@ import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageSe
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { remapDuplicatedProjectUuids } from "../utils/linkEnrichment.js";
+import {
+  remapDuplicatedProjectUuids,
+  remapCollectionItemMenuRefs,
+  remapCollectionItemLinkRefs,
+} from "../utils/linkEnrichment.js";
 import { scaffoldProjectContent } from "../utils/projectScaffold.js";
 
 import multer from "multer";
@@ -27,6 +32,119 @@ import { readAppSettingsFile } from "./appSettingsController.js";
 // Make sure the projects directory exists
 async function ensureDirectories() {
   await fs.ensureDir(path.join(DATA_DIR, "projects"));
+}
+
+/**
+ * Seed preset collection ITEM data into a freshly created project. Each item gets
+ * a fresh uuid + created/updated timestamps. Items whose type is not defined by
+ * the (theme-owned) collection-types schemas are skipped with a warning — preset
+ * collection-type SCHEMAS are never honored (BLOCKER-1 resolution); the schemas
+ * come from the theme via copyThemeToProject. fs-based against the project dir
+ * (mirrors projectScaffold), so it stays adapter-agnostic.
+ *
+ * @param {string} folderName - project folder name
+ * @param {string} presetCollectionsDir - absolute path to the preset's collections/
+ */
+export async function seedPresetCollections(folderName, presetCollectionsDir) {
+  // Known collection types = the theme's collection-types/ dirs that ship a
+  // schema.json (copied into the project on create). Never the preset's.
+  const projectDir = getProjectDir(folderName);
+  const collectionTypesDir = path.join(projectDir, "collection-types");
+  const knownTypes = new Set();
+  try {
+    const typeDirs = await fs.readdir(collectionTypesDir, { withFileTypes: true });
+    for (const dirent of typeDirs) {
+      if (dirent.isDirectory() && (await fs.pathExists(path.join(collectionTypesDir, dirent.name, "schema.json")))) {
+        knownTypes.add(dirent.name);
+      }
+    }
+  } catch {
+    // No collection-types in the theme — nothing to seed against.
+  }
+
+  // Source preset uuid -> freshly seeded uuid, so preset menu/link refs remap (#11).
+  const oldToNewItemUuid = new Map();
+  const typeEntries = await fs.readdir(presetCollectionsDir, { withFileTypes: true });
+
+  for (const typeEntry of typeEntries) {
+    if (!typeEntry.isDirectory()) continue;
+    const type = typeEntry.name;
+    if (!knownTypes.has(type)) {
+      console.warn(
+        `[ProjectController] Skipping preset collection "${type}": the theme defines no such collection type.`,
+      );
+      continue;
+    }
+
+    const srcTypeDir = path.join(presetCollectionsDir, type);
+    const destTypeDir = path.join(projectDir, "collections", type);
+    await fs.ensureDir(destTypeDir);
+    const names = (await fs.readdir(srcTypeDir)).filter((n) => n.endsWith(".json") && n !== "_order.json");
+
+    for (const name of names) {
+      const slug = name.replace(/\.json$/, "");
+      const raw = await fs.readJSON(path.join(srcTypeDir, name));
+      const now = new Date().toISOString();
+      const newUuid = randomUUID();
+      if (raw.uuid) oldToNewItemUuid.set(raw.uuid, newUuid);
+      const seeded = { ...raw, id: slug, slug, uuid: newUuid, created: now, updated: now };
+      await fs.outputFile(path.join(destTypeDir, `${slug}.json`), JSON.stringify(seeded, null, 2));
+    }
+
+    // Carry over a manual order file verbatim if the preset shipped one.
+    const orderSrc = path.join(srcTypeDir, "_order.json");
+    if (await fs.pathExists(orderSrc)) {
+      await fs.copy(orderSrc, path.join(destTypeDir, "_order.json"));
+    }
+  }
+
+  // Preset menus + widget/item `link` settings may ship stable collection-item
+  // references against the preset's source uuids; remap them to the freshly
+  // seeded uuids so the links resolve (#11).
+  await remapCollectionItemMenuRefs(folderName, oldToNewItemUuid);
+  await remapCollectionItemLinkRefs(folderName, oldToNewItemUuid);
+}
+
+/**
+ * Seed preset starter media into a freshly created project. A preset may ship
+ * starter images under `presets/<id>/media/`: `images/` holds the binaries
+ * (originals + pre-generated variants) and `manifest.json` describes them. The
+ * binaries are copied into the project's uploads/images/ verbatim (their
+ * /uploads/images/... paths are identical across projects, so image-field values
+ * shipped in preset templates/collections resolve as-is); each manifest entry is
+ * registered in the media DB with a fresh, project-scoped UUID.
+ *
+ * @param {string} folderName - project folder name (filesystem)
+ * @param {string} projectId  - project UUID (DB key for media_files.project_id)
+ * @param {string} presetMediaDir - absolute path to the preset's media/ dir
+ */
+export async function seedPresetMedia(folderName, projectId, presetMediaDir) {
+  const srcImagesDir = path.join(presetMediaDir, "images");
+  if (await fs.pathExists(srcImagesDir)) {
+    await fs.copy(srcImagesDir, getProjectImagesDir(folderName));
+  }
+
+  const manifestPath = path.join(presetMediaDir, "manifest.json");
+  if (!(await fs.pathExists(manifestPath))) return;
+
+  const manifest = await fs.readJSON(manifestPath);
+  const now = new Date().toISOString();
+  for (const entry of manifest.files || []) {
+    if (!entry.filename) continue;
+    mediaRepo.addMediaFile(projectId, {
+      id: randomUUID(),
+      filename: entry.filename,
+      originalName: entry.originalName || entry.filename,
+      type: entry.type || "",
+      size: entry.size || 0,
+      uploaded: now,
+      path: entry.path || `/uploads/images/${entry.filename}`,
+      width: entry.width || null,
+      height: entry.height || null,
+      metadata: { alt: entry.alt || "", title: entry.title || "", caption: entry.caption || "" },
+      sizes: entry.sizes || {},
+    });
+  }
 }
 
 /**
@@ -184,6 +302,20 @@ export async function createProject(req, res) {
     const projectDir = getProjectDir(folderName);
     const themeVersion = await scaffoldProjectContent({ projectDir, theme, preset });
 
+    // Seed preset collection ITEM data + starter media (schemas always come from
+    // the theme via copyThemeToProject — never the preset; BLOCKER-1 resolution).
+    // Collection items are fs-only so they seed before the DB row; media files
+    // register against the project_id, so that runs after createProject below.
+    const { collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } =
+      await themeController.resolvePresetPaths(theme, preset);
+    if (presetCollectionsDir) {
+      try {
+        await seedPresetCollections(folderName, presetCollectionsDir);
+      } catch (error) {
+        console.warn(`[ProjectController] Failed to seed preset collections: ${error.message}`);
+      }
+    }
+
     const newProject = {
       id: randomUUID(), // ✅ Generate stable UUID
       folderName, // Folder identifier
@@ -204,6 +336,18 @@ export async function createProject(req, res) {
     const wasFirstProject = !currentActiveId;
 
     projectRepo.createProject(newProject);
+
+    // Seed preset starter media (binaries + DB records) now that the project row
+    // exists for the media_files foreign key — before the usage rescan below so
+    // the seeded files are picked up.
+    if (presetMediaDir) {
+      try {
+        await seedPresetMedia(folderName, newProject.id, presetMediaDir);
+      } catch (error) {
+        console.warn(`[ProjectController] Failed to seed preset media: ${error.message}`);
+      }
+    }
+
     await refreshMediaUsageAfterStructuralChange(newProject.id, "project creation");
     if (!currentActiveId) {
       projectRepo.setActiveProjectId(newProject.id);

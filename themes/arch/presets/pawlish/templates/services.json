@@ -13,6 +13,7 @@
         "color_scheme": "highlight-secondary",
         "top_spacing": "none",
         "bottom_spacing": "none",
+        "image": "/uploads/images/services-hero.webp",
         "overlay_color": "#0a1e388a"
       },
       "blocks": {
@@ -138,6 +139,7 @@
               "href": "contact.html",
               "target": "_self"
             },
+            "image": "/uploads/images/services-bento-full.webp",
             "text_color": "light",
             "overlay_color": "#0a1e3854"
           }
@@ -150,8 +152,9 @@
             "col_span": "1",
             "row_span": "1",
             "alignment": "end",
-            "text_color": "light",
-            "overlay_color": "#0a1e386e"
+            "image": "/uploads/images/services-bento-bath.webp",
+            "overlay_color": "#0a1e386e",
+            "text_color": "light"
           }
         },
         "bento-deshed": {
@@ -162,8 +165,9 @@
             "col_span": "1",
             "row_span": "1",
             "alignment": "end",
-            "text_color": "light",
-            "overlay_color": "#0a1e386e"
+            "image": "/uploads/images/services-bento-deshed.webp",
+            "overlay_color": "#0a1e386e",
+            "text_color": "light"
           }
         },
         "bento-hand-strip": {
@@ -174,8 +178,9 @@
             "col_span": "1",
             "row_span": "1",
             "alignment": "end",
-            "text_color": "light",
-            "overlay_color": "#0a1e386e"
+            "image": "/uploads/images/services-bento-handstrip.webp",
+            "overlay_color": "#0a1e386e",
+            "text_color": "light"
           }
         },
         "bento-nail": {
@@ -186,6 +191,7 @@
             "col_span": "1",
             "row_span": "1",
             "alignment": "end",
+            "image": "/uploads/images/services-bento-nails.webp",
             "text_color": "light",
             "overlay_color": "#0a1e386e"
           }
@@ -215,6 +221,7 @@
         "icon_size": "xl",
         "icon_shape": "circle",
         "color_scheme": "standard-primary",
+        "featured_image": "/uploads/images/services-included-featured.webp",
         "featured_image_position": "end"
       },
       "blocks": {
@@ -223,7 +230,12 @@
           "settings": {
             "icon": "paw",
             "title": "Calm intake",
-            "description": "Five minutes to meet your dog before anything starts."
+            "description": "Five minutes to meet your dog before anything starts.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-shampoo": {
@@ -231,7 +243,12 @@
           "settings": {
             "icon": "bath",
             "title": "Hypoallergenic bath",
-            "description": "Scent-free shampoo on request, no charge."
+            "description": "Scent-free shampoo on request, no charge.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-cut": {
@@ -239,7 +256,12 @@
           "settings": {
             "icon": "wand",
             "title": "Breed-aware finish",
-            "description": "We cut to your breed, not a default style."
+            "description": "We cut to your breed, not a default style.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         },
         "inc-dryer": {
@@ -247,7 +269,12 @@
           "settings": {
             "icon": "wind",
             "title": "Low-noise dryers",
-            "description": "Forced-air, hand-held. Never a crate dryer."
+            "description": "Forced-air, hand-held. Never a crate dryer.",
+            "button_link": {
+              "href": "",
+              "text": "",
+              "target": "_self"
+            }
           }
         }
       },
@@ -367,6 +394,6 @@
     "services_close"
   ],
   "id": "services",
-  "created": "2026-04-23T10:00:00.000Z",
-  "updated": "2026-04-23T15:00:00.000Z"
+  "created": "2026-04-23T13:59:56.912Z",
+  "updated": "2026-04-23T15:24:30.244Z"
 }

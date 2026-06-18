@@ -1,7 +1,7 @@
 {
   "type": "footer",
   "settings": {
-    "copyright": "<p>© 2026 Pipeworks Plumbing Co. Licensed · Insured · Bonded. CSLB #1048293.</p>",
+    "copyright": "© 2026 Pipeworks Plumbing Co. Licensed · Insured · Bonded. CSLB #1048293.",
     "layout": "first-featured",
     "color_scheme": "highlight-secondary"
   },
@@ -11,7 +11,8 @@
       "settings": {
         "logo_text": "Pipeworks",
         "logo_width": 160,
-        "text": "<p>Residential and light commercial plumbing. Master plumber-led, 28 years in greater Portland.</p>"
+        "text": "<p>Residential and light commercial plumbing. Master plumber-led, 28 years in greater Portland.</p>",
+        "logo": "/uploads/images/pipeworks-logo-white.png"
       }
     },
     "text_block_1": {
@@ -25,7 +26,7 @@
       "type": "menu_block",
       "settings": {
         "title": "Site",
-        "menu": "footer-menu"
+        "menu": "47a81574-2825-4ba5-a910-0fd8a5cf6123"
       }
     },
     "social_block_1": {
@@ -35,5 +36,10 @@
       }
     }
   },
-  "blocksOrder": ["logo_text_1", "text_block_1", "menu_block_1", "social_block_1"]
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
 }

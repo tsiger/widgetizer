@@ -27,13 +27,31 @@ export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
 
+// Collection enumeration + item-page render for hosted's cloud render/export
+// loop. The render-deps fragment (buildCollectionRenderDeps) and the deps-driven
+// item-page render (renderCollectionItemPageWithDeps) are shell-agnostic and
+// scope-first, so hosted reuses the SAME tenant-isolated collectionService as the
+// OSS path (no parallel fs reader); the readers below back hosted's export
+// item-page loop + SEO/itemPages enumeration. See the stage-2 plan §7 + Phase 7.
+export {
+  buildCollectionRenderDeps,
+  renderCollectionItemPageWithDeps,
+} from "./services/renderingService.js";
+export {
+  listCollectionSchemas,
+  listCollectionItems,
+  getCollectionSchema,
+  loadCollectionTemplate,
+  loadCollectionItemsByUuid,
+} from "./services/collectionService.js";
+
 // Project-creation building blocks for hosted's "create site with editor" flow.
 // scaffoldProjectContent is the dir-explicit core of createProject (theme copy +
 // templates → pages + link enrichment) so hosted can scaffold into a per-user
 // dir; listThemes/listThemePresets back the theme/preset picker (the actor-scoped
 // /themes router is not mounted in hosted). See the stage-2 plan §"create flow".
 export { scaffoldProjectContent } from "./utils/projectScaffold.js";
-export { listThemes, listThemePresets } from "./controllers/themeController.js";
+export { listThemes, listThemePresets, resolvePresetPaths } from "./controllers/themeController.js";
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.
 export { readAppSettingsFile } from "./controllers/appSettingsController.js";

@@ -24,6 +24,9 @@ export const CONTENT_TYPES = {
   ".webp": "image/webp",
   ".avif": "image/avif",
 
+  // Audio
+  ".mp3": "audio/mpeg",
+
   // Fonts
   ".woff": "font/woff",
   ".woff2": "font/woff2",

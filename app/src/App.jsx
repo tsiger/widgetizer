@@ -9,6 +9,7 @@ import ProjectsAdd from "./pages/ProjectsAdd";
 import ProjectsEdit from "./pages/ProjectsEdit";
 import HomeRedirect from "./pages/HomeRedirect";
 import PagePreview from "./pages/PagePreview";
+import CollectionItemPagePreview from "./pages/CollectionItemPagePreview";
 import NotFound from "./pages/NotFound";
 import RouteError from "./pages/RouteError";
 import AdminMenu from "./components/layout/AdminMenu";
@@ -60,6 +61,11 @@ const router = createBrowserRouter([
       overlay: <DebugStatePanel />,
     },
   }),
+  {
+    path: "/preview/collection/:prefix/:slug",
+    element: <CollectionItemPagePreview />,
+    errorElement: <RouteError />,
+  },
   {
     path: "/preview/:pageId",
     element: <PagePreview />,
