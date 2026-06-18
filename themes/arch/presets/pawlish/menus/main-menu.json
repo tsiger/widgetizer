@@ -2,9 +2,30 @@
   "id": "main-menu",
   "name": "Main Menu",
   "items": [
-    { "label": "Services", "link": "services.html", "items": [] },
-    { "label": "Groomers", "link": "groomers.html", "items": [] },
-    { "label": "Gallery", "link": "gallery.html", "items": [] },
-    { "label": "First visit", "link": "first-visit.html", "items": [] }
+    {
+      "label": "Services",
+      "link": "services.html",
+      "items": []
+    },
+    {
+      "label": "Groomers",
+      "link": "groomers.html",
+      "items": []
+    },
+    {
+      "label": "Gallery",
+      "link": "gallery.html",
+      "items": []
+    },
+    {
+      "label": "First visit",
+      "link": "first-visit.html",
+      "items": []
+    },
+    {
+      "label": "News",
+      "link": "news.html",
+      "items": []
+    }
   ]
 }

@@ -16,6 +16,11 @@
       "label": "About",
       "link": "about.html",
       "items": []
+    },
+    {
+      "label": "News",
+      "link": "news.html",
+      "items": []
     }
   ]
 }
