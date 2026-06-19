@@ -6,11 +6,6 @@
 <article class="widget widget-service">
   <style>
     .widget-service {
-      & .service-icon {
-        color: var(--accent);
-        margin-block-end: var(--space-sm);
-      }
-
       & .service-meta {
         margin-block-start: var(--space-xs);
         color: var(--text-muted);
@@ -52,10 +47,6 @@
 
   <div class="widget-container">
     <div class="widget-content content-flow widget-content-md">
-      {% if item.settings.icon != blank %}
-        <div class="service-icon reveal reveal-up">{% render 'icon', icon: item.settings.icon, size: 'xl' %}</div>
-      {% endif %}
-
       <h1 class="w-headline reveal reveal-up">{{ item.settings.title }}</h1>
 
       {% if item.settings.price != blank or item.settings.duration != blank %}
