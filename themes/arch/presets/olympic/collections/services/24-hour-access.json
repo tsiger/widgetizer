@@ -1,0 +1,13 @@
+{
+  "slug": "24-hour-access",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "24 Hour Access",
+    "icon": "clock-24",
+    "summary": "Round the clock entry for shift workers and early risers who train outside normal hours.",
+    "description": "<p>The gym never closes for full members. Use your fob to get in at 5am or midnight, whatever your schedule demands, with no need to plan your training around set opening hours.</p><h2>What stays open</h2><p>The strength floor and cardio area stay open at all hours, with lighting and security in place so late sessions feel safe. Cameras and secure fob entry mean you are not training in an empty building with the doors wide open, and the equipment you rely on is there whenever you walk in.</p><ul><li>Fob entry day or night, every day of the week</li><li>Full access to the strength floor and cardio area</li><li>Lighting and security in place for quieter hours</li></ul><p>It suits anyone whose working week does not fit a nine to five gym, from shift workers and night staff to early risers who would rather train before the day begins. The off-peak hours also tend to be the quietest, so you often have the floor largely to yourself.</p><h3>Training at quiet times</h3><p>If you train alone in the small hours, it is worth keeping your phone on you and letting someone know your rough plans. Sticking to loads you can handle confidently makes solo sessions safer.</p><p>Your fob is personal to you, so please do not share it or let others in behind you. Keeping entry to members only is what keeps the place secure for everyone using it at odd hours.</p>",
+    "price": "$15 add on per month",
+    "duration": "Always open",
+    "featured_image": "/uploads/images/olympic-services-24-hour-access.webp"
+  }
+}

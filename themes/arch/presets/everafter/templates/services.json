@@ -65,8 +65,7 @@
             "button_link": {
               "text": "Inquire about day-of",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
+              "target": "_self"
             },
             "featured": false
           }
@@ -81,8 +80,7 @@
             "button_link": {
               "text": "Inquire about partial",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
+              "target": "_self"
             },
             "featured": true
           }
@@ -97,8 +95,7 @@
             "button_link": {
               "text": "Inquire about full-service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
+              "target": "_self"
             },
             "featured": false
           }
@@ -314,8 +311,7 @@
             "link": {
               "text": "Begin an inquiry",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

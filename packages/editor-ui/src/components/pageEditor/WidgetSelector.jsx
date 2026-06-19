@@ -97,13 +97,20 @@ export default function WidgetSelector({
   const hasAnyPreview = availableWidgets.some((s) => s.hasPreview);
   const projectId = getActiveProjectId();
 
-  // Scroll focused item into view
+  // Keep the focused row scrolled into view as you arrow through the list.
+  // We adjust the list's own scrollTop directly (rather than scrollIntoView) so the
+  // highlight reliably follows the keyboard inside the fixed-position dropdown.
   useEffect(() => {
-    if (focusedIndex >= 0 && listRef.current) {
-      const focusedElement = listRef.current.children[focusedIndex];
-      if (focusedElement) {
-        focusedElement.scrollIntoView({ block: "nearest" });
-      }
+    if (focusedIndex < 0 || !listRef.current) return;
+    const list = listRef.current;
+    const el = list.children[focusedIndex];
+    if (!el) return;
+    const listRect = list.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    if (elRect.top < listRect.top) {
+      list.scrollTop -= listRect.top - elRect.top;
+    } else if (elRect.bottom > listRect.bottom) {
+      list.scrollTop += elRect.bottom - listRect.bottom;
     }
   }, [focusedIndex]);
 
@@ -152,11 +159,15 @@ export default function WidgetSelector({
   });
 
   useLayoutEffect(() => {
-    if (!isOpen || !triggerRef?.current) {
+    if (!isOpen || !triggerRef?.current || !dropdownRef.current) {
       return;
     }
 
+    const margin = 12;
     const triggerRect = triggerRef.current.getBoundingClientRect();
+    // Measure the real rendered height so a taller list is accounted for exactly,
+    // rather than a fixed guess that breaks once the list grows.
+    const dropdownHeight = dropdownRef.current.getBoundingClientRect().height;
     // w-56 (224px) list + optional w-64 (256px) preview pane
     const dropdownWidth = hasAnyPreview ? 480 : 224;
 
@@ -170,27 +181,31 @@ export default function WidgetSelector({
     }
 
     // Make sure it doesn't go off the left edge either
-    if (leftPosition < 12) {
-      leftPosition = 12;
+    if (leftPosition < margin) {
+      leftPosition = margin;
     }
 
-    // For vertical positioning, check if there's enough space below
+    // Vertical: align with the trigger, but if the dropdown would run past the bottom
+    // of the viewport (trigger near the bottom of the screen) shift it up so the whole
+    // list stays visible. Never let it go above the top edge.
     let topPosition = triggerRect.top;
-    const estimatedDropdownHeight = 300; // Generous estimate
-
-    // If dropdown would go off screen, position it above the trigger
-    if (triggerRect.top + estimatedDropdownHeight > window.innerHeight - 20) {
-      topPosition = triggerRect.top - estimatedDropdownHeight - 10;
+    if (topPosition + dropdownHeight > window.innerHeight - margin) {
+      topPosition = window.innerHeight - margin - dropdownHeight;
+    }
+    if (topPosition < margin) {
+      topPosition = margin;
     }
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStyle({
       position: "fixed",
-      top: Math.max(12, topPosition), // Don't go above top of screen
+      top: topPosition,
       left: leftPosition,
       zIndex: 1000,
     });
-  }, [isOpen, triggerRef, hasAnyPreview]);
+    // filteredWidgets.length: reposition after the search resets to the full list on
+    // open (the list grows taller, so it must be re-fit against the viewport bottom).
+  }, [isOpen, triggerRef, hasAnyPreview, filteredWidgets.length]);
 
   if (!isOpen) return null;
 
@@ -245,7 +260,15 @@ export default function WidgetSelector({
             </button>
           )}
 
-          <div ref={listRef} id="widget-selector-list" className="max-h-64 overflow-y-auto" role="listbox">
+          <div
+            ref={listRef}
+            id="widget-selector-list"
+            className="overflow-y-auto"
+            // Doubled from the old max-h-64 (16rem), but capped to the viewport so it
+            // never overflows on short screens (~9rem reserved for header/search/margins).
+            style={{ maxHeight: "min(32rem, calc(100vh - 9rem))" }}
+            role="listbox"
+          >
             {filteredWidgets.length > 0 ? (
               filteredWidgets.map((schema, index) => (
                 <button

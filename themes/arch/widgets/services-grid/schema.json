@@ -48,6 +48,27 @@
       "label": "tTheme:global.widgets.settings.display_header.label"
     },
     {
+      "type": "select",
+      "id": "layout",
+      "label": "tTheme:global.widgets.settings.layout.label",
+      "default": "card",
+      "options": [
+        { "value": "card", "label": "tTheme:global.widgets.settings.layout.options.card" },
+        { "value": "overlay", "label": "tTheme:global.widgets.settings.layout.options.overlay" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "text_display",
+      "label": "tTheme:global.widgets.settings.text_display.label",
+      "description": "tTheme:global.widgets.settings.text_display.description",
+      "default": "always",
+      "options": [
+        { "value": "hover", "label": "tTheme:global.widgets.settings.text_display.options.hover" },
+        { "value": "always", "label": "tTheme:global.widgets.settings.text_display.options.always" }
+      ]
+    },
+    {
       "type": "number",
       "id": "limit",
       "label": "tTheme:services_grid.settings.limit.label",
@@ -86,6 +107,7 @@
       "type": "checkbox",
       "id": "show_icon",
       "label": "tTheme:services_grid.settings.show_icon.label",
+      "description": "tTheme:global.widgets.settings.card_layout_only.description",
       "default": true
     },
     {
@@ -110,7 +132,47 @@
       "type": "checkbox",
       "id": "show_read_more",
       "label": "tTheme:services_grid.settings.show_read_more.label",
+      "description": "tTheme:global.widgets.settings.card_layout_only.description",
       "default": true
+    },
+    {
+      "type": "header",
+      "id": "icon_header",
+      "label": "tTheme:global.widgets.settings.icon_header.label"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "tTheme:global.widgets.settings.icon_style.label",
+      "default": "plain",
+      "options": [
+        { "value": "plain", "label": "tTheme:global.widgets.settings.icon_style.options.plain" },
+        { "value": "outline", "label": "tTheme:global.widgets.settings.icon_style.options.outline" },
+        { "value": "filled", "label": "tTheme:global.widgets.settings.icon_style.options.filled" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "tTheme:global.widgets.settings.icon_size.label",
+      "default": "lg",
+      "options": [
+        { "value": "sm", "label": "tTheme:global.widgets.settings.icon_size.options.sm" },
+        { "value": "md", "label": "tTheme:global.widgets.settings.icon_size.options.md" },
+        { "value": "lg", "label": "tTheme:global.widgets.settings.icon_size.options.lg" },
+        { "value": "xl", "label": "tTheme:global.widgets.settings.icon_size.options.xl" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_shape",
+      "label": "tTheme:global.widgets.settings.icon_shape.label",
+      "default": "circle",
+      "options": [
+        { "value": "sharp", "label": "tTheme:global.widgets.settings.icon_shape.options.sharp" },
+        { "value": "rounded", "label": "tTheme:global.widgets.settings.icon_shape.options.rounded" },
+        { "value": "circle", "label": "tTheme:global.widgets.settings.icon_shape.options.circle" }
+      ]
     },
     {
       "type": "header",

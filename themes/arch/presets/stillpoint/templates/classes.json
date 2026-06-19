@@ -231,8 +231,7 @@
             "link": {
               "text": "Get Started",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -285,8 +284,7 @@
             "link": {
               "text": "About Our Team",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "2d9fff43-ced5-4bf9-a1b8-abd87ebd97f8"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"

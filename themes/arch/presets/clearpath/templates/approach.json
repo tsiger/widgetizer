@@ -225,8 +225,7 @@
             "link": {
               "text": "Start a conversation",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

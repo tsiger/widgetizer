@@ -1,0 +1,11 @@
+{
+  "slug": "phishing-warning-signs",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Five Signs an Email Is Trying to Trick You",
+    "date": "2026-02-16",
+    "excerpt": "Most breaches we clean up started with one convincing message, and the warning signs are easier to spot than you think.",
+    "body": "<p>The most expensive incidents we handle rarely begin with clever hacking. They begin with a member of staff clicking a link in an email that looked entirely normal.</p><p>Train your team to pause when they see any of these.</p><ul><li>An urgent demand to act right now or lose access</li><li>A sender address that is almost right but slightly off</li><li>A request to move money or share a password</li><li>Spelling that is close but not quite professional</li><li>A link whose real destination does not match the text</li></ul><h2>Why these messages work</h2><p>The reason phishing succeeds is that it does not feel like an attack. A good fake imitates a supplier, a bank, or a colleague closely enough that a busy person glances at it and acts on instinct. The urgency is deliberate. It is designed to push someone into clicking before they stop to think, which is exactly the moment you want them to slow down.</p><p>What the warning signs have in common is pressure and a small thing that does not add up. An address that is one letter wrong, a tone that is more urgent than usual, a request that would normally go through a different channel. None of them prove a message is fake on their own, but together they are reason enough to stop.</p><h3>The thirty-second habit</h3><p>When something feels off, the safest move is to stop and check by phone. A thirty-second call has saved several of our clients from a very bad week.</p><p>Make it normal in your team to verify rather than rush. Nobody should feel awkward ringing a supplier to confirm a payment request, and nobody should be blamed for asking. That small pause, made a habit, is worth more than any amount of software.</p>",
+    "featured_image": "/uploads/images/uplink-news-phishing-warning-signs.webp"
+  }
+}

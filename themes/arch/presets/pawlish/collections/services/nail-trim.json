@@ -1,0 +1,13 @@
+{
+  "slug": "nail-trim",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Nail Trim",
+    "icon": "razor",
+    "summary": "A quick, careful nail clip for dogs who just need their claws kept in check.",
+    "description": "<p>Overgrown nails can make walking uncomfortable and change how a dog stands over time, so we keep them at a sensible length. It is a quick visit on its own, or an easy add-on to a bath or groom.</p><h2>How we keep it calm</h2><p>We clip a little at a time and stay clear of the quick, the sensitive part inside the nail, so the trim stays comfortable. Nervous dogs are welcome and we will go slowly, with treats on hand to keep things easy and positive.</p><ul><li>A careful clip, taking a little off at a time</li><li>Attention paid to avoid the quick</li><li>Treats and patience for anxious dogs</li></ul><p>The whole thing usually takes only a few minutes once your dog is settled, though we never rush a dog who needs a moment. If your dog dislikes having their paws held, tell us and we will take it gently and build up at their pace.</p><h3>How often and a tip</h3><p>As a rough guide, if you can hear nails clicking on a hard floor, they are ready for a trim, which for many dogs is every few weeks. Dogs walked mostly on soft ground tend to need it more often than those on pavements that wear the nails down.</p><p>Handling your dog's paws gently at home, even just touching them during a cuddle, makes future trims much easier. A short walk before the visit helps them arrive calm and ready.</p>",
+    "price": "$20",
+    "duration": "15 min",
+    "featured_image": "/uploads/images/pawlish-services-nail-trim.webp"
+  }
+}

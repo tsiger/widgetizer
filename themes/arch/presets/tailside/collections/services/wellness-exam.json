@@ -1,0 +1,13 @@
+{
+  "slug": "wellness-exam",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Wellness Exam",
+    "icon": "stethoscope",
+    "summary": "A nose-to-tail check that catches changes in your pet's health early.",
+    "description": "<p>Pets age faster than we do, so a yearly once-over makes a real difference. A wellness exam is a chance to catch small changes early, while they are far easier to manage, and to keep a steady record of your companion's health over time.</p><h2>What we check</h2><p>We listen to the heart and lungs, check eyes, ears, teeth, and weight, and ask about appetite and behaviour at home. The conversation matters as much as the hands-on part, since you notice the day-to-day shifts we cannot see in the clinic.</p><ul><li>Heart, lungs, eyes, ears, and teeth</li><li>Weight, body condition, and coat or skin</li><li>A chat about appetite, energy, and any changes at home</li></ul><p>You leave knowing how your companion is doing and what to keep an eye on. If anything stands out, we will explain it plainly and suggest a sensible next step rather than a long list of worries.</p><h3>Who benefits most</h3><p>Every pet gains from a regular check, but older animals and those with ongoing conditions often benefit from coming in more than once a year. We will recommend a rhythm that fits your pet's stage of life.</p><p>It helps to jot down anything you have noticed beforehand, even small things like drinking more or slowing on walks. Those details often give us the most useful clues.</p>",
+    "price": "From $60",
+    "duration": "30 min",
+    "featured_image": "/uploads/images/tailside-services-wellness-exam.webp"
+  }
+}

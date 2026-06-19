@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "petalry-news-blooms-for-the-hospice-ward.webp",
+      "originalName": "petalry-news-blooms-for-the-hospice-ward.webp",
+      "type": "image/webp",
+      "size": 102808,
+      "path": "/uploads/images/petalry-news-blooms-for-the-hospice-ward.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Blooms for the Hospice Ward, Every Friday",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/petalry-news-blooms-for-the-hospice-ward-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/petalry-news-blooms-for-the-hospice-ward-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/petalry-news-blooms-for-the-hospice-ward-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "petalry-news-inside-our-cold-room.webp",
+      "originalName": "petalry-news-inside-our-cold-room.webp",
+      "type": "image/webp",
+      "size": 142956,
+      "path": "/uploads/images/petalry-news-inside-our-cold-room.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Inside the Cold Room Before the Doors Open",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/petalry-news-inside-our-cold-room-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/petalry-news-inside-our-cold-room-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/petalry-news-inside-our-cold-room-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "petalry-news-make-cut-flowers-last.webp",
+      "originalName": "petalry-news-make-cut-flowers-last.webp",
+      "type": "image/webp",
+      "size": 119504,
+      "path": "/uploads/images/petalry-news-make-cut-flowers-last.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Three Ways to Make Cut Flowers Last Twice as Long",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/petalry-news-make-cut-flowers-last-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/petalry-news-make-cut-flowers-last-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/petalry-news-make-cut-flowers-last-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "petalry-news-valentines-pickup-windows.webp",
+      "originalName": "petalry-news-valentines-pickup-windows.webp",
+      "type": "image/webp",
+      "size": 105760,
+      "path": "/uploads/images/petalry-news-valentines-pickup-windows.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Valentine's Pickup Windows Are Open for Booking",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/petalry-news-valentines-pickup-windows-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/petalry-news-valentines-pickup-windows-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/petalry-news-valentines-pickup-windows-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "petalry-news-weekly-bloom-subscription.webp",
+      "originalName": "petalry-news-weekly-bloom-subscription.webp",
+      "type": "image/webp",
+      "size": 146184,
+      "path": "/uploads/images/petalry-news-weekly-bloom-subscription.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Weekly Bloom Subscription Lands at Petalry",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/petalry-news-weekly-bloom-subscription-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/petalry-news-weekly-bloom-subscription-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/petalry-news-weekly-bloom-subscription-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "petalry-logo-light-1.png",
       "originalName": "petalry-logo-light.png",
       "type": "image/png",

@@ -6,13 +6,12 @@
     "contactDetailsLine1": "+30 22840 00 00 00",
     "contactDetailsLine2": "hello@example.com",
     "contact_position": "logo",
-    "headerNavigation": "be0c466a-a83e-4074-97a1-644904dd408f",
+    "headerNavigation": "main-menu",
     "center_nav": false,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Check availability",
-      "target": "_self",
-      "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

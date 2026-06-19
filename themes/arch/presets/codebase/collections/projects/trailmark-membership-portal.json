@@ -1,0 +1,12 @@
+{
+  "slug": "trailmark-membership-portal",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Membership Portal for Trailmark Climbing",
+    "summary": "We built a member portal that handles sign-ups, billing, and class booking in one place.",
+    "description": "<p>Trailmark ran a busy climbing gym on three separate tools for memberships, payments, and class sign-ups, none of which talked to each other. A member could be marked active in one system, behind on payment in another, and booked into a full class in the third, and only a staff member cross-checking by hand would ever notice.</p><h2>The problem</h2><p>Every Friday the front desk reconciled the three systems against each other to catch billing mismatches. It took hours, it was error-prone, and it scaled badly as the gym grew. The members felt the seams too, juggling separate logins to do related things.</p><h2>What we built</h2><p>We combined the three tools into one portal. Members manage their plan, book classes, and update billing in a single place, and a member who is behind on payment can no longer slip into a class they should not be able to book. We added a staff view for day-to-day work at the desk, covering check-ins and waivers.</p><ul><li>One member login for plan, billing, and class booking</li><li>Billing state linked to class booking, so the two stay in sync</li><li>A staff view for check-ins and digital waivers</li><li>An end to the weekly three-way reconciliation</li></ul><p>Migrating the existing members was the careful part. We mapped each member's plan, payment status, and class history across the old systems, ran the import against a copy first, and reconciled the totals before going live so nobody lost a booking or a billing record.</p><h2>The result</h2><p>Billing errors mostly disappeared, because the numbers now come from one source instead of three. The front desk stopped reconciling three systems by hand at the end of every week, and the staff view turned check-in and waivers into a single short step at the counter.</p>",
+    "client": "Trailmark Climbing Co",
+    "year": "2024",
+    "featured_image": "/uploads/images/codebase-projects-trailmark-membership-portal.webp"
+  }
+}

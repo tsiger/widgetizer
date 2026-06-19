@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "reservations.html",
       "text": "Reserve a Table",
-      "target": "_self",
-      "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

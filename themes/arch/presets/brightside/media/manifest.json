@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "brightside-news-flossing-that-actually-sticks.webp",
+      "originalName": "brightside-news-flossing-that-actually-sticks.webp",
+      "type": "image/webp",
+      "size": 46558,
+      "path": "/uploads/images/brightside-news-flossing-that-actually-sticks.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Make Flossing a Habit That Sticks",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-news-flossing-that-actually-sticks-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brightside-news-flossing-that-actually-sticks-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-news-flossing-that-actually-sticks-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brightside-news-meet-our-hygiene-team.webp",
+      "originalName": "brightside-news-meet-our-hygiene-team.webp",
+      "type": "image/webp",
+      "size": 123068,
+      "path": "/uploads/images/brightside-news-meet-our-hygiene-team.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Meet the People Who Clean Your Teeth",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-news-meet-our-hygiene-team-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brightside-news-meet-our-hygiene-team-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-news-meet-our-hygiene-team-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brightside-news-saturday-morning-appointments.webp",
+      "originalName": "brightside-news-saturday-morning-appointments.webp",
+      "type": "image/webp",
+      "size": 94448,
+      "path": "/uploads/images/brightside-news-saturday-morning-appointments.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "We Are Now Open Saturday Mornings",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-news-saturday-morning-appointments-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brightside-news-saturday-morning-appointments-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-news-saturday-morning-appointments-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brightside-news-spring-checkup-reminder.webp",
+      "originalName": "brightside-news-spring-checkup-reminder.webp",
+      "type": "image/webp",
+      "size": 105004,
+      "path": "/uploads/images/brightside-news-spring-checkup-reminder.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Book Your Spring Checkup Before the Summer Rush",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-news-spring-checkup-reminder-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brightside-news-spring-checkup-reminder-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-news-spring-checkup-reminder-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brightside-news-ten-years-on-the-high-street.webp",
+      "originalName": "brightside-news-ten-years-on-the-high-street.webp",
+      "type": "image/webp",
+      "size": 201544,
+      "path": "/uploads/images/brightside-news-ten-years-on-the-high-street.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Ten Years on the High Street",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-news-ten-years-on-the-high-street-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brightside-news-ten-years-on-the-high-street-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-news-ten-years-on-the-high-street-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brightside-services-childrens-dentistry.webp",
+      "originalName": "brightside-services-childrens-dentistry.webp",
+      "type": "image/webp",
+      "size": 110820,
+      "path": "/uploads/images/brightside-services-childrens-dentistry.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Children's Dentistry",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-services-childrens-dentistry-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/brightside-services-childrens-dentistry-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-services-childrens-dentistry-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "brightside-services-emergency-dental-care.webp",
+      "originalName": "brightside-services-emergency-dental-care.webp",
+      "type": "image/webp",
+      "size": 87900,
+      "path": "/uploads/images/brightside-services-emergency-dental-care.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Emergency Dental Care",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-services-emergency-dental-care-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/brightside-services-emergency-dental-care-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-services-emergency-dental-care-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "brightside-services-routine-check-up-and-clean.webp",
+      "originalName": "brightside-services-routine-check-up-and-clean.webp",
+      "type": "image/webp",
+      "size": 76692,
+      "path": "/uploads/images/brightside-services-routine-check-up-and-clean.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Routine Check-Up and Clean",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-services-routine-check-up-and-clean-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/brightside-services-routine-check-up-and-clean-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-services-routine-check-up-and-clean-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "brightside-services-teeth-whitening.webp",
+      "originalName": "brightside-services-teeth-whitening.webp",
+      "type": "image/webp",
+      "size": 82430,
+      "path": "/uploads/images/brightside-services-teeth-whitening.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Professional Teeth Whitening",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-services-teeth-whitening-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/brightside-services-teeth-whitening-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-services-teeth-whitening-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "brightside-services-tooth-coloured-fillings.webp",
+      "originalName": "brightside-services-tooth-coloured-fillings.webp",
+      "type": "image/webp",
+      "size": 78756,
+      "path": "/uploads/images/brightside-services-tooth-coloured-fillings.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Tooth-Coloured Fillings",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brightside-services-tooth-coloured-fillings-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/brightside-services-tooth-coloured-fillings-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/brightside-services-tooth-coloured-fillings-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "contact-reception.webp",
       "originalName": "contact-reception.webp",
       "type": "image/webp",

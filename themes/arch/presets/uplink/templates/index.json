@@ -41,15 +41,13 @@
             "link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "See pricing",
               "href": "pricing.html",
-              "target": "_self",
-              "pageUuid": "340a528c-3ba5-4587-9e9a-ee365dd559ee"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "large"
@@ -137,8 +135,7 @@
             "link": {
               "text": "How we run helpdesk",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "d842e7e0-7733-44cf-813d-3b931b899e27"
+              "target": "_self"
             }
           }
         },
@@ -150,8 +147,7 @@
             "link": {
               "text": "Our networking approach",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "d842e7e0-7733-44cf-813d-3b931b899e27"
+              "target": "_self"
             }
           }
         },
@@ -163,8 +159,7 @@
             "link": {
               "text": "Security baseline",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "d842e7e0-7733-44cf-813d-3b931b899e27"
+              "target": "_self"
             }
           }
         },
@@ -176,8 +171,7 @@
             "link": {
               "text": "Cloud services",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "d842e7e0-7733-44cf-813d-3b931b899e27"
+              "target": "_self"
             }
           }
         },
@@ -189,8 +183,7 @@
             "link": {
               "text": "Backup program",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "d842e7e0-7733-44cf-813d-3b931b899e27"
+              "target": "_self"
             }
           }
         }
@@ -471,8 +464,7 @@
             "link": {
               "text": "Book assessment",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfc5be6-a6c4-4168-b033-6453ff2470fa"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"

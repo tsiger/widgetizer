@@ -6,8 +6,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Inquire",
-      "target": "_self",
-      "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

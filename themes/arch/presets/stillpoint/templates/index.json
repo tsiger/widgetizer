@@ -44,14 +44,12 @@
             "link": {
               "text": "Book a Class",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             },
             "link_2": {
               "text": "View Schedule",
               "href": "schedule.html",
-              "target": "_self",
-              "pageUuid": "aaed89bf-c559-4847-8a12-73391021a817"
+              "target": "_self"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -108,8 +106,7 @@
             "link": {
               "text": "Explore Our Classes",
               "href": "classes.html",
-              "target": "_self",
-              "pageUuid": "c1dc1c45-96cd-4f10-8a12-04a8470efe83"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -266,8 +263,7 @@
             "link": {
               "text": "Visit Us",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -395,8 +391,7 @@
             "link": {
               "text": "Book Your Free Class",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2576aa52-36a5-40ec-b4aa-7493458cfd05"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

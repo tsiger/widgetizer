@@ -44,8 +44,7 @@
             "link": {
               "href": "new-patients.html",
               "text": "New patient info",
-              "target": "_self",
-              "pageUuid": "74dc9f13-f8f3-4803-a680-1d15e63e661e"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"
@@ -203,8 +202,7 @@
             "link": {
               "href": "contact.html",
               "text": "Contact the clinic",
-              "target": "_self",
-              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

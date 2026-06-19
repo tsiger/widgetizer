@@ -23,8 +23,7 @@
             "button_link": {
               "text": "See Our Work",
               "href": "portfolio.html",
-              "target": "_self",
-              "pageUuid": "6f6e1b9e-39bc-44bc-ab44-166671d70475"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -43,8 +42,7 @@
             "button_link": {
               "text": "Our Services",
               "href": "services.html",
-              "target": "_self",
-              "pageUuid": "d25937fe-225e-46e6-b712-a9b30900f2b3"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -63,8 +61,7 @@
             "button_link": {
               "text": "Free Estimate",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "0e3a754c-6297-4860-a3ce-ddb1e518ff10"
+              "target": "_self"
             },
             "button_style": "primary",
             "button_size": "medium",
@@ -265,8 +262,7 @@
             "link": {
               "text": "About Us",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "8042c826-00ad-44b9-b584-e02a4a0341e6"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -359,8 +355,7 @@
             "link": {
               "text": "Get a Free Estimate",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "0e3a754c-6297-4860-a3ce-ddb1e518ff10"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

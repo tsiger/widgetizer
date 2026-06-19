@@ -199,8 +199,7 @@
             "button_link": {
               "text": "Reserve a Spot",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
+              "target": "_self"
             }
           }
         },
@@ -215,8 +214,7 @@
             "button_link": {
               "text": "Sign Up",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
+              "target": "_self"
             }
           }
         },
@@ -231,8 +229,7 @@
             "button_link": {
               "text": "Get Tickets",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
+              "target": "_self"
             }
           }
         }

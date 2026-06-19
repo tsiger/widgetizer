@@ -247,15 +247,13 @@
             "link": {
               "text": "Find Us",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "2845e053-7b6d-4204-8b0f-0bd5b5982357"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "View Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "80519a5f-8307-4ffd-94c1-929867f65f59"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

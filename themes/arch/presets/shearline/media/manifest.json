@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "shearline-news-holiday-late-nights.webp",
+      "originalName": "shearline-news-holiday-late-nights.webp",
+      "type": "image/webp",
+      "size": 96452,
+      "path": "/uploads/images/shearline-news-holiday-late-nights.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Late-Night Hours for the Holiday Rush",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-news-holiday-late-nights-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/shearline-news-holiday-late-nights-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-news-holiday-late-nights-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "shearline-news-make-your-color-last.webp",
+      "originalName": "shearline-news-make-your-color-last.webp",
+      "type": "image/webp",
+      "size": 125724,
+      "path": "/uploads/images/shearline-news-make-your-color-last.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Keep Your Color From Fading So Fast",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-news-make-your-color-last-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/shearline-news-make-your-color-last-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-news-make-your-color-last-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "shearline-news-meet-our-newest-stylist.webp",
+      "originalName": "shearline-news-meet-our-newest-stylist.webp",
+      "type": "image/webp",
+      "size": 83834,
+      "path": "/uploads/images/shearline-news-meet-our-newest-stylist.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Say Hello to Theo Behind the Third Chair",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-news-meet-our-newest-stylist-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/shearline-news-meet-our-newest-stylist-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-news-meet-our-newest-stylist-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "shearline-news-online-booking-is-here.webp",
+      "originalName": "shearline-news-online-booking-is-here.webp",
+      "type": "image/webp",
+      "size": 221392,
+      "path": "/uploads/images/shearline-news-online-booking-is-here.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "You Can Now Book Online, Any Hour",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-news-online-booking-is-here-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/shearline-news-online-booking-is-here-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-news-online-booking-is-here-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "shearline-news-ponytails-for-a-cause.webp",
+      "originalName": "shearline-news-ponytails-for-a-cause.webp",
+      "type": "image/webp",
+      "size": 194436,
+      "path": "/uploads/images/shearline-news-ponytails-for-a-cause.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Free Cuts for Anyone Donating a Ponytail",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-news-ponytails-for-a-cause-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/shearline-news-ponytails-for-a-cause-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-news-ponytails-for-a-cause-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "shearline-services-balayage.webp",
+      "originalName": "shearline-services-balayage.webp",
+      "type": "image/webp",
+      "size": 165294,
+      "path": "/uploads/images/shearline-services-balayage.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Balayage",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-services-balayage-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/shearline-services-balayage-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-services-balayage-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "shearline-services-full-colour.webp",
+      "originalName": "shearline-services-full-colour.webp",
+      "type": "image/webp",
+      "size": 93232,
+      "path": "/uploads/images/shearline-services-full-colour.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Full Colour",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-services-full-colour-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/shearline-services-full-colour-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-services-full-colour-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "shearline-services-mens-cut.webp",
+      "originalName": "shearline-services-mens-cut.webp",
+      "type": "image/webp",
+      "size": 223260,
+      "path": "/uploads/images/shearline-services-mens-cut.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Men's Cut",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-services-mens-cut-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/shearline-services-mens-cut-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-services-mens-cut-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "shearline-services-treatment-and-blow-dry.webp",
+      "originalName": "shearline-services-treatment-and-blow-dry.webp",
+      "type": "image/webp",
+      "size": 198968,
+      "path": "/uploads/images/shearline-services-treatment-and-blow-dry.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Treatment and Blow-Dry",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-services-treatment-and-blow-dry-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/shearline-services-treatment-and-blow-dry-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-services-treatment-and-blow-dry-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "shearline-services-womens-cut-and-style.webp",
+      "originalName": "shearline-services-womens-cut-and-style.webp",
+      "type": "image/webp",
+      "size": 266790,
+      "path": "/uploads/images/shearline-services-womens-cut-and-style.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Women's Cut and Style",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/shearline-services-womens-cut-and-style-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/shearline-services-womens-cut-and-style-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/shearline-services-womens-cut-and-style-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "shearline-logo-light-v2.png",
       "originalName": "shearline-logo-light-v2.png",
       "type": "image/png",

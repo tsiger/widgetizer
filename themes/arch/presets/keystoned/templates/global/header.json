@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "properties.html",
       "text": "View Properties",
-      "target": "_self",
-      "pageUuid": "c7a629ee-9ff5-4dc5-94f0-4d620e1450b7"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,

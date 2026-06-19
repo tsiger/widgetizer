@@ -1,0 +1,13 @@
+{
+  "slug": "dental-care",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Pet Dental Care",
+    "icon": "dental",
+    "summary": "Cleaning and treatment for the teeth and gums that pets cannot tend themselves.",
+    "description": "<p>Dental disease is one of the most common problems we see, and it often hides in plain sight. Pets are good at carrying on as normal even when their teeth are sore, so trouble can build up quietly until a proper look reveals it.</p><h2>How we treat the mouth</h2><p>We assess the mouth, clean below the gumline under anaesthetic, and treat any teeth causing trouble. Working under anaesthetic lets us clean thoroughly and painlessly, take dental X-rays where needed, and check areas a conscious pet would never let us reach. Beforehand we run safety checks to make sure your pet is well enough for the procedure.</p><ul><li>A pre-procedure health check before any anaesthetic</li><li>A full clean above and below the gumline</li><li>Treatment or removal of teeth that are damaged or painful</li></ul><p>Afterwards we show you simple ways to keep things healthy at home, from brushing to suitable chews and diets. Most pets are noticeably brighter once a sore mouth has been sorted, even if their owners had not realised anything was wrong.</p><h3>Signs worth watching for</h3><p>Bad breath, drooling, pawing at the mouth, or eating on one side can all point to dental discomfort. If you notice any of these, it is worth booking a check rather than waiting.</p><p>We are happy to talk through home care at any visit and show you techniques that fit your pet rather than ones they will fight. Even a little regular care between cleans makes the next visit easier.</p>",
+    "price": "From $250",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/tailside-services-dental-care.webp"
+  }
+}

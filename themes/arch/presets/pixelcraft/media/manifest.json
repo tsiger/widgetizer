@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "pixelcraft-news-now-offering-brand-refresh-sprints.webp",
+      "originalName": "pixelcraft-news-now-offering-brand-refresh-sprints.webp",
+      "type": "image/webp",
+      "size": 87598,
+      "path": "/uploads/images/pixelcraft-news-now-offering-brand-refresh-sprints.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Now Offering Brand Refresh Sprints",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-news-now-offering-brand-refresh-sprints-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-news-now-offering-brand-refresh-sprints-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-news-now-offering-brand-refresh-sprints-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-news-pixelcraft-design-award.webp",
+      "originalName": "pixelcraft-news-pixelcraft-design-award.webp",
+      "type": "image/webp",
+      "size": 133344,
+      "path": "/uploads/images/pixelcraft-news-pixelcraft-design-award.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Our Packaging Work Took a Regional Award",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-news-pixelcraft-design-award-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-news-pixelcraft-design-award-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-news-pixelcraft-design-award-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-news-spring-design-workshop-for-locals.webp",
+      "originalName": "pixelcraft-news-spring-design-workshop-for-locals.webp",
+      "type": "image/webp",
+      "size": 119718,
+      "path": "/uploads/images/pixelcraft-news-spring-design-workshop-for-locals.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Spring Workshop for Local Makers",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-news-spring-design-workshop-for-locals-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-news-spring-design-workshop-for-locals-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-news-spring-design-workshop-for-locals-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-news-the-sketchbook-stage.webp",
+      "originalName": "pixelcraft-news-the-sketchbook-stage.webp",
+      "type": "image/webp",
+      "size": 89852,
+      "path": "/uploads/images/pixelcraft-news-the-sketchbook-stage.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The Stage Clients Never See",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-news-the-sketchbook-stage-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-news-the-sketchbook-stage-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-news-the-sketchbook-stage-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-news-why-your-logo-needs-room.webp",
+      "originalName": "pixelcraft-news-why-your-logo-needs-room.webp",
+      "type": "image/webp",
+      "size": 308996,
+      "path": "/uploads/images/pixelcraft-news-why-your-logo-needs-room.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Why Your Logo Needs Room to Breathe",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-news-why-your-logo-needs-room-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-news-why-your-logo-needs-room-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-news-why-your-logo-needs-room-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-projects-aperture-festival-branding.webp",
+      "originalName": "pixelcraft-projects-aperture-festival-branding.webp",
+      "type": "image/webp",
+      "size": 257914,
+      "path": "/uploads/images/pixelcraft-projects-aperture-festival-branding.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Festival Branding for Aperture Film Days",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-projects-aperture-festival-branding-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-projects-aperture-festival-branding-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-projects-aperture-festival-branding-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-projects-halcyon-skincare-rebrand.webp",
+      "originalName": "pixelcraft-projects-halcyon-skincare-rebrand.webp",
+      "type": "image/webp",
+      "size": 36504,
+      "path": "/uploads/images/pixelcraft-projects-halcyon-skincare-rebrand.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Rebrand for Halcyon Skincare",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-projects-halcyon-skincare-rebrand-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-projects-halcyon-skincare-rebrand-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-projects-halcyon-skincare-rebrand-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-projects-meridian-press-editorial.webp",
+      "originalName": "pixelcraft-projects-meridian-press-editorial.webp",
+      "type": "image/webp",
+      "size": 201288,
+      "path": "/uploads/images/pixelcraft-projects-meridian-press-editorial.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Editorial System for Meridian Press",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-projects-meridian-press-editorial-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-projects-meridian-press-editorial-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-projects-meridian-press-editorial-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-projects-rootcellar-packaging.webp",
+      "originalName": "pixelcraft-projects-rootcellar-packaging.webp",
+      "type": "image/webp",
+      "size": 184886,
+      "path": "/uploads/images/pixelcraft-projects-rootcellar-packaging.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Packaging Line for Rootcellar Ferments",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-projects-rootcellar-packaging-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-projects-rootcellar-packaging-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-projects-rootcellar-packaging-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pixelcraft-projects-saltbox-coffee-identity.webp",
+      "originalName": "pixelcraft-projects-saltbox-coffee-identity.webp",
+      "type": "image/webp",
+      "size": 86576,
+      "path": "/uploads/images/pixelcraft-projects-saltbox-coffee-identity.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Brand Identity for Saltbox Coffee Roasters",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pixelcraft-projects-saltbox-coffee-identity-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pixelcraft-projects-saltbox-coffee-identity-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pixelcraft-projects-saltbox-coffee-identity-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "services-banner-v2.webp",
       "originalName": "services-banner-v2.webp",
       "type": "image/webp",

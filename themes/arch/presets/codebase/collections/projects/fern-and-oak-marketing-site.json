@@ -1,0 +1,12 @@
+{
+  "slug": "fern-and-oak-marketing-site",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Marketing Site for Fern and Oak Interiors",
+    "summary": "We gave a design studio a fast portfolio site they can update themselves without calling us.",
+    "description": "<p>Fern and Oak had a beautiful body of work trapped inside a slow template they were afraid to touch. Every photo they wanted to add meant emailing a freelancer and waiting a week, so most finished rooms never made it onto the site at all.</p><h2>The brief</h2><p>The studio came to us with a simple ask: a marketing site that showed their interiors at full strength and that the team could update without help. They did not want a content system with a hundred buttons. They wanted to post a room and move on.</p><p>We started by cataloguing what they actually published in a year and stripped the page types down to the few that mattered. A project gallery, individual room pages, an about section, and a contact form covered everything they needed.</p><h2>What we built</h2><p>We built a lightweight site around a project gallery, with an editor the team uses to post new rooms in minutes. Image handling was the heart of it: we set up a pipeline that resizes and compresses every upload so the photos stay sharp on a large screen but still load quickly on a phone.</p><ul><li>A filterable project gallery with individual room pages</li><li>An in-house editor for posting new projects without code</li><li>Automatic image resizing and compression on upload</li><li>A contact form wired to the studio inbox</li></ul><p>We also wrote a short guide and sat with two staff members until they could publish a project on their own. That handoff mattered more than any feature, because the whole point was to get us out of the loop.</p><h2>The result</h2><p>The studio publishes new projects on its own now, usually the same week a job wraps. Inquiries through the contact form roughly doubled in the first two months, which the owner credited to having current work on display rather than a gallery frozen a year in the past.</p>",
+    "client": "Fern and Oak Interiors",
+    "year": "2023",
+    "featured_image": "/uploads/images/codebase-projects-fern-and-oak-marketing-site.webp"
+  }
+}

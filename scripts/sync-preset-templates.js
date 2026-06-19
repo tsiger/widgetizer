@@ -18,7 +18,7 @@
  */
 import path from "path";
 import fs from "fs-extra";
-import { THEMES_SEED_DIR, getProjectPagesDir } from "../packages/builder-server/src/config.js";
+import { THEMES_SEED_DIR, getProjectPagesDir, getProjectMenusDir } from "../packages/builder-server/src/config.js";
 
 function parseArgs(argv) {
   const args = {};
@@ -46,6 +46,41 @@ async function walkJson(dir) {
   return out;
 }
 
+// Internal-link references are re-derived from the link's href (slug) at project
+// creation (enrichNewProjectReferences). A demo's per-project pageUuid is stale in
+// a preset, so strip it here, just like the page's own uuid.
+function stripLinkPageUuids(node) {
+  if (Array.isArray(node)) {
+    node.forEach(stripLinkPageUuids);
+  } else if (node && typeof node === "object") {
+    if ("href" in node && "pageUuid" in node) delete node.pageUuid;
+    for (const key of Object.keys(node)) stripLinkPageUuids(node[key]);
+  }
+}
+
+// Menu settings (header nav, footer menu, etc.) must reference a menu by its id
+// (e.g. "main-menu"), not its uuid: enrichNewProjectReferences remaps the id to
+// the project's freshly-generated menu uuid at creation. A demo's per-project
+// menu uuid is stale in a preset, so convert any baked-in menu uuid back to its
+// id here, using the demo project's own menu uuid->id map. Returns the count.
+function convertMenuRefsToIds(node, uuidToId) {
+  let n = 0;
+  if (Array.isArray(node)) {
+    for (const v of node) n += convertMenuRefsToIds(v, uuidToId);
+  } else if (node && typeof node === "object") {
+    for (const key of Object.keys(node)) {
+      const v = node[key];
+      if (typeof v === "string" && uuidToId.has(v)) {
+        node[key] = uuidToId.get(v);
+        n += 1;
+      } else {
+        n += convertMenuRefsToIds(v, uuidToId);
+      }
+    }
+  }
+  return n;
+}
+
 async function main() {
   const { project, theme = "arch", preset } = parseArgs(process.argv);
   if (!project) fail("Usage: node scripts/sync-preset-templates.js --project <folder> --preset <id> [--theme arch]");
@@ -65,11 +100,26 @@ async function main() {
   // pages don't linger).
   await fs.emptyDir(templatesDir);
 
+  // Map the demo project's menu uuids -> ids so menu settings ship referencing
+  // menus by id (see convertMenuRefsToIds).
+  const menuUuidToId = new Map();
+  const menusDir = getProjectMenusDir(project);
+  if (await fs.pathExists(menusDir)) {
+    for (const entry of await fs.readdir(menusDir)) {
+      if (!entry.endsWith(".json")) continue;
+      const menu = await fs.readJSON(path.join(menusDir, entry));
+      if (menu.uuid && menu.id) menuUuidToId.set(menu.uuid, menu.id);
+    }
+  }
+
   let imageRefs = 0;
+  let menuRefs = 0;
   for (const pageFile of pageFiles) {
     const rel = path.relative(pagesDir, pageFile);
     const page = await fs.readJSON(pageFile);
     delete page.uuid; // per-instance id, regenerated when a project is created
+    stripLinkPageUuids(page); // pageUuid is re-derived from href at creation; a demo's is stale in a preset
+    menuRefs += convertMenuRefsToIds(page, menuUuidToId); // menu uuid -> id; enrichment remaps at creation
 
     const targetPath = path.join(templatesDir, rel);
     await fs.ensureDir(path.dirname(targetPath));
@@ -80,7 +130,7 @@ async function main() {
 
   console.log(
     `✓ Synced ${pageFiles.length} page(s) from project "${project}" → ` +
-      `themes/${theme}/presets/${presetId}/templates/ (${imageRefs} image references)`,
+      `themes/${theme}/presets/${presetId}/templates/ (${imageRefs} image references, ${menuRefs} menu refs normalized to ids)`,
   );
 }
 

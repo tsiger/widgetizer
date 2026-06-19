@@ -54,15 +54,13 @@
             "link": {
               "text": "Check availability",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "See the rooms",
               "href": "rooms.html",
-              "target": "_self",
-              "pageUuid": "a48394e3-2466-42d0-b762-30b88a4b8346"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "large"
@@ -136,7 +134,6 @@
             "text_color": "light",
             "alignment": "start",
             "link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Book Olive",
               "target": "_self"
@@ -155,7 +152,6 @@
             "text_color": "light",
             "alignment": "start",
             "link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Book Fig",
               "target": "_self"
@@ -174,7 +170,6 @@
             "text_color": "light",
             "alignment": "start",
             "link": {
-              "pageUuid": "5d6beef3-0361-45a9-8d04-7324641d2d32",
               "href": "room-jasmine.html",
               "text": "Book Jasmine",
               "target": "_self"
@@ -545,15 +540,13 @@
             "link": {
               "text": "Check availability",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "Say hello",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ede30b81-3aca-4d64-abb7-a322a91a97b1"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

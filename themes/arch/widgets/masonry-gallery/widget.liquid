@@ -94,6 +94,10 @@
     {% endif %}
 
     <div class="widget-content">
+      {% comment %} Column-aware image sizing: masonry columns are equal width, so each
+         image ≈ container / columns at ≥990px (2-up in the 750–989 band, 1-up below). {% endcomment %}
+      {% assign desktop_vw = 100 | divided_by: widget.settings.columns_desktop %}
+      {% assign card_sizes = '(max-width: 749px) 100vw, (max-width: 989px) 50vw, ' | append: desktop_vw | append: 'vw' %}
       <div class="masonry-grid">
         {% assign item_heading_level = 'h3' %}
         {% if widget.settings.title == blank %}
@@ -104,7 +108,7 @@
           {% assign block = widget.blocks[blockId] %}
           <div class="widget-card reveal reveal-fade" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-caption="{{ block.settings.title }}">
             {% if block.settings.image != blank %}
-              {% image src: block.settings.image, size: 'medium', srcset: true, sizes: '(max-width: 749px) 100vw, 400px', class: 'widget-card-image' %}
+              {% image src: block.settings.image, size: 'medium', srcset: true, sizes: card_sizes, class: 'widget-card-image' %}
             {% else %}
               {% assign aspect_index = forloop.index | modulo: 3 %}
               {% if aspect_index == 1 %}

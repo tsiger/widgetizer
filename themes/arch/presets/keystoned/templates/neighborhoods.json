@@ -176,8 +176,7 @@
             "link": {
               "text": "About Sarah",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "89853daf-fc71-40e0-b8ac-d7016599f885"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -250,8 +249,7 @@
             "link": {
               "text": "Free Consultation",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "53852415-e1bc-4371-a530-0ffe7fd78310"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

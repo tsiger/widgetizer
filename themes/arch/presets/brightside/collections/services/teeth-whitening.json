@@ -1,0 +1,13 @@
+{
+  "slug": "teeth-whitening",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Professional Teeth Whitening",
+    "icon": "sparkles",
+    "summary": "A safe, supervised way to brighten your smile by several shades.",
+    "description": "<p>Over time coffee, tea, and red wine leave their mark. This treatment lifts that staining without the guesswork of over-the-counter kits, using a supervised approach that protects your teeth and gums along the way.</p><h2>How it works</h2><p>We start by checking your teeth and gums are healthy enough, since whitening works best on a clean, sound mouth. We then take impressions and fit custom trays made to sit snugly against your teeth. From there we walk you through the gel and how to use it at home over a set number of days.</p><ul><li>A check to confirm whitening is right for you</li><li>Custom-fitted trays made to your mouth</li><li>Professional-grade gel with clear instructions for home use</li></ul><p>Results are gradual and even, which is exactly what makes them look natural. Because you apply the gel yourself at home under our guidance, you stay in control of the final shade, and we are on hand if anything feels off.</p><h3>What to expect afterwards</h3><p>Some people notice mild, short-lived sensitivity, which usually settles on its own. We will suggest a gentle toothpaste and a sensible pace if that happens. Keeping up your normal cleaning routine helps the result last.</p><p>Whitening lightens natural teeth but not crowns or fillings, so if you have visible restorations we will talk through what to expect before you start. Cutting back on staining drinks, or sipping them through a straw, keeps your new shade looking bright for longer.</p>",
+    "price": "From $350",
+    "duration": "60 min",
+    "featured_image": "/uploads/images/brightside-services-teeth-whitening.webp"
+  }
+}

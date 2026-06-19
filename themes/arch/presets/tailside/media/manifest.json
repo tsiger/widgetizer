@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "tailside-news-a-day-with-our-nurses.webp",
+      "originalName": "tailside-news-a-day-with-our-nurses.webp",
+      "type": "image/webp",
+      "size": 82298,
+      "path": "/uploads/images/tailside-news-a-day-with-our-nurses.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Day in the Life of Our Nurses",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-a-day-with-our-nurses-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-a-day-with-our-nurses-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-a-day-with-our-nurses-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-spotting-pain-in-quiet-pets.webp",
+      "originalName": "tailside-news-spotting-pain-in-quiet-pets.webp",
+      "type": "image/webp",
+      "size": 137052,
+      "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Spot Pain in a Pet That Hides It",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-spotting-pain-in-quiet-pets-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-spring-parasite-season.webp",
+      "originalName": "tailside-news-spring-parasite-season.webp",
+      "type": "image/webp",
+      "size": 239894,
+      "path": "/uploads/images/tailside-news-spring-parasite-season.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Getting Ahead of Tick and Flea Season",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-spring-parasite-season-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-spring-parasite-season-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-spring-parasite-season-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-twenty-years-caring-for-pets.webp",
+      "originalName": "tailside-news-twenty-years-caring-for-pets.webp",
+      "type": "image/webp",
+      "size": 204946,
+      "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Twenty Years of Caring for Local Pets",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-twenty-years-caring-for-pets-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-news-welcoming-our-new-vet.webp",
+      "originalName": "tailside-news-welcoming-our-new-vet.webp",
+      "type": "image/webp",
+      "size": 124184,
+      "path": "/uploads/images/tailside-news-welcoming-our-new-vet.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Welcoming Dr Owusu to the Practice",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-news-welcoming-our-new-vet-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/tailside-news-welcoming-our-new-vet-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-news-welcoming-our-new-vet-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-dental-care.webp",
+      "originalName": "tailside-services-dental-care.webp",
+      "type": "image/webp",
+      "size": 119458,
+      "path": "/uploads/images/tailside-services-dental-care.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Pet Dental Care",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-dental-care-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-dental-care-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-dental-care-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-diagnostic-lab-testing.webp",
+      "originalName": "tailside-services-diagnostic-lab-testing.webp",
+      "type": "image/webp",
+      "size": 70410,
+      "path": "/uploads/images/tailside-services-diagnostic-lab-testing.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Diagnostic Lab Testing",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-diagnostic-lab-testing-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-diagnostic-lab-testing-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-diagnostic-lab-testing-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-emergency-and-urgent-care.webp",
+      "originalName": "tailside-services-emergency-and-urgent-care.webp",
+      "type": "image/webp",
+      "size": 175926,
+      "path": "/uploads/images/tailside-services-emergency-and-urgent-care.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Emergency and Urgent Care",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-emergency-and-urgent-care-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-emergency-and-urgent-care-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-emergency-and-urgent-care-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-vaccinations.webp",
+      "originalName": "tailside-services-vaccinations.webp",
+      "type": "image/webp",
+      "size": 127396,
+      "path": "/uploads/images/tailside-services-vaccinations.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Vaccinations",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-vaccinations-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-vaccinations-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-vaccinations-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "tailside-services-wellness-exam.webp",
+      "originalName": "tailside-services-wellness-exam.webp",
+      "type": "image/webp",
+      "size": 112108,
+      "path": "/uploads/images/tailside-services-wellness-exam.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Wellness Exam",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/tailside-services-wellness-exam-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/tailside-services-wellness-exam-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/tailside-services-wellness-exam-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "new-patients-welcome.webp",
       "originalName": "new-patients-welcome.webp",
       "type": "image/webp",

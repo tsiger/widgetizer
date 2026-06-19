@@ -96,8 +96,7 @@
             "link": {
               "text": "See Saoirse's work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "1c88938d-fbd4-4653-b5f9-b2297bcef8fa"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -165,8 +164,7 @@
             "link": {
               "text": "See Rafael's work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "1c88938d-fbd4-4653-b5f9-b2297bcef8fa"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -234,8 +232,7 @@
             "link": {
               "text": "See Kiko's work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "1c88938d-fbd4-4653-b5f9-b2297bcef8fa"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -303,8 +300,7 @@
             "link": {
               "text": "See Elena's work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "1c88938d-fbd4-4653-b5f9-b2297bcef8fa"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -372,8 +368,7 @@
             "link": {
               "text": "See Jules's work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "1c88938d-fbd4-4653-b5f9-b2297bcef8fa"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -441,8 +436,7 @@
             "link": {
               "text": "See Indra's work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "1c88938d-fbd4-4653-b5f9-b2297bcef8fa"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -550,8 +544,7 @@
             "link": {
               "text": "Start an inquiry",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

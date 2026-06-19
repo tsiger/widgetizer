@@ -8,17 +8,6 @@
 <article class="widget widget-news-article">
   <style>
     .widget-news-article {
-      & .news-back {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-xs);
-        color: var(--text-muted);
-
-        &:hover {
-          color: var(--accent);
-        }
-      }
-
       & .news-meta {
         margin-block-start: var(--space-xs);
         color: var(--text-muted);
@@ -42,8 +31,6 @@
 
   <div class="widget-container">
     <div class="widget-content content-flow widget-content-md">
-      <a class="news-back w-label t-xs t-uppercase" href="../index.html">&larr; Back to home</a>
-
       <h1 class="w-headline reveal reveal-up">{{ item.settings.title }}</h1>
 
       {% if item.settings.date != blank %}

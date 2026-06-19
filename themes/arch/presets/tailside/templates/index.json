@@ -44,15 +44,13 @@
             "link": {
               "href": "contact.html",
               "text": "Book a visit",
-              "target": "_self",
-              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "href": "services.html",
               "text": "View services",
-              "target": "_self",
-              "pageUuid": "e15b0596-c0a9-470c-888b-e26e9c17eddc"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "large"
@@ -291,8 +289,7 @@
             "link": {
               "href": "contact.html",
               "text": "Contact Tailside",
-              "target": "_self",
-              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

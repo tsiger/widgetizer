@@ -297,8 +297,7 @@
             "link": {
               "text": "Begin an inquiry",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "f1810ddb-0d14-42df-8110-d587d251e511"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

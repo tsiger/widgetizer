@@ -313,8 +313,7 @@
             "link": {
               "href": "contact.html",
               "text": "Schedule a Tour",
-              "target": "_self",
-              "pageUuid": "0db30ea7-c4f3-4513-a160-34d01f823fe8"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

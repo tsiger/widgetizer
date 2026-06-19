@@ -238,8 +238,7 @@
             "link": {
               "href": "pricing.html",
               "text": "Start Free Trial",
-              "target": "_self",
-              "pageUuid": "c3fb2f51-af25-43f7-9068-f7b5a572dede"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"

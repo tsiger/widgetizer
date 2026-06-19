@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "codebase-news-five-years-of-codebase.webp",
+      "originalName": "codebase-news-five-years-of-codebase.webp",
+      "type": "image/webp",
+      "size": 78184,
+      "path": "/uploads/images/codebase-news-five-years-of-codebase.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Five Years and Forty Launches",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-news-five-years-of-codebase-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/codebase-news-five-years-of-codebase-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-news-five-years-of-codebase-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "codebase-news-free-site-audits-this-spring.webp",
+      "originalName": "codebase-news-free-site-audits-this-spring.webp",
+      "type": "image/webp",
+      "size": 107422,
+      "path": "/uploads/images/codebase-news-free-site-audits-this-spring.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Free Site Health Checks Through April",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-news-free-site-audits-this-spring-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/codebase-news-free-site-audits-this-spring-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-news-free-site-audits-this-spring-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "codebase-news-how-we-handle-a-handoff.webp",
+      "originalName": "codebase-news-how-we-handle-a-handoff.webp",
+      "type": "image/webp",
+      "size": 84868,
+      "path": "/uploads/images/codebase-news-how-we-handle-a-handoff.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How We Hand a Project Back to You",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-news-how-we-handle-a-handoff-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/codebase-news-how-we-handle-a-handoff-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-news-how-we-handle-a-handoff-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "codebase-news-now-booking-q3-projects.webp",
+      "originalName": "codebase-news-now-booking-q3-projects.webp",
+      "type": "image/webp",
+      "size": 65882,
+      "path": "/uploads/images/codebase-news-now-booking-q3-projects.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "We Are Now Booking Q3 Projects",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-news-now-booking-q3-projects-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/codebase-news-now-booking-q3-projects-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-news-now-booking-q3-projects-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "codebase-news-stop-shipping-unused-css.webp",
+      "originalName": "codebase-news-stop-shipping-unused-css.webp",
+      "type": "image/webp",
+      "size": 86128,
+      "path": "/uploads/images/codebase-news-stop-shipping-unused-css.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Stop Shipping CSS Nobody Sees",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-news-stop-shipping-unused-css-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/codebase-news-stop-shipping-unused-css-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-news-stop-shipping-unused-css-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "codebase-projects-fern-and-oak-marketing-site.webp",
+      "originalName": "codebase-projects-fern-and-oak-marketing-site.webp",
+      "type": "image/webp",
+      "size": 79460,
+      "path": "/uploads/images/codebase-projects-fern-and-oak-marketing-site.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Marketing Site for Fern and Oak Interiors",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-projects-fern-and-oak-marketing-site-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/codebase-projects-fern-and-oak-marketing-site-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-projects-fern-and-oak-marketing-site-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "codebase-projects-harborline-grocery-rebuild.webp",
+      "originalName": "codebase-projects-harborline-grocery-rebuild.webp",
+      "type": "image/webp",
+      "size": 249546,
+      "path": "/uploads/images/codebase-projects-harborline-grocery-rebuild.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Headless Storefront for Harborline Grocers",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-projects-harborline-grocery-rebuild-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/codebase-projects-harborline-grocery-rebuild-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-projects-harborline-grocery-rebuild-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "codebase-projects-lumen-analytics-dashboard.webp",
+      "originalName": "codebase-projects-lumen-analytics-dashboard.webp",
+      "type": "image/webp",
+      "size": 77766,
+      "path": "/uploads/images/codebase-projects-lumen-analytics-dashboard.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Operations Dashboard for Lumen Logistics",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-projects-lumen-analytics-dashboard-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/codebase-projects-lumen-analytics-dashboard-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-projects-lumen-analytics-dashboard-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "codebase-projects-northfield-clinic-booking.webp",
+      "originalName": "codebase-projects-northfield-clinic-booking.webp",
+      "type": "image/webp",
+      "size": 53192,
+      "path": "/uploads/images/codebase-projects-northfield-clinic-booking.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Appointment System for Northfield Dental",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-projects-northfield-clinic-booking-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/codebase-projects-northfield-clinic-booking-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-projects-northfield-clinic-booking-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "codebase-projects-trailmark-membership-portal.webp",
+      "originalName": "codebase-projects-trailmark-membership-portal.webp",
+      "type": "image/webp",
+      "size": 191864,
+      "path": "/uploads/images/codebase-projects-trailmark-membership-portal.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Membership Portal for Trailmark Climbing",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/codebase-projects-trailmark-membership-portal-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/codebase-projects-trailmark-membership-portal-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/codebase-projects-trailmark-membership-portal-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "logo06.png",
       "originalName": "logo06.png",
       "type": "image/png",

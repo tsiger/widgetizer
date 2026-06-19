@@ -65,8 +65,7 @@
             "button_link": {
               "text": "Start weekly",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
+              "target": "_self"
             },
             "featured": false
           }
@@ -81,8 +80,7 @@
             "button_link": {
               "text": "Start biweekly",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
+              "target": "_self"
             },
             "featured": true
           }
@@ -97,8 +95,7 @@
             "button_link": {
               "text": "Start monthly",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
+              "target": "_self"
             },
             "featured": false
           }
@@ -401,8 +398,7 @@
             "link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "609cd26c-4181-4b7e-88dd-34c920124867"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

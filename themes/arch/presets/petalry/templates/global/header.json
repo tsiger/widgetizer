@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Order Now",
-      "target": "_self",
-      "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

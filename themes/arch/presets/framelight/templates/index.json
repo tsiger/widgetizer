@@ -43,8 +43,7 @@
             "link": {
               "text": "Inquire",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -199,8 +198,7 @@
             "link": {
               "text": "About the studio",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "d67fe916-c47d-4ec2-a18a-88f20c62de60"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium",
@@ -348,8 +346,7 @@
             "link": {
               "text": "Inquire",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

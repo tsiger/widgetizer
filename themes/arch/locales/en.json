@@ -308,8 +308,21 @@
           "label": "Layout",
           "options": {
             "grid": "Grid",
-            "carousel": "Carousel"
+            "carousel": "Carousel",
+            "card": "Card",
+            "overlay": "Overlay"
           }
+        },
+        "text_display": {
+          "label": "Text display",
+          "description": "Overlay layout only: reveal the card text on hover or keep it always visible.",
+          "options": {
+            "hover": "On hover",
+            "always": "Always"
+          }
+        },
+        "card_layout_only": {
+          "description": "Applies to the card layout only."
         },
         "fullwidth": {
           "label": "Full width"

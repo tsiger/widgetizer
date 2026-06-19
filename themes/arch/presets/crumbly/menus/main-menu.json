@@ -2,10 +2,35 @@
   "id": "main-menu",
   "name": "Main Menu",
   "items": [
-    { "label": "Menu", "link": "menu.html", "items": [] },
-    { "label": "Custom Cakes", "link": "custom-cakes.html", "items": [] },
-    { "label": "Gallery", "link": "gallery.html", "items": [] },
-    { "label": "About", "link": "about.html", "items": [] },
-    { "label": "Contact", "link": "contact.html", "items": [] }
+    {
+      "label": "Menu",
+      "link": "menu.html",
+      "items": []
+    },
+    {
+      "label": "Custom Cakes",
+      "link": "custom-cakes.html",
+      "items": []
+    },
+    {
+      "label": "Gallery",
+      "link": "gallery.html",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "about.html",
+      "items": []
+    },
+    {
+      "label": "News",
+      "link": "news.html",
+      "items": []
+    },
+    {
+      "label": "Contact",
+      "link": "contact.html",
+      "items": []
+    }
   ]
 }

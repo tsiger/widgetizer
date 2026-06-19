@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "little-oaks-news-easing-drop-off.webp",
+      "originalName": "little-oaks-news-easing-drop-off.webp",
+      "type": "image/webp",
+      "size": 117398,
+      "path": "/uploads/images/little-oaks-news-easing-drop-off.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Make Morning Goodbyes Easier",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/little-oaks-news-easing-drop-off-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/little-oaks-news-easing-drop-off-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/little-oaks-news-easing-drop-off-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "little-oaks-news-forest-school-fridays.webp",
+      "originalName": "little-oaks-news-forest-school-fridays.webp",
+      "type": "image/webp",
+      "size": 387234,
+      "path": "/uploads/images/little-oaks-news-forest-school-fridays.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Little Oaks Introduces Forest School Fridays",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/little-oaks-news-forest-school-fridays-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/little-oaks-news-forest-school-fridays-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/little-oaks-news-forest-school-fridays-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "little-oaks-news-meet-our-key-workers.webp",
+      "originalName": "little-oaks-news-meet-our-key-workers.webp",
+      "type": "image/webp",
+      "size": 123152,
+      "path": "/uploads/images/little-oaks-news-meet-our-key-workers.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The Key Workers Who Know Your Child",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/little-oaks-news-meet-our-key-workers-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/little-oaks-news-meet-our-key-workers-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/little-oaks-news-meet-our-key-workers-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "little-oaks-news-spring-open-morning.webp",
+      "originalName": "little-oaks-news-spring-open-morning.webp",
+      "type": "image/webp",
+      "size": 154562,
+      "path": "/uploads/images/little-oaks-news-spring-open-morning.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Come to Our Spring Open Morning",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/little-oaks-news-spring-open-morning-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/little-oaks-news-spring-open-morning-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/little-oaks-news-spring-open-morning-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "little-oaks-news-twenty-years-of-little-oaks.webp",
+      "originalName": "little-oaks-news-twenty-years-of-little-oaks.webp",
+      "type": "image/webp",
+      "size": 103168,
+      "path": "/uploads/images/little-oaks-news-twenty-years-of-little-oaks.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Twenty Years of First Steps and Painted Hands",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/little-oaks-news-twenty-years-of-little-oaks-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/little-oaks-news-twenty-years-of-little-oaks-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/little-oaks-news-twenty-years-of-little-oaks-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "little-oaks-green.png",
       "originalName": "little-oaks-green.png",
       "type": "image/png",

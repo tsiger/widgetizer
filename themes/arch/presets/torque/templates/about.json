@@ -285,8 +285,7 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {

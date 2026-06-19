@@ -53,8 +53,7 @@
             "button_link": {
               "href": "contact.html",
               "text": "Buy a Pass",
-              "target": "_self",
-              "pageUuid": "b3e2da2a-3d11-4355-b2e8-78b0fc7df73a"
+              "target": "_self"
             }
           }
         },
@@ -68,8 +67,7 @@
             "button_link": {
               "href": "contact.html",
               "text": "Start Free Trial",
-              "target": "_self",
-              "pageUuid": "b3e2da2a-3d11-4355-b2e8-78b0fc7df73a"
+              "target": "_self"
             },
             "featured": true
           }
@@ -84,8 +82,7 @@
             "button_link": {
               "href": "contact.html",
               "text": "Start Free Trial",
-              "target": "_self",
-              "pageUuid": "b3e2da2a-3d11-4355-b2e8-78b0fc7df73a"
+              "target": "_self"
             }
           }
         }
@@ -257,8 +254,7 @@
             "link": {
               "href": "contact.html",
               "text": "Get Started",
-              "target": "_self",
-              "pageUuid": "b3e2da2a-3d11-4355-b2e8-78b0fc7df73a"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"

@@ -46,8 +46,7 @@
             "link": {
               "text": "Book a consult",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"
@@ -139,8 +138,7 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             },
             "image": "/uploads/images/artist-rafael.webp"
           }
@@ -153,8 +151,7 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             },
             "image": "/uploads/images/artist-saoirse.webp"
           }
@@ -167,8 +164,7 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             },
             "image": "/uploads/images/artist-elena.webp"
           }
@@ -181,8 +177,7 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             },
             "image": "/uploads/images/artist-jules.webp"
           }
@@ -195,8 +190,7 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             },
             "image": "/uploads/images/artist-kiko.webp"
           }
@@ -209,8 +203,7 @@
             "button_link": {
               "text": "See work",
               "href": "artists.html",
-              "target": "_self",
-              "pageUuid": "38831f08-8ccb-4c51-a5cf-894158f00251"
+              "target": "_self"
             },
             "image": "/uploads/images/artist-indra.webp"
           }
@@ -375,8 +368,7 @@
             "link": {
               "text": "More on the Visit page",
               "href": "visit.html",
-              "target": "_self",
-              "pageUuid": "451a3a44-daa2-4efd-a6c3-06ea5f2273b1"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -480,8 +472,7 @@
             "link": {
               "text": "Start an inquiry",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "9d9267a8-ca0f-44a4-8970-27d585dd24cc"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

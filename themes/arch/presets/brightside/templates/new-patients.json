@@ -55,8 +55,7 @@
             "link": {
               "text": "Book Your First Visit",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -213,8 +212,7 @@
             "link": {
               "text": "Book Appointment",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

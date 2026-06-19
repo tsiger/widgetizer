@@ -6,13 +6,12 @@
     "contactDetailsLine1": "hello@example.com",
     "contactDetailsLine2": "By appointment",
     "contact_position": "menu",
-    "headerNavigation": "6184cf63-2331-4c3b-91d2-99d366b32374",
+    "headerNavigation": "main-menu",
     "center_nav": true,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Inquire",
-      "target": "_self",
-      "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

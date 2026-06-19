@@ -132,8 +132,7 @@
             "button_link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
+              "target": "_self"
             },
             "featured": false
           }
@@ -148,8 +147,7 @@
             "button_link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
+              "target": "_self"
             },
             "featured": true
           }
@@ -164,8 +162,7 @@
             "button_link": {
               "text": "Get a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
+              "target": "_self"
             },
             "featured": false
           }
@@ -276,8 +273,7 @@
             "link": {
               "text": "Book a call",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

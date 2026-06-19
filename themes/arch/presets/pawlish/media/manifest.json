@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "pawlish-news-a-morning-with-the-pawlish-groomers.webp",
+      "originalName": "pawlish-news-a-morning-with-the-pawlish-groomers.webp",
+      "type": "image/webp",
+      "size": 110566,
+      "path": "/uploads/images/pawlish-news-a-morning-with-the-pawlish-groomers.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Morning With the Pawlish Groomers",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-news-a-morning-with-the-pawlish-groomers-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-news-a-morning-with-the-pawlish-groomers-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-news-a-morning-with-the-pawlish-groomers-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pawlish-news-brushing-between-grooms-the-right-way.webp",
+      "originalName": "pawlish-news-brushing-between-grooms-the-right-way.webp",
+      "type": "image/webp",
+      "size": 196394,
+      "path": "/uploads/images/pawlish-news-brushing-between-grooms-the-right-way.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Brushing Between Grooms, the Right Way",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-news-brushing-between-grooms-the-right-way-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-news-brushing-between-grooms-the-right-way-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-news-brushing-between-grooms-the-right-way-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pawlish-news-five-years-and-a-rescue-day.webp",
+      "originalName": "pawlish-news-five-years-and-a-rescue-day.webp",
+      "type": "image/webp",
+      "size": 100992,
+      "path": "/uploads/images/pawlish-news-five-years-and-a-rescue-day.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Five Years In, a Free Grooming Day for Rescues",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-news-five-years-and-a-rescue-day-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-news-five-years-and-a-rescue-day-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-news-five-years-and-a-rescue-day-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pawlish-news-now-offering-puppy-intro-sessions.webp",
+      "originalName": "pawlish-news-now-offering-puppy-intro-sessions.webp",
+      "type": "image/webp",
+      "size": 81778,
+      "path": "/uploads/images/pawlish-news-now-offering-puppy-intro-sessions.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "We Now Run Gentle Puppy Intro Sessions",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-news-now-offering-puppy-intro-sessions-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-news-now-offering-puppy-intro-sessions-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-news-now-offering-puppy-intro-sessions-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pawlish-news-summer-coat-care-clinic.webp",
+      "originalName": "pawlish-news-summer-coat-care-clinic.webp",
+      "type": "image/webp",
+      "size": 96474,
+      "path": "/uploads/images/pawlish-news-summer-coat-care-clinic.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Drop In to Our Summer Coat Clinic in May",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-news-summer-coat-care-clinic-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-news-summer-coat-care-clinic-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-news-summer-coat-care-clinic-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "pawlish-services-bath-and-brush.webp",
+      "originalName": "pawlish-services-bath-and-brush.webp",
+      "type": "image/webp",
+      "size": 150070,
+      "path": "/uploads/images/pawlish-services-bath-and-brush.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Bath and Brush",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-services-bath-and-brush-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-services-bath-and-brush-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-services-bath-and-brush-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pawlish-services-deshedding-treatment.webp",
+      "originalName": "pawlish-services-deshedding-treatment.webp",
+      "type": "image/webp",
+      "size": 256414,
+      "path": "/uploads/images/pawlish-services-deshedding-treatment.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "De-Shedding Treatment",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-services-deshedding-treatment-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-services-deshedding-treatment-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-services-deshedding-treatment-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pawlish-services-full-groom.webp",
+      "originalName": "pawlish-services-full-groom.webp",
+      "type": "image/webp",
+      "size": 108070,
+      "path": "/uploads/images/pawlish-services-full-groom.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Full Groom",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-services-full-groom-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-services-full-groom-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-services-full-groom-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pawlish-services-nail-trim.webp",
+      "originalName": "pawlish-services-nail-trim.webp",
+      "type": "image/webp",
+      "size": 110226,
+      "path": "/uploads/images/pawlish-services-nail-trim.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Nail Trim",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-services-nail-trim-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-services-nail-trim-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-services-nail-trim-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "pawlish-services-puppy-intro-groom.webp",
+      "originalName": "pawlish-services-puppy-intro-groom.webp",
+      "type": "image/webp",
+      "size": 114558,
+      "path": "/uploads/images/pawlish-services-puppy-intro-groom.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "Puppy Intro Groom",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/pawlish-services-puppy-intro-groom-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/pawlish-services-puppy-intro-groom-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/pawlish-services-puppy-intro-groom-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "contact-callout.webp",
       "originalName": "contact-callout.webp",
       "type": "image/webp",

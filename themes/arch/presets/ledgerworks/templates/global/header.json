@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Book a consultation",
-      "target": "_self",
-      "pageUuid": "881e495e-f3f6-4627-b32d-0455b378f509"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "full_width": true,

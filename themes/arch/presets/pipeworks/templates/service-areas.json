@@ -294,8 +294,7 @@
             "link_2": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "92855630-d72b-4403-b24b-319bf88392bf"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

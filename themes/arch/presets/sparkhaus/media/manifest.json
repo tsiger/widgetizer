@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "sparkhaus-news-five-years-and-a-refuge-partnership.webp",
+      "originalName": "sparkhaus-news-five-years-and-a-refuge-partnership.webp",
+      "type": "image/webp",
+      "size": 105536,
+      "path": "/uploads/images/sparkhaus-news-five-years-and-a-refuge-partnership.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Five Years In, Cleaning for a Local Refuge",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/sparkhaus-news-five-years-and-a-refuge-partnership-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/sparkhaus-news-five-years-and-a-refuge-partnership-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/sparkhaus-news-five-years-and-a-refuge-partnership-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "sparkhaus-news-meet-the-sparkhaus-teams.webp",
+      "originalName": "sparkhaus-news-meet-the-sparkhaus-teams.webp",
+      "type": "image/webp",
+      "size": 64132,
+      "path": "/uploads/images/sparkhaus-news-meet-the-sparkhaus-teams.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The People Who Actually Hold Your Keys",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/sparkhaus-news-meet-the-sparkhaus-teams-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/sparkhaus-news-meet-the-sparkhaus-teams-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/sparkhaus-news-meet-the-sparkhaus-teams-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "sparkhaus-news-now-offering-end-of-tenancy-cleans.webp",
+      "originalName": "sparkhaus-news-now-offering-end-of-tenancy-cleans.webp",
+      "type": "image/webp",
+      "size": 138572,
+      "path": "/uploads/images/sparkhaus-news-now-offering-end-of-tenancy-cleans.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "We Now Handle End-of-Tenancy Cleans",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/sparkhaus-news-now-offering-end-of-tenancy-cleans-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/sparkhaus-news-now-offering-end-of-tenancy-cleans-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/sparkhaus-news-now-offering-end-of-tenancy-cleans-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "sparkhaus-news-spring-clean-week-special.webp",
+      "originalName": "sparkhaus-news-spring-clean-week-special.webp",
+      "type": "image/webp",
+      "size": 111914,
+      "path": "/uploads/images/sparkhaus-news-spring-clean-week-special.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Spring Clean Week Is Back This April",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/sparkhaus-news-spring-clean-week-special-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/sparkhaus-news-spring-clean-week-special-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/sparkhaus-news-spring-clean-week-special-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "sparkhaus-news-stop-spreading-grime-with-one-cloth.webp",
+      "originalName": "sparkhaus-news-stop-spreading-grime-with-one-cloth.webp",
+      "type": "image/webp",
+      "size": 163820,
+      "path": "/uploads/images/sparkhaus-news-stop-spreading-grime-with-one-cloth.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The One-Cloth Habit That Spreads More Grime",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/sparkhaus-news-stop-spreading-grime-with-one-cloth-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/sparkhaus-news-stop-spreading-grime-with-one-cloth-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/sparkhaus-news-stop-spreading-grime-with-one-cloth-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "contact-opener.webp",
       "originalName": "contact-opener.webp",
       "type": "image/webp",

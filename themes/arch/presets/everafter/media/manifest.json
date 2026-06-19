@@ -1,6 +1,296 @@
 {
   "files": [
     {
+      "filename": "everafter-news-autumn-wedding-open-evening.webp",
+      "originalName": "everafter-news-autumn-wedding-open-evening.webp",
+      "type": "image/webp",
+      "size": 340606,
+      "path": "/uploads/images/everafter-news-autumn-wedding-open-evening.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "An Open Evening for Autumn Couples",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-news-autumn-wedding-open-evening-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/everafter-news-autumn-wedding-open-evening-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-news-autumn-wedding-open-evening-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "everafter-news-build-your-timeline-backward.webp",
+      "originalName": "everafter-news-build-your-timeline-backward.webp",
+      "type": "image/webp",
+      "size": 139058,
+      "path": "/uploads/images/everafter-news-build-your-timeline-backward.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Build Your Wedding Timeline Backward",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-news-build-your-timeline-backward-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/everafter-news-build-your-timeline-backward-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-news-build-your-timeline-backward-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "everafter-news-everafter-turns-five.webp",
+      "originalName": "everafter-news-everafter-turns-five.webp",
+      "type": "image/webp",
+      "size": 194796,
+      "path": "/uploads/images/everafter-news-everafter-turns-five.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Five Years and a Hundred First Dances",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-news-everafter-turns-five-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/everafter-news-everafter-turns-five-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-news-everafter-turns-five-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "everafter-news-now-planning-2027-weddings.webp",
+      "originalName": "everafter-news-now-planning-2027-weddings.webp",
+      "type": "image/webp",
+      "size": 80960,
+      "path": "/uploads/images/everafter-news-now-planning-2027-weddings.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "We Are Now Planning 2027 Weddings",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-news-now-planning-2027-weddings-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/everafter-news-now-planning-2027-weddings-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-news-now-planning-2027-weddings-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "everafter-news-what-a-coordinator-actually-does.webp",
+      "originalName": "everafter-news-what-a-coordinator-actually-does.webp",
+      "type": "image/webp",
+      "size": 118538,
+      "path": "/uploads/images/everafter-news-what-a-coordinator-actually-does.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "What We Are Doing While You Dance",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-news-what-a-coordinator-actually-does-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/everafter-news-what-a-coordinator-actually-does-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-news-what-a-coordinator-actually-does-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "everafter-projects-barn-wedding-in-october-rain.webp",
+      "originalName": "everafter-projects-barn-wedding-in-october-rain.webp",
+      "type": "image/webp",
+      "size": 237802,
+      "path": "/uploads/images/everafter-projects-barn-wedding-in-october-rain.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Barn Wedding That Worked Despite the Rain",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-projects-barn-wedding-in-october-rain-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/everafter-projects-barn-wedding-in-october-rain-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-projects-barn-wedding-in-october-rain-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "everafter-projects-marquee-wedding-on-family-farm.webp",
+      "originalName": "everafter-projects-marquee-wedding-on-family-farm.webp",
+      "type": "image/webp",
+      "size": 296840,
+      "path": "/uploads/images/everafter-projects-marquee-wedding-on-family-farm.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Marquee Wedding on the Family Farm",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-projects-marquee-wedding-on-family-farm-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/everafter-projects-marquee-wedding-on-family-farm-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-projects-marquee-wedding-on-family-farm-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "everafter-projects-small-registry-office-and-restaurant.webp",
+      "originalName": "everafter-projects-small-registry-office-and-restaurant.webp",
+      "type": "image/webp",
+      "size": 170188,
+      "path": "/uploads/images/everafter-projects-small-registry-office-and-restaurant.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "An Intimate Registry Office and Restaurant Day",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-projects-small-registry-office-and-restaurant-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/everafter-projects-small-registry-office-and-restaurant-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-projects-small-registry-office-and-restaurant-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "everafter-projects-two-day-coastal-celebration.webp",
+      "originalName": "everafter-projects-two-day-coastal-celebration.webp",
+      "type": "image/webp",
+      "size": 181448,
+      "path": "/uploads/images/everafter-projects-two-day-coastal-celebration.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Two-Day Coastal Celebration",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-projects-two-day-coastal-celebration-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/everafter-projects-two-day-coastal-celebration-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-projects-two-day-coastal-celebration-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
+      "filename": "everafter-projects-winter-city-hall-wedding.webp",
+      "originalName": "everafter-projects-winter-city-hall-wedding.webp",
+      "type": "image/webp",
+      "size": 381788,
+      "path": "/uploads/images/everafter-projects-winter-city-hall-wedding.webp",
+      "width": 1600,
+      "height": 992,
+      "alt": "A Candlelit Winter Wedding in a City Hall",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/everafter-projects-winter-city-hall-wedding-medium.webp",
+          "width": 1024,
+          "height": 635
+        },
+        "small": {
+          "path": "/uploads/images/everafter-projects-winter-city-hall-wedding-small.webp",
+          "width": 480,
+          "height": 298
+        },
+        "thumb": {
+          "path": "/uploads/images/everafter-projects-winter-city-hall-wedding-thumb.webp",
+          "width": 150,
+          "height": 93
+        }
+      }
+    },
+    {
       "filename": "everafterwhite.png",
       "originalName": "everafter_white.png",
       "type": "image/png",

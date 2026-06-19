@@ -213,8 +213,7 @@
             "link": {
               "text": "Inquire",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "529f07ea-b574-4438-a806-5e965e01e66b"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

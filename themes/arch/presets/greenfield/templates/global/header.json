@@ -8,8 +8,7 @@
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Free Estimate",
-      "target": "_self",
-      "pageUuid": "0e3a754c-6297-4860-a3ce-ddb1e518ff10"
+      "target": "_self"
     },
     "ctaButtonStyle": "primary",
     "center_nav": false,

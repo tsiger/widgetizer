@@ -271,8 +271,7 @@
             "link": {
               "text": "Get in Touch",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ff269404-11c0-40a3-aa58-d2654dc1580d"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

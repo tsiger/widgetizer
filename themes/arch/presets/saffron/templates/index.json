@@ -34,15 +34,13 @@
             "link": {
               "text": "View Our Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "48c12fdc-0376-4b43-ad94-c2d5d20439de"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "Reserve a Table",
               "href": "reservations.html",
-              "target": "_self",
-              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "large"
@@ -182,8 +180,7 @@
             "link": {
               "text": "Book a Table",
               "href": "reservations.html",
-              "target": "_self",
-              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -263,15 +260,13 @@
             "link": {
               "text": "Reserve a Table",
               "href": "reservations.html",
-              "target": "_self",
-              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "View Menu",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "48c12fdc-0376-4b43-ad94-c2d5d20439de"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "ledgerworks-news-behind-the-numbers-team.webp",
+      "originalName": "ledgerworks-news-behind-the-numbers-team.webp",
+      "type": "image/webp",
+      "size": 112458,
+      "path": "/uploads/images/ledgerworks-news-behind-the-numbers-team.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The People Who Read Your Books",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/ledgerworks-news-behind-the-numbers-team-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/ledgerworks-news-behind-the-numbers-team-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/ledgerworks-news-behind-the-numbers-team-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "ledgerworks-news-cloud-bookkeeping-service.webp",
+      "originalName": "ledgerworks-news-cloud-bookkeeping-service.webp",
+      "type": "image/webp",
+      "size": 51102,
+      "path": "/uploads/images/ledgerworks-news-cloud-bookkeeping-service.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Ledgerworks Now Offers Real-Time Cloud Bookkeeping",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/ledgerworks-news-cloud-bookkeeping-service-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/ledgerworks-news-cloud-bookkeeping-service-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/ledgerworks-news-cloud-bookkeeping-service-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "ledgerworks-news-expenses-you-miss.webp",
+      "originalName": "ledgerworks-news-expenses-you-miss.webp",
+      "type": "image/webp",
+      "size": 66540,
+      "path": "/uploads/images/ledgerworks-news-expenses-you-miss.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Four Business Expenses People Forget to Claim",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/ledgerworks-news-expenses-you-miss-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/ledgerworks-news-expenses-you-miss-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/ledgerworks-news-expenses-you-miss-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "ledgerworks-news-fifteen-years-local.webp",
+      "originalName": "ledgerworks-news-fifteen-years-local.webp",
+      "type": "image/webp",
+      "size": 188510,
+      "path": "/uploads/images/ledgerworks-news-fifteen-years-local.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Fifteen Years of Keeping Local Books in Order",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/ledgerworks-news-fifteen-years-local-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/ledgerworks-news-fifteen-years-local-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/ledgerworks-news-fifteen-years-local-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "ledgerworks-news-year-end-prep-evening.webp",
+      "originalName": "ledgerworks-news-year-end-prep-evening.webp",
+      "type": "image/webp",
+      "size": 97290,
+      "path": "/uploads/images/ledgerworks-news-year-end-prep-evening.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Get Tax Year End Ready With Us",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/ledgerworks-news-year-end-prep-evening-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/ledgerworks-news-year-end-prep-evening-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/ledgerworks-news-year-end-prep-evening-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "ledgerworks-light.png",
       "originalName": "ledgerworks-light.png",
       "type": "image/png",

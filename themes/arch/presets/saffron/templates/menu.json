@@ -265,8 +265,7 @@
             "link": {
               "text": "Ask About Pairings",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "0f2a1ee4-bebb-49a5-ba2f-4299af559fdc"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -300,8 +299,7 @@
             "link": {
               "text": "Reserve a Table",
               "href": "reservations.html",
-              "target": "_self",
-              "pageUuid": "2c845956-c382-4678-b07c-97f03313637b"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

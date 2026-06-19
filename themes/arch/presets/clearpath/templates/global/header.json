@@ -6,13 +6,12 @@
     "contactDetailsLine1": "hello@example.com",
     "contactDetailsLine2": "(555) 203-9844",
     "contact_position": "logo",
-    "headerNavigation": "30ebd95f-9f20-4cde-97a8-b1ea5fcb3d84",
+    "headerNavigation": "main-menu",
     "center_nav": false,
     "ctaButtonLink": {
       "href": "contact.html",
       "text": "Start a conversation",
-      "target": "_self",
-      "pageUuid": "b61f28fc-7b0f-462c-87df-0cf19965425f"
+      "target": "_self"
     },
     "ctaButtonStyle": "secondary",
     "full_width": true,

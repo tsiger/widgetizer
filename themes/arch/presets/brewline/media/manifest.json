@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "brewline-news-better-coffee-at-home.webp",
+      "originalName": "brewline-news-better-coffee-at-home.webp",
+      "type": "image/webp",
+      "size": 80950,
+      "path": "/uploads/images/brewline-news-better-coffee-at-home.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Three Small Changes for Better Coffee at Home",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brewline-news-better-coffee-at-home-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brewline-news-better-coffee-at-home-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brewline-news-better-coffee-at-home-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brewline-news-cupping-evenings-are-back.webp",
+      "originalName": "brewline-news-cupping-evenings-are-back.webp",
+      "type": "image/webp",
+      "size": 96880,
+      "path": "/uploads/images/brewline-news-cupping-evenings-are-back.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Cupping Evenings Are Back, First Thursday of the Month",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brewline-news-cupping-evenings-are-back-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brewline-news-cupping-evenings-are-back-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brewline-news-cupping-evenings-are-back-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brewline-news-meet-dani-our-head-barista.webp",
+      "originalName": "brewline-news-meet-dani-our-head-barista.webp",
+      "type": "image/webp",
+      "size": 111772,
+      "path": "/uploads/images/brewline-news-meet-dani-our-head-barista.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Meet Dani, the Hands Behind Your Morning Flat White",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brewline-news-meet-dani-our-head-barista-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brewline-news-meet-dani-our-head-barista-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brewline-news-meet-dani-our-head-barista-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brewline-news-now-pouring-hillcrest-roastery.webp",
+      "originalName": "brewline-news-now-pouring-hillcrest-roastery.webp",
+      "type": "image/webp",
+      "size": 141128,
+      "path": "/uploads/images/brewline-news-now-pouring-hillcrest-roastery.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Now Pouring: Beans from Hillcrest Roastery, Three Streets Over",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brewline-news-now-pouring-hillcrest-roastery-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brewline-news-now-pouring-hillcrest-roastery-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brewline-news-now-pouring-hillcrest-roastery-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "brewline-news-spring-single-origin-has-landed.webp",
+      "originalName": "brewline-news-spring-single-origin-has-landed.webp",
+      "type": "image/webp",
+      "size": 117328,
+      "path": "/uploads/images/brewline-news-spring-single-origin-has-landed.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Our Spring Single-Origin Has Landed",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/brewline-news-spring-single-origin-has-landed-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/brewline-news-spring-single-origin-has-landed-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/brewline-news-spring-single-origin-has-landed-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "brewlinetransparent.png",
       "originalName": "brewline_transparent.png",
       "type": "image/png",

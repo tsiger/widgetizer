@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "hearthstone-news-how-to-pack-for-a-coast-weekend.webp",
+      "originalName": "hearthstone-news-how-to-pack-for-a-coast-weekend.webp",
+      "type": "image/webp",
+      "size": 157586,
+      "path": "/uploads/images/hearthstone-news-how-to-pack-for-a-coast-weekend.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "How to Pack for a Weekend on Our Coast",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hearthstone-news-how-to-pack-for-a-coast-weekend-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/hearthstone-news-how-to-pack-for-a-coast-weekend-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/hearthstone-news-how-to-pack-for-a-coast-weekend-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hearthstone-news-morning-shift-in-the-hearthstone-kitchen.webp",
+      "originalName": "hearthstone-news-morning-shift-in-the-hearthstone-kitchen.webp",
+      "type": "image/webp",
+      "size": 119086,
+      "path": "/uploads/images/hearthstone-news-morning-shift-in-the-hearthstone-kitchen.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The Morning Shift in the Hearthstone Kitchen",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hearthstone-news-morning-shift-in-the-hearthstone-kitchen-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/hearthstone-news-morning-shift-in-the-hearthstone-kitchen-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/hearthstone-news-morning-shift-in-the-hearthstone-kitchen-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hearthstone-news-new-garden-room-now-open.webp",
+      "originalName": "hearthstone-news-new-garden-room-now-open.webp",
+      "type": "image/webp",
+      "size": 300482,
+      "path": "/uploads/images/hearthstone-news-new-garden-room-now-open.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Our New Garden Room Is Now Open",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hearthstone-news-new-garden-room-now-open-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/hearthstone-news-new-garden-room-now-open-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/hearthstone-news-new-garden-room-now-open-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hearthstone-news-ten-years-of-welcomes.webp",
+      "originalName": "hearthstone-news-ten-years-of-welcomes.webp",
+      "type": "image/webp",
+      "size": 200338,
+      "path": "/uploads/images/hearthstone-news-ten-years-of-welcomes.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Ten Years of Front Doors Left Unlocked",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hearthstone-news-ten-years-of-welcomes-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/hearthstone-news-ten-years-of-welcomes-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/hearthstone-news-ten-years-of-welcomes-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "hearthstone-news-winter-fireside-supper-evenings.webp",
+      "originalName": "hearthstone-news-winter-fireside-supper-evenings.webp",
+      "type": "image/webp",
+      "size": 147554,
+      "path": "/uploads/images/hearthstone-news-winter-fireside-supper-evenings.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Fireside Supper Evenings Return in February",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/hearthstone-news-winter-fireside-supper-evenings-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/hearthstone-news-winter-fireside-supper-evenings-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/hearthstone-news-winter-fireside-supper-evenings-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "jasmine-linen.webp",
       "originalName": "jasmine-linen.webp",
       "type": "image/webp",

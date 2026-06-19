@@ -44,8 +44,7 @@
             "link": {
               "href": "book.html",
               "text": "Book a Session",
-              "target": "_self",
-              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"
@@ -228,8 +227,7 @@
             "link": {
               "href": "book.html",
               "text": "Book a Free Consultation",
-              "target": "_self",
-              "pageUuid": "4e3f6a6d-66d1-4977-99f3-9e86a345ef82"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"

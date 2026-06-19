@@ -61,8 +61,7 @@
             "button_link": {
               "text": "See the Wine List",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
+              "target": "_self"
             }
           }
         },
@@ -87,8 +86,7 @@
             "button_link": {
               "text": "View Cocktails",
               "href": "menu.html",
-              "target": "_self",
-              "pageUuid": "fa273763-b18c-481b-8a5c-422c464f8e67"
+              "target": "_self"
             }
           }
         },
@@ -197,8 +195,7 @@
             "link": {
               "text": "See What's On",
               "href": "events.html",
-              "target": "_self",
-              "pageUuid": "481c0638-5dfa-4c5c-bc5b-e101e7c194d9"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -240,8 +237,7 @@
             "link": {
               "text": "Find Us",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "93184b7b-39d0-485a-a40b-11fd331db05b"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

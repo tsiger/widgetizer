@@ -43,8 +43,7 @@
             "link": {
               "text": "See our work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "228c6833-a69f-402b-9fff-eca12e01f1ae"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -322,8 +321,7 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "438924c1-dc41-4f05-ba1e-4c70727e9cbd"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

@@ -1,6 +1,151 @@
 {
   "files": [
     {
+      "filename": "saffron-news-a-decade-at-the-same-address.webp",
+      "originalName": "saffron-news-a-decade-at-the-same-address.webp",
+      "type": "image/webp",
+      "size": 119198,
+      "path": "/uploads/images/saffron-news-a-decade-at-the-same-address.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Ten Years at the Same Address",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/saffron-news-a-decade-at-the-same-address-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/saffron-news-a-decade-at-the-same-address-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/saffron-news-a-decade-at-the-same-address-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "saffron-news-how-to-bloom-spices.webp",
+      "originalName": "saffron-news-how-to-bloom-spices.webp",
+      "type": "image/webp",
+      "size": 267168,
+      "path": "/uploads/images/saffron-news-how-to-bloom-spices.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The One Step That Makes Spices Taste Like Ours",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/saffron-news-how-to-bloom-spices-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/saffron-news-how-to-bloom-spices-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/saffron-news-how-to-bloom-spices-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "saffron-news-new-tasting-menu-tuesdays.webp",
+      "originalName": "saffron-news-new-tasting-menu-tuesdays.webp",
+      "type": "image/webp",
+      "size": 226470,
+      "path": "/uploads/images/saffron-news-new-tasting-menu-tuesdays.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "A Five-Course Tasting Menu Arrives on Tuesdays",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/saffron-news-new-tasting-menu-tuesdays-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/saffron-news-new-tasting-menu-tuesdays-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/saffron-news-new-tasting-menu-tuesdays-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "saffron-news-summer-courtyard-now-open.webp",
+      "originalName": "saffron-news-summer-courtyard-now-open.webp",
+      "type": "image/webp",
+      "size": 232606,
+      "path": "/uploads/images/saffron-news-summer-courtyard-now-open.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Our Summer Courtyard Is Open Again",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/saffron-news-summer-courtyard-now-open-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/saffron-news-summer-courtyard-now-open-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/saffron-news-summer-courtyard-now-open-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "saffron-news-the-cooks-who-prep-before-noon.webp",
+      "originalName": "saffron-news-the-cooks-who-prep-before-noon.webp",
+      "type": "image/webp",
+      "size": 182454,
+      "path": "/uploads/images/saffron-news-the-cooks-who-prep-before-noon.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "The Cooks Who Get Here Before Noon",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/saffron-news-the-cooks-who-prep-before-noon-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/saffron-news-the-cooks-who-prep-before-noon-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/saffron-news-the-cooks-who-prep-before-noon-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
       "filename": "logo.png",
       "originalName": "logo.png",
       "type": "image/png",

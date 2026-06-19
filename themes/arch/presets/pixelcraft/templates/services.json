@@ -251,8 +251,7 @@
             "link": {
               "text": "Request a sprint",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
+              "target": "_self"
             }
           }
         },
@@ -265,8 +264,7 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
+              "target": "_self"
             }
           }
         },
@@ -278,8 +276,7 @@
             "link": {
               "text": "Discuss a retainer",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
+              "target": "_self"
             }
           }
         },
@@ -377,15 +374,13 @@
             "link": {
               "text": "Start a project",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "d0523f02-ec78-4d94-b29b-2bdd8973aa59"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "text": "See the work",
               "href": "work.html",
-              "target": "_self",
-              "pageUuid": "4c480249-a44e-4475-992f-b62df9731eb0"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "medium"

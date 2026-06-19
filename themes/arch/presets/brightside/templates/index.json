@@ -42,14 +42,12 @@
             "link": {
               "text": "Book Appointment",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
+              "target": "_self"
             },
             "link_2": {
               "text": "Meet Our Team",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "b452a9e0-3ad2-4480-9f52-e4058edc22d1"
+              "target": "_self"
             },
             "style": "primary",
             "style_2": "secondary",
@@ -279,8 +277,7 @@
             "link": {
               "text": "About Us",
               "href": "about.html",
-              "target": "_self",
-              "pageUuid": "b452a9e0-3ad2-4480-9f52-e4058edc22d1"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -374,8 +371,7 @@
             "link": {
               "text": "Book Your First Visit",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "ad9d338f-d4be-47b1-a4d1-5cdc64b4565f"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

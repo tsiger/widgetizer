@@ -44,15 +44,13 @@
             "link": {
               "href": "arrangements.html",
               "text": "Shop Arrangements",
-              "target": "_self",
-              "pageUuid": "3b23031c-8329-4235-ad2d-31456729b579"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
               "href": "events.html",
               "text": "Plan an Event",
-              "target": "_self",
-              "pageUuid": "011cdb22-a4f5-4a31-bf75-aa96c347d9f2"
+              "target": "_self"
             },
             "style_2": "secondary",
             "size": "large"
@@ -191,8 +189,7 @@
             "link": {
               "href": "about.html",
               "text": "Our Story",
-              "target": "_self",
-              "pageUuid": "b1d6b58f-1287-4a00-a667-4544e06ffe8a"
+              "target": "_self"
             },
             "style": "secondary",
             "size": "medium"
@@ -263,8 +260,7 @@
         "button": {
           "href": "contact.html",
           "text": "Pre-Order Now",
-          "target": "_self",
-          "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
+          "target": "_self"
         },
         "show_seconds": false,
         "style": "minimal",
@@ -298,8 +294,7 @@
             "link": {
               "href": "contact.html",
               "text": "Get in Touch",
-              "target": "_self",
-              "pageUuid": "0d7c8ff4-9da9-462d-ad0d-2f99f0de49ff"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

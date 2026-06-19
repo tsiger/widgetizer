@@ -44,8 +44,7 @@
             "link": {
               "href": "contact.html",
               "text": "Ask about a visit",
-              "target": "_self",
-              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
+              "target": "_self"
             },
             "style": "primary",
             "size": "large"
@@ -302,8 +301,7 @@
             "link": {
               "href": "contact.html",
               "text": "Contact the clinic",
-              "target": "_self",
-              "pageUuid": "0d8786bc-c75c-4067-8b0c-272c6479a7bb"
+              "target": "_self"
             },
             "style": "primary",
             "size": "medium"

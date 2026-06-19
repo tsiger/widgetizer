@@ -71,8 +71,7 @@
             "button_link": {
               "text": "Book a diagnostic",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             }
           }
         },
@@ -84,8 +83,7 @@
             "button_link": {
               "text": "Book brake service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             }
           }
         },
@@ -97,8 +95,7 @@
             "button_link": {
               "text": "Request a quote",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             }
           }
         },
@@ -110,8 +107,7 @@
             "button_link": {
               "text": "Book tire service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             }
           }
         },
@@ -291,8 +287,7 @@
             "link": {
               "text": "Book basic",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             }
           }
         },
@@ -305,8 +300,7 @@
             "link": {
               "text": "Book complete",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             }
           }
         },
@@ -318,8 +312,7 @@
             "link": {
               "text": "Book pre-purchase",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             }
           }
         },
@@ -509,8 +502,7 @@
             "link": {
               "text": "Book service",
               "href": "contact.html",
-              "target": "_self",
-              "pageUuid": "3bfd56e0-cd1a-47c2-a839-b1707143b9e0"
+              "target": "_self"
             },
             "style": "primary",
             "link_2": {
