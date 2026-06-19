@@ -1,7 +1,7 @@
 import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 
 const SETTINGS_KEY = "config:local";
-const DEFAULT_MAX_FILE_SIZE_MB = 5;
+const DEFAULT_MAX_FILE_SIZE_MB = 50;
 
 /**
  * OSS LimitsAdapter — single-user, so most limits are unbounded. The only

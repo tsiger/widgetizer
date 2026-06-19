@@ -97,7 +97,7 @@ describe("readAppSettingsFile", () => {
     saveSettings({});
     const settings = await readAppSettingsFile();
     assert.equal(settings.general.language, "en");
-    assert.equal(settings.media.maxFileSizeMB, 5);
+    assert.equal(settings.media.maxFileSizeMB, 50);
     assert.equal(settings.developer.enabled, false);
   });
 
@@ -112,7 +112,7 @@ describe("readAppSettingsFile", () => {
     const settings = await readAppSettingsFile();
     assert.equal(settings.general.language, "fr");
     // media should come from defaults
-    assert.equal(settings.media.maxFileSizeMB, 5);
+    assert.equal(settings.media.maxFileSizeMB, 50);
   });
 });
 
@@ -129,7 +129,7 @@ describe("getAppSettings (controller)", () => {
   it("includes all default sections", async () => {
     const res = await callController(getAppSettings);
     assert.equal(res._json.general.language, "en");
-    assert.equal(res._json.media.maxFileSizeMB, 5);
+    assert.equal(res._json.media.maxFileSizeMB, 50);
     assert.equal(res._json.export.maxVersionsToKeep, 10);
     assert.equal(res._json.export.maxImportSizeMB, 500);
     assert.equal(res._json.developer.enabled, false);
@@ -176,7 +176,7 @@ describe("updateAppSettings", () => {
     const saved = await readAppSettingsFile();
     assert.equal(saved.developer.enabled, true);
     // media defaults should still be present
-    assert.equal(saved.media.maxFileSizeMB, 5);
+    assert.equal(saved.media.maxFileSizeMB, 50);
   });
 
   it("rejects negative maxFileSizeMB", async () => {
@@ -184,7 +184,7 @@ describe("updateAppSettings", () => {
       body: { media: { maxFileSizeMB: -1 } },
     });
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /max image upload size/i);
+    assert.match(res._json.error, /max upload size/i);
   });
 
   it("validates maxFileSizeMB rejects negative string", async () => {
@@ -192,7 +192,7 @@ describe("updateAppSettings", () => {
       body: { media: { maxFileSizeMB: "-5" } },
     });
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /max image upload size/i);
+    assert.match(res._json.error, /max upload size/i);
   });
 
   it("validates maxFileSizeMB rejects non-numeric string", async () => {
@@ -332,7 +332,7 @@ describe("getSetting", () => {
 
     // media.maxFileSizeMB should fall back to default
     const maxSize = await getSetting("media.maxFileSizeMB");
-    assert.equal(maxSize, 5);
+    assert.equal(maxSize, 50);
   });
 
   it("returns null for a key that doesn't exist in defaults either", async () => {

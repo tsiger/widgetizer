@@ -211,6 +211,7 @@
       "saving": "Saving...",
       "types": {
         "image": "Image",
+        "audio": "Audio",
         "file": "File"
       }
     }
@@ -246,6 +247,7 @@
       "searchPlaceholder": "Search media...",
       "all": "All",
       "images": "Images",
+      "audio": "Audio",
       "files": "Files"
     },
     "mediaUploader": {
@@ -253,8 +255,9 @@
       "dropInactive": "Drag and drop images here or",
       "selectFiles": "Select Files",
       "supportedImages": "Images: JPG, PNG, GIF, WebP, SVG",
-      "supportedFiles": "Files: PDF",
-      "supportedFormats": "Images: JPG, PNG, GIF, WebP, SVG | Files: PDF",
+      "supportedAudio": "Audio: MP3",
+      "supportedFiles": "Files: PDF, MP3",
+      "supportedFormats": "Images: JPG, PNG, GIF, WebP, SVG | Audio: MP3 | Files: PDF",
       "uploading": "Uploading..."
     },
     "fileUploader": {
@@ -778,8 +781,8 @@
     },
     "media": {
       "maxFileSizeMB": {
-        "label": "Max Image Upload Size (MB)",
-        "description": "Set the maximum size for individual image uploads across all projects."
+        "label": "Max Upload Size (MB)",
+        "description": "Set the maximum size for individual uploads (images, audio, documents) across all projects."
       },
       "imageProcessing": {
         "quality": {

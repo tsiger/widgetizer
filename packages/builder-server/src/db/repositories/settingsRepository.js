@@ -31,7 +31,7 @@ const defaultSettings = {
     dateFormat: "MMMM D, YYYY h:mm A",
   },
   media: {
-    maxFileSizeMB: 5,
+    maxFileSizeMB: 50,
     imageProcessing: {
       quality: 85,
       sizes: {

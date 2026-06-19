@@ -8,7 +8,7 @@ import useAppSettings from "../../../hooks/useAppSettings";
 import MediaSelectorDrawer from "../../../components/media/MediaSelectorDrawer";
 import Button from "../../ui/Button";
 import { showRejectedFiles, showUploadOutcome } from "../../../utils/uploadFeedback";
-import { FILE_ACCEPT, validateFileSizes } from "../../../utils/uploadValidation";
+import { NON_IMAGE_ACCEPT, validateFileSizes } from "../../../utils/uploadValidation";
 
 export default function FileInput({ id, value = "", onChange }) {
   const { t } = useTranslation();
@@ -46,7 +46,7 @@ export default function FileInput({ id, value = "", onChange }) {
     const file = event.target.files[0];
     if (!file || !activeProject) return;
 
-    const limitMB = settings?.media?.maxFileSizeMB ?? 5;
+    const limitMB = settings?.media?.maxFileSizeMB ?? 50;
     const { valid, rejected } = validateFileSizes([file], { maxSizeMB: limitMB });
     if (rejected.length > 0) {
       showRejectedFiles(showToast, rejected);
@@ -104,7 +104,7 @@ export default function FileInput({ id, value = "", onChange }) {
         ref={fileInputRef}
         type="file"
         id={id}
-        accept={Object.values(FILE_ACCEPT).flat().join(",")}
+        accept={Object.values(NON_IMAGE_ACCEPT).flat().join(",")}
         onChange={handleFileChange}
         disabled={uploading}
         className="hidden"
@@ -139,7 +139,7 @@ export default function FileInput({ id, value = "", onChange }) {
           <p className="mt-1 text-sm font-semibold">
             {uploading ? `${t("components.fileInput.uploading")} ${uploadProgress}%` : t("components.fileInput.importNew")}
           </p>
-          <p className="text-xs">PDF</p>
+          <p className="text-xs">PDF, MP3</p>
         </div>
       )}
 

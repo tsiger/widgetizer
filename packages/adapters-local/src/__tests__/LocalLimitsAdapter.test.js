@@ -23,10 +23,10 @@ runLimitsAdapterConformance({
 });
 
 describe("LocalLimitsAdapter (impl-specific)", () => {
-  it("defaults the upload size limit to 5 MB", async () => {
+  it("defaults the upload size limit to 50 MB", async () => {
     const a = new LocalLimitsAdapter(makeDb());
     const bytes = await a.getLimit(makeScope("a"), LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES);
-    expect(bytes).toBe(5 * 1024 * 1024);
+    expect(bytes).toBe(50 * 1024 * 1024);
   });
 
   it("reads a configured maxFileSizeMB from app_settings", async () => {

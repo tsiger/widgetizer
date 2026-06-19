@@ -665,7 +665,7 @@ describe("uploadProjectMedia", () => {
           originalname: "huge.jpg",
           filename: "huge.jpg",
           mimetype: "image/jpeg",
-          size: 100 * 1024 * 1024, // 100MB — exceeds default 5MB limit
+          size: 100 * 1024 * 1024, // 100MB — exceeds default 50MB limit
           path: filePath,
         },
       ],

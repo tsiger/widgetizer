@@ -51,7 +51,7 @@ export async function updateAppSettings(req, res) {
     // Validate file size limits
     if (newSettings.media) {
       const sizeLimits = [
-        { key: "maxFileSizeMB", label: "Max Image Upload Size", min: 1, max: 100 },
+        { key: "maxFileSizeMB", label: "Max Upload Size", min: 1, max: 100 },
       ];
 
       for (const { key, label, min, max } of sizeLimits) {
