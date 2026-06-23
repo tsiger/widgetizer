@@ -19,5 +19,5 @@ contextBridge.exposeInMainWorld("electronUpdater", {
   downloadUpdate: () => ipcRenderer.send("download-update"),
   installUpdate: () => ipcRenderer.send("install-update"),
   openExternal: (url) => ipcRenderer.send("open-external", url),
-  openPreviewWindow: (pageId) => ipcRenderer.send("open-preview-window", pageId),
+  openPreviewWindow: (previewPath) => ipcRenderer.send("open-preview-window", previewPath),
 });

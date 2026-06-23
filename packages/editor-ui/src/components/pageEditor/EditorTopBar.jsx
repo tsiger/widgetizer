@@ -135,17 +135,21 @@ export default function EditorTopBar({
   const handleOpenPreview = useCallback(() => {
     if (!pageId) return;
 
+    // The standalone preview path defaults to the OSS /preview/:pageId route; an
+    // embedding host overrides it (setStandalonePreviewPath) to point at its own
+    // preview surface. That page hosts PreviewPanel in an iframe and handles
+    // in-preview link navigation (NAVIGATE_PREVIEW).
+    const standalonePath = getStandalonePreviewPath(pageId);
+
+    // In the packaged desktop app the preview lives in a dedicated Electron window;
+    // hand it the same in-app /preview/... path (the main process re-checks it).
     const electronOpenPreview = window.electronUpdater?.openPreviewWindow;
     if (typeof electronOpenPreview === "function") {
-      electronOpenPreview(pageId);
+      electronOpenPreview(standalonePath);
       return;
     }
 
-    // Open the standalone preview app in a new tab. The path defaults to the OSS
-    // /preview/:pageId route; an embedding host overrides it (setStandalonePreviewPath)
-    // to point at its own preview surface. That page hosts PreviewPanel in an
-    // iframe and handles in-preview link navigation (NAVIGATE_PREVIEW).
-    const previewUrl = new URL(getStandalonePreviewPath(pageId), window.location.origin).toString();
+    const previewUrl = new URL(standalonePath, window.location.origin).toString();
     const previewWindow = window.open(previewUrl, "widgetizer-preview");
     previewWindow?.focus();
   }, [pageId]);

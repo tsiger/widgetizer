@@ -103,13 +103,17 @@ export default function Sidebar() {
       const homepage = pages.find((p) => p.slug === "index") || pages[0];
       if (!homepage) return;
 
+      const previewPath = `/preview/${homepage.id}`;
+
+      // In the packaged desktop app the preview lives in a dedicated Electron window;
+      // hand it the same in-app /preview/... path (the main process re-checks it).
       const electronOpenPreview = window.electronUpdater?.openPreviewWindow;
       if (typeof electronOpenPreview === "function") {
-        electronOpenPreview(homepage.id);
+        electronOpenPreview(previewPath);
         return;
       }
 
-      const previewUrl = new URL(`/preview/${homepage.id}`, window.location.origin).toString();
+      const previewUrl = new URL(previewPath, window.location.origin).toString();
       const previewWindow = window.open(previewUrl, "widgetizer-preview");
       previewWindow?.focus();
     } catch (error) {

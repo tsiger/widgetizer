@@ -464,12 +464,19 @@ function createPreviewWindow() {
   return previewWindow;
 }
 
-async function openPreviewWindow(pageId) {
-  if (pageId === null || pageId === undefined || pageId === "") {
+// The preview window carries the app preload bridge, so a previewPath arriving over IPC is
+// untrusted: only ever open a real in-app /preview/... route (a page id, or a collection
+// item). Without this, an absolute or protocol-relative path (e.g. "//evil.com/x") resolves
+// to remote content in getRendererUrl and would load it into the privileged preview window.
+const SAFE_PREVIEW_PATH = /^\/preview\/(?:collection\/[a-z0-9-]+\/[a-z0-9-]+|[A-Za-z0-9_-]+)$/;
+
+async function openPreviewWindow(previewPath) {
+  if (typeof previewPath !== "string" || !SAFE_PREVIEW_PATH.test(previewPath)) {
+    log(`Ignoring unsafe preview path: ${JSON.stringify(previewPath)}`);
     return;
   }
 
-  const previewUrl = getRendererUrl(`/preview/${encodeURIComponent(String(pageId))}`);
+  const previewUrl = getRendererUrl(previewPath);
 
   if (previewWindow && !previewWindow.isDestroyed()) {
     log(`Reusing preview window for URL: ${previewUrl}`);
@@ -755,8 +762,8 @@ function setupIpcHandlers() {
     }
   });
 
-  ipcMain.on("open-preview-window", (_event, pageId) => {
-    openPreviewWindow(pageId).catch((err) => {
+  ipcMain.on("open-preview-window", (_event, previewPath) => {
+    openPreviewWindow(previewPath).catch((err) => {
       log(`Failed to open preview window: ${err.message}`);
     });
   });
