@@ -11,7 +11,6 @@ export const SeoTag = {
       const page = allVars.page;
       const project = allVars.project;
       const mediaFiles = allVars.mediaFiles || {};
-      const imagePath = (allVars.imagePath || "uploads/images").replace(/^\/+/, "");
 
       if (!page) {
         return "<!-- SEO Tag: No page data found -->";
@@ -20,9 +19,6 @@ export const SeoTag = {
       // Use page.seo if available, otherwise create defaults
       const seo = page.seo || {};
       const metaTags = [];
-
-      // Check if we have an image for conditional logic
-      const hasImage = seo.og_image && seo.og_image.trim();
 
       const pageTitle = seo.title && seo.title.trim() ? seo.title.trim() : page.name || "";
       const siteTitle = project?.siteTitle && project.siteTitle.trim() ? project.siteTitle.trim() : "";
@@ -58,14 +54,18 @@ export const SeoTag = {
       const ogType = seo.og_type || "website";
       metaTags.push(`<meta property="og:type" content="${escapeHtml(ogType)}">`);
 
-      // Open Graph image - only if specified
-      if (hasImage) {
-        const ogImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl, mediaFiles);
+      // Open Graph image. Social crawlers require an absolute URL, so this is
+      // emitted only when it resolves to one (an absolute og_image, or a
+      // siteUrl-based published URL). Without siteUrl it is omitted entirely
+      // rather than emitting a useless relative path.
+      const ogImageUrl =
+        seo.og_image && seo.og_image.trim() ? resolveImageUrl(seo.og_image, project?.siteUrl, mediaFiles) : "";
+      if (ogImageUrl) {
         metaTags.push(`<meta property="og:image" content="${escapeHtml(ogImageUrl)}">`);
       }
 
-      // Twitter Card tags - only add if we have an image or use summary card
-      const twitterCard = hasImage ? seo.twitter_card || "summary_large_image" : "summary";
+      // Twitter Card tags - large image card only when we have a resolved image
+      const twitterCard = ogImageUrl ? seo.twitter_card || "summary_large_image" : "summary";
 
       metaTags.push(`<meta name="twitter:card" content="${escapeHtml(twitterCard)}">`);
       metaTags.push(`<meta name="twitter:title" content="${escapeHtml(ogTitle)}">`);
@@ -74,10 +74,9 @@ export const SeoTag = {
         metaTags.push(`<meta name="twitter:description" content="${escapeHtml(ogDescription)}">`);
       }
 
-      // Twitter image (use same as og:image) - only if image exists
-      if (hasImage) {
-        const twitterImageUrl = resolveImageUrl(seo.og_image, imagePath, project?.siteUrl, mediaFiles);
-        metaTags.push(`<meta name="twitter:image" content="${escapeHtml(twitterImageUrl)}">`);
+      // Twitter image (use same as og:image) - only when resolved
+      if (ogImageUrl) {
+        metaTags.push(`<meta name="twitter:image" content="${escapeHtml(ogImageUrl)}">`);
       }
 
       return metaTags.join("\n\t\t");
@@ -89,32 +88,30 @@ export const SeoTag = {
 };
 
 /**
- * Resolves an og_image value to the correct URL using imagePath.
- * Stored og_image values are typically "/uploads/images/file.jpg" — the
- * filename is extracted and combined with the current imagePath so that
- * preview mode uses the API URL and publish mode uses "assets/images".
- * Fully-qualified URLs (http/https) are returned unchanged.
+ * Resolve an og_image value to an ABSOLUTE URL suitable for social crawlers.
+ * Fully-qualified URLs (http/https) pass through unchanged. Otherwise the
+ * filename is resolved to its published variant and combined with the project's
+ * siteUrl and the published `assets/images/` location. Returns "" when no
+ * absolute URL can be built (no siteUrl), so the caller omits the tag — a
+ * relative og:image is meaningless to crawlers, and og:image must be
+ * depth-independent (always absolute), so no outputPathPrefix is involved.
  */
-function resolveImageUrl(rawValue, imagePath, siteUrl, mediaFiles = {}) {
+function resolveImageUrl(rawValue, siteUrl, mediaFiles = {}) {
   if (!rawValue) return "";
 
-  // Already an absolute URL — use as-is
+  // Already an absolute URL — use as-is.
   if (rawValue.startsWith("http")) {
     return rawValue;
   }
 
-  // Extract just the filename from the stored path
-  // e.g. "/uploads/images/hero.jpg" → "hero.jpg"
+  // Need an absolute base to build a usable social URL.
+  if (!siteUrl || !siteUrl.trim()) return "";
+
+  // Extract the filename from the stored path: "/uploads/images/hero.jpg" → "hero.jpg".
   const filename = rawValue.split("/").pop();
   const publicFilename = getPublicImageFilename(filename, mediaFiles);
-  const resolvedPath = `/${imagePath}/${publicFilename}`;
-
-  if (siteUrl) {
-    const cleanSiteUrl = siteUrl.replace(/\/$/, "");
-    return `${cleanSiteUrl}${resolvedPath}`;
-  }
-
-  return resolvedPath;
+  const cleanSiteUrl = siteUrl.replace(/\/$/, "");
+  return `${cleanSiteUrl}/assets/images/${publicFilename}`;
 }
 
 function getPublicImageFilename(filename, mediaFiles) {

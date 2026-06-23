@@ -231,10 +231,11 @@ describe("SeoTag", () => {
 
   it("generates og:image with absolute URL from stored /uploads/ path", async () => {
     const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
-    // og_image is stored as "/uploads/images/hero.jpg" — SeoTag extracts filename
-    // and combines with imagePath using the public delivery asset in preview mode
-    assert.match(result, /og:image" content="https:\/\/example\.com\/uploads\/images\/hero-large\.jpg"/);
-    assert.doesNotMatch(result, /\/\/uploads/, "should not produce double slashes in path");
+    // og_image is stored as "/uploads/images/hero.jpg" — SeoTag extracts the filename,
+    // resolves the public (large) variant, and builds an absolute URL at the published
+    // assets/images location (og:image must be absolute and depth-independent).
+    assert.match(result, /og:image" content="https:\/\/example\.com\/assets\/images\/hero-large\.jpg"/);
+    assert.doesNotMatch(result, /\/uploads\//, "must not reference the raw /uploads/ storage path");
   });
 
   it("generates twitter:card as summary_large_image when image present", async () => {
@@ -271,7 +272,7 @@ describe("SeoTag", () => {
 
   it("generates twitter:image matching og:image", async () => {
     const result = await render("{% seo %}", { page: fixtures.basicPage, project: fixtures.project });
-    assert.match(result, /twitter:image" content="https:\/\/example\.com\/uploads\/images\/hero-large\.jpg"/);
+    assert.match(result, /twitter:image" content="https:\/\/example\.com\/assets\/images\/hero-large\.jpg"/);
   });
 
   it("handles og:image that is already an absolute URL", async () => {
@@ -317,7 +318,7 @@ describe("SeoTag", () => {
     assert.match(result, /twitter:image" content="https:\/\/example\.com\/assets\/images\/social-banner\.jpg"/);
   });
 
-  it("uses relative path in publish mode when no siteUrl", async () => {
+  it("omits og:image/twitter:image and uses summary card when no siteUrl (absolute URL required)", async () => {
     const page = {
       name: "No Domain Page",
       seo: { og_image: "/uploads/images/photo.png" },
@@ -325,9 +326,21 @@ describe("SeoTag", () => {
     const result = await render("{% seo %}", {
       page,
       project: {},
-      imagePath: "assets/images",
     });
-    assert.match(result, /og:image" content="\/assets\/images\/photo\.png"/);
+    assert.doesNotMatch(result, /property="og:image"/, "og:image needs an absolute URL; omit without siteUrl");
+    assert.doesNotMatch(result, /name="twitter:image"/);
+    assert.match(result, /name="twitter:card" content="summary"/);
+  });
+
+  it("passes an absolute-URL og_image through unchanged even without siteUrl", async () => {
+    const page = {
+      name: "Absolute OG",
+      seo: { og_image: "https://cdn.example.com/social.jpg" },
+    };
+    const result = await render("{% seo %}", { page, project: {} });
+    assert.match(result, /og:image" content="https:\/\/cdn\.example\.com\/social\.jpg"/);
+    assert.match(result, /twitter:image" content="https:\/\/cdn\.example\.com\/social\.jpg"/);
+    assert.match(result, /name="twitter:card" content="summary_large_image"/);
   });
 
   it("handles bare filename og_image (no path prefix)", async () => {
