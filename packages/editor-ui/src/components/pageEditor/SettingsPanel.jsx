@@ -117,7 +117,7 @@ export default function SettingsPanel({
 
   return (
     <div className="w-58 bg-white border-l border-slate-200 flex flex-col h-full">
-      <div className="px-4 pt-4 pb-2 border-b border-slate-100 font-bold">
+      <div className="px-3 pt-4 pb-2 border-b border-slate-100 font-bold">
         {selectedBlockId ? (
           <div className="flex items-center gap-2">
             <button onClick={onBackToWidget} className="p-1 hover:bg-slate-100 rounded-sm text-slate-500">
@@ -129,7 +129,7 @@ export default function SettingsPanel({
           <span>{displayName}</span>
         )}
       </div>
-      <div className="px-4 pb-4 flex-1 overflow-y-auto">
+      <div className="px-3 pb-4 flex-1 overflow-y-auto">
         <div
           key={
             isThemeSettings

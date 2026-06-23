@@ -47,6 +47,12 @@
   /* === FORM LABELS === */
   .form-label {
     @apply block text-sm font-medium text-slate-700 mb-1;
+
+    /* Right sidebar (page editor) only — matches the left sidebar's text-xs.
+       Theme Settings page and collection editor keep text-sm. */
+    .page-editor-settings & {
+      @apply text-xs;
+    }
   }
 
   .form-label-required::after {
@@ -70,7 +76,10 @@
     @apply focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500;
     @apply disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none;
 
+    /* Right sidebar (page editor) only — matches the left sidebar's text-xs.
+       Theme Settings page and collection editor keep text-sm. */
     .page-editor-settings & {
+      @apply text-xs;
     }
   }
 
@@ -162,7 +171,7 @@
 
   /* === PAGE EDITOR SETTINGS HEADERS === */
   .page-editor-settings .setting-type-header {
-    @apply -mx-4 mt-4 px-4 py-2 bg-slate-100 border-t-0;
+    @apply -mx-3 mt-4 px-3 py-2 bg-slate-100 border-t-0;
   }
 
   /* First child header: no top margin, sits flush */
@@ -173,6 +182,23 @@
   /* First child non-header: add top padding */
   .page-editor-settings > *:first-child:not(.setting-type-header) {
     @apply pt-4;
+  }
+
+  /* Radio options stack vertically in the narrow sidebar (instead of wrapping) */
+  .page-editor-settings .radio-input-group {
+    @apply flex-col items-start;
+  }
+
+  /* Smaller text on inline action buttons (Choose from library, Add image).
+     !important to beat the Button's text-sm utility, which sits in a later
+     cascade layer than this components-layer rule. */
+  .page-editor-settings .settings-action-btn {
+    font-size: 0.75rem !important;
+  }
+
+  /* Icon-picker buttons fill their grid track so the grid never scrolls sideways */
+  .page-editor-settings .icon-grid-button {
+    width: 100% !important;
   }
 
   /* === THEME SETTINGS PAGE HEADERS === */

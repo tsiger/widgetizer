@@ -18,7 +18,7 @@ export default function RadioInput({ id, value = "", onChange, options = [] }) {
     : [];
 
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-2">
+    <div className="radio-input-group flex flex-wrap gap-x-4 gap-y-2">
       {normalizedOptions.map((option) => (
         <div key={option.value} className="flex items-center">
           <input
