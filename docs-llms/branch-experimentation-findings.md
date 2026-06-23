@@ -173,3 +173,71 @@ The port consolidated tests; two deletions directly explain why P0-A1 and P1-B1 
 ## 7. Relationship to the in-flight QA run
 
 This audit is **complementary** to the black-box QA run (`docs-llms/qa-runs/2026-06-22-web-app-experimentation.md`, issues `QA-001`–`QA-011`), which tests "does experimentation work?". This audit tests "did experimentation lose anything master had?". No findings here duplicate the open QA issues — B2 in particular is a *silent* drop with no UI surface to black-box test.
+
+---
+
+## 8. Codex review addendum (2026-06-23)
+
+Method: compared `experimentation` against `master`/`origin/master` (there is no `main` ref in this checkout), read this findings document, and split independent review slices across three agents: backend/rendering, frontend/Electron, and broad/test-coverage.
+
+### Overall agreement
+
+I agree with the main direction of the audit. In particular:
+
+- **A1 is still P0.** Depth-aware asset/favicon prefixing is not faithfully ported. Core tags still emit bare `assets/...` in publish mode, and `site_icons` are passed through without the master `prefixSiteIcons` behavior.
+- **B1 is valid.** `collection-types` is absent from `UPDATABLE_PATHS`, so theme updates do not deliver changed collection schemas to existing projects.
+- **B2 is valid.** Caption support was removed across migration/repository/controller/UI/locale paths. The lingering `description` validation and import-time `entry.caption` handling are dead residue.
+- **C1/C3/C4 are directionally valid.** Atomic local JSON writes, audio-inclusive upload copy, and the shared standalone preview layout were all dropped or partially dropped.
+
+### Severity corrections / overstatements
+
+- **A2 should not be treated as a P0 remote-content/security issue as written.** Current Electron code still encodes the IPC argument into a local `/preview/...` path, so a payload like `//evil.com/x` does not load remote content. The real regression is that desktop collection-item preview is broken because `openSitePreview()` sends `/preview/collection/...`, while Electron still treats the argument as a page id. Keep as a real missing master hardening/feature-port issue, but downgrade to **P1/P2** rather than P0 security.
+- **B3 impact is overstated.** `SeoTag` does not emit relative `og:image` on all pages; with `siteUrl` it can still produce absolute URLs. The missing master hardening is still important because without `siteUrl` it emits relative/rooted values, and collection item pages can produce malformed depth-derived paths such as `/../assets/...`.
+- **C2 wording is stale.** Some compact-sidebar CSS did migrate, but key pieces are still missing: smaller settings-panel padding, text-size rules for inputs, radio/action/icon hooks, and icon-grid styling.
+- **C4 is mostly cosmetic on the web path.** It matters more when paired with A2 because the unified preview layout was part of the navigable page/item preview experience.
+- **The "no findings duplicate QA issues" claim is too strong.** The sortable-table regression below overlaps the black-box QA run's manual collection reorder issue.
+- **Migration v2 should not be framed as simply "by design."** Reusing migration version `2` for a different schema change creates an upgrade-path hazard for databases that already recorded master v2.
+
+### Additional missing findings
+
+#### D1 — Migration version collision can skip schema changes
+
+- **experimentation:** `packages/builder-server/src/db/migrations.js` uses migration v2 for `projects.owner_id`.
+- **master:** migration v2 added `media_files.caption`.
+- **Problem:** `runMigrations` skips any version already recorded in `schema_migrations`. A database upgraded through master v2 will skip experimentation's v2 and never receive `owner_id`; experimentation also needs a later migration for `caption`.
+- **Impact:** Upgrade-path schema drift. This is more serious than the current note in B2 suggests.
+- **Remediation:** Add forward-only migration versions for both missing schema changes; do not rely on a reused v2 slot.
+
+#### D2 — Shared `Table` lost sortable row support
+
+- **experimentation:** `packages/editor-ui/src/pages/CollectionItems.jsx` passes `sortable`, `getRowId`, `onReorder`, and `rowClassName` to `Table`, but `packages/editor-ui/src/components/ui/Table.jsx` ignores those props and renders a plain table.
+- **master:** `Table` included the dnd-kit sortable implementation.
+- **Impact:** Manual collection item reorder is broken. This overlaps QA-003 and should be treated as a master-port regression too.
+- **Remediation:** Restore sortable support in the shared `Table` component, or move the sortable table behavior into `CollectionItems`.
+
+#### D3 — Menu active state / `aria-current` regressed on collection item pages
+
+- **experimentation:** `packages/core/src/snippets/menu.liquid` still compares `pageSlug | append: '.html'` against `item.link`.
+- **master:** menu rendering compared canonical paths (`currentCanonicalPath` and `item.canonicalPath`), which avoids depth-prefix and collection-item mismatches.
+- **Impact:** Collection item pages and some live preview morphs can lose active menu classes and `aria-current`.
+- **Remediation:** Restore canonical-path active-state logic in the menu snippet and ensure single-widget preview/render paths pass `currentCanonicalPath`.
+
+#### D4 — MediaDrawer master fixes were also dropped
+
+- **First-open metadata reset:** `MediaDrawer` seeds `prevSelectedFileRef` with the selected file, which can skip the initial form reset when the drawer is mounted already-open from `ImageInput`.
+- **Portal behavior:** the drawer now renders inline instead of through `createPortal(document.body)`, reintroducing stacking-context risks inside sortable/gallery rows.
+- **Cache invalidation:** `useMediaMetadata` updates local media-page state but no longer invalidates the shared media cache, so page-editor image inputs can see stale metadata until cache expiry.
+- **Impact:** Metadata editing can appear blank/stale in edge cases, and overlay layering can regress.
+- **Remediation:** Restore master's null-sentinel reset, body portal, and `invalidateMediaCache()` call after metadata saves.
+
+#### D5 — Audio media UI polish is only partially ported
+
+- **experimentation:** upload handling accepts audio, but some UI labels/icons still treat every non-image as a generic file.
+- **Impact:** Minor polish/accessibility regression: MP3s display less clearly in drawer/grid/list views.
+- **Remediation:** Restore audio-specific labels/icons from master.
+
+#### D6 — Repository guidance is stale
+
+- **experimentation:** `AGENTS.md` still describes the old `src/` + `server/` layout and old test/lint paths, while the branch now uses package workspaces.
+- **Impact:** Tooling/documentation drift for future agents and maintainers.
+- **Remediation:** Update `AGENTS.md` to match the package layout, or point it at the newer workspace guidance.
