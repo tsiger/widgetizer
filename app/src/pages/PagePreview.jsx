@@ -22,8 +22,14 @@ export default function PagePreview() {
   const { page, loading, error, loadPage } = usePageStore();
   const themeSettings = useThemeStore((s) => s.settings);
 
-  // Load initial data from stores
+  // Load initial data from stores — but only once the active project is seeded.
+  // A freshly opened preview window/tab cold-boots and resolves activeProject a
+  // beat after first render; loading (and mounting PreviewPanel) before that means
+  // the activeProject `undefined → id` flip resets the preview mid-load and aborts
+  // the in-flight /render/<token> iframe. Gate on activeProject?.id, as hosted's
+  // StandalonePreview already does.
   useEffect(() => {
+    if (!activeProject?.id) return;
     loadPage(pageId);
   }, [pageId, activeProject?.id, loadPage]);
 
@@ -39,7 +45,10 @@ export default function PagePreview() {
     return () => window.removeEventListener("message", handleMessage);
   }, [navigate]);
 
-  if (loading) {
+  // Hold at the loading gate until the active project is seeded, so PreviewPanel
+  // never mounts during the activeProject `undefined → id` window (see the load
+  // effect above).
+  if (!activeProject || loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-900">
         <LoadingSpinner message={t("pagePreview.loading")} />
