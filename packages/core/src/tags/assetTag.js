@@ -43,6 +43,8 @@ export const AssetTag = {
     const apiUrl = globals.apiUrl || "";
     const activeProjectId = globals.projectId || "";
     const renderMode = globals.renderMode || "preview"; // Default to preview
+    // Depth-aware prefix for nested item pages ("" at the export root).
+    const outputPathPrefix = globals.outputPathPrefix || "";
 
     // Determine file type from extension
     const isCSS = filepath.endsWith(".css");
@@ -55,9 +57,9 @@ export const AssetTag = {
       // Add cache busting version for CSS and JS files
       const version = globals.exportVersion;
       if ((isCSS || isJS) && version) {
-        assetUrl = `assets/${filepath}?v=${version}`;
+        assetUrl = `${outputPathPrefix}assets/${filepath}?v=${version}`;
       } else {
-        assetUrl = `assets/${filepath}`;
+        assetUrl = `${outputPathPrefix}assets/${filepath}`;
       }
     } else {
       // For preview mode, use the existing API route

@@ -52,3 +52,26 @@ export function prefixInternalHref(href, outputPathPrefix) {
   if (normalized.startsWith("/")) return normalized; // root-absolute (user opted in)
   return `${outputPathPrefix}${normalized}`;
 }
+
+/**
+ * Return a shallow copy of a site_icons object with every href field rewritten
+ * for the given output depth. Export-generated site icons carry root-relative
+ * filenames (e.g. `favicon.svg`), so when they are rendered into a nested item
+ * page they must be depth-prefixed. Non-href fields (type/sizes) and empty
+ * hrefs are left untouched; at the root (prefix "") the copy is byte-identical
+ * to the input.
+ *
+ * @param {object} siteIcons
+ * @param {string} outputPathPrefix - "" at the root, "../" one level deep
+ * @returns {object}
+ */
+export function prefixSiteIcons(siteIcons, outputPathPrefix) {
+  if (!siteIcons) return siteIcons;
+  return {
+    ...siteIcons,
+    primaryIconHref: prefixInternalHref(siteIcons.primaryIconHref, outputPathPrefix),
+    legacyIconHref: prefixInternalHref(siteIcons.legacyIconHref, outputPathPrefix),
+    appleTouchIconHref: prefixInternalHref(siteIcons.appleTouchIconHref, outputPathPrefix),
+    manifestHref: prefixInternalHref(siteIcons.manifestHref, outputPathPrefix),
+  };
+}

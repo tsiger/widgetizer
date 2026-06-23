@@ -55,13 +55,15 @@ export const PlaceholderImageTag = {
     const apiUrl = globals.apiUrl || "";
     const projectId = globals.projectId || "";
     const renderMode = globals.renderMode || "preview";
+    // Depth-aware prefix for nested item pages ("" at the export root).
+    const outputPathPrefix = globals.outputPathPrefix || "";
 
     let assetUrl;
 
     if (customFile) {
       // Theme-specific placeholder from theme's assets folder
       if (renderMode === "publish") {
-        assetUrl = `assets/${customFile}`;
+        assetUrl = `${outputPathPrefix}assets/${customFile}`;
       } else {
         assetUrl = `${apiUrl}/api/preview/assets/${projectId}/assets/${customFile}`;
       }
@@ -70,7 +72,7 @@ export const PlaceholderImageTag = {
       const safeAspect = ASPECT_RATIOS.includes(aspect) ? aspect : "landscape";
       const placeholderFile = PLACEHOLDER_FILES[safeAspect];
       if (renderMode === "publish") {
-        assetUrl = `assets/${placeholderFile}`;
+        assetUrl = `${outputPathPrefix}assets/${placeholderFile}`;
       } else {
         assetUrl = `${apiUrl}/api/core/assets/${placeholderFile}`;
       }

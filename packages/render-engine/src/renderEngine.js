@@ -25,7 +25,7 @@ import {
   registerCollectionFilter,
 } from "@widgetizer/core";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
-import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
+import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
 /**
@@ -499,7 +499,12 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
     globals,
     imagePath: imageBasePath,
     filePath: fileBasePath,
-    site_icons: globals.siteIcons || deps.buildRuntimeSiteIcons(siteIconSrc, mediaFiles, imageBasePath),
+    // Export-generated site icons carry root-relative filenames, so prefix them
+    // per render depth. Runtime icons are built from the already-prefixed
+    // imageBasePath, so they need no further prefixing.
+    site_icons: globals.siteIcons
+      ? prefixSiteIcons(globals.siteIcons, globals.outputPathPrefix || "")
+      : deps.buildRuntimeSiteIcons(siteIconSrc, mediaFiles, imageBasePath),
   };
 }
 

@@ -7,6 +7,29 @@
  * Usage:
  * {% header_assets %}
  */
+import { prefixInternalHref } from "../utils/linkPrefixer.js";
+
+/**
+ * Prefix every candidate URL in a srcset/imagesrcset string for the given
+ * output depth, preserving each `<url> <descriptor>` pair. At the export root
+ * (empty prefix) the original string is returned byte-for-byte.
+ */
+function prefixSrcset(srcset, outputPathPrefix) {
+  if (!outputPathPrefix || typeof srcset !== "string") return srcset;
+  return srcset
+    .split(",")
+    .map((part) => {
+      const trimmed = part.trim();
+      if (!trimmed) return trimmed;
+      const spaceIdx = trimmed.indexOf(" ");
+      if (spaceIdx === -1) return prefixInternalHref(trimmed, outputPathPrefix);
+      const url = trimmed.slice(0, spaceIdx);
+      const descriptor = trimmed.slice(spaceIdx); // leading space + e.g. "320w"
+      return `${prefixInternalHref(url, outputPathPrefix)}${descriptor}`;
+    })
+    .join(", ");
+}
+
 export const RenderHeaderAssetsTag = {
   parse(tagToken) {
     this.tagName = tagToken.name;
@@ -21,6 +44,8 @@ export const RenderHeaderAssetsTag = {
       const apiUrl = globals.apiUrl || "";
       const projectId = globals.projectId || "";
       const renderMode = globals.renderMode || "preview";
+      // Depth-aware prefix for nested item pages ("" at the export root).
+      const outputPathPrefix = globals.outputPathPrefix || "";
 
       let output = "";
 
@@ -28,9 +53,9 @@ export const RenderHeaderAssetsTag = {
       const preloads = globals.enqueuedPreloads;
       if (preloads && preloads.size > 0) {
         preloads.forEach((options, src) => {
-          // Resolve URL based on type/location if needed, or assume src is absolute/relative
-          // For now, we'll treat it similar to assets but simpler since preloads can be anything
-          let assetUrl = src;
+          // Preload sources can be relative asset paths or absolute URLs; only
+          // genuinely-relative internal hrefs get the depth prefix.
+          let assetUrl = prefixInternalHref(src, outputPathPrefix);
 
           // Construct the link tag
           const attrs = [`<link rel="preload" href="${assetUrl}"`];
@@ -39,7 +64,7 @@ export const RenderHeaderAssetsTag = {
           if (options.type) attrs.push(`type="${options.type}"`);
           if (options.fetchpriority) attrs.push(`fetchpriority="${options.fetchpriority}"`);
           if (options.media) attrs.push(`media="${options.media}"`);
-          if (options.imagesrcset) attrs.push(`imagesrcset="${options.imagesrcset}"`);
+          if (options.imagesrcset) attrs.push(`imagesrcset="${prefixSrcset(options.imagesrcset, outputPathPrefix)}"`);
           if (options.imagesizes) attrs.push(`imagesizes="${options.imagesizes}"`);
           if (options.crossorigin) attrs.push(`crossorigin`);
 
@@ -77,7 +102,9 @@ export const RenderHeaderAssetsTag = {
         let assetUrl;
         if (renderMode === "publish") {
           const version = globals.exportVersion;
-          assetUrl = version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
+          assetUrl = version
+            ? `${outputPathPrefix}assets/${filepath}?v=${version}`
+            : `${outputPathPrefix}assets/${filepath}`;
         } else if (options.source === "widget" && options.widgetType) {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {
@@ -97,7 +124,9 @@ export const RenderHeaderAssetsTag = {
         let assetUrl;
         if (renderMode === "publish") {
           const version = globals.exportVersion;
-          assetUrl = version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
+          assetUrl = version
+            ? `${outputPathPrefix}assets/${filepath}?v=${version}`
+            : `${outputPathPrefix}assets/${filepath}`;
         } else if (options.source === "widget" && options.widgetType) {
           assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
         } else {
