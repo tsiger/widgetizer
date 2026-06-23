@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IconButton } from "../ui/Button";
-import { getExportEntryFile, downloadExportZip, deleteExportAPI } from "../../queries/exportManager";
+import { getExportEntryFile, downloadExportZip, deleteExportAPI, getExportViewUrl } from "../../queries/exportManager";
 import useToastStore from "../../stores/toastStore";
 import useConfirmationAction from "../../hooks/useConfirmationAction";
 import useFormatDate from "../../hooks/useFormatDate";
@@ -9,7 +9,6 @@ import { formatFileSize } from "../../utils/formatFileSize";
 import Table from "../ui/Table";
 import Badge from "../ui/Badge";
 import { Loader2, ExternalLink, Trash2, Calendar, Download, Package, MoreVertical, AlertTriangle } from "lucide-react";
-import { getApiBase } from "../../lib/apiBase";
 
 export default function ExportHistoryTable({
   exportHistory,
@@ -69,13 +68,13 @@ export default function ExportHistoryTable({
       const result = await getExportEntryFile(exportPath);
       const entryFile = result.entryFile || "index.html";
 
-      const viewUrl = `${getApiBase()}/export/view/${exportPath}/${entryFile}`;
+      const viewUrl = getExportViewUrl(exportPath, entryFile);
       window.open(viewUrl, "_blank");
     } catch (error) {
       console.error("Error getting entry file:", error);
       // Fallback to index.html - handle both Windows and Unix paths
       const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
-      const viewUrl = `${getApiBase()}/export/view/${exportPath}/index.html`;
+      const viewUrl = getExportViewUrl(exportPath, "index.html");
       window.open(viewUrl, "_blank");
     }
   };
@@ -83,7 +82,7 @@ export default function ExportHistoryTable({
   const handleViewIssues = (exportRecord) => {
     // The report is served from the export dir via the existing view route.
     const exportPath = exportRecord.outputDir.split(/[/\\]/).pop();
-    const reportUrl = `${getApiBase()}/export/view/${exportPath}/__export__issues.html`;
+    const reportUrl = getExportViewUrl(exportPath, "__export__issues.html");
     window.open(reportUrl, "_blank");
   };
 

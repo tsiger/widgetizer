@@ -1,5 +1,35 @@
 import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
 import { getApiBase } from "../lib/apiBase";
+import { API_URL } from "../lib/config";
+
+/**
+ * Absolute URL for a browser navigation to an exported file (View links + the
+ * dev-mode issues report).
+ *
+ * View/Download are real browser navigations (window.open / <a download>), not
+ * editorFetch calls, so they must be ABSOLUTE: the relative apiBase ("/api")
+ * resolves against the Vite dev origin — which has no API proxy — and returns
+ * the SPA shell (404 / corrupt zip). API_URL prepends the configured host
+ * (VITE_API_URL in dev, "" same-origin in prod); getApiBase() supplies the
+ * scope prefix (OSS "/api", hosted "/api/projects/:id").
+ *
+ * @param {string} exportDir - The export directory name
+ * @param {string} filePath - File within the export (e.g. "index.html")
+ * @returns {string} Absolute URL
+ */
+export function getExportViewUrl(exportDir, filePath) {
+  return API_URL(`${getApiBase()}/export/view/${exportDir}/${filePath}`);
+}
+
+/**
+ * Absolute URL for downloading an export as a ZIP. Absolute for the same reason
+ * as {@link getExportViewUrl}.
+ * @param {string} exportDir - The export directory name
+ * @returns {string} Absolute URL
+ */
+export function getExportDownloadUrl(exportDir) {
+  return API_URL(`${getApiBase()}/export/download/${exportDir}`);
+}
 
 /**
  * @typedef {Object} ExportResult
@@ -135,7 +165,7 @@ export function downloadExportZip(exportDir) {
   }
 
   // Create a temporary link to trigger download
-  const downloadUrl = `${getApiBase()}/export/download/${exportDir}`;
+  const downloadUrl = getExportDownloadUrl(exportDir);
   const link = document.createElement("a");
   link.href = downloadUrl;
   link.download = `${exportDir}.zip`;
