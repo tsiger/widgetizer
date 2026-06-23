@@ -124,21 +124,22 @@ export function deleteMediaFiles(projectId, fileIds) {
 }
 
 /**
- * Update metadata (alt, title) for a single media file, scoped to a project.
+ * Update metadata (alt, title, caption) for a single media file, scoped to a project.
  * @param {string} projectId - Project UUID
  * @param {string} fileId
- * @param {{ alt?: string, title?: string, description?: string }} metadata
+ * @param {{ alt?: string, title?: string, caption?: string }} metadata
  * @returns {boolean} True if a row was updated
  */
 export function updateFileMetadata(projectId, fileId, metadata) {
   const db = getDb();
   const result = db.prepare(
-    "UPDATE media_files SET alt = @alt, title = @title WHERE id = @id AND project_id = @projectId"
+    "UPDATE media_files SET alt = @alt, title = @title, caption = @caption WHERE id = @id AND project_id = @projectId"
   ).run({
     id: fileId,
     projectId,
     alt: metadata.alt ?? "",
     title: metadata.title ?? "",
+    caption: metadata.caption ?? "",
   });
   return result.changes > 0;
 }
@@ -214,8 +215,8 @@ export function updateMediaUsageForSource(projectId, sourceId, fileIds) {
  */
 function insertMediaFile(db, projectId, fileData) {
   db.prepare(`
-    INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, width, height)
-    VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @width, @height)
+    INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, caption, width, height)
+    VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @caption, @width, @height)
   `).run({
     id: fileData.id,
     projectId,
@@ -227,6 +228,7 @@ function insertMediaFile(db, projectId, fileData) {
     path: fileData.path || "",
     alt: fileData.metadata?.alt || "",
     title: fileData.metadata?.title || "",
+    caption: fileData.metadata?.caption || "",
     width: fileData.width || null,
     height: fileData.height || null,
   });
@@ -273,7 +275,7 @@ function rowToMediaFile(row, sizeRows, usageList) {
     size: row.size,
     uploaded: row.uploaded,
     path: row.path,
-    metadata: { alt: row.alt || "", title: row.title || "" },
+    metadata: { alt: row.alt || "", title: row.title || "", caption: row.caption || "" },
     sizes,
     usedIn: usageList,
     width: row.width,

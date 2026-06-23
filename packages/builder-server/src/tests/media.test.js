@@ -867,7 +867,8 @@ describe("updateMediaMetadata", () => {
       PROJECT_ID,
       {
         files: [
-          { id: "meta-img", filename: "photo.jpg", type: "image/jpeg", metadata: { alt: "", title: "" } },
+          { id: "meta-img", filename: "photo.jpg", type: "image/jpeg", metadata: { alt: "", title: "", caption: "" } },
+          { id: "meta-pdf", filename: "doc.pdf", type: "application/pdf", metadata: { alt: "", title: "", caption: "" } },
         ],
       },
     );
@@ -909,6 +910,42 @@ describe("updateMediaMetadata", () => {
     const mediaData = await readMediaFile(PROJECT_ID);
     const file = mediaData.files.find((f) => f.id === "meta-img");
     assert.equal(file.metadata.alt, "Persisted alt text");
+  });
+
+  it("updates and persists an image caption", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "meta-img" },
+      body: { alt: "Alt", title: "Title", caption: "A lovely caption" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.file.metadata.caption, "A lovely caption");
+
+    const mediaData = await readMediaFile(PROJECT_ID);
+    const file = mediaData.files.find((f) => f.id === "meta-img");
+    assert.equal(file.metadata.caption, "A lovely caption");
+  });
+
+  it("ignores caption for non-image files (image-only concept)", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "meta-pdf" },
+      body: { alt: "Doc", title: "Doc", caption: "Should be dropped" },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.file.metadata.caption, "", "caption must not be stored for a non-image");
+
+    const mediaData = await readMediaFile(PROJECT_ID);
+    const file = mediaData.files.find((f) => f.id === "meta-pdf");
+    assert.equal(file.metadata.caption, "");
+  });
+
+  it("strips HTML from caption", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "meta-img" },
+      body: { alt: "Alt", title: "Title", caption: "Nice <script>alert(1)</script> caption" },
+    });
+    assert.equal(res._status, 200);
+    assert.ok(!res._json.file.metadata.caption.includes("<script>"), "caption should not contain script tags");
+    assert.ok(res._json.file.metadata.caption.includes("Nice"), "caption should preserve text content");
   });
 
   it("strips HTML from alt text", async () => {

@@ -38,6 +38,13 @@ function appliedVersions(db, trackingTable) {
     .map((row) => row.version);
 }
 
+function columnExists(db, table, column) {
+  return db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === column);
+}
+
+// Every version this branch's runner should converge a database to.
+const ALL_VERSIONS = [1, 2, 3, 4];
+
 describe("runMigrations", () => {
   it("creates the full initial schema on a fresh database", () => {
     const db = new Database(":memory:");
@@ -54,7 +61,7 @@ describe("runMigrations", () => {
     runMigrations(db);
 
     assert.ok(tableExists(db, DEFAULT_TRACKING_TABLE));
-    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1, 2]);
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
     db.close();
   });
 
@@ -68,7 +75,7 @@ describe("runMigrations", () => {
     }
     // ...tracked under the custom name only.
     assert.ok(tableExists(db, "_widgetizer_migrations"));
-    assert.deepEqual(appliedVersions(db, "_widgetizer_migrations"), [1, 2]);
+    assert.deepEqual(appliedVersions(db, "_widgetizer_migrations"), ALL_VERSIONS);
     assert.equal(tableExists(db, DEFAULT_TRACKING_TABLE), false);
     db.close();
   });
@@ -79,7 +86,7 @@ describe("runMigrations", () => {
     // Second run must not throw (e.g. CREATE TABLE projects again) or re-insert.
     runMigrations(db);
 
-    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1, 2]);
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
     db.close();
   });
 
@@ -89,6 +96,15 @@ describe("runMigrations", () => {
       () => runMigrations(db, { trackingTable: "_migrations; DROP TABLE projects" }),
       /Invalid trackingTable name/,
     );
+    db.close();
+  });
+
+  it("a fresh database ends up with both owner_id and caption columns", () => {
+    const db = new Database(":memory:");
+    runMigrations(db);
+
+    assert.ok(columnExists(db, "projects", "owner_id"), "projects.owner_id should exist");
+    assert.ok(columnExists(db, "media_files", "caption"), "media_files.caption should exist");
     db.close();
   });
 
@@ -104,22 +120,71 @@ describe("runMigrations", () => {
     db.close();
   });
 
-  it("v2 upgrade preserves existing rows, backfilling owner_id = 'default'", () => {
-    // Simulate a v1 database: projects table without owner_id, v1 recorded as
-    // applied, and a pre-existing row.
+  it("upgrade from v1 preserves existing rows, backfilling owner_id = 'default' and adding caption", () => {
+    // Simulate a v1 database: full v1 schema with v1 recorded as applied and a
+    // pre-existing row. (media_files must exist because v3 alters it — v1 always
+    // creates it alongside projects.)
     const db = new Database(":memory:");
     db.exec(`
       CREATE TABLE projects (id TEXT PRIMARY KEY, folder_name TEXT NOT NULL, name TEXT);
+      CREATE TABLE media_files (id TEXT PRIMARY KEY, project_id TEXT, alt TEXT, title TEXT);
       CREATE TABLE _migrations (version INTEGER PRIMARY KEY, description TEXT, applied_at TEXT);
     `);
     db.prepare("INSERT INTO _migrations (version, description) VALUES (1, 'init')").run();
     db.prepare("INSERT INTO projects (id, folder_name, name) VALUES ('old','of','Old')").run();
 
-    runMigrations(db); // applies only v2
+    runMigrations(db); // applies v2, v3, v4
 
-    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), [1, 2]);
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
     const row = db.prepare("SELECT owner_id FROM projects WHERE id = 'old'").get();
     assert.equal(row.owner_id, "default");
+    assert.ok(columnExists(db, "media_files", "caption"), "caption should be added on upgrade");
+    db.close();
+  });
+
+  it("master-history database (v2 = caption) is backfilled with owner_id via v4", () => {
+    // master shipped v2 = caption. Such a database has {1,2} recorded with the
+    // caption column present but owner_id MISSING (this branch's v2 is skipped
+    // because version 2 is already recorded). v4 must backfill owner_id.
+    const db = new Database(":memory:");
+    db.exec(`
+      CREATE TABLE projects (id TEXT PRIMARY KEY, folder_name TEXT NOT NULL, name TEXT);
+      CREATE TABLE media_files (id TEXT PRIMARY KEY, project_id TEXT, alt TEXT, title TEXT, caption TEXT DEFAULT '');
+      CREATE TABLE _migrations (version INTEGER PRIMARY KEY, description TEXT, applied_at TEXT);
+    `);
+    db.prepare("INSERT INTO _migrations (version, description) VALUES (1, 'init'), (2, 'caption')").run();
+    db.prepare("INSERT INTO projects (id, folder_name, name) VALUES ('m','mf','M')").run();
+
+    assert.equal(columnExists(db, "projects", "owner_id"), false, "precondition: owner_id missing");
+
+    runMigrations(db); // should apply v3 (caption guard skips) and v4 (adds owner_id)
+
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
+    assert.ok(columnExists(db, "projects", "owner_id"), "owner_id should be backfilled");
+    const row = db.prepare("SELECT owner_id FROM projects WHERE id = 'm'").get();
+    assert.equal(row.owner_id, "default");
+    // caption already present — v3 must not have failed trying to re-add it.
+    assert.ok(columnExists(db, "media_files", "caption"));
+    db.close();
+  });
+
+  it("this-branch-history database (v2 = owner_id) gets caption via v3", () => {
+    // A database that already went through this branch's v2 has owner_id but no
+    // caption. v3 must add caption; v4 must be a no-op (owner_id already there).
+    const db = new Database(":memory:");
+    db.exec(`
+      CREATE TABLE projects (id TEXT PRIMARY KEY, folder_name TEXT NOT NULL, name TEXT, owner_id TEXT NOT NULL DEFAULT 'default');
+      CREATE TABLE media_files (id TEXT PRIMARY KEY, project_id TEXT, alt TEXT, title TEXT);
+      CREATE TABLE _migrations (version INTEGER PRIMARY KEY, description TEXT, applied_at TEXT);
+    `);
+    db.prepare("INSERT INTO _migrations (version, description) VALUES (1, 'init'), (2, 'owner_id')").run();
+
+    assert.equal(columnExists(db, "media_files", "caption"), false, "precondition: caption missing");
+
+    runMigrations(db); // should apply v3 (adds caption) and v4 (owner_id guard skips)
+
+    assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
+    assert.ok(columnExists(db, "media_files", "caption"), "caption should be added");
     db.close();
   });
 });

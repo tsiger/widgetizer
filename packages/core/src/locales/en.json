@@ -207,6 +207,8 @@
       "altHelp": "Describes the {{type}} for screen readers.",
       "titleLabel": "Title",
       "titleHelp": "Sets the title attribute (often shown on hover).",
+      "captionLabel": "Caption",
+      "captionHelp": "Optional caption for this image. Shown where a theme displays it.",
       "save": "Save Changes",
       "saving": "Saving...",
       "types": {

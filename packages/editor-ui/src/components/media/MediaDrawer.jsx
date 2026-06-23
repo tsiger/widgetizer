@@ -17,6 +17,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
     defaultValues: {
       alt: "",
       title: "",
+      caption: "",
     },
   });
 
@@ -33,12 +34,13 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
         reset({
           alt: selectedFile.metadata?.alt || "",
           title: selectedFile.metadata?.title || "",
+          caption: selectedFile.metadata?.caption || "",
         });
         prevSelectedFileRef.current = currentSelectedFileStr;
       }
     } else if (!visible) {
       // Reset form when drawer is closed
-      reset({ alt: "", title: "" });
+      reset({ alt: "", title: "", caption: "" });
       prevSelectedFileRef.current = JSON.stringify(null);
     }
   }, [visible, selectedFile, reset]);
@@ -58,7 +60,9 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
 
   const onSubmitHandler = (data) => {
     if (selectedFile) {
-      onSave(selectedFile.id, { alt: data.alt, title: data.title });
+      // caption is image-only (the field renders for images only; the backend also
+      // gates on type), so a non-image save sends an empty caption harmlessly.
+      onSave(selectedFile.id, { alt: data.alt, title: data.title, caption: data.caption });
     }
   };
 
@@ -161,6 +165,17 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             <input type="text" id="title" {...register("title")} className="form-input" />
             <p className="form-description">{t("forms.media.titleHelp")}</p>
           </div>
+
+          {/* Caption — images only (a caption is an image concept; the backend also gates on type) */}
+          {isImage && (
+            <div className="form-field">
+              <label htmlFor="caption" className="form-label-optional">
+                {t("forms.media.captionLabel")}
+              </label>
+              <input type="text" id="caption" {...register("caption")} className="form-input" />
+              <p className="form-description">{t("forms.media.captionHelp")}</p>
+            </div>
+          )}
 
           <div className="form-actions-separated">
             <Button type="button" onClick={onClose} variant="secondary">

@@ -311,7 +311,7 @@ export async function uploadProjectMedia(req, res) {
           size: file.size,
           uploaded: new Date().toISOString(),
           path: uploadPath,
-          metadata: { alt: "", title: "" },
+          metadata: { alt: "", title: "", caption: "" },
           sizes: {}, // Initialize sizes object
         };
 
@@ -492,6 +492,7 @@ export async function updateMediaMetadata(req, res) {
     }
     const alt = stripHtmlTags(req.body.alt);
     const title = stripHtmlTags(req.body.title);
+    const caption = stripHtmlTags(req.body.caption);
     // Validate project ownership
     await getProjectFolderName(projectId);
 
@@ -506,11 +507,15 @@ export async function updateMediaMetadata(req, res) {
       return res.status(400).json({ error: "Alt text is required for images" });
     }
 
-    // Update metadata in DB (alt and title columns, scoped to project)
-    mediaRepo.updateFileMetadata(projectId, fileId, { alt: alt || "", title: title || "" });
+    // Captions are an image-only concept; a caption sent for a non-image (e.g. a
+    // PDF, via direct API) is stored as "" rather than text.
+    const captionForType = file.type?.startsWith("image/") ? caption || "" : "";
+
+    // Update metadata in DB (alt, title, caption columns, scoped to project)
+    mediaRepo.updateFileMetadata(projectId, fileId, { alt: alt || "", title: title || "", caption: captionForType });
 
     // Build response metadata in the shape the frontend expects
-    const metadata = { alt: alt || "", title: title || "" };
+    const metadata = { alt: alt || "", title: title || "", caption: captionForType };
 
     res.json({
       message: "Metadata updated successfully",

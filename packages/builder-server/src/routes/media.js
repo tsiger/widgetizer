@@ -57,7 +57,7 @@ router.put(
     param("fileId").notEmpty(),
     body("alt").optional().trim().customSanitizer(stripHtmlTags),
     body("title").optional().trim().customSanitizer(stripHtmlTags),
-    body("description").optional().trim().customSanitizer(stripHtmlTags),
+    body("caption").optional().trim().customSanitizer(stripHtmlTags),
   ],
   validateRequest,
   updateMediaMetadata,
