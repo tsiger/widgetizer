@@ -798,8 +798,9 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
 
 /**
  * Read `_order.json`, apply `transform(order)`, prune slugs whose item file no
- * longer exists, and write back (Section 15). The storage adapter writes whole
- * files, so the monolith's atomic-temp dance is unnecessary.
+ * longer exists, and write back (Section 15). Crash-safety is the adapter's job:
+ * LocalStorageAdapter.write is atomic (temp-file + rename), so this service stays
+ * adapter-agnostic and never does the temp-file dance itself.
  */
 async function rewriteOrder(storage, scope, collectionType, transform) {
   let order = [];

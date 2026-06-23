@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { assertWithin } from "./internal/paths.js";
+import { writeFileAtomic, isAtomicTmpFile } from "./internal/atomic.js";
 
 /**
  * OSS StorageAdapter — project content as whole files under
@@ -37,7 +38,10 @@ export class LocalStorageAdapter {
   async write(scope, relativePath, content) {
     const target = this.#resolve(scope, relativePath);
     await fs.mkdir(path.dirname(target), { recursive: true });
-    await fs.writeFile(target, content);
+    // Atomic write (temp-file + rename) so a crash can't truncate a half-written
+    // item/_order.json. The contract doesn't require atomicity; it's a local-FS
+    // robustness detail confined to this adapter (cloud PUTs are already atomic).
+    await writeFileAtomic(target, content);
   }
 
   async delete(scope, relativePath) {
@@ -46,7 +50,10 @@ export class LocalStorageAdapter {
 
   async list(scope, relativeDir) {
     try {
-      return await fs.readdir(this.#resolve(scope, relativeDir));
+      const names = await fs.readdir(this.#resolve(scope, relativeDir));
+      // Hide orphan atomic staging files (a crashed write between tmp-write and
+      // rename) so upstream readers never see them as spurious entries.
+      return names.filter((name) => !isAtomicTmpFile(name));
     } catch (err) {
       if (err.code === "ENOENT") return [];
       throw err;
