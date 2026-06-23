@@ -147,7 +147,7 @@ const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Supported types: images and PDF."), false);
+    cb(new Error("Invalid file type. Supported types: images, audio (MP3), and PDF."), false);
   }
 };
 
@@ -288,7 +288,7 @@ export async function uploadProjectMedia(req, res) {
             success: false,
             file: {
               originalName: file.originalname,
-              reason: `Image size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
+              reason: `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
               sizeBytes: file.size,
             },
           };

@@ -675,7 +675,12 @@ describe("uploadProjectMedia", () => {
     assert.equal(res._status, 400);
     assert.equal(res._json.processedFiles.length, 0);
     assert.equal(res._json.rejectedFiles.length, 1);
-    assert.ok(res._json.rejectedFiles[0].reason.includes("exceeds"));
+    // C3: the reason is type-agnostic ("File size…"), not image-specific — the
+    // pipeline also carries audio/PDF, which can be the oversized file.
+    const reason = res._json.rejectedFiles[0].reason;
+    assert.ok(reason.includes("exceeds"));
+    assert.ok(reason.startsWith("File size ("), `expected "File size (…" prefix, got: ${reason}`);
+    assert.ok(!reason.includes("Image size"), "size-limit copy must not be image-specific");
   });
 
   it("handles mixed success and rejection", async () => {
