@@ -34,10 +34,11 @@ None block the refactor. All are fixable by porting the named master commit into
 | C4 | P2 | preview | `SitePreviewLayout` dropped → page↔item preview remounts chrome (flash) | ✅ `cd2f5a48` (+hosted) |
 | D1 | P1 | db/migrations | Migration v2 slot reused for `owner_id` → master-v2 DBs skip it; caption never lands | ✅ `66125d85` (+hosted) |
 | D2 | P1 | editor UI | Shared `Table` lost sortable rows → collection reorder broken (overlaps QA-003) | ✅ `97e38324` |
-| D3 | P2 | render | Menu active state / `aria-current` uses `.html` slug, not canonical path | ⬜ open |
+| D3 | P2 | render | Menu active state / `aria-current` uses `.html` slug, not canonical path | ✅ `e60ef712` (+hosted) |
 | D4 | P2 | media | MediaDrawer master fixes dropped (first-open reset, body portal, cache invalidation) | ⬜ open |
 | D5 | P2 | media | Audio media UI labels/icons only partially ported | ⬜ open |
-| D6 | P3 | docs | `AGENTS.md` still describes the pre-refactor `src/`+`server/` layout | ✅ docs (pending commit) |
+| D6 | P3 | docs | `AGENTS.md` still describes the pre-refactor `src/`+`server/` layout | ✅ `f6962890` (docs) |
+| D7 | P1 | editor UI | Collection items not linkable in menus — picker fetch + select-mapping + grouped combobox dropped | ✅ `e60ef712` |
 
 > **Status legend:** ✅ fixed (commit in the OSS `experimentation` repo unless noted) · ⬜ open. Full remediation detail — including every **deviation from `master` and why** — is in **§9**.
 
@@ -250,6 +251,15 @@ I agree with the main direction of the audit. In particular:
 - **Impact:** Tooling/documentation drift for future agents and maintainers.
 - **Remediation:** Update `AGENTS.md` to match the package layout, or point it at the newer workspace guidance.
 
+#### D7 — Collection items can't be added to menus
+
+> Not from the original audit or the Codex pass — **surfaced 2026-06-24 during D3 remediation**, manually testing the menu editor (no collection items appeared in a menu row's link picker).
+
+- **experimentation:** `packages/editor-ui/src/components/menus/MenuEditor/index.jsx` fetched **only** `getAllPages()` for the link picker, and `SortableItem.jsx`'s select handler had **only** the `isPage` branch — so collection items never appeared in the combobox, and even if they had, a pick would be mis-stored as a custom URL. `MenuCombobox.jsx` had also been flattened (lost the per-group headers). Everything *behind* the UI already supported it (`menuResolver` resolves `collectionItemUuid`, `useLinkTargets` lists items, menu save persists the fields).
+- **master:** `index.jsx` fetched pages **+ `hasItemPages` collection items**; `SortableItem.jsx` mapped an `isCollectionItem` pick to `collectionItemUuid`/`collectionType`/derived link (and resolved a stored ref back to its label); `MenuCombobox.jsx` rendered an uppercase header per group.
+- **Impact:** Collection item pages (News/Projects/Services/…) could not be linked from any menu — a real lost feature (workaround: paste a custom URL, which loses the stable rename-following ref). Picker was also ungrouped.
+- **Remediation:** Restore the option source, the select/display mapping, and the grouped combobox.
+
 ---
 
 ## 9. Remediation log (2026-06-24)
@@ -305,9 +315,20 @@ The `CollectionItems` consumer was already fully wired (`sortable`/`getRowId`/`o
 - *Test scope:* new `Table.test.jsx` pins the rendering contract (plain unchanged; sortable adds the handle column + per-row handles + correct empty-state colspan; `rowClassName` applied). The dnd-kit drag interaction itself is left to manual/e2e — not reliably reproducible in jsdom, and master shipped no test for it either.
 - *Resolves* QA-003 (`qa-issues/QA-003-collection-table-ignores-sort-and-row-props.md`).
 
-**D6 — stale repository guidance** · docs (pending commit)
+**D3 — canonical-path menu active state** · `e60ef712`; `[hosted]` `ddf58f1`
+The menu snippet matched the active item with `pageSlug | append: '.html'` vs the **depth-prefixed** `item.link`, so collection item pages (and any nested-depth render) lost `is-active`/`aria-current`. Switched to matching the un-prefixed `currentCanonicalPath` global vs each item's `item.canonicalPath` (the `href` still emits the prefixed `link`) — most of the infra was already present (`menuResolver` emits `canonicalPath`; `renderEngine` defaults the global; the item-page paths already set it). Filled the gaps: page preview/export globals + the single-widget morph endpoint (reads it from the request) now set `currentCanonicalPath`, and the editor `previewManager` forwards it on every morph; the now-dead `pageSlug` global was dropped. Faithful to master.
+- *Two-repo scope:* mirrored in hosted's parallel render pipeline (`renderPreviewPage.js` page + widget globals, `renderProjectStream.js` publish globals, `routes/previewRender.js` forwarding) — `ddf58f1`.
+- *Test scope:* `menuActiveState.test.js` renders the real snippet via LiquidJS (active by `canonicalPath` at item-page depth despite `../` links; nested subitems; no-match guard); `previewManager.test.js` pins the morph request carrying `currentCanonicalPath`. The hosted env-gated **server** suite wasn't run in-sandbox; no hosted render/route test asserts on menu active-state or `pageSlug`.
+
+**D7 — collection items linkable in menus** · `e60ef712`
+Port regression surfaced 2026-06-24 while testing D3 (see §8 D7). The MenuEditor only fetched pages and only mapped page selections, so collection items couldn't be added to a menu; the picker had also lost its group headers.
+- *Fix (editor-ui only → web/Electron/hosted):* `index.jsx` now sources options from the shared **`useLinkTargets`** hook (pages + `hasItemPages` collection items) **instead of its own `getAllPages()` fetch** — this both restores collection items *and* retires a duplicated link-target fetch, gaining the hook's cache + invalidation. `SortableItem.jsx` restores master's `isCollectionItem` select branch (store `collectionItemUuid`/`collectionType`/derived `slugPrefix/slug.html`, clear the other refs) and the `collectionItemUuid` display branch. `MenuCombobox.jsx` restores the per-group header rendering (the `group` field was already supplied).
+- *Deviation from master:* master kept an inline pages+items fetch in `index.jsx`; we used the existing `useLinkTargets` hook (which postdates master's copy and is already the source `LinkInput` uses) — same option shape, less duplication.
+- *Test scope:* `SortableItem.test.jsx` (pick a collection item → `collectionItemUuid` + derived link; pick a page → `pageUuid` + cleared item ref; stored ref shows its label); `MenuCombobox.test.jsx` (group headers render once per group and aren't selectable).
+
+**D6 — stale repository guidance** · `f6962890`
 Updated `widgetizer/AGENTS.md` to the package-workspace layout (it still described the pre-refactor `src/` + `server/` monolith): workspace-packages architecture + adapter/`scope` note, package directory layout, corrected Quick Reference (`test:frontend`, `lint:all`, `theme:sync`/`preset:sync`), and the `packages/builder-server/src/tests/` test/lint paths — mirroring the already-current `CLAUDE.md`.
-- *Doc-accuracy sweep done alongside (pending commit):* `core-page-editor.md` (PreviewPanel is editor-only post-C4; "Previewing a Page" now describes the `SitePreviewLayout` + headless-resolver + `PreviewStage` structure); `core-media.md` (the B2 `caption` metadata field added to examples + drawer/hook/update descriptions); hosted `database-schema.md` (the D1 forward-only editor migration sequence v1–v4). Audited but already accurate: `core-hooks.md`, `core-architecture.md`, `core-security.md`, `core-pages.md` (B3 og:image), `core-file-assets.md`, hosted `oss-editor-integration.md`, `experiment-docs/*`.
+- *Doc-accuracy sweep in the same commit:* `core-page-editor.md` (PreviewPanel is editor-only post-C4; "Previewing a Page" now describes the `SitePreviewLayout` + headless-resolver + `PreviewStage` structure); `core-media.md` (the B2 `caption` metadata field added to examples + drawer/hook/update descriptions); hosted `database-schema.md` (the D1 forward-only editor migration sequence v1–v4 — committed separately as `ba7d866`). Audited but already accurate: `core-hooks.md`, `core-architecture.md`, `core-security.md`, `core-pages.md` (B3 og:image), `core-file-assets.md`, hosted `oss-editor-integration.md`, `experiment-docs/*`.
 - *Known tolerated drift (not touched):* several `docs-llms/*` bodies still cite pre-refactor `src/...`/`server/...` paths (e.g. `core-database.md` migration path) — covered by the blanket "treat package paths as current" note in `CLAUDE.md`; out of scope to chase here.
 
 ### Related fixes made during this work (not in the original findings)
@@ -320,9 +341,9 @@ A freshly opened OSS preview window/tab cold-boots and `activeProject` resolves 
 
 ### Open (not yet started)
 
-**D3** (canonical-path menu active state) · **D4** (MediaDrawer master fixes) · **D5** (audio media UI labels).
+**D4** (MediaDrawer master fixes) · **D5** (audio media UI labels).
 
 Also open, tracked in `experiment-docs/TODO.md`: **§13** hosted preview full-parity decision; the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`).
 
 ### How to verify
-OSS: `npm run test:frontend` (614), `npm test` (1233), `npm run lint:all`, `npm run validate:locales` (611 keys) — all green at `cd2f5a48`. Hosted: `npm run test:client` (57) + `eslint` — green at `a93252f`. Manual preview test plan (web/Electron/hosted, incl. the editor-live-preview blast radius from the `buildPreviewUrl` extraction) was provided separately; the key check is in-preview click-through navigation working with **no chrome flash on OSS**.
+OSS: `npm run test:frontend` (628), `npm test` (1237), `npm run lint:all`, `npm run validate:locales` (611 keys) — all green at `e60ef712`. Hosted: `npm run test:client` (57) + `eslint` — green at `ddf58f1`; the env-gated hosted **server** suite (`test:server`) couldn't run in-sandbox and should be run to confirm the D3 render-pipeline changes. Manual checks: menu `is-active`/`aria-current` on a collection item page; adding a collection item to a menu (grouped picker → saves a `collectionItemUuid`); and the earlier preview click-through with no chrome flash on OSS.
