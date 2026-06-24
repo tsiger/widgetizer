@@ -360,7 +360,7 @@ A freshly opened OSS preview window/tab cold-boots and `activeProject` resolves 
 ### Open (not yet started)
 
 All original findings (A1–D7) are now closed. Remaining follow-ups are housekeeping, not port-misses:
-- *Design smell (logged):* `resolveUsageTitle` is inlined in both `MediaGridItem` and `MediaListItem` — extract the shared `utils/mediaUsageDisplay.js` master uses (surfaced during D5).
+- *Design smell (resolved):* the `resolveUsageTitle` helper, previously inlined identically in both `MediaGridItem` and `MediaListItem`, was extracted into a shared `utils/mediaUsageDisplay.js` (ported from master, with its unit test); both components now consume it.
 - Tracked in `experiment-docs/TODO.md`: **§13** hosted preview full-parity decision; the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`); **§14** docs-llms `src/...`/`server/...` path modernization.
 
 ### How to verify

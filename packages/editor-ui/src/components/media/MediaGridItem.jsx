@@ -1,6 +1,7 @@
 import { Check, Search, Trash2, Edit2, FileText, Music, Copy } from "lucide-react";
 import { API_URL } from "../../lib/config";
 import Tooltip from "../ui/Tooltip";
+import { resolveUsageTitle } from "../../utils/mediaUsageDisplay";
 
 export default function MediaGridItem({
   file,
@@ -18,26 +19,7 @@ export default function MediaGridItem({
   const usageBadgeClass =
     "inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800";
 
-  const resolveUsageTitle = (usageEntry) => {
-    if (!usageEntry) return null;
-
-    if (typeof usageEntry === "object") {
-      return usageEntry.title || usageEntry.name || usageEntry.id || null;
-    }
-
-    if (usageTitleMap[usageEntry]) {
-      return usageTitleMap[usageEntry];
-    }
-
-    if (usageEntry.startsWith("global:")) {
-      const globalKey = usageEntry.replace("global:", "");
-      return `${globalKey.charAt(0).toUpperCase() + globalKey.slice(1)} (Global)`;
-    }
-
-    return usageEntry;
-  };
-
-  const usageTitles = usageEntries.map(resolveUsageTitle).filter(Boolean);
+  const usageTitles = usageEntries.map((entry) => resolveUsageTitle(entry, usageTitleMap)).filter(Boolean);
 
   return (
     <div
