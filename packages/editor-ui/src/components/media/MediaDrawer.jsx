@@ -95,7 +95,9 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
       : null;
 
   const isImage = selectedFile?.type?.startsWith("image/");
-  const getMediaTypeLabel = () => isImage ? t("forms.media.types.image") : t("forms.media.types.file");
+  const isAudio = selectedFile?.type?.startsWith("audio/");
+  const getMediaTypeLabel = () =>
+    isImage ? t("forms.media.types.image") : isAudio ? t("forms.media.types.audio") : t("forms.media.types.file");
 
   // Portaled to <body> so the fixed overlay escapes any ancestor stacking context
   // (e.g. a @dnd-kit sortable row's position/z-index in GalleryInput).

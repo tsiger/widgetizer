@@ -30,7 +30,7 @@ import useToastStore from "../stores/toastStore";
  * @property {Function} setViewMode - Change the view mode
  * @property {string} searchTerm - Current search filter text
  * @property {Function} setSearchTerm - Update the search filter
- * @property {string} filterType - Current type filter ('all', 'image', 'file')
+ * @property {string} filterType - Current type filter ('all', 'image', 'audio', 'file')
  * @property {Function} setFilterType - Update the type filter
  * @property {Array} filteredFiles - Files filtered by search term and type
  * @property {Object|null} activeProject - The currently active project
@@ -100,11 +100,15 @@ export default function useMediaState() {
   // Filter files based on search term and type
   const filteredFiles = files.filter((file) => {
     const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
+    // "file" = any non-image asset (documents + audio); "audio" is a focused subset of it.
+    // Keeping "file" = non-image is what lets non-image pickers (e.g. the richtext
+    // "Link to file" picker, filterType="file") reach audio too.
     const matchesType =
       filterType === "all" ? true
         : filterType === "image" ? file.type.startsWith("image/")
-          : filterType === "file" ? !file.type.startsWith("image/")
-            : true;
+          : filterType === "audio" ? file.type.startsWith("audio/")
+            : filterType === "file" ? !file.type.startsWith("image/")
+              : true;
 
     return matchesSearch && matchesType;
   });

@@ -1,6 +1,6 @@
 import Tooltip from "../../components/ui/Tooltip";
 import { IconButton } from "../ui/Button";
-import { Search, Trash2, Check, Edit2, MoreVertical, FileText, Copy } from "lucide-react";
+import { Search, Trash2, Check, Edit2, MoreVertical, FileText, Music, Copy } from "lucide-react";
 import { API_URL } from "../../lib/config";
 import useFormatDate from "../../hooks/useFormatDate";
 import { formatFileSize } from "../../utils/formatFileSize";
@@ -84,6 +84,8 @@ export default function MediaListItem({
               alt={file.metadata?.alt || file.originalName}
               className={`w-full h-full object-contain rounded ${file.type === "image/svg+xml" ? "p-1" : ""}`}
             />
+          ) : file.type?.startsWith("audio/") ? (
+            <Music className="text-slate-400" size={24} />
           ) : (
             <FileText className="text-slate-400" size={24} />
           )}
