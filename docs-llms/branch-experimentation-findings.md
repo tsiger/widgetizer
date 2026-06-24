@@ -35,7 +35,7 @@ None block the refactor. All are fixable by porting the named master commit into
 | D1 | P1 | db/migrations | Migration v2 slot reused for `owner_id` → master-v2 DBs skip it; caption never lands | ✅ `66125d85` (+hosted) |
 | D2 | P1 | editor UI | Shared `Table` lost sortable rows → collection reorder broken (overlaps QA-003) | ✅ `97e38324` |
 | D3 | P2 | render | Menu active state / `aria-current` uses `.html` slug, not canonical path | ✅ `e60ef712` (+hosted) |
-| D4 | P2 | media | MediaDrawer master fixes dropped (first-open reset, body portal, cache invalidation) | ⬜ open |
+| D4 | P2 | media | MediaDrawer master fixes dropped (first-open reset, body portal, cache invalidation) | ✅ `81d75ccb` |
 | D5 | P2 | media | Audio media UI labels/icons only partially ported | ⬜ open |
 | D6 | P3 | docs | `AGENTS.md` still describes the pre-refactor `src/`+`server/` layout | ✅ `f6962890` (docs) |
 | D7 | P1 | editor UI | Collection items not linkable in menus — picker fetch + select-mapping + grouped combobox dropped | ✅ `e60ef712` |
@@ -318,7 +318,15 @@ The `CollectionItems` consumer was already fully wired (`sortable`/`getRowId`/`o
 **D3 — canonical-path menu active state** · `e60ef712`; `[hosted]` `ddf58f1`
 The menu snippet matched the active item with `pageSlug | append: '.html'` vs the **depth-prefixed** `item.link`, so collection item pages (and any nested-depth render) lost `is-active`/`aria-current`. Switched to matching the un-prefixed `currentCanonicalPath` global vs each item's `item.canonicalPath` (the `href` still emits the prefixed `link`) — most of the infra was already present (`menuResolver` emits `canonicalPath`; `renderEngine` defaults the global; the item-page paths already set it). Filled the gaps: page preview/export globals + the single-widget morph endpoint (reads it from the request) now set `currentCanonicalPath`, and the editor `previewManager` forwards it on every morph; the now-dead `pageSlug` global was dropped. Faithful to master.
 - *Two-repo scope:* mirrored in hosted's parallel render pipeline (`renderPreviewPage.js` page + widget globals, `renderProjectStream.js` publish globals, `routes/previewRender.js` forwarding) — `ddf58f1`.
-- *Test scope:* `menuActiveState.test.js` renders the real snippet via LiquidJS (active by `canonicalPath` at item-page depth despite `../` links; nested subitems; no-match guard); `previewManager.test.js` pins the morph request carrying `currentCanonicalPath`. The hosted env-gated **server** suite wasn't run in-sandbox; no hosted render/route test asserts on menu active-state or `pageSlug`.
+- *Test scope:* `menuActiveState.test.js` renders the real snippet via LiquidJS (active by `canonicalPath` at item-page depth despite `../` links; nested subitems; no-match guard); `previewManager.test.js` pins the morph request carrying `currentCanonicalPath`. Hosted `npm run test:server` is green (608) including the render + preview/export route suites.
+
+**D4 — MediaDrawer master fixes** · `81d75ccb`
+Three master fixes lost in the package port, restored to match master (editor-ui only → inherited by web/Electron/hosted, which vendors editor-ui):
+1. *First-open reset* — `MediaDrawer` seeded `prevSelectedFileRef` with the initial `selectedFile`, so the populate-form effect saw "no change" on first mount and skipped the reset, showing blank alt/title/caption. `ImageInput` mounts the drawer **conditionally** (`{visible && file && …}`), i.e. already-visible with the file set, so it hit this every time (the Media page mounts the drawer persistently from `selectedFile=null`, so it was unaffected). Seeded the ref with a `null` sentinel (master's fix).
+2. *Body portal* — the fixed overlay rendered inline; `createPortal`'d it to `document.body` so it escapes ancestor stacking contexts (a `@dnd-kit` sortable row's transform/z-index in `GalleryInput`).
+3. *Cache invalidation* — `useMediaMetadata.handleSaveMetadata` updated local `setFiles` but never dropped the shared 30s media cache, so the page editor's image inputs served stale metadata until expiry. Added `invalidateMediaCache(activeProject.id)` after the save (`ImageInput`'s own save handler already did this; only the Media-page hook was missing it).
+- *Deviation from master:* none functional — the only un-ported lines are the `lib/config` import path (the package refactor) and master's `isAudio`/audio-label branch, which is **D5**'s scope (same file, deferred deliberately).
+- *Test scope:* `MediaDrawer.test.jsx` (first-open populate from an already-visible mount; overlay portaled to `document.body` not the container); `useMediaMetadata.test.js` (cache invalidated after a successful save).
 
 **D7 — collection items linkable in menus** · `e60ef712`
 Port regression surfaced 2026-06-24 while testing D3 (see §8 D7). The MenuEditor only fetched pages and only mapped page selections, so collection items couldn't be added to a menu; the picker had also lost its group headers.
@@ -341,9 +349,9 @@ A freshly opened OSS preview window/tab cold-boots and `activeProject` resolves 
 
 ### Open (not yet started)
 
-**D4** (MediaDrawer master fixes) · **D5** (audio media UI labels).
+**D5** (audio media UI labels).
 
 Also open, tracked in `experiment-docs/TODO.md`: **§13** hosted preview full-parity decision; the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`).
 
 ### How to verify
-OSS: `npm run test:frontend` (628), `npm test` (1237), `npm run lint:all`, `npm run validate:locales` (611 keys) — all green at `e60ef712`. Hosted: `npm run test:client` (57) + `eslint` — green at `ddf58f1`; the env-gated hosted **server** suite (`test:server`) couldn't run in-sandbox and should be run to confirm the D3 render-pipeline changes. Manual checks: menu `is-active`/`aria-current` on a collection item page; adding a collection item to a menu (grouped picker → saves a `collectionItemUuid`); and the earlier preview click-through with no chrome flash on OSS.
+OSS: `npm run test:frontend` (631), `npm test` (1237), `npm run lint:all`, `npm run validate:locales` (611 keys) — all green (D4 at `81d75ccb`; D3/D7 at `e60ef712`). Hosted: `npm run test:client` (57) + `npm run test:server` (608) + `eslint` — all green at `ddf58f1`. Manual checks: menu `is-active`/`aria-current` on a collection item page; adding a collection item to a menu (grouped picker → saves a `collectionItemUuid`); and the earlier preview click-through with no chrome flash on OSS.
