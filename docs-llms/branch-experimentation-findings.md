@@ -36,7 +36,7 @@ None block the refactor. All are fixable by porting the named master commit into
 | D2 | P1 | editor UI | Shared `Table` lost sortable rows → collection reorder broken (overlaps QA-003) | ✅ `97e38324` |
 | D3 | P2 | render | Menu active state / `aria-current` uses `.html` slug, not canonical path | ✅ `e60ef712` (+hosted) |
 | D4 | P2 | media | MediaDrawer master fixes dropped (first-open reset, body portal, cache invalidation) | ✅ `81d75ccb` |
-| D5 | P2 | media | Audio media UI labels/icons only partially ported | ⬜ open |
+| D5 | P2 | media | Audio media UI labels/icons only partially ported | ✅ `9ba0a3df` |
 | D6 | P3 | docs | `AGENTS.md` still describes the pre-refactor `src/`+`server/` layout | ✅ `f6962890` (docs) |
 | D7 | P1 | editor UI | Collection items not linkable in menus — picker fetch + select-mapping + grouped combobox dropped | ✅ `e60ef712` |
 
@@ -328,6 +328,16 @@ Three master fixes lost in the package port, restored to match master (editor-ui
 - *Deviation from master:* none functional — the only un-ported lines are the `lib/config` import path (the package refactor) and master's `isAudio`/audio-label branch, which is **D5**'s scope (same file, deferred deliberately).
 - *Test scope:* `MediaDrawer.test.jsx` (first-open populate from an already-visible mount; overlay portaled to `document.body` not the container); `useMediaMetadata.test.js` (cache invalidated after a successful save).
 
+**D5 — audio-specific media UI** · `9ba0a3df`
+The audio *infrastructure* was already present (upload accepts MP3, `.mp3` MIME, 206 range streaming) **and the locale keys were byte-identical to master** (`forms.media.types.audio`, `components.mediaToolbar.audio`) — only the **UI that consumes them** was dropped, so audio fell back to generic "file" treatment. Restored to match master across five spots (editor-ui only → inherited by web/Electron/hosted):
+- `useMediaState.js` — added the `filterType === "audio"` branch (`"file"` still = any non-image, so non-image pickers like the richtext "Link to file" still reach audio).
+- `MediaToolbar.jsx` — added the `<option value="audio">` to the type filter (pairs with the hook branch).
+- `MediaGridItem.jsx` / `MediaListItem.jsx` — render the `Music` icon for audio (`FileText` for other non-images, unchanged).
+- `MediaDrawer.jsx` — `getMediaTypeLabel` returns the audio label for audio files.
+- *Deviation from master:* surgical, not a verbatim port — master's grid/list caption shows `file.filename`; **this branch keeps `file.metadata?.title || file.filename`** (an experimentation enhancement that's *ahead* of master), so only the icon was ported, not the title display. The `lib/config` import path (the refactor) is also left as-is.
+- *Separate smell (not touched):* `resolveUsageTitle` is inlined identically in both `MediaGridItem` and `MediaListItem`; master shares it via `utils/mediaUsageDisplay.js`. Logged as its own dedup task — pure cleanup, no functional loss.
+- *Test scope:* `useMediaState.test.js` (audio filter selects only `audio/*`; `"file"` still includes audio + documents); `MediaToolbar.test.jsx` (audio option renders); `MediaGridItem.test.jsx`/`MediaListItem.test.jsx` (`Music` for audio, `FileText` for other non-images). The drawer audio *label* has no dedicated test — `t()` interpolation isn't available in the no-i18n test env (same call as C2/C3); covered by manual + the existing label key.
+
 **D7 — collection items linkable in menus** · `e60ef712`
 Port regression surfaced 2026-06-24 while testing D3 (see §8 D7). The MenuEditor only fetched pages and only mapped page selections, so collection items couldn't be added to a menu; the picker had also lost its group headers.
 - *Fix (editor-ui only → web/Electron/hosted):* `index.jsx` now sources options from the shared **`useLinkTargets`** hook (pages + `hasItemPages` collection items) **instead of its own `getAllPages()` fetch** — this both restores collection items *and* retires a duplicated link-target fetch, gaining the hook's cache + invalidation. `SortableItem.jsx` restores master's `isCollectionItem` select branch (store `collectionItemUuid`/`collectionType`/derived `slugPrefix/slug.html`, clear the other refs) and the `collectionItemUuid` display branch. `MenuCombobox.jsx` restores the per-group header rendering (the `group` field was already supplied).
@@ -349,9 +359,9 @@ A freshly opened OSS preview window/tab cold-boots and `activeProject` resolves 
 
 ### Open (not yet started)
 
-**D5** (audio media UI labels).
-
-Also open, tracked in `experiment-docs/TODO.md`: **§13** hosted preview full-parity decision; the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`).
+All original findings (A1–D7) are now closed. Remaining follow-ups are housekeeping, not port-misses:
+- *Design smell (logged):* `resolveUsageTitle` is inlined in both `MediaGridItem` and `MediaListItem` — extract the shared `utils/mediaUsageDisplay.js` master uses (surfaced during D5).
+- Tracked in `experiment-docs/TODO.md`: **§13** hosted preview full-parity decision; the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`); **§14** docs-llms `src/...`/`server/...` path modernization.
 
 ### How to verify
-OSS: `npm run test:frontend` (631), `npm test` (1237), `npm run lint:all`, `npm run validate:locales` (611 keys) — all green (D4 at `81d75ccb`; D3/D7 at `e60ef712`). Hosted: `npm run test:client` (57) + `npm run test:server` (608) + `eslint` — all green at `ddf58f1`. Manual checks: menu `is-active`/`aria-current` on a collection item page; adding a collection item to a menu (grouped picker → saves a `collectionItemUuid`); and the earlier preview click-through with no chrome flash on OSS.
+OSS: `npm run test:frontend` (638), `npm test` (1237), `npm run lint:all`, `npm run validate:locales` (611 keys) — all green (D5 at `9ba0a3df`; D4 at `81d75ccb`; D3/D7 at `e60ef712`). Hosted: `npm run test:client` (57) + `npm run test:server` (608) + `eslint` — all green at `ddf58f1`. Manual checks: menu `is-active`/`aria-current` on a collection item page; adding a collection item to a menu (grouped picker → saves a `collectionItemUuid`); and the earlier preview click-through with no chrome flash on OSS.
