@@ -1,121 +1,68 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { Monitor, Smartphone } from "lucide-react";
+import { useEffect } from "react";
+import { useParams, useOutletContext } from "react-router-dom";
 
 import usePageStore from "@widgetizer/editor-ui/stores/pageStore";
 import useThemeStore from "@widgetizer/editor-ui/stores/themeStore";
 import useProjectStore from "@widgetizer/editor-ui/stores/projectStore";
-import PreviewPanel from "@widgetizer/editor-ui/components/pageEditor/PreviewPanel.jsx";
-import { isStandalonePreviewNavigationUrl } from "@widgetizer/editor-ui/utils/previewLinkUtils";
+import { fetchPreviewToken } from "@widgetizer/editor-ui/queries/previewManager";
+import { buildPreviewUrl } from "@widgetizer/editor-ui/lib/previewBase";
 
-import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
-import DebugStatePanel from "../components/dev/DebugStatePanel";
-
+/**
+ * Standalone site preview for a normal page. A thin child of SitePreviewLayout:
+ * it loads the saved page (plus its global widgets and theme settings) into the
+ * page store, requests a standalone render token, and reports the resulting iframe
+ * src up to the layout. All chrome (toolbar, loader, iframe) lives in the layout.
+ *
+ * Unlike the editor, this is a *one-shot* render — there is no live editing in a
+ * standalone preview window, so it does not mount PreviewPanel's diff/morph
+ * machinery; it just resolves the saved page to a render token once.
+ */
 export default function PagePreview() {
-  const { t } = useTranslation();
   const { pageId } = useParams();
-  const navigate = useNavigate();
-  const [previewMode, setPreviewMode] = useState(() => localStorage.getItem("editorPreviewMode") || "desktop");
-  const activeProject = useProjectStore((state) => state.activeProject);
+  const { setPreview } = useOutletContext();
+  const activeProjectId = useProjectStore((state) => state.activeProject?.id);
+  const loadPage = usePageStore((state) => state.loadPage);
+  const loading = usePageStore((state) => state.loading);
+  const error = usePageStore((state) => state.error);
+  const page = usePageStore((state) => state.page);
 
-  const { page, loading, error, loadPage } = usePageStore();
-  const themeSettings = useThemeStore((s) => s.settings);
-
-  // Load initial data from stores — but only once the active project is seeded.
-  // A freshly opened preview window/tab cold-boots and resolves activeProject a
-  // beat after first render; loading (and mounting PreviewPanel) before that means
-  // the activeProject `undefined → id` flip resets the preview mid-load and aborts
-  // the in-flight /render/<token> iframe. Gate on activeProject?.id, as hosted's
-  // StandalonePreview already does.
+  // Boot-race gate (Electron + web): a freshly opened preview window/tab
+  // cold-boots and `activeProject` resolves a beat AFTER first render. Loading
+  // the page before that races a not-yet-seeded project (the did-fail-load -3
+  // abort we fixed). Gate loadPage on activeProjectId; the effect re-runs and
+  // loads once it is seeded.
   useEffect(() => {
-    if (!activeProject?.id) return;
+    if (!activeProjectId) return;
     loadPage(pageId);
-  }, [pageId, activeProject?.id, loadPage]);
+  }, [pageId, activeProjectId, loadPage]);
 
-  // Handle cross-origin navigation requests from the preview iframe
   useEffect(() => {
-    const handleMessage = (event) => {
-      const targetUrl = event.data?.payload?.url;
-      if (event.data?.type === "NAVIGATE_PREVIEW" && isStandalonePreviewNavigationUrl(targetUrl)) {
-        navigate(targetUrl);
+    // Hold the layout at its loader until the project is seeded and the page
+    // store has finished loading.
+    if (!activeProjectId || loading) {
+      setPreview({ src: null, loading: true, notFound: false });
+      return undefined;
+    }
+    if (error || !page) {
+      setPreview({ src: null, loading: false, notFound: true });
+      return undefined;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { globalWidgets } = usePageStore.getState();
+        const themeSettings = useThemeStore.getState().settings;
+        const { token } = await fetchPreviewToken({ ...page, globalWidgets }, themeSettings, "standalone");
+        if (!cancelled) setPreview({ src: buildPreviewUrl(token), loading: false, notFound: false });
+      } catch {
+        if (!cancelled) setPreview({ src: null, loading: false, notFound: true });
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [navigate]);
+  }, [activeProjectId, loading, error, page, setPreview]);
 
-  // Hold at the loading gate until the active project is seeded, so PreviewPanel
-  // never mounts during the activeProject `undefined → id` window (see the load
-  // effect above).
-  if (!activeProject || loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-900">
-        <LoadingSpinner message={t("pagePreview.loading")} />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-900">
-        <p className="text-red-500">Error: {String(error)}</p>
-      </div>
-    );
-  }
-
-  if (!page) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-900">
-        <p className="text-yellow-500">Page not found.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden">
-      <DebugStatePanel />
-      <div className="bg-white border-b border-slate-200 p-2 flex items-center justify-center">
-        <div className="flex gap-1 p-1 h-9 bg-slate-200 rounded-md items-center">
-          <button
-            onClick={() => {
-              setPreviewMode("desktop");
-              localStorage.setItem("editorPreviewMode", "desktop");
-            }}
-            title={t("pageEditor.toolbar.desktopView")}
-            className={`p-1.5 rounded ${
-              previewMode === "desktop" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <Monitor size={18} />
-          </button>
-          <button
-            onClick={() => {
-              setPreviewMode("mobile");
-              localStorage.setItem("editorPreviewMode", "mobile");
-            }}
-            title={t("pageEditor.toolbar.mobileView")}
-            className={`p-1.5 rounded ${
-              previewMode === "mobile" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            <Smartphone size={18} />
-          </button>
-        </div>
-      </div>
-      <div className="flex flex-1 min-h-0">
-        <PreviewPanel
-          page={page}
-          widgets={page?.widgets || {}}
-          themeSettings={themeSettings}
-          previewMode={previewMode}
-          runtimeMode="standalone"
-          showSelectionOverlay={false}
-          selectedWidgetId={null}
-          selectedBlockId={null}
-          selectedGlobalWidgetId={null}
-        />
-      </div>
-    </div>
-  );
+  return null;
 }

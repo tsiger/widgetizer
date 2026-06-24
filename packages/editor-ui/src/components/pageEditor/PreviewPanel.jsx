@@ -5,20 +5,8 @@ import { fetchPreviewToken, scrollElementIntoView, updatePreview } from "../../q
 import usePageStore from "../../stores/pageStore";
 import useProjectStore from "../../stores/projectStore";
 import useWidgetStore from "../../stores/widgetStore";
-import { getPreviewRenderBase, getPreviewTargetOrigin } from "../../lib/previewBase";
+import { buildPreviewUrl, getPreviewTargetOrigin } from "../../lib/previewBase";
 import SelectionOverlay from "./SelectionOverlay";
-
-// Build the preview URL from a token. The base defaults to today's behaviour
-// (VITE_API_URL || "") but a nested host overrides it via setPreviewRenderBase()
-// so the iframe loads from a proxied, same-origin path.
-function buildPreviewUrl(token) {
-  // Pass the editor's origin to the preview runtime so it can verify inbound
-  // control messages and target its replies — the no-referrer policy strips
-  // document.referrer, so the URL is the only channel for it.
-  const url = `${getPreviewRenderBase()}/render/${token}`;
-  const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}parentOrigin=${encodeURIComponent(window.location.origin)}`;
-}
 
 /**
  * Detect if changes are structural (requiring full reload) or content-only (can be morphed)

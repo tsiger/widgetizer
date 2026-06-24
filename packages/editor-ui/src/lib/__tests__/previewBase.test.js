@@ -5,6 +5,7 @@ import {
   setPreviewRenderBase,
   getStandaloneCollectionPreviewPath,
   setStandaloneCollectionPreviewPath,
+  buildPreviewUrl,
 } from "../previewBase";
 
 // getPreviewTargetOrigin() is the postMessage send-scoping helper: the editor
@@ -39,6 +40,39 @@ describe("getPreviewTargetOrigin", () => {
   it("uses only the origin of an absolute base, dropping any path", () => {
     setPreviewRenderBase("http://localhost:3001/render/abc123");
     expect(getPreviewTargetOrigin()).toBe("http://localhost:3001");
+  });
+});
+
+// buildPreviewUrl(token) is the single builder for a preview iframe's render URL,
+// replacing the copies that lived in PreviewPanel and the standalone preview pages.
+// It joins the configurable render base (getPreviewRenderBase) with /render/<token>
+// and appends parentOrigin — the no-referrer preview iframe reads the editor origin
+// from the URL to scope its reply postMessages. Base state is module-level, so each
+// test restores it via setPreviewRenderBase("") in afterEach.
+describe("buildPreviewUrl", () => {
+  afterEach(() => {
+    setPreviewRenderBase("");
+  });
+
+  it("builds a same-origin render URL with the parentOrigin query (empty base)", () => {
+    setPreviewRenderBase("");
+    const expected = `/render/tok123?parentOrigin=${encodeURIComponent(window.location.origin)}`;
+    expect(buildPreviewUrl("tok123")).toBe(expected);
+  });
+
+  it("prefixes the configured render base (hosted proxied path)", () => {
+    setPreviewRenderBase("/api/projects/x/preview");
+    expect(buildPreviewUrl("abc")).toBe(
+      `/api/projects/x/preview/render/abc?parentOrigin=${encodeURIComponent(window.location.origin)}`,
+    );
+  });
+
+  it("uses & to append parentOrigin when the base already carries a query", () => {
+    // A render base with an existing query string must not get a second "?".
+    setPreviewRenderBase("http://localhost:3001?v=2");
+    const url = buildPreviewUrl("abc");
+    expect(url.startsWith("http://localhost:3001?v=2/render/abc&parentOrigin=")).toBe(true);
+    expect(url.split("parentOrigin=").length).toBe(2);
   });
 });
 

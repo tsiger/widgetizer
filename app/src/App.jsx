@@ -8,6 +8,7 @@ import AppSettings from "./pages/AppSettings";
 import ProjectsAdd from "./pages/ProjectsAdd";
 import ProjectsEdit from "./pages/ProjectsEdit";
 import HomeRedirect from "./pages/HomeRedirect";
+import SitePreviewLayout from "./pages/SitePreviewLayout";
 import PagePreview from "./pages/PagePreview";
 import CollectionItemPagePreview from "./pages/CollectionItemPagePreview";
 import NotFound from "./pages/NotFound";
@@ -62,14 +63,16 @@ const router = createBrowserRouter([
     },
   }),
   {
-    path: "/preview/collection/:prefix/:slug",
-    element: <CollectionItemPagePreview />,
+    // Persistent shell for the standalone site preview: the toolbar + iframe
+    // stage live here so navigating page<->item never remounts them. Children are
+    // headless resolvers that report a render src up via the outlet context.
+    path: "/preview",
+    element: <SitePreviewLayout />,
     errorElement: <RouteError />,
-  },
-  {
-    path: "/preview/:pageId",
-    element: <PagePreview />,
-    errorElement: <RouteError />,
+    children: [
+      { path: ":pageId", element: <PagePreview /> },
+      { path: "collection/:prefix/:slug", element: <CollectionItemPagePreview /> },
+    ],
   },
   {
     path: "*",

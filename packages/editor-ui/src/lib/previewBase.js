@@ -21,6 +21,17 @@ export function getPreviewRenderBase() {
   return _previewRenderBase;
 }
 
+// Single builder for a preview iframe's render URL: `${base}/render/${token}`
+// plus the editor origin as `parentOrigin`. The preview runtime serves a
+// no-referrer document, so the URL is the only channel through which it learns
+// which origin to target its reply postMessages at. Replaces the copies that
+// lived in PreviewPanel and the OSS/hosted standalone preview pages.
+export function buildPreviewUrl(token) {
+  const url = `${getPreviewRenderBase()}/render/${token}`;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}parentOrigin=${encodeURIComponent(window.location.origin)}`;
+}
+
 // The concrete origin the inline preview iframe runs on, derived from the render
 // base. Editor→preview postMessage targets this instead of "*", so a message
 // can't be delivered to an unexpected origin if the iframe ever navigates away.

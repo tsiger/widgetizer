@@ -743,6 +743,7 @@
   "pagePreview": {
     "title": "Preview: {{name}}",
     "loading": "Loading page...",
+    "notFound": "Page not found.",
     "backToEditor": "Back"
   },
   "appSettings": {

@@ -1,54 +1,62 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { render, waitFor } from "@testing-library/react";
+import { MemoryRouter, Routes, Route, Outlet } from "react-router-dom";
 
-// Regression guard for the standalone page-preview boot race (Electron + web):
-// the preview window/tab cold-boots and `fetchActiveProject()` resolves a beat
-// AFTER the first render. PagePreview must NOT load the page or mount the live
-// PreviewPanel until the active project is seeded — otherwise the activeProject
-// `undefined → id` flip resets PreviewPanel mid-load and aborts the in-flight
-// /render/<token> iframe (did-fail-load -3). This mirrors the gate hosted's
-// StandalonePreview.jsx already has.
+// PagePreview is a headless child of SitePreviewLayout (C4 + one-shot #17): it no
+// longer mounts the live-edit PreviewPanel. It loads the saved page, requests a
+// standalone render token, and reports { src, loading, notFound } up to the layout
+// via the outlet context. Two behaviours are pinned:
+//   1. The boot-race gate (Electron + web): a freshly opened preview window
+//      cold-boots and activeProject resolves a beat AFTER first render, so the
+//      page must NOT load until activeProject is seeded (regression guard for the
+//      did-fail-load -3 abort).
+//   2. The one-shot resolve: once the page is loaded it fetches a token and
+//      reports the iframe src — no PreviewPanel, no live-edit machinery.
 
 const loadPage = vi.fn();
+const fetchPreviewToken = vi.fn();
 
-// Mutable store states the fake hooks read at call time, so each test seeds the
-// project/page the component sees. The fakes honour both call shapes PagePreview
-// uses: bare `useStore()` and selector `useStore((s) => s.x)`.
 let projectState;
 let pageState;
 let themeState;
 
+// pageStore is read both as a selector hook and via getState() (for globalWidgets
+// inside the async resolve), so the mock supports both call shapes.
+function makeStore(getState) {
+  const hook = (selector) => (selector ? selector(getState()) : getState());
+  hook.getState = getState;
+  return hook;
+}
+
 vi.mock("@widgetizer/editor-ui/stores/projectStore", () => ({
-  default: (selector) => (selector ? selector(projectState) : projectState),
+  default: makeStore(() => projectState),
 }));
 vi.mock("@widgetizer/editor-ui/stores/pageStore", () => ({
-  default: (selector) => (selector ? selector(pageState) : pageState),
+  default: makeStore(() => pageState),
 }));
 vi.mock("@widgetizer/editor-ui/stores/themeStore", () => ({
-  default: (selector) => (selector ? selector(themeState) : themeState),
+  default: makeStore(() => themeState),
 }));
-
-// PreviewPanel is the heavy iframe component whose mount is the race-prone path —
-// replace it with a sentinel so the test can assert whether the page preview
-// mounts it (bug) vs. holds at the loading gate (fixed).
-vi.mock("@widgetizer/editor-ui/components/pageEditor/PreviewPanel.jsx", () => ({
-  default: () => <div data-testid="preview-panel" />,
+vi.mock("@widgetizer/editor-ui/queries/previewManager", () => ({
+  fetchPreviewToken: (...args) => fetchPreviewToken(...args),
 }));
-vi.mock("@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx", () => ({
-  default: ({ message }) => <div data-testid="loading">{message}</div>,
-}));
-vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (k) => k }) }));
-vi.mock("../../components/dev/DebugStatePanel", () => ({ default: () => null }));
 
 import PagePreview from "../PagePreview.jsx";
+
+// Capture every setPreview() the child reports so tests can assert the sequence.
+let reports;
+function CaptureLayout() {
+  return <Outlet context={{ setPreview: (s) => reports.push(s) }} />;
+}
 
 function renderPreview() {
   return render(
     <MemoryRouter initialEntries={["/preview/contact"]}>
       <Routes>
-        <Route path="/preview/:pageId" element={<PagePreview />} />
+        <Route path="/preview" element={<CaptureLayout />}>
+          <Route path=":pageId" element={<PagePreview />} />
+        </Route>
       </Routes>
     </MemoryRouter>,
   );
@@ -56,12 +64,14 @@ function renderPreview() {
 
 beforeEach(() => {
   loadPage.mockClear();
+  fetchPreviewToken.mockReset();
+  reports = [];
   projectState = { activeProject: null };
-  pageState = { page: null, loading: true, error: null, loadPage };
+  pageState = { page: null, loading: true, error: null, loadPage, globalWidgets: {} };
   themeState = { settings: {} };
 });
 
-describe("PagePreview — active-project gate (boot-race guard)", () => {
+describe("PagePreview — boot-race gate", () => {
   it("does not load the page until the active project is seeded", () => {
     projectState = { activeProject: null };
     renderPreview();
@@ -74,19 +84,50 @@ describe("PagePreview — active-project gate (boot-race guard)", () => {
     expect(loadPage).toHaveBeenCalledWith("contact");
   });
 
-  it("does not mount PreviewPanel until the active project is seeded", () => {
-    // Page is fully loaded, but the project hasn't arrived yet — the unfixed
-    // component would already mount PreviewPanel here and start the iframe.
+  it("reports a loading state (no notFound) while the project is unseeded", () => {
     projectState = { activeProject: null };
-    pageState = { page: { id: "contact", widgets: {} }, loading: false, error: null, loadPage };
     renderPreview();
-    expect(screen.queryByTestId("preview-panel")).toBeNull();
+    expect(reports.at(-1)).toEqual({ src: null, loading: true, notFound: false });
+  });
+});
+
+describe("PagePreview — one-shot token resolve", () => {
+  it("fetches a standalone token and reports the iframe src once the page is loaded", async () => {
+    projectState = { activeProject: { id: "p1" } };
+    pageState = { page: { id: "contact", widgets: {} }, loading: false, error: null, loadPage, globalWidgets: { header: {} } };
+    fetchPreviewToken.mockResolvedValue({ token: "tok123" });
+
+    renderPreview();
+
+    await waitFor(() => expect(fetchPreviewToken).toHaveBeenCalled());
+    // The page + its global widgets are sent with the standalone preview mode.
+    expect(fetchPreviewToken).toHaveBeenCalledWith(
+      { id: "contact", widgets: {}, globalWidgets: { header: {} } },
+      {},
+      "standalone",
+    );
+    await waitFor(() => {
+      const last = reports.at(-1);
+      expect(last.notFound).toBe(false);
+      expect(last.loading).toBe(false);
+      expect(last.src).toContain("/render/tok123");
+    });
   });
 
-  it("mounts PreviewPanel once the active project is seeded and the page is loaded", () => {
+  it("reports notFound when the page is missing", () => {
     projectState = { activeProject: { id: "p1" } };
-    pageState = { page: { id: "contact", widgets: {} }, loading: false, error: null, loadPage };
+    pageState = { page: null, loading: false, error: null, loadPage, globalWidgets: {} };
     renderPreview();
-    expect(screen.getByTestId("preview-panel")).toBeInTheDocument();
+    expect(reports.at(-1)).toEqual({ src: null, loading: false, notFound: true });
+  });
+
+  it("reports notFound when the token request fails", async () => {
+    projectState = { activeProject: { id: "p1" } };
+    pageState = { page: { id: "contact", widgets: {} }, loading: false, error: null, loadPage, globalWidgets: {} };
+    fetchPreviewToken.mockRejectedValue(new Error("boom"));
+
+    renderPreview();
+
+    await waitFor(() => expect(reports.at(-1)).toEqual({ src: null, loading: false, notFound: true }));
   });
 });
