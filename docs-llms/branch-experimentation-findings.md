@@ -361,7 +361,7 @@ A freshly opened OSS preview window/tab cold-boots and `activeProject` resolves 
 
 All original findings (A1–D7) are now closed. Remaining follow-ups are housekeeping, not port-misses:
 - *Design smell (resolved):* the `resolveUsageTitle` helper, previously inlined identically in both `MediaGridItem` and `MediaListItem`, was extracted into a shared `utils/mediaUsageDisplay.js` (ported from master, with its unit test); both components now consume it.
-- Tracked in `experiment-docs/TODO.md`: **§13** hosted preview full-parity decision; the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`); **§14** docs-llms `src/...`/`server/...` path modernization.
+- Tracked in the project TODOs (migrated 2026-06-24 out of `experiment-docs/TODO.md`): the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`) and the narrow-sidebar icon-grid/color-picker visual review (the C2 follow-up above) — both in `widgetizer/docs-llms/TODO.md`; the hosted preview full-parity decision (was §13) in `widgetizer-hosted/docs/TODO.md`; and the docs-llms `src/...`/`server/...` path modernization (was §14) in `widgetizer/docs-llms/TODO.md`.
 
 ### How to verify
 OSS: `npm run test:frontend` (638), `npm test` (1237), `npm run lint:all`, `npm run validate:locales` (611 keys) — all green (D5 at `9ba0a3df`; D4 at `81d75ccb`; D3/D7 at `e60ef712`). Hosted: `npm run test:client` (57) + `npm run test:server` (608) + `eslint` — all green at `ddf58f1`. Manual checks: menu `is-active`/`aria-current` on a collection item page; adding a collection item to a menu (grouped picker → saves a `collectionItemUuid`); and the earlier preview click-through with no chrome flash on OSS.
