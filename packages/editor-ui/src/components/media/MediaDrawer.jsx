@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { X, FileText } from "lucide-react";
@@ -21,8 +22,12 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
     },
   });
 
-  // Track previous selectedFile to prevent infinite loops
-  const prevSelectedFileRef = useRef(JSON.stringify(selectedFile));
+  // Track previous selectedFile so the populate-form effect only resets on a real file
+  // change (not every render). Initialize to a sentinel — NOT the initial selectedFile —
+  // so the first open WITH a file always populates. ImageInput mounts this drawer
+  // already-visible with the file set; seeding the ref with that file would make the effect
+  // below see "no change" and skip the reset, showing blank alt/title/caption.
+  const prevSelectedFileRef = useRef(JSON.stringify(null));
 
   // Update form data when selectedFile or visibility changes
   useEffect(() => {
@@ -92,7 +97,9 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
   const isImage = selectedFile?.type?.startsWith("image/");
   const getMediaTypeLabel = () => isImage ? t("forms.media.types.image") : t("forms.media.types.file");
 
-  return (
+  // Portaled to <body> so the fixed overlay escapes any ancestor stacking context
+  // (e.g. a @dnd-kit sortable row's position/z-index in GalleryInput).
+  return createPortal(
     <div
       className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ease-in-out"
       onClick={onClose}
@@ -187,6 +194,7 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

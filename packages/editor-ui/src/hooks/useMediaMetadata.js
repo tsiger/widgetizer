@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { API_URL } from "../lib/config";
 import { apiFetch } from "../lib/apiFetch";
+import { invalidateMediaCache } from "../queries/mediaManager";
 
 /**
  * Hook for managing media file metadata editing via a drawer interface.
@@ -69,6 +70,10 @@ export default function useMediaMetadata({ activeProject, showToast, setFiles })
       setFiles((prevFiles) =>
         prevFiles.map((file) => (file.id === fileId ? { ...file, metadata: updatedFileData.file.metadata } : file)),
       );
+
+      // Drop the shared 30s media cache so the page editor's image inputs re-fetch
+      // fresh metadata on their next load instead of serving stale cached data.
+      invalidateMediaCache(activeProject.id);
 
       showToast("Metadata updated successfully", "success");
       handleCloseDrawer(); // Close drawer on successful save
