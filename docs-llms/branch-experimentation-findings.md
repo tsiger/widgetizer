@@ -33,7 +33,7 @@ None block the refactor. All are fixable by porting the named master commit into
 | C3 | P2 | media | Audio-inclusive upload error copy regressed ("images and PDF" / "Image size…") | ✅ `b980cebc` |
 | C4 | P2 | preview | `SitePreviewLayout` dropped → page↔item preview remounts chrome (flash) | ✅ `cd2f5a48` (+hosted) |
 | D1 | P1 | db/migrations | Migration v2 slot reused for `owner_id` → master-v2 DBs skip it; caption never lands | ✅ `66125d85` (+hosted) |
-| D2 | P1 | editor UI | Shared `Table` lost sortable rows → collection reorder broken (overlaps QA-003) | ⬜ open |
+| D2 | P1 | editor UI | Shared `Table` lost sortable rows → collection reorder broken (overlaps QA-003) | ✅ `97e38324` |
 | D3 | P2 | render | Menu active state / `aria-current` uses `.html` slug, not canonical path | ⬜ open |
 | D4 | P2 | media | MediaDrawer master fixes dropped (first-open reset, body portal, cache invalidation) | ⬜ open |
 | D5 | P2 | media | Audio media UI labels/icons only partially ported | ⬜ open |
@@ -300,6 +300,11 @@ This bundles the documented **C4** with a related refactor (session item **#17**
 **D1 — migration version collision** · `66125d85`; `[hosted]` `8d9b688`
 Resolved together with B2 via forward-only migrations v3 (`caption`) / v4 (`owner_id` backfill) — see B2 above. Hosted's shared-topology migration-count assertion updated to match.
 
+**D2 — sortable rows in shared `Table`** · `97e38324`
+The `CollectionItems` consumer was already fully wired (`sortable`/`getRowId`/`onReorder`/`rowClassName`, with `handleReorder` persisting via `reorderCollectionItems`) — only `packages/editor-ui/src/components/ui/Table.jsx` was missing the implementation, so the four props leaked onto the native `<table>` and rows rendered plain (also the QA-003 console warnings). Ported master's opt-in dnd-kit `sortable` mode (same path; `@dnd-kit/*` already in `editor-ui` deps): grip-handle column via `SortableTableRow`, `DndContext`/`SortableContext` with `restrictToVerticalAxis` + pointer/keyboard sensors, `handleDragEnd` → `onReorder(arrayMove(...))`. Faithful port; the non-sortable branch is behavior-identical so the 5 plain-table consumers (`Pages`/`Menus`/`Projects`/`MediaList`/`ExportHistoryTable`) are unaffected.
+- *Test scope:* new `Table.test.jsx` pins the rendering contract (plain unchanged; sortable adds the handle column + per-row handles + correct empty-state colspan; `rowClassName` applied). The dnd-kit drag interaction itself is left to manual/e2e — not reliably reproducible in jsdom, and master shipped no test for it either.
+- *Resolves* QA-003 (`qa-issues/QA-003-collection-table-ignores-sort-and-row-props.md`).
+
 **D6 — stale repository guidance** · docs (pending commit)
 Updated `widgetizer/AGENTS.md` to the package-workspace layout (it still described the pre-refactor `src/` + `server/` monolith): workspace-packages architecture + adapter/`scope` note, package directory layout, corrected Quick Reference (`test:frontend`, `lint:all`, `theme:sync`/`preset:sync`), and the `packages/builder-server/src/tests/` test/lint paths — mirroring the already-current `CLAUDE.md`.
 - *Doc-accuracy sweep done alongside (pending commit):* `core-page-editor.md` (PreviewPanel is editor-only post-C4; "Previewing a Page" now describes the `SitePreviewLayout` + headless-resolver + `PreviewStage` structure); `core-media.md` (the B2 `caption` metadata field added to examples + drawer/hook/update descriptions); hosted `database-schema.md` (the D1 forward-only editor migration sequence v1–v4). Audited but already accurate: `core-hooks.md`, `core-architecture.md`, `core-security.md`, `core-pages.md` (B3 og:image), `core-file-assets.md`, hosted `oss-editor-integration.md`, `experiment-docs/*`.
@@ -315,7 +320,7 @@ A freshly opened OSS preview window/tab cold-boots and `activeProject` resolves 
 
 ### Open (not yet started)
 
-**D2** (sortable `Table`) · **D3** (canonical-path menu active state) · **D4** (MediaDrawer master fixes) · **D5** (audio media UI labels).
+**D3** (canonical-path menu active state) · **D4** (MediaDrawer master fixes) · **D5** (audio media UI labels).
 
 Also open, tracked in `experiment-docs/TODO.md`: **§13** hosted preview full-parity decision; the route-**dispatch** half of the preview-helper consolidation (the `buildPreviewUrl` half landed in `cd2f5a48`).
 
