@@ -78,26 +78,42 @@ const SortableItem = memo(function SortableItem({
 
   const handleLinkChange = useCallback(
     (value) => {
-      // Check if the value is a page uuid (matches one of our page options)
-      const page = pages.find((p) => p.value === value);
+      // Match the chosen value against a stable option (page or collection item).
+      const option = pages.find((p) => p.value === value);
 
-      if (page) {
+      const trimmedLabel = String(item.label ?? "").trim();
+      const isDefaultLabel =
+        !trimmedLabel ||
+        trimmedLabel === MENU_DEFAULT_LABEL_NEW_ITEM ||
+        trimmedLabel === MENU_DEFAULT_LABEL_NEW_CHILD;
 
-        const trimmedLabel = String(item.label ?? "").trim();
-        const isDefaultLabel = !trimmedLabel || trimmedLabel === MENU_DEFAULT_LABEL_NEW_ITEM || trimmedLabel === MENU_DEFAULT_LABEL_NEW_CHILD;
-
-        // User selected an internal page - store pageUuid and derive link from current slug
+      if (option?.isPage) {
+        // Internal page - store pageUuid, derive link from current slug.
         onEdit(item.id, {
           ...item,
-          pageUuid: page.value,
-          link: `${page.slug}.html`,
-          label: isDefaultLabel ? page.label : item.label 
+          pageUuid: option.value,
+          collectionType: undefined,
+          collectionItemUuid: undefined,
+          link: `${option.slug}.html`,
+          label: isDefaultLabel ? option.label : item.label,
         });
-      } else {
-        // Custom URL - explicitly clear pageUuid because menu item updates are merged.
+      } else if (option?.isCollectionItem) {
+        // Collection item page - store a stable collectionType + uuid (#11).
         onEdit(item.id, {
           ...item,
           pageUuid: undefined,
+          collectionType: option.collectionType,
+          collectionItemUuid: option.value,
+          link: `${option.slugPrefix}/${option.slug}.html`,
+          label: isDefaultLabel ? option.label : item.label,
+        });
+      } else {
+        // Custom URL - clear both stable refs (menu item updates are merged).
+        onEdit(item.id, {
+          ...item,
+          pageUuid: undefined,
+          collectionType: undefined,
+          collectionItemUuid: undefined,
           link: value,
         });
       }
@@ -132,20 +148,21 @@ const SortableItem = memo(function SortableItem({
     }
   }, [depth]);
 
-  // Compute resolved value for the combobox - handles deleted pages
+  // Compute resolved value for the combobox - handles deleted pages/items
   const resolvedLinkValue = useMemo(() => {
+    if (item.collectionItemUuid) {
+      // Stable collection-item ref - show it if the item still exists (#11).
+      const opt = pages.find((p) => p.value === item.collectionItemUuid);
+      return opt ? item.collectionItemUuid : "";
+    }
     if (item.pageUuid) {
       // Has pageUuid - check if page still exists
       const page = pages.find((p) => p.value === item.pageUuid);
-      if (page) {
-        return item.pageUuid; // Page exists, use pageUuid
-      } else {
-        return ""; // Page was deleted, show empty
-      }
+      return page ? item.pageUuid : ""; // empty if the page was deleted
     }
-    // No pageUuid - use link directly (custom URL or anchor)
+    // No stable ref - use link directly (custom URL or anchor)
     return item.link || "";
-  }, [item.pageUuid, item.link, pages]);
+  }, [item.pageUuid, item.collectionItemUuid, item.link, pages]);
 
   // Check if this item or any child has an open dropdown
   const hasActiveDropdown = useMemo(() => {

@@ -24,7 +24,7 @@ import {
   isDescendant,
   removeActiveFromFlat,
 } from "./utils/treeUtils";
-import { getAllPages } from "../../../queries/pageManager";
+import useLinkTargets from "../../../hooks/useLinkTargets";
 
 const DRAG_DEPTH_STEP = 32; // horizontal drag needed to change depth
 
@@ -36,7 +36,11 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
   const [activeItem, setActiveItem] = useState(null);
   const [activeItemDepth, setActiveItemDepth] = useState(0);
   const [activeItemWidth, setActiveItemWidth] = useState(null);
-  const [pages, setPages] = useState([]);
+  // Link targets for the per-item combobox: all pages + the items of every
+  // `hasItemPages` collection (#11), grouped + cached + cache-invalidated by the
+  // shared hook — the same source LinkInput uses. (`pages` keeps its historical
+  // name; it now also carries collection-item options.)
+  const { options: pages } = useLinkTargets();
   const [openDropdownId, setOpenDropdownId] = useState(null);
 
   // Cross-level drag state
@@ -74,26 +78,6 @@ function MenuEditor({ initialItems = [], onChange, onDeleteItem }) {
     () => (activeId ? removeActiveFromFlat(flattenedItems, activeId) : flattenedItems),
     [flattenedItems, activeId],
   );
-
-  // Fetch pages for the link selector - use uuid as value for stable references
-  useEffect(() => {
-    async function fetchPages() {
-      try {
-        const allPages = await getAllPages();
-        setPages(
-          allPages.map((p) => ({
-            value: p.uuid, // Use uuid as value for stable reference across renames
-            label: p.name,
-            slug: p.slug, // Keep slug for deriving href
-            isPage: true,
-          })),
-        );
-      } catch (error) {
-        console.error("Failed to load pages:", error);
-      }
-    }
-    fetchPages();
-  }, []);
 
   // Update items when initialItems change
   useEffect(() => {

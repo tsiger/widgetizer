@@ -323,7 +323,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         enqueuedStyles: new Map(),
         enqueuedScripts: new Map(),
         exportVersion: version, // For cache busting
-        pageSlug: pageData.slug || "",
+        currentCanonicalPath: `${pageData.slug || ""}.html`,
       };
 
       // Render header if exists (for each page to capture enqueued assets)

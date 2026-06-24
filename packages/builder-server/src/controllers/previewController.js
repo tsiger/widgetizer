@@ -82,7 +82,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     themeSettingsRaw: rawThemeSettings,
     enqueuedStyles: new Map(),
     enqueuedScripts: new Map(),
-    pageSlug: pageData.slug || "",
+    currentCanonicalPath: `${pageData.slug || ""}.html`,
   };
 
   let headerContent = "";
@@ -423,14 +423,17 @@ export async function createCollectionPreviewToken(req, res) {
  */
 export async function renderSingleWidget(req, res) {
   try {
-    const { widgetId, widget, themeSettings: rawThemeSettings } = req.body; // Expect themeSettings too
+    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath } = req.body; // Expect themeSettings too
     const activeProjectId = req.activeProject.id;
 
-    // Provide sharedGlobals so we can read back enqueued assets after render
+    // Provide sharedGlobals so we can read back enqueued assets after render.
+    // currentCanonicalPath flows from the morph request so a menu-bearing widget
+    // (header/footer) keeps its active-state on live edits (D3).
     const sharedGlobals = {
       renderMode: "preview",
       enqueuedStyles: new Map(),
       enqueuedScripts: new Map(),
+      currentCanonicalPath: typeof currentCanonicalPath === "string" ? currentCanonicalPath : "",
     };
 
     const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null, collectionDepsFromReq(req));
