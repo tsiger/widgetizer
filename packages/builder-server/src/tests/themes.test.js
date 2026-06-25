@@ -967,6 +967,55 @@ describe("uploadTheme validation", () => {
 });
 
 // ============================================================================
+// uploadTheme — collection-type schema validation (gate the new-theme install
+// path; see docs-llms/TODO.md §7)
+// ============================================================================
+
+describe("uploadTheme collection-schema validation", () => {
+  it("rejects a new theme that ships an invalid collection-type schema", async () => {
+    // `type` matches the folder but `settings` is not an array -> the schema is
+    // invalid, so the upload must be rejected rather than silently installed.
+    const buffer = buildThemeZip("bad-collection-theme", {
+      extraFiles: {
+        "collection-types/news/schema.json": JSON.stringify({ type: "news", settings: "not-an-array" }),
+      },
+    });
+    const res = await callController(uploadTheme, { file: buffer });
+    assert.equal(res._status, 400);
+    assert.ok(res._json.message.includes("collection-type schema validation failed"));
+    assert.ok(Array.isArray(res._json.errors) && res._json.errors.length > 0);
+  });
+
+  it("rejects a new theme whose preset ships a collection-types/ folder (BLOCKER-1)", async () => {
+    // Presets seed item DATA only; a preset-owned collection-types/ is disallowed.
+    const buffer = buildThemeZip("preset-collection-theme", {
+      extraFiles: {
+        "presets/sample/collection-types/news/schema.json": JSON.stringify({ type: "news", settings: [] }),
+      },
+    });
+    const res = await callController(uploadTheme, { file: buffer });
+    assert.equal(res._status, 400);
+    assert.ok(res._json.message.includes("collection-type schema validation failed"));
+    assert.ok(res._json.errors.some((e) => e.includes("collection-types")));
+  });
+
+  it("installs a new theme whose collection-type schema is valid", async () => {
+    // Sanity: the gate must not reject a well-formed collection-type schema.
+    const buffer = buildThemeZip("good-collection-theme", {
+      extraFiles: {
+        "collection-types/news/schema.json": JSON.stringify({
+          type: "news",
+          settings: [{ id: "title", type: "text", usedAsTitle: true }],
+        }),
+      },
+    });
+    const res = await callController(uploadTheme, { file: buffer });
+    assert.equal(res._status, 201);
+    assert.equal(res._json.theme.id, "good-collection-theme");
+  });
+});
+
+// ============================================================================
 // uploadTheme — update version validation
 // ============================================================================
 

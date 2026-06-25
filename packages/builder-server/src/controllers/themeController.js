@@ -22,6 +22,7 @@ import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
+import { validateThemeCollectionSchemas } from "../services/collectionService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
 
 const CORE_WIDGET_LOCALES_DIR = path.join(CORE_WIDGETS_DIR, "locales");
@@ -1435,6 +1436,22 @@ export async function uploadTheme(req, res) {
           await fs.remove(extractedLatestDir);
         } catch {
           // Ignore if doesn't exist
+        }
+
+        // Reject an upload whose collection-type schemas are invalid (bad schema,
+        // duplicate slugPrefix, or a preset shipping collection-types/) before it
+        // is committed, so the theme author gets upfront per-collection errors
+        // rather than the schemas being silently dropped at read time. Path-based,
+        // so it runs on the extracted temp source — no scope/adapter needed.
+        // (Only the new-theme install path is gated here; the update-import path
+        // is tracked separately — see docs-llms/TODO.md.)
+        const collectionValidation = await validateThemeCollectionSchemas(extractedThemeDir);
+        if (!collectionValidation.valid) {
+          await fs.remove(tempDir);
+          return res.status(400).json({
+            message: "Invalid theme: collection-type schema validation failed.",
+            errors: collectionValidation.errors,
+          });
         }
 
         // Move to final location

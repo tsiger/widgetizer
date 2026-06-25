@@ -145,7 +145,20 @@ Low priority, cosmetic.
 
 ---
 
-## 7. Missed port — theme-upload collection-schema gate not wired (`builder-server`)  *(was experiment-docs §8)*
+## 7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — ✅ new-theme install path DONE 2026-06-25 (update-import path → §22)  *(was experiment-docs §8)*
+
+**Status (2026-06-25):** the **new-theme install** path is now gated, restoring master parity:
+`validateThemeCollectionSchemas(extractedThemeDir)` runs between the `latest/` removal and the
+`fs.copy` commit in `uploadTheme` (`themeController.js`); an invalid theme (bad schema, duplicate
+slugPrefix, or a preset shipping `collection-types/`) is rejected with **400 + per-collection
+`errors`** before anything is written. Covered by a new `describe("uploadTheme collection-schema
+validation")` block in `themes.test.js` (invalid-schema → 400, BLOCKER-1 preset-owned
+collection-types → 400, valid-schema → 201). Also **manually verified** 2026-06-25: uploading a
+theme with an invalid collection schema to `POST /api/themes/upload` returns 400 and installs
+nothing; a valid one installs (201). The **update-import path** (importing new update
+versions into an installed theme — an exp-only branch master never had) is **not** gated here; it
+needs different handling because the effective theme only exists after `buildLatestSnapshot` merges
+base + updates — tracked as **§22**. Original finding below.
 
 Surfaced 2026-06-24 during the master-commit port audit (`experiment-docs/widgetizer-master-commits.md`),
 inspecting **`6e6fe472`** (Collections Phase 1) against latest master.
@@ -962,3 +975,46 @@ preview runtime import. (a) is simpler and matches today's usage; revisit (b) on
 appears. Pairs with the §5 dispatch consolidation and the §17/§20 test-hygiene theme. Low priority.
 
 **Hosted impact:** none — OSS-only; hosted consumes only `isStandalonePreviewNavigationUrl`, unaffected.
+
+---
+
+## 22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — **low/moderate**
+
+Surfaced 2026-06-25 finishing §7. The new-theme install path now rejects invalid collection-type
+schemas (§7), but `uploadTheme`'s **update-import** branch (`themeController.js`, the `else` arm of
+`if (isNewTheme)` — imports new `updates/<version>/` folders into an already-installed theme) does
+**not** validate them. An update version can ship/modify a `collection-types/<type>/schema.json`
+(`UPDATABLE_PATHS` includes `collection-types`, finding B1), so a bad schema introduced *by an update*
+is currently applied unchecked — the same "silently dropped at read time, no upfront author feedback"
+gap §7 closed for installs.
+
+**Why it wasn't done with §7 (the real complication):** the install path validates the whole theme
+sitting in a temp dir *before* `fs.copy`, so it's cleanly pre-commit. The update path is different —
+new `updates/<version>/` folders are copied into the **installed** theme (`:1483`) and the *effective*
+theme only exists once `buildLatestSnapshot` merges base + updates into `latest/` (`:1500`). So
+validating "the theme the user will run" means validating the **merged** result, which doesn't exist
+until after the installed theme has already been mutated. (Master never had this branch — update-import
+via zip is exp-only — so there's no port to copy; this is new ground.)
+
+**Effect (low/moderate):** an installed theme can be pushed into an invalid collection-schema state via
+an update zip (broken schema, or a new update-introduced `slugPrefix` colliding with the base). Bad
+schemas are skip-invalid at read time (no crash), so the loss is upfront rejection + author feedback,
+same severity family as §7. Reachable only by the explicit theme-update-import action on a theme that
+ships collection-types.
+
+**Options (decide when picked up — the fork that paused §7):**
+- **(A) Merged/effective, pre-commit (most correct):** assemble base + installed updates + new update
+  deltas into a temp merged dir, `buildLatestSnapshot` there, validate that, and only commit the real
+  copy if valid. Catches cross-version `slugPrefix` collisions; cost is staging the merge off to the
+  side (mirrors `buildLatestSnapshot`) so the installed theme is never touched on failure.
+- **(B) Per-update delta, pre-commit (simpler):** validate each new `updates/<version>/` collection-types
+  subtree in isolation before copying. Small diff, no rollback; misses a base↔update prefix collision.
+- **(C) Post-build + rollback:** copy, build `latest/`, validate the resolved snapshot, roll back the
+  new version folders + rebuild on failure. Complete but mutates-then-reverts installed state — fragile.
+
+Recommendation: **(A)** if we want it correct, **(B)** if we want it cheap and accept the narrow gap.
+Add a `node:test` that imports an update version carrying an invalid collection schema and asserts
+400 + the installed theme is left untouched (option A/B) or restored (option C).
+
+**Hosted impact:** none — shared `builder-server`; hosted wires no theme-upload/update route today, and
+inherits the gate if it ever does. No hosted-only concepts.

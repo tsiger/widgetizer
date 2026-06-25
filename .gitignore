@@ -27,6 +27,7 @@ logs/
 .electron-home/
 themes/widgetizer/
 temp/
+tmp/
 temp-webp/
 docs-entities/.obsidian/
 docs-entities/.trash/
