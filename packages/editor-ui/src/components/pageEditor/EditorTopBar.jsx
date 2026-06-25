@@ -6,7 +6,7 @@ import { getAllPages } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
 import { useEditorPath } from "../../lib/routeBase.jsx";
-import { getStandalonePreviewPath } from "../../lib/previewBase.js";
+import { openPagePreview } from "../../lib/openSitePreview.js";
 
 export default function EditorTopBar({
   pageName,
@@ -134,24 +134,11 @@ export default function EditorTopBar({
 
   const handleOpenPreview = useCallback(() => {
     if (!pageId) return;
-
-    // The standalone preview path defaults to the OSS /preview/:pageId route; an
-    // embedding host overrides it (setStandalonePreviewPath) to point at its own
-    // preview surface. That page hosts PreviewPanel in an iframe and handles
-    // in-preview link navigation (NAVIGATE_PREVIEW).
-    const standalonePath = getStandalonePreviewPath(pageId);
-
-    // In the packaged desktop app the preview lives in a dedicated Electron window;
-    // hand it the same in-app /preview/... path (the main process re-checks it).
-    const electronOpenPreview = window.electronUpdater?.openPreviewWindow;
-    if (typeof electronOpenPreview === "function") {
-      electronOpenPreview(standalonePath);
-      return;
-    }
-
-    const previewUrl = new URL(standalonePath, window.location.origin).toString();
-    const previewWindow = window.open(previewUrl, "widgetizer-preview");
-    previewWindow?.focus();
+    // Resolve the page's standalone preview route and dispatch it (Electron preview
+    // window in the desktop app, shared browser tab on the web; an embedding host can
+    // override the route via setStandalonePreviewPath). That page hosts PreviewPanel
+    // in an iframe and handles in-preview link navigation (NAVIGATE_PREVIEW).
+    openPagePreview(pageId);
   }, [pageId]);
 
   const hasMultiplePages = pages.length > 1;

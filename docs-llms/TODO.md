@@ -101,20 +101,36 @@ separately in `widgetizer-hosted/docs/TODO.md`.)
 
 ---
 
-## 5. Consolidate preview-dispatch logic (route-mapping half)  *(findings-doc follow-up; session task #16)*
+## 5. Consolidate preview-dispatch logic (route-mapping half) — ✅ DONE 2026-06-25  *(findings-doc follow-up; session task #16)*
 
 Surfaced during OSS finding **C4 + #17** (unify the standalone site preview). The
 `buildPreviewUrl(token)` half of the preview-helper consolidation already landed
 (`cd2f5a48` — one shared definition in `editor-ui/src/lib/previewBase.js`, was copy-pasted
-4×). **Still open:** the **route-dispatch** half — the target→route mapping currently spread
-across `getStandalonePreviewPath` / `openSitePreview` / `previewLinkUtils` in editor-ui. Fold
-these into one place so a preview target (page vs collection item) maps to its route/URL
-through a single helper rather than three parallel call sites.
+4×). The **route-dispatch** half is now done too: the open-a-standalone-preview mechanics —
+which had been re-inlined in **three** places (`EditorTopBar` and `Sidebar` each hand-rolled
+the electron-bridge-vs-`window.open` branch; `Sidebar` even hardcoded `` `/preview/${id}` ``
+instead of the registry) — were folded into a single dispatch in
+`editor-ui/src/lib/openSitePreview.js`:
+- `openPagePreview(pageId)` / `openCollectionItemPreview(slugPrefix, slug)` resolve the route
+  through the `previewBase` registries, then share one internal `openResolvedPreview(path)`.
+- `EditorTopBar.jsx` + `Sidebar.jsx` now call `openPagePreview`; the collection forms keep
+  calling `openCollectionItemPreview` (now also routed through the shared open).
+- The old unused exported `openSitePreview(path)` was removed (imported nowhere).
+- **Guard unified** (the one judgment call, agreed up-front): both page + item open paths now
+  honour an embedding-host override (`/sites/:siteId/preview/...`) identically — electron bridge
+  for in-app `/preview/...`, `window.open` for an app-relative host path, and **refuse**
+  absolute/protocol-relative values. Inert today (no shell wires `setStandalonePreviewPath`
+  yet) but removes the asymmetry that would have bitten the hosted full-parity work.
+- Covered by `editor-ui/src/lib/__tests__/openSitePreview.test.js` (web open, electron bridge,
+  host-override, absolute/protocol-relative refusal).
 
-editor-ui change (OSS) → inherited by web/Electron/hosted. It's the natural companion to the
-**hosted preview full-parity decision** (`widgetizer-hosted/docs/TODO.md` §7): if hosted moves
-to the persistent `SitePreviewLayout` pattern, a single dispatch helper is what both repos'
-layouts would call. Do this consolidation first regardless — it stands on its own.
+`previewLinkUtils` was deliberately **left out** of the fold — it parses arbitrary in-preview
+hrefs (the navigation-guard concern), a different job from dispatching a known target. (Its own
+cross-bundle dup is now tracked separately — §21.)
+
+editor-ui change (OSS) → inherited by web/Electron/hosted. Natural companion to the **hosted
+preview full-parity decision** (`widgetizer-hosted/docs/TODO.md` §7): if hosted moves to the
+persistent `SitePreviewLayout` pattern, this single dispatch is what both repos' layouts call.
 
 ---
 
@@ -915,3 +931,34 @@ if that direct coverage is still wanted (master had it; exp currently exercises 
 duplication integration test). Pairs with the §17/§19 test-hygiene theme. Trivial; do opportunistically.
 
 **Hosted impact:** none — OSS test-comment only.
+
+---
+
+## 21. Dedup the cross-bundle `getStandalonePreviewTarget` copy + drop its dead `editor-ui` export (`editor-ui` + OSS preview runtime) — **low (cleanup)**
+
+Surfaced 2026-06-25 while consolidating the standalone-preview dispatch (§5). The href→preview-path
+mapper `getStandalonePreviewTarget(href)` (turns an in-preview link's href into a `/preview/:pageId`
+or `/preview/collection/:prefix/:slug` route) exists in **two** copies:
+- `packages/editor-ui/src/utils/previewLinkUtils.js:1` — exported, but **imported nowhere** (grep:
+  only its sibling `isStandalonePreviewNavigationUrl` is consumed — by `app/src/pages/SitePreviewLayout.jsx`
+  and hosted's `StandalonePreview.jsx` / `StandaloneCollectionPreview.jsx`).
+- `src/utils/previewRuntime.js:42` — a full standalone copy, and the one **actually used at runtime**
+  (`:604`), because it runs inside the no-referrer preview iframe (a separate bundle that can't import
+  from the `editor-ui` package).
+
+So the `editor-ui` `getStandalonePreviewTarget` is effectively **dead code**, while the live mapping is
+the duplicated `previewRuntime.js` one — two definitions of the same route-shape parsing that can
+silently drift (e.g. if the `/preview/collection/:prefix/:slug` shape ever changes, only one copy gets
+updated). `previewLinkUtils.test.js` tests the dead copy, masking that it's unused.
+
+**Effect (low):** no current bug — the two copies are in sync today. Pure maintainability / drift risk
+plus a dead export carrying its own tests.
+
+**Fix (options):** either (a) **delete** the unused `getStandalonePreviewTarget` export (+ its tests)
+from `previewLinkUtils.js`, keeping `isStandalonePreviewNavigationUrl` (which *is* shared) and leaving
+`previewRuntime.js` as the single owner; or (b) if the mapping is worth sharing across the bundle
+boundary, factor it into a tiny dependency-free module both the `editor-ui` util and the injected
+preview runtime import. (a) is simpler and matches today's usage; revisit (b) only if a third consumer
+appears. Pairs with the §5 dispatch consolidation and the §17/§20 test-hygiene theme. Low priority.
+
+**Hosted impact:** none — OSS-only; hosted consumes only `isStandalonePreviewNavigationUrl`, unaffected.

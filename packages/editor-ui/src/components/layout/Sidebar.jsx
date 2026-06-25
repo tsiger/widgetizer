@@ -8,6 +8,7 @@ import { useNavItems } from "../../extension/PluginProvider.jsx";
 import { groupNavItems } from "../../extension/builtinNav.js";
 import useCollections from "../../hooks/useCollections";
 import { resolveLucideIcon } from "../../utils/lucideIcon";
+import { openPagePreview } from "../../lib/openSitePreview";
 
 export default function Sidebar() {
   const { t } = useTranslation();
@@ -102,20 +103,10 @@ export default function Sidebar() {
       const pages = await getAllPages();
       const homepage = pages.find((p) => p.slug === "index") || pages[0];
       if (!homepage) return;
-
-      const previewPath = `/preview/${homepage.id}`;
-
-      // In the packaged desktop app the preview lives in a dedicated Electron window;
-      // hand it the same in-app /preview/... path (the main process re-checks it).
-      const electronOpenPreview = window.electronUpdater?.openPreviewWindow;
-      if (typeof electronOpenPreview === "function") {
-        electronOpenPreview(previewPath);
-        return;
-      }
-
-      const previewUrl = new URL(previewPath, window.location.origin).toString();
-      const previewWindow = window.open(previewUrl, "widgetizer-preview");
-      previewWindow?.focus();
+      // Resolve the homepage's standalone preview route and dispatch it (Electron
+      // preview window in the desktop app, shared browser tab on the web). The route
+      // shape + open mechanics live in openSitePreview.js's single dispatch.
+      openPagePreview(homepage.id);
     } catch (error) {
       console.error("Failed to open site preview:", error);
     }
