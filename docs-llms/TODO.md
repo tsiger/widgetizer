@@ -264,7 +264,23 @@ OSS and hosted request scopes. No hosted-only concepts.
 
 ---
 
-## 9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`)  *(was experiment-docs §10)*
+## 9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — ✅ DONE 2026-06-25  *(was experiment-docs §10)*
+
+**Status (2026-06-25):** fixed. `Media.jsx` `loadUsageTitles` now also fetches collection schemas +
+items and seeds the usage-title map with `collection:{type}/{slug}` → `"{displayName}: {item title}"`,
+so the Media "Used in" badge shows the friendly label instead of the raw source string. The map-building
+was extracted to a pure `buildUsageTitleMap({ pages, collections })` + `GLOBAL_USAGE_TITLES` constant in
+`utils/mediaUsageDisplay.js` (next to `resolveUsageTitle`), so it's unit-tested without React;
+`Media.jsx` just does the fetching (per-fetch `.catch(() => [])` so a collections failure can't blank the
+page titles) and calls it. Used `schema.displayName` per master (so a News item reads "Article: …", since
+Arch news `displayName` is "Article"). Covered by 8 new Vitest cases in `mediaUsageDisplay.test.js`
+(collection seeding, end-to-end resolve, slug fallback, page-key precedence, multi-collection +
+typeless-schema + empty-items guards, globals-only empty input, no-mutation).
+
+**Parity verified** (adversarial review): the seeded key `collection:${schema.type}/${item.slug}` exactly
+matches the backend `usedIn` writer `collection:${collectionType}/${itemSlug}`
+(`builder-server/src/services/mediaUsageService.js:288`), so the labels actually resolve. Original
+finding below.
 
 Surfaced 2026-06-24 during the master-commit port audit, inspecting **`122311d8`**
 (Collections Phase 14 — media library awareness of collections) against latest master.

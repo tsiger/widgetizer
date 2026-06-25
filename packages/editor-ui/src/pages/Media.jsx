@@ -19,6 +19,8 @@ import useMediaSelection from "../hooks/useMediaSelection";
 import useMediaMetadata from "../hooks/useMediaMetadata";
 import useAppSettings from "../hooks/useAppSettings";
 import { getAllPages } from "../queries/pageManager";
+import { getCollectionSchemas, getCollectionItems } from "../queries/collectionManager";
+import { buildUsageTitleMap } from "../utils/mediaUsageDisplay";
 import { showRejectedFiles } from "../utils/uploadFeedback";
 import { MEDIA_ACCEPT, mapDropzoneRejections } from "../utils/uploadValidation";
 
@@ -114,26 +116,15 @@ export default function Media() {
       }
 
       try {
-        const pages = await getAllPages();
-        const nextMap = {
-          "global:header": "Header (Global)",
-          "global:footer": "Footer (Global)",
-          "global:theme-settings": "Theme Settings (Global)",
-        };
-
-        for (const page of pages) {
-          const pageTitle = page.name || page.title || page.slug;
-          if (page.id) nextMap[page.id] = pageTitle;
-          if (page.slug) nextMap[page.slug] = pageTitle;
-        }
-
-        setUsageTitleMap(nextMap);
+        // Pages + collections feed the "Used in" labels. A collections failure
+        // must not blank the page titles, so it degrades to [] independently.
+        const [pages, schemas] = await Promise.all([getAllPages(), getCollectionSchemas().catch(() => [])]);
+        const collections = await Promise.all(
+          schemas.map(async (schema) => ({ schema, items: await getCollectionItems(schema.type).catch(() => []) })),
+        );
+        setUsageTitleMap(buildUsageTitleMap({ pages, collections }));
       } catch {
-        setUsageTitleMap({
-          "global:header": "Header (Global)",
-          "global:footer": "Footer (Global)",
-          "global:theme-settings": "Theme Settings (Global)",
-        });
+        setUsageTitleMap(buildUsageTitleMap());
       }
     }
 
