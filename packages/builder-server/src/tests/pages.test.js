@@ -30,7 +30,7 @@ process.env.DATA_ROOT = TEST_DATA_DIR;
 process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
-const { getThemeDir, getProjectPagesDir, getPagePath } = await import("../config.js");
+const { getThemeDir, getProjectPagesDir, getPagePath, getProjectDir } = await import("../config.js");
 
 const {
   createPage,
@@ -48,6 +48,8 @@ const {
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb, getDb } = await import("../db/index.js");
 const { LocalStorageAdapter, LocalScopeResolver } = await import("@widgetizer/adapters-local");
+const { writeMediaFile } = await import("../controllers/mediaController.js");
+const { updateCollectionItemMediaUsage, getMediaUsage } = await import("../services/mediaUsageService.js");
 
 // The page handlers operate on req.adapters.storage over req.scope. Use the real
 // OSS storage adapter against the isolated test data root, matching production.
@@ -880,5 +882,81 @@ describe("duplicatePage", () => {
 
     const dupPath = getPagePath(activeProject.folderName, res._json.slug);
     assert.ok(await fs.pathExists(dupPath));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// deletePage / bulkDeletePages — re-sync collection-item media usage (TODO §8)
+//
+// Deleting a page clears collection-item links that point to it, and must
+// re-derive those items' media usage — but only if the controller threads
+// scope.projectId into cleanupDeletedPageReferences. We make the re-sync
+// observable with a collection-item link that carries BOTH the deleted page's
+// uuid AND a media href: clearing the link drops the media reference, so a
+// re-synced usage index goes from ["collection:portfolio/alpha"] -> []. The
+// link is cleared on disk regardless, but the usage INDEX only updates when
+// projectId is passed — so this asserts the caller-threading, not just the
+// function-level behaviour (which collectionLinkEnrichment.test.js covers).
+// ---------------------------------------------------------------------------
+
+/** Write a collection item file by hand (no controller for this in OSS tests). */
+async function writeCollectionItem(type, slug, settings) {
+  await fs.outputJSON(path.join(getProjectDir(activeProject.folderName), "collections", type, `${slug}.json`), {
+    id: slug,
+    uuid: `item-${slug}`,
+    slug,
+    settings,
+  });
+}
+
+/** Read a collection item file back. */
+function readCollectionItem(type, slug) {
+  return fs.readJSON(path.join(getProjectDir(activeProject.folderName), "collections", type, `${slug}.json`));
+}
+
+/**
+ * Seed: a media file used only via a collection item's link href, where that
+ * link also targets `pageUuid`. Returns nothing; asserts the seeded usage.
+ */
+async function seedItemLinkingToPage(pageUuid) {
+  await writeMediaFile(PROJECT_ID, {
+    files: [{ id: "f1", filename: "x.pdf", path: "/uploads/files/x.pdf", type: "application/pdf", usedIn: [] }],
+  });
+  await writeCollectionItem("portfolio", "alpha", {
+    title: "Alpha",
+    doc: { pageUuid, href: "/uploads/files/x.pdf", text: "Doc", target: "_self" },
+  });
+  await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", await readCollectionItem("portfolio", "alpha"));
+  assert.deepEqual(
+    (await getMediaUsage(PROJECT_ID, "f1")).usedIn,
+    ["collection:portfolio/alpha"],
+    "precondition: the media file is seeded as used by the collection item",
+  );
+}
+
+describe("deletePage — re-syncs collection-item media usage", () => {
+  beforeEach(async () => {
+    await resetPages();
+  });
+
+  it("re-derives a linked collection item's media usage when its target page is deleted", async () => {
+    const page = await createTestPage("Linked Page");
+    await seedItemLinkingToPage(page.uuid);
+
+    const res = await callController(deletePage, { params: { id: page.id } });
+    assert.equal(res._status, 200);
+
+    // The link is cleared AND the usage index re-synced -> the file is now unused.
+    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);
+  });
+
+  it("re-derives media usage via bulkDeletePages too", async () => {
+    const page = await createTestPage("Linked Page Bulk");
+    await seedItemLinkingToPage(page.uuid);
+
+    const res = await callController(bulkDeletePages, { body: { pageIds: [page.id] } });
+    assert.ok(res._json.results.deleted.includes(page.id));
+
+    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);
   });
 });

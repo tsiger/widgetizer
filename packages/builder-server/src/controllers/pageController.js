@@ -342,7 +342,7 @@ export async function deletePage(req, res) {
     // Clean up orphaned references in menus and widget links
     if (deletedPageUuid) {
       try {
-        await cleanupDeletedPageReferences(scope.folderName, deletedPageUuid);
+        await cleanupDeletedPageReferences(scope.folderName, deletedPageUuid, scope.projectId);
       } catch (cleanupError) {
         console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
       }
@@ -408,7 +408,7 @@ export async function bulkDeletePages(req, res) {
   // Clean up orphaned references for all deleted pages
   for (const uuid of deletedUuids) {
     try {
-      await cleanupDeletedPageReferences(scope.folderName, uuid);
+      await cleanupDeletedPageReferences(scope.folderName, uuid, scope.projectId);
     } catch (cleanupError) {
       console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
     }

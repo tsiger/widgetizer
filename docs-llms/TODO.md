@@ -208,7 +208,16 @@ exposes upload it gets the gate for free. No hosted-only concepts involved.
 
 ---
 
-## 8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`)  *(was experiment-docs §9)*
+## 8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — ✅ DONE 2026-06-25  *(was experiment-docs §9)*
+
+**Status (2026-06-25):** fixed — both call sites in `pageController.js` now pass `scope.projectId`
+as the 3rd arg (`deletePage` `:345`, `bulkDeletePages` `:411`), so the collection-item media-usage
+re-sync fires on page delete, restoring master parity. Covered by a new
+`describe("deletePage — re-syncs collection-item media usage")` block in `pages.test.js` that drives
+the real controllers: a collection item links to the deleted page via a link whose href is a media
+path, so clearing the link drops the reference and the re-synced usage index goes from
+`["collection:portfolio/alpha"]` → `[]`. Two tests (one per call site); each verified to go red when
+*only its own* call site is left un-threaded. Original finding below.
 
 Surfaced 2026-06-24 during the master-commit port audit, inspecting **`eea285de`**
 (Collections Phase 7 — link integrity) against latest master.
