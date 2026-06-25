@@ -1027,3 +1027,68 @@ Add a `node:test` that imports an update version carrying an invalid collection 
 
 **Hosted impact:** none — shared `builder-server`; hosted wires no theme-upload/update route today, and
 inherits the gate if it ever does. No hosted-only concepts.
+
+---
+
+## 23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — **low (log hygiene / signal-masking)**
+
+Surfaced 2026-06-25 from a colleague's report; researched and confirmed against current code. Two
+spots, one root cause, in `getProjectWidgets` (`projectController.js`).
+
+**Symptom:** loading the editor's widget panel (the widget-catalog GET) logs, per stray non-folder
+entry in the project's `widgets/` tree:
+```
+[ProjectController] Failed to parse schema for widget at widgets/.DS_Store: ENOTDIR: not a directory ...
+```
+typically from a macOS `.DS_Store`. The **widget list itself is correct** — the bad entry is read,
+throws, is dropped to `null`, and filtered out (`:680`). The harm is purely the warning: it's noise,
+and it reuses the **exact message a genuinely broken `schema.json` produces**, so a real failure can
+hide in it.
+
+**Root cause — the `isDirectory()` guard was lost in the adapter swap.** Commit **`d2737081`**
+(2026-06-13, "fix hosted widget catalog — Sprint 2.6") replaced `fs.readdir(dir, { withFileTypes:
+true })` + `.filter(e => e.isDirectory() && …)` with `storage.list(scope, …)`. `LocalStorageAdapter.list`
+(`:51`) returns **plain names — files, dirs, dotfiles alike**, only hiding atomic temp files; no type
+info. The directory guard that used to skip non-folders is gone at both enumeration spots:
+- **Spot 1 (`:670–671`):** `storage.list(scope, "widgets")` → `.filter((name) => name !== "global")` —
+  no folder/dotfile guard.
+- **Spot 2 (`:675–676`):** `storage.list(scope, "widgets/global")` → no filter at all. (Latent — just
+  hasn't fired because no junk has landed in `widgets/global/` yet; same bug.)
+`processWidgetFolder` (`:639–652`) then reads `widgets/<name>/schema.json`; for a file like `.DS_Store`
+that path throws **`ENOTDIR`** (and `storage.read` only maps `ENOENT`→`null`, re-throwing everything
+else — adapter `:33`), so the catch `console.warn`s. Reported as exp-only (master keeps the
+`withFileTypes` guard); but the fix lives in shared `builder-server`, so **hosted has the same latent
+bug** (its cloud `list` likewise returns plain names) and inherits the fix.
+
+**Reference for the correct pattern (already in-tree):** `listCollectionSchemas`
+(`collectionService.js:227–236`) hit the identical "adapter lost `withFileTypes`" problem and guards it
+by probing each name for its `schema.json` (`storage.exists(scope, schemaKey(name))`) before use. The
+widget enumeration is the one place that didn't get the same treatment.
+
+**Effect (low):** no functional/data/security impact — output is unaffected. It's log-noise + a
+diagnostic-clarity regression (false alarms indistinguishable from a real broken-schema warning).
+
+**Fix — guard the listing (primary), optionally harden the warning:**
+- **Robust (mirror `listCollectionSchemas`):** keep only entries whose `schema.json` exists —
+  `storage.exists(scope, \`widgets/${name}/schema.json\`)` for spot 1 and the `widgets/global/...`
+  equivalent for spot 2. Excludes *any* stray entry, not just dotfiles. It's async, so resolve with a
+  `Promise.all` map + filter rather than a sync `.filter`. With this, `processWidgetFolder` is only
+  ever called on real widget folders, so its remaining `console.warn` becomes inherently honest (fires
+  only on a genuinely malformed `schema.json`).
+- **Quick (weaker):** add `&& !name.startsWith(".")` at `:671` and a `.filter((name) =>
+  !name.startsWith("."))` at `:676`. Kills `.DS_Store`/dotfile junk but not a stray non-dotfile file —
+  if taken, also make `processWidgetFolder`'s catch warn only on a JSON `SyntaxError` and stay silent
+  on filesystem `ENOTDIR`/`ENOENT`, to cover the gap.
+
+Recommend the **robust** guard (parity with the collections code, excludes all stray entries, and makes
+the warning self-honest).
+
+**Test-first (TDD):** add a `node:test` (builder-server) that seeds a project with one real widget
+folder plus a stray plain file (e.g. `.DS_Store`) in **both** `widgets/` and `widgets/global/`, calls
+`getProjectWidgets`, and asserts (a) the response still contains the real widget and (b) `console.warn`
+was **not** called with "Failed to parse schema" (spy/capture `console.warn`). Red on current code
+(warns), green after the listing guard. A second case with a genuinely malformed `schema.json` should
+still warn — proving the honest-signal path survives.
+
+**Hosted impact:** fix is shared `builder-server` — hosted's widget catalog runs the same enumeration
+and inherits both the guard and the cleaner logs. No hosted-only concepts.
