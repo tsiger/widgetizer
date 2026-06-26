@@ -88,7 +88,30 @@ before(async () => {
 
   // A stray non-directory entry under widgets/ must be skipped, not crash.
   await fs.writeFile(path.join(projectDir, "widgets", "README.md"), "not a widget");
+  // Stray dotfiles (e.g. a macOS .DS_Store) in both enumeration spots must be
+  // skipped silently — never logged as a "Failed to parse schema" warning (§23).
+  await fs.writeFile(path.join(projectDir, "widgets", ".DS_Store"), "");
+  await fs.writeFile(path.join(projectDir, "widgets", "global", ".DS_Store"), "");
+
+  // A widget folder with a genuinely malformed schema.json — this SHOULD still
+  // warn, proving the honest-signal path survives the stray-entry guard.
+  await fs.ensureDir(path.join(projectDir, "widgets", "broken-widget"));
+  await fs.writeFile(path.join(projectDir, "widgets", "broken-widget", "schema.json"), "{ not valid json");
 });
+
+/** Run getProjectWidgets while capturing console.warn calls. */
+async function widgetsWithWarnings() {
+  const warnings = [];
+  const original = console.warn;
+  console.warn = (msg) => warnings.push(String(msg));
+  const res = mockRes();
+  try {
+    await getProjectWidgets(mockReq(), res);
+  } finally {
+    console.warn = original;
+  }
+  return { res, warnings };
+}
 
 after(async () => {
   await fs.remove(TEST_ROOT);
@@ -125,5 +148,25 @@ describe("getProjectWidgets", () => {
     assert.equal(res._status, 200);
     // README.md has no schema.json so it never becomes a schema entry.
     assert.ok(!res._json.some((s) => s.type === "README.md" || s.type == null));
+  });
+
+  it("does not warn 'Failed to parse schema' for stray non-widget entries (§23)", async () => {
+    const { res, warnings } = await widgetsWithWarnings();
+    assert.equal(res._status, 200);
+
+    // No stray entry (README.md / .DS_Store, in widgets/ or widgets/global/)
+    // should ever produce a schema-parse warning.
+    const strayWarnings = warnings.filter(
+      (w) => w.includes("Failed to parse schema") && (w.includes(".DS_Store") || w.includes("README.md")),
+    );
+    assert.deepEqual(strayWarnings, [], `unexpected stray-entry warnings: ${strayWarnings.join(" | ")}`);
+  });
+
+  it("still warns on a genuinely malformed schema.json (honest signal survives)", async () => {
+    const { warnings } = await widgetsWithWarnings();
+    const brokenWarning = warnings.find(
+      (w) => w.includes("Failed to parse schema") && w.includes("broken-widget"),
+    );
+    assert.ok(brokenWarning, "a real broken schema.json must still warn");
   });
 });

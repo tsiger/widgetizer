@@ -54,6 +54,7 @@ function transformWidgetSettings(widgetData, valueTransformer) {
  * write back pages that were modified. Skips header/footer types.
  */
 async function updatePageWidgets(pagesDir, widgetProcessor) {
+  if (!(await fs.pathExists(pagesDir))) return;
   const pageFiles = await fs.readdir(pagesDir);
   for (const pageFile of pageFiles) {
     if (!pageFile.endsWith(".json")) continue;

@@ -633,9 +633,24 @@ export async function getProjectWidgets(req, res) {
       // If there's an error reading theme.json, default to including core widgets
     }
 
+    // The storage adapter lists plain names (files, dirs, dotfiles alike) with
+    // no type info, so probe each candidate for its schema.json before treating
+    // it as a widget folder — mirroring listCollectionSchemas. This skips stray
+    // entries (e.g. a macOS .DS_Store, which on some platforms throws ENOTDIR on
+    // read) instead of letting processWidgetFolder log a spurious "Failed to
+    // parse schema" warning, keeping that warning honest: it now fires only on a
+    // genuinely malformed schema.json.
+    async function widgetFoldersWithSchema(folderRelPaths) {
+      const present = await Promise.all(
+        folderRelPaths.map((relPath) => storage.exists(scope, `${relPath}/schema.json`)),
+      );
+      return folderRelPaths.filter((_, idx) => present[idx]);
+    }
+
     // Helper: read one widget folder's schema.json (flagging a sibling
-    // preview.png) via the storage adapter. A non-directory entry yields a
-    // failing read here, which is caught and dropped.
+    // preview.png) via the storage adapter. Only ever called on entries that
+    // passed the schema.json existence probe above, so a thrown error here means
+    // a real malformed schema.json.
     async function processWidgetFolder(folderRelPath) {
       try {
         const buf = await storage.read(scope, `${folderRelPath}/schema.json`);
@@ -668,12 +683,16 @@ export async function getProjectWidgets(req, res) {
     // Theme widget folders (new structure: widgets/<name>/schema.json),
     // excluding the global/ subdir which is handled separately below.
     const widgetEntries = await storage.list(scope, "widgets");
-    const widgetFolders = widgetEntries.filter((name) => name !== "global").map((name) => `widgets/${name}`);
+    const widgetFolders = await widgetFoldersWithSchema(
+      widgetEntries.filter((name) => name !== "global").map((name) => `widgets/${name}`),
+    );
     allSchemas = allSchemas.concat(await Promise.all(widgetFolders.map(processWidgetFolder)));
 
     // Global widget folders (widgets/global/<name>/schema.json)
     const globalEntries = await storage.list(scope, "widgets/global");
-    const globalFolders = globalEntries.map((name) => `widgets/global/${name}`);
+    const globalFolders = await widgetFoldersWithSchema(
+      globalEntries.map((name) => `widgets/global/${name}`),
+    );
     allSchemas = allSchemas.concat(await Promise.all(globalFolders.map(processWidgetFolder)));
 
     // Filter out nulls (files without schemas or errors)

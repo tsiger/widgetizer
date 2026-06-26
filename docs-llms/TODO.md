@@ -12,7 +12,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open — **16 done · 2 deferred · 9 open**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open — **18 done · 2 deferred · 7 open**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
 - ⬜ [2. Bundled theme updates on the OSS desktop app (product/design decision)](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
@@ -36,8 +36,8 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open — **16 done · 2 deferred · 
 - ✅ [20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — DONE 2026-06-26 (option b: comment + direct tests)](#20-stale-test-comment--claims-remapcollectionitemlinkmenurefs-not-ported-when-they-are-builder-server---done-2026-06-26-option-b-comment--direct-tests--was-experiment-docs-21)
 - ✅ [21. Dedup the cross-bundle `getStandalonePreviewTarget` copy + drop its dead `editor-ui` export (`editor-ui` + OSS preview runtime) — DONE 2026-06-26 — **low (cleanup)**](#21-dedup-the-cross-bundle-getstandalonepreviewtarget-copy--drop-its-dead-editor-ui-export-editor-ui--oss-preview-runtime---done-2026-06-26--low-cleanup)
 - ⬜ [22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — **low/moderate**](#22-gate-collection-schemas-on-the-theme-update-import-path-too-builder-server--lowmoderate)
-- ⬜ [23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — **low (log hygiene / signal-masking)**](#23-widget-catalog-enumeration-logs-spurious-failed-to-parse-schema-warnings-builder-server--low-log-hygiene--signal-masking)
-- ⬜ [24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — **trivial (robustness, likely-unreachable)**](#24-missed-port-defensive--updatepagewidgets-lacks-the-pagesdir-existence-guard-builder-server--trivial-robustness-likely-unreachable)
+- ✅ [23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — DONE 2026-06-26 — **low (log hygiene / signal-masking)**](#23-widget-catalog-enumeration-logs-spurious-failed-to-parse-schema-warnings-builder-server---done-2026-06-26--low-log-hygiene--signal-masking)
+- ✅ [24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — DONE 2026-06-26 — **trivial (robustness, likely-unreachable)**](#24-missed-port-defensive--updatepagewidgets-lacks-the-pagesdir-existence-guard-builder-server---done-2026-06-26--trivial-robustness-likely-unreachable)
 - ⬜ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server--low-correctness-master-parity-tradeoff)
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
 - ⬜ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling--low-dev-only-mostly-latent)
@@ -1235,7 +1235,26 @@ inherits the gate if it ever does. No hosted-only concepts.
 
 ---
 
-## 23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — **low (log hygiene / signal-masking)**
+## 23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — ✅ DONE 2026-06-26 — **low (log hygiene / signal-masking)**
+
+**Done note (2026-06-26):** Took the **robust** guard (parity with `listCollectionSchemas`). Added a
+`widgetFoldersWithSchema(folderRelPaths)` helper in `getProjectWidgets` (`projectController.js`) that
+probes `storage.exists(scope, \`${relPath}/schema.json\`)` (via `Promise.all` + index filter) for **both**
+enumeration spots — `widgets/<name>` and `widgets/global/<name>` — so `processWidgetFolder` is only ever
+called on real widget folders. Stray entries (a macOS `.DS_Store`, a `README.md`) are dropped before any
+read, so they no longer trip the catch's `console.warn`; the warning is now **self-honest** — it fires only
+on a genuinely malformed `schema.json`. Updated the two stale comments accordingly. TDD: extended
+`widgets.test.js` — seeded `.DS_Store` in both `widgets/` and `widgets/global/` plus a `broken-widget` with
+invalid JSON, added a `console.warn`-capturing helper, and asserted (1) **no** "Failed to parse schema"
+warning references a stray entry and (2) a real broken schema **still** warns (honest-signal survives).
+Full backend suite **1279** green, lint clean.
+
+**Platform note (why no Windows-red TDD):** the spurious warning only manifests on **macOS/Linux**, where
+reading `widgets/.DS_Store/schema.json` (a file as a dir) throws `ENOTDIR`, which `LocalStorageAdapter.read`
+re-throws → the warning. On **Windows** that same read returns `ENOENT`, which the adapter maps to `null`,
+so no warning ever fired there — the new stray-entry test was already green on Windows pre-fix. The test
+still locks the contract (red on macOS/Linux without the guard) and the fix makes the behavior
+platform-independent. Original finding below.
 
 Surfaced 2026-06-25 from a colleague's report; researched and confirmed against current code. Two
 spots, one root cause, in `getProjectWidgets` (`projectController.js`).
@@ -1300,7 +1319,13 @@ and inherits both the guard and the cleaner logs. No hosted-only concepts.
 
 ---
 
-## 24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — **trivial (robustness, likely-unreachable)**
+## 24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — ✅ DONE 2026-06-26 — **trivial (robustness, likely-unreachable)**
+
+**Done note (2026-06-26):** Added the one-line `if (!(await fs.pathExists(pagesDir))) return;` guard at the
+top of `updatePageWidgets` (`packages/builder-server/src/utils/linkEnrichment.js`), matching master — a
+missing `pages/` dir now early-returns cleanly instead of surfacing as a caught `readdir` ENOENT. Pure
+defensive parity, no observable behavior change; no test added (per the finding). Full backend suite **1279**
+green, lint clean. Original finding below.
 
 Split out of **§11** (2026-06-26) when that item's Combobox fix landed — kept separate because it's a
 different package/concern. `3f707b26` added a `if (!(await fs.pathExists(pagesDir))) return;` guard to
