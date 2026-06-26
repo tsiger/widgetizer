@@ -414,10 +414,11 @@ export async function refreshAllMediaUsage(projectId) {
     const projectFolderName = await getProjectFolderName(projectId);
     const pagesDir = getProjectPagesDir(projectFolderName);
 
-    // Check if pages directory exists
-    if (!(await fs.pathExists(pagesDir))) {
-      return { success: true, message: "No pages directory found" };
-    }
+    // The pages dir may be absent on a collections-only or freshly-imported
+    // project. Don't early-return on it — theme settings and collection items
+    // live under the project dir (independent of pages/) and must still be
+    // scanned + rewritten via replaceMediaUsage. Only the page scan is gated.
+    const pagesExist = await fs.pathExists(pagesDir);
 
     // Read all media files to build a path → fileId lookup
     const mediaData = await readMediaFile(projectId);
@@ -442,23 +443,27 @@ export async function refreshAllMediaUsage(projectId) {
       }
     }
 
-    // Get all page files
-    const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
-    const pageFiles = allEntries.filter(
-      (entry) => entry.isFile() && entry.name.endsWith(".json") && entry.name !== "global",
-    );
+    // Process each page (skipped when pages/ is absent — globals/theme/collections
+    // below still run).
+    let pageCount = 0;
+    if (pagesExist) {
+      const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
+      const pageFiles = allEntries.filter(
+        (entry) => entry.isFile() && entry.name.endsWith(".json") && entry.name !== "global",
+      );
+      pageCount = pageFiles.length;
 
-    // Process each page
-    for (const fileEntry of pageFiles) {
-      const pageId = fileEntry.name.replace(".json", "");
-      const pagePath = path.join(pagesDir, fileEntry.name);
+      for (const fileEntry of pageFiles) {
+        const pageId = fileEntry.name.replace(".json", "");
+        const pagePath = path.join(pagesDir, fileEntry.name);
 
-      try {
-        const pageContent = await fs.readFile(pagePath, "utf8");
-        const pageData = JSON.parse(pageContent);
-        addUsageForPaths(extractMediaPathsFromPage(pageData), pageId);
-      } catch (error) {
-        console.warn(`Error processing page ${pageId} for media usage:`, error.message);
+        try {
+          const pageContent = await fs.readFile(pagePath, "utf8");
+          const pageData = JSON.parse(pageContent);
+          addUsageForPaths(extractMediaPathsFromPage(pageData), pageId);
+        } catch (error) {
+          console.warn(`Error processing page ${pageId} for media usage:`, error.message);
+        }
       }
     }
 
@@ -534,7 +539,7 @@ export async function refreshAllMediaUsage(projectId) {
 
     return {
       success: true,
-      message: `Refreshed usage tracking for ${pageFiles.length} pages, ${collectionItemCount} collection items, global widgets, and theme settings`,
+      message: `Refreshed usage tracking for ${pageCount} pages, ${collectionItemCount} collection items, global widgets, and theme settings`,
     };
   } catch (error) {
     console.error("Error refreshing media usage:", error);

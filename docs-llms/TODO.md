@@ -749,7 +749,20 @@ hosted-only concepts.
 
 ---
 
-## 16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — **low/moderate**  *(was experiment-docs §17)*
+## 16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §17)*
+
+**Done note (2026-06-26):** Replaced the top-of-function early `return` (`mediaUsageService.js`, was
+`:417-420`) with master's `const pagesExist = await fs.pathExists(pagesDir)` flag; hoisted `let pageCount = 0`
+and wrapped only the page-file read + per-page loop in `if (pagesExist) { … pageCount = pageFiles.length }`;
+switched the summary message from `pageFiles.length` → `pageCount`. The globals/theme/collection scans +
+`replaceMediaUsage` now always run, so a collections-only / freshly-imported project (no `pages/` yet) gets
+its collection-item and theme-settings media tracked instead of left "unused". Pure control-flow change —
+the scan bodies (incl. the §12 work) were already correct and untouched. TDD red-first: (1) updated the
+existing "no pages directory" test to prove the theme-settings favicon is still tracked when `pages/` is
+moved away (was asserting the now-removed `/no pages directory/i` early-return message); (2) new
+collections-only test — no `pages/` dir + a collection item referencing media → its `usedIn` is non-empty.
+Both red before the fix (one on the stale message, one on empty `usedIn`), green after; §12 tests in the same
+file stayed green. Full backend suite 1251, lint clean. Hosted inherits via shared `builder-server`.
 
 Surfaced 2026-06-25 from a colleague's port-gap report; researched and confirmed against latest
 master. Master fixed this; the fix was not carried into the package port.

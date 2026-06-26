@@ -18,7 +18,7 @@
  * Run with: node --test server/tests/mediaUsage.test.js
  */
 
-import { describe, it, before, after, beforeEach } from "node:test";
+import { describe, it, before, after, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
@@ -662,8 +662,8 @@ describe("refreshAllMediaUsage", () => {
     assert.match(result.message, /2 pages/); // home.json + about.json
   });
 
-  it("handles project with no pages directory", async () => {
-    // Temporarily move pages dir out of the way
+  it("still scans theme settings when the pages directory is absent (TODO §16)", async () => {
+    // Temporarily move pages dir out of the way (collections-only / fresh-import shape).
     const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
     const backupDir = pagesDir + ".backup";
     await fs.move(pagesDir, backupDir);
@@ -671,10 +671,56 @@ describe("refreshAllMediaUsage", () => {
     try {
       const result = await refreshAllMediaUsage(PROJECT_ID);
       assert.equal(result.success, true);
-      assert.match(result.message, /no pages directory/i);
+      // Pre-§16 this early-returned ("no pages directory") BEFORE the theme-settings
+      // scan + replaceMediaUsage, so the favicon went untracked. Now it falls through.
+      assert.doesNotMatch(result.message, /no pages directory/i);
+      assert.match(result.message, /0 pages/);
+
+      const media = await readMediaJson();
+      // theme.json (seeded in beforeEach) sets the favicon to logo (IMG2).
+      assert.ok(
+        media.files.find((f) => f.id === IMG2).usedIn.includes("global:theme-settings"),
+        "favicon should be tracked even with no pages dir",
+      );
     } finally {
       await fs.move(backupDir, pagesDir);
     }
+  });
+});
+
+// ============================================================================
+// refreshAllMediaUsage — collections-only project (no pages dir) (TODO §16)
+// ============================================================================
+
+describe("refreshAllMediaUsage — collections-only project (TODO §16)", () => {
+  const COLL_IMG = "coll-img-16";
+
+  beforeEach(async () => {
+    await seedMediaJson([
+      { id: COLL_IMG, filename: "cover.jpg", path: "/uploads/images/cover.jpg", type: "image/jpeg", usedIn: [] },
+    ]);
+
+    // No pages/ dir at all — only a collection item referencing the media file.
+    await fs.remove(getProjectPagesDir(PROJECT_FOLDER));
+    const itemPath = path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "hello.json");
+    await fs.ensureDir(path.dirname(itemPath));
+    await fs.writeFile(itemPath, JSON.stringify({ settings: { cover: "/uploads/images/cover.jpg" } }));
+  });
+
+  afterEach(async () => {
+    // Restore project structure for subsequent suites.
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections"));
+    await fs.ensureDir(path.join(getProjectPagesDir(PROJECT_FOLDER), "global"));
+  });
+
+  it("tracks a collection item's media when pages/ is absent", async () => {
+    const result = await refreshAllMediaUsage(PROJECT_ID);
+    assert.equal(result.success, true);
+
+    const media = await readMediaJson();
+    // Pre-§16: early return → never scanned → usedIn stays []. Post-fix: tracked.
+    assert.deepEqual(media.files.find((f) => f.id === COLL_IMG).usedIn, ["collection:news/hello"]);
+    assert.match(result.message, /1 collection items/);
   });
 });
 
