@@ -1117,3 +1117,24 @@ still warn — proving the honest-signal path survives.
 
 **Hosted impact:** fix is shared `builder-server` — hosted's widget catalog runs the same enumeration
 and inherits both the guard and the cleaner logs. No hosted-only concepts.
+
+---
+
+## 24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — **trivial (robustness, likely-unreachable)**
+
+Split out of **§11** (2026-06-26) when that item's Combobox fix landed — kept separate because it's a
+different package/concern. `3f707b26` added a `if (!(await fs.pathExists(pagesDir))) return;` guard to
+`updatePageWidgets` (`packages/builder-server/src/utils/linkEnrichment.js`); experimentation's copy calls
+`fs.readdir(pagesDir)` with no guard.
+
+**Effect (trivial / likely-unreachable):** in the OSS new-project flow this can't throw —
+`scaffoldProjectContent` (`projectController.js`) creates the pages dir **before** `seedPresetCollections`
+→ `remapCollectionItemLinkRefs` → `updatePageWidgets` runs, and that call is wrapped in try/catch. Hosted
+uses its own scoped seeding, not this fs path. So purely a parity/robustness one-liner — a missing
+`pages/` dir would otherwise surface as a caught readdir ENOENT rather than a clean early return.
+
+**Fix:** add the one-line `if (!(await fs.pathExists(pagesDir))) return;` guard at the top of
+`updatePageWidgets`, matching master. No test needed (defensive, no observable behavior change); add one
+only if a no-`pages/` caller is ever introduced.
+
+**Hosted impact:** none — shared `builder-server`; hosted doesn't reach this fs path. No hosted-only concepts.
