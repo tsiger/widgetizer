@@ -980,7 +980,23 @@ guard protects hosted's exported item pages too once added.
 
 ---
 
-## 19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — **low (non-runtime)**  *(was experiment-docs §20)*
+## 19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — ✅ DONE 2026-06-26 (tight scope)  *(was experiment-docs §20)*
+
+**Done note (2026-06-26):** Added `packages/builder-server/src/tests/renderCollectionItemPage.test.js` —
+scoped **tight** to the one piece of master's contract not already covered by §15/§18: the
+`mainContentHtml` / `html` separation (the markdown-parity seam). Drives the real scope-first wrapper
+`renderingService.renderCollectionItemPage(PROJECT_ID, args, { storage, scope })` over a self-contained
+scaffold (LocalStorageAdapter, theme.json, a layout with `<!DOCTYPE>`/`<title>`/`<body class>` markers,
+a NEWS schema/template/item). 8 tests across **publish ("../") and preview ("")**: the four-field return
+shape; **`mainContentHtml` is the inner template only** (`<article class="news-item">` present,
+`doesNotMatch(/<!doctype|<body|<title>/i)` — the load-bearing guard); `html` is the full laid-out page
+(`<!DOCTYPE>` + `<body class="collection-news item-alpha">` + the inner content); and
+`resolvedItem.slug`/`itemPageData.slug` (`news/alpha`). `headerData`/`footerData` passed null (engine
+skips header/footer render), minimal `sharedGlobals` sufficed. Non-vacuity spot-check: temporarily folding
+the layout into `mainContentHtml` (`return { ..., mainContentHtml: html }`) reds exactly the separation
+assertion in both modes, the other 6 staying green — proving it's a live guard. Deliberately did NOT
+re-port master's body-class/depth assertions (already covered by §15/§18). Full backend suite 1271, lint
+clean. No production change. Hosted inherits the guarded seam.
 
 Surfaced 2026-06-25 from a colleague's port-gap report; researched and confirmed. Master's
 `server/tests/renderCollectionItemPage.test.js` (added in **`1aa6e92d`**, the finding-#2 follow-up that
