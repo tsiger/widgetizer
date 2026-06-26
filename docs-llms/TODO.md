@@ -364,7 +364,17 @@ navigable-preview UX instead — covered by the broader docs-accuracy follow-up 
 
 ---
 
-## 11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`)  *(was experiment-docs §12)*
+## 11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — ✅ DONE 2026-06-26 (sub-item → §24)  *(was experiment-docs §12)*
+
+**Status (2026-06-26):** fixed. `ui/Combobox.jsx` now renders a non-clickable uppercase section
+header before the first option of each `group` (mirroring `MenuCombobox.jsx:79–90`:
+`showHeader = option.group && (idx === 0 || filteredOptions[idx-1].group !== option.group)`, wrapped
+in a `Fragment`), so the LinkInput picker shows "PAGES" / "NEWS" / … dividers instead of one flat
+list. Backward-compatible — ungrouped options (other `Combobox` consumers) render no header. Covered
+by a new `ui/__tests__/Combobox.test.jsx` (headers render on group change, not repeated within a
+group, one-header-per-group structural count, option selectable, header NOT selectable, ungrouped =
+no header) — red on the flat Combobox, green after. Full frontend suite green (664). The defensive
+`updatePageWidgets` `pagesDir` guard sub-item was **excluded and moved to §24**. Original finding below.
 
 Surfaced 2026-06-24 during the master-commit port audit, inspecting **`3f707b26`**
 (Sort link picker entries alphabetically — pages, groups, items) against latest master.
