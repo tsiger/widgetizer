@@ -215,10 +215,15 @@ describe("collection item-page export — happy path", () => {
     assert.ok(!html.includes("/uploads/images/"), "raw storage path must not survive");
   });
 
-  it("applies the collection/item body class", async () => {
+  it("applies the collection/item body class — exactly, no leaked page-{slug} (TODO §15)", async () => {
     const dir = latestExportDir();
     const html = await fs.readFile(path.join(dir, "news", "alpha.html"), "utf8");
-    assert.ok(html.includes("collection-news") && html.includes("item-alpha"), html);
+    // Exact match: the item page must carry ONLY its collection/item hooks. The
+    // page-{slug} default (here "page-news/alpha") must be overridden, not appended
+    // — a substring check (the pre-§15 assertion) passed even with the stray class.
+    const bodyClass = html.match(/<body class="([^"]*)"/)?.[1];
+    assert.equal(bodyClass, "collection-news item-alpha", html);
+    assert.ok(!html.includes("page-news"), "the page-{slug} index class must not leak onto item pages");
   });
 
   it("includes the item easter egg + page title", async () => {

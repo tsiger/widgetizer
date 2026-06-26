@@ -689,6 +689,38 @@ describe("renderPageLayout", () => {
     assert.ok(html.includes('class="page-about-us"'));
   });
 
+  it("overrides the page-slug body class when contentSections.bodyClass is set (TODO §15)", async () => {
+    // Collection item pages pass an explicit bodyClass to REPLACE the page-{slug}
+    // default — otherwise a `.page-{slug}` index CSS rule leaks onto item pages,
+    // and the nested item slug ("news/alpha") even yields a malformed `/` token.
+    const html = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "", footerContent: "", bodyClass: "collection-news item-alpha" },
+      { name: "Alpha", slug: "news/alpha" },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+    );
+
+    const bodyClass = html.match(/<body class="([^"]*)"/)?.[1];
+    assert.equal(bodyClass, "collection-news item-alpha");
+    assert.ok(!html.includes("page-news"), "the page-{slug} default must not leak onto an override");
+  });
+
+  it("appends extraBodyClasses after the page-slug default (transparent-header channel)", async () => {
+    const html = await renderPageLayout(
+      PROJECT_ID,
+      { headerContent: "", mainContent: "", footerContent: "", extraBodyClasses: "transparent-header" },
+      { name: "About", slug: "about-us" },
+      RAW_THEME_SETTINGS,
+      "preview",
+      null,
+    );
+
+    const bodyClass = html.match(/<body class="([^"]*)"/)?.[1];
+    assert.equal(bodyClass, "page-about-us transparent-header");
+  });
+
   it("renders SEO tags via {% seo %} in layout", async () => {
     const html = await renderPageLayout(
       PROJECT_ID,

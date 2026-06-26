@@ -780,7 +780,11 @@ async function renderPageLayout(
 
     // 4. Add page-specific context with separated content sections
     const pageSlugClass = pageData?.slug ? `page-${pageData.slug}` : "";
-    const bodyClasses = [pageSlugClass, contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
+    // A caller may pass `bodyClass` to REPLACE the page-{slug} default (collection
+    // item pages do this so a `.page-{slug}` index rule never leaks onto them);
+    // `extraBodyClasses` always appends (e.g. the transparent-header channel).
+    const baseBodyClass = contentSections.bodyClass !== undefined ? contentSections.bodyClass : pageSlugClass;
+    const bodyClasses = [baseBodyClass, contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
     const renderContext = {
       ...baseContext,
       header: contentSections.headerContent || "",
@@ -914,7 +918,7 @@ async function renderCollectionItemPage(
       headerContent,
       mainContent: mainContentHtml,
       footerContent,
-      extraBodyClasses: `collection-${schema.type} item-${resolvedItem.slug}`,
+      bodyClass: `collection-${schema.type} item-${resolvedItem.slug}`,
     },
     itemPageData,
     rawThemeSettings,

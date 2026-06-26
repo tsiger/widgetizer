@@ -171,7 +171,7 @@ call site was missed**: `validateThemeCollectionSchemas` was ported into
 On **latest master** (`server/controllers/themeController.js:1436`, still live — not undone by a
 later commit), `uploadTheme` runs the gate before committing an uploaded theme:
 
-```js
+```text
 const collectionValidation = await validateThemeCollectionSchemas(extractedThemeDir);
 if (!collectionValidation.valid) {
   await fs.remove(tempDir);
@@ -226,7 +226,7 @@ Surfaced 2026-06-24 during the master-commit port audit, inspecting **`eea285de`
 **faithfully** into `packages/builder-server/src/utils/linkEnrichment.js` — including the
 optional `projectId` tail param and its media-usage re-sync block:
 
-```js
+```text
 const touched = await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => …); // link cleanup — always runs
 if (projectId) {
   for (…touched…) await syncCollectionItemMediaUsageOnWrite(projectId, type, slug, item, null);   // media re-sync — gated
@@ -649,7 +649,20 @@ theme authors today; 14c–14e are `docs-llms` backfills (path-ref rewrites, no 
 
 ---
 
-## 15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — **low/moderate**  *(was experiment-docs §16)*
+## 15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — ✅ DONE 2026-06-26  *(was experiment-docs §16)*
+
+**Done note (2026-06-26):** Restored the dropped override in `renderEngine.js` `renderPageLayout`
+(`:782`): a caller may pass `bodyClass` to REPLACE the `page-{slug}` default, while `extraBodyClasses`
+still appends (transparent-header channel) — `[baseBodyClass, extraBodyClasses].join(" ")`. Switched the
+shared item-page call (`:921`) from `extraBodyClasses:` back to `bodyClass:`, so item pages render exactly
+`collection-{type} item-{slug}` with no leaked `page-news/{slug}`. The `:914` comment is true again. Pages
+never set `bodyClass`, so the `page-{slug}` default is unchanged. TDD red-first: (1) render-level in
+`rendering.test.js` — `renderPageLayout` with `bodyClass` set asserts the exact override + no `page-` leak,
+plus a transparent-header *append* guard; (2) tightened `collectionItemExport.test.js` from a substring
+check to an **exact** body-class match + `!includes("page-news")`. Both red before the fix, green after; the
+existing regular-page `page-{slug}` guard stayed green throughout. Satisfied the TODO's "render-engine-level"
+ask via `rendering.test.js` (calls `renderPageLayout` directly) rather than standing up a new render-engine
+suite. Full backend suite 1250 green, lint clean. Hosted inherits the fix (shared render-engine).
 
 Surfaced 2026-06-25 from a colleague's port-gap report; researched and confirmed against latest
 master. Master fixed this; the fix's mechanism was dropped during the package refactor.
@@ -765,7 +778,7 @@ or even rewritten; the existing (here: empty) usage rows just stay.
 On **master** (`server/services/mediaUsageService.js`) there is **no early return**. It captures a
 flag and gates only the page-reading block on it, then continues to globals/theme/collections:
 
-```js
+```text
 const pagesExist = await fs.pathExists(pagesDir);
 …
 // Process each page (the pages dir may be absent on a freshly-imported or
