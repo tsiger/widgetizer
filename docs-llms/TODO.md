@@ -507,7 +507,19 @@ runs the same `mediaUsageService`, so it inherits the fix. No hosted-only concep
 
 ---
 
-## 13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — **low**  *(was experiment-docs §14)*
+## 13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — ✅ DONE 2026-06-26  *(was experiment-docs §14)*
+
+**Done note (2026-06-26):** Recovered `scripts/theme-update-delta.js` from `master` and re-added the
+`theme:update-delta` npm script. **Not** verbatim — adapted to the repo's tested-script convention
+(matching `preset-sync.js`): `export`ed the eight pure helpers (`parseSemver`, `parseVersionFromTag`,
+`compareVersions`, `describeProgression`, `isExcludedRelPath`, `isDeletionEligible`, `parseDiffNameStatus`,
+`buildPlan`) and replaced the bare `main().catch(...)` with an `isDirectRun` guard so importing the module
+doesn't shell out to git. No logic changes. TDD: `scripts/__tests__/theme-update-delta.test.js` (18 Vitest
+cases) covers version logic, the exclusion/deletion predicates, the `git diff --name-status` parser (incl.
+prefix-stripping, out-of-theme skip, auto-required `theme.json`), and `buildPlan` bucketing — red first
+(module absent), then green. Verified: `--dry-run` against `themes/arch` produces a real plan and writes
+nothing; eslint clean on both files; `test:frontend` 682 green. Still ties into the open bundled-theme-update
+story (§2).
 
 Surfaced 2026-06-24 during the master-commit port audit, inspecting **`ac9a4f5c`** (Add
 `theme:update-delta` script for bundled Arch releases) + **`c846b84e`** (its untracked-files note)

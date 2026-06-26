@@ -34,6 +34,7 @@
     "test:verbose": "VERBOSE=1 node --test --test-reporter ./packages/builder-server/src/tests/reporter.js packages/builder-server/src/tests/*.test.js",
     "test:frontend": "vitest run",
     "theme:sync": "node scripts/theme-sync.js",
+    "theme:update-delta": "node scripts/theme-update-delta.js",
     "preset:sync": "node scripts/preset-sync.js",
     "preset:media": "node scripts/pack-preset-media.js",
     "preset:templates": "node scripts/sync-preset-templates.js",
