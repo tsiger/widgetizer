@@ -12,7 +12,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open — **18 done · 2 deferred · 7 open**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open — **19 done · 2 deferred · 6 open**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
 - ⬜ [2. Bundled theme updates on the OSS desktop app (product/design decision)](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
@@ -38,7 +38,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open — **18 done · 2 deferred · 
 - ⬜ [22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — **low/moderate**](#22-gate-collection-schemas-on-the-theme-update-import-path-too-builder-server--lowmoderate)
 - ✅ [23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — DONE 2026-06-26 — **low (log hygiene / signal-masking)**](#23-widget-catalog-enumeration-logs-spurious-failed-to-parse-schema-warnings-builder-server---done-2026-06-26--low-log-hygiene--signal-masking)
 - ✅ [24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — DONE 2026-06-26 — **trivial (robustness, likely-unreachable)**](#24-missed-port-defensive--updatepagewidgets-lacks-the-pagesdir-existence-guard-builder-server---done-2026-06-26--trivial-robustness-likely-unreachable)
-- ⬜ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server--low-correctness-master-parity-tradeoff)
+- ✅ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server---resolved-2026-06-26-keep-master-parity--low-correctness-master-parity-tradeoff)
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
 - ⬜ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling--low-dev-only-mostly-latent)
 
@@ -1346,7 +1346,16 @@ only if a no-`pages/` caller is ever introduced.
 
 ---
 
-## 25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — **low (correctness, master-parity tradeoff)**
+## 25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — ✅ RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**
+
+**Resolution (2026-06-26):** Chose **option (a) — keep master parity, no code change.** The over-match only
+ever goes in the **safe direction** (it can mark a local asset *used* when a foreign `/uploads/` URL collides
+with its filename — never prunes a genuinely-referenced asset), the failure mode is benign (a stale,
+undeletable "in use" entry / an extra file copied on export — no data loss, no broken page), the colliding
+scenario is rare, and the regex is byte-identical to master + hosted's shared `mediaUsageService`. Not worth
+diverging unless stale "used" entries become a real user complaint. If we ever revisit: anchor in shared
+`builder-server` (so hosted inherits) and add a test that a foreign `/uploads/` URL does **not** mark the
+same-named local record used. Original finding below.
 
 Surfaced 2026-06-26 by the max-effort code review of the §12 work (CONFIRMED finding). The new
 `EMBEDDED_MEDIA_PATH_RE = /\/uploads\/(?:images|files)\/[A-Za-z0-9._-]+/g` (`mediaUsageService.js:21`,
