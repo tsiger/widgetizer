@@ -30,7 +30,11 @@ export default {
     // Core placeholder SVGs are served via res.sendFile, which needs real files
     // on disk (not inside the asar). They live in @widgetizer/core since 1.6.
     "node_modules/@widgetizer/core/src/assets/**",
-    "src/utils/previewRuntime.js",
+    // Served raw via express.static(/runtime). previewRuntime.js imports its
+    // sibling standalonePreviewTarget.js by relative URL, so every served runtime
+    // module must be a real on-disk file (unpacked), not read from inside the asar.
+    // Top-level *.js only — __tests__ stays packed.
+    "src/utils/*.js",
     "node_modules/sharp/**",
     "node_modules/@img/sharp-*/**",
     "node_modules/@img/sharp-libvips-*/**",
