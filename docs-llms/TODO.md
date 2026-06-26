@@ -1,7 +1,5 @@
 # TODO — OSS builder (web + Electron desktop)
 
-**Updated:** 2026-06-24
-
 Open work for the OSS builder, migrated 2026-06-24 from the engagement-level
 `experiment-docs/TODO.md` (parent repo) so each item lives with the project it
 applies to. Hosted-specific items moved to `widgetizer-hosted/docs/TODO.md`.
@@ -9,6 +7,40 @@ Original engagement section numbers are kept in parentheses for traceability.
 
 Conventions still in force: commit only on the `experimentation` branch with
 explicit permission, never switch branch / never push.
+
+---
+
+## Contents
+
+_Legend: ✅ done · ⏸️ deferred · ⬜ open — **14 done · 2 deferred · 11 open**_
+
+- ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
+- ⬜ [2. Bundled theme updates on the OSS desktop app (product/design decision)](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
+- ⬜ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene)](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene--was-experiment-docs-14)
+- ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss-was-experiment-docs-9-oss-portion)
+- ✅ [5. Consolidate preview-dispatch logic (route-mapping half) — DONE 2026-06-25](#5-consolidate-preview-dispatch-logic-route-mapping-half---done-2026-06-25--findings-doc-follow-up-session-task-16)
+- ⬜ [6. Narrow-sidebar icon-grid + color-picker visual review](#6-narrow-sidebar-icon-grid--color-picker-visual-review--c2-follow-up-session-task-18)
+- ✅ [7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — new-theme install path DONE 2026-06-25 (update-import path → §22)](#7-missed-port--theme-upload-collection-schema-gate-not-wired-builder-server---new-theme-install-path-done-2026-06-25-update-import-path--22--was-experiment-docs-8)
+- ✅ [8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — DONE 2026-06-25](#8-missed-port--pagecontroller-doesnt-thread-projectid-into-cleanupdeletedpagereferences-builder-server---done-2026-06-25--was-experiment-docs-9)
+- ✅ [9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — DONE 2026-06-25](#9-missed-port--mediajsx-doesnt-seed-collection-item-usage-titles-editor-ui---done-2026-06-25--was-experiment-docs-10)
+- ✅ [10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — DONE 2026-06-26](#10-missed-port-tests-only--createcollectionpreviewtoken-guard-tests-builder-server---done-2026-06-26--was-experiment-docs-11)
+- ✅ [11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — DONE 2026-06-26 (sub-item → §24)](#11-missed-port--link-picker-combobox-group-headers-not-rendered-editor-ui---done-2026-06-26-sub-item--24--was-experiment-docs-12)
+- ✅ [12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — DONE 2026-06-26](#12-missed-port--richtext-embedded-media-not-tracked-as-used-builder-server---done-2026-06-26--was-experiment-docs-13)
+- ✅ [13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — DONE 2026-06-26](#13-missed-port--themeupdate-delta-release-tool-not-ported-oss-dev-tooling---done-2026-06-26--was-experiment-docs-14)
+- ⬜ [14. Documentation port audit — content gaps from the master-commit doc changes](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes--was-experiment-docs-15)
+- ✅ [15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — DONE 2026-06-26](#15-missed-port--collection-item-pages-leak-the-page-slug-body-class-render-engine---done-2026-06-26--was-experiment-docs-16)
+- ✅ [16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — DONE 2026-06-26](#16-missed-port--refreshallmediausage-aborts-early-on-a-project-with-no-pages-dir-builder-server---done-2026-06-26--was-experiment-docs-17)
+- ⏸️ [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process--was-experiment-docs-18)
+- ✅ [18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — DONE 2026-06-26](#18-missed-port-tests-only--depth-1-render-smoke--depth-0-no-leak-guard-not-ported-builder-server---done-2026-06-26--was-experiment-docs-19)
+- ✅ [19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — DONE 2026-06-26 (tight scope)](#19-missed-port-tests-only--rendercollectionitempage-contract-test-not-ported-builder-server---done-2026-06-26-tight-scope--was-experiment-docs-20)
+- ✅ [20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — DONE 2026-06-26 (option b: comment + direct tests)](#20-stale-test-comment--claims-remapcollectionitemlinkmenurefs-not-ported-when-they-are-builder-server---done-2026-06-26-option-b-comment--direct-tests--was-experiment-docs-21)
+- ⬜ [21. Dedup the cross-bundle `getStandalonePreviewTarget` copy + drop its dead `editor-ui` export (`editor-ui` + OSS preview runtime) — **low (cleanup)**](#21-dedup-the-cross-bundle-getstandalonepreviewtarget-copy--drop-its-dead-editor-ui-export-editor-ui--oss-preview-runtime--low-cleanup)
+- ⬜ [22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — **low/moderate**](#22-gate-collection-schemas-on-the-theme-update-import-path-too-builder-server--lowmoderate)
+- ⬜ [23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — **low (log hygiene / signal-masking)**](#23-widget-catalog-enumeration-logs-spurious-failed-to-parse-schema-warnings-builder-server--low-log-hygiene--signal-masking)
+- ⬜ [24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — **trivial (robustness, likely-unreachable)**](#24-missed-port-defensive--updatepagewidgets-lacks-the-pagesdir-existence-guard-builder-server--trivial-robustness-likely-unreachable)
+- ⬜ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server--low-correctness-master-parity-tradeoff)
+- ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
+- ⬜ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling--low-dev-only-mostly-latent)
 
 ---
 
@@ -1280,7 +1312,17 @@ same-named local record used).
 
 ---
 
-## 26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — **low (DRY / maintainability)**
+## 26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — ✅ DONE 2026-06-26 — **low (DRY / maintainability)**
+
+**Done note (2026-06-26):** Extracted the shared dropdown body into a new presentational
+`packages/editor-ui/src/components/ui/ComboboxOptionList.jsx` (the `<ul>` + group-header `showHeader` logic +
+option/empty-state `<li>` markup, `Fragment`-wrapped). Both `ui/Combobox.jsx` and `menus/MenuEditor/MenuCombobox.jsx`
+now render `<ComboboxOptionList … />` instead of their own copy; each keeps its own open-state strategy (self-owned
+`isOpen` vs controlled `isOpen`/`onOpenChange`) and passes its differing bits as props — `emptyText` ("No matching
+pages found…" vs "No matching results…") and the z-index via `className` ("z-10" vs "!z-[99999]", which had already
+drifted). The duplicated `Fragment` import was dropped from both. No behavior change — the existing
+`Combobox.test.jsx` (6) + `MenuCombobox.test.jsx` (4) stay green as the regression net (10 passed); lint clean on all
+three files. Original finding below.
 
 Surfaced 2026-06-26 by the code review of the §11 work (CONFIRMED design smell). Porting the link-picker
 group-header into `packages/editor-ui/src/components/ui/Combobox.jsx` was done by **copy-pasting** the
