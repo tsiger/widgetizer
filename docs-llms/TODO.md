@@ -435,7 +435,18 @@ one-line guard for parity/robustness alongside the Combobox fix, but not indepen
 
 ---
 
-## 12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — **moderate**  *(was experiment-docs §13)*
+## 12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §13)*
+
+**Done note (2026-06-26):** Ported both missing halves into `mediaUsageService.js` — `EMBEDDED_MEDIA_PATH_RE`
++ `extractMediaPathsFromString` (now drives `collectMediaPaths`'s string branch; removed the dead
+whole-string `isMediaPath`) and `recordMediaPaths(file)` (original `path` + all `sizes.*.path` variants),
+threaded through `findFileIdsByPaths` and `refreshAllMediaUsage`'s `pathToFileId`. Both kept module-internal
+(no API widening). TDD: 3 `node:test` cases in `mediaUsage.test.js` (`updatePageMediaUsage` + `refreshAllMediaUsage`
+track a richtext-only `-large` variant; multi-path extraction incl. master's trailing-period over-match) — red
+first, then green. Vacuity spot-check: reverting *each* half independently reds exactly those 3 and nothing else,
+proving both load-bearing. Full backend suite 1248 green, lint clean. Export-copy end-to-end test deliberately
+skipped (export prune is purely `usedIn.length > 0`, `exportController.js:722/803`, already covered) — fix is
+covered-by-construction once usage tracking is correct.
 
 Surfaced 2026-06-24 during the master-commit port audit, inspecting **`5940dada`**
 (Add opt-in richtext images with automatic media resolution) against latest master.

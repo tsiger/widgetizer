@@ -679,6 +679,118 @@ describe("refreshAllMediaUsage", () => {
 });
 
 // ============================================================================
+// Richtext-embedded media (TODO §12)
+//
+// An image inserted *only* into a richtext field embeds a SIZE-VARIANT path
+// (e.g. the `-large` variant) inside an HTML `<img src>` string. Tracking must
+//   (a) extract upload paths embedded *anywhere* in a string (not just a value
+//       that *is* a bare upload path), and
+//   (b) match a media record by ANY of its size-variant paths, not only the
+//       original `file.path`.
+// Both halves are load-bearing: the embedded path is a variant, so extraction
+// without variant-matching (or vice-versa) still leaves usedIn empty → export
+// prunes the image → broken <img> on the published page.
+// ============================================================================
+
+const RICH = "rich-img";
+
+describe("richtext-embedded media (TODO §12)", () => {
+  /** A media record whose richtext-embedded reference is a `-large` variant path. */
+  function mediaFilesWithVariants() {
+    return [
+      {
+        id: RICH,
+        filename: "hero.jpg",
+        path: "/uploads/images/hero.jpg",
+        type: "image/jpeg",
+        sizes: {
+          medium: { path: "/uploads/images/hero-medium.jpg", width: 1024, height: 576 },
+          large: { path: "/uploads/images/hero-large.jpg", width: 1920, height: 1080 },
+        },
+        usedIn: [],
+      },
+    ];
+  }
+
+  beforeEach(async () => {
+    await seedMediaJson(mediaFilesWithVariants());
+  });
+
+  it("updatePageMediaUsage tracks an image embedded only in a richtext <img src> (variant path)", async () => {
+    const pageData = {
+      widgets: {
+        w1: {
+          settings: {
+            body: '<p>Intro text <img src="/uploads/images/hero-large.jpg" alt="hero"> trailing text.</p>',
+          },
+        },
+      },
+    };
+    const result = await updatePageMediaUsage(PROJECT_ID, "article", pageData);
+    assert.ok(
+      result.mediaPaths.includes("/uploads/images/hero-large.jpg"),
+      "the embedded variant path should be extracted from the richtext HTML string",
+    );
+
+    const media = await readMediaJson();
+    const hero = media.files.find((f) => f.id === RICH);
+    assert.deepEqual(hero.usedIn, ["article"], "the variant path should match the record via recordMediaPaths");
+  });
+
+  it("refreshAllMediaUsage tracks a richtext-only image (variant path) from a page on disk", async () => {
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    await fs.ensureDir(pagesDir);
+    await fs.writeFile(
+      path.join(pagesDir, "news.json"),
+      JSON.stringify({
+        widgets: {
+          w1: { settings: { body: '<p><img src="/uploads/images/hero-large.jpg"></p>' } },
+        },
+      }),
+    );
+
+    try {
+      const result = await refreshAllMediaUsage(PROJECT_ID);
+      assert.equal(result.success, true);
+
+      const media = await readMediaJson();
+      const hero = media.files.find((f) => f.id === RICH);
+      assert.ok(hero.usedIn.includes("news"), "refresh should mark the richtext-only image as used");
+    } finally {
+      await fs.remove(path.join(pagesDir, "news.json"));
+    }
+  });
+
+  it("extracts multiple embedded paths from one richtext string and over-matches a trailing period (master parity)", async () => {
+    const pageData = {
+      widgets: {
+        w1: {
+          settings: {
+            // Two embedded refs; the second sits at the end of a sentence, so the
+            // regex's `.` absorbs the trailing period — master accepted this, since
+            // over-matching only ever marks an asset "used" (the safe direction).
+            body:
+              '<p>First <img src="/uploads/images/hero-large.jpg">. Then see /uploads/images/hero-medium.jpg.</p>',
+          },
+        },
+      },
+    };
+    const result = await updatePageMediaUsage(PROJECT_ID, "multi", pageData);
+    assert.ok(result.mediaPaths.includes("/uploads/images/hero-large.jpg"), "first embedded path found");
+    assert.ok(
+      result.mediaPaths.includes("/uploads/images/hero-medium.jpg."),
+      "second match absorbs the trailing period (parity over-match)",
+    );
+
+    // Despite the over-matched period, the bare medium variant still matches the
+    // record (hero-large does too), so the image is tracked.
+    const media = await readMediaJson();
+    const hero = media.files.find((f) => f.id === RICH);
+    assert.deepEqual(hero.usedIn, ["multi"]);
+  });
+});
+
+// ============================================================================
 // Concurrent / race-condition safety
 // ============================================================================
 
