@@ -52,6 +52,9 @@
       & table.test-table td { border: 1px solid var(--border-subtle, #e5e7eb); padding: var(--space-2xs) var(--space-sm); }
       & .test-video { aspect-ratio: 16 / 9; max-inline-size: 560px; }
       & .test-video iframe { inline-size: 100%; block-size: 100%; border: 0; border-radius: var(--radius-md, 10px); }
+      & .test-menu { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin: 0; padding: 0; list-style: none; }
+      & .test-menu-submenu { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin: 0; padding-inline-start: var(--space-sm); list-style: none; }
+      & .test-menu-link { color: var(--link, #2563eb); text-decoration: underline; }
     }
   </style>
 
@@ -146,11 +149,24 @@
           </div>
         {% endif %}
 
-        {%- comment -%} menu (stored as a stable UUID) {%- endcomment -%}
-        {% if item.settings.related_menu != blank %}
+        {%- comment -%}
+          menu — resolved to a menu object ({ items: [...] }), NOT a UUID string,
+          so render it with the shared 'menu' snippet (never output it raw, which
+          prints [object Object]). Guard on items so an empty menu shows no row.
+        {%- endcomment -%}
+        {% if item.settings.related_menu.items.size > 0 %}
           <div class="test-row">
-            <dt class="test-label">Menu (uuid)</dt>
-            <dd><code>{{ item.settings.related_menu }}</code></dd>
+            <dt class="test-label">Menu</dt>
+            <dd>
+              {% render 'menu',
+                menu: item.settings.related_menu,
+                aria_label: 'Related',
+                class_list: 'test-menu',
+                class_item: 'test-menu-item',
+                class_link: 'test-menu-link',
+                class_submenu: 'test-menu-submenu'
+              %}
+            </dd>
           </div>
         {% endif %}
 
