@@ -849,7 +849,14 @@ bug there — but the fix is harmless and keeps parity.) No hosted-only concepts
 
 ---
 
-## 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — **low (process)**  *(was experiment-docs §18)*
+## 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — ⏸️ DEFERRED 2026-06-26 — **low (process)**  *(was experiment-docs §18)*
+
+**Deferred (2026-06-26):** The one *proven* escape (the item-page body-class assertion) was already
+fixed as part of §15 (exact match + `!includes("page-news")`). The broader sweep is defensive-only with
+**no known active bug**: the mechanical grep yields ~375 `assert.ok(...includes(...))` hits, the vast
+majority legitimate presence checks. Decided to defer the discretionary render/sanitize-output hardening
+pass and instead tighten opportunistically when touching a suite. Revisit only if another weak-assertion
+escape surfaces.
 
 Surfaced 2026-06-25 from a colleague's port-gap report, generalising the **§15** root cause. Not a
 single bug — a **methodology gap** in the master→experimentation test port worth one focused pass.
@@ -895,7 +902,24 @@ discipline applies to hosted's own ported suites if/when audited, but that's sep
 
 ---
 
-## 18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — **low**  *(was experiment-docs §19)*
+## 18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §19)*
+
+**Done note (2026-06-26):** Added `packages/builder-server/src/tests/depthRenderSmoke.test.js` — a
+self-contained suite (own TEST_ROOT) driving the **real `exportProject`** controller (option a) so the
+inlined `/uploads/`→`assets/` rewrite + markdown-alternate `<link>` injection are exercised, not just the
+prefixer in isolation. Full master parity, both directions, 12 tests: **Gap 1** (depth-1 `news/alpha.html`,
+`outputPathPrefix "../"`) asserts every path form carries `../` — asset-tag URL, `{% image %}` src (+lazy),
+placeholder, preload `href`+`imagesrcset`, favicon/legacy/apple-touch/manifest (`site_icons` via a real SVG
+favicon → Sharp-rasterized variants), the `/uploads/`→`../assets/` banner rewrite (+ `doesNotMatch(/\/uploads\//)`),
+and the relative `alpha.md` markdown-alt. **Gap 2** (depth-0 `index.html`) is the no-leak guard —
+`doesNotMatch(html, /\.\.\//)` — plus non-vacuity asserts of the canonical un-prefixed forms (the §15/§17
+absence-check family, for path prefixes). Enriched shared `layout.liquid` emits the head/body forms so both
+depths exercise the chain. Tolerant regexes for exp divergences (`?v=` on assets, `loading="lazy"`, bare-relative
+preload → `../hero.jpg`, Prettier reflow). Non-vacuity spot-check: temporarily forcing the item
+`outputPathPrefix` to `""` reds exactly the 5 prefix-driven asserts (asset/image/placeholder/preload/favicon),
+proving they're live guards; the `/uploads`-rewrite + markdown-alt asserts stayed green (separate code paths,
+correctly). Full backend suite 1263 green, lint clean. No production change. Hosted inherits the protected
+machinery. (§19 is the sibling — `renderCollectionItemPage` return-contract test.)
 
 Surfaced 2026-06-25 from a colleague's port-gap report; researched and confirmed. Master's
 `server/tests/depthRenderSmoke.test.js` (Collections **Phase 17**) has **no equivalent on
