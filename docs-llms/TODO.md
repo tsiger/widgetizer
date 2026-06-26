@@ -1221,3 +1221,79 @@ uses its own scoped seeding, not this fs path. So purely a parity/robustness one
 only if a no-`pages/` caller is ever introduced.
 
 **Hosted impact:** none — shared `builder-server`; hosted doesn't reach this fs path. No hosted-only concepts.
+
+---
+
+## 25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — **low (correctness, master-parity tradeoff)**
+
+Surfaced 2026-06-26 by the max-effort code review of the §12 work (CONFIRMED finding). The new
+`EMBEDDED_MEDIA_PATH_RE = /\/uploads\/(?:images|files)\/[A-Za-z0-9._-]+/g` (`mediaUsageService.js:21`,
+ported verbatim from master) substring-matches `/uploads/images|files/...` **anywhere** in a string. So a
+setting value that merely *contains* that substring inside a foreign URL — e.g. an external link
+`https://othercdn.com/uploads/images/logo.png`, or a code-field snippet — flags the **local** media record
+whose path is `/uploads/images/logo.png` as **used**.
+
+**Effect (low):** a real behavior change vs *old* exp (the removed `isMediaPath` was `startsWith`, so a
+foreign URL never matched), but it is the **safe direction** — it over-marks an asset *used*, never prunes a
+referenced one. Consequence is a stale, undeletable "in use" entry (the media manager refuses deletion / the
+exporter copies an unreferenced file), never data loss or a broken page. It is **faithful to master** (same
+regex), so this is a *deliberate-deviation* decision, not a port bug.
+
+**Options:** (a) keep master parity (do nothing — the over-match is the safe direction, already documented in
+§12's note); (b) anchor/guard so a match only counts when **not** part of a URL host — e.g. require the match
+to be preceded by a boundary (`"` / `'` / whitespace / `(` / `>`) and not by `://...` — at the cost of
+diverging from master and from hosted's identical `mediaUsageService`. **Recommendation: (a) keep parity**
+unless stale "used" entries become a real user complaint; if we change it, change it in shared `builder-server`
+so hosted inherits it. Test-first either way (a settings value with a foreign `/uploads/` URL must NOT mark the
+same-named local record used).
+
+**Hosted impact:** none unless we deviate — shared `builder-server`; hosted runs the same recognizer.
+
+---
+
+## 26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — **low (DRY / maintainability)**
+
+Surfaced 2026-06-26 by the code review of the §11 work (CONFIRMED design smell). Porting the link-picker
+group-header into `packages/editor-ui/src/components/ui/Combobox.jsx` was done by **copy-pasting** the
+`showHeader` expression + `Fragment` wrapper + Tailwind header classes from `MenuCombobox.jsx`. The two
+components' entire `<ul>` list bodies are now ~95% identical (differing only in state strategy —
+self-owned `isOpen` vs external `isOpen`/`onOpenChange` — and a `z-10` vs `!z-[99999]` class that predates
+this change). The duplication **predates** §11, but porting by copy-paste deepened it.
+
+**Effect (low, no runtime bug):** every future change to link-picker dropdown rendering (header styling, a11y
+role/aria, keyboard nav, empty-state) must be made in two places and kept in sync by hand; they have already
+drifted (the z-index class). **Fix:** extract a shared presentational list (e.g. `ComboboxOptionList`) that
+both components render, parameterised by the open-state strategy; collapse the duplicated `<li>`/header markup
+into it. Keep the existing `Combobox.test.jsx` / `MenuCombobox.test.jsx` green as the regression net.
+
+**Hosted impact:** none — OSS `editor-ui` only.
+
+---
+
+## 27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — **low (dev-only, mostly latent)**
+
+Surfaced 2026-06-26 by the code review of the §13 verbatim port. Four findings on
+`scripts/theme-update-delta.js`, all **dev-only** (manual, `--dry-run`-gated release tool — a maintainer
+producing a wrong/empty delta, never a runtime user). All are present in master too (verbatim port):
+
+- **CONFIRMED — `parseVersionFromTag` greedily takes the last `x.y.z` token.** A date/compound tag like
+  `release-2024.01.15` or `arch-1.2.3-rc.0.9.9` parses to `2024.01.15` / `0.9.9` and is fed to
+  `compareVersions`, so `findPreviousTag` can pick the wrong baseline (or a date-tag outranks a real release
+  and is filtered out, hiding it). Latent under the current `0.9.x` tag scheme. Fix: anchor the tag pattern
+  (e.g. require a `v?`-prefixed standalone semver) / validate the tag shape.
+- **CONFIRMED — `parseDiffNameStatus` drops quote-escaped paths.** Git's default `core.quotePath=true` wraps
+  non-ASCII/special paths in `"..."` with octal escapes; such a line fails `gitPath.startsWith(prefix)` and is
+  silently skipped ("Skipping unexpected diff line"), omitting that file from the delta. Latent — Arch's
+  filenames are all ASCII. Fix: pass `-c core.quotePath=false` to the `git diff` call (and/or unescape), and
+  treat an unexpected-but-in-prefix line as an error rather than a skip.
+- **PLAUSIBLE — reuse over re-implement (×2):** `parseSemver`/`compareVersions` re-implement
+  `packages/builder-server/src/utils/semver.js`, and `toGitPath`/`resolveInside`/`writePlan` re-implement
+  `@widgetizer/core/pathSecurity` (`isWithinDirectory`/`assertWithin`). Both are workspace-importable from
+  `scripts/`. Note: the script's `compareVersions` **throws** on invalid input (relied on + tested) whereas
+  `semver.js` sorts invalid last — reuse needs a thin wrapper, not a blind swap.
+
+**Effect:** low — no runtime/user impact; correctness of a maintainer-run release tool on edge-case tags or
+filenames, plus DRY. **Fix:** do the two CONFIRMED hardenings (quotePath flag + tag-shape validation) when the
+theme-update workflow is next revisited (ties into §2/§13); fold the reuse cleanups in opportunistically.
+
+**Hosted impact:** none — OSS-only release tooling.
