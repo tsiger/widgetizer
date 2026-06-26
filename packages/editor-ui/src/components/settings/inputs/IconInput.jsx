@@ -43,17 +43,33 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
   const [isOpen, setIsOpen] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
+  const [gridWidth, setGridWidth] = useState(0);
   const popoverRef = useRef(null);
   const scrollRef = useRef(null);
 
   const columns = 5;
-  const rowHeight = 40;
   const rowGap = 8;
-  const rowStride = rowHeight + rowGap;
   const groupPadding = 8;
   const groupHeaderHeight = 28;
   const groupSeparatorHeight = 1;
   const overscanRows = 2;
+  const baseCellSize = 40;
+  const minCellSize = 24;
+
+  // Square icon cells sized to the (possibly narrow) container so the grid never
+  // scrolls sideways and the buttons stay square. Before the first measure — and
+  // in wide contexts (Theme Settings) — this caps at the normal 40px cell; in the
+  // ~200px page-editor sidebar it shrinks to fit all `columns` without overflow.
+  // rowHeight drives both the rendered cell and the virtual-scroll offset math.
+  const cellSize =
+    gridWidth > 0
+      ? Math.min(
+          baseCellSize,
+          Math.max(minCellSize, Math.floor((gridWidth - groupPadding * 2 - rowGap * (columns - 1)) / columns)),
+        )
+      : baseCellSize;
+  const rowHeight = cellSize;
+  const rowStride = rowHeight + rowGap;
 
   const projectId = activeProject?.id;
   const iconsData = getIcons(projectId);
@@ -168,9 +184,18 @@ export default function IconInput({ value, onChange, options, allow_patterns, de
   useEffect(() => {
     if (!isOpen) return;
 
+    // Reopening mounts a fresh scroll container at scrollTop 0, but the `scrollTop`
+    // state persists from the previous open. Left stale, the virtualizer renders
+    // the rows for the old offset (down inside the spacer) while the viewport sits
+    // at the top — so the list looks empty until the first scroll resyncs it.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setScrollTop(0);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+
     const updateHeight = () => {
       if (scrollRef.current) {
         setContainerHeight(scrollRef.current.clientHeight);
+        setGridWidth(scrollRef.current.clientWidth);
       }
     };
 

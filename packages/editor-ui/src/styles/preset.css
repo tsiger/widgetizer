@@ -196,9 +196,27 @@
     font-size: 0.75rem !important;
   }
 
-  /* Icon-picker buttons fill their grid track so the grid never scrolls sideways */
+  /* Icon-picker buttons fill their grid track so the grid never scrolls sideways.
+     IconInput shrinks the cell HEIGHT to match in the narrow sidebar, so the
+     filled width now yields a square (not a tall rectangle). */
   .page-editor-settings .icon-grid-button {
     width: 100% !important;
+  }
+
+  /* react-colorful's saturation area is a fixed 200px square, which overflows the
+     narrow page-editor sidebar and forces a horizontal scrollbar. Make the popover
+     and picker fill the field width instead, so they can't spill past the panel
+     edge at any sidebar width. (Theme Settings keeps the default size.)
+     `!important` is required: react-colorful injects its `width: 200px` as an
+     UNLAYERED <style>, which beats this @layer components rule on cascade-layer
+     order regardless of specificity — only `!important` overrides it. */
+  .page-editor-settings .color-picker-popover {
+    width: 100%;
+  }
+
+  .page-editor-settings .color-picker-popover .react-colorful {
+    width: 100% !important;
+    height: 160px !important;
   }
 
   /* === THEME SETTINGS PAGE HEADERS === */

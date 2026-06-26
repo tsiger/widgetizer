@@ -12,14 +12,14 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open — **14 done · 2 deferred · 11 open**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open — **15 done · 2 deferred · 10 open**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
 - ⬜ [2. Bundled theme updates on the OSS desktop app (product/design decision)](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
 - ⬜ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene)](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene--was-experiment-docs-14)
 - ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss-was-experiment-docs-9-oss-portion)
 - ✅ [5. Consolidate preview-dispatch logic (route-mapping half) — DONE 2026-06-25](#5-consolidate-preview-dispatch-logic-route-mapping-half---done-2026-06-25--findings-doc-follow-up-session-task-16)
-- ⬜ [6. Narrow-sidebar icon-grid + color-picker visual review](#6-narrow-sidebar-icon-grid--color-picker-visual-review--c2-follow-up-session-task-18)
+- ✅ [6. Narrow-sidebar icon-grid + color-picker visual review — DONE 2026-06-26](#6-narrow-sidebar-icon-grid--color-picker-visual-review--c2-follow-up-session-task-18)
 - ✅ [7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — new-theme install path DONE 2026-06-25 (update-import path → §22)](#7-missed-port--theme-upload-collection-schema-gate-not-wired-builder-server---new-theme-install-path-done-2026-06-25-update-import-path--22--was-experiment-docs-8)
 - ✅ [8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — DONE 2026-06-25](#8-missed-port--pagecontroller-doesnt-thread-projectid-into-cleanupdeletedpagereferences-builder-server---done-2026-06-25--was-experiment-docs-9)
 - ✅ [9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — DONE 2026-06-25](#9-missed-port--mediajsx-doesnt-seed-collection-item-usage-titles-editor-ui---done-2026-06-25--was-experiment-docs-10)
@@ -166,7 +166,27 @@ persistent `SitePreviewLayout` pattern, this single dispatch is what both repos'
 
 ---
 
-## 6. Narrow-sidebar icon-grid + color-picker visual review  *(C2 follow-up; session task #18)*
+## 6. Narrow-sidebar icon-grid + color-picker visual review — ✅ DONE 2026-06-26  *(C2 follow-up; session task #18)*
+
+**Done note (2026-06-26):** Eyes-on pass in the running app surfaced three concrete issues, all fixed:
+- **Icon grid — stretched buttons.** `IconInput.jsx` hardcoded the cell at 40px; with the C2
+  `.icon-grid-button { width: 100% }` fill, the narrow sidebar produced ~26×40 *rectangles*. Made the
+  cell size width-aware (`cellSize` derived from the measured scroll-container width, capped at the 40px
+  `baseCellSize` so wide contexts/Theme Settings are untouched, floored at `minCellSize`); `rowHeight`
+  now follows it, so buttons are square at any panel width and the virtual-scroll math stays consistent.
+- **Icon grid — empty-on-reopen bug** (pre-existing, unrelated to C2). The `scrollTop` state persisted
+  across close→reopen; the fresh scroll container mounts at 0 while the virtualizer rendered rows for the
+  stale offset (down in the spacer), so the list looked empty until the first scroll resynced it. Reset
+  `scrollTop` (state + DOM) when the picker opens.
+- **Color picker — overflow / horizontal scrollbar.** `react-colorful`'s fixed 200px square overflowed the
+  (since-narrowed) sidebar. Scoped `.page-editor-settings .color-picker-popover .react-colorful` to
+  `width: 100% !important; height: 160px !important` (the `!important` is required — react-colorful injects
+  its `width: 200px` as an *unlayered* `<style>`, which beats this `@layer components` rule on cascade-layer
+  order regardless of specificity), gave the popover `width: 100%`, and tightened the popover inner padding
+  `p-3 → p-1` to reclaim width. Theme Settings keeps the default size (rule is sidebar-scoped).
+
+Tests: `IconInput.test.jsx` green (4); lint clean. CSS-only/cosmetic + the one virtualization bugfix — no
+unit surface for the visual sizing, verified in-app by the user. Original finding below.
 
 Surfaced post-**C2** (compact settings-sidebar CSS, `c74d714f`): the icon-grid and color
 picker in the narrow (~200 px) right page-editor settings sidebar looked slightly off after the
