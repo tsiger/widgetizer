@@ -17,10 +17,13 @@
  *    name); it derives the collections dir as a sibling of pagesDir.
  *  - Media usage is keyed by projectId; cleanupDeletedPageReferences syncs it via
  *    getMediaUsage(projectId, fileId) when a projectId is supplied.
- *  - The upstream `describe("remapCollectionItemLinkRefs …")` block is OMITTED:
- *    remapCollectionItemLinkRefs / remapCollectionItemMenuRefs are intentionally
- *    NOT ported to the new arch yet (deferred to Phase 6 preset-seeding) and are
- *    absent from utils/linkEnrichment.js.
+ *  - remapCollectionItemMenuRefs / remapCollectionItemLinkRefs ARE ported
+ *    (utils/linkEnrichment.js:554 / :588) and wired into project duplication
+ *    (controllers/projectController.js) + preset seeding (seedPresetCollections).
+ *    They are covered directly by the two describe blocks at the bottom of this
+ *    file (and indirectly by collectionPresetSeeding.test.js). (An earlier header
+ *    note here claimed they were "NOT ported / absent" — that was true only before
+ *    Phase 6 preset-seeding landed them; corrected per TODO §20.)
  *
  * Run with: node --test packages/builder-server/src/tests/collectionLinkEnrichment.test.js
  */
@@ -44,6 +47,8 @@ const {
   cleanupDeletedCollectionItemReferences,
   enrichNewProjectReferences,
   remapDuplicatedProjectUuids,
+  remapCollectionItemMenuRefs,
+  remapCollectionItemLinkRefs,
 } = await import("../utils/linkEnrichment.js");
 const { updateCollectionItemMediaUsage, getMediaUsage } = await import(
   "../services/mediaUsageService.js"
@@ -290,5 +295,88 @@ describe("remapDuplicatedProjectUuids — collection items", () => {
     const page = await readPage("home");
     assert.notEqual(item.uuid, "item-suite"); // item uuid regenerated
     assert.equal(page.widgets.w1.settings.cta.collectionItemUuid, item.uuid); // widget ref remapped
+  });
+});
+
+// ============================================================================
+// remapCollectionItemMenuRefs / remapCollectionItemLinkRefs (TODO §20)
+//
+// The preset-seeding remap pair: a preset's menus/widgets/items may carry stable
+// collectionItemUuid refs against the preset's OWN item uuids, which are
+// regenerated on seed — so the refs must follow an old->new uuid map. Exercised
+// indirectly via preset seeding + duplication; these block them directly.
+// ============================================================================
+
+describe("remapCollectionItemMenuRefs", () => {
+  it("remaps matching menu collectionItemUuid refs (incl. nested) and leaves unknown ones intact", async () => {
+    await writeMenu("main", [
+      { id: "i1", label: "Suite", link: "rooms/suite.html", collectionItemUuid: "old-suite" },
+      { id: "i2", label: "Other", link: "rooms/other.html", collectionItemUuid: "stays-as-is" },
+      {
+        id: "i3",
+        label: "Group",
+        items: [{ id: "i3a", label: "Deluxe", link: "rooms/deluxe.html", collectionItemUuid: "old-deluxe" }],
+      },
+    ]);
+
+    await remapCollectionItemMenuRefs(
+      PROJECT_FOLDER,
+      new Map([
+        ["old-suite", "new-suite"],
+        ["old-deluxe", "new-deluxe"],
+      ]),
+    );
+
+    const menu = await readMenu("main");
+    assert.equal(menu.items[0].collectionItemUuid, "new-suite"); // matched -> remapped
+    assert.equal(menu.items[1].collectionItemUuid, "stays-as-is"); // unknown -> untouched
+    assert.equal(menu.items[2].items[0].collectionItemUuid, "new-deluxe"); // nested -> remapped
+  });
+
+  it("is a no-op for an empty map", async () => {
+    await writeMenu("main", [{ id: "i1", label: "Suite", collectionItemUuid: "old-suite" }]);
+    await remapCollectionItemMenuRefs(PROJECT_FOLDER, new Map());
+    assert.equal((await readMenu("main")).items[0].collectionItemUuid, "old-suite");
+  });
+
+  it("does not throw when the menus dir is absent", async () => {
+    await fs.remove(getProjectMenusDir(PROJECT_FOLDER));
+    await remapCollectionItemMenuRefs(PROJECT_FOLDER, new Map([["old", "new"]]));
+  });
+});
+
+describe("remapCollectionItemLinkRefs", () => {
+  // isLinkObject requires an `href` key; only href-bearing link settings carrying a
+  // collectionItemUuid are remapped.
+  const link = (collectionItemUuid) => ({ href: "rooms/x.html", text: "X", target: "_self", collectionItemUuid });
+
+  it("remaps collectionItemUuid in page widget, global widget, and collection-item link settings", async () => {
+    await writePageWidgets("home", "page-home", {
+      w1: { type: "hero", settings: { cta: link("old-1") } },
+    });
+    await fs.outputJSON(path.join(getProjectPagesDir(PROJECT_FOLDER), "global", "header.json"), {
+      settings: { cta: link("old-1") },
+    });
+    await writeItem("rooms", "suite", { title: "Suite", cta: link("old-1") });
+
+    await remapCollectionItemLinkRefs(PROJECT_FOLDER, new Map([["old-1", "new-1"]]));
+
+    assert.equal((await readPage("home")).widgets.w1.settings.cta.collectionItemUuid, "new-1");
+    const header = await fs.readJSON(path.join(getProjectPagesDir(PROJECT_FOLDER), "global", "header.json"));
+    assert.equal(header.settings.cta.collectionItemUuid, "new-1");
+    assert.equal((await readItem("rooms", "suite")).settings.cta.collectionItemUuid, "new-1");
+  });
+
+  it("leaves an unknown collectionItemUuid intact", async () => {
+    await writePageWidgets("home", "page-home", { w1: { type: "hero", settings: { cta: link("not-in-map") } } });
+    await remapCollectionItemLinkRefs(PROJECT_FOLDER, new Map([["old-1", "new-1"]]));
+    assert.equal((await readPage("home")).widgets.w1.settings.cta.collectionItemUuid, "not-in-map");
+  });
+
+  it("does not touch a non-link value (no href) that happens to carry a collectionItemUuid", async () => {
+    // No `href` -> not a link object -> the guard must skip it.
+    await writeItem("rooms", "suite", { title: "Suite", meta: { collectionItemUuid: "old-1", note: "not a link" } });
+    await remapCollectionItemLinkRefs(PROJECT_FOLDER, new Map([["old-1", "new-1"]]));
+    assert.equal((await readItem("rooms", "suite")).settings.meta.collectionItemUuid, "old-1");
   });
 });

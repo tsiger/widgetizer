@@ -1045,7 +1045,20 @@ contract guard protects hosted's item-page render path too once added.
 
 ---
 
-## 20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — **trivial (comment-only)**  *(was experiment-docs §21)*
+## 20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — ✅ DONE 2026-06-26 (option b: comment + direct tests)  *(was experiment-docs §21)*
+
+**Done note (2026-06-26):** Chose option (b) — corrected the stale comment **and** added the missing direct
+coverage. Rewrote the `collectionLinkEnrichment.test.js` header note (the "OMITTED … intentionally NOT ported
+… absent" paragraph) to state the truth: both functions are present (`linkEnrichment.js:554`/`588`), wired
+into duplication (`projectController.js:104-105`) + preset seeding, and now covered directly here. Added two
+`describe` blocks (6 tests): `remapCollectionItemMenuRefs` (matched ref remapped incl. a **nested** submenu
+item, unknown ref untouched, empty-map no-op, absent-menus-dir no-throw) and `remapCollectionItemLinkRefs`
+(remap across **page widget + global header.json + collection item** link settings, unknown ref intact, and a
+non-link value with no `href` is **not** touched — pinning the `isLinkObject` guard). Reused the existing
+harness helpers (`writeMenu`/`writePageWidgets`/`writeItem`/`read*`) and the `remapDuplicatedProjectUuids`
+block's shapes. Non-vacuity: temporarily no-op'ing both production functions reds exactly the two "remaps"
+headline tests (the no-op/unknown/non-link cases correctly stay green — they assert non-change). Full backend
+suite 1277, lint clean. No production change. Pairs with the §17/§19 test-hygiene theme.
 
 Surfaced 2026-06-25 from a colleague's port-gap report. **Not a port gap — a misleading comment.**
 
