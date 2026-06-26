@@ -46,9 +46,9 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 ### Loading a Page
 
 1.  The `PageEditor` mounts and reads the `pageId` from the URL search parameters.
-2.  A `useEffect` hook, dependent on the `pageId` and the current active-project identity, triggers the data loading functions from the relevant stores. Project switches are also handled one level higher by `RequireActiveProject`, which resets project-scoped singleton stores and remounts the workspace subtree.
+2.  A `useEffect` hook, dependent on the `pageId` and the current active-project identity, triggers the data loading functions from the relevant stores. Project switches are also handled one level higher: `RequireActiveProject` remounts the workspace subtree by project ID, and the OSS shell resets project-scoped singleton stores via `projectSwitchCoordinator`.
 3.  It calls `usePageStore.getState().loadPage(pageId)` to fetch the page structure.
-4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. The editor no longer performs its own explicit project-switch store reset; that reset is coordinated by `RequireActiveProject`.
+4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. The editor no longer performs its own explicit project-switch store reset; that reset is coordinated by the OSS shell's `projectSwitchCoordinator`.
 5.  While data is being fetched, `LoadingSpinner` components are displayed to inform the user.
 
 ### Editing a Widget
@@ -61,7 +61,7 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
     - It calls `updateWidgetSettings()` from the `useWidgetStore` to update the data.
     - It calls `useAutoSave.getState().markWidgetModified()` to notify the save store that a change has occurred.
 6.  The `PreviewPanel`, subscribed to all relevant stores, detects the state change.
-7.  It triggers a master `updatePreview` function located in `src/queries/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
+7.  It triggers a master `updatePreview` function located in `packages/editor-ui/src/queries/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
 
 #### Preview Update Messages
 
@@ -86,7 +86,7 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 
 1.  The user clicks the **Preview** button in the `EditorTopBar`.
 2.  In the web app, this opens or reuses a named browser tab at the `/preview/:pageId` URL.
-3.  In Electron, the toolbar uses IPC to open or reuse a dedicated `BrowserWindow` for preview, maximizing and focusing that window on subsequent opens.
+3.  In Electron, the toolbar uses IPC to open or reuse a dedicated `BrowserWindow` for preview. New windows match the editor bounds with an offset; subsequent opens restore the window if minimized, then show and focus it.
 4.  The `/preview` route is a persistent `SitePreviewLayout` (separate from the main editor layout) that owns the toolbar + iframe stage; its children resolve a render for it. `PagePreview` handles `:pageId`; `CollectionItemPagePreview` handles `collection/:prefix/:slug`.
 5.  These children are **headless one-shot resolvers** (they render `null`): `PagePreview` fetches the page data, mints a render token, and reports the resulting render src up to the layout via outlet context. (It no longer mounts the live-edit `PreviewPanel`.)
 6.  `SitePreviewLayout` displays that src in a shared `PreviewStage` `<iframe>`, providing an accurate representation of the final published page. Because the layout is persistent, navigating page↔item never remounts the toolbar/iframe.
@@ -122,38 +122,9 @@ The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zu
 
 ### Navigation Protection (`useNavigationGuard`)
 
-The page editor implements comprehensive navigation protection to prevent users from accidentally losing unsaved changes when attempting to leave the editor.
+The page editor protects against accidental loss of unsaved changes when the user tries to leave the editor. The `PageEditor` activates this by calling `useNavigationGuard()` (in `packages/editor-ui/src/hooks/useNavigationGuard.js`); the hook operates entirely through side effects and returns nothing.
 
-#### Implementation (`src/hooks/useNavigationGuard.js`)
-
-The `useNavigationGuard` hook provides a two-layer protection system and operates automatically via side effects:
-
-**Layer 1: Browser Navigation Protection**
-
-- Listens for the browser's `beforeunload` event
-- Prevents tab closing, URL changes, and browser back/forward navigation when there are unsaved changes
-- Shows the browser's standard "unsaved changes" warning dialog
-
-**Layer 2: Internal Navigation Protection**
-
-- Uses React Router's `useBlocker` to intercept all navigation attempts
-- Automatically blocks navigation when unsaved changes are detected
-- Shows a custom confirmation dialog (`window.confirm`) before allowing navigation
-- Resets unsaved changes state if user confirms leaving
-
-#### Usage in Page Editor
-
-The page editor integrates navigation protection automatically:
-
-1. **Automatic Setup**: The `PageEditor` component calls `useNavigationGuard()` to activate protection
-2. **No Return Value**: The hook operates entirely through side effects - no functions are returned
-3. **Universal Protection**: Automatically protects against all navigation (sidebar clicks, page switching, browser back/forward)
-
-#### Key Features
-
-- **Smart Detection**: Only triggers protection when there are actual unsaved changes
-- **User Choice**: Allows users to choose whether to discard changes or stay on the page
-- **Seamless Integration**: Works with both browser navigation and React Router navigation
+It layers a `beforeunload` listener (tab close, URL change, browser back/forward) over React Router's `useBlocker` (in-app navigation), and only engages when the save store reports actual unsaved changes. On confirm-to-leave it resets the unsaved-changes state. For the full hook contract — both protection layers, the confirmation flow, and integration notes — see [Custom Hooks](core-hooks.md).
 
 ### Editing Global Widgets
 

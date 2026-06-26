@@ -11,17 +11,17 @@ The repo is an npm workspace (`"workspaces": ["packages/*"]` in the root `packag
 | Package | Role | Key exports | Depends on |
 | --- | --- | --- | --- |
 | `@widgetizer/core` | Shared FE/BE primitives: Liquid tags/filters/snippets, fonts config, 3 core widgets, browser helpers, **plus the adapter contracts, error types, `LIMIT_KEYS`, and runner-agnostic conformance suites** | `adapters.js`, `errors.js`, `test-helpers/*`, Liquid tags/filters, `config/fonts.json` | `liquidjs ^10.26.0` |
-| `@widgetizer/render-engine` | **Pure** LiquidJS rendering — functions take a per-project `deps` bag; never resolves projects, touches SQLite, or builds absolute paths | `renderWidget`, `renderPageLayout`, `renderEnqueuedAssetTags`, `widgetSupportsTransparentHeader` | `@widgetizer/core`, `liquidjs` |
-| `@widgetizer/builder-server` | Express 5 backend: routes/controllers/services/SQLite db layer | `setupBuilderServer`, `createEditorApp`, `initDb` | (does **not** depend on `adapters-local`) |
-| `@widgetizer/editor-ui` | Mountable React editor library | `EditorShell`, `EditorProvider`, `createEditorRoutes`, stores/hooks/queries, API client, extension system, Tailwind v4 preset | peer: `react`/`react-dom` >=19, `react-router-dom` >=7 |
-| `@widgetizer/adapters-local` | OSS (local FS + SQLite) implementations of the adapter contracts | `LocalScopeResolver`, `LocalPreviewScopeResolver`, `LocalStorageAdapter`, `LocalAssetStorageAdapter`, `LocalPublishAdapter`, `LocalLimitsAdapter` | `@widgetizer/core`, `@widgetizer/builder-server` |
+| `@widgetizer/render-engine` | Scope-free LiquidJS rendering — functions take a per-project `deps` bag; never resolves projects or touches SQLite, and reads templates/schemas from paths supplied by `deps` | `renderWidget`, `renderPageLayout`, `renderEnqueuedAssetTags`, `widgetSupportsTransparentHeader` | `@widgetizer/core`, `liquidjs` |
+| `@widgetizer/builder-server` | Express 5 backend: routes/controllers/services/SQLite db layer | `setupBuilderServer`, `createEditorApp`, `initDb` | `@widgetizer/core`, `@widgetizer/render-engine` (**not** `@widgetizer/adapters-local`) |
+| `@widgetizer/editor-ui` | Mountable React editor library | Root exports: extension API plus `EditorShell`, `EditorProvider`, `createEditorRoutes`; host-facing stores/hooks/queries/API clients are exposed through explicit subpath exports | `@widgetizer/core`; peers: `react`/`react-dom` >=19, `react-router-dom` >=7 |
+| `@widgetizer/adapters-local` | OSS (local FS + SQLite) implementations of the adapter contracts | `LocalScopeResolver`, `LocalPreviewScopeResolver`, `LocalStorageAdapter`, `LocalAssetStorageAdapter`, `LocalPublishAdapter`, `LocalLimitsAdapter` | `@widgetizer/core` |
 
 ### Shell directories (not packages)
 
 - `app/` — OSS frontend + server assembly. `app/server-common.js` exports `buildOssApp()` / `startOssServer()`: it constructs the six local adapters and calls `createEditorApp({ adapters })`. `app/src/main.jsx` is the FE entry; `app/src/App.jsx` composes routes via `createEditorRoutes`.
 - `electron/` — Electron shell. `electron/main.js` forks `electron/server-bootstrap.js`, which calls `startOssServer`.
 - `server.js` (repo root) — web entry; calls `startOssServer`.
-- `src/` — now backend-runtime assets only (currently just `src/utils/previewRuntime.js`).
+- `src/` — a handful of residual pre-refactor runtime assets that legitimately still live here: `src/utils/previewRuntime.js`, `src/utils/standalonePreviewTarget.js` (+ its `__tests__/standalonePreviewTarget.test.js`), and `src/core/assets/placeholder.svg`.
 
 ---
 
@@ -43,11 +43,11 @@ Defined as JSDoc typedefs in `packages/core/src/adapters.js`. Every storage/asse
 | --- | --- |
 | `ScopeResolver` | `resolveActor(req)`, `resolveScope(req)` |
 | `StorageAdapter` | `read`, `write`, `delete`, `list`, `exists`, `stat` — all `(scope, relativePath, …)` |
-| `AssetStorageAdapter` | `upload`, `download`, `delete`, `list`, `getUrl` — all `(scope, key, …)`; `getUrl` takes `{ context: 'editor' \| 'published' }` |
+| `AssetStorageAdapter` | `upload`, `download(scope, key, range?)`, `stat`, `delete`, `list`, `getUrl` — all `(scope, key, …)`. `download` accepts an optional inclusive `{ start, end }` byte range (powers HTTP 206 media seeking); `stat` returns `{ size }` for `Content-Length` / `Content-Range`; `getUrl` takes `{ context: 'editor' \| 'published' }` |
 | `PublishAdapter` | `publish(scope, renderStream, options)` |
 | `LimitsAdapter` | `getLimit(scope, key)` |
 
-A separate **`previewScopeResolver`** adapter key is also required (preview uses a token-scoped resolver distinct from the editor's `scopeResolver`).
+A separate **`previewScopeResolver`** adapter key is also required as a reserved seam. Current preview API routes use the normal `scopeResolver` through `resolveActiveProject`, and `GET /render/:token` dereferences only the preview token store; hosts can wire a distinct preview resolver without changing the required adapter shape.
 
 ### The `Scope` shape
 
@@ -65,11 +65,13 @@ The dual `projectId` (UUID, authz) / `folderName` (path-safe) split matches the 
 
 ### Limit keys & constants
 
-`LIMIT_KEYS` (the keys passed to `getLimit`): `MAX_UPLOAD_SIZE_BYTES`, `MAX_PAGES_PER_PROJECT`, `MAX_PROJECTS_PER_USER`, `MAX_MEDIA_BYTES`, `CUSTOM_DOMAIN_ALLOWED`, `ANALYTICS_TIER`, `FORM_SUBMISSIONS_PER_MONTH`, `MAX_WIDGETS_PER_PAGE`, `MAX_MENU_ITEMS`.
+`LIMIT_KEYS` (the keys passed to `getLimit`): `MAX_UPLOAD_SIZE_BYTES`, `MAX_PAGES_PER_PROJECT`, `MAX_PROJECTS_PER_USER`, `MAX_MEDIA_BYTES`, `CUSTOM_DOMAIN_ALLOWED`, `ANALYTICS_TIER`, `FORM_SUBMISSIONS_PER_MONTH`, `MAX_WIDGETS_PER_PAGE`, `MAX_MENU_ITEMS`, `MAX_COLLECTION_ITEMS`, `MAX_COLLECTIONS`.
 
 Exported constants: `MAX_WIDGETS_PER_PAGE = 5000`, `MAX_MENU_ITEMS = 1000`, `MAX_MENU_DEPTH = 32` (`MAX_MENU_DEPTH` is a hard structural cap, not a per-tenant limit key).
 
-OSS's `LocalLimitsAdapter` returns `Infinity` for the DoS keys so OSS stays unbounded/byte-neutral; the hosted `CloudLimitsAdapter` returns finite ceilings. See [Platform Security](core-security.md) for how these enforce cross-tenant safety.
+`MAX_COLLECTION_ITEMS` (per-collection item count) and `MAX_COLLECTIONS` (collection-type count per project) guard the collection write path and the export-time per-collection enumeration against unbounded growth.
+
+OSS's `LocalLimitsAdapter` returns the App Settings upload cap for `MAX_UPLOAD_SIZE_BYTES` and `Infinity` for the count/quota DoS keys so OSS stays otherwise unbounded/byte-neutral; the hosted `CloudLimitsAdapter` returns finite tenant ceilings. See [Platform Security](core-security.md) for how these enforce cross-tenant safety.
 
 ### Error types (`packages/core/src/errors.js`)
 
@@ -105,7 +107,7 @@ const { actorScopedRouter, projectScopedRouter, previewRouter } = setupBuilderSe
 | Router | Mounts |
 | --- | --- |
 | `actorScopedRouter` | `/projects`, `/themes`, `/settings`, `/core` |
-| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons` |
+| `projectScopedRouter` | `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections` |
 | `previewRouter` | `GET /render/:token` |
 
 `req.adapters` is attached **per-router** (not app-wide), so each router is self-sufficient wherever it is mounted.
@@ -146,26 +148,26 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 
 ### Provider / shell / routes
 
-- `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, routeBase, project, scope, plugins, slots })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`.
+- `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, standaloneCollectionPreviewPath, routeBase, project, scope, plugins, slots })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`.
 - `EditorShell` — adds the editor's own `Layout` on top of `EditorProvider`.
 - `createEditorRoutes({ … })` — returns a react-router route object. `EditorShell` deliberately owns **no** router, so the host supplies a single data-router context (needed for `useBlocker`).
 
-### Extension system (`src/extension/`)
+### Extension system (`packages/editor-ui/src/extension/`)
 
 - `buildRegistry(plugins)` — merges declarative `navItems` / `routes` / `commands` from all plugins.
-- `createHookRunner(plugins)` — `HOOK_EVENTS`: `beforePublish`, `afterPublish`, `beforeProjectDelete`, `afterProjectDelete`, `beforePageDelete`, `afterPageDelete`. `before*` run sequentially and the first `{ proceed: false }` halts; `after*` are fire-and-forget.
+- `createHookRunner(plugins)` — runs the lifecycle `HOOK_EVENTS` defined in `packages/editor-ui/src/extension/hooks.js` (`before*` run sequentially and halt on the first `{ proceed: false }`; `after*` are fire-and-forget).
 - `SLOT_NAMES`: `sidebarHeader`, `sidebarFooter`, `topbarLeft`, `topbarRight`, `topbarBanner`, `overlay`, `publishConfirmation`.
 - `builtinNavPlugin` — supplies the default nav with `NAV_GROUPS` `site` and `tools`.
 
 ### Tailwind v4 preset
 
-Exported as `@widgetizer/editor-ui/tailwind-preset` → `src/styles/preset.css` (CSS-first). A consumer does `@import "tailwindcss"` then `@import "@widgetizer/editor-ui/tailwind-preset"`. The preset uses `@source ".."` so it scans across the workspace symlink.
+Exported as `@widgetizer/editor-ui/tailwind-preset` → `packages/editor-ui/src/styles/preset.css` (the package.json export maps `./tailwind-preset` → `./src/styles/preset.css`; CSS-first). A consumer does `@import "tailwindcss"` then `@import "@widgetizer/editor-ui/tailwind-preset"`. The preset uses `@source ".."` so it scans across the workspace symlink.
 
 ---
 
-## Render-engine purity
+## Render-engine Scope-Free Boundary
 
-`@widgetizer/render-engine` never resolves projects, touches SQLite, or builds absolute paths. Its functions take a `RenderDeps` bag with these keys:
+`@widgetizer/render-engine` never resolves projects or touches SQLite. Its functions take a `RenderDeps` bag that supplies both capabilities and filesystem roots; the engine reads templates, schemas, snippets, menus, and icons from those supplied paths rather than importing builder-server services or concrete storage adapters. The bag has these keys:
 
 `projectId`, `projectDir` (absolute), `coreWidgetsDir`, `coreSnippetsDir`, `getProjectData()`, `getMediaFiles()`, `listPages()`, `sanitizeWidgetData()`, `preprocessThemeSettings()`, `buildRuntimeSiteIcons()`.
 
@@ -183,5 +185,6 @@ Custom ESLint rule `local/require-scope-arg` (`eslint-rules/require-scope-arg.js
 
 - [App Architecture](core-architecture.md) — how the packages assemble into the running app
 - [Platform Security](core-security.md) — the cross-tenant-safety contract these adapters uphold
+- `packages/editor-ui/src/extension/hooks.js` — the lifecycle hook events the extension system runs
 - [Electron App](core-electron.md) — how the workspace packages get bundled into the asar
 - [Project Identity](core-project-id-architecture.md) — the `projectId` (UUID) vs `folderName` split mirrored in `Scope`

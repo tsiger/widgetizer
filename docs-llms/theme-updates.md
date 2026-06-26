@@ -23,6 +23,8 @@ The `latest/` snapshot is only built in the **user data directory** — the seed
 
 When `buildLatestSnapshot` runs, it first syncs any `updates/` folders from the seed into the user data directory, then builds `latest/` there.
 
+> **Note.** Theme-update reads and writes go through direct `fs-extra` / `path` calls (the controller and service both `import fs from "fs-extra"`), **not** the scope-first storage adapter — this subsystem operates on the global `themes/` and `data/themes/` trees rather than per-project, scoped content. Source-directory and metadata resolution (`getThemeSourceDir`, `readThemeSourceMetadata`) is gated by a 5-second cache (`THEME_SOURCE_CACHE_TTL_MS = 5000` in `themeController.js`), so a freshly built `latest/` may take up to ~5s to become visible to readers; `buildLatestSnapshot` calls `invalidateThemeSourceCache(themeId)` to clear it eagerly.
+
 ### Version Structure
 
 Theme authors create update folders in the **seed** directory:
@@ -39,6 +41,7 @@ themes/                          # Seed directory (source, git-tracked)
     templates/
     menus/
     snippets/
+    collection-types/
     updates/                     # Version update folders (partial updates)
       1.1.0/
         theme.json               # Required, version must match folder name
@@ -125,33 +128,37 @@ The `latest/` folder is a **composed, ready-to-use snapshot** built in `data/the
 
 - If a file exists in multiple versions, the **latest version wins**
 - `latest/` is rebuilt when a theme author clicks "Update" on the Themes page
-- Projects read theme files from `latest/` (or base if `latest/` doesn't exist)
+- Projects read theme files from `latest/` (or base if `latest/` doesn't exist). `getThemeSourceDir` returns `latest/` only when `latest/theme.json` exists; otherwise it falls back to the root theme — and this resolution is subject to the 5s source cache described above.
 - The seed directory (`themes/{name}/`) is never modified — only the user data directory is
 
 ## Update Eligibility
 
 ### Updatable Paths
 
-These theme files can be updated in projects:
+These theme files can be updated in projects (the `UPDATABLE_PATHS` list in `themeUpdateService.js`):
 
-| Path             | Behavior                              |
-| ---------------- | ------------------------------------- |
-| `layout.liquid`  | Replaced with new version             |
-| `assets/`        | Entire folder replaced                |
-| `widgets/`       | Entire folder replaced                |
-| `snippets/`      | Entire folder replaced                |
-| `locales/`       | Entire folder replaced                |
-| `theme.json`     | **Merged** (see Settings Merge below) |
-| `screenshot.png` | Replaced with new version             |
+| Path                | Behavior                              |
+| ------------------- | ------------------------------------- |
+| `layout.liquid`     | Replaced with new version             |
+| `assets/`           | Entire folder replaced                |
+| `widgets/`          | Entire folder replaced                |
+| `snippets/`         | Entire folder replaced                |
+| `locales/`          | Entire folder replaced                |
+| `collection-types/` | Entire folder replaced (theme-owned)  |
+| `theme.json`        | **Merged** (see Settings Merge below) |
+| `screenshot.png`    | Replaced with new version             |
+
+`collection-types/` defines the schema/layout for collections and is **theme-owned**, so it is replaced wholesale on update. The collection **item data** under `data/projects/<folder>/collections/<type>/` is user content and stays protected — it is never touched by a theme update. See [Collections](core-collections.md).
 
 ### Protected Paths (Never Updated)
 
 User content is never modified:
 
-| Path       | Reason              |
-| ---------- | ------------------- |
-| `pages/`   | User's page content |
-| `uploads/` | User's media files  |
+| Path            | Reason                          |
+| --------------- | ------------------------------- |
+| `pages/`        | User's page content             |
+| `uploads/`      | User's media files              |
+| `collections/`  | User's collection item data     |
 
 ### Add-New-Only Paths
 
@@ -168,7 +175,7 @@ This allows theme authors to add new menus or page templates without overwriting
 
 ## Theme Settings Merge
 
-When updating `theme.json`, the system uses intelligent merging:
+When updating `theme.json`, the system uses intelligent merging (`mergeThemeSettings` in `themeUpdateService.js`):
 
 ### Rules
 
@@ -260,6 +267,8 @@ When a user uploads this zip:
 - **Existing theme**: Only new update versions are imported (existing versions are skipped)
 - **Up to date**: If all versions already exist, upload is rejected with a clear message
 
+Upload validation details (zip structure checks, `theme.json` requirements, version handling) live in [Theme Management](core-themes.md).
+
 **Note**: The `latest/` folder in the zip (if present) is ignored; it's always rebuilt from scratch.
 
 ### 2. User Receives Update Notification
@@ -319,35 +328,38 @@ Projects track theme update information:
 
 ## API Endpoints
 
-| Method | Endpoint                                | Description                                 |
-| ------ | --------------------------------------- | ------------------------------------------- |
-| `GET`  | `/api/themes`                           | Get all themes with `hasPendingUpdate` flag |
-| `GET`  | `/api/themes/:id/versions`              | Get all versions for a theme                |
-| `POST` | `/api/themes/:id/update`                | Build `latest/` for a single theme          |
-| `GET`  | `/api/themes/update-count`              | Get count of themes with pending updates    |
+| Method | Endpoint                                 | Description                                 |
+| ------ | ---------------------------------------- | ------------------------------------------- |
+| `GET`  | `/api/themes`                            | Get all themes with `hasPendingUpdate` flag |
+| `GET`  | `/api/themes/:id/versions`               | Get all versions for a theme                |
+| `POST` | `/api/themes/:id/update`                 | Build `latest/` for a single theme          |
+| `GET`  | `/api/themes/update-count`               | Get count of themes with pending updates    |
 | `GET`  | `/api/projects/:id/theme-updates/status` | Check if project has theme update available |
-| `PUT`  | `/api/projects/:id/theme-updates`       | Toggle project `receiveThemeUpdates` preference |
-| `POST` | `/api/projects/:id/theme-updates/apply` | Apply theme update to project               |
+| `PUT`  | `/api/projects/:id/theme-updates`        | Toggle project `receiveThemeUpdates` preference |
+| `POST` | `/api/projects/:id/theme-updates/apply`  | Apply theme update to project               |
 
 ## Implementation Files
 
+### Backend (`@widgetizer/builder-server`)
+
+- `packages/builder-server/src/controllers/themeController.js` — Theme CRUD, `latest/` snapshot building (`buildLatestSnapshot`), source resolution, and the 5s source cache
+- `packages/builder-server/src/services/themeUpdateService.js` — Project update logic, `UPDATABLE_PATHS`, and `mergeThemeSettings`
+- `packages/builder-server/src/utils/semver.js` — Version parsing and comparison
+- `packages/builder-server/src/utils/updateStatus.js` — Shared update-status shaping on top of semver comparison
+- `packages/builder-server/src/routes/themes.js`, `packages/builder-server/src/routes/projects.js` — REST routes listed above
+
 ### Frontend
 
-- `src/pages/Themes.jsx` - Theme management UI with update buttons
-- `src/stores/themeUpdateStore.js` - Zustand store for sidebar badge
-- `src/queries/themeManager.js` - API client functions
-
-### Backend
-
-- `server/controllers/themeController.js` - Theme CRUD and snapshot building
-- `server/services/themeUpdateService.js` - Project update logic and settings merge
-- `server/utils/semver.js` - Version parsing and comparison
-- `server/utils/updateStatus.js` - Shared update-status shaping on top of semver comparison
+- `app/src/pages/Themes.jsx` — Theme management UI with update buttons (admin shell)
+- `packages/editor-ui/src/stores/themeUpdateStore.js` — Zustand store for sidebar badge
+- `packages/editor-ui/src/queries/themeManager.js` — API client functions
 
 ---
 
 **See also:**
 
-- [Theme Management](core-themes.md) - Themes page and upload functionality
-- [Project Management](core-projects.md) - Project theme relationship
-- [Theming Guide](theming.md) - Theme structure and development
+- [Theme Management](core-themes.md) — Themes page, upload, and upload-validation details
+- [Project Management](core-projects.md) — Project theme relationship
+- [Collections](core-collections.md) — `collection-types/` vs. protected `collections/` item data
+- [Theming Guide](theming.md) — Theme structure and development
+- [Packages & Adapters](core-packages.md) — Package boundaries, adapters, scope-first contract

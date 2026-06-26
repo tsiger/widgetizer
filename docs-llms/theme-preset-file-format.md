@@ -1,6 +1,6 @@
 # Arch Theme Preset File Format Reference
 
-Structural reference for the JSON files that make up an Arch preset. This document covers file shapes, field requirements, and naming conventions — not design strategy. For design decisions, see [theme-preset-generator.md](theme-preset-generator.md).
+Structural reference for the JSON files that make up an Arch preset. This document covers file shapes, field requirements, and naming conventions — not design strategy. For design decisions, see [theme-preset-generator.md](theme-preset-generator.md). For the end-to-end authoring process, see [theme-preset-process.md](theme-preset-process.md).
 
 ---
 
@@ -28,14 +28,31 @@ themes/arch/presets/{preset-id}/
   menus/
     main-menu.json             # Primary navigation
     footer-menu.json           # Footer navigation
+  collections/                 # Optional — seeded collection items
+    <type>/
+      <item-slug>.json         # One file per collection item
+  media/                       # Optional — starter image binaries + manifest
+    images/
+      <preset-id>-...-.webp    # Original + responsive derivatives
+    manifest.json              # Media metadata for the seeded binaries
 ```
 
-Why this convention exists:
+Why the full-preset convention exists:
 
 - it keeps each preset self-contained
 - it avoids hidden inheritance from root demo content
 - it makes review and maintenance easier
 - it better matches Arch's goal of each preset being a complete industry-specific site
+
+### `collections/` and `media/`
+
+These two directories are present only when a preset seeds collection content (e.g. a blog/news list, a services grid, a projects portfolio):
+
+- **`collections/<type>/<item-slug>.json`** — one JSON file per collection item, seeded into the new project's `collections/<type>/` directory at project creation. The `<type>` directory name must match a collection type defined in `themes/arch/collection-types/<type>/` (see [core-collections.md](core-collections.md)). Item shape is documented in §11.
+- **`media/images/`** — the starter image binaries the preset references (originals plus their `-medium` / `-small` / `-thumb` responsive derivatives), copied into the project's `uploads/images/` on seed.
+- **`media/manifest.json`** — the media metadata (`filename`, `path`, `width`, `height`, `alt`, `sizes`, …) that seeds the per-project media records so the seeded binaries are tracked, usage-counted, and exportable. See [core-media.md](core-media.md).
+
+If a preset has no collections, omit both `collections/` and `media/` entirely.
 
 ### Screenshot exception
 
@@ -160,7 +177,7 @@ Each page is a single JSON file in `templates/`. The filename is the page slug w
 | `widgets` | Yes | Object keyed by widget instance IDs (see §3.1) |
 | `widgetsOrder` | Yes | Array of widget instance IDs defining render order |
 
-**Do not include `uuid`** in preset templates. UUIDs are generated automatically when a project is created from the preset.
+**Do not include `uuid`** in preset templates. UUIDs are generated automatically when a project is created from the preset. **Do not include `seo`** either — see §10.
 
 ### 3.1 Widget instance IDs
 
@@ -250,6 +267,29 @@ Some widgets have no block types (e.g., `image`, `scrolling-text`). For these, o
 Widget and block settings that are omitted fall back to the default defined in `schema.json`. Omit settings that match the default unless they are structural settings whose explicit presence improves readability.
 
 In practice, keep key structural settings such as `color_scheme`, `layout`, and alignment-related settings explicit when they define how the preset is composed, even if they match the default.
+
+### 3.7 Setting value types
+
+Every value in a `settings` object is keyed by a setting defined in the widget/block `schema.json`, and each setting has a `type` that dictates the value shape. The authoritative reference is [theming-setting-types.md](theming-setting-types.md) (input behavior) and [core-form-widget.md](core-form-widget.md) (the form renderer). The types you will encounter in preset content:
+
+| Setting type | Value shape in JSON |
+|--------------|---------------------|
+| `text` / `textarea` | Plain string (auto-escaped at render) |
+| `richtext` | Tiptap HTML string — emit with `\| raw`; sanitized server-side at save/render boundaries |
+| `code` | Raw string — not sanitized or transformed; ordinary `{{ }}` output still autoescapes, so emit only through explicit raw/custom sinks when intended |
+| `select` / `radio` | One of the option `value` strings |
+| `checkbox` / `toggle` | Boolean |
+| `number` / `range` | Number |
+| `color` | Hex color string |
+| `image` | Upload-path string (`"/uploads/images/…"`) |
+| `link` | Link object (see §7) |
+| `menu` | Menu ID/UUID string (see §6) |
+| `icon` | Icon name string (see [arch-icons-list.txt](arch-icons-list.txt)) |
+
+Notes:
+
+- **No `gallery` or `table` field in preset page/widget content.** Image collections in widgets are built from repeated `image`-typed blocks (e.g. the `gallery` widget), not a single gallery field. The `gallery` and `table` setting types do exist, but in Arch they are used in **collection-type** schemas (`themes/arch/collection-types/<type>/schema.json`), not in page widget settings — see [core-collections.md](core-collections.md).
+- **Richtext "emptiness".** A richtext value is never truly blank when cleared — the editor leaves markup like `<p></p>` or `<p>&nbsp;</p>`. Theme templates that key visibility off richtext content use the `rte_text` / `rte_blank` Liquid filters rather than `== blank`. This affects template authoring, not the preset JSON shape; presets simply store the HTML string.
 
 ---
 
@@ -400,7 +440,9 @@ Located in `menus/`. Each menu is a separate JSON file.
 |-------|----------|-------------|
 | `label` | Yes | Display text in the navigation |
 | `link` | Yes | URL — use `"{slug}.html"` for internal pages (e.g., `"about.html"`, `"index.html"`) |
-| `items` | Yes | Array of child menu items (empty array `[]` for leaf items). Supports up to 4 nesting levels. |
+| `items` | Yes | Array of child menu items (empty array `[]` for leaf items). The theme convention supports up to 4 nesting levels. |
+
+> The 4-level limit is a theme-authoring convention, distinct from the backend's hard caps (`MAX_MENU_DEPTH`, `MAX_MENU_ITEMS`). See [core-menus.md](core-menus.md).
 
 **Do not include `pageUuid`** in preset menu templates. UUIDs and `pageUuid` references are generated and enriched automatically at project creation time based on matching page slugs.
 
@@ -417,7 +459,7 @@ The header defaults to `"main-menu"` and the footer's `menu_block` defaults to `
 
 ## 7. Link Objects
 
-Link objects appear in button blocks and the header CTA. The format:
+Link objects appear in button blocks, menu items, and the header CTA. The format:
 
 ```json
 {
@@ -433,7 +475,30 @@ Link objects appear in button blocks and the header CTA. The format:
 | `text` | Yes | Button/link display text |
 | `target` | Yes | `"_self"` for same tab, `"_blank"` for new tab |
 
-**Do not include `pageUuid`** in link objects in preset templates. It is added automatically at project creation.
+**Do not include `pageUuid`** in link objects in preset templates. For internal-page links written as `"{slug}.html"`, the enrichment step adds the matching page's `pageUuid` automatically at project creation, so the link survives later page renames.
+
+### Collection-item link targets
+
+Links (and menu items) can also point at a **collection item** rather than a page. At runtime these carry two extra fields alongside `href`:
+
+```json
+{
+  "collectionType": "news",
+  "collectionItemUuid": "…",
+  "href": "blog/first-impressions-sell.html",
+  "text": "Read more",
+  "target": "_self"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `collectionType` | The collection type slug the item belongs to (e.g. `"news"`, `"services"`) |
+| `collectionItemUuid` | The item's stable UUID — resolved to the item's current slug at render time |
+
+These behave exactly like `pageUuid` for stability: the system stores the stable UUID and re-derives the live `href` from the target's current slug. When a project is created from a preset, or a project is duplicated, `collectionItemUuid` values are **auto-remapped** to the freshly seeded/regenerated item UUIDs (the same mechanism that remaps `pageUuid`).
+
+In **preset source** you normally do not hand-author `collectionItemUuid` — write the internal `href` and let seeding wire up the references, just as with page links. (Seeded item UUIDs are generated on seed, so any hand-written UUID would be stale.)
 
 ### Button blocks with two links
 
@@ -475,28 +540,84 @@ Used in widget `color_scheme` settings, the header, and the footer:
 
 ---
 
-## 9. Preset Registry Update
+## 9. Preset Registry (`presets.json`)
 
-After creating a preset, add an entry to `themes/arch/presets/presets.json`:
+`themes/arch/presets/presets.json` is the registry of all selectable presets. It is a single object with a `default` key (the preset chosen when none is specified) and a `presets` array:
 
 ```json
 {
-  "id": "{preset-id}",
-  "name": "Preset Name",
-  "description": "Industry label"
+  "default": "blank",
+  "presets": [
+    {
+      "id": "blank",
+      "name": "Blank",
+      "description": "Empty slate"
+    },
+    {
+      "id": "saffron",
+      "name": "Saffron",
+      "description": "Restaurant",
+      "liveDemo": "https://demos.widgetizer.org/saffron/"
+    }
+  ]
 }
 ```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | The `preset-id` — must match the preset directory name under `themes/arch/presets/` |
+| `name` | Yes | Display name shown in the project-creation picker |
+| `description` | Yes | Short industry label (e.g., `"Restaurant"`, `"Law firm"`) |
+| `liveDemo` | No | Public demo URL for the preset (omit for `blank`) |
+
+After creating a preset directory, add a matching entry to the `presets` array. The `default` value (`"blank"`) is the empty starter and should not normally change.
 
 ---
 
 ## 10. What Preset Templates Do Not Include
 
-Preset templates are **simpler** than project files. The following fields are added automatically at project creation and must **not** be present in preset templates:
+Preset templates are **simpler** than project files. The following fields are added/derived automatically and must **not** be present in preset templates:
 
 | Field | Where | Added by |
 |-------|-------|----------|
-| `uuid` | Pages, menus | Generated at project creation |
-| `pageUuid` | Menu items, link objects | Enriched at project creation by matching page slugs |
-| `seo` | Pages | Added with defaults at project creation |
+| `uuid` | Pages, menus, collection items | Generated at project creation / seed |
+| `pageUuid` | Menu items, link objects | Enriched at project creation by matching internal-page slugs |
+| `collectionItemUuid` / `collectionType` | Menu items, link objects | Wired/remapped from internal `href` at seed (see §7) |
+| `created` / `updated` | Menus | Added at project creation |
+| `seo` | Pages | **Per-page**, authored later in the page editor |
+
+On `seo`: it is **not** bulk-injected at project creation. SEO is a per-page concern — a page only gains an `seo` object once it is saved with SEO fields filled in via the page editor (`pageController` sanitizes and persists whatever the editor submits). Presets therefore omit `seo` entirely; it represents authored state, not starting content.
 
 Keep preset templates minimal — they represent the starting content, not the full runtime state.
+
+---
+
+## 11. Collection Item JSON
+
+When a preset seeds collections (§1), each item is a JSON file at `collections/<type>/<item-slug>.json`. The filename (without `.json`) is the item slug.
+
+```json
+{
+  "slug": "first-impressions-sell",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Three Cheap Fixes That Help a House Sell",
+    "date": "2026-02-27",
+    "excerpt": "A focused weekend of small jobs.",
+    "body": "<p>Buyers decide how they feel about a home within seconds…</p>",
+    "featured_image": "/uploads/images/keystoned-news-first-impressions-sell.webp"
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `slug` | Yes | Item slug — must match the filename without `.json` |
+| `schemaVersion` | Yes | Collection-item schema version (currently `1`) |
+| `settings` | Yes | Flat object of field values, keyed by settings defined in the collection type's `schema.json` (see [core-collections.md](core-collections.md)) |
+
+Notes:
+
+- `settings` is **flat** (v1 has no repeaters inside items). Each key must exist in `themes/arch/collection-types/<type>/schema.json`; value shapes follow the same setting types as §3.7.
+- Image fields (e.g. `featured_image`) reference `/uploads/images/…` paths that must exist in `media/images/` and be described in `media/manifest.json` (§1).
+- **Do not include `uuid`** in preset items — a stable UUID is assigned at seed. Internal links inside item settings follow the same slug-format-`href` rule as §7 and are enriched/remapped at seed.

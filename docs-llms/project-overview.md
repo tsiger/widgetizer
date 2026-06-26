@@ -13,7 +13,7 @@ Widgetizer is built on two fundamental principles: **simplicity** and **portabil
 Widgetizer uses a **hybrid model**:
 
 - **SQLite metadata store** (`data/widgetizer.db`) for projects, media metadata/usage, app settings, and export history
-- **Filesystem content store** for page JSON, menu JSON, global widgets, theme files, and uploaded media binaries
+- **Filesystem content store** for page JSON, menu JSON, global widgets, collection items, theme files, and uploaded media binaries
 
 This gives fast relational lookups and safer concurrent writes without giving up portable project content folders.
 
@@ -27,7 +27,7 @@ Because your site is just a collection of files, you own your data. You can easi
 
 ### Projects
 
-A **Project** is a container for your website. It holds all the pages, images, menus, and design settings specific to that site. You can manage multiple projects simultaneously, switching between them with a single click.
+A **Project** is a container for your website. It holds all the pages, media, menus, collections, and design settings specific to that site. You can manage multiple projects simultaneously, switching between them with a single click.
 
 ### Themes
 
@@ -40,12 +40,16 @@ Building pages in Widgetizer is as easy as arranging building blocks.
 - **What is a Widget?** Widgets are the main building blocks of your page. Examples include a **Hero Banner**, a **Text Section**, a **Contact Form**, or a **Gallery**. Each widget is self-contained and comes with its own set of customization options (like background colors, alignment, and spacing).
 - **What is a Block?** Blocks are smaller, flexible units _inside_ certain widgets. For example, if you have a "Features" widget, each individual feature is a **block**. This allows you to add as many features as you need, reorder them, or remove them without affecting the overall layout of the widget.
 
+### Collections
+
+A **Collection** holds a set of structured, repeatable content items — think a list of services, news posts, team members, or projects. Each item shares the same set of fields, and widgets can pull from a collection to display its items on a page. This keeps repetitive content consistent and editable in one place, separate from the page layouts that present it.
+
 ### Media Library
 
-The **Media Library** is your central hub for managing images.
+The **Media Library** is your central hub for managing uploaded files — images, files (PDF), and audio.
 
 - **Automatic Optimization**: When you upload an image, Widgetizer automatically creates different sizes to ensure your site loads instantly on both mobile and desktop.
-- **Usage Tracking**: The system knows exactly which page is using which image, protecting you from accidentally deleting something that's currently live on your site.
+- **Usage Tracking**: The system knows exactly which page is using which file, protecting you from accidentally deleting something that's currently live on your site.
 
 ### Navigation Menus
 
@@ -57,8 +61,8 @@ Easily manage your site's navigation through a simple drag-and-drop interface. C
 
 Working with Widgetizer follows a simple, three-step journey:
 
-1.  **Create**: Start a new project by choosing a theme that fits your needs.
-2.  **Build**: Use the visual editor to add widgets, customize their settings, and fill them with your content. Arrange blocks within widgets to create dynamic layouts.
+1.  **Create**: Start a new project by choosing a theme that fits your needs. Many themes also ship **presets** — ready-made starting points with sample content and styling you can build on.
+2.  **Build**: Use the visual editor to add widgets, customize their settings, and fill them with your content. Arrange blocks within widgets to create dynamic layouts, and surface collection items where you need them.
 3.  **Export**: When your site is ready, use the **Export** feature. Widgetizer converts your project into a collection of fast, secure, static HTML files.
 
 ---

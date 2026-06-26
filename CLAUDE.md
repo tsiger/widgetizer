@@ -2,7 +2,7 @@
 
 Visual website builder with theme support. Runs as an Electron desktop app or as a web app (Express backend + React frontend).
 
-> **Architecture note.** The codebase has been refactored from the old monolith (`src/` frontend + `server/` backend) into **npm-workspace packages behind adapter contracts**, so the backend can be embedded in a multi-tenant host (Widgetizer Hosted) without forking. The authoritative maps are `docs-llms/core-architecture.md` (orientation) and `docs-llms/core-packages.md` (adapters / DI / `Scope` / `LIMIT_KEYS`). Some `docs-llms/*` bodies still cite pre-refactor `src/...` / `server/...` paths for orientation and map them in a header note — treat the package paths below as current.
+> **Architecture note.** The codebase has been refactored from the old monolith (`src/` frontend + `server/` backend) into **npm-workspace packages behind adapter contracts**, so the backend can be embedded in a multi-tenant host (Widgetizer Hosted) without forking. The authoritative maps are `docs-llms/core-architecture.md` (orientation) and `docs-llms/core-packages.md` (adapters / DI / `Scope` / `LIMIT_KEYS`).
 
 ## Quick Reference
 
@@ -23,11 +23,11 @@ npm run preset:sync                # Sync theme presets
 
 ## Architecture
 
-- **Workspace packages** (`"workspaces": ["packages/*"]`): `@widgetizer/core` (shared FE/BE primitives + adapter contracts + error types + conformance suites), `@widgetizer/render-engine` (pure LiquidJS rendering over a `deps` bag — no `fs`, no `scope`), `@widgetizer/builder-server` (Express 5 backend — routes/controllers/services/SQLite, **adapter-agnostic**), `@widgetizer/editor-ui` (mountable React editor), `@widgetizer/adapters-local` (OSS local-FS + SQLite adapter implementations).
+- **Workspace packages** (`"workspaces": ["packages/*"]`): `@widgetizer/core` (shared FE/BE primitives + adapter contracts + error types + conformance suites), `@widgetizer/render-engine` (scope-free LiquidJS rendering over a `deps` bag — no project resolution/SQLite; reads templates/schemas from paths supplied in `deps`), `@widgetizer/builder-server` (Express 5 backend — routes/controllers/services/SQLite, **adapter-agnostic**), `@widgetizer/editor-ui` (mountable React editor), `@widgetizer/adapters-local` (OSS local-FS + SQLite adapter implementations).
 - **Shells**: `app/` (OSS frontend + server assembly — `app/server-common.js` builds the local adapters and calls `createEditorApp({ adapters })`; `app/src/` is the FE entry/composition), `server.js` (repo-root web entry → `startOssServer`), `electron/` (desktop wrapper → `electron/main.js`).
 - **Adapter contract**: the backend receives adapters by injection and is scope-first — every storage/asset/limits call takes a `scope` (`{ actor, projectId, folderName }`). `adapters-local` is consumed **only** by the OSS shells, never by `builder-server`; hosted swaps in cloud adapters. The `local/require-scope-arg` ESLint rule (in `eslint-rules/`) enforces the scope-first call shape.
-- **Hybrid storage** — SQLite (`data/widgetizer.db`) for metadata (projects, media metadata/usage, app settings, export history); filesystem (via the storage adapter) for content (page/menu/global JSON, theme files, uploaded binaries).
-- **Frontend**: React 19, Zustand (state), React Query, Tailwind CSS 4, Vite 7.
+- **Hybrid storage** — SQLite (`data/widgetizer.db`) for metadata (projects, media metadata/usage, app settings, export history); filesystem content is split between the `StorageAdapter` (page/menu/global JSON, theme files) and `AssetStorageAdapter` (uploaded binaries).
+- **Frontend**: React 19, Zustand (state), Tailwind CSS 4, Vite 7.
 - **Backend**: Express 5 (ES modules), LiquidJS templates, Sharp for images.
 - **Node**: Requires >=20.19.5.
 
@@ -36,7 +36,7 @@ npm run preset:sync                # Sync theme presets
 ```
 packages/               # npm-workspace packages (the app's code)
   core/                 # @widgetizer/core — shared primitives, adapter contracts, errors, conformance suites
-  render-engine/        # @widgetizer/render-engine — pure LiquidJS render over a deps bag
+  render-engine/        # @widgetizer/render-engine — scope-free LiquidJS render over a deps bag
   builder-server/       # @widgetizer/builder-server — Express backend (controllers/services/routes/db/tests)
     src/tests/          # Node test runner test files (*.test.js)
   editor-ui/            # @widgetizer/editor-ui — mountable React editor (components/pages/stores/hooks/queries)
@@ -64,14 +64,14 @@ For the detailed file-by-file map (and the admin-shell vs site-workspace routing
 ### Content Model
 
 - **SQLite metadata**: projects, media metadata/usage, app settings, export history (`data/widgetizer.db`).
-- **Filesystem content** (through the storage adapter + `scope`): pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, collection items (`collections/<type>/<slug>.json`), theme files, uploaded binaries.
+- **Filesystem content**: pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, collection items (`collections/<type>/<slug>.json`), and theme files through the storage adapter; uploaded binaries through the asset storage adapter.
 - Repository layer in `packages/builder-server/src/db/repositories/` (project, media, settings, export).
 
 ### Rendering Pipeline
 
-- `@widgetizer/render-engine` is a **pure** LiquidJS renderer: it imports no backend code and receives all capability (collection loaders, schemas, link prefixing) through a `deps` bag supplied by the shell (`renderingService.buildRenderDeps` in OSS, `buildCloudRenderDeps` in hosted).
+- `@widgetizer/render-engine` is a scope-free LiquidJS renderer: it imports no backend services and receives capability (collection loaders, schemas, link prefixing, filesystem paths for templates/schemas) through a `deps` bag supplied by the shell (`renderingService.buildRenderDeps` in OSS, `buildCloudRenderDeps` in hosted).
 - LiquidJS runs with `outputEscape: "escape"` (autoescape enabled globally). `| raw` is required for richtext output, SVG icons, embed code, and layout variables (`{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`).
-- Widget/field types: `text`/`textarea` (auto-escaped), `richtext` (DOMPurify + `| raw`), `code` (intentionally unescaped). Item pages render at `slugPrefix/itemSlug/` depth via `outputPathPrefix` + `prefixInternalHref`.
+- Widget/field types: `text`/`textarea` (auto-escaped), `richtext` (DOMPurify + `| raw`), `code` (not sanitized; ordinary `{{ }}` output still autoescapes, so emit only through explicit raw/custom CSS/script sinks when intended). Item pages render at `slugPrefix/itemSlug/` depth via `outputPathPrefix` + `prefixInternalHref`.
 
 ### Sanitization & Safety
 
@@ -122,7 +122,7 @@ Copy `.env.example` to `.env`. Key variables:
 npm run electron:dev   # Starts Vite + Express + Electron together
 ```
 
-Note: the `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev`, rebuilding `better-sqlite3` for the installed Electron runtime and validating locales. No need to run those by hand.
+Note: the `preelectron:dev` npm lifecycle hook runs automatically before `electron:dev`, rebuilding `better-sqlite3` for the local Node dev server and validating locales. Electron ABI rebuilds run during packaged builds in `scripts/build-electron.mjs`. No need to run those by hand.
 
 ### Server port (production)
 
@@ -162,7 +162,7 @@ Output goes to `dist-electron/`.
 - Compares the running app version against `latest-mac.yml` / `latest.yml`
 - If a newer version exists, the in-app update banner appears
 - Update flow: detect → user clicks Update → download with progress → user clicks Restart Now → install
-- Config in `package.json` under `build.publish` (provider: github, owner: tsiger, repo: widgetizer)
+- Config in `electron/builder.config.mjs` under `publish` (provider: github, owner: tsiger, repo: widgetizer)
 
 ## Important Patterns
 

@@ -1,154 +1,45 @@
-# Theme Presets Feature
+# Theme Presets
 
-> **Status: ✅ Implemented** — This feature has been fully implemented. The specification below reflects the current working implementation. See also: [Theming Guide — Presets](theming.md), [Core Themes](core-themes.md), [Core Projects](core-projects.md).
+> **Status: Implemented** — Conceptual overview. For the on-disk file shapes see [theme-preset-file-format.md](theme-preset-file-format.md); for how a preset is applied at project creation see [core-projects.md](core-projects.md); for authoring workflow see [theme-preset-process.md](theme-preset-process.md).
 
-## Context
+## What presets are
 
-Currently, each Widgetizer theme has a single set of demo content (templates, menus, global widgets) and a single set of default settings (colors, typography). If a theme author wants to showcase different visual styles or different page layouts (e.g., "restaurant site" vs. "agency site" vs. "portfolio"), they must create entirely separate themes — duplicating all widgets, layout, assets, and CSS.
+Each theme ships shared infrastructure (layout, widgets, assets, snippets, locales) plus a single set of demo content and default settings. **Presets** are named variants of one theme that override **settings** (colors, fonts, style toggles) and/or **demo content** (templates, menus, global widgets) without forking the theme. Authors get many showcase looks from one codebase; users pick a preset when creating a project.
 
-This feature introduces **presets**: named variants of a theme that can override **theme settings** (colors, fonts, etc.) and/or **demo content** (templates, menus, global widgets). The theme codebase (layout, widgets, assets, snippets) stays shared. Users pick a preset when creating a project.
+A preset is a directory under `themes/<theme>/presets/<id>/` plus an entry in the theme's `presets/presets.json` registry. The Arch reference theme uses presets heavily — `themes/arch/presets/presets.json` lists 30+ industry variants (bakery, law firm, yoga studio, etc.).
 
-## Design
+## The model
 
-### Theme directory structure with presets
+### Registry — `presets/presets.json`
 
-```
-themes/my-theme/
-  theme.json              # Base settings schema (unchanged)
-  layout.liquid           # Shared
-  screenshot.png          # Root screenshot (also default preset fallback)
-  assets/                 # Shared
-  snippets/               # Shared
-  locales/                # Shared (theme locale i18n files)
-  widgets/                # Shared
-  templates/              # Default demo content (backward compatible)
-  menus/                  # Default menus (backward compatible)
-  presets/                # NEW
-    presets.json          # Preset registry
-    restaurant/
-      preset.json         # Settings overrides (colors, fonts, etc.)
-      screenshot.png      # Preset preview
-      templates/          # Full page set for this preset
-        index.json
-        about.json
-        menu.json
-        contact.json
-        global/
-          header.json
-          footer.json
-      menus/              # Preset navigation
-        main-menu.json
-        footer-menu.json
-    agency/
-      preset.json         # Settings overrides
-      screenshot.png
-      templates/          # Full page set
-      menus/
-```
+A `default` field (which preset is pre-selected in the UI) plus a `presets` array of `{ id, name, description }` entries (optionally `liveDemo`). The default preset falls through to the theme root, so it needs no `presets/<id>/` directory. See [theme-preset-file-format.md](theme-preset-file-format.md) for the full shape.
 
-### presets.json (preset registry)
+### Per-preset overrides — `preset.json`
 
-```json
-{
-  "default": "default",
-  "presets": [
-    { "id": "default", "name": "Default", "description": "The base theme with default colors and layout" },
-    { "id": "restaurant", "name": "Restaurant", "description": "Warm tones and food-focused layout for dining establishments" },
-    { "id": "agency", "name": "Creative Agency", "description": "Bold and modern layout for creative professionals" }
-  ]
-}
-```
-
-- `"default"` field = which preset is pre-selected in UI
-- `"default"` preset falls through to root `templates/`, `menus/`, and `theme.json` defaults (no `presets/default/` directory needed)
-- All non-default presets include full `templates/`, `menus/`, `preset.json`, and `screenshot.png`
-- Themes without `presets/` work exactly as before (zero breaking changes)
-
-### preset.json (per-preset settings overrides)
-
-```json
-{
-  "settings": {
-    "standard_bg_primary": "#fefbf6",
-    "standard_accent": "#c4540a",
-    "heading_font": { "stack": "\"Playfair Display\", serif", "weight": 700 },
-    "corner_style": "rounded",
-    "spacing_density": "default",
-    "button_shape": "auto"
-  }
-}
-```
-
-Flat map of `setting_id → value`. Applied to the `default` field of matching settings in the project's `theme.json` at creation time. Only specifies what changes — schema stays in base `theme.json`.
-
-Settings can include both visual tokens (colors, fonts) and style settings (shapes, spacing density, etc.). Style settings control body classes that cascade through the CSS design system — see [Theme Design System — Style Classes](theme-design-system.md#style-classes-body-class-pattern).
+A flat `setting_id → value` map under a `settings` key. At creation time these values overwrite the `default` field of matching settings in the project's copied `theme.json`; the schema itself stays in the base `theme.json`. Overrides cover both visual tokens (colors, fonts) and style toggles (corner style, spacing density) that drive body classes through the CSS design system — see [arch-design-system.md](arch-design-system.md).
 
 ### Fallback chain
 
-For any preset:
-- **Templates**: `presets/{id}/templates/` → root `templates/`
-- **Menus**: `presets/{id}/menus/` → root `menus/`
-- **Settings**: `presets/{id}/preset.json` overrides → `theme.json` defaults
-- **Screenshot**: `presets/{id}/screenshot.png` → root `screenshot.png`
+For any preset, resolution falls back to the theme root when the preset omits a dimension:
 
-## Files to modify
+- **Templates**: `presets/<id>/templates/` → root `templates/`
+- **Menus**: `presets/<id>/menus/` → root `menus/`
+- **Settings**: `presets/<id>/preset.json` overrides → `theme.json` defaults
+- **Collections**: `presets/<id>/collections/` (item data only — schemas stay theme-only) → none
+- **Media**: `presets/<id>/media/` (starter image binaries + `manifest.json`) → none
+- **Screenshot**: `presets/<id>/screenshot.png` → root `screenshot.png`
 
-### 1. `server/controllers/themeController.js`
+Themes with no `presets/` directory behave exactly as before — presets are fully opt-in, and the `preset` param defaults to none.
 
-- **Add `resolvePresetPaths(themeId, presetId)` helper**: Returns `{ templatesDir, menusDir, settingsOverrides }` with fallback logic
-- **Add `getThemePresets(req, res)` endpoint**: Reads `presets/presets.json`, returns array of preset objects with `isDefault` flag
-- **Modify `copyThemeToProject`**: Add `"presets"` to the `allExcludes` list so preset data is never copied into projects
-- **Modify `getAllThemes`**: Add `presetCount` to each theme's response object (read from `presets/presets.json` if it exists)
+## Where it lives in code
 
-### 2. `server/controllers/projectController.js`
+- **Resolution + registry**: `resolvePresetPaths(themeId, presetId)` and `listThemePresets` / `getThemePresets` in `packages/builder-server/src/controllers/themeController.js`. Preset path helpers (`getThemePresetsDir`, `getThemePresetDir`) are in `packages/builder-server/src/config.js`. Resolution reads from the theme **source** dir (`latest/` if present, root otherwise) so presets delivered via theme updates are visible.
+- **Route**: `GET /:id/presets` in `packages/builder-server/src/routes/themes.js`; `getAllThemes` includes a `presets` count per theme.
+- **Creation flow**: `scaffoldProjectContent` in `packages/builder-server/src/utils/projectScaffold.js` applies preset menus, template-derived pages, and the settings overrides; `seedPresetCollections` / `seedPresetMedia` in `packages/builder-server/src/controllers/projectController.js` seed collection item data and starter media. See [core-projects.md](core-projects.md) for the full sequence.
+- **Frontend**: `getThemePresets` / `getPresetScreenshotUrl` in `packages/editor-ui/src/queries/themeManager.js`, consumed by the project-creation card grid in `app/src/components/projects/ProjectForm.jsx`.
 
-- **Modify `createProject`**:
-  - Accept optional `preset` from request body
-  - Call `resolvePresetPaths(theme, preset)` to get resolved templates/menus dirs and settings overrides
-  - Use resolved `templatesDir` instead of `getThemeTemplatesDir(theme)` for `processTemplatesRecursive`
-  - After theme copy, if preset has custom menus, replace the copied menus with preset menus
-  - After theme copy, apply `settingsOverrides` to project's `theme.json` (walk settings groups, update `default` field for matching IDs)
-  - Store `preset` in project metadata
+## Lifecycle notes
 
-### 3. `server/routes/themes.js`
-
-- Add route: `router.get("/:id/presets", themeController.getThemePresets)`
-
-### 4. `server/routes/projects.js`
-
-- Add optional `preset` field to POST validation: `body("preset").optional().isString().trim()`
-
-### 5. `src/components/projects/ProjectForm.jsx`
-
-- When theme selection changes, fetch `GET /api/themes/{themeId}/presets`
-- If presets exist, render a visual card grid below the theme dropdown
-- Each card shows preset screenshot + name, with selected state (pink border)
-- Default preset is pre-selected
-- `preset` value included in form data on submit
-
-### 6. `src/queries/projectManager.js` (or new `themeManager.js`)
-
-- Add `getThemePresets(themeId)` fetch function
-- Add `getPresetScreenshotUrl(themeId, presetId)` URL helper
-
-## Key implementation details
-
-**Menus handling**: `copyThemeToProject` copies root `menus/` into the project. If a preset has its own `menus/`, the project creation flow must replace the already-copied menus with the preset's menus before the enrichment step. Simplest approach: after `copyThemeToProject`, if preset menus exist, delete project's `menus/` dir and copy preset menus in.
-
-**Settings override application**: After `copyThemeToProject` copies `theme.json`, iterate all settings groups and update `item.default` for items whose `id` matches a key in `settingsOverrides`. This happens once at project creation — after that the project is independent.
-
-**Static file serving**: Screenshots are served from the themes directory via `/themes/*` (backed by `getThemesDir()` in `server/createApp.js`). Preset screenshots at `/themes/my-theme/presets/restaurant/screenshot.png` work automatically.
-
-**Theme updates**: Presets are only used at project creation time. Once a project is created, it's independent. Theme updates (`applyThemeUpdate`) replace project-owned theme infrastructure like widgets/layout/assets/snippets/locales, merge `theme.json`, and add new menus/templates without overwriting existing project content. Preset files can be updated via the existing version system (add/modify files in `updates/` version folders).
-
-**Backward compatibility**: Everything is opt-in. No `presets/` directory = no presets = existing behavior unchanged. The `preset` param in `createProject` is optional and defaults to null.
-
-## Verification
-
-1. **Backward compatibility**: Create a project with a theme that has no `presets/` dir — should work identically to current behavior
-2. **Settings-only preset**: Create a preset with only `preset.json` + `screenshot.png` — project should get root templates/menus but with overridden color/font defaults in `theme.json`
-3. **Full preset**: Create a preset with `templates/`, `menus/`, `preset.json` — project should get preset's pages, menus, and overridden settings
-4. **UI**: Select a theme with presets — card grid appears, default is pre-selected, changing preset updates form state
-5. **Screenshots**: Each preset card shows its own screenshot, with fallback to root screenshot if missing
-6. **Theme updates**: Apply a theme update to a project created from a preset — widgets/layout/locales update correctly, pages remain unchanged, and settings merge correctly
-7. Run existing tests: `npm test`
+- **Creation-time only**: presets are consumed once, at project creation. Afterward the project is independent — preset edits don't propagate. The `copyThemeToProject` flow excludes `presets/` (alongside `updates/` and `latest/`) so preset data never lands in a project.
+- **Screenshots**: served from the themes directory via `/themes/*`, so `presets/<id>/screenshot.png` resolves automatically.
+- **Theme updates**: handled by the version system, which refreshes shared infrastructure and merges `theme.json` without clobbering project content — see [theme-updates.md](theme-updates.md).

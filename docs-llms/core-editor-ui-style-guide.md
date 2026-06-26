@@ -1,12 +1,14 @@
-# Widgetizer Design System
+# Editor UI Style Guide
 
-A comprehensive guide to the visual design patterns, colors, typography, and component styling used in the Widgetizer application. Use this document to build new applications with a consistent look and feel.
+A standalone visual style guide for the **admin/editor app chrome** — the pink-accent + slate-neutral interface that wraps the Widgetizer builder (sidebar, page chrome, forms, tables, modals, toasts). Use this document to build new admin surfaces with a consistent look and feel.
+
+> **Scope.** This guide covers the **editor/admin UI only** (the React editor in `@widgetizer/editor-ui` and the OSS admin shell in `app/src`). It is **not** the design system for rendered websites — for the Arch theme's token system and front-end design language, see `arch-design-system.md`. For where these styles are wired into the repo, see [Implementation in this repo](#implementation-in-this-repo).
 
 ---
 
 ## Technology Stack
 
-- **CSS Framework:** Tailwind CSS v4.1.3
+- **CSS Framework:** Tailwind CSS `^4.1.x` (CSS-first config; no `tailwind.config.js`).
 - **Icon Library:** lucide-react
 - **Font:** System sans-serif (Tailwind's `font-sans`)
 
@@ -289,6 +291,8 @@ Used on buttons to create a subtle "lift" effect on hover.
 </button>
 ```
 
+> In the React editor, prefer the `<Button>` component (`packages/editor-ui/src/components/ui/Button.jsx`) over hand-rolled classes — it owns these `variant` / `size` maps. See [Implementation in this repo](#implementation-in-this-repo).
+
 #### Button Sizes
 
 | Size             | Classes               |
@@ -340,6 +344,8 @@ Square buttons for icon-only actions.
 </button>
 ```
 
+> The editor exposes these as the `<IconButton>` component (same file as `<Button>`), with `variant` values `neutral` / `primary` / `danger`.
+
 #### Icon Button Sizes
 
 | Size             | Classes |
@@ -351,6 +357,8 @@ Square buttons for icon-only actions.
 ---
 
 ### Form Inputs
+
+> The editor ships these as reusable component classes (`.form-input`, `.form-textarea`, `.form-select`, `.form-label`, …) in `packages/editor-ui/src/styles/preset.css`. The raw markup below is the canonical expansion of those classes; prefer the class names inside the editor.
 
 #### Text Input
 
@@ -847,16 +855,18 @@ Same structure but with:
 
 ### Sidebar Navigation (Dark Theme)
 
+The left admin sidebar collapses to an icon rail (`72px`) on narrow viewports and expands to the full width at the `md` breakpoint. The expanded width is driven by the `--sidebar-width` CSS variable (default `14rem`, i.e. Tailwind's `w-56`), so it is theme-tunable in one place rather than hard-coded. The logo width uses `--sidebar-logo-width` (default `10rem`).
+
 ```html
 <div
-  class="w-[72px] md:w-48 bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto"
+  class="w-[72px] md:w-[var(--sidebar-width)] bg-slate-900 text-white h-screen flex flex-col fixed left-0 top-0 overflow-y-auto"
 >
   <!-- Logo -->
   <div
     class="border-b border-slate-800 py-0 pb-2 mb-4 md:mb-4 md:py-4 px-2 md:px-4"
   >
-    <img src="/logo.svg" class="hidden md:block w-40" />
-    <img src="/logo-symbol.svg" class="md:hidden w-12 h-12 mx-auto" />
+    <img src="/widgetizer_logo.svg" class="hidden md:block w-[var(--sidebar-logo-width)]" />
+    <img src="/widgetizer_symbol.svg" class="md:hidden w-12 h-12 mx-auto" />
   </div>
 
   <!-- Navigation Sections -->
@@ -946,9 +956,12 @@ Same structure but with:
 
 **IMPORTANT:** All pages must follow this consistent structure:
 
-1. Layout component provides outer `p-8 max-w-7xl mx-auto` padding
-2. Page header (title, description, actions) sits OUTSIDE the white container
-3. Main content is wrapped in ONE white container: `bg-white rounded-xl border border-gray-200`
+1. `Layout` owns the sidebar offset, slate frame, and scroll-pane padding: `ml-[72px] md:ml-[var(--sidebar-width)]`, `bg-slate-900`, and inner `bg-slate-100 p-8 md:p-10`.
+2. `PageLayout` owns the page width: `mx-auto w-full max-w-7xl`.
+3. Page header (title, description, actions) sits OUTSIDE the white content panel.
+4. Main content is wrapped in ONE white panel: `bg-white rounded-md border border-gray-200 p-6`.
+
+The main content area is offset by the sidebar width via the same `--sidebar-width` variable (`ml-[72px] md:ml-[var(--sidebar-width)]`) so the rail and content never overlap.
 
 ```html
 <div class="flex h-screen overflow-hidden">
@@ -958,15 +971,21 @@ Same structure but with:
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 overflow-auto ml-[72px] md:ml-48 bg-gray-50">
-    <div class="p-8 max-w-7xl mx-auto">
+  <main class="relative z-30 flex flex-1 flex-col ml-[72px] md:ml-[var(--sidebar-width)] bg-slate-900">
+    <header class="flex items-center justify-between px-[18px] pt-[18px] text-white">
+      <!-- active project + topbar actions -->
+    </header>
+
+    <div class="flex flex-1 min-h-0 flex-col overflow-hidden rounded-[22px] border-[18px] border-slate-900 bg-slate-900">
+      <div class="flex-1 min-h-0 overflow-y-auto bg-slate-100 p-8 md:p-10">
+        <div class="mx-auto w-full max-w-7xl">
       <!-- Page Header (OUTSIDE white container) -->
       <div class="flex justify-between items-center mb-6">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 tracking-tight">
             Page Title
           </h1>
-          <p class="text-slate-500 mt-1">Optional description text.</p>
+              <p class="text-gray-700 mt-1">Optional description text.</p>
         </div>
         <div class="flex gap-2 items-center">
           <!-- Header actions (buttons) -->
@@ -974,10 +993,11 @@ Same structure but with:
       </div>
 
       <!-- Page Content (INSIDE white container) -->
-      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <!-- For tables: no padding, table fills container -->
-        <!-- For other content: add p-4 or p-6 -->
+          <div class="bg-white rounded-md border border-gray-200 p-6">
+        <!-- Page-specific content -->
         <!-- For sections: use border-b border-gray-200 dividers -->
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -1048,7 +1068,7 @@ Parent element needs `group` class:
 
 ### Global Focus Ring
 
-Applied to all focusable elements via CSS:
+Applied to all focusable elements via the editor's base layer (`*:focus-visible` in `preset.css`):
 
 ```css
 *:focus-visible {
@@ -1141,9 +1161,9 @@ focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500
 
 ## Tailwind Configuration
 
-This design system uses Tailwind CSS v4 with default configuration. No custom `tailwind.config.js` is required—all styling uses Tailwind's default utility classes.
+This style guide targets Tailwind CSS `^4.1.x` with a **CSS-first** setup — no `tailwind.config.js` is required. The editor relies almost entirely on Tailwind's default utility classes plus a handful of CSS variables (`--sidebar-width`, `--sidebar-logo-width`, `--shell-inset`, `--shell-radius`, `--shell-content-padding`) declared in the `@layer base` of the editor preset.
 
-To set up in a new project:
+To stand up the same look in a new project:
 
 ```bash
 npm install tailwindcss @tailwindcss/postcss postcss
@@ -1181,4 +1201,26 @@ export default {
 
 ---
 
-_This design system document is self-contained and includes all patterns needed to recreate the Widgetizer visual style in new applications._
+## Implementation in this repo
+
+These patterns are not just documentation — they are wired into concrete files. When changing the editor chrome, edit these rather than re-deriving styles:
+
+- **`packages/editor-ui/src/styles/preset.css`** — the shared Tailwind v4 preset consumed by every shell that mounts `<EditorShell>`. It owns the design tokens (`--sidebar-width: 14rem`, `--sidebar-logo-width`, `--shell-inset`, `--shell-radius`, `--shell-content-padding`), the `@layer base` focus ring, and the editor component classes (`.form-input`, `.form-textarea`, `.form-select`, `.form-label`, `.form-section`, `.form-actions`, `.page-editor-settings …`). Consumers import it **after** `@import "tailwindcss"` (it uses `@apply` and does not import Tailwind itself).
+- **`app/src/index.css`** — the OSS admin shell's entry CSS. It imports Tailwind, then `@import "@widgetizer/editor-ui/tailwind-preset"`, and keeps the page-global `body` base (background/typography) shell-side so each shell owns its own chrome.
+- **`packages/editor-ui/src/components/ui/Button.jsx`** — the canonical `<Button>` and `<IconButton>` components. The `variant` (`primary` / `secondary` / `ghost` / `danger` / `dark`) and `size` (`sm` / `md` / `lg`) maps here are the source of truth for the button classes documented above; the raw HTML snippets are their expansion.
+- **`packages/editor-ui/src/components/layout/Sidebar.jsx`** and **`Layout.jsx`** — apply the sidebar/main-content layout: `md:w-[var(--sidebar-width)]` on the rail and `md:ml-[var(--sidebar-width)]` on the content offset.
+
+### Narrow-sidebar (page editor) overrides
+
+The page editor renders its settings in a narrow right-hand sidebar wrapped in a `.page-editor-settings` container (`packages/editor-ui/src/components/pageEditor/SettingsPanel.jsx`). The `@layer components` block in `preset.css` adds density and overflow fixes scoped to that container, so the same form classes render tighter there than on the full-width Theme Settings page or the collection editor:
+
+- `.form-label`, `.form-input` / `.form-textarea` / `.form-select`, and `.form-description` drop to `text-xs` under `.page-editor-settings` (matching the left sidebar) while staying `text-sm` elsewhere.
+- `.setting-type-header` gets a flush `-mx-3` slate-100 band; the first header sits without top margin.
+- `.radio-input-group` stacks vertically (`flex-col items-start`) instead of wrapping.
+- `.settings-action-btn` shrinks to `0.75rem` (`!important`, to beat the `Button` `text-sm` utility in a later cascade layer).
+- `.icon-grid-button` fills its grid track (`width: 100%`) so the icon picker never scrolls sideways.
+- `.color-picker-popover .react-colorful` is forced to `width: 100%` / `height: 160px` (`!important`) because react-colorful injects an unlayered `width: 200px` that would otherwise overflow the narrow panel.
+
+---
+
+_This style guide is self-contained and covers the patterns needed to recreate the Widgetizer **editor/admin** visual style. For the rendered-site (theme) design language, see `arch-design-system.md`._

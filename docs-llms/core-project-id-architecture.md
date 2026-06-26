@@ -4,239 +4,67 @@
 
 Widgetizer uses a dual-identifier system for projects:
 
-- **Project ID**: A stable UUID that never changes
-- **Project FolderName**: A mutable, filesystem-friendly identifier used for directory names
+- **Project ID** — a stable UUID that never changes.
+- **Project FolderName** — a mutable, filesystem-friendly identifier used for directory names.
 
-This architecture decouples the project's identity from its filesystem representation, allowing users to rename projects without breaking references or requiring complex migrations.
+This decouples a project's identity from its filesystem representation, so users can rename projects without breaking API references or running migrations.
+
+The identity model is the foundation for the **scope-first** backend: every storage/asset/limits call carries a `scope` (`{ actor, projectId, folderName }`) that pairs the stable UUID with the current folderName. The `Scope` shape, the adapter contracts, and `LIMIT_KEYS` are owned by [core-packages.md](core-packages.md) — this doc covers only how UUID and folderName relate and where each is used.
 
 ## Core Principles
 
-### 1. Stable Identity (Project ID)
+### 1. Stable identity (Project ID)
 
-- Generated once using `randomUUID()` during project creation
-- Never changes throughout the project's lifetime
+- Generated once with `randomUUID()` during project creation (`packages/builder-server/src/controllers/projectController.js`).
+- Never changes for the project's lifetime.
 - Used for:
-  - API endpoints (`/api/projects/:projectId`)
-  - Frontend routing (`/projects/edit/:id`)
-  - SQLite-backed metadata references
-  - Cross-referencing between entities
+  - API routes (`/api/projects/:projectId`)
+  - Host/embedded frontend routing when the host mounts `createEditorRoutes` at a project-id path (e.g. `/projects/:projectId/editor`); the OSS app instead uses active-project routes like `/pages` and `/page-editor`
+  - SQLite metadata (the `projects` table and all cross-references)
+  - The `projectId` field of every `scope`
 
-### 2. Mutable Filesystem Path (Project FolderName)
+### 2. Mutable filesystem path (Project FolderName)
 
-- Generated from the project name using the shared backend slug helper path (`generateUniqueSlug()` / `sanitizeSlug()`)
-- Can change when the project is renamed
-- Stored as `project.folderName` in the SQLite `projects` table
-- Used for:
-  - Directory names (`data/projects/{folderName}/`)
-  - File path construction
-  - All filesystem operations
+- Derived from the project name via the shared slug helpers (`generateUniqueSlug()` / `sanitizeSlug()` in `packages/builder-server/src/utils/slugHelpers.js`).
+- Changes when a project is renamed.
+- Stored as `project.folderName` in the SQLite `projects` table.
+- Used for directory names (`data/projects/{folderName}/`) and the `folderName` field of every `scope`.
 
-## Implementation by Controller
+## How handlers get identity: scope, not resolution
 
-### Project Controller (`projectController.js`)
+The backend is **adapter-agnostic and scope-first**. Route handlers no longer resolve a UUID to a folderName and build absolute paths themselves. Instead:
 
-**Key Functions:**
+1. The `resolveActiveProject` middleware (`packages/builder-server/src/middleware/resolveActiveProject.js`) delegates to the injected `req.adapters.scopeResolver` to produce a `scope`. In OSS this is the local resolver (singleton active project); hosted swaps in its own.
+2. The middleware attaches `req.scope` (the resolved `{ actor, projectId, folderName }`) and `req.activeProject` (the full project row, for handlers that still read it).
+3. It also enforces the HTTP-layer write-guard: writes whose `x-project-id` header or `:projectId` route param disagree with the resolved scope are rejected with `409 PROJECT_MISMATCH`.
 
-- `createProject()`: Generates both UUID and folderName
-- `updateProject()`: Handles folderName changes and directory renaming
-- `duplicateProject()`: Creates new UUID but derives folderName from name
-- `importProject()`: Generates a unique folderName through the same shared uniqueness helper path
-
-**Pattern:**
+Handlers then pass `req.scope` straight to the injected adapters:
 
 ```javascript
-const newProject = {
-  id: randomUUID(), // Stable UUID
-  folderName: await generateUniqueSlug(name, existsCheck), // Filesystem identifier
-  name,
-  // ...
-};
+// mediaController.uploadProjectMedia — no path building, no folderName lookup
+const scope = req.scope;
+const assetStorage = req.adapters.assetStorage;
+const keys = await assetStorage.list(scope, `${subdir}/`);
+
+// pageController — limit checks read through the limits adapter
+const widgetCap = await req.adapters?.limits?.getLimit?.(req.scope, LIMIT_KEYS.MAX_WIDGETS_PER_PAGE);
 ```
 
-**Directory Operations:**
+The adapter owns the mapping from `scope.folderName` (and `scope.projectId`) to physical storage. The controller never builds an absolute path from user input. See [core-packages.md](core-packages.md) for the adapter contracts and DI seam, and [core-security.md](core-security.md) for the cross-tenant write-guard / resolver authz floor.
 
-- Uses `project.folderName` for `getProjectDir(folderName)`
-- Renames directories when folderName changes
-- Preserves UUID in project metadata
+## Still-path-based exceptions
 
----
+Some reads have not yet moved behind the storage adapter and continue to resolve a folderName and join an absolute path through `packages/builder-server/src/config.js` helpers. These are the documented exceptions, not the pattern:
 
-### Page Controller (`pageController.js`)
+- **Project theme settings** — `themeController.readProjectThemeData()` resolves the folderName via `getProjectFolderName()` and reads `theme.json` through `getProjectThemeJsonPath(projectFolderName)`. The save path (`saveProjectThemeSettings`) does the same.
+- **Some legacy page reads** — `pageController.listProjectPagesData()` / `readGlobalWidgetData()` still take a folderName argument and use `getProjectPagesDir()` / `getPagePath()` / `getProjectDir()` directly.
+- **Project lifecycle directory ops** — create/rename/duplicate/import in `projectController.js` operate on directories by folderName with `fs-extra` (see Renaming, below). These are inherently filesystem-shaped and run in the OSS shell.
 
-**Rationale:** Pages are stored as JSON files within a project's directory. The controller must resolve the project UUID to its folderName to access the correct filesystem path.
+When these migrate behind the adapter, the folderName resolution disappears with them.
 
-**Pattern:** The `resolveActiveProject` middleware attaches the active project to the request. Controllers use `req.activeProject` to get the ID and folderName.
+## Foldername resolution helper
 
-```javascript
-// req.activeProject is set by resolveActiveProject middleware
-const { id: activeProjectId, folderName: projectFolderName } = req.activeProject;
-
-// Use folderName for all file operations
-const pagePath = getPagePath(projectFolderName, pageSlug);
-```
-
-**Key Functions:**
-
-- `getAllPages()`: Lists pages from `data/projects/{folderName}/pages/`
-- `createPage()`: Creates page file in correct project directory
-- `updatePage()`: Handles page slug changes within project directory
-- `duplicatePage()`: Copies page files using project folderName
-
-**Why This Matters:**
-
-- API receives project UUID in routes
-- Filesystem requires project folderName for paths
-- Controller bridges this gap by resolving UUID → folderName
-
----
-
-### Menu Controller (`menuController.js`)
-
-**Rationale:** Menus are stored as JSON files in `data/projects/{folderName}/menus/`. Like pages, menu operations require folderName resolution.
-
-**Pattern:**
-
-```javascript
-const activeProjectId = projectRepo.getActiveProjectId();
-const activeProject = projectRepo.getProjectById(activeProjectId);
-const projectFolderName = activeProject.folderName;
-
-const menusDir = getProjectMenusDir(projectFolderName);
-const menuPath = getMenuPath(projectFolderName, menuId);
-```
-
-**Key Functions:**
-
-- `getAllMenus()`: Reads from `{folderName}/menus/`
-- `createMenu()`: Writes to `{folderName}/menus/{menuId}.json`
-- `updateMenu()`: Updates menu file in correct directory
-- `duplicateMenu()`: Copies menu using project folderName
-
-**Special Consideration:** The `getMenuById()` function (used by rendering service) receives a project directory path directly, so it doesn't need folderName resolution.
-
----
-
-### Media Controller (`mediaController.js`)
-
-**Rationale:** Media files (images) are stored in `data/projects/{folderName}/uploads/`. The controller handles file uploads and must ensure files are stored in the correct project directory.
-
-**Pattern:**
-
-```javascript
-const projectFolderName = await getProjectFolderName(projectId);
-const imagesDir = getProjectImagesDir(projectFolderName);
-const imagePath = getImagePath(projectFolderName, filename);
-```
-
-**Key Functions:**
-
-- `uploadProjectMedia()`: Stores files in `{folderName}/uploads/images/`
-- `getProjectMedia()`: Reads media metadata from SQLite; media binaries still come from `{folderName}/uploads/*`
-- `deleteProjectMedia()`: Removes files from correct project directory
-- `serveProjectMedia()`: Serves files from `{folderName}/uploads/`, sets `Content-Type` via `getContentType()` from `server/utils/mimeTypes.js`
-
-**Multer Integration:** The multer storage configuration uses `getProjectFolderName()` to determine the upload destination dynamically.
-
----
-
-### Theme Controller (`themeController.js`)
-
-**Rationale:** Theme settings are stored per-project in `data/projects/{folderName}/theme.json`. Theme operations must use the project folderName to access these files.
-
-**Pattern:**
-
-```javascript
-const projectFolderName = await getProjectFolderName(projectId);
-const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
-```
-
-**Key Functions:**
-
-- `getProjectThemeSettings()`: Reads from `{folderName}/theme.json`
-- `saveProjectThemeSettings()`: Writes to `{folderName}/theme.json`
-- `copyThemeToProject()`: Copies theme files to `{folderName}/` directory
-
-**Why FolderName Resolution:**
-
-- API endpoints use project UUID
-- Theme files are stored in project directory
-- Controller resolves UUID to folderName for file access
-
----
-
-### Export Controller (`exportController.js`)
-
-**Rationale:** Exports generate static HTML from project data. The controller must read from the correct project directory using the folderName.
-
-**Pattern:**
-
-```javascript
-const project = projectRepo.getProjectById(projectId);
-const projectFolderName = project.folderName;
-const projectDir = getProjectDir(projectFolderName);
-```
-
-**Key Functions:**
-
-- `exportProject()`: Reads project files from `{folderName}/` directory
-- Generates static site in `data/publish/{folderName}-v{version}/`
-- Uses folderName for all file path construction
-
-**Export Directory:** Exports are stored in the publish directory using the project folderName and version for consistency and human-readability.
-
----
-
-### Preview Controller (`previewController.js`)
-
-**Rationale:** Preview generation requires reading project files and rendering them. The controller must resolve the project UUID to access the correct directory.
-
-**Pattern:** Uses `req.activeProject.id` from middleware for project-scoped endpoints. The internal `generatePreviewHtml()` helper still reads the active project ID directly since it's called within already-validated request handlers.
-
-```javascript
-const activeProjectId = req.activeProject.id;
-const projectFolderName = await getProjectFolderName(activeProjectId);
-const projectDir = getProjectDir(projectFolderName);
-```
-
-**Key Functions:**
-
-- `generatePreview()`: Renders page preview from project files
-- `getGlobalWidgets()`: Reads global widgets from `{folderName}/pages/global/`
-- `saveGlobalWidget()`: Saves global widgets to correct directory (middleware handles mismatch guard)
-- `serveAsset()`: Serves static assets from project directory
-
-**Rendering Service Integration:** The preview controller passes the project UUID to the rendering service, which internally resolves it to the folderName.
-
----
-
-### Rendering Service (`renderingService.js`)
-
-**Rationale:** The rendering service needs to load templates and data from project directories. It uses folderName resolution to access the correct filesystem paths.
-
-**Pattern:**
-
-```javascript
-const projectFolderName = await getProjectFolderName(projectId);
-const projectDir = getProjectDir(projectFolderName);
-```
-
-**Key Functions:**
-
-- `renderWidget()`: Loads widget templates from `{folderName}/widgets/`
-- `renderPageLayout()`: Loads page templates from `{folderName}/templates/`
-- Uses folderName for all file system access
-
-**Template Resolution:** Templates are stored in the project directory, requiring folderName-based path resolution.
-
----
-
-## Helper Utility
-
-### `getProjectFolderName()` (`server/utils/projectHelpers.js`)
-
-**Purpose:** Centralized function to resolve a project UUID to its folderName, with ownership validation.
-
-**Implementation:**
+`getProjectFolderName()` (`packages/builder-server/src/utils/projectHelpers.js`) maps an existing UUID to its folderName, and is used only by the still-path-based call sites above. Authorization is the injected `ScopeResolver`'s responsibility; this helper only validates existence and performs the UUID → folderName lookup:
 
 ```javascript
 export async function getProjectFolderName(projectId) {
@@ -250,331 +78,46 @@ export async function getProjectFolderName(projectId) {
 }
 ```
 
-**Usage:**
+Project resolution errors are centralized in `packages/builder-server/src/utils/projectErrors.js` (`PROJECT_ERROR_CODES`, `isProjectResolutionError()`, `handleProjectResolutionError()`), so controllers return consistent 404/500 responses and services propagate failures without masking them.
 
-- Imported by controllers that need folderName resolution
-- Provides consistent error handling
-- Throws if the project cannot be resolved so callers can respond with 404/500
+## Renaming projects
 
-### Project Error Helpers (`server/utils/projectErrors.js`)
+Renaming is a directory move plus a metadata update — the UUID is untouched. In `projectController.updateProject()`:
 
-Centralized error codes and helpers used by controllers/services to detect and respond to project resolution failures.
+1. The new folderName is validated (`/^[a-z0-9-]+$/`) and checked for uniqueness against other projects (`projectRepo.projectFolderExists`).
+2. The directory is moved old → new. For Windows compatibility this is `fs.copy(oldDir, newDir)` then `fs.remove(oldDir)` (with cleanup of `newDir` if the remove fails), not `fs.rename`.
+3. `projectRepo.updateProject()` writes the new `folderName` to SQLite.
+4. The Project ID stays the same, so API routes, frontend URLs, and metadata references keep working.
 
-```javascript
-export const PROJECT_ERROR_CODES = {
-  PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
-  PROJECT_DIR_MISSING: "PROJECT_DIR_MISSING",
-};
+`duplicateProject()` and `importProject()` follow the same shape but generate a **new** UUID and a fresh unique folderName.
 
-export function isProjectResolutionError(error) {
-  if (!error || !error.code) return false;
-  return Object.values(PROJECT_ERROR_CODES).includes(error.code);
-}
-```
+## Export naming
 
-**Usage:**
-
-- Controllers use `handleProjectResolutionError(res, error)` to return consistent 404/500 responses.
-- Services use `isProjectResolutionError(error)` to propagate resolution failures without masking them.
-
----
-
-## Benefits of This Architecture
-
-### 1. **Stable References**
-
-- API endpoints and routes never break when projects are renamed
-- Frontend can bookmark/share project URLs that remain valid
-- No need to update references when slug changes
-
-### 2. **User-Friendly Filesystem**
-
-- Project directories have readable, meaningful names
-- Easy to locate and manage projects in the filesystem
-- FolderName changes are transparent to the user
-
-### 3. **Flexibility**
-
-- Projects can be renamed without data migration
-- FolderName conflicts are handled gracefully
-- System can evolve without breaking existing projects
-
-### 4. **Separation of Concerns**
-
-- Identity (UUID) is separate from representation (folderName)
-- Each serves its specific purpose
-- Clear boundaries between API and filesystem layers
-
----
-
-## Renaming Projects
-
-When a project's name (and thus folderName) changes:
-
-1. New folderName is generated from the new name
-2. Project directory is renamed from old folderName to new folderName
-3. All file references use the new folderName
-4. Project ID remains unchanged
-5. API endpoints continue to work with the same UUID
-
----
-
-## Best Practices
-
-### For Controllers
-
-1. **Always resolve UUID to folderName** before filesystem operations
-2. **Use `getProjectFolderName()` helper** for consistency
-3. **Handle folderName changes** by renaming directories
-4. **Preserve UUID** in all project metadata
-
-### For Frontend
-
-1. **Use project UUID** in routes and API calls
-2. **Display project name** to users, not folderName or UUID
-3. **Handle folderName changes** transparently (no UI impact)
-
-### For File Operations
-
-1. **Use folderName** for all `getProjectDir()`, `getPagePath()`, etc.
-2. **Never use UUID** for filesystem paths
-3. **Validate folderName** before directory operations
-4. **Handle missing directories** gracefully
-
----
-
-## Common Patterns
-
-### Reading Project Data
+Exports use the folderName for human-readable bundle directories under the publish dir (`exportController.js`):
 
 ```javascript
-// 1. Get project by UUID
-const activeProjectId = projectRepo.getActiveProjectId();
-const project = projectRepo.getProjectById(activeProjectId);
-
-// 2. Get folderName
-const projectFolderName = project.folderName;
-
-// 3. Use folderName for file operations
-const filePath = getProjectDir(projectFolderName);
+const outputDir = path.join(getPublishDir(), `${projectFolderName}-v${version}`);
 ```
 
-### Creating Project Resources
+Bundles land at `data/publish/{folderName}-v{version}/`. The export read-back guard (`exportDirBelongsToScope`) anchors ownership to the active scope's `folderName` and the `<folderName>-v<digits>` shape, rejecting any separator or parent-segment token first. See [core-export.md](core-export.md) for the full export pipeline.
 
-```javascript
-// 1. Resolve folderName from project UUID
-const projectFolderName = await getProjectFolderName(projectId);
+## Why this split
 
-// 2. Construct file path
-const resourcePath = path.join(getProjectDir(projectFolderName), "resource.json");
-
-// 3. Perform file operation
-await fs.outputFile(resourcePath, data);
-```
-
-### Handling FolderName Changes
-
-```javascript
-// 1. Detect folderName change
-if (updatedProject.folderName !== originalProject.folderName) {
-  // 2. Rename directory
-  const oldDir = getProjectDir(originalProject.folderName);
-  const newDir = getProjectDir(updatedProject.folderName);
-  await fs.copy(oldDir, newDir);
-  await fs.remove(oldDir);
-}
-```
-
----
+- **Stable references** — API routes and frontend URLs never break on rename; no reference rewrites when the slug changes.
+- **Human-readable filesystem** — project directories carry meaningful names, so backups, debugging, and support stay legible.
+- **No migrations on rename** — a name change is a directory move plus one metadata write.
+- **Clean tenant seam** — pairing a stable `projectId` with a current `folderName` inside `scope` lets hosted reuse the same handlers with a different resolver and storage backend.
 
 ## Troubleshooting
 
-### "Project not found" errors
-
-- Verify project UUID exists in SQLite (`projects` table)
-- Check if folderName resolution is working
-- Ensure directory exists with correct folderName
-
-### File path errors
-
-- Confirm you're using folderName, not UUID, for paths
-- Check `getProjectFolderName()` is being called
-- If resolution fails, expect a 404/500 instead of a fallback
-
-### FolderName conflicts
-
-- System automatically appends numbers to ensure uniqueness
-- Check folderName generation logic in `projectController.js`
-- Verify `generateUniqueSlug()` is being used
-
----
-
-## Summary
-
-The Project ID/FolderName architecture provides a robust foundation for managing projects in Widgetizer. By separating identity (UUID) from filesystem representation (folderName), the system achieves both stability and flexibility. Controllers consistently resolve UUIDs to folderNames for file operations, ensuring that projects can be renamed without breaking functionality or requiring complex migrations.
-
----
-
-## Architectural Comparison: UUID+FolderName vs UUID-Only
-
-### Alternative Approach: UUID-Only Filesystem
-
-An alternative architecture would use **UUIDs exclusively** for all filesystem operations, with human-readable folderNames **only** for exports:
-
-- Project directories: `data/projects/a7f3c2b1-4d5e-6789-0abc-def123456789/`
-- Exports: `data/publish/my-awesome-project/` (folderName-based)
-
-### Advantages of UUID-Only Approach
-
-#### 1. Architectural Simplicity
-
-- No folderName resolution needed in controllers
-- Single identifier for all operations
-- Eliminate `getProjectFolderName()` helper
-- No directory renaming logic
-- Cleaner, more straightforward code
-
-#### 2. Zero Naming Conflicts
-
-- Guaranteed uniqueness (mathematical certainty)
-- No folderName sanitization or conflict detection
-- Simpler project creation flow
-- No awkward chained duplicate naming scenarios
-
-#### 3. Trivial Rename Operations
-
-- Name changes only update metadata
-- No filesystem operations during renames
-- Instant, atomic updates
-- Zero risk of failed directory renames
-
-#### 4. Performance Benefits
-
-- No folderName lookup overhead
-- Direct UUID → path conversion
-- Reduced I/O operations
-- Faster project operations
-
-### Disadvantages of UUID-Only Approach
-
-#### 1. Developer Experience Nightmare
-
-- **Unreadable filesystem**: Wall of meaningless UUIDs in file explorer
-- **Manual inspection required**: Can't identify projects without opening files
-- **Debugging hell**: Error messages with UUIDs are useless without context
-- **No visual scanning**: Impossible to locate projects by name
-
-#### 2. Operations and Maintenance Pain
-
-- **Backup/restore complexity**: Can't identify what you're backing up
-- **Manual operations**: Must look up UUIDs for any file operation
-- **Support nightmares**: "Which project?" requires UUID cross-referencing
-- **Log analysis**: Logs full of UUIDs are nearly impossible to parse
-
-#### 3. Version Control Challenges
-
-- **Meaningless diffs**: Git shows UUID changes, not project names
-- **Code review difficulty**: Reviewers need context for every change
-- **Merge conflicts**: Harder to resolve without project identification
-- **History tracking**: Git log shows UUIDs instead of readable names
-
-#### 4. External Tool Integration
-
-- **File browsers**: Users see UUIDs, not project names
-- **Search tools**: Can't grep for project names
-- **Backup software**: Can't create meaningful backup names
-- **CI/CD pipelines**: Scripts need UUID lookup for everything
-
-#### 5. Data Portability Issues
-
-- **Manual exports**: Requires UUID mapping between systems
-- **Sharing projects**: "Send me the portfolio" → "Which UUID?"
-- **Import/export**: Need metadata file to make sense of directories
-- **Migration complexity**: Moving systems requires translation layer
-
-### Technical Pitfalls of UUID-Only
-
-#### 1. Metadata Dependency
-
-- **Single point of failure**: project metadata store (SQLite) must remain healthy
-- **Orphaned directories**: Lost metadata makes UUIDs meaningless
-- **Recovery difficulty**: Disaster recovery requires metadata reconstruction
-- **Backup strategy**: Must always backup metadata with projects
-
-#### 2. Human Error Amplification
-
-- **Accidental deletions**: Can't visually verify correct project
-- **Wrong project operations**: Easy to operate on wrong UUID
-- **Configuration mistakes**: Harder to catch errors with UUIDs
-- **Testing confusion**: Test data indistinguishable from production
-
-#### 3. Tooling Requirements
-
-- **Admin tools needed**: UI required to map UUIDs to names
-- **CLI tools required**: Standard Unix tools become ineffective
-- **Custom scripts**: Every operation needs UUID lookup
-- **Increased complexity**: More code to maintain
-
-### Why UUID+FolderName is the Right Choice
-
-The current architecture was chosen because:
-
-1. **Developer experience matters**: Humans work with this system daily
-2. **Debugging is critical**: Readable directories save hours of troubleshooting
-3. **Collaboration is key**: Team members need to communicate about projects
-4. **Operational simplicity**: Standard tools work without custom wrappers
-5. **Self-documenting**: Filesystem structure tells the story
-
-### The Cost-Benefit Analysis
-
-**Cost of folderName resolution**: A few extra lines of code per controller, minimal performance overhead
-
-**Benefit of readable directories**: Massive improvement in developer productivity, debugging efficiency, operational clarity, and team collaboration
-
-**Verdict**: The cost of folderName resolution is **far outweighed** by the benefits of human-readable directories.
-
-### When UUID-Only Makes Sense
-
-UUID-only architecture is appropriate for:
-
-- **Database-backed systems**: Where filesystem is cache, not source of truth
-- **Microservices**: Where each service has isolated UUID namespace
-- **Temporary storage**: Where directories are ephemeral
-- **Fully automated systems**: Where humans never inspect filesystem
-
-### When UUID+FolderName Makes Sense (Widgetizer)
-
-The current architecture is ideal for:
-
-- **Developer-facing tools**: Where humans inspect/debug filesystem
-- **Small to medium scale**: Where manual operations are common
-- **Collaborative environments**: Where teams reference projects by name
-- **Self-documenting systems**: Where filesystem tells the story
-
-### Real-World Impact
-
-**Scenario: Production Debugging**
-
-- **Current**: "Error in project 'client-portfolio'" → immediately actionable
-- **UUID-only**: "Error in a7f3c2b1-4d5e-6789" → must look up UUID first
-
-**Scenario: Team Collaboration**
-
-- **Current**: "Check the portfolio project changes"
-- **UUID-only**: "Check a7f3c2b1... wait, which one is that?"
-
-**Scenario: Server Migration**
-
-- **Current**: Copy directories, names are self-explanatory
-- **UUID-only**: Copy UUIDs, need metadata to understand them
-
-### Conclusion
-
-The UUID+FolderName architecture strikes the perfect balance between **stable identity** (UUID) and **human usability** (folderName). While UUID-only would simplify the code, it would create massive usability problems that far outweigh the minor complexity of folderName resolution. The current architecture is not premature optimization—it's a pragmatic choice that prioritizes developer productivity and operational clarity.
-
----
-
-**See also:**
-
-- [Project Management](core-projects.md) - Project CRUD operations using this architecture
-- [Custom Hooks](core-hooks.md) - Frontend state management for projects
+- **"Project not found"** — confirm the UUID exists in the SQLite `projects` table and the directory exists under the resolved folderName. Resolution failures surface as 404/500 (via `projectErrors.js`), never a silent fallback.
+- **Wrong directory / path errors** — for the still-path-based exceptions, confirm `getProjectFolderName()` resolved the expected folderName; everywhere else, the adapter owns the path, so check `req.scope.folderName`.
+- **FolderName conflicts** — `generateUniqueSlug()` appends a numeric suffix to guarantee uniqueness; rename/create both validate the `/^[a-z0-9-]+$/` format and check `projectFolderExists`.
+
+## See also
+
+- [core-projects.md](core-projects.md) — project CRUD operations
+- [core-packages.md](core-packages.md) — adapter contracts, DI, `Scope`, `LIMIT_KEYS`
+- [core-security.md](core-security.md) — resolver authz and the cross-tenant write-guard
+- [core-export.md](core-export.md) — export pipeline and publish naming
+- [core-hooks.md](core-hooks.md) — frontend project state

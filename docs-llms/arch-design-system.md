@@ -2,9 +2,9 @@
 
 > **Complete reference for the Arch theme's visual design language, CSS custom properties, layout system, component patterns, and modifiers**
 
-The Arch theme is the default Widgetizer theme. It provides a comprehensive, token-driven design system built entirely on CSS custom properties. Every visual decision — colors, spacing, typography, sizing — flows through a centralized set of design tokens defined in `base.css`, with user-customizable values injected at runtime from `theme.json` via the `{% theme_settings %}` Liquid tag.
+The Arch theme is the default Widgetizer theme. It provides a comprehensive, token-driven design system built entirely on CSS custom properties. Every visual decision — colors, spacing, typography, sizing — flows through a centralized set of design tokens defined in `themes/arch/assets/base.css`, with user-customizable values injected at runtime from `themes/arch/theme.json` via the `{% theme_settings %}` Liquid tag.
 
-For widget authoring patterns, see [theming-widgets.md](theming-widgets.md). For setting types reference, see [theming-setting-types.md](theming-setting-types.md).
+This doc covers the **theme-side** design system (what a themer / theme-aware LLM reads). For the editor UI's own React/Tailwind style guide, see [core-editor-ui-style-guide.md](core-editor-ui-style-guide.md). For widget authoring patterns, see [theming-widgets.md](theming-widgets.md). For setting-type reference, see [theming-setting-types.md](theming-setting-types.md). For theme structure and global settings, see [theming.md](theming.md).
 
 ---
 
@@ -26,6 +26,7 @@ For widget authoring patterns, see [theming-widgets.md](theming-widgets.md). For
 14. [Responsive Breakpoints](#responsive-breakpoints)
 15. [CSS Variable Pipeline](#css-variable-pipeline)
 16. [Widget Template Conventions](#widget-template-conventions)
+17. [Available Widgets](#available-widgets-arch-theme)
 
 ---
 
@@ -44,8 +45,10 @@ themes/arch/
 │   ├── carousel.js     # Carousel initialization and navigation
 │   ├── lightbox.js     # Lightbox for gallery image viewing
 │   ├── masonry.js      # Masonry layout for gallery widgets
-│   └── video-modal.js  # Video popup modal (YouTube/Vimeo)
-├── widgets/            # 42 page widget components + 2 global
+│   ├── video-modal.js  # Video popup modal (YouTube/Vimeo)
+│   ├── countdown.js    # Countdown widget timer
+│   └── icons.json      # SVG icon registry (consumed by icon.liquid)
+├── widgets/            # 56 page widget components + 2 global
 │   ├── accordion/
 │   ├── banner/
 │   ├── card-grid/
@@ -54,8 +57,10 @@ themes/arch/
 │       ├── header/
 │       └── footer/
 ├── snippets/           # Reusable Liquid partials
-│   ├── icon.liquid     # SVG icon rendering from icons.json
-│   └── social-icons.liquid  # Social media link icons (16 platforms)
+│   ├── icon.liquid          # SVG icon rendering from icons.json
+│   ├── social-icons.liquid  # Social media link icons (16 platforms)
+│   ├── site-icons.liquid    # Favicon / apple-touch-icon / manifest <link> tags
+│   └── cs-class-row.liquid   # Single class row partial for the class-schedule widget
 ├── locales/            # Theme locale files (nested JSON per language)
 │   ├── en.json
 │   └── ...
@@ -65,23 +70,24 @@ themes/arch/
 
 ### Asset Loading Order
 
-Defined in `layout.liquid`, assets load in this sequence:
+Defined in `layout.liquid`, head/body assets load in this sequence:
 
 1. `{% seo %}` — Meta tags
 2. `{% fonts %}` — Google/Bunny font stylesheets
-3. `{% theme_settings %}` — Generates `<style id="theme-settings-styles">` with `:root` CSS variables from `theme.json` user values
-4. `{% asset src: "base.css" %}` — The design system stylesheet
-5. Reveal animation override (if animations disabled): `.reveal { opacity: 1 !important; transform: none !important; }`
-6. `{% custom_css %}` — User's custom CSS
-7. `{% custom_head_scripts %}` — User's head scripts
-8. `{% header_assets %}` — Widget-enqueued CSS/JS
-9. Page content (header, main, footer)
-10. `{% asset src: "scripts.js", defer: true %}` — Core JS (header, navigation, sticky header scroll behavior, `--header-sticky-offset` CSS variable)
-11. `{% asset src: "reveal.js", defer: true %}` — Reveal animations (conditional)
-12. `{% footer_assets %}` — Widget-enqueued footer assets (e.g., `carousel.js` when carousel widgets are present)
-13. `{% custom_footer_scripts %}` — User's footer scripts
+3. `{% render 'site-icons', site_icons: site_icons %}` — Favicon, apple-touch-icon, and web-manifest `<link>` tags
+4. `{% theme_settings %}` — Generates `<style id="theme-settings-styles">` with `:root` CSS variables from `theme.json` user values
+5. `{% asset src: "base.css" %}` — The design system stylesheet
+6. Reveal animation override (when animations disabled): `<style>.reveal { opacity: 1 !important; transform: none !important; }</style>`
+7. `{% custom_css %}` — User's custom CSS
+8. `{% custom_head_scripts %}` — User's head scripts
+9. `{% header_assets %}` — Widget-enqueued CSS/JS (head)
+10. Body: skip link, `{{ header | raw }}`, `<main id="main-content">{{ main_content | raw }}</main>`, `{{ footer | raw }}`
+11. `{% asset src: "scripts.js", defer: true %}` — Core JS (header, navigation, sticky header scroll behavior, `--header-sticky-offset` CSS variable)
+12. `{% asset src: "reveal.js", defer: true %}` — Reveal animations (only rendered when `enable_reveal_animations` is on)
+13. `{% footer_assets %}` — Widget-enqueued footer assets (e.g., `carousel.js` when carousel widgets are present)
+14. `{% custom_footer_scripts %}` — User's footer scripts
 
-This order ensures that theme settings CSS variables are available before `base.css` reads them, and that user customizations cascade last.
+This order ensures theme-settings CSS variables are available before `base.css` reads them, and that user customizations cascade last. The reveal override and `reveal.js` are gated on the `enable_reveal_animations` setting (default **off**), and `site-icons` is rendered before `theme_settings` so the favicon links appear early in `<head>`.
 
 ### Unit System
 
@@ -118,7 +124,12 @@ All tokens are defined on `:root` in `base.css`. They fall into two categories:
 | `--font-size-3xl`  | `2.8rem` | 28px   |
 | `--font-size-4xl`  | `3.2rem` | 32px   |
 | `--font-size-5xl`  | `3.6rem` | 36px   |
-| `--font-size-6xl`  | `4rem`   | 40px   |
+| `--font-size-6xl`  | `4.4rem` | 44px   |
+| `--font-size-7xl`  | `5.4rem` | 54px   |
+| `--font-size-8xl`  | `6.8rem` | 68px   |
+| `--font-size-9xl`  | `8.4rem` | 84px   |
+
+This single table is the source of truth for the type scale — widget-authoring docs point here rather than re-listing it.
 
 #### Line Heights
 
@@ -152,14 +163,16 @@ These are static utilities. Actual heading/body weights come from the dynamic ty
 | `--space-5xl` | `8rem`   | 80px   |
 | `--space-6xl` | `9.6rem` | 96px   |
 
+This single table is the source of truth for the spacing scale. (Note: `carousel.js`-driven carousel tracks reference a `--space-2xs` token for inline padding; it has no `:root` default and resolves to nothing when unset — treat the scale above as the defined set.)
+
 #### Section Spacing
 
 | Token                      | Default                   | @750px                    | @990px                    |
 | -------------------------- | ------------------------- | ------------------------- | ------------------------- |
-| `--section-padding-block`  | `var(--space-4xl)` (64px) | `var(--space-5xl)` (80px) | `var(--space-6xl)` (96px) |
+| `--section-padding-block`  | `var(--space-4xl)` (64px) | `var(--space-4xl)` (64px) | `var(--space-5xl)` (80px) |
 | `--section-padding-inline` | `var(--space-lg)` (24px)  | —                         | —                         |
 
-Section spacing scales automatically via nested media queries inside `:root`.
+`--section-padding-block` scales automatically via nested media queries inside `:root`. The widget container then applies it as `margin-block: calc(var(--section-padding-block) * var(--spacing-scale))`, so the **spacing-density** body class (compact / default / airy) multiplies section spacing as well as card padding.
 
 #### Container & Content Widths
 
@@ -181,7 +194,7 @@ Section spacing scales automatically via nested media queries inside `:root`.
 
 #### Style Tokens (Class-Driven)
 
-These tokens control shapes, card appearance, and spacing density. Unlike other tokens, they are **not** set directly in `:root` — instead, they have default values in `:root` that are overridden by **body classes** applied from the `style` category in `theme.json`. See [Style Classes (Body Class Pattern)](#style-classes-body-class-pattern) below for details.
+These tokens control shapes, card appearance, and spacing density. Unlike other tokens, they are seeded with default values in `:root` and then **overridden by body classes** applied from the `style` category in `theme.json`. See [Style Classes (Body Class Pattern)](#style-classes-body-class-pattern) below for details.
 
 | Token | Default (`:root`) | Purpose |
 | --- | --- | --- |
@@ -191,12 +204,13 @@ These tokens control shapes, card appearance, and spacing density. Unlike other 
 | `--radius-button` | `0` | Button border-radius (separate for pill override) |
 | `--radius-marker` | `0` | Numbered badge / marker radius — becomes `50%` (circle) on `corner-rounded` |
 | `--card-border` | `var(--border-width-thin) solid var(--border-color)` | Card border style |
-| `--card-shadow` | `none` | Card box-shadow |
-| `--spacing-scale` | `1` | Multiplier applied to card padding and widget container spacing |
+| `--spacing-scale` | `1` | Multiplier applied to section spacing, card padding, and widget header margin |
+
+> The Arch base card is **borderless-shadow-free by design**: `.widget-card` sets a border and a `border-color` transition only — there is no `--card-shadow` token and no `box-shadow` on the base card. Depth comes from the border plus the active color scheme's background.
 
 #### Color Tokens (Dynamic)
 
-These reference the runtime-injected `--colors-*` variables from theme settings, with fallbacks:
+These reference the runtime-injected `--colors-standard_*` variables from theme settings, with hardcoded fallbacks. They are the base-`:root` defaults; the `.color-scheme-*` classes (see [Color System](#color-system)) re-point them per widget.
 
 | Token                 | Source                                | Fallback  |
 | --------------------- | ------------------------------------- | --------- |
@@ -211,6 +225,8 @@ These reference the runtime-injected `--colors-*` variables from theme settings,
 | `--border-color`      | `var(--colors-standard_border_color)` | `#e0e0e0` |
 | `--color-white`       | `#ffffff`                             | (static)  |
 | `--color-black`       | `#000000`                             | (static)  |
+
+> The fallback hex values above are the base-`:root` fallbacks in `base.css`; they are intentionally *not* the same as the `theme.json` defaults (which are what users actually get — see the [Color System](#color-system) defaults tables). Fallbacks only apply when no `--colors-*` variable was injected at all.
 
 #### Icon Sizes
 
@@ -230,6 +246,15 @@ These reference the runtime-injected `--colors-*` variables from theme settings,
 | `--transition-speed-normal` | `0.3s`  |
 | `--transition-speed-slow`   | `0.5s`  |
 
+#### Computed Scales
+
+| Token             | Value                                              |
+| ----------------- | -------------------------------------------------- |
+| `--heading-scale` | `calc(var(--typography-heading_scale, 100) / 100)` |
+| `--body-scale`    | `calc(var(--typography-body_scale, 100) / 100)`    |
+
+`heading_scale` and `body_scale` are `range` settings (80–120, default 100) with `outputAsCssVar: true`. Body-size classes (`t-xs`–`t-xl`, `.w-eyebrow`, `.w-meta`, etc.) multiply by `--body-scale`; heading-size classes (`t-2xl`+, headings) multiply by `--heading-scale`.
+
 #### Widget Background System
 
 Default values for widget background control (overridden inline per-widget):
@@ -244,27 +269,27 @@ Default values for widget background control (overridden inline per-widget):
 | `--widget-overlay-color`   | `transparent` |
 | `--widget-overlay-opacity` | `0.5`         |
 
+> Background **images** are set inline on the element (with a `.has-bg-image` class), not via a CSS variable.
+
 ---
 
 ## Color System
 
 ### Four Color Schemes
 
-The Arch theme ships with four color schemes:
+The Arch theme exposes two palettes — **standard** (light) and **highlight** (dark/emphasis) — each with a **primary** and a **secondary** surface variant, for four schemes total. Widgets select one via a `color_scheme` setting whose values are:
 
-- **Standard**: default light surface
-- **Standard Accent**: light alternate surface using the standard palette
-- **Highlight**: default dark/emphasis surface
-- **Highlight Accent**: dark alternate surface using the highlight palette
+- `standard-primary` (**default**) — light surface, `bg_primary`
+- `standard-secondary` — light surface with `bg_primary` ↔ `bg_secondary` swapped
+- `highlight-primary` — dark/emphasis surface, `bg_primary`
+- `highlight-secondary` — dark surface with the background pair swapped
 
-These are activated by CSS classes that remap the shorthand color tokens to point at different source variables.
+Each value maps directly to a CSS class: `.color-scheme-{value}`. The class remaps the shorthand color tokens (`--text-content`, `--bg-primary`, `--accent`, …) to point at the corresponding `--colors-{palette}_*` variables, so every descendant resolves to the active palette automatically.
 
-#### Standard Color Scheme (`.color-scheme-standard`)
-
-Remaps all shorthand tokens to `--colors-standard_*` variables:
+#### Standard Primary (`.color-scheme-standard-primary`)
 
 ```css
-.color-scheme-standard {
+.color-scheme-standard-primary {
   --text-heading: var(--colors-standard_text_heading, #0f172a);
   --text-content: var(--colors-standard_text_content, #1f2937);
   --text-muted: var(--colors-standard_text_muted, #6b7280);
@@ -277,12 +302,10 @@ Remaps all shorthand tokens to `--colors-standard_*` variables:
 }
 ```
 
-#### Highlight Color Scheme (`.color-scheme-highlight`)
-
-Remaps all shorthand tokens to `--colors-highlight_*` variables:
+#### Highlight Primary (`.color-scheme-highlight-primary`)
 
 ```css
-.color-scheme-highlight {
+.color-scheme-highlight-primary {
   --text-heading: var(--colors-highlight_text_heading, #ffffff);
   --text-content: var(--colors-highlight_text_content, #eaf3fc);
   --text-muted: var(--colors-highlight_text_muted, #64748b);
@@ -295,17 +318,19 @@ Remaps all shorthand tokens to `--colors-highlight_*` variables:
 }
 ```
 
-#### Accent Variants
+#### Secondary Variants
 
-The accent variants keep the same text/border/accent palette as their parent scheme but swap `--bg-primary` and `--bg-secondary` so widgets can get a filled alternate surface without introducing a second palette:
+The `-secondary` variants keep the same text/border/accent palette as their `-primary` sibling but swap `--bg-primary` and `--bg-secondary`, so a widget can get a filled alternate surface without introducing a second palette:
 
 ```css
-.color-scheme-standard-accent {
+.color-scheme-standard-secondary {
+  /* same text/border/accent as standard-primary, but: */
   --bg-primary: var(--colors-standard_bg_secondary, #f1f5f9);
   --bg-secondary: var(--colors-standard_bg_primary, #ffffff);
 }
 
-.color-scheme-highlight-accent {
+.color-scheme-highlight-secondary {
+  /* same text/border/accent as highlight-primary, but: */
   --bg-primary: var(--colors-highlight_bg_secondary, #152a3e);
   --bg-secondary: var(--colors-highlight_bg_primary, #233c54);
 }
@@ -313,7 +338,7 @@ The accent variants keep the same text/border/accent palette as their parent sch
 
 #### How Color Schemes Work
 
-Every widget applies a color scheme class on its root element. All child elements use the shorthand tokens (`--text-content`, `--bg-primary`, etc.) which resolve to different values depending on which scheme class is active:
+Every widget applies a color-scheme class on its root element and renders all children using the shorthand tokens, which resolve to whichever palette the class selected:
 
 ```liquid
 <section class="widget color-scheme-{{ widget.settings.color_scheme }}">
@@ -321,27 +346,33 @@ Every widget applies a color scheme class on its root element. All child element
 </section>
 ```
 
-When a widget uses any non-`standard` scheme, it also sets its background:
+When a widget uses any non-default scheme, it fills its own background (and adds `widget-container-padded` so the fill covers the padded area). Branch on the **default value** (`standard-primary`), not a bare `'standard'`:
 
 ```liquid
-{% unless widget.settings.color_scheme == 'standard' %}
+{% unless widget.settings.color_scheme == 'standard-primary' %}
   style="--widget-bg-color: var(--bg-primary);"
 {% endunless %}
 ```
 
+```liquid
+<div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+```
+
 #### Default Color Palette (theme.json)
+
+These are the values users actually start with (from `theme.json` `defaults`), and they differ from the base-`:root` fallbacks.
 
 **Standard scheme defaults:**
 
 | Setting ID              | Label                | Default   |
 | ----------------------- | -------------------- | --------- |
 | `standard_bg_primary`   | Primary Background   | `#ffffff` |
-| `standard_bg_secondary` | Secondary Background | `#f1f5f9` |
-| `standard_text_content` | Content Text         | `#1f2937` |
+| `standard_bg_secondary` | Secondary Background | `#f8fafc` |
+| `standard_text_content` | Content Text         | `#334155` |
 | `standard_text_heading` | Heading Text         | `#0f172a` |
 | `standard_text_muted`   | Muted Text           | `#6b7280` |
 | `standard_border_color` | Border Color         | `#e2e8f0` |
-| `standard_accent`       | Accent Color         | `#DE1877` |
+| `standard_accent`       | Accent Color         | `#0f172a` |
 | `standard_accent_text`  | Accent Text Color    | `#ffffff` |
 | `standard_rating_star`  | Rating Star Color    | `#fbbf24` |
 
@@ -349,17 +380,17 @@ When a widget uses any non-`standard` scheme, it also sets its background:
 
 | Setting ID               | Label                | Default   |
 | ------------------------ | -------------------- | --------- |
-| `highlight_bg_primary`   | Primary Background   | `#233c54` |
-| `highlight_bg_secondary` | Secondary Background | `#152a3e` |
-| `highlight_text_content` | Content Text         | `#eaf3fc` |
+| `highlight_bg_primary`   | Primary Background   | `#0f172a` |
+| `highlight_bg_secondary` | Secondary Background | `#020617` |
+| `highlight_text_content` | Content Text         | `#cbd5e1` |
 | `highlight_text_heading` | Heading Text         | `#ffffff` |
-| `highlight_text_muted`   | Muted Text           | `#64748b` |
-| `highlight_border_color` | Border Color         | `#526884` |
-| `highlight_accent`       | Accent Color         | `#DE1877` |
-| `highlight_accent_text`  | Accent Text Color    | `#ffffff` |
+| `highlight_text_muted`   | Muted Text           | `#94a3b8` |
+| `highlight_border_color` | Border Color         | `#334155` |
+| `highlight_accent`       | Accent Color         | `#ffffff` |
+| `highlight_accent_text`  | Accent Text Color    | `#0f172a` |
 | `highlight_rating_star`  | Rating Star Color    | `#fbbf24` |
 
-All 18 color settings have `"outputAsCssVar": true`, which causes the `{% theme_settings %}` tag to generate `--colors-{id}` CSS variables on `:root`.
+All 18 color settings have `"outputAsCssVar": true`, so `{% theme_settings %}` emits a `--colors-{id}` CSS variable on `:root` for each. Together with the two `range` scale settings (`heading_scale`, `body_scale`), that is **20 settings** marked `outputAsCssVar: true` in `theme.json`.
 
 ---
 
@@ -367,18 +398,18 @@ All 18 color settings have `"outputAsCssVar": true`, which causes the `{% theme_
 
 ### Font Configuration
 
-Fonts are configured in `theme.json` via `font_picker` settings:
+Fonts are configured in `theme.json` via `font_picker` settings. Both default to **Inter**:
 
 | Setting ID     | Label        | Default Stack         | Default Weight |
 | -------------- | ------------ | --------------------- | -------------- |
-| `heading_font` | Heading Font | `"Fraunces", serif`   | 600            |
+| `heading_font` | Heading Font | `"Inter", sans-serif` | 600            |
 | `body_font`    | Body Font    | `"Inter", sans-serif` | 400            |
 
 The `{% theme_settings %}` tag generates these CSS variables:
 
 ```css
 :root {
-  --typography-heading_font-family: "Fraunces", serif;
+  --typography-heading_font-family: "Inter", sans-serif;
   --typography-heading_font-weight: 600;
   --typography-body_font-family: "Inter", sans-serif;
   --typography-body_font-weight: 400;
@@ -388,7 +419,7 @@ The `{% theme_settings %}` tag generates these CSS variables:
 
 #### Smart Bold Weight
 
-For `body_font` when the base weight is 400, the system looks up the font in `fonts.json` and finds the best available bold weight (preferring 700 > 600 > 500). This value becomes `--typography-body_font_bold-weight` and is used by `<strong>` and `<b>` elements.
+For `body_font` when the base weight is **400**, `themeSettings.js` looks up the font in `fonts.json` (Google fonts only) and finds the best available bold weight (preferring 700 > 600 > 500). That value becomes `--typography-body_font_bold-weight`, used by `<strong>`/`<b>` and `.t-body-bold`. When the body weight is not 400, the selected weight is reused as the bold weight.
 
 ### Base Typography Styles
 
@@ -396,9 +427,10 @@ For `body_font` when the base weight is 400, the system looks up the font in `fo
 body {
   font-family: var(--typography-body_font-family, ...system-stack...);
   font-weight: var(--typography-body_font-weight, 400);
-  font-size: var(--font-size-base); /* 16px */
+  font-size: calc(var(--font-size-base) * var(--body-scale)); /* 16px × body-scale */
   line-height: var(--line-height-normal); /* 1.5 */
   color: var(--text-content);
+  background-color: var(--bg-primary);
 }
 
 strong,
@@ -414,7 +446,11 @@ h1-h6 {
 }
 ```
 
+`body` uses a sticky-footer flex column (`display: flex; flex-direction: column; min-height: 100dvh`), and `.main-content` gets `flex: 1` so the footer is pushed to the bottom.
+
 #### Heading Size Scale
+
+Heading sizes multiply by `--heading-scale`:
 
 | Element | Token             | Size |
 | ------- | ----------------- | ---- |
@@ -431,19 +467,19 @@ Each class is a complete, self-contained text style. All set `margin: 0`. Modifi
 
 | Class | Role | Key Properties |
 | --- | --- | --- |
-| `.w-eyebrow` | Small label above headline | `font-size-sm * body-scale`, `body-bold weight`, `letter-spacing: 0.05em`, `color: --text-muted` |
-| `.w-headline` | Section-level heading (h1/h2) | `heading font-weight`, `color: --text-heading`, `line-height-tight` |
+| `.w-eyebrow` | Small label above headline | `font-size-sm × body-scale`, `letter-spacing: 0.05em`, `line-height-relaxed`, `color: --text-muted` |
+| `.w-headline` | Section-level heading (h1/h2) | `font-size-4xl × heading-scale`, `heading font-weight`, `color: --text-heading`, `line-height-tight` |
 | `.w-title` | Item-level heading (card title, list item name) | `heading font-weight`, `color: --text-heading`, `line-height-tight` |
 | `.w-description` | Subtext in header trio ONLY | `line-height-relaxed`, `color: --text-content` |
 | `.w-body` | All other body-level text | `line-height-relaxed`, `color: --text-content` |
-| `.w-meta` | Small secondary text (dates, roles, captions) | `font-size-sm * body-scale`, `color: --text-muted` |
-| `.w-label` | Small bold text (badges, tags, filters) | `font-size-sm * body-scale`, `font-weight-semibold` |
+| `.w-meta` | Small secondary text (dates, roles, captions) | `font-size-sm × body-scale`, `color: --text-muted` |
+| `.w-label` | Small bold text (badges, tags, filters) | `font-size-sm × body-scale`, `font-weight-semibold`, `color: --text-content` |
 
 Notes:
-- `w-headline` vs `w-title`: headline = section-level (h1/h2 in widget header), title = item-level (card title, list item name)
-- `w-description` is **only** for the header trio (eyebrow + headline + description). Gets `max-width: 70rem` inside `.widget-header`.
-- `w-body` is for all other body-level text
-- `w-eyebrow` does NOT include `text-transform: uppercase` — add `t-uppercase` explicitly when needed
+- `w-headline` vs `w-title`: headline = section-level (h1/h2 in widget header), title = item-level (card title, list item name).
+- `w-description` is **only** for the header trio (eyebrow + headline + description). Inside `.widget-header` it is capped at `max-width: 70rem` and centered.
+- `w-body` is for all other body-level text.
+- `w-eyebrow` does NOT include `text-transform: uppercase` — add `t-uppercase` explicitly when needed.
 
 ### Text Modifier Classes (`t-` prefix)
 
@@ -451,7 +487,7 @@ Short, composable modifiers. Declared after base classes in CSS so they always w
 
 #### Size Modifiers
 
-Body-scale sizes (xs–xl) use `--body-scale`, heading-scale sizes (2xl–9xl) use `--heading-scale`:
+Body-scale sizes (xs–xl) use `--body-scale`; heading-scale sizes (2xl–9xl) use `--heading-scale` plus `line-height-tight`:
 
 | Class | Font Size | Scale |
 | --- | --- | --- |
@@ -464,8 +500,12 @@ Body-scale sizes (xs–xl) use `--body-scale`, heading-scale sizes (2xl–9xl) u
 | `.t-3xl` | `--font-size-3xl` (28px) | heading-scale + line-height-tight |
 | `.t-4xl` | `--font-size-4xl` (32px) | heading-scale + line-height-tight |
 | `.t-5xl` | `--font-size-5xl` (36px) | heading-scale + line-height-tight |
-| `.t-6xl` | `--font-size-6xl` (40px) | heading-scale + line-height-tight |
-| `.t-7xl` … `.t-9xl` | `--font-size-7xl` … `--font-size-9xl` | heading-scale + line-height-tight |
+| `.t-6xl` | `--font-size-6xl` (44px) | heading-scale + line-height-tight |
+| `.t-7xl` | `--font-size-7xl` (54px) | heading-scale + line-height-tight |
+| `.t-8xl` | `--font-size-8xl` (68px) | heading-scale + `line-height: 1.1` |
+| `.t-9xl` | `--font-size-9xl` (84px) | heading-scale + `line-height: 1.1` |
+
+Below 750px the largest sizes step down: `.t-6xl`/`.t-7xl` clamp to `--font-size-4xl`, and `.t-8xl`/`.t-9xl` clamp to `--font-size-5xl`.
 
 #### Weight Modifiers
 
@@ -485,26 +525,21 @@ Body-scale sizes (xs–xl) use `--body-scale`, heading-scale sizes (2xl–9xl) u
 | `.t-heading` | `color: var(--text-heading)` |
 | `.t-accent` | `color: var(--accent)` |
 
-#### Style Modifiers
+#### Style & Font Modifiers
 
 | Class | Effect |
 | --- | --- |
 | `.t-uppercase` | `text-transform: uppercase; letter-spacing: 0.05em` |
-
-### Typography Scale Variables
-
-Two independent scale multipliers allow users to adjust body and heading text sizes:
-
-```css
---heading-scale: calc(var(--typography-heading_scale, 100) / 100);
---body-scale: calc(var(--typography-body_scale, 100) / 100);
-```
-
-Body-size classes (xs–xl) multiply by `--body-scale`. Heading-size classes (2xl–9xl) multiply by `--heading-scale`.
+| `.t-heading-font` | `font-family: var(--typography-heading_font-family, inherit)` |
+| `.t-body-font` | `font-family: var(--typography-body_font-family, inherit)` |
 
 ### Rich Text Container
 
-`.w-rte` — Styles rich text editor output. Adds bottom margin to `<p>` tags (except last child), styles links with accent color and hover underline, and formats `<ul>`, `<ol>`, and `<li>` elements.
+`.w-rte` — styles rich-text editor output. Adds bottom margin to `<p>` (except last child), spaces `<h2>`–`<h4>`, styles links with accent color + hover underline, formats `<ul>`/`<ol>`/`<li>`, and rounds embedded `<img>` to `--radius-md`. Use it alongside `.w-body`:
+
+```html
+<div class="w-body w-rte t-sm">{{ block.settings.text | raw }}</div>
+```
 
 ### Dynamic Size/Style Classes in Liquid
 
@@ -521,7 +556,7 @@ Templates build dynamic classes using the `t-` prefix:
 
 ## Spacing System
 
-The spacing scale is based on a 4px/8px rhythm. All spacing values use rem with the 62.5% base (so `0.8rem = 8px`).
+The spacing scale is based on a 4px/8px rhythm. All values use rem with the 62.5% base (so `0.8rem = 8px`). See the [Spacing Scale](#spacing-scale) token table above for the authoritative list.
 
 ### Usage Patterns
 
@@ -532,11 +567,10 @@ The spacing scale is based on a 4px/8px rhythm. All spacing values use rem with 
 | General gaps                       | `--space-md` (16px)  |
 | Card padding (mobile)              | `--space-lg` (24px)  |
 | Card padding (tablet)              | `--space-xl` (32px)  |
-| Card padding (desktop)             | `--space-2xl` (40px) |
-| Section header bottom margin       | `--space-2xl` (40px) |
-| Section vertical padding (mobile)  | `--space-4xl` (64px) |
-| Section vertical padding (tablet)  | `--space-5xl` (80px) |
-| Section vertical padding (desktop) | `--space-6xl` (96px) |
+| Card padding (desktop, dense-aware)| `max(--space-md, --space-xl − …)` |
+| Section header bottom margin       | `--space-2xl × --spacing-scale` (40px base) |
+| Section vertical spacing (mobile)  | `--space-4xl × --spacing-scale` (64px base) |
+| Section vertical spacing (desktop) | `--space-5xl × --spacing-scale` (80px base) |
 
 ---
 
@@ -559,8 +593,8 @@ The outer wrapper. Handles backgrounds, background images, and overlays.
 
 - `position: relative`
 - `padding-inline: var(--section-padding-inline)` — Horizontal page gutters
-- Background properties from `--widget-bg-*` tokens
-- Overlay via `&.has-overlay::before` pseudo-element
+- Background properties from `--widget-bg-*` tokens; `overflow-x: clip`
+- Overlay via `&.has-overlay::before` pseudo-element (`opacity: var(--widget-overlay-opacity)`)
 
 #### `.widget-container`
 
@@ -568,31 +602,37 @@ The inner container that constrains width and adds vertical spacing.
 
 - `max-width: var(--container-max-width)` (1420px)
 - `margin-inline: auto` — Centers content
-- `margin-block: var(--section-padding-block)` — Vertical spacing (collapses between adjacent widgets)
+- `margin-block: calc(var(--section-padding-block) * var(--spacing-scale))` — Vertical spacing (collapses between adjacent widgets, density-aware)
 - `z-index: 2` — Sits above overlays
 
 #### `.widget-container-padded`
 
-Alternative for widgets with non-default backgrounds. Uses `padding-block` instead of `margin-block` so the background fills the padded area.
-
-Usage pattern in templates:
+Alternative for widgets with non-default backgrounds. Uses `padding-block` (same `calc(... × --spacing-scale)`) instead of `margin-block` so the background fills the padded area.
 
 ```liquid
-<div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
+<div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
 ```
+
+#### Per-Widget Spacing Overrides
+
+Many widgets expose `top_spacing` / `bottom_spacing` settings that emit `spacing-top-*` / `spacing-bottom-*` classes on `.widget`. The base rules use **descendant** selectors (`.widget.spacing-top-none .widget-container`) so they keep working even when a widget injects a `<style>` block before `.widget-container`:
+
+| Class | Effect |
+| --- | --- |
+| `spacing-top-small` / `spacing-bottom-small` | Halves the section spacing on that edge |
+| `spacing-top-none` / `spacing-bottom-none` | Removes the section spacing on that edge |
 
 #### `.widget-header`
 
 Centered section header with flex column layout:
 
 - `text-align: center`, `align-items: center`
-- `margin-block-end: var(--space-2xl)` — Gap before content
+- `margin-block-end: calc(var(--space-2xl) * var(--spacing-scale))` — Gap before content
 - `gap: var(--space-sm)` — Between header children
-- `.w-description` inside is capped at `max-width: 70rem` (700px)
+- `.w-description` inside is capped at `max-width: 70rem` and centered
+- Add `.widget-header--align-start` to left-align the trio
 
 ### Content Width Modifiers
-
-Constrain content to narrower widths for readability:
 
 | Class                | Max Width                         | Use Case                  |
 | -------------------- | --------------------------------- | ------------------------- |
@@ -607,13 +647,13 @@ All apply `margin-inline: auto` for centering.
 
 | Class                          | Effect                                            |
 | ------------------------------ | ------------------------------------------------- |
-| `.widget-content-align-center` | Centers text, centers `.widget-actions`           |
+| `.widget-content-align-center` | Centers text, centers `.widget-actions` / rating / features |
 | `.widget-content-align-start`  | Left-aligns text, left-aligns `.widget-actions`   |
 | `.widget-content-align-end`    | Right-aligns text, right-aligns `.widget-actions` |
 
 ### Height Modifiers
 
-For full-viewport or partial-viewport hero sections:
+For full- or partial-viewport hero sections. All three also set `display: flex; flex-direction: column; justify-content: center;` to vertically center content.
 
 | Class                       | Min Height         |
 | --------------------------- | ------------------ |
@@ -621,20 +661,9 @@ For full-viewport or partial-viewport hero sections:
 | `.widget-height-medium`     | `75vh`             |
 | `.widget-height-large`      | `100vh` / `100dvh` |
 
-All three also set `display: flex; flex-direction: column; justify-content: center;` to vertically center content.
-
-### Layout Direction Modifiers
-
-| Class                 | Effect                                                        |
-| --------------------- | ------------------------------------------------------------- |
-| `.layout-image-right` | Reverses flex direction at desktop to move image to the right |
-| `.layout-reverse`     | General flex direction reversal                               |
-
 ---
 
 ## Grid System
-
-The grid system uses CSS Grid with responsive breakpoints:
 
 ### Base Grid (`.widget-grid`)
 
@@ -644,7 +673,7 @@ Tablet (750px+):   2 columns
 Desktop (990px+):  var(--grid-cols-desktop, 3) columns
 ```
 
-Gap is automatically calculated based on column count:
+Gap is auto-calculated from the column count, then clamped:
 
 ```css
 --grid-gap-auto: max(var(--space-xs), calc(var(--space-xl) - (var(--grid-cols-desktop, 3) - 2) * var(--space-xs)));
@@ -663,7 +692,7 @@ gap: clamp(var(--space-xs), var(--grid-gap, var(--grid-gap-auto)), var(--space-x
 | `.widget-grid-7` | 7                     |
 | `.widget-grid-8` | 8                     |
 
-The column count can also be set inline from widget settings:
+Or set the desktop column count inline:
 
 ```liquid
 <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
@@ -671,13 +700,24 @@ The column count can also be set inline from widget settings:
 
 ### Card Grid (`.widget-card-grid`)
 
-An alternative grid container with the same breakpoint behavior as `.widget-grid`, designed for card lists (resets `list-style`, `padding`, `margin`).
+A list-reset container (`list-style: none; padding: 0; margin: 0`) designed to pair with `.widget-grid` for card lists. `.widget-card` itself uses a density-aware padding that tracks the column count:
+
+```css
+--card-padding-auto: var(--space-lg);              /* mobile */
+@media (min-width: 750px) { --card-padding-auto: var(--space-xl); }
+@media (min-width: 990px) {
+  --card-padding-auto: max(var(--space-md), calc(var(--space-xl) - (var(--grid-cols-desktop, 2) - 2) * var(--space-xs)));
+}
+padding: calc(var(--card-padding, var(--card-padding-auto)) * var(--spacing-scale));
+```
+
+Set `--card-padding` on a widget's `.widget-card` to opt out of the auto value. The `card-layout-flat` modifier strips the border/background/padding for a flat presentation.
 
 ### Carousel Layout
 
-Many card-based widgets support a `layout` setting with `grid` and `carousel` options. When `carousel` is selected, the grid is replaced by a horizontal scrolling carousel.
+Card-based widgets support a `layout` setting with `grid` and `carousel` options. When `carousel` is selected, the grid is replaced by a horizontal scrolling carousel.
 
-**Widgets supporting carousel layout:** card-grid, icon-card-grid, profile-grid, testimonials, gallery, pricing, icon-list, key-figures, logo-cloud, numbered-cards, project-showcase.
+**Widgets supporting the grid↔carousel pattern (use `.carousel-track`):** card-grid, gallery, icon-card-grid, icon-list, key-figures, logo-cloud, numbered-cards, pricing, profile-grid, project-showcase, testimonials. *(The slideshow widget is a hero carousel of its own and does not use this `.carousel-track` pattern.)*
 
 #### CSS Classes
 
@@ -686,22 +726,22 @@ Many card-based widgets support a `layout` setting with `grid` and `carousel` op
 | `.carousel-container` | Wrapper with `position: relative` for button positioning |
 | `.carousel-track` | Scrollable flex container with `scroll-snap-type: x mandatory` |
 | `.carousel-item` | Individual item with `scroll-snap-align: start` |
-| `.carousel-btn` | Prev/next navigation button (hidden on mobile, visible at 990px+) |
-| `.carousel-btn-prev` | Positioned at left edge (`inset-inline-start: -2.2rem`) |
-| `.carousel-btn-next` | Positioned at right edge (`inset-inline-end: -2.2rem`) |
+| `.carousel-btn` | Prev/next button (hidden by default; revealed on container hover/focus at 990px+) |
+| `.carousel-btn-prev` | Positioned at left edge (`inset-inline-start: -2.2rem` at desktop) |
+| `.carousel-btn-next` | Positioned at right edge (`inset-inline-end: -2.2rem` at desktop) |
 | `.carousel-btn-icon` | SVG chevron icon inside buttons |
 
 #### Responsive Behavior
 
 ```
 Mobile (<750px):   ~85% width per item, buttons hidden, swipe to scroll
-Tablet (750px+):   50% width per item, buttons hidden
-Desktop (990px+):  var(--carousel-cols) columns, prev/next buttons visible
+Tablet (750px+):   ~50% width per item, buttons hidden
+Desktop (990px+):  var(--carousel-cols, 4) columns; prev/next buttons appear on hover/focus
 ```
 
 #### Column Control
 
-The number of visible columns at desktop is set inline via `--carousel-cols`:
+The visible column count at desktop is set inline via `--carousel-cols`:
 
 ```liquid
 <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
@@ -709,43 +749,14 @@ The number of visible columns at desktop is set inline via `--carousel-cols`:
 
 #### JavaScript (`carousel.js`)
 
-Loaded globally via `layout.liquid`. Auto-initializes all `.carousel-container` elements:
+Enqueued (with `theme: true`, deduped) by carousel-capable widgets and rendered via `{% footer_assets %}`. It auto-initializes all `.carousel-container` elements:
 
 - Prev/next buttons scroll by one item width + gap
 - Buttons auto-disable at scroll boundaries
 - `ResizeObserver` updates button state on container resize
 - `MutationObserver` on `#main-content` picks up dynamically added carousels
 
-#### Template Pattern
-
-```liquid
-{% if widget.settings.layout == 'carousel' %}
-  <div class="carousel-container">
-    <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">
-      <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </button>
-    <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">
-      <svg class="carousel-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </button>
-    <ul class="widget-card-grid carousel-track" style="--carousel-cols: {{ widget.settings.columns_desktop }}">
-      {% for blockId in widget.blocksOrder %}
-        {% assign block = widget.blocks[blockId] %}
-        <li class="widget-card carousel-item" data-block-id="{{ blockId }}">
-          <!-- card content -->
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-{% else %}
-  <ul class="widget-card-grid widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
-    <!-- grid items -->
-  </ul>
-{% endif %}
-```
+No per-widget JavaScript is needed for carousel layouts. See [theming-widgets.md](theming-widgets.md) for the full grid↔carousel template pattern.
 
 ---
 
@@ -761,27 +772,27 @@ Loaded globally via `layout.liquid`. Auto-initializes all `.carousel-container` 
   flex-direction: column;
   background-color: var(--bg-primary);
   border: var(--card-border);
-  box-shadow: var(--card-shadow);
   border-radius: var(--radius-md);
-  padding: calc(var(--space-lg) * var(--spacing-scale)); /* Responsive, scaled by density */
-  transition: border-color var(--transition-speed-normal), box-shadow var(--transition-speed-normal);
+  /* density-aware padding (see Card Grid above) */
+  padding: calc(var(--card-padding, var(--card-padding-auto)) * var(--spacing-scale));
+  transition: border-color var(--transition-speed-normal);
 }
 ```
 
-Card appearance is driven by the [style tokens](#style-tokens-class-driven) (`--card-border`, `--card-shadow`, `--radius-md`, `--spacing-scale`), which are set by body classes from theme style settings.
+Card appearance is driven by the [style tokens](#style-tokens-class-driven) (`--card-border`, `--radius-md`, `--spacing-scale`), set by body classes from theme style settings. There is no `--card-shadow` / `box-shadow` on the base card. On `corner-rounded`, `.widget-card-image` gets `border-radius: calc(var(--radius-md) / 2)` for a concentric-corners look.
 
 #### Card Sub-Components
 
 | Class                      | Purpose           | Key Styles                                                   |
 | -------------------------- | ----------------- | ------------------------------------------------------------ |
-| `.widget-card-flat`        | No-border variant | `background: var(--bg-secondary)`                            |
+| `.widget-card-flat`        | No-border variant | `background: var(--bg-secondary)`, no border/shadow          |
 | `.widget-card-header`      | Header section    | `margin-block-end: var(--space-lg)`                          |
 | `.widget-card-content`     | Main body         | `flex: 1` (fills remaining space)                            |
 | `.widget-card-footer`      | Bottom section    | `margin-block-start: auto` (pushes to bottom)                |
-| `.widget-card-image`       | Cover image       | `aspect-ratio: 16/9`, `object-fit: cover`                    |
+| `.widget-card-image`       | Cover image       | `aspect-ratio: var(--card-image-ratio, 16/9)`, `object-fit: cover` |
 | `.widget-card-icon`        | Accent icon       | `--icon-size-lg`, `color: --accent`                          |
 
-Card typography uses `w-*` + `t-*` classes: `w-title` for card titles, `w-eyebrow` or `w-meta` for subtitles, `w-body w-rte` for card descriptions.
+Card typography uses `w-*` + `t-*` classes: `w-title` for titles, `w-eyebrow`/`w-meta` for subtitles, `w-body w-rte` for descriptions.
 
 ### Buttons
 
@@ -795,7 +806,7 @@ The default button is a **secondary** (outlined) style:
   align-items: center;
   gap: var(--space-sm);
   padding: 0.8rem 1.6rem;
-  font-size: var(--font-size-sm);
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
   background-color: transparent;
   color: var(--text-content);
   border: var(--border-width-medium) solid var(--accent);
@@ -808,7 +819,7 @@ The default button is a **secondary** (outlined) style:
 }
 ```
 
-Button border-radius is driven by the `--radius-button` [style token](#style-tokens-class-driven), which responds to the `corner-*` and `buttons-*` body classes.
+Button border-radius is driven by `--radius-button`, which responds to the `corner-*` and `buttons-*` body classes.
 
 #### Button Variants
 
@@ -826,24 +837,19 @@ Button border-radius is driven by the `--radius-button` [style token](#style-tok
 | `.widget-button-large`  | `1.6rem 3.2rem` | `--font-size-lg` (18px)   |
 | `.widget-button-xlarge` | `2rem 4.8rem`   | `--font-size-xl` (20px)   |
 
-#### Button Modifiers
+#### Button Modifiers & Container
 
-| Class                 | Effect                                                       |
-| --------------------- | ------------------------------------------------------------ |
-| `.widget-button-full` | Full-width (`width: 100%`, centered text)                    |
-| `.widget-button-icon` | Icon inside button (`1.6rem` square, `stroke: currentColor`) |
-
-#### Button Container
-
-`.widget-actions` — Flex container for buttons with `gap: var(--space-md)`, `flex-wrap: wrap`, centered by default.
+- `.widget-button-full` — Full-width (`width: 100%`, centered text)
+- `.widget-button-icon` — Icon inside button (`1.6rem` square, `stroke: currentColor`)
+- `.widget-actions` — Flex container for buttons: `gap: var(--space-md)`, `flex-wrap: wrap`, centered by default
 
 ### Forms
 
 | Class | Purpose | Key Styles |
 | --- | --- | --- |
 | `.form-group` | Vertical field container | `flex column`, `gap: --space-xs` |
-| `.form-label` | Field label | `font-size: sm`, `color: --text-content` |
-| `.form-input` | Text input | Full width, `padding: sm md`, `border: thin`, focus: `border-color: --text-heading` |
+| `.form-label` | Field label | `font-size: sm × body-scale`, `color: --text-content` |
+| `.form-input` | Text input | Full width, `padding: sm md`, `border: thin`, `radius: --radius-sm`, focus: `border-color: --text-heading` |
 | `.form-textarea` | Multi-line input | Same as input + `min-height: 15rem`, `resize: vertical` |
 | `.form-select` | Dropdown select | Custom chevron via SVG background-image |
 | `.form-checkbox-group` | Checkbox + label row | `flex`, `gap: --space-sm` |
@@ -854,13 +860,15 @@ Legacy aliases `.widget-label` and `.widget-input` also exist for backwards comp
 
 ### Icons
 
+Two icon systems coexist:
+
 | Class                | Size Token       | Dimensions |
 | -------------------- | ---------------- | ---------- |
 | `.widget-icon`       | `--icon-size-lg` | 32px       |
 | `.widget-icon-small` | `--icon-size-sm` | 20px       |
 | `.widget-icon-large` | `--icon-size-xl` | 48px       |
 
-All icons use `stroke: currentColor` for color inheritance.
+A newer **icon design system** (`.w-icon` + style/size/shape modifiers) supports plain / outline / filled treatments: `.w-icon-plain | .w-icon-outline | .w-icon-filled`, sizes `.w-icon-sm | -md | -lg | -xl`, and shapes `.w-icon-sharp | -rounded | -circle`. Icons use `stroke: currentColor` (or `--accent` for `.w-icon`) for color inheritance.
 
 ---
 
@@ -868,7 +876,7 @@ All icons use `stroke: currentColor` for color inheritance.
 
 ### Block Item Background/Overlay (`.block-item`)
 
-The block system mirrors the widget background/overlay system for individual blocks within a widget. It reuses the same `--widget-bg-*` CSS variables:
+The block system mirrors the widget background/overlay system for individual blocks within a widget, reusing the same `--widget-bg-*` variables:
 
 ```css
 .block-item {
@@ -889,7 +897,7 @@ The block system mirrors the widget background/overlay system for individual blo
 }
 ```
 
-When used, the `--widget-bg-*` and `--widget-overlay-*` variables are set inline on the block element so they scope to that specific block rather than inheriting the widget-level values.
+When used, the `--widget-bg-*` / `--widget-overlay-*` variables are set inline on the block element so they scope to that specific block rather than inheriting widget-level values.
 
 ---
 
@@ -901,17 +909,16 @@ The header is a global widget with responsive behavior:
 
 **Mobile (< 990px):**
 
-- Slide-out navigation panel from the right (`.header-nav`)
+- Slide-out navigation panel from the right (`.header-nav`, fixed, `32rem` wide / `85vw` max)
 - Hamburger toggle button (`.menu-toggle`)
-- Mobile CTA button visible
-- Contact info hidden (shown inside slide-out panel via `.header-contact-mobile`)
+- Mobile CTA button visible inside the panel; contact info shown via `.header-contact-mobile`
 
 **Desktop (990px+):**
 
-- Horizontal inline navigation
-- Dropdown submenus on hover
-- Desktop CTA button visible
-- Contact info visible in header bar
+- Horizontal inline navigation, hover dropdown submenus
+- Desktop CTA (`.desktop-cta`) visible; mobile CTA hidden
+- Contact info (`.header-contact-right` / `.header-end`) visible
+- Optional centered layout via `.header-inner.header-center-nav` (3-column grid)
 
 Modifiers: `.header-sticky`, `.header-scrolled`.
 
@@ -921,10 +928,10 @@ The header supports a transparent overlay mode for hero-type widgets. When enabl
 
 **How it works:**
 
-1. The header schema has a `transparent_on_hero` checkbox setting
-2. Widgets declare support via `"supportsTransparentHeader": true` in their `schema.json`
-3. The backend checks the first widget on each page — if it supports transparent header and the setting is enabled, a `transparent-header` class is added to `<body>`
-4. CSS rules in `base.css` handle the visual states
+1. The header schema has a `transparent_on_hero` checkbox setting.
+2. Widgets declare support via `"supportsTransparentHeader": true` in their `schema.json`.
+3. The backend checks the first widget on each page — if it supports the transparent header and the setting is enabled, a `transparent-header` class is added to `<body>`.
+4. CSS rules in `base.css` handle the visual states.
 
 **Supporting widgets (Arch theme):** banner, slideshow, video-popup.
 
@@ -936,22 +943,22 @@ The header supports a transparent overlay mode for hero-type widgets. When enabl
 | `.transparent-header .widget-site-header.header-sticky:not(.header-scrolled)` | Fixed, transparent background |
 | `.transparent-header .widget-site-header.header-sticky.header-scrolled` | Fixed, solid background (normal header appearance) |
 
-**Colors:** The transparent state uses the highlight color scheme variables (`--colors-highlight_text_heading`, `--colors-highlight_accent`, etc.) without a background, ensuring consistency with the theme's color configuration.
+**Colors:** the transparent state uses the **highlight** palette variables (`--colors-highlight_text_heading`, `--colors-highlight_accent`, etc.) without a background, keeping it consistent with the theme's color configuration.
 
-**Transparent logo:** An optional `transparent_logo` image setting allows a light logo variant to display when the header is transparent. CSS toggles `.header-logo-default` / `.header-logo-transparent` visibility based on the header state.
+**Transparent logo:** an optional `transparent_logo` image setting shows a light logo variant when the header is transparent. CSS toggles `.header-logo-default` / `.header-logo-transparent` visibility based on header state.
 
-**First widget padding:** `.transparent-header .main-content > :first-child` receives `padding-block-start: var(--header-sticky-offset)` to compensate for the overlapping header.
+**First widget padding:** `.transparent-header .main-content > :first-child` receives `padding-block-start: var(--header-sticky-offset, 4.5rem)` to compensate for the overlapping header.
 
 #### Navigation Structure
 
 ```
 .widget-site-header
-  .header-inner (flex, space-between)
+  .header-inner (flex, space-between; or .header-center-nav 3-col grid)
     .header-branding
       .header-logo (text or image link)
       .header-contact (desktop contact info)
     .header-actions
-      .menu-toggle (hamburger button, hidden at 990px+)
+      .menu-toggle (hamburger, hidden at 990px+)
       .desktop-cta (button, hidden below 990px)
     .header-nav (slide-out panel on mobile, inline on desktop)
       .nav-close (close button, hidden at 990px+)
@@ -959,8 +966,7 @@ The header supports a transparent overlay mode for hero-type widgets. When enabl
         .nav-item
           a (nav link)
           .submenu-toggle (chevron button, mobile only)
-          .nav-submenu (dropdown/accordion)
-            .nav-item (nested, supports 3 levels)
+          .nav-submenu (dropdown / accordion; supports 3 levels)
       .mobile-cta (button, hidden at 990px+)
       .header-contact-mobile (contact info, mobile only)
 ```
@@ -969,22 +975,22 @@ The header supports a transparent overlay mode for hero-type widgets. When enabl
 
 | Viewport | Behavior |
 | --- | --- |
-| Mobile | Accordion-style expand/collapse via `.submenu-open` class on `.nav-item` and `.nav-submenu`. Uses `max-height` transition. |
-| Desktop | Hover-triggered dropdown via `opacity`/`visibility`/`transform` transition. Submenus positioned absolutely. Third-level menus open to the side. `.submenu-flip` class flips direction when menus would overflow the viewport. |
+| Mobile | Accordion-style expand/collapse via `.submenu-open` (`max-height` transition). |
+| Desktop | Hover/focus-triggered dropdown via `opacity`/`visibility`/`transform`. Third-level menus open to the side; `.submenu-flip` flips direction (and the chevron) when they would overflow the viewport. |
 
 ### Site Footer (`.widget-footer`)
 
-Centered layout with vertical stack:
+Vertically stacked layout (`padding-block: 8rem 2rem`, top border):
 
 ```
 .widget-footer
-  .footer-content (flex column, centered)
-    .footer-logo
-    .footer-menu (horizontal, wrapping link list)
+  .footer-content (flex column)
+    .footer-column / .footer-logo
+    .footer-menu (link list)
       .footer-menu-link
-    .footer-social (horizontal icon links)
-      .social-link (2.4rem square, hover: --accent color)
-    .footer-copyright (xs, muted)
+    .footer-social (social-link icons)
+    .footer-badges (.footer-badge → .footer-badge-image)
+    .footer-copyright (xs, muted, centered, top border)
 ```
 
 ---
@@ -993,7 +999,7 @@ Centered layout with vertical stack:
 
 ### Content Flow (`.content-flow`)
 
-Adds vertical spacing between adjacent sibling elements within a container:
+Adds vertical spacing between adjacent siblings (owl selector):
 
 ```css
 .content-flow > * + * {
@@ -1006,8 +1012,6 @@ Adds vertical spacing between adjacent sibling elements within a container:
 
 ### Feature Lists
 
-For displaying lists of features or benefits:
-
 | Class               | Purpose                                                        |
 | ------------------- | -------------------------------------------------------------- |
 | `.features-list`    | Container — flex column, `gap: --space-xs`, resets list styles |
@@ -1019,21 +1023,21 @@ For displaying lists of features or benefits:
 
 | Class              | Purpose                                                                             |
 | ------------------ | ----------------------------------------------------------------------------------- |
-| `.visually-hidden` | Hides element visually but keeps it accessible to screen readers (1px clip rect)    |
-| `.skip-link`       | Hidden by default, becomes visible on focus — positioned absolute with z-index 9999 |
+| `.visually-hidden` | Hides element visually but keeps it accessible to screen readers (clip rect)        |
+| `.skip-link`       | Hidden by default; becomes visible on focus — positioned absolute with z-index 9999 |
 
 ---
 
 ## Style Classes (Body Class Pattern)
 
-The Arch theme uses **body classes** to implement global style settings that affect shapes, spacing density, heading treatment, and button shape. These classes are applied to `<body>` in `layout.liquid` based on theme settings from the `style` category in `theme.json`.
+The Arch theme uses **body classes** to implement global style settings that affect shapes, spacing density, and button shape. These classes are applied to `<body>` in `layout.liquid` from the `style` category in `theme.json`.
 
 ### How It Works
 
-1. **`theme.json`** defines select settings in the `style` category (e.g., `corner_style`, `spacing_density`)
-2. **`layout.liquid`** renders body classes from setting values: `corner-{{ theme.style.corner_style | default: 'sharp' }}`
-3. **`base.css`** defines class-based rulesets that override the default `:root` tokens
-4. **Live preview**: The `UPDATE_STYLE_CLASSES` message swaps body classes without a full page reload (see [Page Editor docs](core-page-editor.md))
+1. **`theme.json`** defines select settings in the `style` category (`corner_style`, `spacing_density`, `button_shape`).
+2. **`layout.liquid`** renders body classes from setting values: `corner-{{ theme.style.corner_style | default: 'sharp' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}`.
+3. **`base.css`** defines class-based rulesets that override the default `:root` tokens.
+4. **Live preview**: the `UPDATE_STYLE_CLASSES` message swaps body classes without a full page reload (see [core-page-editor.md](core-page-editor.md)).
 
 ### Setting-to-Class Mapping
 
@@ -1049,7 +1053,7 @@ The Arch theme uses **body classes** to implement global style settings that aff
 
 | Class | Effect |
 | --- | --- |
-| `corner-sharp` (default) | All radii `0` — square corners everywhere |
+| `corner-sharp` (default) | All radii `0` — square corners everywhere (set via `:root` defaults; no `corner-sharp` rule needed) |
 | `corner-slightly-rounded` | `--radius-sm: 0.4rem`, `--radius-md: 0.6rem`, `--radius-lg: 0.8rem`, `--radius-button: 0.4rem`, `--radius-marker: 0.8rem` |
 | `corner-rounded` | `--radius-sm: 0.6rem`, `--radius-md: 1.2rem`, `--radius-lg: 1.6rem`, `--radius-button: 0.8rem`, `--radius-marker: 50%` |
 
@@ -1057,9 +1061,9 @@ The Arch theme uses **body classes** to implement global style settings that aff
 
 | Class | Effect |
 | --- | --- |
-| `spacing-compact` | `--spacing-scale: 0.8` — tighter card padding and widget spacing |
-| `spacing-default` | `--spacing-scale: 1` — standard spacing |
-| `spacing-airy` | `--spacing-scale: 1.25` — more generous breathing room |
+| `spacing-compact` | `--spacing-scale: 0.8` — tighter section spacing and card padding |
+| `spacing-default` | `--spacing-scale: 1` — standard spacing (the `:root` default; no class rule needed) |
+| `spacing-airy` | `--spacing-scale: 1.2` — more generous breathing room |
 
 #### Button Shape (`buttons-*`)
 
@@ -1077,69 +1081,38 @@ Widgets should reference the style tokens rather than hardcoding values:
 /* Correct — responds to style settings */
 .my-card {
   border: var(--card-border);
-  box-shadow: var(--card-shadow);
   border-radius: var(--radius-md);
   padding: calc(var(--space-lg) * var(--spacing-scale));
 }
-
-.my-button {
-  border-radius: var(--radius-button);
-}
-
-.my-image {
-  border-radius: var(--radius-lg);
-}
+.my-button { border-radius: var(--radius-button); }
+.my-image { border-radius: var(--radius-lg); }
 
 /* Wrong — hardcoded, ignores user's style choices */
-.my-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-}
+.my-card { border: 1px solid #e0e0e0; border-radius: 8px; }
 ```
 
 ### Per-Widget Token Usage
 
-Widgets that already inherit via `.widget-card` class (no extra work needed):
-card-grid, icon-card-grid, pricing, testimonials, numbered-cards, key-figures, event-list, job-listing, content-switcher, project-showcase, gallery, masonry-gallery
+Widgets that already inherit via `.widget-card` need no extra work (card-grid, icon-card-grid, pricing, testimonials, numbered-cards, key-figures, event-list, job-listing, content-switcher, project-showcase, gallery, masonry-gallery).
 
-Widgets with custom token usage:
+Widgets with custom token usage (selected):
 
 | Widget | Element | Token |
 |---|---|---|
 | image | `.image-wrapper`, `.image-link` (when not fullwidth) | `--radius-lg` |
-| slideshow | `.slideshow-constrained` (slideshow.css) | `--radius-lg` |
+| slideshow | `.slideshow-constrained` | `--radius-lg` |
 | banner | section (when not fullwidth) | `--radius-lg` |
 | accordion | `.accordion-item`, `.accordion-list` (bordered) | `--radius-sm` |
-| comparison-table | `.comparison-table-badge` | `--radius-sm` |
 | content-switcher | `.switcher-btn` | `--radius-button` |
 | image-tabs | `.image-tabs-image-area` | `--radius-md` |
-| image-hotspots | `.image-hotspots-wrapper` | `--radius-md` |
-| image-hotspots | `.image-hotspot-tooltip` | `--radius-sm` |
+| image-hotspots | `.image-hotspots-wrapper` / `.image-hotspot-tooltip` | `--radius-md` / `--radius-sm` |
 | testimonial-hero | `.testimonial-image-wrapper` | `--radius-lg` |
-| event-list | `.event-date` | `--radius-sm` |
-| timeline | `.timeline-content` | `--radius-sm` |
-| timeline | `.timeline-marker` | `--radius-marker` |
+| timeline | `.timeline-content` / `.timeline-marker` | `--radius-sm` / `--radius-marker` |
 | steps | `.steps-badge` | `--radius-marker` |
-| logo-cloud | `.logo-item` | `--radius-sm` |
-| job-listing | `.job-badge` | `--radius-sm` |
-| job-listing | `.job-filter-btn` | `--radius-button` |
-| gallery | `.gallery-modal-image` | `--radius-md` |
-| image-text | image container | `--radius-lg` |
-| image-callout | `.callout-image` / `.callout-content` | `--radius-lg` / `--radius-md` |
-| bento-grid | bento items | `--radius-lg` |
-| countdown | `.style-cards .countdown-unit` | `--radius-lg` |
-| contact-form | `.form-status` | `--radius-md` |
-| comparison-slider | wrapper | `--radius-md` |
 | video-embed | iframe | `--radius-md` |
 | map | `.map-container` | `--radius-md` |
-| priced-list | `.priced-item-image` | `--radius-sm` |
 
-Widgets intentionally **not** affected by shapes:
-- banner/slideshow/split-hero when fullwidth (edge-to-edge backgrounds)
-- profile-grid/testimonials avatars (`border-radius: 50%` — always circular)
-- hotspot buttons (`border-radius: 50%` — interactive dots)
-- gallery/masonry `.widget-card-image` (`border-radius: 0` — images fill card, card has radius)
-- project-showcase `.project-image` (`border-radius: 0` — same pattern)
+Widgets intentionally **not** affected by shapes include fullwidth banner/slideshow/split-hero (edge-to-edge backgrounds), profile-grid/testimonials avatars and hotspot dots (`border-radius: 50%`), and gallery/masonry/project-showcase card images (`border-radius: 0` — the image fills the card while the card carries the radius).
 
 ---
 
@@ -1147,11 +1120,11 @@ Widgets intentionally **not** affected by shapes:
 
 ### Overview
 
-The reveal system animates elements into view as the user scrolls. It is **opt-in** via the `enable_reveal_animations` setting in `theme.json`. When disabled, all `.reveal` elements are forced visible via an inline `<style>` override in `layout.liquid`.
+The reveal system animates elements into view as the user scrolls. It is **opt-in** via the `enable_reveal_animations` setting in `theme.json` (default **off**). When disabled, `layout.liquid` injects an inline `<style>` forcing all `.reveal` elements visible, and `reveal.js` is not loaded.
 
 ### Usage
 
-Add `.reveal` and a direction class to any element:
+Add `.reveal` and (optionally) a direction class to any element:
 
 ```html
 <div class="reveal reveal-up" style="--reveal-delay: 2">Content appears from below with a 0.2s delay</div>
@@ -1166,34 +1139,30 @@ Add `.reveal` and a direction class to any element:
 | `.reveal-left`  | `translateX(2rem)` — slides in from right    |
 | `.reveal-right` | `translateX(-2rem)` — slides in from left    |
 | `.reveal-scale` | `scale(0.95)` — scales up                    |
-| `.reveal-fade`  | (no transform) — fade only                   |
+
+A bare `.reveal` with no direction class is a plain fade (opacity only — no transform).
 
 ### Hidden State (`.reveal`)
 
 ```css
 .reveal {
   opacity: 0;
-  transition:
-    opacity 0.6s ease-out,
-    transform 0.6s ease-out;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   transition-delay: calc(var(--reveal-delay, 0) * 0.1s);
 }
 ```
 
 ### Revealed State (`.reveal.revealed`)
 
-Applied by JavaScript (`reveal.js`) when the element enters the viewport:
+Applied by `reveal.js` when the element enters the viewport:
 
 ```css
-.reveal.revealed {
-  opacity: 1;
-  transform: none;
-}
+.reveal.revealed { opacity: 1; transform: none; }
 ```
 
 ### Staggered Delays
 
-Use `--reveal-delay` (set as inline style) to stagger animations. Each increment adds `0.1s` delay:
+Use `--reveal-delay` (inline style) to stagger. Each increment adds `0.1s`:
 
 ```liquid
 {% for blockId in widget.blocksOrder %}
@@ -1219,64 +1188,66 @@ The theme uses three breakpoints:
 | Tablet     | `750px+`  | Two-column grids, increased spacing                |
 | Desktop    | `990px+`  | Full grid columns, desktop navigation, max spacing |
 
-An additional breakpoint at `1200px` exists in the documentation but is not used in Arch's `base.css`.
+Widget-authoring docs sometimes reference a `1200px` "desktop large" tier for completeness, but Arch's `base.css` does not use it.
 
 ### Key Responsive Behaviors
 
 | Element         | Mobile          | Tablet (750px+) | Desktop (990px+)              |
 | --------------- | --------------- | --------------- | ----------------------------- |
 | Grid columns    | 1               | 2               | `var(--grid-cols-desktop, 3)` |
-| Section padding | 64px            | 80px            | 96px                          |
-| Card padding    | 24px            | 32px            | 40px                          |
+| Section spacing | 64px            | 64px            | 80px                          |
+| Card padding    | 24px            | 32px            | dense-aware (≤32px)           |
 | Card title size | 18px            | 18px            | 20px                          |
 | Navigation      | Slide-out panel | Slide-out panel | Horizontal dropdown           |
-| Header contact  | Hidden          | Hidden          | Visible                       |
+| Header contact  | In panel        | In panel        | Visible                       |
 | Header CTA      | Mobile CTA      | Mobile CTA      | Desktop CTA                   |
 
 ---
 
 ## CSS Variable Pipeline
 
-This describes how user-configured theme values flow from `theme.json` settings to rendered CSS:
+How user-configured theme values flow from `theme.json` settings to rendered CSS:
 
 ### 1. Configuration (theme.json)
 
-Settings with `"outputAsCssVar": true` (colors) and `font_picker` types are candidates for CSS variable generation:
+Settings with `"outputAsCssVar": true` (the 18 colors + `heading_scale` + `body_scale`) and `font_picker` types are candidates for CSS variable generation:
 
 ```json
 {
   "type": "color",
   "id": "standard_accent",
-  "label": "tTheme:settings.colors.standard_accent",
-  "default": "#DE1877",
+  "label": "tTheme:global.colors.settings.standard_accent.label",
+  "default": "#0f172a",
   "outputAsCssVar": true
 }
 ```
 
-Labels, displayNames, descriptions, and option labels in widget `schema.json` files use `tTheme:` prefixed keys (e.g., `"displayName": "tTheme:carousel.name"`). These are resolved at runtime by the `useThemeLocale` hook's `tTheme()` function, which strips the prefix and walks dot-paths through the theme's locale JSON.
+Labels, displayNames, descriptions, and option labels in `theme.json` and widget `schema.json` use `tTheme:`-prefixed keys, resolved at runtime by the `useThemeLocale` hook's `tTheme()` function (strips the prefix, walks dot-paths through the theme locale JSON).
 
 ### 2. Processing (themeSettings.js)
 
-The `{% theme_settings %}` Liquid tag reads all global settings, and for each one:
+The `{% theme_settings %}` tag (`packages/core/src/tags/themeSettings.js`) reads every global setting and:
 
-- **Color/range settings** with `outputAsCssVar: true`: generates `--{category}-{id}: {value};`
-- **Font pickers**: generates `--{category}-{id}-family`, `--{category}-{id}-weight`, and (for body) `--{category}-{id}_bold-weight`
+- **`outputAsCssVar` settings** (colors, ranges): emits `--{category}-{id}: {value};` (appending a unit for `range` settings that define one).
+- **`font_picker` settings**: emits `--{category}-{id}-family`, `--{category}-{id}-weight`, and (for `body_font`) `--{category}-{id}_bold-weight` via smart-bold lookup.
+
+CSS values are passed through a `<>{}`-stripping escape as defense-in-depth against `<style>` breakout.
 
 ### 3. Output (injected `<style>`)
 
 ```html
 <style id="theme-settings-styles">
-  :root {
-    --colors-standard_bg_primary: #ffffff;
-    --colors-standard_accent: #de1877;
-    --colors-highlight_bg_primary: #233c54;
-    --typography-heading_font-family: "Fraunces", serif;
-    --typography-heading_font-weight: 600;
-    --typography-body_font-family: "Inter", sans-serif;
-    --typography-body_font-weight: 400;
-    --typography-body_font_bold-weight: 700;
-    /* ... all 18 colors + typography variables */
-  }
+:root {
+  --colors-standard_bg_primary: #ffffff;
+  --colors-standard_accent: #0f172a;
+  --colors-highlight_bg_primary: #0f172a;
+  --typography-heading_font-family: "Inter", sans-serif;
+  --typography-heading_font-weight: 600;
+  --typography-body_font-family: "Inter", sans-serif;
+  --typography-body_font-weight: 400;
+  --typography-body_font_bold-weight: 700;
+  /* ... all 18 colors + 2 scale ranges + typography variables */
+}
 </style>
 ```
 
@@ -1288,7 +1259,7 @@ The design system reads the injected variables via `var()` with fallbacks:
 :root {
   --accent: var(--colors-standard_accent, #0d47b7);
 }
-.color-scheme-highlight {
+.color-scheme-highlight-primary {
   --accent: var(--colors-highlight_accent, #de1877);
 }
 body {
@@ -1309,104 +1280,84 @@ body {
 
 ## Widget Template Conventions
 
-### Standard Widget Root Element
+This is the design-system-level summary. For the complete widget-authoring reference (schema conventions, JS lifecycle, asset enqueueing, block types, accessibility checklist), see [theming-widgets.md](theming-widgets.md). For per-setting-type details, see [theming-setting-types.md](theming-setting-types.md).
 
-Every widget follows this pattern:
+### Standard Widget Root Element
 
 ```liquid
 <section
   id="{{ widget.id }}"
   class="widget widget-type-{name} widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {modifiers}"
-  {% if widget.settings.color_scheme == 'highlight' %}
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
-  {% endif %}
+  {% endunless %}
   data-widget-id="{{ widget.id }}"
   data-widget-type="{name}"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
 ```
 
-Key attributes:
-
-- `id="{{ widget.id }}"` — Unique anchor
-- `class="widget"` — Base styles (background, padding)
-- `class="widget-type-{name}"` — Type-specific CSS scoping
-- `class="widget-{{ widget.id }}"` — Instance-specific scoped styles (used with `<style>` blocks inside the widget)
-- `class="color-scheme-{{ widget.settings.color_scheme }}"` — Activates color scheme remapping
-- `data-widget-id` / `data-widget-type` / `data-widget-index` — Editor integration
+Key attributes: `id` (anchor), `widget` (base styles), `widget-type-{name}` (type scoping), `widget-{{ widget.id }}` (instance-scoped `<style>` boundary), `color-scheme-{value}` (palette remap), and `data-widget-id`/`-type`/`-index` (editor integration).
 
 ### Scoped Widget Styles
 
-Widgets that need custom CSS use instance-scoped `<style>` blocks:
+Widgets that need custom CSS use instance-scoped `<style>` blocks with native nesting (`&`) under the unique `.widget-{{ widget.id }}` class:
 
 ```liquid
 <style>
   .widget-{{ widget.id }} {
-    & .my-custom-element {
-      /* Styles scoped to this widget instance */
-    }
-
+    & .my-custom-element { /* scoped to this instance */ }
     @media (min-width: 990px) {
-      & .my-custom-element {
-        /* Desktop overrides */
-      }
+      & .my-custom-element { /* desktop overrides */ }
     }
   }
 </style>
 ```
 
-This uses CSS nesting (`&`) with the unique `.widget-{{ widget.id }}` class as the scope boundary.
-
 ### Container Pattern
 
 ```liquid
-<div class="widget-container {% if widget.settings.color_scheme == 'highlight' %}widget-container-padded{% endif %}">
-  <!-- Widget content here -->
+<div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+  <!-- Widget content -->
 </div>
 ```
 
 ### Heading Level Logic
 
-Widgets use `widget.index` to determine heading levels (h1 vs h2) for proper semantic hierarchy:
-
-```liquid
-{% if widget.index == 1 %}
-  <h1 class="w-headline">{{ widget.settings.title }}</h1>
-{% else %}
-  <h2 class="w-headline">{{ widget.settings.title }}</h2>
-{% endif %}
-```
+Widgets use `widget.index` to choose heading levels for semantic hierarchy (`widget.index == 1` → `<h1>`, otherwise `<h2>`). See [theming-widgets.md](theming-widgets.md) for the full heading-hierarchy rules including item-level headings.
 
 ### Block Rendering Pattern
 
-Widgets with blocks iterate over `widget.blocksOrder` and use `{% case %}` to render each block type:
+Widgets with blocks iterate `widget.blocksOrder` and `{% case block.type %}` to render each type:
 
 ```liquid
 {% for blockId in widget.blocksOrder %}
   {% assign block = widget.blocks[blockId] %}
   {% case block.type %}
-    {% when 'heading' %}
-      <!-- Heading block -->
-    {% when 'text' %}
-      <!-- Text block -->
-    {% when 'button' %}
-      <!-- Button block -->
+    {% when 'heading' %}<!-- ... -->
+    {% when 'text' %}<!-- ... -->
+    {% when 'button' %}<!-- ... -->
   {% endcase %}
 {% endfor %}
-```
-
-### Reveal Animation Integration
-
-Apply `.reveal` + direction class to elements, with staggered delays using `--reveal-delay`:
-
-```liquid
-<div class="reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}">
 ```
 
 ---
 
 ## Available Widgets (Arch Theme)
 
-47 widgets (45 page + 2 global): accordion, banner, bento-grid, card-grid, comparison-slider, comparison-table, contact-form, content-switcher, countdown, embed, event-list, features-split, gallery, icon-card-grid, icon-list, image, image-callout, image-hotspots, image-tabs, image-text, job-listing, key-figures, logo-cloud, map, masonry-gallery, numbered-cards, numbered-service-list, priced-list, pricing, profile-grid, project-showcase, rich-text, schedule-table, scrolling-text, slideshow, social-icons, split-content, split-hero, team-highlight, testimonial-hero, testimonials, timeline, trust-bar, video-embed, video-popup, header (global), footer (global).
+The Arch theme ships **58 widgets — 56 page widgets + 2 global** (header, footer). Page widgets:
 
-Many card-based widgets (card-grid, icon-card-grid, profile-grid, testimonials, gallery, pricing, icon-list, key-figures, logo-cloud, numbered-cards, project-showcase) support a `layout` setting to switch between grid and carousel display modes. See [Carousel Layout](#carousel-layout) for details.
+accordion, action-bar, audio-player, banner, bento-grid, card-grid, checkerboard, class-schedule, comparison-slider, comparison-table, contact-details, content-switcher, countdown, embed, event-list, features-split, gallery, icon-card-grid, icon-list, image, image-callout, image-hotspots, image-tabs, image-text, job-listing, key-figures, logo-cloud, map, masonry-gallery, news-grid, numbered-cards, numbered-service-list, priced-list, pricing, profile-grid, project-showcase, projects-grid, resource-list, rich-text, schedule-table, scrolling-text, services-grid, slideshow, sliding-panels, social-icons, split-content, split-hero, steps, team-highlight, testimonial-hero, testimonial-slider, testimonials, timeline, trust-bar, video-embed, video-popup.
+
+Global widgets: **header**, **footer** (rendered on every page via `{{ header | raw }}` / `{{ footer | raw }}`).
+
+Card-based widgets that support a `layout` setting to switch between grid and carousel display: **card-grid, gallery, icon-card-grid, icon-list, key-figures, logo-cloud, numbered-cards, pricing, profile-grid, project-showcase, testimonials**. See [Carousel Layout](#carousel-layout) for details.
+
+---
+
+**See also:**
+
+- [theming.md](theming.md) — Theme structure, global settings, layout templates
+- [theming-widgets.md](theming-widgets.md) — Widget authoring guide
+- [theming-setting-types.md](theming-setting-types.md) — All available setting types
+- [core-editor-ui-style-guide.md](core-editor-ui-style-guide.md) — Editor UI (React/Tailwind) style guide

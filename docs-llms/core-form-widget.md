@@ -15,13 +15,13 @@ On any other static host the form renders correctly but submissions POST to a
 
 | Concern | File |
 |---|---|
-| Widget schema (settings + blocks) | `src/core/widgets/core-form/schema.json` |
-| Widget markup | `src/core/widgets/core-form/widget.liquid` |
-| Authoring/usage guidance | `src/core/widgets/core-form/insights.md` |
-| Manifest builder | `server/services/formsManifestService.js` |
-| Export wiring | `server/controllers/exportController.js` (writes `widgetizer.forms.json`) |
-| Locale strings | `src/core/widgets/locales/en.json` (`core_form.*`) |
-| Tests | `server/tests/formsManifest.test.js` |
+| Widget schema (settings + blocks) | `packages/core/src/widgets/core-form/schema.json` |
+| Widget markup | `packages/core/src/widgets/core-form/widget.liquid` |
+| Authoring/usage guidance | `packages/core/src/widgets/core-form/insights.md` |
+| Manifest builder | `packages/builder-server/src/services/formsManifestService.js` |
+| Export wiring | `packages/builder-server/src/controllers/exportController.js` (writes `widgetizer.forms.json`) |
+| Locale strings | `packages/core/src/widgets/locales/en.json` (`core_form.*`) |
+| Tests | `packages/builder-server/src/tests/formsManifest.test.js` |
 
 ---
 
@@ -107,8 +107,8 @@ configuration violates the hosted contract, so a broken manifest never ships.
 To keep the editor friendly for non-technical users, the widget does not expose
 form keys, field keys, or option values. The hosted service needs them, so the
 export pipeline derives them silently using the same `handleize` slug rules the
-widget template uses (`server/services/formsManifestService.js` mirrors
-`src/core/filters/handleizeFilter.js` exactly):
+widget template uses (`packages/builder-server/src/services/formsManifestService.js`
+mirrors `packages/core/src/filters/handleizeFilter.js` exactly):
 
 - The **form identifier** comes from the form name (`"Contact"` → `contact`,
   `"Quote Request"` → `quote-request`). Two forms with the same name on
@@ -135,7 +135,7 @@ label, never the derived key.
 ## Widget settings
 
 Defined in `schema.json`. Labels are `tTheme:` i18n keys resolved from
-`src/core/widgets/locales/en.json`.
+`packages/core/src/widgets/locales/en.json`.
 
 | Setting | Values | Effect |
 |---|---|---|
@@ -203,7 +203,7 @@ Enforced by the hosted service; the manifest builder applies the matching
 | `radio` | string | same as select |
 | `checkbox` | boolean | `true` when checked; required checkboxes must be checked to submit |
 
-Limits enforced at export time (`formsManifestService.js`):
+Limits enforced at export time (`packages/builder-server/src/services/formsManifestService.js`):
 
 - **Max 5 forms per site** (distinct derived form keys)
 - **Max 30 fields per form**
@@ -214,7 +214,7 @@ Limits enforced at export time (`formsManifestService.js`):
 
 ## What the export pipeline does
 
-When a project is exported (`exportController.js`):
+When a project is exported (`packages/builder-server/src/controllers/exportController.js`):
 
 1. Each `core-form` widget renders the markup above — required
    `data-widgetizer-*` attributes, off-screen honeypot named `website`, empty
@@ -286,7 +286,7 @@ The widget's flexibility covers common form patterns. A few worth knowing:
   style, a distinct `form_name` ("Newsletter") so it stays separate from the
   main Contact form in the dashboard.
 
-See `src/core/widgets/core-form/insights.md` for the full set of recipes and
+See `packages/core/src/widgets/core-form/insights.md` for the full set of recipes and
 per-setting authoring guidance.
 
 ---

@@ -13,7 +13,7 @@ This document exists to help generate presets that:
 Use this guide together with:
 
 - [theme-preset-file-format.md](theme-preset-file-format.md) — JSON file structures for all preset files (pages, header, footer, menus, preset.json)
-- [theme-presets-tracker.md](theme-presets-tracker.md) for preset ids and status only
+- [theme-preset-process.md](theme-preset-process.md) for preset ids and production status only
 - `themes/arch/theme.json`
 - widget `schema.json` files
 - widget `insights.md` files
@@ -307,11 +307,11 @@ This file is a **prompt library consumed directly by `scripts/generate-images.js
 ```json
 [
   { "file": "hero.jpg", "width": 1920, "height": 1080, "prompt": "..." },
-  { "file": "services/emergency.jpg", "width": 1024, "height": 768, "prompt": "..." }
+  { "file": "services-emergency.jpg", "width": 1024, "height": 768, "prompt": "..." }
 ]
 ```
 
-- `file` — output filename, can include subdirectory (e.g. `"testimonials/melissa.jpg"`)
+- `file` — flat output filename, hyphenated (e.g. `"testimonials-melissa.jpg"`); no path separators — see the filename rules below
 - `width` / `height` — integers in pixels; see §11.3 for dimension rules
 - `prompt` — one prose paragraph. Cover subject, setting, lighting, composition, and things to avoid — but fold it into natural sentences, not labeled sections.
 
@@ -344,8 +344,6 @@ This is the bridge between the image prompt library (Phase 2) and the template J
 
 **Required shape:** one section per page, each with a table mapping widget ID → block ID → image filename → dimensions. List widgets on the page that have no images as a trailing note. At the end, include a count-by-category table summing to the total, and a list of user-supplied images that are outside the generator pipeline (logos, favicon, logo-cloud entries).
 
-See `docs-llms/preset-plans/uplink-images-usage.md` for the reference shape.
-
 ### Phase 3: Build
 
 Use [theme-preset-file-format.md](theme-preset-file-format.md) as the structural reference for all JSON files below.
@@ -372,7 +370,7 @@ themes/arch/presets/{preset-id}/
 Then update:
 
 - `themes/arch/presets/presets.json`
-- `docs-llms/theme-presets-tracker.md`
+- the preset production status tracked in [theme-preset-process.md](theme-preset-process.md)
 
 ---
 
@@ -736,7 +734,7 @@ Fold these into natural sentences — do not write `Subject: ... Setting: ...` a
 
 **Dimensions — match the widgetizer render pipeline.**
 
-Widgetizer generates four resized variants of every upload at `thumb` (150w), `small` (480w), `medium` (1024w), and `large` (1920w) — see `server/controllers/mediaController.js`. The `large` variant (1920w) is the biggest the frontend will ever request. Source images larger than ~1920w waste tokens and disk without improving anything the user sees.
+By default Widgetizer generates four resized variants of every upload at `thumb` (150w), `small` (480w), `medium` (1024w), and `large` (1920w) — see `packages/builder-server/src/controllers/mediaController.js`. These widths are defaults: a theme can override them via `settings.imageSizes` in its `theme.json` (the `thumb` variant is always kept for the media library). With Arch's defaults, the `large` variant (1920w) is the biggest the frontend will ever request. Source images larger than ~1920w waste tokens and disk without improving anything the user sees.
 
 Pick dimensions by **the widget that will render the image**, not by what "looks big." Aspect ratio should match the widget's configured `aspect_ratio` setting when one exists. Recommended source sizes:
 
@@ -980,7 +978,7 @@ For every preset, deliver:
 - `themes/arch/presets/{preset-id}/templates/...`
 - `themes/arch/presets/{preset-id}/menus/...`
 - registry update in `themes/arch/presets/presets.json`
-- status update in `docs-llms/theme-presets-tracker.md`
+- production status update in [theme-preset-process.md](theme-preset-process.md)
 
 ---
 

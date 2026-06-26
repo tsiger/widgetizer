@@ -2,15 +2,17 @@
 
 This document provides a detailed overview of how projects are created, managed, and updated within the application. After the workspace merge, projects now live in a separate admin area and act as the entry point into the site workspace.
 
+> **Path note.** The Projects pages, `ProjectForm.jsx`, and `ProjectImportModal` live in the **OSS shell** under `app/src/`, while the project store and query manager they call live in the **`@widgetizer/editor-ui`** package under `packages/editor-ui/src/`. The backend routes live in **`@widgetizer/builder-server`** under `packages/builder-server/src/`. See [Packages & Adapter Architecture](core-packages.md).
+
 ## Core Components & Pages
 
-The project management UI is primarily handled by three pages:
+The project management UI is primarily handled by three OSS-shell pages (`app/src/pages/`):
 
 1.  **`Projects.jsx`**: The main project listing page.
 2.  **`ProjectsAdd.jsx`**: The page for creating a new project.
 3.  **`ProjectsEdit.jsx`**: The page for modifying an existing project.
 
-These pages rely on a central form component for handling user input:
+These pages rely on shared components in `app/src/components/projects/`:
 
 - **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address)
   - Migrated to **react-hook-form** for improved validation and state management
@@ -18,6 +20,7 @@ These pages rely on a central form component for handling user input:
   - Exposes `isDirty` state to parent components for navigation guard integration
   - Automatic slug generation from project name for new projects
   - **Preset selection**: When a theme with presets is selected, fetches presets via `GET /api/themes/{themeId}/presets` and displays a visual card grid with preset screenshots, names, and descriptions. The default preset is pre-selected. The selected preset ID is included in the form data as `preset`.
+- **`ProjectImportModal`**: The drag-and-drop ZIP import dialog used from the Projects page header (see [Importing a Project](#4-importing-a-project)).
 
 ## Client-Side Routing
 
@@ -38,9 +41,9 @@ The application uses `react-router-dom` to handle navigation between these pages
 
 ## Data Flow & State Management
 
-Project state is managed by a central **Zustand store** defined in `src/stores/projectStore.js`. This store is the single source of truth for the currently active project and provides actions to interact with it.
+Project state is managed by a central **Zustand store** defined in `packages/editor-ui/src/stores/projectStore.js`. This store is the single source of truth for the currently active project and provides actions to interact with it.
 
-Data fetching and backend communication are handled by utility functions in `src/queries/projectManager.js`. After the workspaces refactor, these editor client calls route through the editor-ui `apiBase` singleton via `editorFetch` (which injects `X-Project-Id`), and internal links resolve through `useEditorPath`, so the same code runs unchanged in the OSS SPA and embedded in a host. See [Packages & Adapter Architecture](core-packages.md#the-editor-ui-library-seams).
+Data fetching and backend communication are handled by utility functions in `packages/editor-ui/src/queries/projectManager.js`. These project-admin calls use `apiFetch`/`apiFetchJson` with **absolute** `/api/projects/...` paths (not the project-relative `editorFetch` helper used by the in-workspace editor queries). `apiFetch` injects the `X-Project-Id` header from `getActiveProjectId()` (`packages/editor-ui/src/lib/activeProjectId.js`), so the same code runs unchanged in the OSS SPA and embedded in a host. See [Packages & Adapter Architecture](core-packages.md#the-editor-ui-library-seams).
 
 ### The `projectManager.js` Utility
 
@@ -86,7 +89,7 @@ This file contains functions that make API calls to the backend:
 
 ### 1b. Access Without an Active Project
 
-If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no longer a separate "No Active Project" empty-state screen in the route guard. The same component also acts as the centralized project-switch boundary for site-workspace routes: when the active project changes, it resets project-scoped stores and remounts the workspace subtree with a project-keyed outlet.
+If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no longer a separate "No Active Project" empty-state screen in the route guard. The same component keys the workspace outlet by project ID so site-workspace routes remount on project switch; the OSS shell observes active-project changes in `app/src/App.jsx` and resets `themeStore`, `widgetStore`, `saveStore`, and `pageStore` through `app/src/lib/projectSwitchCoordinator.js`.
 
 ### 2. Listing and Managing Projects
 
@@ -174,11 +177,11 @@ When the user switches projects, the app must ensure no data from the previous p
 
 ### How switching works
 
-`openProjectWorkspace()` in `Projects.jsx` calls `PUT /api/projects/active/:id` to set the new active project in SQLite, refreshes the Zustand store via `fetchActiveProject()`, then navigates to `/pages`. `RequireActiveProject` observes the active-project change, resets the project-scoped frontend stores, and remounts the site-workspace subtree with a project-keyed outlet.
+`openProjectWorkspace()` in `Projects.jsx` calls `PUT /api/projects/active/:id` to set the new active project in SQLite, refreshes the Zustand store via `fetchActiveProject()`, then navigates to `/pages`. `RequireActiveProject` remounts the site-workspace subtree with a project-keyed outlet, while `app/src/App.jsx` observes the active-project change and resets the project-scoped frontend stores via `projectSwitchCoordinator`.
 
 ### Server-side protection
 
-`resolveActiveProject` middleware is applied to all project-scoped routes. For write requests, it validates both the `X-Project-Id` header (injected by `apiFetch` from the Zustand store) and `req.params.projectId` against the server's active project. Either mismatch returns 409 `PROJECT_MISMATCH`. Controllers use `req.activeProject` from the middleware.
+`resolveActiveProject` middleware is applied to all project-scoped routes. Scope resolution is delegated to the injected adapter: the middleware calls `req.adapters.scopeResolver.resolveScope(req)` and attaches the resulting `req.scope` (`{ actor, projectId, folderName }`), so swapping adapters swaps tenancy behaviour with no route changes. For write requests, it validates both the `X-Project-Id` header (injected by `apiFetch` from the Zustand store) and `req.params.projectId` against the server's active project. Either mismatch returns 409 `PROJECT_MISMATCH`. Controllers read the resolved scope (and `req.activeProject`) from the middleware. See [Packages & Adapter Architecture](core-packages.md).
 
 ### Client-side protection
 
@@ -198,7 +201,7 @@ When the user switches projects, the app must ensure no data from the previous p
 
 ## Backend API Endpoints
 
-The frontend `projectManager.js` communicates with a set of backend API endpoints defined in `server/routes/projects.js`. These routes handle the core logic of project management.
+The frontend `projectManager.js` communicates with a set of backend API endpoints defined in `packages/builder-server/src/routes/projects.js`. The OSS shell mounts the actor-scoped router (which carries `projectRoutes`) under `/api`, yielding the `/api/projects/...` URLs below. These routes handle the core logic of project management.
 
 | Method | Route | Controller Action | Description |
 | :-- | :-- | :-- | :-- |
@@ -211,11 +214,11 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
 | `POST` | `/api/projects/:projectId/export` | `exportProject` | Exports project as a downloadable ZIP file. |
 | `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
-| `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
-| `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |
 | `GET` | `/api/projects/:id/theme-updates/status` | `getThemeUpdateStatus` | Checks whether a newer theme version is available for the project. |
 | `PUT` | `/api/projects/:id/theme-updates` | `toggleProjectThemeUpdates` | Toggles the project's `receiveThemeUpdates` preference (`enabled: boolean`). |
 | `POST` | `/api/projects/:id/theme-updates/apply` | `applyProjectThemeUpdate` | Applies the currently available theme update to the project. |
+
+> **Note.** The active project's widget schemas and icon set are served by `projectController.getProjectWidgets` / `getProjectIcons`, but those routes live on the **project-scoped** router (`packages/builder-server/src/routes/widgets.js` and `icons.js`), mounted at `/api/widgets` and `/api/icons` — not under `/api/projects/...`. They are documented with the widget and theme tooling, not in the project route table above.
 
 ### Security Considerations
 
@@ -232,3 +235,4 @@ All API endpoints described in this document are protected by input validation a
 - [App Settings](core-appSettings.md) - Configure project import size limits
 - [Platform Security](core-security.md) - Security considerations for project import/export
 - [Theme Presets](theme-presets.md) - Preset variants applied during project creation
+- [Packages & Adapter Architecture](core-packages.md) - Adapters, DI, `Scope`, and `LIMIT_KEYS`

@@ -1,8 +1,8 @@
 # App Architecture
 
-This document maps the architecture of the Widgetizer app, showing how frontend components connect to queries, routes, controllers, and utilities.
+This document is the authoritative **orientation map** for the Widgetizer codebase: it shows how the refactored npm-workspace packages and shells fit together and where each subsystem lives. It deliberately stays thin — every per-subsystem detail (endpoints, controllers, stores, hooks) lives in its dedicated `core-<x>.md` doc, linked from the index below.
 
-> **Note on file paths.** After the workspaces/adapter refactor, the old monolithic `src/` (frontend) + `server/` (backend) layout has moved into npm workspace packages and shell directories. The `src/...` and `server/...` paths used throughout this doc now live under packages and shells — see **Packages & Shells** below for the mapping. The frontend React code is now `@widgetizer/editor-ui` (`packages/editor-ui/src/`); the backend is `@widgetizer/builder-server` (`packages/builder-server/src/`); rendering moved to the pure `@widgetizer/render-engine`. The deep adapter/DI detail lives in **[Packages & Adapter Architecture](core-packages.md)**; this section is the orientation map.
+> **Companion map.** The deep adapter / DI / `Scope` / `LIMIT_KEYS` detail lives in **[Packages & Adapter Architecture](core-packages.md)**. These two docs (`core-architecture.md` + `core-packages.md`) are the two maps to keep; everything else defers to a subsystem doc.
 
 ---
 
@@ -10,14 +10,43 @@ This document maps the architecture of the Widgetizer app, showing how frontend 
 
 The repo is an npm workspace (`"workspaces": ["packages/*"]`). Five packages plus three thin shells:
 
-- **Packages:** `@widgetizer/core` (shared FE/BE primitives + adapter contracts + error types + conformance suites), `@widgetizer/render-engine` (pure LiquidJS rendering over a `deps` bag), `@widgetizer/builder-server` (Express 5 backend — routes/controllers/services/SQLite), `@widgetizer/editor-ui` (mountable React editor), `@widgetizer/adapters-local` (OSS local-FS + SQLite adapter implementations).
-- **Shells:** `app/` (OSS frontend + server assembly — `app/server-common.js` builds the six local adapters and calls `createEditorApp({ adapters })`; `app/src/main.jsx` FE entry, `app/src/App.jsx` composes routes via `createEditorRoutes`); `electron/` (`electron/main.js` forks `electron/server-bootstrap.js` → `startOssServer`); `server.js` (repo-root web entry → `startOssServer`). `src/` now holds backend-runtime assets only (`src/utils/previewRuntime.js`).
+- **Packages:**
+  - `@widgetizer/core` (`packages/core/src/`) — shared FE/BE primitives + adapter **contracts** + error types + conformance suites. Also the single source of truth for the server-side Liquid filters/tags (`packages/core/src/filters/`, `packages/core/src/tags/`), `pathSecurity`, `mimeTypes`, and the adapter contract surface (`packages/core/src/adapters.js`).
+  - `@widgetizer/render-engine` (`packages/render-engine/src/`) — scope-free LiquidJS rendering over a `deps` bag; no project resolution or SQLite access. It reads Liquid templates, schemas, menus, and icons from filesystem paths supplied in `deps`.
+  - `@widgetizer/builder-server` (`packages/builder-server/src/`) — Express 5 backend (controllers/services/routes/db/SQLite/tests); **adapter-agnostic** and scope-first.
+  - `@widgetizer/editor-ui` (`packages/editor-ui/src/`) — mountable React editor (the **site-workspace** FE: page editor, media, menus, pages, collections, export, settings).
+  - `@widgetizer/adapters-local` (`packages/adapters-local/src/`) — OSS local-FS + SQLite adapter implementations.
+- **Shells:**
+  - `app/` — OSS frontend + server assembly. `app/server-common.js` builds the local adapters and calls `createEditorApp({ adapters })` / exposes `startOssServer`. `app/src/main.jsx` is the FE entry; `app/src/App.jsx` composes routes, contributing the **admin-shell** pages (`app/src/pages/` — Projects/Themes/AppSettings/Dashboard/previews) and splicing in the site-workspace routes via editor-ui's `createEditorRoutes`.
+  - `electron/` — desktop wrapper. `electron/main.js` forks `electron/server-bootstrap.js` (via `utilityProcess.fork`) → `startOssServer`. Build config lives in `electron/builder.config.mjs` (package.json has no `build` key).
+  - `server.js` — repo-root web entry → `startOssServer`.
+- **Residual `src/`:** a few pre-refactor runtime assets that legitimately still live at repo-root `src/`: `src/utils/previewRuntime.js` (injected into the preview iframe), `src/utils/standalonePreviewTarget.js` (standalone-preview href mapper), and `src/core/assets/placeholder.svg`.
+
+### Where the FE/BE code actually lives
+
+The old monolith split (root `src/` frontend + `server/` backend) is gone. The current split is:
+
+| Concern | Home |
+| ------- | ---- |
+| Admin-shell FE (Projects, Themes, App Settings, previews, dashboard) | `app/src/` |
+| Site-workspace FE (Page Editor, Pages, Menus, Media, Collections, Export, Settings) | `packages/editor-ui/src/` |
+| Backend (controllers, services, routes, db, SQLite, tests) | `packages/builder-server/src/` |
+| Shared primitives, Liquid filters/tags, `pathSecurity`, `mimeTypes`, adapter contracts | `packages/core/src/` |
+| Scope-free LiquidJS rendering | `packages/render-engine/src/` |
+| OSS local-FS + SQLite adapters | `packages/adapters-local/src/` |
+| Residual runtime assets | repo-root `src/` |
 
 **Key invariant:** `adapters-local` is consumed only by the OSS shells, never by `builder-server`. The backend is adapter-agnostic and receives adapters by injection; hosted swaps in cloud adapters without forking the server. Full detail in [Packages & Adapter Architecture](core-packages.md).
 
 ### DI assembly & scoped routers
 
-`setupBuilderServer({ adapters, plugins })` returns three routers — `actorScopedRouter` (`/projects /themes /settings /core`), `projectScopedRouter` (`/pages /menus /media /preview /export /widgets /icons`), and `previewRouter` (`GET /render/:token`). `createEditorApp({ adapters, plugins })` wires both scoped routers under `/api` and the preview router at `/`, plus helmet/cors/JSON-limits/error-handler. `initDb({ getConnection })` injects the SQLite connection. Required adapter keys: `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
+`setupBuilderServer({ adapters, plugins })` (`packages/builder-server/src/setupBuilderServer.js`) returns three routers:
+
+- `actorScopedRouter` — `/projects`, `/themes`, `/settings`, `/core`
+- `projectScopedRouter` — `/pages`, `/menus`, `/media`, `/preview`, `/export`, `/widgets`, `/icons`, `/collections`
+- `previewRouter` — `GET /render/:token`
+
+`createEditorApp({ adapters, plugins })` (`packages/builder-server/src/createApp.js`) is the **single** editor app factory. It wires both scoped routers under `/api` and the preview router at `/`, plus helmet/cors/JSON-limits/error-handler. `initDb({ getConnection })` injects the SQLite connection. Required adapter keys: `scopeResolver`, `previewScopeResolver`, `storage`, `assetStorage`, `publish`, `limits`.
 
 The `resolveActiveProject` middleware (in builder-server) delegates to `req.adapters.scopeResolver.resolveScope(req)`, sets `req.scope` (`{ actor, projectId, folderName }`) and `req.activeProject`, and enforces a write-guard: on POST/PUT/PATCH/DELETE a mismatching `X-Project-Id` header or `:projectId` param vs `scope.projectId` → `409 PROJECT_MISMATCH`. `req.adapters` is attached per-router. OSS mounts the actor + project routers both under `/api`; hosted mounts the project router under `/api/projects/:projectId`. See [Packages & Adapter Architecture](core-packages.md) for the adapter contracts, `Scope` shape, and `LIMIT_KEYS`.
 
@@ -25,744 +54,80 @@ The `resolveActiveProject` middleware (in builder-server) delegates to `req.adap
 
 ## Routing & Shell Structure
 
-The app now has two main shells plus a root redirect:
+The frontend has two shells plus a root redirect. The root composition lives in `app/src/App.jsx`; the site-workspace routes are contributed by editor-ui's `createEditorRoutes` and spliced in.
 
-- `/` is handled by `src/pages/HomeRedirect.jsx`. It redirects to `/pages` when an active project exists, otherwise to `/projects`.
-- The **admin shell** uses `src/components/layout/ProjectPickerLayout.jsx` for `/projects`, `/themes`, and `/app-settings`. It can be used without an active project.
-- The **site workspace shell** uses `src/components/layout/Layout.jsx` for `/pages`, `/menus`, `/media`, `/settings`, and `/export-site`.
-- All site workspace routes are wrapped by `src/components/layout/RequireActiveProject.jsx`. If no active project exists, the user is redirected to `/projects`. When the active project changes, the same boundary resets project-scoped singleton stores and keys the workspace outlet by project ID so the route subtree remounts cleanly.
+- `/` is handled by `app/src/pages/HomeRedirect.jsx`. It redirects to `/pages` when an active project exists, otherwise to `/projects`.
+- The **admin shell** uses `app/src/components/layout/ProjectPickerLayout.jsx` for `/projects`, `/themes`, and `/app-settings`. It can be used without an active project.
+- The **site-workspace shell** uses `packages/editor-ui/src/components/layout/Layout.jsx` for `/pages`, `/menus`, `/media`, `/settings`, `/export-site`, and the collections routes.
+- All site-workspace routes are wrapped by `packages/editor-ui/src/components/layout/RequireActiveProject.jsx`. If no active project exists, the user is redirected to `/projects`. When the active project changes, that boundary keys the workspace outlet by project ID so the route subtree remounts cleanly; the OSS shell observes the same active-project change in `app/src/App.jsx` and resets project-scoped singleton stores through `app/src/lib/projectSwitchCoordinator.js`.
 
-This admin-vs-site split is the main architectural consequence of the recent workspaces merge.
-
----
-
-## Projects
-
-### Frontend Files
-
-- `src/pages/Projects.jsx` - List view with CRUD operations
-- `src/pages/ProjectsAdd.jsx` - Create project form
-- `src/pages/ProjectsEdit.jsx` - Edit project with theme update UI
-- `src/components/projects/ProjectForm.jsx` - Reusable form component (includes `siteTitle`, `siteUrl`, description, preset/theme selection)
-- `src/components/projects/ProjectImportModal.jsx` - ZIP import modal
-- `src/components/layout/ProjectPickerLayout.jsx` - Admin-area shell for project-management routes
-- `src/components/layout/AdminMenu.jsx` - Dropdown entrypoint for project/theme/app-settings navigation
-- `src/pages/HomeRedirect.jsx` - Chooses `/projects` vs `/pages` at app root
-- `src/utils/projectNavigation.js` - Resolves preserved `next` query params back into workspace destinations
-- `src/components/layout/RequireActiveProject.jsx` - Route guard plus project-switch boundary for site-workspace routes; redirects to `/projects` when no active project exists, resets project-scoped stores on active-project changes, and remounts the workspace subtree
-
-### Route Structure
+This admin-vs-site split is the main architectural consequence of the workspaces refactor.
 
 | Route | Shell | Notes |
 | ----- | ----- | ----- |
 | `/` | none | Redirects through `HomeRedirect` |
-| `/projects`, `/projects/add`, `/projects/edit/:id` | `ProjectPickerLayout` | Project administration |
-| `/themes`, `/app-settings` | `ProjectPickerLayout` | Admin utilities |
-| `/pages`, `/menus`, `/media`, `/settings`, `/export-site` | `Layout` + `RequireActiveProject` | Active-project site workspace |
+| `/projects`, `/projects/add`, `/projects/edit/:id` | `ProjectPickerLayout` (admin, `app/src/`) | Project administration |
+| `/themes`, `/app-settings` | `ProjectPickerLayout` (admin, `app/src/`) | Admin utilities |
+| `/pages`, `/menus`, `/media`, `/settings`, `/export-site`, collections | `Layout` + `RequireActiveProject` (site, `packages/editor-ui/src/`) | Active-project site workspace |
 
-### Query Layer (`src/queries/projectManager.js`)
-
-| Function                  | Method | Endpoint                                 |
-| ------------------------- | ------ | ---------------------------------------- |
-| `getAllProjects()`        | GET    | `/api/projects`                          |
-| `getActiveProject()`      | GET    | `/api/projects/active`                   |
-| `createProject(data)`     | POST   | `/api/projects`                          |
-| `setActiveProject(id)`    | PUT    | `/api/projects/active/:id`               |
-| `updateProject(id, data)` | PUT    | `/api/projects/:id`                      |
-| `deleteProject(id)`       | DELETE | `/api/projects/:id`                      |
-| `duplicateProject(id)`    | POST   | `/api/projects/:id/duplicate`            |
-| `exportProject(id)`       | POST   | `/api/projects/:id/export`               |
-| `importProject(file)`     | POST   | `/api/projects/import`                   |
-| `checkThemeUpdates(id)`   | GET    | `/api/projects/:id/theme-updates/status` |
-| `toggleThemeUpdates(id, enabled)` | PUT | `/api/projects/:id/theme-updates` |
-| `applyThemeUpdate(id)`    | POST   | `/api/projects/:id/theme-updates/apply`  |
-
-`getAllProjects()` is a lightweight cached query wrapper with a short TTL, in-flight request deduplication, and mutation-driven invalidation. Successful project writes, including `applyThemeUpdate(id)`, invalidate that cache so follow-up reads see fresh `themeVersion` and update-status metadata.
-
-### Server Controller (`server/controllers/projectController.js`)
-
-| Function                    | Purpose                                                    |
-| --------------------------- | ---------------------------------------------------------- |
-| `getAllProjects()`          | Get all projects (enriched with themeName, hasThemeUpdate) |
-| `getActiveProject()`        | Get active project                                         |
-| `createProject()`           | Create project (copies theme, applies preset, processes templates/menus) |
-| `setActiveProject()`        | Set active project ID                                      |
-| `updateProject()`           | Update project (handles folderName rename)                 |
-| `deleteProject()`           | Delete project and cleanup exports                         |
-| `duplicateProject()`        | Clone project with new ID                                  |
-| `getProjectWidgets()`       | Get widgets (theme + core)                                 |
-| `getProjectIcons()`         | Get icons from assets/icons.json                           |
-| `exportProject()`           | Export as ZIP with manifest                                |
-| `importProject()`           | Import from ZIP                                            |
-| `getThemeUpdateStatus()`    | Check theme update availability                            |
-| `toggleProjectThemeUpdates()` | Toggle per-project theme update preference                 |
-| `applyProjectThemeUpdate()` | Apply theme update                                         |
-
-### Store (`src/stores/projectStore.js`)
-
-| State/Action                | Purpose                         |
-| --------------------------- | ------------------------------- |
-| `activeProject`             | Current active project object   |
-| `loading`                   | Loading state                   |
-| `setActiveProject(project)` | Set active project              |
-| `fetchActiveProject()`      | Fetch and update active project |
-| `clearActiveProject()`      | Clear active project            |
-
-### Service (`server/services/projectService.js`)
-
-| Function               | Purpose                                               |
-| ---------------------- | ----------------------------------------------------- |
-| `deleteProjectById()` | Reusable project deletion: exports, SQLite, files, active project reassignment. |
-
-### Utils Used
-
-- `server/utils/semver.js` - low-level semver parsing/comparison helpers
-- `server/utils/updateStatus.js` - higher-level update-status helpers such as `getUpdateStatus()` / `hasAvailableUpdate()` for theme/project update checks
-- `src/utils/slugUtils.js` - `formatSlug()` for folder name generation
-- `src/utils/dateFormatter.js` - low-level `formatDate()` implementation
-- `src/hooks/useFormatDate.js` - app-aware date formatting hook for UI display
+`registerProjectStore(useProjectStore)` in `app/src/App.jsx` connects the active-project store to API header injection. `ProjectPickerLayout` is for choosing/managing projects, themes, and app-level settings; `Layout` is project-scoped (active project name, site sidebar, and the `AdminMenu` escape hatch back to the admin area).
 
 ---
 
-## Core Widgets
+## Subsystem Index
 
-### Server Controller (`server/controllers/coreWidgetsController.js`)
+Each subsystem has a dedicated doc. This map records only each subsystem's package home; go to the linked doc for endpoints, controllers, stores, hooks, and data flow.
 
-| Function                    | Purpose                                   |
-| --------------------------- | ----------------------------------------- |
-| `getCoreWidgets()`          | Get all core widget schemas               |
-| `getCoreWidget(widgetName)` | Get specific core widget schema           |
-| `getAllCoreWidgets()`       | API endpoint to retrieve all core widgets |
-
-### Server Route (`server/routes/coreWidgets.js`)
-
-| Method | Endpoint            | Handler               |
-| ------ | ------------------- | --------------------- |
-| GET    | `/api/core-widgets` | `getAllCoreWidgets()` |
-
-### Description
-
-Core widgets are reusable, theme-independent widgets stored in the core widgets directory. They can be used across all projects and themes. The controller reads schema.json files from each core widget folder and returns them to the frontend.
-
----
-
-## Pages
-
-### Frontend Files
-
-- `src/pages/Pages.jsx` - List view with bulk operations
-- `src/pages/PagesAdd.jsx` - Create page form
-- `src/pages/PagesEdit.jsx` - Edit page metadata
-- `src/components/pages/PageForm.jsx` - Reusable form with SEO fields
-
-### Query Layer (`src/queries/pageManager.js`)
-
-| Function                    | Method | Endpoint                   |
-| --------------------------- | ------ | -------------------------- |
-| `getAllPages()`             | GET    | `/api/pages`               |
-| `getPage(id)`               | GET    | `/api/pages/:id`           |
-| `createPage(data)`          | POST   | `/api/pages`               |
-| `updatePage(id, data)`      | PUT    | `/api/pages/:id`           |
-| `deletePage(id)`            | DELETE | `/api/pages/:id`           |
-| `bulkDeletePages(ids)`      | POST   | `/api/pages/bulk-delete`   |
-| `duplicatePage(id)`         | POST   | `/api/pages/:id/duplicate` |
-| `savePageContent(id, data)` | POST   | `/api/pages/:id/content`   |
-
-### Server Controller (`server/controllers/pageController.js`)
-
-| Function            | Purpose                            |
-| ------------------- | ---------------------------------- |
-| `getAllPages()`     | List all pages for active project  |
-| `getPage()`         | Get page by slug                   |
-| `createPage()`      | Create page with unique slug       |
-| `updatePage()`      | Update page, handle slug changes   |
-| `deletePage()`      | Delete page, update media usage, clean up references |
-| `bulkDeletePages()` | Delete multiple pages, clean up references            |
-| `duplicatePage()`   | Clone page with `Name (Copy)` naming   |
-| `savePageContent()` | Save page content from editor      |
-
-### Internal Helpers
-
-- `sanitizeSlug(value, fallback?)` - Normalize backend slug input with one shared rule set
-- `generateUniqueSlug(baseName, existsCheck, options)` - Generate unique slug
-- `listProjectPagesData(projectFolderName)` - List and read all page files
-
-### Services Used
-
-- `server/services/mediaUsageService.js`:
-  - `updatePageMediaUsage()` - Track media usage in pages
-  - `removePageFromMediaUsage()` - Remove page from tracking
-
-### Hooks Used
-
-- `src/hooks/usePageSelection.js` - Multi-page selection for bulk ops
+| Subsystem | Backend home | Frontend home | Detail doc |
+| --------- | ------------ | ------------- | ---------- |
+| Projects | `packages/builder-server/src/controllers/projectController.js`, `services/projectService.js` | `app/src/pages/` (admin shell), `app/src/components/projects/` | [core-projects.md](core-projects.md) |
+| Pages | `packages/builder-server/src/controllers/pageController.js` | `packages/editor-ui/src/pages/Pages*.jsx`, `components/pages/` | [core-pages.md](core-pages.md) |
+| Menus | `packages/builder-server/src/controllers/menuController.js` | `packages/editor-ui/src/pages/Menus*.jsx`, `components/menus/` | [core-menus.md](core-menus.md) |
+| Media | `packages/builder-server/src/controllers/mediaController.js`, `services/mediaService.js`, `services/mediaUsageService.js` | `packages/editor-ui/src/pages/Media.jsx`, `components/media/` | [core-media.md](core-media.md) |
+| Collections | `packages/builder-server/src/controllers/collectionController.js`, `services/collectionService.js`, route `routes/collections.js` | `packages/editor-ui/src/pages/CollectionItem*.jsx`, `CollectionItems.jsx`, `components/collections/` | [core-collections.md](core-collections.md) |
+| Themes | `packages/builder-server/src/controllers/themeController.js`, `services/themeUpdateService.js` | `app/src/pages/Themes.jsx` (admin shell) | [core-themes.md](core-themes.md) |
+| Export | `packages/builder-server/src/controllers/exportController.js`, `services/renderingService.js` | `packages/editor-ui/src/pages/ExportSite.jsx`, `components/export/` | [core-export.md](core-export.md) |
+| App Settings | `packages/builder-server/src/controllers/appSettingsController.js` | `app/src/pages/AppSettings.jsx` (admin shell), `app/src/components/settings/` | [core-appSettings.md](core-appSettings.md) |
+| Preview | `packages/builder-server/src/controllers/previewController.js`, `services/previewTokenStore.js`; runtime at `src/utils/previewRuntime.js` | `packages/editor-ui/src/components/preview/`, `app/src/pages/SitePreviewLayout.jsx`, `PagePreview.jsx`, `CollectionItemPagePreview.jsx` | (see [core-page-editor.md](core-page-editor.md) / [core-security.md](core-security.md)) |
+| Page Editor | — | `packages/editor-ui/src/pages/PageEditor.jsx`, `components/pageEditor/`, `stores/` | [core-page-editor.md](core-page-editor.md) |
+| Widgets (theme + core) | `packages/builder-server/src/controllers/projectController.js` (`/widgets`), core widget schemas under `packages/core/src/widgets/` | — | [core-widgets.md](core-widgets.md) |
+| Database / repositories | `packages/builder-server/src/db/` (repositories: project, media, settings, export) | — | [core-database.md](core-database.md) |
 
 ---
 
-## Menus
+## Rendering Pipeline
 
-### Frontend Files
-
-- `src/pages/Menus.jsx` - List view
-- `src/pages/MenusAdd.jsx` - Create menu
-- `src/pages/MenusEdit.jsx` - Edit menu settings
-- `src/components/menus/MenuForm.jsx` - Name/description form
-
-### Query Layer (`src/queries/menuManager.js`)
-
-| Function               | Method | Endpoint                   |
-| ---------------------- | ------ | -------------------------- |
-| `getAllMenus()`        | GET    | `/api/menus`               |
-| `getMenu(id)`          | GET    | `/api/menus/:id`           |
-| `createMenu(data)`     | POST   | `/api/menus`               |
-| `updateMenu(id, data)` | PUT    | `/api/menus/:id`           |
-| `deleteMenu(id)`       | DELETE | `/api/menus/:id`           |
-| `duplicateMenu(id)`    | POST   | `/api/menus/:id/duplicate` |
-
-### Server Controller (`server/controllers/menuController.js`)
-
-| Function          | Purpose                           |
-| ----------------- | --------------------------------- |
-| `getAllMenus()`   | List all menus for active project |
-| `getMenu()`       | Get menu by ID                    |
-| `createMenu()`    | Create menu with unique ID        |
-| `updateMenu()`    | Update menu in place (stable ID)  |
-| `deleteMenu()`    | Delete menu file                  |
-| `duplicateMenu()` | Clone with regenerated item IDs   |
-| `getMenuById()`   | Helper for rendering service      |
-
-### Internal Helpers
-
-- `generateUniqueSlug()` - Generate unique menu ID from name
-- `generateNewMenuItemIds()` - Recursively regenerate item IDs
-
----
-
-## Media
-
-### Frontend Files
-
-- `src/pages/Media.jsx` - Main media browser
-- `src/components/media/MediaToolbar.jsx` - View toggle, search, filter
-- `src/components/media/MediaGrid.jsx` - Grid view
-- `src/components/media/MediaList.jsx` - List view
-- `src/components/media/MediaGridItem.jsx` - Grid item
-- `src/components/media/MediaListItem.jsx` - List item
-- `src/components/media/MediaDrawer.jsx` - Metadata editor
-- `src/components/media/MediaSelectorDrawer.jsx` - Media picker for inputs
-
-### Query Layer (`src/queries/mediaManager.js`)
-
-| Function                                           | Method | Endpoint                                             |
-| -------------------------------------------------- | ------ | ---------------------------------------------------- |
-| `getProjectMedia(projectId)`                       | GET    | `/api/media/projects/:projectId/media`               |
-| `uploadProjectMedia(projectId, files, onProgress)` | POST   | `/api/media/projects/:projectId/media`               |
-| `deleteProjectMedia(projectId, fileId)`            | DELETE | `/api/media/projects/:projectId/media/:fileId`       |
-| `deleteMultipleMedia(projectId, fileIds)`          | POST   | `/api/media/projects/:projectId/media/bulk-delete`   |
-| `getMediaFileUsage(projectId, fileId)`             | GET    | `/api/media/projects/:projectId/media/:fileId/usage` |
-| `refreshMediaUsage(projectId)`                     | POST   | `/api/media/projects/:projectId/refresh-usage`       |
-| `getMediaUrl(projectId, fileId, type)`             | -      | URL construction                                     |
-
-### Media Service (`server/services/mediaService.js`)
-
-| Function                          | Purpose                                    |
-| --------------------------------- | ------------------------------------------ |
-| `readMediaFile(projectId)`        | Read media metadata from SQLite            |
-
-### Server Controller (`server/controllers/mediaController.js`)
-
-| Function                          | Purpose                                    |
-| --------------------------------- | ------------------------------------------ |
-| `writeMediaFile(projectId, data)` | Write media metadata to SQLite                        |
-| `getProjectMedia()`               | Get all media files                        |
-| `uploadProjectMedia()`            | Upload and process files                   |
-| `updateMediaMetadata()`           | Update alt/title/description               |
-| `deleteProjectMedia()`            | Delete file (checks usage)                 |
-| `bulkDeleteProjectMedia()`        | Delete multiple (skips in-use)             |
-| `serveProjectMedia()`             | Serve media files by ID                    |
-| `getMediaFileUsage()`             | Get usage info for file                    |
-| `refreshMediaUsage()`             | Rebuild usage tracking                     |
-
-### Service (`server/services/mediaUsageService.js`)
-
-| Function                              | Purpose                            |
-| ------------------------------------- | ---------------------------------- |
-| `extractMediaPathsFromPage()`         | Extract media paths from page data |
-| `extractMediaPathsFromGlobalWidget()` | Extract from global widgets        |
-| `updatePageMediaUsage()`              | Update tracking for a page         |
-| `updateGlobalWidgetMediaUsage()`      | Update tracking for globals        |
-| `removePageFromMediaUsage()`          | Remove page from tracking          |
-| `getMediaUsage()`                     | Get pages/widgets using file       |
-| `refreshAllMediaUsage()`              | Scan all and rebuild tracking      |
-
-### Hooks Used
-
-- `src/hooks/useMediaState.js` - Media state management
-- `src/hooks/useMediaUpload.js` - Upload handling
-- `src/hooks/useMediaSelection.js` - Selection and bulk ops
-- `src/hooks/useMediaMetadata.js` - Metadata editing
-
-### Features
-
-- 30-second cache with request deduplication
-- SQLite transactions provide atomic media metadata updates
-- Usage tracking prevents deletion of in-use files
-- Image processing (multiple sizes, quality)
-- SVG sanitization with DOMPurify
-
----
-
-## Themes
-
-### Frontend Files
-
-- `src/pages/Themes.jsx` - Theme list with upload and update UI
-
-### Query Layer (`src/queries/themeManager.js`)
-
-| Function                  | Method | Endpoint                         |
-| ------------------------- | ------ | -------------------------------- |
-| `getAllThemes()`          | GET    | `/api/themes`                    |
-| `getThemePresets(id)`     | GET    | `/api/themes/:id/presets`        |
-| `getPresetScreenshotUrl(themeId, presetId)` | -  | URL construction             |
-| `getTheme(id)`            | GET    | `/api/themes/:id`                |
-| `getThemeWidgets(id)`     | GET    | `/api/themes/:id/widgets`        |
-| `getThemeTemplates(id)`   | GET    | `/api/themes/:id/templates`      |
-| `getThemeSettings()`      | GET    | `/api/themes/project/:projectId` |
-| `saveThemeSettings(data)` | POST   | `/api/themes/project/:projectId` |
-| `uploadThemeZip(file)`    | POST   | `/api/themes/upload`             |
-| `getThemeVersions(id)`    | GET    | `/api/themes/:id/versions`       |
-| `getThemeUpdateCount()`   | GET    | `/api/themes/update-count`       |
-| `updateTheme(id)`         | POST   | `/api/themes/:id/update`         |
-
-### Server Controller (`server/controllers/themeController.js`)
-
-| Function                     | Purpose                           |
-| ---------------------------- | --------------------------------- |
-| `getThemeVersions(id)`       | Get all versions for theme        |
-| `getThemeSourceDir(id)`      | Get source dir (latest/ or root)  |
-| `getThemeLatestVersion(id)`  | Get latest version string         |
-| `buildLatestSnapshot(id)`    | Build latest/ from base + updates |
-| `themeHasPendingUpdates(id)` | Check if pending updates exist    |
-| `getAllThemes()`             | Get all themes with metadata      |
-| `getTheme()`                 | Get specific theme                |
-| `getThemeWidgets()`          | Get theme widgets                 |
-| `getThemeTemplates()`        | Get theme templates               |
-| `uploadTheme()`              | Upload theme zip                  |
-| `handleThemeUpload()`        | Configure theme ZIP upload middleware |
-| `getThemeUpdateCount()`      | Count themes with pending updates |
-| `updateTheme()`              | Build latest/ for single theme    |
-| `getThemePresets()`          | Get presets for a theme            |
-| `resolvePresetPaths()`       | Resolve preset templates/menus/settings with fallback |
-| `getProjectThemeSettings()`  | Get project theme settings        |
-| `saveProjectThemeSettings()` | Save project theme settings       |
-| `copyThemeToProject()`       | Copy theme to project directory   |
-| `readProjectThemeData()`     | Read project theme.json           |
-
-### Service (`server/services/themeUpdateService.js`)
-
-| Function                      | Purpose                               |
-| ----------------------------- | ------------------------------------- |
-| `checkForUpdates(projectId)`  | Check if update available for project |
-| `toggleThemeUpdates(projectId)` | Toggle project `receiveThemeUpdates` |
-| `mergeThemeSettings()`        | Merge user + new theme.json settings  |
-| `applyThemeUpdate(projectId)` | Apply update to project               |
-
-When a project theme update is applied successfully, the frontend invalidates the cached projects list before any follow-up `getAllProjects()` read. That keeps project-level theme metadata aligned with the filesystem and database update that `themeUpdateService` just completed.
-
-### Store (`src/stores/themeUpdateStore.js`)
-
-| State/Action         | Purpose                               |
-| -------------------- | ------------------------------------- |
-| `updateCount`        | Number of themes with pending updates |
-| `isLoading`          | Loading state                         |
-| `fetchUpdateCount()` | Fetch count from API                  |
-
-### Utils
-
-- `server/utils/semver.js`:
-  - `parseVersion()` - Parse semver string
-  - `isValidVersion()` - Validate format
-  - `compareVersions()` - Compare two versions
-  - `isNewerVersion()` - Check if newer
-  - `sortVersions()` - Sort ascending
-  - `getLatestVersion()` - Get latest from array
-- `server/utils/updateStatus.js`:
-  - `getUpdateStatus()` - Derive richer update-status objects from current/available versions
-  - `hasAvailableUpdate()` - Lightweight boolean check for project/theme update availability
-- `server/utils/themeHelpers.js`:
-  - `preprocessThemeSettings()` - Transform settings for access
-- `scripts/validate-theme-locales.js` + `validate-theme-locales-helpers.js`:
-  - Validates all `tTheme:` keys in widget schemas resolve to entries in theme locale files
-  - Detects orphaned keys in `en.json` not referenced by any schema
-  - Checks non-English locales match `en.json` (missing and extra keys) when additional locales are present
-  - Recursively scans widget directories (including `widgets/global/header/`, `widgets/global/footer/`)
-  - Run via `npm run validate:theme-locales`; also runs as part of `predev:all` hook
-
----
-
-## Export
-
-### Frontend Files
-
-- `src/pages/ExportSite.jsx` - Export page
-- `src/components/export/ExportCreator.jsx` - Trigger export
-- `src/components/export/ExportHistoryTable.jsx` - History with actions
-
-### Query Layer (`src/queries/exportManager.js`)
-
-| Function                              | Method | Endpoint                          |
-| ------------------------------------- | ------ | --------------------------------- |
-| `exportProjectAPI(projectId)`         | POST   | `/api/export/:projectId`          |
-| `getExportHistory(projectId)`         | GET    | `/api/export/history/:projectId`  |
-| `deleteExportAPI(projectId, version)` | DELETE | `/api/export/:projectId/:version` |
-| `getExportEntryFile(exportDir)`       | GET    | `/api/export/files/:exportDir`    |
-| `downloadExportZip(exportDir)`        | GET    | `/api/export/download/:exportDir` |
-
-### Server Controller (`server/controllers/exportController.js`)
-
-| Function                  | Purpose                     |
-| ------------------------- | --------------------------- |
-| `exportProject()`         | Main export handler         |
-| `getExportHistory()`      | Get export history          |
-| `deleteExport()`          | Delete export version       |
-| `getExportFiles()`        | Get entry file info         |
-| `downloadExport()`        | Stream ZIP download         |
-| `cleanupProjectExports()` | Cleanup for deleted project |
-
-### Internal Helpers
-
-- `resolveOutputDir()` - Resolve publish output path from relative `outputDir`
-- `findEntryFile()` - Find `index.html`, fallback to first HTML
-- `findFilesRecursive()` - Find files by patterns
-- `exportRepo.getNextVersion()` - Auto-increment export version
-- `exportRepo.recordExport()` - Persist export history row in SQLite
-
-### Service (`server/services/renderingService.js`)
-
-| Function                    | Purpose                                 |
-| --------------------------- | --------------------------------------- |
-| `renderWidget()`            | Render widget using Liquid              |
-| `renderPageLayout()`        | Render full page layout                 |
-| `createBaseRenderContext()` | Create context with theme, media, icons |
-| `getOrCreateEngine()`       | Get cached Liquid engine                |
-
-After the refactor, the actual LiquidJS rendering lives in the pure `@widgetizer/render-engine` package, which takes a per-project `deps` bag and never resolves projects or touches SQLite. `renderingService.js` is the thin wrapper: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary) and assembles the bag, preserving the historical `(projectId, …)` signatures above. See [Packages & Adapter Architecture](core-packages.md#render-engine-purity).
-
-### Hook Used
-
-- `src/hooks/useExportState.js` - Export state management
-
----
-
-## App Settings
-
-### Frontend Files
-
-- `src/pages/AppSettings.jsx` - Settings page
-- `src/components/settings/AppSettingsPanel.jsx` - Settings renderer
-
-### Route Context
-
-- App Settings lives in the admin shell at `/app-settings`.
-- It does not require an active project.
-- When an active project exists, `AppSettings.jsx` also loads that project's theme metadata via `getTheme(activeProject.theme)` so it can hide app-level image-size controls when the theme defines its own `imageSizes`.
-
-### Query Layer (`src/queries/appSettingsManager.js`)
-
-| Function                | Method | Endpoint        |
-| ----------------------- | ------ | --------------- |
-| `getAppSettings()`      | GET    | `/api/settings` |
-| `saveAppSettings(data)` | PUT    | `/api/settings` |
-
-### Server Controller (`server/controllers/appSettingsController.js`)
-
-| Function                | Purpose                                 |
-| ----------------------- | --------------------------------------- |
-| `getAppSettings()`      | Return current settings                 |
-| `updateAppSettings()`   | Update with validation                  |
-| `readAppSettingsFile()` | Read from SQLite-backed settings store (with defaults merge) |
-| `getSetting(key)`       | Get setting by dot-notation key         |
-
-### Hook (`src/hooks/useAppSettings.js`)
-
-| Export                | Purpose                |
-| --------------------- | ---------------------- |
-| `settings`            | Current settings state |
-| `loading`             | Loading state          |
-| `isSaving`            | Saving state           |
-| `hasChanges`          | Dirty state check      |
-| `schema`              | Settings schema        |
-| `handleInputChange()` | Update setting value   |
-| `handleSave()`        | Save to server         |
-| `handleCancel()`      | Reset to original      |
-
-### Schema (`src/config/appSettings.schema.json`)
-
-**Tabs:** general, media, export, developer
-
-**Settings:**
-
-- `general.language` - Language selection
-- `general.dateFormat` - Date format
-- `media.maxFileSizeMB` - Max file size
-- `media.imageProcessing.quality` - Image quality
-- `media.imageProcessing.sizes.*` - Size configurations
-- `export.maxVersionsToKeep` - Max export versions
-- `export.maxImportSizeMB` - Max import size
-- `developer.enabled` - Developer mode toggle
-
-**Current shipped defaults:** the UI currently exposes English only for `general.language`, and `general.dateFormat` defaults to `MMMM D, YYYY h:mm A`.
-
----
-
-## Preview
-
-### Frontend Files
-
-- `src/components/pageEditor/PreviewPanel.jsx` - Preview iframe
-- `src/pages/PagePreview.jsx` - Standalone preview page
-
-### Query Layer (`src/queries/previewManager.js`)
-
-| Function                   | Purpose                      |
-| -------------------------- | ---------------------------- |
-| `fetchPreview()`           | Get full page HTML           |
-| `fetchRenderedWidget()`    | Render single widget         |
-| `updatePreview()`          | Morph changed widgets        |
-| `settingsToCssVariables()` | Convert settings to CSS vars |
-| `updateWidgetSetting()`    | Update widget in preview     |
-| `getGlobalWidgets()`       | Fetch header/footer          |
-| `saveGlobalWidget()`       | Save global widget           |
-| `getProjectWidgets()`      | Fetch widget schemas         |
-| `scrollWidgetIntoView()`   | Scroll to widget             |
-
-### Server Controller (`server/controllers/previewController.js`)
-
-| Function               | Purpose                 |
-| ---------------------- | ----------------------- |
-| `generatePreview()`    | Generate full page HTML |
-| `renderSingleWidget()` | Render single widget    |
-| `getGlobalWidgets()`   | Get header/footer data  |
-| `saveGlobalWidget()`   | Save global widget      |
-| `serveAsset()`         | Serve asset files       |
-
-### Preview Runtime (`src/utils/previewRuntime.js`)
-
-Injected into preview iframe, handles:
-
-- CSS variable updates
-- Font loading
-- Widget morphing (including loading newly enqueued styles/scripts from morph response)
-- Selection detection and editor lifecycle events (`widget:select`, `widget:deselect`, `widget:block-select`, `widget:block-deselect`)
-- Scroll to widget
-- Real-time settings updates
-- Element bounds reporting
-
-Design mode detection is injected by `previewController.js` as an inline `<script>` in the `<head>` (`window.Widgetizer = { designMode: true }`) so it's available before deferred widget scripts run. Theme JS checks `window.Widgetizer?.designMode` to conditionally attach editor event listeners.
-
----
-
-## Page Editor
-
-### Main Page (`src/pages/PageEditor.jsx`)
-
-**Imports:**
-
-- Components: `WidgetList`, `PreviewPanel`, `SettingsPanel`, `EditorTopBar`, `ThemeSelector`
-- Stores: `usePageStore`, `useWidgetStore`
-- Hooks: `useNavigationGuard`
-
-**State:**
-
-- `previewMode` - desktop/mobile/tablet
-- `previewIframeRef` - iframe reference
-
-### Components (`src/components/pageEditor/`)
-
-| Component                 | Purpose                          |
-| ------------------------- | -------------------------------- |
-| `WidgetList.jsx`          | Left sidebar with drag-and-drop  |
-| `PreviewPanel.jsx`        | Preview iframe with update logic |
-| `SettingsPanel.jsx`       | Right panel for settings         |
-| `EditorTopBar.jsx`        | Top toolbar with save/undo/redo  |
-| `ThemeSelector.jsx`       | Theme settings dropdown          |
-| `WidgetSelector.jsx`      | Widget picker modal              |
-| `WidgetInsertionZone.jsx` | Insert widget UI                 |
-| `SelectionOverlay.jsx`    | Preview selection overlay        |
-| `WidgetItem.jsx`          | Widget item in sidebar           |
-| `SortableWidgetItem.jsx`  | Draggable widget wrapper         |
-| `FixedWidgetItem.jsx`     | Non-draggable header/footer      |
-| `BlockItem.jsx`           | Block item in widget             |
-| `SortableBlockItem.jsx`   | Draggable block wrapper          |
-| `BlockSelector.jsx`       | Block picker modal               |
-| `BlockInsertionZone.jsx`  | Insert block UI                  |
-
-### Store (`src/stores/pageStore.js`)
-
-| State                   | Purpose                                                  |
-| ----------------------- | -------------------------------------------------------- |
-| `page`                  | Current page data                                        |
-| `originalPage`          | Saved state for comparison                               |
-| `globalWidgets`         | Header/footer widgets                                    |
-| `themeSettingsSnapshot` | Thin theme snapshot used only for editor undo/redo state |
-
-| Action                         | Purpose                                                          |
-| ------------------------------ | ---------------------------------------------------------------- |
-| `loadPage(id)`                 | Load page data, globals, and the canonical theme-store snapshot  |
-| `loadGlobalWidgets()`          | Fetch header/footer                                              |
-| `setPage(page)`                | Update page state                                                |
-| `updateGlobalWidget()`         | Update header/footer                                             |
-| `updateThemeSetting()`         | Forward theme change to `themeStore` and record a history snapshot |
-| `syncThemeStoreFromSnapshot()` | Push restored undo/redo snapshot back to `themeStore`            |
-| `resetPage()`                  | Reset to original                                                |
-
-**Undo/Redo:** Uses `zundo` temporal middleware (50 state limit)
-
-### Store (`src/stores/widgetStore.js`)
-
-Manages widget operations:
-
-- `addWidget()`, `deleteWidget()`, `duplicateWidget()`
-- `reorderWidgets()`, `updateWidgetSettings()`
-- `addBlock()`, `deleteBlock()`, `reorderBlocks()`, `updateBlockSettings()`, `duplicateBlock()`
-- Block operations work on both page widgets and global widgets (header/footer) via internal helpers: `isGlobalWidgetId()`, `getWidgetData()`, `setWidgetData()`
-- The store now uses extracted pure helpers for ordered insert/remove behavior, default widget/block payload building, cloning, and next-selection fallback so widget and block flows stay aligned.
-- `updateWidgetSettings()` now uses the same targeted nested-patch style as block setting updates instead of deep-cloning the full page object on every change.
-- Selection state: `selectedWidgetId`, `selectedBlockId`, `selectedGlobalWidgetId`
-- Hover state: `hoveredWidgetId`, `hoveredBlockId`
-- Modification tracking: `modifiedWidgets`, `structureModified`
-
-### Store (`src/stores/saveStore.js`)
-
-Auto-save and save state:
-
-- `save()` - Save all changes
-- `hasUnsavedChanges()` - Check dirty state
-- `resetAutoSaveTimer()` - Reset 60-second timer
-
-### Data Flow
-
-**Page Load:**
-
-```
-PageEditor → pageStore.loadPage(id)
-  ├→ getPage(id) → page data
-  ├→ loadGlobalWidgets() → header/footer
-  └→ themeStore.loadSettings() → canonical theme settings
-      └→ pageStore captures themeSettingsSnapshot for zundo
-→ widgetStore.loadSchemas()
-→ PreviewPanel.fetchPreview() → initial HTML
-```
-
-**Widget Update:**
-
-```
-SettingsPanel change
-→ widgetStore.updateWidgetSettings()
-→ markWidgetModified()
-→ PreviewPanel detects change
-  ├→ Immediate: UPDATE_WIDGET_SETTINGS postMessage
-  └→ Debounced: updatePreview() → morph widget
-```
-
-**Save:**
-
-```
-Save button / Auto-save timer
-→ saveStore.save()
-  ├→ savePageContent()
-  ├→ saveGlobalWidget("header")
-  ├→ saveGlobalWidget("footer")
-  └→ themeStore.saveSettings()
-→ Update original states
-→ Clear modification flags
-```
+The actual LiquidJS rendering lives in the scope-free `@widgetizer/render-engine` package (`packages/render-engine/src/`), which takes a per-project `deps` bag and never resolves projects or touches SQLite. It reads Liquid templates, schemas, menus, and icons from filesystem paths supplied by that bag. `packages/builder-server/src/services/renderingService.js` is the thin shell wrapper: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary) and assembles the bag. In OSS the bag is assembled here; hosted assembles its own via `buildCloudRenderDeps`. The server-side Liquid filters/tags themselves live in `@widgetizer/core` (`packages/core/src/filters/`, `packages/core/src/tags/`). See [Packages & Adapter Architecture](core-packages.md#render-engine-scope-free-boundary) and [core-security.md](core-security.md) for autoescape/sanitization.
 
 ---
 
 ## Shared Utilities
 
-### Frontend
+### Backend (`packages/builder-server/src/`)
 
-| File                         | Functions                  |
-| ---------------------------- | -------------------------- |
-| `src/utils/slugUtils.js`     | `formatSlug()`             |
-| `src/utils/dateFormatter.js` | low-level `formatDate()`   |
-| `src/config.js`              | `API_URL()`, `MEDIA_TYPES` (image extensions) |
+| File | Role |
+| ---- | ---- |
+| `config.js` | Roots + path helpers (`DATA_DIR`, `APP_ROOT`, theme/locale/core-widget dirs, static dist) |
+| `utils/mimeTypes.js` | Thin wrapper over `@widgetizer/core/mimeTypes` (`ALLOWED_MIME_TYPES`, `getContentType()`, `getMediaCategory()`) |
+| `utils/pathSecurity.js` | Thin wrapper over `@widgetizer/core/pathSecurity` (`isWithinDirectory()`) |
+| `utils/semver.js` | `parseVersion()`, `compareVersions()`, `isNewerVersion()`, `sortVersions()`, `getLatestVersion()` |
+| `utils/updateStatus.js` | `getUpdateStatus()`, `hasAvailableUpdate()` for theme/project update checks |
+| `utils/themeHelpers.js` | `preprocessThemeSettings()` |
+| `utils/projectHelpers.js` | `getProjectFolderName(projectId)`, `getProjectDetails()` |
+| `utils/projectErrors.js` | `PROJECT_ERROR_CODES`, `handleProjectResolutionError()`, `isProjectResolutionError()` |
 
-### Backend
+The canonical source for `mimeTypes` and `pathSecurity` is `@widgetizer/core` (`packages/core/src/utils/`), shared with the local adapters; builder-server re-exports thin wrappers.
 
-| File | Functions |
-| --- | --- |
-| `server/config.js` | Path helpers (`getProjectDir()`, `getPublishDir()`, `getThemeDir()`, `getThemesDir()`, etc.), `getMediaDir()` |
-| `server/utils/mimeTypes.js` | `ALLOWED_MIME_TYPES`, `ZIP_MIME_TYPES`, `getContentType()`, `getMediaCategory()` |
-| `server/utils/semver.js` | `parseVersion()`, `compareVersions()`, `isNewerVersion()`, `sortVersions()`, `getLatestVersion()` |
-| `server/utils/themeHelpers.js` | `preprocessThemeSettings()` |
-| `server/utils/projectHelpers.js` | `getProjectFolderName(projectId)`, `getProjectDetails()` |
-| `server/utils/pathSecurity.js` | `isWithinDirectory()` |
-| `server/utils/projectErrors.js` | `PROJECT_ERROR_CODES`, `handleProjectResolutionError()`, `isProjectResolutionError()` |
-| `server/createApp.js` | Editor app factory — exports `createEditorApiApp()` (API routes + middleware) and `createEditorUiApp()` (static files + SPA catch-all) |
+### Shared FE hooks & stores
 
-### Shared Hooks
+The site-workspace FE hooks/stores (`useAppSettings`, `useConfirmationModal`, `useFormatDate`, `useFormNavigationGuard`, `useThemeLocale`, `useToastStore`; `projectStore`, `toastStore`, `themeUpdateStore`, `iconsStore`, `themeStore`) live under `packages/editor-ui/src/hooks/` and `packages/editor-ui/src/stores/`. The canonical `themeStore` owns per-project theme settings for both the Settings page and the Page Editor save flow; `pageStore` keeps only a thin snapshot proxy for undo/redo. Project switches are coordinated from `RequireActiveProject`. See [core-hooks.md](core-hooks.md) and [core-page-editor.md](core-page-editor.md) for the per-store/per-hook tables.
 
-| Hook                     | Purpose                                 | Used By                               |
-| ------------------------ | --------------------------------------- | ------------------------------------- |
-| `useAppSettings`         | App settings with caching               | Media, Pages, Projects, Export        |
-| `useConfirmationModal`   | Confirmation modal state                | Pages, Menus, Media, Projects, Export |
-| `useFormatDate`          | App-aware date formatting               | Main list/history surfaces            |
-| `useFormNavigationGuard` | Prevent navigation with unsaved changes | All forms                             |
-| `useThemeLocale`         | Fetches the active project's theme locale JSON, provides `tTheme()` resolver for `tTheme:`-prefixed i18n keys | Editor components (SettingsPanel, ThemeSelector, PreviewPanel, BlockList, etc.) |
-| `useToastStore`          | Toast notifications                     | All pages                             |
+---
 
-### Shared Stores
+## See Also
 
-| Store              | Purpose                              |
-| ------------------ | ------------------------------------ |
-| `projectStore`     | Active project state                 |
-| `toastStore`       | Toast notification state             |
-| `themeUpdateStore` | Theme update count                   |
-| `iconsStore`       | Per-project icon set caching         |
-| `themeStore`       | Canonical per-project theme settings state (Settings + Page Editor) |
-
-### Shared Navigation Behavior
-
-- `registerProjectStore(useProjectStore)` in `src/App.jsx` connects the active-project store to API header injection.
-- `ProjectPickerLayout` is intentionally separate from the workspace sidebar. It is for choosing/managing projects, themes, and app-level settings.
-- `Layout` is intentionally project-scoped. It shows the active project name, the site sidebar, and the `AdminMenu` escape hatch back to the admin area.
-
-#### Icons Store (`src/stores/iconsStore.js`)
-
-| State/Action                          | Purpose                          |
-| ------------------------------------- | -------------------------------- |
-| `iconsCache`                          | Cached icons by project ID       |
-| `loading`                             | Loading state by project ID      |
-| `error`                               | Error messages by project ID     |
-| `fetchIcons(projectId, forceRefresh)` | Fetch icons for a project        |
-| `getIcons(projectId)`                 | Get cached icons synchronously   |
-| `clearCache(projectId)`               | Clear cache for specific project |
-| `clearAllCache()`                     | Clear all cached icons           |
-
-**Features:** Prevents refetching icons on every IconInput mount by maintaining a per-project cache.
-
-#### Theme Store (`src/stores/themeStore.js`)
-
-| State/Action                                     | Purpose                                    |
-| ------------------------------------------------ | ------------------------------------------ |
-| `settings`                                       | Current theme settings object              |
-| `originalSettings`                               | Settings at load time for change detection |
-| `loading`                                        | Loading state                              |
-| `error`                                          | Error message if loading failed            |
-| `loadedProjectId`                                | Project currently represented by the store |
-| `activeLoadId`                                   | Stale-load guard for superseded requests   |
-| `loadSettings()`                                 | Fetch theme settings from server           |
-| `saveSettings()`                                 | Save via canonical path, including warning-driven reloads |
-| `setSettings(settings)`                          | Update settings object                     |
-| `updateThemeSetting(groupKey, settingId, value)` | Update single setting                      |
-| `resetThemeSettings()`                           | Revert to original state                   |
-| `hasUnsavedThemeChanges()`                       | Check if settings differ from original     |
-| `markThemeSettingsSaved()`                       | Update original after save                 |
-| `resetForProjectChange()`                        | Clear state and invalidate in-flight loads |
-| `reset()`                                        | Clear all state                            |
-
-**Used by:** Settings page as the canonical owner, plus the page editor/save flow. `pageStore` keeps only a snapshot proxy for undo/redo. Project switches are coordinated from `RequireActiveProject`, which calls the relevant store reset actions before remounting the workspace subtree.
+- [Packages & Adapter Architecture](core-packages.md) — adapters, DI, `Scope`, `LIMIT_KEYS`, render-engine scope-free boundary.
+- [core-database.md](core-database.md) — SQLite schema and repositories.
+- [core-security.md](core-security.md) — sanitization, autoescape, URL/image hardening, isolation contract.
+- [core-electron.md](core-electron.md) — desktop wrapper, ephemeral port, auto-updates.
+- [documentation-index.md](documentation-index.md) — full doc index.

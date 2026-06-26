@@ -1,16 +1,16 @@
 # Custom Hooks
 
-This document provides documentation for the custom React hooks used throughout the Widgetizer application. These hooks encapsulate common functionality and provide reusable state management patterns.
+Index of the custom React hooks in `@widgetizer/editor-ui`. All hook files live under `packages/editor-ui/src/hooks/`. Hooks that are really the surface of a larger subsystem (media, export, app settings) are demoted here to a one-line pointer into the subsystem doc; the editor-only utility hooks are documented in full.
 
 ## Confirmation & Modal Hooks
 
-### `useConfirmationModal` Hook (`src/hooks/useConfirmationModal.js`)
+### `useConfirmationModal` (`packages/editor-ui/src/hooks/useConfirmationModal.js`)
 
 A reusable hook for managing confirmation modal state and workflows, commonly used for destructive actions throughout the application.
 
 #### Purpose
 
-This hook standardizes confirmation dialogs across the application, providing consistent UX for operations like deletion, bulk operations, and other destructive actions.
+Standardizes confirmation dialogs across the application, providing consistent UX for operations like deletion, bulk operations, and other destructive actions.
 
 #### Usage
 
@@ -47,7 +47,7 @@ const openDeleteConfirmation = (itemId, itemName) => {
 
 **Parameters:**
 
-- `onConfirm` (function): Callback function executed when user confirms the action. Receives the `data` object passed to `openModal`.
+- `onConfirm` (function): Callback executed when the user confirms the action. Receives the `data` object passed to `openModal`.
 
 **Returns:**
 
@@ -72,15 +72,32 @@ const openDeleteConfirmation = (itemId, itemName) => {
 - Export deletion (`ExportHistoryTable.jsx`)
 - Widget deletion (`PageEditor.jsx`)
 
+### `useConfirmationAction` (`packages/editor-ui/src/hooks/useConfirmationAction.js`)
+
+Thin wrapper around `useConfirmationModal` that removes the repeated modal-wiring boilerplate from list pages with destructive actions. It owns the `ConfirmationModal` element so the page only has to render it.
+
+#### API Reference
+
+**Parameters:**
+
+- `onConfirm` (function): Callback executed when the user confirms; receives the modal `data` (same contract as `useConfirmationModal`).
+
+**Returns:**
+
+- `confirm(options)` (function): Opens the confirmation dialog — same options object as `openModal`.
+- `confirmationModal` (React element): A ready-to-render `<ConfirmationModal />` already wired to the hook's state.
+
+Pages still own their mutation logic and localized copy; this hook only eliminates the `modalState`/`openModal`/`closeModal`/`handleConfirm` plumbing and the manual `<ConfirmationModal />` props.
+
 ## Navigation & Protection Hooks
 
-### `useNavigationGuard` Hook (`src/hooks/useNavigationGuard.js`)
+### `useNavigationGuard` (`packages/editor-ui/src/hooks/useNavigationGuard.js`)
 
-Provides comprehensive navigation protection to prevent users from losing unsaved changes when attempting to leave pages.
+Provides comprehensive navigation protection to prevent users from losing unsaved changes when attempting to leave the page editor.
 
 #### Purpose
 
-This hook implements a two-layer protection system for preventing accidental data loss during navigation:
+Implements a two-layer protection system for preventing accidental data loss during navigation:
 
 1. **Browser Navigation Protection**: Prevents tab closing, URL changes, and browser navigation
 2. **Internal Navigation Protection**: Provides guarded navigation for React Router
@@ -105,14 +122,14 @@ function PageEditor() {
 
 **Parameters:** None
 
-**Returns:** None (void) - Hook manages navigation protection via side effects only
+**Returns:** None (void) — manages navigation protection via side effects only
 
 **How It Works:**
 
 - Integrates with `saveStore` to check for unsaved changes
 - Uses React Router's `useBlocker` to intercept navigation
 - Automatically shows confirmation dialogs when blocking navigation
-- Uses `beforeunload` event for browser navigation protection
+- Uses the `beforeunload` event for browser navigation protection
 
 #### Integration Points
 
@@ -120,35 +137,33 @@ function PageEditor() {
 - **Layout Component**: Integrates with sidebar navigation when on editor routes
 - **Editor Top Bar**: Used for page switching within the editor
 
-#### Key Features
+This hook is purpose-built for the page editor's `saveStore`. Form pages (Projects, Pages, Menus, Settings) use the form-state variant below instead.
 
-- **Smart Detection**: Only triggers when there are actual unsaved changes
-- **Browser Integration**: Uses `beforeunload` event for browser navigation protection
-- **Custom Dialogs**: Shows user-friendly confirmation dialogs for internal navigation
-- **Automatic Cleanup**: Properly removes event listeners on component unmount
+### `useFormNavigationGuard` (`packages/editor-ui/src/hooks/useFormNavigationGuard.js`)
 
-### `useFormNavigationGuard` Hook (`src/hooks/useFormNavigationGuard.js`)
-
-A simplified navigation guard hook specifically designed for form pages with a single bool boolean parameter.
+A simplified navigation guard for form pages, driven by a single dirty-state boolean plus an optional bypass ref.
 
 #### Purpose
 
-Provides streamlined navigation protection for form-based pages (Projects, Pages, App Settings, etc.) where the dirty state is tracked by form libraries like react-hook-form.
+Provides streamlined navigation protection for form-based pages where the dirty state is tracked by the page (typically `react-hook-form`'s `isDirty`). Unlike `useNavigationGuard`, it does not read `saveStore`.
 
 #### Usage
 
 ```javascript
+import { useRef } from "react";
 import useFormNavigationGuard from "../hooks/useFormNavigationGuard";
 
 function ProjectForm() {
   const {
     formState: { isDirty },
   } = useForm();
+  const skipRef = useRef(false);
 
-  // Protect against navigation when form is dirty
-  useFormNavigationGuard(isDirty);
+  // Protect against navigation when the form is dirty.
+  useFormNavigationGuard(isDirty, skipRef);
 
-  return <form>...</form>;
+  // Set skipRef.current = true immediately before a programmatic navigate()
+  // (e.g. after a successful save) to bypass the guard for that transition.
 }
 ```
 
@@ -156,75 +171,58 @@ function ProjectForm() {
 
 **Parameters:**
 
-- `hasUnsavedChanges` (boolean): Whether the form has unsaved changes
+- `hasUnsavedChanges` (boolean): Whether the form has unsaved changes.
+- `skipRef` (`React.RefObject<boolean>`, optional): A ref that, when `true`, bypasses both layers of the guard. Used to allow programmatic navigation after a save without prompting. Defaults to `null` (no bypass).
 
-**Returns:**
-
-- Nothing (hook handles protection automatically)
+**Returns:** Nothing — both protection layers are wired via side effects.
 
 #### Key Features
 
-- **Simplified API**: Single boolean parameter instead of complex state management
-- **Browser Protection**: Prevents tab closing and URL changes when form is dirty
-- **React Router Integration**: Works seamlessly with react-router-dom navigation
-- **Automatic Cleanup**: Removes event listeners on unmount
+- **Layer 1 — Browser protection**: `beforeunload` handler blocks tab close / refresh / external URL changes while dirty (and `skipRef` is not set).
+- **Layer 2 — Internal protection**: `useBlocker` blocks React Router navigation while dirty and the location is actually changing; shows a `window.confirm` dialog and proceeds or resets accordingly.
+- **Bypass**: `skipRef.current === true` short-circuits both layers.
+
+Most pages consume this indirectly through `useGuardedFormPage` rather than calling it directly.
+
+### `useGuardedFormPage` (`packages/editor-ui/src/hooks/useGuardedFormPage.jsx`)
+
+Standardizes the shell around guarded form pages: it owns the `skipRef`, wires `useFormNavigationGuard`, and exposes a guard-bypassing navigate plus a dirty-dot title helper. Pages keep ownership of their dirty state, submission logic, and toast behavior.
+
+#### API Reference
+
+**Parameters:**
+
+- `hasUnsavedChanges` (boolean): Whether the form has unsaved changes.
+
+**Returns:**
+
+- `navigateSafely(to, options?)` (function): Sets the internal `skipRef`, calls React Router `navigate(to, options)`, then resets the ref in a `queueMicrotask` so the guard re-arms even when navigation keeps the component mounted (e.g. a slug-change `replace`). Use after a successful save or on cancel.
+- `getDirtyTitle(title)` (function): Wraps a title string/node with the pink dirty-dot indicator when `hasUnsavedChanges` is true.
+
+Stay-in-place pages (`Settings.jsx`, App Settings) that don't navigate after save simply ignore `navigateSafely` — the guard still works from `hasUnsavedChanges` alone.
 
 #### Used In
 
-- Form pages throughout the application:
-  - `AppSettings.jsx`
-  - `ProjectsAdd.jsx`, `ProjectsEdit.jsx`
-  - `PagesAdd.jsx`, `PagesEdit.jsx`
-  - Theme settings forms
-  - Menu editing forms
+- `PagesAdd.jsx`, `PagesEdit.jsx`
+- `MenusAdd.jsx`, `MenusEdit.jsx`, `MenuStructure.jsx`
+- `CollectionItemAdd.jsx`, `CollectionItemEdit.jsx`
+- `Settings.jsx`
 
-## Selection & State Management Hooks
+## Selection & Shortcut Hooks
 
-### `usePageSelection` Hook (`src/hooks/usePageSelection.js`)
+### `usePageSelection` (`packages/editor-ui/src/hooks/usePageSelection.js`)
 
-Manages multi-item selection state for bulk operations, specifically designed for page management but with reusable patterns.
+Manages multi-item selection state for bulk operations, designed for page management but with reusable patterns.
 
 #### Purpose
 
-Provides comprehensive selection state management for list interfaces that support bulk operations like deletion, with features like select-all and visual feedback.
-
-#### Usage
-
-```javascript
-import { usePageSelection } from "../hooks/usePageSelection";
-
-function PagesList() {
-  const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
-
-  const handleSelectAll = () => {
-    if (isAllSelected(pages)) {
-      clearSelection();
-    } else {
-      selectAllPages(pages.map((page) => page.id));
-    }
-  };
-
-  return (
-    <div>
-      <input type="checkbox" checked={isAllSelected(pages)} onChange={handleSelectAll} />
-      {pages.map((page) => (
-        <PageItem
-          key={page.id}
-          page={page}
-          selected={selectedPages.includes(page.id)}
-          onSelect={() => togglePageSelection(page.id)}
-        />
-      ))}
-    </div>
-  );
-}
-```
+Provides selection state management for list interfaces that support bulk operations like deletion, with features like select-all and visual feedback.
 
 #### API Reference
 
 **Returns:**
 
-- `selectedPages` (array): Array of currently selected page IDs
+- `selectedPages` (array): Currently selected page IDs
 - `togglePageSelection(pageId)` (function): Toggles selection state for a specific page
 - `selectAllPages(pageIds)` (function): Selects all pages from the provided ID array
 - `clearSelection()` (function): Clears all selected pages
@@ -233,135 +231,155 @@ function PagesList() {
 #### Integration
 
 - **Pages Interface**: Used in `Pages.jsx` for bulk page operations
-- **Visual Feedback**: Integrates with UI to show selected states
 - **Bulk Operations**: Powers bulk deletion and other multi-page actions
+
+### `useDeleteKeyShortcut` (`packages/editor-ui/src/hooks/useDeleteKeyShortcut.js`)
+
+Editor-wide keyboard shortcut: <kbd>Delete</kbd> / <kbd>Backspace</kbd> removes the currently selected block or widget in the page editor.
+
+#### API Reference
+
+**Parameters:** None
+
+**Returns:** None — registers a single `keydown` listener for the editor's lifetime.
+
+#### Behavior
+
+- Ignores the keystroke when a modifier (`meta`/`ctrl`/`alt`) is held or when the event target is an editable field — `isEditableTarget()` treats `INPUT`/`TEXTAREA`/`SELECT` and any `contentEditable` element as off-limits, so text editing keeps its Backspace.
+- `resolveDeleteTarget()` decides what to remove from the current `widgetStore` selection: a selected block wins over its parent widget; `header`/`footer` are singletons and cannot be deleted (only their blocks can).
+- Block deletes on a global widget (`header`/`footer`) persist via `saveStore.markWidgetModified`; block deletes on a page widget set `setStructureModified(true)`; widget deletes go through `deleteWidget`, which already signals the structure flag.
+- Selection and store actions are read fresh from the stores on every keystroke (`useWidgetStore.getState()`), so the listener is registered once and never goes stale.
+
+Both `isEditableTarget` and `resolveDeleteTarget` are exported for unit testing. Used in `PageEditor.jsx`.
+
+## Layout Hooks
+
+### `useStickyActionBar` (`packages/editor-ui/src/hooks/useStickyActionBar.js`)
+
+Detects when a `position: sticky; bottom: 0` action bar is floating over scrollable content, so the caller can show a drop shadow only while it floats.
+
+#### API Reference
+
+**Parameters:**
+
+- `deps` (array, optional): Re-establish the observer when these change (e.g. a collapsible section that alters the form's scroll height, or async content that loads after mount). Defaults to `[]`.
+
+**Returns:**
+
+- `sentinelRef` (`React.RefObject<HTMLElement>`): Attach to a 1px element placed **immediately after** the sticky bar in the DOM.
+- `isStuck` (boolean): True while the bar is covering content (the sentinel is out of view).
+
+#### Behavior
+
+An `IntersectionObserver` watches the sentinel and roots on the actual scrolling ancestor (the app shell's `overflow-y-auto` container), not the window, since the form scrolls inside an inner container. When the sentinel — only visible at the very bottom or when the form is too short to scroll — leaves the viewport, `isStuck` flips true.
+
+Used in `PageForm.jsx` and `CollectionItemForm.jsx`.
 
 ## Media Management Hooks
 
-### Media Hook Architecture
+The media library is built from four cooperating hooks. They are documented in full in [Media Library](core-media.md); the one-line roles:
 
-The media system uses a modular hook architecture that separates different aspects of media functionality:
+- `useMediaState` (`packages/editor-ui/src/hooks/useMediaState.js`) — core state, data loading, view-mode persistence, and search filtering for the media library.
+- `useMediaUpload` (`packages/editor-ui/src/hooks/useMediaUpload.js`) — file upload operations with per-file XHR progress and toast feedback.
+- `useMediaSelection` (`packages/editor-ui/src/hooks/useMediaSelection.js`) — file selection and deletion workflows, with usage-protection validation via `useConfirmationModal`.
+- `useMediaMetadata` (`packages/editor-ui/src/hooks/useMediaMetadata.js`) — metadata-edit drawer state and saving (alt text, title) plus image viewing.
 
-#### `useMediaState` Hook (`src/hooks/useMediaState.js`)
-
-**Purpose**: Core state management and data loading for the media library.
-
-**Key Features:**
-
-- Files list management and loading states
-- View mode persistence (grid/list) in localStorage
-- Real-time search filtering by filename
-- Integration with project store for active project
-- Manual usage tracking refresh functionality
-
-#### `useMediaUpload` Hook (`src/hooks/useMediaUpload.js`)
-
-**Purpose**: Handles all file upload operations with progress tracking.
-
-**Key Features:**
-
-- Real-time progress tracking using XMLHttpRequest
-- Multi-file processing with individual progress indicators
-- Comprehensive error handling and user feedback
-- Toast notifications for success, warning, and error states
-- Integration with parent component state updates
-
-#### `useMediaSelection` Hook (`src/hooks/useMediaSelection.js`)
-
-**Purpose**: Manages file selection and deletion workflows for the media library.
-
-**Key Features:**
-
-- Multi-file selection state management
-- Bulk operations (select all/none) with filtering support
-- Deletion logic with usage protection validation
-- Integration with `useConfirmationModal` for safe deletion
-- Prevents deletion of files currently in use by pages
-
-#### `useMediaMetadata` Hook (`src/hooks/useMediaMetadata.js`)
-
-**Purpose**: Handles metadata editing workflows and drawer management.
-
-**Key Features:**
-
-- Drawer visibility and state management
-- File metadata editing (alt text, title)
-- API integration for saving metadata changes
-- Loading states for save operations
-- File viewing functionality for images
+See [Media Library](core-media.md) for the full architecture, API, and usage-protection rules.
 
 ## Export Management Hooks
 
-### `useExportState` Hook (`src/hooks/useExportState.js`)
+### `useExportState` (`packages/editor-ui/src/hooks/useExportState.js`)
 
-Manages all export-related state and data loading for the static site export system.
+Centralizes all export-related state for the static-site export system — project validation, export-history loading (with stale-response protection on project switch), max-versions from app settings, and last-export tracking. It is the primary hook for `ExportSite.jsx`.
 
-#### Purpose
-
-Centralizes export functionality including project validation, export history management, and settings integration.
-
-#### Key Features
-
-- **Project State**: Subscribes to `useProjectStore` for the active project (reactive to project switches)
-- **Export History**: Loading and managing export version history with automatic refresh on project change
-- **Stale-Response Protection**: Both the effect-level load and the shared `loadExportHistory()` function check the active project after async completion and discard late responses if the project changed
-- **Settings Integration**: Max versions configuration from app settings
-- **Version Management**: Last export tracking and history updates
-
-#### Usage Context
-
-Primary hook for the `ExportSite.jsx` page, providing all necessary state and data for both export creation and history management components.
+Full behavior, history shape, and stale-response handling are documented in [Export System](core-export.md).
 
 ## App Settings Hooks
 
-### `useAppSettings` Hook (`src/hooks/useAppSettings.js`)
+### `useAppSettings` (`packages/editor-ui/src/hooks/useAppSettings.js`)
 
-Manages global application settings with schema-driven validation and nested object support.
+Manages global application settings with schema-driven validation, nested dot-notation paths, change tracking, and save/cancel logic. Used by the App Settings page.
 
-#### Purpose
+Full behavior is documented in [App Settings](core-appSettings.md).
 
-Provides comprehensive state management for application-wide settings including media processing, export configuration, and other system-level options.
-
-#### Key Features
-
-- **Schema Integration**: Loads and merges with JSON schema defaults
-- **Nested Object Support**: Handles dot-notation paths for complex settings structures
-- **Change Tracking**: Automatic detection of unsaved changes
-- **Data Validation**: Type conversion and validation before saving
-- **Save/Cancel Logic**: Complete workflow management with undo functionality
-
-#### Usage
-
-Used by `AppSettings.jsx` page for managing system-wide configuration that affects all projects and users.
-
-### `useFormatDate` Hook (`src/hooks/useFormatDate.js`)
+### `useFormatDate` (`packages/editor-ui/src/hooks/useFormatDate.js`)
 
 Formats dates using the current app-level date format from `useAppSettings()`.
 
 #### Purpose
 
-Removes repeated `useAppSettings()` wiring from list/history surfaces that only need to format timestamps for display. The low-level formatting logic still lives in `src/utils/dateFormatter.js`, while this hook provides the app-aware format string and a memoized formatter function.
+Removes repeated `useAppSettings()` wiring from list/history surfaces that only need to format timestamps for display. The low-level formatting logic lives in `packages/editor-ui/src/utils/dateFormatter.js`; this hook supplies the app-aware format string and a memoized formatter.
 
 #### API Reference
 
 **Returns:**
 
-- `dateFormat` (string): The active app-level date format, falling back to `DEFAULT_DATE_FORMAT`
-- `formatDate(date)` (function): Formats a `Date`, ISO string, or timestamp using the current app setting
+- `dateFormat` (string): The active app-level date format (`settings.general.dateFormat`), falling back to `DEFAULT_DATE_FORMAT`.
+- `formatDate(date)` (function): Formats a `Date`, ISO string, or timestamp using the current app setting.
 
 #### Used In
 
-- Main list/history surfaces such as `Projects.jsx`, `Pages.jsx`, `Menus.jsx`, `ExportHistoryTable.jsx`, and media list rows
+- List/history surfaces such as `Projects.jsx`, `Pages.jsx`, `Menus.jsx`, `ExportHistoryTable.jsx`, and media list rows.
+
+## Collection Data Hooks
+
+Two thin data-loading hooks for collections, mirroring the `useAppSettings` per-project pattern. See [Collections](core-collections.md) for the data model.
+
+### `useCollections` (`packages/editor-ui/src/hooks/useCollections.js`)
+
+Loads the active project's collection schemas. Per-project module-level cache (1-minute TTL, in-flight dedup).
+
+**Returns:** `{ schemas, loading, error, refetch }`. `refetch()` forces a fresh fetch, bypassing the cache.
+
+### `useCollectionItems` (`packages/editor-ui/src/hooks/useCollectionItems.js`)
+
+Loads the items of a single collection type. Unlike schemas, item lists are **not** cached across navigations — list pages mutate them frequently, so each mount fetches fresh.
+
+**Parameters:** `type` (collection type slug), `params` (optional query params: sort, invalid, limit, offset).
+
+**Returns:** `{ items, loading, error, refetch }`.
+
+## Link Target Hook
+
+### `useLinkTargets` (`packages/editor-ui/src/hooks/useLinkTargets.js`)
+
+Loads the link-target options for the active project — all pages plus the items of every `hasItemPages` collection — as a flat, grouped option list the shared `<Combobox>` renders (a "Pages" group plus one group per collection).
+
+#### Purpose
+
+Powers the link picker in `LinkInput.jsx` and the menu editor (`MenuEditor`). Each option carries a stable `value` that is a **uuid**, so a stored link reference survives renames; the rendered `href` is re-derived at render time from the uuid, so a briefly-stale picker label can never produce a wrong link. Collection-item options additionally carry `collectionType`, `slugPrefix`, and `slug`.
+
+#### API Reference
+
+**Returns:**
+
+- `options` (array): Grouped option objects. Page options have `{ value: uuid, label, slug, isPage, group: "Pages" }`; collection-item options have `{ value: uuid, label, isCollectionItem, collectionType, slugPrefix, slug, group }`.
+- `loading` (boolean): True while the first load is in flight.
+
+**Named export:**
+
+- `invalidateLinkTargetsCache(projectId?)` — drops the cached targets so the next load refetches. Call after creating, renaming, or deleting a page or collection item so a new target appears in the picker immediately instead of after the TTL. Clears one project when given an id, or all projects when omitted.
+
+#### Caching
+
+- Per-project module-level cache (1-minute TTL) shared across all `LinkInput` instances, so the many link inputs a page can host don't each refetch.
+- Single in-flight promise per project deduplicates concurrent loads.
+
+#### Used In
+
+- `LinkInput.jsx` (settings link picker)
+- `MenuEditor/index.jsx` (menu link picker)
+- Cache invalidated from `CollectionItemAdd.jsx`, `CollectionItemEdit.jsx`, and `CollectionItems.jsx` after item writes.
 
 ## Theme Locale Hook
 
-### `useThemeLocale` Hook (`src/hooks/useThemeLocale.js`)
+### `useThemeLocale` (`packages/editor-ui/src/hooks/useThemeLocale.js`)
 
 Fetches the active project's theme locale JSON for the current language and provides a `tTheme()` resolver for `tTheme:`-prefixed i18n keys used in widget schemas.
 
 #### Purpose
 
-Widget `schema.json` files typically use `tTheme:` prefixed keys for displayName, label, description, and option labels instead of plain English strings. This hook loads the active project's copied theme locale files and returns a resolver that translates those keys into localized strings at runtime. Non-prefixed strings are returned unchanged, which allows simpler one-off themes to use direct labels when needed.
+Widget `schema.json` files typically use `tTheme:`-prefixed keys for displayName, label, description, and option labels instead of plain English strings. This hook loads the active project's copied theme locale files and returns a resolver that translates those keys into localized strings at runtime. Non-prefixed strings are returned unchanged, so simpler one-off themes can use direct labels.
 
 #### API Reference
 
@@ -369,18 +387,21 @@ Widget `schema.json` files typically use `tTheme:` prefixed keys for displayName
 
 - `tTheme(str)` (function): If `str` starts with `tTheme:`, strips the prefix and walks the dot-path through the loaded locale object to return the translated string. Non-prefixed strings are returned as-is.
 
+The pure resolver `resolveThemeKey(str, locale)` is exported separately so it can be unit-tested without React.
+
 #### Caching
 
-- Module-level locale cache shared across all component instances via `useSyncExternalStore`
-- 5-minute staleness window before re-fetching
-- **Stale-while-revalidate**: When the cache expires, stale data continues to be served while the re-fetch happens in the background. This prevents a flash of raw keys between cache expiry and fetch completion.
-- Single in-flight promise deduplication to prevent duplicate API calls
-- Backend endpoint: `GET /api/themes/project/:projectId/locales/:lang`
-- Locale source: `data/projects/<project>/locales/`, merged with `src/core/widgets/locales/`
+- Module-level locale cache keyed by `projectId:lang`, shared across all component instances via `useSyncExternalStore`.
+- 5-minute staleness window before re-fetching.
+- **Stale-while-revalidate**: when the cache expires, stale data keeps being served while the re-fetch runs in the background, preventing a flash of raw keys between expiry and fetch completion.
+- Single in-flight promise (tracked at module level) deduplicates concurrent fetches across instances.
+- **Developer-mode invalidation**: on first use the hook reads `/api/settings` once; if `developer.enabled` is true the cache is always treated as stale (`isStale()` returns true), so theme/locale edits show up without waiting out the TTL.
+- Backend endpoint: `GET /api/themes/project/:projectId/locales/:lang` (served by `themeController.js`).
+- Locale source: the project's copied `data/projects/<folder>/locales/`, merged server-side over the core widget locales in `packages/core/src/widgets/locales/` (the `themeController.js` `loadMergedLocale` / `CORE_WIDGET_LOCALES_DIR` path); requests for a missing language fall back to English.
 
 #### Used In
 
-10 editor components including SettingsPanel, ThemeSelector, PreviewPanel, BlockList, WidgetList, WidgetSelector, BlockSelector, WidgetItem, BlockItem, and EditorTopBar.
+~10 editor components including `SettingsPanel`, `ThemeSelector`, `PreviewPanel`, `BlockList`, `WidgetList`, `WidgetSelector`, `BlockSelector`, `WidgetItem`, `BlockItem`, and `EditorTopBar`.
 
 ---
 
@@ -392,29 +413,22 @@ Widget `schema.json` files typically use `tTheme:` prefixed keys for displayName
 2. **Reusability**: Hooks are designed to be reusable across different components
 3. **State Isolation**: Each hook manages its own state without interfering with others
 4. **Error Handling**: Comprehensive error handling with user feedback
-5. **Integration Points**: Hooks are designed to work together when needed
+5. **Integration Points**: Hooks are designed to work together when needed (e.g. `useConfirmationAction` over `useConfirmationModal`, `useGuardedFormPage` over `useFormNavigationGuard`)
 
 ### Best Practices
 
 - **Single Responsibility**: Each hook has a clear, single purpose
 - **Predictable APIs**: Consistent naming and return patterns across hooks
-- **Error Boundaries**: Proper error handling and user feedback
-- **Performance**: Efficient state updates and re-render optimization
-- **Testing**: Hooks are designed to be easily unit tested
-
-### Usage Guidelines
-
-- Use hooks to encapsulate complex state logic
-- Combine multiple hooks for comprehensive functionality
-- Always handle loading and error states
-- Provide user feedback for async operations
-- Follow the established patterns for consistency
+- **Performance**: Module-level per-project caches and in-flight dedup where data is project-scoped (`useCollections`, `useLinkTargets`, `useThemeLocale`)
+- **Testing**: Pure helpers (`resolveThemeKey`, `resolveDeleteTarget`, `isEditableTarget`) are exported for unit tests
 
 ---
 
 **See also:**
 
-- [App Settings](core-appSettings.md) - Settings managed by `useAppSettings` hook
-- [Export System](core-export.md) - Export functionality using `useExportState` hook
-- [Media Library](core-media.md) - Media management using media hooks
-- [Page Editor](core-page-editor.md) - Editor functionality using navigation guards
+- [App Settings](core-appSettings.md) — settings managed by `useAppSettings`
+- [Export System](core-export.md) — export functionality using `useExportState`
+- [Media Library](core-media.md) — media management using the media hooks
+- [Collections](core-collections.md) — data model behind `useCollections` / `useCollectionItems` / `useLinkTargets`
+- [Page Editor](core-page-editor.md) — editor functionality using the navigation guards and delete shortcut
+- [Themes](core-themes.md) — theme locale files resolved by `useThemeLocale`

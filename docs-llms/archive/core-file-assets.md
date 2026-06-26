@@ -398,7 +398,7 @@ V1 is **implemented**. Key deliverables:
 
 **See also:**
 
-- [core-media.md](core-media.md) - Media library architecture (updated for file assets)
-- [core-export.md](core-export.md) - Static export with file asset copying and path rewriting
-- [theming-setting-types.md](theming-setting-types.md) - Setting types including the `file` type
-- [core-page-editor.md](core-page-editor.md) - Editor-side setting selection and asset usage patterns
+- [core-media.md](../core-media.md) - Media library architecture (updated for file assets)
+- [core-export.md](../core-export.md) - Static export with file asset copying and path rewriting
+- [theming-setting-types.md](../theming-setting-types.md) - Setting types including the `file` type
+- [core-page-editor.md](../core-page-editor.md) - Editor-side setting selection and asset usage patterns

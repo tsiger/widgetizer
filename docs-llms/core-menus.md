@@ -1,38 +1,41 @@
 # Menu Management
 
-This document provides a comprehensive overview of the menu management system, from data storage to the frontend and backend implementations. The system allows for creating multiple menus, managing their basic settings, and editing their hierarchical structure.
+This document covers the menu-management subsystem end to end: per-project menu JSON storage, the `pageUuid` / `collectionItemUuid` link-resolution lifecycle, the React menu-editor pages and components, the client API helper, and the Express routes/controller (CRUD + duplicate). The system lets a project define multiple menus, edit each menu's basic settings, and build its hierarchical item structure with drag-and-drop.
+
+> **Refactor note.** Paths below are post-workspaces-refactor. Menu I/O on the CRUD path goes through the injected `StorageAdapter` over the request's `scope`; menu link-resolution at render time lives in the pure `@widgetizer/render-engine`; the disk-walking enrichment/cleanup helpers live in `@widgetizer/builder-server`. See [Packages & Adapter Architecture](core-packages.md) for the adapter/DI/`Scope`/`LIMIT_KEYS` model.
 
 ## 1. Data Structure & Storage
 
-Each menu is stored as an individual JSON file within the active project's directory. This isolates menu data and keeps it organized per-project.
+Each menu is stored as an individual JSON file under the active project's `menus/` directory. This isolates menu data and keeps it organized per-project.
 
-- **Location**: `/data/projects/<folderName>/menus/`
-- **Filename**: The filename is a "slugified" version of the menu's name (e.g., `main-menu.json`).
+- **Location**: `data/projects/<folderName>/menus/`
+- **Filename**: the slugified menu name (e.g. `main-menu.json`). The slug is also the menu's stable `id`.
 
-> **Adapter note.** After the workspaces refactor, menu JSON I/O routes through the `StorageAdapter` over the request's `scope`. `menuController` also depth/count-caps menu trees before any recursive walk: a hard `MAX_MENU_DEPTH = 32` and a `MAX_MENU_ITEMS` ceiling from the `LimitsAdapter` (over-cap → `422`; OSS = unbounded, hosted = finite). This is distinct from the theme-level nesting convention. See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
+> **Adapter note.** All CRUD-path menu I/O routes through the `StorageAdapter` (`storage.list/read/write/delete/exists`) over the request's `scope` (`{ actor, projectId, folderName }`) — the controller never builds absolute paths from request input. `menuController` also depth/count-caps menu trees before any recursive walk: a hard `MAX_MENU_DEPTH = 32` and a `MAX_MENU_ITEMS` ceiling from the `LimitsAdapter` (over-cap → `422`; OSS = unbounded, hosted = finite). Both caps are defined in `packages/core/src/adapters.js`. See [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
 
 A typical menu JSON file (`main-menu.json`) has the following structure:
 
 ```json
 {
   "id": "main-menu",
+  "uuid": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
   "name": "Main Menu",
   "description": "The primary navigation menu for the site header.",
   "items": [
     {
-      "id": "1",
+      "id": "item_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "label": "Home",
       "link": "index.html",
       "pageUuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     },
     {
-      "id": "2",
+      "id": "item_b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "label": "About Us",
       "link": "about.html",
       "pageUuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "items": [
         {
-          "id": "3",
+          "id": "item_c3d4e5f6-a7b8-9012-cdef-123456789012",
           "label": "Our Team",
           "link": "team.html",
           "pageUuid": "c3d4e5f6-a7b8-9012-cdef-123456789012"
@@ -40,7 +43,14 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
       ]
     },
     {
-      "id": "4",
+      "id": "item_d4e5f6a7-b8c9-0123-defa-234567890123",
+      "label": "Project Alpha",
+      "link": "work/project-alpha.html",
+      "collectionItemUuid": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+      "collectionType": "projects"
+    },
+    {
+      "id": "item_e5f6a7b8-c9d0-1234-efab-345678901234",
       "label": "External Link",
       "link": "https://example.com"
     }
@@ -50,61 +60,78 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
 }
 ```
 
-**Menu Item Fields:**
+**Top-level fields:**
 
-- `items`: An array of menu item objects. Each item can contain a nested `items` array, allowing for up to 4 levels of hierarchy.
-- `id`: A unique identifier for the menu item within the menu.
-- `label`: The display text shown in the navigation.
-- `link`: The URL or page filename (e.g., `about.html` for internal pages, or a full URL for external links).
-- `pageUuid` (optional): For internal page links, stores the page's stable UUID. This ensures the link remains valid even if the page is renamed.
+- `id`: the slugified, URL-friendly identifier; also the filename stem. Stable across name edits — widgets reference a menu by `uuid` (preferred) or this slug.
+- `uuid`: stable identity used by `menu`-type widget settings to reference this menu. Backfilled lazily for legacy menus that predate it (see below).
+- `name` / `description`: HTML-stripped on every write.
+- `items`: the menu item tree (see below).
+- `created` / `updated`: ISO timestamps.
 
-**Link Resolution & pageUuid Lifecycle:**
+**Menu item fields:**
 
-1. **Project Creation**: When a project is created from a theme, all menu items linking to internal pages are automatically enriched with `pageUuid` based on matching page slugs.
+- `items`: nested array of child items. Nesting is capped at `MAX_MENU_DEPTH = 32` (a DoS guard, not a UI convention — the Arch nav template only renders a few levels).
+- `id`: a unique per-item identifier. New items minted on the duplicate path use the form `item_<uuid>` (e.g. `item_9b1deb4d-...`); regenerated on duplicate to avoid collisions.
+- `label`: display text shown in the navigation (required — empty labels are rejected with `400`).
+- `link`: the URL or page filename (e.g. `about.html` for internal pages, `work/project-alpha.html` for a collection item page, or a full URL for external links). For internal targets this is a denormalized convenience value; the authoritative target is the stable UUID below.
+- `pageUuid` (optional): for links to a regular page, the page's stable UUID, so the link survives renames.
+- `collectionItemUuid` + `collectionType` (optional): for links to a collection item's detail page, the item's stable UUID plus its collection type. A first-class link target alongside `pageUuid`. Deep detail on collection item identity lives in [Collections](core-collections.md).
 
-2. **User Selection**: When users select an internal page in the menu editor, both `link` and `pageUuid` are stored.
+### Link Resolution & UUID Lifecycle
 
-3. **Rendering/Export**: The rendering service resolves each item's `pageUuid` to the current page slug, ensuring links stay up-to-date even after page renames.
+Internal links carry a stable UUID (`pageUuid` for pages, `collectionItemUuid` for collection items) so they follow renames and self-clean on deletes. The `link` string is recomputed from that UUID at render time.
 
-4. **Page Deletion Cleanup**: When a page is deleted, all menu items referencing its `pageUuid` are automatically cleaned up — the `link` is set to empty and `pageUuid` is removed from the JSON file.
+1. **Project creation** — when a project is scaffolded from a theme, menu items linking to internal pages are enriched with `pageUuid` by matching the `link` slug against the page slug→UUID map (`enrichNewProjectReferences` in `packages/builder-server/src/utils/linkEnrichment.js`).
+2. **User selection** — when an author picks an internal target in the menu editor, both the `link` and the stable UUID (`pageUuid` or `collectionItemUuid` + `collectionType`) are stored.
+3. **Rendering / export** — the render engine resolves each item's stable UUID to the current page/item slug, so emitted links stay correct after renames (Section 5).
+4. **Page deletion cleanup** — deleting a page clears every menu item referencing its `pageUuid` (the `link` is emptied and `pageUuid` removed) via `cleanupDeletedPageReferences`.
+5. **Collection-item deletion cleanup** — deleting a collection item clears every menu item referencing its `collectionItemUuid` (the `link` is emptied and `collectionItemUuid` / `collectionType` removed) via `cleanupDeletedCollectionItemReferences`.
+6. **Project cloning** — duplicating a project regenerates all page, menu, and collection-item UUIDs, then remaps every `pageUuid` / `collectionItemUuid` reference (in menu items, widget link settings, and collection-item settings) to the new values via `remapDuplicatedProjectUuids`.
 
-5. **Project Cloning**: When a project is cloned, all page UUIDs are regenerated, and all menu item `pageUuid` references are updated to point to the new UUIDs.
+All of the above enrichment/cleanup/remap helpers live in `packages/builder-server/src/utils/linkEnrichment.js`. They are OSS-internal, fs-based walks over the per-tenant project root (never request input). Preset seeding additionally remaps menu/link collection-item refs from preset-source UUIDs to freshly seeded ones (`remapCollectionItemMenuRefs` / `remapCollectionItemLinkRefs`).
 
 ## 2. Frontend Implementation
 
-The frontend for menu management is split across several React components, providing a clear separation between listing, editing settings, and managing the menu structure.
+The frontend is split across React pages under `packages/editor-ui/src/pages/` and components under `packages/editor-ui/src/components/menus/`, separating listing, settings editing, and structure editing.
 
-### Key Components
+### Pages
 
-- **`src/pages/Menus.jsx`**: Displays a list of all created menus for the active project. It lives at `/menus` inside the site workspace shell. From here, a user can navigate to add, edit settings, edit structure, duplicate, or delete a menu. The duplicate feature creates a complete copy of the menu with all nested items. Fully localized.
-- `src/pages/MenusAdd.jsx`: A page containing a form (`MenuForm.jsx`) to create a new menu by providing a name and description.
-- **`src/pages/MenusEdit.jsx`**: A page containing a form (`MenuForm.jsx`) to update an existing menu's name and description. Integrates `useFormNavigationGuard`.
-- **`src/pages/MenuStructure.jsx`**: The core of the menu editing experience. It uses the `MenuEditor.jsx` component to provide a drag-and-drop interface for adding, editing, reordering, and nesting menu items. Fully localized interface.
+- **`packages/editor-ui/src/pages/Menus.jsx`** — lists all menus for the active project at `/menus`. From here a user can add, edit settings, edit structure, duplicate, or delete a menu. Duplicate creates a complete copy with all nested items. Fully localized.
+- **`packages/editor-ui/src/pages/MenusAdd.jsx`** — a page wrapping `MenuForm` to create a menu from a name and description; on success it navigates to the new menu's structure editor.
+- **`packages/editor-ui/src/pages/MenusEdit.jsx`** — a page wrapping `MenuForm` to update an existing menu's name and description. Uses `useGuardedFormPage` for the unsaved-changes navigation guard.
+- **`packages/editor-ui/src/pages/MenuStructure.jsx`** — the core editing experience. It renders the `MenuEditor` component for drag-and-drop add/edit/reorder/nest of menu items, and saves the whole tree via `updateMenu`. Also guarded by `useGuardedFormPage`. Fully localized.
+
+### Components
+
+- **`packages/editor-ui/src/components/menus/MenuForm.jsx`** — the shared name/description form used by both add and edit pages.
+- **`packages/editor-ui/src/components/menus/MenuEditor/`** — the structure editor (`index.jsx` plus `SortableList.jsx`, `SortableItem.jsx`, `DragOverlay.jsx`, the `MenuCombobox.jsx` link-target picker, and `utils/` tree helpers). The combobox lets the author pick an internal page or collection item as the link target, which writes back the corresponding stable UUID.
 
 ### Route Context
 
-- `/menus`, `/menus/add`, `/menus/edit/:id`, and `/menus/:id/structure` are part of the site workspace shell.
-- `RequireActiveProject` redirects users to `/projects` if they reach these routes without an active project.
-- The primary click target in the list opens `/menus/:id/structure`; settings edits are a separate action.
+Routes are registered in `packages/editor-ui/src/EditorShell.jsx`:
 
-### Client-Side API (`src/queries/menuManager.js`)
+- `menus`, `menus/add`, `menus/edit/:id`, and `menus/:id/structure` live in the site-workspace shell.
+- `RequireActiveProject` redirects to `/projects` if these routes are reached without an active project.
+- The primary click target in the list opens `/menus/:id/structure`; settings edits (`/menus/edit/:id`) are a separate action.
 
-This utility file handles all communication with the backend API endpoints for menus.
+### Client-Side API (`packages/editor-ui/src/queries/menuManager.js`)
 
-- `getAllMenus()`: Fetches all menus for the active project.
-- `getMenu(id)`: Fetches a single menu by its ID.
-- `createMenu(menuData)`: Creates a new menu file.
-- `updateMenu(id, menuData)`: Updates an entire menu object. This is used for both saving settings and the complex nested structure from the `MenuStructure` page.
-- `duplicateMenu(id)`: Creates a copy of an existing menu with a new unique ID and name.
-- `deleteMenu(id)`: Deletes a menu file.
+This module wraps all menu API calls (via `editorFetchJson`):
+
+- `getAllMenus()` — fetch all menus for the active project.
+- `getMenu(id)` — fetch a single menu by ID.
+- `createMenu(menuData)` — create a new menu file.
+- `updateMenu(id, menuData)` — overwrite an entire menu object. Used for both settings saves and the full nested structure from `MenuStructure`.
+- `duplicateMenu(id)` — create a copy with a new ID and copy-suffixed name.
+- `deleteMenu(id)` — delete a menu file.
 
 ## 3. Backend Implementation
 
-The backend consists of an Express router and a controller that performs the file system operations.
+The backend is an Express 5 router plus a controller that performs scope-first storage operations through the injected `StorageAdapter`.
 
-### API Routes (`server/routes/menus.js`)
+### API Routes (`packages/builder-server/src/routes/menus.js`)
 
-This router maps HTTP requests to the appropriate controller functions.
+The router applies `resolveActiveProject` (which populates `req.scope`) and a JSON body parser, then maps requests to the controller. `name` / `description` are HTML-stripped and length-validated by `express-validator` before the controller runs.
 
 | Method   | Endpoint                   | Controller Function | Description                          |
 | -------- | -------------------------- | ------------------- | ------------------------------------ |
@@ -115,30 +142,51 @@ This router maps HTTP requests to the appropriate controller functions.
 | `POST`   | `/api/menus/:id/duplicate` | `duplicateMenu`     | Create a copy of an existing menu    |
 | `DELETE` | `/api/menus/:id`           | `deleteMenu`        | Delete a menu                        |
 
-### Controller Logic (`server/controllers/menuController.js`)
+### Controller Logic (`packages/builder-server/src/controllers/menuController.js`)
 
-The controller handles the logic for interacting with the menu JSON files on the server's filesystem.
+The controller is adapter-agnostic and scope-first — every storage call takes `req.scope` and a project-relative path under `menus/`.
 
-- **File Operations**: Uses `fs-extra` to read the list of files in the `menus` directory, read individual menu files, write new ones, and delete them.
-- **ID Generation**: When a new menu is created, a unique, URL-friendly ID is generated from its name (via `generateUniqueSlug`). This ID is used as the filename (e.g., "Header Menu" becomes `header-menu.json`).
-- **CRUD Logic**:
-  - `createMenu`: Creates a new JSON file with a basic menu structure.
-  - `updateMenu`: Overwrites the existing menu file in place. The menu filename/ID remains stable even if the menu name changes.
-  - `duplicateMenu`: Creates a complete copy of an existing menu with:
-    - **New unique ID**: Generated using `generateUniqueSlug()` from `slugHelpers`
-    - **New name**: Follows the suffix pattern `{original-name} (Copy)`, `{original-name} (Copy 2)`, etc.
-    - **Deep cloning**: All menu data is completely duplicated
-    - **Unique item IDs**: All nested menu items get new unique IDs to prevent conflicts
-    - **Fresh timestamps**: New `created` and `updated` timestamps
-  - `deleteMenu`: Removes the corresponding menu file from the `menus` directory.
+- **Storage operations**: `storage.list(scope, "menus")` to enumerate, `storage.read` / `storage.write` / `storage.delete` for individual files, and `storage.exists` for uniqueness checks. No `fs` and no absolute paths on this path.
+- **ID generation**: a new menu's `id` is a unique, URL-friendly slug from its name (`generateUniqueSlug`, checking `storage.exists`); this slug is the filename. A `uuid` (`crypto.randomUUID()`) is minted at creation.
+- **Defensive sanitization**: even though the route validator strips HTML, the controller re-strips `name` / `description` and rejects empty names with `400`.
+- **Lazy uuid backfill**: `getAllMenus` adds a `uuid` to any legacy menu that lacks one and writes it back, so older projects converge to the current shape.
+
+**CRUD behavior:**
+
+- `createMenu` — writes a new file `{ id, uuid, name, description, items: [], created, updated }`.
+- `getMenu` — reads one menu; `404` when the file is absent.
+- `updateMenu` — overwrites the file in place; `id` / filename stay stable even if `name` changes, and the existing `uuid` is preserved (minted if missing). Reads the existing file first as the existence check (`404` if absent). Before persisting an `items` tree it runs `validateMenuTree` (see Section 4), then `sanitizeMenuItems` (strips HTML from labels/links) and rejects any item with an empty label (`400`).
+- `duplicateMenu` — deep-clones the source menu with a fresh `uuid`, a copy-suffixed `name` (`{name} (Copy)`, `(Copy 2)`, … via `generateCopyName`), a new unique slug `id`, regenerated per-item IDs (`item_<uuid>` via `generateNewMenuItemIds`), and fresh timestamps. Returns `201`. It also runs `validateMenuTree` against the loaded tree first, to defend against duplicating a menu that was persisted oversized before the save-time guard existed.
+- `deleteMenu` — `storage.delete(scope, "menus/<id>.json")`.
+
+## 4. Tree Caps (MAX_MENU_DEPTH / MAX_MENU_ITEMS)
+
+`updateMenu` and `duplicateMenu` bound the item tree before any recursive walk (sanitize, label-check, clone, render). The guard is `validateMenuTree`, which walks iteratively (explicit stack, so the measurement itself can't blow the call stack) and bails as soon as either ceiling is crossed:
+
+- **Depth** — `MAX_MENU_DEPTH = 32` (hard, tier-independent).
+- **Item count** — resolved from the `LimitsAdapter` (`LIMIT_KEYS.MAX_MENU_ITEMS`), defaulting to `MAX_MENU_ITEMS = 1000` when no adapter is wired. OSS is effectively unbounded; hosted is finite.
+
+When a tree exceeds either ceiling, the controller responds `422` with a message indicating which cap was hit (`Menu nesting is too deep (maximum 32 levels).` or `Menu has too many items (maximum N).`). Both constants are defined in `packages/core/src/adapters.js`. This is the SA-20 DoS guard described in [Platform Security](core-security.md).
+
+## 5. Render-Time Link Resolution
+
+Menu link resolution at render time is pure and lives in `packages/render-engine/src/menuResolver.js`. It operates only on passed-in maps and string helpers from `@widgetizer/core` (it touches neither `fs` nor `scope`); the shell loads the menu maps (OSS via the storage adapter, hosted via cloud storage) and passes them in.
+
+- `resolveMenuItemLinks(menuItems, pagesByUuid, outputPathPrefix, collectionItemsByUuid, depth)` recursively rewrites each item's emitted `link` (depth-aware, prefixed via `prefixInternalHref`) plus an un-prefixed `canonicalPath` for active-state matching. A `collectionItemUuid` resolves to the item's current `slugPrefix/slug.html`; a `pageUuid` resolves to the page's current `slug.html`; a missing target clears the link (and drops the dead ref in the resolved copy); a custom `link` is passed through `sanitizeHref`. Recursion stops at `MAX_MENU_DEPTH` so a hostile/legacy tree can't blow the stack.
+- `resolveMenuPageLinks(menuData, …)` wraps the above over `menuData.items`.
+- `resolveMenuSettings(settings, schemaSettings, deps)` is the single source of truth for resolving every `menu`-type widget/block setting into a full menu object the menu snippet can render. It looks the stored menu value up in `menuMaps.byUuid` / `menuMaps.bySlug` and resolves its items; a missing/empty value or unknown menu yields `{ items: [] }`. It is consumed by widget rendering (`renderEngine.js`) and collection-item rendering (`collectionService.js`).
+
+> **fs-extra holdover.** `getMenuById(projectIdOrDir, menuId)` in `menuController.js` is the one render-path menu reader still using `fs-extra` / `path` directly against a project directory rather than the scope-first `StorageAdapter`. It reads a single menu (returning `{ items: [] }` for a missing file and lazily backfilling `uuid`). Migrating it onto the storage adapter is pending.
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.
+All endpoints are protected by input validation, HTML stripping, and the tree caps above. For the cross-tenant isolation contract, see [Platform Security](core-security.md).
 
 ---
 
 **See also:**
 
-- [Theming Guide](theming.md) - How menus are rendered in theme templates using the `{% render 'menu' %}` snippet
-- [Page Editor](core-page-editor.md) - How menus integrate with header/footer widgets
+- [Theming Guide](theming.md) — how menus render in theme templates via the `{% render 'menu' %}` snippet
+- [Page Editor](core-page-editor.md) — how menus integrate with header/footer widgets
+- [Collections](core-collections.md) — collection item identity and the `collectionItemUuid` link target
+- [Packages & Adapter Architecture](core-packages.md) — adapters, DI, `Scope`, `LIMIT_KEYS`

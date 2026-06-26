@@ -25,7 +25,7 @@ A collection type is defined by `collection-types/{type}/schema.json` in the the
 
 **Field rules:**
 
-- **Allowed field types** are the standard setting types: `header`, `text`, `number`, `date`, `textarea`, `richtext`, `code`, `color`, `range`, `select`, `checkbox`, `radio`, `font_picker`, `menu`, `image`, `gallery`, `table`, `file`, `link`, `youtube`, `icon`. The repeater-style keys `multiple`, `repeater`, and `blocks` are **disallowed** (an item is a flat record; use a `table` or `gallery` for repetition within a field).
+- **Allowed field types** are the standard editor setting types — validated via `isSupportedSettingType` against `SUPPORTED_SETTING_TYPES` (`packages/core/src/config/settingTypes.js`), the single source of truth shared with the editor's `SettingsRenderer`. An item is a **flat record**, so the repeater-style keys `multiple`, `repeater`, and `blocks` are **disallowed** (use a `table` or `gallery` for repetition within a field). For the per-type authoring shapes — including the `richtext` toolbar options — see [Setting Types](theming-setting-types.md).
 - **`usedAsTitle: true`** — exactly one field, which must be `text`. It supplies the item's title and the auto-generated slug.
 - **`usedAsDate: true`** — at most one field, which must be `date`. It becomes the sort key for `date_desc` / `date_asc` (items with a blank date sort last).
 - **`required: true`** — the item fails validation until the field has a non-empty value.
@@ -77,27 +77,29 @@ Schemas and templates live on the **collection-type** path (seeded from the them
 
 **Render prep / links / order** — `prepareCollectionItemForRender(item, schema, pagesByUuid, outputPathPrefix, menuDeps, mediaBasePaths)` (resolve links/menus, sanitize, resolve richtext media), `resolveCollectionItemLinks(…)`, `loadCollectionItemsByUuid(storage, scope)` (uuid → `{ slugPrefix, slug }`), `reorderCollectionItems(storage, scope, type, order)`, `buildCollectionItemPageData(schema, item, siteUrl)`.
 
+`normalizeCollectionItem` separates any out-of-schema key into an in-memory `_archived` map and re-checks every `required` field, setting `invalid: true` plus a per-field `validationErrors` list — so the editor can surface stale data and missing values on read without rewriting the file. `listCollectionItems` additionally **recovers from duplicate-uuid rename crashes**: if two files share a `uuid` (the gap between writing the new slug and deleting the old one), the one with the newer `updated` wins and the loser is excluded from the listing but never deleted (a save cleans it up via `cleanupDuplicateUuidSiblings`).
+
 The `slug` rule (`^[a-z0-9-]+$`) is enforced in `buildCollectionItemData` as defense-in-depth, independent of the route-layer validation below.
 
 ---
 
 ## 4. Routes & tenant isolation
 
-Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", collectionsRoutes)`, so collections inherit the same isolation as pages/menus/media — including in hosted, which mounts the same `projectScopedRouter` (no hosted-specific collection route). `resolveActiveProject` runs first and supplies `req.scope` + `req.adapters`; the write-guard rejects a `:projectId` / `X-Project-Id` ≠ `scope.projectId` with `409 PROJECT_MISMATCH`. Slug params are validated against `^[a-z0-9-]+$` at the route layer.
+Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", collectionsRoutes)`, so collections inherit the same isolation as pages/menus/media — including in hosted, which mounts the same `projectScopedRouter` (no hosted-specific collection route). `resolveActiveProject` runs first and supplies `req.scope` + `req.adapters`; the write-guard rejects a `:projectId` / `X-Project-Id` ≠ `scope.projectId` with `409 PROJECT_MISMATCH`. The `:collectionType` and `:itemSlug` params are validated against `^[a-z0-9-]+$` at the route layer.
 
 | Method | Path (under `/collections`) | Controller |
 |---|---|---|
 | GET | `/schemas` | list all type schemas |
-| GET | `/schema/:type` | one type schema |
-| GET | `/:type` | list items (`?sort=&limit=&offset=`) |
-| GET | `/:type/:slug` | one item |
-| POST | `/:type` | create item |
-| PUT | `/:type/:slug` | update / rename item |
-| DELETE | `/:type/:slug` | delete item |
-| POST | `/:type/bulk-delete` | `{ itemSlugs: [] }` |
-| POST | `/:type/:slug/duplicate` | duplicate item |
-| POST | `/:type/:slug/discard-archived` | drop archived out-of-schema settings |
-| POST | `/:type/reorder` | `{ order: [] }` (manual ordering) |
+| GET | `/schema/:collectionType` | one type schema |
+| GET | `/:collectionType` | list items (`?sort=&limit=&offset=`) |
+| GET | `/:collectionType/:itemSlug` | one item |
+| POST | `/:collectionType` | create item |
+| PUT | `/:collectionType/:itemSlug` | update / rename item |
+| DELETE | `/:collectionType/:itemSlug` | delete item |
+| POST | `/:collectionType/bulk-delete` | `{ itemSlugs: [] }` |
+| POST | `/:collectionType/:itemSlug/duplicate` | duplicate item |
+| POST | `/:collectionType/:itemSlug/discard-archived` | drop archived out-of-schema settings |
+| POST | `/:collectionType/reorder` | `{ order: [] }` (manual ordering) |
 
 **Status codes:** validation failure → `400` (`{ error, validationErrors }`); slug conflict on create/rename → `409` (`{ error, conflictingSlug }`); per-collection item cap exceeded → `422` (see §7). Writes set `Cache-Control: no-store`.
 
@@ -127,7 +129,7 @@ When `hasItemPages: true` and the type ships a `template.liquid`, each item rend
 
 **Depth model.** Root pages render with `outputPathPrefix: ""`; item pages render with `outputPathPrefix: "../"`. The pure helper `prefixInternalHref(href, outputPathPrefix)` (`packages/core/src/utils/linkPrefixer.js`) prepends the prefix to **relative** internal hrefs only — it leaves any URI scheme, protocol-relative (`//…`), anchor (`#…`), query-only (`?…`), and root-absolute (`/…`) href untouched. Menu links resolve through the render-engine `menuResolver.js` with the same depth awareness. Asset paths are rewritten on export: `/uploads/images/ → ../assets/images/`, `/uploads/files/ → ../assets/files/`.
 
-**Page-shaped object** (`buildCollectionItemPageData`): `id = "{slugPrefix}-{slug}"`, `slug = "{slugPrefix}/{slug}"`, `name` from the `usedAsTitle` field, plus a per-item `seo` object at parity with page SEO (`description`, `og_title`, `og_image`, `canonical_url`, `robots`, defaulting `og_type: "article"`, `twitter_card: "summary"`). This lets item pages flow through the same layout, SEO, sitemap, and markdown-export paths as regular pages.
+**Page-shaped object** (`buildCollectionItemPageData`): `id = "{slugPrefix}-{slug}"`, `slug = "{slugPrefix}/{slug}"`, `name` from the `usedAsTitle` field, plus a per-item `seo` object at parity with page SEO. The five author-editable SEO fields are `description`, `og_title`, `og_image`, `canonical_url`, and `robots` (defaulting to `index,follow`); `shapeItemSeo` also fills the non-UI defaults `og_type: "article"` and `twitter_card: "summary"`. This lets item pages flow through the same layout, SEO, sitemap, and markdown-export paths as regular pages.
 
 **Render helpers** (`renderingService.js`): `buildCollectionRenderDeps({ storage, scope })` assembles the lazy collection capability (`buildCollectionItemsLoader`, `getCollectionSchemas`, `loadCollectionItemsByUuid`); `renderCollectionItemPageWithDeps(deps, args)` renders one item page (injecting `prepareItem: prepareCollectionItemForRender`, `buildItemPageData: buildCollectionItemPageData`). Export is fail-fast on a bad item; a multi-tenant host that streams publishes may instead warn-and-skip an invalid item (or a `hasItemPages` type with no template) so one bad record can't fail the whole publish.
 
@@ -142,13 +144,13 @@ When `hasItemPages: true` and the type ships a `template.liquid`, each item rend
 - **`MAX_COLLECTION_ITEMS`** — enforced in `createItem`: at or over the cap returns `422`. This is the per-collection DoS ceiling that bounds export-time enumeration.
 - **`MAX_COLLECTIONS`** — a reserved per-project collection-type ceiling. Because types are theme-seeded (no create-type API), there is no creation endpoint to gate; the key exists for hosts that bound seeding/import.
 
-**Sanitization** runs on every item write and again at render (`prepareCollectionItemForRender`), reusing the page pipeline: DOMPurify for `richtext`, `sanitizeImagePath` (strict `/uploads/images/…`) for each `gallery` entry and required-field image validation, `sanitizeImageSettingValue` for plain `image` fields, `sanitizeHref` for `link` fields, per-column sanitization for `table` (blank rows + undeclared keys dropped), and `YYYY-MM-DD` coercion for `date`. See [Link & URL Safety](core-security.md#12-link--url-safety).
+**Sanitization** runs on every item write and again at render (`prepareCollectionItemForRender`), reusing the page pipeline: DOMPurify for `richtext`, `sanitizeImagePath` (strict `/uploads/images/…`) for each `gallery` entry and required-field image validation, `sanitizeImageSettingValue` for plain `image` fields, `sanitizeHref` for `link` fields, per-column sanitization for `table` (blank rows + undeclared keys dropped), and `YYYY-MM-DD` coercion for `date`. After sanitizing, `prepareCollectionItemForRender` calls `resolveRichtextMediaInSettings` (`packages/core/src/utils/richtextMedia.js`) with the render mode's `mediaBasePaths` so embedded `<img>`/file references in `richtext` fields resolve to the served base (preview → live media URL, publish → `assets/`) without the theme author wiring anything in the template. See [Link & URL Safety](core-security.md#12-link--url-safety).
 
 ---
 
 ## 8. Preview
 
-The editor's item-edit form has a **Preview** button (enabled once the item is saved) that opens a standalone, navigable preview of the item page. It posts the saved item to a `/preview/collection` endpoint that renders through the same item-page pipeline and returns a one-time render token; in-preview link clicks bubble up and navigate within the site's preview space. A multi-tenant host swaps in its own scope-bound `/preview/collection` renderer over the same pipeline.
+The editor's item-edit form has a **Preview** button (enabled once the item is saved) that opens the standalone item route (`/preview/collection/:prefix/:slug`). That route loads the saved item and calls `previewCollectionItem()` against `/preview/collection`, which renders through the same item-page pipeline and returns a one-time render token; in-preview link clicks bubble up and navigate within the site's preview space. A multi-tenant host swaps in its own scope-bound `/preview/collection` renderer over the same pipeline.
 
 ---
 

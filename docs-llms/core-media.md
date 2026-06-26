@@ -1,48 +1,46 @@
 # Media Library
 
-This document provides an exhaustive explanation of the Media Library system, covering its architecture, data storage, and the full range of frontend and backend functionalities.
+Canonical reference for the Media Library: per-project file storage and image resizing, the SQLite metadata model, usage tracking (pages, global widgets, theme settings, collection items), audio/range streaming, the Media page + hooks, and the media controller/routes/usage service.
+
+The library is a single **asset system** spanning two categories — `image` and `file` (PDFs, audio) — managed together and scoped per project. There is no separate "Files" page or parallel storage model; file assets are first-class media records that share usage tracking, deletion protection, and export participation with images. See [Export System](core-export.md) for how used file assets are copied into static exports.
 
 ## 1. Architecture & Data Storage
 
-The Media Library is designed to handle file uploads, storage, and metadata management on a per-project basis.
-
 ### Physical File Storage
 
-- **Location**: Uploaded files are physically stored on the server's filesystem, scoped per project:
+Uploaded binaries are stored through the **`AssetStorageAdapter`** (local FS in OSS, cloud object storage in hosted), scoped per project. The OSS adapter maps adapter keys to on-disk paths:
+
 - **Images**: `data/projects/{folderName}/uploads/images/`
-- **Files** (PDFs, etc.): `data/projects/{folderName}/uploads/files/`
-- **Routing**: The `getMediaDir(projectFolderName, mimeType)` function uses `getMediaCategory()` to route uploads to the correct subdirectory — `images/` for image MIME types, `files/` for everything else (currently PDF).
-- **File Naming**: To avoid conflicts, uploaded files are renamed. The original filename is "slugified" (e.g., "My Awesome Picture.jpg" becomes `my-awesome-picture.jpg`). If a file with that name already exists, a counter is appended (e.g., `my-awesome-picture-1.jpg`).
-- **Automatic Resizing**: To improve site performance, the system automatically creates multiple sizes for each uploaded image (excluding SVGs). The generated sizes and quality settings are **fully configurable** through the App Settings interface. Generated sizes are stored alongside the original using `-{size}` suffixes (e.g., `photo-thumb.jpg`, `photo-small.jpg`).
-- **Smart Size Generation**: The system only creates image sizes that are meaningfully smaller than the original. If an image is 800px wide and the "large" size is configured for 1920px, no "large" size will be generated since it would be identical to a smaller size. Public delivery then falls back to the best available size or the original only when no `large` variant exists.
-- **Original Compression**: When an uploaded image is smaller than the largest enabled size (meaning the original will be used as the effective top delivery asset), the original is compressed in-place using the configured quality setting. Dimensions are preserved — only file size is reduced. GIF images are excluded to preserve animation frames. When the original is larger than the largest enabled size, it is left untouched since the generated `large` variant becomes the public delivery ceiling.
-### Image Processing Configuration
+- **Files** (PDFs, audio): `data/projects/{folderName}/uploads/files/`
 
-The system's image processing behavior is controlled through **App Settings**, making it fully customizable:
+The controller chooses the subdir inline from `getMediaCategory(file.mimetype)` (`packages/builder-server/src/utils/mimeTypes.js`): `"image"` MIME types go to `images/`, everything else (PDF, audio) to `files/`. The adapter key is `${subdir}/${filename}` (originals) or `images/${variantFilename}` (generated sizes) — the historical disk layout minus the `/uploads/` URL prefix. There is no `getMediaDir` path-builder; the backend never constructs absolute paths from user input — all binary I/O routes through the adapter over `req.scope`. See [Packages & Adapter Architecture](core-packages.md).
 
-- **Quality Setting**: A single quality value (1-100) applies to all generated image sizes, allowing administrators to balance file size vs. image quality.
-- **Size Configuration**: Each image size can be individually:
-  - **Enabled/Disabled**: Toggle specific sizes on or off
-  - **Width Customized**: Set custom maximum widths for each size
-- **Default Sizes**:
-  - `thumb`: 150px width (for previews)
-  - `small`: 480px width
-  - `medium`: 1024px width
-  - `large`: 1920px width
-- **Fallback Behavior**: If a thumbnail variant is unavailable, the media UI falls back to the original image path for preview rendering.
+- **File naming**: Original filenames are slugified (`My Awesome Picture.jpg` → `my-awesome-picture.jpg`, truncated to 100 chars). Collisions are deduped against the adapter's existing keys (plus names assigned earlier in the same request) by appending a counter (`my-awesome-picture-1.jpg`).
+- **Automatic resizing**: For each uploaded raster image (not SVG), the system generates multiple sizes whose widths/quality come from App Settings or a theme override (§ Image Sizes). Variants are stored alongside the original with `-{size}` suffixes (`photo-thumb.jpg`).
+- **Smart size generation**: Only sizes meaningfully smaller than the original are generated (`sizeConfig.width >= metadata.width` is skipped). If an 800px image has `large` configured at 1920px, no `large` variant is produced.
+- **Original compression**: When the original is no larger than the largest enabled size (so the original is the effective top delivery asset), it is recompressed in place at the configured quality — dimensions preserved, only file size reduced. GIFs are excluded to preserve animation frames. When the original exceeds the largest enabled size, it is stored untouched (the `large` variant becomes the public delivery ceiling).
 
-### Theme-Defined Image Sizes
+### Decompression-Bomb Guards
 
-Themes can override the app-level image size configuration by defining `imageSizes` in their `theme.json`. This is useful when a theme requires specific image dimensions (e.g., a `hero` size at 1600px for hero banners).
+Image processing through `sharp` is bounded so a small malicious file cannot exhaust memory:
 
-**How it works:**
+- `sharp(buffer, { limitInputPixels: 100_000_000 })` caps decoded pixels.
+- After reading metadata, images with `width > 10_000` or `height > 10_000` are rejected with a descriptive `reason` (never processed).
 
-- When a theme defines `settings.imageSizes` in `theme.json`, those sizes **replace** the app settings entirely for that project
-- The `thumb` size is **always generated** regardless of theme configuration (required for the media library UI)
-- Each size can specify its own `quality` value, falling back to the app's global quality setting
-- Sizes can be disabled by setting `enabled: false`
+### Two-Gate Size Enforcement
 
-**Example theme.json configuration:**
+Upload size is enforced at **two** points:
+
+1. **Streaming gate (SA-02)** — `uploadWithLimit` builds a per-request `multer` whose `limits.fileSize` is sourced from the `LimitsAdapter` (`LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES`). An oversize part is rejected mid-stream **before** the whole file is buffered into memory; `errorHandler` maps multer's `LIMIT_FILE_SIZE` to `413`. OSS returns a finite cap from app settings (default fallback `10 MB` when no adapter is wired); hosted returns its tenant ceiling.
+2. **Post-buffer gate** — inside `uploadProjectMedia`, each buffered file is re-checked against `media.maxFileSizeMB` (App Settings); over-limit files are reported in `rejectedFiles` with a human-readable reason rather than throwing.
+
+The streaming gate is the DoS-safe floor; the post-buffer gate enforces the user-configurable per-file limit. File-type acceptance is enforced by multer's `fileFilter` against `ALLOWED_MIME_TYPES`.
+
+### Image Sizes (App Settings + Theme Overrides)
+
+Resizing is configured through **App Settings** (`media.imageProcessing.quality`, `media.imageProcessing.sizes`) — see [App Settings](core-appSettings.md) for the full config UI and defaults. Default sizes: `thumb` 150px, `small` 480px, `medium` 1024px, `large` 1920px; a single quality value (1–100) applies to all sizes unless a size overrides it.
+
+Themes can override the app-level sizes by defining `settings.imageSizes` in `theme.json`. When present, the theme sizes **replace** app settings for that project, except `thumb` which is **always generated** (the media UI needs it). Each size may carry its own `quality`, falling back to the global quality. Sizes are disabled with `enabled: false`.
 
 ```json
 {
@@ -57,23 +55,17 @@ Themes can override the app-level image size configuration by defining `imageSiz
 }
 ```
 
-**App Settings UI behavior:**
-
-- When the active project's theme defines `imageSizes`, the Image Sizes controls in App Settings are hidden
-- A notice is displayed explaining that image sizes are managed by the theme
-- Other media settings (file size limits, image quality) remain visible and editable
+When the active project's theme defines `imageSizes`, the Image Sizes controls in App Settings are hidden behind an explanatory notice; file-size limit and quality remain editable. Resolution lives in `getImageProcessingSettings(projectId)` in `packages/builder-server/src/controllers/mediaController.js`.
 
 ### Metadata Storage
 
-Media metadata is stored in SQLite, while the uploaded binary files remain on disk under each project folder.
+Media metadata lives in SQLite (`data/widgetizer.db`); binaries live behind the asset adapter. Repository: `packages/builder-server/src/db/repositories/mediaRepository.js`.
 
-- **Database**: `/data/widgetizer.db`
-- **Tables**:
-  - `media_files`: core file records (id, project_id, filename, type, path, dimensions, metadata)
-  - `media_sizes`: generated image variants (thumb/small/medium/etc.)
-  - `media_usage`: usage relationships (`used_in`) for pages, globals, and theme settings
-- **Filesystem**: original uploads and generated image variants still live in:
-  - `data/projects/{folderName}/uploads/images/`
+- `media_files` — core records (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, caption, width, height).
+- `media_sizes` — generated image variants (size_name, path, width, height), keyed by `media_file_id`.
+- `media_usage` — usage relationships: one `used_in` source string per (file, source), keyed by `media_file_id`.
+
+API responses assemble a `files` array from these rows:
 
 ```json
 {
@@ -86,19 +78,14 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
       "size": 123456,
       "uploaded": "2023-10-29T10:00:00.000Z",
       "path": "/uploads/images/my-awesome-picture.jpg",
-      "metadata": {
-        "alt": "An awesome picture of a sunset",
-        "title": "Sunset Over Mountains",
-        "caption": "Taken on the summit at dawn"
-      },
+      "metadata": { "alt": "An awesome sunset", "title": "Sunset", "caption": "Summit at dawn" },
       "width": 1920,
       "height": 1080,
       "usedIn": ["about-us", "home"],
       "sizes": {
-        "thumb": { "path": "/uploads/images/my-awesome-picture-thumb.jpg", "width": 150, "height": 113 },
-        "small": { "path": "/uploads/images/my-awesome-picture-small.jpg", "width": 480, "height": 360 },
+        "thumb":  { "path": "/uploads/images/my-awesome-picture-thumb.jpg",  "width": 150,  "height": 113 },
+        "small":  { "path": "/uploads/images/my-awesome-picture-small.jpg",  "width": 480,  "height": 360 },
         "medium": { "path": "/uploads/images/my-awesome-picture-medium.jpg", "width": 1024, "height": 768 }
-        // Note: "large" size omitted if disabled in settings
       }
     },
     {
@@ -109,11 +96,7 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
       "size": 245760,
       "uploaded": "2024-03-15T14:30:00.000Z",
       "path": "/uploads/files/brochure.pdf",
-      "metadata": {
-        "alt": "",
-        "title": "",
-        "caption": ""
-      },
+      "metadata": { "alt": "", "title": "", "caption": "" },
       "width": null,
       "height": null,
       "usedIn": ["home"],
@@ -123,295 +106,166 @@ Media metadata is stored in SQLite, while the uploaded binary files remain on di
 }
 ```
 
-_Note: API responses return a `files` array assembled from SQLite rows._
-
-### Usage Tracking
-
-The media library automatically tracks which pages and global widgets are using each media file to prevent accidental deletion of images that are currently in use.
-
-- **`usedIn` Array**: Each file object contains a `usedIn` array with the slugs of pages and IDs of global widgets that reference this file
-- **Automatic Updates**: Usage tracking is updated automatically when:
-  - Pages are saved or updated (scans widget/block settings and SEO metadata for media paths)
-  - Pages are deleted (removes the page slug from all media files)
-  - Page slugs are changed (removes old slug, adds new slug to relevant files)
-  - **Global widgets** (header/footer) are saved or updated (scans settings for media paths)
-- **Delete Protection**: Files with a non-empty `usedIn` array cannot be deleted
-- **Manual Refresh**: Users can manually refresh usage tracking to recalculate all relationships
-- **Media Types Tracked**: Images and file assets (PDFs) are tracked across pages, global widgets, and theme settings
-- **Recursive Scanning**: The usage scanner recurses into nested objects (e.g. link settings with `{ href: "/uploads/files/brochure.pdf", ... }`) so media paths inside link fields are tracked for deletion protection and export
+Non-image records (PDFs, audio) carry `width: null`, `height: null`, and `sizes: {}` — no resizing, no dimension extraction.
 
 ### Media Type Configuration
 
-The system uses centralized configuration for media types and MIME handling on both frontend and backend.
+MIME/accept definitions are centralized:
 
-**Frontend** (`src/config.js`):
-- `MEDIA_TYPES` defines allowed file extensions for the upload UI:
-  - `image`: `.jpeg`, `.jpg`, `.png`, `.gif`, `.webp`, `.svg`
-  - `file`: `.pdf`, `.mp3` (accept lists enforced by `uploadValidation.js`)
-
-**Backend** (`server/utils/mimeTypes.js`):
-All server-side MIME definitions live in a single module:
-- `ALLOWED_MIME_TYPES` — MIME types accepted for media uploads (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`, `audio/mpeg`, `audio/mp3`)
-- `ZIP_MIME_TYPES` — MIME types for ZIP archive validation (`application/zip`, `application/x-zip-compressed`), used by project import and theme upload
-- `getContentType(ext)` — resolves a file extension (e.g. `".png"`, `".pdf"`) to its MIME type, used by `serveProjectMedia`, `serveAsset`, and `serveExportFile` for setting `Content-Type` headers
-- `getMediaCategory(mimeType)` — classifies a MIME type into an asset category: returns `"image"` for image MIME types, `"file"` for everything else (currently PDF and MP3 audio). Used by `getMediaDir()` to route uploads to the correct subdirectory.
-
-This ensures consistency across all server code — upload validation, file serving, and export content-type resolution all use the same definitions.
+- **Backend** (`packages/builder-server/src/utils/mimeTypes.js`):
+  - `ALLOWED_MIME_TYPES` — upload allowlist: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`, `audio/mpeg`, `audio/mp3`.
+  - `ZIP_MIME_TYPES` — ZIP archive validation (project import / theme upload).
+  - `getMediaCategory(mimeType)` — `"image"` for image MIME types, `"file"` for everything else (PDF, audio); decides the upload subdir inline in the controller.
+  - `getContentType(ext)` / `CONTENT_TYPES` — re-exported from `@widgetizer/core/mimeTypes` (single source of truth shared with the local asset adapter); resolves an extension to a MIME type for `Content-Type` headers.
+- **Frontend** (`packages/editor-ui/src/utils/uploadValidation.js`): a family of accept objects drives the upload UIs —
+  - `IMAGE_ACCEPT` (jpeg/jpg, png, gif, webp, svg), `FILE_ACCEPT` (pdf), `AUDIO_ACCEPT` (mp3).
+  - `NON_IMAGE_ACCEPT` = `{ ...FILE_ACCEPT, ...AUDIO_ACCEPT }` — what the `file` category covers; shared by every `filterType="file"` surface (the media drawer uploader, `FileInput`).
+  - `MEDIA_ACCEPT` = `{ ...IMAGE_ACCEPT, ...AUDIO_ACCEPT, ...FILE_ACCEPT }` — the main Media Library uploader.
+  - Client-side helpers: `validateFileSizes`, `mapDropzoneRejections`, ZIP validation.
 
 ### Audio Files & Range Requests
 
-`.mp3` audio is an accepted upload type. Audio is **not** a separate storage category: `getMediaCategory()` returns `"file"` for any non-image MIME, so audio binaries live under `uploads/files/` alongside PDFs, with `width/height: null` and `sizes: {}` (no variants, no resizing). In the media UI the type filter groups audio under **file** (the `all` / `image` / `file` filter treats everything non-image as "file").
+`.mp3` audio is an accepted upload type but **not** a separate storage category: `getMediaCategory` returns `"file"` for any non-image MIME, so audio binaries live under `uploads/files/` alongside PDFs, with `width/height: null` and `sizes: {}`. In the media UI the type filter groups audio under **file** (`all` / `image` / `file`; everything non-image is "file").
 
-- **Accepted MIME types:** `audio/mpeg` and `audio/mp3` are in `ALLOWED_MIME_TYPES`; the extension map resolves `.mp3 → audio/mpeg`. Front-end upload validation (`uploadValidation.js`) accepts `.mp3` for `file` inputs.
-- **The Arch theme's `audio-player` widget** points each `track` block's `file` setting at an uploaded `.mp3` (with an `image` cover), so audio playback is theme-rendered — there is no core audio widget.
+- Accepted MIME: `audio/mpeg` and `audio/mp3` are in `ALLOWED_MIME_TYPES`; the extension map resolves `.mp3 → audio/mpeg`. Front-end validation accepts `.mp3` via `AUDIO_ACCEPT`/`NON_IMAGE_ACCEPT`.
+- The Arch theme's `audio-player` widget points each `track` block's `file` setting at an uploaded `.mp3` (with an `image` cover); audio playback is theme-rendered — there is no core audio widget.
 
-**Byte-range streaming (HTTP 206).** `serveProjectMedia` honours `Range` requests so an `<audio>` / `<video>` element can seek without downloading the whole file:
+**Byte-range streaming (HTTP 206).** `serveProjectMedia` honours `Range` requests so an `<audio>`/`<video>` element can seek without downloading the whole file:
 
 - Always sends `Accept-Ranges: bytes`.
 - Parses a single `bytes=start-end` range (including the suffix form `bytes=-N` for the final N bytes); an unsatisfiable range returns `416` with `Content-Range: bytes */<size>`.
-- A valid range streams the slice as `206 Partial Content` with `Content-Range: bytes start-end/<size>`; a missing or malformed range streams the full file (`200`).
-- The slice is read through the adapter — `req.adapters.assetStorage.download(scope, key, { start, end })` — so the same handler serves local files (OSS) and ranged object-storage GETs (hosted R2). See [Packages & Adapter Architecture](core-packages.md).
+- A valid range streams the slice as `206 Partial Content` with `Content-Range: bytes start-end/<size>`; a missing/malformed range streams the full file (`200`).
+- The slice is read through the adapter — `assetStorage.download(scope, key, { start, end })` — so the same handler serves local files (OSS) and ranged object-storage GETs (hosted).
 
-## 2. Frontend Implementation (`src/pages/Media.jsx`)
+## 2. Usage Tracking
 
-The Media page has been **refactored** into a clean, modular architecture with the main component acting as an orchestrator for several specialized hooks and UI components.
+The library tracks which content references each media file so in-use assets are protected from deletion and included in export. Each file's `usedIn` array holds source identifiers; a file with a non-empty `usedIn` cannot be deleted. Service: `packages/builder-server/src/services/mediaUsageService.js`.
 
-### Architecture Overview
+### Sources Tracked
 
-The `Media.jsx` component (reduced from ~410 lines to ~126 lines) now uses a **hook-based architecture** that separates concerns:
+Usage is keyed by a **source string** per `media_usage` row:
 
-- **`useMediaState`**: Core state management and data loading
-- **`useMediaUpload`**: File upload logic with progress tracking
-- **`useMediaSelection`**: File selection and deletion workflows
-- **`useMediaMetadata`**: Metadata editing and drawer management
-- **Localization**: Fully integrated with `react-i18next` for all user-facing text
+- **Pages** — source = page slug. Scans every widget/block setting plus the SEO social image (`seo.og_image`).
+- **Global widgets** (header/footer) — source = `global:{id}`. Scans settings + blocks.
+- **Theme settings** — source = `global:theme-settings`. Scans `settings.global` items (live `value`, falling back to schema `default`), e.g. favicon and any image/gallery setting.
+- **Collection items** — source = `collection:{type}/{slug}`. Scans item settings plus the item's `seo.og_image`. See [Collections](core-collections.md).
 
-This architecture provides better **maintainability**, **testability**, and **code reuse** while keeping the main component focused on UI orchestration.
+### Path Matching
 
-### Custom Hooks
+- A regex (`/\/uploads\/(?:images|files)\/[A-Za-z0-9._-]+/g`) extracts upload paths embedded **anywhere** in a string — including a richtext `<img src="/uploads/images/foo-large.jpg">` inside saved HTML, and `href` values inside link settings.
+- Extraction recurses into nested objects and arrays (`collectMediaPaths`), so media paths inside link/gallery/object fields are tracked.
+- A record matches on its original `path` **or any of its size-variant paths** (`recordMediaPaths`) — a richtext `<img>` typically embeds a variant (`-large`), which only resolves to its record via the size paths. Both `/uploads/images/` and `/uploads/files/` prefixes are recognised (`UPLOAD_PREFIXES`); relative forms without a leading slash are normalised.
 
-#### `useMediaState` Hook (`src/hooks/useMediaState.js`)
+Over-matching only ever marks an asset "used" (the safe direction for deletion protection and export).
 
-Manages core media state and data loading:
+### Integration & Refresh
 
-- **State Management**: Files list, loading states, view mode, search filtering
-- **Data Loading**: Fetches project media on mount using `getProjectMedia`
-- **View Persistence**: Saves view mode preference to localStorage
-- **Type Filtering**: Supports filtering the media list by type (`all`, `image`, `file`)
-- **Search Filtering**: Real-time filename filtering
-- **Usage Refresh**: Manual usage tracking refresh functionality
+Targeted updates run automatically on the corresponding write/delete/rename:
 
-#### `useMediaUpload` Hook (`src/hooks/useMediaUpload.js`)
+- `syncPageMediaUsageOnWrite` / `syncPageMediaUsageOnDelete` — page save/rename/delete (called from `pageController`).
+- `updateGlobalWidgetMediaUsage` — header/footer save.
+- `updateThemeSettingsMediaUsage` — theme settings save (`themeController`).
+- `syncCollectionItemMediaUsageOnWrite` / `removeCollectionItemFromMediaUsage` — collection item save/rename/delete (`collectionController`).
 
-Handles all file upload operations:
+`refreshAllMediaUsage(projectId)` is the full rescan (also exposed via the manual "refresh usage" UI action and `refreshMediaUsageAfterStructuralChange` for imports/duplication/theme updates). It rebuilds `media_usage` from scratch by scanning all pages, global widgets, theme settings, and collection items, then writing the map in one transaction (`replaceMediaUsage`). The page scan is gated on `pages/` existing; globals/theme/collections still run for collections-only or freshly-imported projects.
 
-- **Upload Progress**: Real-time progress tracking using XMLHttpRequest
-- **Chunked Processing**: Processes files in batches of 5 to avoid overwhelming the server
-- **Multi-file Support**: Handles multiple file uploads with sequential chunk processing
-- **Multi-layered SVG Sanitization**: For defense-in-depth, SVG files are sanitized twice:
-  - **Client-side**: Sanitized in the browser using `DOMPurify` before the upload starts.
-  - **Server-side**: Re-sanitized on the server using `isomorphic-dompurify` before being saved to the filesystem.
-- **Error Handling**: Detailed error reporting for rejected files with unique toast IDs
-- **State Updates**: Updates parent files state with successful uploads
-- **Toast Notifications**: Success, warning, and error feedback with batch progress indicators
-
-#### `useMediaSelection` Hook (`src/hooks/useMediaSelection.js`)
-
-Manages file selection and deletion workflows:
-
-- **Selection State**: Tracks selected files array
-- **Bulk Operations**: Select all/none functionality with filtering support
-- **Deletion Logic**: Single and bulk file deletion with usage protection
-- **Modal Management**: Confirmation dialog state and messaging
-- **Usage Validation**: Prevents deletion of files currently in use
-
-#### `useMediaMetadata` Hook (`src/hooks/useMediaMetadata.js`)
-
-Handles metadata editing and drawer functionality:
-
-- **Drawer Management**: Controls metadata editing drawer visibility
-- **File Selection**: Manages which file is being edited
-- **Metadata Updates**: Saves alt text, title, and caption changes via API
-- **Loading States**: Tracks save operations in progress
-- **State Synchronization**: Updates parent files state after successful saves
-
-### Core UI Components
-
-- `MediaUploader`: Drag-and-drop zone with real-time upload progress display (localized)
-- `MediaToolbar`: Contains view toggle, search bar, media type filter dropdown, bulk actions, and usage refresh (localized)
-- `MediaGrid`: Responsive grid view with thumbnail cards and usage badges
-- `MediaList`: Table view with detailed file information and select-all functionality (localized)
-- `MediaDrawer`: Slide-out panel for editing file metadata (alt text, title, and caption, localized)
-- `MediaSelectorDrawer`: Media browser drawer for selecting existing files in setting inputs (localized)
-- `ConfirmationModal`: Deletion confirmation dialog with usage warnings (localized)
-
-#### `MediaSelectorDrawer` Component (`src/components/media/MediaSelectorDrawer.jsx`)
-
-A specialized drawer component that allows users to browse and select existing media files from the project library. This component is primarily used within setting input components (like `ImageInput` and `VideoInput`) to provide a "Browse" functionality.
-
-**Key Features:**
-
-- **Direct Upload**: Includes an "Upload" button that triggers the OS file dialog, allowing users to add new files directly while browsing.
-- **Search Bar**: Integrated search functionality to quickly find files by name.
-- **File Type Filtering**: Supports filtering by file type (`image`, `file`, or `all`). The filter can be pre-set via props. Upload accept types adjust automatically based on the active filter.
-- **Visual Indicators**:
-  - **Images**: Displays the actual image thumbnail.
-  - **Files**: Displays a file icon with the extension badge.
-- **Keyboard Navigation**: Escape key support for closing the drawer
-- **Background Scroll Prevention**: Prevents body scrolling when drawer is open
-
-**Usage Context:**
-
-The `MediaSelectorDrawer` is integrated into:
-
-- **`ImageInput`**: Browse for existing images when setting image widget properties or theme-level image settings like favicons
-- **`FileInput`**: Browse for existing file assets (PDFs) when setting file widget properties
-- **`PageForm`**: Select featured images for pages
-
-#### `ImageInput` Modes (`src/components/settings/inputs/ImageInput.jsx`)
-
-The image setting input supports two presentation modes:
-
-- **Default mode**: Wide preview area with Upload and Browse actions below it. Used for most widget and theme image settings.
-- **Compact mode** (`compact: true`): Square preview with Upload and Browse stacked beside it, plus hover-only Edit and Remove controls on the preview. Intended for small assets such as the Arch theme's `favicon` setting.
-
-**Props Interface:**
-
-- `visible`: Boolean to control drawer visibility
-- `onClose`: Function called when drawer should be closed
-- `onSelect`: Function called with selected file object
-- `activeProject`: Current project object for loading media
-- `filterType`: String to filter files (`'image'`, `'file'`, or `'all'`)
-
-#### `FileInput` Component (`src/components/settings/inputs/FileInput.jsx`)
-
-A filename-oriented setting input for selecting uploaded file assets (PDFs). Modeled after `ImageInput` but without image-specific features like preview thumbnails or metadata editing.
-
-**Key Features:**
-
-- **Upload**: Triggers OS file dialog accepting only file types (PDF)
-- **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"`
-- **Selected State**: Displays filename, extension badge, and a clear button
-- **No image preview**: Shows a file icon instead of a thumbnail
-
-**Props Interface:**
-
-- `id`: Setting identifier
-- `value`: Current file path string (e.g. `/uploads/files/brochure.pdf`)
-- `onChange`: Callback receiving the selected file path
-
-### UI Improvements
-
-#### Enhanced Empty State
-
-- **Custom Styling**: Replaced generic `EmptyState` component with custom-designed empty state
-- **Visual Icon**: Features an `Image` icon from lucide-react for better visual appeal
-- **Consistent Design**: Matches the styling and layout of other empty states throughout the application
-- **Improved Centering**: Better visual hierarchy and spacing for a more polished appearance
-
-### Key Workflows & Logic
-
-- **Loading**: `useMediaState` loads project media on mount and manages loading states
-- **Uploading**: `useMediaUpload` handles file processing with progress tracking and detailed error reporting
-- **File Selection**: `useMediaSelection` manages multi-file selection with bulk operations support
-- **Deletion**: `useMediaSelection` provides usage-aware deletion with confirmation dialogs
-- **Metadata Editing**: `useMediaMetadata` handles the complete edit workflow from drawer opening to saving changes
-
-### Benefits of Refactored Architecture
-
-- **Separation of Concerns**: Each hook handles a specific aspect of media functionality
-- **Reusability**: Hooks can be easily tested and potentially reused in other components
-- **Maintainability**: Smaller, focused code units are easier to understand and modify
-- **Testability**: Individual hooks can be unit tested independently
-- **Reduced Complexity**: Main component focuses on UI orchestration rather than business logic
+`getMediaUsage(projectId, fileId)` returns `{ fileId, filename, usedIn, isInUse }` for a single file.
 
 ## 3. Backend Implementation
 
-The backend uses Express.js with `multer` for file handling and `sharp` for image processing.
+Express 5 + `multer` (memory storage) + `sharp`. Controller: `packages/builder-server/src/controllers/mediaController.js`. The backend is adapter-agnostic and scope-first — every storage/limits call takes `req.scope` (`{ actor, projectId, folderName }`). See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
 
-> **Adapter note.** After the workspaces/adapter refactor, media binary I/O routes through the `AssetStorageAdapter` over the request's `scope` (the OSS adapter reads/writes the local `uploads/` paths described above; a hosted host swaps in cloud object storage). The upload size cap is no longer a fixed app setting alone: `uploadWithLimit` reads `MAX_UPLOAD_SIZE_BYTES` from the `LimitsAdapter` and enforces it as a **streaming** multer `limits.fileSize`, so oversize uploads are rejected mid-stream with a `413` (the `errorHandler` maps multer's `LIMIT_FILE_SIZE`). OSS returns `Infinity` for this key unless overridden by app settings; hosted returns a finite ceiling. See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
+### API Routes (`packages/builder-server/src/routes/media.js`)
 
-### API Routes (`server/routes/media.js`)
+The router applies `resolveActiveProject` so active-project management routes carry the `X-Project-Id` header and read `req.scope` — the project id stays out of the path. Hosted serves these same relative routes under `/api/projects/:projectId` via the project-scoped router.
 
-| Method | Endpoint | Middleware | Controller Function | Description |
+| Method | Endpoint (under the media router) | Middleware | Controller | Description |
 | --- | --- | --- | --- | --- |
-| `GET` | `/api/media/projects/:projectId/media` |  | `getProjectMedia` | Reads and returns media metadata from SQLite. |
-| `POST` | `/api/media/projects/:projectId/media` | `upload.array("files", 10)` | `uploadProjectMedia` | Handles file uploads. |
-| `DELETE` | `/api/media/projects/:projectId/media/:fileId` |  | `deleteProjectMedia` | Deletes a single file and its metadata. Prevents deletion if file is in use. |
-| `POST` | `/api/media/projects/:projectId/media/bulk-delete` |  | `bulkDeleteProjectMedia` | Deletes multiple files and their metadata. Prevents deletion if any files are in use. |
-| `PUT` | `/api/media/projects/:projectId/media/:fileId/metadata` |  | `updateMediaMetadata` | Updates the metadata for a single file. |
-| `GET` | `/api/media/projects/:projectId/media/:fileId/usage` |  | `getMediaFileUsage` | Returns usage information for a specific media file. |
-| `POST` | `/api/media/projects/:projectId/refresh-usage` |  | `refreshMediaUsage` | Manually refreshes usage tracking for all media files in the project. |
-| `GET` | `/api/media/projects/:projectId/media/:fileId` |  | `serveProjectMedia` | Serves a media file by metadata ID. |
-| `GET` | `/api/media/projects/:projectId/uploads/images/:filename` |  | `serveProjectMedia` | Serves an image file by filename. |
-| `GET` | `/api/media/projects/:projectId/uploads/files/:filename` |  | `serveProjectMedia` | Serves a file asset by filename. |
+| `GET` | `/` | | `getProjectMedia` | List media metadata (from SQLite) for the active project. |
+| `POST` | `/` | `uploadWithLimit` | `uploadProjectMedia` | Upload files (multer `array("files", 10)`; streaming size cap). |
+| `POST` | `/bulk-delete` | `body.fileIds isArray` | `bulkDeleteProjectMedia` | Delete multiple files; skips in-use files. |
+| `POST` | `/refresh-usage` | | `refreshMediaUsage` | Full usage rescan for the project. |
+| `GET` | `/:fileId/usage` | | `getMediaFileUsage` | Usage info for one file. |
+| `DELETE` | `/:fileId` | | `deleteProjectMedia` | Delete one file; blocked if in use. |
 
-**Identifier contract:** `:projectId` is always the project UUID in API routes. The backend resolves it to `folderName` for filesystem paths. If the UUID cannot be resolved, the request fails (no fallback directories are created). Errors use standardized codes (for example `PROJECT_NOT_FOUND`, `PROJECT_DIR_MISSING`) to keep responses consistent.
+Browser-native loads (`<img src>`, downloads) and the metadata editor cannot carry the `X-Project-Id` header, so these keep the project id in the path and read `req.params.projectId`:
 
-### Controller Logic (`server/controllers/mediaController.js`)
+| Method | Endpoint | Controller | Description |
+| --- | --- | --- | --- |
+| `PUT` | `/projects/:projectId/media/:fileId/metadata` | `updateMediaMetadata` | Update alt/title/caption (HTML stripped). |
+| `GET` | `/projects/:projectId/media/:fileId` | `serveProjectMedia` | Serve a file by metadata ID. |
+| `GET` | `/projects/:projectId/uploads/images/:filename` | `serveProjectMedia` | Serve an image by filename. |
+| `GET` | `/projects/:projectId/uploads/files/:filename` | `serveProjectMedia` | Serve a file asset / audio by filename. |
 
-- **Dynamic Image Processing Settings**: The system loads image processing configuration dynamically from App Settings:
-  ```javascript
-  // Loads quality and enabled sizes from app settings
-  const imageProcessingSettings = await getImageProcessingSettings();
-  // Returns only enabled sizes with their width and quality settings
-  ```
-- **File Upload (`multer` + `uploadProjectMedia`)**:
-  1.  The `multer` middleware is configured first. It intercepts the request, routes each file to the correct project subdirectory based on `getMediaCategory()` (`uploads/images/` for images, `uploads/files/` for PDFs) with a unique, slugified name. It also filters files to ensure they have an allowed MIME type (from `ALLOWED_MIME_TYPES` in `server/utils/mimeTypes.js`).
-  2.  The `uploadProjectMedia` function then runs. It dynamically checks each uploaded file against the size limit (`media.maxFileSizeMB`).
-  3.  For each valid file, it generates a unique persistent media ID (currently still using UUID-format values; this path is being normalized with the rest of the backend identifier cleanup).
-  4.  **SVG Sanitization**: If the file is an SVG, it's sanitized using `DOMPurify` with SVG profile to prevent XSS attacks before being saved.
-  5.  **Non-image files** (PDFs) skip all image processing — no resizing, no dimensions extraction. They are stored with `width: null`, `height: null`, and an empty `sizes: {}` object.
-  6.  If the file is an image (not an SVG), it uses the `sharp` library to:
-      - Read the original `width` and `height`.
-      - **Dynamically load** the current image processing settings from App Settings
-      - Generate **only the enabled** image sizes with the configured quality setting
-      - Apply the configured maximum widths for each enabled size
-      - **Skip sizes larger than original**: Only creates sizes that are smaller than the original image dimensions to avoid storage waste
-  6.  It creates a metadata object for the file—including a `sizes` object containing the paths and dimensions for generated variants—and persists it to SQLite.
-  8.  Files that are too large or have the wrong type are rejected and immediately deleted from the server.
-  9.  **Parallel Processing**: All files are processed in parallel using `Promise.allSettled` for optimal performance.
-  10. It returns a JSON response to the client with arrays of successfully processed and rejected files.
-- **Deletion Logic (`deleteProjectMedia`, `bulkDeleteProjectMedia`)**:
-  1.  The controller loads the target file entry (or entries) from SQLite.
-  2.  It resolves filesystem paths for originals and generated variants.
-  3.  **Usage Check**: It verifies that the file(s) are not currently in use by checking the `usedIn` array. If any files are in use, deletion is prevented with an error response.
-  4.  It uses `fs.remove` to delete the original physical file and **all** of its generated sizes from the filesystem.
-  5.  It deletes metadata rows from SQLite (`media_files`, with cascade to `media_sizes` + `media_usage`).
-- **Metadata Update (`updateMediaMetadata`)**:
-  1.  The controller loads the file from SQLite by `fileId`.
-  2.  It updates persisted metadata columns (`alt`, `title`, `caption`).
+**Identifier contract:** `:projectId` is always the project UUID; the backend resolves it to `folderName` for storage keys. If it cannot be resolved the request fails with a standardized code (`PROJECT_NOT_FOUND`, `PROJECT_DIR_MISSING`) — no fallback directories are created.
 
-### Usage Tracking Service (`server/services/mediaUsageService.js`)
+**TI-03 cross-tenant guard.** The metadata route is path-in-path (`.../media/projects/:projectId/...`). The router-level `resolveActiveProject` owner-checks the stashed/outer id before the inner `:projectId` binds, so `updateMediaMetadata` asserts `projectId === req.scope.projectId` and returns `403` on mismatch — preventing a caller from targeting another tenant's project id in the leaf. OSS standalone is byte-neutral (its single active project's id always equals `req.params.projectId`).
 
-The media usage tracking is handled by a dedicated service that provides automated tracking of which pages and global widgets use which media files:
+### Upload Flow (`uploadProjectMedia`)
 
-- **`updatePageMediaUsage(projectId, pageId, pageData)`**: Scans a page's content for media references and updates `usedIn` in SQLite. First removes the page from all existing usage links, then adds it to files that are actually referenced. Recursively inspects nested objects (e.g. link settings) so media paths inside `href` values are detected.
-- **`updateGlobalWidgetMediaUsage(projectId, globalId, widgetData)`**: Scans a global widget (header/footer) for media references and updates the `usedIn` arrays. Works the same way as page tracking but for global widgets. Also recurses into nested objects.
-- **`removePageFromMediaUsage(projectId, pageId)`**: Removes a page from all media files' `usedIn` arrays when the page is deleted.
-- **`getMediaUsage(projectId, fileId)`**: Returns usage information for a specific media file, including which pages and global widgets use it.
-- **`refreshAllMediaUsage(projectId)`**: Scans all pages and global widgets in a project and rebuilds the complete usage tracking data.
+1. `multer` (memory storage) buffers each file; `fileFilter` rejects MIME types outside `ALLOWED_MIME_TYPES`.
+2. A sequential pre-pass assigns a collision-free slugified filename per file (deduped against adapter keys + names assigned this request).
+3. Per file, in parallel (`Promise.allSettled`):
+   - Re-check `media.maxFileSizeMB` (post-buffer gate); over-limit → `rejectedFiles`.
+   - Mint a UUID media id; build the `fileInfo` record (`path: /uploads/{subdir}/{filename}`).
+   - **Raster images** (`image/*` except SVG): read dimensions via `sharp` (decompression-bomb guards apply), generate each enabled size smaller than the original (preserving format at the size's quality), upload each variant through the adapter, then recompress the original when it is no larger than the largest enabled size (GIFs excluded).
+   - **SVG**: re-sanitize server-side with `DOMPurify` (`USE_PROFILES: { svg: true }`) before storing — defense-in-depth atop the client-side sanitize.
+   - **Non-image** (PDF, audio): skip all image processing; store as-is with `width/height: null`, `sizes: {}`.
+   - Upload the (possibly recompressed/sanitized) original bytes through `assetStorage.upload(scope, key, buffer)`.
+4. Insert each processed record via `mediaRepo.addMediaFile`. Respond `201` (or `400` when all files were rejected) with `processedFiles` / `rejectedFiles`.
 
-**Integration with Page Operations:**
+### Metadata Update (`updateMediaMetadata`)
 
-- **Page Save/Update**: Automatically triggers usage tracking updates
-- **Page Delete**: Automatically removes page from all media usage arrays
-- **Slug Changes**: Removes old slug and adds new slug to relevant media files
+Strips HTML from `alt`/`title`/`caption` (`stripHtmlTags`, also applied as an express-validator sanitizer on the route). **Caption is image-only**: a caption sent for a non-image (e.g. a PDF via the direct API) is stored as `""`, not text (`file.type` must start with `image/`). Persists to the `alt`/`title`/`caption` columns.
 
-**Integration with Global Widget Operations:**
+### Deletion (`deleteProjectMedia` / `bulkDeleteProjectMedia`)
 
-- **Header/Footer Save**: Automatically triggers usage tracking updates for media used in global widgets
-- This ensures images and file assets used in the header logo, footer, etc. are protected from deletion
+1. Load the target record(s) from SQLite.
+2. **Usage check** — if `usedIn` is non-empty, single delete returns `400`; bulk delete skips the in-use file and reports it under `filesInUse` (still `200`).
+3. `deleteMediaAssets` removes the original key plus every generated size key through the adapter.
+4. Delete the `media_files` row(s); SQLite cascades to `media_sizes` and `media_usage`.
 
-## Security Considerations
+## 4. Frontend Implementation
 
-All API endpoints described in this document are protected by input validation and CORS policies. For details, see the **[Platform Security](core-security.md)** documentation.
+The Media page (`packages/editor-ui/src/pages/Media.jsx`) orchestrates specialized hooks and UI components; all user-facing text is localized via `react-i18next`.
+
+### Hooks (`packages/editor-ui/src/hooks/`)
+
+- `useMediaState` — files list, loading/view-mode (persisted to localStorage), search + type filter (`all`/`image`/`file`), manual usage refresh; loads media on mount.
+- `useMediaUpload` — XHR progress tracking, batched (chunks of 5) multi-file uploads, client-side SVG sanitization via `DOMPurify` (server re-sanitizes — see § Upload Flow), per-file error reporting and toasts.
+- `useMediaSelection` — multi-select, select-all/none with filtering, usage-aware single/bulk deletion, confirmation-modal state.
+- `useMediaMetadata` — metadata drawer state, saving alt/title/caption via the API.
+
+See [Custom Hooks](core-hooks.md) for hook-by-hook detail.
+
+### Components (`packages/editor-ui/src/components/media/`)
+
+- `MediaToolbar` — view toggle, search, type-filter dropdown, bulk actions, usage refresh.
+- `MediaGrid` / `MediaGridItem` — thumbnail cards with usage badges; non-images show a `FileText` icon + extension badge.
+- `MediaList` / `MediaListItem` — table view with select-all and per-row detail.
+- `MediaDrawer` — slide-out metadata editor (alt, title, caption).
+- `MediaSelectorDrawer` — media browser used inside setting inputs to pick existing files. Supports an "Upload" button (OS file dialog), search, and a `filterType` (`image` / `file` / `all`) that adjusts upload accept types; images show thumbnails, files show an icon + extension badge.
+
+The thumbnail/preview path falls back to the original image when a `thumb` variant is unavailable. Copy-URL is available on media items (copies the relative storage path) so a file URL can be pasted into generic link fields.
+
+### Setting Inputs (`packages/editor-ui/src/components/settings/inputs/`)
+
+- `ImageInput` — image picker with **default** mode (wide preview, Upload + Browse below) and **compact** mode (`compact: true` — square preview with stacked actions and hover Edit/Remove; used for small assets like the Arch `favicon`). Opens `MediaSelectorDrawer` with `filterType="image"`.
+- `FileInput` — filename-oriented picker for file assets (`type: "file"` in `SettingsRenderer`). Upload accepts `NON_IMAGE_ACCEPT`; Browse opens `MediaSelectorDrawer` with `filterType="file"`. Shows filename + extension badge + clear; no thumbnail. `value` is the file path string (e.g. `/uploads/files/brochure.pdf`). See [Setting Types](theming-setting-types.md) for the `file` type.
+
+`MediaSelectorDrawer` is also used by `PageForm` (featured image). The Arch theme's `resource-list` widget uses the `file` setting type for download lists.
+
+## 5. Security
+
+Upload validation (MIME allowlist, two-gate size enforcement, decompression-bomb guards, SVG sanitization), the TI-03 cross-tenant metadata guard, and per-scope asset isolation are summarized above. For the platform-wide contract see [Platform Security](core-security.md).
 
 ---
 
 **See also:**
 
-- [App Settings](core-appSettings.md) - Configure image processing and upload limits
-- [Export System](core-export.md) - How media usage tracking optimizes exports
-- [File Assets Architecture](core-file-assets.md) - Architecture and product decisions for file asset support
-- [Custom Hooks](core-hooks.md) - Media management hooks documentation
+- [App Settings](core-appSettings.md) — image-processing quality/sizes and the upload size limit.
+- [Export System](core-export.md) — used image and file assets copied into static exports with path rewriting.
+- [Setting Types](theming-setting-types.md) — the `image` and `file` setting types.
+- [Collections](core-collections.md) — collection-item media usage tracking.
+- [Custom Hooks](core-hooks.md) — Media hook deep-dives.
+- [Packages & Adapter Architecture](core-packages.md) — `AssetStorageAdapter`, `LimitsAdapter`, `Scope`, `LIMIT_KEYS`.

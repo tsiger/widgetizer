@@ -103,7 +103,7 @@ This is also possible, but it should be treated as a later phase because it is f
 | `widgetizer://themes/{id}/presets` | `GET /api/themes/:id/presets` | Theme preset registry |
 | `widgetizer://themes/{id}/widget/{name}/schema` | Filesystem read | Individual widget schema |
 | `widgetizer://themes/{id}/widget/{name}/insights` | Filesystem read | Widget-specific authoring notes |
-| `widgetizer://fonts` | `src/core/config/fonts.json` | Available fonts with stacks and weights |
+| `widgetizer://fonts` | `packages/core/src/config/fonts.json` | Available fonts with stacks and weights |
 | `widgetizer://projects` | `GET /api/projects` | List all projects |
 | `widgetizer://projects/active` | `GET /api/projects/active` | Current active project |
 | `widgetizer://projects/{id}/widgets` | `GET /api/projects/:projectId/widgets` | All widget schemas available in a project, including globals/core/theme widgets |
@@ -183,11 +183,11 @@ This is also possible, but it should be treated as a later phase because it is f
 
 ### Architecture
 
-A Node.js MCP server package (fits naturally since everything is already Node/ES modules) that makes HTTP calls to the running Widgetizer instance. Could live at `server/mcp/` inside the repo or as a separate `@widgetizer/mcp` package.
+A Node.js MCP server package (fits naturally since everything is already Node/ES modules) that makes HTTP calls to the running Widgetizer instance. Could live as a new workspace package, e.g. `packages/mcp/` exporting `@widgetizer/mcp`, or as a separate `@widgetizer/mcp` package.
 
 The HTTP approach (calling `localhost:3001/api/*`) is preferred over importing controllers directly — it keeps clean separation and works whether Widgetizer is running as Electron or web app.
 
-The first implementation should probably live inside the repo at `server/mcp/`. A separate `@widgetizer/mcp` package can come later if/when the surface stabilizes.
+The first implementation should probably live inside the repo as a workspace package if it shares repo tests/config; a separate published `@widgetizer/mcp` package can come later if/when the surface stabilizes.
 
 ### Widget convenience layer
 

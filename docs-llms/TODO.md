@@ -12,11 +12,11 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open — **19 done · 2 deferred · 6 open**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open — **20 done · 2 deferred · 5 open**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
 - ⬜ [2. Bundled theme updates on the OSS desktop app (product/design decision)](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
-- ⬜ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene)](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene--was-experiment-docs-14)
+- ✅ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — DONE 2026-06-26](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene---done-2026-06-26--was-experiment-docs-14)
 - ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss-was-experiment-docs-9-oss-portion)
 - ✅ [5. Consolidate preview-dispatch logic (route-mapping half) — DONE 2026-06-25](#5-consolidate-preview-dispatch-logic-route-mapping-half---done-2026-06-25--findings-doc-follow-up-session-task-16)
 - ✅ [6. Narrow-sidebar icon-grid + color-picker visual review — DONE 2026-06-26](#6-narrow-sidebar-icon-grid--color-picker-visual-review--c2-follow-up-session-task-18)
@@ -27,7 +27,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open — **19 done · 2 deferred · 
 - ✅ [11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — DONE 2026-06-26 (sub-item → §24)](#11-missed-port--link-picker-combobox-group-headers-not-rendered-editor-ui---done-2026-06-26-sub-item--24--was-experiment-docs-12)
 - ✅ [12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — DONE 2026-06-26](#12-missed-port--richtext-embedded-media-not-tracked-as-used-builder-server---done-2026-06-26--was-experiment-docs-13)
 - ✅ [13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — DONE 2026-06-26](#13-missed-port--themeupdate-delta-release-tool-not-ported-oss-dev-tooling---done-2026-06-26--was-experiment-docs-14)
-- ⬜ [14. Documentation port audit — content gaps from the master-commit doc changes](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes--was-experiment-docs-15)
+- ⬜ [14. Documentation port audit — content gaps from the master-commit doc changes (14c–14e DONE via docs-llms reorg; 14a/14b public-docs remain)](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes--was-experiment-docs-15)
 - ✅ [15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — DONE 2026-06-26](#15-missed-port--collection-item-pages-leak-the-page-slug-body-class-render-engine---done-2026-06-26--was-experiment-docs-16)
 - ✅ [16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — DONE 2026-06-26](#16-missed-port--refreshallmediausage-aborts-early-on-a-project-with-no-pages-dir-builder-server---done-2026-06-26--was-experiment-docs-17)
 - ⏸️ [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process--was-experiment-docs-18)
@@ -97,7 +97,20 @@ theme-versioning story. Not blocking; needs a product call, not just wiring.
 
 ---
 
-## 3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene)  *(was experiment-docs §14)*
+## 3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — ✅ DONE 2026-06-26  *(was experiment-docs §14)*
+
+**Done note (2026-06-26):** Resolved as part of a **full `docs-llms/` reorg + rewrite** (multi-agent: 36-agent
+audit → reorg plan → 30-doc rewrite wave → verification sweep). Every `src/...` / `server/...` citation across
+`docs-llms/*` was repointed to its **verified** `packages/*` path (or kept as a legitimate residual `src/`
+runtime asset — `previewRuntime.js`, `standalonePreviewTarget.js`, `placeholder.svg` — explicitly labelled as
+such in `core-architecture.md` / `core-packages.md`). Path verification is clean: all 166 anchored file-path
+citations in the active docs resolve on disk; all cross-doc `.md` links resolve; the only remaining
+`src/...`/`server/...` strings are intentional **master** references inside this `TODO.md` and the archived
+docs. The blanket "treat package paths as current / docs cite pre-refactor paths" caveat was **dropped** from
+`CLAUDE.md` and `AGENTS.md` (the refactor description + authoritative-maps pointer kept); the per-doc "Path
+note" header was removed too. Beyond §3's scope, the same reorg also renamed/disambiguated the two
+design-system docs, archived three completed logs/trackers to `docs-llms/archive/`, and regenerated
+`documentation-index.md`. Original finding below.
 
 Surfaced 2026-06-24, while doing finding **D6** (updated `AGENTS.md` to the package layout)
 and the accompanying doc-accuracy sweep.
@@ -608,6 +621,15 @@ story.
 
 ## 14. Documentation port audit — content gaps from the master-commit doc changes  *(was experiment-docs §15)*
 
+**Status (2026-06-26):** the **`docs-llms` sub-items are DONE** via the full docs-llms reorg/rewrite (see §3) —
+**14c** (`theming-setting-types.md` richtext `allow_headings`/`allow_images`/`min_height` + gallery/table depth
++ the folded-in `file` setting type), **14d** (`rte_text`/`rte_blank` filters), and **14e** (collection-item
+link targets documented in `core-collections.md` / `core-menus.md` / `theming-setting-types.md` /
+`theme-preset-file-format.md`) all landed. **14f** needs no port (recorded only). **Remaining open: 14a + 14b**
+— these are **public `docs-website/src/*` theme-author docs** (the removed `pageSlug` global; missing
+gallery/table in `theme-dev-setting-types.md`), which were **out of scope** for this `docs-llms`-only pass. §14
+stays open until 14a/14b are ported. Original finding below.
+
 Surfaced 2026-06-24 on a **second pass** through `experiment-docs/widgetizer-master-commits.md`, this
 time reading the docs each commit touched (`docs-llms/*`, `docs-website/src/*`; `docs-entities/*`
 Obsidian vault stays out, decided earlier). Goal: which doc *content* must land on experimentation,
@@ -680,7 +702,7 @@ blurb (what `rte_text`/`rte_blank` do + the `{% if … | rte_text != blank %}` i
 ### 14e. **LOW/MEDIUM (docs-llms, scope-aware rewrite)** — collection-item-as-link-target undocumented in feature docs
 
 The `collectionItemUuid` link-target feature (`3f707b26`) is fully ported in code but appears in exp
-docs **only** in `branch-experimentation-findings.md` (a log), whereas master documents it as a feature
+docs **only** in `archive/branch-experimentation-findings.md` (a log), whereas master documents it as a feature
 in `core-collections.md`, `core-menus.md`, and `theming-setting-types.md`. **Fix:** add the
 "a `link` setting can target a collection item page (resolves to its current slug, clears on delete)"
 description to those exp docs, written in the scope-first idiom — the resolver runs in
