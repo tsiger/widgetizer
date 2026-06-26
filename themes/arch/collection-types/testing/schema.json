@@ -1,0 +1,186 @@
+{
+  "type": "testing",
+  "schemaVersion": 1,
+  "displayName": "Testing",
+  "displayNamePlural": "Testing",
+  "description": "A scratch collection type that exercises every supported setting type.",
+  "icon": "FlaskConical",
+  "slugPrefix": "testing",
+  "hasItemPages": true,
+  "sortable": false,
+  "defaultSort": "date_desc",
+  "settings": [
+    { "type": "header", "id": "content_header", "label": "Content" },
+
+    { "type": "text", "id": "title", "label": "Text (title)", "required": true, "usedAsTitle": true },
+
+    {
+      "type": "number",
+      "id": "rating",
+      "label": "Number",
+      "description": "Numeric input with min/max.",
+      "default": 5,
+      "min": 0,
+      "max": 10
+    },
+
+    {
+      "type": "date",
+      "id": "publish_date",
+      "label": "Date",
+      "description": "Sort key for this collection (date_desc).",
+      "usedAsDate": true
+    },
+
+    {
+      "type": "textarea",
+      "id": "summary",
+      "label": "Textarea",
+      "description": "Plain multi-line text (auto-escaped)."
+    },
+
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Rich text",
+      "description": "Formatted HTML. Headings + inline images enabled.",
+      "allow_headings": true,
+      "allow_images": true
+    },
+
+    {
+      "type": "code",
+      "id": "custom_html",
+      "label": "Code",
+      "description": "Raw code snippet (intentionally unescaped).",
+      "language": "html",
+      "rows": 8,
+      "default": ""
+    },
+
+    { "type": "header", "id": "style_header", "label": "Style" },
+
+    {
+      "type": "color",
+      "id": "accent",
+      "label": "Color",
+      "description": "Color picker with alpha enabled.",
+      "default": "#ec4899",
+      "allow_alpha": true
+    },
+
+    {
+      "type": "range",
+      "id": "opacity",
+      "label": "Range",
+      "description": "Slider 0–100%.",
+      "default": 100,
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%"
+    },
+
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Select",
+      "default": "md",
+      "options": [
+        { "label": "Small", "value": "sm" },
+        { "label": "Medium", "value": "md" },
+        { "label": "Large", "value": "lg" }
+      ]
+    },
+
+    {
+      "type": "checkbox",
+      "id": "featured",
+      "label": "Checkbox",
+      "description": "Boolean toggle.",
+      "default": false
+    },
+
+    {
+      "type": "radio",
+      "id": "alignment",
+      "label": "Radio",
+      "default": "left",
+      "options": [
+        { "label": "Left", "value": "left" },
+        { "label": "Center", "value": "center" },
+        { "label": "Right", "value": "right" }
+      ]
+    },
+
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Font picker",
+      "default": {
+        "stack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "weight": 700
+      }
+    },
+
+    { "type": "header", "id": "media_header", "label": "Media & references" },
+
+    {
+      "type": "menu",
+      "id": "related_menu",
+      "label": "Menu",
+      "description": "References a menu by its stable UUID."
+    },
+
+    {
+      "type": "image",
+      "id": "hero_image",
+      "label": "Image"
+    },
+
+    {
+      "type": "gallery",
+      "id": "photos",
+      "label": "Gallery",
+      "description": "Ordered list of images."
+    },
+
+    {
+      "type": "table",
+      "id": "specs",
+      "label": "Table",
+      "description": "Repeating rows (text columns).",
+      "columns": [
+        { "id": "label", "type": "text", "label": "Label" },
+        { "id": "value", "type": "text", "label": "Value" }
+      ]
+    },
+
+    {
+      "type": "file",
+      "id": "brochure",
+      "label": "File",
+      "description": "Downloadable asset (PDF)."
+    },
+
+    {
+      "type": "link",
+      "id": "cta",
+      "label": "Link",
+      "default": { "href": "#", "text": "Learn more", "target": "_self" }
+    },
+
+    {
+      "type": "youtube",
+      "id": "video",
+      "label": "YouTube",
+      "embedOptions": { "autoplay": false, "controls": true, "mute": false }
+    },
+
+    {
+      "type": "icon",
+      "id": "badge_icon",
+      "label": "Icon"
+    }
+  ]
+}

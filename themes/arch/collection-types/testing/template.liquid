@@ -1,0 +1,238 @@
+{%- comment -%}
+  Testing item page. Exported at testing/{slug}.html (one directory deep, so
+  internal links use ../). Renders inside the Arch layout (header / main / footer).
+  Purpose: render every supported setting type so each can be verified end to end
+  (editor → save → render → export). SEO is wired automatically for hasItemPages.
+{%- endcomment -%}
+<article class="widget widget-testing">
+  <style>
+    .widget-testing {
+      & .test-grid {
+        display: grid;
+        gap: var(--space-lg);
+        margin-block-start: var(--space-xl);
+      }
+      & .test-row {
+        display: grid;
+        gap: var(--space-2xs);
+        padding-block-end: var(--space-md);
+        border-block-end: 1px solid var(--border-subtle, #e5e7eb);
+      }
+      & .test-label {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      & .test-swatch {
+        display: inline-block;
+        inline-size: 2.5rem;
+        block-size: 2.5rem;
+        border-radius: var(--radius-sm, 6px);
+        border: 1px solid var(--border-subtle, #e5e7eb);
+        vertical-align: middle;
+      }
+      & .test-code {
+        margin: 0;
+        padding: var(--space-sm);
+        background: var(--surface-subtle, #f8fafc);
+        border-radius: var(--radius-sm, 6px);
+        overflow-x: auto;
+        font-size: var(--text-sm, 0.875rem);
+      }
+      & .test-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--space-sm);
+      }
+      & .test-gallery img { inline-size: 100%; height: auto; border-radius: var(--radius-sm, 6px); }
+      & .test-image { max-inline-size: 480px; height: auto; border-radius: var(--radius-md, 10px); }
+      & table.test-table { border-collapse: collapse; }
+      & table.test-table td { border: 1px solid var(--border-subtle, #e5e7eb); padding: var(--space-2xs) var(--space-sm); }
+      & .test-video { aspect-ratio: 16 / 9; max-inline-size: 560px; }
+      & .test-video iframe { inline-size: 100%; block-size: 100%; border: 0; border-radius: var(--radius-md, 10px); }
+    }
+  </style>
+
+  <div class="widget-container">
+    <div class="widget-content content-flow widget-content-md">
+
+      {%- comment -%} text (usedAsTitle) {%- endcomment -%}
+      <h1 class="w-headline">{{ item.settings.title }}</h1>
+
+      <dl class="test-grid">
+
+        {%- comment -%} number {%- endcomment -%}
+        <div class="test-row">
+          <dt class="test-label">Number</dt>
+          <dd>{{ item.settings.rating }}</dd>
+        </div>
+
+        {%- comment -%} date (formatted with the theme's date setting) {%- endcomment -%}
+        {% if item.settings.publish_date != blank %}
+          <div class="test-row">
+            <dt class="test-label">Date</dt>
+            <dd><time datetime="{{ item.settings.publish_date }}">{{ item.settings.publish_date | format_date }}</time></dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} textarea (auto-escaped) {%- endcomment -%}
+        {% if item.settings.summary != blank %}
+          <div class="test-row">
+            <dt class="test-label">Textarea</dt>
+            <dd>{{ item.settings.summary }}</dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} richtext (already-sanitized HTML) {%- endcomment -%}
+        {% if item.settings.body != blank %}
+          <div class="test-row">
+            <dt class="test-label">Rich text</dt>
+            <dd class="w-rte">{{ item.settings.body | raw }}</dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} code (intentionally unescaped — shown literally here for inspection) {%- endcomment -%}
+        {% if item.settings.custom_html != blank %}
+          <div class="test-row">
+            <dt class="test-label">Code</dt>
+            <dd><pre class="test-code"><code>{{ item.settings.custom_html }}</code></pre></dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} color (swatch + value) {%- endcomment -%}
+        {% if item.settings.accent != blank %}
+          <div class="test-row">
+            <dt class="test-label">Color</dt>
+            <dd><span class="test-swatch" style="background: {{ item.settings.accent }}"></span> {{ item.settings.accent }}</dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} range {%- endcomment -%}
+        <div class="test-row">
+          <dt class="test-label">Range</dt>
+          <dd>{{ item.settings.opacity }}%</dd>
+        </div>
+
+        {%- comment -%} select {%- endcomment -%}
+        <div class="test-row">
+          <dt class="test-label">Select</dt>
+          <dd>{{ item.settings.size }}</dd>
+        </div>
+
+        {%- comment -%} checkbox {%- endcomment -%}
+        <div class="test-row">
+          <dt class="test-label">Checkbox</dt>
+          <dd>{% if item.settings.featured %}Yes{% else %}No{% endif %}</dd>
+        </div>
+
+        {%- comment -%} radio {%- endcomment -%}
+        <div class="test-row">
+          <dt class="test-label">Radio</dt>
+          <dd>{{ item.settings.alignment }}</dd>
+        </div>
+
+        {%- comment -%} font_picker (object: stack + weight) {%- endcomment -%}
+        {% if item.settings.heading_font.stack != blank %}
+          <div class="test-row">
+            <dt class="test-label">Font picker</dt>
+            <dd>
+              <span style="font-family: {{ item.settings.heading_font.stack }}; font-weight: {{ item.settings.heading_font.weight }};">
+                The quick brown fox
+              </span>
+              <small class="t-muted">({{ item.settings.heading_font.weight }})</small>
+            </dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} menu (stored as a stable UUID) {%- endcomment -%}
+        {% if item.settings.related_menu != blank %}
+          <div class="test-row">
+            <dt class="test-label">Menu (uuid)</dt>
+            <dd><code>{{ item.settings.related_menu }}</code></dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} image {%- endcomment -%}
+        {% if item.settings.hero_image != blank %}
+          <div class="test-row">
+            <dt class="test-label">Image</dt>
+            <dd>{% image src: item.settings.hero_image, size: 'large', class: 'test-image', alt: item.settings.title %}</dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} gallery (ordered array of paths) {%- endcomment -%}
+        {% if item.settings.photos != blank %}
+          <div class="test-row">
+            <dt class="test-label">Gallery</dt>
+            <dd>
+              <div class="test-gallery">
+                {% for src in item.settings.photos %}
+                  {% if src != blank %}
+                    {% image src: src, size: 'medium', alt: '' %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} table (rows keyed by column id) {%- endcomment -%}
+        {% if item.settings.specs != blank %}
+          <div class="test-row">
+            <dt class="test-label">Table</dt>
+            <dd>
+              <table class="test-table">
+                <tbody>
+                  {% for row in item.settings.specs %}
+                    <tr><td>{{ row.label }}</td><td>{{ row.value }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} file (resolve via filePath; works in preview + publish) {%- endcomment -%}
+        {% if item.settings.brochure != blank %}
+          {% assign file_filename = item.settings.brochure | split: '/' | last %}
+          {% assign file_url = filePath | append: '/' | append: file_filename %}
+          <div class="test-row">
+            <dt class="test-label">File</dt>
+            <dd><a href="{{ file_url }}" target="_blank" rel="noopener">{{ file_filename }}</a></dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} link (href already depth-prefixed for internal targets) {%- endcomment -%}
+        {% if item.settings.cta.href != blank %}
+          <div class="test-row">
+            <dt class="test-label">Link</dt>
+            <dd><a href="{{ item.settings.cta.href }}" target="{{ item.settings.cta.target | default: '_self' }}">{{ item.settings.cta.text | default: item.settings.cta.href }}</a></dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} youtube (object: videoId + embedUrl) {%- endcomment -%}
+        {% if item.settings.video.videoId != blank %}
+          <div class="test-row">
+            <dt class="test-label">YouTube</dt>
+            <dd>
+              <div class="test-video">
+                <iframe src="{{ item.settings.video.embedUrl }}" title="{{ item.settings.title }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              </div>
+            </dd>
+          </div>
+        {% endif %}
+
+        {%- comment -%} icon (rendered via the shared icon snippet) {%- endcomment -%}
+        {% if item.settings.badge_icon != blank %}
+          <div class="test-row">
+            <dt class="test-label">Icon</dt>
+            <dd>{% render 'icon', icon: item.settings.badge_icon, class: 'test-icon' %}</dd>
+          </div>
+        {% endif %}
+
+      </dl>
+    </div>
+  </div>
+</article>
