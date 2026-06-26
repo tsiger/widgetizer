@@ -44,7 +44,9 @@ const { getProjectDir, getProjectPagesDir, CORE_WIDGETS_DIR } = await import("..
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 
-const { getGlobalWidgets, saveGlobalWidget, serveAsset } = await import("../controllers/previewController.js");
+const { getGlobalWidgets, saveGlobalWidget, serveAsset, createCollectionPreviewToken } = await import(
+  "../controllers/previewController.js"
+);
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
@@ -489,3 +491,57 @@ describe("saveGlobalWidget — mismatch guard", () => {
 
 // NOTE: Project mismatch (409) is now handled by the resolveActiveProject middleware,
 // not by individual controller functions. Middleware-level tests cover this behavior.
+
+// ============================================================================
+// createCollectionPreviewToken — guards (POST /api/preview/collection)
+//
+// Regression lock for the three reject paths: missing collectionType (400),
+// unknown collection (404), and a collection whose schema exists but ships no
+// template.liquid (400). The endpoint reads schema/template scope-relative via
+// the storage adapter, so the template-less case is seeded by writing a valid
+// schema and no template.liquid under collection-types/<type>/.
+// ============================================================================
+
+describe("createCollectionPreviewToken — guards", () => {
+  // Matches the scope mockReq builds, so seeded fixtures resolve for the handler.
+  const previewScope = {
+    actor: { id: "default", kind: "local" },
+    projectId: PROJECT_ID,
+    folderName: PROJECT_FOLDER,
+  };
+
+  // Isolate: no other suite touches collection-types/, but wipe it so a seeded
+  // fixture can't leak across cases.
+  beforeEach(async () => {
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collection-types"));
+  });
+
+  it("returns 400 when collectionType is missing", async () => {
+    const res = await callController(createCollectionPreviewToken, { body: {} });
+    assert.equal(res._status, 400);
+    assert.equal(res._json.error, "collectionType is required");
+  });
+
+  it("returns 404 for an unknown collection", async () => {
+    const res = await callController(createCollectionPreviewToken, { body: { collectionType: "ghost", slug: "x" } });
+    assert.equal(res._status, 404);
+    assert.match(res._json.error, /Collection "ghost" not found/);
+  });
+
+  it("returns 400 for a collection with no template.liquid", async () => {
+    // Valid schema, but deliberately no template.liquid sibling.
+    await previewStorage.write(
+      previewScope,
+      "collection-types/notmpl/schema.json",
+      JSON.stringify({
+        type: "notmpl",
+        displayName: "No Template",
+        settings: [{ id: "title", type: "text", usedAsTitle: true }],
+      }),
+    );
+    const res = await callController(createCollectionPreviewToken, { body: { collectionType: "notmpl", slug: "x" } });
+    assert.equal(res._status, 400);
+    assert.equal(res._json.error, "Preview unavailable");
+    assert.match(res._json.message, /no template\.liquid/);
+  });
+});

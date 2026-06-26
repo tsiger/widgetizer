@@ -325,7 +325,16 @@ vendored package. No hosted-only concepts.
 
 ---
 
-## 10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`)  *(was experiment-docs §11)*
+## 10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §11)*
+
+**Status (2026-06-26):** added the `describe("createCollectionPreviewToken — guards")` block to
+`packages/builder-server/src/tests/preview.test.js` mirroring master — asserts **400** on missing
+`collectionType`, **404** on an unknown collection, and **400** on a collection whose schema exists
+but ships no `template.liquid` (seeded via the scope-first adapter: a valid `collection-types/<type>/
+schema.json` with no template sibling). Exact status + `error`/`message` assertions (no loose
+`includes`). The guards already worked (this is a regression lock, not a fix); proved non-vacuous by
+disabling each guard in turn and confirming only its own test goes red. Full `builder-server` suite
+green (1245). The docs half of `c38b76af` is a non-issue (see note below). Original finding below.
 
 Surfaced 2026-06-24 during the master-commit port audit, inspecting **`c38b76af`**
 (docs + guard tests for collection item preview).
