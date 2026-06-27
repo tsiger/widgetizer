@@ -12,7 +12,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **21 done · 2 deferred · 3 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **22 done · 2 deferred · 2 open · 1 wontfix**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
@@ -35,7 +35,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **21 done ·
 - ✅ [19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — DONE 2026-06-26 (tight scope)](#19-missed-port-tests-only--rendercollectionitempage-contract-test-not-ported-builder-server---done-2026-06-26-tight-scope--was-experiment-docs-20)
 - ✅ [20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — DONE 2026-06-26 (option b: comment + direct tests)](#20-stale-test-comment--claims-remapcollectionitemlinkmenurefs-not-ported-when-they-are-builder-server---done-2026-06-26-option-b-comment--direct-tests--was-experiment-docs-21)
 - ✅ [21. Dedup the cross-bundle `getStandalonePreviewTarget` copy + drop its dead `editor-ui` export (`editor-ui` + OSS preview runtime) — DONE 2026-06-26 — **low (cleanup)**](#21-dedup-the-cross-bundle-getstandalonepreviewtarget-copy--drop-its-dead-editor-ui-export-editor-ui--oss-preview-runtime---done-2026-06-26--low-cleanup)
-- ⬜ [22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — **low/moderate**](#22-gate-collection-schemas-on-the-theme-update-import-path-too-builder-server--lowmoderate)
+- ✅ [22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — DONE 2026-06-27 (option A) — **low/moderate**](#22-gate-collection-schemas-on-the-theme-update-import-path-too-builder-server--lowmoderate)
 - ✅ [23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — DONE 2026-06-26 — **low (log hygiene / signal-masking)**](#23-widget-catalog-enumeration-logs-spurious-failed-to-parse-schema-warnings-builder-server---done-2026-06-26--low-log-hygiene--signal-masking)
 - ✅ [24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — DONE 2026-06-26 — **trivial (robustness, likely-unreachable)**](#24-missed-port-defensive--updatepagewidgets-lacks-the-pagesdir-existence-guard-builder-server---done-2026-06-26--trivial-robustness-likely-unreachable)
 - ✅ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server---resolved-2026-06-26-keep-master-parity--low-correctness-master-parity-tradeoff)
@@ -1222,7 +1222,27 @@ appears. Pairs with the §5 dispatch consolidation and the §17/§20 test-hygien
 
 ---
 
-## 22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — **low/moderate**
+## 22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — ✅ DONE 2026-06-27 (option A) — **low/moderate**
+
+**Done note (2026-06-27):** Implemented **option (A)** — validate the merged/effective theme
+pre-commit. The merge core of `buildLatestSnapshot` was extracted into a shared
+`layerThemeSnapshot({ baseDir, updates, targetDir })` helper (copy base minus `updates/`+`latest/`,
+then apply each update in ascending order incl. `deleted/` markers); `buildLatestSnapshot` now calls
+it, so there's one merge implementation. The update-import branch of `uploadTheme` then merges
+**installed base + installed updates + the incoming deltas** into a throwaway `_validate_<ts>/` dir,
+runs `validateThemeCollectionSchemas` on it, and rejects with **400 + per-collection `errors`** if
+invalid — *before* any update folder is copied into the installed theme, so a bad update leaves the
+install untouched (the temp dir is always cleaned up in a `finally`). Because it validates the merged
+result, it catches the cross-version case option B can't: a new update collection whose `slugPrefix`
+collides with a base/earlier-version collection.
+
+TDD: new `describe("uploadTheme update-import collection-schema validation")` in `themes.test.js` —
+(1) invalid update schema → 400 + install untouched (version dir not created), (2) cross-version
+slugPrefix collision → 400 mentioning "Duplicate slugPrefix" + untouched, (3) valid new-collection
+update → 201 + imported. Each rejection test proven non-vacuous (both go red with the gate disabled,
+the valid one stays green). Full `builder-server` suite green (1282); `themeUpdates` /
+`themeUpdateService` (which exercise the refactored `buildLatestSnapshot`) green (55); lint clean.
+Original finding below.
 
 Surfaced 2026-06-25 finishing §7. The new-theme install path now rejects invalid collection-type
 schemas (§7), but `uploadTheme`'s **update-import** branch (`themeController.js`, the `else` arm of

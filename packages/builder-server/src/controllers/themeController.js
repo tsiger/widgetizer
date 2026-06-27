@@ -353,6 +353,65 @@ export async function getThemeLatestVersion(themeId) {
 }
 
 /**
+ * Layer a theme base directory + an ordered list of update version dirs into
+ * targetDir (created fresh). Copies the base (minus the updates/ and latest/
+ * staging trees), then applies each update in ascending order — overwrite-wins,
+ * honouring each version's deleted/ markers.
+ *
+ * Shared by buildLatestSnapshot (the real latest/ build) and the update-import
+ * pre-commit validation, which merges base + installed updates + the incoming
+ * deltas off to the side so it can validate the *effective* theme without
+ * touching the installed copy until the merged result passes.
+ *
+ * @param {object} args
+ * @param {string} args.baseDir - Theme root (base version) directory
+ * @param {Array<{ version: string, dir: string }>} args.updates - Update version
+ *   directories in ascending version order
+ * @param {string} args.targetDir - Destination snapshot directory
+ */
+async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
+  await fs.ensureDir(targetDir);
+
+  // 1. Base (root) files, excluding the updates/ and latest/ staging trees
+  const baseEntries = await fs.readdir(baseDir, { withFileTypes: true });
+  for (const entry of baseEntries) {
+    if (entry.name === "updates" || entry.name === "latest") continue;
+    await fs.copy(path.join(baseDir, entry.name), path.join(targetDir, entry.name));
+  }
+
+  // 2. Apply updates in version order (later versions win)
+  for (const { version, dir } of updates) {
+    try {
+      const versionEntries = await fs.readdir(dir, { withFileTypes: true });
+      for (const entry of versionEntries) {
+        // The deleted/ folder is processed separately, not copied.
+        if (entry.name === "deleted") continue;
+        await fs.copy(path.join(dir, entry.name), path.join(targetDir, entry.name), { overwrite: true });
+      }
+
+      const deletedDir = path.join(dir, "deleted");
+      if (await fs.pathExists(deletedDir)) {
+        const deletedPaths = await getDeletedPaths(deletedDir, "");
+        for (const deletedPath of deletedPaths) {
+          try {
+            await fs.remove(path.join(targetDir, deletedPath));
+            console.log(`[layerThemeSnapshot] Deleted ${deletedPath} (v${version})`);
+          } catch (deleteError) {
+            if (deleteError.code !== "ENOENT") {
+              console.warn(`[layerThemeSnapshot] Could not delete ${deletedPath}:`, deleteError.message);
+            }
+          }
+        }
+      }
+
+      console.log(`[layerThemeSnapshot] Applied version ${version}`);
+    } catch (error) {
+      console.warn(`[layerThemeSnapshot] Could not apply version ${version}:`, error.message);
+    }
+  }
+}
+
+/**
  * Build the latest/ snapshot by layering base + updates.
  * Only called when updates exist.
  * @param {string} themeId - Theme identifier
@@ -458,63 +517,13 @@ export async function buildLatestSnapshot(themeId) {
     }
   }
 
-  // Create fresh latest/ directory
-  await fs.ensureDir(latestDir);
-
-  // 1. Start with base (root) files, excluding updates/ and latest/ directories
-  const baseEntries = await fs.readdir(themeDir, { withFileTypes: true });
-  for (const entry of baseEntries) {
-    if (entry.name === "updates" || entry.name === "latest") continue;
-
-    const sourcePath = path.join(themeDir, entry.name);
-    const targetPath = path.join(latestDir, entry.name);
-
-    await fs.copy(sourcePath, targetPath);
-  }
-
-  // 2. Apply updates in version order (skip base version)
+  // Layer base + updates (ascending order) into a fresh latest/.
   const sortedUpdateVersions = sortVersions(updateVersions);
-
-  for (const version of sortedUpdateVersions) {
-    const versionDir = getThemeVersionDir(themeId, version);
-
-    try {
-      const versionEntries = await fs.readdir(versionDir, { withFileTypes: true });
-
-      for (const entry of versionEntries) {
-        // Skip the deleted/ folder - it's processed separately
-        if (entry.name === "deleted") continue;
-
-        const sourcePath = path.join(versionDir, entry.name);
-        const targetPath = path.join(latestDir, entry.name);
-
-        // Copy with overwrite (later versions win)
-        await fs.copy(sourcePath, targetPath, { overwrite: true });
-      }
-
-      // Process deleted/ folder if it exists
-      const deletedDir = path.join(versionDir, "deleted");
-      if (await fs.pathExists(deletedDir)) {
-        const deletedPaths = await getDeletedPaths(deletedDir, "");
-        for (const deletedPath of deletedPaths) {
-          const targetPath = path.join(latestDir, deletedPath);
-          try {
-            await fs.remove(targetPath);
-            console.log(`[buildLatestSnapshot] Deleted ${deletedPath} (v${version})`);
-          } catch (deleteError) {
-            // Ignore if path doesn't exist
-            if (deleteError.code !== "ENOENT") {
-              console.warn(`[buildLatestSnapshot] Could not delete ${deletedPath}:`, deleteError.message);
-            }
-          }
-        }
-      }
-
-      console.log(`[buildLatestSnapshot] Applied version ${version} to latest/`);
-    } catch (error) {
-      console.warn(`[buildLatestSnapshot] Could not apply version ${version}:`, error.message);
-    }
-  }
+  await layerThemeSnapshot({
+    baseDir: themeDir,
+    updates: sortedUpdateVersions.map((version) => ({ version, dir: getThemeVersionDir(themeId, version) })),
+    targetDir: latestDir,
+  });
 
   console.log(`[buildLatestSnapshot] Successfully built latest/ for ${themeId}`);
   invalidateThemeSourceCache(themeId);
@@ -1490,6 +1499,43 @@ export async function uploadTheme(req, res) {
 
         const extractedThemeDir = path.join(tempDir, themeFolderName);
         const extractedUpdatesDir = path.join(extractedThemeDir, "updates");
+
+        // Gate collection-type schemas on the update-import path too (TODO §22).
+        // Unlike the new-theme install (validated as a self-contained temp dir),
+        // an update only ships deltas — the *effective* theme exists only after
+        // base + installed updates + incoming deltas are merged. So merge that
+        // off to the side and validate the result; if it's invalid (bad schema,
+        // or a slugPrefix that now collides across versions) reject with 400 and
+        // leave the installed theme untouched. The merge mirrors buildLatestSnapshot.
+        const newVersionSet = new Set(newUpdateVersions);
+        const orderedUpdateVersions = sortVersions([...new Set([...existingVersions, ...newUpdateVersions])]).filter(
+          (version) => version !== uploadedVersion,
+        );
+        const validateDir = path.join(userThemesDir, `_validate_${Date.now()}`);
+        try {
+          await layerThemeSnapshot({
+            baseDir: themeDir,
+            updates: orderedUpdateVersions.map((version) => ({
+              version,
+              dir: newVersionSet.has(version)
+                ? path.join(extractedUpdatesDir, version)
+                : getThemeVersionDir(themeFolderName, version),
+            })),
+            targetDir: validateDir,
+          });
+
+          const collectionValidation = await validateThemeCollectionSchemas(validateDir);
+          if (!collectionValidation.valid) {
+            await fs.remove(validateDir);
+            await fs.remove(tempDir);
+            return res.status(400).json({
+              message: "Invalid theme update: collection-type schema validation failed.",
+              errors: collectionValidation.errors,
+            });
+          }
+        } finally {
+          await fs.remove(validateDir).catch(() => {});
+        }
 
         // Copy each new update version folder
         for (const version of newUpdateVersions) {

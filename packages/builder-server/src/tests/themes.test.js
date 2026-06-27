@@ -1016,6 +1016,112 @@ describe("uploadTheme collection-schema validation", () => {
 });
 
 // ============================================================================
+// uploadTheme — update-import collection-schema validation (gate the
+// update-import path; see docs-llms/TODO.md §22). Unlike the new-theme install,
+// the effective theme only exists after base + incoming deltas are merged, so
+// these assert the merged result is validated and the install is left untouched
+// on rejection.
+// ============================================================================
+
+describe("uploadTheme update-import collection-schema validation", () => {
+  const validNews = JSON.stringify({
+    type: "news",
+    settings: [{ id: "title", type: "text", usedAsTitle: true }],
+  });
+
+  const installed = [];
+
+  async function installBaseWithNews(themeName) {
+    installed.push(themeName);
+    const base = buildThemeZip(themeName, {
+      version: "1.0.0",
+      extraFiles: { "collection-types/news/schema.json": validNews },
+    });
+    const res = await callController(uploadTheme, { file: base });
+    assert.equal(res._status, 201, `base install failed: ${JSON.stringify(res._json)}`);
+  }
+
+  afterEach(async () => {
+    while (installed.length) await fs.remove(getThemeDir(installed.pop()));
+  });
+
+  it("rejects an update whose collection-type schema is invalid, leaving the install untouched", async () => {
+    const theme = "upd-bad-collection";
+    await installBaseWithNews(theme);
+
+    const update = buildThemeZip(theme, {
+      version: "1.0.0",
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            "collection-types/articles/schema.json": JSON.stringify({ type: "articles", settings: "not-an-array" }),
+          },
+        },
+      ],
+    });
+    const res = await callController(uploadTheme, { file: update });
+    assert.equal(res._status, 400);
+    assert.ok(res._json.message.includes("collection-type schema validation failed"));
+    assert.ok(Array.isArray(res._json.errors) && res._json.errors.length > 0);
+    // The install must be untouched: the update version was not imported.
+    assert.equal(await fs.pathExists(getThemeVersionDir(theme, "1.1.0")), false);
+  });
+
+  it("rejects an update that introduces a cross-version slugPrefix collision (option A)", async () => {
+    const theme = "upd-prefix-collision";
+    await installBaseWithNews(theme);
+
+    // `articles` is a valid schema on its own, but its slugPrefix collides with
+    // the base theme's `news` collection — only catchable by validating the merge.
+    const update = buildThemeZip(theme, {
+      version: "1.0.0",
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            "collection-types/articles/schema.json": JSON.stringify({
+              type: "articles",
+              slugPrefix: "news",
+              settings: [{ id: "title", type: "text", usedAsTitle: true }],
+            }),
+          },
+        },
+      ],
+    });
+    const res = await callController(uploadTheme, { file: update });
+    assert.equal(res._status, 400);
+    assert.ok(res._json.errors.some((e) => e.includes("Duplicate slugPrefix")));
+    assert.equal(await fs.pathExists(getThemeVersionDir(theme, "1.1.0")), false);
+  });
+
+  it("imports an update that adds a valid new collection", async () => {
+    const theme = "upd-good-collection";
+    await installBaseWithNews(theme);
+
+    const update = buildThemeZip(theme, {
+      version: "1.0.0",
+      updates: [
+        {
+          version: "1.1.0",
+          files: {
+            "collection-types/events/schema.json": JSON.stringify({
+              type: "events",
+              settings: [{ id: "title", type: "text", usedAsTitle: true }],
+            }),
+          },
+        },
+      ],
+    });
+    const res = await callController(uploadTheme, { file: update });
+    assert.equal(res._status, 201, `Expected 201, got ${res._status}: ${JSON.stringify(res._json)}`);
+    assert.ok(res._json.theme.isUpdate);
+    assert.ok(res._json.theme.addedVersions.includes("1.1.0"));
+    assert.equal(await fs.pathExists(getThemeVersionDir(theme, "1.1.0")), true);
+  });
+});
+
+// ============================================================================
 // uploadTheme — update version validation
 // ============================================================================
 
