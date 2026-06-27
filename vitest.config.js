@@ -12,9 +12,6 @@ export default mergeConfig(
       setupFiles: ["./vitest.setup.js"],
       include: [
         "app/src/**/*.test.{js,jsx}",
-        // Residual pre-refactor helpers under src/ that are pure and import-safe
-        // (e.g. the standalone-preview href mapper consumed by previewRuntime.js).
-        "src/**/*.test.{js,jsx}",
         // Electron shell carries a few pure, import-safe helpers (e.g. the preview
         // path guard) that are unit-tested here; main.js itself stays out (it imports
         // electron and isn't import-safe under Vitest).

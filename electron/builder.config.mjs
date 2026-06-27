@@ -14,9 +14,8 @@ export default {
     // app/ is frontend source already bundled into dist/ by Vite). It composes
     // the @widgetizer/* backend packages, which are bundled via dependencies.
     "app/server-common.js",
-    // src/core data dirs (widgets/snippets/assets) moved into @widgetizer/core
-    // in Sprint 1.6 — they ride along via the @widgetizer/core dependency.
-    "src/utils",
+    // The pre-refactor root src/ folder is gone: core assets + the preview-iframe
+    // runtime modules now live in @widgetizer/core and ride along via that dependency.
     "themes",
     "!themes/widgetizer/**",
     "electron",
@@ -34,7 +33,7 @@ export default {
     // sibling standalonePreviewTarget.js by relative URL, so every served runtime
     // module must be a real on-disk file (unpacked), not read from inside the asar.
     // Top-level *.js only — __tests__ stays packed.
-    "src/utils/*.js",
+    "node_modules/@widgetizer/core/src/runtime/*.js",
     "node_modules/sharp/**",
     "node_modules/@img/sharp-*/**",
     "node_modules/@img/sharp-libvips-*/**",

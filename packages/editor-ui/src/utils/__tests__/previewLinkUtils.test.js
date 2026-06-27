@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { isStandalonePreviewNavigationUrl } from "../previewLinkUtils";
 
-// `getStandalonePreviewTarget` moved to src/utils/standalonePreviewTarget.js
+// `getStandalonePreviewTarget` lives in @widgetizer/core/src/runtime/standalonePreviewTarget.js
 // (its only consumer is the injected preview runtime); see that file's test.
 
 describe("isStandalonePreviewNavigationUrl", () => {

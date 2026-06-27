@@ -21,7 +21,7 @@ The repo is an npm workspace (`"workspaces": ["packages/*"]` in the root `packag
 - `app/` — OSS frontend + server assembly. `app/server-common.js` exports `buildOssApp()` / `startOssServer()`: it constructs the six local adapters and calls `createEditorApp({ adapters })`. `app/src/main.jsx` is the FE entry; `app/src/App.jsx` composes routes via `createEditorRoutes`.
 - `electron/` — Electron shell. `electron/main.js` forks `electron/server-bootstrap.js`, which calls `startOssServer`.
 - `server.js` (repo root) — web entry; calls `startOssServer`.
-- `src/` — a handful of residual pre-refactor runtime assets that legitimately still live here: `src/utils/previewRuntime.js`, `src/utils/standalonePreviewTarget.js` (+ its `__tests__/standalonePreviewTarget.test.js`), and `src/core/assets/placeholder.svg`.
+- Preview-iframe runtime modules live in `@widgetizer/core` at `packages/core/src/runtime/` — `previewRuntime.js`, `standalonePreviewTarget.js` (+ its `__tests__/standalonePreviewTarget.test.js`). They are served raw by path (`express.static(/runtime)`), not exported from the package index. (The old repo-root `src/` folder is gone.)
 
 ---
 

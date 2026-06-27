@@ -1,6 +1,7 @@
 // NOTE: the in-preview href → preview-route mapper (`getStandalonePreviewTarget`)
-// lives in `src/utils/standalonePreviewTarget.js` — its only consumer is the
-// injected preview runtime (`previewRuntime.js`), which can't import this package.
+// lives in `@widgetizer/core/src/runtime/standalonePreviewTarget.js` — its only
+// consumer is the injected preview runtime (`previewRuntime.js`, served raw to the
+// preview iframe), which can't import this package.
 
 export function isStandalonePreviewNavigationUrl(url) {
   // Accept flat page routes (/preview/about) and nested collection item routes

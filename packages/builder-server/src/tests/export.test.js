@@ -541,19 +541,7 @@ before(async () => {
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.js"), "// slider init");
 
   // -----------------------------------------------------------
-  // 11. Core assets (placeholder SVGs) — may already exist
-  // -----------------------------------------------------------
-  const coreAssetsDir = path.join(process.cwd(), "src", "core", "assets");
-  if (!(await fs.pathExists(path.join(coreAssetsDir, "placeholder.svg")))) {
-    await fs.ensureDir(coreAssetsDir);
-    await fs.writeFile(
-      path.join(coreAssetsDir, "placeholder.svg"),
-      '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"></svg>',
-    );
-  }
-
-  // -----------------------------------------------------------
-  // 12. Ensure publish dir exists
+  // 11. Ensure publish dir exists
   // -----------------------------------------------------------
   await fs.ensureDir(PUBLISH_DIR);
 });

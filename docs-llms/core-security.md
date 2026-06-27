@@ -190,7 +190,7 @@ Optional security boundary that runs the preview iframe on a separate origin fro
 
 **PostMessage origin verification:** All `postMessage` calls use explicit target origins (not `"*"`) when isolation is enabled (`getPreviewTargetOrigin()` in `previewBase.js`). The preview runtime rejects messages from unexpected origins.
 
-**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js` (`src/utils/previewRuntime.js` — a residual runtime asset legitimately still served from `src/`), eliminating cross-origin `contentDocument` access. When the preview loads same-origin, `postMessage` uses `"*"`.
+**Inline overlay rendering:** Selection/hover overlays are rendered inside the iframe by `previewRuntime.js` (`packages/core/src/runtime/previewRuntime.js`, served raw to the iframe via `express.static(/runtime)`), eliminating cross-origin `contentDocument` access. When the preview loads same-origin, `postMessage` uses `"*"`.
 
 ### Project-Switch Isolation
 

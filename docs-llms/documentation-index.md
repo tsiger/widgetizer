@@ -12,7 +12,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 **Purpose**: Authoritative orientation map (#1 of 2) — a thin index of how the refactored package codebase fits together and where each subsystem lives, deferring all per-subsystem detail to the dedicated docs **When to use**:
 
-- Understanding the real package split (admin-shell FE in `app/src/`, site-workspace FE in `packages/editor-ui/src/`, backend in `packages/builder-server/src/`, shared primitives in `packages/core/src/`, residual runtime in `src/`)
+- Understanding the real package split (admin-shell FE in `app/src/`, site-workspace FE in `packages/editor-ui/src/`, backend in `packages/builder-server/src/`, shared primitives in `packages/core/src/`, preview-iframe runtime in `packages/core/src/runtime/`)
 - Onboarding new developers and finding where a subsystem lives
 - Tracing the DI assembly and scoped routers at a high level
 - Locating which dedicated doc owns a given subsystem
@@ -31,7 +31,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Building a new adapter implementation against the conformance suites
 - Tracing the render-engine scope-free boundary or the `require-scope-arg` lint rule
 
-**Key topics**: Five packages, OSS/hosted boundary, adapter contracts (Storage/AssetStorage incl. `stat()` + download byte-range/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` (incl. `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`) + constants, error types + status codes, conformance suites, `projectScopedRouter` mounts (incl. `/collections`), editor-ui seams (apiBase/editorFetch, routeBase, EditorProvider/EditorShell, extension registry/hooks/slots, tailwind preset), render-engine deps bag, residual `src/` runtime assets, `require-scope-arg`
+**Key topics**: Five packages, OSS/hosted boundary, adapter contracts (Storage/AssetStorage incl. `stat()` + download byte-range/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` (incl. `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`) + constants, error types + status codes, conformance suites, `projectScopedRouter` mounts (incl. `/collections`), editor-ui seams (apiBase/editorFetch, routeBase, EditorProvider/EditorShell, extension registry/hooks/slots, tailwind preset), render-engine deps bag, preview-iframe runtime in `@widgetizer/core`, `require-scope-arg`
 
 ---
 
@@ -244,7 +244,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing editor features (preview, save, undo/redo)
 - Troubleshooting the preview protocol or navigation guard
 
-**Key topics**: Editor components, Zustand store data flow, load/edit/preview/save/undo-redo, postMessage preview protocol (`packages/editor-ui/src/queries/previewManager.js`, `src/utils/previewRuntime.js` residual), navigation guard (`packages/editor-ui/src/hooks/useNavigationGuard.js`), global-widget editing, pointer to core-hooks.md
+**Key topics**: Editor components, Zustand store data flow, load/edit/preview/save/undo-redo, postMessage preview protocol (`packages/editor-ui/src/queries/previewManager.js`, `packages/core/src/runtime/previewRuntime.js`), navigation guard (`packages/editor-ui/src/hooks/useNavigationGuard.js`), global-widget editing, pointer to core-hooks.md
 
 ---
 

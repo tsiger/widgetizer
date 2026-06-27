@@ -10,37 +10,6 @@ const local = { rules: { "require-scope-arg": requireScopeArg } };
 
 export default [
   { ignores: ["dist", "dist-electron"] },
-  // Frontend (React) - src/, components, pages, etc.
-  {
-    files: ["src/**/*.{js,jsx}"],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        __APP_VERSION__: "readonly",
-      },
-      parserOptions: {
-        ecmaVersion: "latest",
-        ecmaFeatures: { jsx: true },
-        sourceType: "module",
-      },
-    },
-    settings: { react: { version: "19.0" } },
-    plugins: {
-      react,
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
-    },
-    rules: {
-      ...js.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      ...react.configs["jsx-runtime"].rules,
-      ...reactHooks.configs.recommended.rules,
-      "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
-      "react/jsx-no-target-blank": "off",
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-      "react/prop-types": "off",
-    },
-  },
   // Node packages: the Express backend (@widgetizer/builder-server) and the
   // OSS local adapters (@widgetizer/adapters-local).
   {

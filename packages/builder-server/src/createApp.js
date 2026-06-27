@@ -4,7 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 
 import errorHandler from "./middleware/errorHandler.js";
-import { getThemesDir, STATIC_DIST_DIR, STATIC_UTILS_DIR } from "./config.js";
+import { getThemesDir, STATIC_DIST_DIR, STATIC_PREVIEW_RUNTIME_DIR } from "./config.js";
 import { setupBuilderServer } from "./setupBuilderServer.js";
 
 function applySharedMiddleware(app) {
@@ -39,7 +39,7 @@ function mountEditorApiRoutes(app, { adapters, plugins } = {}) {
   app.use("/themes", express.static(getThemesDir()));
 
   // iFrame runtime script (MUST be before production catch-all)
-  app.use("/runtime", express.static(STATIC_UTILS_DIR));
+  app.use("/runtime", express.static(STATIC_PREVIEW_RUNTIME_DIR));
 
   // Token-based preview rendering (MUST be before production catch-all)
   app.use("/", previewRouter);

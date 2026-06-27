@@ -311,13 +311,13 @@ xattr -cr /path/to/Widgetizer.app
 
 ## Bundling & asar
 
-The workspace packages are bundled into the asar by their presence in the OSS `package.json` `dependencies` (not by being npm workspaces), with placeholder SVGs, `dist`, themes, and `src/utils/*.js` runtime modules asar-**unpacked** via `asarUnpack` in `electron/builder.config.mjs`. The full set of bundling rules and path-resolution patterns (`config.js` fs-read-from-asar, `UNPACKED_ROOT`, `THEMES_ROOT`) is documented in [core-packages.md](core-packages.md) — refer there rather than duplicating it.
+The workspace packages are bundled into the asar by their presence in the OSS `package.json` `dependencies` (not by being npm workspaces), with placeholder SVGs, `dist`, themes, and the `@widgetizer/core` preview-runtime modules asar-**unpacked** via `asarUnpack` in `electron/builder.config.mjs`. The full set of bundling rules and path-resolution patterns (`config.js` fs-read-from-asar, `UNPACKED_ROOT`, `THEMES_ROOT`) is documented in [core-packages.md](core-packages.md) — refer there rather than duplicating it.
 
 Quick reference for what `electron/builder.config.mjs` unpacks (`asarUnpack`):
 
 - `themes/**` (excluding `themes/widgetizer/**`) and `dist/**`
 - `node_modules/@widgetizer/core/src/assets/**` — placeholder SVGs served via `res.sendFile`
-- `src/utils/*.js` — `previewRuntime.js` + its sibling `standalonePreviewTarget.js`, served raw via `express.static`
+- `node_modules/@widgetizer/core/src/runtime/*.js` — `previewRuntime.js` + its sibling `standalonePreviewTarget.js`, served raw via `express.static`
 - native modules: `sharp`, `@img/sharp-*`, `better-sqlite3`
 
 ## See Also

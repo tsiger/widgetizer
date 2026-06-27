@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src packages app server.js",
+    "lint": "eslint packages app server.js",
     "lint:electron": "eslint electron",
     "lint:all": "eslint .",
     "preview": "vite preview",

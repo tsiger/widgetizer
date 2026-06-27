@@ -62,7 +62,18 @@ export const STATIC_CORE_ASSETS_DIR = path.join(
   "src",
   "assets",
 );
-export const STATIC_UTILS_DIR = path.join(UNPACKED_ROOT, "src", "utils");
+// Preview-iframe runtime modules (previewRuntime.js + its standalonePreviewTarget.js
+// sibling) are served raw via express.static(/runtime) as plain ES modules, so they
+// must be real files on disk (asar-UNPACKED). They live in @widgetizer/core; resolve
+// to the unpacked copy under node_modules (mirrors STATIC_CORE_ASSETS_DIR).
+export const STATIC_PREVIEW_RUNTIME_DIR = path.join(
+  UNPACKED_ROOT,
+  "node_modules",
+  "@widgetizer",
+  "core",
+  "src",
+  "runtime",
+);
 
 // Helper to check if a path is inside an asar archive
 export function isAsarPath(p) {

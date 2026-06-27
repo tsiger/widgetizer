@@ -1200,10 +1200,16 @@ instead of a dead twin — `previewLinkUtils.test.js` keeps only its `isStandalo
 the vitest `include` with `src/**/*.test.{js,jsx}` so the new test runs. **Packaging fix (would have broken the
 packaged app):** `electron/builder.config.mjs` only asar-unpacked the single file `src/utils/previewRuntime.js`; since
 the runtime now imports a served sibling, changed it to `src/utils/*.js` so every served runtime module is a real
-on-disk file. Tests green (6 moved + 2 kept = 8); lint clean. **Note (deferred, separate TODO-worthy):** the preview
-runtime living in root `src/utils` at all is pre-refactor legacy (CLAUDE.md tags `src/` as residual); the principled
-fix is to make it a built editor-ui lib entry so it + helpers live in the package and the build output is served — a
-build-pipeline change out of scope for this cleanup. Original finding below.
+on-disk file. Tests green (6 moved + 2 kept = 8); lint clean. **Update (2026-06-27): the deferred follow-up is
+DONE — the repo-root `src/` folder is gone.** The two runtime files moved to `packages/core/src/runtime/`
+(`previewRuntime.js` + `standalonePreviewTarget.js` + its test), served raw by path via the renamed
+`STATIC_PREVIEW_RUNTIME_DIR` (→ `node_modules/@widgetizer/core/src/runtime`, mirroring `STATIC_CORE_ASSETS_DIR`);
+not exported from the core index. Chose relocation over a build-pipeline lib-entry (they're already dependency-free
+raw ES modules — bundling would add complexity for no gain). Also: dropped the dead leftover
+`src/core/assets/placeholder.svg`; repointed the Electron `asarUnpack` glob + removed `src/utils` from `files`;
+fixed the `lint` script (`eslint packages app server.js`) and removed the dead `src/**` eslint block + `src/**`
+vitest include; fixed a stale `export.test.js` block that recreated `src/core/assets` on every run; updated all
+docs that called `src/` "residual". Original finding below.
 
 Surfaced 2026-06-25 while consolidating the standalone-preview dispatch (§5). The href→preview-path
 mapper `getStandalonePreviewTarget(href)` (turns an in-preview link's href into a `/preview/:pageId`
