@@ -34,8 +34,8 @@ afterEach(async () => {
 });
 
 describe("parseSemver", () => {
-  it("parses a valid semver into numeric components + raw", () => {
-    expect(parseSemver("0.9.9")).toEqual({ major: 0, minor: 9, patch: 9, raw: "0.9.9" });
+  it("parses a valid semver into numeric components", () => {
+    expect(parseSemver("0.9.9")).toEqual({ major: 0, minor: 9, patch: 9 });
   });
 
   it("returns null for non-semver input", () => {
@@ -47,13 +47,24 @@ describe("parseSemver", () => {
 });
 
 describe("parseVersionFromTag", () => {
-  it("extracts the last semver-looking token from a tag", () => {
+  it("extracts a clean trailing semver, optionally v-prefixed or separator-delimited", () => {
     expect(parseVersionFromTag("v0.9.8")).toBe("0.9.8");
+    expect(parseVersionFromTag("0.9.8")).toBe("0.9.8");
     expect(parseVersionFromTag("arch-theme-1.2.3")).toBe("1.2.3");
   });
 
   it("returns null when the tag has no semver token", () => {
     expect(parseVersionFromTag("latest")).toBeNull();
+  });
+
+  it("rejects date/compound tags with leading-zero components", () => {
+    // Old last-token regex greedily parsed this to 2024.01.15.
+    expect(parseVersionFromTag("release-2024.01.15")).toBeNull();
+  });
+
+  it("does not grab a trailing pre-release version segment", () => {
+    // Old behaviour returned the last x.y.z token => wrong baseline 0.9.9.
+    expect(parseVersionFromTag("arch-1.2.3-rc.0.9.9")).toBeNull();
   });
 });
 
@@ -150,6 +161,17 @@ describe("parseDiffNameStatus", () => {
   it("does not duplicate theme.json when the diff already lists it", () => {
     const changes = parseDiffNameStatus("M\tthemes/arch/theme.json", THEME);
     expect(changes.filter((c) => c.relPath === "theme.json")).toHaveLength(1);
+  });
+
+  it("throws on a git-quoted path rather than silently dropping it", () => {
+    // What git emits for a non-ASCII filename; would be skipped (and lost from
+    // the delta) by the old prefix check.
+    const output = 'M\t"themes/arch/n\\303\\241me.css"';
+    expect(() => parseDiffNameStatus(output, THEME)).toThrow(/quoted/i);
+  });
+
+  it("throws on an unparseable diff line", () => {
+    expect(() => parseDiffNameStatus("garbage-no-tab", THEME)).toThrow(/unparseable/i);
   });
 });
 

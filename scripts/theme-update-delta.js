@@ -4,6 +4,9 @@ import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { parseVersion as parseSemver } from "../packages/builder-server/src/utils/semver.js";
+import { isWithinDirectory } from "../packages/core/src/utils/pathSecurity.js";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
@@ -96,20 +99,18 @@ function readJson(filePath) {
   return readFile(filePath, "utf8").then((content) => JSON.parse(content));
 }
 
-export function parseSemver(version) {
-  const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version || "");
-  if (!match) return null;
-  return {
-    major: Number(match[1]),
-    minor: Number(match[2]),
-    patch: Number(match[3]),
-    raw: version,
-  };
-}
+// parseSemver is the shared builder-server semver parser, re-exported here so
+// the tool (and its tests) keep one source of truth for version parsing.
+export { parseSemver };
 
 export function parseVersionFromTag(tag) {
-  const matches = String(tag).match(/\d+\.\d+\.\d+/g);
-  return matches?.at(-1) ?? null;
+  // Accept a clean x.y.z only when it sits at the END of the tag, optionally
+  // `v`-prefixed and preceded by start-of-string or a separator. Reject
+  // leading-zero components so date/compound tags (e.g. `release-2024.01.15`)
+  // don't masquerade as versions, and ignore trailing pre-release junk
+  // (e.g. `arch-1.2.3-rc.0.9.9` -> null rather than the wrong 0.9.9).
+  const match = /(?:^|[-/_])v?((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$/.exec(String(tag));
+  return match?.[1] ?? null;
 }
 
 export function compareVersions(a, b) {
@@ -144,18 +145,17 @@ export function describeProgression(fromVersion, targetVersion) {
 }
 
 function toGitPath(absPath, gitRoot) {
-  const rel = path.relative(gitRoot, absPath);
-  if (!rel || rel.startsWith("..") || path.isAbsolute(rel)) {
+  if (!isWithinDirectory(path.resolve(gitRoot), path.resolve(absPath))) {
     fail(`Theme path must be inside the git repository: ${absPath}`);
   }
+  const rel = path.relative(gitRoot, absPath);
   return rel.split(path.sep).join("/");
 }
 
 function resolveInside(parent, child) {
   const resolvedParent = path.resolve(parent);
   const resolvedChild = path.resolve(parent, child);
-  const rel = path.relative(resolvedParent, resolvedChild);
-  if (rel.startsWith("..") || path.isAbsolute(rel)) {
+  if (!isWithinDirectory(resolvedParent, resolvedChild, { allowEqual: true })) {
     fail(`Refusing to write outside ${resolvedParent}: ${resolvedChild}`);
   }
   return resolvedChild;
@@ -181,8 +181,22 @@ export function parseDiffNameStatus(output, themeGitPath) {
     const [statusRaw, gitPath] = line.split("\t");
     const status = statusRaw?.[0];
 
-    if (!status || !gitPath?.startsWith(prefix)) {
-      warn(`Skipping unexpected diff line: ${line}`);
+    if (!status || !gitPath) {
+      throw new Error(`Unparseable git diff line: ${line}`);
+    }
+
+    // A git-quoted path (octal-escaped non-ASCII / control chars — these survive
+    // even with core.quotePath=false) can't be matched against the theme prefix
+    // and would be silently dropped from the delta. Fail loudly rather than ship
+    // an incomplete update.
+    if (gitPath.startsWith('"')) {
+      throw new Error(`Refusing to skip a git-quoted diff path (incomplete delta): ${line}`);
+    }
+
+    if (!gitPath.startsWith(prefix)) {
+      // Outside the requested theme. A scoped `git diff -- <theme>` shouldn't
+      // emit these, but stay defensive and skip rather than fail.
+      warn(`Skipping out-of-theme diff line: ${line}`);
       continue;
     }
 
@@ -276,8 +290,7 @@ async function writePlan(plan, themeDir, outputDir, force) {
     }
 
     const updatesDir = path.join(themeDir, "updates");
-    const rel = path.relative(path.resolve(updatesDir), path.resolve(outputDir));
-    if (rel.startsWith("..") || path.isAbsolute(rel)) {
+    if (!isWithinDirectory(path.resolve(updatesDir), path.resolve(outputDir))) {
       fail(`Refusing to remove path outside theme updates directory: ${outputDir}`);
     }
     await rm(outputDir, { recursive: true, force: true });
@@ -396,7 +409,16 @@ async function main() {
   log(`Version progression: ${baselineVersion} -> ${targetVersion} (${progression}).`);
   log(`We will continue with ${themeId} update ${targetVersion}.`);
 
-  const diffOutput = git(["diff", "--name-status", "--no-renames", from.tag, "--", themeGitPath]);
+  const diffOutput = git([
+    "-c",
+    "core.quotePath=false",
+    "diff",
+    "--name-status",
+    "--no-renames",
+    from.tag,
+    "--",
+    themeGitPath,
+  ]);
   const changes = parseDiffNameStatus(diffOutput, themeGitPath);
   const plan = buildPlan(changes, themeDir);
 

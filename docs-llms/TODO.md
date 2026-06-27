@@ -12,10 +12,10 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open — **20 done · 2 deferred · 5 open**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **21 done · 2 deferred · 3 open · 1 wontfix**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
-- ⬜ [2. Bundled theme updates on the OSS desktop app (product/design decision)](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
+- ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
 - ✅ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — DONE 2026-06-26](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene---done-2026-06-26--was-experiment-docs-14)
 - ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss-was-experiment-docs-9-oss-portion)
 - ✅ [5. Consolidate preview-dispatch logic (route-mapping half) — DONE 2026-06-25](#5-consolidate-preview-dispatch-logic-route-mapping-half---done-2026-06-25--findings-doc-follow-up-session-task-16)
@@ -40,7 +40,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open — **20 done · 2 deferred · 
 - ✅ [24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — DONE 2026-06-26 — **trivial (robustness, likely-unreachable)**](#24-missed-port-defensive--updatepagewidgets-lacks-the-pagesdir-existence-guard-builder-server---done-2026-06-26--trivial-robustness-likely-unreachable)
 - ✅ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server---resolved-2026-06-26-keep-master-parity--low-correctness-master-parity-tradeoff)
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
-- ⬜ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling--low-dev-only-mostly-latent)
+- ✅ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — DONE 2026-06-27 — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling--low-dev-only-mostly-latent)
 
 ---
 
@@ -66,7 +66,15 @@ render server) and doesn't break the editor's same-origin/hosted-nested cases. L
 
 ---
 
-## 2. Bundled theme updates on the OSS desktop app (product/design decision)  *(was experiment-docs §11)*
+## 2. Bundled theme updates on the OSS desktop app (product/design decision) — ❌ WONTFIX 2026-06-27  *(was experiment-docs §11)*
+
+**WONTFIX note (2026-06-27):** Closed as not-a-problem. The original concern came from a
+misunderstanding — it assumed bundled theme version bumps should reach existing installs by some
+new auto-reconcile/refresh mechanism. They don't need to: from now on theme updates go **through
+the existing theme-update system** (`themeUpdateService` / `/themes` apply-update, consuming the
+`updates/<version>/` deltas produced by `theme:update-delta`, §13). The install-if-missing seed
+behaviour is intentional and correct (it never clobbers user edits); reconciling the bundled seed
+on app upgrade is explicitly *not* the chosen path. No code or product change required.
 
 Surfaced 2026-06-19 during an Electron re-validation: a fresh v0.9.9 build showed
 **Arch 0.9.6** when creating a new project. Root cause (not a build/refactor regression):
@@ -1433,7 +1441,28 @@ into it. Keep the existing `Combobox.test.jsx` / `MenuCombobox.test.jsx` green a
 
 ---
 
-## 27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — **low (dev-only, mostly latent)**
+## 27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — ✅ DONE 2026-06-27 — **low (dev-only, mostly latent)**
+
+**Done note (2026-06-27):** All four findings addressed in `scripts/theme-update-delta.js`.
+- **CONFIRMED #1 (tag parsing):** `parseVersionFromTag` now anchors the semver to the **end** of the
+  tag (optional `v`-prefix, preceded by start-or-separator) and rejects leading-zero components, so
+  `release-2024.01.15` and `arch-1.2.3-rc.0.9.9` → `null` instead of a bogus baseline; `v0.9.8` /
+  `0.9.8` / `arch-theme-1.2.3` still parse. Verified the default `findPreviousTag` auto-detection still
+  picks `0.9.8` against the real tag set.
+- **CONFIRMED #2 (quoted paths):** the `git diff` call now passes `-c core.quotePath=false`, and
+  `parseDiffNameStatus` **throws** on a git-quoted (`"`-prefixed) or otherwise unparseable line rather
+  than silently dropping it from the delta; genuinely out-of-theme lines stay a defensive skip.
+- **REUSE #1 (semver):** the duplicated semver regex is gone — `parseSemver` is now re-exported from
+  `packages/builder-server/src/utils/semver.js` (`parseVersion`); the script keeps its thin
+  throw-on-invalid `compareVersions` wrapper (the shared one sorts-invalid-last). The unused `raw`
+  field was dropped (test updated).
+- **REUSE #2 (path safety):** `toGitPath` / `resolveInside` / `writePlan`'s containment check now use
+  `isWithinDirectory` from `@widgetizer/core/pathSecurity` (kept the domain-specific `fail()` messages).
+
+TDD: `scripts/__tests__/theme-update-delta.test.js` extended (18 → 22 cases): tag-parsing rejects
+date/compound + pre-release tags, `parseDiffNameStatus` throws on quoted + unparseable lines, and the
+`raw`-field assertion was removed. All 22 green; eslint clean on both files; manual `--dry-run` against
+`themes/arch` produces a valid plan and writes nothing. Original finding below.
 
 Surfaced 2026-06-26 by the code review of the §13 verbatim port. Four findings on
 `scripts/theme-update-delta.js`, all **dev-only** (manual, `--dry-run`-gated release tool — a maintainer
