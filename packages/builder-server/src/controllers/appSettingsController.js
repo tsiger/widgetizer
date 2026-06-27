@@ -98,6 +98,24 @@ export async function updateAppSettings(req, res) {
       }
     }
 
+    // Validate export options
+    if (newSettings.export) {
+      const exportLimits = [
+        { key: "maxVersionsToKeep", label: "Export versions to keep", min: 1, max: 50 },
+        { key: "maxImportSizeMB", label: "Maximum project import size", min: 1, max: 2000 },
+      ];
+
+      for (const { key, label, min, max } of exportLimits) {
+        if (typeof newSettings.export[key] !== "undefined") {
+          const parsed = parseInt(newSettings.export[key], 10);
+          if (isNaN(parsed) || parsed < min || parsed > max) {
+            return res.status(400).json({ error: `Invalid ${label}. Must be between ${min} and ${max}.` });
+          }
+          newSettings.export[key] = parsed;
+        }
+      }
+    }
+
     saveSettings(newSettings);
     res.json({ message: "Settings updated successfully", settings: newSettings });
   } catch (error) {

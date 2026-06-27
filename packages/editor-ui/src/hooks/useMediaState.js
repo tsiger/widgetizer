@@ -41,7 +41,12 @@ import useToastStore from "../stores/toastStore";
 export default function useMediaState() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState("list");
+  // Restore the saved view mode on mount (persisted by the effect below); fall
+  // back to "list" when nothing valid is stored.
+  const [viewMode, setViewMode] = useState(() => {
+    const saved = typeof localStorage !== "undefined" ? localStorage.getItem("mediaViewMode") : null;
+    return saved === "grid" || saved === "list" ? saved : "list";
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
 

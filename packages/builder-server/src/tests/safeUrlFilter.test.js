@@ -11,8 +11,33 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { Liquid } from "liquidjs";
 
-import { sanitizeHref, normalize } from "@widgetizer/core/urlSafety";
+import { sanitizeHref, normalize, isValidSiteUrl } from "@widgetizer/core/urlSafety";
 import { registerSafeUrlFilter } from "@widgetizer/core";
+
+describe("urlSafety.isValidSiteUrl", () => {
+  it("treats empty/blank/non-string as valid (optional field)", () => {
+    assert.equal(isValidSiteUrl(""), true);
+    assert.equal(isValidSiteUrl("   "), true);
+    assert.equal(isValidSiteUrl(undefined), true);
+    assert.equal(isValidSiteUrl(null), true);
+  });
+
+  it("accepts proper http(s) URLs with a dotted host", () => {
+    assert.equal(isValidSiteUrl("https://mysite.com"), true);
+    assert.equal(isValidSiteUrl("http://cssigniter.com"), true);
+    assert.equal(isValidSiteUrl("  https://www.example.co.uk/path?q=1  "), true);
+  });
+
+  it("rejects malformed / non-web / authority-less values", () => {
+    assert.equal(isValidSiteUrl("not a url"), false);
+    assert.equal(isValidSiteUrl("mysite.com"), false);
+    // WHATWG `new URL` accepts these, but they are not real site URLs:
+    assert.equal(isValidSiteUrl("https:cssigniter.com"), false); // missing //
+    assert.equal(isValidSiteUrl("https://localhost"), false); // single-label host
+    assert.equal(isValidSiteUrl("https://foo"), false);
+    assert.equal(isValidSiteUrl("ftp://example.com"), false); // non-http(s)
+  });
+});
 
 describe("urlSafety.normalize", () => {
   it("trims leading/trailing C0-control-or-space", () => {

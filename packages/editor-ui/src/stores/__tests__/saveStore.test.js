@@ -457,6 +457,20 @@ describe("saveStore (useAutoSave)", () => {
       expect(mockThemeStoreState.saveSettings).toHaveBeenCalledWith("test-project");
     });
 
+    it("clears undo history after a successful save (EDIT-045)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      // Simulate accumulated undo/redo history before the save.
+      usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
+      expect(usePageStore.temporal.getState().pastStates.length).toBeGreaterThan(0);
+
+      await useAutoSave.getState().save();
+
+      // Save rebaselines history so Undo can't step past the saved state.
+      expect(usePageStore.temporal.getState().pastStates).toHaveLength(0);
+      expect(usePageStore.temporal.getState().futureStates).toHaveLength(0);
+    });
+
     it("aborts before saving when the loaded page belongs to another project", async () => {
       seedPageStore();
       usePageStore.setState({ loadedProjectId: "other-project" });

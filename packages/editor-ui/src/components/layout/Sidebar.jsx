@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useProjectStore from "../../stores/projectStore";
+import usePageListStore from "../../stores/pageListStore";
 import { getAllPages } from "../../queries/pageManager";
 import SidebarMeta from "./SidebarMeta";
 import { useNavItems } from "../../extension/PluginProvider.jsx";
@@ -16,6 +17,7 @@ export default function Sidebar() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const hasActiveProject = !!activeProject;
   const [hasPages, setHasPages] = useState(false);
+  const pagesVersion = usePageListStore((state) => state.version);
   const { schemas: collectionSchemas } = useCollections();
 
   // Nav comes from the plugin registry (built-in items + any plugin items). One
@@ -69,7 +71,7 @@ export default function Sidebar() {
     return () => {
       isCancelled = true;
     };
-  }, [hasActiveProject, activeProject?.id, location.pathname]);
+  }, [hasActiveProject, activeProject?.id, location.pathname, pagesVersion]);
 
   const canOpenSitePreview = hasActiveProject && hasPages;
 

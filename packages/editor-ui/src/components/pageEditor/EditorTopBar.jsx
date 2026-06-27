@@ -85,6 +85,14 @@ export default function EditorTopBar({
         }
       }
 
+      // Don't hijack undo/redo while the user is editing a text field — let the
+      // browser's native input undo handle it (page-level history would otherwise
+      // run instead and leave the field value stale). Ctrl/Cmd+S above still works.
+      const el = e.target;
+      const isEditableTarget =
+        !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
+      if (isEditableTarget) return;
+
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
         if (e.shiftKey) {
           e.preventDefault();

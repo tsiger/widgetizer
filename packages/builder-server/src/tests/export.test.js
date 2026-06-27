@@ -56,8 +56,15 @@ const {
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
-const { exportProject, cleanupProjectExports, getExportFiles, downloadExport, getExportHistory, deleteExport } =
-  await import("../controllers/exportController.js");
+const {
+  exportProject,
+  cleanupProjectExports,
+  getExportFiles,
+  downloadExport,
+  getExportHistory,
+  deleteExport,
+  isExportableEntry,
+} = await import("../controllers/exportController.js");
 const { closeDb } = await import("../db/index.js");
 const exportRepo = await import("../db/repositories/exportRepository.js");
 
@@ -531,6 +538,10 @@ before(async () => {
   // -----------------------------------------------------------
   await fs.writeFile(path.join(projectDir, "assets", "css", "styles.css"), "body { margin: 0; }");
   await fs.writeFile(path.join(projectDir, "assets", "js", "app.js"), "console.log('hello');");
+  // System metadata that must be filtered out of the export (EXPZIP-013).
+  await fs.writeFile(path.join(projectDir, "assets", ".DS_Store"), "junk");
+  await fs.ensureDir(path.join(projectDir, "assets", "__MACOSX"));
+  await fs.writeFile(path.join(projectDir, "assets", "__MACOSX", "foo"), "junk");
 
   // -----------------------------------------------------------
   // 10. Widget assets (CSS/JS in widgets dir)
@@ -705,6 +716,15 @@ describe("exportProject", () => {
     const exportDir = await getLatestExportDir();
     const heroPath = path.join(exportDir, "assets", "images", "hero.jpg");
     assert.ok(!(await fs.pathExists(heroPath)), "Original hero.jpg should be omitted when hero-large.jpg exists");
+  });
+
+  it("excludes OS/system metadata from the export assets (EXPZIP-013)", async () => {
+    const exportDir = await getLatestExportDir();
+    // Real project assets are still copied...
+    assert.ok(await fs.pathExists(path.join(exportDir, "assets", "css", "styles.css")), "Real asset should be copied");
+    // ...but system junk is filtered out.
+    assert.ok(!(await fs.pathExists(path.join(exportDir, "assets", ".DS_Store"))), ".DS_Store must not be exported");
+    assert.ok(!(await fs.pathExists(path.join(exportDir, "assets", "__MACOSX"))), "__MACOSX must not be exported");
   });
 
   it("copies image size variants", async () => {
@@ -1055,6 +1075,25 @@ describe("getExportFiles", () => {
 // ========================================================================
 // downloadExport — ZIP streaming
 // ========================================================================
+
+describe("isExportableEntry (export ZIP system-junk filter)", () => {
+  it("excludes OS/system metadata files anywhere in the tree", () => {
+    assert.equal(isExportableEntry(".DS_Store"), false);
+    assert.equal(isExportableEntry("assets/.DS_Store"), false);
+    assert.equal(isExportableEntry("assets/images/Thumbs.db"), false);
+    assert.equal(isExportableEntry("Desktop.ini"), false);
+    assert.equal(isExportableEntry("__MACOSX/foo"), false);
+    assert.equal(isExportableEntry("assets/__MACOSX/bar.css"), false);
+  });
+
+  it("keeps real site files (including legitimate dotfiles)", () => {
+    assert.equal(isExportableEntry("index.html"), true);
+    assert.equal(isExportableEntry("assets/style.css"), true);
+    assert.equal(isExportableEntry("assets/placeholder.svg"), true);
+    assert.equal(isExportableEntry(".nojekyll"), true);
+    assert.equal(isExportableEntry(".well-known/security.txt"), true);
+  });
+});
 
 describe("downloadExport", () => {
   let testExportDir;

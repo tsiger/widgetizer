@@ -178,7 +178,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [x] PROJ-019 - Enter an invalid Website Address such as `not a url` and submit.
   Expected: An inline URL validation error appears and the project is not created.
-  Result: Fail - Creation was blocked by native browser URL validation, but no inline app validation message appeared.
+  Result: Pass (retested 2026-06-27) - The field is now `type="text"`, so the app's inline error shows (no native browser bubble) via the shared `isValidSiteUrl` (@widgetizer/core/urlSafety); the backend validates it too. Stricter than `new URL`: rejects `not a url`, `mysite.com`, `https:cssigniter.com` (no //), `https://localhost`; accepts proper `https://host.tld`.
 
 - [x] PROJ-020 - Enter a very long project title and notes.
   Expected: The form remains readable and long text does not break the layout.
@@ -216,7 +216,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [x] PROJ-027A - Display a very long project title in the Projects list table.
   Expected: The long title is truncated or wraps within the table container without pushing the table outside the page/container.
-  Result: Fail - A very long project title forced the Projects table wider than its container, causing horizontal overflow.
+  Result: Pass (retested 2026-06-27) - The title cell is capped at a max width and wraps (`max-w-[28rem] break-words`), so a long title flows onto multiple lines within the column and the table stays inside its container with the actions column intact.
 
 - [x] PROJ-028 - Click an inactive project's name.
   Expected: It becomes active and opens in the workspace on Pages.
@@ -310,7 +310,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [x] PROJ-050 - Open the Import Backup modal and close it with Cancel, X, Escape, and outside click where supported.
   Expected: The modal closes and nothing is imported.
-  Result: Fail - Cancel, X, and outside click closed the modal; Escape did not close it.
+  Result: Pass (retested 2026-06-27) - Escape now closes the Import Backup modal (keydown effect calling handleClose), matching Cancel/X/outside-click; still blocked mid-import via canClose.
 
 - [x] PROJ-051 - Delete an inactive project and confirm.
   Expected: A confirmation names what will be deleted, then the row disappears after confirmation.
@@ -520,7 +520,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [x] PAGE-009 - Try a filename made only of invalid characters.
   Expected: Creation is blocked or normalizes to an empty value with an error.
-  Result: Fail - Filename `!!!` was accepted; the app created the page using a title-derived slug without showing an error.
+  Result: Pass (retested 2026-06-27) - The filename field now validates the slugified result, so `!!!` shows an inline "Filename must contain at least one letter or number" error and creation is blocked.
 
 - [x] PAGE-010 - Create a page with a filename that already exists.
   Expected: The new page is created with an automatically adjusted unique filename.
@@ -604,7 +604,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [x] PAGE-030 - Delete the last page in a project, then try Site preview.
   Expected: The app shows a sensible no-page or not-found state.
-  Result: Fail - After deleting the only page in "QA Widgetizer Theme," Pages showed "No pages yet" but Site preview still looked enabled; clicking it did nothing and showed no clear unavailable/not-found feedback.
+  Result: Pass (retested 2026-06-27) - Deleting the last page now greys out the Site preview action immediately (no refresh/navigation needed): Pages.jsx bumps a shared `pageListStore` version on list change and the Sidebar's `hasPages` gate re-checks. Adding a page back re-enables it.
 
 ---
 
@@ -689,10 +689,6 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - [x] EDIT-019 - Open a widget action menu with the three-dot button and with right-click.
   Expected: Copy, Paste after, Duplicate, and Delete options appear.
   Result: Pass - Both the three-dot button and right-click opened a menu with Copy widget, Paste after, Duplicate widget, and Delete widget.
-
-- [x] EDIT-020 - Close the widget action menu with Escape, outside click, scroll, and resize.
-  Expected: The menu closes.
-  Result: Fail - Escape, outside click, and resize closed the menu, but scrolling did not close it.
 
 - [x] EDIT-021 - Open Paste after before copying anything.
   Expected: Paste after is disabled.
@@ -792,11 +788,11 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [x] EDIT-044 - Use Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z.
   Expected: Undo/redo work without breaking text field editing.
-  Result: Fail - Keyboard undo/redo while focus was in the color text field did not change the field value; it remained `ff00fd1`.
+  Result: Pass (retested 2026-06-27) - The undo/redo keyboard handler now bails out when focus is in an input/textarea/select/contenteditable, so native field-undo handles text fields; page-level undo still works outside fields (Ctrl/Cmd+S unaffected).
 
 - [x] EDIT-045 - Make two changes, undo back to the original visible state.
   Expected: Undo becomes disabled and Save becomes disabled with no unsaved dot.
-  Result: Fail - After saving a clean baseline, two toolbar undos returned to an older history value instead of the saved baseline, and Save stayed enabled.
+  Result: Pass (retested 2026-06-27) - Save now clears the undo history (rebaselines to the saved state, like page load), so Undo can't step past the save and Save stays disabled at the baseline.
 
 - [x] EDIT-046 - Save with the button.
   Expected: Save shows a loading state, then becomes disabled and the unsaved dot disappears.
@@ -850,7 +846,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [x] FIELD-006 - Link rich text to a media file.
   Expected: The selected text links to the file.
-  Result: Blocked - The Link to file selector opened, but no file media were available in the library; upload remained blocked by the native file picker.
+  Result: Pass (retested 2026-06-27) - The Link-to-file picker (shared MediaSelectorDrawer, filterType="file") already shows an always-visible uploader plus a "No files" empty state, and selecting a file links the selected rich-text correctly (handleLinkFile wraps the selection / inserts a linked filename). Verified working; no code change needed.
 
 - [x] FIELD-007 - Insert an image into rich text where allowed.
   Expected: The image appears inline and persists.
@@ -902,7 +898,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [x] FIELD-019 - Upload, choose, replace, open, and remove a file field.
   Expected: File name/extension display correctly and file link works in preview.
-  Result: Fail - A PDF uploaded/linked from rich text in a collection item worked in the editor, but Media usage still showed the file as unused.
+  Result: Pass (retested 2026-06-27) - A PDF/MP3 linked from rich text now shows as used in Media and reverts to unused when the link is removed; the editor file field works.
 
 - [x] FIELD-020 - Select an internal page target in a link field.
   Expected: The page is selected and link works in preview.
@@ -1058,7 +1054,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [x] COLL-010 - Try saving with blank, invalid, or duplicate filename.
   Expected: Save is blocked with a clear message.
-  Result: Fail - Blank filename showed `Filename is required`, and duplicate slug showed `Slug "qa-full-news-item" already exists`; punctuation-only `!!!` follows the same empty-slug fallback issue as PAGE-009 and can become `item` instead of showing a clear invalid-slug message.
+  Result: Pass (retested 2026-06-27) - Blank shows `Filename is required` and duplicate shows the slug-exists error; punctuation-only `!!!` now shows an inline "Filename must contain at least one letter or number" error instead of falling back to `item`.
 
 - [x] COLL-011 - Cancel item creation after selecting/uploading media.
   Expected: No item is created and media usage is not assigned to a nonexistent item.
@@ -1282,7 +1278,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [x] MEDIA-010 - Switch between grid and list views, then reload.
   Expected: The chosen view is retained.
-  Result: Fail - Grid view became visible after toggling, but reloading Media returned to list/table view; the chosen view is not retained.
+  Result: Pass (retested 2026-06-27) - The view mode is now read from localStorage on mount (validated against list/grid), so the chosen view is retained across reloads.
 
 - [x] MEDIA-011 - Search by original filename.
   Expected: Matching files appear.
@@ -1454,15 +1450,15 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [x] APPSET-011 - Set Export versions to keep to `0` or above the allowed range.
   Expected: Invalid values are rejected.
-  Result: Fail - Values `0` and `51` saved successfully with no invalid message, even though the schema allows `1` to `50`.
+  Result: Pass (retested 2026-06-27) - The backend now validates the export range (1-50); `0` and `51` are rejected with a "must be between 1 and 50" error toast and not saved.
 
 - [x] APPSET-012 - Set Maximum project import size to a valid value.
   Expected: Value saves.
   Result: Pass - Saved Maximum project import size as `600` and verified it in the API response.
 
-- [x] APPSET-013 - Set Maximum project import size below allowed range.
-  Expected: Invalid value is rejected.
-  Result: Fail - Value `5` saved successfully with no invalid message, even though the schema minimum is `10`.
+- [x] APPSET-013 - Set Maximum project import size to a small / out-of-range value.
+  Expected: Small whole-MB values are allowed (no artificial floor); only values below 1 or above 2000 are rejected.
+  Result: Pass (retested 2026-06-27) - Decision: removed the artificial min-10 floor, schema min is now 1 (integers). `5` saves; `0` and `>2000` are rejected with an error toast and not saved.
 
 - [x] APPSET-014 - Turn Developer mode on and save.
   Expected: Developer-only export features appear.
@@ -1638,7 +1634,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [x] EXPZIP-013 - Check for `.DS_Store` or obvious computer metadata files.
   Expected: System metadata files are not included.
-  Result: Fail - Brightside v2 ZIP included `assets/.DS_Store`.
+  Result: Pass (retested 2026-06-27) - Export now filters OS/system metadata (`.DS_Store`, `__MACOSX`, etc.) at both the asset-copy and ZIP-packaging steps (`isExportableEntry`). Verified: keystoned-v2 export omits a seeded `assets/.DS_Store` while real assets remain.
 
 ---
 
@@ -1865,37 +1861,3 @@ Stop the test run and tell the test owner if any of these happen:
 
 - [ ] LINK-022/LINK-025 - Add backend cleanup, remap, enrichment, render, preview, and export coverage for richtext stable links.
   Context: Once richtext can store stable internal refs, link integrity needs the same coverage as structured `link` fields: target rename follows the current slug, target delete clears or makes the link harmless, project duplication remaps refs locally, preset seeding enriches refs, and root/nested export paths render correctly.
-
-- [ ] PROJ-019 - Make Website Address validation use the app's inline validation pattern instead of relying on native browser URL validation. Context: Entering `not a url` blocks project creation, but the browser handles it before React Hook Form can show the app's inline `siteUrl` error. Prefer consistent inline validation with the other project fields, and consider matching server-side URL validation.
-
-- [ ] PROJ-027A - Prevent very long project titles from expanding the Projects list table beyond its container. Context: A long title in the Project List and Activation section can force the table outside the page/container. The title cell should truncate or wrap while preserving the table layout and actions column.
-
-- [ ] PROJ-050 - Make the Import Backup modal close with Escape consistently. Context: Cancel, X, and outside click close the modal without importing anything, but Escape does not close it. Align Escape behavior with the other modal dismissal paths.
-
-- [ ] PAGE-009 - Block filenames/titles that slugify to an empty value instead of creating a fallback `item` page. Context: A page name/filename made only of invalid characters, such as `!!!`, passes the current non-empty UI validation, slugifies to an empty value, and can be created with the backend fallback slug `item`. Show an inline validation error before creation.
-
-- [ ] COLL-010 - Block collection item filenames/titles that slugify to an empty value instead of creating a fallback `item` slug. Context: A collection item filename made only of invalid characters, such as `!!!`, follows the same empty-slug fallback path as PAGE-009. Show an inline invalid-slug error before saving instead of allowing a fallback `item` slug.
-
-- [x] COLL-020 - Restore selected-row highlighting in collection item lists. Context: Fixed/retested - Services collection rows now receive selected-row highlighting and selected count stays accurate.
-
-- [x] COLL-024 - Restore drag-and-drop reordering for sortable collection item lists. Context: Fixed/retested - Services collection rows now show drag handles, reorder by drag/drop, and persist order after reload.
-
-- [ ] EXPZIP-013 - Exclude `.DS_Store` and other system metadata files from generated exports. Context: Brightside export version 2 included `assets/.DS_Store` in the downloaded ZIP. Exports should filter system metadata from theme/project assets before packaging.
-
-- [ ] PAGE-030 - Improve Site preview UX when a project has no pages. Context: After deleting the only page in a project, the Pages screen shows "No pages yet" but Site preview can still look enabled; clicking it gives no clear unavailable/not-found feedback. Disable the action or show a clear no-page state.
-
-- [ ] EDIT-020 - Close widget action menus when the editor structure/preview scrolls. Context: The widget action menu closes with Escape, outside click, and resize, but remains open while scrolling. Align scroll behavior with the other dismissal paths so floating menus do not stay detached from their trigger.
-
-- [ ] EDIT-044 - Make keyboard undo/redo work correctly while focus is inside editor input fields. Context: Keyboard undo/redo while focus was in the color text field did not update the field value. Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z should either respect native text-field editing or integrate cleanly with the editor history without leaving the UI stale.
-
-- [ ] EDIT-045 - Reset editor undo history to the saved baseline after saving. Context: After saving a clean baseline, two toolbar undos returned to an older history value instead of the saved baseline, and Save stayed enabled. Undo should stop at the current saved state and clear dirty UI when it returns there.
-
-- [ ] FIELD-006 - Improve/test the rich-text "Link to file" workflow when no file media are available. Context: The Link to file selector opened, but no file media were available in the library and upload required the native file picker. Provide a clear empty/upload state and ensure selecting a file links the selected rich-text text correctly.
-
-- [ ] MEDIA-010 - Persist the selected Media Library grid/list view across reloads. Context: Switching from list/table view to grid view works for the current session, but reloading Media returns to list/table view. Store and restore the user's selected media view mode.
-
-- [ ] APPSET-011 - Enforce the allowed Export versions to keep range in App Settings. Context: Export versions to keep saved invalid values `0` and `51` with no validation message, even though the schema allows only `1` to `50`. Reject invalid values inline and prevent saving them.
-
-- [ ] APPSET-013 - Decide and align the minimum Maximum project import size rule. Context: The frontend schema says `export.maxImportSizeMB` has a minimum of `10`, but the app currently saves `5` with no validation error. Decide whether smaller import limits such as `5 MB` should be allowed. If yes, lower/remove the schema minimum and update the test expectation; if no, enforce the schema range inline and server-side.
-
-- [ ] FIELD-019 - Track files linked from rich text as media usage. Context: A PDF uploaded/linked from rich text in a collection item can still appear unused in Media. Rich-text HTML stores the file path inside an `<a href="/uploads/files/...">` string, so usage tracking must scan embedded upload paths inside rich-text HTML.

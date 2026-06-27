@@ -660,7 +660,9 @@ Per aspera ad astra
     const projectAssetsDir = path.join(projectDir, "assets");
     try {
       if (await fs.pathExists(projectAssetsDir)) {
-        await fs.copy(projectAssetsDir, outputAssetsDir);
+        // Skip OS/system metadata (.DS_Store, __MACOSX, …) so it never lands in
+        // the export directory or the packaged ZIP.
+        await fs.copy(projectAssetsDir, outputAssetsDir, { filter: (src) => isExportableEntry(src) });
       } else {
         console.warn(`Project assets directory not found: ${projectAssetsDir}`);
       }
@@ -1048,6 +1050,30 @@ export async function getExportFiles(req, res) {
   }
 }
 
+// OS/system metadata that must never ship inside an exported ZIP. archiver globs
+// with dot:true, so these would otherwise be bundled (the same junk the theme
+// upload path already strips via removeDSStoreRecursive / __MACOSX filtering).
+const SYSTEM_JUNK_FILENAMES = new Set([
+  ".DS_Store",
+  "Thumbs.db",
+  "ehthumbs.db",
+  "Desktop.ini",
+  ".Spotlight-V100",
+  ".Trashes",
+]);
+
+/**
+ * Whether a directory entry (path relative to the export root) should be included
+ * in the exported ZIP. Excludes OS/system metadata files and __MACOSX trees.
+ * @param {string} relPath - Forward-slash relative path of the entry
+ * @returns {boolean}
+ */
+export function isExportableEntry(relPath) {
+  const segments = relPath.split("/");
+  if (segments.includes("__MACOSX")) return false;
+  return !SYSTEM_JUNK_FILENAMES.has(segments[segments.length - 1]);
+}
+
 /**
  * Downloads an export directory as a ZIP archive.
  * @param {import('express').Request} req - Express request object with exportDir in params
@@ -1102,8 +1128,9 @@ export async function downloadExport(req, res) {
     // Pipe archive data to response
     archive.pipe(res);
 
-    // Add all files from the export directory to the ZIP
-    archive.directory(fullPath, false);
+    // Add all files from the export directory to the ZIP, skipping OS/system
+    // metadata (.DS_Store, __MACOSX, etc.) so it never ships in the download.
+    archive.directory(fullPath, false, (entry) => (isExportableEntry(entry.name) ? entry : false));
 
     // Finalize the archive
     await archive.finalize();

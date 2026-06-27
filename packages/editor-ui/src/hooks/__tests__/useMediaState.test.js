@@ -35,3 +35,29 @@ describe("useMediaState — type filter", () => {
     expect(result.current.filteredFiles).toEqual([AUDIO, PDF]);
   });
 });
+
+// MEDIA-010: the grid/list view choice must survive a reload (read from localStorage on mount).
+describe("useMediaState — view mode persistence", () => {
+  it("defaults to list when nothing is stored", () => {
+    const { result } = renderHook(() => useMediaState());
+    expect(result.current.viewMode).toBe("list");
+  });
+
+  it("restores a saved view mode on mount", () => {
+    localStorage.setItem("mediaViewMode", "grid");
+    const { result } = renderHook(() => useMediaState());
+    expect(result.current.viewMode).toBe("grid");
+  });
+
+  it("ignores an invalid stored value and falls back to list", () => {
+    localStorage.setItem("mediaViewMode", "bogus");
+    const { result } = renderHook(() => useMediaState());
+    expect(result.current.viewMode).toBe("list");
+  });
+
+  it("persists a changed view mode to localStorage", () => {
+    const { result } = renderHook(() => useMediaState());
+    act(() => result.current.setViewMode("grid"));
+    expect(localStorage.getItem("mediaViewMode")).toBe("grid");
+  });
+});

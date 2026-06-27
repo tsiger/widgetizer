@@ -143,7 +143,10 @@ export default function PageForm({
               id="slug"
               {...register("slug", {
                 required: t("forms.page.filenameRequired"),
-                validate: (value) => value.trim() !== "" || t("forms.page.filenameNotEmpty"),
+                validate: (value) =>
+                  value.trim() === ""
+                    ? t("forms.page.filenameNotEmpty")
+                    : formatSlug(value).length > 0 || t("forms.page.filenameInvalid"),
               })}
               onBlur={handleSlugBlur}
               className="form-input flex-1"

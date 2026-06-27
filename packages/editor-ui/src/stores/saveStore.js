@@ -145,6 +145,10 @@ const useAutoSave = create((set, get) => ({
       if (page) {
         pageStore.setOriginalPage(page);
       }
+
+      // Rebaseline undo history to the just-saved state (like page load does), so
+      // Undo can't step past the save into stale pre-save values and re-dirty the UI.
+      usePageStore.temporal.getState().clear();
     } catch (err) {
       if (err.code === "PROJECT_MISMATCH") {
         const { showToast } = useToastStore.getState();

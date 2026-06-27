@@ -15,6 +15,7 @@ import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { isValidSiteUrl } from "@widgetizer/core/urlSafety";
 import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 
@@ -276,6 +277,10 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
+    if (!isValidSiteUrl(siteUrl)) {
+      return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
+    }
+
     // If a folder name is explicitly provided, validate its format. Collisions on
     // either name or folder are no longer hard errors — resolveProjectIdentity
     // disambiguates them with suffixes, matching the import flow.
@@ -462,6 +467,10 @@ export async function updateProject(req, res) {
         }
         throw new Error(`Failed to rename project directory: ${renameError.message}`);
       }
+    }
+
+    if (updates.siteUrl !== undefined && !isValidSiteUrl(updates.siteUrl)) {
+      return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
     }
 
     // Sanitize site title and siteUrl if provided

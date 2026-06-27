@@ -355,7 +355,10 @@ export default function CollectionItemForm({
                   id="slug"
                   {...register("slug", {
                     required: t("collectionsForm.slugRequired"),
-                    validate: (value) => value.trim() !== "" || t("collectionsForm.slugNotEmpty"),
+                    validate: (value) =>
+                      value.trim() === ""
+                        ? t("collectionsForm.slugNotEmpty")
+                        : formatSlug(value).length > 0 || t("collectionsForm.slugInvalid"),
                   })}
                   onBlur={(e) => e.target.value && setValue("slug", formatSlug(e.target.value))}
                   className="form-input flex-1"

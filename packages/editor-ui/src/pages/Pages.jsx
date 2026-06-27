@@ -9,6 +9,7 @@ import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
+import usePageListStore from "../stores/pageListStore";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
 import Table from "../components/ui/Table";
@@ -97,6 +98,9 @@ export default function Pages() {
       setLoading(true);
       const data = await getAllPages();
       setPages(data);
+      // Signal components that derive state from the page list (e.g. the Sidebar's
+      // Site-preview gate) so they re-check after an in-place create/delete.
+      usePageListStore.getState().notifyPagesChanged();
     } catch (error) {
       console.error("Error loading pages:", error);
       showToast(t("pages.toasts.loadError"), "error");

@@ -48,3 +48,31 @@ export function sanitizeHref(href) {
   if (typeof href !== "string") return href;
   return DANGEROUS_PROTOCOLS.test(normalize(href)) ? "" : href;
 }
+
+/**
+ * Whether a value is acceptable as an optional site URL. Empty is allowed
+ * (the field is optional). Otherwise it must be a proper public web address:
+ * an http/https URL written with an authority (`scheme://host`) and a dotted
+ * host. Plain `new URL()` is intentionally not enough — the WHATWG parser is
+ * lenient with special schemes and accepts garbage like `https:cssigniter.com`
+ * (no `//`), `https://localhost`, or `https://foo`, which we reject here.
+ * Shared by the project form's inline validation and the controller's
+ * server-side check so the two never drift.
+ * @param {*} value
+ * @returns {boolean}
+ */
+export function isValidSiteUrl(value) {
+  if (!value || typeof value !== "string" || value.trim() === "") return true;
+  const trimmed = value.trim();
+  // Require an explicit http(s):// authority — rejects the lenient `https:host` form.
+  if (!/^https?:\/\//i.test(trimmed)) return false;
+  let url;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+  // Require a dotted host so single-label hosts (localhost, foo) are rejected.
+  return url.hostname.includes(".");
+}

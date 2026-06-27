@@ -272,16 +272,16 @@ export default function Projects() {
 
               return (
                 <>
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-4 max-w-[28rem]">
                     <button
                       type="button"
                       onClick={() => openProjectWorkspace(project)}
-                      className="flex w-full min-w-0 items-center gap-3 rounded-sm text-left text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
+                      className="flex w-full min-w-0 items-start gap-3 rounded-sm text-left text-slate-900 transition-colors hover:text-pink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
                       title={project.name}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="block min-w-0 truncate font-semibold">{project.name}</span>
+                        <div className="flex items-start gap-2">
+                          <span className="block min-w-0 break-words font-semibold">{project.name}</span>
                           {showActiveBadge && (
                             <Badge
                               variant="success"

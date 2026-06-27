@@ -739,6 +739,24 @@ describe("createProject", () => {
     assert.ok(project.siteUrl.includes("https://example.com/"), "siteUrl should preserve the valid URL part");
   });
 
+  it("rejects an invalid siteUrl (PROJ-019)", async () => {
+    const res = await callController(createProject, {
+      body: { name: "Bad URL Project", description: "", theme: TEST_THEME_ID, siteUrl: "not a url" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /website address|valid url/i);
+  });
+
+  it("accepts an empty siteUrl (optional field)", async () => {
+    const project = await createTestProject("Empty SiteUrl", { siteUrl: "" });
+    assert.equal(project.siteUrl, "");
+  });
+
+  it("accepts a valid siteUrl", async () => {
+    const project = await createTestProject("Valid SiteUrl", { siteUrl: "https://mysite.com" });
+    assert.equal(project.siteUrl, "https://mysite.com");
+  });
+
   it("strips HTML from siteTitle", async () => {
     const project = await createTestProject("SiteTitle Sanitize", {
       siteTitle: 'My Site <script>alert(1)</script>',

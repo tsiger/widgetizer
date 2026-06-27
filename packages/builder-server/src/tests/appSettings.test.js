@@ -210,6 +210,43 @@ describe("updateAppSettings", () => {
     assert.equal(res._json.settings.media.maxFileSizeMB, 10);
   });
 
+  // Export option ranges (APPSET-011: versions-to-keep 1-50; APPSET-013: import size >= 1, no artificial floor)
+  it("rejects maxVersionsToKeep below 1", async () => {
+    const res = await callController(updateAppSettings, { body: { export: { maxVersionsToKeep: 0 } } });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /versions to keep/i);
+  });
+
+  it("rejects maxVersionsToKeep above 50", async () => {
+    const res = await callController(updateAppSettings, { body: { export: { maxVersionsToKeep: 51 } } });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /versions to keep/i);
+  });
+
+  it("accepts maxVersionsToKeep within 1-50", async () => {
+    const res = await callController(updateAppSettings, { body: { export: { maxVersionsToKeep: 50 } } });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.settings.export.maxVersionsToKeep, 50);
+  });
+
+  it("rejects maxImportSizeMB below 1", async () => {
+    const res = await callController(updateAppSettings, { body: { export: { maxImportSizeMB: 0 } } });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /import size/i);
+  });
+
+  it("accepts a small maxImportSizeMB (no artificial floor)", async () => {
+    const res = await callController(updateAppSettings, { body: { export: { maxImportSizeMB: 5 } } });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.settings.export.maxImportSizeMB, 5);
+  });
+
+  it("rejects maxImportSizeMB above 2000", async () => {
+    const res = await callController(updateAppSettings, { body: { export: { maxImportSizeMB: 2001 } } });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /import size/i);
+  });
+
   it("validates image quality range (1-100)", async () => {
     const res = await callController(updateAppSettings, {
       body: { media: { maxFileSizeMB: 5, imageProcessing: { quality: 0 } } },

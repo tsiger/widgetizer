@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Upload, AlertCircle } from "lucide-react";
 import FileUploader from "@widgetizer/editor-ui/components/ui/FileUploader.jsx";
@@ -21,6 +21,28 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
 
   const maxSizeMB = settings?.export?.maxImportSizeMB || 500;
   const canClose = !uploading;
+
+  const handleClose = useCallback(() => {
+    if (!canClose) {
+      return;
+    }
+
+    setSelectedFile(null);
+    setError(null);
+    setUploading(false);
+    setUploadProgress({});
+    onClose();
+  }, [canClose, onClose]);
+
+  // Close on Escape, matching the X / Cancel / outside-click paths (blocked mid-upload via canClose).
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") handleClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -82,17 +104,6 @@ export default function ProjectImportModal({ isOpen, onClose, onSuccess }) {
     }
   };
 
-  const handleClose = () => {
-    if (!canClose) {
-      return;
-    }
-
-    setSelectedFile(null);
-    setError(null);
-    setUploading(false);
-    setUploadProgress({});
-    onClose();
-  };
 
   const handleCancel = () => {
     if (uploading && abortControllerRef.current) {
