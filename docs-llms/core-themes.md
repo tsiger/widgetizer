@@ -152,6 +152,7 @@ The router also applies `standardJsonParser` to all theme routes.
   - Validates ZIP structure and required files
   - Ensures `theme.json`, `layout.liquid`, `screenshot.png` exist
   - Verifies `assets/`, `templates/`, `widgets/` directories
+  - Validates collection-type schemas before committing, on **both** paths: a new-theme install validates the self-contained extracted ZIP; an update-import validates the *merged effective theme* (base + installed updates + the incoming deltas, assembled off to the side via `layerThemeSnapshot`) so a `slugPrefix` collision that only appears across versions is caught too. An invalid schema (bad structure, duplicate `slugPrefix`, or a preset shipping `collection-types/`) is rejected with **400 + a per-collection `errors` array**, leaving the installed theme untouched.
   - Supports importing new update versions for existing themes when base versions match
 
 #### Theme Deletion

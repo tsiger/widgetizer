@@ -12,7 +12,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **22 done · 2 deferred · 2 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done · 2 deferred · 1 open · 1 wontfix**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
@@ -27,7 +27,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **22 done ·
 - ✅ [11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — DONE 2026-06-26 (sub-item → §24)](#11-missed-port--link-picker-combobox-group-headers-not-rendered-editor-ui---done-2026-06-26-sub-item--24--was-experiment-docs-12)
 - ✅ [12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — DONE 2026-06-26](#12-missed-port--richtext-embedded-media-not-tracked-as-used-builder-server---done-2026-06-26--was-experiment-docs-13)
 - ✅ [13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — DONE 2026-06-26](#13-missed-port--themeupdate-delta-release-tool-not-ported-oss-dev-tooling---done-2026-06-26--was-experiment-docs-14)
-- ⬜ [14. Documentation port audit — content gaps from the master-commit doc changes (14c–14e DONE via docs-llms reorg; 14a/14b public-docs remain)](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes--was-experiment-docs-15)
+- ✅ [14. Documentation port audit — content gaps from the master-commit doc changes — DONE 2026-06-27 (14c–14e via docs-llms reorg; 14a/14b public-docs)](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes--was-experiment-docs-15)
 - ✅ [15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — DONE 2026-06-26](#15-missed-port--collection-item-pages-leak-the-page-slug-body-class-render-engine---done-2026-06-26--was-experiment-docs-16)
 - ✅ [16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — DONE 2026-06-26](#16-missed-port--refreshallmediausage-aborts-early-on-a-project-with-no-pages-dir-builder-server---done-2026-06-26--was-experiment-docs-17)
 - ⏸️ [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process--was-experiment-docs-18)
@@ -627,7 +627,19 @@ story.
 
 ---
 
-## 14. Documentation port audit — content gaps from the master-commit doc changes  *(was experiment-docs §15)*
+## 14. Documentation port audit — content gaps from the master-commit doc changes — ✅ DONE 2026-06-27  *(was experiment-docs §15)*
+
+**Done note (2026-06-27):** 14a + 14b landed (verified against experimentation code, not blind-ported from
+master). **14a** — `docs-website/src/theme-dev-objects-context.md` + `theme-dev-menus-snippets.md` now document
+`currentCanonicalPath` (matched against each menu item's `canonicalPath`) instead of the removed `pageSlug`
+global; confirmed against `packages/core/src/snippets/menu.liquid` + `render-engine`/`menuResolver`. **14b** —
+`docs-website/src/theme-dev-setting-types.md` now documents the `gallery` (array of `/uploads/images/…` path
+strings) and `table` (author-declared `columns` → array of row objects) setting types, with schema + Liquid
+examples verified against `sanitizationService.js` and real Arch usage. Sweep done across all docs: the only other
+`pageSlug` hits are intentional (this TODO's history, the archived findings log, and `future-mcp.md`'s unrelated
+hypothetical MCP tool param); `docs-website/dist/*.html` is gitignored build output that regenerates from `src/`.
+The same sweep also reconciled today's §22/§27 changes into `core-themes.md` + `theme-updates.md` (see those
+commits). §2 (WONTFIX) needed no doc change — nothing promised bundled-theme auto-reconcile. Original finding below.
 
 **Status (2026-06-26):** the **`docs-llms` sub-items are DONE** via the full docs-llms reorg/rewrite (see §3) —
 **14c** (`theming-setting-types.md` richtext `allow_headings`/`allow_images`/`min_height` + gallery/table depth

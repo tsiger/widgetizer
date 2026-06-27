@@ -65,7 +65,7 @@ If you need the menu data directly (for custom rendering), access it in widget t
 
 ### Active Menu Items
 
-The core `menu.liquid` snippet automatically adds an `is-active` class to menu items whose link matches the current page slug (resolved via the global `pageSlug` variable — see [Theme Objects & Context](theme-dev-objects-context.html#global-variables-available-everywhere)). Hook into this class in your theme CSS to style the current page in navigation:
+The core `menu.liquid` snippet automatically adds an `is-active` class (and `aria-current="page"`) to the menu item matching the current page. It compares each item's `canonicalPath` against the global `currentCanonicalPath` (see [Theme Objects & Context](theme-dev-objects-context.html#global-variables-available-everywhere)), so active state is matched on the canonical path rather than the displayed `href` and keeps working on nested collection-item pages whose links are prefixed with `../`. Hook into this class in your theme CSS to style the current page in navigation:
 
 ```css
 .site-header__nav-link.is-active { color: var(--accent); }

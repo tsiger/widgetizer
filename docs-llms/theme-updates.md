@@ -246,6 +246,8 @@ When updating `theme.json`, the system uses intelligent merging (`mergeThemeSett
 6. System syncs seed updates into `data/themes/{name}/updates/` and builds `latest/` there
 7. Zip and distribute the entire theme folder (including `updates/`)
 
+> For bundled themes maintained in git (e.g. Arch), steps 1–3 can be generated automatically with `npm run theme:update-delta -- themes/{name} --from <old-version> --version <new-version>` (add `--dry-run` to preview). It git-diffs between release tags and writes the `updates/<version>/` folder — copied files for additions/edits plus `deleted/` markers for removals. See `scripts/theme-update-delta.js`.
+
 ### Distributing Theme Updates
 
 Theme authors can distribute updates by zipping the entire theme folder:
@@ -267,7 +269,7 @@ When a user uploads this zip:
 - **Existing theme**: Only new update versions are imported (existing versions are skipped)
 - **Up to date**: If all versions already exist, upload is rejected with a clear message
 
-Upload validation details (zip structure checks, `theme.json` requirements, version handling) live in [Theme Management](core-themes.md).
+Both paths validate collection-type schemas before committing. An update-import validates the **merged** result (base + installed updates + the incoming deltas), not just the new delta in isolation, so it also catches a `slugPrefix` that only collides once a new collection sits next to an existing one. An invalid schema is rejected with HTTP 400 (per-collection errors) and the installed theme is left untouched. Upload validation details (zip structure checks, `theme.json` requirements, version handling) live in [Theme Management](core-themes.md).
 
 **Note**: The `latest/` folder in the zip (if present) is ignored; it's always rebuilt from scratch.
 

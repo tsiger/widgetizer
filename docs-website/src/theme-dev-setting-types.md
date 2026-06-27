@@ -217,6 +217,58 @@ In Liquid, resolve the file path using the `filePath` context variable (set by t
 
 The export pipeline rewrites `/uploads/files/` paths to `assets/files/` in exported HTML automatically.
 
+**`gallery`** — Ordered set of images managed through the media library (add, remove, drag-reorder). The value is an **array of upload-path strings** (e.g. `["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`); an empty gallery is `[]`. Image alt/title/caption live on the media record, not in the gallery value.
+
+```json
+{
+  "id": "photos",
+  "type": "gallery",
+  "label": "Photos"
+}
+```
+
+In Liquid, loop the array and resolve each path with the `{% image %}` tag, guarding blank entries:
+
+```liquid
+{% for src in widget.settings.photos %}
+  {% if src != blank %}
+    {% image src: src, size: 'large' %}
+  {% endif %}
+{% endfor %}
+```
+
+Render sanitization drops blank entries and any path that fails the image-path allowlist, so the stored value keeps what the editor wrote while the renderer emits only safe `/uploads/images/…` paths.
+
+# Structured Types
+
+**`table`** — Editable grid of repeating rows with author-defined columns. Declare the columns in the schema (in v1 every column is `text`); the stored value is an **array of row objects** keyed by each column's `id` (e.g. `[{ "label": "Basic", "price": "$10" }]`). An empty table is `[]`.
+
+```json
+{
+  "id": "rates",
+  "type": "table",
+  "label": "Rates",
+  "columns": [
+    { "id": "label", "type": "text", "label": "Label" },
+    { "id": "price", "type": "text", "label": "Price" }
+  ]
+}
+```
+
+The `columns` array is required and must be non-empty; each column `id` must match `^[a-zA-Z][a-zA-Z0-9_]*$` and cannot be a reserved name (`__proto__`, `constructor`, `prototype`).
+
+In Liquid, loop the rows and read each cell by its column `id` (cells are autoescaped strings):
+
+```liquid
+<table>
+  {% for row in widget.settings.rates %}
+    <tr><td>{{ row.label }}</td><td>{{ row.price }}</td></tr>
+  {% endfor %}
+</table>
+```
+
+Render sanitization rebuilds each row from the declared columns only (dropping unknown keys) and removes fully-blank rows.
+
 # UI-Specific Types
 
 **`font_picker`** — Font family + weight selector. This always outputs CSS variables for `-family` and `-weight`.
