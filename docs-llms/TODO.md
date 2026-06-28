@@ -40,7 +40,8 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done ·
 - ✅ [24. Missed port (defensive) — `updatePageWidgets` lacks the `pagesDir` existence guard (`builder-server`) — DONE 2026-06-26 — **trivial (robustness, likely-unreachable)**](#24-missed-port-defensive--updatepagewidgets-lacks-the-pagesdir-existence-guard-builder-server---done-2026-06-26--trivial-robustness-likely-unreachable)
 - ✅ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server---resolved-2026-06-26-keep-master-parity--low-correctness-master-parity-tradeoff)
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
-- ✅ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — DONE 2026-06-27 — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling--low-dev-only-mostly-latent)
+- ✅ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — DONE 2026-06-27 — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling---low-dev-only-mostly-latent)
+- 🟡 [28. TBD — Close the path-based storage exceptions for the hosted boundary (adapter discipline) — discuss with partner](#28-tbd--close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline---discuss-with-partner)
 
 ---
 
@@ -1527,3 +1528,66 @@ filenames, plus DRY. **Fix:** do the two CONFIRMED hardenings (quotePath flag + 
 theme-update workflow is next revisited (ties into §2/§13); fold the reuse cleanups in opportunistically.
 
 **Hosted impact:** none — OSS-only release tooling.
+
+---
+
+## 28. TBD — Close the path-based storage exceptions for the hosted boundary (adapter discipline) — discuss with partner
+
+**Status:** 🟡 TBD — to discuss with partner before scoping.
+
+**Context.** The backend is scope-first + adapter-injected, but a small set of
+functions bypass the `StorageAdapter` and read the filesystem directly by
+`folderName`. These work fine in OSS (single tenant) but are the spots where the
+"no fork for hosted" claim has asterisks on it. Documented in
+[`core-project-id-architecture.md` § Still-path-based exceptions](core-project-id-architecture.md#still-path-based-exceptions).
+
+**The exceptions:**
+
+1. `themeController.readProjectThemeData()` / `saveProjectThemeSettings` — resolve
+   folderName via `getProjectFolderName()` and read `theme.json` directly.
+2. `pageController.listProjectPagesData()` / `readGlobalWidgetData()` — take a
+   folderName, build paths via `getProjectPagesDir()` / `getProjectDir()`.
+3. `menuController.getMenuById()` — the one render-path menu reader still using
+   `fs-extra` / `path` directly against a project directory.
+4. **Project lifecycle directory ops** — create / rename / duplicate / import in
+   `projectController.js` operate on directories by folderName with `fs-extra`.
+   These are inherently filesystem-shaped (bulk directory copy / rename) and run
+   in the OSS shell context.
+
+**Why it matters.** Every exception is a spot where hosted has to either
+reimplement the logic against cloud storage or accept OSS-only behavior. Closing
+them keeps the "swapping local FS for cloud is a wiring change in the shell, not a
+fork of the server" invariant honest.
+
+**Difficulty split.**
+
+- **Easy (1–3):** mechanical port. Swap `fs.readFile(path)` →
+  `storage.read(scope, relativePath)` and thread `scope` + `req.adapters.storage`
+  through the callers. The render path already goes through `buildRenderDeps()` →
+  `deps` bag, so the seam exists; just push `storage` + `scope` into the bag and
+  swap the `fs` calls inside. The `require-scope-arg` ESLint rule will catch any
+  missed call site. Estimated ~1–2 days plus test updates; tests already exist
+  and just need their call sites updated.
+- **Not easy (4):** project lifecycle ops are genuinely OSS-shell code. Hosted
+  wouldn't copy a theme directory — it would write a batch of blobs to cloud
+  storage, which is a different implementation. Honest fix is to move these ops
+  out of `builder-server`'s project controller and into the OSS shell
+  (`app/server-common.js` or a sibling), explicitly marking them OSS-only by
+  design. Bigger structural refactor, not a swap-a-call fix.
+
+**Suggested plan if we proceed.**
+
+1. Pick `getMenuById` (smallest, ~30 lines) as a proof-of-concept and port it
+   to the storage adapter. Validates the pattern end-to-end and gives a template
+   for the other two easy ones.
+2. Port `listProjectPagesData`, `readGlobalWidgetData`, `readProjectThemeData`
+   using the same pattern.
+3. Decide on (4) separately — either move the lifecycle ops into the OSS shell,
+   or document them as "OSS-only by design" in `core-architecture.md` so the
+   boundary is explicit rather than accidental.
+
+**Effect:** moderate (architectural) — closes the hosted-boundary leak; enables
+the "no fork" claim to hold without caveats. Not user-visible.
+
+**Hosted impact:** positive — every closed exception is one less spot the hosted
+product has to reimplement or work around.
