@@ -25,6 +25,7 @@ import {
   registerCollectionFilter,
 } from "@widgetizer/core";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
+import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
@@ -653,8 +654,18 @@ async function renderWidget(
     const hasLinkSettings =
       schemaHasLinkSetting(schema) ||
       Object.values(blockSchemas).some((bs) => Array.isArray(bs) && bs.some((s) => s.type === "link"));
+    // Richtext can also carry a collection-item ref (data-collection-item-uuid), so a
+    // richtext-only widget/block must trigger the item-map load too (LINK-024). Checks
+    // top-level settings AND block schemas, mirroring the link/menu gate above.
+    const hasRichtextSettings =
+      schemaHasRichtextSetting(schema) ||
+      Object.values(blockSchemas).some((bs) => Array.isArray(bs) && bs.some((s) => s.type === "richtext"));
     let collectionItemsByUuid = (sharedGlobals && sharedGlobals.collectionItemsByUuid) || null;
-    if ((hasMenuSettings || hasLinkSettings) && !collectionItemsByUuid && typeof deps.loadCollectionItemsByUuid === "function") {
+    if (
+      (hasMenuSettings || hasLinkSettings || hasRichtextSettings) &&
+      !collectionItemsByUuid &&
+      typeof deps.loadCollectionItemsByUuid === "function"
+    ) {
       try {
         collectionItemsByUuid = await deps.loadCollectionItemsByUuid();
         if (sharedGlobals) sharedGlobals.collectionItemsByUuid = collectionItemsByUuid;
@@ -695,6 +706,15 @@ async function renderWidget(
     // wiring. Runs on the already-sanitized clone; stored values keep their portable path.
     const baseContext = await createBaseRenderContext(deps, rawThemeSettings, renderMode, sharedGlobals);
     resolveRichtextMediaInWidgetData(resolvedWidgetData, schema, baseContext.imagePath, baseContext.filePath);
+
+    // Resolve stable internal-link refs embedded in richtext anchors (data-page-uuid /
+    // data-collection-item-uuid) to current slugs, depth-aware — the richtext analogue of
+    // resolveWidgetPageLinks above. Runs on the sanitized clone; data attrs survived sanitize.
+    resolveRichtextLinksInWidgetData(resolvedWidgetData, schema, {
+      pagesByUuid,
+      collectionItemsByUuid,
+      outputPathPrefix,
+    });
 
     // Create widget context for template
     const widgetContext = {

@@ -10,6 +10,7 @@ import Button from "../components/ui/Button";
 
 import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
+import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import { getPage, updatePage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
@@ -78,6 +79,9 @@ export default function PagesEdit() {
         const activeProject = useProjectStore.getState().activeProject;
         if (activeProject) {
           invalidateMediaCache(activeProject.id);
+          // A renamed page changes its link-picker label/slug — refresh link targets
+          // so the rich-text/structured link pickers don't show the stale name (TTL).
+          invalidateLinkTargetsCache(activeProject.id);
         }
         return true;
       } else {

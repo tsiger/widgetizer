@@ -125,6 +125,50 @@ describe("widget link resolution to collection items", () => {
   });
 });
 
+// Richtext stable internal-links (LINK-022→025) resolve through the SAME render path.
+// The widget has ONLY a richtext setting (no link/menu), so this also proves the
+// collection-item map still loads for richtext-only widgets (the gate fix).
+const RT_WIDGET_SCHEMA = { type: "rt-widget", settings: [{ type: "richtext", id: "body" }] };
+
+async function renderRichtextWidget(body, sharedGlobals = null) {
+  const dir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "rt-widget");
+  await fs.ensureDir(dir);
+  await fs.writeFile(path.join(dir, "widget.liquid"), `{{ widget.settings.body | raw }}`);
+  await fs.writeFile(path.join(dir, "schema.json"), JSON.stringify(RT_WIDGET_SCHEMA));
+  return renderWidget(
+    PROJECT_ID,
+    "rt-widget",
+    { type: "rt-widget", settings: { body } },
+    RAW_THEME,
+    "publish",
+    sharedGlobals,
+    null,
+    collectionDeps,
+  );
+}
+
+describe("richtext stable internal-link resolution (LINK-022→025)", () => {
+  it("resolves a richtext collection-item link to the item's page URL (richtext-only widget)", async () => {
+    const html = await renderRichtextWidget(
+      '<p><a href="portfolio/stale.html" data-collection-item-uuid="u-alpha">Alpha</a></p>',
+    );
+    assert.ok(html.includes('href="portfolio/alpha.html"'), html);
+  });
+
+  it("depth-prefixes a richtext item link inside a nested item page", async () => {
+    const html = await renderRichtextWidget('<a href="x.html" data-collection-item-uuid="u-alpha">A</a>', {
+      outputPathPrefix: "../",
+    });
+    assert.ok(html.includes('href="../portfolio/alpha.html"'), html);
+  });
+
+  it("neutralizes a richtext link whose item was deleted", async () => {
+    const html = await renderRichtextWidget('<a href="portfolio/gone.html" data-collection-item-uuid="u-missing">Gone</a>');
+    assert.ok(!html.includes("portfolio/gone.html"), html);
+    assert.ok(!html.includes("data-collection-item-uuid"), html);
+  });
+});
+
 // Widget `menu` settings now resolve through the SAME shared menuResolver as
 // collection-item rendering (the consolidation of the old inline widget-menu
 // path): collection-item menu targets resolve to the item's page URL and custom

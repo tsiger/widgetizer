@@ -167,6 +167,47 @@ describe("cleanupDeletedPageReferences — collection items", () => {
 });
 
 // ============================================================================
+// Richtext stable links (LINK-022→025) — integrity wiring
+// ============================================================================
+
+describe("richtext stable links — integrity wiring", () => {
+  it("unwraps a richtext anchor pointing at a deleted page (cleanup)", async () => {
+    await writePageWidgets("home", "home-uuid", {
+      w1: { type: "text", settings: { body: '<p>see <a href="x.html" data-page-uuid="DELETED">our page</a> now</p>' } },
+    });
+    await cleanupDeletedPageReferences(PROJECT_FOLDER, "DELETED");
+    assert.equal((await readPage("home")).widgets.w1.settings.body, "<p>see our page now</p>");
+  });
+
+  it("unwraps a richtext anchor pointing at a deleted collection item (cleanup)", async () => {
+    await writePageWidgets("home", "home-uuid", {
+      w1: { type: "text", settings: { body: '<a href="news/x.html" data-collection-item-uuid="item-gone">x</a>' } },
+    });
+    await cleanupDeletedCollectionItemReferences(PROJECT_FOLDER, "item-gone");
+    assert.equal((await readPage("home")).widgets.w1.settings.body, "x");
+  });
+
+  it("stamps data-page-uuid on a richtext page-link from its href slug (enrich)", async () => {
+    await writePage("about", "about-uuid");
+    await writePageWidgets("home", "home-uuid", {
+      w1: { type: "text", settings: { body: '<a href="about.html">About</a>' } },
+    });
+    await enrichNewProjectReferences(getProjectPagesDir(PROJECT_FOLDER), getProjectMenusDir(PROJECT_FOLDER));
+    assert.ok((await readPage("home")).widgets.w1.settings.body.includes('data-page-uuid="about-uuid"'));
+  });
+
+  it("remaps a richtext anchor uuid on project duplication (remap)", async () => {
+    await writePageWidgets("home", "OLD-PAGE", {
+      w1: { type: "text", settings: { body: '<a data-page-uuid="OLD-PAGE">x</a>' } },
+    });
+    await remapDuplicatedProjectUuids(PROJECT_FOLDER);
+    const page = await readPage("home");
+    assert.ok(page.widgets.w1.settings.body.includes(`data-page-uuid="${page.uuid}"`));
+    assert.ok(!page.widgets.w1.settings.body.includes("OLD-PAGE"));
+  });
+});
+
+// ============================================================================
 // cleanupDeletedCollectionItemReferences — menu / widget / item refs
 // ============================================================================
 

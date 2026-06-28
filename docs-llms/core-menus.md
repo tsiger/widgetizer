@@ -79,7 +79,7 @@ A typical menu JSON file (`main-menu.json`) has the following structure:
 
 ### Link Resolution & UUID Lifecycle
 
-Internal links carry a stable UUID (`pageUuid` for pages, `collectionItemUuid` for collection items) so they follow renames and self-clean on deletes. The `link` string is recomputed from that UUID at render time.
+Internal links carry a stable UUID (`pageUuid` for pages, `collectionItemUuid` for collection items) so they follow renames and self-clean on deletes. The `link` string is recomputed from that UUID at render time. Richtext fields carry the **same** stable refs on their anchors as data-attributes (`data-page-uuid` / `data-collection-item-uuid`), resolved / cleaned / remapped / enriched the same way — see [Setting Types](theming-setting-types.md) and [Security](core-security.md).
 
 1. **Project creation** — when a project is scaffolded from a theme, menu items linking to internal pages are enriched with `pageUuid` by matching the `link` slug against the page slug→UUID map (`enrichNewProjectReferences` in `packages/builder-server/src/utils/linkEnrichment.js`).
 2. **User selection** — when an author picks an internal target in the menu editor, both the `link` and the stable UUID (`pageUuid` or `collectionItemUuid` + `collectionType`) are stored.

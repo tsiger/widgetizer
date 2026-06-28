@@ -24,6 +24,7 @@ import {
   remapDuplicatedProjectUuids,
   remapCollectionItemMenuRefs,
   remapCollectionItemLinkRefs,
+  enrichSeededRichtextLinks,
 } from "../utils/linkEnrichment.js";
 import { scaffoldProjectContent } from "../utils/projectScaffold.js";
 
@@ -104,6 +105,11 @@ export async function seedPresetCollections(folderName, presetCollectionsDir) {
   // seeded uuids so the links resolve (#11).
   await remapCollectionItemMenuRefs(folderName, oldToNewItemUuid);
   await remapCollectionItemLinkRefs(folderName, oldToNewItemUuid);
+
+  // Richtext stable links (LINK-022→025): presets ship richtext with the uuid attrs
+  // stripped, and the seeded item uuids only exist now — so stamp data-page-uuid /
+  // data-collection-item-uuid on all richtext (pages, globals, items) from their hrefs.
+  await enrichSeededRichtextLinks(folderName);
 }
 
 /**

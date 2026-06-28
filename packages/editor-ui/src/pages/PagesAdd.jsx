@@ -7,6 +7,7 @@ import useToastStore from "../stores/toastStore";
 import useProjectStore from "../stores/projectStore";
 import { createPage } from "../queries/pageManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
+import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
@@ -31,6 +32,8 @@ export default function PagesAdd() {
       const activeProject = useProjectStore.getState().activeProject;
       if (activeProject) {
         invalidateMediaCache(activeProject.id);
+        // New page is a new link target — refresh the link-picker cache.
+        invalidateLinkTargetsCache(activeProject.id);
       }
 
       navigateSafely(editorPath("/pages"));

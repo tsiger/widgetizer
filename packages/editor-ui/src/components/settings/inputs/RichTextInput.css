@@ -84,11 +84,26 @@
 /* Link row - appears above toolbar */
 .richtext-link-row {
   display: flex;
+  flex-wrap: wrap; /* narrow sidebar: the page/item picker wraps to its own line */
   align-items: center;
   gap: 0.25rem;
   padding: 0.375rem;
   border-bottom: 1px solid #e2e8f0; /* slate-200 */
   background: #f8fafc; /* slate-50 */
+}
+
+/* The internal-target picker takes its own full-width line below the URL row so the
+   URL input + apply/cancel buttons stay usable in the ~200px settings sidebar.
+   Scoped under .richtext-link-row to outrank the generic .richtext-link-input
+   `flex: 1` the <select> also carries (same specificity would otherwise lose on order). */
+.richtext-link-row .richtext-link-picker {
+  flex: 1 0 100%;
+}
+
+/* In the expanded modal there's plenty of width, so keep the picker inline with the
+   URL input (overrides the stacked sidebar rule above via higher specificity). */
+.richtext-editor-expanded .richtext-link-row .richtext-link-picker {
+  flex: 1 1 auto;
 }
 
 /* Link input */

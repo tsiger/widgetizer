@@ -26,6 +26,7 @@ import {
   schemaHasMenuSetting,
 } from "@widgetizer/render-engine";
 
+import { schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { getProjectDir, CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -82,7 +83,9 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
       // the menu maps the engine already populated on `globals` — so plain
       // collections pay no extra I/O.
       let menuDeps = null;
-      if (schemaHasMenuSetting(schema) || schemaHasLinkSetting(schema)) {
+      // Richtext can also carry a collection-item ref (data-collection-item-uuid), so a
+      // richtext-only item must load the item map too (LINK-024) — not just menu/link items.
+      if (schemaHasMenuSetting(schema) || schemaHasLinkSetting(schema) || schemaHasRichtextSetting(schema)) {
         if (!globals.collectionItemsByUuid) {
           globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope);
         }

@@ -139,6 +139,44 @@ describe("seedPresetCollections", () => {
     assert.equal(await fs.pathExists(itemPath(FOLDER, "events", "expo")), false);
   });
 
+  it("stamps richtext page + item links on seeded collection-item bodies (LINK-022→025)", async () => {
+    await fs.outputJson(schemaPath(FOLDER, "posts"), {
+      type: "posts",
+      schemaVersion: 1,
+      displayName: "Post",
+      displayNamePlural: "Posts",
+      icon: "FileText",
+      hasItemPages: true,
+      slugPrefix: "blog",
+      settings: [
+        { type: "text", id: "title", usedAsTitle: true },
+        { type: "richtext", id: "body" },
+      ],
+    });
+    // A page the richtext links to (exists at seed time).
+    await fs.outputJson(path.join(getProjectPagesDir(FOLDER), "about.json"), {
+      id: "about",
+      slug: "about",
+      uuid: "ABOUT-UUID",
+      widgets: {},
+    });
+    // Two preset items: hello's body links to the page (slug href) and to the other item
+    // (slugPrefix/slug href). Preset items carry NO uuid; the seed assigns fresh ones.
+    const presetCollections = path.join(TEST_ROOT, "preset-collections");
+    await fs.outputJson(path.join(presetCollections, "posts", "world.json"), { slug: "world", settings: { title: "World" } });
+    await fs.outputJson(path.join(presetCollections, "posts", "hello.json"), {
+      slug: "hello",
+      settings: { title: "Hello", body: '<a href="about.html">A</a><a href="blog/world.html">W</a>' },
+    });
+
+    await seedPresetCollections(FOLDER, presetCollections);
+
+    const hello = await fs.readJson(itemPath(FOLDER, "posts", "hello"));
+    const world = await fs.readJson(itemPath(FOLDER, "posts", "world"));
+    assert.ok(hello.settings.body.includes('data-page-uuid="ABOUT-UUID"'), hello.settings.body);
+    assert.ok(hello.settings.body.includes(`data-collection-item-uuid="${world.uuid}"`), hello.settings.body);
+  });
+
   it("remaps preset menu collectionItemUuid refs to the freshly seeded uuid (#11)", async () => {
     await fs.outputJson(schemaPath(FOLDER, "posts"), {
       type: "posts",

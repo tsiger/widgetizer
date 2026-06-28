@@ -20,7 +20,10 @@ export function stripHtmlTags(value) {
 // autoescape (outputEscape: "escape").
 const RICHTEXT_BASE_TAGS = ["p", "strong", "em", "a", "br", "span", "ul", "ol", "li"];
 const RICHTEXT_HEADING_TAGS = ["h2", "h3", "h4"];
-const RICHTEXT_BASE_ATTR = ["href", "target", "rel", "class"];
+// `data-page-uuid` / `data-collection-item-uuid` carry stable internal-link refs on
+// richtext anchors (LINK-022→025) — kept so renames follow / deletes clear at render.
+// Only these two data-* attrs are allowed; any other data-* is still stripped.
+const RICHTEXT_BASE_ATTR = ["href", "target", "rel", "class", "data-page-uuid", "data-collection-item-uuid"];
 
 // A richtext <img> src must be exactly an in-project upload path with a single safe
 // filename segment — the same charset the media scanner tracks. This rejects external /

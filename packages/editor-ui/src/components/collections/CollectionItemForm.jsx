@@ -324,6 +324,7 @@ export default function CollectionItemForm({
               value={settingsValues[setting.id]}
               onChange={handleSettingChange}
               error={fieldErrors[setting.id]}
+              allowInternalLinkTargets
             />
           );
           return renderer;

@@ -5,8 +5,7 @@
  */
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useMemo, useRef, useState } from "react";
 import {
   Bold,
   Italic,
@@ -28,8 +27,52 @@ import {
 import ResolvedImage from "./ResolvedImage";
 import MediaSelectorDrawer from "../../media/MediaSelectorDrawer";
 import useProjectStore from "../../../stores/projectStore";
+import useLinkTargets from "../../../hooks/useLinkTargets";
+import { resolveRichtextLinkRefs } from "@widgetizer/core/richtextLinks";
+import { StableLink } from "./stableLink";
 import { API_URL } from "../../../lib/config";
 import "./RichTextInput.css";
+
+/** A picker (mounted only when internal targets are allowed + the link row is open) so
+ *  useLinkTargets fetches lazily. Selecting a page/item applies a stable internal link. */
+function InternalLinkPicker({ onPick }) {
+  const { options, loading } = useLinkTargets();
+  const groups = [];
+  for (const opt of options) {
+    let group = groups.find((g) => g.label === opt.group);
+    if (!group) {
+      group = { label: opt.group, items: [] };
+      groups.push(group);
+    }
+    group.items.push(opt);
+  }
+  return (
+    <select
+      className="richtext-link-input richtext-link-picker"
+      defaultValue=""
+      disabled={loading}
+      onChange={(e) => {
+        const opt = options.find((o) => o.value === e.target.value);
+        if (opt) onPick(opt);
+        e.target.value = "";
+      }}
+      title="Link to a page or collection item"
+    >
+      <option value="" disabled>
+        {loading ? "Loading…" : "Link to page/item…"}
+      </option>
+      {groups.map((g) => (
+        <optgroup key={g.label} label={g.label}>
+          {g.items.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
+  );
+}
 
 // Heading levels exposed when `allowHeadings` is on. To offer more later, add the
 // level here and its lucide icon below — H1 is intentionally omitted (reserved for
@@ -60,6 +103,7 @@ function MenuBar({
   allowSource,
   allowHeadings,
   allowImages,
+  allowInternalLinkTargets,
   onInsertImage,
   onLinkFile,
 }) {
@@ -69,14 +113,35 @@ function MenuBar({
   const setLink = useCallback(() => {
     const url = normalizeLinkUrl(linkUrl);
     if (!url) {
-      // Empty/whitespace input removes the link.
+      // Empty/whitespace input removes the link (the mark, and its data attrs, go with it).
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
     } else {
-      editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+      // Internal-link stable refs (LINK-022→025) are mutually exclusive — applying an
+      // external URL clears BOTH data attrs so a stale uuid can't linger.
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: url, "data-page-uuid": null, "data-collection-item-uuid": null })
+        .run();
     }
     setShowLinkInput(false);
     setLinkUrl("");
   }, [editor, linkUrl]);
+
+  // Apply a stable internal link from the target picker: set the matching uuid attr and
+  // clear the other (page→clear item, item→clear page), so exactly one ref is ever set.
+  const applyInternalLink = useCallback(
+    (option) => {
+      const attrs = option.isPage
+        ? { href: `${option.slug}.html`, "data-page-uuid": option.value, "data-collection-item-uuid": null }
+        : { href: `${option.slugPrefix}/${option.slug}.html`, "data-collection-item-uuid": option.value, "data-page-uuid": null };
+      editor.chain().focus().extendMarkRange("link").setLink(attrs).run();
+      setShowLinkInput(false);
+      setLinkUrl("");
+    },
+    [editor],
+  );
 
   const openLinkInput = useCallback(() => {
     const previousUrl = editor.getAttributes("link").href || "";
@@ -131,6 +196,7 @@ function MenuBar({
             className="richtext-link-input"
             autoFocus
           />
+          {allowInternalLinkTargets && <InternalLinkPicker onPick={applyInternalLink} />}
           <button type="button" onClick={setLink} className="richtext-link-icon-button" title="Apply">
             <Check size={14} />
           </button>
@@ -274,16 +340,48 @@ export default function RichTextInput({
   allowSource = false,
   allowHeadings = false,
   allowImages = false,
+  allowInternalLinkTargets = false,
   minHeight,
 }) {
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [sourceValue, setSourceValue] = useState(value);
   const [isExpanded, setIsExpanded] = useState(false);
   const [pickerMode, setPickerMode] = useState(null); // null | "image" | "fileLink"
+  // True only when a press STARTED on the overlay backdrop itself — so a text-selection
+  // drag that begins inside the editor but releases on the backdrop doesn't close it.
+  const overlayPressOnSelf = useRef(false);
   // Force re-render on selection change so toolbar buttons update
   const [, setSelectionUpdate] = useState(0);
 
   const activeProject = useProjectStore((state) => state.activeProject);
+
+  // Display-time resolution of stable internal-link refs (LINK-022→025, Issue 3):
+  // an anchor's stored href is the slug at authoring time, so after a page/item rename
+  // the editor would show the OLD href even though render/preview resolve the uuid to the
+  // current slug. Rebuild the uuid→slug maps from the link-target list and rewrite hrefs
+  // for DISPLAY only (setContent below uses emitUpdate:false, so this never dirties the
+  // field or changes what's saved until the user actually edits). Only where internal
+  // targets are in scope; theme-settings richtext carries no refs.
+  const { options: linkTargetOptions } = useLinkTargets();
+  const { pagesByUuid, collectionItemsByUuid } = useMemo(() => {
+    const pages = new Map();
+    const items = new Map();
+    for (const o of linkTargetOptions) {
+      if (o.isPage) pages.set(o.value, { slug: o.slug });
+      else if (o.isCollectionItem) items.set(o.value, { slugPrefix: o.slugPrefix, slug: o.slug });
+    }
+    return { pagesByUuid: pages, collectionItemsByUuid: items };
+  }, [linkTargetOptions]);
+
+  const resolveForDisplay = useCallback(
+    (html) => {
+      // Not in scope, or targets not loaded yet → keep the stored href (no neutralizing
+      // during the load window; an empty map can't distinguish "loading" from "none").
+      if (!allowInternalLinkTargets || (pagesByUuid.size === 0 && collectionItemsByUuid.size === 0)) return html;
+      return resolveRichtextLinkRefs(html, { pagesByUuid, collectionItemsByUuid, outputPathPrefix: "" });
+    },
+    [allowInternalLinkTargets, pagesByUuid, collectionItemsByUuid],
+  );
 
   // Map a stored portable `/uploads/…` path to a browser-loadable media URL for
   // *display only* (used by the ResolvedImage NodeView). External/absolute URLs
@@ -321,11 +419,17 @@ export default function RichTextInput({
         // so only our openOnClick:false instance applies.
         link: false,
       }),
-      Link.configure({
+      StableLink.configure({
         openOnClick: false,
         HTMLAttributes: {
           rel: "noopener noreferrer",
         },
+        // Tiptap's default isAllowedUri rejects scheme-less relative hrefs that contain a
+        // "/" (e.g. a collection item's "news/hello.html"), so setLink would silently bail
+        // for item links. Allow any scheme-LESS (relative) href; defer only scheme'd URLs
+        // to the default protocol allowlist so javascript:/data: stay blocked. (The server
+        // sanitizer is the real security gate; this is just the editor-side guard.)
+        isAllowedUri: (url, ctx) => (/^[a-z][a-z0-9+.-]*:/i.test(url) ? ctx.defaultValidate(url) : true),
       }),
       ...(allowImages ? [ResolvedImage.configure({ inline: false, allowBase64: false, resolveSrc })] : []),
     ],
@@ -353,12 +457,16 @@ export default function RichTextInput({
   // throws "Cannot read properties of null (reading 'cached')".
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
-    if (value !== editor.getHTML()) {
-      editor.commands.setContent(value, false);
+    // Resolve internal-link hrefs to current slugs for display (Issue 3). setContent with
+    // emitUpdate=false means this is display-only — it does NOT fire onUpdate/onChange, so
+    // the field isn't dirtied and the stored value is untouched until a real edit.
+    const displayValue = resolveForDisplay(value);
+    if (displayValue !== editor.getHTML()) {
+      editor.commands.setContent(displayValue, false);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing external value to source mode
-      setSourceValue(value);
+      setSourceValue(value); // source view shows the raw stored HTML, not the resolved display
     }
-  }, [value, editor]);
+  }, [value, editor, resolveForDisplay]);
 
   // Sync source changes back to editor when switching modes
   const handleToggleSource = useCallback(() => {
@@ -435,16 +543,19 @@ export default function RichTextInput({
     (file) => {
       if (!editor || !file?.path) return;
       const href = file.path;
+      // A file link is not an internal page/item ref — clear both stable-ref attrs so a
+      // link changed from page/item to file doesn't keep resolving to the old target.
+      const clearedRefs = { "data-page-uuid": null, "data-collection-item-uuid": null };
       const { from, to } = editor.state.selection;
       if (from === to) {
         const text = file.originalName || file.path.split("/").pop();
         editor
           .chain()
           .focus()
-          .insertContent({ type: "text", text, marks: [{ type: "link", attrs: { href } }] })
+          .insertContent({ type: "text", text, marks: [{ type: "link", attrs: { href, ...clearedRefs } }] })
           .run();
       } else {
-        editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
+        editor.chain().focus().extendMarkRange("link").setLink({ href, ...clearedRefs }).run();
       }
       setPickerMode(null);
     },
@@ -460,6 +571,7 @@ export default function RichTextInput({
         allowSource={allowSource}
         allowHeadings={allowHeadings}
         allowImages={allowImages}
+        allowInternalLinkTargets={allowInternalLinkTargets}
         onInsertImage={() => setPickerMode("image")}
         onLinkFile={() => setPickerMode("fileLink")}
       />
@@ -495,7 +607,16 @@ export default function RichTextInput({
 
       {/* Expanded overlay */}
       {isExpanded && (
-        <div className="richtext-overlay" onClick={handleCollapse}>
+        <div
+          className="richtext-overlay"
+          onMouseDown={(e) => {
+            overlayPressOnSelf.current = e.target === e.currentTarget;
+          }}
+          onClick={(e) => {
+            // Close only on a genuine backdrop click — press AND release both on the overlay.
+            if (e.target === e.currentTarget && overlayPressOnSelf.current) handleCollapse();
+          }}
+        >
           <div className="richtext-overlay-container" onClick={(e) => e.stopPropagation()}>
             <div className="richtext-overlay-header">
               <span className="richtext-overlay-title">Edit Content</span>

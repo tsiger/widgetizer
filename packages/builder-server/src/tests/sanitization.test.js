@@ -62,6 +62,19 @@ describe("sanitizeRichText", () => {
     assert.equal(sanitizeRichText(input), input);
   });
 
+  it("keeps the stable internal-link data attrs on anchors (LINK-022→025)", () => {
+    const page = '<a href="about.html" data-page-uuid="p1">x</a>';
+    assert.ok(sanitizeRichText(page).includes('data-page-uuid="p1"'));
+    const item = '<a href="news/x.html" data-collection-item-uuid="i1">y</a>';
+    assert.ok(sanitizeRichText(item).includes('data-collection-item-uuid="i1"'));
+  });
+
+  it("strips any other data-* attribute on anchors", () => {
+    const result = sanitizeRichText('<a href="x.html" data-evil="1" data-page-uuid="p1">x</a>');
+    assert.ok(!result.includes("data-evil"), "unknown data-* must be stripped");
+    assert.ok(result.includes('data-page-uuid="p1"'), "known ref attr is kept");
+  });
+
   it("allows ordered lists", () => {
     const input = "<ol><li>First</li><li>Second</li></ol>";
     assert.equal(sanitizeRichText(input), input);

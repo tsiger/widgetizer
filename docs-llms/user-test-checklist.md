@@ -1745,17 +1745,45 @@ These tests cover stable internal references for structured `link` settings. Ric
 - [ ] LINK-021 - Export or preview content containing stable page and collection-item links from root pages and nested collection item pages.
   Expected: Links render with the current target slug and correct relative path.
 
-- [ ] LINK-022 - Add a page link inside widget, block, or global richtext, then rename/delete the page.
-  Expected: Not implemented yet - richtext page links are raw HTML anchors and do not have stable page refs.
+- [x] LINK-022 - Add a page link inside widget, block, or global richtext, then rename/delete the page.
+  Expected: The richtext link follows the page's new slug on rename and becomes plain text (unwrapped) on delete; preview and export render the current slug, depth-aware.
+  Result: Pass (2026-06-27) - Implemented (LINK-022→025): the richtext link picker stamps `data-page-uuid` on the anchor; render resolves it to the current slug (root + nested depth), rename follows, delete unwraps to plain text. Verified by core unit tests + a render-engine integration test (richtext-only widget) and manual editor authoring.
 
-- [ ] LINK-023 - Add a page link inside collection item richtext, then rename/delete the page.
-  Expected: Not implemented yet - collection richtext page links are raw HTML anchors and do not have stable page refs.
+- [x] LINK-023 - Add a page link inside collection item richtext, then rename/delete the page.
+  Expected: Same as LINK-022 but for a page link authored inside a collection item's richtext field.
+  Result: Pass (2026-06-27) - Collection-item richtext resolves `data-page-uuid` via the same `collectionService` render path; rename follows, delete unwraps. Preset collection-item bodies get the ref stamped at seed (post-seed enrichment). Verified by unit + preset-seeding tests.
 
-- [ ] LINK-024 - Add a collection item link inside widget, block, or global richtext, then rename/delete the target item.
-  Expected: Not implemented yet - richtext collection item links are raw HTML anchors and do not have stable collection item refs.
+- [x] LINK-024 - Add a collection item link inside widget, block, or global richtext, then rename/delete the target item.
+  Expected: The richtext link follows the item's new slug on rename and becomes plain text on delete; preview and export render the current `slugPrefix/slug`, depth-aware.
+  Result: Pass (2026-06-27) - The picker stamps `data-collection-item-uuid`; the collection-item map now loads for richtext-only widgets/blocks (gate fix); render resolves to the current item URL, rename follows, delete unwraps. Verified by core unit + render-engine integration tests.
 
-- [ ] LINK-025 - Add a collection item link inside collection item richtext, then rename/delete the target item.
-  Expected: Not implemented yet - collection richtext collection item links are raw HTML anchors and do not have stable collection item refs.
+- [x] LINK-025 - Add a collection item link inside collection item richtext, then rename/delete the target item.
+  Expected: Same as LINK-024 but for an item link authored inside a collection item's richtext field.
+  Result: Pass (2026-06-27) - Resolved via the collection-item render path (item-map gate extended in renderingService); duplication remaps refs, preset seeding enriches from hrefs. Verified by unit + integrity (cleanup/remap) + preset-seeding tests.
+
+- [x] LINK-026 - Take an existing richtext internal link and switch it to a different page, then to a collection item, then to an external URL, then to a "Link to file".
+  Expected: Each switch keeps exactly one stable ref (page→page-uuid only, item→item-uuid only) or none (external/file); no stale uuid from the previous target lingers, so render always resolves to the current target.
+  Result: Pass (2026-06-27) - The picker sets one uuid attr and clears the other; external-URL and file-link paths clear both attrs (the file-link clear was the P1 fix). Covered by the headless StableLink regression test (round-trip + clear-on-file-link) plus manual.
+
+- [x] LINK-027 - Open a theme-settings richtext field (page-editor theme panel and admin Theme Settings) and try to add a link.
+  Expected: Only the URL box is offered (no page/item picker); a stable internal ref cannot be authored there (theme settings are out of scope).
+  Result: Pass (2026-06-27) - `allowInternalLinkTargets` is off by default and enabled only for widget/block/global settings (`pageEditor/SettingsPanel`, `!isThemeSettings`) and the collection-item form; theme settings keep the plain URL flow.
+
+- [x] LINK-028 - Add a richtext link to a page, rename the page's slug, then REOPEN the editor (not just preview).
+  Expected: The editor displays the link with the current slug, not the authoring-time slug; saved output is unchanged until you actually edit.
+  Result: Pass (2026-06-27) - The editor resolves anchor hrefs from the uuid for display via `setContent(emitUpdate:false)` (display-only, no spurious dirty); falls back to the stored href until link targets load; a deleted target shows as plain text.
+
+- [x] LINK-029 - Create, rename, or delete a page, then immediately open a richtext link picker.
+  Expected: The new/renamed/removed page is reflected in the picker right away (no ~60s stale-cache delay).
+  Result: Pass (2026-06-27) - Page create/rename/delete/duplicate now invalidate the link-targets cache (`PagesAdd`/`PagesEdit`/`Pages`), matching collection-item mutations.
+
+- [x] LINK-030 - Open a richtext that already contains a stable internal link (e.g. preset/enriched content), make an unrelated edit, save, and reopen.
+  Expected: The link's stable ref survives the edit/save round-trip and still follows a later target rename.
+  Result: Pass (2026-06-27) - The `StableLink` TipTap extension round-trips `data-page-uuid`/`data-collection-item-uuid` through `getHTML()`, and the sanitizer keeps both attrs. Covered by the StableLink round-trip test.
+
+- [x] LINK-031 - Author a richtext link via HTML source mode, including single-quoted attributes, then rename/delete the target and duplicate the project.
+  Expected: The link resolves at render and is cleaned (on delete) / remapped (on duplication) on disk despite single-quoted source HTML.
+  Result: Pass (2026-06-27) - The disk lifecycle helpers (resolve/cleanup/remap/enrich/strip) are quote-agnostic (`["']`); render sanitizes to the normalized form. Covered by single-quote unit cases (P2 fix).
 
 ---
 
@@ -1851,13 +1879,4 @@ Stop the test run and tell the test owner if any of these happen:
 
 ## Tasks to be fixed/investigated
 
-### Stable Links
-
-- [ ] LINK-022/LINK-023 - Implement stable page references for richtext links.
-  Context: Richtext currently stores page links as raw HTML anchors such as `<a href="about.html">`, so page rename/delete cannot update or clear those links. Add a page-aware richtext linking flow/storage model for widget settings, block settings, global widgets, and collection item richtext.
-
-- [ ] LINK-024/LINK-025 - Implement stable collection item references for richtext links.
-  Context: Richtext currently stores collection item links as raw HTML anchors such as `<a href="news/item.html">`, so collection item rename/delete cannot update or clear those links. Add collection-item-aware richtext linking for widget settings, block settings, global widgets, and collection item richtext.
-
-- [ ] LINK-022/LINK-025 - Add backend cleanup, remap, enrichment, render, preview, and export coverage for richtext stable links.
-  Context: Once richtext can store stable internal refs, link integrity needs the same coverage as structured `link` fields: target rename follows the current slug, target delete clears or makes the link harmless, project duplication remaps refs locally, preset seeding enriches refs, and root/nested export paths render correctly.
+_All tracked items addressed._

@@ -20,6 +20,7 @@
     "./pathSecurity": "./src/utils/pathSecurity.js",
     "./urlSafety": "./src/utils/urlSafety.js",
     "./richtextMedia": "./src/utils/richtextMedia.js",
+    "./richtextLinks": "./src/utils/richtextLinks.js",
     "./linkPrefixer": "./src/utils/linkPrefixer.js",
     "./dateFormat": "./src/utils/dateFormat.js",
     "./config/settingTypes": "./src/config/settingTypes.js",

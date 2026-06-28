@@ -24,6 +24,7 @@ import { randomUUID } from "node:crypto";
 import { isSupportedSettingType } from "@widgetizer/core/config/settingTypes";
 import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
 import { resolveRichtextMediaInSettings } from "@widgetizer/core/richtextMedia";
+import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
 import { resolveMenuSettings } from "@widgetizer/render-engine";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import {
@@ -1113,6 +1114,16 @@ export function prepareCollectionItemForRender(
   // the theme author wiring anything in the template. Runs after sanitize, on the clone.
   if (mediaBasePaths && resolved && resolved.settings) {
     resolveRichtextMediaInSettings(resolved.settings, schema.settings, mediaBasePaths.imagePath, mediaBasePaths.filePath);
+  }
+  // Resolve stable internal-link refs in richtext anchors (data-page-uuid /
+  // data-collection-item-uuid) to current slugs, depth-aware — parity with the
+  // structured `link` resolution above. Runs on the sanitized clone.
+  if (resolved && resolved.settings) {
+    resolveRichtextLinksInSettings(resolved.settings, schema.settings, {
+      pagesByUuid,
+      collectionItemsByUuid: menuDeps?.collectionItemsByUuid || null,
+      outputPathPrefix,
+    });
   }
   return resolved;
 }

@@ -47,7 +47,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Managing theme assets, CSS variables, and locales (i18n)
 - Implementing scroll reveal animations
 
-**Key topics**: Theme manifest, layout template, Liquid tags & filters (`rte_text`/`rte_blank`, richtext + `| raw`), widgets, blocks, global settings, menu rendering & collection-item link targets (`collectionItemUuid`/`collectionType`), asset management, scroll reveal animations, theme locales, pointers to theming-setting-types.md, theme-presets.md, and core-export.md
+**Key topics**: Theme manifest, layout template, Liquid tags & filters (`rte_text`/`rte_blank`, richtext + `| raw`, incl. stable internal-link refs in richtext anchors), widgets, blocks, global settings, menu rendering & collection-item link targets (`collectionItemUuid`/`collectionType`), asset management, scroll reveal animations, theme locales, pointers to theming-setting-types.md, theme-presets.md, and core-export.md
 
 ---
 
@@ -73,7 +73,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Understanding setting properties, CSS variable output, and i18n labels
 - Looking up the `file` setting type or richtext/link options
 
-**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height`, link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
+**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
 
 ---
 
@@ -218,7 +218,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing menu editing interfaces
 - Working with menu depth/item caps and render-time link resolution
 
-**Key topics**: Menu JSON (top-level `uuid`, `item_<uuid>` ids, `pageUuid` + `collectionItemUuid`/`collectionType` link targets), editor pages/components in `packages/editor-ui/src/`, scope-first StorageAdapter path (`getMenuById` is the fs-extra render holdover), `MAX_MENU_DEPTH=32`/`MAX_MENU_ITEMS` caps + 422 over-cap, render-time resolution (`render-engine/menuResolver.js`), `linkEnrichment.js` clone/delete cleanup
+**Key topics**: Menu JSON (top-level `uuid`, `item_<uuid>` ids, `pageUuid` + `collectionItemUuid`/`collectionType` link targets), editor pages/components in `packages/editor-ui/src/`, scope-first StorageAdapter path (`getMenuById` is the fs-extra render holdover), `MAX_MENU_DEPTH=32`/`MAX_MENU_ITEMS` caps + 422 over-cap, render-time resolution (`render-engine/menuResolver.js`), `linkEnrichment.js` clone/delete cleanup (also covers richtext stable-link anchors)
 
 ---
 
@@ -231,7 +231,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Using the `| collection` Liquid filter in templates
 - Understanding item-page depth prefixing, SEO, and export output
 
-**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), per-item SEO (`robots: index,follow` default), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media resolution, item preview
+**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), per-item SEO (`robots: index,follow` default), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
 
 ---
 
@@ -350,7 +350,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Configuring the application for a production environment
 - Tracing the cross-tenant isolation floor
 
-**Key topics**: Input validation, two-tier (2mb/10mb) JSON body parser, HTTP security headers/helmet, CORS, SVG sanitization (incl. tenant), global error handling, gallery/table setting-type sanitizers, richtext `allow_headings`/`allow_images` opt-in tag sets + path-validated `<img>`, `rte_text`/`rte_blank` filters, `collectionItemUuid` link enrichment, Project-Switch Isolation + write-guard, cross-tenant contract (cites core-packages.md for Scope/`LIMIT_KEYS`), Link & URL safety (`sanitizeHref`/`safe_url`, image-path allowlist), `createEditorApp({ adapters })` entry point
+**Key topics**: Input validation, two-tier (2mb/10mb) JSON body parser, HTTP security headers/helmet, CORS, SVG sanitization (incl. tenant), global error handling, gallery/table setting-type sanitizers, richtext `allow_headings`/`allow_images` opt-in tag sets + path-validated `<img>` + stable-link `data-*-uuid` anchor allowlist, `rte_text`/`rte_blank` filters, `collectionItemUuid` link enrichment (structured + richtext), Project-Switch Isolation + write-guard, cross-tenant contract (cites core-packages.md for Scope/`LIMIT_KEYS`), Link & URL safety (`sanitizeHref`/`safe_url`, image-path allowlist), `createEditorApp({ adapters })` entry point
 
 ---
 

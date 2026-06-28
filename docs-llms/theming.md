@@ -244,7 +244,7 @@ Each setting in a group (and each widget/block setting) declares a `type`. The f
 - `text` — single-line text input _(can use `outputAsCssVar` when the value is a valid CSS value)_
 - `textarea` — multi-line text input _(can use `outputAsCssVar`)_
 - `number` — numeric input with optional min/max/step
-- `richtext` — Tiptap HTML editor (bold/italic/link/lists). The server sanitizes stored HTML with DOMPurify at the save/render boundary; the editor is not the security boundary. Optional flags: `allow_source` (HTML source toggle), `allow_headings`, `allow_images`, `min_height`. Output requires `| raw` — see [Liquid filters](#liquid-filters)
+- `richtext` — Tiptap HTML editor (bold/italic/link/lists). The server sanitizes stored HTML with DOMPurify at the save/render boundary; the editor is not the security boundary. Optional flags: `allow_source` (HTML source toggle), `allow_headings`, `allow_images`, `min_height`. Internal page/collection-item links authored in richtext (in widget/block/global and collection-item fields, not theme settings) are **stable refs** — stored as `data-*-uuid` anchor attributes that follow renames and clear on delete, like the structured `link` field; no schema flag needed. Output requires `| raw` — see [Liquid filters](#liquid-filters)
 - `code` — raw, intentionally **unsanitized** code editor (`language`, `rows`); used for CSS/HTML/JS injection
 - `color` — color picker with hex input and swatch _(ideal for `outputAsCssVar`)_
 - `checkbox` — boolean toggle switch

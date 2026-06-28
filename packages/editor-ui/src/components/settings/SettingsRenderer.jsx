@@ -27,7 +27,15 @@ import SettingsField from "./SettingsField";
 /**
  * Renders the appropriate input component for a given setting
  */
-export default function SettingsRenderer({ setting, value, onChange, error, allowExpand = false, resizable = false }) {
+export default function SettingsRenderer({
+  setting,
+  value,
+  onChange,
+  error,
+  allowExpand = false,
+  resizable = false,
+  allowInternalLinkTargets = false,
+}) {
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
 
@@ -92,6 +100,7 @@ export default function SettingsRenderer({ setting, value, onChange, error, allo
             allowSource={setting.allow_source}
             allowHeadings={setting.allow_headings}
             allowImages={setting.allow_images}
+            allowInternalLinkTargets={allowInternalLinkTargets}
             minHeight={setting.min_height}
           />
         );

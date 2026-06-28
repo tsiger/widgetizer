@@ -3,6 +3,11 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { getProjectPagesDir, getProjectMenusDir, getProjectDir } from "../config.js";
 import { syncCollectionItemMediaUsageOnWrite } from "../services/mediaUsageService.js";
+import {
+  cleanupRichtextLinkRefs,
+  remapRichtextLinkRefs,
+  enrichRichtextLinkRefs,
+} from "@widgetizer/core/richtextLinks";
 
 /** The per-tenant collections root, a sibling of pages/ under the project dir. */
 function collectionsDirFor(projectFolderName) {
@@ -289,6 +294,11 @@ export async function enrichNewProjectReferences(pagesDir, menusDir) {
     if (typeof value === "string" && menuSlugToUuid.has(value)) {
       return menuSlugToUuid.get(value);
     }
+    // Richtext page-links: stamp data-page-uuid from the anchor's slug href. (Item-links
+    // in richtext are stamped post-seed, once collection items exist — see seedPresetCollections.)
+    if (typeof value === "string") {
+      return enrichRichtextLinkRefs(value, { pageSlugToUuid });
+    }
     return value;
   };
 
@@ -403,6 +413,10 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     if (typeof value === "string" && oldToNewMenuUuid.has(value)) {
       return oldToNewMenuUuid.get(value);
     }
+    // Richtext anchors: remap stable-ref uuid attrs to the duplicated project's new uuids.
+    if (typeof value === "string") {
+      return remapRichtextLinkRefs(value, { pageMap: oldToNewUuid, itemMap: oldToNewItemUuid });
+    }
     return value;
   };
 
@@ -432,9 +446,14 @@ export async function cleanupDeletedPageReferences(projectFolderName, deletedPag
   const menusDir = getProjectMenusDir(projectFolderName);
 
   // Clean widget link settings in pages and global widgets
+  const deletedPageUuids = new Set([deletedPageUuid]);
   const cleanValue = (value) => {
     if (isLinkObject(value) && value.pageUuid === deletedPageUuid) {
       return { href: "", text: "", target: "_self" };
+    }
+    // Richtext anchors targeting the deleted page → unwrap to plain text.
+    if (typeof value === "string") {
+      return cleanupRichtextLinkRefs(value, { pageUuids: deletedPageUuids });
     }
     return value;
   };
@@ -509,6 +528,10 @@ export async function cleanupDeletedCollectionItemReferences(projectFolderName, 
   const cleanValue = (value) => {
     if (isLinkObject(value) && value.collectionItemUuid && uuids.has(value.collectionItemUuid)) {
       return { href: "", text: "", target: "_self" };
+    }
+    // Richtext anchors targeting a deleted item → unwrap to plain text.
+    if (typeof value === "string") {
+      return cleanupRichtextLinkRefs(value, { itemUuids: uuids });
     }
     return value;
   };
@@ -595,6 +618,10 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
       const next = oldToNewItemUuid.get(value.collectionItemUuid);
       if (next) return { ...value, collectionItemUuid: next };
     }
+    // Richtext anchors: remap item refs to the seeded uuids (no-op for uuid-free presets).
+    if (typeof value === "string") {
+      return remapRichtextLinkRefs(value, { itemMap: oldToNewItemUuid });
+    }
     return value;
   };
   const widgetProcessor = (widget) => transformWidgetSettings(widget, remapValue);
@@ -603,4 +630,73 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
   await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
     transformItemSettings(item, remapValue),
   );
+}
+
+/**
+ * Post-seed enrichment for richtext stable links (LINK-022→025): once pages exist (scaffold)
+ * and collection items have been seeded with fresh uuids, walk all richtext (pages, globals,
+ * collection items) and stamp `data-page-uuid` / `data-collection-item-uuid` on internal anchors,
+ * derived from each anchor's slug-format href. Presets ship richtext with the uuid attrs stripped
+ * (sync-preset-templates) and the seed uuids only exist now, so this href→uuid pass is the only
+ * place collection-item richtext links (and item-links in page richtext) get their refs.
+ * @param {string} projectFolderName
+ */
+export async function enrichSeededRichtextLinks(projectFolderName) {
+  const pagesDir = getProjectPagesDir(projectFolderName);
+  const collectionsDir = collectionsDirFor(projectFolderName);
+
+  // slug -> page uuid
+  const pageSlugToUuid = new Map();
+  try {
+    for (const pageFile of await fs.readdir(pagesDir)) {
+      if (!pageFile.endsWith(".json")) continue;
+      try {
+        const page = JSON.parse(await fs.readFile(path.join(pagesDir, pageFile), "utf8"));
+        if (page.slug && page.uuid) pageSlugToUuid.set(page.slug, page.uuid);
+      } catch {
+        // skip unreadable page
+      }
+    }
+  } catch {
+    // no pages dir
+  }
+
+  // "slugPrefix/slug" -> item uuid (slugPrefix from the collection-type schema, falling back to type)
+  const itemUuidBySlugPath = new Map();
+  try {
+    const typeEntries = await fs.readdir(collectionsDir, { withFileTypes: true });
+    for (const typeEntry of typeEntries) {
+      if (!typeEntry.isDirectory()) continue;
+      const type = typeEntry.name;
+      let slugPrefix = type;
+      try {
+        const schema = await fs.readJSON(path.join(getProjectDir(projectFolderName), "collection-types", type, "schema.json"));
+        slugPrefix = schema.slugPrefix || schema.type || type;
+      } catch {
+        // no schema — fall back to the type folder name
+      }
+      const typeDir = path.join(collectionsDir, type);
+      for (const name of await fs.readdir(typeDir)) {
+        if (!name.endsWith(".json") || name === "_order.json") continue;
+        try {
+          const item = JSON.parse(await fs.readFile(path.join(typeDir, name), "utf8"));
+          if (item.uuid) itemUuidBySlugPath.set(`${slugPrefix}/${name.replace(/\.json$/, "")}`, item.uuid);
+        } catch {
+          // skip unreadable item
+        }
+      }
+    }
+  } catch {
+    // no collections dir
+  }
+
+  if (pageSlugToUuid.size === 0 && itemUuidBySlugPath.size === 0) return;
+
+  const maps = { pageSlugToUuid, itemUuidBySlugPath };
+  const enrichString = (value) => (typeof value === "string" ? enrichRichtextLinkRefs(value, maps) : value);
+  const widgetProcessor = (widget) => transformWidgetSettings(widget, enrichString);
+
+  await updatePageWidgets(pagesDir, widgetProcessor);
+  await updateGlobalWidgets(pagesDir, widgetProcessor);
+  await updateCollectionItems(collectionsDir, (item) => transformItemSettings(item, enrichString));
 }
