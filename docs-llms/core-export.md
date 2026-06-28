@@ -100,7 +100,7 @@ After pages: collection item pages ([§3](#3-collection-item-page-export)), the 
 
 ## 3. Collection Item-Page Export
 
-Collections participate in export only when the request supplies a scope-aware capability: the handler builds `collectionDeps = { storage: req.adapters.storage, scope: req.scope }` and threads it through `exportProjectToDir` into every `renderWidget` / `renderPageLayout` / `renderCollectionItemPage` call (so `| collection` filters in exported pages read items through the same storage adapter as the API). Legacy/test callers without `collectionDeps` skip collections entirely.
+Collections participate in export only when the request supplies a scope-aware capability: the handler builds `collectionDeps = { storage: req.adapters.storage, scope: req.scope }` and threads it through `exportProjectToDir` into every `renderWidget` / `renderPageLayout` / `renderCollectionItemPage` call (so `| collection` filters in exported pages read items through the same storage adapter as the API). Callers that don't supply `collectionDeps` (e.g. tests) skip collections entirely.
 
 ### Two-Pass Collection Validation (fail-fast)
 

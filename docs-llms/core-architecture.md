@@ -1,6 +1,6 @@
 # App Architecture
 
-This document is the authoritative **orientation map** for the Widgetizer codebase: it shows how the refactored npm-workspace packages and shells fit together and where each subsystem lives. It deliberately stays thin — every per-subsystem detail (endpoints, controllers, stores, hooks) lives in its dedicated `core-<x>.md` doc, linked from the index below.
+This document is the authoritative **orientation map** for the Widgetizer codebase: it shows how the npm-workspace packages and shells fit together and where each subsystem lives. It deliberately stays thin — every per-subsystem detail (endpoints, controllers, stores, hooks) lives in its dedicated `core-<x>.md` doc, linked from the index below.
 
 > **Companion map.** The deep adapter / DI / `Scope` / `LIMIT_KEYS` detail lives in **[Packages & Adapter Architecture](core-packages.md)**. These two docs (`core-architecture.md` + `core-packages.md`) are the two maps to keep; everything else defers to a subsystem doc.
 
@@ -20,11 +20,11 @@ The repo is an npm workspace (`"workspaces": ["packages/*"]`). Five packages plu
   - `app/` — OSS frontend + server assembly. `app/server-common.js` builds the local adapters and calls `createEditorApp({ adapters })` / exposes `startOssServer`. `app/src/main.jsx` is the FE entry; `app/src/App.jsx` composes routes, contributing the **admin-shell** pages (`app/src/pages/` — Projects/Themes/AppSettings/Dashboard/previews) and splicing in the site-workspace routes via editor-ui's `createEditorRoutes`.
   - `electron/` — desktop wrapper. `electron/main.js` forks `electron/server-bootstrap.js` (via `utilityProcess.fork`) → `startOssServer`. Build config lives in `electron/builder.config.mjs` (package.json has no `build` key).
   - `server.js` — repo-root web entry → `startOssServer`.
-- **Preview-iframe runtime:** the raw browser ES modules served to the preview iframe live in `@widgetizer/core` at `packages/core/src/runtime/` — `previewRuntime.js` (injected into the iframe) and its `standalonePreviewTarget.js` sibling (standalone-preview href mapper). They are served by path (`express.static(/runtime)`), never imported as package primitives. (The old repo-root `src/` folder was removed once these moved into the package.)
+- **Preview-iframe runtime:** the raw browser ES modules served to the preview iframe live in `@widgetizer/core` at `packages/core/src/runtime/` — `previewRuntime.js` (injected into the iframe) and its `standalonePreviewTarget.js` sibling (standalone-preview href mapper). They are served by path (`express.static(/runtime)`), never imported as package primitives.
 
 ### Where the FE/BE code actually lives
 
-The old monolith split (root `src/` frontend + `server/` backend) is gone. The current split is:
+Code is organized by concern across the workspace packages and the OSS shell:
 
 | Concern | Home |
 | ------- | ---- |
@@ -61,7 +61,7 @@ The frontend has two shells plus a root redirect. The root composition lives in 
 - The **site-workspace shell** uses `packages/editor-ui/src/components/layout/Layout.jsx` for `/pages`, `/menus`, `/media`, `/settings`, `/export-site`, and the collections routes.
 - All site-workspace routes are wrapped by `packages/editor-ui/src/components/layout/RequireActiveProject.jsx`. If no active project exists, the user is redirected to `/projects`. When the active project changes, that boundary keys the workspace outlet by project ID so the route subtree remounts cleanly; the OSS shell observes the same active-project change in `app/src/App.jsx` and resets project-scoped singleton stores through `app/src/lib/projectSwitchCoordinator.js`.
 
-This admin-vs-site split is the main architectural consequence of the workspaces refactor.
+This admin-vs-site split is the main architectural consequence of the package layout.
 
 | Route | Shell | Notes |
 | ----- | ----- | ----- |

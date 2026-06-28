@@ -11,12 +11,12 @@ The backend (`@widgetizer/builder-server`) is **adapter-agnostic and scope-first
 
 ## 1. Why Hybrid Storage
 
-The project migrated from JSON-only metadata storage to SQLite to improve:
+SQLite backs metadata storage to provide:
 
 - atomic updates and concurrency safety
 - relational queries and cascade behavior
 - export/version bookkeeping
-- startup migration reliability from legacy installs
+- reliable startup migrations
 
 Content files that benefit from direct file ownership and portability remain on disk.
 
@@ -48,10 +48,10 @@ Migrations live in `db/migrations.js` as an ordered list, each wrapped in a tran
 
 - **v1 — Initial schema.** Creates `projects`, `app_settings`, `media_files` (+ `idx_media_project`, `idx_media_path`), `media_sizes`, `media_usage` (+ `idx_media_usage_used_in`), and `exports` (+ `idx_exports_project`, unique `idx_exports_project_version`).
 - **v2 — Add `owner_id` to `projects`.** `ALTER TABLE projects ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'default'` plus `idx_projects_owner_id`. The value is an opaque owner string (no FK to a users table): OSS sets `'default'`, hosted sets the Clerk user id.
-- **v3 — Add `caption` to `media_files`.** Guarded `ALTER` (`columnExists` check), so it is a no-op on databases that already received the column through master's history.
-- **v4 — Backfill `projects.owner_id`.** Forward-only, idempotent: adds `owner_id` (and its index, via `CREATE INDEX IF NOT EXISTS`) for databases that came through master's v2 (which added `caption` instead) and therefore skipped this branch's v2.
+- **v3 — Add `caption` to `media_files`.** Guarded `ALTER` (`columnExists` check), so it is a no-op on databases that already have the column.
+- **v4 — Backfill `projects.owner_id`.** Forward-only, idempotent: ensures `owner_id` (and its index, via `CREATE INDEX IF NOT EXISTS`) is present on every database.
 
-> The v2/v3 split exists because this branch and master diverged on what migration v2 meant — this branch used the v2 slot for `owner_id`, master used it for `caption`. The guards and the v4 backfill make both histories converge to the same final schema.
+> The guarded `ALTER`s and the v4 backfill keep databases from different histories convergent on the same final schema.
 
 **Migration tracking table** — `runMigrations(db, { trackingTable })` creates `CREATE TABLE IF NOT EXISTS _migrations (version INTEGER PRIMARY KEY, description TEXT, applied_at TEXT DEFAULT (datetime('now')))` and inserts a row per applied migration. The default name is `_migrations` (exported as `DEFAULT_TRACKING_TABLE`); hosted may pass a namespaced name (e.g. `_widgetizer_migrations`) when sharing a database with its own migration system. The name is validated as a plain SQL identifier before interpolation.
 

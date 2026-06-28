@@ -2,7 +2,7 @@
 
 This document covers the menu-management subsystem end to end: per-project menu JSON storage, the `pageUuid` / `collectionItemUuid` link-resolution lifecycle, the React menu-editor pages and components, the client API helper, and the Express routes/controller (CRUD + duplicate). The system lets a project define multiple menus, edit each menu's basic settings, and build its hierarchical item structure with drag-and-drop.
 
-> **Refactor note.** Paths below are post-workspaces-refactor. Menu I/O on the CRUD path goes through the injected `StorageAdapter` over the request's `scope`; menu link-resolution at render time lives in the pure `@widgetizer/render-engine`; the disk-walking enrichment/cleanup helpers live in `@widgetizer/builder-server`. See [Packages & Adapter Architecture](core-packages.md) for the adapter/DI/`Scope`/`LIMIT_KEYS` model.
+> **Architecture note.** Menu I/O on the CRUD path goes through the injected `StorageAdapter` over the request's `scope`; menu link-resolution at render time lives in the pure `@widgetizer/render-engine`; the disk-walking enrichment/cleanup helpers live in `@widgetizer/builder-server`. See [Packages & Adapter Architecture](core-packages.md) for the adapter/DI/`Scope`/`LIMIT_KEYS` model.
 
 ## 1. Data Structure & Storage
 
@@ -176,7 +176,7 @@ Menu link resolution at render time is pure and lives in `packages/render-engine
 - `resolveMenuPageLinks(menuData, …)` wraps the above over `menuData.items`.
 - `resolveMenuSettings(settings, schemaSettings, deps)` is the single source of truth for resolving every `menu`-type widget/block setting into a full menu object the menu snippet can render. It looks the stored menu value up in `menuMaps.byUuid` / `menuMaps.bySlug` and resolves its items; a missing/empty value or unknown menu yields `{ items: [] }`. It is consumed by widget rendering (`renderEngine.js`) and collection-item rendering (`collectionService.js`).
 
-> **fs-extra holdover.** `getMenuById(projectIdOrDir, menuId)` in `menuController.js` is the one render-path menu reader still using `fs-extra` / `path` directly against a project directory rather than the scope-first `StorageAdapter`. It reads a single menu (returning `{ items: [] }` for a missing file and lazily backfilling `uuid`). Migrating it onto the storage adapter is pending.
+> **Non-adapter read.** `getMenuById(projectIdOrDir, menuId)` in `menuController.js` is the one render-path menu reader still using `fs-extra` / `path` directly against a project directory rather than the scope-first `StorageAdapter`. It reads a single menu (returning `{ items: [] }` for a missing file and lazily backfilling `uuid`).
 
 ## Security Considerations
 

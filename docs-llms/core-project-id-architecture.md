@@ -32,7 +32,7 @@ The identity model is the foundation for the **scope-first** backend: every stor
 
 ## How handlers get identity: scope, not resolution
 
-The backend is **adapter-agnostic and scope-first**. Route handlers no longer resolve a UUID to a folderName and build absolute paths themselves. Instead:
+Route handlers get identity from `req.scope`; adapter-backed handlers do not resolve UUIDs to folderNames or build absolute paths themselves. Instead:
 
 1. The `resolveActiveProject` middleware (`packages/builder-server/src/middleware/resolveActiveProject.js`) delegates to the injected `req.adapters.scopeResolver` to produce a `scope`. In OSS this is the local resolver (singleton active project); hosted swaps in its own.
 2. The middleware attaches `req.scope` (the resolved `{ actor, projectId, folderName }`) and `req.activeProject` (the full project row, for handlers that still read it).
@@ -54,13 +54,13 @@ The adapter owns the mapping from `scope.folderName` (and `scope.projectId`) to 
 
 ## Still-path-based exceptions
 
-Some reads have not yet moved behind the storage adapter and continue to resolve a folderName and join an absolute path through `packages/builder-server/src/config.js` helpers. These are the documented exceptions, not the pattern:
+Some reads resolve a folderName and join an absolute path through `packages/builder-server/src/config.js` helpers rather than going through the storage adapter. These are the documented exceptions, not the pattern:
 
 - **Project theme settings** — `themeController.readProjectThemeData()` resolves the folderName via `getProjectFolderName()` and reads `theme.json` through `getProjectThemeJsonPath(projectFolderName)`. The save path (`saveProjectThemeSettings`) does the same.
-- **Some legacy page reads** — `pageController.listProjectPagesData()` / `readGlobalWidgetData()` still take a folderName argument and use `getProjectPagesDir()` / `getPagePath()` / `getProjectDir()` directly.
+- **Some page reads** — `pageController.listProjectPagesData()` / `readGlobalWidgetData()` still take a folderName argument and use `getProjectPagesDir()` / `getPagePath()` / `getProjectDir()` directly.
 - **Project lifecycle directory ops** — create/rename/duplicate/import in `projectController.js` operate on directories by folderName with `fs-extra` (see Renaming, below). These are inherently filesystem-shaped and run in the OSS shell.
 
-When these migrate behind the adapter, the folderName resolution disappears with them.
+These are the documented exceptions; the folderName resolution lives with them.
 
 ## Foldername resolution helper
 

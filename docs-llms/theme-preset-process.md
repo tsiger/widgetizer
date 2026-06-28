@@ -12,9 +12,9 @@ mechanics (registry, fallback, media seeding) see [theme-presets.md](theme-prese
 
 ---
 
-## How preset media works now
+## How preset media works
 
-The key change from the old workflow: **preset media is packed once into the
+**Preset media is packed once into the
 seed theme, not uploaded per project.** A preset ships its images and their
 metadata under `themes/arch/presets/<id>/media/`, and the backend seeds them
 automatically into every project created from that preset.

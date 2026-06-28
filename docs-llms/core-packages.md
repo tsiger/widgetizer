@@ -1,6 +1,6 @@
 # Packages & Adapter Architecture
 
-This document is the home for the workspace/package layout, the adapter contracts, the dependency-injection assembly, and the editor-ui library seams introduced by the workspaces refactor. Other `core-*` docs cross-reference this file rather than duplicating adapter detail.
+This document is the home for the workspace/package layout, the adapter contracts, the dependency-injection assembly, and the editor-ui library seams. Other `core-*` docs cross-reference this file rather than duplicating adapter detail.
 
 The repo is an npm workspace (`"workspaces": ["packages/*"]` in the root `package.json`). The OSS app and the Electron app are thin **shells** that wire concrete adapters into a runner-agnostic backend and a mountable React editor. The hosted product reuses the same packages and swaps in its own cloud adapters.
 
@@ -21,13 +21,13 @@ The repo is an npm workspace (`"workspaces": ["packages/*"]` in the root `packag
 - `app/` — OSS frontend + server assembly. `app/server-common.js` exports `buildOssApp()` / `startOssServer()`: it constructs the six local adapters and calls `createEditorApp({ adapters })`. `app/src/main.jsx` is the FE entry; `app/src/App.jsx` composes routes via `createEditorRoutes`.
 - `electron/` — Electron shell. `electron/main.js` forks `electron/server-bootstrap.js`, which calls `startOssServer`.
 - `server.js` (repo root) — web entry; calls `startOssServer`.
-- Preview-iframe runtime modules live in `@widgetizer/core` at `packages/core/src/runtime/` — `previewRuntime.js`, `standalonePreviewTarget.js` (+ its `__tests__/standalonePreviewTarget.test.js`). They are served raw by path (`express.static(/runtime)`), not exported from the package index. (The old repo-root `src/` folder is gone.)
+- Preview-iframe runtime modules live in `@widgetizer/core` at `packages/core/src/runtime/` — `previewRuntime.js`, `standalonePreviewTarget.js` (+ its `__tests__/standalonePreviewTarget.test.js`). They are served raw by path (`express.static(/runtime)`), not exported from the package index.
 
 ---
 
 ## The OSS/hosted boundary
 
-The most important architectural invariant of the refactor:
+The most important architectural invariant:
 
 - **`@widgetizer/adapters-local` is consumed ONLY by the OSS shells (`app/`, `electron/`), never by `@widgetizer/builder-server`.** builder-server is adapter-agnostic: it receives adapters via dependency injection and never imports a concrete implementation.
 - This protects the OSS/hosted boundary. The hosted product mounts the same builder-server routers but injects its own **cloud adapters** (cloud storage, asset CDN, publish pipeline, finite limits, multi-tenant scope resolution).

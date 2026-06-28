@@ -4,7 +4,7 @@
 
 The **App Settings** page manages global configuration that applies across the entire application rather than to a single project. These are system-level settings that control application behavior — for example the maximum upload size for the media manager and the image-processing configuration. The system is **schema-driven** and completely isolated from the theme settings system.
 
-After the workspace merge, App Settings lives in the admin shell at `/app-settings`, separate from the site workspace routes.
+App Settings lives in the admin shell at `/app-settings`, separate from the site workspace routes.
 
 ## Route Context
 

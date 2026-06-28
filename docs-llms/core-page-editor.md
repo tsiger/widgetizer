@@ -20,7 +20,7 @@ The `PageEditor` is composed of several specialized child components, each with 
   - Adding, duplicating, and deleting widgets.
   - Adding blocks to a widget.
 
-- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. Link navigation is intercepted to avoid leaving the editor while still allowing widget/block selection. `PreviewPanel` is mounted **only** in the in-editor live preview; the standalone site preview uses a separate headless flow (`SitePreviewLayout` + `PagePreview` + `PreviewStage`, see "Previewing a Page" below).
+- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It works declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. Link navigation is intercepted to avoid leaving the editor while still allowing widget/block selection. `PreviewPanel` is mounted **only** in the in-editor live preview; the standalone site preview uses a separate headless flow (`SitePreviewLayout` + `PagePreview` + `PreviewStage`, see "Previewing a Page" below).
 
 - **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview. Schema labels that use `tTheme:` prefixed keys are resolved at render time through the `useThemeLocale` hook's `tTheme()` function.
 
@@ -48,7 +48,7 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 1.  The `PageEditor` mounts and reads the `pageId` from the URL search parameters.
 2.  A `useEffect` hook, dependent on the `pageId` and the current active-project identity, triggers the data loading functions from the relevant stores. Project switches are also handled one level higher: `RequireActiveProject` remounts the workspace subtree by project ID, and the OSS shell resets project-scoped singleton stores via `projectSwitchCoordinator`.
 3.  It calls `usePageStore.getState().loadPage(pageId)` to fetch the page structure.
-4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. The editor no longer performs its own explicit project-switch store reset; that reset is coordinated by the OSS shell's `projectSwitchCoordinator`.
+4. Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. Project-switch store reset is coordinated by the OSS shell's `projectSwitchCoordinator`.
 5.  While data is being fetched, `LoadingSpinner` components are displayed to inform the user.
 
 ### Editing a Widget
@@ -88,7 +88,7 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 2.  In the web app, this opens or reuses a named browser tab at the `/preview/:pageId` URL.
 3.  In Electron, the toolbar uses IPC to open or reuse a dedicated `BrowserWindow` for preview. New windows match the editor bounds with an offset; subsequent opens restore the window if minimized, then show and focus it.
 4.  The `/preview` route is a persistent `SitePreviewLayout` (separate from the main editor layout) that owns the toolbar + iframe stage; its children resolve a render for it. `PagePreview` handles `:pageId`; `CollectionItemPagePreview` handles `collection/:prefix/:slug`.
-5.  These children are **headless one-shot resolvers** (they render `null`): `PagePreview` fetches the page data, mints a render token, and reports the resulting render src up to the layout via outlet context. (It no longer mounts the live-edit `PreviewPanel`.)
+5. These children are **headless one-shot resolvers** (they render `null`): `PagePreview` fetches the page data, mints a render token, and reports the resulting render src up to the layout via outlet context. `PagePreview` uses the headless preview flow instead of the live-edit `PreviewPanel`.
 6.  `SitePreviewLayout` displays that src in a shared `PreviewStage` `<iframe>`, providing an accurate representation of the final published page. Because the layout is persistent, navigating page↔item never remounts the toolbar/iframe.
 7.  Internal `.html` links in the preview post `NAVIGATE_PREVIEW` up to `SitePreviewLayout`, which routes to other `/preview/:slug` pages, while external links remain disabled.
 

@@ -2,7 +2,7 @@
 
 This document explains the "Themes" management page — the user interface and CRUD routes for viewing, uploading, updating, and deleting themes — plus the sidebar update badge and theme locale / site-icon plumbing. The deep mechanics of theme **versioning/updates** and **presets** are summarized here and covered in full by [Theme Updates](theme-updates.md) and [Theme Presets](theme-presets.md).
 
-In the application's architecture, a "Theme" is the core concept for styling and layout. After the workspace refactor, the Themes page lives in the OSS admin shell (`app/src/`) rather than inside the editor workspace.
+In the application's architecture, a "Theme" is the core concept for styling and layout. The Themes page lives in the OSS admin shell (`app/src/`) rather than inside the editor workspace.
 
 ## 1. Overview
 

@@ -9,7 +9,7 @@ Unlike project metadata (which is stored in SQLite), each page is stored as an i
 - **Location**: `data/projects/<folderName>/pages/` (resolved by the storage adapter from the project-relative path `pages/`).
 - **Filename**: The filename is derived from the page's "slug" (e.g., `about-us.json`).
 
-> **Adapter note.** After the workspaces refactor, page JSON I/O routes through the `StorageAdapter` over the request's `scope` rather than direct `fs` calls. The OSS adapter reads/writes the project-relative paths described here; a host swaps in cloud storage. `savePageContent` is also capped by `MAX_WIDGETS_PER_PAGE` from the limits adapter (over-cap → `422`; OSS = unbounded, hosted = finite). See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
+> **Adapter note.** Page JSON I/O routes through the `StorageAdapter` over the request's `scope` rather than direct `fs` calls. The OSS adapter reads/writes the project-relative paths described here; a host swaps in cloud storage. `savePageContent` is also capped by `MAX_WIDGETS_PER_PAGE` from the limits adapter (over-cap → `422`; OSS = unbounded, hosted = finite). See [Packages & Adapter Architecture](core-packages.md) and [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
 
 A typical page JSON file (`about-us.json`) looks like this:
 
@@ -112,7 +112,7 @@ In `Pages.jsx`, each row carries a checkbox bound to the selection state, a head
 
 The backend persists page content through the request's storage adapter (`req.adapters.storage`) over the request `scope` (`{ actor, projectId, folderName }`), keeping it adapter-agnostic and tenant-safe. The `resolveActiveProject` middleware resolves `req.scope` and `req.adapters` before any handler runs.
 
-> **Legacy `fs-extra` survivors.** Two exported helpers in the controller still read directly from disk via `fs-extra`: `listProjectPagesData(projectId)` and `readGlobalWidgetData(projectId, widgetType)`. These run in contexts without `req.adapters` — the OSS render/export path (`renderingService`, `exportController`, `previewController`). The request handlers (`getAllPages`, `getPage`, create/update/delete/duplicate/`savePageContent`) all go through the storage adapter and `scope`.
+> **Non-adapter helpers.** Two exported helpers in the controller read directly from disk via `fs-extra`: `listProjectPagesData(projectId)` and `readGlobalWidgetData(projectId, widgetType)`. These run in contexts without `req.adapters` — the OSS render/export path (`renderingService`, `exportController`, `previewController`). The request handlers (`getAllPages`, `getPage`, create/update/delete/duplicate/`savePageContent`) all go through the storage adapter and `scope`.
 
 ### API Routes (`packages/builder-server/src/routes/pages.js`)
 

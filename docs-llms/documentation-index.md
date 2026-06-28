@@ -2,7 +2,7 @@
 
 This document serves as a comprehensive index to all documentation in the Widgetizer project. Use this guide to quickly find the appropriate documentation for your needs, whether you're developing, troubleshooting, or understanding system architecture.
 
-> **Post-refactor note.** The codebase now lives in npm-workspace packages behind adapter contracts. The two authoritative maps are **[core-architecture.md](core-architecture.md)** (orientation) and **[core-packages.md](core-packages.md)** (adapters / DI / `Scope` / `LIMIT_KEYS`). Per-subsystem docs defer the contract to those two rather than re-deriving it.
+> The codebase lives in npm-workspace packages behind adapter contracts. The two authoritative maps are **[core-architecture.md](core-architecture.md)** (orientation) and **[core-packages.md](core-packages.md)** (adapters / DI / `Scope` / `LIMIT_KEYS`). Per-subsystem docs defer the contract to those two rather than re-deriving it.
 
 ---
 
@@ -10,7 +10,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[core-architecture.md](core-architecture.md)** - Application Architecture
 
-**Purpose**: Authoritative orientation map (#1 of 2) — a thin index of how the refactored package codebase fits together and where each subsystem lives, deferring all per-subsystem detail to the dedicated docs **When to use**:
+**Purpose**: Authoritative orientation map (#1 of 2) — a thin index of how the package codebase fits together and where each subsystem lives, deferring all per-subsystem detail to the dedicated docs **When to use**:
 
 - Understanding the real package split (admin-shell FE in `app/src/`, site-workspace FE in `packages/editor-ui/src/`, backend in `packages/builder-server/src/`, shared primitives in `packages/core/src/`, preview-iframe runtime in `packages/core/src/runtime/`)
 - Onboarding new developers and finding where a subsystem lives
@@ -158,7 +158,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[theme-preset-generator.md](theme-preset-generator.md)** - Preset Generation Playbook
 
-**Purpose**: Working authoring playbook for generating high-quality Arch presets — a 4-phase workflow plus color/spacing/typography/icon/image/differentiation rules — largely independent of the package refactor **When to use**:
+**Purpose**: Working authoring playbook for generating high-quality Arch presets — a 4-phase workflow plus color/spacing/typography/icon/image/differentiation rules — largely independent of the package architecture **When to use**:
 
 - Generating a high-quality Arch preset from a brief
 - Applying color/spacing/typography/icon/image rules
@@ -192,7 +192,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with filesystem paths vs API IDs
 - Troubleshooting "project not found" errors
 
-**Key topics**: UUID vs folderName, scope-first handlers (`req.scope` + injected adapters), rename = directory move + metadata update, still-path-based exceptions (`theme.json` via `getProjectThemeJsonPath`, some legacy page reads), OSS active-project routes vs host-mounted project-id editor routes, pointer to core-packages.md for the Scope/adapter contract
+**Key topics**: UUID vs folderName, scope-first handlers (`req.scope` + injected adapters), rename = directory move + metadata update, still-path-based exceptions (`theme.json` via `getProjectThemeJsonPath`, some non-adapter page reads), OSS active-project routes vs host-mounted project-id editor routes, pointer to core-packages.md for the Scope/adapter contract
 
 ---
 
@@ -205,7 +205,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with slugs, UUID preservation, and media-usage sync
 - Troubleshooting page limits or slug conflicts
 
-**Key topics**: Page JSON structure, scope-first storage (`req.scope` + `req.adapters.storage`; fs-extra only in legacy render/export helpers), Pages list/forms/bulk UI, `generateUniqueSlug` (`(Copy)` name), `MAX_WIDGETS_PER_PAGE` 422 cap, 409 explicit-slug-conflict, bulkDelete 207/400 semantics, pointer to core-hooks.md for `usePageSelection`
+**Key topics**: Page JSON structure, scope-first storage (`req.scope` + `req.adapters.storage`; `fs-extra` only in non-adapter render/export helpers), Pages list/forms/bulk UI, `generateUniqueSlug` (`(Copy)` name), `MAX_WIDGETS_PER_PAGE` 422 cap, 409 explicit-slug-conflict, bulkDelete 207/400 semantics, pointer to core-hooks.md for `usePageSelection`
 
 ---
 
@@ -218,7 +218,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing menu editing interfaces
 - Working with menu depth/item caps and render-time link resolution
 
-**Key topics**: Menu JSON (top-level `uuid`, `item_<uuid>` ids, `pageUuid` + `collectionItemUuid`/`collectionType` link targets), editor pages/components in `packages/editor-ui/src/`, scope-first StorageAdapter path (`getMenuById` is the fs-extra render holdover), `MAX_MENU_DEPTH=32`/`MAX_MENU_ITEMS` caps + 422 over-cap, render-time resolution (`render-engine/menuResolver.js`), `linkEnrichment.js` clone/delete cleanup (also covers richtext stable-link anchors)
+**Key topics**: Menu JSON (top-level `uuid`, `item_<uuid>` ids, `pageUuid` + `collectionItemUuid`/`collectionType` link targets), editor pages/components in `packages/editor-ui/src/`, scope-first StorageAdapter path (`getMenuById` is the non-adapter render read), `MAX_MENU_DEPTH=32`/`MAX_MENU_ITEMS` caps + 422 over-cap, render-time resolution (`render-engine/menuResolver.js`), `linkEnrichment.js` clone/delete cleanup (also covers richtext stable-link anchors)
 
 ---
 
@@ -456,7 +456,7 @@ Primary docs: `project-overview.md`, `core-themes.md`, `core-page-editor.md` Sec
 1. **Structure** – Each document includes overview, implementation details, and workflows.
 2. **Code Examples** – Practical examples with proper syntax highlighting.
 3. **API References** – Complete endpoint documentation with parameters.
-4. **File Paths** – Exact file locations for reference (package paths post-refactor).
+4. **File Paths** – Exact file locations for reference (package paths).
 5. **Cross-References** – Links to related docs where applicable.
 
 When adding new features, always update the relevant documentation **and** this index.

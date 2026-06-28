@@ -1,6 +1,6 @@
 # Project Management Workflow
 
-This document provides a detailed overview of how projects are created, managed, and updated within the application. After the workspace merge, projects now live in a separate admin area and act as the entry point into the site workspace.
+This document provides a detailed overview of how projects are created, managed, and updated within the application. Projects live in a separate admin area and act as the entry point into the site workspace.
 
 > **Path note.** The Projects pages, `ProjectForm.jsx`, and `ProjectImportModal` live in the **OSS shell** under `app/src/`, while the project store and query manager they call live in the **`@widgetizer/editor-ui`** package under `packages/editor-ui/src/`. The backend routes live in **`@widgetizer/builder-server`** under `packages/builder-server/src/`. See [Packages & Adapter Architecture](core-packages.md).
 
@@ -15,7 +15,7 @@ The project management UI is primarily handled by three OSS-shell pages (`app/sr
 These pages rely on shared components in `app/src/components/projects/`:
 
 - **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address)
-  - Migrated to **react-hook-form** for improved validation and state management
+  - Built on **react-hook-form** for validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
   - Automatic slug generation from project name for new projects
@@ -74,7 +74,7 @@ This file contains functions that make API calls to the backend:
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
-9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, `menus/`, `snippets/`, `theme.json`, and `locales/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into the installed themes directory (`data/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files. After the workspaces refactor, the dir-explicit core of this step (theme copy + preset application + template/menu processing) is extracted into `scaffoldProjectContent({ projectDir, theme, preset })` (`packages/builder-server/src/utils/projectScaffold.js`, re-exported from the package index) so a host can scaffold project content without going through the OSS controller. See [Packages & Adapter Architecture](core-packages.md).
+9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, `menus/`, `snippets/`, `theme.json`, and `locales/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into the installed themes directory (`data/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files. The dir-explicit core of this step (theme copy + preset application + template/menu processing) is extracted into `scaffoldProjectContent({ projectDir, theme, preset })` (`packages/builder-server/src/utils/projectScaffold.js`, re-exported from the package index) so a host can scaffold project content without going through the OSS controller. See [Packages & Adapter Architecture](core-packages.md).
 9b. **Preset Application**: If a preset was selected during creation, the system applies preset overrides after the theme copy:
     - **Templates**: If the preset has its own `templates/` directory, those templates are used instead of the root theme templates for the `processTemplatesRecursive` step.
     - **Menus**: If the preset has its own `menus/` directory, the root menus already copied into the project are removed and replaced with the preset's menus. This happens before menu enrichment (step 10).
@@ -89,7 +89,7 @@ This file contains functions that make API calls to the backend:
 
 ### 1b. Access Without an Active Project
 
-If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no longer a separate "No Active Project" empty-state screen in the route guard. The same component keys the workspace outlet by project ID so site-workspace routes remount on project switch; the OSS shell observes active-project changes in `app/src/App.jsx` and resets `themeStore`, `widgetStore`, `saveStore`, and `pageStore` through `app/src/lib/projectSwitchCoordinator.js`.
+If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no separate "No Active Project" empty-state screen in the route guard. The same component keys the workspace outlet by project ID so site-workspace routes remount on project switch; the OSS shell observes active-project changes in `app/src/App.jsx` and resets `themeStore`, `widgetStore`, `saveStore`, and `pageStore` through `app/src/lib/projectSwitchCoordinator.js`.
 
 ### 2. Listing and Managing Projects
 

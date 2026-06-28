@@ -2,7 +2,7 @@
 
 This document covers all security measures in Widgetizer: input validation/sanitization, HTTP headers/CORS, SVG sanitization, error handling, advanced-theme raw-code injection, upload limits, import/export path-traversal, preview isolation, the cross-tenant contract, and link/URL safety.
 
-> **Refactor note.** The backend is the adapter-agnostic `@widgetizer/builder-server` package; shared primitives (URL safety, path security, the `Scope`/`LIMIT_KEYS` contract) live in `@widgetizer/core`; the React editor is `@widgetizer/editor-ui`. For the adapter / DI / `Scope` / `LIMIT_KEYS` model that §11 builds on, see [Packages & Adapter Architecture](core-packages.md).
+> **Architecture note.** The backend is the adapter-agnostic `@widgetizer/builder-server` package; shared primitives (URL safety, path security, the `Scope`/`LIMIT_KEYS` contract) live in `@widgetizer/core`; the React editor is `@widgetizer/editor-ui`. For the adapter / DI / `Scope` / `LIMIT_KEYS` model that §11 builds on, see [Packages & Adapter Architecture](core-packages.md).
 
 ---
 
@@ -133,7 +133,7 @@ See [Site Exporting](core-export.md) for the export/import flow detail.
 
 ### 11. Cross-Tenant Safety (Multi-Tenant Host Contract)
 
-After the workspaces/adapter refactor, `@widgetizer/builder-server` is adapter-agnostic and can be embedded in a multi-tenant host (Widgetizer Hosted) that injects cloud adapters via `createEditorApp({ adapters })` (`packages/builder-server/src/createApp.js`); the OSS shell builds local adapters in `app/server-common.js`. The `Scope` shape (`{ actor, projectId, folderName }`), the `LimitsAdapter`/`LIMIT_KEYS` model, and the storage/asset adapter contracts are defined in [Packages & Adapter Architecture](core-packages.md) — this section only lists the security controls the OSS code must uphold so one tenant's data, paths, or limits can never reach another.
+`@widgetizer/builder-server` is adapter-agnostic and can be embedded in a multi-tenant host (Widgetizer Hosted) that injects cloud adapters via `createEditorApp({ adapters })` (`packages/builder-server/src/createApp.js`); the OSS shell builds local adapters in `app/server-common.js`. The `Scope` shape (`{ actor, projectId, folderName }`), the `LimitsAdapter`/`LIMIT_KEYS` model, and the storage/asset adapter contracts are defined in [Packages & Adapter Architecture](core-packages.md) — this section only lists the security controls the OSS code must uphold so one tenant's data, paths, or limits can never reach another.
 
 **Authz happens at the resolver, not bolted onto routes.** Tenant/actor ownership checks live in the injected `ScopeResolver` implementation. `resolveActiveProject` then sets `req.scope` / `req.activeProject`; controllers read those instead of resolving projects themselves. On write requests, the [write-guard](#project-switch-isolation) (`X-Project-Id` header or `:projectId` param vs `scope.projectId`) returns `409 PROJECT_MISMATCH`.
 
