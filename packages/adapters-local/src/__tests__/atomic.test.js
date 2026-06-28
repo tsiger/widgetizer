@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { writeFileAtomic, isAtomicTmpFile } from "../internal/atomic.js";
 
-// Restores master's atomicFs spec (Collections §15) at the adapter layer:
 // writeFileAtomic stages to a UUID-suffixed tmp then renames, so a reader never
 // sees a partial write and concurrent writers never collide on a shared tmp name.
 // isAtomicTmpFile is the reader-side filter the adapter's list() uses to hide

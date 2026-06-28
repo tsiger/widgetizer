@@ -91,10 +91,10 @@ export const LIMIT_KEYS = Object.freeze({
   ANALYTICS_TIER: "ANALYTICS_TIER",
   FORM_SUBMISSIONS_PER_MONTH: "FORM_SUBMISSIONS_PER_MONTH",
   // Per-page widget count ceiling — guards the render/save loops against an
-  // attacker persisting tens of thousands of widgets in one page (SA-04).
+  // attacker persisting tens of thousands of widgets in one page.
   MAX_WIDGETS_PER_PAGE: "MAX_WIDGETS_PER_PAGE",
   // Total menu-item node count ceiling — guards the recursive menu sanitize/
-  // render walks against an attacker persisting a huge menu tree (SA-20).
+  // render walks against an attacker persisting a huge menu tree.
   MAX_MENU_ITEMS: "MAX_MENU_ITEMS",
   // Per-collection item-count ceiling — guards the collection write path and the
   // export-time enumeration against a tenant persisting unbounded items.
@@ -105,7 +105,7 @@ export const LIMIT_KEYS = Object.freeze({
 });
 
 /**
- * Default DoS-protection ceiling for widgets per page (security-audit SA-04).
+ * Default DoS-protection ceiling for widgets per page.
  * The hosted limits adapter returns this for LIMIT_KEYS.MAX_WIDGETS_PER_PAGE;
  * OSS stays unbounded (Infinity). It also serves as the hard clamp the render
  * loops apply as a safety net against already-persisted oversized pages. Set far
@@ -114,16 +114,16 @@ export const LIMIT_KEYS = Object.freeze({
 export const MAX_WIDGETS_PER_PAGE = 5000;
 
 /**
- * Default DoS-protection ceiling for total menu-item nodes (security-audit
- * SA-20). Hosted returns this for LIMIT_KEYS.MAX_MENU_ITEMS; OSS stays unbounded
+ * Default DoS-protection ceiling for total menu-item nodes.
+ * Hosted returns this for LIMIT_KEYS.MAX_MENU_ITEMS; OSS stays unbounded
  * (Infinity). Far above any realistic menu (real menus have tens of items).
  */
 export const MAX_MENU_ITEMS = 1000;
 
 /**
- * Hard cap on menu-tree nesting depth (security-audit SA-20). Applied at both
+ * Hard cap on menu-tree nesting depth. Applied at both
  * save (reject deeper trees) and render (the link-resolution walk stops here),
- * so the recursive menu walks can never blow the stack on a hostile/legacy
+ * so the recursive menu walks can never blow the stack on a hostile or unchecked
  * tree. Tier-independent — the nav template only renders three levels, so any
  * realistic menu is far shallower than this.
  */

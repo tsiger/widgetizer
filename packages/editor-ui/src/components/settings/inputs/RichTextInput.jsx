@@ -116,8 +116,8 @@ function MenuBar({
       // Empty/whitespace input removes the link (the mark, and its data attrs, go with it).
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
     } else {
-      // Internal-link stable refs (LINK-022→025) are mutually exclusive — applying an
-      // external URL clears BOTH data attrs so a stale uuid can't linger.
+      // Internal-link stable refs are mutually exclusive; applying an external
+      // URL clears both data attrs so a stale uuid can't linger.
       editor
         .chain()
         .focus()
@@ -355,9 +355,9 @@ export default function RichTextInput({
 
   const activeProject = useProjectStore((state) => state.activeProject);
 
-  // Display-time resolution of stable internal-link refs (LINK-022→025, Issue 3):
+  // Display-time resolution of stable internal-link refs:
   // an anchor's stored href is the slug at authoring time, so after a page/item rename
-  // the editor would show the OLD href even though render/preview resolve the uuid to the
+  // the editor would show a stale href even though render/preview resolve the uuid to the
   // current slug. Rebuild the uuid→slug maps from the link-target list and rewrite hrefs
   // for DISPLAY only (setContent below uses emitUpdate:false, so this never dirties the
   // field or changes what's saved until the user actually edits). Only where internal
@@ -543,8 +543,8 @@ export default function RichTextInput({
     (file) => {
       if (!editor || !file?.path) return;
       const href = file.path;
-      // A file link is not an internal page/item ref — clear both stable-ref attrs so a
-      // link changed from page/item to file doesn't keep resolving to the old target.
+      // A file link is not an internal page/item ref; clear both stable-ref attrs so a
+      // link changed from page/item to file doesn't keep resolving to the previous target.
       const clearedRefs = { "data-page-uuid": null, "data-collection-item-uuid": null };
       const { from, to } = editor.state.selection;
       if (from === to) {

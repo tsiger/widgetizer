@@ -1,5 +1,5 @@
 /**
- * Depth-prefix export smoke test (TODO §18 — port of master's depthRenderSmoke).
+ * Depth-prefix export smoke test.
  *
  * Drives the REAL `exportProject` controller (so the inlined /uploads/ rewrites
  * and markdown-alternate <link> injection in exportController.js are exercised)
@@ -13,8 +13,8 @@
  *           machinery must never leak into root pages) — the absence guard, with
  *           the canonical un-prefixed forms asserted present for non-vacuity.
  *
- * The depth/prefix machinery is already ported and works; this is regression
- * protection (cf. §15/§17 — the dropped exclusion assertions).
+ * These assertions protect the full depth/prefix contract for root pages and
+ * nested item pages.
  *
  * Run with: node --test packages/builder-server/src/tests/depthRenderSmoke.test.js
  */
@@ -237,7 +237,7 @@ after(async () => {
 // Gap 1 — depth-1 item page carries the ../ prefix on every path form
 // ============================================================================
 
-describe("depth-1 item render — full path chain is prefixed (TODO §18)", () => {
+describe("depth-1 item render — full path chain is prefixed", () => {
   let html;
 
   before(async () => {
@@ -298,7 +298,7 @@ describe("depth-1 item render — full path chain is prefixed (TODO §18)", () =
 // Gap 2 — depth-0 root page never leaks ../ (no-leak guard + non-vacuity)
 // ============================================================================
 
-describe("depth-0 root render — no ../ leakage (TODO §18)", () => {
+describe("depth-0 root render — no ../ leakage", () => {
   let html;
 
   before(async () => {

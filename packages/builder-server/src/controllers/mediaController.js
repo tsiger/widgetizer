@@ -73,11 +73,7 @@ async function getImageProcessingSettings(projectId) {
 
   return enabledSizes;
 }
-
-
-
-
-// Decode the filename TODO: Where should things like this live?
+// Decode filenames supplied by upload clients without failing the whole request.
 function decodeFileName(filename) {
   try {
     return decodeURIComponent(escape(filename));
@@ -165,12 +161,10 @@ const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 /**
  * Per-request multer for the media upload route. Sources the per-file size cap
  * from the injected limits adapter and enforces it as a streaming multer limit,
- * so an oversize part is rejected BEFORE the whole file is buffered into memory
- * (SA-02 — the old module-level upload had no fileSize limit and the size check
- * ran only after buffering, enabling a heap-exhaustion DoS). resolveActiveProject
- * runs first (router-level), so req.scope + req.adapters are present here.
- * Byte-neutral for OSS: LocalLimitsAdapter returns the same configured max the
- * post-buffer check already enforced — over-size files now fail fast (413).
+ * so an oversize part is rejected BEFORE the whole file is buffered into memory.
+ * resolveActiveProject runs first (router-level), so req.scope + req.adapters are
+ * present here. LocalLimitsAdapter returns the configured OSS max; over-size
+ * files fail fast with 413.
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
@@ -200,10 +194,8 @@ export async function getProjectMedia(req, res) {
       return res.status(400).json({ error: "Project ID is required" });
     }
 
-    // Validate the project exists + is owned (throws → mapped below). This
-    // replaces a former on-disk projectDir existence check, which assumed the
-    // global DATA_DIR and so 404'd under hosted's per-user storage; media
-    // metadata comes from the DB, not that dir.
+    // Validate the project exists + is owned (throws -> mapped below). Media
+    // metadata comes from the DB and is keyed by projectId.
     await getProjectFolderName(projectId);
 
     const mediaData = await readMediaFile(projectId);
@@ -480,9 +472,9 @@ export async function updateMediaMetadata(req, res) {
   try {
 
     const { projectId, fileId } = req.params;
-    // TI-03: bind the inner :projectId to the owner-resolved scope. This route is
+    // Bind the inner :projectId to the owner-resolved scope. This route is
     // path-in-path (.../media/projects/:projectId/media/:fileId/metadata); the
-    // router-level resolveActiveProject owner-checks the OUTER/stashed id before
+    // router-level resolveActiveProject owner-checks the outer/stashed id before
     // the inner :projectId binds, so without this a caller could target another
     // tenant's project id in the leaf and overwrite their media metadata. OSS
     // standalone is byte-neutral: its single active project's id always equals

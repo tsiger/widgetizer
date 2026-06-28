@@ -2,10 +2,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 
-// Finding D4: after a successful metadata save the hook must drop the shared 30s
-// media cache (invalidateMediaCache) so the page editor's image inputs re-fetch
-// fresh metadata instead of serving stale cached data. The package port kept the
-// local setFiles update but lost the cache-invalidation call.
+// After a successful metadata save the hook must drop the shared 30s media cache
+// so the page editor's image inputs re-fetch fresh metadata instead of serving
+// stale cached data.
 
 vi.mock("../../queries/mediaManager", () => ({
   invalidateMediaCache: vi.fn(),

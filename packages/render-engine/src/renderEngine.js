@@ -242,9 +242,8 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", 
 
 // Widget `menu`-type setting resolution is delegated to the shared ./menuResolver
 // (resolveMenuSettings) — the single source of truth shared with collection-item
-// rendering. The former inline resolveMenuItemLinks/resolveMenuPageLinks (pageUuid
-// only, no depth-prefix or collection-item targets) were removed in that
-// consolidation (master 741abfb8 follow-up).
+// rendering. This keeps page UUID, collection-item target, and depth-prefix
+// behavior in one place.
 
 /**
  * Load all pages for a project and return a map of uuid -> page data.
@@ -655,7 +654,7 @@ async function renderWidget(
       schemaHasLinkSetting(schema) ||
       Object.values(blockSchemas).some((bs) => Array.isArray(bs) && bs.some((s) => s.type === "link"));
     // Richtext can also carry a collection-item ref (data-collection-item-uuid), so a
-    // richtext-only widget/block must trigger the item-map load too (LINK-024). Checks
+    // richtext-only widget/block must trigger the item-map load too. Checks
     // top-level settings AND block schemas, mirroring the link/menu gate above.
     const hasRichtextSettings =
       schemaHasRichtextSetting(schema) ||

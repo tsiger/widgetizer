@@ -3,10 +3,10 @@
  *
  * Renders a real widget through renderWidget with a scope-aware `collectionDeps`
  * ({ storage, scope }) — the same capability the preview/export route handlers
- * pass — so this exercises the async filter end-to-end through the new-arch
- * wiring: the OSS `buildCollectionItemsLoader` factory reading items via the
- * storage adapter, keyword-argument parsing, invalid-item exclusion, `item.url`
- * depth resolution, and the per-render cache.
+ * pass — so this exercises the async filter end-to-end: the OSS
+ * `buildCollectionItemsLoader` factory reading items via the storage adapter,
+ * keyword-argument parsing, invalid-item exclusion, `item.url` depth resolution,
+ * and the per-render cache.
  *
  * Mirrors the storage-adapter/scope pattern of collectionApi.test.js (real
  * LocalStorageAdapter over a tmp dataRoot). Without `collectionDeps` the filter

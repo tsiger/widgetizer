@@ -335,8 +335,8 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
   const oldToNewMenuUuid = new Map();
   const oldToNewItemUuid = new Map();
 
-  // Step 1: Regenerate collection item UUIDs FIRST, building the old->new map so
-  // the menu/link passes below can remap stable collection-item references (#11).
+  // Step 1: Regenerate collection item UUIDs first, building the source-to-copy map
+  // so the menu/link passes below can remap stable collection-item references.
   // Every item gets a fresh identity in the duplicated project (always rewritten).
   await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => {
     const newUuid = randomUUID();
@@ -633,7 +633,7 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
 }
 
 /**
- * Post-seed enrichment for richtext stable links (LINK-022→025): once pages exist (scaffold)
+ * Post-seed enrichment for richtext stable links: once pages exist (scaffold)
  * and collection items have been seeded with fresh uuids, walk all richtext (pages, globals,
  * collection items) and stamp `data-page-uuid` / `data-collection-item-uuid` on internal anchors,
  * derived from each anchor's slug-format href. Presets ship richtext with the uuid attrs stripped

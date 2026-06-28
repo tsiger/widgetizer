@@ -81,10 +81,9 @@ describe("IconInput SVG XSS sanitization", () => {
     expect(screen.getByTitle("evil")).toBeInTheDocument();
   });
 
-  // C2 (master 1a102213): the compact sidebar makes icon-grid buttons fill their
-  // track via `.page-editor-settings .icon-grid-button { width: 100% }` so the
-  // grid stops scrolling sideways. Pin the `icon-grid-button` class hook the rule
-  // targets.
+  // The compact sidebar makes icon-grid buttons fill their track via
+  // `.page-editor-settings .icon-grid-button { width: 100% }` so the grid stops
+  // scrolling sideways. Pin the `icon-grid-button` class hook the rule targets.
   it("tags each grid button with the icon-grid-button class hook", () => {
     seedStores({ icons: { home: { body: '<path d="M1 1"/>' } } });
 

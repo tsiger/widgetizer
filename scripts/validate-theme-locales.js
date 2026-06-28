@@ -22,7 +22,7 @@ import {
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const rootDir = join(__dirname, "..");
-// Core widgets moved into @widgetizer/core in Sprint 1.6.
+// Core widget locale definitions are read from the shared core package.
 const coreWidgetsDir = join(rootDir, "packages", "core", "src", "widgets");
 const coreLocalesDir = join(coreWidgetsDir, "locales");
 

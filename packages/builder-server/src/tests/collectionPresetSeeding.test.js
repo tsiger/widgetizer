@@ -1,9 +1,7 @@
 /**
- * Preset → collections seeding test suite (new-arch port).
+ * Preset collections seeding test suite.
  *
- * Ported from the upstream monolith test (server/tests/collectionPresetSeeding.test.js)
- * to the package-split / scope-first builder-server. Covers the BLOCKER-1
- * resolution boundary on the creation side:
+ * Covers the project-creation boundary for preset collection data:
  *  - resolvePresetPaths returns collectionsDir (item data) when the preset ships
  *    a collections/ folder, null when it doesn't, and NEVER a collectionTypesDir
  *    (collection-type schemas are theme-only).
@@ -11,9 +9,7 @@
  *    items whose type the (theme-owned) collection-types schemas don't define.
  *  - Preset menu collectionItemUuid refs are remapped to the freshly seeded uuid.
  *
- * NEW-ARCH NOTES (vs. upstream):
- *  - The upstream helpers getProjectCollectionSchemaPath / getProjectCollectionItemPath /
- *    getThemePresetDir-as-source DO NOT EXIST in the same shape. We use, from config.js:
+ *  - Collection paths are resolved through config.js helpers:
  *    getProjectDir(folder) + hand-built paths for collection-types/<type>/schema.json
  *    and collections/<type>/<slug>.json, and getThemePresetDir(theme, preset) for the
  *    preset dir. resolvePresetPaths resolves the preset under getThemeSourceDir(theme),
@@ -139,7 +135,7 @@ describe("seedPresetCollections", () => {
     assert.equal(await fs.pathExists(itemPath(FOLDER, "events", "expo")), false);
   });
 
-  it("stamps richtext page + item links on seeded collection-item bodies (LINK-022→025)", async () => {
+  it("stamps richtext page + item links on seeded collection-item bodies", async () => {
     await fs.outputJson(schemaPath(FOLDER, "posts"), {
       type: "posts",
       schemaVersion: 1,

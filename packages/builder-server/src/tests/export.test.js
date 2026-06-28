@@ -112,8 +112,8 @@ function mockReq({ params = {}, body = {}, file = null, scope } = {}) {
     // exportProject/getExportHistory/deleteExport read the active project from
     // req.scope (set by resolveActiveProject in real routes); derive it from
     // params here so these direct-controller tests exercise the same path.
-    // folderName mirrors what resolveActiveProject sets — the export serve/
-    // download handlers now bind exportDir to it (TI-02/SA-13).
+    // folderName mirrors what resolveActiveProject sets, so the export serve/
+    // download handlers bind exportDir to it.
     scope: scope ?? { projectId: params.projectId, folderName: PROJECT_FOLDER },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
@@ -538,7 +538,7 @@ before(async () => {
   // -----------------------------------------------------------
   await fs.writeFile(path.join(projectDir, "assets", "css", "styles.css"), "body { margin: 0; }");
   await fs.writeFile(path.join(projectDir, "assets", "js", "app.js"), "console.log('hello');");
-  // System metadata that must be filtered out of the export (EXPZIP-013).
+  // System metadata that must be filtered out of the export.
   await fs.writeFile(path.join(projectDir, "assets", ".DS_Store"), "junk");
   await fs.ensureDir(path.join(projectDir, "assets", "__MACOSX"));
   await fs.writeFile(path.join(projectDir, "assets", "__MACOSX", "foo"), "junk");
@@ -718,7 +718,7 @@ describe("exportProject", () => {
     assert.ok(!(await fs.pathExists(heroPath)), "Original hero.jpg should be omitted when hero-large.jpg exists");
   });
 
-  it("excludes OS/system metadata from the export assets (EXPZIP-013)", async () => {
+  it("excludes OS/system metadata from the export assets", async () => {
     const exportDir = await getLatestExportDir();
     // Real project assets are still copied...
     assert.ok(await fs.pathExists(path.join(exportDir, "assets", "css", "styles.css")), "Real asset should be copied");

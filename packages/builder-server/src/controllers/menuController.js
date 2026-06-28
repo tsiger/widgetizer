@@ -7,7 +7,7 @@ import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 
 /**
- * SA-20: bound an attacker-controlled menu-item tree BEFORE the recursive
+ * Bound an attacker-controlled menu-item tree BEFORE the recursive
  * sanitize/label/clone walks run. Walked ITERATIVELY (explicit stack) so the
  * measurement itself can never blow the call stack, and bails as soon as either
  * ceiling is crossed so the work is O(maxItems), not O(tree).
@@ -232,8 +232,8 @@ export async function updateMenu(req, res) {
 
     // Sanitize menu item labels and links
     if (Array.isArray(menuData.items)) {
-      // SA-20: bound the tree before the recursive walks run. Without this an
-      // owner could persist a huge/deeply-nested menu that re-pays its
+      // Bound the tree before the recursive walks run. Without this an owner
+      // could persist a huge/deeply-nested menu that re-pays its
       // sanitize/DOMPurify/render cost on every save and render.
       const maxItems = await resolveMaxMenuItems(req);
       const check = validateMenuTree(menuData.items, maxItems);
@@ -344,9 +344,8 @@ export async function duplicateMenu(req, res) {
     }
     const originalMenu = JSON.parse(originalBuf.toString("utf8"));
 
-    // SA-20: bound the loaded tree before the recursive clone/id-regeneration.
-    // Defends against duplicating a menu that was persisted oversized before the
-    // save-time guard existed (legacy data).
+    // Bound the loaded tree before the recursive clone/id-regeneration.
+    // Defends against duplicating an oversized on-disk menu.
     const maxItems = await resolveMaxMenuItems(req);
     const check = validateMenuTree(originalMenu.items, maxItems);
     if (!check.ok) {

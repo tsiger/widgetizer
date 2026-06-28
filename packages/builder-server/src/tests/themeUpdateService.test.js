@@ -362,7 +362,7 @@ describe("applyThemeUpdate", () => {
     assert.ok(newCss.includes(".new"), "New asset file should be added");
   });
 
-  it("replaces collection-types from the theme but preserves user collections/ (BLOCKER-1 regression)", async () => {
+  it("replaces collection-types from the theme but preserves user collections", async () => {
     await createTheme("1.0.0", {
       updates: [
         {

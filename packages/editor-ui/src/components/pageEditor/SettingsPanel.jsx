@@ -159,8 +159,8 @@ export default function SettingsPanel({
                 onChange={handleSettingChange}
                 isFirst={index === 0}
                 allowExpand
-                // Richtext stable-link picker is in scope for widget/block/global
-                // settings, but NOT theme settings (LINK-022→025 scope).
+                // Richtext stable-link picker is available for widget/block/global
+                // settings, but not theme settings.
                 allowInternalLinkTargets={!isThemeSettings}
               />
             );

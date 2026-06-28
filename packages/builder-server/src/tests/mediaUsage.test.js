@@ -662,7 +662,7 @@ describe("refreshAllMediaUsage", () => {
     assert.match(result.message, /2 pages/); // home.json + about.json
   });
 
-  it("still scans theme settings when the pages directory is absent (TODO §16)", async () => {
+  it("still scans theme settings when the pages directory is absent", async () => {
     // Temporarily move pages dir out of the way (collections-only / fresh-import shape).
     const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
     const backupDir = pagesDir + ".backup";
@@ -671,8 +671,8 @@ describe("refreshAllMediaUsage", () => {
     try {
       const result = await refreshAllMediaUsage(PROJECT_ID);
       assert.equal(result.success, true);
-      // Pre-§16 this early-returned ("no pages directory") BEFORE the theme-settings
-      // scan + replaceMediaUsage, so the favicon went untracked. Now it falls through.
+      // The scan should continue through theme settings even without page files,
+      // so the favicon remains tracked.
       assert.doesNotMatch(result.message, /no pages directory/i);
       assert.match(result.message, /0 pages/);
 
@@ -689,10 +689,10 @@ describe("refreshAllMediaUsage", () => {
 });
 
 // ============================================================================
-// refreshAllMediaUsage — collections-only project (no pages dir) (TODO §16)
+// refreshAllMediaUsage — collections-only project (no pages dir)
 // ============================================================================
 
-describe("refreshAllMediaUsage — collections-only project (TODO §16)", () => {
+describe("refreshAllMediaUsage — collections-only project", () => {
   const COLL_IMG = "coll-img-16";
 
   beforeEach(async () => {
@@ -718,14 +718,14 @@ describe("refreshAllMediaUsage — collections-only project (TODO §16)", () => 
     assert.equal(result.success, true);
 
     const media = await readMediaJson();
-    // Pre-§16: early return → never scanned → usedIn stays []. Post-fix: tracked.
+    // Collections are still scanned even when the project has no pages dir.
     assert.deepEqual(media.files.find((f) => f.id === COLL_IMG).usedIn, ["collection:news/hello"]);
     assert.match(result.message, /1 collection items/);
   });
 });
 
 // ============================================================================
-// Richtext-embedded media (TODO §12)
+// Richtext-embedded media
 //
 // An image inserted *only* into a richtext field embeds a SIZE-VARIANT path
 // (e.g. the `-large` variant) inside an HTML `<img src>` string. Tracking must
@@ -740,7 +740,7 @@ describe("refreshAllMediaUsage — collections-only project (TODO §16)", () => 
 
 const RICH = "rich-img";
 
-describe("richtext-embedded media (TODO §12)", () => {
+describe("richtext-embedded media", () => {
   /** A media record whose richtext-embedded reference is a `-large` variant path. */
   function mediaFilesWithVariants() {
     return [
@@ -807,14 +807,14 @@ describe("richtext-embedded media (TODO §12)", () => {
     }
   });
 
-  it("extracts multiple embedded paths from one richtext string and over-matches a trailing period (master parity)", async () => {
+  it("extracts multiple embedded paths from one richtext string and handles a trailing period safely", async () => {
     const pageData = {
       widgets: {
         w1: {
           settings: {
-            // Two embedded refs; the second sits at the end of a sentence, so the
-            // regex's `.` absorbs the trailing period — master accepted this, since
-            // over-matching only ever marks an asset "used" (the safe direction).
+            // Two embedded refs; the second sits at the end of a sentence. If the
+            // regex absorbs the trailing period, over-matching only ever marks an
+            // asset "used", which is the safe direction.
             body:
               '<p>First <img src="/uploads/images/hero-large.jpg">. Then see /uploads/images/hero-medium.jpg.</p>',
           },

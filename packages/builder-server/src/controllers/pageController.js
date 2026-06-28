@@ -529,9 +529,9 @@ export async function savePageContent(req, res) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
     }
 
-    // SA-04: cap the per-page widget count before persisting. Without this an
+    // Cap the per-page widget count before persisting. Without this an
     // authenticated owner could store tens of thousands of widgets in one page,
-    // which then re-renders on every publish/preview (unbounded CPU/work). The
+    // which then re-renders on every publish/preview. The
     // ceiling comes from the limits adapter (hosted: a platform constant; OSS:
     // Infinity → unbounded). Count the larger of the order array and the widget
     // map so an oversized map without a matching order is still rejected.

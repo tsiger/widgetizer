@@ -600,7 +600,7 @@ export async function resolvePresetPaths(themeId, presetId) {
   }
 
   // Resolve preset collections/ (item DATA only). Collection-type SCHEMAS are
-  // theme-only (BLOCKER-1 resolution) — a preset's collection-types/ folder is
+  // theme-only — a preset's collection-types/ folder is
   // never consulted here.
   let collectionsDir = null;
   const presetCollectionsDir = path.join(presetDir, "collections");
@@ -636,7 +636,7 @@ export async function resolvePresetPaths(themeId, presetId) {
  * Pure helper: list a theme's presets (id/name/description + isDefault +
  * hasScreenshot), or `{ default: null, presets: [] }` when the theme has no
  * presets.json. Throws an Error with `code: "THEME_NOT_FOUND"` if the theme is
- * absent. Reusable by any shell (no req/res) — exported from the package barrel.
+ * absent. Reusable by any shell (no req/res) via the package barrel.
  * @param {string} themeId
  */
 export async function listThemePresets(themeId) {
@@ -702,7 +702,7 @@ export async function getThemePresets(req, res) {
  * Pure helper: list installed themes with their metadata (id, name, version,
  * widget/preset counts, update status). Does NOT include project-usage data
  * (that needs the DB and would leak across tenants in a multi-tenant shell), so
- * it is safe to expose from any shell. Exported from the package barrel.
+ * it is safe to expose from any shell via the package barrel.
  * @returns {Promise<Array<object>>}
  */
 export async function listThemes() {
@@ -1452,8 +1452,6 @@ export async function uploadTheme(req, res) {
         // is committed, so the theme author gets upfront per-collection errors
         // rather than the schemas being silently dropped at read time. Path-based,
         // so it runs on the extracted temp source — no scope/adapter needed.
-        // (Only the new-theme install path is gated here; the update-import path
-        // is tracked separately — see docs-llms/TODO.md.)
         const collectionValidation = await validateThemeCollectionSchemas(extractedThemeDir);
         if (!collectionValidation.valid) {
           await fs.remove(tempDir);
@@ -1500,13 +1498,11 @@ export async function uploadTheme(req, res) {
         const extractedThemeDir = path.join(tempDir, themeFolderName);
         const extractedUpdatesDir = path.join(extractedThemeDir, "updates");
 
-        // Gate collection-type schemas on the update-import path too (TODO §22).
-        // Unlike the new-theme install (validated as a self-contained temp dir),
-        // an update only ships deltas — the *effective* theme exists only after
-        // base + installed updates + incoming deltas are merged. So merge that
-        // off to the side and validate the result; if it's invalid (bad schema,
-        // or a slugPrefix that now collides across versions) reject with 400 and
-        // leave the installed theme untouched. The merge mirrors buildLatestSnapshot.
+        // Validate update imports against the effective theme: base files plus
+        // installed updates plus incoming deltas. If the merged result is invalid
+        // (bad schema, or a slugPrefix collision across versions), reject with 400
+        // and leave the installed theme untouched. The merge mirrors
+        // buildLatestSnapshot.
         const newVersionSet = new Set(newUpdateVersions);
         const orderedUpdateVersions = sortVersions([...new Set([...existingVersions, ...newUpdateVersions])]).filter(
           (version) => version !== uploadedVersion,

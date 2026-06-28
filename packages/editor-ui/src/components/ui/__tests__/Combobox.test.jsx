@@ -7,7 +7,7 @@ import Combobox from "../Combobox.jsx";
 // group + one per collection). The shared <Combobox> must render an uppercase
 // section header whenever the group changes between consecutive options, and
 // those headers must not be selectable. Ungrouped options (other consumers)
-// render flat with no header. (Half (b) of 3f707b26 — missed in the package port.)
+// render flat with no header.
 
 const GROUPED = [
   { value: "p1", label: "About", group: "Pages" },

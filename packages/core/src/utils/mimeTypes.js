@@ -1,10 +1,9 @@
 /**
  * Canonical extension → MIME mapping, shared by both shells.
  *
- * This is the single source of truth for static-file content types. It is the
- * UNION of what builder-server served (documents, images, fonts) and what the
- * local asset adapter knew (notably `.avif`) — the two had silently drifted
- * apart. Keep additions here, not in a consumer's private copy.
+ * This is the single source of truth for static-file content types shared by
+ * builder-server and the local asset adapter. Keep additions here, not in a
+ * consumer's private copy.
  *
  * Pure data + a lookup; no Node APIs, so it is safe to import anywhere.
  */

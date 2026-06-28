@@ -1,21 +1,16 @@
 /**
- * Collection media-usage tracking test suite (new-arch port).
+ * Collection media-usage tracking test suite.
  *
- * Ported from the upstream monolith test (server/tests/collectionMediaUsage.test.js)
- * to the package-split / scope-first builder-server. Verifies that collection
- * items contribute to media usage under the `collection:{type}/{slug}` source and
+ * Verifies that collection items contribute to media usage under the
+ * `collection:{type}/{slug}` source and
  * that refreshAllMediaUsage scans collections/ from disk alongside pages/globals.
  *
- * NEW-ARCH NOTES (vs. upstream):
  *  - Media usage is SQLite metadata keyed by projectId (mediaRepo), asserted via
  *    getMediaUsage(projectId, fileId) / readMediaFile(projectId).
- *  - There is NO getProjectCollectionItemPath helper — collection item files are
- *    written by hand to getProjectDir(folderName)/collections/<type>/<slug>.json.
- *  - The richtext-embedded <img src> + size-variant upstream cases are OMITTED:
- *    extractMediaPathsFromCollectionItem walks settings values via collectMediaPaths,
- *    which only matches a string value that itself STARTS with an upload prefix
- *    (an HTML body string does not), and findFileIdsByPaths matches file.path
- *    exactly (not file.sizes). The new arch therefore does not track those.
+ *  - Collection item files are written to
+ *    getProjectDir(folderName)/collections/<type>/<slug>.json.
+ *  - Richtext-embedded <img src> + size-variant cases are covered in
+ *    mediaUsage.test.js; this suite focuses on direct collection-field values.
  *
  * Run with: node --test packages/builder-server/src/tests/collectionMediaUsage.test.js
  */
@@ -65,7 +60,7 @@ function mediaFiles() {
   ];
 }
 
-/** Read a file's usedIn[] via the new-arch getMediaUsage accessor. */
+/** Read a file's usedIn[] via the media usage accessor. */
 const usedIn = async (id) => (await getMediaUsage(PROJECT_ID, id)).usedIn;
 
 /** Write a collection item JSON file directly to disk (as an import would). */
@@ -171,7 +166,7 @@ describe("updateCollectionItemMediaUsage", () => {
 // ============================================================================
 
 describe("syncCollectionItemMediaUsageOnWrite", () => {
-  it("on rename, removes the old source and adds the new one", async () => {
+  it("on rename, removes the previous source and adds the current one", async () => {
     await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", {
       settings: { featured_image: "/uploads/images/hero.jpg" },
     });

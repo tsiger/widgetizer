@@ -68,8 +68,8 @@ router.get("/view/:exportDir/*filePath", (req, res) => {
   return serveExportFile(req, res);
 });
 
-// TI-02/SA-13: an export dir belongs to the actor only when it is the active
-// project's own bundle. OSS names export dirs `<folderName>` / `<folderName>-v<n>`
+// An export dir belongs to the actor only when it is the active project's own
+// bundle. OSS names export dirs `<folderName>` / `<folderName>-v<n>`
 // (exportController), so binding to req.scope.folderName is byte-neutral for OSS
 // standalone (the active project's own request always matches) while blocking a
 // cross-tenant read of the GLOBAL publish dir in any multi-tenant mount.

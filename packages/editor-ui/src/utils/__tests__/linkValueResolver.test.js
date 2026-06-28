@@ -57,7 +57,7 @@ describe("resolveStoredLink", () => {
     expect(resolveStoredLink(v, optionsByUuid, pageOptionBySlug, false)).toBe(v);
   });
 
-  it("matches a legacy internal href to a page uuid", () => {
+  it("matches a slug-only internal href to a page uuid", () => {
     const out = resolveStoredLink(
       { href: "about.html", text: "About", target: "_self" },
       optionsByUuid,

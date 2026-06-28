@@ -6,7 +6,7 @@ import MenuCombobox from "../MenuCombobox.jsx";
 // The menu link picker groups its options (a "Pages" group + one group per
 // collection, via useLinkTargets' `group` field). MenuCombobox must render an
 // uppercase header whenever the group changes between consecutive options — and
-// those headers must not be selectable. (Lost in the package port; restored here.)
+// those headers must not be selectable.
 
 const OPTIONS = [
   { value: "p1", label: "About", group: "Pages" },

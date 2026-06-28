@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import useMediaState from "../useMediaState.js";
 
-// Finding D5: the media library lost its "audio" type filter. "file" means any
-// non-image asset (so non-image pickers still reach audio); "audio" is a focused
-// subset of it. With no active project seeded, the load effect is a no-op, so we
+// The media library has a focused "audio" type filter. "file" means any non-image
+// asset, so non-image pickers still reach audio; "audio" is a focused subset of it.
+// With no active project seeded, the load effect is a no-op, so we
 // drive the filter purely through setFiles/setFilterType.
 
 const AUDIO = { id: "a", type: "audio/mpeg", originalName: "song.mp3", filename: "song.mp3" };

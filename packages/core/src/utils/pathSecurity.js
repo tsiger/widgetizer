@@ -2,9 +2,8 @@ import path from "path";
 
 /**
  * Path-containment guard shared by both shells. One implementation; callers
- * choose the boundary semantics via `allowEqual`, because the two original
- * copies (builder-server's isWithinDirectory and adapters-local's assertWithin)
- * had drifted on exactly that edge: whether `target === base` counts as inside.
+ * choose the boundary semantics via `allowEqual`, including whether
+ * `target === base` counts as inside.
  *
  * Both paths should already be resolved (`path.resolve`) before calling.
  *

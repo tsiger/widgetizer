@@ -264,8 +264,8 @@ export default function WidgetSelector({
             ref={listRef}
             id="widget-selector-list"
             className="overflow-y-auto"
-            // Doubled from the old max-h-64 (16rem), but capped to the viewport so it
-            // never overflows on short screens (~9rem reserved for header/search/margins).
+            // Cap the list height to the viewport so it never overflows on short
+            // screens (~9rem reserved for header/search/margins).
             style={{ maxHeight: "min(32rem, calc(100vh - 9rem))" }}
             role="listbox"
           >

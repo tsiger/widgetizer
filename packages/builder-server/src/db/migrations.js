@@ -1,10 +1,8 @@
 /**
  * Whether `table` already has a column named `column`. Used to make
- * forward-only "add column" migrations idempotent — necessary because this
- * branch and master diverged on what migration v2 meant (owner_id here,
- * caption on master), so a given column may already exist depending on which
- * history a database came through. `table` is always a literal constant in
- * this file (never user input), so interpolating it into PRAGMA is safe.
+ * forward-only "add column" migrations idempotent when a database already
+ * contains the target column. `table` is always a literal constant in this file
+ * (never user input), so interpolating it into PRAGMA is safe.
  * @param {import('better-sqlite3').Database} db
  * @param {string} table
  * @param {string} column
@@ -111,10 +109,8 @@ const migrations = [
     version: 3,
     description: "Add caption column to media_files",
     up(db) {
-      // master shipped caption as migration v2; this branch reused the v2 slot
-      // for owner_id, so caption is delivered here as a later, forward-only
-      // version. Idempotent: a database upgraded through master's v2 already
-      // has the column, so guard the ALTER instead of failing on it.
+      // Guard the ALTER so databases that already contain caption continue
+      // through the forward-only migration sequence.
       if (!columnExists(db, "media_files", "caption")) {
         db.exec("ALTER TABLE media_files ADD COLUMN caption TEXT DEFAULT ''");
       }
@@ -124,11 +120,8 @@ const migrations = [
     version: 4,
     description: "Backfill projects.owner_id for master-history databases",
     up(db) {
-      // owner_id was added at v2 on this branch's databases. A database upgraded
-      // through master (whose v2 added caption) has v2 recorded and therefore
-      // skipped this branch's v2 — leaving owner_id missing. This forward-only,
-      // idempotent migration backfills it (and its index) for those databases;
-      // it is a no-op where v2 already added the column.
+      // Ensure owner_id and its index exist even when earlier migration records
+      // are present but the column is not.
       if (!columnExists(db, "projects", "owner_id")) {
         db.exec("ALTER TABLE projects ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'default'");
       }

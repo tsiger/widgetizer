@@ -659,7 +659,7 @@ describe("savePageContent", () => {
     assert.match(res._json.error, /missing required/i);
   });
 
-  // SA-04: the widget-count ceiling comes from the limits adapter. Inject a tiny
+  // The widget-count ceiling comes from the limits adapter. Inject a tiny
   // cap so we can exercise the boundary without persisting thousands of widgets.
   function makeWidgets(n) {
     const widgets = {};
@@ -671,7 +671,7 @@ describe("savePageContent", () => {
     return { widgets, widgetsOrder };
   }
 
-  it("rejects a page whose widget count exceeds the adapter limit (SA-04)", async () => {
+  it("rejects a page whose widget count exceeds the adapter limit", async () => {
     const page = await createTestPage("Too Many Widgets");
     const req = mockReq({
       params: { id: page.slug },
@@ -684,7 +684,7 @@ describe("savePageContent", () => {
     assert.match(res._json.error, /too many widgets/i);
   });
 
-  it("allows a page exactly at the widget cap (SA-04)", async () => {
+  it("allows a page exactly at the widget cap", async () => {
     const page = await createTestPage("At Cap");
     const req = mockReq({
       params: { id: page.slug },
@@ -697,7 +697,7 @@ describe("savePageContent", () => {
     assert.equal(res._json.success, true);
   });
 
-  it("stays unbounded when the adapter reports Infinity (OSS) (SA-04)", async () => {
+  it("stays unbounded when the adapter reports Infinity (OSS)", async () => {
     const page = await createTestPage("Unbounded");
     const req = mockReq({
       params: { id: page.slug },
@@ -886,7 +886,7 @@ describe("duplicatePage", () => {
 });
 
 // ---------------------------------------------------------------------------
-// deletePage / bulkDeletePages — re-sync collection-item media usage (TODO §8)
+// deletePage / bulkDeletePages — re-sync collection-item media usage
 //
 // Deleting a page clears collection-item links that point to it, and must
 // re-derive those items' media usage — but only if the controller threads

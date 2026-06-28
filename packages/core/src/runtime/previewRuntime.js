@@ -20,8 +20,8 @@ import { getStandalonePreviewTarget } from "./standalonePreviewTarget.js";
 // sends `Referrer-Policy: no-referrer`. We use it to (a) target replies to the
 // editor instead of "*", and (b) reject control messages — notably the
 // script/HTML-injecting UPDATE_CUSTOM_SCRIPTS / MORPH_WIDGET — from any other
-// window. Empty when absent (legacy/standalone load): we then fall back to
-// today's permissive behaviour so the preview never silently goes deaf.
+// window. Empty when absent on standalone loads: we then fall back to permissive
+// behaviour so the preview never silently goes deaf.
 const PARENT_ORIGIN = new URLSearchParams(window.location.search).get("parentOrigin") || "";
 
 function postToParent(data) {

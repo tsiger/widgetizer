@@ -61,7 +61,7 @@ function todayISO() {
   return `${d.getFullYear()}-${mm}-${dd}`;
 }
 
-/** Page-shaped SEO form defaults for a collection item (Finding #12). Mirrors
+/** Page-shaped SEO form defaults for a collection item. Mirrors
  *  the page SEO shape; items default og_type to "article" (they are content). */
 function seoDefaults(seo = {}) {
   return {
@@ -100,10 +100,10 @@ export default function CollectionItemForm({
   const { tTheme } = useThemeLocale();
   const showToast = useToastStore((state) => state.showToast);
   const isNew = !initialData.id && !initialData.slug;
-  // Item-page collections get the same SEO editor as pages (Finding #12).
+  // Item-page collections get the same SEO editor as pages.
   const hasItemPages = !!schema?.hasItemPages;
 
-  // Finding #8: out-of-schema values are kept on disk in `_archived`. Surface
+  // Out-of-schema values are kept on disk in `_archived`. Surface
   // them with a confirmed discard. Empty for new items, so this is edit-only.
   const [archived, setArchived] = useState(() => initialData._archived || {});
   const archivedKeys = Object.keys(archived);
@@ -331,7 +331,7 @@ export default function CollectionItemForm({
         })}
       </div>
 
-      {/* More settings — the Filename, plus the SEO editor (Finding #12) for
+      {/* More settings - the Filename, plus the SEO editor for
           collections that render item pages. Collapsed by default, mirroring PageForm. */}
       <div className="max-w-xl form-section">
         <button

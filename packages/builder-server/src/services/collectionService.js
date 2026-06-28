@@ -48,7 +48,7 @@ const TABLE_COLUMN_ID_RE = /^[a-zA-Z][a-zA-Z0-9_]*$/;
 const RESERVED_COLUMN_IDS = new Set(["__proto__", "constructor", "prototype"]);
 
 // ============================================================================
-// Relative storage-key builders (replace the monolith's absolute path helpers).
+// Relative storage-key builders.
 // Every key is relative to the per-tenant project root the StorageAdapter owns.
 // ============================================================================
 
@@ -62,8 +62,7 @@ const orderKey = (collectionType) => `collections/${collectionType}/_order.json`
 /**
  * Read + parse a JSON file through the storage adapter. Returns null when the
  * file is absent; lets a parse error (SyntaxError) propagate so callers can
- * decide whether to skip-and-warn or rethrow — matching the monolith's
- * `fs.readJSON` (ENOENT → null via caller, parse error → throw).
+ * decide whether to skip-and-warn or rethrow.
  */
 async function readJson(storage, scope, relPath) {
   const buf = await storage.read(scope, relPath);
@@ -285,8 +284,8 @@ export async function listCollectionSchemas(storage, scope) {
  * this **rejects** (collects errors) rather than skipping — the upload should
  * fail loudly so the theme author fixes it.
  *
- * Also enforces the `BLOCKER-1` resolution: a preset may not ship a
- * `collection-types/` folder (collection schemas are theme-only).
+ * Also enforces that a preset may not ship a `collection-types/` folder
+ * (collection schemas are theme-only).
  *
  * Stays on direct `fs` because it inspects a theme-upload SOURCE directory (a
  * temp dir during validation), not per-tenant storage.
@@ -333,7 +332,7 @@ export async function validateThemeCollectionSchemas(themeSourceDir) {
     }
   }
 
-  // BLOCKER-1 resolution: presets are item-data only; reject preset-owned schemas.
+  // Presets are item-data only; reject preset-owned schemas.
   const presetsDir = path.join(themeSourceDir, "presets");
   let presetEntries = [];
   try {
@@ -422,8 +421,8 @@ export async function getCollectionSchema(storage, scope, collectionType) {
 
 /**
  * Shape a raw SEO object (from form input or disk) into the page-shaped `seo`
- * object collection item pages use — the SAME field set as page SEO (Finding
- * #12), so item pages feed the shared `SeoTag` exactly like pages. Only the five
+ * object collection item pages use — the SAME field set as page SEO, so item
+ * pages feed the shared `SeoTag` exactly like pages. Only the five
  * user-edited fields are authored (description, og_title, og_image,
  * canonical_url, robots); `og_type`/`twitter_card` are non-UI defaults (items
  * are content, so `og_type` defaults to "article"). With `sanitize`, the
@@ -455,7 +454,7 @@ export function shapeItemSeo(rawSeo, { sanitize = false } = {}) {
 /**
  * Normalize a raw item against a schema (Section 4). Pure — does not mutate the
  * input and does not touch disk. Unknown fields are separated into an in-memory
- * `_archived` map (BLOCKER-2: they remain on disk; this only hides them from the
+ * `_archived` map (they remain on disk; this only hides them from the
  * form/render). Missing fields are filled; required-but-empty fields flag invalid.
  *
  * @param {object} rawItem - parsed item JSON
@@ -482,7 +481,7 @@ export function normalizeCollectionItem(rawItem, schema) {
     }
   }
 
-  // BLOCKER-2: keep values for fields no longer in the schema, in memory only.
+  // Keep values for fields no longer in the schema, in memory only.
   const _archived = {};
   for (const [key, value] of Object.entries(rawSettings)) {
     if (!knownIds.has(key)) _archived[key] = value;
@@ -498,7 +497,7 @@ export function normalizeCollectionItem(rawItem, schema) {
     schemaVersion: schema.schemaVersion,
     created: rawItem.created,
     updated: rawItem.updated,
-    // Item-page SEO is a page-shaped object (Finding #12), surfaced only for
+    // Item-page SEO is a page-shaped object, surfaced only for
     // collections that render item pages.
     ...(schema.hasItemPages ? { seo: shapeItemSeo(rawItem?.seo) } : {}),
     settings,
@@ -546,7 +545,7 @@ async function applyManualOrder(items, storage, scope, collectionType) {
  */
 function compareByDate(a, b, dateField, dir) {
   // Validate, don't just check non-empty: a malformed value (e.g. "2026-13-40" from a
-  // legacy or hand-edited file) must be treated as undated and sort to the END rather
+  // hand-edited or unchecked file) must be treated as undated and sort to the END rather
   // than as a huge date. New writes are already coerced in buildCollectionItemData.
   const av = dateField ? sanitizeDateValue(a.settings?.[dateField]) : "";
   const bv = dateField ? sanitizeDateValue(b.settings?.[dateField]) : "";
@@ -650,7 +649,7 @@ export async function listCollectionItems(storage, scope, collectionType, option
 
 /**
  * Read the raw on-disk item file (no normalization), preserving any orphaned
- * out-of-schema settings. Used by the update path so BLOCKER-2 orphan
+ * out-of-schema settings. Used by the update path so orphaned
  * preservation works. Returns null if the file does not exist.
  */
 export async function readRawCollectionItem(storage, scope, collectionType, itemSlug) {
@@ -721,7 +720,7 @@ function nextUpdatedIso(previousUpdated) {
  * Build a fully-formed item record from caller input (Section 10). Pure (aside
  * from uuid/time generation). Preserves `uuid`/`created` on update, generates
  * them on create, derives/sanitizes the slug, applies a monotonic `updated`,
- * fills schema fields, preserves orphaned settings (BLOCKER-2), and enforces
+ * fills schema fields, preserves orphaned settings, and enforces
  * required fields.
  *
  * @returns {{ item: object, previousSlug: string|null }}
@@ -766,7 +765,7 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
     }
   }
 
-  // BLOCKER-2: carry forward orphaned on-disk settings the schema dropped and the
+  // Carry forward orphaned on-disk settings the schema dropped and the
   // caller didn't resubmit, so an ordinary save never silently loses them.
   if (existingItem && existingItem.settings) {
     for (const [key, value] of Object.entries(existingItem.settings)) {
@@ -780,7 +779,7 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
     throw new CollectionValidationError(validationErrors);
   }
 
-  // A page-shaped seo object lives top-level (parity with pages, Finding #12),
+  // A page-shaped seo object lives top-level at parity with pages,
   // sanitized like page SEO, and only for collections that render item pages.
   // Carry forward existing seo when an update omits it.
   const rawSeo = input && input.seo !== undefined ? input.seo : existingItem?.seo;
@@ -873,7 +872,7 @@ export async function writeCollectionItem(storage, scope, collectionType, item, 
 
 /**
  * Explicitly discard an item's archived (out-of-schema) settings — the
- * counterpart to the BLOCKER-2 merge-back in `buildCollectionItemData`. Keeps
+ * counterpart to the orphaned-setting merge-back in `buildCollectionItemData`. Keeps
  * only current-schema setting keys and rewrites the item in place, preserving
  * `uuid`/`created`/`updated` (this clears hidden data, not visible content).
  * Returns the re-normalized item (now with an empty `_archived`), or null if the
@@ -983,7 +982,7 @@ export async function duplicateCollectionItem(storage, scope, collectionType, so
     schemaVersion: schema.schemaVersion,
     created: now,
     updated: now,
-    // Carry the page-shaped SEO object to the copy (Finding #12); before the
+    // Carry the page-shaped SEO object to the copy. Before the
     // SEO object existed these fields lived in settings and copied for free.
     ...(schema.hasItemPages ? { seo: shapeItemSeo(source.seo) } : {}),
     settings,
@@ -1083,7 +1082,7 @@ export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, 
  * @param {Map} pagesByUuid - uuid -> page ({ slug })
  * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
  * @param {object} [menuDeps] - { menuMaps, collectionItemsByUuid } to resolve
- *   `menu`-type settings into menu objects (finding #10). When omitted, menu
+ *   `menu`-type settings into menu objects. When omitted, menu
  *   settings pass through unresolved (back-compat).
  * @returns {object} resolved + sanitized clone
  */
@@ -1166,7 +1165,7 @@ function isValidSiteUrl(siteUrl) {
  * Map a normalized collection item + its schema into the page-shaped object that
  * renderPageLayout and SeoTag consume for an item page (spec Section 13). The
  * title comes from the schema's usedAsTitle field; SEO comes from the item's
- * own page-shaped `seo` object (Finding #12 — at parity with page SEO), so the
+ * own page-shaped `seo` object at parity with page SEO, so the
  * shared `SeoTag` handles `<title>`, og fallbacks, og:image absolutization, and
  * the twitter card exactly as it does for pages. An explicit `seo.canonical_url`
  * wins; otherwise we precompute the absolute canonical from siteUrl so the

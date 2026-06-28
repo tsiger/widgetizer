@@ -14,7 +14,7 @@
  *
  * @param {object} value - Stored link value { pageUuid?, collectionItemUuid?, collectionType?, href, text, target }
  * @param {Map} optionsByUuid - uuid -> picker option ({ isPage|isCollectionItem, slug, slugPrefix, collectionType, ... })
- * @param {Map} pageOptionBySlug - page slug -> page option (for legacy href matching)
+ * @param {Map} pageOptionBySlug - page slug -> page option (for slug-only href matching)
  * @param {boolean} loading - true while options are still loading (returns value untouched)
  * @returns {object} display-ready link value
  */
@@ -47,8 +47,8 @@ export function resolveStoredLink(value = {}, optionsByUuid, pageOptionBySlug, l
     return value; // absent from options — preserve the ref
   }
 
-  // No stable ref — match a legacy internal href to a page so the picker shows the
-  // page name (and a future save stores its uuid).
+  // No stable ref: match a slug-only internal href to a page so the picker shows
+  // the page name and a future save stores its uuid.
   if (href && href.endsWith(".html") && !href.includes("://") && !href.startsWith("#")) {
     const slug = href.replace(".html", "");
     const opt = pageOptionBySlug.get(slug);

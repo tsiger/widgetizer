@@ -1,29 +1,17 @@
 /**
- * Collection link-integrity test suite (new-arch port).
+ * Collection link-integrity test suite.
  *
- * Ported from the upstream monolith test (server/tests/collectionLinkEnrichment.test.js)
- * to the package-split / scope-first builder-server. Covers the linkEnrichment.js
- * functions that walk collection items on disk:
+ * Covers the linkEnrichment.js functions that walk collection items on disk:
  *  - cleanupDeletedPageReferences: clear pageUuid link refs + sync media usage
- *  - cleanupDeletedCollectionItemReferences: clear menu/widget/item refs (bulk)
- *  - enrichNewProjectReferences: slug-format link href -> pageUuid
- *  - remapDuplicatedProjectUuids: remap pageUuid refs + regenerate item uuid +
+ *  - cleanupDeletedCollectionItemReferences: clear menu/widget/item refs in bulk
+ *  - enrichNewProjectReferences: convert slug-format link hrefs to pageUuid refs
+ *  - remapDuplicatedProjectUuids: remap pageUuid refs, regenerate item uuids, and
  *    remap stable collectionItemUuid refs in menus/widgets
  *
- * NEW-ARCH NOTES (vs. upstream):
- *  - There is NO getProjectCollectionItemPath helper — collection item files are
- *    written by hand to getProjectDir(folder)/collections/<type>/<slug>.json.
- *  - enrichNewProjectReferences takes (pagesDir, menusDir) directly (NOT a folder
- *    name); it derives the collections dir as a sibling of pagesDir.
- *  - Media usage is keyed by projectId; cleanupDeletedPageReferences syncs it via
- *    getMediaUsage(projectId, fileId) when a projectId is supplied.
- *  - remapCollectionItemMenuRefs / remapCollectionItemLinkRefs ARE ported
- *    (utils/linkEnrichment.js:554 / :588) and wired into project duplication
- *    (controllers/projectController.js) + preset seeding (seedPresetCollections).
- *    They are covered directly by the two describe blocks at the bottom of this
- *    file (and indirectly by collectionPresetSeeding.test.js). (An earlier header
- *    note here claimed they were "NOT ported / absent" — that was true only before
- *    Phase 6 preset-seeding landed them; corrected per TODO §20.)
+ * Collection item files are written under
+ * getProjectDir(folder)/collections/<type>/<slug>.json. Media usage is keyed by
+ * projectId, and collectionItemUuid remapping is exercised directly here and
+ * indirectly through preset seeding.
  *
  * Run with: node --test packages/builder-server/src/tests/collectionLinkEnrichment.test.js
  */
@@ -167,7 +155,7 @@ describe("cleanupDeletedPageReferences — collection items", () => {
 });
 
 // ============================================================================
-// Richtext stable links (LINK-022→025) — integrity wiring
+// Richtext stable links - integrity wiring
 // ============================================================================
 
 describe("richtext stable links — integrity wiring", () => {
@@ -278,8 +266,7 @@ describe("enrichNewProjectReferences — collection items", () => {
       title: "Alpha",
       cta: { href: "about.html", text: "About", target: "_self" },
     });
-    // New-arch signature: (pagesDir, menusDir). The collections dir is derived
-    // by the function as a sibling of pagesDir.
+    // The collections dir is derived by the function as a sibling of pagesDir.
     await enrichNewProjectReferences(getProjectPagesDir(PROJECT_FOLDER), getProjectMenusDir(PROJECT_FOLDER));
     const item = await readItem("portfolio", "alpha");
     assert.equal(item.settings.cta.pageUuid, "page-about-uuid");
@@ -340,12 +327,12 @@ describe("remapDuplicatedProjectUuids — collection items", () => {
 });
 
 // ============================================================================
-// remapCollectionItemMenuRefs / remapCollectionItemLinkRefs (TODO §20)
+// remapCollectionItemMenuRefs / remapCollectionItemLinkRefs
 //
 // The preset-seeding remap pair: a preset's menus/widgets/items may carry stable
 // collectionItemUuid refs against the preset's OWN item uuids, which are
-// regenerated on seed — so the refs must follow an old->new uuid map. Exercised
-// indirectly via preset seeding + duplication; these block them directly.
+// regenerated on seed, so the refs must follow the source-to-seeded uuid map.
+// Exercised indirectly via preset seeding + duplication; these block them directly.
 // ============================================================================
 
 describe("remapCollectionItemMenuRefs", () => {

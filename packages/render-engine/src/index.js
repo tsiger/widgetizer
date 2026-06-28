@@ -13,6 +13,5 @@ export {
   widgetSupportsTransparentHeader,
 } from "./renderEngine.js";
 
-// Pure `menu`-type setting resolver (Collections finding #10), shared by
-// collection-item rendering and — once 741abfb8 is folded in — widget rendering.
+// Pure `menu`-type setting resolver shared by widget and collection-item rendering.
 export { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";

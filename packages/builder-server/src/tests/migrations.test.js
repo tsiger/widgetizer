@@ -142,10 +142,9 @@ describe("runMigrations", () => {
     db.close();
   });
 
-  it("master-history database (v2 = caption) is backfilled with owner_id via v4", () => {
-    // master shipped v2 = caption. Such a database has {1,2} recorded with the
-    // caption column present but owner_id MISSING (this branch's v2 is skipped
-    // because version 2 is already recorded). v4 must backfill owner_id.
+  it("database with caption recorded at v2 is backfilled with owner_id via v4", () => {
+    // Such a database has {1,2} recorded with the caption column present but
+    // owner_id missing, so v4 must backfill owner_id.
     const db = new Database(":memory:");
     db.exec(`
       CREATE TABLE projects (id TEXT PRIMARY KEY, folder_name TEXT NOT NULL, name TEXT);

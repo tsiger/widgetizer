@@ -25,7 +25,7 @@ const UPDATABLE_PATHS = [
   "snippets",
   "locales",
   "screenshot.png",
-  // collection-types are theme-owned (BLOCKER-1 resolution): replaced wholesale
+  // collection-types are theme-owned: replaced wholesale
   // from the theme source on update. collections/ (user item data) is protected
   // and never appears here.
   "collection-types",

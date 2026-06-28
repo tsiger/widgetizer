@@ -28,7 +28,7 @@ export default function MenuSelectInput({ id, value = "", onChange }) {
     loadMenus();
   }, []);
 
-  // Resolve the current value — handles both UUID and legacy slug-based values
+  // Resolve the current value; handles both UUID and slug-based values.
   const resolvedValue = useMemo(() => {
     if (!value || menus.length === 0) return value || "";
 

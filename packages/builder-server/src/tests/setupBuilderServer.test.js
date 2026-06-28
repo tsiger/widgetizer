@@ -1,7 +1,7 @@
 /**
  * setupBuilderServer DI-seam test suite.
  *
- * Pins the Sprint-2.0b hardening:
+ * Pins the server assembly behavior:
  *  - the adapter set is validated up front (fail loud, not per-request 500s);
  *  - req.scope is sourced from the INJECTED scopeResolver (F3) — proven with a
  *    sentinel cloud-actor resolver that no OSS code would ever hand-build;

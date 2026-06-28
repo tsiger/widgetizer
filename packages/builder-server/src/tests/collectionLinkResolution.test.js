@@ -1,7 +1,7 @@
 /**
  * Render-time resolution of widget `link` settings that target a collection item
- * (collectionItemUuid). Exercises the new-arch wiring end-to-end through
- * renderWidget + the scope-aware `collectionDeps`: the engine lazily loads the
+ * (collectionItemUuid). Exercises renderWidget + the scope-aware `collectionDeps`:
+ * the engine lazily loads the
  * item uuid -> { slugPrefix, slug } map via deps.loadCollectionItemsByUuid and
  * resolveWidgetPageLinks rewrites the href to the item's current page URL,
  * depth-aware (outputPathPrefix), clearing the link when the item is gone (#11
@@ -125,7 +125,7 @@ describe("widget link resolution to collection items", () => {
   });
 });
 
-// Richtext stable internal-links (LINK-022→025) resolve through the SAME render path.
+// Richtext stable internal links resolve through the same render path.
 // The widget has ONLY a richtext setting (no link/menu), so this also proves the
 // collection-item map still loads for richtext-only widgets (the gate fix).
 const RT_WIDGET_SCHEMA = { type: "rt-widget", settings: [{ type: "richtext", id: "body" }] };
@@ -147,7 +147,7 @@ async function renderRichtextWidget(body, sharedGlobals = null) {
   );
 }
 
-describe("richtext stable internal-link resolution (LINK-022→025)", () => {
+describe("richtext stable internal-link resolution", () => {
   it("resolves a richtext collection-item link to the item's page URL (richtext-only widget)", async () => {
     const html = await renderRichtextWidget(
       '<p><a href="portfolio/stale.html" data-collection-item-uuid="u-alpha">Alpha</a></p>',
@@ -169,10 +169,9 @@ describe("richtext stable internal-link resolution (LINK-022→025)", () => {
   });
 });
 
-// Widget `menu` settings now resolve through the SAME shared menuResolver as
-// collection-item rendering (the consolidation of the old inline widget-menu
-// path): collection-item menu targets resolve to the item's page URL and custom
-// menu links are sanitized.
+// Widget `menu` settings resolve through the same shared menuResolver as
+// collection-item rendering: collection-item menu targets resolve to the item's
+// page URL and custom menu links are sanitized.
 const NAV_WIDGET_SCHEMA = { type: "nav-widget", settings: [{ type: "menu", id: "nav" }] };
 
 async function renderNavWidget() {

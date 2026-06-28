@@ -551,7 +551,7 @@ describe("updateMenu", () => {
     assert.match(res._json.error, /title.*required/i);
   });
 
-  // SA-20: bound attacker-controlled menu-item trees before the recursive walks.
+  // Bound menu-item trees before the recursive walks.
   function labelledItems(n) {
     return Array.from({ length: n }, (_, i) => ({ label: `Item ${i}`, link: `/p${i}`, items: [] }));
   }
@@ -568,20 +568,20 @@ describe("updateMenu", () => {
     return res;
   }
 
-  it("rejects a menu with more items than the adapter limit (SA-20)", async () => {
+  it("rejects a menu with more items than the adapter limit", async () => {
     const res = await updateWithCap({ name: "Original Name", items: labelledItems(5) }, 3);
     assert.equal(res._status, 422);
     assert.match(res._json.error, /too many items/i);
   });
 
-  it("rejects a menu nested deeper than MAX_MENU_DEPTH (SA-20)", async () => {
+  it("rejects a menu nested deeper than MAX_MENU_DEPTH", async () => {
     // 40 > 32; node count (40) is under the default cap, so depth is what trips.
     const res = await updateWithCap({ name: "Original Name", items: deepChain(40) }, 1000);
     assert.equal(res._status, 422);
     assert.match(res._json.error, /too deep/i);
   });
 
-  it("allows a menu within both ceilings (SA-20)", async () => {
+  it("allows a menu within both ceilings", async () => {
     const res = await updateWithCap({ name: "Original Name", items: labelledItems(3) }, 10);
     assert.equal(res._status, 200);
     assert.equal(res._json.items.length, 3);
@@ -809,10 +809,10 @@ describe("Edge cases", () => {
 // ============================================================================
 
 describe("UUID backward compatibility", () => {
-  it("backfills uuid for legacy menus without one (getAllMenus)", async () => {
+  it("backfills uuid for menus without one (getAllMenus)", async () => {
     await resetMenus();
 
-    // Write a legacy menu file without uuid
+    // Write a menu file without uuid.
     const menuPath = getMenuPath(activeProject.folderName, "legacy-menu");
     const legacyMenu = {
       id: "legacy-menu",
@@ -827,17 +827,17 @@ describe("UUID backward compatibility", () => {
     const res = await callController(getAllMenus);
     assert.equal(res._status, 200);
     const menu = res._json.find((m) => m.id === "legacy-menu");
-    assert.ok(menu.uuid, "legacy menu should have been backfilled with a uuid");
+    assert.ok(menu.uuid, "menu should have been backfilled with a uuid");
 
     // Verify it was persisted to disk
     const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
     assert.equal(onDisk.uuid, menu.uuid);
   });
 
-  it("backfills uuid for legacy menus without one (getMenuById)", async () => {
+  it("backfills uuid for menus without one (getMenuById)", async () => {
     await resetMenus();
 
-    // Write a legacy menu file without uuid
+    // Write a menu file without uuid.
     const menuPath = getMenuPath(activeProject.folderName, "legacy-by-id");
     const legacyMenu = {
       id: "legacy-by-id",
@@ -849,7 +849,7 @@ describe("UUID backward compatibility", () => {
     // getMenuById should backfill the uuid
     const projectDir = getProjectDir(activeProject.folderName);
     const menu = await getMenuById(projectDir, "legacy-by-id");
-    assert.ok(menu.uuid, "legacy menu should have been backfilled with a uuid");
+    assert.ok(menu.uuid, "menu should have been backfilled with a uuid");
     assert.equal(menu.items.length, 1);
 
     // Verify it was persisted to disk

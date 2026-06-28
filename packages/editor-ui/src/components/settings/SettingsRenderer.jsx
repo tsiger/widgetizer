@@ -122,7 +122,7 @@ export default function SettingsRenderer({
       case "menu":
         return <MenuSelectInput {...inputProps} />;
       case "image": {
-        // `size` replaces legacy `compact` for image width; prefer `size` when both exist
+        // Prefer `size` over `compact` when both image-width fields exist.
         const imageSize = size || (compact ? "narrow" : "full");
         // `layout` ("stacked" default | "row") drives the editor's input shape — a big
         // full-width preview vs. a compact thumbnail with the controls beside it.

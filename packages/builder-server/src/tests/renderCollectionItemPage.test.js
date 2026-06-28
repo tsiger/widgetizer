@@ -1,11 +1,7 @@
 /**
- * renderCollectionItemPage return-contract test (TODO §19, tight scope).
+ * renderCollectionItemPage return-contract test.
  *
- * Master's renderCollectionItemPage.test.js (1aa6e92d — the shared item-page
- * pipeline unifying export + preview) was never ported. The function is fully
- * ported and works; exp covers it only transitively through exportProject
- * (collectionItemExport.test.js asserts written files), never its direct return
- * shape. This pins the load-bearing part of that contract:
+ * Pins the load-bearing part of the direct return contract:
  *
  *   { html, mainContentHtml, itemPageData, resolvedItem }
  *
@@ -167,7 +163,7 @@ for (const { mode, prefix, label } of [
   { mode: "publish", prefix: "../", label: "publish (depth-1)" },
   { mode: "preview", prefix: "", label: "preview (depth-0)" },
 ]) {
-  describe(`renderCollectionItemPage — ${label} return contract (TODO §19)`, () => {
+  describe(`renderCollectionItemPage — ${label} return contract`, () => {
     let result;
     before(async () => {
       result = await renderAlpha(mode, prefix);

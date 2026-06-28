@@ -62,7 +62,7 @@ describe("sanitizeRichText", () => {
     assert.equal(sanitizeRichText(input), input);
   });
 
-  it("keeps the stable internal-link data attrs on anchors (LINK-022→025)", () => {
+  it("keeps the stable internal-link data attrs on anchors", () => {
     const page = '<a href="about.html" data-page-uuid="p1">x</a>';
     assert.ok(sanitizeRichText(page).includes('data-page-uuid="p1"'));
     const item = '<a href="news/x.html" data-collection-item-uuid="i1">y</a>';
@@ -1027,9 +1027,8 @@ describe("gallery sanitization", () => {
     assert.deepEqual(data.settings.gallery, ["/uploads/images/a.jpg"]);
   });
 
-  it("drops a legacy { src, caption } object entry — NOT coerced to its src", () => {
-    // Locks the "no legacy handling / no coercion" decision: an old object-shaped entry
-    // is removed, never converted to a string.
+  it("drops an object-shaped gallery entry instead of coercing it to its src", () => {
+    // Object-shaped entries are removed, never converted to strings.
     const data = {
       settings: {
         gallery: [{ src: "/uploads/images/legacy.jpg", caption: "old" }, "/uploads/images/new.jpg"],

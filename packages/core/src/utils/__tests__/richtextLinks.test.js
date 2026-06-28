@@ -166,7 +166,7 @@ describe("schemaHasRichtextSetting", () => {
   it("detects a top-level richtext setting", () => {
     expect(schemaHasRichtextSetting({ settings: [{ id: "b", type: "richtext" }] })).toBe(true);
   });
-  it("detects a block-level richtext setting (LINK-022/024 scope)", () => {
+  it("detects a block-level richtext setting", () => {
     expect(schemaHasRichtextSetting({ settings: [], blocks: [{ type: "c", settings: [{ id: "t", type: "richtext" }] }] })).toBe(true);
   });
   it("returns false when no richtext setting exists", () => {

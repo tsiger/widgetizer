@@ -8,8 +8,8 @@ vi.mock("../activeProjectId", () => ({
   getActiveProjectId: vi.fn(),
 }));
 
-// Sprint 1.5b: editor (project-scoped) calls go through editorFetch, which
-// prepends the configurable apiBase — OSS "/api", hosted "/api/projects/:id".
+// Editor project-scoped calls go through editorFetch, which prepends the
+// configurable apiBase: OSS "/api", hosted "/api/projects/:id".
 describe("editorFetch / apiBase", () => {
   let fetchMock;
   let getActiveProjectId;

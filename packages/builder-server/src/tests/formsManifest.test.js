@@ -19,8 +19,8 @@ import { Liquid } from "liquidjs";
 import { buildFormsManifest } from "../services/formsManifestService.js";
 import { registerHandleizeFilter } from "@widgetizer/core";
 
-// Core widgets moved into @widgetizer/core in Sprint 1.6; tests run with
-// cwd = repo root, where the package resolves via the workspace symlink.
+// Tests run with cwd = repo root, where core widget templates resolve via the
+// workspace package path.
 const WIDGET_LIQUID_PATH = join(
   process.cwd(),
   "packages",

@@ -560,9 +560,9 @@ export async function saveGlobalWidget(req, res) {
  */
 export async function serveAsset(req, res) {
   const { projectId, folder, filepath } = req.params;
-  // Allow-list the folder segment (SA-01): only "assets" and "widgets" are ever
-  // legitimate. An unsanitized folder of "../.." would widen baseDir below up to
-  // DATA_DIR and defeat the isWithinDirectory check against the widened base.
+  // Allow-list the folder segment: only "assets" and "widgets" are legitimate.
+  // An unsanitized folder of "../.." would widen baseDir below up to DATA_DIR and
+  // defeat the isWithinDirectory check against the widened base.
   if (folder !== "assets" && folder !== "widgets") {
     return res.status(400).send("Invalid asset folder");
   }

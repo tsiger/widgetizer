@@ -29,7 +29,7 @@ router.use(resolveActiveProject);
 router.get("/", getProjectMedia);
 
 // Upload media to the active project (per-request multer with a fileSize cap
-// sourced from the limits adapter — SA-02).
+// sourced from the limits adapter).
 router.post("/", uploadWithLimit, uploadProjectMedia);
 
 // Bulk delete media files

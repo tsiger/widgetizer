@@ -1,5 +1,5 @@
 /**
- * Stable internal references for richtext links (LINK-022→025).
+ * Stable internal references for richtext links.
  *
  * Richtext anchors that target an internal page or collection item carry the target's
  * stable uuid as a data-attribute — `data-page-uuid` / `data-collection-item-uuid` — so
@@ -173,8 +173,8 @@ export function remapRichtextLinkRefs(html, { pageMap, itemMap } = {}) {
 
 /**
  * Enrichment / backfill: derive a stable ref from each internal anchor's `href` slug and stamp
- * the matching `data-*-uuid` (clearing the other kind). Used for presets (attrs stripped) and
- * legacy backfill where hrefs are the durable identity. External / unresolved hrefs are left as-is.
+ * the matching `data-*-uuid` (clearing the other kind). Used for presets with stripped attrs
+ * and slug-only stored links. External / unresolved hrefs are left as-is.
  * @param {*} html
  * @param {{ pageSlugToUuid?: Map<string,string>, itemUuidBySlugPath?: Map<string,string> }} maps
  * @returns {*}

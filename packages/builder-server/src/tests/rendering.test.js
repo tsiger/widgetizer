@@ -479,7 +479,7 @@ describe("renderWidget — menu resolution", () => {
     assert.ok(!html.includes("widget-error"));
   });
 
-  it("falls back to slug-based lookup for legacy menu references", async () => {
+  it("falls back to slug-based lookup for menu references without uuids", async () => {
     const html = await renderWidget(
       PROJECT_ID,
       "hero-menu-slug",
@@ -689,7 +689,7 @@ describe("renderPageLayout", () => {
     assert.ok(html.includes('class="page-about-us"'));
   });
 
-  it("overrides the page-slug body class when contentSections.bodyClass is set (TODO §15)", async () => {
+  it("overrides the page-slug body class when contentSections.bodyClass is set", async () => {
     // Collection item pages pass an explicit bodyClass to REPLACE the page-{slug}
     // default — otherwise a `.page-{slug}` index CSS rule leaks onto item pages,
     // and the nested item slug ("news/alpha") even yields a malformed `/` token.

@@ -174,8 +174,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const outputAssetsDir = path.join(outputDir, "assets");
     const outputImagesDir = path.join(outputAssetsDir, "images");
 
-    // The scope-aware collection capability (storage adapter + scope) the export
-    // route supplies; absent for legacy/test callers → no collections enumerated.
+    // The scope-aware collection capability (storage adapter + scope) supplied by
+    // the export route; absent callers get no collection enumeration.
     const collectionStorage = collectionDeps?.storage || null;
     const collectionScope = collectionDeps?.scope || null;
     const collectionsEnabled = !!(collectionStorage && collectionScope);
@@ -729,7 +729,7 @@ Per aspera ad astra
 
         for (const imageFile of usedImages) {
           const sourceImagePath = path.join(projectDir, imageFile.path.replace(/^\//, ""));
-          // Changed: Export images to assets/images/ instead of uploads/images/
+          // Export images under the public assets/images/ directory.
           const targetImagePath = path.join(outputDir, "assets", "images", path.basename(imageFile.path));
           const hasLargeVariant = Boolean(imageFile.sizes?.large?.path);
           const isSvg = imageFile.type === "image/svg+xml" || imageFile.filename?.toLowerCase().endsWith(".svg");
@@ -755,7 +755,7 @@ Per aspera ad astra
               // Skip thumb variants — only used for the media library UI
               if (sizeName === "thumb") continue;
               const sourceSizePath = path.join(projectDir, sizeInfo.path.replace(/^\//, ""));
-              // Changed: Export image sizes to assets/images/ instead of uploads/images/
+              // Export generated image sizes under the public assets/images/ directory.
               const targetSizePath = path.join(outputDir, "assets", "images", path.basename(sizeInfo.path));
 
               try {
@@ -987,12 +987,11 @@ async function findEntryFile(exportDir) {
   }
 }
 
-// TI-02/SA-13: an export dir belongs to the actor only when it is the active
-// project's own bundle. Reject any separator / parent-segment token first (a
+// An export dir belongs to the actor only when it is the active project's own
+// bundle. Reject any separator / parent-segment token first (a
 // "<folder>-v1/../<otherTenant>-v1" would otherwise pass a bare prefix check and
 // path.join would normalize it back INTO the publish dir, inside isWithinDirectory's
 // bound), then anchor to `<folderName>-v<digits>` (the exportProject naming).
-// Byte-neutral for OSS: the single active project's own request always matches.
 function exportDirBelongsToScope(req, exportDir) {
   const folderName = req.scope?.folderName;
   if (!folderName || typeof exportDir !== "string") return false;
@@ -1015,7 +1014,7 @@ export async function getExportFiles(req, res) {
     if (!exportDir) {
       return res.status(400).json({ error: "Export directory is required" });
     }
-    // TI-02/SA-13: bind to the owner-resolved scope (see exportDirBelongsToScope).
+    // Bind to the owner-resolved scope (see exportDirBelongsToScope).
     if (!exportDirBelongsToScope(req, exportDir)) {
       return res.status(404).json({ error: "Export directory not found" });
     }
@@ -1087,7 +1086,7 @@ export async function downloadExport(req, res) {
     if (!exportDir) {
       return res.status(400).json({ error: "Export directory is required" });
     }
-    // TI-02/SA-13: bind to the owner-resolved scope (see exportDirBelongsToScope).
+    // Bind to the owner-resolved scope (see exportDirBelongsToScope).
     if (!exportDirBelongsToScope(req, exportDir)) {
       return res.status(404).json({ error: "Export directory not found" });
     }

@@ -210,7 +210,7 @@ describe("updateAppSettings", () => {
     assert.equal(res._json.settings.media.maxFileSizeMB, 10);
   });
 
-  // Export option ranges (APPSET-011: versions-to-keep 1-50; APPSET-013: import size >= 1, no artificial floor)
+  // Export option ranges: versions-to-keep is 1-50; import size must be at least 1.
   it("rejects maxVersionsToKeep below 1", async () => {
     const res = await callController(updateAppSettings, { body: { export: { maxVersionsToKeep: 0 } } });
     assert.equal(res._status, 400);

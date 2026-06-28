@@ -40,7 +40,7 @@ async function ensureDirectories() {
  * Seed preset collection ITEM data into a freshly created project. Each item gets
  * a fresh uuid + created/updated timestamps. Items whose type is not defined by
  * the (theme-owned) collection-types schemas are skipped with a warning — preset
- * collection-type SCHEMAS are never honored (BLOCKER-1 resolution); the schemas
+ * collection-type SCHEMAS are never honored; the schemas
  * come from the theme via copyThemeToProject. fs-based against the project dir
  * (mirrors projectScaffold), so it stays adapter-agnostic.
  *
@@ -106,7 +106,7 @@ export async function seedPresetCollections(folderName, presetCollectionsDir) {
   await remapCollectionItemMenuRefs(folderName, oldToNewItemUuid);
   await remapCollectionItemLinkRefs(folderName, oldToNewItemUuid);
 
-  // Richtext stable links (LINK-022→025): presets ship richtext with the uuid attrs
+  // Richtext stable links: presets ship richtext with the uuid attrs
   // stripped, and the seeded item uuids only exist now — so stamp data-page-uuid /
   // data-collection-item-uuid on all richtext (pages, globals, items) from their hrefs.
   await enrichSeededRichtextLinks(folderName);
@@ -314,7 +314,7 @@ export async function createProject(req, res) {
     const themeVersion = await scaffoldProjectContent({ projectDir, theme, preset });
 
     // Seed preset collection ITEM data + starter media (schemas always come from
-    // the theme via copyThemeToProject — never the preset; BLOCKER-1 resolution).
+    // the theme via copyThemeToProject — never the preset).
     // Collection items are fs-only so they seed before the DB row; media files
     // register against the project_id, so that runs after createProject below.
     const { collectionsDir: presetCollectionsDir, mediaDir: presetMediaDir } =
@@ -1091,7 +1091,7 @@ export async function importProject(req, res) {
             }
             mediaRepo.writeMediaData(newProject.id, mediaData);
           }
-          // Remove the media.json file — metadata now lives in SQLite
+          // Remove the media.json file after importing its metadata into SQLite.
           await fs.remove(mediaJsonPath);
         }
       } catch (mediaError) {

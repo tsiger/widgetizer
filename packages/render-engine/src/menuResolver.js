@@ -1,17 +1,11 @@
 /**
  * menuResolver — pure `menu`-type setting resolution shared by widget rendering
- * and collection-item rendering (Collections finding #10).
+ * and collection-item rendering.
  *
- * On the OSS monolith this lived in `server/services/menuResolver.js`. In the
- * package split it belongs in the pure render-engine: it operates only on
- * passed-in maps (menus/pages/collection-items) and string helpers from
- * `@widgetizer/core`, so it touches neither `fs` nor `scope`. The shell loads the
- * menu maps (OSS via fs, hosted via cloud storage) and passes them in.
- *
- * NOTE: the legacy inline `resolveMenuItemLinks`/`resolveMenuPageLinks` still live
- * in `renderEngine.js` for widget *menu rendering*; consolidating widget rendering
- * onto this module is the deferred 741abfb8 render-side-sanitization follow-up.
- * Until then this module is consumed only by `collectionService`.
+ * The resolver operates only on passed-in maps (menus/pages/collection-items)
+ * and string helpers from `@widgetizer/core`, so it touches neither `fs` nor
+ * `scope`. The shell loads the menu maps (OSS via fs, hosted via cloud storage)
+ * and passes them in.
  */
 
 import { MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
@@ -38,9 +32,9 @@ export function resolveMenuItemLinks(
     return menuItems;
   }
 
-  // SA-20: cap recursion depth so rendering a hostile/legacy menu tree (e.g. one
-  // persisted before the save-time depth guard existed) can never blow the call
-  // stack. Levels beyond the cap are returned unresolved rather than walked.
+  // Cap recursion depth so rendering a hostile or unchecked menu tree can never
+  // blow the call stack. Levels beyond the cap are returned unresolved rather
+  // than walked.
   if (depth > MAX_MENU_DEPTH) {
     return menuItems;
   }

@@ -3,9 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { render } from "@testing-library/react";
 import MediaToolbar from "../MediaToolbar.jsx";
 
-// Finding D5: the type-filter <select> lost its "Audio" option, so the media
-// library could not be filtered to audio. (Pairs with the useMediaState "audio"
-// filter branch.)
+// The type-filter <select> includes a focused "Audio" option. This pairs with the
+// useMediaState "audio" filter branch.
 
 function renderToolbar() {
   return render(

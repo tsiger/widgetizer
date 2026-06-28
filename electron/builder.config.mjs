@@ -14,8 +14,8 @@ export default {
     // app/ is frontend source already bundled into dist/ by Vite). It composes
     // the @widgetizer/* backend packages, which are bundled via dependencies.
     "app/server-common.js",
-    // The pre-refactor root src/ folder is gone: core assets + the preview-iframe
-    // runtime modules now live in @widgetizer/core and ride along via that dependency.
+    // Core assets + preview-iframe runtime modules are supplied by
+    // @widgetizer/core and ride along via that dependency.
     "themes",
     "!themes/widgetizer/**",
     "electron",
@@ -27,7 +27,7 @@ export default {
     "!themes/widgetizer/**",
     "dist/**",
     // Core placeholder SVGs are served via res.sendFile, which needs real files
-    // on disk (not inside the asar). They live in @widgetizer/core since 1.6.
+    // on disk (not inside the asar).
     "node_modules/@widgetizer/core/src/assets/**",
     // Served raw via express.static(/runtime). previewRuntime.js imports its
     // sibling standalonePreviewTarget.js by relative URL, so every served runtime

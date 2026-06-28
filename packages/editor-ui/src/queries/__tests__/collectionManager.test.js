@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// The new-arch query layer goes through editorFetchJson (apiBase-relative paths,
-// X-Project-Id injected), mirroring pageManager — so paths carry NO "/api" prefix.
+// Collection queries go through editorFetchJson (apiBase-relative paths,
+// X-Project-Id injected), mirroring pageManager, so paths carry NO "/api" prefix.
 vi.mock("../../lib/apiFetch", () => ({
   editorFetchJson: vi.fn(),
   isApiError: vi.fn((error) => error?.name === "ApiError"),

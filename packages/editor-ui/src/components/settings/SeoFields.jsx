@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next";
 import ImageInput from "./inputs/ImageInput";
 
 /**
- * Shared SEO editor section — the same controls for page SEO and collection
- * item SEO (Finding #12), so item pages are authored exactly like pages. Bound
+ * Shared SEO editor section: the same controls for page SEO and collection
+ * item SEO, so item pages are authored exactly like pages. Bound
  * to a react-hook-form `seo` object via the passed-in register/setValue;
  * `ogImage` is the watched `seo.og_image` value for the media picker. Renders
  * the five user-edited fields (meta description, social title, social image,

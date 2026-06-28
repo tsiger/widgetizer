@@ -3,9 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { render } from "@testing-library/react";
 import MediaGridItem from "../MediaGridItem.jsx";
 
-// Finding D5: audio files lost their distinct Music icon in the grid view and
-// fell back to the generic FileText (document) icon. Non-audio non-images must
-// still show FileText.
+// Audio files get their distinct Music icon in the grid view. Non-audio
+// non-images still show FileText.
 
 const ACTIVE_PROJECT = { id: "proj-1" };
 

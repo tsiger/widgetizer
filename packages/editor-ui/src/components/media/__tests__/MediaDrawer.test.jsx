@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import MediaDrawer from "../MediaDrawer.jsx";
 
-// Two master fixes were dropped in the package port (finding D4):
+// The drawer has two load-bearing behaviors:
 //
 //  1. First-open reset — ImageInput mounts this drawer already-visible with the
 //     file set (a conditional `{visible && file && <MediaDrawer/>}`). The

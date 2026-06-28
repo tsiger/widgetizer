@@ -14,9 +14,8 @@ const UPLOAD_PREFIXES = ["/uploads/images/", "/uploads/files/"];
  * Match upload paths embedded *anywhere* in a string — including a richtext
  * `<img src="/uploads/images/foo-large.jpg">` inside saved HTML — not just a
  * value that *is* a bare upload path. The `.` in the character class lets a
- * match absorb a trailing sentence period in prose (e.g. `…/x.jpg.`); this is
- * intentional parity with master — over-matching only ever marks an asset
- * "used", which is the safe direction.
+ * match absorb a trailing sentence period in prose (e.g. `…/x.jpg.`);
+ * over-matching only ever marks an asset "used", which is the safe direction.
  */
 const EMBEDDED_MEDIA_PATH_RE = /\/uploads\/(?:images|files)\/[A-Za-z0-9._-]+/g;
 
@@ -324,7 +323,7 @@ export function extractMediaPathsFromCollectionItem(itemData) {
   if (itemData?.settings && typeof itemData.settings === "object") {
     Object.values(itemData.settings).forEach((value) => collectMediaPaths(value, mediaPaths));
   }
-  // SEO social image (Finding #12 — parity with page media tracking).
+  // SEO social image, at parity with page media tracking.
   if (itemData?.seo?.og_image && typeof itemData.seo.og_image === "string") {
     const normalized = normalizeMediaPath(itemData.seo.og_image);
     if (normalized) mediaPaths.add(normalized);
@@ -359,7 +358,7 @@ export async function removeCollectionItemFromMediaUsage(projectId, collectionTy
 
 /**
  * Keep collection-item media usage in sync after a write. On rename
- * (previousItemSlug !== itemSlug) the old source is removed first.
+ * (previousItemSlug !== itemSlug) the previous source is removed first.
  */
 export async function syncCollectionItemMediaUsageOnWrite(
   projectId,

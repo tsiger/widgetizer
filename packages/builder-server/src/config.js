@@ -24,11 +24,9 @@ export const THEMES_SEED_DIR = process.env.THEMES_ROOT
   ? path.resolve(process.env.THEMES_ROOT)
   : path.join(APP_ROOT, "themes");
 
-// Core widget definitions + Liquid snippets moved into @widgetizer/core in
-// Sprint 1.6 (the deferred data-dir move). They are read via fs during
-// rendering, so they live happily inside the asar — resolve the package root
-// through its own exports (works in both web via the workspace symlink and
-// packaged Electron via node_modules/@widgetizer/core).
+// Core widget definitions + Liquid snippets are read via fs during rendering,
+// so resolve the core package root to real files in both workspace dev and
+// packaged Electron.
 const CORE_PKG_DIR = path.dirname(require.resolve("@widgetizer/core/package.json"));
 
 // CORE_WIDGETS_DIR stays overridable via env: backend tests point it at an
@@ -40,20 +38,19 @@ export const CORE_WIDGETS_DIR = process.env.CORE_WIDGETS_DIR
 
 export const CORE_SNIPPETS_DIR = path.join(CORE_PKG_DIR, "src", "snippets");
 
-// Frontend locale files (read via fs for preview empty-states) moved into
-// @widgetizer/core in Sprint 1.5f. Resolve the directory through the package's
-// own exports so it works in both web (workspace symlink) and packaged Electron
-// (bundled under node_modules/@widgetizer/core) without guessing an APP_ROOT path.
+// Frontend locale files are read via fs for preview empty-states. Resolve the
+// directory through the package's own exports so it works in both web
+// (workspace symlink) and packaged Electron (bundled under
+// node_modules/@widgetizer/core) without guessing an APP_ROOT path.
 export const LOCALES_DIR = path.dirname(require.resolve("@widgetizer/core/locales/en.json"));
 
 // Static paths — served via express.static() or res.sendFile(), so must be real files on disk.
 // In packaged Electron builds these are unpacked from the asar archive.
 export const STATIC_DIST_DIR = path.join(UNPACKED_ROOT, "dist");
 // Core assets (placeholder SVGs) are served via res.sendFile, which needs real
-// files on disk — so they must be asar-UNPACKED, not read from inside the asar.
-// They moved into @widgetizer/core (Sprint 1.6); resolve to the unpacked copy
-// under node_modules (mirrors STATIC_DIST_DIR / STATIC_UTILS_DIR). In web/dev,
-// UNPACKED_ROOT = APP_ROOT and the node_modules path resolves via the symlink.
+// files on disk, so resolve to the unpacked package copy under node_modules. In
+// web/dev, UNPACKED_ROOT = APP_ROOT and the node_modules path resolves via the
+// workspace symlink.
 export const STATIC_CORE_ASSETS_DIR = path.join(
   UNPACKED_ROOT,
   "node_modules",
@@ -63,9 +60,8 @@ export const STATIC_CORE_ASSETS_DIR = path.join(
   "assets",
 );
 // Preview-iframe runtime modules (previewRuntime.js + its standalonePreviewTarget.js
-// sibling) are served raw via express.static(/runtime) as plain ES modules, so they
-// must be real files on disk (asar-UNPACKED). They live in @widgetizer/core; resolve
-// to the unpacked copy under node_modules (mirrors STATIC_CORE_ASSETS_DIR).
+// sibling) are served raw via express.static(/runtime) as plain ES modules, so
+// they must resolve to real files on disk in dev and packaged Electron.
 export const STATIC_PREVIEW_RUNTIME_DIR = path.join(
   UNPACKED_ROOT,
   "node_modules",
@@ -146,4 +142,3 @@ export function getMediaDir(projectFolderName, mimeType) {
   }
   return getProjectImagesDir(projectFolderName);
 }
-

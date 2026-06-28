@@ -84,7 +84,7 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
       // collections pay no extra I/O.
       let menuDeps = null;
       // Richtext can also carry a collection-item ref (data-collection-item-uuid), so a
-      // richtext-only item must load the item map too (LINK-024) — not just menu/link items.
+      // richtext-only item must load the item map too, not just menu/link items.
       if (schemaHasMenuSetting(schema) || schemaHasLinkSetting(schema) || schemaHasRichtextSetting(schema)) {
         if (!globals.collectionItemsByUuid) {
           globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope);

@@ -1,11 +1,10 @@
 /**
  * MIME helpers for builder-server.
  *
- * The extension→MIME map and `getContentType` now live in @widgetizer/core
- * (the single source of truth shared with the local asset adapter, which had
- * drifted from this copy). Re-exported here so this module's many importers
- * don't churn. The upload-validation constants and classification below are
- * builder-server concerns and stay here.
+ * The extension-to-MIME map and `getContentType` come from @widgetizer/core,
+ * the shared source of truth for server and adapter content types. The
+ * upload-validation constants and classification below are builder-server
+ * concerns and stay here.
  */
 export { CONTENT_TYPES, getContentType } from "@widgetizer/core/mimeTypes";
 

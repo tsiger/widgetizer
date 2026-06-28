@@ -9,9 +9,7 @@ import { MENU_DEFAULT_LABEL_NEW_ITEM } from "../utils/menuUtils";
 // A menu item's link target is chosen in MenuCombobox. The selection handler must
 // map the chosen option to the correct STABLE reference the renderer resolves:
 // a page -> pageUuid, a collection item -> collectionItemUuid + collectionType
-// (#11), a free-typed value -> a custom link. The collection-item branch was lost
-// in the package port (collection items stopped being linkable from menus); these
-// tests pin it back.
+// (#11), a free-typed value -> a custom link.
 
 const PAGE_OPTION = { value: "page-uuid-1", label: "About", slug: "about", isPage: true, group: "Pages" };
 const ITEM_OPTION = {

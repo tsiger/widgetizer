@@ -967,8 +967,7 @@ describe("uploadTheme validation", () => {
 });
 
 // ============================================================================
-// uploadTheme — collection-type schema validation (gate the new-theme install
-// path; see docs-llms/TODO.md §7)
+// uploadTheme — collection-type schema validation for new-theme installs
 // ============================================================================
 
 describe("uploadTheme collection-schema validation", () => {
@@ -986,7 +985,7 @@ describe("uploadTheme collection-schema validation", () => {
     assert.ok(Array.isArray(res._json.errors) && res._json.errors.length > 0);
   });
 
-  it("rejects a new theme whose preset ships a collection-types/ folder (BLOCKER-1)", async () => {
+  it("rejects a new theme whose preset ships a collection-types folder", async () => {
     // Presets seed item DATA only; a preset-owned collection-types/ is disallowed.
     const buffer = buildThemeZip("preset-collection-theme", {
       extraFiles: {
@@ -1016,11 +1015,9 @@ describe("uploadTheme collection-schema validation", () => {
 });
 
 // ============================================================================
-// uploadTheme — update-import collection-schema validation (gate the
-// update-import path; see docs-llms/TODO.md §22). Unlike the new-theme install,
-// the effective theme only exists after base + incoming deltas are merged, so
-// these assert the merged result is validated and the install is left untouched
-// on rejection.
+// uploadTheme — collection-schema validation for update imports. The effective
+// theme only exists after base + incoming deltas are merged, so these assert the
+// merged result is validated and the install is left untouched on rejection.
 // ============================================================================
 
 describe("uploadTheme update-import collection-schema validation", () => {

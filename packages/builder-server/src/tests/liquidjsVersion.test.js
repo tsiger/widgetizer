@@ -1,13 +1,13 @@
 /**
- * SA-06 regression guard — liquidjs floor in the live render engine.
+ * liquidjs version floor in the live render engine.
  *
  * liquidjs <10.26.0 carries a CRITICAL RCE/SSTI (GHSA-gf2q-c269-pqgc) plus a
  * HIGH strip_html ReDoS and renderFile/symlink file-read advisories. The render
  * engine (@widgetizer/render-engine) drives all Liquid rendering, so the version
  * it actually resolves at runtime is what matters.
  *
- * The subtlety SA-06 caught: in hosted, @widgetizer/render-engine is a vendor
- * SYMLINK into this OSS tree, so the consumer's own lockfile is shadowed — the
+ * In hosted, @widgetizer/render-engine is a vendor symlink into this OSS tree,
+ * so the consumer's own lockfile is shadowed. The
  * engine resolves liquidjs from the OSS tree under its realpath. This test
  * reproduces that exact resolution (realpath of the engine entry, then resolve
  * liquidjs relative to it) and asserts the secure floor, so it guards both the
@@ -21,7 +21,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { realpathSync } from "node:fs";
 
-const MIN = [10, 26, 0]; // secure floor for the SA-06 advisories
+const MIN = [10, 26, 0]; // secure floor for the liquidjs advisories
 
 // Resolve liquidjs exactly as the render engine does: follow the engine's real
 // path (defeats the vendor-symlink lockfile-shadowing trap), then resolve
@@ -43,13 +43,13 @@ function gte(version, min) {
   return true;
 }
 
-describe("SA-06: liquidjs version floor", () => {
+describe("liquidjs version floor", () => {
   it("render engine resolves liquidjs >= 10.26.0", () => {
     const version = resolveEngineLiquidVersion();
     assert.ok(
       gte(version, MIN),
-      `render-engine resolves liquidjs ${version}, but the SA-06 secure floor is ${MIN.join(".")} ` +
-        `(see findings.md SA-06: <10.26.0 carries a CRITICAL RCE + HIGH ReDoS). ` +
+      `render-engine resolves liquidjs ${version}, but the secure floor is ${MIN.join(".")} ` +
+        `(<10.26.0 carries a CRITICAL RCE + HIGH ReDoS). ` +
         `Bump liquidjs in packages/render-engine, packages/core, and the root package.json, then npm install.`,
     );
   });

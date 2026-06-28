@@ -19,7 +19,7 @@ function usage() {
   console.log(`
 Usage: node scripts/generate-images.js <plan.json> <output-folder>
 
-  plan.json       JSON file with an array of image specs (see docs-llms/preset-plans/)
+  plan.json       JSON file with an array of image specs
   output-folder   Directory to write generated images into (created if missing)
 
 Each entry in the JSON array must have:

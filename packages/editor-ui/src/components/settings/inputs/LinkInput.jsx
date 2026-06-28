@@ -18,7 +18,7 @@ export default function LinkInput({ id, value = {}, onChange, setting }) {
     return map;
   }, [options]);
 
-  // slug -> page option, to recognize legacy hrefs that match a page.
+  // slug -> page option, to recognize slug-only hrefs that match a page.
   const pageOptionBySlug = useMemo(() => {
     const map = new Map();
     options.forEach((o) => {

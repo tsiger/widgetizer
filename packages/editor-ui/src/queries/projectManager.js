@@ -252,7 +252,7 @@ export async function exportProject(projectId) {
 }
 
 /**
- * Import a project from a ZIP file previously exported from the application.
+ * Import a project from a ZIP file created by the application export flow.
  * @param {File} file - The ZIP file to import (from file input or drag-drop)
  * @param {function(number): void|{onProgress?: function(number): void, signal?: AbortSignal}} [optionsOrProgress] - Progress callback or options
  * @returns {Promise<Project>} The imported project object

@@ -164,8 +164,8 @@ describe("parseDiffNameStatus", () => {
   });
 
   it("throws on a git-quoted path rather than silently dropping it", () => {
-    // What git emits for a non-ASCII filename; would be skipped (and lost from
-    // the delta) by the old prefix check.
+    // What git emits for a non-ASCII filename; must still be decoded into a
+    // usable theme-relative path.
     const output = 'M\t"themes/arch/n\\303\\241me.css"';
     expect(() => parseDiffNameStatus(output, THEME)).toThrow(/quoted/i);
   });

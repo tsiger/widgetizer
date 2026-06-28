@@ -1,24 +1,19 @@
 /**
- * Preset → media seeding test suite (new-arch port).
+ * Preset media seeding test suite.
  *
- * Ported from the upstream monolith test (server/tests/presetMediaSeeding.test.js)
- * to the package-split / scope-first builder-server. Covers the starter-image
- * path used at project creation:
+ * Covers the starter-image path used at project creation:
  *  - resolvePresetPaths returns mediaDir when the preset ships a media/ folder,
  *    and null when it doesn't.
  *  - seedPresetMedia copies the image binaries into the project's uploads/images
  *    and registers each manifest entry in the media DB with a fresh,
  *    project-scoped UUID (originals + their generated sizes).
  *
- * NEW-ARCH NOTES (vs. upstream):
- *  - There is NO getProjectImagesDir-via-monolith / getThemePresetDir-as-source in
- *    the same shape; we use config.js getProjectImagesDir(folder) and
- *    getThemePresetDir(theme, preset). resolvePresetPaths resolves the preset under
- *    getThemeSourceDir(theme), which returns getThemeDir(theme) when there is no
- *    latest/theme.json — so writing under getThemePresetDir IS the resolved source.
- *  - The project ROW is seeded via projectRepo.writeProjectsData (not a monolith
- *    createProject helper) so media_files.project_id FK is satisfied before
- *    seedPresetMedia registers records.
+ *  - Preset media is resolved through config.js helpers:
+ *    getProjectImagesDir(folder), getThemePresetDir(theme, preset), and
+ *    getThemeSourceDir(theme).
+ *  - The project row is seeded via projectRepo.writeProjectsData so
+ *    media_files.project_id FK is satisfied before seedPresetMedia registers
+ *    records.
  *  - mediaRepo.getMediaFiles(projectId) returns { files: [...] } with the
  *    rowToMediaFile shape: { id, filename, path, type, width, height,
  *    metadata: { alt, title }, sizes: { <name>: { path, width, height } }, ... }.

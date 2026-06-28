@@ -1,9 +1,8 @@
 // Built-in OSS editor navigation, contributed through the SAME plugin registry
 // as user plugins — EditorShell composes the list as `[builtinNavPlugin, ...plugins]`.
-// Ported from the former `src/config/navigation.js` section list: the two
-// sections (site, tools) become an ordered NAV_GROUPS table plus a per-item
-// `group` tag, so plugin-contributed navItems can join an existing group or
-// render in a trailing section of their own.
+// The two sections (site, tools) are represented by an ordered NAV_GROUPS table
+// plus a per-item `group` tag, so plugin-contributed navItems can join an
+// existing group or render in a trailing section of their own.
 
 import { File, ListTree, Image, Settings, Rocket, Eye } from "lucide-react";
 
