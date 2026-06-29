@@ -27,6 +27,32 @@ npm run electron:preflight         # Pre-release sanity check: lint + locale val
 
 The four `electron:build:*` scripts are thin wrappers over `scripts/build-electron.mjs`, which runs Vite build → platform prep → `@electron/rebuild` → `electron-builder`.
 
+## Simulating auto-updates locally (Windows)
+
+Test the real auto-update flow — detect → banner → download with progress → Restart → install → relaunch — without cutting a GitHub tag/release. It's accurate because only the feed *host* changes (localhost instead of github.com): the same `autoUpdater`, the same `latest.yml` parsing, the same NSIS installer + blockmap, the same relaunch.
+
+This works because `main.js` already supports a feed override via the `ELECTRON_UPDATER_URL` env var (or `--updater-url=` arg), which points `autoUpdater` at a `generic` provider instead of GitHub.
+
+You can't update *from* nothing, so install a baseline first:
+
+```bash
+npm run updater:base    # builds + runs the installer for the CURRENT package.json version
+# ...let it install (silent NSIS one-click; the app launches)...
+npm run updater:sim     # builds the NEXT version, serves it locally, launches the baseline
+```
+
+`updater:sim` then:
+
+1. Builds a version-bumped installer (default: base patch + 1) into `dist-electron-update/` using `build-electron.mjs --app-version <next> --out-dir …` — **no change to `package.json` or git**.
+2. Serves that directory over `http://127.0.0.1:8384` (`scripts/serve-update-feed.mjs`, an Express static server that honours Range/ETag — what electron-updater's downloader needs).
+3. Launches the installed baseline app with `ELECTRON_UPDATER_URL` pointed at the local feed.
+
+The update check fires ~10s after launch; the banner appears, you download and Restart, and the app relaunches as the new version (verify via **Help → About**). Press Ctrl+C in the `updater:sim` terminal to stop the feed server.
+
+Useful flags: `--next <x.y.z>` (explicit update version), `--port <n>`, `--skip-build` (reuse `dist-electron-update/`), `--app-exe <path>` (if the installed exe isn't auto-found). The new version, once installed, relaunches without the override env var, so it reverts to the GitHub feed — no loops.
+
+> Notes: the first simulated update typically does a *full* download (blockmap delta needs the prior version's blockmap matched up); the user-visible flow is identical. Mac is intentionally not supported — Squirrel.Mac requires matching code signatures, so an unsigned update can't be faked, though the flow is otherwise the same.
+
 ## Notes
 
 - Build output goes to `dist-electron/` at the repo root (gitignored).

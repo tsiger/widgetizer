@@ -4,6 +4,7 @@
  *
  * Usage:
  *   node scripts/build-electron.mjs --platform <mac|win> [--unsigned]
+ *       [--app-version <x.y.z>] [--out-dir <path>]
  *
  * Pipeline (runs sequentially; aborts on any failure):
  *   1. Vite build (`npm run build`)
@@ -12,6 +13,15 @@
  *        win: install win32 x64 optional deps without saving
  *   3. Native rebuild for Electron (`@electron/rebuild --force`)
  *   4. electron-builder with the right platform flag, env vars, and target arg
+ *
+ * Override flags (used by the update simulator, scripts/simulate-update.mjs):
+ *   --app-version  Override the packaged version without touching package.json
+ *                  (electron-builder `-c.extraMetadata.version`). Lets you build
+ *                  a "next" release for local auto-update testing.
+ *   --out-dir      Override the output directory (`-c.directories.output`) so a
+ *                  simulated build lands beside, not on top of, a real build.
+ *   When either override is present, `--publish never` is forced so a simulated
+ *   build can never accidentally publish.
  */
 
 import { spawnSync } from "node:child_process";
@@ -23,6 +33,11 @@ const args = process.argv.slice(2);
 const platformIdx = args.indexOf("--platform");
 const platform = platformIdx !== -1 ? args[platformIdx + 1] : null;
 const unsigned = args.includes("--unsigned");
+
+const appVersionIdx = args.indexOf("--app-version");
+const appVersion = appVersionIdx !== -1 ? args[appVersionIdx + 1] : null;
+const outDirIdx = args.indexOf("--out-dir");
+const outDir = outDirIdx !== -1 ? args[outDirIdx + 1] : null;
 
 if (platform !== "mac" && platform !== "win") {
   console.error("Usage: node scripts/build-electron.mjs --platform <mac|win> [--unsigned]");
@@ -102,6 +117,18 @@ run("npx", ["@electron/rebuild", "--force"]);
 // 4. electron-builder
 const builderArgs = ["electron-builder", "--config", "electron/builder.config.mjs", `--${platform}`];
 const builderEnv = {};
+
+// Simulation overrides: bump the packaged version and/or redirect output without
+// editing package.json, and never publish a simulated artifact.
+if (appVersion) {
+  builderArgs.push(`-c.extraMetadata.version=${appVersion}`);
+}
+if (outDir) {
+  builderArgs.push(`-c.directories.output=${outDir}`);
+}
+if (appVersion || outDir) {
+  builderArgs.push("--publish", "never");
+}
 
 if (platform === "mac" && unsigned) {
   builderArgs.push("dir");
