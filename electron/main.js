@@ -841,7 +841,7 @@ function setupAutoUpdater() {
     autoUpdater.checkForUpdates().catch((err) => {
       log(`Update check failed: ${err.message}`);
     });
-  }, 10000);
+  }, 5000);
 }
 
 // App lifecycle
