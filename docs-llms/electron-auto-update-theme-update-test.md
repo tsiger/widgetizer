@@ -61,6 +61,156 @@ $feedUrl = "http://127.0.0.1:$feedPort"
 - Projects that did not opt in do not show project-level update notifications.
 - Applying a project theme update moves the project from `$fromVersion` to `$targetVersion`.
 
+## Fast Retest From Existing Artifacts: Two PowerShell Windows
+
+Use this section when the `0.9.8` installer and the target `dist-electron` feed artifacts already exist and you want to rerun the upgrade test from a clean slate.
+
+For the current `0.9.8 -> 0.9.9` test, the expected files are:
+
+- Base installer: `C:\Users\g_tsi\Projects\widgetizer-upgrade-test\widgetizer-0.9.8\dist-electron\Widgetizer-Setup-0.9.8.exe`
+- Target feed directory: `C:\Users\g_tsi\Projects\widgetizer\dist-electron`
+- Target feed URL: `http://127.0.0.1:8384`
+
+### PowerShell Window 1: Clean And Install `0.9.8`
+
+Open a normal PowerShell window. Run the whole block below in this window:
+
+```powershell
+Get-Process Widgetizer -ErrorAction SilentlyContinue | Stop-Process -Force
+
+foreach ($port in 3001,8384) {
+  Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue |
+    Select-Object -ExpandProperty OwningProcess -Unique |
+    ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
+}
+
+$paths = @(
+  "$env:LOCALAPPDATA\Programs\widgetizer",
+  "$env:LOCALAPPDATA\Programs\Widgetizer",
+  "$env:APPDATA\widgetizer",
+  "$env:APPDATA\Widgetizer",
+  "$env:LOCALAPPDATA\widgetizer",
+  "$env:LOCALAPPDATA\Widgetizer",
+  "$env:LOCALAPPDATA\widgetizer-updater",
+  "$env:LOCALAPPDATA\Widgetizer-updater"
+)
+
+foreach ($p in $paths) {
+  if (Test-Path -LiteralPath $p) {
+    Remove-Item -LiteralPath $p -Recurse -Force
+  }
+}
+
+& "C:\Users\g_tsi\Projects\widgetizer-upgrade-test\widgetizer-0.9.8\dist-electron\Widgetizer-Setup-0.9.8.exe"
+```
+
+After the installer finishes, open Widgetizer if it did not auto-open.
+
+Create the base-version test projects in the `0.9.8` app:
+
+- one Arch project with theme updates enabled
+- one Arch project with theme updates disabled
+
+Still in **PowerShell Window 1**, verify the clean `0.9.8` state while Widgetizer is running:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:3001/api/projects | ConvertTo-Json -Depth 10
+Invoke-RestMethod http://127.0.0.1:3001/api/themes | ConvertTo-Json -Depth 10
+```
+
+Expected before starting the update:
+
+- `/api/themes` shows Arch `version: "0.9.8"`.
+- The opted-in project has `receiveThemeUpdates: true`.
+- The opted-out project has `receiveThemeUpdates: false`.
+- Both projects have `themeVersion: "0.9.8"`.
+
+Close Widgetizer before launching it against the update feed:
+
+```powershell
+Get-Process Widgetizer -ErrorAction SilentlyContinue | Stop-Process -Force
+```
+
+### PowerShell Window 2: Start The `0.9.9` Feed Server
+
+Open a **second PowerShell window or tab**. This second window is only for the feed server.
+
+Run this in **PowerShell Window 2**:
+
+```powershell
+cd "C:\Users\g_tsi\Projects\widgetizer\dist-electron"
+npx http-server . -p 8384 -a 127.0.0.1
+```
+
+Leave **PowerShell Window 2** open. Do not run any other test commands in it. It should keep showing something like:
+
+```text
+Available on:
+  http://127.0.0.1:8384
+Hit CTRL-C to stop the server
+```
+
+Do not close this feed-server window until the app update has been downloaded and installed.
+
+### PowerShell Window 1: Verify The Feed
+
+Return to **PowerShell Window 1**. Run:
+
+```powershell
+Invoke-WebRequest "http://127.0.0.1:8384/latest.yml" -UseBasicParsing | Select-Object StatusCode,Content
+```
+
+Expected:
+
+```text
+StatusCode 200
+Content    version: 0.9.9...
+```
+
+### PowerShell Window 1: Launch Installed `0.9.8` Against The Feed
+
+Still in **PowerShell Window 1**, run:
+
+```powershell
+$env:ELECTRON_UPDATER_URL = "http://127.0.0.1:8384"
+& "$env:LOCALAPPDATA\Programs\widgetizer\Widgetizer.exe"
+```
+
+Expected:
+
+- Widgetizer starts as `0.9.8`.
+- The log includes `Using updater override feed: http://127.0.0.1:8384`.
+- After about 10 seconds, `0.9.8` checks the feed and finds `0.9.9`.
+- In `0.9.8`, enter a project workspace if the update banner is not visible on the Projects screen. The old `0.9.8` banner is not mounted globally.
+- Click the update action in the app, wait for download, then restart/install when prompted.
+
+Optional log tail in **PowerShell Window 1**:
+
+```powershell
+Get-Content -LiteralPath "$env:APPDATA\widgetizer\logs\widgetizer.log" -Wait
+```
+
+After the app restarts into `0.9.9`, verify the result with the API port shown in the log. For `0.9.9+`, the packaged app may use a dynamic backend port. Look for a log line like:
+
+```text
+Server reported ready on port <port>
+```
+
+Then run, replacing `<port>`:
+
+```powershell
+$port = <port>
+Invoke-RestMethod "http://127.0.0.1:$port/api/themes" | ConvertTo-Json -Depth 10
+Invoke-RestMethod "http://127.0.0.1:$port/api/projects" | ConvertTo-Json -Depth 10
+```
+
+Expected final state:
+
+- App is running as `0.9.9`.
+- Arch reports `version: "0.9.9"` after the Arch update is applied.
+- The opted-in project moves to `themeVersion: "0.9.9"` after applying its project theme update.
+- The opted-out project remains on `themeVersion: "0.9.8"`.
+
 ## Updater Override Requirement
 
 The base version must already support a local updater feed override. Verify once per base version:
@@ -243,7 +393,7 @@ The generic feed folder must contain at least:
 
 ## Serve The Target Update Feed
 
-In one PowerShell window:
+Use a dedicated PowerShell window or tab for the feed server. In examples above this is **PowerShell Window 2**.
 
 ```powershell
 cd "$repo\dist-electron"
@@ -259,7 +409,7 @@ npx http-server . -p 8384 -a 127.0.0.1
 
 Leave this feed-server window open.
 
-Check the feed:
+Check the feed from a different PowerShell window, not the feed-server window:
 
 ```powershell
 Invoke-WebRequest "$feedUrl/latest.yml" -UseBasicParsing | Select-Object StatusCode,Content
@@ -273,7 +423,7 @@ Invoke-WebRequest "http://127.0.0.1:8384/latest.yml" -UseBasicParsing | Select-O
 
 ## Launch The Installed Base App Against The Local Feed
 
-In another PowerShell window:
+Run this from a different PowerShell window than the feed server. In examples above this is **PowerShell Window 1**.
 
 ```powershell
 $env:ELECTRON_UPDATER_URL = $feedUrl

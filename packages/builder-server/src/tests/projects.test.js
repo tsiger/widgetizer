@@ -43,6 +43,7 @@ const {
   duplicateProject,
   exportProject,
   importProject,
+  toggleProjectThemeUpdates,
 } = await import("../controllers/projectController.js");
 const { closeDb } = await import("../db/index.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
@@ -643,6 +644,14 @@ describe("createProject", () => {
     assert.equal(project.receiveThemeUpdates, true);
   });
 
+  it("rejects non-boolean receiveThemeUpdates on create", async () => {
+    const res = await callController(createProject, {
+      body: { name: "String Updates Flag", description: "", theme: TEST_THEME_ID, receiveThemeUpdates: "false" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /receiveThemeUpdates.*boolean/i);
+  });
+
   it("stores siteTitle", async () => {
     const project = await createTestProject("Site Title Project", { siteTitle: "Widgetizer Demo" });
     assert.equal(project.siteTitle, "Widgetizer Demo");
@@ -1053,6 +1062,15 @@ describe("updateProject", () => {
     assert.equal(res._json.receiveThemeUpdates, true);
   });
 
+  it("rejects non-boolean receiveThemeUpdates on update", async () => {
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Original Name", receiveThemeUpdates: "false" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /receiveThemeUpdates.*boolean/i);
+  });
+
   it("rejects invalid folderName characters on update", async () => {
     const res = await callController(updateProject, {
       params: { id: project.id },
@@ -1114,6 +1132,62 @@ describe("updateProject", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /name.*required/i);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Toggle Theme Updates
+// ---------------------------------------------------------------------------
+
+describe("toggleProjectThemeUpdates", () => {
+  let project;
+
+  beforeEach(async () => {
+    await resetProjects();
+    project = await createTestProject("Toggle Updates");
+  });
+
+  it("enables and disables theme updates for a project", async () => {
+    const onRes = await callController(toggleProjectThemeUpdates, {
+      params: { id: project.id },
+      body: { enabled: true },
+    });
+    assert.equal(onRes._status, 200);
+    assert.equal(onRes._json.success, true);
+    assert.equal(onRes._json.receiveThemeUpdates, true);
+
+    const offRes = await callController(toggleProjectThemeUpdates, {
+      params: { id: project.id },
+      body: { enabled: false },
+    });
+    assert.equal(offRes._json.receiveThemeUpdates, false);
+  });
+
+  it("rejects a non-boolean enabled flag", async () => {
+    const res = await callController(toggleProjectThemeUpdates, {
+      params: { id: project.id },
+      body: { enabled: "true" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /enabled.*boolean/i);
+  });
+
+  it("rejects a missing enabled flag", async () => {
+    const res = await callController(toggleProjectThemeUpdates, {
+      params: { id: project.id },
+      body: {},
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /enabled.*boolean/i);
+  });
+
+  it("returns 404 for a non-existent project", async () => {
+    const res = await callController(toggleProjectThemeUpdates, {
+      params: { id: "non-existent-uuid" },
+      body: { enabled: true },
+    });
+    assert.equal(res._status, 404);
+    assert.ok(res._json.error);
   });
 });
 

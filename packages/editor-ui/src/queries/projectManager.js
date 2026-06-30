@@ -27,7 +27,7 @@ export function invalidateProjectsListCache() {
  * @property {string} theme - Theme identifier used by the project
  * @property {string} [description] - Optional project description
  * @property {string} [siteTitle] - Optional site title used for exported metadata
- * @property {boolean} [themeUpdatesEnabled] - Whether theme updates are enabled
+ * @property {boolean} [receiveThemeUpdates] - Whether theme update notifications are enabled
  * @property {string} [themeVersion] - Current theme version
  * @property {string} createdAt - ISO timestamp of creation
  * @property {string} updatedAt - ISO timestamp of last update
@@ -316,7 +316,7 @@ export async function checkThemeUpdates(projectId) {
  * Enable or disable automatic theme update notifications for a project.
  * @param {string} projectId - The ID of the project to configure
  * @param {boolean} enabled - Whether to enable theme update notifications
- * @returns {Promise<{success: boolean, themeUpdatesEnabled: boolean}>} Updated preference status
+ * @returns {Promise<{success: boolean, receiveThemeUpdates: boolean}>} Updated preference status
  * @throws {Error} If the toggle fails
  */
 export async function toggleThemeUpdates(projectId, enabled) {

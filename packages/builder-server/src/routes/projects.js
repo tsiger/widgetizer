@@ -9,6 +9,17 @@ import { standardJsonParser } from "../middleware/jsonParser.js";
 const router = express.Router();
 router.use(standardJsonParser);
 
+const booleanField = (field) =>
+  body(field)
+    .custom((value) => typeof value === "boolean")
+    .withMessage(`${field} must be a boolean.`);
+
+const optionalBooleanField = (field) =>
+  body(field)
+    .optional()
+    .custom((value) => typeof value === "boolean")
+    .withMessage(`${field} must be a boolean.`);
+
 // GET /api/projects - Get all projects
 router.get("/", projectController.getAllProjects);
 
@@ -24,6 +35,7 @@ router.post(
     body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
     body("preset").optional().isString().trim(),
+    optionalBooleanField("receiveThemeUpdates"),
   ],
   validateRequest,
   projectController.createProject,
@@ -45,6 +57,7 @@ router.put(
     body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
     body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
     body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
+    optionalBooleanField("receiveThemeUpdates"),
   ],
   validateRequest,
   projectController.updateProject,
@@ -87,7 +100,10 @@ router.get(
 // PUT /api/projects/:id/theme-updates - Toggle theme updates preference
 router.put(
   "/:id/theme-updates",
-  [param("id").notEmpty().withMessage("Project ID is required.")],
+  [
+    param("id").notEmpty().withMessage("Project ID is required."),
+    booleanField("enabled"),
+  ],
   validateRequest,
   projectController.toggleProjectThemeUpdates,
 );

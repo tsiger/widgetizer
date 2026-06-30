@@ -36,6 +36,10 @@ async function ensureDirectories() {
   await fs.ensureDir(path.join(DATA_DIR, "projects"));
 }
 
+function isOptionalBoolean(value) {
+  return value === undefined || typeof value === "boolean";
+}
+
 /**
  * Seed preset collection ITEM data into a freshly created project. Each item gets
  * a fresh uuid + created/updated timestamps. Items whose type is not defined by
@@ -287,6 +291,10 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
     }
 
+    if (!isOptionalBoolean(receiveThemeUpdates)) {
+      return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
+    }
+
     // If a folder name is explicitly provided, validate its format. Collisions on
     // either name or folder are no longer hard errors — resolveProjectIdentity
     // disambiguates them with suffixes, matching the import flow.
@@ -336,7 +344,7 @@ export async function createProject(req, res) {
       theme,
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
-      receiveThemeUpdates: receiveThemeUpdates || false, // Opt-in flag (default: off)
+      receiveThemeUpdates: receiveThemeUpdates ?? false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
@@ -477,6 +485,10 @@ export async function updateProject(req, res) {
 
     if (updates.siteUrl !== undefined && !isValidSiteUrl(updates.siteUrl)) {
       return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
+    }
+
+    if (!isOptionalBoolean(updates.receiveThemeUpdates)) {
+      return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
     }
 
     // Sanitize site title and siteUrl if provided
@@ -1178,7 +1190,7 @@ export async function toggleProjectThemeUpdates(req, res) {
     const { enabled } = req.body;
 
     if (typeof enabled !== "boolean") {
-      return res.status(400).json({ error: "'enabled' must be a boolean" });
+      return res.status(400).json({ error: "enabled must be a boolean." });
     }
 
     const { toggleThemeUpdates } = await import("../services/themeUpdateService.js");
