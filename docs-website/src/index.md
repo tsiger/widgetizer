@@ -44,6 +44,10 @@ The [Media Library](media.html) is your central hub for images.
 
 Easily manage your site's [navigation menus](menus.html) through a simple drag-and-drop interface. Create hierarchical menus (with sub-menus) and link them to your pages with ease.
 
+### Collections
+
+Some themes include [Collections](collections.html) — content types like News, Projects, or Services. Each collection holds many items of the same shape, and the theme decides how they appear on your site. It's a lightweight CMS built right into your theme.
+
 # The Workflow: From Idea to Live Site
 
 Working with Widgetizer follows a simple, three-step journey:

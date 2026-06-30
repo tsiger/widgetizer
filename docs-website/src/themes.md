@@ -12,6 +12,7 @@ A theme is a complete package that includes:
 - **Widgets**: Pre-built content components specific to that theme (like hero banners, text sections, galleries, video popups, etc.)
 - **Layout Templates**: The HTML structure that wraps your content
 - **Global Settings**: Theme-wide customization options (colors, fonts, etc.)
+- **Collections** _(some themes)_: Content types like News or Projects that you fill with items — see [Collections](collections.html)
 
 Think of a theme as a design system and component library rolled into one. It provides you with a set of building blocks (widgets) that are designed to work together cohesively.
 

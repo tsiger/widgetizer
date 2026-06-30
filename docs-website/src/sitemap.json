@@ -24,7 +24,7 @@
     },
     {
       "type": "header",
-      "title": "Core Concepts"
+      "title": "Using Widgetizer"
     },
     {
       "type": "page",
@@ -38,6 +38,11 @@
     },
     {
       "type": "page",
+      "title": "Collections",
+      "path": "collections.md"
+    },
+    {
+      "type": "page",
       "title": "Menus",
       "path": "menus.md"
     },
@@ -48,13 +53,13 @@
     },
     {
       "type": "page",
-      "title": "Themes",
-      "path": "themes.md"
+      "title": "Forms",
+      "path": "forms.md"
     },
     {
       "type": "page",
-      "title": "Plugins",
-      "path": "plugins.md"
+      "title": "Themes",
+      "path": "themes.md"
     },
     {
       "type": "page",
@@ -67,8 +72,18 @@
       "path": "export.md"
     },
     {
+      "type": "page",
+      "title": "Plugins",
+      "path": "plugins.md"
+    },
+    {
       "type": "header",
       "title": "Theme Development"
+    },
+    {
+      "type": "page",
+      "title": "Quickstart",
+      "path": "theme-dev-quickstart.md"
     },
     {
       "type": "page",
@@ -92,13 +107,27 @@
     },
     {
       "type": "page",
-      "title": "Liquid Tags & Assets",
-      "path": "theme-dev-liquid-assets.md"
+      "title": "Widgets & Blocks",
+      "path": "theme-dev-widgets-blocks.md"
     },
     {
       "type": "page",
-      "title": "Widgets & Blocks",
-      "path": "theme-dev-widgets-blocks.md"
+      "title": "Collections (Authoring)",
+      "path": "theme-dev-collections.md"
+    },
+    {
+      "type": "page",
+      "title": "Menus & Snippets",
+      "path": "theme-dev-menus-snippets.md"
+    },
+    {
+      "type": "header",
+      "title": "Theme Reference"
+    },
+    {
+      "type": "page",
+      "title": "Liquid Tags & Filters",
+      "path": "theme-dev-liquid-assets.md"
     },
     {
       "type": "page",
@@ -107,18 +136,23 @@
     },
     {
       "type": "page",
-      "title": "Menus & Snippets",
-      "path": "theme-dev-menus-snippets.md"
-    },
-    {
-      "type": "page",
       "title": "Design System & Utilities",
       "path": "theme-dev-design-system.md"
     },
     {
       "type": "page",
+      "title": "Theme Contract",
+      "path": "theme-dev-contract.md"
+    },
+    {
+      "type": "page",
       "title": "Advanced & Accessibility",
       "path": "theme-dev-advanced-accessibility.md"
+    },
+    {
+      "type": "page",
+      "title": "Distributing & Updating Themes",
+      "path": "theme-dev-distribution.md"
     }
   ]
 }

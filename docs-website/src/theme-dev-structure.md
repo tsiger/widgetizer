@@ -9,7 +9,7 @@ A theme in Widgetizer is a complete package with a predictable folder structure.
 Themes are built with familiar web technologies:
 
 - **HTML** for overall document structure (in `layout.liquid`)
-- **LiquidJS** for templating, data access, and reusable snippets (see [Liquid Tags & Assets](theme-dev-liquid-assets.html))
+- **LiquidJS** for templating, data access, and reusable snippets (see [Liquid Tags & Filters](theme-dev-liquid-assets.html))
 - **CSS** for base styles, tokens, and widget-level styling
 - **JavaScript** for widget behavior and advanced interactions
 
@@ -51,6 +51,10 @@ themes/my-theme/
 │   └── main-menu.json
 ├── snippets/
 │   └── icon.liquid
+├── collection-types/     # Optional: theme-defined content types (CMS)
+│   └── news/
+│       ├── schema.json
+│       └── template.liquid
 ├── locales/              # Translation files for i18n
 │   ├── en.json
 │   ├── fr.json
@@ -86,7 +90,7 @@ The theme manifest. It must include `name`, `version`, and `author` at minimum. 
 
 **`layout.liquid`**
 
-The main HTML wrapper for every page. This is where global assets are loaded and where page content is inserted. See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Assets](theme-dev-liquid-assets.html) for required placeholders and asset loading.
+The main HTML wrapper for every page. This is where global assets are loaded and where page content is inserted. See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Filters](theme-dev-liquid-assets.html) for required placeholders and asset loading.
 
 **`screenshot.png`**
 
@@ -130,6 +134,7 @@ When a theme is selected for a project, the system loads:
 - `assets/` for theme-level assets
 - `menus/` for navigation menus
 - `snippets/` for reusable Liquid partials
+- `collection-types/*/` for collection schemas and item-page templates (when present)
 - `locales/` for translation strings (when present)
 - `presets/*/preset.json` for preset variants (when present)
 
@@ -157,98 +162,8 @@ When a new project is created, the selected theme is copied into the project's d
 
 This ensures each project has its own theme files and can evolve independently.
 
-# Publishing Theme Updates
+# Distributing & Updating Themes
 
-Widgetizer supports a versioned update system that lets you distribute improvements to users of your theme.
+Themes are shared as zip files, and Widgetizer's versioned update system lets you ship improvements to existing projects without touching user content. The `updates/` and `latest/` folders shown in the layout above are part of that system.
 
-### Update Folder Structure
-
-Theme updates use a **partial update** (delta) approach. Each version folder in `updates/` contains only the files that changed:
-
-```
-themes/my-theme/
-├── theme.json              # Base version (e.g., 1.0.0)
-├── layout.liquid
-├── widgets/
-├── updates/
-│   ├── 1.1.0/
-│   │   ├── theme.json      # Required, version must be "1.1.0"
-│   │   └── widgets/
-│   │       └── new-widget/ # Only new/changed widgets
-│   └── 1.2.0/
-│       ├── theme.json      # Required, version must be "1.2.0"
-│       └── assets/
-│           └── base.css    # Only changed assets
-│   └── 1.3.0/
-│       ├── theme.json
-│       └── deleted/        # Deleted files
-│           └── assets/
-│               └── old.css
-└── latest/                 # Auto-generated snapshot
-```
-
-### Creating an Update
-
-1. Create a version folder (e.g., `updates/1.1.0/`)
-2. Add a `theme.json` with the matching version number
-3. Add only the files that changed (new widgets, updated CSS, etc.)
-4. (Optional) Add a `deleted/` folder to remove files from previous versions (see below)
-5. Go to the Themes page in Widgetizer and click "Update" on your theme
-6. The system builds the `latest/` snapshot by layering all versions
-
-### Deleting Files
-
-To remove files or folders from previous versions, add a `deleted/` folder to your update version. The structure inside `deleted/` mirrors the paths you want to remove:
-
-- **Files:** Add an empty file to mark it for deletion (e.g., `deleted/assets/old.css`)
-- **Folders:** Add an empty directory to delete the entire folder and its contents (e.g., `deleted/widgets/old-widget/`)
-- **Path Containers:** Non-empty directories in `deleted/` are treated as path containers and are not deleted themselves (only their key contents are).
-
-**Protected from Deletion:** User content (`pages/`, `uploads/`) and additive-only paths (`templates/`, `menus/`) cannot be deleted.
-
-### The `latest/` Folder
-
-The `latest/` folder is automatically generated—**do not edit it manually**. It's built by:
-
-1. Starting from the base theme files (root level)
-2. Applying each version folder in semver order
-3. For overlapping files, the latest version wins
-
-Projects read from `latest/` when it exists, ensuring they always get the most up-to-date theme.
-
-### Version Validation
-
-The system enforces:
-
-- Every version folder must contain a `theme.json`
-- The version in `theme.json` must match the folder name
-- Versions must be valid semver format (x.y.z)
-
-If validation fails, the build is aborted with an error message.
-
-### Distributing Updates
-
-To distribute your theme with updates:
-
-1. Zip the entire theme folder (including `updates/`)
-2. Share the zip file with users
-3. When users upload the zip, new versions are imported automatically
-4. The `latest/` folder in the zip is ignored—it's always rebuilt locally
-
-### What Gets Updated in Projects
-
-When users apply your theme update to their projects:
-
-| Path              | Behavior                                |
-| ----------------- | --------------------------------------- |
-| `layout.liquid`   | Replaced                                |
-| `widgets/`        | Replaced                                |
-| `assets/`         | Replaced                                |
-| `snippets/`       | Replaced                                |
-| `locales/`        | Replaced                                |
-| `screenshot.png`  | Replaced                                |
-| `theme.json`      | Settings merged (user values preserved) |
-| `menus/`          | New menus added, existing preserved     |
-| `templates/`      | New templates added, existing preserved |
-
-User content (`pages/`, `uploads/`) is never modified.
+See [Distributing & Updating Themes](theme-dev-distribution.html) for the full workflow — packaging, the partial update folders, deleting files, the `latest/` snapshot, and what gets updated vs. protected in projects.

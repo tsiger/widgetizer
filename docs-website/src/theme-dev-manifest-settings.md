@@ -31,7 +31,7 @@ These fields are required for a theme to be valid:
 
 **`name`** — Human-friendly theme name shown in the UI.
 
-**`version`** — Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-structure.html#publishing-theme-updates) to track which version users have installed and to determine when updates are available.
+**`version`** — Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-distribution.html) to track which version users have installed and to determine when updates are available.
 
 **`author`** — Theme author or organization name.
 
@@ -132,7 +132,7 @@ For a complete list and properties, see [Setting Types](theme-dev-setting-types.
 
 # CSS Variables Output
 
-When `outputAsCssVar: true` is set, the `{% theme_settings %}` tag outputs a CSS variable in the `<head>`. See [Liquid Tags & Assets](theme-dev-liquid-assets.html) for tag details and [Design System & Utilities](theme-dev-design-system.html) for how tokens map to CSS variables.
+When `outputAsCssVar: true` is set, the `{% theme_settings %}` tag outputs a CSS variable in the `<head>`. See [Liquid Tags & Filters](theme-dev-liquid-assets.html) for tag details and [Design System & Utilities](theme-dev-design-system.html) for how tokens map to CSS variables.
 
 ### Naming Convention
 

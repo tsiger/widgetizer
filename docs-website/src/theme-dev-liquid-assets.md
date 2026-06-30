@@ -1,8 +1,97 @@
 ---
-description: Custom Liquid tags in Widgetizer for assets, media, SEO, and theme settings. Complete reference with examples.
+description: Custom Liquid tags and filters in Widgetizer for assets, media, SEO, richtext, URLs, dates, and collections. Complete reference with examples.
 ---
 
-Widgetizer extends LiquidJS with custom tags for assets, media, SEO, and theme settings. This page documents all available tags with usage examples. For where these tags belong in the document structure, see [Layout & Templates](theme-dev-layout-templates.html).
+Widgetizer extends LiquidJS with custom **tags** (for assets, media, SEO, and theme settings) and custom **filters** (for richtext, URLs, dates, collections, and media metadata). This page documents the full custom surface area with examples. For where the layout tags belong in the document, see [Layout & Templates](theme-dev-layout-templates.html).
+
+Everything here sits on top of standard LiquidJS, so the usual objects, control-flow tags (`{% if %}`, `{% for %}`, `{% case %}`, `{% assign %}`, `{% capture %}`), and [standard filters](https://liquidjs.com/filters/overview.html) (`default`, `upcase`, `truncate`, `where`, `map`, `join`, `size`, …) are available too.
+
+# Autoescaping & the `raw` filter
+
+Widgetizer renders every template with **autoescaping enabled globally**. Each `{{ ... }}` expression is HTML-escaped by default, so author- and user-entered text is safe automatically. Plain `text` and `textarea` settings can be output directly:
+
+```liquid
+<h2>{{ widget.settings.title }}</h2>   {# escaped automatically — safe #}
+```
+
+When a value is **already trusted HTML**, append the `raw` filter so it isn't escaped. You need `| raw` for:
+
+- **Richtext** settings (these are sanitized server-side with DOMPurify)
+- **Layout placeholders** — `{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`
+- **SVG icon markup**, embed codes, and anything you intentionally emit as raw HTML
+
+```liquid
+{# Without raw, the HTML tags would render as visible text #}
+<div class="rte">{{ widget.settings.body | raw }}</div>
+```
+
+> **Warning:** Only use `raw` on values you trust. Richtext is sanitized for you, but the `code` setting type and the `custom_css` / `custom_head_scripts` / `custom_footer_scripts` tags are **not** sanitized — they output exactly what the user enters.
+
+# Liquid Filters
+
+Alongside the standard LiquidJS filters, Widgetizer registers these custom filters:
+
+### `rte_text` and `rte_blank` (richtext helpers)
+
+Richtext fields are never truly empty — the editor leaves markup like `<p></p>` behind — so an ordinary `{% if x == blank %}` check always thinks the field has content. Use these helpers to test emptiness, and always render the original value with `| raw`:
+
+- `rte_text` — collapses a richtext value to plain text (strips tags, `&nbsp;`, whitespace). Use it for emptiness tests.
+- `rte_blank` — boolean; `true` when the richtext is visually empty (`<p></p>`, `<p><br></p>`, `&nbsp;`, …).
+
+```liquid
+{% unless block.settings.body | rte_blank %}
+  <div class="rte">{{ block.settings.body | raw }}</div>
+{% endunless %}
+```
+
+### `safe_url`
+
+Strips dangerous URL schemes (`javascript:`, `data:`, `vbscript:` and obfuscated variants), returning an empty string for unsafe values. Apply it to author-entered URLs before placing them in an `href`:
+
+```liquid
+<a href="{{ block.settings.url | safe_url }}">Visit</a>
+```
+
+> **Note:** Structured `link` settings and internal page/collection links are already sanitized by the platform. Reach for `safe_url` when you emit a raw URL string a user typed into a plain `text` field.
+
+### `format_date`
+
+Formats a `YYYY-MM-DD` date value using the project's configured date format (App Settings → Date Format). Pass an optional format string to override it per call:
+
+```liquid
+<time datetime="{{ item.settings.date }}">{{ item.settings.date | format_date }}</time>
+{{ item.settings.date | format_date: 'MMMM D, YYYY' }}
+```
+
+### `handleize`
+
+Converts a string into a URL- and identifier-safe "handle" (lowercase, hyphenated). Handy for generating ids or anchors from titles:
+
+```liquid
+<section id="section-{{ block.settings.title | handleize }}">
+```
+
+### `media_meta`
+
+Looks up metadata for a media file by its path. Returns the full metadata object, or a single property when you pass a key:
+
+```liquid
+{% assign caption = block.settings.image | media_meta: 'title' %}
+{% if caption != blank %}<figcaption>{{ caption }}</figcaption>{% endif %}
+```
+
+Available properties depend on what's stored on the media record (typically `alt` and `title`).
+
+### `collection`
+
+Pulls items from a theme-defined collection. It takes `limit`, `offset`, and `sort` options and returns an array of items. See [Collections](theme-dev-collections.html) for the full workflow:
+
+```liquid
+{% assign posts = 'news' | collection: limit: 6, sort: 'date_desc' %}
+{% for post in posts %}
+  <a href="{{ post.url }}">{{ post.settings.title }}</a>
+{% endfor %}
+```
 
 # Asset Tags
 
@@ -316,16 +405,41 @@ Always pair `srcset: true` with a realistic `sizes` string. `sizes` should descr
 
 `{% youtube %}`
 
-Renders a responsive YouTube embed or returns the embed URL.
+Renders a responsive YouTube embed, or returns just the embed/thumbnail URL.
 
 ```liquid
-{# Full embed #}
+{# Full responsive iframe embed #}
 {% youtube src: widget.settings.video %}
 {% youtube src: widget.settings.video, class: 'hero-video' %}
 
-{# Embed URL only #}
-{% youtube src: widget.settings.video, output: 'path' %}
+{# Playback options #}
+{% youtube src: widget.settings.video, autoplay: true, mute: true, loop: true, controls: false %}
+
+{# Embed URL only (e.g. for a custom trigger) #}
+{% youtube src: widget.settings.video, output: 'url' %}
+
+{# Thumbnail image URL (e.g. as a video-popup poster) #}
+{% youtube src: widget.settings.video, output: 'thumbnail', quality: 'sddefault' %}
 ```
+
+`src` accepts a `youtube` setting value, a full URL, or a bare video ID.
+
+| Parameter         | Default           | Description                                                       |
+| :---------------- | :---------------- | :--------------------------------------------------------------- |
+| `src`             | (required)        | YouTube video ID, URL, or `youtube` setting value                |
+| `class`           | `'youtube-embed'` | CSS class on the wrapper                                          |
+| `width` / `height`| `560` / `315`     | Used to compute the embed aspect ratio                           |
+| `title`           | `null`            | `title` attribute on the iframe                                  |
+| `loading`         | `'lazy'`          | iframe loading strategy                                           |
+| `autoplay`        | `false`           | Autoplay on load (pair with `mute: true`)                        |
+| `mute`            | `false`           | Start muted                                                      |
+| `controls`        | `true`            | Show player controls                                             |
+| `loop`            | `false`           | Loop playback                                                    |
+| `modestbranding`  | `false`           | Reduce YouTube branding                                          |
+| `rel`             | `true`            | Show related videos at the end                                  |
+| `start` / `end`   | `null`            | Start/end time in seconds                                        |
+| `output`          | (iframe)          | `'url'` for the embed URL, `'thumbnail'` for the thumbnail image URL |
+| `quality`         | `'hqdefault'`     | Thumbnail quality (with `output: 'thumbnail'`): `hqdefault`, `mqdefault`, `sddefault` |
 
 # Export Behavior
 

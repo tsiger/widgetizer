@@ -83,22 +83,31 @@ Features:
 Optional properties:
 
 - `placeholder` (string): Placeholder text when empty
-- `allow_source` (boolean): Show HTML source toggle for advanced editing
+- `allow_source` (boolean): Show an HTML source toggle for advanced editing
+- `allow_headings` (boolean): Enable heading levels in the toolbar
+- `allow_images` (boolean): Allow inline images (inserted from the media library)
+- `min_height` (number): Minimum editor height, in pixels
 
 ```json
 {
   "id": "content",
   "type": "richtext",
   "label": "Content",
+  "allow_headings": true,
+  "allow_images": true,
   "allow_source": true
 }
 ```
 
-In Liquid templates, output directly (it's already HTML):
+Because autoescaping is on globally, richtext **must** be rendered with the `raw` filter — without it the HTML tags show up as visible text. And since the editor leaves markup like `<p></p>` behind even when a field looks empty, gate visibility with the `rte_blank` filter rather than `== blank`:
 
 ```liquid
-{{ widget.settings.description }}
+{% unless widget.settings.description | rte_blank %}
+  <div class="rte">{{ widget.settings.description | raw }}</div>
+{% endunless %}
 ```
+
+See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter) for the full rules and the `rte_text` / `rte_blank` helpers.
 
 **`code`** — Code editor with syntax highlighting.
 
@@ -167,6 +176,22 @@ In Liquid templates, output directly (it's already HTML):
   "default": true
 }
 ```
+
+**`date`** — Date picker. The stored value is an ISO `YYYY-MM-DD` string. Render it with the [`format_date`](theme-dev-liquid-assets.html#liquid-filters) filter to honor the project's date format.
+
+```json
+{
+  "id": "published",
+  "type": "date",
+  "label": "Publication Date"
+}
+```
+
+```liquid
+<time datetime="{{ widget.settings.published }}">{{ widget.settings.published | format_date }}</time>
+```
+
+In [collection](theme-dev-collections.html) schemas, a `date` field can be marked `usedAsDate: true` to drive date-based sorting.
 
 # Media Types
 
@@ -337,5 +362,7 @@ Optional properties:
 
 - **Theme settings** live in `theme.json` and render via `{% theme_settings %}`.
 - **Widget settings** live in `widgets/*/schema.json` and are accessed via `widget.settings.*`.
+- **Block settings** live in the widget schema's `blocks` array and are accessed via `block.settings.*`.
+- **Collection fields** live in `collection-types/*/schema.json` and are accessed via `item.settings.*`. They use these same types, plus a few collection-only flags (`usedAsTitle`, `usedAsDate`, `required`) — see [Collections](theme-dev-collections.html).
 
-See [Widgets & Blocks](theme-dev-widgets-blocks.html) for widget schema patterns, and [Liquid Tags & Assets](theme-dev-liquid-assets.html) for rendering tips.
+See [Widgets & Blocks](theme-dev-widgets-blocks.html) for widget schema patterns, and [Liquid Tags & Filters](theme-dev-liquid-assets.html) for rendering tips.

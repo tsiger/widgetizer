@@ -6,6 +6,28 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
+## 0.9.9 - Unreleased
+
+### Collections
+
+A built-in CMS for themes. A theme can now define **collection types** — content types like News, Projects, or Services — and site owners manage many items of each type from the editor.
+
+- Theme-defined collection schemas (`collection-types/`) with typed fields, titles, and dates
+- Optional per-item pages, rendered through the theme layout with automatic SEO and `sitemap.xml` inclusion
+- The `collection` Liquid filter for listing items inside widgets
+- Menu links can target collection items
+- Depth-aware links and assets so item pages (one directory deep) export correctly
+
+### Added
+
+- **Stable rich-text links** — internal links inside rich-text fields now follow page and collection-item renames, and clear automatically when the target is deleted
+
+### Documentation
+
+- Theme-author docs expanded: a build-your-first-theme quickstart, a Liquid **filters** reference, a Collections authoring guide, and a one-page theme contract
+- New end-user guides for **Collections** and **Forms**
+- Corrected rich-text rendering guidance (richtext requires the `raw` filter under global autoescaping)
+
 ## 0.9.8 - 2026-04-26
 
 ### New Theme Presets

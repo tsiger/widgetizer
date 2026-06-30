@@ -323,7 +323,7 @@ Loop through `widget.blocksOrder` and look up each block in `widget.blocks`:
             <p class="quote-text" data-setting="text">{{ block.settings.text }}</p>
             <footer class="quote-attribution">
               {% if block.settings.avatar != blank %}
-                <img src="{% image src: block.settings.avatar, size: 'thumbnail', output: 'path' %}" alt="{{ block.settings.author }}" class="quote-avatar">
+                <img src="{% image src: block.settings.avatar, size: 'thumb', output: 'path' %}" alt="{{ block.settings.author }}" class="quote-avatar">
               {% endif %}
               <cite>
                 <span class="quote-author" data-setting="author">{{ block.settings.author }}</span>
@@ -700,5 +700,5 @@ if (window.Widgetizer?.designMode) {
 
 - [Setting Types](theme-dev-setting-types.html) — all available field types for settings
 - [Theme Objects & Context](theme-dev-objects-context.html) — what data is available in templates
-- [Liquid Tags & Assets](theme-dev-liquid-assets.html) — media tags, asset loading, and custom tags
+- [Liquid Tags & Filters](theme-dev-liquid-assets.html) — media tags, asset loading, and custom tags
 - [Design System & Utilities](theme-dev-design-system.html) — CSS tokens and utility classes

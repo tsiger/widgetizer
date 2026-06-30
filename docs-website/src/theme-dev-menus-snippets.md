@@ -73,11 +73,16 @@ The core `menu.liquid` snippet automatically adds an `is-active` class (and `ari
 
 # Snippets
 
-Snippets are reusable Liquid partials in `snippets/`.
+Snippets are reusable Liquid partials rendered with `{% render 'name' %}`. They come from two places:
+
+- **Theme snippets** — files in your theme's `snippets/` folder (e.g. `snippets/icon.liquid`).
+- **Built-in snippets** — a small set Widgetizer provides. The `menu` snippet used above is built in, so you can render menus without shipping your own.
+
+When the same name exists in both, **your theme's version wins** — so you can override a built-in snippet by adding a file with that name to `snippets/`.
 
 ### Icon Snippet (Arch)
 
-For example, `themes/arch/snippets/icon.liquid` renders an SVG icon from `assets/icons.json` and supports a fallback icon if the requested one doesn’t exist.
+For example, `themes/arch/snippets/icon.liquid` renders an SVG icon from `assets/icons.json` and falls back to a default icon if the requested one doesn't exist.
 
 ### Usage
 
@@ -85,7 +90,7 @@ For example, `themes/arch/snippets/icon.liquid` renders an SVG icon from `assets
 {% render 'icon', icon: 'lightning', class: 'widget-card-icon' %}
 ```
 
-For asset resolution rules and snippet rendering details, see [Liquid Tags & Assets](theme-dev-liquid-assets.html).
+Snippets receive the full render context plus any parameters you pass. For asset resolution rules and rendering details, see [Liquid Tags & Filters](theme-dev-liquid-assets.html).
 
 # Practical Guidance
 

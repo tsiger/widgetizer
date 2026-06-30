@@ -6,28 +6,52 @@ The layout and templates system defines how pages are assembled. `layout.liquid`
 
 # Layout Template (layout.liquid)
 
-`layout.liquid` is the global wrapper for every page. It contains the document structure, loads assets, and inserts the rendered header, page content, and footer.
+`layout.liquid` is the global wrapper for every page. It contains the document structure, loads global assets, and inserts the rendered header, page content, and footer.
 
-### Example (Arch)
+### A Minimal Layout
 
-`themes/arch/layout.liquid` includes:
+```liquid
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-- `{% seo %}` and `{% fonts %}` for meta and fonts
-- `{% theme_settings %}` to output CSS variables
-- `{% asset src: "base.css" %}` and `{% asset src: "scripts.js" %}` for theme assets
-- `{% header_assets %}` and `{% footer_assets %}` for enqueued assets
-- `{{ header }}`, `{{ main_content }}`, and `{{ footer }}`
-- Optional `{% custom_css %}`, `{% custom_head_scripts %}`, `{% custom_footer_scripts %}`
+  {% seo %}                     {# title, description, Open Graph, canonical #}
+  {% fonts %}                   {# font preconnect + stylesheet #}
+  {% theme_settings %}          {# CSS variables from global settings #}
+  {% asset src: "base.css" %}   {# theme base styles (after theme_settings) #}
+  {% custom_css %}              {# optional: user custom CSS #}
+  {% custom_head_scripts %}     {# optional: analytics, etc. #}
+  {% header_assets %}           {# enqueued header styles/scripts #}
+</head>
+<body class="{{ body_class }}">
+  {{ header | raw }}
 
-These tags are part of the standard Liquid surface area; see [Liquid Tags & Assets](theme-dev-liquid-assets.html) for a full list and usage rules.
+  <main id="main-content">
+    {{ main_content | raw }}
+  </main>
+
+  {{ footer | raw }}
+
+  {% asset src: "scripts.js", defer: true %}
+  {% footer_assets %}           {# enqueued footer styles/scripts #}
+  {% custom_footer_scripts %}   {# optional: pre-</body> scripts #}
+</body>
+</html>
+```
+
+`themes/arch/layout.liquid` is a complete, production-ready version you can reference. For the full tag reference and ordering rules, see [Liquid Tags & Filters](theme-dev-liquid-assets.html).
 
 ### Required Placeholders
 
-Your layout must include:
+Your layout must render the three content placeholders. They contain **pre-rendered HTML**, so each requires the `raw` filter (autoescaping is enabled globally — see [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter)):
 
-- `{{ header }}` (global header widget)
-- `{{ main_content }}` (page widgets)
-- `{{ footer }}` (global footer widget)
+- `{{ header | raw }}` — global header widget
+- `{{ main_content | raw }}` — the page's widgets
+- `{{ footer | raw }}` — global footer widget
+
+> **Warning:** Without `| raw`, the rendered HTML is escaped and the page displays raw markup as text.
 
 ### Body Class
 

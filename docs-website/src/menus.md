@@ -24,12 +24,14 @@ Once you've created a menu, you can build its structure:
 
 ### Link Types
 
-#### Page Link
+#### Page or Collection Item Link
 
-Links to one of your website pages.
+Links to one of your website pages — or, if your theme defines [collections](collections.html) with item pages, to a specific collection item (a news article, project, service, etc.).
 
 - **Label**: The text shown in the menu (e.g., "About Us")
-- **Page**: Select which page to link to from the dropdown
+- **Link to**: Pick a page or collection item from the dropdown
+
+> **Note:** Internal links are stored as stable references. If you later rename the page or item's filename, the menu link follows the change automatically instead of breaking.
 
 #### Custom URL
 

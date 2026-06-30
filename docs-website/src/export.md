@@ -25,6 +25,10 @@ Every page in your project becomes an HTML file:
 - Other pages use their slug as the filename (e.g., `about.html`, `contact.html`)
 - All HTML is formatted with Prettier for clean, readable output
 
+### Collection Item Pages
+
+If your theme defines [collections](collections.html) with item pages, each item is exported to its own HTML file under the collection's prefix — for example `news/summer-sale.html` — and included in `sitemap.xml`. List-only items (those without an item page) are rendered wherever the theme's widgets display them.
+
 ### Assets
 
 The export includes all assets your site needs:
@@ -127,7 +131,7 @@ The exported folder contains static HTML, CSS, JS, and media files that can be d
 
 - **Instant hosting** --- upload your ZIP and your site is live immediately
 - **Built-in analytics** --- privacy-first pageview tracking is auto-injected into your HTML on upload (no cookies, no tracking identifiers, respects Do Not Track)
-- **Form submissions** --- if your site uses the contact form widget, submissions are collected and emailed to you automatically
+- **Form submissions** --- if your site uses the [Form widget](forms.html), submissions are collected and emailed to you automatically
 - **Version history** --- roll back to previous uploads at any time
 - **Custom subdomains** --- choose your `*.mywidgetizer.org` subdomain
 

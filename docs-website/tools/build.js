@@ -59,6 +59,36 @@ function parseFrontmatter(content) {
   };
 }
 
+// Add id attributes to headings so in-page anchor links (#section) resolve.
+// Slug: lowercase the heading text (inline tags/entities stripped) and collapse
+// every run of non-alphanumeric characters to a single hyphen. Duplicate slugs on
+// the same page get a numeric suffix (-1, -2, …).
+function addHeadingIds(html) {
+  const used = new Map();
+  return html.replace(/<(h[1-6])>([\s\S]*?)<\/\1>/g, (match, tag, inner) => {
+    const text = inner
+      .replace(/<[^>]+>/g, "")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+    let slug = text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    if (!slug) slug = tag;
+    if (used.has(slug)) {
+      const n = used.get(slug) + 1;
+      used.set(slug, n);
+      slug = `${slug}-${n}`;
+    } else {
+      used.set(slug, 0);
+    }
+    return `<${tag} id="${slug}">${inner}</${tag}>`;
+  });
+}
+
 // Ensure dist directory exists
 await fs.ensureDir(DIST_DIR);
 
@@ -231,6 +261,9 @@ for (const item of sitemap.navigation) {
 
       return type ? `<blockquote class="blockquote-${type}">` : match;
     });
+
+    // Add id attributes to headings so #section anchor links resolve
+    htmlContent = addHeadingIds(htmlContent);
 
     // Compute canonical URL
     const cleanSlug = item.path === "index.md" ? "" : item.path.replace(".md", "");

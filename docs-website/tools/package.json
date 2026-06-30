@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.js",
+    "preview": "npm run build && serve ../dist -l 5050",
     "deploy": "npm run build && wrangler deploy --config ../wrangler.toml"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
     "marked-highlight": "^2.2.1"
   },
   "devDependencies": {
+    "serve": "^14.2.6",
     "wrangler": "^4.63.0"
   }
 }
