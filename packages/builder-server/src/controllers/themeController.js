@@ -1010,27 +1010,17 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
   const { sourceDir, theme } = await readThemeSourceMetadata(themeName);
 
   try {
-    // Copy theme directory to project directory recursively
-    // We will filter out excluded directories manually if needed, fs.cp doesn't have built-in filter
-    await fs.cp(sourceDir, projectDir, { recursive: true });
-
-    // Remove excluded directories AFTER copying everything
-    // Also remove versioning directories that shouldn't be in project
-    const allExcludes = [...excludeDirs, "updates", "latest", "presets"];
-    for (const dirToExclude of allExcludes) {
-      const projectExcludePath = path.join(projectDir, dirToExclude);
-      try {
-        // Check if it exists before attempting removal
-        await fs.access(projectExcludePath);
-        await fs.rm(projectExcludePath, { recursive: true, force: true });
-        console.log(`Removed excluded directory: ${projectExcludePath}`);
-      } catch (rmError) {
-        // If access failed (ENOENT), the dir wasn't copied or doesn't exist, which is fine.
-        if (rmError.code !== "ENOENT") {
-          console.warn(`Could not remove excluded directory ${projectExcludePath}: ${rmError.message}`);
-        }
-      }
-    }
+    // Copy theme directory to project, skipping excluded top-level dirs during the
+    // copy (filter) rather than copying everything and deleting after. This avoids
+    // copying then throwing away large dirs like presets/ (200MB+ for Arch).
+    const allExcludes = new Set([...excludeDirs, "updates", "latest", "presets"]);
+    await fs.cp(sourceDir, projectDir, {
+      recursive: true,
+      filter: (src) => {
+        const rel = path.relative(sourceDir, src);
+        return rel === "" || !allExcludes.has(rel.split(path.sep)[0]);
+      },
+    });
 
     // Get and return the version that was copied
     return theme.version;
