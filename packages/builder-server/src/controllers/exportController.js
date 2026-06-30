@@ -661,8 +661,12 @@ Per aspera ad astra
     try {
       if (await fs.pathExists(projectAssetsDir)) {
         // Skip OS/system metadata (.DS_Store, __MACOSX, …) so it never lands in
-        // the export directory or the packaged ZIP.
-        await fs.copy(projectAssetsDir, outputAssetsDir, { filter: (src) => isExportableEntry(src) });
+        // the export directory or the packaged ZIP. fs-extra hands the filter an
+        // absolute path; normalize to a relative, forward-slash path so the junk
+        // check works on Windows (where the absolute path is backslash-separated).
+        await fs.copy(projectAssetsDir, outputAssetsDir, {
+          filter: (src) => isExportableEntry(path.relative(projectAssetsDir, src).split(path.sep).join("/")),
+        });
       } else {
         console.warn(`Project assets directory not found: ${projectAssetsDir}`);
       }
