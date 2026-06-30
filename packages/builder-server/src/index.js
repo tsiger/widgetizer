@@ -51,6 +51,12 @@ export {
 // dir; listThemes/listThemePresets back the theme/preset picker (the actor-scoped
 // /themes router is not mounted in hosted). See the stage-2 plan §"create flow".
 export { scaffoldProjectContent } from "./utils/projectScaffold.js";
+// Dir-explicit project-content readers (TODO §28). Pure FS transforms over a
+// caller-supplied project working directory — the shared, scope-free counterparts
+// of the request-boundary StorageAdapter reads. Hosted's cloud render loop reads
+// content through these against its per-tenant working dir, so the OSS and hosted
+// render paths read pages/globals/theme the same way (no parallel fs reader).
+export { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "./utils/projectContentFs.js";
 export { listThemes, listThemePresets, resolvePresetPaths } from "./controllers/themeController.js";
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.

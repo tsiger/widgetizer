@@ -17,8 +17,7 @@ import {
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
-import { readProjectThemeData } from "./themeController.js";
-import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
+import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
@@ -335,14 +334,15 @@ export async function createCollectionPreviewToken(req, res) {
     }
     const folder = projectData.folderName;
 
-    const rawThemeSettings = await readProjectThemeData(activeProjectId);
-    const headerData = await readGlobalWidgetData(folder, "header");
-    const footerData = await readGlobalWidgetData(folder, "footer");
+    const projectDir = getProjectDir(folder);
+    const rawThemeSettings = await readThemeDataFromDir(projectDir);
+    const headerData = await readGlobalWidgetFromDir(projectDir, "header");
+    const footerData = await readGlobalWidgetFromDir(projectDir, "footer");
 
     // uuid -> page map so pageUuid links inside the item resolve to slugs.
-    // listProjectPagesData reads data/projects/<folder>/pages, so it takes the
-    // FOLDER name (not the UUID) — matching the export path.
-    const pages = await listProjectPagesData(folder);
+    // listPagesFromDir reads <projectDir>/pages — projectDir is the working dir
+    // resolved from the FOLDER name (not the UUID), matching the export path.
+    const pages = await listPagesFromDir(projectDir);
     const pagesByUuid = new Map();
     for (const page of pages || []) {
       if (page.uuid) pagesByUuid.set(page.uuid, page);

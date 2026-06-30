@@ -41,8 +41,6 @@ const {
   bulkDeletePages,
   duplicatePage,
   savePageContent,
-  listProjectPagesData,
-  readGlobalWidgetData,
 } = await import("../controllers/pageController.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
@@ -406,55 +404,9 @@ describe("getAllPages", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// listProjectPagesData (exported helper)
-// ---------------------------------------------------------------------------
-
-describe("listProjectPagesData", () => {
-  beforeEach(async () => {
-    await resetPages();
-  });
-
-  it("returns page data directly by folderName", async () => {
-    await createTestPage("Direct Access");
-    const pages = await listProjectPagesData(activeProject.folderName);
-    assert.equal(pages.length, 1);
-    assert.equal(pages[0].name, "Direct Access");
-  });
-
-  it("returns empty array for non-existent project", async () => {
-    const pages = await listProjectPagesData("non-existent-folder");
-    assert.deepEqual(pages, []);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// readGlobalWidgetData (exported helper)
-// ---------------------------------------------------------------------------
-
-describe("readGlobalWidgetData", () => {
-  it("reads header global widget", async () => {
-    const header = await readGlobalWidgetData(activeProject.folderName, "header");
-    assert.ok(header);
-    assert.equal(header.type, "header");
-  });
-
-  it("reads footer global widget", async () => {
-    const footer = await readGlobalWidgetData(activeProject.folderName, "footer");
-    assert.ok(footer);
-    assert.equal(footer.type, "footer");
-  });
-
-  it("returns null for invalid widget type", async () => {
-    const result = await readGlobalWidgetData(activeProject.folderName, "sidebar");
-    assert.equal(result, null);
-  });
-
-  it("returns null for non-existent project", async () => {
-    const result = await readGlobalWidgetData("non-existent", "header");
-    assert.equal(result, null);
-  });
-});
+// Note: the dir-explicit page/global-widget readers (listPagesFromDir /
+// readGlobalWidgetFromDir) that replaced the former listProjectPagesData /
+// readGlobalWidgetData helpers are covered in projectContentFs.test.js (TODO §28).
 
 // ---------------------------------------------------------------------------
 // updatePage

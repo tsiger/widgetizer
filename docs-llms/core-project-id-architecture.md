@@ -54,17 +54,59 @@ The adapter owns the mapping from `scope.folderName` (and `scope.projectId`) to 
 
 ## Still-path-based exceptions
 
-Some reads resolve a folderName and join an absolute path through `packages/builder-server/src/config.js` helpers rather than going through the storage adapter. These are the documented exceptions, not the pattern:
+A project's data lives in **three planes**, and one boundary principle governs access to each:
 
-- **Project theme settings** — `themeController.readProjectThemeData()` resolves the folderName via `getProjectFolderName()` and reads `theme.json` through `getProjectThemeJsonPath(projectFolderName)`. The save path (`saveProjectThemeSettings`) does the same.
-- **Some page reads** — `pageController.listProjectPagesData()` / `readGlobalWidgetData()` still take a folderName argument and use `getProjectPagesDir()` / `getPagePath()` / `getProjectDir()` directly.
-- **Project lifecycle directory ops** — create/rename/duplicate/import in `projectController.js` operate on directories by folderName with `fs-extra` (see Renaming, below). These are inherently filesystem-shaped and run in the OSS shell.
+- **Metadata** → the shared **SQLite** DB (projects, media rows, settings, exports). Adapter-agnostic.
+- **Content files** (pages, menus, `theme.json`, collection items, theme templates) → the project
+  **working directory** at the scope's project base. Two access disciplines over the *same* directory:
+  - **Request/API boundary → the scope-aware `StorageAdapter`** (`storage.op(scope, rel)`): scope
+    namespacing + `assertWithin` + atomic write. The default for per-key, tenant-isolated access
+    (collection CRUD, theme CRUD, `getAllPages`).
+  - **Whole-directory, FS-bound operations → the `projectDir` working directory** (raw `fs` over
+    `getProjectDir(folderName)` via dir-explicit helpers): the deliberately scope-free render engine (it
+    opens `layout.liquid` / `widget.liquid` / snippets / `schema.json` / menus / icons from
+    `deps.projectDir`), the render-path content readers (`utils/projectContentFs.js`), and the project
+    lifecycle dir ops.
+- **Media binaries** → the **asset plane** — the scope-first `AssetStorageAdapter`. In OSS they physically
+  live under `getProjectDir(folderName)/uploads/`; in hosted they live in R2 via `CloudAssetStorageAdapter`.
 
-These are the documented exceptions; the folderName resolution lives with them.
+**Boundary principle:** request-scoped per-key access → `StorageAdapter`; whole-directory FS-bound ops
+(render + lifecycle) → `projectDir` working directory; media → `AssetStorageAdapter`; metadata → SQLite.
+
+The former adapter-*bypass* read exceptions have been closed against this principle:
+
+- **Project theme settings → adapter.** `getProjectThemeSettings` / `saveProjectThemeSettings` now read/write
+  `storage.{read,write}(req.scope, 'theme.json')` (the old `readProjectThemeData` helper is gone).
+- **Render-path page/global/theme reads → dir-explicit readers.** `pageController.listProjectPagesData` /
+  `readGlobalWidgetData` were replaced by `utils/projectContentFs.js`'s `listPagesFromDir` /
+  `readGlobalWidgetFromDir` / `readThemeDataFromDir(projectDir)` — pure FS transforms over a caller-supplied
+  working dir, consumed by `renderingService.buildRenderDeps` + the preview/export controllers.
+- **Dead `menuController.getMenuById` deleted** (no production callers).
+
+**What remains genuinely path-based (by design):** the **project lifecycle directory ops** in
+`projectController.js` — create / rename / duplicate / import — operate on whole directories by folderName
+with `fs-extra` (see Renaming, below). They're inherently filesystem-shaped (bulk copy / move). **Rename is
+OSS-only by design** (a hosted `folderName` is an immutable storage key).
+
+### The working-directory contract (C1/C2)
+
+The `projectDir`-based operations above depend on a small contract, which is what keeps them
+backend-swappable rather than an OSS-only leak:
+
+- **C1 — working-directory guarantee.** The shell resolves a real filesystem path for the scope's content
+  for the *duration of an operation* (OSS: `getProjectDir(folderName)` for content, `getPublishDir()` for
+  export staging; hosted: the storage adapter's per-tenant project base). Dependents are the scope-free
+  render engine, the render-path content readers (`projectContentFs.js`), and the project lifecycle dir ops.
+  This is a **per-operation** guarantee, **not** a permanent-home assumption: if hosted ever moves content to R2, the
+  `StorageAdapter` becomes R2-backed (the API boundary is already ready) and the working-directory resolver
+  returns a per-operation hydrated temp dir — the dependents don't change.
+- **C2 — pure dir-explicit transforms.** The dir-explicit helpers take a caller-supplied dir and do
+  pure FS work over it — no `config.getProjectDir` reach-through, no permanence assumption. Persistence /
+  hydrate is the shell's job.
 
 ## Foldername resolution helper
 
-`getProjectFolderName()` (`packages/builder-server/src/utils/projectHelpers.js`) maps an existing UUID to its folderName, and is used only by the still-path-based call sites above. Authorization is the injected `ScopeResolver`'s responsibility; this helper only validates existence and performs the UUID → folderName lookup:
+`getProjectFolderName()` (`packages/builder-server/src/utils/projectHelpers.js`) maps an existing UUID to its folderName. It is the shared projectId → folderName resolver and the project-resolution error boundary, used wherever a controller/service needs a real folderName: `buildRenderDeps` (to build `projectDir`), media/asset paths, export bundle naming, theme updates, and the lifecycle dir ops. Authorization is the injected `ScopeResolver`'s responsibility; this helper only validates existence and performs the UUID → folderName lookup:
 
 ```javascript
 export async function getProjectFolderName(projectId) {
@@ -111,7 +153,7 @@ Bundles land at `data/publish/{folderName}-v{version}/`. The export read-back gu
 ## Troubleshooting
 
 - **"Project not found"** — confirm the UUID exists in the SQLite `projects` table and the directory exists under the resolved folderName. Resolution failures surface as 404/500 (via `projectErrors.js`), never a silent fallback.
-- **Wrong directory / path errors** — for the still-path-based exceptions, confirm `getProjectFolderName()` resolved the expected folderName; everywhere else, the adapter owns the path, so check `req.scope.folderName`.
+- **Wrong directory / path errors** — for `projectDir`-based operations (render readers, lifecycle dir ops), confirm `getProjectFolderName()` resolved the expected folderName; everywhere else, the adapter owns the path, so check `req.scope.folderName`.
 - **FolderName conflicts** — `generateUniqueSlug()` appends a numeric suffix to guarantee uniqueness; rename/create both validate the `/^[a-z0-9-]+$/` format and check `projectFolderExists`.
 
 ## See also

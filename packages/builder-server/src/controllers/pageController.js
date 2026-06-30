@@ -1,7 +1,4 @@
-import fs from "fs-extra";
 import { randomUUID } from "crypto";
-import { getProjectPagesDir, getPagePath, getProjectDir } from "../config.js";
-import path from "path";
 import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
 import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
@@ -9,92 +6,11 @@ import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 
-
-/**
- * Lists and reads data for all publishable pages in a project's pages directory.
- * @param {string} projectId - The project folder name
- * @returns {Promise<Array<object>>} Array of page data objects
- * @throws {Error} If the pages directory cannot be read
- */
-export async function listProjectPagesData(projectId) {
-  const pagesDir = getProjectPagesDir(projectId);
-  try {
-    // Check if pages directory exists
-    if (!(await fs.pathExists(pagesDir))) {
-      console.warn(`Pages directory not found for project ${projectId} at ${pagesDir}`);
-      return []; // Return empty array if directory doesn't exist
-    }
-    // Use withFileTypes to distinguish files from directories
-    const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
-
-    // Filter out the 'global' directory and any non-JSON files
-    const pageFiles = allEntries.filter(
-      (entry) => entry.isFile() && entry.name.endsWith(".json"),
-      // We don't need to explicitly filter out 'global' if it's a directory,
-      // as entry.isFile() will handle it. If 'global.json' could exist and
-      // should be excluded, add: && entry.name !== 'global.json'
-    );
-
-    const pagesData = await Promise.all(
-      pageFiles.map(async (fileEntry) => {
-        const pageId = fileEntry.name.replace(".json", "");
-        const pagePath = getPagePath(projectId, pageId);
-        try {
-          const pageContent = await fs.readFile(pagePath, "utf8");
-          const parsedData = JSON.parse(pageContent);
-          // Ensure the object has the id matching the filename
-          return {
-            ...parsedData,
-            id: pageId,
-          };
-        } catch (readError) {
-          console.error(`Error reading or parsing page file ${pagePath}:`, readError);
-          // Return null or throw, depending on how failures should be handled
-          return null;
-        }
-      }),
-    );
-
-    // Filter out any null results from read/parse errors
-    return pagesData.filter((page) => page !== null);
-  } catch (error) {
-    // Error handling, pathExists check above handles ENOENT specifically
-    console.error(`Error listing pages data for project ${projectId}:`, error);
-    throw new Error(`Failed to list pages data for project ${projectId}: ${error.message}`);
-  }
-}
-
-/**
- * Reads the JSON data for a global widget (header or footer).
- * @param {string} projectId - The project folder name
- * @param {'header'|'footer'} widgetType - The type of global widget to read
- * @returns {Promise<object|null>} The widget data or null if not found
- */
-export async function readGlobalWidgetData(projectId, widgetType) {
-  if (widgetType !== "header" && widgetType !== "footer") {
-    console.error(`Invalid global widget type requested: ${widgetType}`);
-    return null;
-  }
-  const projectDir = getProjectDir(projectId);
-  // Ensure path uses projectDir consistently
-  const globalWidgetPath = path.join(projectDir, "pages", "global", `${widgetType}.json`);
-
-  try {
-    // pathExists check is cleaner than try/catch for ENOENT
-    if (!(await fs.pathExists(globalWidgetPath))) {
-      return null;
-    }
-    const widgetContent = await fs.readFile(globalWidgetPath, "utf-8");
-    const widgetData = JSON.parse(widgetContent);
-    // Add the type explicitly if not present in the file
-    widgetData.type = widgetType;
-    return widgetData;
-  } catch (error) {
-    // Catch other errors (parsing, reading)
-    console.error(`Error reading global widget data (${widgetType}, project ${projectId}):`, error);
-    return null; // Return null on error
-  }
-}
+// Page/global-widget reads moved to the dir-explicit reader family
+// (utils/projectContentFs.js: listPagesFromDir / readGlobalWidgetFromDir) under
+// TODO §28 — the render path consumes those against the project working dir, and
+// the request boundary (getAllPages below, getPage, etc.) reads through the
+// scope-aware storage adapter. No folderName-based fs readers live here anymore.
 
 async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, previousPageId = null }) {
   await storage.write(scope, `pages/${pageId}.json`, JSON.stringify(pageData, null, 2));
@@ -280,9 +196,9 @@ export async function getAllPages(req, res) {
     // Read the page list via the storage adapter so it resolves the same scope
     // (and tenant-namespaced path) as every other page handler — `getProjectDir`
     // would resolve a different root in shells that namespace per actor. The
-    // `global/` subdir is skipped because it isn't a `.json` entry. (The
-    // dir-based listProjectPagesData stays exported for the OSS-internal render
-    // wrapper and exportProjectToDir, which run without req.adapters.)
+    // `global/` subdir is skipped because it isn't a `.json` entry. (The render
+    // path reads the same files via the dir-explicit listPagesFromDir, which runs
+    // without req.adapters against the project working directory.)
     const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
     const pages = (
       await Promise.all(

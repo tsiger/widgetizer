@@ -1,5 +1,3 @@
-import fs from "fs-extra";
-import path from "path";
 import { randomUUID } from "crypto";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_MENU_ITEMS, MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
@@ -268,40 +266,6 @@ export async function updateMenu(req, res) {
   } catch (error) {
     console.error("Error updating menu:", error);
     res.status(500).json({ error: "Failed to update menu" });
-  }
-}
-
-/**
- * Retrieves a menu by ID for the rendering service.
- * @param {string} projectIdOrDir - The project directory path
- * @param {string} menuId - The menu identifier
- * @returns {Promise<object>} The menu data or an object with empty items array
- */
-export async function getMenuById(projectIdOrDir, menuId) {
-  if (!menuId) {
-    return null;
-  }
-
-  try {
-    const menuPath = path.join(projectIdOrDir, "menus", `${menuId}.json`);
-
-    if (!(await fs.pathExists(menuPath))) {
-      return { items: [] };
-    }
-
-    const menuData = await fs.readFile(menuPath, "utf8");
-    const menu = JSON.parse(menuData);
-
-    // Lazy backfill: add uuid if missing
-    if (!menu.uuid) {
-      menu.uuid = randomUUID();
-      await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
-    }
-
-    return menu;
-  } catch (error) {
-    console.error(`Error reading menu by id (${menuId}):`, error);
-    return { items: [] };
   }
 }
 

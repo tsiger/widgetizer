@@ -68,7 +68,6 @@ const {
   getThemeUpdateCount,
   updateTheme,
   copyThemeToProject,
-  readProjectThemeData,
   deleteTheme,
   uploadTheme,
   getProjectThemeSettings,
@@ -79,6 +78,17 @@ const {
   invalidateThemeSourceCache,
 } = await import("../controllers/themeController.js");
 const { closeDb } = await import("../db/index.js");
+const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
+
+// The project-theme handlers read/write theme.json through the injected storage
+// adapter over req.scope (TODO §28). Direct controller calls supply the scope of
+// the seeded active project, matching production (resolveActiveProject middleware).
+const themeStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
+const TEST_SCOPE = {
+  actor: { id: "default", kind: "local" },
+  projectId: "theme-test-project-uuid",
+  folderName: "theme-test-project",
+};
 
 // Lazy-load AdmZip for building test zip files
 let AdmZip;
@@ -93,6 +103,8 @@ function mockReq({ params = {}, body = {}, file = null } = {}) {
     body,
     file,
     headers: {},
+    scope: TEST_SCOPE,
+    adapters: { storage: themeStorage },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -245,7 +257,7 @@ before(async () => {
     activeProjectId: "theme-test-project-uuid",
   });
 
-  // Create project dir with theme.json for readProjectThemeData tests
+  // Create project dir with theme.json for the project-theme-settings handler tests
   const projDir = getProjectDir("theme-test-project", "local");
   await fs.ensureDir(projDir);
   await fs.ensureDir(getProjectPagesDir("theme-test-project", "local"));
@@ -1325,23 +1337,8 @@ describe("copyThemeToProject", () => {
 });
 
 // ============================================================================
-// readProjectThemeData / getProjectThemeSettings / saveProjectThemeSettings
+// getProjectThemeSettings / saveProjectThemeSettings (scope + storage adapter)
 // ============================================================================
-
-describe("readProjectThemeData", () => {
-  it("reads theme.json from project directory", async () => {
-    const data = await readProjectThemeData("theme-test-project-uuid", "local");
-    assert.ok(data.settings);
-    assert.ok(data.settings.global);
-  });
-
-  it("throws for nonexistent project", async () => {
-    await assert.rejects(
-      () => readProjectThemeData("nonexistent-uuid", "local"),
-      (err) => err.message.includes("not found"),
-    );
-  });
-});
 
 describe("getProjectThemeSettings", () => {
   it("returns project theme data", async () => {
@@ -1352,6 +1349,30 @@ describe("getProjectThemeSettings", () => {
     assert.ok(res._json.settings);
   });
 
+  it("resolves theme via req.scope, not req.params", async () => {
+    // The handler resolves through the injected storage adapter over req.scope;
+    // the route :projectId no longer drives content resolution (parity with
+    // getAllPages + the multi-tenant model — scope is the source of truth).
+    const res = await callController(getProjectThemeSettings, { params: {} });
+    assert.equal(res._status, 200);
+    assert.ok(res._json.settings);
+  });
+
+  it("returns 404 when theme.json is missing", async () => {
+    // Strict: a missing theme surfaces as 404 (adapter read → null), never a
+    // silent default.
+    const themePath = getProjectThemeJsonPath("theme-test-project");
+    const original = await fs.readFile(themePath, "utf8");
+    await fs.remove(themePath);
+    try {
+      const res = await callController(getProjectThemeSettings, {
+        params: { projectId: "theme-test-project-uuid" },
+      });
+      assert.equal(res._status, 404);
+    } finally {
+      await fs.outputFile(themePath, original); // restore for later tests
+    }
+  });
 });
 
 describe("saveProjectThemeSettings", () => {
@@ -1364,11 +1385,10 @@ describe("saveProjectThemeSettings", () => {
     assert.equal(res._status, 200);
     assert.ok(res._json.message.includes("saved"));
 
-    // Verify persisted
-    const saved = await readProjectThemeData("theme-test-project-uuid", "local");
+    // Verify persisted — read back through the same storage adapter the handler wrote.
+    const saved = JSON.parse((await themeStorage.read(TEST_SCOPE, "theme.json")).toString("utf8"));
     assert.equal(saved.settings.global.colors[0].id, "bg");
   });
-
 });
 
 // ============================================================================

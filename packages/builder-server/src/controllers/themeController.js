@@ -12,10 +12,8 @@ import {
   getThemeLatestDir,
   getThemeVersionDir,
   getProjectDir,
-  getProjectThemeJsonPath,
 } from "../config.js";
 import { getAllProjects, getProjectById } from "../db/repositories/projectRepository.js";
-import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion } from "../utils/semver.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
@@ -1042,34 +1040,6 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
 }
 
 /**
- * Reads and parses the theme settings JSON for a given project.
- * @param {string} projectId - The ID of the project.
- * @returns {Promise<object>} - The parsed theme settings object.
- * @throws {Error} - If the theme file doesn't exist or cannot be read/parsed.
- */
-export async function readProjectThemeData(projectId) {
-  const projectFolderName = await getProjectFolderName(projectId);
-  const themeFile = getProjectThemeJsonPath(projectFolderName);
-  try {
-    // Check existence first to provide a clearer error if not found
-    await fs.access(themeFile);
-    const themeDataStr = await fs.readFile(themeFile, "utf8");
-    return JSON.parse(themeDataStr);
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      // If the file doesn't exist, maybe return a default or rethrow specific error
-      console.warn(`Theme settings file not found for project ${projectId} at ${themeFile}`);
-      // Depending on requirements, might return {} or throw
-      throw new Error(`Theme settings file not found for project ${projectId}.`);
-    } else {
-      // For other errors (read errors, JSON parse errors)
-      console.error(`Error reading or parsing theme file ${themeFile}:`, error);
-      throw new Error(`Failed to read or parse theme settings for project ${projectId}: ${error.message}`);
-    }
-  }
-}
-
-/**
  * Delete a theme if it's not currently in use by any projects.
  * @param {import('express').Request} req - Express request with theme id param
  * @param {import('express').Response} res - Express response object
@@ -1632,20 +1602,22 @@ export async function uploadTheme(req, res) {
  */
 export async function getProjectThemeSettings(req, res) {
   try {
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const { projectId } = req.params;
-    // Call the internal helper function
-    const themeData = await readProjectThemeData(projectId);
-    res.json(themeData);
-  } catch (error) {
-    // Handle errors appropriately for the API response
-    if (handleProjectResolutionError(res, error)) return;
-    if (error.message.includes("not found")) {
-      res.status(404).json({ message: error.message });
-    } else {
-      console.error(`API Error in getProjectThemeSettings for ${req.params.projectId}:`, error);
-      res.status(500).json({ message: "Error reading project theme settings" });
+    // Read theme.json through the injected storage adapter over the resolved scope
+    // (TODO §28) — the same scope-first, tenant-isolated path as every other content
+    // read (cf. getAllPages). The route :projectId no longer drives resolution.
+    const buf = await storage.read(scope, "theme.json");
+    if (buf == null) {
+      // Strict: a missing theme is a 404, never a silent default.
+      return res.status(404).json({ message: `Theme settings file not found for project ${scope.projectId}.` });
     }
+    res.json(JSON.parse(buf.toString("utf8")));
+  } catch (error) {
+    if (handleProjectResolutionError(res, error)) return;
+    console.error(`API Error in getProjectThemeSettings for ${req.scope?.projectId}:`, error);
+    res.status(500).json({ message: "Error reading project theme settings" });
   }
 }
 
@@ -1657,26 +1629,21 @@ export async function getProjectThemeSettings(req, res) {
  */
 export async function saveProjectThemeSettings(req, res) {
   try {
+    const { scope } = req;
+    const { storage } = req.adapters;
 
-    const { projectId } = req.params;
-    const projectFolderName = await getProjectFolderName(projectId);
-    const themeFile = getProjectThemeJsonPath(projectFolderName);
-
-    // Check if project exists
-    const projectDir = getProjectDir(projectFolderName);
-    try {
-      await fs.access(projectDir);
-    } catch {
-      return res.status(404).json({ message: "Project not found" });
-    }
-
-    // Validate and sanitize theme settings before writing
+    // Validate and sanitize theme settings before writing.
     const { data: sanitizedThemeData, warnings } = sanitizeThemeSettings(req.body);
-    await fs.writeFile(themeFile, JSON.stringify(sanitizedThemeData, null, 2));
+
+    // Write theme.json through the injected storage adapter over the resolved scope
+    // (TODO §28). The active project's existence is already guaranteed by the
+    // resolveActiveProject middleware (and the write-guard asserts route :projectId
+    // matches scope), so the former manual fs.access project-existence check is gone.
+    await storage.write(scope, "theme.json", JSON.stringify(sanitizedThemeData, null, 2));
 
     // Track media used in theme settings (e.g. favicon) for usage and export
     try {
-      await updateThemeSettingsMediaUsage(projectId, sanitizedThemeData);
+      await updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData);
     } catch (usageError) {
       console.warn("Failed to update theme settings media usage:", usageError.message);
     }

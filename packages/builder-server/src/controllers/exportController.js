@@ -12,8 +12,7 @@ import {
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
-import { readProjectThemeData } from "./themeController.js";
-import { listProjectPagesData, readGlobalWidgetData } from "./pageController.js";
+import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { formatHtml, validateHtml, generateIssuesReport } from "../utils/htmlProcessor.js";
 import { buildSitemap, buildRobotsTxt } from "../services/seoArtifacts.js";
@@ -184,11 +183,11 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // blocked export (missing homepage / invalid collection items / missing
     // template) leaves no output directory, favicon, or manifest behind. Nothing
     // below touches disk until the "validation passed" marker. ---
-    const rawThemeSettings = await readProjectThemeData(projectId);
+    const rawThemeSettings = await readThemeDataFromDir(projectDir);
     const processedThemeSettings = preprocessThemeSettings(rawThemeSettings);
 
     // Fetch list of page data using the helper function
-    const pagesDataArray = await listProjectPagesData(projectFolderName);
+    const pagesDataArray = await listPagesFromDir(projectDir);
 
     // Validate that at least one page has the "index" slug (required for homepage)
     // Note: page.id is derived from filename, which is the authoritative slug
@@ -288,8 +287,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       } catch { /* invalid URL */ }
     }
 
-    const headerData = await readGlobalWidgetData(projectFolderName, "header");
-    const footerData = await readGlobalWidgetData(projectFolderName, "footer");
+    const headerData = await readGlobalWidgetFromDir(projectDir, "header");
+    const footerData = await readGlobalWidgetFromDir(projectDir, "footer");
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {

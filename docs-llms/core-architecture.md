@@ -97,7 +97,7 @@ Each subsystem has a dedicated doc. This map records only each subsystem's packa
 
 ## Rendering Pipeline
 
-The actual LiquidJS rendering lives in the scope-free `@widgetizer/render-engine` package (`packages/render-engine/src/`), which takes a per-project `deps` bag and never resolves projects or touches SQLite. It reads Liquid templates, schemas, menus, and icons from filesystem paths supplied by that bag. `packages/builder-server/src/services/renderingService.js` is the thin shell wrapper: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary) and assembles the bag. In OSS the bag is assembled here; hosted assembles its own via `buildCloudRenderDeps`. The server-side Liquid filters/tags themselves live in `@widgetizer/core` (`packages/core/src/filters/`, `packages/core/src/tags/`). See [Packages & Adapter Architecture](core-packages.md#render-engine-scope-free-boundary) and [core-security.md](core-security.md) for autoescape/sanitization.
+The actual LiquidJS rendering lives in the scope-free `@widgetizer/render-engine` package (`packages/render-engine/src/`), which takes a per-project `deps` bag and never resolves projects or touches SQLite. It reads Liquid templates, schemas, menus, and icons from filesystem paths supplied by that bag. `packages/builder-server/src/services/renderingService.js` is the thin shell wrapper: `buildRenderDeps(projectId)` resolves `folderName` (the project-resolution error boundary) and assembles the bag. In OSS the bag is assembled here; hosted assembles its own via `buildCloudRenderDeps`. Beyond templates/schemas, the render path reads page/global/theme **content** from the project working directory via `utils/projectContentFs.js` (`listPagesFromDir` / `readGlobalWidgetFromDir` / `readThemeDataFromDir`) — the scope-free, FS-bound half of the storage boundary; the request/API boundary reads the same files per-key through the `StorageAdapter`. See [core-project-id-architecture.md § Still-path-based exceptions](core-project-id-architecture.md#still-path-based-exceptions) for the three-planes boundary principle + the C1/C2 working-directory contract. The server-side Liquid filters/tags themselves live in `@widgetizer/core` (`packages/core/src/filters/`, `packages/core/src/tags/`). See [Packages & Adapter Architecture](core-packages.md#render-engine-scope-free-boundary) and [core-security.md](core-security.md) for autoescape/sanitization.
 
 ---
 
@@ -115,6 +115,7 @@ The actual LiquidJS rendering lives in the scope-free `@widgetizer/render-engine
 | `utils/themeHelpers.js` | `preprocessThemeSettings()` |
 | `utils/projectHelpers.js` | `getProjectFolderName(projectId)`, `getProjectDetails()` |
 | `utils/projectErrors.js` | `PROJECT_ERROR_CODES`, `handleProjectResolutionError()`, `isProjectResolutionError()` |
+| `utils/projectContentFs.js` | Dir-explicit content readers (`listPagesFromDir`, `readGlobalWidgetFromDir`, `readThemeDataFromDir`) — pure FS over a caller-supplied working dir, for the scope-free render path (C2) |
 
 The canonical source for `mimeTypes` and `pathSecurity` is `@widgetizer/core` (`packages/core/src/utils/`), shared with the local adapters; builder-server re-exports thin wrappers.
 

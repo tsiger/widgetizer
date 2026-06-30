@@ -1540,7 +1540,7 @@ describe("export failure recording", () => {
     const projDir = getProjectDir(badFolder);
     const pagesDir = getProjectPagesDir(badFolder);
     await fs.ensureDir(pagesDir);
-    // No theme.json — this will cause readProjectThemeData to throw
+    // No theme.json — this will cause the export theme read (readThemeDataFromDir) to throw
 
     const res = await callController(exportProject, {
       params: { projectId: badId },

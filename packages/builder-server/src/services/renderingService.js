@@ -30,7 +30,7 @@ import { schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { getProjectDir, CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { listProjectPagesData } from "../controllers/pageController.js";
+import { listPagesFromDir } from "../utils/projectContentFs.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
@@ -175,7 +175,7 @@ async function buildRenderDeps(projectId, collectionDeps = null) {
     coreSnippetsDir: CORE_SNIPPETS_DIR,
     getProjectData: () => projectRepo.getProjectById(projectId) || null,
     getMediaFiles: () => readMediaFile(projectId),
-    listPages: () => listProjectPagesData(folderName),
+    listPages: () => listPagesFromDir(getProjectDir(folderName)),
     sanitizeWidgetData,
     preprocessThemeSettings,
     buildRuntimeSiteIcons,

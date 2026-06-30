@@ -12,7 +12,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done · 2 deferred · 1 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done · 3 deferred · 3 open · 1 wontfix**_
 
 - ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
@@ -41,7 +41,10 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done ·
 - ✅ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server---resolved-2026-06-26-keep-master-parity--low-correctness-master-parity-tradeoff)
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
 - ✅ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — DONE 2026-06-27 — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling---low-dev-only-mostly-latent)
-- 🟡 [28. TBD — Close the path-based storage exceptions for the hosted boundary (adapter discipline) — discuss with partner](#28-tbd--close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline---discuss-with-partner)
+- 🟢 [28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — OSS reads + theme-CRUD + dead-code slices implemented; lifecycle 4b + hosted follow-on deferred](#28-close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline)
+- ⬜ [29. Loud stale-active-project detection in the OSS editor — focus/visibility revalidation + 409 handling (OSS shell `app/` + `editor-ui`) — **low/moderate (single-tenant UX correctness)**](#29-loud-stale-active-project-detection-in-the-oss-editor)
+- ⏸️ [30. Extract project lifecycle duplicate/import into dir-explicit cores (`builder-server`) — **deferred** until hosted builds duplicate/import (blocker: `AssetStorageAdapter.copy`); the lifecycle tail of §28](#30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores)
+- ⬜ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — surfaced by §28 D — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted)
 
 ---
 
@@ -1531,9 +1534,49 @@ theme-update workflow is next revisited (ties into §2/§13); fold the reuse cle
 
 ---
 
-## 28. TBD — Close the path-based storage exceptions for the hosted boundary (adapter discipline) — discuss with partner
+## 28. Close the path-based storage exceptions for the hosted boundary (adapter discipline)
 
-**Status:** 🟡 TBD — to discuss with partner before scoping.
+**Status:** 🟢 OSS reads + theme-CRUD + dead-code slices **IMPLEMENTED** + C1/C2 promoted into the
+docs-llms maps (2026-06-29; TDD, full backend suite + `npm run lint` green) — see "Implementation progress"
+below. Hosted follow-on (D) **render-reader dedup IMPLEMENTED** (2026-06-30; hosted server suite 609 +
+`eslint` green) — `cloudProjectData.js`'s `listPages`/`readGlobalWidget` now come from the shared OSS
+`…FromDir` readers. The theme-settings fork was re-checked against code and **kept, not collapsed**
+(collapsing would change ~9 behaviors — see D below). 🟡 remaining tails tracked separately: lifecycle
+duplicate/import cores in **§30** (deferred); the hosted theme media-usage gap surfaced by D in **§31** (open).
+The unified architecture (three storage planes; the `projectDir` working-directory contract) lives in
+`core-project-id-architecture.md` § Still-path-based exceptions.
+
+### Implementation progress — 2026-06-29
+
+OSS slices landed, behavior-preserving except the one semantic note called out below:
+
+- **Shared reader family (Phase A).** New `packages/builder-server/src/utils/projectContentFs.js` —
+  `listPagesFromDir` / `readGlobalWidgetFromDir` / `readThemeDataFromDir(projectDir)`: dir-explicit pure
+  FS transforms (C2), barrel-exported from `index.js`, unit-tested in `tests/projectContentFs.test.js`.
+- **E1b/E2 — render path wired.** `buildRenderDeps.listPages` → `listPagesFromDir(getProjectDir(folderName))`;
+  `previewController` + `exportController` read globals/theme/pages via the `…FromDir` readers. The old
+  folderName-based `listProjectPagesData` / `readGlobalWidgetData` are **deleted** from `pageController`
+  (along with their now-unused `fs`/`path`/config-helper imports); their unit coverage folds into
+  `projectContentFs.test.js`.
+- **E1a — theme CRUD → storage adapter.** `getProjectThemeSettings` / `saveProjectThemeSettings` now use
+  `storage.read/write(req.scope, 'theme.json')`; the manual `fs.access` project-existence check is gone
+  (the `resolveActiveProject` middleware already guarantees it). Dead `readProjectThemeData` **deleted**.
+  **Semantic note:** the GET is now **scope-driven, not `req.params.projectId`-driven** — `LocalScopeResolver`
+  ignores the route param and returns the active project (parity with `getAllPages`; the POST write-guard
+  already enforced `param == scope`). In OSS single-tenant they always coincide; for hosted this is the
+  secure default (you read your authorized project, not an arbitrary route id).
+- **E3 — dead `getMenuById` deleted** from `menuController` + its `menus.test.js` blocks (the uuid-backfill
+  behavior stays covered via the live `getAllMenus` path). Zero references remain anywhere.
+
+Docs landed: **C1/C2 + the three-planes boundary principle** are now in `core-project-id-architecture.md`
+(rewrote the "Still-path-based exceptions" section — bullets 1–2 were stale, naming deleted functions) and
+cross-referenced from `core-architecture.md` (Rendering Pipeline + the backend-utils table row for
+`projectContentFs.js`).
+
+Deferred (not started): the **hosted cross-repo follow-on (D)** (repoint `buildCloudRenderDeps`, delete
+`cloudProjectData.js`'s content readers; collapse the now-redundant `projectThemes.js` theme settings fork).
+Lifecycle duplicate/import cores (+ the `AssetStorageAdapter.copy` R2 blocker) are tracked separately in
+**§30** (deferred).
 
 **Context.** The backend is scope-first + adapter-injected, but a small set of
 functions bypass the `StorageAdapter` and read the filesystem directly by
@@ -1547,47 +1590,223 @@ functions bypass the `StorageAdapter` and read the filesystem directly by
    folderName via `getProjectFolderName()` and read `theme.json` directly.
 2. `pageController.listProjectPagesData()` / `readGlobalWidgetData()` — take a
    folderName, build paths via `getProjectPagesDir()` / `getProjectDir()`.
-3. `menuController.getMenuById()` — the one render-path menu reader still using
-   `fs-extra` / `path` directly against a project directory.
+3. `menuController.getMenuById()` — ~~the one render-path menu reader still using
+   `fs-extra` / `path` directly~~. **Correction (2026-06-29):** verified to have
+   **no production callers** — only `menus.test.js` exercises it as a "rendering
+   helper". It is **dead-but-tested**, so the §28 proof-of-concept below is
+   mis-targeted; treat this as "delete the dead export (or wire it)" rather than a
+   port. (The live OSS render path that *does* read content without a scope is
+   `buildRenderDeps` → `listProjectPagesData` / `readGlobalWidgetData` — exception 2.)
+   **→ resolved: delete** (see Reads scoping outcome below).
 4. **Project lifecycle directory ops** — create / rename / duplicate / import in
    `projectController.js` operate on directories by folderName with `fs-extra`.
    These are inherently filesystem-shaped (bulk directory copy / rename) and run
-   in the OSS shell context.
+   in the OSS shell context. **→ scoped 2026-06-29, see 4a/4b below.**
 
 **Why it matters.** Every exception is a spot where hosted has to either
-reimplement the logic against cloud storage or accept OSS-only behavior. Closing
-them keeps the "swapping local FS for cloud is a wiring change in the shell, not a
-fork of the server" invariant honest.
+reimplement the logic against cloud storage or accept OSS-only behavior. Confirmed
+concretely: hosted **already forked** the exception-1/2 reads into
+`widgetizer-hosted/server/render/cloudProjectData.js` (+ its own `buildCloudRenderDeps.js`)
+precisely because the OSS functions hardcode the global `DATA_DIR` namespace and
+`@widgetizer/builder-server` is barrel-only. Closing them keeps the "swapping local
+FS for cloud is a wiring change in the shell, not a fork of the server" invariant honest.
 
 **Difficulty split.**
 
-- **Easy (1–3):** mechanical port. Swap `fs.readFile(path)` →
-  `storage.read(scope, relativePath)` and thread `scope` + `req.adapters.storage`
-  through the callers. The render path already goes through `buildRenderDeps()` →
-  `deps` bag, so the seam exists; just push `storage` + `scope` into the bag and
-  swap the `fs` calls inside. The `require-scope-arg` ESLint rule will catch any
-  missed call site. Estimated ~1–2 days plus test updates; tests already exist
-  and just need their call sites updated.
-- **Not easy (4):** project lifecycle ops are genuinely OSS-shell code. Hosted
-  wouldn't copy a theme directory — it would write a batch of blobs to cloud
-  storage, which is a different implementation. Honest fix is to move these ops
-  out of `builder-server`'s project controller and into the OSS shell
-  (`app/server-common.js` or a sibling), explicitly marking them OSS-only by
-  design. Bigger structural refactor, not a swap-a-call fix.
+- **Reads (1–2):** scoped — see "Reads scoping outcome" below. **Hybrid:** theme CRUD routes →
+  storage adapter; render-path pages/globals/theme → shared `projectDir`-rooted readers (the engine
+  is already `projectDir`-rooted + FS-bound). Payoff: hosted deletes the `cloudProjectData.js` fork.
+  (Exception 3 `getMenuById` is dead → delete.)
+- **Lifecycle (4):** *not* a per-key swap and *not* a wholesale relocation. Scoped
+  below — the create path already shows the right pattern.
 
-**Suggested plan if we proceed.**
+### Scoping outcome (all four exceptions) — 2026-06-29 (consolidated)
 
-1. Pick `getMenuById` (smallest, ~30 lines) as a proof-of-concept and port it
-   to the storage adapter. Validates the pattern end-to-end and gives a template
-   for the other two easy ones.
-2. Port `listProjectPagesData`, `readGlobalWidgetData`, `readProjectThemeData`
-   using the same pattern.
-3. Decide on (4) separately — either move the lifecycle ops into the OSS shell,
-   or document them as "OSS-only by design" in `core-architecture.md` so the
-   boundary is explicit rather than accidental.
+Re-verified against code: `storage.{read,write}(scope, rel)` resolves to the **same file** as raw
+`projectDir` FS access (`LocalStorageAdapter.#projectBase` ≡ `getProjectDir`; `CloudStorageAdapter` ≡
+`getProjectBase`) — the adapter is just a scope/`assertWithin`/atomic wrapper over the **same project
+directory**. So the four exceptions are facets of one architecture with **three planes** (SQLite
+metadata; content in the project working dir; media on the asset plane = R2 in hosted) and one
+**boundary principle:** request-scoped per-key access → StorageAdapter; whole-directory FS-bound ops
+(render + lifecycle) → `projectDir` working directory; media → AssetStorageAdapter; metadata → SQLite.
+Decisions:
 
-**Effect:** moderate (architectural) — closes the hosted-boundary leak; enables
-the "no fork" claim to hold without caveats. Not user-visible.
+- **E1a — Theme CRUD routes → storage adapter.** `getProjectThemeSettings` / `saveProjectThemeSettings`
+  (`themeController.js:1633`/`:1658`) move to `storage.read/write(req.scope, 'theme.json')` (scope is
+  already attached via `resolveActiveProject`). Adapter `null → 404` preserves today's behavior; keep
+  `sanitizeThemeSettings` + `updateThemeSettingsMediaUsage`. Matches `getAllPages` + hosted `projectThemes.js`.
+- **E1b + E2 — Render-path reads → shared `projectDir`-rooted readers.** Add barrel-exported
+  `listPagesFromDir` / `readGlobalWidgetFromDir` / `readThemeDataFromDir(projectDir)`. `buildRenderDeps`'
+  `listPages` becomes `listPagesFromDir(getProjectDir(folderName))` (no scope threading needed); the
+  preview/export controllers swap their globals/theme reads to the `…FromDir` readers. Consistent with
+  the engine's existing `projectDir` reads; render is FS-bound by LiquidJS regardless.
+- **Hosted follow-on (cross-repo) — ✅ render-reader dedup DONE 2026-06-30.** `buildCloudRenderDeps` +
+  `render/renderProjectStream` + `routes/previewRender` now import the shared `…FromDir` readers from
+  `@widgetizer/builder-server` (aliased `listPagesFromDir as listPages` / `readGlobalWidgetFromDir as
+  readGlobalWidget`); `cloudProjectData.js`'s `listPages`/`readGlobalWidget` are **deleted**. Kept in
+  `cloudProjectData.js`: `getProjectRow`/`getMediaFiles` (SQLite) and — deliberately — **`readThemeData`**:
+  hosted's reader is **lenient** (missing `theme.json` → `{}`, still publishes) whereas the shared
+  `readThemeDataFromDir` is **strict** (throws). That OSS-strict / hosted-lenient render divergence is
+  pre-existing (not introduced here) and is documented at the code level on both sides (`projectContentFs.js`
+  "strict by design"; `cloudProjectData.js` header). Verified line-for-line equivalent before the swap;
+  covered by a new hosted render test for the non-null global-widget path. The `exportSite.js`
+  export-orchestration fork stays (R2 media + publish pipeline — asset/publish planes, not a §28 read).
+  - **Theme settings GET/POST fork — KEPT (earlier "collapsible" assessment reversed 2026-06-30).** Code
+    re-check: `widgetizer-hosted/server/routes/projectThemes.js` is *already* adapter-based
+    (`storage.{read,write}(scope,'theme.json')` + the shared `sanitizeThemeSettings`), so E1a did remove the
+    DATA_DIR coupling — but collapsing onto the OSS Express handlers is **not** behavior-neutral. The OSS
+    theme handlers sit on the **actor-scoped router hosted deliberately doesn't mount** (not owner-filtered),
+    and adopting them would change ~9 behaviors (start writing theme media-usage rows, add the write-guard
+    409, change error-envelope keys `error`→`message`, reject unprovisioned-but-authenticated callers instead
+    of provisioning them, …). So the hosted route shell stays; only its stale "DATA_DIR-coupled" header
+    comment was corrected. The media-usage omission this surfaced is its own item — **§31**. The
+    `/locales/:lang` handler is bespoke (core-locale merge) and stays.
+- **E3 — Delete dead `getMenuById`** + its `menus.test.js` blocks.
+- **Missing `theme.json`: keep STRICT (no behavior change)** — GET → 404, render → throws.
+
+Why hybrid (not adapter-everywhere): the adapter discipline earns its keep at the API boundary
+(scope/authz, backend-agnostic); the scope-free, FS-bound render path naturally belongs with
+`projectDir`, and routing it through the per-key adapter buys no R2-readiness (render needs a filesystem
+anyway) while adding plumbing. Simplest fit without weakening the invariant.
+
+Lifecycle (4) reuses the same `projectDir` helper family — `scaffoldProjectContent({ projectDir, … })`
+(`index.js:53`) is the barrel-exported precedent that OSS `createProject` and hosted `POST /api/projects`
+each wrap (hosted content is itself filesystem-backed under `data/users/<actorId>/projects/<folderName>/`;
+only media is R2):
+
+- **4a — Rename → OSS-only by design.** Hosted never renames (`folderName` is an
+  immutable storage key; its `PATCH /api/projects/:id` won't touch it). Keep rename
+  in `projectController`; mark it *intentional* — a code comment + a note in
+  `core-project-id-architecture.md` § Still-path-based exceptions. No code move, no
+  contract change.
+- **4b — Duplicate / import → extract shared FS cores.** **Promoted to its own deferred item — see §30.**
+  (Extract `duplicateProjectContent({srcDir,destDir})` / `importProjectContent({bundleDir,destDir})` next to
+  `scaffoldProjectContent`; OSS controllers become thin wrappers; `remapDuplicatedProjectUuids` takes an
+  explicit `destDir`.) Deferred until hosted builds duplicate/import; the genuine blocker is duplicate's
+  **media** copy — `AssetStorageAdapter` has no `copy`. The C1/C2 contract it must honor is documented above.
+
+**Effect:** moderate (architectural) — makes the boundary explicit rather than
+accidental; 4a/4b keep the "no fork" claim honest for lifecycle. Not user-visible.
 
 **Hosted impact:** positive — every closed exception is one less spot the hosted
-product has to reimplement or work around.
+product has to reimplement or work around (and 4b means duplicate/import become a
+shell-wrapper job, not a re-fork, if/when hosted wants them).
+
+---
+
+## 29. Loud stale-active-project detection in the OSS editor
+
+**Status:** ⬜ open — scoped 2026-06-29, not started. OSS-shell (`app/`) + `editor-ui` feature; orthogonal
+to §28 (no `builder-server`/contract change). Grew out of the §28/E1a discussion of the OSS singleton
+active-project model.
+
+**Context.** OSS is single-active-project by design — `LocalScopeResolver` returns the singleton
+`app_settings.activeProjectId`, and opening a project flips it globally via `setActiveProject`. So two
+tabs/windows/browsers pointed at different projects can't both be live: a "stale" tab (whose client store
+names a different project than the server's current active) **silently reads the active project's content**
+(scope-driven GETs return the singleton), while its **writes are blocked 409** by the `resolveActiveProject`
+write-guard (`PROJECT_MISMATCH`). The data is safe (writes can't reach the wrong project); the wart is the
+silent-wrong **display** — the stale tab shows another project's pages/theme with no signal. There is no
+cross-tab awareness today (`projectSwitchCoordinator` only resets stores on an *in-tab* switch).
+
+**Decision (2026-06-29).** Keep OSS single-tenant (no real multi-tab for now) and make the staleness
+**loud**, entirely client-side. **No server changes:**
+- **GET behaviour unchanged** — content GETs stay scope-driven (return the active project); **no GET-side
+  409 / read-guard.** A read-guard was considered and rejected: redundant with the curtain below, and
+  inferior — a forced reload lands on the active project anyway, it's a broad `resolveActiveProject` change,
+  it risks transient 409s from in-flight GETs during legitimate same-tab switches, and it would force
+  exempting `GET /api/projects/active` + cold-boot (the very probe staleness detection relies on).
+- **Keep the existing write-guard 409** — it's the data-safety floor (only thing stopping a stale tab from
+  mutating the wrong project) *and* one of the curtain triggers below.
+
+**Mechanism (client-only).** Detect staleness against the **server** — the single shared source of truth
+(one local server; every tab/window/browser hits it), so it works across tabs *and* browsers.
+BroadcastChannel/`localStorage` events are same-browser-profile only (can't cover Firefox↔Chrome), so they
+can't be the foundation:
+1. **Revalidate on focus/visibility** — when a tab becomes visible/focused, `GET /api/projects/active`
+   (endpoint exists — `editor-ui/src/queries/projectManager.js`), compare to `projectStore`; if different,
+   show a non-destructive curtain: *"Another tab/window switched to <name> — this view is out of date.
+   Reload."* (Reload re-bootstraps to the active project — the accepted single-tab outcome.)
+2. **React to the write-guard 409** (`PROJECT_MISMATCH`) — surface the same curtain instead of a generic
+   error toast.
+3. **(Optional) BroadcastChannel fast-path** — instant curtain for *same-browser* sibling tabs without
+   waiting for focus. Polish, not load-bearing.
+
+**Work.** `editor-ui`: a focus/visibility hook that probes `GET /api/projects/active` and compares to
+`projectStore`; a curtain/overlay component + 409→curtain handling in the query layer; optional
+BroadcastChannel. `app/` shell wires it once on mount (alongside the existing `registerProjectStore` /
+`projectSwitchCoordinator`). No `builder-server` change.
+
+**Why it matters / fire early.** Trigger the curtain on focus (not just at save time) so a stale tab with
+unsaved edits warns the user **before** they invest more work that can only 409 on save (work-loss safety).
+A background stale tab may show old data until focused — acceptable.
+
+**Effect:** low/moderate — OSS-shell UX correctness; no server/contract change. No effect on hosted, which
+is per-request scoped (`CloudScopeResolver`) and has no shared active-project to go stale — multi-tab works
+there already.
+
+---
+
+## 30. Extract project lifecycle duplicate/import into dir-explicit cores
+
+**Status:** ⏸️ deferred — scoped under §28 (2026-06-29), promoted to its own item 2026-06-29. The OSS
+reads/theme-CRUD half of §28 is done; this is the **lifecycle (exception 4) tail**. Blocked on hosted
+building duplicate/import (no consumer yet) and on the asset-plane copy primitive below.
+
+**What.** Pull the bulk-filesystem bodies of `projectController.duplicateProject` / `importProject` into
+directory-explicit cores — `duplicateProjectContent({srcDir,destDir})`,
+`importProjectContent({bundleDir,destDir})` — next to `scaffoldProjectContent` (`index.js:53`),
+barrel-export them, and leave the OSS controllers as thin wrappers (resolve dirs → call core → DB metadata).
+Refactor `remapDuplicatedProjectUuids` (`utils/linkEnrichment.js:330`) to take an explicit `destDir` instead
+of resolving `getProjectDir(folderName)` internally (the C2 reach-through). Behavior-preserving for OSS:
+existing duplicate/import tests stay green, plus unit tests for each core on scratch `srcDir`/`destDir`.
+
+**Why deferred — the media / asset-plane crux.** OSS `duplicateProject` does one
+`fs.copy(originalDir, newDir)` that copies content **and** `uploads/` media together (OSS media lives under
+the project dir). Hosted media is in **R2**, so a hosted duplicate must copy content via the core **and**
+copy media separately on the asset plane — but `AssetStorageAdapter` has **no `copy`**. So a clean extraction
+has to first decide (a) the asset primitive (a `download→upload` loop — no contract change — or add
+`copy(scope, srcKey, destKey)`), and (b) whether the content core includes `uploads/` (OSS-convenient but
+hosted-unusable) or excludes it (uniform asset-plane handling, but adds an OSS step for no current benefit).
+That decision only pays off once hosted needs duplicate/import, so the extraction waits rather than baking in
+a speculative shape. Import needs no new primitive (`AssetStorageAdapter.upload` already exists).
+
+**Design contract it must honor:** the C1/C2 working-directory contract + the three-planes boundary
+principle — see §28 and `core-project-id-architecture.md` § Still-path-based exceptions.
+
+**Not in scope:** rename (4a) stays **OSS-only by design** (immutable hosted `folderName`) — a resolved
+decision documented under §28, no code change.
+
+**Effect:** moderate (architectural / hosted-readiness) — not user-visible; makes duplicate/import a
+shell-wrapper job rather than a re-fork if/when hosted wants them.
+
+---
+
+## 31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`)
+
+**Status:** ⬜ open — surfaced by §28 D (2026-06-30) while re-checking the theme-settings fork. Hosted-repo
+fix; independent of the §28 read-closure (which is done).
+
+**What.** `widgetizer-hosted/server/routes/projectThemes.js`'s `POST /api/themes/project/:projectId`
+sanitizes + writes `theme.json` but **never calls `updateThemeSettingsMediaUsage`** (the OSS
+`saveProjectThemeSettings` does). So media referenced **only** from theme settings (favicon, OG/social
+image, any themed image) is never recorded as "used" in hosted's `media_usage`. Consequence: such an asset
+shows as unused and can be reported/cleaned/safe-deleted while the live theme still references it → broken
+favicon / social image on the published site.
+
+**Why it exists.** The fork predates E1a and only ever did the storage write; the OSS media-usage tracking
+was never ported into the hosted route. Grep confirms **zero** `mediaUsage` references in
+`widgetizer-hosted/server` (non-test).
+
+**Fix (when scheduled).** On the hosted theme save, after the `storage.write`, track usage the same way OSS
+does — call the OSS `updateThemeSettingsMediaUsage(scope.projectId, sanitizedThemeData)` if it's reachable
+from the `@widgetizer/builder-server` barrel (confirm; it's **not** exported today — `getProjectThemeSettings`/
+`saveProjectThemeSettings`/`updateThemeSettingsMediaUsage` are all unexported), else export it or factor the
+tracking into a shared helper. Verify against hosted's media-usage schema (shared SQLite `media_usage`) and
+add a hosted route test asserting a favicon-only theme asset is recorded as used.
+
+**Not in scope:** collapsing the theme route onto the OSS handlers — explicitly **rejected** under §28 D
+(would change ~9 behaviors). This item fixes only the missing-tracking bug inside hosted's existing fork.
+
+**Effect:** moderate (data-integrity / correctness) — prevents silent loss of theme-referenced media in
+hosted. Not visible until an affected asset is cleaned up.

@@ -31,7 +31,7 @@ process.env.NODE_ENV = "test";
 
 const { getProjectMenusDir, getMenuPath, getProjectDir } = await import("../config.js");
 
-const { createMenu, getMenu, getAllMenus, getMenuById, updateMenu, deleteMenu, duplicateMenu } =
+const { createMenu, getMenu, getAllMenus, updateMenu, deleteMenu, duplicateMenu } =
   await import("../controllers/menuController.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
@@ -361,42 +361,6 @@ describe("getAllMenus", () => {
     assert.deepEqual(res._json, []);
     // Restore for subsequent tests
     await fs.ensureDir(menusDir);
-  });
-});
-
-// ============================================================================
-// getMenuById (rendering helper — direct function call, not controller)
-// ============================================================================
-
-describe("getMenuById", () => {
-  before(async () => {
-    await resetMenus();
-    await createTestMenu("Render Menu");
-  });
-
-  it("returns menu data by project directory and menu ID", async () => {
-    const projectDir = getProjectDir(activeProject.folderName);
-    const menu = await getMenuById(projectDir, "render-menu");
-    assert.ok(menu);
-    assert.equal(menu.name, "Render Menu");
-    assert.equal(menu.id, "render-menu");
-  });
-
-  it("returns { items: [] } for a non-existent menu", async () => {
-    const projectDir = getProjectDir(activeProject.folderName);
-    const menu = await getMenuById(projectDir, "ghost-menu");
-    assert.ok(menu);
-    assert.deepEqual(menu.items, []);
-  });
-
-  it("returns null when menuId is falsy", async () => {
-    const projectDir = getProjectDir(activeProject.folderName);
-    const result1 = await getMenuById(projectDir, null);
-    assert.equal(result1, null);
-    const result2 = await getMenuById(projectDir, undefined);
-    assert.equal(result2, null);
-    const result3 = await getMenuById(projectDir, "");
-    assert.equal(result3, null);
   });
 });
 
@@ -828,29 +792,6 @@ describe("UUID backward compatibility", () => {
     assert.equal(res._status, 200);
     const menu = res._json.find((m) => m.id === "legacy-menu");
     assert.ok(menu.uuid, "menu should have been backfilled with a uuid");
-
-    // Verify it was persisted to disk
-    const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
-    assert.equal(onDisk.uuid, menu.uuid);
-  });
-
-  it("backfills uuid for menus without one (getMenuById)", async () => {
-    await resetMenus();
-
-    // Write a menu file without uuid.
-    const menuPath = getMenuPath(activeProject.folderName, "legacy-by-id");
-    const legacyMenu = {
-      id: "legacy-by-id",
-      name: "Legacy By ID",
-      items: [{ id: "item_1", label: "Home", link: "/" }],
-    };
-    await fs.outputFile(menuPath, JSON.stringify(legacyMenu, null, 2));
-
-    // getMenuById should backfill the uuid
-    const projectDir = getProjectDir(activeProject.folderName);
-    const menu = await getMenuById(projectDir, "legacy-by-id");
-    assert.ok(menu.uuid, "menu should have been backfilled with a uuid");
-    assert.equal(menu.items.length, 1);
 
     // Verify it was persisted to disk
     const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
