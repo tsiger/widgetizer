@@ -151,8 +151,8 @@ export default function ProjectsEdit() {
 
       {/* Theme Update Banner – inside white box, before the form */}
       {project && updateStatus && updateStatus.hasUpdate && (
-        <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg border-l-4 border-l-amber-500">
-          <div className="flex items-start justify-between gap-4">
+        <div className="mb-6 border border-slate-200 bg-slate-50 px-4 py-3">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h3 className="font-semibold text-slate-800">
@@ -175,7 +175,7 @@ export default function ProjectsEdit() {
               onClick={handleApplyUpdate}
               disabled={isApplyingUpdate}
               icon={<RefreshCw size={18} className={isApplyingUpdate ? "animate-spin" : ""} />}
-              className="shrink-0"
+              className="shrink-0 self-start sm:self-center"
             >
               {isApplyingUpdate
                 ? t("projectsEdit.themeUpdate.applying", "Applying...")

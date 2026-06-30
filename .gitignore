@@ -2,7 +2,6 @@ node_modules
 dist
 .wrangler
 dist-electron
-dist-electron-update
 # Ignore the entire data folder
 data/*
 # But include the projects directory structure

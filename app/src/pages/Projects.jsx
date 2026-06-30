@@ -8,13 +8,11 @@ import {
   CirclePlus,
   Copy,
   Download,
-  ArrowUpCircle,
   MoreVertical,
   Check,
 } from "lucide-react";
 
 import PageLayout from "@widgetizer/editor-ui/components/layout/PageLayout.jsx";
-import Tooltip from "@widgetizer/editor-ui/components/ui/Tooltip.jsx";
 import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
 import Table from "@widgetizer/editor-ui/components/ui/Table.jsx";
 import Badge from "@widgetizer/editor-ui/components/ui/Badge.jsx";
@@ -268,6 +266,7 @@ export default function Projects() {
               const showActiveBadge = isCurrentProject && sortedProjects.length > 1;
               const themeLabel = project.themeName || project.theme || "Unknown";
               const isExporting = exportingProjectId === project.id;
+              const hasThemeUpdate = project.hasThemeUpdate;
               const menuButtonClass = "flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors";
 
               return (
@@ -295,15 +294,18 @@ export default function Projects() {
                     </button>
                   </td>
                   <td className="py-3 px-4">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <div className="flex min-w-0 items-baseline gap-1.5 text-slate-600" title={themeLabel}>
-                        <span className="min-w-0 truncate text-sm">{themeLabel}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex items-baseline gap-1.5 text-slate-600" title={themeLabel}>
+                        <span className="text-sm">{themeLabel}</span>
                         {project.themeVersion && <span className="shrink-0 text-xs text-slate-400">v{project.themeVersion}</span>}
                       </div>
-                      {project.hasThemeUpdate && (
-                        <Tooltip content={t("projects.badges.updateAvailable", "Update available")}>
-                          <ArrowUpCircle size={16} className="shrink-0 text-pink-500" />
-                        </Tooltip>
+                      {hasThemeUpdate && (
+                        <Link
+                          to={`/projects/edit/${project.id}`}
+                          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-pink-200 bg-pink-50 px-2.5 py-0.5 text-xs font-semibold text-pink-700 transition-colors hover:border-pink-300 hover:bg-pink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2"
+                        >
+                          {t("projects.badges.updateAvailable", "Update available")}
+                        </Link>
                       )}
                     </div>
                   </td>
@@ -328,7 +330,7 @@ export default function Projects() {
 
                       {openMenuId === project.id && (
                         <div
-                          className={`absolute right-0 z-10 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg ${
+                          className={`absolute right-0 z-10 ${hasThemeUpdate ? "w-80" : "w-64"} rounded-md border border-slate-200 bg-white py-1 shadow-lg ${
                             menuDirection === "up" ? "bottom-full mb-1" : "top-full mt-1"
                           }`}
                         >
@@ -360,10 +362,17 @@ export default function Projects() {
                           <Link
                             to={`/projects/edit/${project.id}`}
                             onClick={() => setOpenMenuId(null)}
-                            className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
+                            className={`${menuButtonClass} justify-between text-slate-700 hover:bg-slate-50`}
                           >
-                            <Pencil size={14} />
-                            {t("projects.actions.editDetails", "Edit project details")}
+                            <span className="inline-flex items-center gap-2">
+                              <Pencil size={14} className="shrink-0" />
+                              <span>{t("projects.actions.editDetails", "Edit project details")}</span>
+                            </span>
+                            {hasThemeUpdate && (
+                              <span className="shrink-0 rounded-full border border-pink-200 bg-pink-50 px-2 py-0.5 text-[11px] font-semibold leading-none text-pink-700">
+                                {t("projects.badges.updateAvailable", "Update available")}
+                              </span>
+                            )}
                           </Link>
                           <button
                             type="button"

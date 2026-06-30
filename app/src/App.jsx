@@ -58,7 +58,6 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
     slots: {
       topbarRight: <AdminMenu />,
-      topbarBanner: <UpdateBanner />,
       overlay: <DebugStatePanel />,
     },
   }),
@@ -84,6 +83,7 @@ const router = createBrowserRouter([
 function AppWithToast() {
   return (
     <>
+      <UpdateBanner />
       <RouterProvider router={router} />
       <LanguageInitializer />
       <ToastContainer />
