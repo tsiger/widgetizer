@@ -141,6 +141,15 @@ function generateMobileNav() {
   return html;
 }
 
+// Escape a value for safe use inside a double-quoted HTML attribute
+function escapeAttr(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 // Generate HTML template
 function generateHTML(title, content, activePath, description = "", canonicalUrl = "") {
   const nav = generateNav()
@@ -168,13 +177,23 @@ function generateHTML(title, content, activePath, description = "", canonicalUrl
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} - ${sitemap.title}</title>${descriptionMeta}${canonicalLink}
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/pagefind/pagefind-ui.css">
 </head>
 <body>
   ${generateMobileNav()}
   ${nav}
   <main class="content">
+    <div id="search" class="docs-search" data-pagefind-ignore></div>
+    <article data-pagefind-body data-pagefind-meta="title:${escapeAttr(title)}">
     ${content}
+    </article>
   </main>
+  <script src="/pagefind/pagefind-ui.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      new PagefindUI({ element: '#search', showSubResults: true, showImages: false });
+    });
+  </script>
   <script>
     // Mobile menu toggle
     const hamburger = document.querySelector('.hamburger');

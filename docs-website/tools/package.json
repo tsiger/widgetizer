@@ -4,8 +4,8 @@
   "description": "Static site generator for Widgetizer documentation",
   "type": "module",
   "scripts": {
-    "build": "node build.js",
-    "dev": "node build.js --watch",
+    "build": "node build.js && pagefind --site ../dist",
+    "dev": "npm run build && node build.js --watch",
     "preview": "npm run build && serve ../dist -l 5050",
     "deploy": "npm run build && wrangler deploy --config ../wrangler.toml"
   },
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "browser-sync": "^3.0.3",
+    "pagefind": "^1.5.2",
     "serve": "^14.2.6",
     "wrangler": "^4.63.0"
   }

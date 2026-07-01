@@ -195,7 +195,7 @@ body {
   max-width: var(--content-width);
   min-width: 0;
 
-  & > p:first-of-type {
+  & article > p:first-of-type {
     font-size: 1.125rem;
     line-height: 1.7;
     margin-bottom: 1.5rem;
@@ -203,7 +203,7 @@ body {
 
   /* Prose links carry a 2px underline so they read as links on any background,
      not by color alone. Component links (e.g. download cards) opt out via :not(). */
-  & a:not(.download-card) {
+  & article a:not(.download-card) {
     border-bottom: 2px solid var(--accent);
     transition: color 0.15s ease, border-color 0.15s ease;
 
@@ -581,6 +581,19 @@ img {
   font-size: 0.8125rem;
   color: var(--text-tertiary);
   margin-bottom: 2rem;
+}
+
+/* Pagefind search (top of content) */
+.docs-search {
+  margin-bottom: 2rem;
+  --pagefind-ui-primary: var(--accent);
+  --pagefind-ui-text: var(--text-primary);
+  --pagefind-ui-background: var(--bg-primary);
+  --pagefind-ui-border: var(--border-color);
+  --pagefind-ui-tag: var(--bg-secondary);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 0.5rem;
+  --pagefind-ui-font: var(--font-sans);
 }
 
 /* Mobile Styles */

@@ -53,6 +53,11 @@
     },
     {
       "type": "page",
+      "title": "Core Widgets",
+      "path": "core-widgets.md"
+    },
+    {
+      "type": "page",
       "title": "Forms",
       "path": "forms.md"
     },
