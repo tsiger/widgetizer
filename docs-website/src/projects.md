@@ -28,11 +28,21 @@ At any given time, one project is marked as **active**. This is the project you'
   <figcaption>Theme presets appear as visual cards during project creation when the selected theme provides them.</figcaption>
 </figure>
 
+### How Theme and Preset Relate
+
+Think of project creation as: **Theme -> Preset -> Project**.
+
+- **Theme** defines the design system, widgets, page templates, settings, and any collection types.
+- **Preset** applies a starting style and optional starter content to that theme.
+- **Project** is your editable copy. After creation, you can change content, settings, pages, menus, media, and collection items without changing the original theme or preset.
+
+For the built-in library, many starter cards are presets of the default **Arch** theme. They may look like separate theme choices because they can include complete demo sites, but they share the same underlying theme and widget system. See [Themes](themes.html) for the full explanation.
+
 ### Understanding the Fields
 
 - **Title**: The display name shown throughout Widgetizer.
-- **[Theme](themes.html)**: Defines the look and feel of your site. **Note:** You cannot change the theme after creating a project, so choose carefully!
-- **Preset**: A variant of the chosen theme with different colors, fonts, and/or demo content. Presets are only applied at project creation. Once created, your project is independent and fully customizable.
+- **[Theme](themes.html)**: Defines the look and feel, available widgets, templates, settings, and theme-owned content types for your site. **Note:** You cannot change the theme after creating a project, so choose carefully!
+- **Preset**: A starting point inside the chosen theme, with different colors, fonts, and/or demo content. Presets are only applied at project creation. Once created, your project is independent and fully customizable.
 - **Folder Name**: The folder where your project files are stored and exported. This is automatically generated from the title as a URL-friendly slug (e.g., "My Site" becomes `my-site`).
 - **Notes**: Personal notes for your own reference. Useful for remembering what each project is for.
 - **Website Address**: The base URL where your site will be hosted (e.g., `https://example.com`). This is used for:

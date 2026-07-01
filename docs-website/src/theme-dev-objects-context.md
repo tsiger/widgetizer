@@ -49,7 +49,7 @@ Nested example:
 
 ```liquid
 {{ theme.typography.heading_font.weight }}
-{{ theme.layout.enable_reveal_animations }}
+{{ theme.general.enable_reveal_animations }}
 ```
 
 # Widget Object

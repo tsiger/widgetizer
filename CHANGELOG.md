@@ -1,5 +1,63 @@
 # Changelog
 
+## [0.9.9] - 2026-07-01
+
+### Added
+
+- Theme-defined collections for lightweight CMS content types such as News, Projects, and Services, including optional per-item pages, SEO output, sitemap inclusion, collection item menu links, depth-aware export links, and in-editor item management
+- New Arch collection widgets: News Grid, Projects Grid, and Services Grid
+- New Arch Audio Player widget with MP3 playlist support
+- Copy and paste for widgets within a page or across pages, including right-click context menu support and keyboard delete
+- Sticky action bars for long page, collection, and project forms
+- Rich-text links can now target Media Library files
+- Grouped, sorted link picker for pages and collection items
+- Taller widget inserter with smarter positioning and keyboard scrolling
+- Denser page-editor settings sidebar
+- Export history now shows the total size of each export
+- Arch presets can seed starter media into new projects
+- Internal rich-text links now follow page and collection-item renames and clear automatically when the target is deleted
+- MP3 and audio uploads are supported
+- Gallery images can carry per-image captions
+- New theme setting types: `date`, `gallery`, and `table`
+- Theme-author filters and helpers for collections and rich text: `collection`, `rte_blank`, and `rte_text`
+- Dev-mode export HTML validation with an export issues report
+
+### Changed
+
+- Backend and editor code reorganized into modular npm packages behind adapter contracts for future hosted deployments
+- Theme update indicators and banners improved, including clearer global update messaging and opt-in project update behavior
+- Project creation avoids copying excluded theme directories for faster setup
+- Local content saves now use temp-file-and-rename writes to avoid half-written files
+- Card and collection grid widgets now scale image sizes, padding, and corner radius by column count
+- Image Callout widget gained the Content color scheme
+- LiquidJS updated to 10.26+
+
+### Fixed
+
+- Windows export junk-file filtering now handles Windows paths correctly
+- YouTube settings no longer trigger a re-save loop
+- Header dropdown readability under highlight color schemes
+- Collection-item save button no longer remains disabled after re-editing
+- Buttons default to `type="button"` to avoid accidental form submits
+- Rich-text link UI no longer crashes under React StrictMode
+
+### Security
+
+- Media uploads are size-capped at the upload stream
+- Per-page widget count, menu-item tree depth, and menu-item count are bounded
+- Image setting paths are allowlisted to block image-based XSS
+- URL sanitization hardened across links, menus, and theme output
+- Theme-authored SVG icons are sanitized before injection
+- `og:image` is always emitted as an absolute URL
+- Additional Liquid rendering isolation hardening for hosted deployments
+
+### Documentation
+
+- Theme-author docs expanded with a build-your-first-theme quickstart, Liquid filters reference, Collections authoring guide, and one-page theme contract
+- New end-user guides for Collections and Forms
+- Themes documentation now explains Arch, presets, and the Theme -> Preset -> Project -> Content model
+- Corrected rich-text rendering guidance for global autoescaping
+
 ## [0.9.8] - 2026-04-26
 
 ### Added

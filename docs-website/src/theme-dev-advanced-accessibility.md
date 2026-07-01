@@ -73,7 +73,7 @@ When using external JavaScript files (via `{% enqueue_script %}`), the script on
 
 # Scroll Reveal Animations
 
-Arch includes a reveal system controlled by `theme.layout.enable_reveal_animations`, but you can implement any animation system you want (or none at all).
+Arch includes a reveal system controlled by `theme.general.enable_reveal_animations`, but you can implement any animation system you want (or none at all).
 
 ### Required Pieces
 
@@ -84,10 +84,10 @@ Arch includes a reveal system controlled by `theme.layout.enable_reveal_animatio
 ### Example (Arch)
 
 ```liquid
-{% unless theme.layout.enable_reveal_animations %}
+{% unless theme.general.enable_reveal_animations %}
   <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
 {% endunless %}
-{% if theme.layout.enable_reveal_animations %}
+{% if theme.general.enable_reveal_animations %}
   {% enqueue_script src: "reveal.js", priority: 50 %}
 {% endif %}
 ```

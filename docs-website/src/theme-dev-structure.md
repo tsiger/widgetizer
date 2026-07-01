@@ -140,17 +140,39 @@ When a theme is selected for a project, the system loads:
 
 # Arch Theme Example
 
-The default theme lives in `themes/arch/` and includes all required components plus a full widget set. It’s a helpful example, but not a required blueprint; you can diverge in structure, naming, and organization as long as the core contract is met.
+The default theme lives in `themes/arch/`. Arch is Widgetizer's bundled production theme: a real design system, widget library, preset family, and reference implementation. It is useful because it shows how a single theme can support many site types through presets, without duplicating the underlying widget and layout code.
 
-### Key Arch Files
+Arch is not a required blueprint. You can build a much smaller theme, organize CSS differently, skip presets, or omit collections entirely as long as the core contract is met.
 
-- `themes/arch/theme.json`
-- `themes/arch/layout.liquid`
-- `themes/arch/templates/index.json`
-- `themes/arch/widgets/`
-- `themes/arch/assets/base.css`
-- `themes/arch/menus/main-menu.json`
-- `themes/arch/snippets/icon.liquid`
+At the current version, Arch includes 57 widget folders and 31 preset folders. Treat those numbers as scale, not a requirement.
+
+### Read Arch in This Order
+
+If you want to understand a real theme, open these files in order:
+
+1. `themes/arch/theme.json`: metadata, global settings, image-size rules, and theme setting groups.
+2. `themes/arch/layout.liquid`: the document wrapper, global tags, content placeholders, and asset output.
+3. `themes/arch/assets/base.css`: shared tokens, utility classes, color schemes, spacing, buttons, forms, and layout primitives.
+4. `themes/arch/widgets/`: the widget library. Each widget has a `schema.json` for the editor and a `widget.liquid` template for rendering.
+5. `themes/arch/templates/`: default page structures and global header/footer widget instances.
+6. `themes/arch/presets/`: starter sites built from the same theme. A preset can override settings, templates, menus, collection items, and starter media.
+7. `themes/arch/collection-types/`: theme-owned CMS types such as News, Projects, Services, and development/demo types.
+8. `themes/arch/snippets/` and `themes/arch/assets/icons.json`: shared Liquid helpers and icon data.
+9. `themes/arch/locales/`: translatable labels for theme settings, widget schemas, and editor UI text.
+
+### What Arch Demonstrates
+
+- A broad widget library with consistent schema patterns
+- A shared design system in `base.css`
+- Global settings that feed CSS variables and Liquid
+- Full presets for different business types
+- Collection types with optional item pages
+- Global widgets for header and footer
+- Localized labels using `tTheme:` keys
+
+### What Arch Is Not
+
+Arch is not a separate theme for every preset. Brewline, Brightside, Shearline, and the other starter cards are Arch presets. They may ship different starter content, but they share the same underlying theme contract.
 
 # Theme Copying in Projects
 

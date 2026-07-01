@@ -13,7 +13,7 @@ The manifest lives at the root of your theme and contains metadata and a `settin
 The default Arch theme uses:
 
 - `themes/arch/theme.json`
-- Groups: `layout`, `colors`, `typography`, `privacy`, `advanced`
+- Groups: `general`, `colors`, `typography`, `style`, `social`, `advanced`
 
 You can add any groups you want. Groups are just sections in the Theme Settings UI, so name them to match your design system or product goals. Example group ideas:
 
@@ -99,11 +99,12 @@ Global settings are defined in `settings.global`. Each key is a group that becom
 
 Arch defines:
 
-- `layout` (animations)
+- `general` (favicon, reveal animations, date format)
 - `colors` (standard and highlight color sets)
 - `typography` (heading and body font pickers)
-- `privacy` (Bunny Fonts toggle)
-- `advanced` (custom CSS and script injection)
+- `style` (corner style, spacing density, button shape)
+- `social` (social profile URLs)
+- `advanced` (Bunny Fonts toggle, custom CSS, and script injection)
 
 # Setting Types
 
@@ -168,7 +169,7 @@ All settings are available in templates through the `theme` object using the sam
 ```liquid
 {{ theme.colors.standard_bg_primary }}
 {{ theme.typography.heading_font.stack }}
-{% if theme.layout.enable_reveal_animations %}
+{% if theme.general.enable_reveal_animations %}
   <!-- Animation logic -->
 {% endif %}
 ```
