@@ -12,9 +12,9 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done · 3 deferred · 3 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **24 done · 3 deferred · 5 open · 1 wontfix**_
 
-- ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
+- ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01--was-experiment-docs-10)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
 - ✅ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — DONE 2026-06-26](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene---done-2026-06-26--was-experiment-docs-14)
 - ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss-was-experiment-docs-9-oss-portion)
@@ -45,10 +45,27 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done ·
 - ⬜ [29. Loud stale-active-project detection in the OSS editor — focus/visibility revalidation + 409 handling (OSS shell `app/` + `editor-ui`) — **low/moderate (single-tenant UX correctness)**](#29-loud-stale-active-project-detection-in-the-oss-editor)
 - ⏸️ [30. Extract project lifecycle duplicate/import into dir-explicit cores (`builder-server`) — **deferred** until hosted builds duplicate/import (blocker: `AssetStorageAdapter.copy`); the lifecycle tail of §28](#30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores)
 - ⬜ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — surfaced by §28 D — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted)
+- ⬜ [32. Theme-upload update-import validation smells — `_validate_<ts>` collision + double per-version log (`builder-server`) — **investigate (low)**](#32-theme-upload-update-import-validation-smells-builder-server)
+- ⬜ [33. Editor-ui duplication smells — slug-validator ternary + `useMediaState` localStorage pattern (`editor-ui`) — **investigate (low)**](#33-editor-ui-duplication-smells-editor-ui)
+- ⬜ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — **investigate (negligible)**](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server)
 
 ---
 
-## 1. Relative preview asset URLs (robustness) — discuss  *(was experiment-docs §10)*
+## 1. Relative preview asset URLs (robustness) — ✅ DONE 2026-07-01  *(was experiment-docs §10)*
+
+**✅ DONE 2026-07-01.** Implemented as **Option B**: preview-mode `apiUrl` is now `""` (origin-relative
+URLs) and `previewController` injects `<base href="/">` instead of `<base href="${SERVER_URL}">`. Two
+source edits — `render-engine/src/renderEngine.js` (preview `apiUrl → ""`, cascading to image/file/forms
+base + site-icon links) and `builder-server/src/controllers/previewController.js` (origin-root base tag +
+the two `sharedGlobals.apiUrl` producers → `""`) — flip all five preview URL categories to root-relative;
+`renderFooterAssets` + the enqueue resolver inherit the empty `apiUrl` unchanged. Full backend suite green
+(1313); acceptance verified in-browser under a deliberately-wrong `SERVER_URL`: page + collection-item
+previews emit `<base href="/">`, zero absolute `/api` URLs, and `masonry.js` loads from the real serving
+port (not the pinned one) with no 404s — the original audit failure mode is gone. OSS-only; hosted verified
+**inert** (its inline editor preview is same-origin, so the now-relative URLs re-resolve to the same
+`APP_ORIGIN` target; three stale hosted comments were corrected). Design + plan:
+`experiment-docs/spec-relative-preview-asset-urls.md` + `plan-relative-preview-asset-urls.md`. Original
+finding below.
 
 Surfaced 2026-06-19 while root-causing a parity-audit "masonry-gallery" false positive — a
 preview that rendered completely unstyled, which turned out to be a `SERVER_URL`/port test
@@ -1810,3 +1827,73 @@ add a hosted route test asserting a favicon-only theme asset is recorded as used
 
 **Effect:** moderate (data-integrity / correctness) — prevents silent loss of theme-referenced media in
 hosted. Not visible until an affected asset is cleaned up.
+
+---
+
+## 32. Theme-upload update-import validation smells (`builder-server`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `1c831b4b` (§22: gate collection
+schemas on the theme **update-import** path). Two minor smells in the new validation path; neither is a
+confirmed bug, both worth a look.
+
+**What.** `1c831b4b` added a pre-commit validation branch to `uploadTheme` (`themeController.js`) that
+merges installed base + installed updates + incoming deltas into a throwaway dir via the extracted
+`layerThemeSnapshot`, runs `validateThemeCollectionSchemas`, and cleans up in `finally`. Two things to
+investigate:
+- **Temp-dir name.** The throwaway merge dir is `_validate_${Date.now()}`. Two update-imports for the *same*
+  installed theme landing in the same millisecond would collide on that name. Investigate whether concurrent
+  uploads to one theme dir are reachable (route / serialization); if so, switch to a collision-proof name
+  (`fs.mkdtemp`).
+- **Log volume.** `layerThemeSnapshot` logs one line per applied version and now runs **twice** per
+  update-import (build `latest` + `_validate_` merge), so the per-version `console.log` fires twice per
+  upload. Investigate quieting it (log once, or gate behind a debug flag).
+
+**Scope.** OSS-only surface — hosted doesn't reach theme upload (`widgetizer-hosted/server/routes/
+projectThemes.js` imports only `sanitizeThemeSettings`; no `uploadTheme` caller). No hosted impact.
+
+**Effect:** low — a same-ms collision would corrupt only one concurrent *validation* run (not the install),
+and the double log is cosmetic. Confirm reachability before deciding to fix.
+
+---
+
+## 33. Editor-ui duplication smells (`editor-ui`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `331ccf8b` (user-test-checklist batch).
+Two DRY / maintainability smells to weigh; refactor-only, no behavior change intended.
+
+**What.**
+- **Slug-validation ternary duplicated.** The same `formatSlug(value).length > 0 ? … : …` validation is
+  inlined in both `PageForm` and `CollectionItemForm`. Investigate extracting a shared rule/helper (a
+  `validateSlug` next to the existing `formatSlug`, or a shared form rule) so the two forms can't drift.
+- **`useMediaState` localStorage pattern.** `useMediaState` reads `localStorage` in a `useState` initializer
+  **and** persists via an effect. Investigate a small reusable `usePersistentState` / `useLocalStorage` hook
+  before this read-init + persist-effect shape is copy-pasted as more editor prefs are added.
+
+**Scope.** Pure `@widgetizer/editor-ui`; a fix flows to web / Electron / hosted via the vendored package.
+
+**Effect:** low (maintainability). Not user-visible; investigate whether the extraction is worth it now or
+when a third consumer appears.
+
+---
+
+## 34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `08039c82` (speed up project creation
+by not copying excluded theme dirs). A behavior-parity question, almost certainly benign.
+
+**What.** `08039c82` replaced copy-everything-then-`fs.rm` with a single `fs.cp` whose `filter` skips
+excluded **top-level** entries (`updates`, `latest`, `presets` + caller excludes such as `templates`) during
+the copy — a real speedup (avoids copying then discarding the ~200MB `presets/` for Arch). But the semantics
+widened subtly: the old `fs.rm` removed only directory *paths*, whereas the new `filter` excludes any
+top-level *entry* whose name matches — so a top-level **file** named e.g. `templates` (not a dir) would now
+also be skipped.
+
+**Investigate.** Whether any theme ships (or could ship) a top-level file whose name collides with an
+excluded dir name — none in `arch` today. If parity matters, make the filter dir-aware (exclude only when the
+entry is a directory); otherwise document the intended semantics and close.
+
+**Scope.** `copyThemeToProject` is called via `scaffoldProjectContent`, which hosted also uses
+(`widgetizer-hosted/server/routes/projects.js`), so hosted inherits both the speedup and this semantic — a
+fix flows through automatically. No hosted-only work.
+
+**Effect:** negligible (theoretical edge case) — flagged for confirmation, not because a break is known.
