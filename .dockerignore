@@ -1,0 +1,31 @@
+# Dependencies: reinstalled inside the image for the Linux/container platform.
+# (Critical: never ship the host's Windows-built native modules.)
+node_modules
+**/node_modules
+
+# Build outputs: rebuilt inside the image.
+dist
+dist-electron
+
+# Runtime data: must never be baked into the image; it lives in the /data volume.
+data
+
+# Local env files: the image sets its own env and forces a same-origin build.
+.env
+.env.*
+
+# VCS, editor and OS cruft.
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+.DS_Store
+
+# Large non-runtime directories.
+docs-website
+docs-entities
+logs
+temp
+tmp
+temp-webp

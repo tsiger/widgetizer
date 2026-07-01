@@ -64,7 +64,12 @@ export async function startOssServer({ defaultPort, onReady } = {}) {
   // requested/default port.
   const requestedPort = parseInt(process.env.PORT || String(defaultPort), 10);
 
-  const server = app.listen(requestedPort, "127.0.0.1", () => {
+  // Bind host: default to loopback, the safe choice for desktop/Electron and
+  // local dev. Set HOST=0.0.0.0 to listen on all interfaces, which is required
+  // inside a container so the published port is reachable from the host.
+  const requestedHost = process.env.HOST || "127.0.0.1";
+
+  const server = app.listen(requestedPort, requestedHost, () => {
     const { port } = server.address();
 
     process.env.PORT = String(port);
