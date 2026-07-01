@@ -23,6 +23,11 @@ At any given time, one project is marked as **active**. This is the project you'
    - **Website Address** (optional): The URL where your site will be hosted
 4. Click **"Create Project"**
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/project-create-presets.png" alt="Widgetizer new project form showing title, theme selector, and visual style preset cards." loading="lazy">
+  <figcaption>Theme presets appear as visual cards during project creation when the selected theme provides them.</figcaption>
+</figure>
+
 ### Understanding the Fields
 
 - **Title**: The display name shown throughout Widgetizer.

@@ -44,6 +44,11 @@ Links to any URL, internal or external.
 
 You can create dropdown menus with up to **3 total levels** (including the top-level menu items).
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/menu-structure-nested.png" alt="Widgetizer menu structure editor showing a Services parent item with nested child menu items." loading="lazy">
+  <figcaption>The structure editor uses indentation to show which menu items are nested under a parent item.</figcaption>
+</figure>
+
 ### How to Create a Sub-Menu
 
 1. **Drag and drop** a menu item to the right to nest it under another item

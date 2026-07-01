@@ -40,6 +40,11 @@ Choose the format that matches your region or preference. The format you select 
 
 # Media & Upload Settings
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/app-settings-media.png" alt="Widgetizer general settings screen showing the Media and Upload tab with upload size, image quality, and image size controls." loading="lazy">
+  <figcaption>Media and upload settings apply across projects unless a theme provides its own image-size rules.</figcaption>
+</figure>
+
 ### File Upload Limits
 
 These settings control the maximum file size allowed for uploads across all projects. If a file exceeds these limits, it will be rejected with an error message.

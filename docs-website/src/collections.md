@@ -21,9 +21,19 @@ Collections are defined by your **theme**, not created by hand. When a theme shi
 
 The **Title** field (whichever field the theme marks as the title) also generates the item's web address. For example, an article titled "Summer Sale" is saved at `news/summer-sale`.
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/collection-item-editor.png" alt="Widgetizer collection item editor showing an article title, publication date, excerpt, featured image, preview button, and save bar." loading="lazy">
+  <figcaption>Collection item editors are generated from the fields defined by the active theme.</figcaption>
+</figure>
+
 # Editing, Duplicating, and Deleting
 
 From a collection's item list you can:
+
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/collections-news-list.png" alt="Widgetizer News collection list showing five article rows, dates, search, and item actions." loading="lazy">
+  <figcaption>Collection lists keep item search, creation, editing, duplication, and deletion in one place.</figcaption>
+</figure>
 
 - **Edit:** click an item to open it, change fields, and save.
 - **Duplicate:** make a copy to use as a starting point for a similar item.

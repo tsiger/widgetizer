@@ -124,6 +124,11 @@ While you can't change themes, you have significant customization options within
 - **Content**: Add, remove, and rearrange widgets and blocks to create your desired layout
 - **Media**: Upload and use your own images
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/theme-settings.png" alt="Widgetizer site settings screen showing the Colors tab with theme color swatches and hex value fields." loading="lazy">
+  <figcaption>Theme settings expose the global controls the theme author has made customizable, such as colors and typography.</figcaption>
+</figure>
+
 These customization options allow you to create a unique website while staying within your theme's design system.
 
 # Creating Your Own Theme

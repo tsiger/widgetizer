@@ -11,6 +11,11 @@ The **Form** widget lets you add a contact or inquiry form to any page. You buil
 3. Add field blocks to build the form (below).
 4. Set the submit button label.
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/widget-picker-form.png" alt="Widgetizer page editor showing the Add widget popover filtered to the Form widget." loading="lazy">
+  <figcaption>Search the widget picker for "form" to add the built-in Form widget to a page.</figcaption>
+</figure>
+
 # Building the Form
 
 A form is made of **blocks** you add and reorder, just like other widgets:

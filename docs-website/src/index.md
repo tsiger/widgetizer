@@ -12,6 +12,11 @@ Widgets are the building blocks of a page: a **Hero Banner**, a **Gallery**, a *
 
 Some widgets hold **blocks**, the smaller repeatable units inside them. In a "Features" widget, each feature is a block: add as many as you need, reorder them, or remove them without touching the rest of the page.
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/page-editor-selected-widget.png" alt="Widgetizer page editor showing a selected Card Grid widget with the widget tree, live page canvas, and settings panel visible." loading="lazy">
+  <figcaption>The editor keeps the widget tree, live canvas, and selected-widget settings visible together.</figcaption>
+</figure>
+
 ### Projects
 
 A [Project](projects.html) is one website. It holds that site's pages, images, menus, and design settings. You can keep several projects and switch between them with a click.

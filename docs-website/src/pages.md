@@ -4,6 +4,11 @@ description: Create and manage pages in Widgetizer. Configure page settings, SEO
 
 Pages are the individual sections of your website. Each page can have its own content, layout, and SEO settings. You'll use the page editor to add widgets and build your content, but first you need to create the pages themselves.
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/pages-list.png" alt="Widgetizer Pages screen showing a project with seven pages, search, page actions, and a New page button." loading="lazy">
+  <figcaption>The Pages screen lists every page in the active project and keeps creation, search, and page actions close by.</figcaption>
+</figure>
+
 # Creating a New Page
 
 1. Click the **"New Page"** button

@@ -74,6 +74,11 @@ Widgetizer keeps a history of your exports:
 - The maximum number of versions to keep is configurable in [App Settings](settings.html)
 - When the limit is exceeded, the oldest exports are automatically deleted
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/export-history.png" alt="Widgetizer export screen showing create export controls and an export history table with Version 1 marked Success." loading="lazy">
+  <figcaption>The Export page shows the latest generated versions and their status after each run.</figcaption>
+</figure>
+
 # Export Options
 
 When creating an export, you can enable:

@@ -103,6 +103,11 @@ See [Themes](themes.html) for how themes work and [Settings](settings.html) for 
 
 Shows your files as thumbnail cards. Great for browsing images visually.
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/media-library-grid.png" alt="Widgetizer Media Library grid view showing upload controls, search, filters, image cards, and usage badges." loading="lazy">
+  <figcaption>Grid view is useful for scanning image-heavy libraries and checking usage badges at a glance.</figcaption>
+</figure>
+
 ### List View
 
 Shows your files in a table with detailed information (filename, size, type, dimensions, upload date).
@@ -128,6 +133,11 @@ Each file can have metadata for accessibility and SEO:
    - **Alt Text**: Describes the image for screen readers and SEO
    - **Title**: Optional title text
 3. Click **"Save"**
+
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/media-detail-drawer.png" alt="Widgetizer media metadata drawer showing an image preview, alt text field, title field, caption field, and Save Changes button." loading="lazy">
+  <figcaption>The metadata drawer lets you add accessibility and SEO text without leaving the media library.</figcaption>
+</figure>
 
 > **Tip:** Always add alt text to images for better accessibility and SEO.
 

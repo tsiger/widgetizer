@@ -511,6 +511,26 @@ img {
   margin: 1.5rem 0;
 }
 
+figure.doc-screenshot {
+  margin: 1.75rem 0;
+}
+
+figure.doc-screenshot img {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 0.625rem;
+  box-shadow: 0 1rem 2.5rem rgba(15, 23, 43, 0.08);
+}
+
+figure.doc-screenshot figcaption {
+  margin-top: 0.625rem;
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
 /* Download buttons (Getting Started) */
 .download-grid {
   display: flex;

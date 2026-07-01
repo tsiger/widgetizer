@@ -23,6 +23,7 @@ const SRC_DIR = path.join(__dirname, "../src");
 const DIST_DIR = path.join(__dirname, "../dist");
 const ROOT_DIR = path.join(__dirname, "../..");
 const STYLES_PATH = path.join(__dirname, "styles.css");
+const ASSETS_DIR = path.join(SRC_DIR, "assets");
 const SITE_URL = "https://docs.widgetizer.org";
 
 // Config reloaded on every build so version/sitemap edits are picked up in watch mode
@@ -236,6 +237,15 @@ async function build() {
     await fs.copy(STYLES_PATH, path.join(DIST_DIR, "styles.css"), { overwrite: true });
   } catch (error) {
     console.warn(`Warning: Could not copy styles: ${error.message}`);
+  }
+
+  // Copy static assets used by markdown pages, such as documentation screenshots.
+  try {
+    if (await fs.pathExists(ASSETS_DIR)) {
+      await fs.copy(ASSETS_DIR, path.join(DIST_DIR, "assets"), { overwrite: true });
+    }
+  } catch (error) {
+    console.warn(`Warning: Could not copy assets: ${error.message}`);
   }
 
   // Process each page

@@ -6,6 +6,11 @@ Most widgets come from your [theme](themes.html), so the set you see depends on 
 
 They cover the small, structural pieces that nearly every site needs, so themes don't have to reinvent them. You'll find them in the widget inserter alongside your theme's own widgets.
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/widget-picker-form.png" alt="Widgetizer page editor showing the Add widget popover with the built-in Form widget available from search." loading="lazy">
+  <figcaption>Core widgets appear in the same inserter as theme widgets, unless the active theme explicitly hides them.</figcaption>
+</figure>
+
 # The Core Widgets
 
 ### Form
