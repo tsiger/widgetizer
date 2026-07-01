@@ -26,7 +26,7 @@ Once you've created a menu, you can build its structure:
 
 #### Page or Collection Item Link
 
-Links to one of your website pages — or, if your theme defines [collections](collections.html) with item pages, to a specific collection item (a news article, project, service, etc.).
+Links to one of your website pages. If your theme defines [collections](collections.html) with item pages, you can also link to a specific collection item (a news article, project, service, etc.).
 
 - **Label**: The text shown in the menu (e.g., "About Us")
 - **Link to**: Pick a page or collection item from the dropdown
@@ -106,7 +106,7 @@ To change a menu's name or description:
 
 Want to create a similar menu? Click the **copy icon** to duplicate a menu. This creates an exact copy with all menu items and nested structure.
 
-The duplicate will be named "[Original Name] (Copy)" — and "(Copy 2)", "(Copy 3)", etc. if a copy already exists.
+The duplicate will be named "[Original Name] (Copy)", and "(Copy 2)", "(Copy 3)", etc. if a copy already exists.
 
 ### Deleting a Menu
 
@@ -128,30 +128,8 @@ For theme developers, see [Menus & Snippets](theme-dev-menus-snippets.html) for 
 
 # Tips & Best Practices
 
-### Menu Organization
-
-- Keep top-level items concise (5-7 items maximum recommended)
-- Use clear, descriptive labels
-- Group related pages under parent items
-
-### Navigation Hierarchy
-
-- Use the first level for main sections of your site
-- Use the second level for sub-sections
-- Use the third level sparingly (too deep makes navigation confusing)
-
-### Multiple Menus
-
-- Create separate menus for different locations (header, footer, sidebar)
-- Use descriptive names like "Main Navigation", "Footer Links", "Quick Links"
-
-### External Links
-
-- Always include `https://` for external URLs
-- Consider opening external links in a new tab (check your theme settings)
-
-### Link Labels
-
-- Use action-oriented text when appropriate ("Get Started", "Contact Us")
-- Keep labels short (1-4 words is ideal)
-- Avoid generic labels like "Click Here"
+- Keep the top level short (5-7 items) and group related pages under parents.
+- Use the first level for main sections, the second for sub-sections, and the third sparingly.
+- Name menus by location, like "Main Navigation" and "Footer Links".
+- Always include `https://` on external URLs, and consider opening them in a new tab (check your theme settings).
+- Keep labels short and action-oriented ("Get Started", "Contact Us"); avoid "Click Here".

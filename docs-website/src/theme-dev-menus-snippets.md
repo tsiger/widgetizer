@@ -51,15 +51,15 @@ Use the menu snippet and pass class names for styling:
 
 **Available parameters:**
 
-- `menu` — Menu object with an `items` array (required)
-- `aria_label` — Accessible label for the `<nav>` element (e.g., "Primary", "Footer")
-- `skip_nav` — Set to `true` if your widget already wraps the menu in its own `<nav>`
-- `class_nav` — Classes for the `<nav>` element (when not skipped)
-- `class_list` — Classes for `<ul>` elements
-- `class_item` — Classes for `<li>` elements
-- `class_link` — Classes for `<a>` elements
-- `class_submenu` — Classes for nested `<ul>` elements
-- `class_has_submenu` — Extra class for `<li>` items that contain a submenu
+- `menu`: Menu object with an `items` array (required)
+- `aria_label`: Accessible label for the `<nav>` element (e.g., "Primary", "Footer")
+- `skip_nav`: Set to `true` if your widget already wraps the menu in its own `<nav>`
+- `class_nav`: Classes for the `<nav>` element (when not skipped)
+- `class_list`: Classes for `<ul>` elements
+- `class_item`: Classes for `<li>` elements
+- `class_link`: Classes for `<a>` elements
+- `class_submenu`: Classes for nested `<ul>` elements
+- `class_has_submenu`: Extra class for `<li>` items that contain a submenu
 
 If you need the menu data directly (for custom rendering), access it in widget templates via a `menu` setting type. See [Setting Types](theme-dev-setting-types.html) and [Widgets & Blocks](theme-dev-widgets-blocks.html).
 
@@ -75,10 +75,10 @@ The core `menu.liquid` snippet automatically adds an `is-active` class (and `ari
 
 Snippets are reusable Liquid partials rendered with `{% render 'name' %}`. They come from two places:
 
-- **Theme snippets** — files in your theme's `snippets/` folder (e.g. `snippets/icon.liquid`).
-- **Built-in snippets** — a small set Widgetizer provides. The `menu` snippet used above is built in, so you can render menus without shipping your own.
+- **Theme snippets:** files in your theme's `snippets/` folder (e.g. `snippets/icon.liquid`).
+- **Built-in snippets:** a small set Widgetizer provides. The `menu` snippet used above is built in, so you can render menus without shipping your own.
 
-When the same name exists in both, **your theme's version wins** — so you can override a built-in snippet by adding a file with that name to `snippets/`.
+When the same name exists in both, **your theme's version wins**, so you can override a built-in snippet by adding a file with that name to `snippets/`.
 
 ### Icon Snippet (Arch)
 

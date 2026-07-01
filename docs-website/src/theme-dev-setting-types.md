@@ -18,7 +18,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 
 # Content Types
 
-**`header`** — Visual divider to group fields. No value stored.
+**`header`:** Visual divider to group fields. No value stored.
 
 ```json
 {
@@ -28,7 +28,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
-**`text`** — Single-line input.
+**`text`:** Single-line input.
 
 ```json
 {
@@ -39,7 +39,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
-**`number`** — Single-line input restricted to numeric values.
+**`number`:** Single-line input restricted to numeric values.
 
 ```json
 {
@@ -50,7 +50,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
-**`textarea`** — Multi-line input for longer text.
+**`textarea`:** Multi-line input for longer text.
 
 ```json
 {
@@ -60,7 +60,7 @@ For how settings map into templates and CSS variables, see [Theme Manifest & Set
 }
 ```
 
-**`richtext`** — Rich text editor with bold, italic, and link formatting. Outputs HTML.
+**`richtext`:** Rich text editor with bold, italic, and link formatting. Outputs HTML.
 
 ```json
 {
@@ -99,7 +99,7 @@ Optional properties:
 }
 ```
 
-Because autoescaping is on globally, richtext **must** be rendered with the `raw` filter — without it the HTML tags show up as visible text. And since the editor leaves markup like `<p></p>` behind even when a field looks empty, gate visibility with the `rte_blank` filter rather than `== blank`:
+Because autoescaping is on globally, richtext **must** be rendered with the `raw` filter; without it the HTML tags show up as visible text. And since the editor leaves markup like `<p></p>` behind even when a field looks empty, gate visibility with the `rte_blank` filter rather than `== blank`:
 
 ```liquid
 {% unless widget.settings.description | rte_blank %}
@@ -109,7 +109,7 @@ Because autoescaping is on globally, richtext **must** be rendered with the `raw
 
 See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter) for the full rules and the `rte_text` / `rte_blank` helpers.
 
-**`code`** — Code editor with syntax highlighting.
+**`code`:** Code editor with syntax highlighting.
 
 ```json
 {
@@ -123,7 +123,7 @@ See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-
 
 # Design Types
 
-**`color`** — Color picker with optional alpha channel (`allow_alpha: true`).
+**`color`:** Color picker with optional alpha channel (`allow_alpha: true`).
 
 ```json
 {
@@ -136,7 +136,7 @@ See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-
 }
 ```
 
-**`range`** — Slider for numeric values.
+**`range`:** Slider for numeric values.
 
 ```json
 {
@@ -151,7 +151,7 @@ See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-
 }
 ```
 
-**`select`** / **`radio`** — Choose from a list of options.
+**`select`** / **`radio`**: Choose from a list of options.
 
 ```json
 {
@@ -166,7 +166,7 @@ See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-
 }
 ```
 
-**`checkbox`** — Boolean toggle.
+**`checkbox`:** Boolean toggle.
 
 ```json
 {
@@ -177,7 +177,7 @@ See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-
 }
 ```
 
-**`date`** — Date picker. The stored value is an ISO `YYYY-MM-DD` string. Render it with the [`format_date`](theme-dev-liquid-assets.html#liquid-filters) filter to honor the project's date format.
+**`date`:** Date picker. The stored value is an ISO `YYYY-MM-DD` string. Render it with the [`format_date`](theme-dev-liquid-assets.html#liquid-filters) filter to honor the project's date format.
 
 ```json
 {
@@ -195,7 +195,7 @@ In [collection](theme-dev-collections.html) schemas, a `date` field can be marke
 
 # Media Types
 
-**`image`** — Image picker with preview and media library access.
+**`image`:** Image picker with preview and media library access.
 
 ```json
 {
@@ -205,7 +205,7 @@ In [collection](theme-dev-collections.html) schemas, a `date` field can be marke
 }
 ```
 
-**`youtube`** — YouTube embed with URL/ID input and embed options.
+**`youtube`:** YouTube embed with URL/ID input and embed options.
 
 ```json
 {
@@ -215,7 +215,7 @@ In [collection](theme-dev-collections.html) schemas, a `date` field can be marke
 }
 ```
 
-**`file`** — File asset selector for downloadable documents (currently PDF). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
+**`file`:** File asset selector for downloadable documents (currently PDF). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
 
 ```json
 {
@@ -242,7 +242,7 @@ In Liquid, resolve the file path using the `filePath` context variable (set by t
 
 The export pipeline rewrites `/uploads/files/` paths to `assets/files/` in exported HTML automatically.
 
-**`gallery`** — Ordered set of images managed through the media library (add, remove, drag-reorder). The value is an **array of upload-path strings** (e.g. `["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`); an empty gallery is `[]`. Image alt/title/caption live on the media record, not in the gallery value.
+**`gallery`:** Ordered set of images managed through the media library (add, remove, drag-reorder). The value is an **array of upload-path strings** (e.g. `["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`); an empty gallery is `[]`. Image alt/title/caption live on the media record, not in the gallery value.
 
 ```json
 {
@@ -266,7 +266,7 @@ Render sanitization drops blank entries and any path that fails the image-path a
 
 # Structured Types
 
-**`table`** — Editable grid of repeating rows with author-defined columns. Declare the columns in the schema (in v1 every column is `text`); the stored value is an **array of row objects** keyed by each column's `id` (e.g. `[{ "label": "Basic", "price": "$10" }]`). An empty table is `[]`.
+**`table`:** Editable grid of repeating rows with author-defined columns. Declare the columns in the schema (in v1 every column is `text`); the stored value is an **array of row objects** keyed by each column's `id` (e.g. `[{ "label": "Basic", "price": "$10" }]`). An empty table is `[]`.
 
 ```json
 {
@@ -296,7 +296,7 @@ Render sanitization rebuilds each row from the declared columns only (dropping u
 
 # UI-Specific Types
 
-**`font_picker`** — Font family + weight selector. This always outputs CSS variables for `-family` and `-weight`.
+**`font_picker`:** Font family + weight selector. This always outputs CSS variables for `-family` and `-weight`.
 
 ```json
 {
@@ -310,7 +310,7 @@ Render sanitization rebuilds each row from the declared columns only (dropping u
 }
 ```
 
-**`menu`** — Dropdown populated with theme menus.
+**`menu`:** Dropdown populated with theme menus.
 
 ```json
 {
@@ -320,7 +320,7 @@ Render sanitization rebuilds each row from the declared columns only (dropping u
 }
 ```
 
-**`link`** — Structured link object with `href`, `text`, and `target`.
+**`link`:** Structured link object with `href`, `text`, and `target`.
 
 ```json
 {
@@ -348,7 +348,7 @@ Optional properties:
 }
 ```
 
-**`icon`** — Icon picker tied to your theme icon set.
+**`icon`:** Icon picker tied to your theme icon set.
 
 ```json
 {
@@ -363,6 +363,6 @@ Optional properties:
 - **Theme settings** live in `theme.json` and render via `{% theme_settings %}`.
 - **Widget settings** live in `widgets/*/schema.json` and are accessed via `widget.settings.*`.
 - **Block settings** live in the widget schema's `blocks` array and are accessed via `block.settings.*`.
-- **Collection fields** live in `collection-types/*/schema.json` and are accessed via `item.settings.*`. They use these same types, plus a few collection-only flags (`usedAsTitle`, `usedAsDate`, `required`) — see [Collections](theme-dev-collections.html).
+- **Collection fields** live in `collection-types/*/schema.json` and are accessed via `item.settings.*`. They use these same types, plus a few collection-only flags (`usedAsTitle`, `usedAsDate`, `required`); see [Collections](theme-dev-collections.html).
 
 See [Widgets & Blocks](theme-dev-widgets-blocks.html) for widget schema patterns, and [Liquid Tags & Filters](theme-dev-liquid-assets.html) for rendering tips.

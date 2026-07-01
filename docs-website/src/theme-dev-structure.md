@@ -2,7 +2,7 @@
 description: Learn the folder structure for Widgetizer themes. Required files, directory layout, and how themes are discovered by the system.
 ---
 
-A theme in Widgetizer is a complete package with a predictable folder structure. This page documents the default theme layout, the minimum required files, and how the system discovers theme content. Theme authoring is meant to be as expressive as it can be — you can build minimal themes or highly opinionated systems.
+A theme in Widgetizer is a complete package with a predictable folder structure. This page documents the default theme layout, the minimum required files, and how the system discovers theme content. Theme authoring is meant to be as expressive as it can be; you can build minimal themes or highly opinionated systems.
 
 # Technologies Used in Themes
 
@@ -121,7 +121,7 @@ A folder containing translation JSON files for theme localization. Each file is 
 
 **`presets/`** (optional)
 
-A folder containing preset variants of the theme. Each subfolder is one preset and contains its own `preset.json` (manifest with name, description, and overridden theme settings), `screenshot.png` (preview shown during project creation), and optionally `menus/` and `templates/` to ship preset-specific demo content. Presets are picked at project creation time — see [Themes](themes.html#theme-presets) for the user flow.
+A folder containing preset variants of the theme. Each subfolder is one preset and contains its own `preset.json` (manifest with name, description, and overridden theme settings), `screenshot.png` (preview shown during project creation), and optionally `menus/` and `templates/` to ship preset-specific demo content. Presets are picked at project creation time; see [Themes](themes.html#theme-presets) for the user flow.
 
 # What Widgetizer Loads
 
@@ -140,7 +140,7 @@ When a theme is selected for a project, the system loads:
 
 # Arch Theme Example
 
-The default theme lives in `themes/arch/` and includes all required components plus a full widget set. It’s a helpful example, but not a required blueprint — you can diverge in structure, naming, and organization as long as the core contract is met.
+The default theme lives in `themes/arch/` and includes all required components plus a full widget set. It’s a helpful example, but not a required blueprint; you can diverge in structure, naming, and organization as long as the core contract is met.
 
 ### Key Arch Files
 
@@ -166,4 +166,4 @@ This ensures each project has its own theme files and can evolve independently.
 
 Themes are shared as zip files, and Widgetizer's versioned update system lets you ship improvements to existing projects without touching user content. The `updates/` and `latest/` folders shown in the layout above are part of that system.
 
-See [Distributing & Updating Themes](theme-dev-distribution.html) for the full workflow — packaging, the partial update folders, deleting files, the `latest/` snapshot, and what gets updated vs. protected in projects.
+See [Distributing & Updating Themes](theme-dev-distribution.html) for the full workflow: packaging, the partial update folders, deleting files, the `latest/` snapshot, and what gets updated vs. protected in projects.

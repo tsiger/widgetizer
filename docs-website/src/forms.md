@@ -1,8 +1,8 @@
 ---
-description: Add a contact form to your Widgetizer site. Build fields with the Form widget and collect submissions through Widgetizer Publisher.
+description: Add a contact form to your Widgetizer site with the Form widget. Collecting submissions is part of the upcoming commercial version of Widgetizer.
 ---
 
-The **Form** widget lets you add a contact or inquiry form to any page. You build the form visually by adding field blocks, then connect it to a host that collects submissions. Form is a built-in widget, so it's available in most themes.
+The **Form** widget lets you add a contact or inquiry form to any page. You build the form visually by adding field blocks. Form is a built-in widget, so it's available in most themes.
 
 # Adding a Form
 
@@ -15,29 +15,28 @@ The **Form** widget lets you add a contact or inquiry form to any page. You buil
 
 A form is made of **blocks** you add and reorder, just like other widgets:
 
-- **Field** — a single input. Choose its type (such as text, email, or phone), set the label and placeholder, and mark it required if needed.
-- **Choice** — a multiple-choice input (dropdown, radio buttons, or checkboxes). Enter the options, one per line.
-- **Consent** — a required checkbox for things like privacy-policy agreement.
+- **Field:** a single input. Choose its type (such as text, email, or phone), set the label and placeholder, and mark it required if needed.
+- **Choice:** a multiple-choice input (dropdown, radio buttons, or checkboxes). Enter the options, one per line.
+- **Consent:** a required checkbox for things like privacy-policy agreement.
 
 You can also add sidebar blocks that show next to the form:
 
-- **Info** — a block of formatted text (address, hours, a short note).
-- **Social** — links to your social profiles.
+- **Info:** a block of formatted text (address, hours, a short note).
+- **Social:** links to your social profiles.
 
 Use the widget's **layout** and **appearance** settings (style, sidebar position, color scheme, spacing) to match the form to your design.
 
 # Where Submissions Go
 
-A static website can't process form submissions on its own — it needs a host that receives them. Widgetizer is built to work with **[Widgetizer Publisher](https://publisher.widgetizer.org)** (free):
+Form submissions work only with the upcoming **commercial version of Widgetizer**, which will be available soon. A static site can't collect submissions on its own, so this is handled by the commercial version rather than by your exported site.
 
-- When you publish a site that contains a Form widget, Publisher automatically collects submissions and emails them to you.
-- Spam protection is applied for you — no setup required.
+We'll document how submissions are collected here once the commercial version is available.
 
-> **Important:** If you deploy your [exported](export.html) site to a generic static host instead of Publisher, the form will display but submissions won't be delivered, because there's no service to receive them. Use Widgetizer Publisher (or the hosted editor at `editor.widgetizer.org`, where publishing and forms are wired up automatically) to collect responses.
+Of course, you can also embed a form from a third-party service like Google Forms or Typeform. Paste the service's embed code into an embed widget, and that service collects and delivers the responses for you, so it works on any static host today.
 
 # Tips
 
-- Keep forms short — ask only for what you need. Every extra field reduces completions.
+- Keep forms short: ask only for what you need. Every extra field reduces completions.
 - Mark only genuinely required fields as required.
 - Always include a clear submit button label ("Send message", "Request a quote").
 - Add a **Consent** block if you collect personal data and your region requires explicit agreement.

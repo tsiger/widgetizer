@@ -10,14 +10,14 @@ A theme must include these to be recognized and functional:
 
 | Path | Purpose |
 | :-- | :-- |
-| `theme.json` | Manifest — must define `name`, `version`, `author` |
+| `theme.json` | Manifest (must define `name`, `version`, `author`) |
 | `layout.liquid` | The HTML wrapper for every page |
 | `screenshot.png` | 1280×720 preview for the theme picker |
 | `widgets/` | At least one widget (`schema.json` + `widget.liquid`) |
 | `templates/` | At least one page template (e.g. `index.json`) |
 | `assets/` | Theme CSS/JS (e.g. `base.css`) |
 
-Optional but recommended: `locales/` — ship at least `en.json` (required if your schemas use `tTheme:` keys, since projects copy and expect a `locales/` directory). Also optional: `snippets/`, `menus/`, `collection-types/`, `presets/`, `updates/`. See [Theme Structure](theme-dev-structure.html).
+Optional but recommended: `locales/`, ship at least `en.json` (required if your schemas use `tTheme:` keys, since projects copy and expect a `locales/` directory). Also optional: `snippets/`, `menus/`, `collection-types/`, `presets/`, `updates/`. See [Theme Structure](theme-dev-structure.html).
 
 # Required Layout Placeholders
 
@@ -81,15 +81,15 @@ See [Widgets & Blocks](theme-dev-widgets-blocks.html).
 
 - **Widget type = folder name.** `widgets/hero/` defines the `hero` type, and `schema.json`'s `type` must match.
 - **Collection type = folder name.** Same rule for `collection-types/{type}/`.
-- **Unique asset filenames.** Widget `.css`/`.js` files are flattened into one `assets/` folder on export — name them uniquely (e.g. `slideshow.css`, not `styles.css`) to avoid collisions. See [Export](export.html).
+- **Unique asset filenames.** Widget `.css`/`.js` files are flattened into one `assets/` folder on export; name them uniquely (e.g. `slideshow.css`, not `styles.css`) to avoid collisions. See [Export](export.html).
 - **Scope widget CSS** with `.widget-{{ widget.id }}` so styles don't leak between instances.
 
 # The `raw` Rule
 
 Autoescaping is on globally, so `{{ ... }}` is HTML-escaped by default. Add `| raw` only for trusted HTML:
 
-- Layout placeholders — `{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`
-- `richtext` settings — `{{ widget.settings.body | raw }}` (gate emptiness with `| rte_blank`)
+- Layout placeholders: `{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`
+- `richtext` settings: `{{ widget.settings.body | raw }}` (gate emptiness with `| rte_blank`)
 - SVG icon markup and embed codes
 
 See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter).

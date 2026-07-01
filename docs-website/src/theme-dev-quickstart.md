@@ -4,7 +4,7 @@ description: Build your first Widgetizer theme from scratch. A step-by-step quic
 
 This quickstart walks you from an empty folder to a working theme that renders a real page. It's the fastest way to understand how the pieces fit together. Once it clicks, the rest of the Theme Development section is reference material you can dip into as needed.
 
-By the end you'll have a minimal theme with a layout, one widget, and a homepage template — the smallest thing Widgetizer will recognize and render.
+By the end you'll have a minimal theme with a layout, one widget, and a homepage template, the smallest thing Widgetizer will recognize and render.
 
 > **Tip:** Keep the [Arch theme](https://github.com/tsiger/widgetizer/tree/master/themes/arch) open in another window. It's a complete, production-ready theme and the best reference while you build.
 
@@ -47,7 +47,7 @@ Create the `themes/hello-theme/` folder, then add the files below.
 }
 ```
 
-`name`, `version`, and `author` are required. Each `outputAsCssVar` setting becomes a CSS variable named `--{group}-{id}` — here, `--colors-accent` and `--colors-text`. See [Theme Manifest & Settings](theme-dev-manifest-settings.html).
+`name`, `version`, and `author` are required. Each `outputAsCssVar` setting becomes a CSS variable named `--{group}-{id}` (here, `--colors-accent` and `--colors-text`). See [Theme Manifest & Settings](theme-dev-manifest-settings.html).
 
 # Step 2: The Layout (layout.liquid)
 
@@ -80,13 +80,13 @@ Create the `themes/hello-theme/` folder, then add the files below.
 </html>
 ```
 
-`{{ header }}` and `{{ footer }}` render your global header/footer widgets. We're skipping those for now, so they'll simply be empty — the page still renders. See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Filters](theme-dev-liquid-assets.html).
+`{{ header }}` and `{{ footer }}` render your global header/footer widgets. We're skipping those for now, so they'll simply be empty; the page still renders. See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Filters](theme-dev-liquid-assets.html).
 
 # Step 3: A Widget
 
 A widget is two files in `widgets/{name}/`. The folder name is the widget's type.
 
-**`widgets/hello/schema.json`** — the editable settings:
+**`widgets/hello/schema.json`:** the editable settings:
 
 ```json
 {
@@ -99,7 +99,7 @@ A widget is two files in `widgets/{name}/`. The folder name is the widget's type
 }
 ```
 
-**`widgets/hello/widget.liquid`** — the HTML. The wrapper attributes are required so the editor can target the widget; richtext is rendered with `| raw`:
+**`widgets/hello/widget.liquid`:** the HTML. The wrapper attributes are required so the editor can target the widget; richtext is rendered with `| raw`:
 
 ```liquid
 <section
@@ -150,7 +150,7 @@ A page template lists which widgets appear on a page and their default content. 
 
 # Step 5: Styles and Screenshot
 
-**`assets/base.css`** — read your theme settings via the CSS variables from Step 1:
+**`assets/base.css`:** read your theme settings via the CSS variables from Step 1:
 
 ```css
 :root { --content-width: 48rem; }
@@ -171,23 +171,23 @@ body {
 h1, h2 { color: var(--colors-accent); }
 ```
 
-Finally, add a **`screenshot.png`** (1280×720) — it's required and shows in the theme picker.
+Finally, add a **`screenshot.png`** (1280×720); it's required and shows in the theme picker.
 
 # Step 6: Load Your Theme
 
 1. Zip the `hello-theme/` folder.
 2. In Widgetizer, go to the **Themes** page and upload the zip (or, if running from source, drop the folder into `themes/` and run `npm run theme:sync`).
 3. Create a new [project](projects.html) and choose **Hello Theme**.
-4. Open the page editor — your homepage renders with the `hello` widget. Edit the heading and watch it update live.
+4. Open the page editor, and your homepage renders with the `hello` widget. Edit the heading and watch it update live.
 
 That's a complete theme. From here, grow it.
 
 # Where to Go Next
 
-- [Theme Structure](theme-dev-structure.html) — the full folder layout and what's required
-- [Setting Types](theme-dev-setting-types.html) — every field type for settings
-- [Liquid Tags & Filters](theme-dev-liquid-assets.html) — media, assets, SEO, and the filter reference
-- [Widgets & Blocks](theme-dev-widgets-blocks.html) — repeatable blocks, multiple block types, editor events
-- [Collections](theme-dev-collections.html) — theme-defined content types with their own pages
-- [Theme Contract](theme-dev-contract.html) — the required files, placeholders, and attributes on one page
-- [Distributing & Updating Themes](theme-dev-distribution.html) — versioned updates and presets
+- [Theme Structure](theme-dev-structure.html): the full folder layout and what's required
+- [Setting Types](theme-dev-setting-types.html): every field type for settings
+- [Liquid Tags & Filters](theme-dev-liquid-assets.html): media, assets, SEO, and the filter reference
+- [Widgets & Blocks](theme-dev-widgets-blocks.html): repeatable blocks, multiple block types, editor events
+- [Collections](theme-dev-collections.html): theme-defined content types with their own pages
+- [Theme Contract](theme-dev-contract.html): the required files, placeholders, and attributes on one page
+- [Distributing & Updating Themes](theme-dev-distribution.html): versioned updates and presets

@@ -45,11 +45,11 @@ The layout and templates system defines how pages are assembled. `layout.liquid`
 
 ### Required Placeholders
 
-Your layout must render the three content placeholders. They contain **pre-rendered HTML**, so each requires the `raw` filter (autoescaping is enabled globally — see [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter)):
+Your layout must render the three content placeholders. They contain **pre-rendered HTML**, so each requires the `raw` filter (autoescaping is enabled globally; see [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter)):
 
-- `{{ header | raw }}` — global header widget
-- `{{ main_content | raw }}` — the page's widgets
-- `{{ footer | raw }}` — global footer widget
+- `{{ header | raw }}`: global header widget
+- `{{ main_content | raw }}`: the page's widgets
+- `{{ footer | raw }}`: global footer widget
 
 > **Warning:** Without `| raw`, the rendered HTML is escaped and the page displays raw markup as text.
 

@@ -28,7 +28,7 @@ Theme development relies on a shared set of data objects. Some are available eve
 - `item`
 - `collection`
 
-> **Note:** `page` and `project` are only available in `layout.liquid`. The `item` and `collection` objects exist only in a collection type's `template.liquid` — see [Collections](theme-dev-collections.html).
+> **Note:** `page` and `project` are only available in `layout.liquid`. The `item` and `collection` objects exist only in a collection type's `template.liquid`; see [Collections](theme-dev-collections.html).
 
 # Theme Object
 
@@ -120,7 +120,7 @@ Available in `layout.liquid`:
 
 Available only inside a collection type's `template.liquid` (item pages). Full details on the [Collections](theme-dev-collections.html) page.
 
-`item` — the current collection item:
+`item`, the current collection item:
 
 - `item.id`
 - `item.uuid`
@@ -130,7 +130,7 @@ Available only inside a collection type's `template.liquid` (item pages). Full d
 - `item.updated`
 - `item.settings.*` (the item's fields, per the collection schema)
 
-`collection` — the collection type's schema:
+`collection`, the collection type's schema:
 
 - `collection.type`
 - `collection.slugPrefix`
@@ -146,7 +146,7 @@ The layout has access to rendered content placeholders. The three content placeh
 - `{{ main_content | raw }}`
 - `{{ footer | raw }}`
 - `{{ body_class }}` (page slugs are prefixed with `page-`, e.g., `page-about`)
-- `{{ site_icons }}` — precomputed favicon / apple-touch-icon paths, typically consumed by a `site-icons` snippet
+- `{{ site_icons }}`: precomputed favicon / apple-touch-icon paths, typically consumed by a `site-icons` snippet
 
 These are not available inside widget templates.
 
@@ -154,8 +154,8 @@ These are not available inside widget templates.
 
 The following globals are available in all templates, including inside `{% render %}` snippets:
 
-- `currentCanonicalPath` — The un-prefixed path of the page being rendered (e.g., `about.html`, or `portfolio/project-alpha.html` for a collection item page). The core `menu.liquid` snippet compares it against each menu item's `canonicalPath` to mark active items with the `is-active` class — matching on the canonical path (rather than the displayed `href`) so active state still works when item links are depth-prefixed with `../`.
-- `filePath` — Base path for resolving file assets (PDFs uploaded via the `file` setting type). Use it as `{{ filePath | append: '/' | append: filename }}` so links work in both preview and exported output. See [Setting Types](theme-dev-setting-types.html#media-types) for the `file` setting and its template usage.
+- `currentCanonicalPath`: The un-prefixed path of the page being rendered (e.g., `about.html`, or `portfolio/project-alpha.html` for a collection item page). The core `menu.liquid` snippet compares it against each menu item's `canonicalPath` to mark active items with the `is-active` class, matching on the canonical path (rather than the displayed `href`) so active state still works when item links are depth-prefixed with `../`.
+- `filePath`: Base path for resolving file assets (PDFs uploaded via the `file` setting type). Use it as `{{ filePath | append: '/' | append: filename }}` so links work in both preview and exported output. See [Setting Types](theme-dev-setting-types.html#media-types) for the `file` setting and its template usage.
 
 # Practical Guidance
 

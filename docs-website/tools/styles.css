@@ -200,6 +200,19 @@ body {
     line-height: 1.7;
     margin-bottom: 1.5rem;
   }
+
+  /* Prose links carry a 2px underline so they read as links on any background,
+     not by color alone. Component links (e.g. download cards) opt out via :not(). */
+  & a:not(.download-card) {
+    border-bottom: 2px solid var(--accent);
+    transition: color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      color: var(--accent-hover);
+      border-bottom-color: var(--accent-hover);
+      text-decoration: none;
+    }
+  }
 }
 
 /* Typography */
@@ -297,6 +310,16 @@ code {
   border: 1px solid var(--code-border);
   border-radius: 0.25rem;
   color: var(--text-primary);
+}
+
+/* Inline code inside a heading follows the heading's size, not the small body-code size */
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+  font-size: inherit;
 }
 
 pre {
@@ -486,6 +509,78 @@ img {
   height: auto;
   border-radius: 0.5rem;
   margin: 1.5rem 0;
+}
+
+/* Download buttons (Getting Started) */
+.download-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.download-card {
+  flex: 1 1 13rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.875rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.625rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+
+  & svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    margin: 0;
+    fill: var(--text-primary);
+    transition: fill 0.15s ease;
+  }
+
+  &:hover {
+    border-color: var(--accent);
+    background: var(--bg-primary);
+    text-decoration: none;
+    transform: translateY(-1px);
+
+    & svg {
+      fill: var(--accent);
+    }
+  }
+}
+
+.download-card-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.download-card-os {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.download-card-variant {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.download-alt {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.download-note {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  margin-bottom: 2rem;
 }
 
 /* Mobile Styles */

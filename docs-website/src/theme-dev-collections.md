@@ -2,7 +2,7 @@
 description: Build collections (CMS content types) in Widgetizer themes. Define collection schemas, list items with the collection filter, and render item pages.
 ---
 
-Collections let a theme define **content types** — News, Projects, Services, Team, FAQ, and so on — that site owners fill with many uniform records called **items**. The theme ships the type definition (a schema, and optionally an item-page template); the site owner authors items in the editor. Themes can then list those items in widgets and, when enabled, give each item its own page.
+Collections let a theme define **content types** (News, Projects, Services, Team, FAQ, and so on) that site owners fill with many uniform records called **items**. The theme ships the type definition (a schema, and optionally an item-page template); the site owner authors items in the editor. Themes can then list those items in widgets and, when enabled, give each item its own page.
 
 Collections are **theme-owned**: there's no "create a collection type" button. The types a project has are whatever its theme ships. For the end-user side (managing items), see [Collections](collections.html).
 
@@ -48,22 +48,22 @@ The folder name is the type's machine id. Here's a complete `schema.json` (the A
 | :-- | :-- | :-- |
 | `type` | Yes | Machine id; must be lowercase letters/numbers/hyphens and match the folder name |
 | `settings` | Yes | The item's fields (see below) |
-| `displayName` / `displayNamePlural` | — | Singular and plural labels shown in the editor |
-| `icon` | — | Icon id for the editor sidebar |
-| `slugPrefix` | — | URL/output prefix for item pages (defaults to `type`; `assets` is reserved) |
-| `hasItemPages` | — | `true` → each item renders its own page (requires `template.liquid`) |
-| `defaultSort` | — | `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc` |
-| `schemaVersion` | — | Bookkeeping value carried onto items for future migrations |
+| `displayName` / `displayNamePlural` | No | Singular and plural labels shown in the editor |
+| `icon` | No | Icon id for the editor sidebar |
+| `slugPrefix` | No | URL/output prefix for item pages (defaults to `type`; `assets` is reserved) |
+| `hasItemPages` | No | `true` → each item renders its own page (requires `template.liquid`) |
+| `defaultSort` | No | `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc` |
+| `schemaVersion` | No | Bookkeeping value carried onto items for future migrations |
 
 ### Item Fields
 
-Fields use the same [setting types](theme-dev-setting-types.html) as widgets (`text`, `textarea`, `richtext`, `image`, `gallery`, `date`, `table`, `select`, etc.). An item is a **flat record**, so the repeater-style keys (`blocks`, `repeater`) aren't allowed — use a `table` or `gallery` for repetition within a field.
+Fields use the same [setting types](theme-dev-setting-types.html) as widgets (`text`, `textarea`, `richtext`, `image`, `gallery`, `date`, `table`, `select`, etc.). An item is a **flat record**, so the repeater-style keys (`blocks`, `repeater`) aren't allowed; use a `table` or `gallery` for repetition within a field.
 
 A few flags are specific to collection fields:
 
-- **`usedAsTitle: true`** — exactly one `text` field. It supplies the item's title and its auto-generated slug.
-- **`usedAsDate: true`** — at most one `date` field. It becomes the sort key for `date_desc` / `date_asc` (items with a blank date sort last).
-- **`required: true`** — the item fails validation until the field has a value.
+- **`usedAsTitle: true`:** exactly one `text` field. It supplies the item's title and its auto-generated slug.
+- **`usedAsDate: true`:** at most one `date` field. It becomes the sort key for `date_desc` / `date_asc` (items with a blank date sort last).
+- **`required: true`:** the item fails validation until the field has a value.
 
 # Listing Items: the `collection` filter
 
@@ -82,7 +82,7 @@ Each returned item has this shape:
   id, uuid, slug,
   url,        // relative URL to the item page, or null when hasItemPages is false
   created, updated,
-  settings    // the item's fields — already link-resolved and sanitized
+  settings    // the item's fields, already link-resolved and sanitized
 }
 ```
 
@@ -127,8 +127,8 @@ When `hasItemPages: true`, add a `template.liquid` to the type folder. Each item
 
 Item templates have access to two objects:
 
-- `item` — the current item (`item.slug`, `item.settings.*`, etc.)
-- `collection` — the type's schema (`collection.slugPrefix`, `collection.settings`, …)
+- `item`: the current item (`item.slug`, `item.settings.*`, etc.)
+- `collection`: the type's schema (`collection.slugPrefix`, `collection.settings`, …)
 
 ```liquid
 <article class="news-article">
@@ -154,9 +154,9 @@ Item templates have access to two objects:
 
 A few things happen automatically for item pages:
 
-- **They render inside your `layout.liquid`** — header, `main_content`, and footer wrap the template, just like a regular page.
+- **They render inside your `layout.liquid`:** header, `main_content`, and footer wrap the template, just like a regular page.
 - **SEO is wired for you.** Title, description, Open Graph, and canonical tags come from the item; you don't add SEO markup in `template.liquid`.
-- **Links are depth-aware.** Item pages live one directory deep, so internal links and assets are prefixed with `../` during export. Use the `{% image %}` tag and `item.url` / menu links and it's handled — don't hand-build `/uploads/...` paths.
+- **Links are depth-aware.** Item pages live one directory deep, so internal links and assets are prefixed with `../` during export. Use the `{% image %}` tag and `item.url` / menu links and it's handled; don't hand-build `/uploads/...` paths.
 - **Richtext is escaped by default.** Render `richtext` fields with `| raw` (see [Autoescaping](theme-dev-liquid-assets.html#autoescaping-the-raw-filter)). Embedded images and internal links inside richtext resolve automatically.
 
 # Where Item Data Lives
@@ -188,7 +188,7 @@ When you export the site, each item page is written to `{slugPrefix}/{slug}.html
 
 # Related Pages
 
-- [Collections](collections.html) — the end-user guide to managing items
-- [Setting Types](theme-dev-setting-types.html) — the field types a schema can use
-- [Liquid Tags & Filters](theme-dev-liquid-assets.html) — the `collection`, `format_date`, and `image` references
-- [Theme Objects & Context](theme-dev-objects-context.html) — the `item` and `collection` objects
+- [Collections](collections.html): the end-user guide to managing items
+- [Setting Types](theme-dev-setting-types.html): the field types a schema can use
+- [Liquid Tags & Filters](theme-dev-liquid-assets.html): the `collection`, `format_date`, and `image` references
+- [Theme Objects & Context](theme-dev-objects-context.html): the `item` and `collection` objects

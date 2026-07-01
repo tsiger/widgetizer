@@ -26,9 +26,13 @@ You can upload multiple files at once. Widgetizer will process them in batches.
 
 **Documents:**
 
-- PDF — for use with the PDF Viewer widget and with `file`-type theme settings (downloads, brochures, menus, etc.)
+- PDF: for downloadable documents (brochures, menus, price lists) via `file`-type theme settings, such as the Resource List widget
 
-> **Note:** Audio and video file uploads are not supported. Use embed widgets (e.g. YouTube) for video and audio content.
+**Audio:**
+
+- MP3: for use with the Audio Player widget
+
+> **Note:** Video files can't be uploaded. Embed video with a widget instead (e.g. YouTube).
 
 ### Upload Limits
 
@@ -205,26 +209,8 @@ PDFs are stored as-is without variants. During export, `/uploads/files/` paths a
 
 # Tips & Best Practices
 
-### Image Optimization
-
-- Optimize images before uploading (reduce resolution for photos that don't need to be huge)
-- Use JPG for photos, PNG for graphics with transparency
-- Use WebP when possible for better compression
-
-### Organization
-
-- Use descriptive filenames before uploading (easier to find later)
-- Add alt text to all images for SEO and accessibility
-- Regularly review unused files and delete what you don't need
-
-### Performance
-
-- Let Widgetizer's automatic sizing do the work
-- Configure image quality in App Settings (80-85 is usually perfect)
-- Disable size variants you don't use to save storage
-
-### Bulk Operations
-
-- Use bulk delete to quickly clean up multiple unused files
-- Use search and filter to find groups of files
-- Always check usage before deleting to avoid breaking your site
+- Resize very large photos before uploading; Widgetizer generates the responsive sizes from there.
+- Use JPG for photos, PNG for graphics with transparency, and WebP when you can.
+- Add alt text to every image for accessibility and SEO, and use descriptive filenames.
+- Keep image quality around 80-85 in [App Settings](settings.html), and disable size variants you never use.
+- Check a file's usage before deleting, and use bulk delete to clear out unused files.

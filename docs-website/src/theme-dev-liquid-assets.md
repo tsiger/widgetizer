@@ -11,13 +11,13 @@ Everything here sits on top of standard LiquidJS, so the usual objects, control-
 Widgetizer renders every template with **autoescaping enabled globally**. Each `{{ ... }}` expression is HTML-escaped by default, so author- and user-entered text is safe automatically. Plain `text` and `textarea` settings can be output directly:
 
 ```liquid
-<h2>{{ widget.settings.title }}</h2>   {# escaped automatically — safe #}
+<h2>{{ widget.settings.title }}</h2>   {# escaped automatically, safe #}
 ```
 
 When a value is **already trusted HTML**, append the `raw` filter so it isn't escaped. You need `| raw` for:
 
 - **Richtext** settings (these are sanitized server-side with DOMPurify)
-- **Layout placeholders** — `{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`
+- **Layout placeholders:** `{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`
 - **SVG icon markup**, embed codes, and anything you intentionally emit as raw HTML
 
 ```liquid
@@ -25,7 +25,7 @@ When a value is **already trusted HTML**, append the `raw` filter so it isn't es
 <div class="rte">{{ widget.settings.body | raw }}</div>
 ```
 
-> **Warning:** Only use `raw` on values you trust. Richtext is sanitized for you, but the `code` setting type and the `custom_css` / `custom_head_scripts` / `custom_footer_scripts` tags are **not** sanitized — they output exactly what the user enters.
+> **Warning:** Only use `raw` on values you trust. Richtext is sanitized for you, but the `code` setting type and the `custom_css` / `custom_head_scripts` / `custom_footer_scripts` tags are **not** sanitized; they output exactly what the user enters.
 
 # Liquid Filters
 
@@ -33,10 +33,10 @@ Alongside the standard LiquidJS filters, Widgetizer registers these custom filte
 
 ### `rte_text` and `rte_blank` (richtext helpers)
 
-Richtext fields are never truly empty — the editor leaves markup like `<p></p>` behind — so an ordinary `{% if x == blank %}` check always thinks the field has content. Use these helpers to test emptiness, and always render the original value with `| raw`:
+Richtext fields are never truly empty (the editor leaves markup like `<p></p>` behind), so an ordinary `{% if x == blank %}` check always thinks the field has content. Use these helpers to test emptiness, and always render the original value with `| raw`:
 
-- `rte_text` — collapses a richtext value to plain text (strips tags, `&nbsp;`, whitespace). Use it for emptiness tests.
-- `rte_blank` — boolean; `true` when the richtext is visually empty (`<p></p>`, `<p><br></p>`, `&nbsp;`, …).
+- `rte_text`: collapses a richtext value to plain text (strips tags, `&nbsp;`, whitespace). Use it for emptiness tests.
+- `rte_blank`: boolean; `true` when the richtext is visually empty (`<p></p>`, `<p><br></p>`, `&nbsp;`, …).
 
 ```liquid
 {% unless block.settings.body | rte_blank %}
@@ -105,17 +105,17 @@ Asset tags load files from different folders depending on where you use them:
 | `snippets/*.liquid`            | `assets/`         |
 | `widgets/{name}/widget.liquid` | `widgets/{name}/` |
 
-`{% asset %}`
+### `{% asset %}`
 
 Immediately outputs a CSS, JS, or image asset inline where it's placed.
 
 ```liquid
-{# In layout.liquid — loads from assets/ #}
+{# In layout.liquid, loads from assets/ #}
 {% asset src: "base.css" %}        {# → assets/base.css #}
 {% asset src: "scripts.js" %}      {# → assets/scripts.js #}
 {% asset src: "logo.svg" %}        {# → assets/logo.svg #}
 
-{# In widgets/slideshow/widget.liquid — loads from widgets/slideshow/ #}
+{# In widgets/slideshow/widget.liquid, loads from widgets/slideshow/ #}
 {% asset src: "slideshow.css" %}   {# → widgets/slideshow/slideshow.css #}
 {% asset src: "slideshow.js" %}    {# → widgets/slideshow/slideshow.js #}
 ```
@@ -144,12 +144,12 @@ Output depends on file type:
 | `crossorigin` | String  | For external resources           |
 | `integrity`   | String  | Subresource integrity hash       |
 
-`{% enqueue_style %}`
+### `{% enqueue_style %}`
 
-Registers a stylesheet for deferred output via `{% header_assets %}` or `{% footer_assets %}`. Enqueued assets are deduplicated — the same file won't load twice.
+Registers a stylesheet for deferred output via `{% header_assets %}` or `{% footer_assets %}`. Enqueued assets are deduplicated; the same file won't load twice.
 
 ```liquid
-{# In widgets/slideshow/widget.liquid — loads from widgets/slideshow/ #}
+{# In widgets/slideshow/widget.liquid, loads from widgets/slideshow/ #}
 {% enqueue_style src: "slideshow.css" %}
 {% enqueue_style src: "slideshow.css", priority: 10 %}
 {% enqueue_style src: "print.css", media: "print", location: "footer" %}
@@ -162,12 +162,12 @@ Registers a stylesheet for deferred output via `{% header_assets %}` or `{% foot
 | `media`    | `null`     | Media query attribute                         |
 | `id`       | `null`     | ID attribute                                  |
 
-`{% enqueue_script %}`
+### `{% enqueue_script %}`
 
 Registers a script for deferred output.
 
 ```liquid
-{# In widgets/slideshow/widget.liquid — loads from widgets/slideshow/ #}
+{# In widgets/slideshow/widget.liquid, loads from widgets/slideshow/ #}
 {% enqueue_script src: "slideshow.js" %}
 {% enqueue_script src: "slideshow.js", priority: 10 %}
 {% enqueue_script src: "analytics.js", location: "header", defer: true %}
@@ -181,18 +181,18 @@ Registers a script for deferred output.
 | `async`    | `false`    | Add `async` attribute                     |
 | `theme`    | `false`    | Load from theme `assets/` instead of widget folder |
 
-### Theme-Level Script Resolution
+#### Theme-Level Script Resolution
 
 By default, `{% enqueue_script %}` inside a widget loads from the widget's own folder. Set `theme: true` to load a shared script from the theme's `assets/` folder instead. This is useful for scripts shared across multiple widgets (e.g., a carousel library):
 
 ```liquid
-{# In widgets/gallery/widget.liquid — loads from assets/carousel.js, not widgets/gallery/ #}
+{# In widgets/gallery/widget.liquid, loads from assets/carousel.js, not widgets/gallery/ #}
 {% enqueue_script src: "carousel.js", theme: true, defer: true %}
 ```
 
 Scripts are deduplicated by filename, so multiple widgets can enqueue the same theme script without it loading twice.
 
-`{% enqueue_preload %}`
+### `{% enqueue_preload %}`
 
 Registers a resource preload directive for the `<head>`.
 
@@ -203,7 +203,7 @@ Registers a resource preload directive for the `<head>`.
 
 **Options:** `src`, `as`, `type`, `fetchpriority`, `media`, `imagesrcset`, `imagesizes`, `crossorigin`.
 
-`{% header_assets %}` and `{% footer_assets %}`
+### `{% header_assets %}` and `{% footer_assets %}`
 
 Output all enqueued assets for that location, sorted by priority. Styles render first, then scripts.
 
@@ -222,12 +222,12 @@ Output all enqueued assets for that location, sorted by priority. Styles render 
 </html>
 ```
 
-`{% placeholder_image %}`
+### `{% placeholder_image %}`
 
 Outputs a placeholder image for development/preview. Placeholders come from:
 
-1. **Core placeholders** — Built-in SVGs served by Widgetizer (default)
-2. **Custom placeholders** — Your own image from the theme's `assets/` folder
+1. **Core placeholders:** Built-in SVGs served by Widgetizer (default)
+2. **Custom placeholders:** Your own image from the theme's `assets/` folder
 
 ```liquid
 {# Core placeholders (built-in) #}
@@ -249,13 +249,13 @@ Outputs a placeholder image for development/preview. Placeholders come from:
 
 **Aspect ratios:**
 
-- `landscape` — 16:9 (1600×900) — default
-- `portrait` — 9:16 (900×1600)
-- `square` — 1:1 (1200×1200)
+- `landscape`: 16:9 (1600×900, default)
+- `portrait`: 9:16 (900×1600)
+- `square`: 1:1 (1200×1200)
 
 # SEO and Font Tags
 
-`{% seo %}`
+### `{% seo %}`
 
 Outputs SEO meta tags (title, description, Open Graph, Twitter Cards, canonical URL). Place in `<head>`.
 
@@ -265,7 +265,7 @@ Outputs SEO meta tags (title, description, Open Graph, Twitter Cards, canonical 
 </head>
 ```
 
-`{% fonts %}`
+### `{% fonts %}`
 
 Outputs font preconnect links and stylesheet based on theme typography settings. Automatically handles Google Fonts and Bunny Fonts (privacy-friendly alternative).
 
@@ -277,7 +277,7 @@ Outputs font preconnect links and stylesheet based on theme typography settings.
 
 # Theme Settings Tags
 
-`{% theme_settings %}`
+### `{% theme_settings %}`
 
 Outputs CSS variables for all global settings that have `outputAsCssVar: true`. Place in `<head>`.
 
@@ -289,7 +289,7 @@ Outputs CSS variables for all global settings that have `outputAsCssVar: true`. 
 
 This outputs a `<style>` block with variables like `--colors-accent`, `--typography-heading_font-family`, etc. See [Theme Manifest & Settings](theme-dev-manifest-settings.html) for how to define settings.
 
-`{% custom_css %}`
+### `{% custom_css %}`
 
 Outputs custom CSS from the theme's `advanced.custom_css` setting, wrapped in a `<style>` tag.
 
@@ -299,7 +299,7 @@ Outputs custom CSS from the theme's `advanced.custom_css` setting, wrapped in a 
 </head>
 ```
 
-`{% custom_head_scripts %}`
+### `{% custom_head_scripts %}`
 
 Outputs raw HTML/JS from the theme's `advanced.custom_head_scripts` setting (e.g., Google Analytics).
 
@@ -309,7 +309,7 @@ Outputs raw HTML/JS from the theme's `advanced.custom_head_scripts` setting (e.g
 </head>
 ```
 
-`{% custom_footer_scripts %}`
+### `{% custom_footer_scripts %}`
 
 Outputs raw HTML/JS from the theme's `advanced.custom_footer_scripts` setting.
 
@@ -333,7 +333,7 @@ These are only available in `layout.liquid`. For data objects available in widge
 
 # Snippet and Menu Tags
 
-`{% render 'snippet_name' %}`
+### `{% render 'snippet_name' %}`
 
 Renders a snippet from the `snippets/` folder.
 
@@ -348,7 +348,7 @@ For menu structure and snippet conventions, see [Menus & Snippets](theme-dev-men
 
 Media tags render uploaded media from the media library.
 
-`{% image %}`
+### `{% image %}`
 
 Renders an `<img>` tag or returns a path.
 
@@ -380,7 +380,7 @@ Renders an `<img>` tag or returns a path.
 | `fetchpriority` | `null`     | Fetch priority hint (`high`, `low`, `auto`)                    |
 | `decoding`      | `null`     | Decoding hint (`async`, `sync`, `auto`)                        |
 
-### Responsive Images (srcset)
+#### Responsive Images (srcset)
 
 When `srcset: true` is set, the tag generates a `srcset` attribute containing all available size variants for the image (excluding thumbnails). This lets browsers pick the best size for the viewport.
 
@@ -403,7 +403,7 @@ SVG images are never given `srcset` since they scale at any size. For raster ima
 
 Always pair `srcset: true` with a realistic `sizes` string. `sizes` should describe the image's rendered slot width in the layout, not the image's intrinsic dimensions.
 
-`{% youtube %}`
+### `{% youtube %}`
 
 Renders a responsive YouTube embed, or returns just the embed/thumbnail URL.
 

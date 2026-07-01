@@ -29,17 +29,17 @@ For group item structure and field options, see [Setting Types](theme-dev-settin
 
 These fields are required for a theme to be valid:
 
-**`name`** — Human-friendly theme name shown in the UI.
+**`name`:** Human-friendly theme name shown in the UI.
 
-**`version`** — Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-distribution.html) to track which version users have installed and to determine when updates are available.
+**`version`:** Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-distribution.html) to track which version users have installed and to determine when updates are available.
 
-**`author`** — Theme author or organization name.
+**`author`:** Theme author or organization name.
 
 # Optional Metadata
 
-**`description`** — A short description shown in the theme picker.
+**`description`:** A short description shown in the theme picker.
 
-**`useCoreWidgets`** — When `true` (or absent), core widgets are included alongside theme widgets. If `false`, core widgets are not exposed in the editor.
+**`useCoreWidgets`:** When `true` (or absent), core widgets are included alongside theme widgets. If `false`, core widgets are not exposed in the editor.
 
 # Theme-Defined Image Sizes (Optional)
 
@@ -65,9 +65,9 @@ When present, theme image sizes **replace** the app settings entirely for projec
 
 **Per-size properties:**
 
-- **`width`** (number) — Maximum width in pixels
-- **`enabled`** (boolean) — Whether to generate this size (default: `true`)
-- **`quality`** (number, optional) — JPEG/WebP quality 1–100; falls back to app setting if omitted
+- **`width`** (number): Maximum width in pixels
+- **`enabled`** (boolean): Whether to generate this size (default: `true`)
+- **`quality`** (number, optional): JPEG/WebP quality 1-100; falls back to app setting if omitted
 
 Templates can reference these sizes with the `{% image %}` tag, e.g. `{% image src: image, size: 'hero' %}`.
 
@@ -262,7 +262,7 @@ Widget `displayName` and setting `label` fields support the same `tTheme:` prefi
 
 ### Supported Languages
 
-Widgetizer's admin interface currently ships with English; additional languages will be added in future releases. Your theme can provide a locale file for any language code you intend to support — the active locale matches the user's language setting in [App Settings](settings.html), and locale files for languages that aren't yet selectable in the UI sit dormant until they are.
+Widgetizer's admin interface currently ships with English; additional languages will be added in future releases. Your theme can provide a locale file for any language code you intend to support; the active locale matches the user's language setting in [App Settings](settings.html), and locale files for languages that aren't yet selectable in the UI sit dormant until they are.
 
 # Practical Guidance
 

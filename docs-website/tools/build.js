@@ -22,14 +22,18 @@ const __dirname = path.dirname(__filename);
 const SRC_DIR = path.join(__dirname, "../src");
 const DIST_DIR = path.join(__dirname, "../dist");
 const ROOT_DIR = path.join(__dirname, "../..");
+const STYLES_PATH = path.join(__dirname, "styles.css");
 const SITE_URL = "https://docs.widgetizer.org";
 
-// Read main package.json for version
-const packageJson = JSON.parse(await fs.readFile(path.join(ROOT_DIR, "package.json"), "utf-8"));
-const version = packageJson.version;
+// Config reloaded on every build so version/sitemap edits are picked up in watch mode
+let version;
+let sitemap;
 
-// Read sitemap
-const sitemap = JSON.parse(await fs.readFile(path.join(SRC_DIR, "sitemap.json"), "utf-8"));
+async function loadConfig() {
+  const packageJson = JSON.parse(await fs.readFile(path.join(ROOT_DIR, "package.json"), "utf-8"));
+  version = packageJson.version;
+  sitemap = JSON.parse(await fs.readFile(path.join(SRC_DIR, "sitemap.json"), "utf-8"));
+}
 
 // Parse frontmatter from markdown content
 function parseFrontmatter(content) {
@@ -87,23 +91,6 @@ function addHeadingIds(html) {
     }
     return `<${tag} id="${slug}">${inner}</${tag}>`;
   });
-}
-
-// Ensure dist directory exists
-await fs.ensureDir(DIST_DIR);
-
-// Copy logo (overwrite if exists)
-try {
-  await fs.copy(path.join(SRC_DIR, sitemap.logo), path.join(DIST_DIR, sitemap.logo), { overwrite: true });
-} catch (error) {
-  console.warn(`Warning: Could not copy logo: ${error.message}`);
-}
-
-// Copy styles (overwrite if exists)
-try {
-  await fs.copy(path.join(__dirname, "styles.css"), path.join(DIST_DIR, "styles.css"), { overwrite: true });
-} catch (error) {
-  console.warn(`Warning: Could not copy styles: ${error.message}`);
 }
 
 // GitHub icon SVG
@@ -164,15 +151,15 @@ function generateHTML(title, content, activePath, description = "", canonicalUrl
   const canonicalLink = canonicalUrl ? `\n  <link rel="canonical" href="${canonicalUrl}">` : "";
 
   return `<!--
-    __          ___     _            _   _              
-    \\ \\        / (_)   | |          | | (_)             
-     \\ \\  /\\  / / _  __| | __ _  ___| |_ _ _______ _ __ 
+    __          ___     _            _   _
+    \\ \\        / (_)   | |          | | (_)
+     \\ \\  /\\  / / _  __| | __ _  ___| |_ _ _______ _ __
       \\ \\/  \\/ / | |/ _\` |/ _\` |/ _ \\ __| |_  / _ \\ '__|
-       \\  /\\  /  | | (_| | (_| |  __/ |_| |/ /  __/ |   
-        \\/  \\/   |_|\\__,_|\\__, |\\___|\\__|_/___\\___|_|   
-                          __/ |                         
+       \\  /\\  /  | | (_| | (_| |  __/ |_| |/ /  __/ |
+        \\/  \\/   |_|\\__,_|\\__, |\\___|\\__|_/___\\___|_|
+                          __/ |
                          |___/
-    Widgetizer.org - ${version}                          
+    Widgetizer.org - ${version}
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -192,7 +179,7 @@ function generateHTML(title, content, activePath, description = "", canonicalUrl
     // Mobile menu toggle
     const hamburger = document.querySelector('.hamburger');
     const sidebar = document.querySelector('.sidebar');
-    
+
     hamburger?.addEventListener('click', () => {
       sidebar.classList.toggle('active');
       hamburger.classList.toggle('active');
@@ -212,105 +199,196 @@ function generateHTML(title, content, activePath, description = "", canonicalUrl
 </html>`;
 }
 
-// Process each page
-for (const item of sitemap.navigation) {
-  if (item.type === "page") {
-    const mdPath = path.join(SRC_DIR, item.path);
-    const htmlPath = path.join(DIST_DIR, item.path.replace(".md", ".html"));
+// Build the whole site once (reads config fresh, so it is safe to call repeatedly in watch mode)
+async function build() {
+  await loadConfig();
 
-    // Read markdown
-    const rawMarkdown = await fs.readFile(mdPath, "utf-8");
+  await fs.ensureDir(DIST_DIR);
 
-    // Parse frontmatter
-    const { metadata, content: markdown } = parseFrontmatter(rawMarkdown);
+  // Copy logo (overwrite if exists)
+  try {
+    await fs.copy(path.join(SRC_DIR, sitemap.logo), path.join(DIST_DIR, sitemap.logo), { overwrite: true });
+  } catch (error) {
+    console.warn(`Warning: Could not copy logo: ${error.message}`);
+  }
 
-    // Convert to HTML
-    let htmlContent = marked.parse(markdown);
+  // Copy styles (overwrite if exists)
+  try {
+    await fs.copy(STYLES_PATH, path.join(DIST_DIR, "styles.css"), { overwrite: true });
+  } catch (error) {
+    console.warn(`Warning: Could not copy styles: ${error.message}`);
+  }
 
-    // Rewrite relative links ending in .html to clean URLs
-    htmlContent = htmlContent.replace(/href=(['"])([^'"]+?)\.html(#([^'"]*))?\1/g, (match, quote, slug, hashGroup, hash) => {
-      if (slug.startsWith("http://") || slug.startsWith("https://") || slug.startsWith("//")) {
-        return match;
+  // Process each page
+  for (const item of sitemap.navigation) {
+    if (item.type === "page") {
+      const mdPath = path.join(SRC_DIR, item.path);
+      const htmlPath = path.join(DIST_DIR, item.path.replace(".md", ".html"));
+
+      // Read markdown
+      const rawMarkdown = await fs.readFile(mdPath, "utf-8");
+
+      // Parse frontmatter
+      const { metadata, content: markdown } = parseFrontmatter(rawMarkdown);
+
+      // Convert to HTML
+      let htmlContent = marked.parse(markdown);
+
+      // Rewrite relative links ending in .html to clean URLs
+      htmlContent = htmlContent.replace(/href=(['"])([^'"]+?)\.html(#([^'"]*))?\1/g, (match, quote, slug, hashGroup, hash) => {
+        if (slug.startsWith("http://") || slug.startsWith("https://") || slug.startsWith("//")) {
+          return match;
+        }
+        const cleanPath = slug === "index" ? "/" : "/" + slug;
+        const cleanHash = hash ? `#${hash}` : "";
+        return `href=${quote}${cleanPath}${cleanHash}${quote}`;
+      });
+
+      // Process blockquotes and add type classes
+      htmlContent = htmlContent.replace(/<blockquote>/g, (match, offset, string) => {
+        // Find the blockquote content
+        const blockquoteEnd = string.indexOf("</blockquote>", offset);
+        if (blockquoteEnd === -1) return match;
+
+        const blockquoteContent = string.substring(offset, blockquoteEnd);
+
+        // Check for type keywords (case-insensitive, handles various formats)
+        let type = null;
+        const contentLower = blockquoteContent.toLowerCase();
+
+        if (contentLower.includes("<strong>note")) {
+          type = "note";
+        } else if (contentLower.includes("<strong>important")) {
+          type = "important";
+        } else if (contentLower.includes("<strong>warning")) {
+          type = "warning";
+        } else if (contentLower.includes("<strong>tip")) {
+          type = "tip";
+        }
+
+        return type ? `<blockquote class="blockquote-${type}">` : match;
+      });
+
+      // Add id attributes to headings so #section anchor links resolve
+      htmlContent = addHeadingIds(htmlContent);
+
+      // Compute canonical URL
+      const cleanSlug = item.path === "index.md" ? "" : item.path.replace(".md", "");
+      const canonicalUrl = `${SITE_URL}/${cleanSlug}`;
+
+      // Generate full HTML page
+      const fullHTML = generateHTML(item.title, htmlContent, item.path, metadata.description, canonicalUrl);
+
+      // Write HTML file
+      try {
+        await fs.writeFile(htmlPath, fullHTML);
+        console.log(`✓ Generated ${item.path.replace(".md", ".html")}`);
+      } catch (error) {
+        console.warn(`⚠ Could not write ${item.path.replace(".md", ".html")}: ${error.message} (file may be open)`);
       }
-      const cleanPath = slug === "index" ? "/" : "/" + slug;
-      const cleanHash = hash ? `#${hash}` : "";
-      return `href=${quote}${cleanPath}${cleanHash}${quote}`;
-    });
-
-    // Process blockquotes and add type classes
-    htmlContent = htmlContent.replace(/<blockquote>/g, (match, offset, string) => {
-      // Find the blockquote content
-      const blockquoteEnd = string.indexOf("</blockquote>", offset);
-      if (blockquoteEnd === -1) return match;
-
-      const blockquoteContent = string.substring(offset, blockquoteEnd);
-
-      // Check for type keywords (case-insensitive, handles various formats)
-      let type = null;
-      const contentLower = blockquoteContent.toLowerCase();
-
-      if (contentLower.includes("<strong>note")) {
-        type = "note";
-      } else if (contentLower.includes("<strong>important")) {
-        type = "important";
-      } else if (contentLower.includes("<strong>warning")) {
-        type = "warning";
-      } else if (contentLower.includes("<strong>tip")) {
-        type = "tip";
-      }
-
-      return type ? `<blockquote class="blockquote-${type}">` : match;
-    });
-
-    // Add id attributes to headings so #section anchor links resolve
-    htmlContent = addHeadingIds(htmlContent);
-
-    // Compute canonical URL
-    const cleanSlug = item.path === "index.md" ? "" : item.path.replace(".md", "");
-    const canonicalUrl = `${SITE_URL}/${cleanSlug}`;
-
-    // Generate full HTML page
-    const fullHTML = generateHTML(item.title, htmlContent, item.path, metadata.description, canonicalUrl);
-
-    // Write HTML file
-    try {
-      await fs.writeFile(htmlPath, fullHTML);
-      console.log(`✓ Generated ${item.path.replace(".md", ".html")}`);
-    } catch (error) {
-      console.warn(`⚠ Could not write ${item.path.replace(".md", ".html")}: ${error.message} (file may be open)`);
     }
   }
-}
 
-// Generate sitemap.xml
-const lastmod = new Date().toISOString().split("T")[0];
-const urls = sitemap.navigation
-  .filter((item) => item.type === "page")
-  .map((item) => {
-    const slug = item.path === "index.md" ? "" : item.path.replace(".md", "");
-    const loc = `${SITE_URL}/${slug}`;
-    const priority = item.path === "index.md" ? "1.0" : "0.8";
-    return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
-  })
-  .join("\n");
+  // Generate sitemap.xml
+  const lastmod = new Date().toISOString().split("T")[0];
+  const urls = sitemap.navigation
+    .filter((item) => item.type === "page")
+    .map((item) => {
+      const slug = item.path === "index.md" ? "" : item.path.replace(".md", "");
+      const loc = `${SITE_URL}/${slug}`;
+      const priority = item.path === "index.md" ? "1.0" : "0.8";
+      return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+    })
+    .join("\n");
 
-const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+  const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
 </urlset>
 `;
 
-await fs.writeFile(path.join(DIST_DIR, "sitemap.xml"), sitemapXml);
-console.log("✓ Generated sitemap.xml");
+  await fs.writeFile(path.join(DIST_DIR, "sitemap.xml"), sitemapXml);
+  console.log("✓ Generated sitemap.xml");
 
-// Generate robots.txt
-const robotsTxt = `User-agent: *
+  // Generate robots.txt
+  const robotsTxt = `User-agent: *
 Allow: /
 
 Sitemap: ${SITE_URL}/sitemap.xml
 `;
 
-await fs.writeFile(path.join(DIST_DIR, "robots.txt"), robotsTxt);
-console.log("✓ Generated robots.txt");
+  await fs.writeFile(path.join(DIST_DIR, "robots.txt"), robotsTxt);
+  console.log("✓ Generated robots.txt");
 
-console.log("\n✨ Documentation site built successfully!\n");
+  console.log("\n✨ Documentation site built successfully!\n");
+}
+
+// Run once, then (with --watch) rebuild on source changes and live-reload the browser
+await build();
+
+if (process.argv.includes("--watch")) {
+  const { default: browserSync } = await import("browser-sync");
+  const bs = browserSync.create();
+
+  // Resolve clean URLs to their .html file, matching how the host serves them
+  // in production (e.g. /getting-started -> getting-started.html).
+  const cleanUrls = (req, res, next) => {
+    const qIndex = req.url.search(/[?#]/);
+    const pathPart = qIndex === -1 ? req.url : req.url.slice(0, qIndex);
+    const suffix = qIndex === -1 ? "" : req.url.slice(qIndex);
+    if (pathPart !== "/" && !path.extname(pathPart)) {
+      const candidate = path.join(DIST_DIR, `${decodeURIComponent(pathPart)}.html`);
+      if (fs.existsSync(candidate)) {
+        req.url = `${pathPart}.html${suffix}`;
+      }
+    }
+    next();
+  };
+
+  bs.init({
+    server: {
+      baseDir: DIST_DIR,
+      middleware: [cleanUrls],
+    },
+    port: 5050,
+    open: false,
+    notify: false,
+    ui: false,
+  });
+
+  let timer = null;
+  let building = false;
+  let queued = false;
+
+  const rebuild = async () => {
+    if (building) {
+      queued = true;
+      return;
+    }
+    building = true;
+    try {
+      await build();
+      bs.reload();
+    } catch (error) {
+      console.error(`⚠ Build failed: ${error.message}`);
+    }
+    building = false;
+    if (queued) {
+      queued = false;
+      rebuild();
+    }
+  };
+
+  // Coalesce rapid saves into a single rebuild
+  const schedule = () => {
+    clearTimeout(timer);
+    timer = setTimeout(rebuild, 150);
+  };
+
+  fs.watch(SRC_DIR, schedule);
+  fs.watch(__dirname, (event, filename) => {
+    if (filename === "styles.css") schedule();
+  });
+
+  console.log("👀 Watching src/ for changes — live preview at http://localhost:5050\n");
+}
