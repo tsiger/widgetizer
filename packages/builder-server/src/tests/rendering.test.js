@@ -650,10 +650,10 @@ describe("renderPageLayout", () => {
     );
 
     assert.ok(
-      html.includes(`rel="icon" href="http://localhost:3001/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
+      html.includes(`rel="icon" href="/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
     );
     assert.ok(
-      html.includes(`rel="apple-touch-icon" href="http://localhost:3001/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
+      html.includes(`rel="apple-touch-icon" href="/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
     );
   });
 
