@@ -6,7 +6,7 @@ description: Release notes and version history for Widgetizer. See what's new in
 
 All notable changes to Widgetizer are documented here.
 
-## 0.9.9 - 2026-07-01
+## 0.9.9 - TBC
 
 ### Collections
 
