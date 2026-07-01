@@ -160,6 +160,8 @@ Example:
 
 For body fonts, a `--{group}-body_font_bold-weight` variable is also generated to avoid faux bold rendering.
 
+The `{% fonts %}` tag also reads `font_picker` settings from the `typography` group. It loads external stylesheets only for Widgetizer's known web fonts; system font stacks intentionally produce no external request. Use `heading_font` and `body_font` ids when you want the same behavior Arch uses, including automatic bold-weight loading for `body_font`.
+
 # Accessing Theme Settings in Liquid
 
 All settings are available in templates through the `theme` object using the same group and ID structure.
@@ -183,6 +185,17 @@ If you include the `advanced` group, users can inject:
 - Custom scripts before `</body>` via `{% custom_footer_scripts %}`
 
 These tags must be present in `layout.liquid` for the settings to take effect. See [Layout & Templates](theme-dev-layout-templates.html) for required placeholders and tag placement.
+
+Use these exact setting ids if you want the built-in tags to pick them up:
+
+| Setting id | Suggested type | Consumed by |
+| :-- | :-- | :-- |
+| `custom_css` | `code` with `language: "css"` | `{% custom_css %}` |
+| `custom_head_scripts` | `code` with `language: "html"` | `{% custom_head_scripts %}` |
+| `custom_footer_scripts` | `code` with `language: "html"` | `{% custom_footer_scripts %}` |
+| `use_bunny_fonts` | `checkbox` | `{% fonts %}` provider selection compatibility |
+
+Custom CSS and scripts are deliberate raw output surfaces. They should be presented as advanced controls and documented for trusted site administrators, not casual content editors. For the detailed output contract, see [Liquid Tags & Filters](theme-dev-liquid-assets.html#seo-fonts-and-theme-settings).
 
 # Theme Localization (i18n)
 

@@ -43,7 +43,7 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 
 ### For Theme Authors
 
-- **New setting types:** `date`, `gallery` (with per-image captions), and `table` (repeating text-column rows), joining the `file` input added in 0.9.8
+- **New setting types:** `date`, `gallery` (with per-image captions), and `table` (repeating text-column rows), joining the existing `file` input
 - **Rich-text images and headings:** opt-in image and heading support inside rich-text fields, with automatic media resolution
 - **`collection` filter:** list collection items from inside a widget template
 - **`rte_blank` and `rte_text` filters:** reliably check whether a rich-text value is truly empty

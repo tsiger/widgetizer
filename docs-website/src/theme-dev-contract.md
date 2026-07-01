@@ -39,8 +39,14 @@ Not strictly required, but expected for a complete theme:
 | :-- | :-- |
 | `{% seo %}` | Title, description, Open Graph, canonical |
 | `{% fonts %}` | Font preconnect + stylesheet |
+| `{% render 'site-icons', site_icons: site_icons %}` | Favicon, Apple touch icon, and manifest links |
 | `{% theme_settings %}` | CSS variables from global settings (place before `base.css`) |
+| `{% asset src: "base.css" %}` | Global theme stylesheet |
+| `{% custom_css %}` | User custom CSS from `advanced.custom_css` |
+| `{% custom_head_scripts %}` / `{% custom_footer_scripts %}` | User-provided script/code sinks |
 | `{% header_assets %}` / `{% footer_assets %}` | Output enqueued widget assets |
+
+For the exact expectations behind each tag, including the `page.seo` fields, font picker shape, CSS variable naming, custom-code settings, image tag behavior, and enqueue ordering, see [Liquid Tags & Filters](theme-dev-liquid-assets.html).
 
 # Required Widget Attributes
 
@@ -83,6 +89,7 @@ See [Widgets & Blocks](theme-dev-widgets-blocks.html).
 - **Collection type = folder name.** Same rule for `collection-types/{type}/`.
 - **Unique asset filenames.** Widget `.css`/`.js` files are flattened into one `assets/` folder on export; name them uniquely (e.g. `slideshow.css`, not `styles.css`) to avoid collisions. See [Export](export.html).
 - **Scope widget CSS** with `.widget-{{ widget.id }}` so styles don't leak between instances.
+- **Use the asset tags instead of hardcoded paths.** They handle preview routes, exported static paths, nested page prefixes, and cache-busting for you.
 
 # The `raw` Rule
 
