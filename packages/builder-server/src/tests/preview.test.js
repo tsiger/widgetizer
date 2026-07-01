@@ -44,7 +44,7 @@ const { getProjectDir, getProjectPagesDir, CORE_WIDGETS_DIR } = await import("..
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 
-const { getGlobalWidgets, saveGlobalWidget, serveAsset, createCollectionPreviewToken } = await import(
+const { getGlobalWidgets, saveGlobalWidget, serveAsset, createCollectionPreviewToken, injectBaseTag } = await import(
   "../controllers/previewController.js"
 );
 const { closeDb } = await import("../db/index.js");
@@ -501,6 +501,20 @@ describe("saveGlobalWidget — mismatch guard", () => {
 // the storage adapter, so the template-less case is seeded by writing a valid
 // schema and no template.liquid under collection-types/<type>/.
 // ============================================================================
+
+describe("injectBaseTag — origin-relative base", () => {
+  it("injects <base href=\"/\"> and never pins an absolute origin", () => {
+    const prev = process.env.SERVER_URL;
+    process.env.SERVER_URL = "http://localhost:9999"; // deliberately-wrong origin
+    try {
+      const out = injectBaseTag("<html><head></head><body></body></html>");
+      assert.ok(out.includes('<base href="/">'), "must inject an origin-root base");
+      assert.doesNotMatch(out, /<base href="https?:\/\//, "must not pin an absolute origin");
+    } finally {
+      process.env.SERVER_URL = prev;
+    }
+  });
+});
 
 describe("createCollectionPreviewToken — guards", () => {
   // Matches the scope mockReq builds, so seeded fixtures resolve for the handler.

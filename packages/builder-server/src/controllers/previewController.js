@@ -39,11 +39,11 @@ function injectRuntimeScript(html, previewMode = "editor") {
   return html;
 }
 
-// Inject base tag for relative URL resolution
-function injectBaseTag(html) {
-  const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
-  const baseTag = `<base href="${apiUrl}">`;
-  return html.replace(/<\/head>/i, `${baseTag}\n</head>`);
+// Inject an origin-root base tag so any stray relative URL resolves against the
+// render document's own origin (whichever port/host actually served it), not a
+// pinned SERVER_URL. Asset/media/forms URLs are already origin-relative.
+export function injectBaseTag(html) {
+  return html.replace(/<\/head>/i, `<base href="/">\n</head>`);
 }
 
 // Derive the scope-aware collection capability for the render path from the
@@ -73,7 +73,9 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   }
 
   // Create shared globals for asset enqueue system
-  const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
+  // Origin-relative asset/media URLs (see injectBaseTag). The serving origin is
+  // the render document's own; no SERVER_URL/port dependency.
+  const apiUrl = "";
   const sharedGlobals = {
     projectId: activeProjectId,
     apiUrl,
@@ -365,9 +367,9 @@ export async function createCollectionPreviewToken(req, res) {
       settings: settings || {},
     };
 
-    const apiUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}`;
+    const apiUrl = "";
     // Preview is served at a single URL (root), so no depth prefixing: assets
-    // resolve via absolute API URLs in preview mode (outputPathPrefix === "").
+    // resolve via origin-relative URLs (see injectBaseTag).
     const sharedGlobals = {
       projectId: activeProjectId,
       apiUrl,
