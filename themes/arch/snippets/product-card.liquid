@@ -1,0 +1,32 @@
+{%- comment -%}
+  Renders a single Shopify product card.
+
+  Must sit inside a product context or a list-context item, so the current item
+  resolves as `product` for the shopify-* queries. Layout, typography, and the
+  button are theme-owned (see the COMMERCE section in base.css).
+
+  Params:
+    - aspect_ratio  image crop: "auto" (natural) or a ratio like "1 / 1"
+    - show_options  when true, renders the variant selector
+    - button_text   add-to-cart label (default "Add to cart")
+    - heading_level product title tag: "h2" or "h3" (default "h3")
+    - image_sizes   the media `sizes` attribute for responsive images
+{%- endcomment -%}
+{%- assign pc_ratio = aspect_ratio | default: 'auto' -%}
+{%- assign pc_heading = heading_level | default: 'h3' -%}
+{%- assign pc_sizes = image_sizes | default: '(min-width: 750px) 480px, 90vw' -%}
+<article class="widget-card product-card">
+  <div class="product-card-media" data-ratio="{% if pc_ratio == 'auto' %}auto{% else %}fixed{% endif %}"{% unless pc_ratio == 'auto' %} style="--pc-ratio: {{ pc_ratio }};"{% endunless %}>
+    <shopify-media layout="fullWidth" query="product.selectedOrFirstAvailableVariant.image" sizes="{{ pc_sizes }}"></shopify-media>
+  </div>
+  <div class="product-card-body">
+    <{{ pc_heading }} class="w-title t-xl product-card-title"><shopify-data query="product.title"></shopify-data></{{ pc_heading }}>
+    <div class="product-card-price t-2xl"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+    {%- if show_options -%}
+      <shopify-variant-selector class="product-card-options"></shopify-variant-selector>
+    {%- endif -%}
+    <div class="widget-card-footer product-card-footer">
+      <button type="button" class="widget-button widget-button-primary widget-button-full" data-shopify-add-to-cart>{{ button_text | default: 'Add to cart' }}</button>
+    </div>
+  </div>
+</article>

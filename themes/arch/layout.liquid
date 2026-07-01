@@ -18,16 +18,27 @@
     {% endunless %}
     {% custom_css %}
     {% custom_head_scripts %}
+    {% assign shopify_domain = theme.shopify.store_domain | default: '' | remove: 'https://' | remove: 'http://' | strip %}
+    {% if shopify_domain != blank %}
+      <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+      <style>shopify-store, shopify-context, shopify-list-context { display: contents; }</style>
+    {% endif %}
     {% header_assets %}
   </head>
   <body class="{{ body_class }} corner-{{ theme.style.corner_style | default: 'sharp' }} spacing-{{ theme.style.spacing_density | default: 'default' }} buttons-{{ theme.style.button_shape | default: 'auto' }}">
     <a href="#main-content" class="visually-hidden skip-link">Skip to main content</a>
+    {% if shopify_domain != blank %}<shopify-store store-domain="https://{{ shopify_domain }}" country="{{ theme.shopify.country | default: 'US' }}" language="{{ theme.shopify.language | default: 'en' }}"{% if theme.shopify.storefront_access_token != blank %} public-access-token="{{ theme.shopify.storefront_access_token }}"{% endif %}>{% endif %}
     {{ header | raw }}
     <main id="main-content" class="main-content">
       {{ main_content | raw }}
     </main>
     {{ footer | raw }}
-    
+    {% if shopify_domain != blank %}
+      <shopify-cart id="widgetizer-cart"></shopify-cart>
+      </shopify-store>
+      {% asset src: "shopify-cart.js", defer: true %}
+    {% endif %}
+
     {% asset src: "scripts.js", defer: true %}
     {% if theme.general.enable_reveal_animations %}
       {% asset src: "reveal.js", defer: true %}

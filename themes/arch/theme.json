@@ -395,6 +395,41 @@
           "label": "tTheme:global.social.settings.mail_url.label"
         }
       ],
+      "shopify": [
+        {
+          "type": "header",
+          "id": "shopify_header",
+          "label": "tTheme:global.shopify.settings.shopify_header.label"
+        },
+        {
+          "type": "text",
+          "id": "store_domain",
+          "label": "tTheme:global.shopify.settings.store_domain.label",
+          "description": "tTheme:global.shopify.settings.store_domain.description",
+          "default": ""
+        },
+        {
+          "type": "text",
+          "id": "storefront_access_token",
+          "label": "tTheme:global.shopify.settings.storefront_access_token.label",
+          "description": "tTheme:global.shopify.settings.storefront_access_token.description",
+          "default": ""
+        },
+        {
+          "type": "text",
+          "id": "country",
+          "label": "tTheme:global.shopify.settings.country.label",
+          "description": "tTheme:global.shopify.settings.country.description",
+          "default": "US"
+        },
+        {
+          "type": "text",
+          "id": "language",
+          "label": "tTheme:global.shopify.settings.language.label",
+          "description": "tTheme:global.shopify.settings.language.description",
+          "default": "en"
+        }
+      ],
       "advanced": [
         {
           "type": "header",

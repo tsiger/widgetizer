@@ -1,0 +1,100 @@
+{% assign shopify_domain = theme.shopify.store_domain | default: '' | strip %}
+{% assign collection_handle = widget.settings.collection_handle | default: '' | strip %}
+{% assign products_count = widget.settings.products_count | default: 8 %}
+{% assign has_header = false %}
+{% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+  {% assign has_header = true %}
+{% endif %}
+{% assign item_heading_level = 'h3' %}
+{% unless has_header %}
+  {% assign item_heading_level = 'h2' %}
+{% endunless %}
+{% if collection_handle == blank %}
+  {% assign list_query = 'products' %}
+{% else %}
+  {% assign list_query = 'collection.products' %}
+{% endif %}
+{% if widget.settings.show_pagination %}
+  {% enqueue_script src: "shopify-list.js", defer: true, location: "footer", priority: 40, theme: true %}
+{% endif %}
+<section
+  id="{{ widget.id }}"
+  class="widget widget-type-product-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="product-grid"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .product-grid-pagination {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-md);
+        margin-block-start: var(--space-2xl);
+      }
+
+      & .product-grid-pagination button[disabled] {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if has_header %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      {% if shopify_domain == blank %}
+        <div class="product-card-notice reveal reveal-fade">
+          <strong>Connect your Shopify store</strong>
+          Add your store domain in Theme Settings, under Shopify, to start showing products.
+        </div>
+      {% else %}
+        {% comment %} The CSS grid lives on a div we control. shopify-store/context/list-context
+           are all display:contents (see layout.liquid), so the cloned product cards become the
+           direct grid items regardless of how the list context nests them. {% endcomment %}
+        {% capture list_block %}<shopify-list-context type="product" query="{{ list_query }}" first="{{ products_count }}"><template>{% render 'product-card', aspect_ratio: widget.settings.aspect_ratio, show_options: widget.settings.show_options, button_text: widget.settings.button_text, heading_level: item_heading_level, image_sizes: '(min-width: 990px) 25vw, (min-width: 750px) 45vw, 90vw' %}</template></shopify-list-context>{% endcapture %}
+        <div class="product-grid-wrap reveal reveal-up" data-shopify-list>
+          <div class="product-grid-list widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
+            {% if collection_handle != blank %}
+              <shopify-context type="collection" handle="{{ collection_handle }}">
+                <template>{{ list_block | raw }}</template>
+              </shopify-context>
+            {% else %}
+              {{ list_block | raw }}
+            {% endif %}
+          </div>
+
+          {% if widget.settings.show_pagination %}
+            <div class="product-grid-pagination">
+              <button type="button" class="widget-button" data-shopify-list-prev disabled>Previous</button>
+              <button type="button" class="widget-button" data-shopify-list-next>Next</button>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

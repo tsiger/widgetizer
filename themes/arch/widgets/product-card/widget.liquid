@@ -1,0 +1,83 @@
+{% assign shopify_domain = theme.shopify.store_domain | default: '' | strip %}
+{% assign has_header = false %}
+{% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+  {% assign has_header = true %}
+{% endif %}
+<section
+  id="{{ widget.id }}"
+  class="widget widget-type-product-card widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="product-card"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .product-card-shell {
+        margin-inline: auto;
+        {% case widget.settings.content_width %}
+          {% when 'medium' %}max-width: var(--content-width-sm);
+          {% when 'wide' %}max-width: var(--content-width-md);
+          {% else %}max-width: var(--content-width-xs);
+        {% endcase %}
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if has_header %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="product-card-shell">
+        {% if shopify_domain == blank %}
+          <div class="product-card-notice reveal reveal-fade">
+            <strong>Connect your Shopify store</strong>
+            Add your store domain in Theme Settings, under Shopify, to start showing products.
+          </div>
+        {% elsif widget.settings.product_handle == blank %}
+          <div class="product-card-notice reveal reveal-fade">
+            <strong>Choose a product</strong>
+            Enter a product handle in this widget's settings (find it in your product's Shopify URL).
+          </div>
+        {% else %}
+          {% assign item_heading_level = 'h3' %}
+          {% unless has_header %}
+            {% assign item_heading_level = 'h2' %}
+          {% endunless %}
+          <shopify-context type="product" handle="{{ widget.settings.product_handle }}">
+            <template>
+              {% render 'product-card',
+                aspect_ratio: widget.settings.aspect_ratio,
+                show_options: widget.settings.show_options,
+                button_text: widget.settings.button_text,
+                heading_level: item_heading_level,
+                image_sizes: '(min-width: 750px) 480px, 90vw'
+              %}
+            </template>
+          </shopify-context>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

@@ -231,6 +231,30 @@
         }
       }
     },
+    "shopify": {
+      "name": "Shopify",
+      "settings": {
+        "shopify_header": {
+          "label": "Store Connection"
+        },
+        "store_domain": {
+          "label": "Store domain",
+          "description": "Your Shopify domain, e.g. your-store.myshopify.com. Leave blank to disable the storefront."
+        },
+        "storefront_access_token": {
+          "label": "Storefront access token",
+          "description": "Optional. A public Storefront API token, needed only for live inventory and metafields."
+        },
+        "country": {
+          "label": "Country",
+          "description": "Two-letter market country code, e.g. US. Sets currency and pricing."
+        },
+        "language": {
+          "label": "Language",
+          "description": "Two-letter language code, e.g. en."
+        }
+      }
+    },
     "widgets": {
       "settings": {
         "display_header": {
@@ -1641,6 +1665,45 @@
             "description": "Start a line with + for a checkmark or - for a cross."
           }
         }
+      }
+    }
+  },
+  "product_card": {
+    "name": "Product Card",
+    "settings": {
+      "product_handle": {
+        "label": "Product handle",
+        "description": "The product's handle from its Shopify URL, e.g. classic-tee."
+      },
+      "button_text": {
+        "label": "Button text"
+      },
+      "show_options": {
+        "label": "Show variant options",
+        "description": "Adds a size/color selector. Leave off to add the first available variant."
+      }
+    }
+  },
+  "product_grid": {
+    "name": "Product Grid",
+    "settings": {
+      "collection_handle": {
+        "label": "Collection handle",
+        "description": "Leave blank to show all products, or enter a collection's handle from its Shopify URL."
+      },
+      "products_count": {
+        "label": "Products per page"
+      },
+      "button_text": {
+        "label": "Button text"
+      },
+      "show_options": {
+        "label": "Show variant options",
+        "description": "Adds a size/color selector to each card. Leave off to add the first available variant."
+      },
+      "show_pagination": {
+        "label": "Show pagination",
+        "description": "Adds Previous / Next buttons to page through the collection."
       }
     }
   },
