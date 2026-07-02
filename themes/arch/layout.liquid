@@ -21,7 +21,7 @@
     {% assign shopify_domain = theme.shopify.store_domain | default: '' | remove: 'https://' | remove: 'http://' | strip %}
     {% if shopify_domain != blank %}
       <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
-      <style>shopify-store, shopify-context, shopify-list-context { display: contents; }</style>
+      {% asset src: "commerce.css" %}
     {% endif %}
     {% header_assets %}
   </head>
@@ -35,6 +35,7 @@
     {{ footer | raw }}
     {% if shopify_domain != blank %}
       <shopify-cart id="widgetizer-cart"></shopify-cart>
+      {% render 'product-modal' %}
       </shopify-store>
       {% asset src: "shopify-cart.js", defer: true %}
     {% endif %}

@@ -2314,8 +2314,12 @@ b {
     border-inline-start: none;
   }
 
+  /* Visible at every breakpoint so the Shopify cart trigger inside it can
+     stay reachable on mobile; the contact block and CTA hide themselves
+     there (.header-contact-right, .desktop-cta), so without a connected
+     store this renders empty and takes no space. */
   & .header-end {
-    display: none;
+    display: flex;
     align-items: center;
     gap: var(--space-lg);
   }
@@ -2831,10 +2835,6 @@ b {
       display: flex;
     }
 
-    & .header-end {
-      display: flex;
-    }
-
     /* Centered navigation layout */
     & .header-inner.header-center-nav {
       display: grid;
@@ -3068,83 +3068,11 @@ b {
 }
 
 /* ==========================================================================
-   COMMERCE (SHOPIFY PRODUCT CARDS)
-   Shared primitives for the product-card snippet (snippets/product-card.liquid),
-   used by the product-card and product-grid widgets. Instance-specific bits
-   (section width, grid columns, pagination) live in each widget's scoped
-   <style>.
+   COMMERCE (SHOPIFY)
+   All storefront styling lives in assets/commerce.css, loaded by
+   layout.liquid only when a Shopify store is connected. Only the setup
+   notice stays here: product widgets render it before any store exists.
    ========================================================================== */
-
-.product-card-media {
-  overflow: hidden;
-  margin-block-end: var(--space-lg);
-  background-color: var(--bg-secondary);
-  border-radius: var(--radius-md);
-}
-
-.product-card-media[data-ratio="fixed"] {
-  aspect-ratio: var(--pc-ratio, 1 / 1);
-}
-
-.product-card-media shopify-media {
-  display: block;
-  width: 100%;
-}
-
-.product-card-media[data-ratio="fixed"] shopify-media {
-  height: 100%;
-}
-
-.product-card-media img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* Fixed ratio: fill the frame and crop, overriding the image's inline height. */
-.product-card-media[data-ratio="fixed"] img {
-  height: 100% !important;
-  object-fit: cover;
-}
-
-.product-card-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.product-card-title {
-  margin: 0;
-}
-
-.product-card-price {
-  margin: 0;
-  color: var(--text-heading);
-  font-weight: var(--font-weight-semibold);
-}
-
-.product-card-price shopify-money {
-  display: inline-block;
-}
-
-.product-card-options {
-  display: block;
-  margin-block: var(--space-sm);
-}
-
-/* The variant selector renders Shopify markup; keep any light-DOM controls on
-   the theme's type ramp (shadow-DOM internals inherit font only). */
-.product-card-options select,
-.product-card-options label {
-  color: var(--text-content);
-  font-family: inherit;
-  font-size: calc(var(--font-size-sm) * var(--body-scale));
-}
-
-.product-card-footer {
-  margin-block-start: auto;
-}
 
 /* Setup / empty state shown when the store or product is not yet configured. */
 .product-card-notice {

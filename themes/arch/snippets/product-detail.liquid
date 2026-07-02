@@ -1,0 +1,71 @@
+{%- comment -%}
+  Renders the full detail view for a single Shopify product: image gallery,
+  title, live price, variant selector, add-to-cart, buy-now, and rich
+  description.
+
+  Must sit inside a product context, so the current item resolves as `product`
+  for the shopify-* queries. Used by the product quick-view modal
+  (snippets/product-modal.liquid) and the Product widget; add-to-cart and
+  buy-now reuse the global commerce wiring (assets/shopify-cart.js). Layout,
+  typography, and the buttons are theme-owned (see assets/commerce.css).
+
+  Gallery: slide 0 is bound to the selected variant's image (so picking a
+  variant updates the visible photo, like the cards do); the slides after it
+  list all product images (Shopify's documented pattern: a list-context of
+  type "image"). Thumbnail N maps to slide N+1, and interacting with the
+  variant selector slides back to slide 0 — both wired in
+  assets/shopify-gallery.js. In the modal this snippet lives in the context's
+  <template> and is re-cloned fresh on every open, so the gallery needs no
+  state reset.
+
+  Params:
+    - button_text       add-to-cart label (default "Add to cart")
+    - heading_level     product title tag: "h1", "h2", or "h3" (default "h2")
+    - show_buy_now      pass false to omit the Buy now button (default shown)
+    - show_description  pass false to omit the description (default shown)
+
+  The show_* params are compared against false explicitly because Liquid's
+  `default` filter would swallow an explicit false.
+{%- endcomment -%}
+{%- assign pd_heading = heading_level | default: 'h2' -%}
+<article class="product-detail">
+  <div class="product-detail-media" data-shopify-gallery>
+    <div class="product-detail-gallery-viewport">
+      <div class="product-detail-gallery-track" data-shopify-gallery-track>
+        <div class="product-detail-slide">
+          <shopify-media layout="fullWidth" query="product.selectedOrFirstAvailableVariant.image" sizes="(min-width: 750px) 40vw, 90vw"></shopify-media>
+        </div>
+        <shopify-list-context type="image" query="product.selectedOrFirstAvailableVariant.product.images" first="8">
+          <template>
+            <div class="product-detail-slide">
+              <shopify-media layout="fullWidth" query="image" sizes="(min-width: 750px) 40vw, 90vw"></shopify-media>
+            </div>
+          </template>
+        </shopify-list-context>
+      </div>
+    </div>
+    <div class="product-detail-thumbs">
+      <shopify-list-context type="image" query="product.selectedOrFirstAvailableVariant.product.images" first="8">
+        <template>
+          <button type="button" class="product-detail-thumb" data-shopify-gallery-thumb aria-label="Show image">
+            <shopify-media query="image" width="72" height="72"></shopify-media>
+          </button>
+        </template>
+      </shopify-list-context>
+    </div>
+  </div>
+  <div class="product-detail-body">
+    <{{ pd_heading }} class="w-title t-2xl product-detail-title"><shopify-data query="product.title"></shopify-data></{{ pd_heading }}>
+    <div class="product-detail-price t-xl"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money><shopify-money class="product-price-compare" query="product.selectedOrFirstAvailableVariant.compareAtPrice"></shopify-money></div>
+    <shopify-variant-selector class="product-detail-options"></shopify-variant-selector>
+    <div class="product-detail-footer">
+      <button type="button" class="widget-button widget-button-primary widget-button-full" data-shopify-add-to-cart shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale">{{ button_text | default: 'Add to cart' }}</button>
+      {%- unless show_buy_now == false -%}
+        <button type="button" class="widget-button widget-button-secondary widget-button-full" data-shopify-buy-now shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale">Buy now</button>
+      {%- endunless -%}
+    </div>
+    {%- unless show_description == false -%}
+      <div class="product-detail-description w-rte"><shopify-data query="product.descriptionHtml"></shopify-data></div>
+    {%- endunless -%}
+  </div>
+</article>

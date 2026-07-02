@@ -3,24 +3,27 @@
 {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
   {% assign has_header = true %}
 {% endif %}
+{% if shopify_domain != blank and widget.settings.product_handle != blank %}
+  {% enqueue_script src: "shopify-gallery.js", defer: true, location: "footer", priority: 42, theme: true %}
+{% endif %}
 <section
   id="{{ widget.id }}"
-  class="widget widget-type-product-card widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  class="widget widget-type-product widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
   {% unless widget.settings.color_scheme == 'standard-primary' %}
     style="--widget-bg-color: var(--bg-primary);"
   {% endunless %}
   data-widget-id="{{ widget.id }}"
-  data-widget-type="product-card"
+  data-widget-type="product"
   {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
 >
   <style>
     .widget-{{ widget.id }} {
-      & .product-card-shell {
+      & .product-widget-shell {
         margin-inline: auto;
         {% case widget.settings.content_width %}
-          {% when 'medium' %}max-width: var(--content-width-sm);
-          {% when 'wide' %}max-width: var(--content-width-md);
-          {% else %}max-width: var(--content-width-xs);
+          {% when 'medium' %}max-width: var(--content-width-md);
+          {% when 'fullwidth' %}max-width: none;
+          {% else %}max-width: var(--content-width-lg);
         {% endcase %}
       }
     }
@@ -49,7 +52,7 @@
     {% endif %}
 
     <div class="widget-content">
-      <div class="product-card-shell">
+      <div class="product-widget-shell">
         {% if shopify_domain == blank %}
           <div class="product-card-notice reveal reveal-fade">
             <strong>Connect your Shopify store</strong>
@@ -65,22 +68,18 @@
           {% unless has_header %}
             {% assign item_heading_level = 'h2' %}
           {% endunless %}
-          {% if widget.settings.quick_view %}
-            {% enqueue_script src: "shopify-gallery.js", defer: true, location: "footer", priority: 42, theme: true %}
-            {% enqueue_script src: "shopify-quick-view.js", defer: true, location: "footer", priority: 43, theme: true %}
-          {% endif %}
-          <shopify-context type="product" handle="{{ widget.settings.product_handle }}">
-            <template>
-              {% render 'product-card',
-                aspect_ratio: widget.settings.aspect_ratio,
-                show_options: widget.settings.show_options,
-                button_text: widget.settings.button_text,
-                heading_level: item_heading_level,
-                image_sizes: '(min-width: 750px) 480px, 90vw',
-                quick_view: widget.settings.quick_view
-              %}
-            </template>
-          </shopify-context>
+          <div class="reveal reveal-up">
+            <shopify-context type="product" handle="{{ widget.settings.product_handle }}">
+              <template>
+                {% render 'product-detail',
+                  button_text: widget.settings.button_text,
+                  heading_level: item_heading_level,
+                  show_buy_now: widget.settings.show_buy_now,
+                  show_description: widget.settings.show_description
+                %}
+              </template>
+            </shopify-context>
+          </div>
         {% endif %}
       </div>
     </div>

@@ -1,0 +1,23 @@
+{%- comment -%}
+  Global Shopify product quick-view modal.
+
+  A single native <dialog> shared by every product-card / product-grid on the
+  page. Its <shopify-context> starts empty (wait-for-update); a card's "view"
+  trigger copies the clicked product into it via context.update(event) and opens
+  the dialog. Open/close wiring lives in assets/shopify-quick-view.js; styling in
+  assets/commerce.css. Rendered by layout.liquid only when a Shopify
+  store is connected.
+{%- endcomment -%}
+<dialog id="widgetizer-product-modal" class="product-modal" aria-label="Product details">
+  <div class="product-modal-shell">
+    <button type="button" class="product-modal-close" data-shopify-modal-close aria-label="Close">
+      {% render 'icon', icon: 'x' %}
+    </button>
+    <div class="product-modal-content">
+      <shopify-context id="widgetizer-product-modal-context" type="product" wait-for-update>
+        <template>{% render 'product-detail' %}</template>
+        <div class="product-modal-loading" shopify-loading-placeholder>Loading&hellip;</div>
+      </shopify-context>
+    </div>
+  </div>
+</dialog>

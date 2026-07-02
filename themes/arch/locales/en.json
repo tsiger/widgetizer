@@ -1668,6 +1668,26 @@
       }
     }
   },
+  "product": {
+    "name": "Product",
+    "settings": {
+      "product_handle": {
+        "label": "Product handle",
+        "description": "The product's handle from its Shopify URL, e.g. classic-tee."
+      },
+      "button_text": {
+        "label": "Button text"
+      },
+      "show_buy_now": {
+        "label": "Show Buy now button",
+        "description": "Adds a second button that goes straight to checkout."
+      },
+      "show_description": {
+        "label": "Show description",
+        "description": "Shows the product's full description from Shopify."
+      }
+    }
+  },
   "product_card": {
     "name": "Product Card",
     "settings": {
@@ -1681,6 +1701,10 @@
       "show_options": {
         "label": "Show variant options",
         "description": "Adds a size/color selector. Leave off to add the first available variant."
+      },
+      "quick_view": {
+        "label": "Quick view",
+        "description": "Lets shoppers open full product details (options, description) in a popup from the card."
       }
     }
   },
@@ -1700,6 +1724,10 @@
       "show_options": {
         "label": "Show variant options",
         "description": "Adds a size/color selector to each card. Leave off to add the first available variant."
+      },
+      "quick_view": {
+        "label": "Quick view",
+        "description": "Lets shoppers open full product details (options, description) in a popup from each card."
       },
       "show_pagination": {
         "label": "Show pagination",

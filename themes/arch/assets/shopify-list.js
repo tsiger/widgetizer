@@ -1,14 +1,19 @@
 /**
  * Shopify product list pagination.
  *
- * Wires Previous/Next buttons to a <shopify-list-context> and enables/disables
- * them from the component's "shopify-list-context-update" event. Each
- * product-grid widget wraps its list + buttons in a [data-shopify-list] element.
+ * Wires Previous/Next buttons to a <shopify-list-context> and keeps their
+ * enabled state in sync with the component's live `pageInfo` property. Each
+ * product-grid widget wraps its list + buttons in a [data-shopify-list]
+ * element.
  *
- * The list-context is resolved lazily on click: in the collection case it is
- * cloned into the DOM only after the parent collection context resolves, so it
- * is not present at page load. The update event bubbles to the wrapper whenever
- * it fires, so that listener can be attached up front.
+ * Why read `pageInfo` instead of trusting the "shopify-list-context-update"
+ * event alone: when the list is nested inside a collection context, the
+ * component re-clones the list element on every page change and can dispatch
+ * that event from a node outside this widget's subtree — so a listener here
+ * never hears it and the buttons go stale (Previous stayed disabled forever).
+ * The live clone's `pageInfo` is authoritative (it is what nextPage()/
+ * previousPage() themselves consult), so we re-read it after the update event,
+ * after any Shopify render, and after any DOM change under the wrapper.
  *
  * Loaded by the product-grid widget only when pagination is enabled.
  */
@@ -21,6 +26,28 @@
 
     function list() {
       return root.querySelector("shopify-list-context");
+    }
+
+    // Re-read paging state from the live list element. Bail (keeping the
+    // current button state) while the component hasn't loaded pageInfo yet.
+    function sync() {
+      var el = list();
+      if (!el) return;
+      var info = el.pageInfo;
+      if (!info) return;
+      if (next) next.disabled = !info.hasNextPage;
+      if (prev) prev.disabled = !info.hasPreviousPage;
+    }
+
+    // Renders and mutations arrive in bursts; coalesce to one sync per frame.
+    var queued = false;
+    function queueSync() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () {
+        queued = false;
+        sync();
+      });
     }
 
     if (prev) {
@@ -36,12 +63,14 @@
       });
     }
 
-    // The update event bubbles from the list context carrying paging state.
-    root.addEventListener("shopify-list-context-update", function (event) {
-      var detail = event.detail || {};
-      if (next) next.disabled = detail.hasNextPage === false;
-      if (prev) prev.disabled = detail.hasPreviousPage === false;
-    });
+    // Un-nested lists dispatch the update event on the attached element, where
+    // it bubbles to us; nested (collection) lists may not — the render event
+    // and the MutationObserver cover those re-clones.
+    root.addEventListener("shopify-list-context-update", queueSync);
+    root.addEventListener("shopify-render", queueSync);
+    new MutationObserver(queueSync).observe(root, { childList: true, subtree: true });
+
+    sync();
   }
 
   function init() {

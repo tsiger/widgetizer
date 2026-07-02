@@ -3,7 +3,7 @@
 
   Must sit inside a product context or a list-context item, so the current item
   resolves as `product` for the shopify-* queries. Layout, typography, and the
-  button are theme-owned (see the COMMERCE section in base.css).
+  button are theme-owned (see assets/commerce.css).
 
   Params:
     - aspect_ratio  image crop: "auto" (natural) or a ratio like "1 / 1"
@@ -11,6 +11,7 @@
     - button_text   add-to-cart label (default "Add to cart")
     - heading_level product title tag: "h2" or "h3" (default "h3")
     - image_sizes   the media `sizes` attribute for responsive images
+    - quick_view    when true, the image and title open the product quick-view modal
 {%- endcomment -%}
 {%- assign pc_ratio = aspect_ratio | default: 'auto' -%}
 {%- assign pc_heading = heading_level | default: 'h3' -%}
@@ -18,15 +19,25 @@
 <article class="widget-card product-card">
   <div class="product-card-media" data-ratio="{% if pc_ratio == 'auto' %}auto{% else %}fixed{% endif %}"{% unless pc_ratio == 'auto' %} style="--pc-ratio: {{ pc_ratio }};"{% endunless %}>
     <shopify-media layout="fullWidth" query="product.selectedOrFirstAvailableVariant.image" sizes="{{ pc_sizes }}"></shopify-media>
+    {%- if quick_view -%}
+      {%- comment -%} Mouse-only convenience trigger; the title button below is the accessible one. {%- endcomment -%}
+      <button type="button" class="product-card-media-trigger" data-shopify-view tabindex="-1" aria-hidden="true"></button>
+    {%- endif -%}
   </div>
   <div class="product-card-body">
-    <{{ pc_heading }} class="w-title t-xl product-card-title"><shopify-data query="product.title"></shopify-data></{{ pc_heading }}>
-    <div class="product-card-price t-2xl"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+    <{{ pc_heading }} class="w-title t-sm product-card-title">
+      {%- if quick_view -%}
+        <button type="button" class="product-card-title-trigger" data-shopify-view><shopify-data query="product.title"></shopify-data></button>
+      {%- else -%}
+        <shopify-data query="product.title"></shopify-data>
+      {%- endif -%}
+    </{{ pc_heading }}>
+    <div class="product-card-price t-lg"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money><shopify-money class="product-price-compare" query="product.selectedOrFirstAvailableVariant.compareAtPrice"></shopify-money></div>
     {%- if show_options -%}
       <shopify-variant-selector class="product-card-options"></shopify-variant-selector>
     {%- endif -%}
     <div class="widget-card-footer product-card-footer">
-      <button type="button" class="widget-button widget-button-primary widget-button-full" data-shopify-add-to-cart>{{ button_text | default: 'Add to cart' }}</button>
+      <button type="button" class="widget-button widget-button-primary widget-button-full" data-shopify-add-to-cart shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale">{{ button_text | default: 'Add to cart' }}</button>
     </div>
   </div>
 </article>

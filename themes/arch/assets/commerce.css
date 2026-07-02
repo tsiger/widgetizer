@@ -1,0 +1,593 @@
+/* ==========================================================================
+   WIDGETIZER DESIGN SYSTEM - ARCH THEME - COMMERCE (SHOPIFY)
+   Storefront Web Components styling: product cards, quick-view modal,
+   product detail + gallery, variant selectors, cart, and the header cart
+   button. Loaded by layout.liquid only when a Shopify store is connected;
+   the setup notice lives in base.css, since it renders without a store.
+   ========================================================================== */
+
+/* Shopify wrapper elements must not create boxes: theme layout owns the box
+   tree (moved here from layout.liquid). */
+shopify-store,
+shopify-context,
+shopify-list-context {
+  display: contents;
+}
+
+.product-card-media {
+  position: relative;
+  overflow: hidden;
+  margin-block-end: var(--space-lg);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.product-card-media[data-ratio="fixed"] {
+  aspect-ratio: var(--pc-ratio, 1 / 1);
+}
+
+.product-card-media shopify-media {
+  display: block;
+  width: 100%;
+}
+
+.product-card-media[data-ratio="fixed"] shopify-media {
+  height: 100%;
+}
+
+.product-card-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Fixed ratio: fill the frame and crop, overriding the image's inline height. */
+.product-card-media[data-ratio="fixed"] img {
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.product-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.product-card-title {
+  margin: 0;
+}
+
+.product-card-price {
+  margin: 0;
+  color: var(--text-heading);
+  font-weight: var(--font-weight-semibold);
+}
+
+.product-card-price shopify-money {
+  display: inline-block;
+}
+
+/* Compare-at (pre-discount) price, on cards and in the modal. Shopify renders
+   nothing into it when the product isn't discounted; :empty hides the element
+   so it leaves no stray gap. */
+.product-price-compare {
+  margin-inline-start: var(--space-xs);
+  color: var(--text-muted);
+  font-size: 0.75em;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.product-price-compare:empty {
+  display: none;
+}
+
+.product-card-options {
+  display: block;
+  margin-block: var(--space-sm);
+}
+
+/* Variant selector (shopify-variant-selector) — its internals are shadow DOM,
+   themed through the CSS parts Shopify exposes (form/label/radio/select/
+   color-swatch). Shared look here; per-context sizing below: compact on cards,
+   comfortable in the quick-view modal. */
+.product-card-options::part(form),
+.product-detail-options::part(form) {
+  gap: var(--space-sm);
+}
+
+.product-card-options::part(label),
+.product-detail-options::part(label) {
+  color: var(--text-heading);
+  font-family: inherit;
+  font-weight: var(--font-weight-semibold);
+}
+
+.product-card-options::part(radio),
+.product-detail-options::part(radio) {
+  font-family: inherit;
+  background-color: var(--bg-secondary);
+  color: var(--text-content);
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+}
+
+.product-card-options::part(radio-selected),
+.product-detail-options::part(radio-selected) {
+  background-color: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.product-card-options::part(radio-disabled),
+.product-detail-options::part(radio-disabled) {
+  opacity: 0.4;
+}
+
+.product-card-options::part(select),
+.product-detail-options::part(select) {
+  font-family: inherit;
+  padding: 0.4rem 0.8rem;
+  background-color: var(--bg-primary);
+  color: var(--text-content);
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+.product-card-options::part(color-swatch-selected),
+.product-detail-options::part(color-swatch-selected) {
+  outline: var(--border-width-medium) solid var(--accent);
+  outline-offset: 0.2rem;
+}
+
+/* Card scale: keep per-card selectors unobtrusive. */
+.product-card-options::part(label),
+.product-card-options::part(select) {
+  font-size: calc(var(--font-size-xs) * var(--body-scale));
+}
+
+.product-card-options::part(radio) {
+  padding: 0.3rem 0.9rem;
+  font-size: calc(var(--font-size-xs) * var(--body-scale));
+}
+
+/* Modal scale. */
+.product-detail-options::part(label),
+.product-detail-options::part(select) {
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+}
+
+.product-detail-options::part(radio) {
+  padding: 0.5rem 1.2rem;
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+}
+
+.product-card-footer {
+  margin-block-start: auto;
+}
+
+/* Quick-view triggers on the card (rendered only when Quick view is enabled).
+   The media trigger is a full-cover, mouse-only overlay; the title trigger is
+   the keyboard/AT-accessible one. */
+.product-card-media-trigger {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.product-card-title-trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.product-card-title-trigger:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Product quick-view modal (snippets/product-modal.liquid)
+   One global native <dialog>, shared by every product card / grid on the page.
+   -------------------------------------------------------------------------- */
+
+.product-modal {
+  /* The global reset zeroes margins, which also kills the UA's
+     `dialog { margin: auto }` centering — restore it explicitly. */
+  margin: auto;
+  /* Shared with the gallery's image cap below. */
+  --product-modal-height: min(64rem, 85vh);
+  width: min(920px, 92vw);
+  max-width: 92vw;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-primary);
+  color: var(--text-content);
+  overflow: hidden;
+}
+
+.product-modal::backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.product-modal[open] {
+  animation: product-modal-in 0.2s ease;
+}
+
+@keyframes product-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+/* Fixed height: the dialog keeps one stable size instead of growing with the
+   product's description; scrolling happens inside (whole content on mobile,
+   the details column only on desktop — see the media query below). */
+.product-modal-shell {
+  position: relative;
+  display: flex;
+  height: var(--product-modal-height);
+  flex-direction: column;
+}
+
+.product-modal-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-2xl);
+}
+
+.product-modal-close {
+  position: absolute;
+  inset-block-start: var(--space-md);
+  inset-inline-end: var(--space-md);
+  z-index: 1;
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  /* Tracks the corner-style theme setting (sharp / slightly rounded / rounded),
+     same token the steps/timeline markers use. */
+  border-radius: var(--radius-marker);
+  background-color: var(--bg-secondary);
+  color: var(--text-heading);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.product-modal-close:hover {
+  background-color: var(--border-color);
+}
+
+.product-modal-close .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.product-modal-loading {
+  padding: var(--space-2xl);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Shared detail view (snippets/product-detail.liquid), rendered inside the modal. */
+.product-detail {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+/* Gallery: a sliding track of all product images plus a thumbnail strip.
+   Thumbnail clicks translate the track (assets/shopify-quick-view.js). */
+.product-detail-media {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* The viewport is only a clipping window for the sliding track — it puts no
+   frame around the image: no background, no forced ratio. Each image renders
+   at its natural aspect, scaled to fit the space it has. */
+.product-detail-gallery-viewport {
+  overflow: hidden;
+}
+
+.product-detail-gallery-track {
+  display: flex;
+  align-items: flex-start;
+  transition: transform 0.3s ease;
+}
+
+.product-detail-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+}
+
+.product-detail-slide shopify-media {
+  display: block;
+}
+
+/* Natural ratio. The !importants override the renderer's inline styles (unpic
+   sets sizing and a blurred cover placeholder directly on the img). */
+.product-detail-slide img {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  border-radius: var(--radius-md);
+  background: none !important;
+}
+
+.product-detail-thumbs {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-xs);
+  overflow-x: auto;
+}
+
+.product-detail-thumb {
+  flex: 0 0 auto;
+  width: 5.6rem;
+  height: 5.6rem;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.product-detail-thumb:hover,
+.product-detail-thumb.is-selected {
+  opacity: 1;
+}
+
+.product-detail-thumb.is-selected {
+  border-color: var(--accent);
+}
+
+.product-detail-thumb img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.product-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.product-detail-title {
+  margin: 0;
+}
+
+.product-detail-price {
+  margin: 0;
+  color: var(--text-heading);
+  font-weight: var(--font-weight-semibold);
+}
+
+.product-detail-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.product-detail-footer .widget-button:disabled,
+.product-card-footer .widget-button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Rich product description: typographic flow comes from w-rte; keep it on the
+   small ramp so long Shopify descriptions stay compact in the modal. */
+.product-detail-description {
+  color: var(--text-content);
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+}
+
+@media (min-width: 750px) {
+  .product-detail {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  /* Inside the fixed-height modal the columns split the scroll: the gallery
+     stays put while only the details column scrolls. */
+  .product-modal .product-modal-content {
+    overflow: hidden;
+  }
+
+  .product-modal .product-detail {
+    height: 100%;
+    /* One explicit row filling the modal: an auto row would size to content
+       and let the gallery overflow the fixed-height dialog. */
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .product-modal .product-detail-media {
+    min-height: 0;
+  }
+
+  /* The gallery hugs the image: no stretched boxes, no filler space — the
+     viewport/track/slide are exactly as tall as the image itself, with the
+     thumbnails directly beneath. Tall photos scale down via the max-height
+     cap: the modal height minus the chrome around the image (content padding
+     top+bottom, thumbnail row height, and the gap above it — keep in sync
+     with .product-modal-content and .product-detail-thumb). */
+  .product-modal .product-detail-slide {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* display: contents lifts the media wrapper out of the way so the img is
+     the flex item and its max-width resolves against the slide. */
+  .product-modal .product-detail-slide shopify-media {
+    display: contents;
+  }
+
+  .product-modal .product-detail-slide img {
+    width: auto !important;
+    max-width: 100%;
+    max-height: calc(var(--product-modal-height) - 2 * var(--space-2xl) - 5.6rem - var(--space-sm));
+  }
+
+  .product-modal .product-detail-body {
+    min-height: 0;
+    overflow-y: auto;
+    padding-inline-end: var(--space-sm);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Shopify cart (the global <shopify-cart> mounted in layout.liquid)
+   Shadow DOM, themed through the CSS parts Shopify exposes. Custom properties
+   cross the shadow boundary, so the theme tokens apply directly; the dialog's
+   font-family cascades to everything inside it.
+   -------------------------------------------------------------------------- */
+
+shopify-cart::part(dialog) {
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-primary);
+  color: var(--text-content);
+  font-family: var(--typography-body_font-family, inherit);
+}
+
+shopify-cart::part(line-heading) {
+  color: var(--text-heading);
+  font-weight: var(--font-weight-semibold);
+}
+
+shopify-cart::part(line-image) {
+  border-radius: var(--radius-sm);
+}
+
+shopify-cart::part(line-price) {
+  color: var(--text-heading);
+}
+
+shopify-cart::part(line-options) {
+  color: var(--text-muted);
+}
+
+/* Checkout link — mirror .widget-button-primary. */
+shopify-cart::part(primary-button) {
+  background-color: var(--accent);
+  color: var(--accent-text);
+  border: var(--border-width-medium) solid var(--accent);
+  border-radius: var(--radius-button);
+  font-family: inherit;
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+  font-weight: var(--typography-body_font-weight, 400);
+}
+
+/* Quantity / remove controls. Shopify renders SVG icons inside these, so the
+   fill must be set alongside the text color. */
+shopify-cart::part(secondary-button) {
+  background-color: var(--bg-secondary);
+  color: var(--text-content);
+  fill: var(--text-content);
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+
+/* Note: the discount text input itself cannot be themed. Shopify puts the
+   `input-field` part on its wrapper div, the inner <input> exposes no part
+   (and the component has no exportparts), so its padding/radius are fixed in
+   the shadow root. Do not add a wrapper rule — it just draws a second box. */
+
+/* Apply button — mirror the theme's outline .widget-button. */
+shopify-cart::part(tertiary-button) {
+  background-color: transparent;
+  color: var(--text-content);
+  border: var(--border-width-medium) solid var(--accent);
+  border-radius: var(--radius-button);
+  font-family: inherit;
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+  cursor: pointer;
+}
+
+shopify-cart::part(tertiary-button):hover {
+  background-color: var(--accent);
+  color: var(--accent-text);
+}
+
+/* --------------------------------------------------------------------------
+   Header cart button (widgets/global/header)
+   Rendered only when a Shopify store is connected; opens the global cart.
+   The live count comes from a cart context (shopify-data query
+   "cart.totalQuantity"), which Shopify refreshes on every cart change.
+   -------------------------------------------------------------------------- */
+
+.header-cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-heading);
+  cursor: pointer;
+}
+
+.header-cart svg {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+/* Hidden until the cart actually holds something: data-count is bound to
+   cart.totalQuantity in the header widget, so a missing, empty, or zero count
+   shows only the bare icon. */
+.header-cart-count {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  padding-inline: 0.4rem;
+  border-radius: var(--radius-marker);
+  background-color: var(--accent);
+  color: var(--accent-text);
+  font-size: calc(var(--font-size-xs) * var(--body-scale) * 0.85);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}
+
+.header-cart-count[data-count]:not([data-count=""]):not([data-count="0"]) {
+  display: flex;
+}
+
+/* --------------------------------------------------------------------------
+   Transparent header: recolor the cart trigger with the rest of the header
+   chrome (mirrors the .header-logo / .menu-toggle rules in base.css 8.1).
+   -------------------------------------------------------------------------- */
+
+.transparent-header .widget-site-header:not(.header-sticky) .header-cart,
+.transparent-header .widget-site-header.header-sticky:not(.header-scrolled) .header-cart {
+  color: var(--colors-highlight_text_content, #fff);
+}

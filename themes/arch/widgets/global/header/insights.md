@@ -183,3 +183,5 @@ This widget has no configurable blocks. All structural regions (branding, nav, c
 - **Clearing both contact lines hides the contact block entirely.** This is the cleanest way to remove it rather than entering spaces or dashes. The template conditionally omits the whole `header-contact` div when both lines are blank.
 
 - **Color schemes affect the entire header at once.** If you only want the CTA to stand out, keep the scheme on `standard-primary` and switch the button to `primary`. Reserve `highlight-primary` and `highlight-secondary` for cases where the whole header bar should draw attention.
+
+- **A cart button appears automatically when a Shopify store is connected** (Theme Settings, under Shopify) — no setting to toggle. It sits beside the menu toggle at every breakpoint, shows a live item-count badge (a Shopify cart context), and opens the global cart via `assets/shopify-cart.js`.

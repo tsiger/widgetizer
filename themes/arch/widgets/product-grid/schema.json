@@ -86,6 +86,13 @@
     },
     {
       "type": "checkbox",
+      "id": "quick_view",
+      "label": "tTheme:product_grid.settings.quick_view.label",
+      "description": "tTheme:product_grid.settings.quick_view.description",
+      "default": false
+    },
+    {
+      "type": "checkbox",
       "id": "show_pagination",
       "label": "tTheme:product_grid.settings.show_pagination.label",
       "description": "tTheme:product_grid.settings.show_pagination.description",

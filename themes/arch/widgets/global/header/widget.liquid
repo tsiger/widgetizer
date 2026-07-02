@@ -139,6 +139,44 @@
           {{ widget.settings.ctaButtonLink.text }}
         </a>
         {% endif %}
+
+        {% assign header_shopify_domain = theme.shopify.store_domain | default: '' | strip %}
+        {% if header_shopify_domain != blank %}
+          {% comment %} Shopify cart trigger: opens the global cart (wired in
+             assets/shopify-cart.js); the badge is a live cart context that
+             Shopify refreshes on every cart change. Lives inside .header-end
+             so it sits next to the CTA in both layouts (in center-nav mode
+             .header-actions becomes display: contents and loose children get
+             auto-placed by the grid); .header-end stays visible on mobile,
+             its other children hide themselves there. {% endcomment %}
+          <button type="button" class="header-cart" data-shopify-cart-open aria-label="Open cart">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+              <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+              <path d="M17 17h-11v-14h-2" />
+              <path d="M6 5l14 1l-1 7h-13" />
+            </svg>
+            <shopify-context type="cart">
+              {% comment %} assets/shopify-cart.js mirrors the rendered count into
+                 data-count so CSS can hide the badge when the cart is empty. A
+                 shopify-attr binding can't do this: attr expressions evaluate as
+                 JS and throw (visibly) while no cart exists yet. {% endcomment %}
+              <template><span class="header-cart-count"><shopify-data query="cart.totalQuantity"></shopify-data></span></template>
+            </shopify-context>
+          </button>
+        {% endif %}
       </div>
 
       <button

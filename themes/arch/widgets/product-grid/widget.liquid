@@ -17,6 +17,10 @@
 {% if widget.settings.show_pagination %}
   {% enqueue_script src: "shopify-list.js", defer: true, location: "footer", priority: 40, theme: true %}
 {% endif %}
+{% if widget.settings.quick_view and shopify_domain != blank %}
+  {% enqueue_script src: "shopify-gallery.js", defer: true, location: "footer", priority: 42, theme: true %}
+  {% enqueue_script src: "shopify-quick-view.js", defer: true, location: "footer", priority: 43, theme: true %}
+{% endif %}
 <section
   id="{{ widget.id }}"
   class="widget widget-type-product-grid widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
@@ -75,7 +79,7 @@
         {% comment %} The CSS grid lives on a div we control. shopify-store/context/list-context
            are all display:contents (see layout.liquid), so the cloned product cards become the
            direct grid items regardless of how the list context nests them. {% endcomment %}
-        {% capture list_block %}<shopify-list-context type="product" query="{{ list_query }}" first="{{ products_count }}"><template>{% render 'product-card', aspect_ratio: widget.settings.aspect_ratio, show_options: widget.settings.show_options, button_text: widget.settings.button_text, heading_level: item_heading_level, image_sizes: '(min-width: 990px) 25vw, (min-width: 750px) 45vw, 90vw' %}</template></shopify-list-context>{% endcapture %}
+        {% capture list_block %}<shopify-list-context type="product" query="{{ list_query }}" first="{{ products_count }}"><template>{% render 'product-card', aspect_ratio: widget.settings.aspect_ratio, show_options: widget.settings.show_options, button_text: widget.settings.button_text, heading_level: item_heading_level, image_sizes: '(min-width: 990px) 25vw, (min-width: 750px) 45vw, 90vw', quick_view: widget.settings.quick_view %}</template></shopify-list-context>{% endcapture %}
         <div class="product-grid-wrap reveal reveal-up" data-shopify-list>
           <div class="product-grid-list widget-grid" style="--grid-cols-desktop: {{ widget.settings.columns_desktop }};">
             {% if collection_handle != blank %}
