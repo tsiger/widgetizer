@@ -12,7 +12,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **24 done · 3 deferred · 5 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **26 done · 3 deferred · 5 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01--was-experiment-docs-10)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
@@ -41,13 +41,14 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **24 done ·
 - ✅ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server---resolved-2026-06-26-keep-master-parity--low-correctness-master-parity-tradeoff)
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
 - ✅ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — DONE 2026-06-27 — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling---low-dev-only-mostly-latent)
-- 🟢 [28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — OSS reads + theme-CRUD + dead-code slices implemented; lifecycle 4b + hosted follow-on deferred](#28-close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline)
+- ✅ [28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — DONE 2026-07-02 (verified green); lifecycle 4b tail deferred → §30](#28-close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline---done-2026-07-02)
 - ⬜ [29. Loud stale-active-project detection in the OSS editor — focus/visibility revalidation + 409 handling (OSS shell `app/` + `editor-ui`) — **low/moderate (single-tenant UX correctness)**](#29-loud-stale-active-project-detection-in-the-oss-editor)
 - ⏸️ [30. Extract project lifecycle duplicate/import into dir-explicit cores (`builder-server`) — **deferred** until hosted builds duplicate/import (blocker: `AssetStorageAdapter.copy`); the lifecycle tail of §28](#30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores)
-- ⬜ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — surfaced by §28 D — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted)
+- ✅ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — DONE 2026-07-02 — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted---done-2026-07-02)
 - ⬜ [32. Theme-upload update-import validation smells — `_validate_<ts>` collision + double per-version log (`builder-server`) — **investigate (low)**](#32-theme-upload-update-import-validation-smells-builder-server)
 - ⬜ [33. Editor-ui duplication smells — slug-validator ternary + `useMediaState` localStorage pattern (`editor-ui`) — **investigate (low)**](#33-editor-ui-duplication-smells-editor-ui)
 - ⬜ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — **investigate (negligible)**](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server)
+- ⬜ [35. Hosted create-from-preset doesn't track seeded media usage (`widgetizer-hosted` + `builder-server`) — root-caused 2026-07-02; fix = dir-aware refresh core — **moderate (data-integrity); pending approval**](#35-hosted-create-from-preset-doesnt-track-seeded-media-usage-widgetizer-hosted--builder-server)
 
 ---
 
@@ -1551,7 +1552,18 @@ theme-update workflow is next revisited (ties into §2/§13); fold the reuse cle
 
 ---
 
-## 28. Close the path-based storage exceptions for the hosted boundary (adapter discipline)
+## 28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — ✅ DONE 2026-07-02
+
+**✅ DONE 2026-07-02.** §28's own scope is complete and re-verified green: OSS builder-server suite
+(1313) + hosted server suite (612) + both repos' lint all pass, and the code matches every claim below
+— theme CRUD reads/writes via `storage.{read,write}(scope,'theme.json')` (`themeController.js`), render
+reads go through the shared `…FromDir` readers (`projectContentFs.js`), `getMenuById` is deleted (zero
+refs anywhere), and hosted's `buildCloudRenderDeps` imports the shared readers while `cloudProjectData.js`
+keeps only the deliberately-lenient `readThemeData` + SQLite getters. The theme-settings fork stays (D).
+The one open gap this work surfaced — hosted theme-save not tracking media usage (**§31**) — is now
+**also fixed** (2026-07-02). The only remaining piece of the original exception set is the **deferred
+lifecycle duplicate/import tail (§30)**, blocked on hosted needing it + the `AssetStorageAdapter.copy`
+primitive. Full status history below.
 
 **Status:** 🟢 OSS reads + theme-CRUD + dead-code slices **IMPLEMENTED** + C1/C2 promoted into the
 docs-llms maps (2026-06-29; TDD, full backend suite + `npm run lint` green) — see "Implementation progress"
@@ -1559,7 +1571,7 @@ below. Hosted follow-on (D) **render-reader dedup IMPLEMENTED** (2026-06-30; hos
 `eslint` green) — `cloudProjectData.js`'s `listPages`/`readGlobalWidget` now come from the shared OSS
 `…FromDir` readers. The theme-settings fork was re-checked against code and **kept, not collapsed**
 (collapsing would change ~9 behaviors — see D below). 🟡 remaining tails tracked separately: lifecycle
-duplicate/import cores in **§30** (deferred); the hosted theme media-usage gap surfaced by D in **§31** (open).
+duplicate/import cores in **§30** (deferred); the hosted theme media-usage gap surfaced by D in **§31** (DONE 2026-07-02).
 The unified architecture (three storage planes; the `projectDir` working-directory contract) lives in
 `core-project-id-architecture.md` § Still-path-based exceptions.
 
@@ -1799,10 +1811,24 @@ shell-wrapper job rather than a re-fork if/when hosted wants them.
 
 ---
 
-## 31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`)
+## 31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — ✅ DONE 2026-07-02
 
-**Status:** ⬜ open — surfaced by §28 D (2026-06-30) while re-checking the theme-settings fork. Hosted-repo
-fix; independent of the §28 read-closure (which is done).
+**Done note (2026-07-02):** Fixed via **export-and-call** (the minimal path the finding pre-sanctioned).
+`updateThemeSettingsMediaUsage` — previously unexported — is now re-exported from the
+`@widgetizer/builder-server` barrel (`src/index.js`), and hosted's `POST /api/themes/project/:projectId`
+(`server/routes/projectThemes.js`) calls it after the `storage.write`, wrapped in a **non-blocking**
+try/catch, exactly mirroring OSS `saveProjectThemeSettings`. No scope/adapter plumbing was needed: the whole
+tracking chain is DB-only through the shared `getDb()` singleton hosted already inits (`server/index.js`
+`initDb`) — `readMediaFile(projectId)` (shared `media` table) → path match (incl. size variants) →
+`updateMediaUsageForSource(projectId, 'global:theme-settings', ids)` (shared `media_usage`). TDD: new
+`server/tests/routes/projectThemes.test.js` seeds a favicon media row, POSTs favicon-referencing theme
+settings through the real header-driven `CloudScopeResolver` + `CloudStorageAdapter`, and asserts a
+`media_usage` row for `global:theme-settings` — **red** (empty usage) before the fix, **green** after.
+Hosted server suite **612** + lint green; OSS **1313** + lint green (barrel change). The theme route is
+otherwise unchanged — the fork stays per §28 D (no behavior collapse). Original finding below.
+
+**Status:** ✅ DONE 2026-07-02 — surfaced by §28 D (2026-06-30) while re-checking the theme-settings fork.
+Hosted-repo fix; independent of the §28 read-closure (which is done).
 
 **What.** `widgetizer-hosted/server/routes/projectThemes.js`'s `POST /api/themes/project/:projectId`
 sanitizes + writes `theme.json` but **never calls `updateThemeSettingsMediaUsage`** (the OSS
@@ -1897,3 +1923,86 @@ entry is a directory); otherwise document the intended semantics and close.
 fix flows through automatically. No hosted-only work.
 
 **Effect:** negligible (theoretical edge case) — flagged for confirmation, not because a break is known.
+
+---
+
+## 35. Hosted create-from-preset doesn't track seeded media usage (`widgetizer-hosted` + `builder-server`)
+
+**Status:** ⬜ open — root-caused 2026-07-02 while checking a user report ("new project from a preset imports
+and uses images, but they show *Unused*"). **Confirmed hosted** (2026-07-02);
+OSS is correct by inspection (see below). Fix approach (dir-aware refresh core + a small adapter-contract
+addition) is scoped below but **not yet implemented**. Sibling of §31, under the §28 boundary umbrella
+(hosted has no working full media-usage rescan of its own).
+
+**Symptom A — preset seeding.** After creating a hosted project from a preset, every preset-seeded image
+shows **"Unused"** in the Media library (`file.usedIn` empty), even though preset pages/widgets reference
+them. They are therefore deletion-unprotected and pruned on export/publish → broken images on the published
+site. Same data-integrity family as §31, but on the bulk-seed path rather than theme-save.
+
+**Symptom B — the "Refresh Usage" button (worse than inert).** The Media page's *Refresh Usage* button hits
+the **shared** `mediaController.refreshMediaUsage` (`mediaController.js:783`) — mounted in hosted via the OSS
+project-scoped router — which calls the same folderName-bound `refreshAllMediaUsage(projectId)`. In hosted it
+scans the wrong global path, finds nothing, and `replaceMediaUsage` **deletes all `media_usage` rows for the
+project and re-inserts nothing** — so it silently **wipes** usage (including any favicon usage §31 recorded on
+the last theme-save), rather than rebuilding it. Same root cause; a second, live caller of the broken rescan.
+
+**Root cause — two compounding facts, both hosted-specific:**
+
+1. **The hosted create route runs no post-seed usage derivation.** OSS `projectController.js:370` calls
+   `refreshMediaUsageAfterStructuralChange(newProject.id, "project creation")` *after* scaffold +
+   `seedPresetCollections` + `seedPresetMedia` (and likewise for duplication `:621` / import `:1114`).
+   Hosted's `POST /api/projects` (`widgetizer-hosted/server/routes/projects.js:171–230`) seeds content +
+   media (`media_files` rows via `seedPresetMedia` → shared `mediaRepository`) but calls **no** usage
+   refresh. Grep confirms zero media-usage refresh calls in hosted's create path.
+2. **The full-rescan function isn't hosted-compatible anyway.** `refreshAllMediaUsage(projectId)`
+   (`mediaUsageService.js:411`) reads *all* content via folderName FS — `getProjectPagesDir` /
+   `getProjectThemeJsonPath` / `getProjectDir`, all rooted at the OSS-global `DATA_DIR/projects/<folder>`
+   (`config.js:106`). Hosted content lives at the per-user `data/users/<actorId>/projects/<folder>`
+   (`CloudStorageAdapter.getProjectBase(scope)`, used at `projects.js:185`). So even if hosted called it, it
+   would scan the wrong empty path and *clear* usage via `replaceMediaUsage`. This is a **§28-class
+   path-based exception** — `refreshAllMediaUsage` is folderName/global-`DATA_DIR`-bound.
+
+**Why §31 didn't cover it, and why normal hosted editing is fine.** The *data-passed* trackers
+(`updatePageMediaUsage(projectId, pageId, pageData)`, `updateThemeSettingsMediaUsage`,
+`syncPageMediaUsageOnWrite`, …) take content as an argument + read `media_files` from the shared DB — no
+folderName FS — so they work in hosted and fire on every in-editor save via the mounted OSS `pageController`.
+§31 fixed the one *forked* route (theme-save). Only the **bulk preset-seed** path writes content directly
+without a save, so it alone depends on the full rescan — the one function that's folderName-bound.
+
+**OSS status (why OSS is *not* affected):** OSS `createProject` calls the refresh at `:370` after seeding,
+and `getProjectDir(folder)` = `DATA_DIR/projects/<folder>` is exactly where OSS content is. Verified by code
+inspection (ordering: scaffold `:322` → seedPresetCollections `:332` → createProject `:357` → seedPresetMedia
+`:364` → refresh `:370`). If the reporter turns out to have been in OSS, re-open as a separate OSS bug.
+
+**Fix (recommended — §28-aligned dir-aware core + a contract addition):**
+- **Extract the dir-aware core.** `refreshAllMediaUsageFromDir({ projectId, projectDir })` next to
+  `refreshAllMediaUsage` — read content via `fs` from the *passed* `projectDir`, read `media_files` from the
+  DB (`readMediaFile(projectId)`), write `media_usage` (`replaceMediaUsage`). Mirrors §28's
+  `projectContentFs.js` `…FromDir` readers (hosted's per-user project dir is itself filesystem-backed — only
+  media is R2 — so an `fs` read of the correct `projectDir` works for both OSS and hosted; no async per-key
+  adapter plumbing). `refreshAllMediaUsage(projectId)` becomes a thin wrapper that resolves
+  `projectDir = getProjectDir(folder)` then delegates — behavior-preserving for its OSS-internal callers
+  (`projectController` create/dup/import, `themeUpdateService`). Barrel-export the core.
+- **Promote `getProjectBase(scope)` to the `StorageAdapter` contract** (`core/adapters.js` typedef +
+  conformance suite). It already exists on hosted's `CloudStorageAdapter`; expose it publicly on
+  `LocalStorageAdapter` (delegate to the existing private `#projectBase`). This is what lets a **shared**
+  request handler resolve the per-tenant project dir without knowing OSS-vs-hosted layout — the missing piece
+  the §28 audit didn't cover (it focused on render reads, which get `projectDir` from the shell, not on the
+  media-usage rescan, which runs inside a shared controller).
+- **Fix Symptom B (the button).** Change `mediaController.refreshMediaUsage` to
+  `refreshAllMediaUsageFromDir({ projectId: req.scope.projectId, projectDir: req.adapters.storage.getProjectBase(req.scope) })`.
+  Correct in both OSS (Local → OSS project dir) and hosted (Cloud → per-user dir); stops the destructive wipe.
+- **Fix Symptom A (preset seed).** Hosted `POST /api/projects`: after seeding, call
+  `refreshAllMediaUsageFromDir({ projectId, projectDir: adapters.storage.getProjectBase(scope) })`
+  (non-blocking try/catch, mirroring OSS's `refreshMediaUsageAfterStructuralChange` wrapper at
+  `projectController.js:370`).
+- Same core is what hosted duplicate/import would reuse if §30 ever lands.
+
+**Test-first (TDD):** hosted route test — create a project from a preset (or seed the fixture), POST/So the
+create flow runs, then assert a preset-seeded image's `usedIn` is non-empty (references the seeding page/
+widget). Red before (empty usage), green after. Plus a `builder-server` unit test for
+`refreshAllMediaUsageFromDir` on a scratch `projectDir`, and confirm OSS `refreshAllMediaUsage` still passes.
+
+**Effect:** moderate (data-integrity) — hosted preset projects currently ship with all seeded media
+mis-flagged unused (deletable / pruned on publish). **Hosted impact:** the fix; OSS unaffected (behavior-
+preserving wrapper).

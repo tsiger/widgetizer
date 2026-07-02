@@ -23,6 +23,11 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizationService.js";
+// Media-usage tracking for theme settings — hosted's theme-save route calls this
+// after writing theme.json so favicon/OG/themed-image assets are recorded as used
+// in the shared media_usage table (TODO §31; the OSS saveProjectThemeSettings does
+// the same). DB-only via the shared getDb() singleton — no scope/adapter needed.
+export { updateThemeSettingsMediaUsage } from "./services/mediaUsageService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
