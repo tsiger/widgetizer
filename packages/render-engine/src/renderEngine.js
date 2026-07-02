@@ -330,7 +330,7 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
 
   // Preview emits origin-relative URLs (the serving shell owns the origin: OSS uses
   // the render document's origin + <base href="/">; hosted its own <base href> →
-  // APP_ORIGIN). Publish already used "". See experiment-docs/spec-relative-preview-asset-urls.md.
+  // APP_ORIGIN). Publish already used "".
   const apiUrl = "";
 
   // Depth-aware output prefix for static export. Collection item pages render one

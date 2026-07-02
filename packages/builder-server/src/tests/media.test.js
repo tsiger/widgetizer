@@ -104,9 +104,14 @@ function mockReq({ params = {}, body = {}, files = null, file = null, scope } = 
     // direct-controller tests exercise the same code path. folderName is what the
     // asset adapter needs to resolve the on-disk uploads dir.
     scope: scope ?? { projectId: params.projectId, folderName: PROJECT_FOLDER },
-    // setupBuilderServer attaches req.adapters per-router in real routes; inject
-    // the real local asset adapter here so byte-I/O hits the test data dir.
-    adapters: { assetStorage: testAssetStorage },
+    // setupBuilderServer attaches req.adapters per-router in real routes; inject the
+    // real local asset adapter here so byte-I/O hits the test data dir, plus a storage
+    // stub exposing getProjectBase (the refreshMediaUsage handler resolves the working
+    // dir through it; mirrors LocalStorageAdapter).
+    adapters: {
+      assetStorage: testAssetStorage,
+      storage: { getProjectBase: (s) => getProjectDir(s.folderName) },
+    },
     app: { locals: {} },
     [Symbol.for("express-validator#contexts")]: [],
   };
@@ -1310,5 +1315,11 @@ describe("refreshMediaUsage", () => {
       params: { projectId: PROJECT_ID },
     });
     assert.equal(res._status, 200);
+
+    // Assert usedIn was actually rebuilt (the tracked image is used on index), not
+    // merely that the handler returned a non-500.
+    const media = await readMediaFile(PROJECT_ID);
+    const tracked = media.files.find((f) => f.id === "refresh-1");
+    assert.ok(tracked.usedIn.includes("index"), "refreshed usage must record the index page");
   });
 });

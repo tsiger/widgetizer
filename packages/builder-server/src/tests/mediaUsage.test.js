@@ -49,6 +49,7 @@ const {
   removePageFromMediaUsage,
   getMediaUsage,
   refreshAllMediaUsage,
+  refreshAllMediaUsageFromDir,
 } = await import("../services/mediaUsageService.js");
 const { closeDb } = await import("../db/index.js");
 
@@ -1062,5 +1063,41 @@ describe("File asset usage tracking", () => {
 
     const media2 = await readMediaJson();
     assert.deepEqual(media2.files.find((f) => f.id === FILE1).usedIn, []);
+  });
+});
+
+// ============================================================================
+// refreshAllMediaUsageFromDir — dir-explicit core
+// ============================================================================
+
+describe("refreshAllMediaUsageFromDir (dir-explicit core)", () => {
+  it("scans content from the explicit projectDir, not the folderName path", async () => {
+    // Reset the project's media rows (usedIn cleared).
+    await seedMediaJson(defaultMediaFiles());
+
+    // Write a page into a scratch dir that is deliberately NOT
+    // getProjectDir(PROJECT_FOLDER) — proving the core reads the dir it is handed,
+    // which is what lets hosted point it at the per-user working dir.
+    const explicitProjectDir = path.join(TEST_ROOT, "explicit-dir-project");
+    const explicitPagesDir = path.join(explicitProjectDir, "pages");
+    await fs.ensureDir(explicitPagesDir);
+    await fs.writeFile(
+      path.join(explicitPagesDir, "scratch-page.json"),
+      JSON.stringify({ widgets: { w1: { settings: { image: "/uploads/images/hero.jpg" } } } }),
+    );
+
+    const result = await refreshAllMediaUsageFromDir({
+      projectId: PROJECT_ID,
+      projectDir: explicitProjectDir,
+    });
+    assert.equal(result.success, true);
+
+    const media = await readMediaJson();
+    // scratch-page lives ONLY under the explicit dir, so this exact match fails if the
+    // core ignored projectDir and read the folderName path (getProjectDir) instead.
+    const hero = media.files.find((f) => f.id === IMG1);
+    assert.deepEqual(hero.usedIn, ["scratch-page"]);
+    const logo = media.files.find((f) => f.id === IMG2);
+    assert.deepEqual(logo.usedIn, []);
   });
 });

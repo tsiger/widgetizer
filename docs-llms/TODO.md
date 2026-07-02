@@ -12,7 +12,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **26 done · 3 deferred · 5 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **27 done · 3 deferred · 4 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01--was-experiment-docs-10)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
@@ -48,7 +48,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **26 done ·
 - ⬜ [32. Theme-upload update-import validation smells — `_validate_<ts>` collision + double per-version log (`builder-server`) — **investigate (low)**](#32-theme-upload-update-import-validation-smells-builder-server)
 - ⬜ [33. Editor-ui duplication smells — slug-validator ternary + `useMediaState` localStorage pattern (`editor-ui`) — **investigate (low)**](#33-editor-ui-duplication-smells-editor-ui)
 - ⬜ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — **investigate (negligible)**](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server)
-- ⬜ [35. Hosted create-from-preset doesn't track seeded media usage (`widgetizer-hosted` + `builder-server`) — root-caused 2026-07-02; fix = dir-aware refresh core — **moderate (data-integrity); pending approval**](#35-hosted-create-from-preset-doesnt-track-seeded-media-usage-widgetizer-hosted--builder-server)
+- ✅ [35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — DONE 2026-07-02 (dir-aware core + getProjectBase contract) — **moderate (data-integrity)**](#35-hosted-create-from-preset--refresh-usage-button-dont-track-media-usage-widgetizer-hosted--builder-server---done-2026-07-02)
 
 ---
 
@@ -1926,9 +1926,25 @@ fix flows through automatically. No hosted-only work.
 
 ---
 
-## 35. Hosted create-from-preset doesn't track seeded media usage (`widgetizer-hosted` + `builder-server`)
+## 35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — ✅ DONE 2026-07-02
 
-**Status:** ⬜ open — root-caused 2026-07-02 while checking a user report ("new project from a preset imports
+**Done note (2026-07-02):** Implemented the dir-aware-core fix (plan approved). Four parts, TDD throughout:
+(1) extracted `refreshAllMediaUsageFromDir({ projectId, projectDir })` in `mediaUsageService.js` — the
+folderName-based `refreshAllMediaUsage(projectId)` is now a thin wrapper (`getProjectDir(folder)` → core),
+behavior-preserving for its OSS-only callers; barrel-exported. (2) Promoted `getProjectBase(scope)` to the
+`StorageAdapter` contract — added the JSDoc property (`core/adapters.js`), the public delegate on
+`LocalStorageAdapter` (Cloud already had it), and a `getProjectBase` invariants block in the shared storage
+conformance suite (auto-covers both adapters) + a concrete "write lands under getProjectBase" test.
+(3) **Symptom B:** `mediaController.refreshMediaUsage` now resolves `projectDir =
+req.adapters.storage.getProjectBase(req.scope)` and calls the core — correct in both shells; the destructive
+wipe is gone. (4) **Symptom A:** hosted `POST /api/projects` calls the core after seeding (non-blocking,
+reusing the `projectDir` from L185). Tests: OSS `mediaUsage.test.js` dir-explicit case + `media.test.js`
+storage-stub update; hosted `mediaRefreshUsage.test.js` (button) and `projectsMediaUsage.test.js`
+(create-from-preset) — both driven through the real route + CloudStorageAdapter + DB and each proven red→green
+by temporarily disabling the fix. Full suites green: OSS builder-server **1314** + Vitest **722** + lint;
+hosted server **615** + lint. Original finding below.
+
+**Status:** ✅ DONE 2026-07-02 — root-caused 2026-07-02 while checking a user report ("new project from a preset imports
 and uses images, but they show *Unused*"). **Confirmed hosted** (2026-07-02);
 OSS is correct by inspection (see below). Fix approach (dir-aware refresh core + a small adapter-contract
 addition) is scoped below but **not yet implemented**. Sibling of §31, under the §28 boundary umbrella

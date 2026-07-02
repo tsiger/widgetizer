@@ -24,9 +24,8 @@ export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizationService.js";
 // Media-usage tracking for theme settings — hosted's theme-save route calls this
-// after writing theme.json so favicon/OG/themed-image assets are recorded as used
-// in the shared media_usage table (TODO §31; the OSS saveProjectThemeSettings does
-// the same). DB-only via the shared getDb() singleton — no scope/adapter needed.
+// after writing theme.json so favicon/themed-image assets are recorded as used.
+// DB-only via the shared getDb() singleton, no scope/adapter needed.
 export { updateThemeSettingsMediaUsage } from "./services/mediaUsageService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
 export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
@@ -56,12 +55,16 @@ export {
 // dir; listThemes/listThemePresets back the theme/preset picker (the actor-scoped
 // /themes router is not mounted in hosted). See the stage-2 plan §"create flow".
 export { scaffoldProjectContent } from "./utils/projectScaffold.js";
-// Dir-explicit project-content readers (TODO §28). Pure FS transforms over a
+// Dir-explicit project-content readers. Pure FS transforms over a
 // caller-supplied project working directory — the shared, scope-free counterparts
 // of the request-boundary StorageAdapter reads. Hosted's cloud render loop reads
 // content through these against its per-tenant working dir, so the OSS and hosted
 // render paths read pages/globals/theme the same way (no parallel fs reader).
 export { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "./utils/projectContentFs.js";
+// Dir-explicit media-usage rescan: rebuilds media_usage by scanning a caller-supplied
+// project working directory. Hosted's create route + the Refresh-Usage handler call
+// it with the per-tenant dir; OSS wraps it as refreshAllMediaUsage(projectId).
+export { refreshAllMediaUsageFromDir } from "./services/mediaUsageService.js";
 export { listThemes, listThemePresets, resolvePresetPaths } from "./controllers/themeController.js";
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.
