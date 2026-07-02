@@ -11,6 +11,7 @@
     "store",
     "ecommerce"
   ],
+  "requiresThemeSetting": "shopify.store_domain",
   "settings": [
     {
       "type": "text",

@@ -4,6 +4,28 @@ import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { API_URL } from "../../lib/config";
 import { getActiveProjectId } from "../../lib/activeProjectId";
+import useThemeStore from "../../stores/themeStore";
+
+/**
+ * A widget schema can gate its availability on a theme setting being filled in
+ * via `requiresThemeSetting: "<groupKey>.<settingId>"` (e.g. the Arch Shopify
+ * widgets declare "shopify.store_domain"). Gated widgets are hidden from the
+ * picker until that setting has a value; widgets already placed on a page are
+ * unaffected. Fails closed: missing settings data hides the widget.
+ */
+function meetsThemeRequirement(schema, themeSettings) {
+  const requirement = schema.requiresThemeSetting;
+  if (!requirement) return true;
+
+  const [groupKey, settingId] = requirement.split(".");
+  const group = themeSettings?.settings?.global?.[groupKey];
+  const setting = Array.isArray(group) ? group.find((s) => s.id === settingId) : null;
+  if (!setting) return false;
+
+  const value = setting.value ?? setting.default;
+  if (value == null || value === false) return false;
+  return String(value).trim() !== "";
+}
 
 export default function WidgetSelector({
   isOpen,
@@ -17,6 +39,7 @@ export default function WidgetSelector({
 }) {
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
+  const themeSettings = useThemeStore((state) => state.settings);
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
   const listRef = useRef(null);
@@ -33,6 +56,7 @@ export default function WidgetSelector({
 
   const availableWidgets = Object.values(widgetSchemas)
     .filter((schema) => schema.type !== "header" && schema.type !== "footer")
+    .filter((schema) => meetsThemeRequirement(schema, themeSettings))
     .sort((a, b) => (tTheme(a.displayName) || a.type).localeCompare(tTheme(b.displayName) || b.type));
 
   const filteredWidgets = availableWidgets.filter((schema) => {
