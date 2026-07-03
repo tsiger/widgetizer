@@ -1,5 +1,5 @@
 /**
- * Collection item-page export test suite (spec Section 13).
+ * Collection item-page export test suite (docs-llms/core-collections.md §6).
  *
  * Drives `exportProject` (the req/res controller) with a real LocalStorageAdapter
  * on `req.adapters.storage` + `req.scope` — exactly what the project-scoped route

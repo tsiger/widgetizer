@@ -1,6 +1,6 @@
 /**
  * collectionController — REST handlers for collection schemas and items
- * (Collections spec Section 10). Mounted at /api/collections on the
+ * (docs-llms/core-collections.md §4). Mounted at /api/collections on the
  * project-scoped router, so every handler runs after resolveActiveProject and
  * has `req.scope` (the resolved tenant scope) + `req.adapters` available.
  *

@@ -1,9 +1,7 @@
 # TODO — OSS builder (web + Electron desktop)
 
-Open work for the OSS builder, migrated 2026-06-24 from the engagement-level
-`experiment-docs/TODO.md` (parent repo) so each item lives with the project it
-applies to. Hosted-specific items moved to `widgetizer-hosted/docs/TODO.md`.
-Original engagement section numbers are kept in parentheses for traceability.
+Open work for the OSS builder. Hosted-specific items are tracked separately in
+`widgetizer-hosted/docs/TODO.md`.
 
 Conventions still in force: commit only on the `experimentation` branch with
 explicit permission, never switch branch / never push.
@@ -14,26 +12,26 @@ explicit permission, never switch branch / never push.
 
 _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **27 done · 3 deferred · 4 open · 1 wontfix**_
 
-- ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01--was-experiment-docs-10)
-- ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
-- ✅ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — DONE 2026-06-26](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene---done-2026-06-26--was-experiment-docs-14)
-- ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss-was-experiment-docs-9-oss-portion)
+- ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
+- ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
+- ✅ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — DONE 2026-06-26](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene---done-2026-06-26)
+- ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss)
 - ✅ [5. Consolidate preview-dispatch logic (route-mapping half) — DONE 2026-06-25](#5-consolidate-preview-dispatch-logic-route-mapping-half---done-2026-06-25--findings-doc-follow-up-session-task-16)
 - ✅ [6. Narrow-sidebar icon-grid + color-picker visual review — DONE 2026-06-26](#6-narrow-sidebar-icon-grid--color-picker-visual-review--c2-follow-up-session-task-18)
-- ✅ [7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — new-theme install path DONE 2026-06-25 (update-import path → §22)](#7-missed-port--theme-upload-collection-schema-gate-not-wired-builder-server---new-theme-install-path-done-2026-06-25-update-import-path--22--was-experiment-docs-8)
-- ✅ [8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — DONE 2026-06-25](#8-missed-port--pagecontroller-doesnt-thread-projectid-into-cleanupdeletedpagereferences-builder-server---done-2026-06-25--was-experiment-docs-9)
-- ✅ [9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — DONE 2026-06-25](#9-missed-port--mediajsx-doesnt-seed-collection-item-usage-titles-editor-ui---done-2026-06-25--was-experiment-docs-10)
-- ✅ [10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — DONE 2026-06-26](#10-missed-port-tests-only--createcollectionpreviewtoken-guard-tests-builder-server---done-2026-06-26--was-experiment-docs-11)
-- ✅ [11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — DONE 2026-06-26 (sub-item → §24)](#11-missed-port--link-picker-combobox-group-headers-not-rendered-editor-ui---done-2026-06-26-sub-item--24--was-experiment-docs-12)
-- ✅ [12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — DONE 2026-06-26](#12-missed-port--richtext-embedded-media-not-tracked-as-used-builder-server---done-2026-06-26--was-experiment-docs-13)
-- ✅ [13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — DONE 2026-06-26](#13-missed-port--themeupdate-delta-release-tool-not-ported-oss-dev-tooling---done-2026-06-26--was-experiment-docs-14)
-- ✅ [14. Documentation port audit — content gaps from the master-commit doc changes — DONE 2026-06-27 (14c–14e via docs-llms reorg; 14a/14b public-docs)](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes--was-experiment-docs-15)
-- ✅ [15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — DONE 2026-06-26](#15-missed-port--collection-item-pages-leak-the-page-slug-body-class-render-engine---done-2026-06-26--was-experiment-docs-16)
-- ✅ [16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — DONE 2026-06-26](#16-missed-port--refreshallmediausage-aborts-early-on-a-project-with-no-pages-dir-builder-server---done-2026-06-26--was-experiment-docs-17)
-- ⏸️ [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process--was-experiment-docs-18)
-- ✅ [18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — DONE 2026-06-26](#18-missed-port-tests-only--depth-1-render-smoke--depth-0-no-leak-guard-not-ported-builder-server---done-2026-06-26--was-experiment-docs-19)
-- ✅ [19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — DONE 2026-06-26 (tight scope)](#19-missed-port-tests-only--rendercollectionitempage-contract-test-not-ported-builder-server---done-2026-06-26-tight-scope--was-experiment-docs-20)
-- ✅ [20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — DONE 2026-06-26 (option b: comment + direct tests)](#20-stale-test-comment--claims-remapcollectionitemlinkmenurefs-not-ported-when-they-are-builder-server---done-2026-06-26-option-b-comment--direct-tests--was-experiment-docs-21)
+- ✅ [7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — new-theme install path DONE 2026-06-25 (update-import path → §22)](#7-missed-port--theme-upload-collection-schema-gate-not-wired-builder-server---new-theme-install-path-done-2026-06-25-update-import-path--22)
+- ✅ [8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — DONE 2026-06-25](#8-missed-port--pagecontroller-doesnt-thread-projectid-into-cleanupdeletedpagereferences-builder-server---done-2026-06-25)
+- ✅ [9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — DONE 2026-06-25](#9-missed-port--mediajsx-doesnt-seed-collection-item-usage-titles-editor-ui---done-2026-06-25)
+- ✅ [10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — DONE 2026-06-26](#10-missed-port-tests-only--createcollectionpreviewtoken-guard-tests-builder-server---done-2026-06-26)
+- ✅ [11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — DONE 2026-06-26 (sub-item → §24)](#11-missed-port--link-picker-combobox-group-headers-not-rendered-editor-ui---done-2026-06-26-sub-item--24)
+- ✅ [12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — DONE 2026-06-26](#12-missed-port--richtext-embedded-media-not-tracked-as-used-builder-server---done-2026-06-26)
+- ✅ [13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — DONE 2026-06-26](#13-missed-port--themeupdate-delta-release-tool-not-ported-oss-dev-tooling---done-2026-06-26)
+- ✅ [14. Documentation port audit — content gaps from the master-commit doc changes — DONE 2026-06-27 (14c–14e via docs-llms reorg; 14a/14b public-docs)](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes)
+- ✅ [15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — DONE 2026-06-26](#15-missed-port--collection-item-pages-leak-the-page-slug-body-class-render-engine---done-2026-06-26)
+- ✅ [16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — DONE 2026-06-26](#16-missed-port--refreshallmediausage-aborts-early-on-a-project-with-no-pages-dir-builder-server---done-2026-06-26)
+- ⏸️ [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process)
+- ✅ [18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — DONE 2026-06-26](#18-missed-port-tests-only--depth-1-render-smoke--depth-0-no-leak-guard-not-ported-builder-server---done-2026-06-26)
+- ✅ [19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — DONE 2026-06-26 (tight scope)](#19-missed-port-tests-only--rendercollectionitempage-contract-test-not-ported-builder-server---done-2026-06-26-tight-scope)
+- ✅ [20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — DONE 2026-06-26 (option b: comment + direct tests)](#20-stale-test-comment--claims-remapcollectionitemlinkmenurefs-not-ported-when-they-are-builder-server---done-2026-06-26-option-b-comment--direct-tests)
 - ✅ [21. Dedup the cross-bundle `getStandalonePreviewTarget` copy + drop its dead `editor-ui` export (`editor-ui` + OSS preview runtime) — DONE 2026-06-26 — **low (cleanup)**](#21-dedup-the-cross-bundle-getstandalonepreviewtarget-copy--drop-its-dead-editor-ui-export-editor-ui--oss-preview-runtime---done-2026-06-26--low-cleanup)
 - ✅ [22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — DONE 2026-06-27 (option A) — **low/moderate**](#22-gate-collection-schemas-on-the-theme-update-import-path-too-builder-server--lowmoderate)
 - ✅ [23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — DONE 2026-06-26 — **low (log hygiene / signal-masking)**](#23-widget-catalog-enumeration-logs-spurious-failed-to-parse-schema-warnings-builder-server---done-2026-06-26--low-log-hygiene--signal-masking)
@@ -52,7 +50,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **27 done ·
 
 ---
 
-## 1. Relative preview asset URLs (robustness) — ✅ DONE 2026-07-01  *(was experiment-docs §10)*
+## 1. Relative preview asset URLs (robustness) — ✅ DONE 2026-07-01
 
 **✅ DONE 2026-07-01.** Implemented as **Option B**: preview-mode `apiUrl` is now `""` (origin-relative
 URLs) and `previewController` injects `<base href="/">` instead of `<base href="${SERVER_URL}">`. Two
@@ -64,8 +62,7 @@ the two `sharedGlobals.apiUrl` producers → `""`) — flip all five preview URL
 previews emit `<base href="/">`, zero absolute `/api` URLs, and `masonry.js` loads from the real serving
 port (not the pinned one) with no 404s — the original audit failure mode is gone. OSS-only; hosted verified
 **inert** (its inline editor preview is same-origin, so the now-relative URLs re-resolve to the same
-`APP_ORIGIN` target; three stale hosted comments were corrected). Design + plan:
-`experiment-docs/spec-relative-preview-asset-urls.md` + `plan-relative-preview-asset-urls.md`. Original
+`APP_ORIGIN` target; three stale hosted comments were corrected). Original
 finding below.
 
 Surfaced 2026-06-19 while root-causing a parity-audit "masonry-gallery" false positive — a
@@ -88,7 +85,7 @@ render server) and doesn't break the editor's same-origin/hosted-nested cases. L
 
 ---
 
-## 2. Bundled theme updates on the OSS desktop app (product/design decision) — ❌ WONTFIX 2026-06-27  *(was experiment-docs §11)*
+## 2. Bundled theme updates on the OSS desktop app (product/design decision) — ❌ WONTFIX 2026-06-27
 
 **WONTFIX note (2026-06-27):** Closed as not-a-problem. The original concern came from a
 misunderstanding — it assumed bundled theme version bumps should reach existing installs by some
@@ -127,7 +124,7 @@ theme-versioning story. Not blocking; needs a product call, not just wiring.
 
 ---
 
-## 3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — ✅ DONE 2026-06-26  *(was experiment-docs §14)*
+## 3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Resolved as part of a **full `docs-llms/` reorg + rewrite** (multi-agent: 36-agent
 audit → reorg plan → 30-doc rewrite wave → verification sweep). Every `src/...` / `server/...` citation across
@@ -166,7 +163,7 @@ behavioural impact.
 
 ---
 
-## 4. Deferred — Playwright E2E smoke (OSS) *(was experiment-docs §9, OSS portion)*
+## 4. Deferred — Playwright E2E smoke (OSS)
 
 No end-to-end browser tests exist yet (only `node:test` server + Vitest client/component
 suites). Planned "later" for OSS: a **Web smoke** (create → edit → export). **Electron E2E is
@@ -240,7 +237,7 @@ Low priority, cosmetic.
 
 ---
 
-## 7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — ✅ new-theme install path DONE 2026-06-25 (update-import path → §22)  *(was experiment-docs §8)*
+## 7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — ✅ new-theme install path DONE 2026-06-25 (update-import path → §22)
 
 **Status (2026-06-25):** the **new-theme install** path is now gated, restoring master parity:
 `validateThemeCollectionSchemas(extractedThemeDir)` runs between the `latest/` removal and the
@@ -255,8 +252,8 @@ versions into an installed theme — an exp-only branch master never had) is **n
 needs different handling because the effective theme only exists after `buildLatestSnapshot` merges
 base + updates — tracked as **§22**. Original finding below.
 
-Surfaced 2026-06-24 during the master-commit port audit (`experiment-docs/widgetizer-master-commits.md`),
-inspecting **`6e6fe472`** (Collections Phase 1) against latest master.
+Surfaced 2026-06-24 during the master-commit port audit, inspecting **`6e6fe472`**
+(Collections Phase 1) against latest master.
 
 The Collections feature was ported wholesale into the new package architecture, but **one
 call site was missed**: `validateThemeCollectionSchemas` was ported into
@@ -303,7 +300,7 @@ exposes upload it gets the gate for free. No hosted-only concepts involved.
 
 ---
 
-## 8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — ✅ DONE 2026-06-25  *(was experiment-docs §9)*
+## 8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — ✅ DONE 2026-06-25
 
 **Status (2026-06-25):** fixed — both call sites in `pageController.js` now pass `scope.projectId`
 as the 3rd arg (`deletePage` `:345`, `bulkDeletePages` `:411`), so the collection-item media-usage
@@ -359,7 +356,7 @@ OSS and hosted request scopes. No hosted-only concepts.
 
 ---
 
-## 9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — ✅ DONE 2026-06-25  *(was experiment-docs §10)*
+## 9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — ✅ DONE 2026-06-25
 
 **Status (2026-06-25):** fixed. `Media.jsx` `loadUsageTitles` now also fetches collection schemas +
 items and seeds the usage-title map with `collection:{type}/{slug}` → `"{displayName}: {item title}"`,
@@ -420,7 +417,7 @@ vendored package. No hosted-only concepts.
 
 ---
 
-## 10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §11)*
+## 10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — ✅ DONE 2026-06-26
 
 **Status (2026-06-26):** added the `describe("createCollectionPreviewToken — guards")` block to
 `packages/builder-server/src/tests/preview.test.js` mirroring master — asserts **400** on missing
@@ -459,7 +456,7 @@ navigable-preview UX instead — covered by the broader docs-accuracy follow-up 
 
 ---
 
-## 11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — ✅ DONE 2026-06-26 (sub-item → §24)  *(was experiment-docs §12)*
+## 11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — ✅ DONE 2026-06-26 (sub-item → §24)
 
 **Status (2026-06-26):** fixed. `ui/Combobox.jsx` now renders a non-clickable uppercase section
 header before the first option of each `group` (mirroring `MenuCombobox.jsx:79–90`:
@@ -530,7 +527,7 @@ one-line guard for parity/robustness alongside the Combobox fix, but not indepen
 
 ---
 
-## 12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §13)*
+## 12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Ported both missing halves into `mediaUsageService.js` — `EMBEDDED_MEDIA_PATH_RE`
 + `extractMediaPathsFromString` (now drives `collectMediaPaths`'s string branch; removed the dead
@@ -602,7 +599,7 @@ runs the same `mediaUsageService`, so it inherits the fix. No hosted-only concep
 
 ---
 
-## 13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — ✅ DONE 2026-06-26  *(was experiment-docs §14)*
+## 13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Recovered `scripts/theme-update-delta.js` from `master` and re-added the
 `theme:update-delta` npm script. **Not** verbatim — adapted to the repo's tested-script convention
@@ -649,7 +646,7 @@ story.
 
 ---
 
-## 14. Documentation port audit — content gaps from the master-commit doc changes — ✅ DONE 2026-06-27  *(was experiment-docs §15)*
+## 14. Documentation port audit — content gaps from the master-commit doc changes — ✅ DONE 2026-06-27
 
 **Done note (2026-06-27):** 14a + 14b landed (verified against experimentation code, not blind-ported from
 master). **14a** — `docs-website/src/theme-dev-objects-context.md` + `theme-dev-menus-snippets.md` now document
@@ -672,7 +669,7 @@ link targets documented in `core-collections.md` / `core-menus.md` / `theming-se
 gallery/table in `theme-dev-setting-types.md`), which were **out of scope** for this `docs-llms`-only pass. §14
 stays open until 14a/14b are ported. Original finding below.
 
-Surfaced 2026-06-24 on a **second pass** through `experiment-docs/widgetizer-master-commits.md`, this
+Surfaced 2026-06-24 on a **second pass** through the master-commit port audit, this
 time reading the docs each commit touched (`docs-llms/*`, `docs-website/src/*`; `docs-entities/*`
 Obsidian vault stays out, decided earlier). Goal: which doc *content* must land on experimentation,
 and how much it needs rewriting for the package architecture.
@@ -743,8 +740,8 @@ blurb (what `rte_text`/`rte_blank` do + the `{% if … | rte_text != blank %}` i
 
 ### 14e. **LOW/MEDIUM (docs-llms, scope-aware rewrite)** — collection-item-as-link-target undocumented in feature docs
 
-The `collectionItemUuid` link-target feature (`3f707b26`) is fully ported in code but appears in exp
-docs **only** in `archive/branch-experimentation-findings.md` (a log), whereas master documents it as a feature
+The `collectionItemUuid` link-target feature (`3f707b26`) is fully ported in code but was
+undocumented in exp feature docs, whereas master documents it as a feature
 in `core-collections.md`, `core-menus.md`, and `theming-setting-types.md`. **Fix:** add the
 "a `link` setting can target a collection item page (resolves to its current slug, clears on delete)"
 description to those exp docs, written in the scope-first idiom — the resolver runs in
@@ -765,7 +762,7 @@ theme authors today; 14c–14e are `docs-llms` backfills (path-ref rewrites, no 
 
 ---
 
-## 15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — ✅ DONE 2026-06-26  *(was experiment-docs §16)*
+## 15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Restored the dropped override in `renderEngine.js` `renderPageLayout`
 (`:782`): a caller may pass `bodyClass` to REPLACE the `page-{slug}` default, while `extraBodyClasses`
@@ -865,7 +862,7 @@ hosted-only concepts.
 
 ---
 
-## 16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §17)*
+## 16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Replaced the top-of-function early `return` (`mediaUsageService.js`, was
 `:417-420`) with master's `const pagesExist = await fs.pathExists(pagesDir)` flag; hoisted `let pageCount = 0`
@@ -965,7 +962,7 @@ bug there — but the fix is harmless and keeps parity.) No hosted-only concepts
 
 ---
 
-## 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — ⏸️ DEFERRED 2026-06-26 — **low (process)**  *(was experiment-docs §18)*
+## 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — ⏸️ DEFERRED 2026-06-26 — **low (process)**
 
 **Deferred (2026-06-26):** The one *proven* escape (the item-page body-class assertion) was already
 fixed as part of §15 (exact match + `!includes("page-news")`). The broader sweep is defensive-only with
@@ -1018,7 +1015,7 @@ discipline applies to hosted's own ported suites if/when audited, but that's sep
 
 ---
 
-## 18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §19)*
+## 18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Added `packages/builder-server/src/tests/depthRenderSmoke.test.js` — a
 self-contained suite (own TEST_ROOT) driving the **real `exportProject`** controller (option a) so the
@@ -1096,7 +1093,7 @@ guard protects hosted's exported item pages too once added.
 
 ---
 
-## 19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — ✅ DONE 2026-06-26 (tight scope)  *(was experiment-docs §20)*
+## 19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — ✅ DONE 2026-06-26 (tight scope)
 
 **Done note (2026-06-26):** Added `packages/builder-server/src/tests/renderCollectionItemPage.test.js` —
 scoped **tight** to the one piece of master's contract not already covered by §15/§18: the
@@ -1161,7 +1158,7 @@ contract guard protects hosted's item-page render path too once added.
 
 ---
 
-## 20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — ✅ DONE 2026-06-26 (option b: comment + direct tests)  *(was experiment-docs §21)*
+## 20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — ✅ DONE 2026-06-26 (option b: comment + direct tests)
 
 **Done note (2026-06-26):** Chose option (b) — corrected the stale comment **and** added the missing direct
 coverage. Rewrote the `collectionLinkEnrichment.test.js` header note (the "OMITTED … intentionally NOT ported

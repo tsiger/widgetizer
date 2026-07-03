@@ -7,8 +7,8 @@ import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 
 // Page/global-widget reads moved to the dir-explicit reader family
-// (utils/projectContentFs.js: listPagesFromDir / readGlobalWidgetFromDir) under
-// TODO §28 — the render path consumes those against the project working dir, and
+// (utils/projectContentFs.js: listPagesFromDir / readGlobalWidgetFromDir) — the
+// render path consumes those against the project working dir, and
 // the request boundary (getAllPages below, getPage, etc.) reads through the
 // scope-aware storage adapter. No folderName-based fs readers live here anymore.
 

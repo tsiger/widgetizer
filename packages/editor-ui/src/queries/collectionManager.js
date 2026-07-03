@@ -1,7 +1,7 @@
 import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
 
 /**
- * Query client for collection schemas and items (Collections spec Section 10).
+ * Query client for collection schemas and items (docs-llms/core-collections.md §4).
  * Mirrors pageManager.js: every call goes through editorFetchJson (which prefixes
  * the configured API base and injects the X-Project-Id header) and rethrows via
  * rethrowQueryError so ApiError instances keep their status/code for callers.

@@ -10,7 +10,7 @@ import { getActiveProject } from "../queries/projectManager";
  *    project from the API (`/api/projects/active`).
  *  - `seedProject(project)` — DI path: a shell (e.g. the hosted `EditorShell`)
  *    that already knows the project hands it in directly, no fetch. This is the
- *    "initial scope via prop" hook from the design doc; it lets editor-ui stop
+ *    "initial scope via prop" hook; it lets editor-ui stop
  *    assuming a singleton active-project API.
  *
  * The store also exposes a derived `scope` ({ actor, projectId, folderName }) so

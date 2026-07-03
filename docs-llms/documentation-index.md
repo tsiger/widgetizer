@@ -468,5 +468,4 @@ When adding new features, always update the relevant documentation **and** this 
 These docs describe completed work or superseded designs. They are kept for history and are not part of the current reference set.
 
 - **[archive/core-file-assets.md](archive/core-file-assets.md)** — Original file-assets architecture/decisions proposal. Its durable facts now live in core-media.md (library/usage), core-export.md (export path), and theming-setting-types.md (the `file` setting type).
-- **[archive/branch-experimentation-findings.md](archive/branch-experimentation-findings.md)** — Closed port-audit + remediation log from the experimentation branch; valuable as history, misleading as current-state.
 - **[archive/theme-presets-tracker.md](archive/theme-presets-tracker.md)** — Completed theme-presets implementation tracker (all rows done).

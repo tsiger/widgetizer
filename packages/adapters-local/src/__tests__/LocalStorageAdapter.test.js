@@ -41,11 +41,11 @@ runStorageAdapterConformance({
   makeScope,
 });
 
-// C1: atomic writes are a local-FS detail of this adapter (see internal/atomic.js).
+// Atomic writes are a local-FS detail of this adapter (see internal/atomic.js).
 // These pin the adapter-level integration: writes round-trip with no leftover
 // staging file, and list() hides orphan atomic tmps from a crashed write so the
 // adapter-agnostic services upstream never see them.
-describe("LocalStorageAdapter atomic writes (C1)", () => {
+describe("LocalStorageAdapter atomic writes", () => {
   function makeAdapterWithRoot() {
     const dataRoot = mkdtempSync(path.join(tmpdir(), "wz-storage-"));
     roots.push(dataRoot);

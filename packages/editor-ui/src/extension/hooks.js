@@ -1,4 +1,4 @@
-// Lifecycle hook runner — see design doc §4.
+// Lifecycle hook runner.
 //
 // Plugins contribute `hooks: { <event>: async (ctx, ...args) => ... }`. Hooks
 // run sequentially in plugin-array order.

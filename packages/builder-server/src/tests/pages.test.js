@@ -406,7 +406,7 @@ describe("getAllPages", () => {
 
 // Note: the dir-explicit page/global-widget readers (listPagesFromDir /
 // readGlobalWidgetFromDir) that replaced the former listProjectPagesData /
-// readGlobalWidgetData helpers are covered in projectContentFs.test.js (TODO §28).
+// readGlobalWidgetData helpers are covered in projectContentFs.test.js.
 
 // ---------------------------------------------------------------------------
 // updatePage

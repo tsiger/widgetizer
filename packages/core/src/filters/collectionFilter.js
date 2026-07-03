@@ -1,5 +1,5 @@
 /**
- * `collection` filter (Collections spec Section 12)
+ * `collection` filter (docs-llms/core-collections.md §5)
  *
  * Usage:
  *   {% assign items = 'portfolio' | collection %}

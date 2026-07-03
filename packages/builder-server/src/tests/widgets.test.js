@@ -89,7 +89,7 @@ before(async () => {
   // A stray non-directory entry under widgets/ must be skipped, not crash.
   await fs.writeFile(path.join(projectDir, "widgets", "README.md"), "not a widget");
   // Stray dotfiles (e.g. a macOS .DS_Store) in both enumeration spots must be
-  // skipped silently — never logged as a "Failed to parse schema" warning (§23).
+  // skipped silently — never logged as a "Failed to parse schema" warning.
   await fs.writeFile(path.join(projectDir, "widgets", ".DS_Store"), "");
   await fs.writeFile(path.join(projectDir, "widgets", "global", ".DS_Store"), "");
 
@@ -150,7 +150,7 @@ describe("getProjectWidgets", () => {
     assert.ok(!res._json.some((s) => s.type === "README.md" || s.type == null));
   });
 
-  it("does not warn 'Failed to parse schema' for stray non-widget entries (§23)", async () => {
+  it("does not warn 'Failed to parse schema' for stray non-widget entries", async () => {
     const { res, warnings } = await widgetsWithWarnings();
     assert.equal(res._status, 200);
 

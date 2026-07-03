@@ -301,7 +301,7 @@ export async function syncPageMediaUsageOnDelete(projectId, pageId) {
 }
 
 // ============================================================================
-// Collection items (spec Section 8) — source string `collection:{type}/{slug}`.
+// Collection items — source string `collection:{type}/{slug}`.
 // Media usage is SQLite metadata keyed by projectId (mediaRepo), exactly like
 // pages/globals — NOT scope/storage. Callers pass scope.projectId.
 // ============================================================================

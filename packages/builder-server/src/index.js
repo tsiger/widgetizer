@@ -18,8 +18,7 @@ export { default as errorHandler } from "./middleware/errorHandler.js";
 // Pure render/export helpers consumed by hosted's cloud publish pipeline. Hosted
 // builds its own render loop + per-project deps bag (it cannot reuse the OSS
 // export orchestration, which resolves every path through the global DATA_DIR);
-// these are the shared, side-effect-free pieces it invokes directly. See the
-// stage-2 plan §7.
+// these are the shared, side-effect-free pieces it invokes directly.
 export { buildFormsManifest } from "./services/formsManifestService.js";
 export { buildSitemap, buildRobotsTxt } from "./services/seoArtifacts.js";
 export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizationService.js";
@@ -36,7 +35,7 @@ export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
 // item-page render (renderCollectionItemPageWithDeps) are shell-agnostic and
 // scope-first, so hosted reuses the SAME tenant-isolated collectionService as the
 // OSS path (no parallel fs reader); the readers below back hosted's export
-// item-page loop + SEO/itemPages enumeration. See the stage-2 plan §7 + Phase 7.
+// item-page loop + SEO/itemPages enumeration.
 export {
   buildCollectionRenderDeps,
   renderCollectionItemPageWithDeps,
@@ -53,7 +52,7 @@ export {
 // scaffoldProjectContent is the dir-explicit core of createProject (theme copy +
 // templates → pages + link enrichment) so hosted can scaffold into a per-user
 // dir; listThemes/listThemePresets back the theme/preset picker (the actor-scoped
-// /themes router is not mounted in hosted). See the stage-2 plan §"create flow".
+// /themes router is not mounted in hosted).
 export { scaffoldProjectContent } from "./utils/projectScaffold.js";
 // Dir-explicit project-content readers. Pure FS transforms over a
 // caller-supplied project working directory — the shared, scope-free counterparts

@@ -1,7 +1,7 @@
 // Slot API — named regions of editor chrome that a shell fills with a single
-// ReactNode each (design doc §5). Distinct from the plugin registries (which
+// ReactNode each. Distinct from the plugin registries (which
 // are multi-entry); slots are shell-provided chrome. New slots are added
-// non-breakingly. The actual rendering lives in the shell/Layout (1.5e); here
+// non-breakingly. The actual rendering lives in the shell/Layout; here
 // we define the contract + a resolver so it is testable framework-free.
 
 export const SLOT_NAMES = Object.freeze([
