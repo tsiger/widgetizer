@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { getProjectPagesDir, getProjectThemeJsonPath, getProjectDir } from "../config.js";
+import { getProjectDir } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
@@ -401,17 +401,19 @@ export async function getMediaUsage(projectId, fileId) {
 }
 
 /**
- * Refresh media usage tracking for all pages and global widgets in a project.
- * Resets all usedIn arrays and rebuilds them by scanning all page and global widget content.
- * Useful for repairing corrupted usage data or after bulk operations.
- * @param {string} projectId - The project's UUID
+ * Refresh media usage tracking for a project, reading content from an explicit
+ * project working directory. Resets all usedIn arrays and rebuilds them by scanning
+ * the project's pages, global widgets, theme settings, and collection items under
+ * `projectDir`. `projectId` keys only the DB reads/writes (media + media_usage), so
+ * any shell can drive it by supplying the right working dir — OSS getProjectDir(folder),
+ * or hosted's per-user CloudStorageAdapter.getProjectBase(scope).
+ * @param {{ projectId: string, projectDir: string }} args
  * @returns {Promise<{success: boolean, message: string}>} Result with summary message
  * @throws {Error} If media file read/write fails
  */
-export async function refreshAllMediaUsage(projectId) {
+export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
   try {
-    const projectFolderName = await getProjectFolderName(projectId);
-    const pagesDir = getProjectPagesDir(projectFolderName);
+    const pagesDir = path.join(projectDir, "pages");
 
     // The pages dir may be absent on a collections-only or freshly-imported
     // project. Don't early-return on it — theme settings and collection items
@@ -485,7 +487,7 @@ export async function refreshAllMediaUsage(projectId) {
     }
 
     // Also scan theme settings (e.g. favicon in settings.global.branding)
-    const themeJsonPath = getProjectThemeJsonPath(projectFolderName);
+    const themeJsonPath = path.join(projectDir, "theme.json");
     if (await fs.pathExists(themeJsonPath)) {
       try {
         const themeContent = await fs.readFile(themeJsonPath, "utf8");
@@ -502,7 +504,7 @@ export async function refreshAllMediaUsage(projectId) {
     // from a directory entry under the per-tenant project root — not request
     // input — and is only ever re-joined under that same root.
     let collectionItemCount = 0;
-    const collectionsDir = path.join(getProjectDir(projectFolderName), "collections");
+    const collectionsDir = path.join(projectDir, "collections");
     if (await fs.pathExists(collectionsDir)) {
       const typeEntries = await fs.readdir(collectionsDir, { withFileTypes: true });
       for (const typeEntry of typeEntries) {
@@ -544,6 +546,20 @@ export async function refreshAllMediaUsage(projectId) {
     console.error("Error refreshing media usage:", error);
     throw error;
   }
+}
+
+/**
+ * Refresh media usage for a project by folderName — resolves the OSS on-disk working
+ * dir via the global config helper, then delegates to the dir-explicit core. Used by
+ * the OSS structural-change callers (project create/duplicate/import, theme updates);
+ * hosted and the Refresh-Usage handler call the core with their own working dir.
+ * @param {string} projectId - The project's UUID
+ * @returns {Promise<{success: boolean, message: string}>} Result with summary message
+ * @throws {Error} If media file read/write fails
+ */
+export async function refreshAllMediaUsage(projectId) {
+  const projectFolderName = await getProjectFolderName(projectId);
+  return refreshAllMediaUsageFromDir({ projectId, projectDir: getProjectDir(projectFolderName) });
 }
 
 /**

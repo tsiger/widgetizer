@@ -328,9 +328,10 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
       ? deps.preprocessThemeSettings(rawThemeSettings)
       : {};
 
-  // Determine API URL based on render mode
-  const apiUrl =
-    renderMode === "preview" ? process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3001}` : "";
+  // Preview emits origin-relative URLs (the serving shell owns the origin: OSS uses
+  // the render document's origin + <base href="/">; hosted its own <base href> →
+  // APP_ORIGIN). Publish already used "".
+  const apiUrl = "";
 
   // Depth-aware output prefix for static export. Collection item pages render one
   // directory deep ({slugPrefix}/{slug}.html), so their asset/link hrefs need an

@@ -14,6 +14,8 @@
 // `makeAdapter()` must return a FRESH adapter backed by isolated storage.
 // `makeScope(id)` must return a distinct Scope per id (so isolation is testable).
 
+import path from "node:path";
+
 export function runStorageAdapterConformance({ describe, it, assert, name, makeAdapter, makeScope }) {
   describe(`StorageAdapter conformance: ${name}`, () => {
     const enc = (s) => Buffer.from(s, "utf8");
@@ -96,6 +98,18 @@ export function runStorageAdapterConformance({ describe, it, assert, name, makeA
       const scope = makeScope("a");
       await assert.rejects(() => a.read(scope, "../../etc/passwd"));
       await assert.rejects(() => a.write(scope, "../escape.json", enc("x")));
+    });
+
+    it("getProjectBase returns a stable, absolute, scope-distinct project root", () => {
+      const a = makeAdapter();
+      const one = makeScope("one");
+      const two = makeScope("two");
+      const base = a.getProjectBase(one);
+      assert.equal(typeof base, "string");
+      assert.ok(base.length > 0, "base must be non-empty");
+      assert.ok(path.isAbsolute(base), "base must be an absolute path");
+      assert.equal(a.getProjectBase(one), base, "base must be stable across calls for the same scope");
+      assert.notEqual(a.getProjectBase(two), base, "distinct scopes must map to distinct roots");
     });
   });
 }

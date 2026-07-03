@@ -9,7 +9,7 @@ import { getThemeJsonPath } from "../config.js";
 import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
-import { getMediaUsage, refreshAllMediaUsage } from "../services/mediaUsageService.js";
+import { getMediaUsage, refreshAllMediaUsageFromDir } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
@@ -784,7 +784,11 @@ export async function refreshMediaUsage(req, res) {
   try {
 
     const { projectId } = req.scope;
-    const result = await refreshAllMediaUsage(projectId);
+    // Read content from the per-tenant working dir via the adapter (getProjectBase),
+    // not the OSS-global folderName path: under hosted the folderName path is the wrong
+    // (empty) dir, so a rescan there would wipe all usage instead of rebuilding it.
+    const projectDir = req.adapters.storage.getProjectBase(req.scope);
+    const result = await refreshAllMediaUsageFromDir({ projectId, projectDir });
     res.json(result);
   } catch (error) {
     console.error("Error refreshing media usage:", error);
