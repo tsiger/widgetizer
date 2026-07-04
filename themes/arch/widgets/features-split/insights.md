@@ -111,4 +111,4 @@ A two-column split layout that pairs a heading area (eyebrow, title, description
 
 - **Choose icon style to match brand personality.** Plain icons feel minimal and modern, filled icons feel confident and corporate, outline icons feel approachable and lightweight. Match the choice to the overall site tone rather than varying it section by section.
 
-- **Combine with spacing overrides** (`top_spacing: none` or `bottom_spacing: none`) when placing features-split directly below a hero or above a CTA banner to create a visually connected flow rather than disconnected blocks.
+- **Combine with spacing overrides** to create a visually connected flow rather than disconnected blocks. Directly below an image or filled hero, use `top_spacing: small` — the hero's bottom spacing is internal padding, so features-split must bring its own gap, and `none` would press it against the hero's edge. Reserve `none` for fusion: an adjacent section sharing the same color scheme, or a `top_spacing: none` under an unfilled widget whose own bottom margin already provides the spacing.

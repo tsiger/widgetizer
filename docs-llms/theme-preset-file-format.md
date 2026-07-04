@@ -46,13 +46,13 @@ Why the full-preset convention exists:
 
 ### `collections/` and `media/`
 
-These two directories are present only when a preset seeds collection content (e.g. a blog/news list, a services grid, a projects portfolio):
+`collections/` is present only when a preset seeds collection content (e.g. a blog/news list, a services grid, a projects portfolio). `media/` is standard for every non-blank preset since 0.9.9 — presets ship their imagery as packed media, and template/collection image fields reference those files directly (see [theme-preset-generator.md](theme-preset-generator.md) §11):
 
 - **`collections/<type>/<item-slug>.json`** — one JSON file per collection item, seeded into the new project's `collections/<type>/` directory at project creation. The `<type>` directory name must match a collection type defined in `themes/arch/collection-types/<type>/` (see [core-collections.md](core-collections.md)). Item shape is documented in §11.
 - **`media/images/`** — the starter image binaries the preset references (originals plus their `-medium` / `-small` / `-thumb` responsive derivatives), copied into the project's `uploads/images/` on seed.
 - **`media/manifest.json`** — the media metadata (`filename`, `path`, `width`, `height`, `alt`, `sizes`, …) that seeds the per-project media records so the seeded binaries are tracked, usage-counted, and exportable. See [core-media.md](core-media.md).
 
-If a preset has no collections, omit both `collections/` and `media/` entirely.
+If a preset has no collections, omit `collections/`; `media/` stays (it carries the page-template imagery). During initial generation — before images are produced and packed — `media/` may not exist yet; it is created by the production pass (`npm run preset:media`, see [theme-preset-process.md](theme-preset-process.md)).
 
 ### Screenshot exception
 
@@ -476,6 +476,16 @@ Link objects appear in button blocks, menu items, and the header CTA. The format
 | `target` | Yes | `"_self"` for same tab, `"_blank"` for new tab |
 
 **Do not include `pageUuid`** in link objects in preset templates. For internal-page links written as `"{slug}.html"`, the enrichment step adds the matching page's `pageUuid` automatically at project creation, so the link survives later page renames.
+
+### Suppressing optional links/buttons
+
+Many block-level link settings (`button_link` on cards/steps, `link` on numbered-service-list rows, widget-level `view_all_link`) have a **non-empty schema default** such as `{ "text": "Learn More", "href": "#" }`. Omitting the setting does not remove the button — it falls back to that default and renders a dead `#` link. To ship a block without a button, set the empty-link object explicitly:
+
+```json
+"button_link": { "href": "", "text": "", "target": "_self" }
+```
+
+This is the established convention across existing presets (see e.g. greystone). Only wire a real link when a genuine destination page exists.
 
 ### Collection-item link targets
 

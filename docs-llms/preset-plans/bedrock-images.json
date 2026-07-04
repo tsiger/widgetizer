@@ -1,0 +1,206 @@
+[
+  {
+    "file": "bedrock-hero.jpg",
+    "width": 1920,
+    "height": 1080,
+    "prompt": "Wide exterior photograph of a newly completed two-story craftsman-style home addition in warm early-evening light, cedar and painted fiber-cement siding, large black-framed windows glowing softly from inside. The house sits in the right two thirds of the frame with calm open sky and a tidy lawn on the left third, leaving that area quiet and uncluttered. Shot from a low three-quarter angle across the yard, shallow depth kept crisp, colors warm and natural. The property is clean and finished — no ladders, no debris, no signage or lettering of any kind."
+  },
+  {
+    "file": "bedrock-service-kitchens.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Interior photograph of a finished kitchen remodel with white shaker cabinets, a walnut island, and brass fixtures, bathed in soft morning window light. Composition is straight-on toward the island with generous headroom, everything spotless and orderly. A single bowl of green apples sits on the island. No people, no text, no papers or labels anywhere in the scene."
+  },
+  {
+    "file": "bedrock-service-additions.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Exterior photograph of a completed single-story home addition seamlessly joined to an existing gray craftsman house, seen from the back garden in bright overcast daylight. New siding and roofline blend cleanly with the original structure, fresh landscaping along the foundation. Tidy, finished, and quiet — no construction equipment, no people, no signs or lettering."
+  },
+  {
+    "file": "bedrock-service-wholehome.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Interior photograph of a fully renovated open-plan living and dining space in a older home, original refinished oak floors, new white-oak built-in shelving, and a restored brick fireplace, lit by large windows with soft daylight. Wide symmetrical composition from the entry looking in. Calm, airy, and completely finished — no people, no visible books with readable spines, no text anywhere."
+  },
+  {
+    "file": "bedrock-service-commercial.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Interior photograph of a small newly built-out neighborhood café, white-oak counter, matte black shelving, and warm pendant lights, photographed from the entrance in soft afternoon light. Chairs neatly arranged, counter clear except for an espresso machine. No customers, no menus, no chalkboards, no lettering or logos anywhere."
+  },
+  {
+    "file": "bedrock-project-kitchen-remodel.jpg",
+    "width": 1600,
+    "height": 1200,
+    "prompt": "Interior photograph of a high-end finished kitchen remodel with deep green cabinetry, white quartz counters, and unlacquered brass hardware, shot from a corner angle in warm natural window light. A wooden cutting board and a ceramic pitcher sit near the range. Everything clean, styled sparely, completely finished. No people, no text, no labels on any containers."
+  },
+  {
+    "file": "bedrock-project-bath-remodel.jpg",
+    "width": 1600,
+    "height": 1200,
+    "prompt": "Interior photograph of a finished primary bathroom remodel with a freestanding white tub, zellige-style ceramic wall tile, warm wood vanity, and a black-framed glass shower, lit by a frosted window with soft daylight. Straight-on composition centered on the tub, towels folded neatly. No people, no product bottles with labels, no text anywhere."
+  },
+  {
+    "file": "bedrock-project-two-story-addition.jpg",
+    "width": 1600,
+    "height": 1200,
+    "prompt": "Exterior photograph of a completed two-story rear addition on a classic American foursquare home, new painted siding matched to the original, large modern windows, seen from the corner of the backyard in golden late-afternoon light. Fresh sod and a young maple tree in the foreground. Finished and pristine — no equipment, no people, no signage or lettering."
+  },
+  {
+    "file": "bedrock-project-whole-home.jpg",
+    "width": 1600,
+    "height": 1200,
+    "prompt": "Interior photograph of a whole-home renovation, looking from a renovated kitchen across an open dining area into a sunlit living room, white walls, refinished oak floors, and new black-framed interior glass doors. Deep perspective composition showing three connected spaces, all impeccably finished and tidy. No people, no artwork with readable text, no lettering anywhere."
+  },
+  {
+    "file": "bedrock-project-cedar-deck.jpg",
+    "width": 1600,
+    "height": 1200,
+    "prompt": "Exterior photograph of a newly built cedar deck with a timber pergola attached to the back of a gray house, photographed in warm early-evening light with string lights off and a simple outdoor dining table under the pergola. Three-quarter angle from the lawn, fresh-sanded cedar tones glowing. Clean and complete — no tools, no people, no text."
+  },
+  {
+    "file": "bedrock-project-cafe-fitout.jpg",
+    "width": 1600,
+    "height": 1200,
+    "prompt": "Interior photograph of a finished commercial café fit-out with exposed original brick, new white-oak millwork, polished concrete floor, and a long service counter, photographed from the seating area in bright even daylight. Stools aligned, surfaces clear. No customers, no staff, no menus, chalkboards, or any visible lettering."
+  },
+  {
+    "file": "bedrock-before-kitchen.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Interior photograph of a dated 1990s kitchen photographed from the doorway, a window centered on the back wall over the sink, honey-oak cabinets, laminate counters, and beige vinyl floor, lit by flat neutral daylight from that single window. The room is clean, uncluttered, and empty of people — dated but well kept, not dirty or damaged. Straight-on one-point perspective from the doorway, camera at chest height. No text or labels anywhere."
+  },
+  {
+    "file": "bedrock-after-kitchen.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Interior photograph of a fully remodeled kitchen photographed from the doorway, a window centered on the back wall over the sink, white shaker cabinets, light quartz counters, and wide-plank oak floor, lit by the same flat neutral daylight from that single window. Straight-on one-point perspective from the doorway, camera at chest height, matching a before-and-after pair. Clean, finished, empty of people, no text or labels anywhere."
+  },
+  {
+    "file": "bedrock-before-livingroom.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Interior photograph of a dated living room photographed from the hallway entrance, a brick fireplace centered on the far wall flanked by two windows, worn wall-to-wall carpet and heavy floral curtains, lit by soft even daylight. The room is tidy and empty of people — dated but cared for, not derelict. Straight-on one-point perspective from the entrance, camera at chest height. No text anywhere."
+  },
+  {
+    "file": "bedrock-after-livingroom.jpg",
+    "width": 1600,
+    "height": 1067,
+    "prompt": "Interior photograph of a renovated living room photographed from the hallway entrance, the same brick fireplace centered on the far wall flanked by two windows, now whitewashed with a new oak mantel, refinished hardwood floors, and linen roman shades, lit by the same soft even daylight. Straight-on one-point perspective from the entrance, camera at chest height, matching a before-and-after pair. Finished, empty of people, no text anywhere."
+  },
+  {
+    "file": "bedrock-process-consult.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Photograph of a contractor in a clean tan work jacket talking with a homeowner couple at their kitchen table, a closed tape measure and a roll of drawings resting unopened on the table, warm natural window light. Candid three-quarter composition, faces relaxed and engaged. The drawings stay rolled so no linework or text is visible. No logos on clothing, no visible paperwork with writing."
+  },
+  {
+    "file": "bedrock-process-quote.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Overhead photograph of a tidy desk with a closed silver laptop, a carpenter's pencil, and material samples of oak flooring and painted cabinet doors arranged in a neat row, soft window light from the left. Flat-lay composition, warm and orderly. Nothing on the desk carries any writing, labels, or screens with content."
+  },
+  {
+    "file": "bedrock-process-permits.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Interior photograph of a residential room professionally prepped for renovation, floors covered in clean protective board, doorways masked with taped plastic sheeting, and new lumber stacked in one neat pile, lit by bright daylight through an uncovered window. Wide composition emphasizing order and preparation. No workers present, no tools scattered, no text or markings visible."
+  },
+  {
+    "file": "bedrock-process-build.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Photograph of a carpenter in a clean gray shirt and safety glasses installing new interior wall framing, level in hand, inside a bright organized job site with swept subfloor and lumber stacked neatly behind. Side-angle composition with warm daylight from a window opening. One person only, focused on the work. No logos on clothing, no signage, no scattered debris."
+  },
+  {
+    "file": "bedrock-process-walkthrough.jpg",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Photograph of a contractor and a homeowner standing in a bright, newly finished kitchen, the contractor gesturing toward the new cabinetry while the homeowner smiles, warm afternoon window light. Relaxed candid composition from a few steps back. The room is spotless and complete. No logos on clothing, no paperwork, no text anywhere."
+  },
+  {
+    "file": "bedrock-founder.jpg",
+    "width": 1024,
+    "height": 1280,
+    "prompt": "Portrait-orientation photograph of a general contractor in his early fifties standing inside a bright finished home renovation, arms crossed loosely, wearing a clean dark canvas work jacket, salt-and-pepper beard, warm confident expression. Soft window light from the side, shallow depth of field with the finished room gently blurred behind him. No hard hat, no logos or lettering on clothing."
+  },
+  {
+    "file": "bedrock-crew-owner.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Portrait photograph of a male general contractor in his early fifties with a salt-and-pepper beard, wearing a clean dark canvas jacket over a plain shirt, photographed from the chest up against the softly blurred interior of a finished bright room. Warm natural window light, relaxed genuine smile, direct eye contact. No hats, no logos, no text."
+  },
+  {
+    "file": "bedrock-crew-pm.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Portrait photograph of a female construction project manager in her late thirties, dark hair tied back, wearing a plain olive field jacket, photographed from the chest up against a softly blurred bright renovated interior. Warm natural window light, confident easy expression, direct eye contact. No hard hat, no logos, no text."
+  },
+  {
+    "file": "bedrock-crew-super.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Portrait photograph of a male site superintendent in his mid-forties, Latino, short dark hair, wearing a clean gray flannel work shirt, photographed from the chest up against a softly blurred organized job-site interior with neat lumber stacks. Bright even daylight, calm approachable expression. No hard hat, no logos, no text."
+  },
+  {
+    "file": "bedrock-crew-office.jpg",
+    "width": 1280,
+    "height": 1600,
+    "prompt": "Portrait photograph of a female office manager in her late twenties, warm smile, wearing a simple rust-colored sweater, photographed from the chest up against a softly blurred bright office corner with a plant. Soft window light, friendly direct gaze. No name tags, no logos, no text."
+  },
+  {
+    "file": "bedrock-warranty.jpg",
+    "width": 1024,
+    "height": 1280,
+    "prompt": "Close-up portrait-orientation photograph of finished carpentry detail, the corner joint of a custom white-oak stair railing meeting a newel post, perfectly flush and hand-sanded, warm side light raking across the grain. Shallow depth of field, the finished staircase softly blurred beyond. Quiet, precise, craftsmanship-focused. No people, no tools, no text."
+  },
+  {
+    "file": "bedrock-oneteam.jpg",
+    "width": 1024,
+    "height": 1280,
+    "prompt": "Portrait-orientation photograph of two builders in clean work clothes reviewing a rolled set of drawings together inside a bright, orderly framed interior space, morning light through window openings, the drawings held closed as they talk. Candid mid-distance composition. Swept floor, lumber stacked neatly to one side. No logos on clothing, no visible linework or text on the drawings."
+  },
+  {
+    "file": "bedrock-testimonial-portrait.jpg",
+    "width": 1024,
+    "height": 1280,
+    "prompt": "Portrait-orientation photograph of a homeowner in her mid-forties leaning against the island of her newly remodeled kitchen, holding a mug, relaxed and quietly proud, warm morning window light. Shallow depth of field with green cabinetry softly blurred behind her. Plain clothing without logos, plain mug without lettering, no text anywhere."
+  },
+  {
+    "file": "bedrock-avatar-1.jpg",
+    "width": 512,
+    "height": 512,
+    "prompt": "Square head-and-shoulders portrait of a smiling man in his late thirties with short brown hair, plain navy crewneck, photographed against a softly blurred warm home interior in natural light. Friendly and genuine, no logos, no text."
+  },
+  {
+    "file": "bedrock-avatar-2.jpg",
+    "width": 512,
+    "height": 512,
+    "prompt": "Square head-and-shoulders portrait of a woman in her early fifties with shoulder-length gray-streaked hair and glasses, plain cream cardigan, photographed against a softly blurred bright living room in natural light. Warm relaxed smile, no logos, no text."
+  },
+  {
+    "file": "bedrock-avatar-3.jpg",
+    "width": 512,
+    "height": 512,
+    "prompt": "Square head-and-shoulders portrait of a Black man in his mid-forties with a close-cropped beard, plain gray henley, photographed against a softly blurred renovated kitchen in warm natural light. Easy confident smile, no logos, no text."
+  },
+  {
+    "file": "bedrock-avatar-4.jpg",
+    "width": 512,
+    "height": 512,
+    "prompt": "Square head-and-shoulders portrait of a woman in her early thirties with dark curly hair, plain mustard sweater, photographed against a softly blurred sunlit dining room in natural light. Bright genuine smile, no logos, no text."
+  },
+  {
+    "file": "bedrock-avatar-5.jpg",
+    "width": 512,
+    "height": 512,
+    "prompt": "Square head-and-shoulders portrait of an East Asian man in his late fifties with short graying hair, plain olive button-up shirt, photographed against a softly blurred bright hallway in natural light. Calm warm expression, no logos, no text."
+  },
+  {
+    "file": "bedrock-avatar-6.jpg",
+    "width": 512,
+    "height": 512,
+    "prompt": "Square head-and-shoulders portrait of a woman in her mid-sixties with short white hair and small earrings, plain denim shirt, photographed against a softly blurred garden patio in natural light. Kind bright smile, no logos, no text."
+  }
+]

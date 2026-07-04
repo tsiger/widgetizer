@@ -1,0 +1,201 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "page_opener": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "wide",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Contact</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Let's talk about your project.",
+            "size": "6xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell us what you're planning. You'll hear back within one business day, and a site visit never costs anything.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "reach_us": {
+      "type": "contact-details",
+      "settings": {
+        "eyebrow": "",
+        "title": "How to reach us.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "first-featured",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "rc-brand": {
+          "type": "info",
+          "settings": {
+            "title": "Bedrock Contracting",
+            "text": "<p>Remodels, additions, and whole-home renovations.</p><p>Ask for Emma — she picks up, and she'll know exactly who should call you back.</p>"
+          }
+        },
+        "rc-callwrite": {
+          "type": "text_block",
+          "settings": {
+            "title": "Call or write",
+            "text": "<p>(555) 555-0130</p><p>hello@example.com</p><p>Photos of the space help — send a few.</p>"
+          }
+        },
+        "rc-hours": {
+          "type": "text_block",
+          "settings": {
+            "title": "Office hours",
+            "text": "<p>Mon–Fri · 7am–5pm</p><p>Saturday · by appointment</p>"
+          }
+        },
+        "rc-area": {
+          "type": "text_block",
+          "settings": {
+            "title": "Service area",
+            "text": "<p>The metro area and surrounding counties.</p><p>Farther out? Ask — we've made exceptions for the right project.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["rc-brand", "rc-callwrite", "rc-hours", "rc-area"]
+    },
+    "next_steps": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "What happens next",
+        "eyebrow_uppercase": true,
+        "title": "From first call to fixed quote.",
+        "description": "",
+        "heading_alignment": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ns-callback": {
+          "type": "step",
+          "settings": {
+            "title": "We call you back",
+            "description": "<p>Within one business day. A short conversation about what you're planning, your rough budget, and whether we're a fit.</p>"
+          }
+        },
+        "ns-visit": {
+          "type": "step",
+          "settings": {
+            "title": "Free site visit",
+            "description": "<p>We walk the space, measure, and talk through options. No charge and no obligation — you're allowed to just be curious.</p>"
+          }
+        },
+        "ns-quote": {
+          "type": "step",
+          "settings": {
+            "title": "Written fixed quote",
+            "description": "<p>Within five days of the visit: an itemized, fixed price, valid for sixty days. Take your time with it.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["ns-callback", "ns-visit", "ns-quote"]
+    },
+    "office_map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Stop by the shop.",
+        "description": "",
+        "heading_alignment": "start",
+        "address": "1200 Industrial Way, Suite B",
+        "show_address": true,
+        "height": "medium",
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "map-visiting": {
+          "type": "info",
+          "settings": {
+            "title": "Visiting?",
+            "text": "<p>Call ahead — most days we're on site, not at the desk.</p><p>(555) 555-0130</p>"
+          }
+        }
+      },
+      "blocksOrder": ["map-visiting"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Prefer the phone?",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Most questions get a straight answer in a five-minute call.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "tel:+15555550130",
+              "text": "Call (555) 555-0130",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "mailto:hello@example.com",
+              "text": "Email us",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_opener", "reach_us", "next_steps", "office_map", "closing_cta"],
+  "id": "contact",
+  "created": "2026-07-04T09:00:00.000Z",
+  "updated": "2026-07-04T09:00:00.000Z"
+}

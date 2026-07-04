@@ -1,6 +1,6 @@
 import chokidar from "chokidar";
 import { copyFile, rm, mkdir } from "node:fs/promises";
-import { cpSync } from "node:fs";
+import { cpSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,26 +31,22 @@ const args = parseArgs(process.argv.slice(2));
 const themeId = args.theme ?? "arch";
 const project = typeof args.project === "string" ? args.project.trim() : "";
 
-if (!project) {
-  console.error(
-    `[${stamp()}]`,
-    `
-Usage: node scripts/theme-sync.js --project <name> [--theme <id>]
+const srcDir = path.join(ROOT, "themes", themeId);
+const themeDest = path.join(ROOT, "data", "themes", themeId);
+const projectDest = project ? path.join(ROOT, "data", "projects", project) : null;
 
-  --project  Required. Project folder under data/projects/
-  --theme    Optional. Theme id under themes/ (default: arch)
-
-Example:
-  npm run theme:sync -- --project myproject
-  node scripts/theme-sync.js --project myproject --theme arch
-`.trim(),
-  );
+if (!existsSync(srcDir)) {
+  console.error(`[${stamp()}] [sync] Theme not found: themes/${themeId}`);
   process.exit(1);
 }
 
-const srcDir = path.join(ROOT, "themes", themeId);
-const themeDest = path.join(ROOT, "data", "themes", themeId);
-const projectDest = path.join(ROOT, "data", "projects", project);
+if (projectDest && !existsSync(projectDest)) {
+  console.error(
+    `[${stamp()}] [sync] Project folder not found: data/projects/${project}`,
+    `\n[${stamp()}] [sync] Create the project first, or omit --project to sync only the runtime theme copy.`,
+  );
+  process.exit(1);
+}
 
 function isExcludedForProject(relPath) {
   const topDir = relPath.split(path.sep)[0];
@@ -61,7 +57,7 @@ async function syncFile(relPath) {
   const src = path.join(srcDir, relPath);
 
   const targets = [path.join(themeDest, relPath)];
-  if (!isExcludedForProject(relPath)) {
+  if (projectDest && !isExcludedForProject(relPath)) {
     targets.push(path.join(projectDest, relPath));
   }
 
@@ -73,7 +69,7 @@ async function syncFile(relPath) {
 
 async function removeFile(relPath) {
   const targets = [path.join(themeDest, relPath)];
-  if (!isExcludedForProject(relPath)) {
+  if (projectDest && !isExcludedForProject(relPath)) {
     targets.push(path.join(projectDest, relPath));
   }
 
@@ -88,7 +84,7 @@ async function removeFile(relPath) {
 
 async function removeDir(relPath) {
   const targets = [path.join(themeDest, relPath)];
-  if (!isExcludedForProject(relPath)) {
+  if (projectDest && !isExcludedForProject(relPath)) {
     targets.push(path.join(projectDest, relPath));
   }
 
@@ -112,6 +108,8 @@ function initialSync() {
     recursive: true,
     filter: (src) => !isGitPath(src),
   });
+
+  if (!projectDest) return;
 
   console.log(`[${stamp()}] [sync] Full copy: themes/${themeId} → data/projects/${project} (filtered)`);
   cpSync(srcDir, projectDest, {
@@ -153,7 +151,7 @@ function startWatcher() {
       if (!rel) return;
       console.log(`[${stamp()}] [sync] +dir ${rel}`);
       const targets = [path.join(themeDest, rel)];
-      if (!isExcludedForProject(rel)) targets.push(path.join(projectDest, rel));
+      if (projectDest && !isExcludedForProject(rel)) targets.push(path.join(projectDest, rel));
       targets.forEach((d) => mkdir(d, { recursive: true }));
     })
     .on("unlinkDir", (dirPath) => {
@@ -173,4 +171,11 @@ function startWatcher() {
 }
 
 initialSync();
-startWatcher();
+
+// Without --project there is nothing to keep in sync live — the runtime theme
+// copy is a one-shot mirror (e.g. to publish a new preset to the picker).
+if (projectDest) {
+  startWatcher();
+} else {
+  console.log(`[${stamp()}] [sync] Done. Runtime theme copy updated (no --project: one-shot, no watcher).`);
+}

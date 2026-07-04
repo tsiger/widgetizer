@@ -1,0 +1,258 @@
+{
+  "name": "Services",
+  "slug": "services",
+  "widgets": {
+    "page_opener": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "wide",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Services</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "What we build.",
+            "size": "6xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One team and one contract, from permits to punch list. If it's on this page, we've built it many times before.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "service_list": {
+      "type": "numbered-service-list",
+      "settings": {
+        "eyebrow": "",
+        "title": "Five things we do well.",
+        "description": "",
+        "heading_alignment": "start",
+        "show_numbers": true,
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "svc-kitchens": {
+          "type": "service",
+          "settings": {
+            "title": "Kitchen & bath remodels",
+            "description": "<p>Full gut-and-rebuild or a careful refresh — cabinetry, tile, plumbing, and electrical handled by one crew, with the same finish standard either way.</p>",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "svc-additions": {
+          "type": "service",
+          "settings": {
+            "title": "Home additions",
+            "description": "<p>Second stories, rear extensions, and in-law suites. Engineered, permitted, and tied into the original structure so it reads as one house.</p>",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "svc-wholehome": {
+          "type": "service",
+          "settings": {
+            "title": "Whole-home renovations",
+            "description": "<p>Down-to-the-studs rebuilds of houses worth saving — new systems, new layouts, original character kept where it counts.</p>",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "svc-decks": {
+          "type": "service",
+          "settings": {
+            "title": "Decks & outdoor structures",
+            "description": "<p>Cedar decks, pergolas, and covered porches built to the same code and the same standard as everything else we do.</p>",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "svc-commercial": {
+          "type": "service",
+          "settings": {
+            "title": "Light commercial fit-outs",
+            "description": "<p>Cafés, shops, and small offices. Tight timelines are the whole job here — we plan backwards from your opening day.</p>",
+            "link": { "href": "", "text": "", "target": "_self" }
+          }
+        }
+      },
+      "blocksOrder": ["svc-kitchens", "svc-additions", "svc-wholehome", "svc-decks", "svc-commercial"]
+    },
+    "one_team": {
+      "type": "image-text",
+      "settings": {
+        "image": "/uploads/images/bedrock-oneteam.webp",
+        "image_position": "end",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "ot-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One team, one contract</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "ot-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "The buck stops with us.",
+            "size": "3xl"
+          }
+        },
+        "ot-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our own carpenters do the core work. The plumbers and electricians we bring in have been with us for over a decade. Either way, you have one contract, one point of contact, and one company responsible for the result.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "ot-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Dedicated project manager on every job\n+ Daily site cleanup, no exceptions\n+ Fixed written quotes before work starts"
+          }
+        }
+      },
+      "blocksOrder": ["ot-eyebrow", "ot-heading", "ot-text", "ot-features"]
+    },
+    "objections": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Before you hire anyone",
+        "eyebrow_uppercase": true,
+        "title": "Fair questions. Straight answers.",
+        "description": "",
+        "heading_alignment": "start",
+        "style": "separated",
+        "allow_multiple": false,
+        "sidebar_position": "end",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "faq-permits": {
+          "type": "item",
+          "settings": {
+            "question": "Who handles the permits?",
+            "answer": "<p>We do — filing, fees, inspections, all of it. Permit costs appear as a line item in your quote, at cost. If a project doesn't need a permit, we'll tell you that too.</p>"
+          }
+        },
+        "faq-living": {
+          "type": "item",
+          "settings": {
+            "question": "Can we live in the house during the work?",
+            "answer": "<p>Usually, yes. We seal the work zone with dust barriers, keep one bathroom functional at all times on bath projects, and set up a temporary kitchen corner on kitchen jobs. Whole-home renovations are the exception — we'll be honest about when moving out saves you money and misery.</p>"
+          }
+        },
+        "faq-changes": {
+          "type": "item",
+          "settings": {
+            "question": "What happens if we change our minds mid-project?",
+            "answer": "<p>Changes get a written change order with a price and a schedule impact before anything happens. You sign it or you don't. No verbal add-ons, no surprise invoices at the end.</p>"
+          }
+        },
+        "faq-subs": {
+          "type": "item",
+          "settings": {
+            "question": "Do you use subcontractors?",
+            "answer": "<p>For plumbing, electrical, and HVAC — yes, licensed specialists we've worked with for years. Carpentry, tile, and finish work stay in-house. Every sub on your job is covered by our insurance requirements and supervised by our site superintendent.</p>"
+          }
+        },
+        "faq-payment": {
+          "type": "item",
+          "settings": {
+            "question": "How does the payment schedule work?",
+            "answer": "<p>A deposit to secure your slot, then progress payments tied to completed milestones — never to dates. The final payment isn't due until after the walkthrough, when the punch list is cleared. You never pay for work that hasn't happened.</p>"
+          }
+        },
+        "faq-sidebar": {
+          "type": "info",
+          "settings": {
+            "title": "Not sure where your project fits?",
+            "text": "<p>hello@example.com</p><p>Send a few photos and a rough idea. We'll tell you honestly whether it's our kind of job — and roughly what it runs.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["faq-permits", "faq-living", "faq-changes", "faq-subs", "faq-payment", "faq-sidebar"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Get a fixed price for your project.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Free site visit, written quote within five days.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Request a quote",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "projects.html",
+              "text": "See our work first",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_opener", "service_list", "one_team", "objections", "closing_cta"],
+  "id": "services",
+  "created": "2026-07-04T09:00:00.000Z",
+  "updated": "2026-07-04T09:00:00.000Z"
+}

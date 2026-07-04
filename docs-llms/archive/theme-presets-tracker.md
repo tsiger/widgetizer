@@ -36,3 +36,4 @@
 | 28 | torque | Torque | Auto Repair | DONE |
 | 29 | uplink | Uplink | IT Support | DONE |
 | 30 | velvet-touch | Velvet Touch | Spa / Massage | DONE |
+| 31 | bedrock | Bedrock | General Contractor | IN PROGRESS — built + imaged + alt text set; header/spacing fixes applied. Remaining: replace bedrock-after-kitchen.webp (bad FLUX diptych) + re-set its alt, logos (user-made: upload default + transparent variants, assign in header, mirror paths into preset header.json; optional favicon), `preset:media` pack, screenshot, demo deploy, liveDemo registry line, commit (exclude scratch/) |

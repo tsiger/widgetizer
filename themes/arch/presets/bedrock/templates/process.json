@@ -1,0 +1,235 @@
+{
+  "name": "Process",
+  "slug": "process",
+  "widgets": {
+    "page_opener": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "start",
+        "content_width": "wide",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "op-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How we work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "op-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "No surprises. That's the point.",
+            "size": "6xl"
+          }
+        },
+        "op-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A renovation goes wrong in the gaps — between what was said and what was written, between what you expected and what showed up. Our process exists to close those gaps.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        }
+      },
+      "blocksOrder": ["op-eyebrow", "op-heading", "op-text"]
+    },
+    "the_steps": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "The process",
+        "eyebrow_uppercase": true,
+        "title": "Five steps, start to finish.",
+        "description": "",
+        "heading_alignment": "start",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "step-visit": {
+          "type": "step",
+          "settings": {
+            "image": "/uploads/images/bedrock-process-consult.webp",
+            "title": "Site visit & consultation",
+            "description": "<p>We walk the space with you, measure, and talk through what you're after. You'll get straight answers about what's realistic — including when the honest answer is that a project isn't worth doing.</p>",
+            "button_link": {
+              "href": "contact.html",
+              "text": "Book a site visit",
+              "target": "_self"
+            }
+          }
+        },
+        "step-quote": {
+          "type": "step",
+          "settings": {
+            "image": "/uploads/images/bedrock-process-quote.webp",
+            "title": "Design & fixed quote",
+            "description": "<p>Within five days you get a written, fixed price — itemized, with allowances spelled out. It's valid for sixty days and it only changes if you change the scope.</p>"
+          }
+        },
+        "step-permits": {
+          "type": "step",
+          "settings": {
+            "image": "/uploads/images/bedrock-process-permits.webp",
+            "title": "Permits & preparation",
+            "description": "<p>We file the permits, order the long-lead materials, and prep the site — floor protection down, dust barriers up — before the first cut is made.</p>"
+          }
+        },
+        "step-build": {
+          "type": "step",
+          "settings": {
+            "image": "/uploads/images/bedrock-process-build.webp",
+            "title": "The build",
+            "description": "<p>Your project manager sends a written update every Friday: what happened, what's next, and anything that needs a decision from you. The site gets swept every day it's worked.</p>"
+          }
+        },
+        "step-walkthrough": {
+          "type": "step",
+          "settings": {
+            "image": "/uploads/images/bedrock-process-walkthrough.webp",
+            "title": "Walkthrough & warranty",
+            "description": "<p>We walk every room together and write down anything that isn't right. The final payment isn't due until that list is cleared. Then the two-year warranty clock starts.</p>"
+          }
+        }
+      },
+      "blocksOrder": ["step-visit", "step-quote", "step-permits", "step-build", "step-walkthrough"]
+    },
+    "typical_timeline": {
+      "type": "timeline",
+      "settings": {
+        "eyebrow": "A typical remodel",
+        "eyebrow_uppercase": true,
+        "title": "What your calendar looks like.",
+        "description": "Every project is different — this is the shape of a typical kitchen remodel from signature to handover.",
+        "heading_alignment": "start",
+        "layout": "horizontal",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "tl-design": {
+          "type": "item",
+          "settings": {
+            "date": "Weeks 1–2",
+            "title": "Design",
+            "features": "+ Measured drawings\n+ Material selections\n+ Fixed quote signed"
+          }
+        },
+        "tl-permits": {
+          "type": "item",
+          "settings": {
+            "date": "Weeks 3–4",
+            "title": "Permits",
+            "features": "+ Permit filed\n+ Materials ordered\n+ Site prepped"
+          }
+        },
+        "tl-build": {
+          "type": "item",
+          "settings": {
+            "date": "Weeks 5–10",
+            "title": "Build",
+            "features": "+ Demo and rough-in\n+ Inspections passed\n+ Finishes installed"
+          }
+        },
+        "tl-handover": {
+          "type": "item",
+          "settings": {
+            "date": "Week 11",
+            "title": "Handover",
+            "features": "+ Punch list cleared\n+ Final walkthrough\n+ Warranty starts"
+          }
+        }
+      },
+      "blocksOrder": ["tl-design", "tl-permits", "tl-build", "tl-handover"]
+    },
+    "warranty": {
+      "type": "image-text",
+      "settings": {
+        "image": "/uploads/images/bedrock-warranty.webp",
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-primary",
+        "content_color_scheme": "none",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "war-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The guarantee</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "war-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "If it's not right, we come back.",
+            "size": "3xl"
+          }
+        },
+        "war-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every job carries a written two-year workmanship warranty. A door that starts sticking, a tile that cracks, a seam that opens — one call, and we schedule the fix. No arguing about whose fault it is.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "war-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ 24-month workmanship warranty, in writing\n+ Manufacturer warranties passed through to you\n+ One call, no runaround"
+          }
+        }
+      },
+      "blocksOrder": ["war-eyebrow", "war-heading", "war-text", "war-features"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Questions about the process?",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Ask us anything",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-button"]
+    }
+  },
+  "widgetsOrder": ["page_opener", "the_steps", "typical_timeline", "warranty", "closing_cta"],
+  "id": "process",
+  "created": "2026-07-04T09:00:00.000Z",
+  "updated": "2026-07-04T09:00:00.000Z"
+}

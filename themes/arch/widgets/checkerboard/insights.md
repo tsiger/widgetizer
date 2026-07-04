@@ -94,7 +94,7 @@ The smallest useful configuration: one image and one content block side by side.
 
 - **Accent color schemes on content tiles**: The `standard-secondary` and `highlight-secondary` schemes give content tiles a distinct background color, which strengthens the visual contrast between image and text tiles. Use these when images have varied brightness levels and you need the text tiles to hold their own.
 
-- **Spacing collapse for full-bleed sections**: Set `top_spacing: none` and `bottom_spacing: none` when stacking the checkerboard directly against a hero or another full-width section. This eliminates gaps and creates a seamless visual flow.
+- **Spacing tuning for full-bleed sections**: Directly below an image or filled hero, use `top_spacing: small` — the hero's bottom spacing is internal padding, so the checkerboard must bring its own gap, and `none` would slam the tiles against the hero's edge. Reserve `none` for fusion: a neighboring section that shares the checkerboard's color scheme and should read as one continuous band, or an unfilled widget above whose own bottom margin already provides the spacing.
 
 - **The 12-block max is generous**: Most effective layouts use 4-8 blocks. Going beyond 8 risks overwhelming the visitor. If you have 12 items, consider whether some should be grouped differently or split across two widget instances.
 

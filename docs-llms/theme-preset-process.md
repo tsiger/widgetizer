@@ -160,13 +160,17 @@ sync scripts instead of copying files by hand — they mirror the source into th
 runtime copy (`data/themes/arch/`) and rebuild the active project.
 
 ```bash
-npm run theme:sync  -- --project <folder> [--theme arch]                 # theme assets/widgets → runtime + project
+npm run theme:sync                                                       # one-shot: themes/<theme> → data/themes/<theme> (runtime copy only)
+npm run theme:sync  -- --project <folder> [--theme arch]                 # theme assets/widgets → runtime + project, then watches
 npm run preset:sync -- --project <folder> --preset <preset-id> [--theme arch]  # preset templates/menus/settings rebuild
 ```
 
-- **`theme:sync`** (`scripts/theme-sync.js`) watches `themes/<theme>/` and mirrors
-  shared theme files (CSS, JS, widgets, fonts) into both `data/themes/<theme>/`
-  and the project. Use it for changes to `assets/`, `widgets/`, etc.
+- **`theme:sync`** (`scripts/theme-sync.js`) mirrors the theme source into the
+  runtime copy (`data/themes/<theme>/`). Without `--project` it is a one-shot
+  mirror and exits — use this to publish a new preset/registry change to the
+  project-creation picker. With `--project` it also mirrors shared theme files
+  (CSS, JS, widgets, fonts) into the project and keeps watching `themes/<theme>/`.
+  The project folder must already exist.
 - **`preset:sync`** (`scripts/preset-sync.js`) additionally rebuilds the project's
   pages/menus from `themes/arch/presets/<id>/` when preset content
   (`preset.json`, `templates/`, `menus/`) changes — so settings overrides and

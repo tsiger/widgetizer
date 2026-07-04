@@ -1,0 +1,895 @@
+{
+  "files": [
+    {
+      "filename": "bedrock-service-kitchens.webp",
+      "originalName": "bedrock-service-kitchens.webp",
+      "type": "image/webp",
+      "size": 37872,
+      "path": "/uploads/images/bedrock-service-kitchens.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Remodeled kitchen with white shaker cabinets, a walnut island, and brass pendant lights",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-service-kitchens-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-service-kitchens-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-service-wholehome.webp",
+      "originalName": "bedrock-service-wholehome.webp",
+      "type": "image/webp",
+      "size": 95618,
+      "path": "/uploads/images/bedrock-service-wholehome.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Renovated open-plan living and dining room with refinished oak floors, built-in shelving, and a brick fireplace",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-service-wholehome-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-service-wholehome-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-testimonial-portrait.webp",
+      "originalName": "bedrock-testimonial-portrait.webp",
+      "type": "image/webp",
+      "size": 70104,
+      "path": "/uploads/images/bedrock-testimonial-portrait.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "Homeowner holding a mug and leaning against the island of her newly remodeled green kitchen",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-testimonial-portrait-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-testimonial-portrait-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-warranty.webp",
+      "originalName": "bedrock-warranty.webp",
+      "type": "image/webp",
+      "size": 98580,
+      "path": "/uploads/images/bedrock-warranty.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "Close-up of a flush, hand-finished white-oak stair railing joint with the staircase softly blurred behind",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-warranty-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-warranty-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-service-commercial.webp",
+      "originalName": "bedrock-service-commercial.webp",
+      "type": "image/webp",
+      "size": 51936,
+      "path": "/uploads/images/bedrock-service-commercial.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Newly built-out cafe interior with a white-oak counter, black shelving, and warm pendant lights",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-service-commercial-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-service-commercial-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-project-kitchen-remodel.webp",
+      "originalName": "bedrock-project-kitchen-remodel.webp",
+      "type": "image/webp",
+      "size": 115892,
+      "path": "/uploads/images/bedrock-project-kitchen-remodel.webp",
+      "width": 1600,
+      "height": 1200,
+      "alt": "Kitchen remodel with deep green cabinetry, white counters, and brass hardware in warm window light",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-project-kitchen-remodel-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-project-kitchen-remodel-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-project-kitchen-remodel-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-project-two-story-addition.webp",
+      "originalName": "bedrock-project-two-story-addition.webp",
+      "type": "image/webp",
+      "size": 519918,
+      "path": "/uploads/images/bedrock-project-two-story-addition.webp",
+      "width": 1600,
+      "height": 1200,
+      "alt": "Completed two-story rear addition with new siding and large windows, seen from the backyard at golden hour",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-project-two-story-addition-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-project-two-story-addition-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-project-two-story-addition-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-project-whole-home.webp",
+      "originalName": "bedrock-project-whole-home.webp",
+      "type": "image/webp",
+      "size": 109224,
+      "path": "/uploads/images/bedrock-project-whole-home.webp",
+      "width": 1600,
+      "height": 1200,
+      "alt": "Whole-home renovation with a sightline from the white kitchen through black-framed glass doors to a sunlit sitting area",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-project-whole-home-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-project-whole-home-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-project-whole-home-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-service-additions.webp",
+      "originalName": "bedrock-service-additions.webp",
+      "type": "image/webp",
+      "size": 222000,
+      "path": "/uploads/images/bedrock-service-additions.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Finished single-story addition blended into a gray craftsman house, seen from the back garden",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-service-additions-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-service-additions-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-process-quote.webp",
+      "originalName": "bedrock-process-quote.webp",
+      "type": "image/webp",
+      "size": 20320,
+      "path": "/uploads/images/bedrock-process-quote.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Closed laptop, carpenter's pencil, oak flooring samples, and cabinet door samples arranged on a desk",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-process-quote-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-process-quote-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-process-walkthrough.webp",
+      "originalName": "bedrock-process-walkthrough.webp",
+      "type": "image/webp",
+      "size": 60406,
+      "path": "/uploads/images/bedrock-process-walkthrough.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Contractor and homeowner talking in a bright, newly finished kitchen during the final walkthrough",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-process-walkthrough-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-process-walkthrough-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-project-bath-remodel.webp",
+      "originalName": "bedrock-project-bath-remodel.webp",
+      "type": "image/webp",
+      "size": 150296,
+      "path": "/uploads/images/bedrock-project-bath-remodel.webp",
+      "width": 1600,
+      "height": 1200,
+      "alt": "Remodeled primary bathroom with a freestanding white tub, wood vanity, and black-framed glass shower",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-project-bath-remodel-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-project-bath-remodel-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-project-bath-remodel-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-project-cafe-fitout.webp",
+      "originalName": "bedrock-project-cafe-fitout.webp",
+      "type": "image/webp",
+      "size": 371328,
+      "path": "/uploads/images/bedrock-project-cafe-fitout.webp",
+      "width": 1600,
+      "height": 1200,
+      "alt": "Finished cafe fit-out with an exposed brick wall, long white service counter, and white-oak shelving and stools",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-project-cafe-fitout-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-project-cafe-fitout-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-project-cafe-fitout-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-project-cedar-deck.webp",
+      "originalName": "bedrock-project-cedar-deck.webp",
+      "type": "image/webp",
+      "size": 482044,
+      "path": "/uploads/images/bedrock-project-cedar-deck.webp",
+      "width": 1600,
+      "height": 1200,
+      "alt": "New cedar deck with a timber pergola and outdoor dining set attached to a gray house in evening light",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-project-cedar-deck-medium.webp",
+          "width": 1024,
+          "height": 768
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-project-cedar-deck-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-project-cedar-deck-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-hero.webp",
+      "originalName": "bedrock-hero.webp",
+      "type": "image/webp",
+      "size": 442360,
+      "path": "/uploads/images/bedrock-hero.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Newly completed two-story craftsman home with cedar and gray siding at dusk, windows glowing over a tidy lawn",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-hero-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-hero-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-hero-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "bedrock-oneteam.webp",
+      "originalName": "bedrock-oneteam.webp",
+      "type": "image/webp",
+      "size": 132036,
+      "path": "/uploads/images/bedrock-oneteam.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "Two builders reviewing a set of drawings together inside a bright, tidy framed interior",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-oneteam-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-oneteam-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-process-build.webp",
+      "originalName": "bedrock-process-build.webp",
+      "type": "image/webp",
+      "size": 66460,
+      "path": "/uploads/images/bedrock-process-build.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Carpenter in safety glasses checking new interior wall framing with a level on an organized job site",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-process-build-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-process-build-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-process-consult.webp",
+      "originalName": "bedrock-process-consult.webp",
+      "type": "image/webp",
+      "size": 63728,
+      "path": "/uploads/images/bedrock-process-consult.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Contractor discussing a project with two homeowners at their kitchen table, tape measure and rolled drawings at hand",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-process-consult-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-process-consult-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-process-permits.webp",
+      "originalName": "bedrock-process-permits.webp",
+      "type": "image/webp",
+      "size": 50474,
+      "path": "/uploads/images/bedrock-process-permits.webp",
+      "width": 1024,
+      "height": 768,
+      "alt": "Room prepped for renovation with protective floor covering, plastic-sheeted doorways, and neatly stacked lumber",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-process-permits-small.webp",
+          "width": 480,
+          "height": 360
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-process-permits-thumb.webp",
+          "width": 150,
+          "height": 112
+        }
+      }
+    },
+    {
+      "filename": "bedrock-founder.webp",
+      "originalName": "bedrock-founder.webp",
+      "type": "image/webp",
+      "size": 126690,
+      "path": "/uploads/images/bedrock-founder.webp",
+      "width": 1024,
+      "height": 1280,
+      "alt": "General contractor standing with arms crossed in a dark canvas jacket inside a bright finished renovation",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-founder-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-founder-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-crew-super.webp",
+      "originalName": "bedrock-crew-super.webp",
+      "type": "image/webp",
+      "size": 289820,
+      "path": "/uploads/images/bedrock-crew-super.webp",
+      "width": 1280,
+      "height": 1600,
+      "alt": "Site superintendent in a gray work shirt in front of neatly stacked lumber",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-crew-super-medium.webp",
+          "width": 1024,
+          "height": 1280
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-crew-super-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-crew-super-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-crew-office.webp",
+      "originalName": "bedrock-crew-office.webp",
+      "type": "image/webp",
+      "size": 257058,
+      "path": "/uploads/images/bedrock-crew-office.webp",
+      "width": 1280,
+      "height": 1600,
+      "alt": "Smiling office manager in a rust-colored sweater in a bright office",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-crew-office-medium.webp",
+          "width": 1024,
+          "height": 1280
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-crew-office-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-crew-office-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-crew-owner.webp",
+      "originalName": "bedrock-crew-owner.webp",
+      "type": "image/webp",
+      "size": 198732,
+      "path": "/uploads/images/bedrock-crew-owner.webp",
+      "width": 1280,
+      "height": 1600,
+      "alt": "Smiling general contractor with a salt-and-pepper beard in a dark work jacket",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-crew-owner-medium.webp",
+          "width": 1024,
+          "height": 1280
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-crew-owner-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-crew-owner-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-crew-pm.webp",
+      "originalName": "bedrock-crew-pm.webp",
+      "type": "image/webp",
+      "size": 100414,
+      "path": "/uploads/images/bedrock-crew-pm.webp",
+      "width": 1280,
+      "height": 1600,
+      "alt": "Construction project manager in an olive field jacket in a bright renovated interior",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-crew-pm-medium.webp",
+          "width": 1024,
+          "height": 1280
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-crew-pm-small.webp",
+          "width": 480,
+          "height": 600
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-crew-pm-thumb.webp",
+          "width": 150,
+          "height": 188
+        }
+      }
+    },
+    {
+      "filename": "bedrock-before-livingroom.webp",
+      "originalName": "bedrock-before-livingroom.webp",
+      "type": "image/webp",
+      "size": 345006,
+      "path": "/uploads/images/bedrock-before-livingroom.webp",
+      "width": 1600,
+      "height": 1056,
+      "alt": "Dated living room with wall-to-wall carpet, floral curtains, and a dark brick fireplace before renovation",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-before-livingroom-medium.webp",
+          "width": 1024,
+          "height": 676
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-before-livingroom-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-before-livingroom-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "bedrock-avatar-4.webp",
+      "originalName": "bedrock-avatar-4.webp",
+      "type": "image/webp",
+      "size": 37596,
+      "path": "/uploads/images/bedrock-avatar-4.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Smiling woman with dark curly hair in a mustard sweater in a sunlit dining room",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-avatar-4-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-avatar-4-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bedrock-avatar-5.webp",
+      "originalName": "bedrock-avatar-5.webp",
+      "type": "image/webp",
+      "size": 24676,
+      "path": "/uploads/images/bedrock-avatar-5.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Man with short graying hair in an olive button-up shirt in a bright hallway",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-avatar-5-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-avatar-5-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bedrock-avatar-6.webp",
+      "originalName": "bedrock-avatar-6.webp",
+      "type": "image/webp",
+      "size": 30304,
+      "path": "/uploads/images/bedrock-avatar-6.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Smiling woman with short white hair in a denim shirt on a garden patio",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-avatar-6-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-avatar-6-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bedrock-before-kitchen.webp",
+      "originalName": "bedrock-before-kitchen.webp",
+      "type": "image/webp",
+      "size": 260394,
+      "path": "/uploads/images/bedrock-before-kitchen.webp",
+      "width": 1600,
+      "height": 1056,
+      "alt": "Dated 1990s kitchen with honey-oak cabinets, laminate counters, and a vinyl floor before renovation",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-before-kitchen-medium.webp",
+          "width": 1024,
+          "height": 676
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-before-kitchen-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-before-kitchen-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "bedrock-avatar-3.webp",
+      "originalName": "bedrock-avatar-3.webp",
+      "type": "image/webp",
+      "size": 25824,
+      "path": "/uploads/images/bedrock-avatar-3.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Smiling man with a close-cropped beard in a gray henley in a bright kitchen",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-avatar-3-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-avatar-3-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bedrock-after-livingroom.webp",
+      "originalName": "bedrock-after-livingroom.webp",
+      "type": "image/webp",
+      "size": 170614,
+      "path": "/uploads/images/bedrock-after-livingroom.webp",
+      "width": 1600,
+      "height": 1056,
+      "alt": "Renovated living room with a whitewashed brick fireplace, oak mantel, and refinished hardwood floors",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-after-livingroom-medium.webp",
+          "width": 1024,
+          "height": 676
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-after-livingroom-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-after-livingroom-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "bedrock-avatar-1.webp",
+      "originalName": "bedrock-avatar-1.webp",
+      "type": "image/webp",
+      "size": 21384,
+      "path": "/uploads/images/bedrock-avatar-1.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Smiling man in a navy crewneck in a warm home interior",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-avatar-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-avatar-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bedrock-avatar-2.webp",
+      "originalName": "bedrock-avatar-2.webp",
+      "type": "image/webp",
+      "size": 28702,
+      "path": "/uploads/images/bedrock-avatar-2.webp",
+      "width": 512,
+      "height": 512,
+      "alt": "Smiling woman with gray-streaked hair and glasses in a cream cardigan",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrock-avatar-2-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-avatar-2-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bedrock-after-kitchen.webp",
+      "originalName": "bedrock-after-kitchen.webp",
+      "type": "image/webp",
+      "size": 117178,
+      "path": "/uploads/images/bedrock-after-kitchen.webp",
+      "width": 1600,
+      "height": 1056,
+      "alt": "Remodeled white kitchen with shaker cabinets and a wide-plank oak floor after renovation",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-after-kitchen-medium.webp",
+          "width": 1024,
+          "height": 676
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-after-kitchen-small.webp",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-after-kitchen-thumb.webp",
+          "width": 150,
+          "height": 99
+        }
+      }
+    }
+  ]
+}
