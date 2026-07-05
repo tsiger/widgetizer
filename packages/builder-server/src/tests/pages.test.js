@@ -842,7 +842,7 @@ describe("duplicatePage", () => {
 //
 // Deleting a page clears collection-item links that point to it, and must
 // re-derive those items' media usage — but only if the controller threads
-// scope.projectId into cleanupDeletedPageReferences. We make the re-sync
+// scope.projectId into cleanupDeletedPageReferencesFromDir. We make the re-sync
 // observable with a collection-item link that carries BOTH the deleted page's
 // uuid AND a media href: clearing the link drops the media reference, so a
 // re-synced usage index goes from ["collection:portfolio/alpha"] -> []. The

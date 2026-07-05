@@ -64,6 +64,11 @@ export { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from 
 // project working directory. Hosted's create route + the Refresh-Usage handler call
 // it with the per-tenant dir; OSS wraps it as refreshAllMediaUsage(projectId).
 export { refreshAllMediaUsageFromDir } from "./services/mediaUsageService.js";
+// Dir-explicit richtext stable-link seed enrichment: stamps data-*-uuid onto
+// preset-seeded richtext item-links, post-seed, against a caller-supplied project
+// dir. Hosted's create route calls it with the per-tenant dir; OSS wraps it as
+// enrichSeededRichtextLinks(folderName) inside seedPresetCollections.
+export { enrichSeededRichtextLinksFromDir } from "./utils/linkEnrichment.js";
 export { listThemes, listThemePresets, resolvePresetPaths } from "./controllers/themeController.js";
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.
