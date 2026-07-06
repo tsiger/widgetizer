@@ -227,7 +227,7 @@
         "eyebrow": "",
         "title": "The numbers behind the name.",
         "description": "",
-        "heading_alignment": "start",
+        "heading_alignment": "center",
         "layout": "grid",
         "columns_desktop": 4,
         "card_layout": "flat",

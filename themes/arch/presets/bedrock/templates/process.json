@@ -108,7 +108,7 @@
         "eyebrow_uppercase": true,
         "title": "What your calendar looks like.",
         "description": "Every project is different — this is the shape of a typical kitchen remodel from signature to handover.",
-        "heading_alignment": "start",
+        "heading_alignment": "center",
         "layout": "horizontal",
         "color_scheme": "standard-secondary",
         "top_spacing": "auto",
