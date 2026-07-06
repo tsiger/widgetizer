@@ -1,5 +1,5 @@
 /**
- * Depth-aware href prefixing for static export (Collections spec Section 6).
+ * Depth-aware href prefixing for static export (docs-llms/core-collections.md §6).
  *
  * In publish mode, content one directory deep (e.g. a collection item page at
  * `{slugPrefix}/{slug}.html`) needs relative hrefs rewritten with an

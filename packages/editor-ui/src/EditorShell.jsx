@@ -23,7 +23,7 @@ import CollectionItems from "./pages/CollectionItems.jsx";
 import CollectionItemAdd from "./pages/CollectionItemAdd.jsx";
 import CollectionItemEdit from "./pages/CollectionItemEdit.jsx";
 
-// The mountable editor surface (design doc §5). Because `useBlocker`/navigation
+// The mountable editor surface. Because `useBlocker`/navigation
 // guards require a single data-router context, EditorShell does NOT own a
 // router — it is the *element* for the editor layout route, and the host splices
 // `createEditorRoutes()` into its own `createBrowserRouter`. EditorShell wraps

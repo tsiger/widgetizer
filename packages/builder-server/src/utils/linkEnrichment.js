@@ -435,15 +435,21 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 /**
  * Clean up all references to a deleted page across the project.
  * Removes orphaned pageUuid references from widget link settings (pages + globals)
- * and menu items, writing back only files that were actually modified.
- * @param {string} projectFolderName - The project folder name
- * @param {string} deletedPageUuid - The UUID of the deleted page
- * @param {string|null} [projectId=null] - When provided, refreshes media usage
+ * and menu items, unwraps richtext anchors targeting the deleted page, writing back
+ * only files that were actually modified.
+ *
+ * Dir-explicit: operates on pages/, menus/, collections/ under the supplied `projectDir`
+ * (hosted passes getProjectBase(scope); OSS passes getProjectDir(folderName)).
+ * @param {object} args
+ * @param {string} args.projectDir - The project working directory
+ * @param {string} args.deletedPageUuid - The UUID of the deleted page
+ * @param {string|null} [args.projectId=null] - When provided, refreshes media usage
  *   for any collection item whose link settings were cleared.
  */
-export async function cleanupDeletedPageReferences(projectFolderName, deletedPageUuid, projectId = null) {
-  const pagesDir = getProjectPagesDir(projectFolderName);
-  const menusDir = getProjectMenusDir(projectFolderName);
+export async function cleanupDeletedPageReferencesFromDir({ projectDir, deletedPageUuid, projectId = null }) {
+  const pagesDir = path.join(projectDir, "pages");
+  const menusDir = path.join(projectDir, "menus");
+  const collectionsDir = path.join(projectDir, "collections");
 
   // Clean widget link settings in pages and global widgets
   const deletedPageUuids = new Set([deletedPageUuid]);
@@ -490,7 +496,7 @@ export async function cleanupDeletedPageReferences(projectFolderName, deletedPag
 
   // Clean collection item link settings, then keep media usage in sync for each
   // touched item (a cleared link may have removed an upload reference).
-  const touched = await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
+  const touched = await updateCollectionItems(collectionsDir, (item) =>
     transformItemSettings(item, cleanValue),
   );
   if (projectId) {
@@ -510,19 +516,24 @@ export async function cleanupDeletedPageReferences(projectFolderName, deletedPag
  * `link` settings. Clears the link and drops the stable-ref fields
  * (`collectionItemUuid`/`collectionType`) on anything pointing at a deleted item.
  * Render-time resolution already clears dead refs; this prunes them from disk so
- * they never re-surface (parity with `cleanupDeletedPageReferences`).
- * @param {string} projectFolderName - The project folder name
- * @param {string|string[]|Set<string>} deletedItemUuids - uuid(s) of deleted items
+ * they never re-surface (parity with `cleanupDeletedPageReferencesFromDir`).
+ *
+ * Dir-explicit: operates on pages/, menus/, collections/ under the supplied `projectDir`
+ * (hosted passes getProjectBase(scope); OSS passes getProjectDir(folderName)).
+ * @param {object} args
+ * @param {string} args.projectDir - The project working directory
+ * @param {string|string[]|Set<string>} args.deletedItemUuids - uuid(s) of deleted items
  */
-export async function cleanupDeletedCollectionItemReferences(projectFolderName, deletedItemUuids) {
+export async function cleanupDeletedCollectionItemReferencesFromDir({ projectDir, deletedItemUuids }) {
   const uuids =
     deletedItemUuids instanceof Set
       ? deletedItemUuids
       : new Set(Array.isArray(deletedItemUuids) ? deletedItemUuids : [deletedItemUuids]);
   if (uuids.size === 0) return;
 
-  const pagesDir = getProjectPagesDir(projectFolderName);
-  const menusDir = getProjectMenusDir(projectFolderName);
+  const pagesDir = path.join(projectDir, "pages");
+  const menusDir = path.join(projectDir, "menus");
+  const collectionsDir = path.join(projectDir, "collections");
 
   // Clear widget/block + collection-item `link` settings pointing at a deleted item.
   const cleanValue = (value) => {
@@ -538,7 +549,7 @@ export async function cleanupDeletedCollectionItemReferences(projectFolderName, 
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
-  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
+  await updateCollectionItems(collectionsDir, (item) =>
     transformItemSettings(item, cleanValue),
   );
 
@@ -639,11 +650,15 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
  * derived from each anchor's slug-format href. Presets ship richtext with the uuid attrs stripped
  * (sync-preset-templates) and the seed uuids only exist now, so this href→uuid pass is the only
  * place collection-item richtext links (and item-links in page richtext) get their refs.
- * @param {string} projectFolderName
+ *
+ * Dir-explicit core: reads pages/, collections/, and collection-types/ under the supplied
+ * `projectDir`. Hosted calls this with its per-tenant dir (getProjectBase(scope)); OSS wraps it
+ * as enrichSeededRichtextLinks(folderName) below.
+ * @param {{ projectDir: string }} args
  */
-export async function enrichSeededRichtextLinks(projectFolderName) {
-  const pagesDir = getProjectPagesDir(projectFolderName);
-  const collectionsDir = collectionsDirFor(projectFolderName);
+export async function enrichSeededRichtextLinksFromDir({ projectDir }) {
+  const pagesDir = path.join(projectDir, "pages");
+  const collectionsDir = path.join(projectDir, "collections");
 
   // slug -> page uuid
   const pageSlugToUuid = new Map();
@@ -670,7 +685,7 @@ export async function enrichSeededRichtextLinks(projectFolderName) {
       const type = typeEntry.name;
       let slugPrefix = type;
       try {
-        const schema = await fs.readJSON(path.join(getProjectDir(projectFolderName), "collection-types", type, "schema.json"));
+        const schema = await fs.readJSON(path.join(projectDir, "collection-types", type, "schema.json"));
         slugPrefix = schema.slugPrefix || schema.type || type;
       } catch {
         // no schema — fall back to the type folder name
@@ -699,4 +714,13 @@ export async function enrichSeededRichtextLinks(projectFolderName) {
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
   await updateCollectionItems(collectionsDir, (item) => transformItemSettings(item, enrichString));
+}
+
+/**
+ * OSS folderName wrapper for {@link enrichSeededRichtextLinksFromDir}: resolves the
+ * project's DATA_DIR working dir. Called by projectController.seedPresetCollections.
+ * @param {string} projectFolderName
+ */
+export async function enrichSeededRichtextLinks(projectFolderName) {
+  return enrichSeededRichtextLinksFromDir({ projectDir: getProjectDir(projectFolderName) });
 }

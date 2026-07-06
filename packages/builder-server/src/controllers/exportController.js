@@ -485,7 +485,7 @@ Per aspera ad astra
       }
     }
 
-    // --- Render collection item pages (spec Section 13) ---
+    // --- Render collection item pages (docs-llms/core-collections.md §6) ---
     // For each hasItemPages collection, render every valid item to
     // {slugPrefix}/{itemSlug}.html with fresh per-item globals (no asset bleed),
     // the full header/footer/layout wrap, and the same HTML post-processing pages

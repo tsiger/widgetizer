@@ -1,6 +1,6 @@
 // Plugin registry — merges the declarative extension points contributed by
 // frontend plugin objects (and the built-in OSS registrations) into ordered
-// collections the shell renders from. See design doc §4.
+// collections the shell renders from.
 //
 // MVP extension points (consumed here): navItems, routes, commands. Lifecycle
 // `hooks` are handled separately by the hook runner (./hooks.js). A few keys are

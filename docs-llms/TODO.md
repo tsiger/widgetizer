@@ -1,9 +1,7 @@
 # TODO — OSS builder (web + Electron desktop)
 
-Open work for the OSS builder, migrated 2026-06-24 from the engagement-level
-`experiment-docs/TODO.md` (parent repo) so each item lives with the project it
-applies to. Hosted-specific items moved to `widgetizer-hosted/docs/TODO.md`.
-Original engagement section numbers are kept in parentheses for traceability.
+Open work for the OSS builder. Hosted-specific items are tracked separately in
+`widgetizer-hosted/docs/TODO.md`.
 
 Conventions still in force: commit only on the `experimentation` branch with
 explicit permission, never switch branch / never push.
@@ -12,28 +10,28 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done · 3 deferred · 3 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **27 done · 3 deferred · 4 open · 1 wontfix**_
 
-- ⬜ [1. Relative preview asset URLs (robustness) — discuss](#1-relative-preview-asset-urls-robustness--discuss--was-experiment-docs-10)
-- ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision--was-experiment-docs-11)
-- ✅ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — DONE 2026-06-26](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene---done-2026-06-26--was-experiment-docs-14)
-- ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss-was-experiment-docs-9-oss-portion)
+- ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
+- ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
+- ✅ [3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — DONE 2026-06-26](#3-modernize-pre-refactor-src--server-paths-in-docs-llms-docs-hygiene---done-2026-06-26)
+- ⏸️ [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss)
 - ✅ [5. Consolidate preview-dispatch logic (route-mapping half) — DONE 2026-06-25](#5-consolidate-preview-dispatch-logic-route-mapping-half---done-2026-06-25--findings-doc-follow-up-session-task-16)
 - ✅ [6. Narrow-sidebar icon-grid + color-picker visual review — DONE 2026-06-26](#6-narrow-sidebar-icon-grid--color-picker-visual-review--c2-follow-up-session-task-18)
-- ✅ [7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — new-theme install path DONE 2026-06-25 (update-import path → §22)](#7-missed-port--theme-upload-collection-schema-gate-not-wired-builder-server---new-theme-install-path-done-2026-06-25-update-import-path--22--was-experiment-docs-8)
-- ✅ [8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — DONE 2026-06-25](#8-missed-port--pagecontroller-doesnt-thread-projectid-into-cleanupdeletedpagereferences-builder-server---done-2026-06-25--was-experiment-docs-9)
-- ✅ [9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — DONE 2026-06-25](#9-missed-port--mediajsx-doesnt-seed-collection-item-usage-titles-editor-ui---done-2026-06-25--was-experiment-docs-10)
-- ✅ [10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — DONE 2026-06-26](#10-missed-port-tests-only--createcollectionpreviewtoken-guard-tests-builder-server---done-2026-06-26--was-experiment-docs-11)
-- ✅ [11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — DONE 2026-06-26 (sub-item → §24)](#11-missed-port--link-picker-combobox-group-headers-not-rendered-editor-ui---done-2026-06-26-sub-item--24--was-experiment-docs-12)
-- ✅ [12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — DONE 2026-06-26](#12-missed-port--richtext-embedded-media-not-tracked-as-used-builder-server---done-2026-06-26--was-experiment-docs-13)
-- ✅ [13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — DONE 2026-06-26](#13-missed-port--themeupdate-delta-release-tool-not-ported-oss-dev-tooling---done-2026-06-26--was-experiment-docs-14)
-- ✅ [14. Documentation port audit — content gaps from the master-commit doc changes — DONE 2026-06-27 (14c–14e via docs-llms reorg; 14a/14b public-docs)](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes--was-experiment-docs-15)
-- ✅ [15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — DONE 2026-06-26](#15-missed-port--collection-item-pages-leak-the-page-slug-body-class-render-engine---done-2026-06-26--was-experiment-docs-16)
-- ✅ [16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — DONE 2026-06-26](#16-missed-port--refreshallmediausage-aborts-early-on-a-project-with-no-pages-dir-builder-server---done-2026-06-26--was-experiment-docs-17)
-- ⏸️ [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process--was-experiment-docs-18)
-- ✅ [18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — DONE 2026-06-26](#18-missed-port-tests-only--depth-1-render-smoke--depth-0-no-leak-guard-not-ported-builder-server---done-2026-06-26--was-experiment-docs-19)
-- ✅ [19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — DONE 2026-06-26 (tight scope)](#19-missed-port-tests-only--rendercollectionitempage-contract-test-not-ported-builder-server---done-2026-06-26-tight-scope--was-experiment-docs-20)
-- ✅ [20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — DONE 2026-06-26 (option b: comment + direct tests)](#20-stale-test-comment--claims-remapcollectionitemlinkmenurefs-not-ported-when-they-are-builder-server---done-2026-06-26-option-b-comment--direct-tests--was-experiment-docs-21)
+- ✅ [7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — new-theme install path DONE 2026-06-25 (update-import path → §22)](#7-missed-port--theme-upload-collection-schema-gate-not-wired-builder-server---new-theme-install-path-done-2026-06-25-update-import-path--22)
+- ✅ [8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — DONE 2026-06-25](#8-missed-port--pagecontroller-doesnt-thread-projectid-into-cleanupdeletedpagereferences-builder-server---done-2026-06-25)
+- ✅ [9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — DONE 2026-06-25](#9-missed-port--mediajsx-doesnt-seed-collection-item-usage-titles-editor-ui---done-2026-06-25)
+- ✅ [10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — DONE 2026-06-26](#10-missed-port-tests-only--createcollectionpreviewtoken-guard-tests-builder-server---done-2026-06-26)
+- ✅ [11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — DONE 2026-06-26 (sub-item → §24)](#11-missed-port--link-picker-combobox-group-headers-not-rendered-editor-ui---done-2026-06-26-sub-item--24)
+- ✅ [12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — DONE 2026-06-26](#12-missed-port--richtext-embedded-media-not-tracked-as-used-builder-server---done-2026-06-26)
+- ✅ [13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — DONE 2026-06-26](#13-missed-port--themeupdate-delta-release-tool-not-ported-oss-dev-tooling---done-2026-06-26)
+- ✅ [14. Documentation port audit — content gaps from the master-commit doc changes — DONE 2026-06-27 (14c–14e via docs-llms reorg; 14a/14b public-docs)](#14-documentation-port-audit--content-gaps-from-the-master-commit-doc-changes)
+- ✅ [15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — DONE 2026-06-26](#15-missed-port--collection-item-pages-leak-the-page-slug-body-class-render-engine---done-2026-06-26)
+- ✅ [16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — DONE 2026-06-26](#16-missed-port--refreshallmediausage-aborts-early-on-a-project-with-no-pages-dir-builder-server---done-2026-06-26)
+- ⏸️ [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process)
+- ✅ [18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — DONE 2026-06-26](#18-missed-port-tests-only--depth-1-render-smoke--depth-0-no-leak-guard-not-ported-builder-server---done-2026-06-26)
+- ✅ [19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — DONE 2026-06-26 (tight scope)](#19-missed-port-tests-only--rendercollectionitempage-contract-test-not-ported-builder-server---done-2026-06-26-tight-scope)
+- ✅ [20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — DONE 2026-06-26 (option b: comment + direct tests)](#20-stale-test-comment--claims-remapcollectionitemlinkmenurefs-not-ported-when-they-are-builder-server---done-2026-06-26-option-b-comment--direct-tests)
 - ✅ [21. Dedup the cross-bundle `getStandalonePreviewTarget` copy + drop its dead `editor-ui` export (`editor-ui` + OSS preview runtime) — DONE 2026-06-26 — **low (cleanup)**](#21-dedup-the-cross-bundle-getstandalonepreviewtarget-copy--drop-its-dead-editor-ui-export-editor-ui--oss-preview-runtime---done-2026-06-26--low-cleanup)
 - ✅ [22. Gate collection schemas on the theme **update-import** path too (`builder-server`) — DONE 2026-06-27 (option A) — **low/moderate**](#22-gate-collection-schemas-on-the-theme-update-import-path-too-builder-server--lowmoderate)
 - ✅ [23. Widget-catalog enumeration logs spurious "Failed to parse schema" warnings (`builder-server`) — DONE 2026-06-26 — **low (log hygiene / signal-masking)**](#23-widget-catalog-enumeration-logs-spurious-failed-to-parse-schema-warnings-builder-server---done-2026-06-26--low-log-hygiene--signal-masking)
@@ -41,14 +39,31 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **23 done ·
 - ✅ [25. Decide whether to anchor `EMBEDDED_MEDIA_PATH_RE` so foreign URLs don't mark local assets "used" (`builder-server`) — RESOLVED 2026-06-26 (keep master parity) — **low (correctness, master-parity tradeoff)**](#25-decide-whether-to-anchor-embedded_media_path_re-so-foreign-urls-dont-mark-local-assets-used-builder-server---resolved-2026-06-26-keep-master-parity--low-correctness-master-parity-tradeoff)
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
 - ✅ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — DONE 2026-06-27 — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling---low-dev-only-mostly-latent)
-- 🟢 [28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — OSS reads + theme-CRUD + dead-code slices implemented; lifecycle 4b + hosted follow-on deferred](#28-close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline)
+- ✅ [28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — DONE 2026-07-02 (verified green); lifecycle 4b tail deferred → §30](#28-close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline---done-2026-07-02)
 - ⬜ [29. Loud stale-active-project detection in the OSS editor — focus/visibility revalidation + 409 handling (OSS shell `app/` + `editor-ui`) — **low/moderate (single-tenant UX correctness)**](#29-loud-stale-active-project-detection-in-the-oss-editor)
 - ⏸️ [30. Extract project lifecycle duplicate/import into dir-explicit cores (`builder-server`) — **deferred** until hosted builds duplicate/import (blocker: `AssetStorageAdapter.copy`); the lifecycle tail of §28](#30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores)
-- ⬜ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — surfaced by §28 D — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted)
+- ✅ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — DONE 2026-07-02 — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted---done-2026-07-02)
+- ⬜ [32. Theme-upload update-import validation smells — `_validate_<ts>` collision + double per-version log (`builder-server`) — **investigate (low)**](#32-theme-upload-update-import-validation-smells-builder-server)
+- ⬜ [33. Editor-ui duplication smells — slug-validator ternary + `useMediaState` localStorage pattern (`editor-ui`) — **investigate (low)**](#33-editor-ui-duplication-smells-editor-ui)
+- ⬜ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — **investigate (negligible)**](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server)
+- ✅ [35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — DONE 2026-07-02 (dir-aware core + getProjectBase contract) — **moderate (data-integrity)**](#35-hosted-create-from-preset--refresh-usage-button-dont-track-media-usage-widgetizer-hosted--builder-server---done-2026-07-02)
 
 ---
 
-## 1. Relative preview asset URLs (robustness) — discuss  *(was experiment-docs §10)*
+## 1. Relative preview asset URLs (robustness) — ✅ DONE 2026-07-01
+
+**✅ DONE 2026-07-01.** Implemented as **Option B**: preview-mode `apiUrl` is now `""` (origin-relative
+URLs) and `previewController` injects `<base href="/">` instead of `<base href="${SERVER_URL}">`. Two
+source edits — `render-engine/src/renderEngine.js` (preview `apiUrl → ""`, cascading to image/file/forms
+base + site-icon links) and `builder-server/src/controllers/previewController.js` (origin-root base tag +
+the two `sharedGlobals.apiUrl` producers → `""`) — flip all five preview URL categories to root-relative;
+`renderFooterAssets` + the enqueue resolver inherit the empty `apiUrl` unchanged. Full backend suite green
+(1313); acceptance verified in-browser under a deliberately-wrong `SERVER_URL`: page + collection-item
+previews emit `<base href="/">`, zero absolute `/api` URLs, and `masonry.js` loads from the real serving
+port (not the pinned one) with no 404s — the original audit failure mode is gone. OSS-only; hosted verified
+**inert** (its inline editor preview is same-origin, so the now-relative URLs re-resolve to the same
+`APP_ORIGIN` target; three stale hosted comments were corrected). Original
+finding below.
 
 Surfaced 2026-06-19 while root-causing a parity-audit "masonry-gallery" false positive — a
 preview that rendered completely unstyled, which turned out to be a `SERVER_URL`/port test
@@ -70,7 +85,7 @@ render server) and doesn't break the editor's same-origin/hosted-nested cases. L
 
 ---
 
-## 2. Bundled theme updates on the OSS desktop app (product/design decision) — ❌ WONTFIX 2026-06-27  *(was experiment-docs §11)*
+## 2. Bundled theme updates on the OSS desktop app (product/design decision) — ❌ WONTFIX 2026-06-27
 
 **WONTFIX note (2026-06-27):** Closed as not-a-problem. The original concern came from a
 misunderstanding — it assumed bundled theme version bumps should reach existing installs by some
@@ -109,7 +124,7 @@ theme-versioning story. Not blocking; needs a product call, not just wiring.
 
 ---
 
-## 3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — ✅ DONE 2026-06-26  *(was experiment-docs §14)*
+## 3. Modernize pre-refactor `src/...` / `server/...` paths in `docs-llms/*` (docs hygiene) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Resolved as part of a **full `docs-llms/` reorg + rewrite** (multi-agent: 36-agent
 audit → reorg plan → 30-doc rewrite wave → verification sweep). Every `src/...` / `server/...` citation across
@@ -148,7 +163,7 @@ behavioural impact.
 
 ---
 
-## 4. Deferred — Playwright E2E smoke (OSS) *(was experiment-docs §9, OSS portion)*
+## 4. Deferred — Playwright E2E smoke (OSS)
 
 No end-to-end browser tests exist yet (only `node:test` server + Vitest client/component
 suites). Planned "later" for OSS: a **Web smoke** (create → edit → export). **Electron E2E is
@@ -222,7 +237,7 @@ Low priority, cosmetic.
 
 ---
 
-## 7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — ✅ new-theme install path DONE 2026-06-25 (update-import path → §22)  *(was experiment-docs §8)*
+## 7. Missed port — theme-upload collection-schema gate not wired (`builder-server`) — ✅ new-theme install path DONE 2026-06-25 (update-import path → §22)
 
 **Status (2026-06-25):** the **new-theme install** path is now gated, restoring master parity:
 `validateThemeCollectionSchemas(extractedThemeDir)` runs between the `latest/` removal and the
@@ -237,8 +252,8 @@ versions into an installed theme — an exp-only branch master never had) is **n
 needs different handling because the effective theme only exists after `buildLatestSnapshot` merges
 base + updates — tracked as **§22**. Original finding below.
 
-Surfaced 2026-06-24 during the master-commit port audit (`experiment-docs/widgetizer-master-commits.md`),
-inspecting **`6e6fe472`** (Collections Phase 1) against latest master.
+Surfaced 2026-06-24 during the master-commit port audit, inspecting **`6e6fe472`**
+(Collections Phase 1) against latest master.
 
 The Collections feature was ported wholesale into the new package architecture, but **one
 call site was missed**: `validateThemeCollectionSchemas` was ported into
@@ -285,7 +300,7 @@ exposes upload it gets the gate for free. No hosted-only concepts involved.
 
 ---
 
-## 8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — ✅ DONE 2026-06-25  *(was experiment-docs §9)*
+## 8. Missed port — `pageController` doesn't thread `projectId` into `cleanupDeletedPageReferences` (`builder-server`) — ✅ DONE 2026-06-25
 
 **Status (2026-06-25):** fixed — both call sites in `pageController.js` now pass `scope.projectId`
 as the 3rd arg (`deletePage` `:345`, `bulkDeletePages` `:411`), so the collection-item media-usage
@@ -341,7 +356,7 @@ OSS and hosted request scopes. No hosted-only concepts.
 
 ---
 
-## 9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — ✅ DONE 2026-06-25  *(was experiment-docs §10)*
+## 9. Missed port — `Media.jsx` doesn't seed collection-item usage titles (`editor-ui`) — ✅ DONE 2026-06-25
 
 **Status (2026-06-25):** fixed. `Media.jsx` `loadUsageTitles` now also fetches collection schemas +
 items and seeds the usage-title map with `collection:{type}/{slug}` → `"{displayName}: {item title}"`,
@@ -402,7 +417,7 @@ vendored package. No hosted-only concepts.
 
 ---
 
-## 10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §11)*
+## 10. Missed port (tests only) — `createCollectionPreviewToken` guard tests (`builder-server`) — ✅ DONE 2026-06-26
 
 **Status (2026-06-26):** added the `describe("createCollectionPreviewToken — guards")` block to
 `packages/builder-server/src/tests/preview.test.js` mirroring master — asserts **400** on missing
@@ -441,7 +456,7 @@ navigable-preview UX instead — covered by the broader docs-accuracy follow-up 
 
 ---
 
-## 11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — ✅ DONE 2026-06-26 (sub-item → §24)  *(was experiment-docs §12)*
+## 11. Missed port — link-picker Combobox group headers not rendered (`editor-ui`) — ✅ DONE 2026-06-26 (sub-item → §24)
 
 **Status (2026-06-26):** fixed. `ui/Combobox.jsx` now renders a non-clickable uppercase section
 header before the first option of each `group` (mirroring `MenuCombobox.jsx:79–90`:
@@ -512,7 +527,7 @@ one-line guard for parity/robustness alongside the Combobox fix, but not indepen
 
 ---
 
-## 12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §13)*
+## 12. Missed port — richtext-embedded media not tracked as used (`builder-server`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Ported both missing halves into `mediaUsageService.js` — `EMBEDDED_MEDIA_PATH_RE`
 + `extractMediaPathsFromString` (now drives `collectMediaPaths`'s string branch; removed the dead
@@ -584,7 +599,7 @@ runs the same `mediaUsageService`, so it inherits the fix. No hosted-only concep
 
 ---
 
-## 13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — ✅ DONE 2026-06-26  *(was experiment-docs §14)*
+## 13. Missed port — `theme:update-delta` release tool not ported (OSS dev tooling) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Recovered `scripts/theme-update-delta.js` from `master` and re-added the
 `theme:update-delta` npm script. **Not** verbatim — adapted to the repo's tested-script convention
@@ -631,7 +646,7 @@ story.
 
 ---
 
-## 14. Documentation port audit — content gaps from the master-commit doc changes — ✅ DONE 2026-06-27  *(was experiment-docs §15)*
+## 14. Documentation port audit — content gaps from the master-commit doc changes — ✅ DONE 2026-06-27
 
 **Done note (2026-06-27):** 14a + 14b landed (verified against experimentation code, not blind-ported from
 master). **14a** — `docs-website/src/theme-dev-objects-context.md` + `theme-dev-menus-snippets.md` now document
@@ -654,7 +669,7 @@ link targets documented in `core-collections.md` / `core-menus.md` / `theming-se
 gallery/table in `theme-dev-setting-types.md`), which were **out of scope** for this `docs-llms`-only pass. §14
 stays open until 14a/14b are ported. Original finding below.
 
-Surfaced 2026-06-24 on a **second pass** through `experiment-docs/widgetizer-master-commits.md`, this
+Surfaced 2026-06-24 on a **second pass** through the master-commit port audit, this
 time reading the docs each commit touched (`docs-llms/*`, `docs-website/src/*`; `docs-entities/*`
 Obsidian vault stays out, decided earlier). Goal: which doc *content* must land on experimentation,
 and how much it needs rewriting for the package architecture.
@@ -725,8 +740,8 @@ blurb (what `rte_text`/`rte_blank` do + the `{% if … | rte_text != blank %}` i
 
 ### 14e. **LOW/MEDIUM (docs-llms, scope-aware rewrite)** — collection-item-as-link-target undocumented in feature docs
 
-The `collectionItemUuid` link-target feature (`3f707b26`) is fully ported in code but appears in exp
-docs **only** in `archive/branch-experimentation-findings.md` (a log), whereas master documents it as a feature
+The `collectionItemUuid` link-target feature (`3f707b26`) is fully ported in code but was
+undocumented in exp feature docs, whereas master documents it as a feature
 in `core-collections.md`, `core-menus.md`, and `theming-setting-types.md`. **Fix:** add the
 "a `link` setting can target a collection item page (resolves to its current slug, clears on delete)"
 description to those exp docs, written in the scope-first idiom — the resolver runs in
@@ -747,7 +762,7 @@ theme authors today; 14c–14e are `docs-llms` backfills (path-ref rewrites, no 
 
 ---
 
-## 15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — ✅ DONE 2026-06-26  *(was experiment-docs §16)*
+## 15. Missed port — collection item pages leak the `page-{slug}` body class (`render-engine`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Restored the dropped override in `renderEngine.js` `renderPageLayout`
 (`:782`): a caller may pass `bodyClass` to REPLACE the `page-{slug}` default, while `extraBodyClasses`
@@ -847,7 +862,7 @@ hosted-only concepts.
 
 ---
 
-## 16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §17)*
+## 16. Missed port — `refreshAllMediaUsage` aborts early on a project with no pages dir (`builder-server`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Replaced the top-of-function early `return` (`mediaUsageService.js`, was
 `:417-420`) with master's `const pagesExist = await fs.pathExists(pagesDir)` flag; hoisted `let pageCount = 0`
@@ -947,7 +962,7 @@ bug there — but the fix is harmless and keeps parity.) No hosted-only concepts
 
 ---
 
-## 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — ⏸️ DEFERRED 2026-06-26 — **low (process)**  *(was experiment-docs §18)*
+## 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — ⏸️ DEFERRED 2026-06-26 — **low (process)**
 
 **Deferred (2026-06-26):** The one *proven* escape (the item-page body-class assertion) was already
 fixed as part of §15 (exact match + `!includes("page-news")`). The broader sweep is defensive-only with
@@ -1000,7 +1015,7 @@ discipline applies to hosted's own ported suites if/when audited, but that's sep
 
 ---
 
-## 18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — ✅ DONE 2026-06-26  *(was experiment-docs §19)*
+## 18. Missed port (tests only) — depth-1 render smoke + depth-0 no-leak guard not ported (`builder-server`) — ✅ DONE 2026-06-26
 
 **Done note (2026-06-26):** Added `packages/builder-server/src/tests/depthRenderSmoke.test.js` — a
 self-contained suite (own TEST_ROOT) driving the **real `exportProject`** controller (option a) so the
@@ -1078,7 +1093,7 @@ guard protects hosted's exported item pages too once added.
 
 ---
 
-## 19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — ✅ DONE 2026-06-26 (tight scope)  *(was experiment-docs §20)*
+## 19. Missed port (tests only) — `renderCollectionItemPage` contract test not ported (`builder-server`) — ✅ DONE 2026-06-26 (tight scope)
 
 **Done note (2026-06-26):** Added `packages/builder-server/src/tests/renderCollectionItemPage.test.js` —
 scoped **tight** to the one piece of master's contract not already covered by §15/§18: the
@@ -1143,7 +1158,7 @@ contract guard protects hosted's item-page render path too once added.
 
 ---
 
-## 20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — ✅ DONE 2026-06-26 (option b: comment + direct tests)  *(was experiment-docs §21)*
+## 20. Stale test comment — claims `remapCollectionItem{Link,Menu}Refs` "NOT ported" when they are (`builder-server`) — ✅ DONE 2026-06-26 (option b: comment + direct tests)
 
 **Done note (2026-06-26):** Chose option (b) — corrected the stale comment **and** added the missing direct
 coverage. Rewrote the `collectionLinkEnrichment.test.js` header note (the "OMITTED … intentionally NOT ported
@@ -1534,7 +1549,18 @@ theme-update workflow is next revisited (ties into §2/§13); fold the reuse cle
 
 ---
 
-## 28. Close the path-based storage exceptions for the hosted boundary (adapter discipline)
+## 28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — ✅ DONE 2026-07-02
+
+**✅ DONE 2026-07-02.** §28's own scope is complete and re-verified green: OSS builder-server suite
+(1313) + hosted server suite (612) + both repos' lint all pass, and the code matches every claim below
+— theme CRUD reads/writes via `storage.{read,write}(scope,'theme.json')` (`themeController.js`), render
+reads go through the shared `…FromDir` readers (`projectContentFs.js`), `getMenuById` is deleted (zero
+refs anywhere), and hosted's `buildCloudRenderDeps` imports the shared readers while `cloudProjectData.js`
+keeps only the deliberately-lenient `readThemeData` + SQLite getters. The theme-settings fork stays (D).
+The one open gap this work surfaced — hosted theme-save not tracking media usage (**§31**) — is now
+**also fixed** (2026-07-02). The only remaining piece of the original exception set is the **deferred
+lifecycle duplicate/import tail (§30)**, blocked on hosted needing it + the `AssetStorageAdapter.copy`
+primitive. Full status history below.
 
 **Status:** 🟢 OSS reads + theme-CRUD + dead-code slices **IMPLEMENTED** + C1/C2 promoted into the
 docs-llms maps (2026-06-29; TDD, full backend suite + `npm run lint` green) — see "Implementation progress"
@@ -1542,7 +1568,7 @@ below. Hosted follow-on (D) **render-reader dedup IMPLEMENTED** (2026-06-30; hos
 `eslint` green) — `cloudProjectData.js`'s `listPages`/`readGlobalWidget` now come from the shared OSS
 `…FromDir` readers. The theme-settings fork was re-checked against code and **kept, not collapsed**
 (collapsing would change ~9 behaviors — see D below). 🟡 remaining tails tracked separately: lifecycle
-duplicate/import cores in **§30** (deferred); the hosted theme media-usage gap surfaced by D in **§31** (open).
+duplicate/import cores in **§30** (deferred); the hosted theme media-usage gap surfaced by D in **§31** (DONE 2026-07-02).
 The unified architecture (three storage planes; the `projectDir` working-directory contract) lives in
 `core-project-id-architecture.md` § Still-path-based exceptions.
 
@@ -1782,10 +1808,24 @@ shell-wrapper job rather than a re-fork if/when hosted wants them.
 
 ---
 
-## 31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`)
+## 31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — ✅ DONE 2026-07-02
 
-**Status:** ⬜ open — surfaced by §28 D (2026-06-30) while re-checking the theme-settings fork. Hosted-repo
-fix; independent of the §28 read-closure (which is done).
+**Done note (2026-07-02):** Fixed via **export-and-call** (the minimal path the finding pre-sanctioned).
+`updateThemeSettingsMediaUsage` — previously unexported — is now re-exported from the
+`@widgetizer/builder-server` barrel (`src/index.js`), and hosted's `POST /api/themes/project/:projectId`
+(`server/routes/projectThemes.js`) calls it after the `storage.write`, wrapped in a **non-blocking**
+try/catch, exactly mirroring OSS `saveProjectThemeSettings`. No scope/adapter plumbing was needed: the whole
+tracking chain is DB-only through the shared `getDb()` singleton hosted already inits (`server/index.js`
+`initDb`) — `readMediaFile(projectId)` (shared `media` table) → path match (incl. size variants) →
+`updateMediaUsageForSource(projectId, 'global:theme-settings', ids)` (shared `media_usage`). TDD: new
+`server/tests/routes/projectThemes.test.js` seeds a favicon media row, POSTs favicon-referencing theme
+settings through the real header-driven `CloudScopeResolver` + `CloudStorageAdapter`, and asserts a
+`media_usage` row for `global:theme-settings` — **red** (empty usage) before the fix, **green** after.
+Hosted server suite **612** + lint green; OSS **1313** + lint green (barrel change). The theme route is
+otherwise unchanged — the fork stays per §28 D (no behavior collapse). Original finding below.
+
+**Status:** ✅ DONE 2026-07-02 — surfaced by §28 D (2026-06-30) while re-checking the theme-settings fork.
+Hosted-repo fix; independent of the §28 read-closure (which is done).
 
 **What.** `widgetizer-hosted/server/routes/projectThemes.js`'s `POST /api/themes/project/:projectId`
 sanitizes + writes `theme.json` but **never calls `updateThemeSettingsMediaUsage`** (the OSS
@@ -1810,3 +1850,172 @@ add a hosted route test asserting a favicon-only theme asset is recorded as used
 
 **Effect:** moderate (data-integrity / correctness) — prevents silent loss of theme-referenced media in
 hosted. Not visible until an affected asset is cleaned up.
+
+---
+
+## 32. Theme-upload update-import validation smells (`builder-server`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `1c831b4b` (§22: gate collection
+schemas on the theme **update-import** path). Two minor smells in the new validation path; neither is a
+confirmed bug, both worth a look.
+
+**What.** `1c831b4b` added a pre-commit validation branch to `uploadTheme` (`themeController.js`) that
+merges installed base + installed updates + incoming deltas into a throwaway dir via the extracted
+`layerThemeSnapshot`, runs `validateThemeCollectionSchemas`, and cleans up in `finally`. Two things to
+investigate:
+- **Temp-dir name.** The throwaway merge dir is `_validate_${Date.now()}`. Two update-imports for the *same*
+  installed theme landing in the same millisecond would collide on that name. Investigate whether concurrent
+  uploads to one theme dir are reachable (route / serialization); if so, switch to a collision-proof name
+  (`fs.mkdtemp`).
+- **Log volume.** `layerThemeSnapshot` logs one line per applied version and now runs **twice** per
+  update-import (build `latest` + `_validate_` merge), so the per-version `console.log` fires twice per
+  upload. Investigate quieting it (log once, or gate behind a debug flag).
+
+**Scope.** OSS-only surface — hosted doesn't reach theme upload (`widgetizer-hosted/server/routes/
+projectThemes.js` imports only `sanitizeThemeSettings`; no `uploadTheme` caller). No hosted impact.
+
+**Effect:** low — a same-ms collision would corrupt only one concurrent *validation* run (not the install),
+and the double log is cosmetic. Confirm reachability before deciding to fix.
+
+---
+
+## 33. Editor-ui duplication smells (`editor-ui`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `331ccf8b` (user-test-checklist batch).
+Two DRY / maintainability smells to weigh; refactor-only, no behavior change intended.
+
+**What.**
+- **Slug-validation ternary duplicated.** The same `formatSlug(value).length > 0 ? … : …` validation is
+  inlined in both `PageForm` and `CollectionItemForm`. Investigate extracting a shared rule/helper (a
+  `validateSlug` next to the existing `formatSlug`, or a shared form rule) so the two forms can't drift.
+- **`useMediaState` localStorage pattern.** `useMediaState` reads `localStorage` in a `useState` initializer
+  **and** persists via an effect. Investigate a small reusable `usePersistentState` / `useLocalStorage` hook
+  before this read-init + persist-effect shape is copy-pasted as more editor prefs are added.
+
+**Scope.** Pure `@widgetizer/editor-ui`; a fix flows to web / Electron / hosted via the vendored package.
+
+**Effect:** low (maintainability). Not user-visible; investigate whether the extraction is worth it now or
+when a third consumer appears.
+
+---
+
+## 34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `08039c82` (speed up project creation
+by not copying excluded theme dirs). A behavior-parity question, almost certainly benign.
+
+**What.** `08039c82` replaced copy-everything-then-`fs.rm` with a single `fs.cp` whose `filter` skips
+excluded **top-level** entries (`updates`, `latest`, `presets` + caller excludes such as `templates`) during
+the copy — a real speedup (avoids copying then discarding the ~200MB `presets/` for Arch). But the semantics
+widened subtly: the old `fs.rm` removed only directory *paths*, whereas the new `filter` excludes any
+top-level *entry* whose name matches — so a top-level **file** named e.g. `templates` (not a dir) would now
+also be skipped.
+
+**Investigate.** Whether any theme ships (or could ship) a top-level file whose name collides with an
+excluded dir name — none in `arch` today. If parity matters, make the filter dir-aware (exclude only when the
+entry is a directory); otherwise document the intended semantics and close.
+
+**Scope.** `copyThemeToProject` is called via `scaffoldProjectContent`, which hosted also uses
+(`widgetizer-hosted/server/routes/projects.js`), so hosted inherits both the speedup and this semantic — a
+fix flows through automatically. No hosted-only work.
+
+**Effect:** negligible (theoretical edge case) — flagged for confirmation, not because a break is known.
+
+---
+
+## 35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — ✅ DONE 2026-07-02
+
+**Done note (2026-07-02):** Implemented the dir-aware-core fix (plan approved). Four parts, TDD throughout:
+(1) extracted `refreshAllMediaUsageFromDir({ projectId, projectDir })` in `mediaUsageService.js` — the
+folderName-based `refreshAllMediaUsage(projectId)` is now a thin wrapper (`getProjectDir(folder)` → core),
+behavior-preserving for its OSS-only callers; barrel-exported. (2) Promoted `getProjectBase(scope)` to the
+`StorageAdapter` contract — added the JSDoc property (`core/adapters.js`), the public delegate on
+`LocalStorageAdapter` (Cloud already had it), and a `getProjectBase` invariants block in the shared storage
+conformance suite (auto-covers both adapters) + a concrete "write lands under getProjectBase" test.
+(3) **Symptom B:** `mediaController.refreshMediaUsage` now resolves `projectDir =
+req.adapters.storage.getProjectBase(req.scope)` and calls the core — correct in both shells; the destructive
+wipe is gone. (4) **Symptom A:** hosted `POST /api/projects` calls the core after seeding (non-blocking,
+reusing the `projectDir` from L185). Tests: OSS `mediaUsage.test.js` dir-explicit case + `media.test.js`
+storage-stub update; hosted `mediaRefreshUsage.test.js` (button) and `projectsMediaUsage.test.js`
+(create-from-preset) — both driven through the real route + CloudStorageAdapter + DB and each proven red→green
+by temporarily disabling the fix. Full suites green: OSS builder-server **1314** + Vitest **722** + lint;
+hosted server **615** + lint. Original finding below.
+
+**Status:** ✅ DONE 2026-07-02 — root-caused 2026-07-02 while checking a user report ("new project from a preset imports
+and uses images, but they show *Unused*"). **Confirmed hosted** (2026-07-02);
+OSS is correct by inspection (see below). Fix approach (dir-aware refresh core + a small adapter-contract
+addition) is scoped below but **not yet implemented**. Sibling of §31, under the §28 boundary umbrella
+(hosted has no working full media-usage rescan of its own).
+
+**Symptom A — preset seeding.** After creating a hosted project from a preset, every preset-seeded image
+shows **"Unused"** in the Media library (`file.usedIn` empty), even though preset pages/widgets reference
+them. They are therefore deletion-unprotected and pruned on export/publish → broken images on the published
+site. Same data-integrity family as §31, but on the bulk-seed path rather than theme-save.
+
+**Symptom B — the "Refresh Usage" button (worse than inert).** The Media page's *Refresh Usage* button hits
+the **shared** `mediaController.refreshMediaUsage` (`mediaController.js:783`) — mounted in hosted via the OSS
+project-scoped router — which calls the same folderName-bound `refreshAllMediaUsage(projectId)`. In hosted it
+scans the wrong global path, finds nothing, and `replaceMediaUsage` **deletes all `media_usage` rows for the
+project and re-inserts nothing** — so it silently **wipes** usage (including any favicon usage §31 recorded on
+the last theme-save), rather than rebuilding it. Same root cause; a second, live caller of the broken rescan.
+
+**Root cause — two compounding facts, both hosted-specific:**
+
+1. **The hosted create route runs no post-seed usage derivation.** OSS `projectController.js:370` calls
+   `refreshMediaUsageAfterStructuralChange(newProject.id, "project creation")` *after* scaffold +
+   `seedPresetCollections` + `seedPresetMedia` (and likewise for duplication `:621` / import `:1114`).
+   Hosted's `POST /api/projects` (`widgetizer-hosted/server/routes/projects.js:171–230`) seeds content +
+   media (`media_files` rows via `seedPresetMedia` → shared `mediaRepository`) but calls **no** usage
+   refresh. Grep confirms zero media-usage refresh calls in hosted's create path.
+2. **The full-rescan function isn't hosted-compatible anyway.** `refreshAllMediaUsage(projectId)`
+   (`mediaUsageService.js:411`) reads *all* content via folderName FS — `getProjectPagesDir` /
+   `getProjectThemeJsonPath` / `getProjectDir`, all rooted at the OSS-global `DATA_DIR/projects/<folder>`
+   (`config.js:106`). Hosted content lives at the per-user `data/users/<actorId>/projects/<folder>`
+   (`CloudStorageAdapter.getProjectBase(scope)`, used at `projects.js:185`). So even if hosted called it, it
+   would scan the wrong empty path and *clear* usage via `replaceMediaUsage`. This is a **§28-class
+   path-based exception** — `refreshAllMediaUsage` is folderName/global-`DATA_DIR`-bound.
+
+**Why §31 didn't cover it, and why normal hosted editing is fine.** The *data-passed* trackers
+(`updatePageMediaUsage(projectId, pageId, pageData)`, `updateThemeSettingsMediaUsage`,
+`syncPageMediaUsageOnWrite`, …) take content as an argument + read `media_files` from the shared DB — no
+folderName FS — so they work in hosted and fire on every in-editor save via the mounted OSS `pageController`.
+§31 fixed the one *forked* route (theme-save). Only the **bulk preset-seed** path writes content directly
+without a save, so it alone depends on the full rescan — the one function that's folderName-bound.
+
+**OSS status (why OSS is *not* affected):** OSS `createProject` calls the refresh at `:370` after seeding,
+and `getProjectDir(folder)` = `DATA_DIR/projects/<folder>` is exactly where OSS content is. Verified by code
+inspection (ordering: scaffold `:322` → seedPresetCollections `:332` → createProject `:357` → seedPresetMedia
+`:364` → refresh `:370`). If the reporter turns out to have been in OSS, re-open as a separate OSS bug.
+
+**Fix (recommended — §28-aligned dir-aware core + a contract addition):**
+- **Extract the dir-aware core.** `refreshAllMediaUsageFromDir({ projectId, projectDir })` next to
+  `refreshAllMediaUsage` — read content via `fs` from the *passed* `projectDir`, read `media_files` from the
+  DB (`readMediaFile(projectId)`), write `media_usage` (`replaceMediaUsage`). Mirrors §28's
+  `projectContentFs.js` `…FromDir` readers (hosted's per-user project dir is itself filesystem-backed — only
+  media is R2 — so an `fs` read of the correct `projectDir` works for both OSS and hosted; no async per-key
+  adapter plumbing). `refreshAllMediaUsage(projectId)` becomes a thin wrapper that resolves
+  `projectDir = getProjectDir(folder)` then delegates — behavior-preserving for its OSS-internal callers
+  (`projectController` create/dup/import, `themeUpdateService`). Barrel-export the core.
+- **Promote `getProjectBase(scope)` to the `StorageAdapter` contract** (`core/adapters.js` typedef +
+  conformance suite). It already exists on hosted's `CloudStorageAdapter`; expose it publicly on
+  `LocalStorageAdapter` (delegate to the existing private `#projectBase`). This is what lets a **shared**
+  request handler resolve the per-tenant project dir without knowing OSS-vs-hosted layout — the missing piece
+  the §28 audit didn't cover (it focused on render reads, which get `projectDir` from the shell, not on the
+  media-usage rescan, which runs inside a shared controller).
+- **Fix Symptom B (the button).** Change `mediaController.refreshMediaUsage` to
+  `refreshAllMediaUsageFromDir({ projectId: req.scope.projectId, projectDir: req.adapters.storage.getProjectBase(req.scope) })`.
+  Correct in both OSS (Local → OSS project dir) and hosted (Cloud → per-user dir); stops the destructive wipe.
+- **Fix Symptom A (preset seed).** Hosted `POST /api/projects`: after seeding, call
+  `refreshAllMediaUsageFromDir({ projectId, projectDir: adapters.storage.getProjectBase(scope) })`
+  (non-blocking try/catch, mirroring OSS's `refreshMediaUsageAfterStructuralChange` wrapper at
+  `projectController.js:370`).
+- Same core is what hosted duplicate/import would reuse if §30 ever lands.
+
+**Test-first (TDD):** hosted route test — create a project from a preset (or seed the fixture), POST/So the
+create flow runs, then assert a preset-seeded image's `usedIn` is non-empty (references the seeding page/
+widget). Red before (empty usage), green after. Plus a `builder-server` unit test for
+`refreshAllMediaUsageFromDir` on a scratch `projectDir`, and confirm OSS `refreshAllMediaUsage` still passes.
+
+**Effect:** moderate (data-integrity) — hosted preset projects currently ship with all seeded media
+mis-flagged unused (deletable / pruned on publish). **Hosted impact:** the fix; OSS unaffected (behavior-
+preserving wrapper).

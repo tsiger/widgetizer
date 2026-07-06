@@ -1,8 +1,8 @@
-// Dir-explicit project-content readers (TODO §28, Phase A).
+// Dir-explicit project-content readers.
 //
 // Pure FS transforms over a caller-supplied project working directory: no
 // DATA_DIR reach-through, no SQLite, no scope, no permanence assumption — the
-// caller owns where the directory comes from and how long it lives (the C1/C2
+// caller owns where the directory comes from and how long it lives (the
 // working-directory contract). These are the OSS-internal counterparts of the
 // request-boundary StorageAdapter reads: the scope-free render path (engine
 // deps, preview/export) reads content through these; the API boundary reads the

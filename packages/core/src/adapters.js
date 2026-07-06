@@ -39,6 +39,10 @@
  * @property {(scope: Scope, relativeDir: string) => Promise<string[]>} list
  * @property {(scope: Scope, relativePath: string) => Promise<boolean>} exists
  * @property {(scope: Scope, relativePath: string) => Promise<{ size: number, mtime: Date } | null>} stat
+ * @property {(scope: Scope) => string} getProjectBase - Absolute path to the project's
+ *   working directory (the root read/write/list resolve against). Lets shared, scope-first
+ *   code hand a dir-explicit FS operation the correct per-project dir without knowing the
+ *   OSS-vs-hosted on-disk layout.
  */
 
 /**

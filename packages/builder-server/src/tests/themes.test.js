@@ -81,7 +81,7 @@ const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
 // The project-theme handlers read/write theme.json through the injected storage
-// adapter over req.scope (TODO §28). Direct controller calls supply the scope of
+// adapter over req.scope. Direct controller calls supply the scope of
 // the seeded active project, matching production (resolveActiveProject middleware).
 const themeStorage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
 const TEST_SCOPE = {

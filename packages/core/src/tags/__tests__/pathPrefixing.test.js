@@ -1,5 +1,5 @@
 /**
- * Phase 15 — depth-aware asset/tag path prefixing.
+ * Depth-aware asset/tag path prefixing.
  *
  * Every asset-emitting tag, in publish mode, must prepend `outputPathPrefix`
  * (the per-render global: "" at the export root, "../" one directory deep) to

@@ -19,6 +19,17 @@ export class LocalStorageAdapter {
     return path.resolve(this.dataRoot, "projects", scope.folderName);
   }
 
+  /**
+   * Absolute path to the project's working directory — the root read/write/list
+   * resolve against. Part of the StorageAdapter contract (see @widgetizer/core/adapters;
+   * mirrors hosted's CloudStorageAdapter.getProjectBase).
+   * @param {{ folderName: string }} scope
+   * @returns {string}
+   */
+  getProjectBase(scope) {
+    return this.#projectBase(scope);
+  }
+
   #resolve(scope, relativePath) {
     const base = this.#projectBase(scope);
     const resolved = path.resolve(base, relativePath);

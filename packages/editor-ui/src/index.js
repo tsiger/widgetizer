@@ -16,3 +16,7 @@ export {
 } from "./extension/PluginProvider.jsx";
 export { builtinNavPlugin, NAV_GROUPS, groupNavItems } from "./extension/builtinNav.js";
 export { EditorShell, EditorProvider, createEditorRoutes } from "./EditorShell.jsx";
+// Resolves a collection schema's PascalCase `icon` name to a lucide-react component
+// (fallback: Database). Shared so a host reproducing the collection nav outside the
+// editor shell renders the same per-collection icons as editor-ui's Sidebar.
+export { resolveLucideIcon } from "./utils/lucideIcon.js";

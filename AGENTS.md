@@ -164,3 +164,4 @@ Output goes to `dist-electron/`.
 - Vite dev server on port 3000, Express API on port 3001
 - `data/` directory is gitignored except for the `projects/` directory structure
 - Theme widgets define their schema in `schema.json` and template in `widget.liquid`
+- **Comments must earn their place** — document non-obvious logic, caveats, gotchas, and important relationships; don't restate the code or comment for its own sake. Never cite ephemeral planning docs from code (no `TODO.md` `§`-section refs or plan-file citations in comments) — put the reason inline instead.

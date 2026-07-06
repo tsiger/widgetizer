@@ -1,6 +1,6 @@
 /**
  * collectionService — reads, validates, normalizes, and persists collection-type
- * schemas (Collections spec Sections 1 and 4) and collection items.
+ * schemas and collection items (docs-llms/core-collections.md §3).
  *
  * Scope-first rewrite for the package split: every stateful function takes the
  * injected `(storage, scope)` pair and addresses tenant content through the
@@ -353,7 +353,7 @@ export async function validateThemeCollectionSchemas(themeSourceDir) {
 }
 
 // ============================================================================
-// Read-side item storage (Phase 3 — spec Sections 2, 4, 15)
+// Read-side item storage (docs-llms/core-collections.md §2)
 // ============================================================================
 
 const HEADER_TYPE = "header";
@@ -671,7 +671,7 @@ export async function readCollectionItem(storage, scope, collectionType, itemSlu
 }
 
 /**
- * Load a collection's `template.liquid` from the project copy (Phase 2 export).
+ * Load a collection's `template.liquid` from the project copy.
  * @returns {Promise<string|null>} template contents, or null if absent
  */
 export async function loadCollectionTemplate(storage, scope, collectionType) {
@@ -681,7 +681,7 @@ export async function loadCollectionTemplate(storage, scope, collectionType) {
 }
 
 // ============================================================================
-// Write-side item storage (Phase 4 — spec Sections 10, 15)
+// Write-side item storage (docs-llms/core-collections.md §2)
 // ============================================================================
 
 /** Slug already taken by a different item — controller surfaces as 409. */
@@ -709,7 +709,7 @@ function nowIso() {
 }
 
 /** Strictly-monotonic `updated`: greater than the file being replaced even under
- *  backward clock adjustments or future-dated imports (spec Section 15). */
+ *  backward clock adjustments or future-dated imports (docs-llms/core-collections.md §2). */
 function nextUpdatedIso(previousUpdated) {
   const prevMs = previousUpdated ? Date.parse(previousUpdated) : 0;
   const base = Number.isFinite(prevMs) ? prevMs : 0;
@@ -1013,7 +1013,7 @@ export async function reorderCollectionItems(storage, scope, collectionType, ord
 }
 
 // ============================================================================
-// Render-time link resolution (Phase 7 — spec Section 9)
+// Render-time link resolution (docs-llms/core-collections.md §3)
 // ============================================================================
 
 /** A link-type setting value: an object carrying an `href`. */
@@ -1044,10 +1044,10 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
 }
 
 /**
- * Resolve link settings on a collection item at render time (spec Section 9):
+ * Resolve link settings on a collection item at render time (docs-llms/core-collections.md §3):
  * `pageUuid` → current page slug, custom URLs depth-prefixed, dead refs cleared.
  * Returns a deep clone; the input item is never mutated. v1 schemas are flat, so
- * a single pass over top-level settings suffices (repeaters arrive in Phase 3+).
+ * a single pass over top-level settings suffices.
  *
  * @param {object} item - a collection item ({ settings })
  * @param {Map} pagesByUuid - uuid -> page ({ slug })
@@ -1163,7 +1163,7 @@ function isValidSiteUrl(siteUrl) {
 
 /**
  * Map a normalized collection item + its schema into the page-shaped object that
- * renderPageLayout and SeoTag consume for an item page (spec Section 13). The
+ * renderPageLayout and SeoTag consume for an item page (docs-llms/core-collections.md §6). The
  * title comes from the schema's usedAsTitle field; SEO comes from the item's
  * own page-shaped `seo` object at parity with page SEO, so the
  * shared `SeoTag` handles `<title>`, og fallbacks, og:image absolutization, and

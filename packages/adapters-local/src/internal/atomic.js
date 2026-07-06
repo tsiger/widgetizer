@@ -1,4 +1,4 @@
-// Atomic local-FS writes (Collections spec §15), kept as a local-adapter detail.
+// Atomic local-FS writes, kept as a local-adapter detail.
 //
 // Write to a UUID-suffixed tmp file in the same directory, then rename onto the
 // target. Rename is atomic on Linux/macOS and (same-volume) Windows, so a reader

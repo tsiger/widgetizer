@@ -1595,8 +1595,8 @@ export async function getProjectThemeSettings(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
 
-    // Read theme.json through the injected storage adapter over the resolved scope
-    // (TODO §28) — the same scope-first, tenant-isolated path as every other content
+    // Read theme.json through the injected storage adapter over the resolved scope —
+    // the same scope-first, tenant-isolated path as every other content
     // read (cf. getAllPages). The route :projectId no longer drives resolution.
     const buf = await storage.read(scope, "theme.json");
     if (buf == null) {
@@ -1625,8 +1625,8 @@ export async function saveProjectThemeSettings(req, res) {
     // Validate and sanitize theme settings before writing.
     const { data: sanitizedThemeData, warnings } = sanitizeThemeSettings(req.body);
 
-    // Write theme.json through the injected storage adapter over the resolved scope
-    // (TODO §28). The active project's existence is already guaranteed by the
+    // Write theme.json through the injected storage adapter over the resolved scope.
+    // The active project's existence is already guaranteed by the
     // resolveActiveProject middleware (and the write-guard asserts route :projectId
     // matches scope), so the former manual fs.access project-existence check is gone.
     await storage.write(scope, "theme.json", JSON.stringify(sanitizedThemeData, null, 2));

@@ -1,12 +1,12 @@
 /**
- * Dir-explicit project-content readers (TODO §28, Phase A).
+ * Dir-explicit project-content readers.
  *
  * These are pure FS transforms over a caller-supplied project working directory
  * (no DATA_DIR reach-through, no SQLite, no scope). They back the scope-free
  * render path (engine deps, preview/export) and are the OSS-internal counterparts
  * to the request-boundary StorageAdapter reads. The tests run against a scratch
  * directory only — no isolated DATA_ROOT / DB bootstrap needed, which is the
- * whole point of the dir-explicit contract (C2).
+ * whole point of the dir-explicit contract.
  *
  * Behaviour must match the folderName-based readers they replace
  * (listProjectPagesData / readGlobalWidgetData in pageController, and the strict
