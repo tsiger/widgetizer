@@ -1,6 +1,83 @@
 {
   "files": [
     {
+      "filename": "bedrock-before-kitchen.jpg",
+      "originalName": "bedrock-before-kitchen.jpg",
+      "type": "image/jpeg",
+      "size": 107834,
+      "path": "/uploads/images/bedrock-before-kitchen.jpg",
+      "width": 1600,
+      "height": 1056,
+      "alt": "",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/bedrock-before-kitchen-medium.jpg",
+          "width": 1024,
+          "height": 676
+        },
+        "small": {
+          "path": "/uploads/images/bedrock-before-kitchen-small.jpg",
+          "width": 480,
+          "height": 317
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrock-before-kitchen-thumb.jpg",
+          "width": 150,
+          "height": 99
+        }
+      }
+    },
+    {
+      "filename": "bedrocklogolight.png",
+      "originalName": "bedrock_logo_light.png",
+      "type": "image/png",
+      "size": 5701,
+      "path": "/uploads/images/bedrocklogolight.png",
+      "width": 800,
+      "height": 144,
+      "alt": "",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrocklogolight-small.png",
+          "width": 480,
+          "height": 86
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrocklogolight-thumb.png",
+          "width": 150,
+          "height": 27
+        }
+      }
+    },
+    {
+      "filename": "bedrocklogodark.png",
+      "originalName": "bedrock_logo_dark.png",
+      "type": "image/png",
+      "size": 16695,
+      "path": "/uploads/images/bedrocklogodark.png",
+      "width": 800,
+      "height": 144,
+      "alt": "",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bedrocklogodark-small.png",
+          "width": 480,
+          "height": 86
+        },
+        "thumb": {
+          "path": "/uploads/images/bedrocklogodark-thumb.png",
+          "width": 150,
+          "height": 27
+        }
+      }
+    },
+    {
       "filename": "bedrock-service-kitchens.webp",
       "originalName": "bedrock-service-kitchens.webp",
       "type": "image/webp",

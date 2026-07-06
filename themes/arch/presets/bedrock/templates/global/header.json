@@ -16,6 +16,8 @@
     "full_width": true,
     "sticky": true,
     "transparent_on_hero": true,
-    "color_scheme": "standard-primary"
+    "color_scheme": "standard-primary",
+    "transparent_logo": "/uploads/images/bedrocklogolight.png",
+    "logoImage": "/uploads/images/bedrocklogodark.png"
   }
 }
