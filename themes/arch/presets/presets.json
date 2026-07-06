@@ -15,7 +15,8 @@
     {
       "id": "bedrock",
       "name": "Bedrock",
-      "description": "General contractor"
+      "description": "General contractor",
+      "liveDemo": "https://demos.widgetizer.org/bedrock/"
     },
     {
       "id": "brewline",
