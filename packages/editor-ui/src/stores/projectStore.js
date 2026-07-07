@@ -35,6 +35,35 @@ function deriveScope(project) {
   };
 }
 
+// Bootstrap resilience: a cold-boot GET /api/projects/active can be cancelled by
+// a top-level navigation (NS_BINDING_ABORTED) or hit a transient error. Retry a
+// bounded number of times before surfacing an error — a failed probe must NOT be
+// mistaken for "no active project" (that wrongly bounces the editor to the picker).
+const BOOTSTRAP_MAX_ATTEMPTS = 3;
+const BOOTSTRAP_RETRY_DELAY_MS = 400;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Retry only THROWN failures. A resolved value (a project, or null when no
+// projects exist) is authoritative and returned immediately — null still routes
+// to the picker.
+async function fetchActiveProjectWithRetry() {
+  let lastError;
+  for (let attempt = 1; attempt <= BOOTSTRAP_MAX_ATTEMPTS; attempt++) {
+    try {
+      return await getActiveProject();
+    } catch (error) {
+      lastError = error;
+      if (attempt < BOOTSTRAP_MAX_ATTEMPTS) await sleep(BOOTSTRAP_RETRY_DELAY_MS);
+    }
+  }
+  throw lastError;
+}
+
+// Single-flight guard: React StrictMode double-invokes the bootstrap effect, and
+// two racing fetches let the first-to-fail bounce the router before the second
+// resolves. Sharing one in-flight promise yields one fetch and one settle.
+let inflightFetch = null;
+
 // Create the store
 const useProjectStore = create((set) => ({
   // State
@@ -44,15 +73,23 @@ const useProjectStore = create((set) => ({
   error: null,
 
   // Actions
-  fetchActiveProject: async () => {
+  fetchActiveProject: () => {
+    if (inflightFetch) return inflightFetch;
     set({ loading: true, error: null });
-    try {
-      const project = await getActiveProject();
-      set({ activeProject: project, scope: deriveScope(project), loading: false });
-    } catch (error) {
-      console.error("Failed to load active project:", error);
-      set({ error: error.message, loading: false });
-    }
+    inflightFetch = (async () => {
+      try {
+        const project = await fetchActiveProjectWithRetry();
+        set({ activeProject: project, scope: deriveScope(project), loading: false, error: null });
+      } catch (error) {
+        // Retries exhausted. Surface an explicit error the gates read as
+        // "couldn't load" (retry screen) — NOT "no project" (picker).
+        console.error("Failed to load active project:", error);
+        set({ error: error.message, loading: false });
+      } finally {
+        inflightFetch = null;
+      }
+    })();
+    return inflightFetch;
   },
 
   // Manually set the active project (e.g. after the OSS project picker selects one).

@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **29 done · 3 deferred · 3 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 2 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -47,7 +47,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **29 done ·
 - ⬜ [33. Editor-ui duplication smells — slug-validator ternary + `useMediaState` localStorage pattern (`editor-ui`) — **investigate (low)**](#33-editor-ui-duplication-smells-editor-ui)
 - ✅ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — DONE 2026-07-07 (top-level-only guard + doc; original premise corrected)](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server---done-2026-07-07)
 - ✅ [35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — DONE 2026-07-02 (dir-aware core + getProjectBase contract) — **moderate (data-integrity)**](#35-hosted-create-from-preset--refresh-usage-button-dont-track-media-usage-widgetizer-hosted--builder-server---done-2026-07-02)
-- ⬜ [36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) — **investigate (low/moderate)**](#36-cold-boot-race-bounces-the-editor-to-the-picker-on-an-aborted-active-project-fetch-editor-ui)
+- ✅ [36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) — DONE 2026-07-07 (single-flight + bounded retry + error-gated bootstrap; no more picker bounce)](#36-cold-boot-race-bounces-the-editor-to-the-picker-on-an-aborted-active-project-fetch-editor-ui---done-2026-07-07)
 
 ---
 
@@ -2054,9 +2054,24 @@ preserving wrapper).
 
 ---
 
-## 36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`)
+## 36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) — ✅ DONE 2026-07-07
 
-**Status:** ⬜ open (investigate) — surfaced 2026-07-07 while verifying §29's stale-project curtain reload
+**Done note (2026-07-07):** Fixed as scoped (client-only; no server/contract change). Root cause confirmed by
+code + a live reproduction: `projectStore.fetchActiveProject` collapsed a *thrown* probe (a nav-cancelled fetch —
+proven a document-navigation abort, since the request carries no `AbortController`; or a transient 500/network
+blip) into the same `{ loading:false, activeProject:null }` as a *resolved* `null` (genuine no-project), and both
+gates (`RequireActiveProject`, `HomeRedirect`) treated that as "go to the picker" without consulting `error`.
+Three cooperating fixes: (1) `fetchActiveProject` is now **single-flight** (StrictMode's double-invoked bootstrap
+shares one fetch/settle) with a **bounded retry** (3 attempts, 400 ms apart) — a resolved value (project or
+`null`) is authoritative and returned at once, only a throw retries; (2) a new opt-in `WorkspaceLoadFailed` screen
+(`editor-ui/components/ui`); (3) both gates gain an `error && !activeProject` branch → render the retry screen,
+never `<Navigate to="/projects">`. Genuine no-project (`null`, no error) still routes to the picker. Verified live
+with the same probe that proved the bug: rejecting the first `/api/projects/active` self-heals to `/pages`;
+rejecting all shows the retry screen (never the picker) and Retry recovers. Frontend suite green (754), lint clean.
+Hosted-inert (seeds via `EditorProvider`; never calls `fetchActiveProject`; the new branch is unreachable —
+`error` stays null). Original scope below.
+
+**Status:** ✅ DONE 2026-07-07 — surfaced 2026-07-07 while verifying §29's stale-project curtain reload
 (`window.location.assign("/pages")`). Pre-existing OSS bootstrap flakiness, independent of §29 (which only
 exposed it).
 

@@ -1,10 +1,13 @@
 import { Navigate, Outlet } from "react-router-dom";
 import useProjectStore from "../../stores/projectStore";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import WorkspaceLoadFailed from "../ui/WorkspaceLoadFailed";
 
 function RequireActiveProject() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const loading = useProjectStore((state) => state.loading);
+  const error = useProjectStore((state) => state.error);
+  const fetchActiveProject = useProjectStore((state) => state.fetchActiveProject);
 
   if (loading) {
     return (
@@ -12,6 +15,11 @@ function RequireActiveProject() {
         <LoadingSpinner />
       </div>
     );
+  }
+
+  // A failed probe is NOT "no project" — offer retry instead of bouncing to the picker.
+  if (error && !activeProject) {
+    return <WorkspaceLoadFailed onRetry={fetchActiveProject} />;
   }
 
   if (!activeProject) {
