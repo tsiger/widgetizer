@@ -342,6 +342,10 @@ before(async () => {
             type: "core-spacer",
             settings: { height: 60 },
           },
+          "slider-1": {
+            type: "hero-slider",
+            settings: {},
+          },
           "link-1": {
             type: "core-link",
             settings: {
@@ -350,7 +354,7 @@ before(async () => {
             },
           },
         },
-        widgetsOrder: ["spacer-1", "link-1"],
+        widgetsOrder: ["spacer-1", "slider-1", "link-1"],
         created: "2025-01-01T00:00:00.000Z",
         updated: "2025-06-01T00:00:00.000Z",
       },
@@ -546,10 +550,38 @@ before(async () => {
   // -----------------------------------------------------------
   // 10. Widget assets (CSS/JS in widgets dir)
   // -----------------------------------------------------------
+  // hero-slider is used on the index page and enqueues its assets — they must
+  // be copied. audio-player exists in the widgets dir but no page uses it, so
+  // its assets must NOT land in the export.
   const widgetAssetsDir = path.join(projectDir, "widgets", "hero-slider");
   await fs.ensureDir(widgetAssetsDir);
+  await fs.writeFile(
+    path.join(widgetAssetsDir, "schema.json"),
+    JSON.stringify({ type: "hero-slider", displayName: "Hero Slider", settings: [] }),
+  );
+  await fs.writeFile(
+    path.join(widgetAssetsDir, "widget.liquid"),
+    `{% enqueue_style src: "hero-slider.css" %}
+{% enqueue_script src: "hero-slider.js", defer: true %}
+<div class="hero-slider">slides</div>`,
+  );
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.css"), ".hero { display: flex; }");
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.js"), "// slider init");
+
+  const unusedWidgetDir = path.join(projectDir, "widgets", "audio-player");
+  await fs.ensureDir(unusedWidgetDir);
+  await fs.writeFile(
+    path.join(unusedWidgetDir, "schema.json"),
+    JSON.stringify({ type: "audio-player", displayName: "Audio Player", settings: [] }),
+  );
+  await fs.writeFile(
+    path.join(unusedWidgetDir, "widget.liquid"),
+    `{% enqueue_style src: "audio-player.css" %}
+{% enqueue_script src: "audio-player.js", defer: true %}
+<div class="audio-player"></div>`,
+  );
+  await fs.writeFile(path.join(unusedWidgetDir, "audio-player.css"), ".player { display: grid; }");
+  await fs.writeFile(path.join(unusedWidgetDir, "audio-player.js"), "// player init");
 
   // -----------------------------------------------------------
   // 11. Ensure publish dir exists
@@ -763,12 +795,20 @@ describe("exportProject", () => {
     assert.ok(await fs.pathExists(jsPath), "Project JS should be copied");
   });
 
-  it("copies widget assets (CSS/JS) to output", async () => {
+  it("copies enqueued widget assets (CSS/JS) to output", async () => {
     const exportDir = await getLatestExportDir();
     const widgetCss = path.join(exportDir, "assets", "hero-slider.css");
     const widgetJs = path.join(exportDir, "assets", "hero-slider.js");
-    assert.ok(await fs.pathExists(widgetCss), "Widget CSS should be copied to assets/");
-    assert.ok(await fs.pathExists(widgetJs), "Widget JS should be copied to assets/");
+    assert.ok(await fs.pathExists(widgetCss), "Used widget CSS should be copied to assets/");
+    assert.ok(await fs.pathExists(widgetJs), "Used widget JS should be copied to assets/");
+  });
+
+  it("skips widget assets no page enqueued", async () => {
+    const exportDir = await getLatestExportDir();
+    const unusedCss = path.join(exportDir, "assets", "audio-player.css");
+    const unusedJs = path.join(exportDir, "assets", "audio-player.js");
+    assert.ok(!(await fs.pathExists(unusedCss)), "Unused widget CSS should NOT be copied");
+    assert.ok(!(await fs.pathExists(unusedJs)), "Unused widget JS should NOT be copied");
   });
 
   it("copies core placeholder SVGs", async () => {

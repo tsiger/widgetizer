@@ -13,6 +13,12 @@
       "liveDemo": "https://demos.widgetizer.org/arch/"
     },
     {
+      "id": "bedrock",
+      "name": "Bedrock",
+      "description": "General contractor",
+      "liveDemo": "https://demos.widgetizer.org/bedrock/"
+    },
+    {
       "id": "brewline",
       "name": "Brewline",
       "description": "Coffee shop",

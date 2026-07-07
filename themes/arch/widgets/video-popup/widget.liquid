@@ -17,7 +17,8 @@
   {%- assign embed_url = video_url -%}
 {%- endif -%}
 
-{% enqueue_script src: "video-modal.js", defer: true, location: "footer", priority: 42, theme: true %}
+{% enqueue_style src: "video-popup.css", priority: 30 %}
+{% enqueue_script src: "video-modal.js", defer: true, location: "footer", priority: 42 %}
 
 <section
   id="{{ widget.id }}"

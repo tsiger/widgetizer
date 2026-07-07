@@ -88,5 +88,5 @@ Full-width interactive panel accordion where panels expand on click/tap to revea
 - **Use subtitles to add context, not repeat the title.** Good: title "Kitchen Remodel", subtitle "Westlake, Austin". Bad: title "Kitchen Remodel", subtitle "A Beautiful Kitchen Remodel".
 - **Choose images with a clear subject and some negative space at the bottom** so the gradient overlay and text remain readable.
 - **Pair with `highlight-primary` or `highlight-secondary` color scheme** when the section sits between two standard-background widgets -- the contrast creates a visual break that keeps visitors scrolling.
-- **Remove spacing (`top_spacing` = none) when stacking below a hero widget** to create a seamless visual flow from the hero into the panels.
+- **Use `top_spacing` = small when stacking below an image or filled hero.** The hero's bottom spacing is internal padding, so it leaves no external gap — `small` lets the panels dock close without colliding with the hero's edge. Keep `none` for fusion cases only: when the panels share a color scheme with the filled section above, or when the widget above is unfilled and its own bottom margin already provides the gap.
 - **Every panel should have a CTA button.** The whole point of expanding a panel is to invite the next click -- don't leave visitors at a dead end.

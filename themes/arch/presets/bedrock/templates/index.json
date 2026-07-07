@@ -1,0 +1,416 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "/uploads/images/bedrock-hero.webp",
+        "overlay_color": "#292219b3",
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "wide",
+        "alignment": "start",
+        "vertical_alignment": "center",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>General contractor · Remodels &amp; additions</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Built right. Built to last.",
+            "size": "7xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Kitchens, additions, and whole-home renovations for people who want it done once — and done properly.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Request a quote",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "projects.html",
+              "text": "See our work",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": ["hero-eyebrow", "hero-heading", "hero-text", "hero-buttons"]
+    },
+    "credentials": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "outline",
+        "icon_size": "lg",
+        "icon_shape": "sharp",
+        "alignment": "start",
+        "show_dividers": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "trust-license": {
+          "type": "item",
+          "settings": {
+            "icon": "license",
+            "title": "Licensed & bonded",
+            "text": "Lic. #000000, in good standing"
+          }
+        },
+        "trust-insured": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "Fully insured",
+            "text": "Liability and workers' comp"
+          }
+        },
+        "trust-years": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "22 years in business",
+            "text": "Same owner, same phone number"
+          }
+        },
+        "trust-warranty": {
+          "type": "item",
+          "settings": {
+            "icon": "tool",
+            "title": "2-year warranty",
+            "text": "On all workmanship, in writing"
+          }
+        }
+      },
+      "blocksOrder": ["trust-license", "trust-insured", "trust-years", "trust-warranty"]
+    },
+    "service_categories": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "What we build",
+        "eyebrow_uppercase": true,
+        "title": "From single rooms to whole homes.",
+        "description": "",
+        "heading_alignment": "start",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cat-kitchens": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/bedrock-service-kitchens.webp",
+            "subtitle": "",
+            "title": "Kitchens & baths",
+            "description": "<p>The two rooms that make or break a house, rebuilt to be used hard every day.</p>",
+            "button_link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cat-additions": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/bedrock-service-additions.webp",
+            "subtitle": "",
+            "title": "Additions",
+            "description": "<p>More house where you already live — matched so well nobody can tell where the old one ends.</p>",
+            "button_link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cat-wholehome": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/bedrock-service-wholehome.webp",
+            "subtitle": "",
+            "title": "Whole-home renovations",
+            "description": "<p>Top-to-bottom rebuilds of good houses that deserve another fifty years.</p>",
+            "button_link": { "href": "", "text": "", "target": "_self" }
+          }
+        },
+        "cat-commercial": {
+          "type": "card",
+          "settings": {
+            "image": "/uploads/images/bedrock-service-commercial.webp",
+            "subtitle": "",
+            "title": "Light commercial",
+            "description": "<p>Cafés, shops, and small offices — built out on schedule, because your rent doesn't wait.</p>",
+            "button_link": { "href": "", "text": "", "target": "_self" }
+          }
+        }
+      },
+      "blocksOrder": ["cat-kitchens", "cat-additions", "cat-wholehome", "cat-commercial"]
+    },
+    "recent_projects": {
+      "type": "projects-grid",
+      "settings": {
+        "eyebrow": "Recent projects",
+        "eyebrow_uppercase": true,
+        "title": "Judge us by the finished work.",
+        "description": "",
+        "heading_alignment": "start",
+        "view_all_link": {
+          "href": "projects.html",
+          "text": "View all projects",
+          "target": "_self"
+        },
+        "layout": "card",
+        "text_display": "always",
+        "limit": 3,
+        "columns_desktop": 3,
+        "aspect_ratio": "4 / 3",
+        "show_summary": true,
+        "show_client": true,
+        "show_year": true,
+        "show_read_more": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      }
+    },
+    "before_after": {
+      "type": "comparison-slider",
+      "settings": {
+        "eyebrow": "Before & after",
+        "eyebrow_uppercase": true,
+        "title": "Same kitchen. Six weeks apart.",
+        "description": "",
+        "heading_alignment": "start",
+        "before_image": "/uploads/images/bedrock-before-kitchen.webp",
+        "after_image": "/uploads/images/bedrock-after-kitchen.webp",
+        "before_label": "Day 1",
+        "after_label": "Handover",
+        "content_width": "wide",
+        "orientation": "horizontal",
+        "initial_position": 25,
+        "show_labels": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      }
+    },
+    "by_the_numbers": {
+      "type": "key-figures",
+      "settings": {
+        "eyebrow": "",
+        "title": "The numbers behind the name.",
+        "description": "",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "fig-years": {
+          "type": "figure",
+          "settings": {
+            "number": "22",
+            "suffix": "+",
+            "label": "Years in business"
+          }
+        },
+        "fig-projects": {
+          "type": "figure",
+          "settings": {
+            "number": "340",
+            "suffix": "+",
+            "label": "Projects completed"
+          }
+        },
+        "fig-ontime": {
+          "type": "figure",
+          "settings": {
+            "number": "96",
+            "suffix": "%",
+            "label": "Finished on or ahead of schedule"
+          }
+        },
+        "fig-warranty": {
+          "type": "figure",
+          "settings": {
+            "number": "24",
+            "suffix": "mo",
+            "label": "Workmanship warranty"
+          }
+        }
+      },
+      "blocksOrder": ["fig-years", "fig-projects", "fig-ontime", "fig-warranty"]
+    },
+    "how_we_work": {
+      "type": "steps",
+      "settings": {
+        "eyebrow": "How it works",
+        "eyebrow_uppercase": true,
+        "title": "Three steps to a fixed price.",
+        "description": "",
+        "heading_alignment": "start",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "hw-visit": {
+          "type": "step",
+          "settings": {
+            "title": "Site visit",
+            "description": "<p>We come out, walk the space with you, and talk honestly about what's possible and what it costs. Free, always.</p>"
+          }
+        },
+        "hw-quote": {
+          "type": "step",
+          "settings": {
+            "title": "Fixed quote",
+            "description": "<p>A written price within five days. Not an estimate — a price. It only changes if you change the scope.</p>"
+          }
+        },
+        "hw-build": {
+          "type": "step",
+          "settings": {
+            "title": "Build & walkthrough",
+            "description": "<p>A dedicated project manager, weekly updates, and a final walkthrough where we fix everything on the list before we call it done.</p>",
+            "button_link": {
+              "href": "process.html",
+              "text": "See the full process",
+              "target": "_self"
+            }
+          }
+        }
+      },
+      "blocksOrder": ["hw-visit", "hw-quote", "hw-build"]
+    },
+    "homeowner_quote": {
+      "type": "testimonial-hero",
+      "settings": {
+        "author_image": "/uploads/images/bedrock-testimonial-portrait.webp",
+        "image_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "quote-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>They told us what it would cost, when it would be done, and then hit both. The kitchen is the best room in the house now.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "quote-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Melissa K.",
+            "size": "lg"
+          }
+        },
+        "quote-role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Kitchen remodel · 2026</p>",
+            "size": "sm",
+            "uppercase": false,
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": ["quote-text", "quote-name", "quote-role"]
+    },
+    "closing_cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Tell us about your project.",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Site visits are free, quotes are fixed, and you'll hear back within one business day.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Request a quote",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "href": "tel:+15555550130",
+              "text": "Call (555) 555-0130",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": ["cta-heading", "cta-text", "cta-button"]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "credentials",
+    "service_categories",
+    "recent_projects",
+    "before_after",
+    "by_the_numbers",
+    "how_we_work",
+    "homeowner_quote",
+    "closing_cta"
+  ],
+  "id": "index",
+  "created": "2026-07-04T09:00:00.000Z",
+  "updated": "2026-07-04T09:00:00.000Z"
+}

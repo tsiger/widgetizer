@@ -57,7 +57,7 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 
 ### 5. Menu / Dish Highlights
 
-- **Settings**: 4-6 hotspots on a beautifully plated spread or table scene. `heading_alignment: center`, eyebrow "Chef's Selection", `color_scheme: highlight-secondary`, `top_spacing: none` (to pair tightly with a hero above).
+- **Settings**: 4-6 hotspots on a beautifully plated spread or table scene. `heading_alignment: center`, eyebrow "Chef's Selection", `color_scheme: highlight-secondary`, `top_spacing: small` (to dock closely under a hero above — the hero's bottom spacing is internal padding, so `none` would press this section against its edge).
 - **Hotspot strategy**: Tag each dish. Description includes key ingredients and dietary info. Link to the full menu or online ordering.
 - **Good for**: Restaurant homepages, catering brochures, food-truck sites.
 
@@ -77,7 +77,7 @@ An interactive image overlay that places clickable marker pins on a photo, each 
 
 ## Differentiation Tips
 
-- **Pair with a preceding hero or full-bleed image widget** using `top_spacing: none` to create a seamless visual flow where the hotspot image feels like a continuation of the hero rather than a separate section.
+- **Pair with a preceding hero or full-bleed image widget** using `top_spacing: small` so the hotspot image reads as a continuation of the hero. Because a filled hero spaces itself with internal padding, it leaves no external gap below — `small` supplies the breathing room, while `none` would slam the hotspot image against the hero's edge. Use `none` only when the widget above is unfilled (its own bottom margin provides the gap) or when the two sections share a color scheme and should fuse into one band.
 - **Keep hotspot count between 3 and 6.** Fewer than 3 and the widget looks underused; more than 6 and the pins start competing for attention, especially on mobile where tooltips stack vertically.
 - **Spread pins across quadrants.** Clustering pins in one corner makes the image feel lopsided and causes tooltip overlap on desktop. Aim for at least 20% separation on both axes between adjacent pins.
 - **Use the link sparingly.** Not every hotspot needs a button. Reserve links for the 1-2 pins that drive the strongest conversion action (book now, view product, get quote) so the call to action stands out.

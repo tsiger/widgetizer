@@ -17,7 +17,7 @@ npm run lint:all                   # Lint everything (eslint .)
 npm run electron:dev               # Full Electron dev mode
 npm run electron:build:mac         # Build Mac installer (signed)
 npm run electron:build:win         # Build Windows installer (signed, run on Windows)
-npm run theme:sync                 # Sync themes/ → project data
+npm run theme:sync                 # Mirror themes/ → runtime copy (one-shot); -- --project <folder> also syncs a project + watches
 npm run preset:sync                # Sync theme presets
 ```
 

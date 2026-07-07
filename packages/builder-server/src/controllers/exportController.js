@@ -311,6 +311,15 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // Track HTML validation issues across all pages (only when dev mode is on)
     const validationIssues = [];
 
+    // Basenames of every asset enqueued while rendering pages and collection items.
+    // The project's widgets/ dir holds every theme widget's CSS/JS, used or not —
+    // this set is what lets the copy step below ship only the used ones.
+    const enqueuedAssetFiles = new Set();
+    const collectEnqueuedAssets = (globals) => {
+      for (const src of globals.enqueuedStyles.keys()) enqueuedAssetFiles.add(path.basename(src));
+      for (const src of globals.enqueuedScripts.keys()) enqueuedAssetFiles.add(path.basename(src));
+    };
+
     for (const pageData of pagesDataArray) {
       // Create shared globals for this page (each page gets fresh enqueue Maps)
       const sharedGlobals = {
@@ -389,6 +398,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         sharedGlobals,
         collectionDeps,
       );
+
+      collectEnqueuedAssets(sharedGlobals);
 
       // Format HTML using Prettier
       const formatResult = await formatHtml(renderedHtml);
@@ -567,6 +578,7 @@ Per aspera ad astra
             },
             collectionDeps,
           );
+          collectEnqueuedAssets(sharedGlobals);
           let itemHtml = itemHtmlRendered;
 
           const itemFormat = await formatHtml(itemHtml);
@@ -698,12 +710,13 @@ Per aspera ad astra
         // Recursively find .css and .js files in the widgets directory
         const widgetAssetFiles = await findFilesRecursive(projectWidgetsDir, [/.css$/, /.js$/]);
 
-        // Copy each found asset to the output assets directory
+        // Copy only assets a rendered page actually enqueued — the widgets dir
+        // holds every theme widget's CSS/JS, whether the site uses it or not.
         for (const sourcePath of widgetAssetFiles) {
           const filename = path.basename(sourcePath);
+          if (!enqueuedAssetFiles.has(filename)) continue;
           const destPath = path.join(outputAssetsDir, filename);
           try {
-            // Use { overwrite: true } ? Or error/warn if exists? Let's overwrite for simplicity now.
             await fs.copy(sourcePath, destPath, { overwrite: true });
           } catch (widgetCopyError) {
             console.error(`Error copying widget asset ${filename}:`, widgetCopyError);

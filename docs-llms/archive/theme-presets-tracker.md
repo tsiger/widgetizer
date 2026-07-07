@@ -36,3 +36,4 @@
 | 28 | torque | Torque | Auto Repair | DONE |
 | 29 | uplink | Uplink | IT Support | DONE |
 | 30 | velvet-touch | Velvet Touch | Spa / Massage | DONE |
+| 31 | bedrock | Bedrock | General Contractor | DONE |

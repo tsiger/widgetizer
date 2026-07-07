@@ -1,6 +1,6 @@
 # banner — Widget Insights
 
-Full-width section with optional background image, color overlay, and a flexible stack of content blocks. Serves two distinct roles: as a **homepage hero** (immersive, image-backed, large-scale) and as an **inner page title** (clean, imageless, setting the page context). The block variety — headings, text, icons, features, numbered items, countdown, rating, buttons — makes it the most versatile opening widget in the theme.
+Full-width section with optional background image, color overlay, and a flexible stack of content blocks. Serves two distinct roles: as a **homepage hero** (immersive, image-backed, large-scale) and as an **inner page title** (clean, imageless, setting the page context). The block variety — headings, text, icons, features, numbered items, countdown, rating, buttons — makes it the most versatile opening widget in the theme. **Caveat:** the imageless page-title role is only safe when the header does *not* use `transparent_on_hero` — see the transparent-header note below.
 
 ## Settings levers
 
@@ -17,7 +17,7 @@ Full-width section with optional background image, color overlay, and a flexible
 | `top_spacing` | `auto` (default), `small`, `none` | `none` removes top spacing — essential when the banner is the first widget and should sit flush under a transparent header. `small` reduces spacing for tighter rhythm |
 | `bottom_spacing` | `auto` (default), `small`, `none` | `none` removes bottom spacing — useful when the next section should visually touch the banner |
 
-**Transparent header support:** This widget has `supportsTransparentHeader: true`. When the theme header is set to `transparent_on_hero`, it overlays on top of this widget. This only makes visual sense when the banner has a background image or a highlight color scheme — a transparent header over `standard-primary` with no image looks broken.
+**Transparent header support:** This widget has `supportsTransparentHeader: true`. When the theme header is set to `transparent_on_hero`, it overlays on top of this widget — and it engages whenever the *first* widget on a page is a banner, **image or not**. This only makes visual sense when the banner has a background image or a highlight color scheme: an imageless light-scheme banner opener renders the header in its light over-image styling on a light background — broken contrast, not just an aesthetic miss. Consequence: **when the header uses `transparent_on_hero`, inner pages must not open with a banner.** Use a rich-text (or split-content) opener as the page-title pattern instead, the way the everafter and inkwell presets do. The imageless-banner-as-page-title recipes below are only safe when the header does not use `transparent_on_hero`.
 
 ## Available blocks
 
@@ -69,6 +69,8 @@ Full-width section with optional background image, color overlay, and a flexible
 
 ### Inner page titles
 
+> **Only when the header does not use `transparent_on_hero`.** With a transparent header, any first-widget banner — imageless included — triggers the header's over-image styling and breaks contrast on light schemes. In that case open inner pages with a rich-text or split-content widget instead (see the everafter and inkwell presets).
+
 **7. Clean page header (the workhorse for inner pages)**
 - Settings: `height: auto`, `fullwidth: true`, `content_width: medium`, `alignment: center`, `color_scheme: standard-primary`, no image
 - Blocks: text (sm, uppercase) as eyebrow "About Us" → heading (4xl-5xl) → text (base) as subtitle
@@ -96,7 +98,7 @@ Full-width section with optional background image, color overlay, and a flexible
 
 ## Differentiation tips
 
-- **The banner is not just a photo hero.** Its richest use in preset generation is as a flexible page opener — with or without images. Every inner page needs a title section, and banner gives you eyebrows, icons, numbered items, and features that rich-text cannot.
+- **The banner is not just a photo hero.** It also works as a flexible imageless page opener, with eyebrows, icons, numbered items, and features that rich-text cannot match — but only on sites whose header does not use `transparent_on_hero`. With a transparent header, reserve the banner for image/highlight heroes and give inner pages a rich-text or split-content opener as their title section (the everafter and inkwell presets model this pattern).
 - **Vary the height setting across presets.** `large` produces a full viewport hero but using it everywhere makes every page feel identical. Inner page titles should almost always use `auto`. Mix in `medium` for secondary heroes.
 - **Toggle `fullwidth` on and off — but with care.** The contained card-style banner (fullwidth: false) is visually distinct, but it only works as the first widget when using `standard-primary` with no image. A contained banner with a highlight scheme or image under a solid header looks broken — there's an awkward gap between the header and the floating colored box. Use contained banners deeper in pages as callout cards, or as first widgets only on `standard-primary`.
 - **Use `content_width` to control text density.** `narrow` with center alignment creates a focused, pull-quote feel. `wide` gives breathing room for features lists and numbered items. `medium` is the safe default for most text-heavy headers.
@@ -105,5 +107,5 @@ Full-width section with optional background image, color overlay, and a flexible
 - **Change up the overlay color, not just the opacity.** A warm brown overlay creates a completely different mood from the default navy. Tint the overlay toward the brand's accent color for variety.
 - **Lean on different block combinations.** The default heading + text + button combo is reliable, but rating + heading, icon + heading, numbered-items + button, or countdown + heading feel like entirely different widgets even though the underlying structure is the same.
 - **Swap the eyebrow and heading order.** Placing a small uppercase text block above the heading (eyebrow pattern) versus placing descriptive text below (subtitle pattern) creates two distinct visual rhythms from the same two blocks.
-- **Use the no-image variants intentionally for inner pages.** A `standard-primary` banner with no photo, eyebrow + heading + subtitle, is the cleanest possible page header. A `highlight-primary` variant of the same adds visual weight. These are not lesser versions — they are the right choice for pages where photography would be filler.
+- **Use the no-image variants intentionally for inner pages.** A `standard-primary` banner with no photo, eyebrow + heading + subtitle, is the cleanest possible page header. A `highlight-primary` variant of the same adds visual weight. These are not lesser versions — they are the right choice for pages where photography would be filler. The one hard restriction: they are off-limits as page openers when the header uses `transparent_on_hero` (see the transparent-header note above).
 - **The countdown block is situational.** Only use it when the preset genuinely supports a time-bound event (grand opening, seasonal launch). Don't add countdowns just because the block exists.
