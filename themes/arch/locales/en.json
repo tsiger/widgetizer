@@ -1072,6 +1072,72 @@
       }
     }
   },
+  "data_table": {
+    "name": "Table",
+    "settings": {
+      "columns": {
+        "label": "Columns",
+        "options": {
+          "2": "2 columns",
+          "3": "3 columns",
+          "4": "4 columns"
+        }
+      },
+      "show_header": {
+        "label": "Show header row"
+      },
+      "column_1_header": {
+        "label": "Column 1 heading"
+      },
+      "column_2_header": {
+        "label": "Column 2 heading"
+      },
+      "column_3_header": {
+        "label": "Column 3 heading"
+      },
+      "column_4_header": {
+        "label": "Column 4 heading"
+      },
+      "note": {
+        "label": "Additional note"
+      },
+      "style": {
+        "label": "Table style",
+        "options": {
+          "lines": "Lines",
+          "striped": "Striped",
+          "plain": "Plain"
+        }
+      },
+      "first_column_emphasis": {
+        "label": "Bold first column"
+      },
+      "align_last_column": {
+        "label": "Align last column"
+      }
+    },
+    "blocks": {
+      "row": {
+        "name": "Row",
+        "settings": {
+          "cell_1": {
+            "label": "Column 1"
+          },
+          "cell_2": {
+            "label": "Column 2"
+          },
+          "cell_3": {
+            "label": "Column 3",
+            "description": "Shown when the table uses 3 or more columns"
+          },
+          "cell_4": {
+            "label": "Column 4",
+            "description": "Shown when the table uses 4 columns"
+          }
+        }
+      }
+    }
+  },
   "embed": {
     "name": "Embed Widget",
     "settings": {
