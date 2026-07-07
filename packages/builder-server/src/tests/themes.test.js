@@ -1334,6 +1334,18 @@ describe("copyThemeToProject", () => {
 
     await fs.remove(targetDir);
   });
+
+  it("rejects a nested excludeDirs entry (top-level names only)", async () => {
+    const targetDir = path.join(TEST_ROOT, "copy-target-nested");
+    await fs.ensureDir(targetDir);
+
+    await assert.rejects(
+      () => copyThemeToProject(COPY_THEME, targetDir, ["widgets/foo"]),
+      /top-level/i,
+    );
+
+    await fs.remove(targetDir);
+  });
 });
 
 // ============================================================================

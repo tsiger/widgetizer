@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **27 done · 3 deferred · 4 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **28 done · 3 deferred · 3 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -45,7 +45,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **27 done ·
 - ✅ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — DONE 2026-07-02 — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted---done-2026-07-02)
 - ⬜ [32. Theme-upload update-import validation smells — `_validate_<ts>` collision + double per-version log (`builder-server`) — **investigate (low)**](#32-theme-upload-update-import-validation-smells-builder-server)
 - ⬜ [33. Editor-ui duplication smells — slug-validator ternary + `useMediaState` localStorage pattern (`editor-ui`) — **investigate (low)**](#33-editor-ui-duplication-smells-editor-ui)
-- ⬜ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — **investigate (negligible)**](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server)
+- ✅ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — DONE 2026-07-07 (top-level-only guard + doc; original premise corrected)](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server---done-2026-07-07)
 - ✅ [35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — DONE 2026-07-02 (dir-aware core + getProjectBase contract) — **moderate (data-integrity)**](#35-hosted-create-from-preset--refresh-usage-button-dont-track-media-usage-widgetizer-hosted--builder-server---done-2026-07-02)
 
 ---
@@ -1899,10 +1899,27 @@ when a third consumer appears.
 
 ---
 
-## 34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`)
+## 34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — ✅ DONE 2026-07-07
 
-**Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `08039c82` (speed up project creation
-by not copying excluded theme dirs). A behavior-parity question, almost certainly benign.
+**Done note (2026-07-07):** Resolved by verifying against the code and hardening — not by reverting the
+speedup, which is a real ~200MB win for Arch. Two outcomes: (1) **documented** — `copyThemeToProject`'s
+JSDoc now states `excludeDirs` is matched against **top-level entry names only** (not nested paths);
+(2) **guarded** — a top-of-function check throws if an `excludeDirs` entry contains a path separator, so a
+nested value fails loudly instead of silently never matching the single-segment filter. **The original
+premise below was inaccurate:** the top-level-*file* worry doesn't hold — the old
+`fs.rm(path, { recursive, force })` deleted a matching top-level *file* too, so a top-level file named e.g.
+`templates` was absent under **both** old and new code (no divergence). The one *real* divergence is the
+reverse — **multi-segment `excludeDirs` values**: the old loop `fs.rm`'d a nested path, whereas the new
+filter only ever compares single top-level segments (`rel.split(sep)[0]`), so a nested exclude silently
+no-ops. Unreachable today (the sole caller `utils/projectScaffold.js` passes `["templates"]`; the internal
+excludes `updates`/`latest`/`presets` are all single-segment; Arch ships no top-level file colliding with an
+exclude name — `presets` + `templates` are both dirs) — the guard just stops a future caller tripping it.
+TDD: a new `themes.test.js` case asserts a nested `excludeDirs` entry rejects (red first, then green);
+`builder-server` suite **1319** green, lint clean. Original finding below.
+
+**Status:** ✅ DONE 2026-07-07 (investigate → resolved) — surfaced 2026-07-01 reviewing OSS `08039c82`
+(speed up project creation by not copying excluded theme dirs). A behavior-parity question, almost certainly
+benign.
 
 **What.** `08039c82` replaced copy-everything-then-`fs.rm` with a single `fs.cp` whose `filter` skips
 excluded **top-level** entries (`updates`, `latest`, `presets` + caller excludes such as `templates`) during

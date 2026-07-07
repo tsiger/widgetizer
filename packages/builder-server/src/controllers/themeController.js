@@ -996,14 +996,24 @@ export async function updateTheme(req, res) {
 
 /**
  * Copy theme files from source (latest/ or root) to a project directory.
- * Excludes versioning directories (updates/, latest/) from the copy.
+ * Always excludes the versioning dirs (updates/, latest/) and presets/ from the copy.
  * @param {string} themeName - Theme identifier (folder name)
  * @param {string} projectDir - Destination project directory path
- * @param {string[]} [excludeDirs=[]] - Additional directories to exclude from copy
+ * @param {string[]} [excludeDirs=[]] - Extra entries to exclude, matched by name against
+ *   top-level entries only (not nested paths)
  * @returns {Promise<string>} The version string that was copied
- * @throws {Error} If theme copy fails
+ * @throws {Error} If an excludeDirs entry is not a top-level name, or the theme copy fails
  */
 export async function copyThemeToProject(themeName, projectDir, excludeDirs = []) {
+  // Exclusions are matched against a single top-level entry name (see the copy filter
+  // below), so a nested path here would silently never match anything. Reject it instead
+  // of quietly ignoring a caller's mistaken exclude.
+  for (const name of excludeDirs) {
+    if (name.includes("/") || name.includes(path.sep)) {
+      throw new Error(`copyThemeToProject: excludeDirs entries must be top-level names, got "${name}"`);
+    }
+  }
+
   // Use the source directory (latest/ if exists, otherwise root)
   const { sourceDir, theme } = await readThemeSourceMetadata(themeName);
 
