@@ -37,6 +37,14 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
   const isThemeInUse = projectsUsingTheme.length > 0;
   const hasPresets = theme.presets > 0;
 
+  // Cap the "in use" project list so a theme used by many projects shows a few
+  // names plus an "and N more" tail instead of an unbounded wall of names.
+  const usageNames = projectsUsingTheme.map((project) => project.name);
+  const usageSummary =
+    usageNames.length > 6
+      ? `${usageNames.slice(0, 6).join(", ")}, and ${usageNames.length - 6} more`
+      : usageNames.join(", ");
+
   // Close menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -69,7 +77,7 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
     : t("themes.buttons.delete", "Delete");
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div className="rounded-lg border border-slate-200 bg-white">
       {/* Theme header row */}
       <div className="flex items-center gap-4 px-5 py-4">
         {/* Collapse toggle */}
@@ -93,9 +101,7 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
             <div className="flex items-center gap-2">
               <h3 className="text-base font-semibold text-slate-900">{theme.name}</h3>
               {isThemeInUse && (
-                <Tooltip
-                  content={projectsUsingTheme.map((p) => p.name).join(", ")}
-                >
+                <Tooltip content={usageSummary} contentClassName="max-w-xs">
                   <span className="text-base font-semibold text-pink-600">In use</span>
                 </Tooltip>
               )}
@@ -138,7 +144,7 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
             <MoreVertical size={16} />
           </button>
           {openMenuId === theme.id && (
-            <div className="absolute right-0 z-10 mt-1 w-64 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+            <div className="absolute right-0 z-10 mt-1 w-max rounded-md border border-slate-200 bg-white py-1 shadow-lg">
               <button
                 onClick={() => {
                   setOpenMenuId(null);
@@ -147,10 +153,8 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
                   }
                 }}
                 disabled={isThemeInUse}
-                title={
-                  isThemeInUse ? projectsUsingTheme.map((project) => project.name).join(", ") : undefined
-                }
-                className={`flex w-full items-center gap-2 whitespace-normal px-3 py-2 text-left text-sm ${
+                title={isThemeInUse ? usageSummary : undefined}
+                className={`flex w-full items-center gap-2 whitespace-nowrap px-3 py-2 text-left text-sm ${
                   isThemeInUse ? "cursor-not-allowed text-red-300" : "text-red-600 hover:bg-red-50"
                 }`}
               >
@@ -164,7 +168,7 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
 
       {/* Presets grid (collapsible) */}
       {hasPresets && isExpanded && presetsLoaded && presets.length > 0 && (
-        <div className="border-t border-slate-100 bg-slate-50 px-5 py-4">
+        <div className="rounded-b-lg border-t border-slate-100 bg-slate-50 px-5 py-4">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {presets.map((preset) => (
               <div key={preset.id} className="min-w-0">
@@ -198,7 +202,7 @@ function ThemeSection({ theme, onUpdate, onDelete, updatingThemeId }) {
 
       {/* No presets — show theme screenshot inline */}
       {!hasPresets && (
-        <div className="border-t border-slate-100 bg-slate-50 px-5 py-4">
+        <div className="rounded-b-lg border-t border-slate-100 bg-slate-50 px-5 py-4">
           <div className="w-48 overflow-hidden rounded-md border border-slate-200">
             <div className="aspect-video overflow-hidden bg-slate-100">
               <img
