@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 2 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 4 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -48,6 +48,8 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ✅ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — DONE 2026-07-07 (top-level-only guard + doc; original premise corrected)](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server---done-2026-07-07)
 - ✅ [35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — DONE 2026-07-02 (dir-aware core + getProjectBase contract) — **moderate (data-integrity)**](#35-hosted-create-from-preset--refresh-usage-button-dont-track-media-usage-widgetizer-hosted--builder-server---done-2026-07-02)
 - ✅ [36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) — DONE 2026-07-07 (single-flight + bounded retry + error-gated bootstrap; no more picker bounce)](#36-cold-boot-race-bounces-the-editor-to-the-picker-on-an-aborted-active-project-fetch-editor-ui---done-2026-07-07)
+- ⬜ [37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — **low (fix)**](#37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui)
+- ⬜ [38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — **investigate (low, likely master-parity)**](#38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server)
 
 ---
 
@@ -2100,3 +2102,56 @@ impact:** none — hosted seeds the project via the `seedProject` DI path (`proj
 
 **Effect:** low/moderate — intermittent wrong landing (picker instead of the project) on cold boot / reload;
 data-safe and self-correcting on a manual navigation.
+
+---
+
+## 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`)
+
+**Status:** ⬜ open — surfaced 2026-07-07 while reviewing error/empty-state components as a model for §36's
+`WorkspaceLoadFailed` (`EmptyState` was rejected as the model *because* it's unstyled). A concrete,
+low-severity defect.
+
+**What.** `packages/editor-ui/src/components/ui/EmptyState.jsx` emits semantic class names — `empty-state`,
+`empty-state-icon`, `empty-state-title`, `empty-state-description` — but **no CSS in the repo matches them.**
+The only `empty-state` rules that exist are `preview-empty-state*` (a *different* prefix, defined inline in the
+preview iframe by `builder-server/src/controllers/previewController.js`). So the component renders as a bare
+`<div><h3><p>` with only whatever `className` the caller passes.
+
+**Live surface.** Used by the Themes page (`app/src/pages/Themes.jsx:414`) as the "no themes" state (no
+`icon` / `action` / extra `className`), so it currently shows an unstyled title + description. It's also
+re-exported from `components/ui/index.js`, so any future consumer inherits the dead styling.
+
+**Fix options.** Add the missing `empty-state*` CSS, or (preferred, to match the rest of `ui/`) restyle with
+Tailwind utilities like the sibling components — e.g. `ExportCreator`'s `variant="empty"` branch already does a
+centered empty-state layout inline. Then re-check the call site.
+
+**Scope.** Pure `@widgetizer/editor-ui`; a fix flows to web / Electron / hosted via the vendored package. No
+server/contract change.
+
+**Effect:** low (cosmetic) — a low-traffic empty state renders unstyled; no data or correctness impact.
+
+---
+
+## 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-07 during §36 (cold-boot race). Likely an intentional
+master-parity fallback; flag-don't-fix unless there's appetite to change it.
+
+**What.** `getActiveProject` (`packages/builder-server/src/controllers/projectController.js:252-272`), the
+handler for `GET /api/projects/active`, auto-activates the first project when none is active —
+`projectRepo.setActiveProjectId(projects[0].id)` **inside a GET**. A read with a write side-effect
+(non-idempotent GET).
+
+**Why it's on the radar.** §36 confirmed React StrictMode double-invokes the cold-boot bootstrap, firing two
+concurrent `GET /api/projects/active` — so this write runs twice concurrently. Benign today (both write the
+same `projects[0].id`, and §36's client single-flight collapses the common path to one fetch), but it's a
+write-on-read under concurrency and breaks GET idempotency.
+
+**Investigate.** Whether to move auto-activation off the read path (a dedicated activate call, or
+resolve-without-persist and let an explicit action set it), weighed against master-parity — this fallback
+mirrors master and covers deleted-active / missing-record / migrated-data edge cases (per its own comment).
+
+**Scope.** OSS `builder-server`. **Hosted impact:** none — hosted resolves scope per-request via
+`CloudScopeResolver` and doesn't use the OSS singleton active-project model, so it never reaches this handler.
+
+**Effect:** low — no known break; GET-idempotency / robustness hygiene, and probably a master-parity keep.
