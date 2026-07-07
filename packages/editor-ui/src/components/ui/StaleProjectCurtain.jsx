@@ -38,7 +38,7 @@ export default function StaleProjectCurtain({ onReload = () => window.location.r
           </p>
           <p className="mt-2 text-sm text-slate-500">
             Reload to continue in the new project — or re-open this project
-            {localName ? ` (“${localName}”)` : ""} in the other tab to keep editing here (this notice
+            <strong>{localName ? ` (“${localName}”)` : ""}</strong> in the other tab to keep editing here (this notice
             clears itself when you return).
           </p>
         </div>
