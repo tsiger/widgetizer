@@ -18,6 +18,7 @@ import UpdateBanner from "./components/layout/UpdateBanner";
 import DebugStatePanel from "./components/dev/DebugStatePanel";
 import ToastContainer from "@widgetizer/editor-ui/components/ui/ToastContainer.jsx";
 import ErrorBoundary from "@widgetizer/editor-ui/components/ui/ErrorBoundary.jsx";
+import StaleProjectCurtain from "@widgetizer/editor-ui/components/ui/StaleProjectCurtain.jsx";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 import useProjectStore from "@widgetizer/editor-ui/stores/projectStore";
 import useThemeStore from "@widgetizer/editor-ui/stores/themeStore";
@@ -25,12 +26,28 @@ import useWidgetStore from "@widgetizer/editor-ui/stores/widgetStore";
 import useAutoSave from "@widgetizer/editor-ui/stores/saveStore";
 import usePageStore from "@widgetizer/editor-ui/stores/pageStore";
 import { registerProjectStore } from "@widgetizer/editor-ui/lib/activeProjectId";
+import { useStaleActiveProjectDetection } from "@widgetizer/editor-ui/hooks/useStaleActiveProjectDetection";
 import { handleActiveProjectChange } from "./lib/projectSwitchCoordinator";
 import "./i18n";
 
 // Register project store for apiFetch X-Project-Id header injection.
 // Safe at module level — Zustand stores are singletons that exist immediately.
 registerProjectStore(useProjectStore);
+
+// Runs the cross-tab stale-active-project detection and renders its curtain,
+// mounted via the editor `overlay` slot so it is scoped to the editor route — the
+// blocking overlay never appears on the picker/preview routes. OSS-only: hosted's
+// shell doesn't pass this slot content, so it opts out.
+//
+// Reload sends the tab to the editor's pages list rather than reloading the
+// current URL: a deep editor URL (e.g. /page-editor?pageId=…) belongs to the *old*
+// project and would 404 under the new active project. /pages re-enters through
+// RequireActiveProject, which re-resolves the (now-current) active project and
+// lands on its pages list.
+function EditorStaleProjectGuard() {
+  useStaleActiveProjectDetection();
+  return <StaleProjectCurtain onReload={() => window.location.assign("/pages")} />;
+}
 
 // Create router with data router API (required for useBlocker). The editor tree
 // is contributed by editor-ui's `createEditorRoutes` and composed in here; the
@@ -58,7 +75,12 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
     slots: {
       topbarRight: <AdminMenu />,
-      overlay: <DebugStatePanel />,
+      overlay: (
+        <>
+          <DebugStatePanel />
+          <EditorStaleProjectGuard />
+        </>
+      ),
     },
   }),
   {

@@ -1,5 +1,6 @@
 import { apiFetch, apiFetchJson, rethrowQueryError, throwApiError } from "../lib/apiFetch";
 import { uploadFormData } from "../lib/uploadRequest";
+import { announceActiveProjectChange } from "../lib/activeProjectChannel.js";
 
 // ---------------------------------------------------------------------------
 // Lightweight cache for getAllProjects() — single entry, not project-keyed.
@@ -138,9 +139,13 @@ export async function createProject(projectData) {
  */
 export async function setActiveProject(projectId) {
   try {
-    return await apiFetchJson(`/api/projects/active/${projectId}`, {
+    const result = await apiFetchJson(`/api/projects/active/${projectId}`, {
       method: "PUT",
     }, { fallbackMessage: "Failed to set active project" });
+    // Tell sibling tabs (same browser) the singleton active project changed, so a
+    // stale editor tab can show its out-of-date curtain immediately (no focus wait).
+    announceActiveProjectChange(projectId);
+    return result;
   } catch (error) {
     rethrowQueryError(error, "Failed to set active project");
   }

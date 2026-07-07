@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **28 done · 3 deferred · 3 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **29 done · 3 deferred · 3 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -40,13 +40,14 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **28 done ·
 - ✅ [26. Extract the shared dropdown `<ul>` from `ui/Combobox` + `MenuCombobox` instead of the copy-pasted group header (`editor-ui`) — DONE 2026-06-26 — **low (DRY / maintainability)**](#26-extract-the-shared-dropdown-ul-from-uicombobox--menucombobox-instead-of-the-copy-pasted-group-header-editor-ui---done-2026-06-26--low-dry--maintainability)
 - ✅ [27. Harden the `theme:update-delta` dev tool — version-tag parsing, quoted diff paths, util reuse (OSS dev tooling) — DONE 2026-06-27 — **low (dev-only, mostly latent)**](#27-harden-the-themeupdate-delta-dev-tool--version-tag-parsing-quoted-diff-paths-util-reuse-oss-dev-tooling---low-dev-only-mostly-latent)
 - ✅ [28. Close the path-based storage exceptions for the hosted boundary (adapter discipline) — DONE 2026-07-02 (verified green); lifecycle 4b tail deferred → §30](#28-close-the-path-based-storage-exceptions-for-the-hosted-boundary-adapter-discipline---done-2026-07-02)
-- ⬜ [29. Loud stale-active-project detection in the OSS editor — focus/visibility revalidation + 409 handling (OSS shell `app/` + `editor-ui`) — **low/moderate (single-tenant UX correctness)**](#29-loud-stale-active-project-detection-in-the-oss-editor)
+- ✅ [29. Loud stale-active-project detection in the OSS editor — DONE 2026-07-07 (curtain + focus/visibility + save-409 + BroadcastChannel fast-path; bootstrap-race follow-up → §36)](#29-loud-stale-active-project-detection-in-the-oss-editor---done-2026-07-07)
 - ⏸️ [30. Extract project lifecycle duplicate/import into dir-explicit cores (`builder-server`) — **deferred** until hosted builds duplicate/import (blocker: `AssetStorageAdapter.copy`); the lifecycle tail of §28](#30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores)
 - ✅ [31. Hosted theme save doesn't track theme media usage (`widgetizer-hosted`) — DONE 2026-07-02 — **moderate (data-integrity)**](#31-hosted-theme-save-doesnt-track-theme-media-usage-widgetizer-hosted---done-2026-07-02)
 - ⬜ [32. Theme-upload update-import validation smells — `_validate_<ts>` collision + double per-version log (`builder-server`) — **investigate (low)**](#32-theme-upload-update-import-validation-smells-builder-server)
 - ⬜ [33. Editor-ui duplication smells — slug-validator ternary + `useMediaState` localStorage pattern (`editor-ui`) — **investigate (low)**](#33-editor-ui-duplication-smells-editor-ui)
 - ✅ [34. `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) — DONE 2026-07-07 (top-level-only guard + doc; original premise corrected)](#34-copythemetoproject-exclude-filter-widened-from-dirs-to-entries-builder-server---done-2026-07-07)
 - ✅ [35. Hosted create-from-preset + Refresh Usage button don't track media usage (`widgetizer-hosted` + `builder-server`) — DONE 2026-07-02 (dir-aware core + getProjectBase contract) — **moderate (data-integrity)**](#35-hosted-create-from-preset--refresh-usage-button-dont-track-media-usage-widgetizer-hosted--builder-server---done-2026-07-02)
+- ⬜ [36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) — **investigate (low/moderate)**](#36-cold-boot-race-bounces-the-editor-to-the-picker-on-an-aborted-active-project-fetch-editor-ui)
 
 ---
 
@@ -1720,9 +1721,23 @@ shell-wrapper job, not a re-fork, if/when hosted wants them).
 
 ---
 
-## 29. Loud stale-active-project detection in the OSS editor
+## 29. Loud stale-active-project detection in the OSS editor — ✅ DONE 2026-07-07
 
-**Status:** ⬜ open — scoped 2026-06-29, not started. OSS-shell (`app/`) + `editor-ui` feature; orthogonal
+**Done note (2026-07-07):** Implemented as decided (blocking curtain, client-only, no server change). A shared
+`editor-ui` signal store `staleProjectStore` (`isStale`/`incomingName`/`markStale`/`clearStale`) is driven by
+three producers: a focus/visibility hook `useStaleActiveProjectDetection` (re-probes `GET /api/projects/active`
+on refocus and flips the flag both ways — so re-activating this project elsewhere and returning auto-dismisses),
+`saveStore`'s existing `PROJECT_MISMATCH` 409 branch (rerouted from a toast to `markStale`), and a same-browser
+`BroadcastChannel` fast-path (`activeProjectChannel`, announced from `setActiveProject`) so a *visible* stale tab
+curtains instantly without waiting for focus. Consumer: a blocking `StaleProjectCurtain` overlay (names both the
+incoming and this-tab's project; Reload → `/pages`). All pieces are opt-in exports wired only in the OSS shell
+`app/src/App.jsx` via the editor `overlay` slot — scoped to the editor route (never blocks picker/preview) and
+hosted opts out by not wiring them. Verified inert for hosted (per-request `CloudScopeResolver`; renders no
+curtain; the rerouted 409 branch is unreachable there). Frontend suite green (743), lint clean. **Follow-up:** a
+pre-existing cold-boot race in `fetchActiveProject`, surfaced by the curtain's reload, is tracked as **§36**.
+Original scope below.
+
+**Status:** ✅ DONE 2026-07-07 — scoped 2026-06-29. OSS-shell (`app/`) + `editor-ui` feature; orthogonal
 to §28 (no `builder-server`/contract change). Grew out of the §28/E1a discussion of the OSS singleton
 active-project model.
 
@@ -2036,3 +2051,37 @@ widget). Red before (empty usage), green after. Plus a `builder-server` unit tes
 **Effect:** moderate (data-integrity) — hosted preset projects currently ship with all seeded media
 mis-flagged unused (deletable / pruned on publish). **Hosted impact:** the fix; OSS unaffected (behavior-
 preserving wrapper).
+
+---
+
+## 36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`)
+
+**Status:** ⬜ open (investigate) — surfaced 2026-07-07 while verifying §29's stale-project curtain reload
+(`window.location.assign("/pages")`). Pre-existing OSS bootstrap flakiness, independent of §29 (which only
+exposed it).
+
+**What.** `projectStore.fetchActiveProject` (`packages/editor-ui/src/stores/projectStore.js`) treats *any*
+`getActiveProject()` failure as "no active project": its `catch` sets `loading:false` while leaving
+`activeProject` null. `HomeRedirect` (`/`) and `RequireActiveProject` (editor routes) both read
+`!activeProject && !loading` as "go to the picker" → `Navigate to="/projects"`. So on a cold boot whose first
+`GET /api/projects/active` is **aborted** (the browser cancels an in-flight request on navigation — observed as
+`NS_BINDING_ABORTED`) or otherwise errors, the user is bounced to `/projects` instead of their project's pages —
+intermittently, since a retry that wins the race lands correctly.
+
+**Evidence.** Network on a curtain reload showed the first `/api/projects/active` as `NS_BINDING_ABORTED`
+followed by two `200`s returning the real active project (`audit-findings`). The multiple bootstrap requests
+also smell of React StrictMode double-invoking App's `fetchActiveProject` effect in dev.
+
+**Fix direction (investigate).** Distinguish "the fetch failed / was superseded" from "there is genuinely no
+active project." Options: ignore `AbortError`/superseded requests in `fetchActiveProject` (don't null
+`activeProject`, don't flip to the redirect state — let the newer fetch settle); and/or surface an explicit
+error state rather than silently redirecting to the picker; and/or dedupe the double bootstrap so there is a
+single in-flight fetch. Confirm the exact trigger (StrictMode double-mount vs a real redirect aborting the
+request) before choosing.
+
+**Scope.** OSS `editor-ui` (`fetchActiveProject`) + the OSS shell bootstrap (`app/src/App.jsx`). **Hosted
+impact:** none — hosted seeds the project via the `seedProject` DI path (`projectStore.js`), not
+`fetchActiveProject`, so it never hits this redirect.
+
+**Effect:** low/moderate — intermittent wrong landing (picker instead of the project) on cold boot / reload;
+data-safe and self-correcting on a manual navigation.

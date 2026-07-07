@@ -5,7 +5,7 @@ import { invalidateMediaCache } from "../queries/mediaManager";
 import usePageStore from "./pageStore";
 import useThemeStore from "./themeStore";
 import useProjectStore from "./projectStore";
-import useToastStore from "./toastStore";
+import useStaleProjectStore from "./staleProjectStore";
 
 /**
  * Zustand store for managing auto-save functionality in the page editor.
@@ -151,12 +151,11 @@ const useAutoSave = create((set, get) => ({
       usePageStore.temporal.getState().clear();
     } catch (err) {
       if (err.code === "PROJECT_MISMATCH") {
-        const { showToast } = useToastStore.getState();
-        showToast(
-          "The active project has changed. Your unsaved edits are preserved — reload to continue editing.",
-          "error",
-          { duration: 0 },
-        );
+        // Another tab took over the singleton active project. Surface the loud
+        // stale-project curtain (the OSS shell renders it) and stop hammering the
+        // server with doomed auto-saves. The tab recovers on reload, or when the
+        // user re-activates this project elsewhere (focus revalidation clears it).
+        useStaleProjectStore.getState().markStale();
         get().stopAutoSave();
         return;
       }

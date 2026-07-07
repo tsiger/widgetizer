@@ -48,6 +48,7 @@ vi.mock("../../lib/activeProjectId", () => ({
 
 const { default: useAutoSave } = await import("../saveStore");
 const { default: usePageStore } = await import("../pageStore");
+const { default: useStaleProjectStore } = await import("../staleProjectStore.js");
 const { savePageContent } = await import("../../queries/pageManager");
 
 // ---------------------------------------------------------------------------
@@ -105,10 +106,30 @@ describe("saveStore (useAutoSave)", () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     resetStores();
+    useStaleProjectStore.getState().clearStale();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  // --------------------------------------------------------------------------
+  // Project mismatch (stale active project)
+  // --------------------------------------------------------------------------
+
+  describe("project mismatch (PROJECT_MISMATCH)", () => {
+    it("marks the project stale and stops auto-save, without throwing", async () => {
+      // The loaded page belongs to a different project than the (mocked) active
+      // project "test-project" — the client-side pre-check throws PROJECT_MISMATCH.
+      usePageStore.setState({ loadedProjectId: "other-project" });
+      useAutoSave.getState().markWidgetModified("w-1"); // unsaved change + arms the auto-save timer
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
+
+      await expect(useAutoSave.getState().save(false)).resolves.toBeUndefined();
+
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+    });
   });
 
   // --------------------------------------------------------------------------
