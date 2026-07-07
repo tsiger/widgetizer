@@ -49,8 +49,8 @@ export default function MediaGridItem({
           </div>
         )}
       </div>
-      <div className="p-2 text-sm truncate" title={file.metadata?.title || file.filename}>
-        {file.metadata?.title || file.filename}
+      <div className="p-2 text-sm truncate" title={file.filename}>
+        {file.filename}
       </div>
 
       <div className="absolute top-2 left-2 z-10 flex items-center space-x-1">

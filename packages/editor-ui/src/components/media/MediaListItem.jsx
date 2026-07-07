@@ -73,10 +73,10 @@ export default function MediaListItem({
           )}
         </div>
       </td>
-      <td className={`${cellClass} max-w-xs truncate`} title={file.metadata?.title || file.filename}>
+      <td className={`${cellClass} max-w-xs truncate`} title={file.filename}>
         {file.type?.startsWith("image/") ? (
           <button type="button" onClick={onEdit} className="truncate text-left hover:text-pink-600 transition-colors">
-            {file.metadata?.title || file.filename}
+            {file.filename}
           </button>
         ) : (
           <span className="truncate">{file.filename}</span>

@@ -46,3 +46,19 @@ describe("MediaListItem — non-image icon", () => {
     expect(container.querySelector(".lucide-music")).toBeNull();
   });
 });
+
+describe("MediaListItem — name column", () => {
+  it("shows the filename, not the title, for an image with a title set", () => {
+    const { getByText, queryByText } = renderItem({
+      id: "img",
+      type: "image/png",
+      filename: "logo6.png",
+      path: "/uploads/images/logo6.png",
+      metadata: { title: "Client logo" },
+      size: 1024,
+      uploaded: "2026-01-01",
+    });
+    expect(getByText("logo6.png")).toBeTruthy();
+    expect(queryByText("Client logo")).toBeNull();
+  });
+});
