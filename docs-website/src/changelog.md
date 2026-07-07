@@ -26,6 +26,16 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - **News Grid:** a collection grid for news and blog items, with an optional single-column blog layout and overlay style
 - **Projects Grid:** a collection grid for projects and portfolio items, with an overlay layout
 - **Services Grid:** a collection grid for services, with icon style, size, and shape controls
+- **Table:** a generic rows-and-columns table (2 to 4 columns) for rate sheets, tuition, size charts, and spec lists, with lines, striped, or plain styles and optional right-aligned last column
+
+### New Preset
+
+- **Bedrock:** a general-contractor / construction preset, with full template content, menus, and starter media
+
+### Desktop App
+
+- **Automatic port selection:** the packaged app binds to the first available port and reports it back to the window, instead of failing to start when port 3000 is already in use
+- **No auto-maximize on launch:** the app opens at a normal window size instead of maximizing
 
 ### Added
 
@@ -40,6 +50,15 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - **Stable rich-text links:** internal links inside rich-text fields follow page and collection-item renames, and clear automatically when the target is deleted
 - **MP3 and audio uploads:** audio files are now a supported media type
 - **Per-image captions:** gallery images can each carry their own caption
+- **Widget previews in the inserter:** the widget picker shows a preview image for each widget, and Arch ships previews for its full widget set
+- **Add a page from the topbar:** a quick "+ New page" action in the editor topbar
+- **Autofill menu labels:** a menu item's label fills in from its target page, and follows the page when it changes
+- **Automatic canonical URLs:** pages without an explicit canonical derive one from the project's site URL
+- **Set active project:** switch which project is active from the projects list, with a cleaner single-project view and improved preset selection at creation time
+- **Font picker language filter:** the theme font picker can filter fonts by language and scrolls the current font into view
+- **Resizable code editor:** the Custom CSS / JS editor in Theme Settings can be dragged to resize vertically
+- **Docker support:** a `Dockerfile` and `docker-compose.yml` for self-hosting the web app (Express backend plus frontend)
+- **Contact Form widget:** a configurable core Form widget, with a forms manifest written into the export. Submissions are handled by Widgetizer Hosting; on other static hosts the form renders but submissions need your own handler
 
 ### For Theme Authors
 
@@ -51,6 +70,7 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - **image-callout Content scheme:** the Content color scheme is now available on the image-callout widget
 - **Mastodon icon:** added to the Arch icon set
 - **Dev-mode HTML validation:** development builds surface an export-issues column with WCAG checks
+- **Widget preview images:** ship a `preview.png` next to a widget's `schema.json` and it appears in the widget inserter
 
 ### Changed
 
@@ -67,6 +87,7 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - Theme-authored SVG icons are sanitized before they are injected
 - `og:image` is always emitted as an absolute URL
 - LiquidJS updated to 10.26+, plus additional isolation hardening for hosted deployments
+- Desktop preview windows are restricted to safe internal paths, and the editor-to-preview message bridge only accepts messages from the resolved peer origin
 
 ### Fixed
 
@@ -76,6 +97,7 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - The collection-item save button no longer stays disabled after re-editing
 - Buttons default to `type="button"`, preventing accidental form submits
 - Fixed a React StrictMode crash in the rich-text link UI
+- The Media Library's Filename column now always shows the filename, rather than showing the image title when one was set
 
 ### Under the Hood
 
@@ -86,6 +108,7 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - Theme-author docs expanded: a build-your-first-theme quickstart, a Liquid **filters** reference, a Collections authoring guide, and a one-page theme contract
 - New end-user guides for **Collections** and **Forms**
 - Corrected rich-text rendering guidance (richtext requires the `raw` filter under global autoescaping)
+- Docs site: full-text search (Pagefind), a Core Widgets reference, and UI screenshots throughout the guides
 
 ## 0.9.8 - 2026-04-26
 
