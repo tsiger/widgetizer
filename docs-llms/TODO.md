@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 4 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 5 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -50,6 +50,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ✅ [36. Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) — DONE 2026-07-07 (single-flight + bounded retry + error-gated bootstrap; no more picker bounce)](#36-cold-boot-race-bounces-the-editor-to-the-picker-on-an-aborted-active-project-fetch-editor-ui---done-2026-07-07)
 - ⬜ [37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — **low (fix)**](#37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui)
 - ⬜ [38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — **investigate (low, likely master-parity)**](#38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server)
+- ⬜ [39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — **39a moderate (data-integrity) · 39b/39c low (latent under concurrency)**](#39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server)
 
 ---
 
@@ -2155,3 +2156,43 @@ mirrors master and covers deleted-active / missing-record / migrated-data edge c
 `CloudScopeResolver` and doesn't use the OSS singleton active-project model, so it never reaches this handler.
 
 **Effect:** low — no known break; GET-idempotency / robustness hygiene, and probably a master-parity keep.
+
+---
+
+## 39. SQLite transaction-boundary audit — media/project repositories (`builder-server`)
+
+**Status:** ⬜ open — surfaced 2026-07-08 auditing every `db.transaction(...)` site across the repositories.
+
+**39a — Atomicity gap: `addMediaFile` isn't transactional (moderate, data-integrity).**
+`insertMediaFile` (`packages/builder-server/src/db/repositories/mediaRepository.js:216`) writes a
+`media_files` row **plus** N `media_sizes` rows across separate statements. `writeMediaData` wraps this helper
+in a `db.transaction(...)`, but `addMediaFile` (`mediaRepository.js:95`) calls it **bare**, and its callers
+don't wrap it either (`controllers/mediaController.js:443`, the upload path; `controllers/projectController.js:145`).
+So a failure *after* the `media_files` insert but *among* the size inserts commits a media file with
+partial/missing size variants → broken/missing thumbnails on render. **Fix:** wrap `insertMediaFile`'s
+two-table write in a transaction (self-wrap the helper so both `addMediaFile` and `writeMediaData` are covered
+— better-sqlite3 nests via savepoints, so `writeMediaData` calling a now-transactional helper is fine).
+
+**39b — Read-then-write transactions are concurrency-fragile (low, latent correctness).**
+`replaceMediaUsage` (`mediaRepository.js:156`), `updateMediaUsageForSource` (`:186`), and `writeProjectsData`
+(`repositories/projectRepository.js:204`) each `SELECT id FROM …` and then `DELETE`/`INSERT` **inside one
+`db.transaction()`**. better-sqlite3's default `BEGIN DEFERRED` takes the write lock lazily, so a
+read-then-write can fail with an **un-waitable `SQLITE_BUSY_SNAPSHOT`** if another connection commits between
+the read and the write. Harmless on a single connection today, but a latent hazard the moment the DB file is
+shared by multiple processes/workers. **Fix (preferred):** fold the `SELECT id FROM media_files WHERE
+project_id = ?` into the `DELETE` as a correlated subquery (`… WHERE media_file_id IN (SELECT id FROM
+media_files WHERE project_id = ?)`), making the txn **write-only** — no snapshot hazard and one fewer round
+trip. **Or:** run these write txns via better-sqlite3's `.immediate()` variant. Also fix the misleading
+"safe for parallel calls" comment on `updateMediaUsageForSource`: SQLite serializes **all** writes on one
+db-level lock (no row-level locking), so parallel calls touching disjoint rows still contend.
+
+**39c — Multi-read getter without a read transaction (low, robustness).**
+`getMediaFileById` (`mediaRepository.js:47`) does 3 reads across `media_files` / `media_sizes` / `media_usage`
+with no wrapping transaction, so under concurrent connections it can observe a **torn snapshot**. Harmless on
+a single connection; wrap the reads in a `DEFERRED` read-only transaction for snapshot consistency if the DB
+is ever shared.
+
+**Scope.** OSS `builder-server`. **Hosted impact:** hosted shares this connection and drives all of the above
+through the mounted routes, so **39a** also affects the hosted media-upload path.
+
+**Effect:** 39a moderate (data-integrity — real, low-probability); 39b/39c low (latent under concurrency).
