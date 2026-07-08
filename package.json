@@ -28,6 +28,7 @@
     "dev:frontend": "wait-on http://localhost:3001/health && npm run dev",
     "dev:all": "concurrently \"npm run server\" \"npm run dev:frontend\"",
     "start:prod": "cross-env NODE_ENV=production npm start",
+    "mcp": "node mcp/server.js",
     "preelectron:dev": "npm rebuild better-sqlite3 && npm run validate:all-locales",
     "electron:dev": "concurrently -k \"cross-env NODE_ENV=development npm run server\" \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env ELECTRON_DEV=1 ELECTRON_DISABLE_INTERNAL_SERVER=1 VITE_DEV_SERVER_URL=http://localhost:3000 electron .\"",
     "test": "node --test --test-reporter ./packages/builder-server/src/tests/reporter.js packages/builder-server/src/tests/*.test.js",
@@ -54,6 +55,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@fal-ai/client": "^1.9.5",
     "@floating-ui/dom": "^1.7.6",
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "@tiptap/extension-link": "^3.18.0",
     "@tiptap/pm": "^3.18.0",
     "@tiptap/react": "^3.18.0",
@@ -94,6 +96,7 @@
     "slugify": "^1.6.6",
     "turndown": "^7.2.2",
     "uuid": "^13.0.0",
+    "zod": "^3.23.8",
     "zundo": "^2.3.0",
     "zustand": "^5.0.3"
   },
