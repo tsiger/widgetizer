@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 5 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 6 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -51,6 +51,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ⬜ [37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — **low (fix)**](#37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui)
 - ⬜ [38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — **investigate (low, likely master-parity)**](#38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server)
 - ⬜ [39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — **39a moderate (data-integrity) · 39b/39c low (latent under concurrency)**](#39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server)
+- ⬜ [40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — **low (security; OSS-standalone only)** — from security-audit SA-21](#40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
 
 ---
 
@@ -2196,3 +2197,19 @@ is ever shared.
 through the mounted routes, so **39a** also affects the hosted media-upload path.
 
 **Effect:** 39a moderate (data-integrity — real, low-probability); 39b/39c low (latent under concurrency).
+
+---
+
+## 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — **low (security; OSS-standalone only)**
+
+**Status:** ⬜ open — carried from the security-audit register (finding **SA-21**, surfaced 2026-06-19). Full row + reproduction preserved in the umbrella `experiment-docs/audit-findings.md` register's git history.
+
+`applySharedMiddleware` (`packages/builder-server/src/createApp.js:11`) mounts a bare `app.use(cors())` — `Access-Control-Allow-Origin: *`, no origin allowlist — on the unauthenticated, single-tenant localhost API. The server binds **127.0.0.1** only (`app/server-common.js:67`, so not network-reachable), but any other origin open in the same browser can `fetch('http://localhost:3001/api/projects')` cross-origin (ACAO `*`, no creds needed), and a JSON `POST`/`DELETE` to a project route passes the preflight → cross-origin **read + state-change** of the user's local projects. (Electron uses an ephemeral port, making targeting harder.)
+
+**Hosted is NOT affected** — the OSS `helmet()`/`cors()` never run in the hosted process (`widgetizer-hosted/server/middleware/securityHeaders.js:4`); hosted serves same-origin `/api` and authorizes with Clerk bearer tokens, so there's no ambient cookie an attacker origin could ride.
+
+**Fix.** Replace bare `cors()` with an origin allowlist (the configured frontend origin), or enable permissive CORS **only in dev** — production/Electron serve the SPA same-origin from the same Express, so CORS is unneeded there. Keep byte-neutral for the legit dev split-origin (:3000 → :3001) flow.
+
+**Test.** Integration: a request with a disallowed `Origin` does **not** receive `Access-Control-Allow-Origin: *` (restricted to the allowlisted/dev origin); the legit dev origin still works.
+
+**Effect:** low — OSS-standalone only; the browser-mediated exposure is bounded to the user's own machine + local content.
