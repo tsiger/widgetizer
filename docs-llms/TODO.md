@@ -2250,3 +2250,29 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 **Test.** Once the mechanism is known: a regression guard asserting per-call sanitize time (or a proxy — e.g. jsdom node/handle count) stays within a bound across a fixed number of calls; and, if a window-reset fix lands, that the reset actually flattens the curve.
 
 **Effect:** low for OSS-standalone (short-lived, low render volume); moderate for a long-lived host process (render-latency creep + a restart-treadmill contribution). No correctness impact — sanitized output is unchanged.
+
+---
+
+## 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — **low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)**
+
+**Status:** ⬜ open — surfaced 2026-07-09 while scoping ZIP media-upload support. **Pre-existing** (affects PDF/audio uploads today, independent of ZIP); newly written up, not carried from the SA register.
+
+**What.** Three points key off *different* signals that don't have to agree:
+
+- **Acceptance keys on the client-declared MIME.** The media `fileFilter` (`packages/builder-server/src/controllers/mediaController.js:142`) admits a file solely because `file.mimetype` is in `ALLOWED_MIME_TYPES` (`utils/mimeTypes.js:16`). That mimetype is the multipart-declared `Content-Type` — attacker-controlled.
+- **Storage keeps the original extension verbatim.** `uniqueName` slugifies only the basename and re-appends `path.extname(originalname)` (`mediaController.js:254-257`), so a `.html` extension survives into `uploads/files/`.
+- **Serve keys on the stored extension.** `serveProjectMedia` sets the response `Content-Type` from `getContentType(path.extname(key))` (`mediaController.js:612`), not from the declared or sniffed type.
+
+**The vector.** A hand-crafted multipart `POST /api/media` pairing `filename="x.html"` with an allowed `Content-Type` (`application/pdf` today, `application/zip` once ZIP lands) passes the filter, is stored as `x.html`, and is later served as `Content-Type: text/html` from the API origin → the browser renders and executes it. `helmet`'s `nosniff` does **not** help: the server *itself* declares `text/html`, so there is nothing to sniff. The normal UI can't reach this (the dropzone `accept` gates on extension) — it takes a crafted request.
+
+**Why low for OSS / why flagged for hosted.** On the OSS desktop app the only actor who can craft that upload is the sole local user, hitting a 127.0.0.1-bound API — self-XSS on your own machine, negligible (same local single-user trust model as `core-security.md` §8's advanced-theme raw-code and this file's §40 local-CORS). It matters for **Widgetizer Hosted**: uploads are served from the authenticated app origin and can be opened/shared across actors, so a stored `text/html` masquerading as an allowed upload is a genuine stored-XSS on the app origin. **Hosted impact needs confirmation** — depends on whether hosted serves uploads through this same controller (extension-derived Content-Type) or via signed object-storage URLs with a forced/stored content-type; if the former, the vector applies.
+
+**ZIP note.** Adding `.zip` to the allowlist does **not** worsen this — a genuine ZIP serves as `application/zip`/`octet-stream` (download, inert). ZIP just makes it timely to close the underlying gap while in this code.
+
+**Fix (root cause).** Add an **extension allowlist** to `fileFilter`: reject unless `path.extname(file.originalname).toLowerCase()` is in an allowed-extension set mirroring `ALLOWED_MIME_TYPES` (`.jpg/.jpeg/.png/.gif/.webp/.svg/.pdf/.mp3` [+`.zip`]). This rejects `x.html` regardless of the declared MIME and is byte-neutral for legitimate uploads. **Defense-in-depth (optional):** send `Content-Disposition: attachment` for the non-image (`files/`) serve category so even a mismatched stored file downloads instead of executing — but keep PDFs inline (their inline view is desirable UX), so gate the disposition on category/extension rather than applying it blanket.
+
+**Scope.** `@widgetizer/builder-server` (`mediaController` `fileFilter` + optionally the serve headers). The theme-upload/import filters have the same MIME-only shape — fold in a shared extension-allowlist helper only if convenient. Docs: `core-media.md` (§ "Media Type Configuration" / "Upload Flow") and `core-security.md` §1/§9 describe the fileFilter as MIME-allowlist-enforced without noting the extension/served-type mismatch — update when fixed.
+
+**Test.** A crafted upload with `filename="x.html"` + an allowed MIME is **rejected** by the filter; legit `.pdf`/`.mp3`/image uploads still pass and PDFs still serve inline. If the serve-side mitigation lands: a stored non-image asset serves with `Content-Disposition: attachment`.
+
+**Effect:** low for OSS-standalone (self-XSS, local-only, crafted-request-only); moderate for hosted **if** uploads are served via this controller (stored XSS on the app origin) — confirm the hosted asset-serving path.
