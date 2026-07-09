@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 6 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 7 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -52,6 +52,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ⬜ [38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — **investigate (low, likely master-parity)**](#38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server)
 - ⬜ [39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — **39a moderate (data-integrity) · 39b/39c low (latent under concurrency)**](#39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server)
 - ⬜ [40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — **low (security; OSS-standalone only)** — from security-audit SA-21](#40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
+- ⬜ [41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — **investigate (perf; hosted-impacting)**](#41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--investigate-perf-hosted-impacting)
 
 ---
 
@@ -2213,3 +2214,39 @@ through the mounted routes, so **39a** also affects the hosted media-upload path
 **Test.** Integration: a request with a disallowed `Origin` does **not** receive `Access-Control-Allow-Origin: *` (restricted to the allowlisted/dev origin); the legit dev origin still works.
 
 **Effect:** low — OSS-standalone only; the browser-mediated exposure is bounded to the user's own machine + local content.
+
+---
+
+## 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — **investigate (perf; hosted-impacting)**
+
+**Status:** ⬜ open — surfaced 2026-07-09 during a read-only render/sanitize CPU benchmark (scratchpad only; no repo changes). Reproducible; root cause uncharacterized.
+
+`sanitizeRichText` (`packages/builder-server/src/services/sanitizationService.js`) runs DOMPurify over `isomorphic-dompurify@2.35.0` → `jsdom@27.4.0`. It is called **per widget, on every render** — `packages/render-engine/src/renderEngine.js:701` for widgets, `packages/builder-server/src/services/collectionService.js:1110` for collection items — i.e. once per richtext field of every page/preview/publish render. A whole-widget LiquidJS `parseAndRender` is only ~0.3–0.6 ms warm; a single richtext sanitize dominates it, so **sanitize is ~80% of per-widget render CPU**.
+
+**The finding.** Within a single long-lived process, the **CPU cost of each sanitize call climbs steadily with cumulative call count — while memory stays bounded.** Measured (Apple M1 Pro, node 24, ~466-byte richtext field, event loop yielding between calls):
+
+| cumulative sanitizes | 1.5k | 3k | 4.5k | 6k | 7.5k | 9k | 10.5k |
+|---|---|---|---|---|---|---|---|
+| pure sanitize ms/call | 0.47 | 1.12 | 2.58 | 4.92 | 7.89 | 10.53 | 13.60 |
+| RSS (MB) | 315 | 358 | 384 | 409 | 409 | 409 | 409 |
+
+Controls rule out the obvious explanations:
+- **Not a memory leak.** RSS plateaus (~330–420 MB) and is GC-stable; an earlier "unbounded RSS → 1 GB" reading was a tight-loop artifact of starving jsdom's deferred cleanup — once the event loop turns between calls (as a real server does), memory bounds.
+- **Not event-loop starvation.** The `setImmediate` drain time between calls stays flat (~0.05 ms).
+- **Not thermal throttling.** Every *fresh* process restarts at ~0.5 ms/call; only the *within-process* cost climbs (confirmed with back-to-back fresh processes).
+
+So DOMPurify+jsdom accumulates state that is cheap in memory but makes each subsequent parse/sanitize progressively more expensive. This is a *distinct* mechanism from unbounded render-cache **memory** growth — here memory is bounded and it's **CPU** that degrades. In a long-lived multi-tenant process this means render/preview/publish latency **creeps upward over the process's life until a restart resets it**. OSS standalone (desktop, one user, few renders, frequent restarts) accumulates far slower — low impact there; this is primarily a hosted-facing property of shared OSS code, so any fix must stay **byte-neutral for the standalone path**.
+
+**Fix — root cause first (follow-up A).** Before mitigating, characterize *what* accumulates:
+- Does periodically **recreating/resetting the jsdom window** DOMPurify binds to (e.g. a fresh `createDOMPurify(new JSDOM('').window)` every N calls) flatten the curve? A quick scratchpad A/B answers this.
+- Is it a **version regression** in `jsdom@27` or `isomorphic-dompurify@2.35`? Reproduce against an older jsdom to bisect.
+- Candidate accumulation sites: jsdom `Window`/`Document` internal registries, listeners, or custom-element state; a growing DOMPurify-internal collection traversed per call.
+If the root cause is a cheap reset/config, prefer that over process-level band-aids. Gate any window-reset behind the render `deps`/config so the OSS desktop path is unchanged.
+
+**Mitigations if the root cause is intractable:** a `worker_threads` render pool with **worker recycling** (respawn a worker after N tasks) resets the accumulation automatically; or a scheduled host restart. Both are containment, not cures.
+
+**Measure real-world impact before investing (follow-up B).** The curve above is from a synthetic loop; the real degradation *slope vs wall-clock* depends on actual render cadence. Run a soak on the real deployment host at realistic renders/day, tracking sanitize/render duration + RSS over hours, to decide whether this needs a fix now or just monitoring.
+
+**Test.** Once the mechanism is known: a regression guard asserting per-call sanitize time (or a proxy — e.g. jsdom node/handle count) stays within a bound across a fixed number of calls; and, if a window-reset fix lands, that the reset actually flattens the curve.
+
+**Effect:** low for OSS-standalone (short-lived, low render volume); moderate for a long-lived host process (render-latency creep + a restart-treadmill contribution). No correctness impact — sanitized output is unchanged.
