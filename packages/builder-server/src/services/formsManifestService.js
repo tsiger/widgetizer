@@ -1,3 +1,5 @@
+import { handleize } from "@widgetizer/core";
+
 const FORM_WIDGET_TYPE = "core-form";
 const MANIFEST_SCHEMA_VERSION = 1;
 const GENERATOR_NAME = "widgetizer";
@@ -30,21 +32,10 @@ const DEFAULT_MAX_LENGTH = {
   radio: 500,
 };
 
-// Mirrors @widgetizer/core filters/handleizeFilter.js EXACTLY — no truncation. The Liquid template
-// applies its own truncation (64 for keys, 200 for option values) via the `truncate` filter
-// to match the hosted contract caps. Truncating here too would silently diverge from the
-// rendered HTML for long labels.
-function handleize(str) {
-  if (!str || typeof str !== "string") return "";
-  return str
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
+// `handleize` (imported from core) is the single source of truth for slug rules, so the manifest
+// keys and the rendered HTML — which calls the same filter in widget.liquid — can never diverge.
+// It transliterates non-Latin scripts and does NOT truncate; the caps below (and the Liquid
+// `truncate` filter) apply the hosted contract limits (64 for keys, 200 for option values).
 function handleizeKey(str) {
   return handleize(str).slice(0, MAX_KEY_LENGTH);
 }
@@ -87,21 +78,22 @@ function parseChoiceOptions(rawOptions, fieldPath, errors) {
 
   const seenValues = new Set();
   const options = [];
+  let optionIndex = 0;
 
   for (const line of rawOptions.split(/\r?\n/)) {
     const label = line.trim();
     if (!label) continue;
+    optionIndex++;
 
     if (label.length > MAX_OPTION_LENGTH) {
       errors.push(`${fieldPath}: option label "${label.slice(0, 30)}…" exceeds ${MAX_OPTION_LENGTH} characters`);
       continue;
     }
 
-    const value = handleizeOptionValue(label);
-    if (!value) {
-      errors.push(`${fieldPath}: option label "${label}" cannot be converted to an identifier (use letters and numbers)`);
-      continue;
-    }
+    // A label with no transliterable characters (e.g. CJK) slugs to "" — fall back to a
+    // positional value so the option still submits. optionIndex counts every non-blank line,
+    // matching the widget.liquid option loop so the rendered value and the manifest agree.
+    const value = handleizeOptionValue(label) || `option-${optionIndex}`;
     if (seenValues.has(value)) {
       errors.push(
         `${fieldPath}: two options ("${label}") produce the same value "${value}". Rename one of them.`,
@@ -115,7 +107,7 @@ function parseChoiceOptions(rawOptions, fieldPath, errors) {
   return options;
 }
 
-function buildField(block, widgetId, pageId, errors) {
+function buildField(block, widgetId, pageId, fieldIndex, errors) {
   const settings = block.settings || {};
   const label = settings.label;
   const fieldPath = `page "${pageId}" → widget "${widgetId}" → field "${label || "(missing label)"}"`;
@@ -129,15 +121,12 @@ function buildField(block, widgetId, pageId, errors) {
     return null;
   }
 
-  const key = handleizeKey(label);
-  if (!key) {
-    errors.push(
-      `${fieldPath}: label "${label}" cannot be converted to an identifier (use letters and numbers in the label)`,
-    );
-    return null;
-  }
+  // A label with no transliterable characters (e.g. CJK) slugs to "" — fall back to a positional
+  // key so the field still submits. fieldIndex counts field-bearing blocks (field/choice/consent)
+  // only, matching the widget.liquid loop so the rendered name and the manifest agree.
+  const key = handleizeKey(label) || `field-${fieldIndex}`;
   if (!KEY_PATTERN.test(key)) {
-    // Defensive — handleize output should already match KEY_PATTERN.
+    // Defensive — handleize output and the positional fallback should already match KEY_PATTERN.
     errors.push(`${fieldPath}: generated field key "${key}" is not valid`);
     return null;
   }
@@ -210,13 +199,15 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
   const blocks = widget.blocks || {};
   const fields = [];
   const seenKeys = new Map();
+  let fieldIndex = 0;
 
   for (const blockId of blockIds) {
     const block = blocks[blockId];
     if (!block) continue;
     if (block.type !== "field" && block.type !== "choice" && block.type !== "consent") continue;
 
-    const field = buildField(block, widgetId, pageId, errors);
+    fieldIndex++;
+    const field = buildField(block, widgetId, pageId, fieldIndex, errors);
     if (!field) continue;
 
     if (seenKeys.has(field.key)) {

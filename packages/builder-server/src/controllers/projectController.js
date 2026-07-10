@@ -17,7 +17,7 @@ import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { isValidSiteUrl } from "@widgetizer/core/urlSafety";
 import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
-import { generateUniqueSlug } from "../utils/slugHelpers.js";
+import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
 import {
@@ -812,9 +812,10 @@ export async function exportProject(req, res) {
       },
     };
 
-    // Generate filename
+    // Generate filename. sanitizeSlug transliterates non-Latin names (e.g. Greek) instead of
+    // rewriting every character to a dash the way a raw [^a-z0-9] strip would.
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
-    const safeName = project.name.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    const safeName = sanitizeSlug(project.name, "site");
     const zipFilename = `${safeName}-export-${timestamp}.zip`;
 
     // Set response headers

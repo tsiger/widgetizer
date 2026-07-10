@@ -255,10 +255,16 @@
             action="/__widgetizer/forms/{{ form_key }}"
             method="post"
           >
+            {% assign field_i = 0 %}
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}
               {% assign field_id = 'form-' | append: widget.id | append: '-' | append: blockId %}
-              {% assign field_key = block.settings.label | handleize | truncate: 64, '' %}
+              {% if block.type == 'field' or block.type == 'choice' or block.type == 'consent' %}
+                {% assign field_i = field_i | plus: 1 %}
+                {% assign field_key = block.settings.label | handleize | truncate: 64, '' %}
+                {% comment %}Non-Latin labels (e.g. CJK) slug to "" — fall back to a positional key so the field still submits. Mirrors formsManifestService.buildField.{% endcomment %}
+                {% if field_key == blank %}{% assign field_key = 'field-' | append: field_i %}{% endif %}
+              {% endif %}
 
               {% case block.type %}
               {% when 'field' %}
@@ -298,10 +304,13 @@
                         <span data-setting="label">{{ block.settings.label }}</span>
                         {% if block.settings.required %}<span class="form-required" aria-hidden="true">*</span>{% endif %}
                       </legend>
+                      {% assign option_i = 0 %}
                       {% for option_line in options_lines %}
                         {% assign option_label = option_line | strip %}
                         {% if option_label != blank %}
+                          {% assign option_i = option_i | plus: 1 %}
                           {% assign option_value = option_label | handleize | truncate: 200, '' %}
+                          {% if option_value == blank %}{% assign option_value = 'option-' | append: option_i %}{% endif %}
                           <label class="form-radio">
                             <input
                               type="radio"
@@ -326,10 +335,13 @@
                       {% if block.settings.required %}required aria-required="true"{% endif %}
                     >
                       <option value="">{{ block.settings.placeholder | default: 'Select an option' }}</option>
+                      {% assign option_i = 0 %}
                       {% for option_line in options_lines %}
                         {% assign option_label = option_line | strip %}
                         {% if option_label != blank %}
+                          {% assign option_i = option_i | plus: 1 %}
                           {% assign option_value = option_label | handleize | truncate: 200, '' %}
+                          {% if option_value == blank %}{% assign option_value = 'option-' | append: option_i %}{% endif %}
                           <option value="{{ option_value }}">{{ option_label }}</option>
                         {% endif %}
                       {% endfor %}

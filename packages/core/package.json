@@ -28,6 +28,7 @@
     "./locales/*": "./src/locales/*"
   },
   "dependencies": {
-    "liquidjs": "^10.26.0"
+    "liquidjs": "^10.26.0",
+    "slugify": "^1.6.6"
   }
 }
