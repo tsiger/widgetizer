@@ -22,7 +22,7 @@ const KNOWN_KEYS = new Set([
   "pageTypes",
 ]);
 
-function defaultWarn(message) {
+export function defaultWarn(message) {
   // Dev aid only; silent in production builds.
   if (typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production") return;
   console.warn(message);

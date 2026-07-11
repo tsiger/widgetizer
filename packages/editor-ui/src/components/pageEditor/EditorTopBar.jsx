@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
+import { ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAllPages } from "../../queries/pageManager";
@@ -7,6 +7,8 @@ import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
+import { useCommands } from "../../extension/PluginProvider.jsx";
+import PrimaryActionControl from "./PrimaryActionControl.jsx";
 
 export default function EditorTopBar({
   pageName,
@@ -15,7 +17,8 @@ export default function EditorTopBar({
   children,
 }) {
   const { t } = useTranslation();
-  const { hasUnsavedChanges, isSaving, save, stopAutoSave } = useAutoSave();
+  const { hasUnsavedChanges, stopAutoSave } = useAutoSave();
+  const commands = useCommands();
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
@@ -79,10 +82,7 @@ export default function EditorTopBar({
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault();
-        // Prevent multiple simultaneous saves if one is already in progress
-        if (hasUnsavedChanges() && !isSaving) {
-          save(false);
-        }
+        commands.find((c) => c.id === "save")?.run({});
       }
 
       // Don't hijack undo/redo while the user is editing a text field — let the
@@ -110,7 +110,7 @@ export default function EditorTopBar({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [safeUndo, safeRedo, save, hasUnsavedChanges, isSaving]);
+  }, [safeUndo, safeRedo, commands]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -276,19 +276,7 @@ export default function EditorTopBar({
           </button>
         </div>
 
-        <button
-          onClick={() => save(false)}
-          disabled={!hasUnsavedChanges() || isSaving}
-          title={`${t("pageEditor.toolbar.save")} (Ctrl+S)`}
-          className={`flex items-center justify-center gap-2 px-3 h-9 min-w-24 rounded-sm text-sm ${
-            hasUnsavedChanges() && !isSaving
-              ? "bg-pink-600 hover:bg-pink-700 text-white"
-              : "bg-slate-200 text-slate-500 cursor-not-allowed"
-          }`}
-        >
-          <Save size={18} />
-          {isSaving ? t("pageEditor.toolbar.saving") : t("pageEditor.toolbar.save")}
-        </button>
+        <PrimaryActionControl />
       </div>
     </div>
   );

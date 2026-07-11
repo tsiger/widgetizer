@@ -11,16 +11,20 @@ import { resolveSlot } from "./slots.js";
 const PluginContext = createContext(null);
 
 /**
- * @param {{ plugins?: Array<object>, slots?: Record<string, React.ReactNode>, children: React.ReactNode }} props
+ * @param {{ plugins?: Array<object>, slots?: Record<string, React.ReactNode>,
+ *           primaryActions?: Array<object>, signals?: Record<string, () => boolean>,
+ *           children: React.ReactNode }} props
  */
-export function PluginProvider({ plugins = [], slots = {}, children }) {
+export function PluginProvider({ plugins = [], slots = {}, primaryActions = [], signals = {}, children }) {
   const value = useMemo(
     () => ({
       registry: buildRegistry(plugins),
       hooks: createHookRunner(plugins),
       slots,
+      primaryActions,
+      signals,
     }),
-    [plugins, slots],
+    [plugins, slots, primaryActions, signals],
   );
   return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
 }
@@ -38,6 +42,10 @@ export const useCommands = () => usePluginContext().registry.commands;
 export const usePluginRoutes = () => usePluginContext().registry.routes;
 export const useHookRunner = () => usePluginContext().hooks;
 export const useSlot = (name) => resolveSlot(usePluginContext().slots, name);
+/** The shell-provided ordered primary-action descriptors (empty if none). */
+export const usePrimaryActions = () => usePluginContext().primaryActions;
+/** The shell-registered toolbar signal map (name → () => boolean); empty if none. */
+export const useToolbarSignals = () => usePluginContext().signals;
 
 /** Render the node a shell placed in a named slot (nothing if unset). */
 export function SlotOutlet({ name }) {

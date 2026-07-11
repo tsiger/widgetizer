@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 7 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 11 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -53,6 +53,10 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ⬜ [39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — **39a moderate (data-integrity) · 39b/39c low (latent under concurrency)**](#39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server)
 - ⬜ [40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — **low (security; OSS-standalone only)** — from security-audit SA-21](#40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
 - ⬜ [41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — **investigate (perf; hosted-impacting)**](#41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--investigate-perf-hosted-impacting)
+- ⬜ [42. Kebab action-menus lack full WAI-ARIA a11y + duplicate open/close logic (`editor-ui`) — **low (a11y / DRY)**](#42-kebab-action-menus-lack-full-wai-aria-a11y--duplicate-openclose-logic-editor-ui--low-a11y--dry)
+- ⬜ [43. Full accessibility / WAI-ARIA APG conformance review for the project (`editor-ui` + all shells) — **investigate (a11y)**](#43-full-accessibility--wai-aria-apg-conformance-review-for-the-project-editor-ui--all-shells--investigate-a11y)
+- ⬜ [44. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — **low (test hygiene)**](#44-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--low-test-hygiene)
+- ⬜ [45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — **low (latent; hosted-wiring)**](#45-ctrls-bypasses-the-primaryactioncontrol-dispatch-seam--empty-ctx-no-busy-guard-no-error-toast-editor-ui--low-latent-hosted-wiring)
 
 ---
 
@@ -2250,3 +2254,117 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 **Test.** Once the mechanism is known: a regression guard asserting per-call sanitize time (or a proxy — e.g. jsdom node/handle count) stays within a bound across a fixed number of calls; and, if a window-reset fix lands, that the reset actually flattens the curve.
 
 **Effect:** low for OSS-standalone (short-lived, low render volume); moderate for a long-lived host process (render-latency creep + a restart-treadmill contribution). No correctness impact — sanitized output is unchanged.
+
+---
+
+## 42. Kebab action-menus lack full WAI-ARIA a11y + duplicate open/close logic (`editor-ui`) — ⬜ **low (a11y / DRY)**
+
+Surfaced 2026-07-09 while speccing the page-editor **primary-action SplitButton** (see
+`experiment-docs/2026-07-09-editor-topbar-primary-action-splitbutton-design.md`), which audited the
+existing kebab/action menus as the house pattern the new control should match — and found they stop
+short of full menu-button accessibility.
+
+The row action-menus — `pages/Pages.jsx`, `pages/CollectionItems.jsx`,
+`components/media/MediaListItem.jsx`, `components/export/ExportHistoryTable.jsx` (plus the
+`aria-haspopup` picker in `components/settings/inputs/FontPickerInput.jsx`) — share a consistent
+**visual** pattern (an `IconButton` + `MoreVertical` trigger with translated `aria-label`,
+`aria-haspopup="menu"`, `aria-expanded`; an absolutely-positioned white rounded-border shadow menu;
+a shared `menuButtonClass` for items; close-on-select). But the a11y stops at the trigger attributes:
+- the dropdown container has **no `role="menu"`** and items have **no `role="menuitem"`**;
+- **no roving focus / Arrow-key (Home/End) navigation** — items rely on plain tab order;
+- **no focus management** — opening doesn't move focus into the menu, and Escape/close doesn't
+  return focus to the trigger;
+- **no `aria-controls`** linking trigger↔menu;
+- the **click-outside + Escape `useEffect`s are copy-pasted per component** (a `document` `mousedown`
+  + `keydown` listener in each) — a DRY smell as much as an a11y one.
+
+**Effect (low):** keyboard/AT users can open these menus but can't operate them as a proper menu
+(no arrow-key navigation, focus neither moved in nor returned on close). Purely an accessibility +
+maintainability gap — mouse users are unaffected and no data/behaviour is wrong.
+
+**Fix (do it *after* the SplitButton lands):** the SplitButton spec builds a proper WAI-ARIA menu
+(`role="menu"`/`menuitem`, roving `tabindex`, Arrow/Home/End, focus-in-on-open + focus-return-on-close)
+with the open/close/click-outside/Escape logic **encapsulated in a reusable `useMenu` hook** (or the
+`SplitButton`'s internal menu). Once that primitive exists, **retrofit these kebab menus onto the
+shared menu/`useMenu`** — closing the a11y gaps and deleting the per-component `document` listeners in
+one pass. Sequencing after the SplitButton means the primitive is designed once and reused, not built
+twice. Note the SplitButton itself differs structurally (primary button **+** caret vs. a single
+kebab), so the reusable unit to extract is the **menu + `useMenu`**, not the whole control.
+
+**Hosted impact:** none — pure `editor-ui` change, inherited by web/Electron/hosted via the vendored
+package. No hosted-only concepts.
+
+---
+
+## 43. Full accessibility / WAI-ARIA APG conformance review for the project (`editor-ui` + all shells) — ⬜ **investigate (a11y)**
+
+Surfaced 2026-07-10 while landing the page-editor **primary-action SplitButton**. The new control
+implements the full WAI-ARIA menu-button pattern, which raised a broader question the project has
+never answered deliberately: **what accessibility bar do we hold, and do we want WAI-ARIA APG
+conformance as a standard?**
+
+Two concrete inputs motivated this:
+- **SplitButton disabled menu items** were left with native `disabled` (announced + non-focusable),
+  *not* the APG "disabled-but-focusable via `aria-disabled` only" pattern (which lets keyboard/AT
+  users arrow onto a disabled item to learn *why* it's unavailable). That was a deliberate minimal
+  choice for one small menu, not a project-wide stance — the convention should be decided once,
+  globally, and applied consistently.
+- The kebab/action menus (§42) already stop short of full menu-button a11y.
+
+**Scope:** a project-wide audit — semantic roles, focus management, keyboard operability, `aria-*`
+correctness, contrast, tap-target sizes — across `editor-ui` and the OSS shells (`app/`, `electron/`),
+deciding whether to adopt APG conformance. If adopted, apply the disabled-item convention (and the
+rest) consistently, including retrofitting §42's kebab menus.
+
+**Effect:** current keyboard/AT support is partial-but-usable; this is about raising and
+standardizing the bar, not fixing a break.
+
+**Hosted impact:** none yet — an OSS `editor-ui`/shells audit. Because the shared components are
+vendored into hosted, **if** the project decides to pursue APG conformance the convention propagates
+to hosted automatically; no separate hosted TODO until that decision is made.
+
+---
+
+## 44. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — ⬜ **low (test hygiene)**
+
+Surfaced 2026-07-10 during the primary-action SplitButton work. `packages/editor-ui`'s jsdom
+component tests deliberately render **without** an i18n provider — the convention is that `t(key)`
+returns the key verbatim and tests assert on the key strings. But no test (nor `vitest.setup.js`)
+ever initializes an i18next instance, so `react-i18next`'s `useTranslation()` emits a
+**"You will need to pass in an i18next instance"** warning on every such render. ~23 jsdom component
+test files across `editor-ui` trigger it (the real instance lives only in the app shell,
+`app/src/i18n.js`, which the tests don't load). Pre-existing and repo-wide — not new to any one feature.
+
+**Effect (low):** noisy stderr in the frontend test run — no failures, no behavioural impact.
+
+**Fix:** initialize a **minimal, resource-less** i18next instance in `vitest.setup.js`
+(`i18n.use(initReactI18next).init({ lng: "en", resources: {} })`). With no resources a missing key
+still falls back to the key string, so the assert-on-keys strategy is preserved — the warning just
+goes away for all 23 files. Global test-infra change (touches every suite), so validate the full
+frontend suite stays green; keep it out of feature branches and do it as its own pass.
+
+**Hosted impact:** none — OSS test infra only.
+
+---
+
+## 45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — ⬜ **low (latent; hosted-wiring)**
+
+Surfaced 2026-07-10 in the whole-branch review of the primary-action control. The page-editor top bar
+dispatches Ctrl/Cmd+S by calling the `save` command directly (`EditorTopBar.jsx`:
+`commands.find((c) => c.id === "save")?.run({})`), **not** through `PrimaryActionControl`'s
+`dispatch`. So the keyboard path differs from the button path: it passes an **empty ctx** (no
+`projectId`), does **no** intrinsic busy-guard, and surfaces **no** error toast on rejection (an
+unhandled promise rejection instead).
+
+**Effect (low today):** harmless for OSS — the builtin `save` command ignores ctx and never rejects,
+and the concurrency edge is already covered (the `save` command skips while `isSaving`). It only bites
+once a **shell-provided** primary command reads `ctx` or can fail.
+
+**Fix (deferred to the hosted-wiring plan):** when hosted adds its first ctx-using / fail-able primary
+command (e.g. `savePublish`), route Ctrl+S through the same `dispatch` seam so ctx, busy-tracking, and
+error-toast are identical for keyboard and click. Keep Ctrl+S bound to the **`save`** action
+specifically (never "whatever the primary button is"), so the shortcut can't map to a destructive
+action like Save & Publish. Left deliberately out of the OSS SplitButton branch.
+
+**Hosted impact:** this is the trigger — a hosted-wiring concern, addressed there (in shared
+`editor-ui`) when the first ctx-using command lands.

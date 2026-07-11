@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { PluginProvider } from "./extension/PluginProvider.jsx";
 import { builtinNavPlugin } from "./extension/builtinNav.js";
+import { builtinToolbarPlugin, DEFAULT_PRIMARY_ACTIONS } from "./extension/toolbar.js";
 import Layout from "./components/layout/Layout.jsx";
 import RequireActiveProject from "./components/layout/RequireActiveProject.jsx";
 import { setApiBase } from "./lib/apiBase.js";
@@ -27,13 +28,14 @@ import CollectionItemEdit from "./pages/CollectionItemEdit.jsx";
 // guards require a single data-router context, EditorShell does NOT own a
 // router — it is the *element* for the editor layout route, and the host splices
 // `createEditorRoutes()` into its own `createBrowserRouter`. EditorShell wraps
-// the editor chrome in a <PluginProvider> ([builtinNav, ...plugins]) and binds
+// the editor chrome in a <PluginProvider> ([builtinNav, builtinToolbar, ...plugins]) and binds
 // the two per-shell singletons (api base, active project) on mount:
 //   - OSS composes with no `project` (its App still drives fetchActiveProject);
 //   - hosted passes a known `project` (+ cloud `scope`) to seed without a fetch.
 //
 // @param {{ apiBase?: string, project?: object, scope?: object,
-//           plugins?: Array<object>, slots?: Record<string, React.ReactNode> }} props
+//           plugins?: Array<object>, slots?: Record<string, React.ReactNode>,
+//           primaryActions?: Array<object>, signals?: Record<string, () => boolean> }} props
 // EditorProvider is the chrome-agnostic core: it registers plugins (incl. the
 // built-in nav) into a <PluginProvider> and binds the two per-shell singletons
 // (api base, active project) on mount, then renders whatever chrome the host
@@ -50,9 +52,11 @@ export function EditorProvider({
   scope,
   plugins = [],
   slots = {},
+  primaryActions = DEFAULT_PRIMARY_ACTIONS,
+  signals = {},
   children,
 }) {
-  const allPlugins = useMemo(() => [builtinNavPlugin, ...plugins], [plugins]);
+  const allPlugins = useMemo(() => [builtinNavPlugin, builtinToolbarPlugin, ...plugins], [plugins]);
 
   useEffect(() => {
     if (apiBase !== undefined) setApiBase(apiBase);
@@ -75,7 +79,7 @@ export function EditorProvider({
   }, [project, scope]);
 
   return (
-    <PluginProvider plugins={allPlugins} slots={slots}>
+    <PluginProvider plugins={allPlugins} slots={slots} primaryActions={primaryActions} signals={signals}>
       <RouteBaseProvider base={routeBase}>{children}</RouteBaseProvider>
     </PluginProvider>
   );
@@ -91,6 +95,8 @@ export function EditorShell({
   scope,
   plugins = [],
   slots = {},
+  primaryActions = DEFAULT_PRIMARY_ACTIONS,
+  signals = {},
 }) {
   return (
     <EditorProvider
@@ -103,6 +109,8 @@ export function EditorShell({
       scope={scope}
       plugins={plugins}
       slots={slots}
+      primaryActions={primaryActions}
+      signals={signals}
     >
       <Layout />
     </EditorProvider>
@@ -143,11 +151,12 @@ function editorRouteChildren(plugins = []) {
  * Build the editor route object for a host `createBrowserRouter`. The host
  * supplies `basename` (its own route `path`) and `errorElement` (a shell page
  * editor-ui can't import). EditorShell-specific props (apiBase/project/scope/
- * plugins/slots) flow into the layout element.
+ * plugins/slots/primaryActions/signals) flow into the layout element.
  *
  * @param {{ path?: string, errorElement?: React.ReactNode, apiBase?: string,
  *           project?: object, scope?: object, plugins?: Array<object>,
- *           slots?: Record<string, React.ReactNode> }} [options]
+ *           slots?: Record<string, React.ReactNode>, primaryActions?: Array<object>,
+ *           signals?: Record<string, () => boolean> }} [options]
  * @returns {object} a react-router route object
  */
 export function createEditorRoutes({
@@ -162,6 +171,8 @@ export function createEditorRoutes({
   scope,
   plugins = [],
   slots = {},
+  primaryActions = DEFAULT_PRIMARY_ACTIONS,
+  signals = {},
 } = {}) {
   return {
     path,
@@ -176,6 +187,8 @@ export function createEditorRoutes({
         scope={scope}
         plugins={plugins}
         slots={slots}
+        primaryActions={primaryActions}
+        signals={signals}
       />
     ),
     errorElement,

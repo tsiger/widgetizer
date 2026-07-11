@@ -524,7 +524,10 @@
       "undo": "Undo",
       "redo": "Redo",
       "saving": "Saving...",
-      "save": "Save"
+      "save": "Save",
+      "saveHint": "Save (Ctrl+S)",
+      "moreActions": "More actions",
+      "actionFailed": "Action failed. Please try again."
     },
     "preview": {
       "loading": "Loading Preview...",

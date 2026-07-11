@@ -8,6 +8,8 @@ import {
   useCommands,
   useSlot,
   useHookRunner,
+  usePrimaryActions,
+  useToolbarSignals,
 } from "../PluginProvider.jsx";
 
 function NavProbe() {
@@ -75,5 +77,45 @@ describe("PluginProvider (React layer)", () => {
       </PluginProvider>,
     );
     expect(screen.getByTestId("hr").textContent).toBe("function/function");
+  });
+});
+
+describe("PluginProvider — primary actions & signals", () => {
+  it("exposes shell-provided primaryActions and signals via hooks", () => {
+    function Probe() {
+      const actions = usePrimaryActions();
+      const signals = useToolbarSignals();
+      return (
+        <div>
+          <span data-testid="ids">{actions.map((a) => a.id).join(",")}</span>
+          <span data-testid="sig">{Object.keys(signals).join(",")}</span>
+        </div>
+      );
+    }
+    render(
+      <PluginProvider
+        plugins={[]}
+        primaryActions={[{ id: "save", command: "save", labelKey: "x" }]}
+        signals={{ publishPending: () => true }}
+      >
+        <Probe />
+      </PluginProvider>,
+    );
+    expect(screen.getByTestId("ids").textContent).toBe("save");
+    expect(screen.getByTestId("sig").textContent).toBe("publishPending");
+  });
+
+  it("defaults to empty when not provided", () => {
+    function Probe() {
+      const actions = usePrimaryActions();
+      const signals = useToolbarSignals();
+      return <span data-testid="d">{actions.length}/{Object.keys(signals).length}</span>;
+    }
+    render(
+      <PluginProvider plugins={[]}>
+        <Probe />
+      </PluginProvider>,
+    );
+    expect(screen.getByTestId("d").textContent).toBe("0/0");
   });
 });
