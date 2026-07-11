@@ -28,6 +28,13 @@ const usePageStore = create(
       page: null,
       originalPage: null,
       globalWidgets: { header: null, footer: null },
+      // Last-saved snapshot of globalWidgets, mirroring originalPage — lets
+      // hasUnsavedChanges() detect a header/footer edit by VALUE, not just by
+      // modifiedWidgets Set membership (a Set can't tell "still dirty from
+      // before a save" apart from "re-dirtied by a fresh edit during that
+      // save's in-flight window", since re-adding an id already present is a
+      // no-op).
+      originalGlobalWidgets: { header: null, footer: null },
 
       // Thin proxy snapshot — NOT the canonical copy. themeStore owns the truth.
       themeSettingsSnapshot: null,
@@ -50,6 +57,7 @@ const usePageStore = create(
             page: null,
             originalPage: null,
             globalWidgets: { header: null, footer: null },
+            originalGlobalWidgets: { header: null, footer: null },
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -63,6 +71,7 @@ const usePageStore = create(
           page: null,
           originalPage: null,
           globalWidgets: { header: null, footer: null },
+          originalGlobalWidgets: { header: null, footer: null },
           themeSettingsSnapshot: null,
         });
 
@@ -124,6 +133,7 @@ const usePageStore = create(
             page: null,
             originalPage: null,
             globalWidgets: { header: null, footer: null },
+            originalGlobalWidgets: { header: null, footer: null },
             themeSettingsSnapshot: null,
             loadedProjectId: projectId,
           });
@@ -181,10 +191,10 @@ const usePageStore = create(
               : null,
           };
 
-          set({ globalWidgets });
+          set({ globalWidgets, originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)) });
         } catch (err) {
           console.error("Failed to load global widgets:", err);
-          set({ globalWidgets: { header: null, footer: null } });
+          set({ globalWidgets: { header: null, footer: null }, originalGlobalWidgets: { header: null, footer: null } });
         }
       },
 
@@ -221,6 +231,7 @@ const usePageStore = create(
           page: null,
           originalPage: null,
           globalWidgets: { header: null, footer: null },
+          originalGlobalWidgets: { header: null, footer: null },
           themeSettingsSnapshot: null,
           loadedProjectId: null,
           loading: false,
@@ -230,6 +241,15 @@ const usePageStore = create(
 
       setOriginalPage: (page) => {
         set({ originalPage: JSON.parse(JSON.stringify(page)) });
+      },
+
+      // Rebaseline after a successful save, mirroring setOriginalPage — called
+      // with the ENTRY-time globalWidgets snapshot save() actually sent (not
+      // whatever the live state has become), so a further edit made while that
+      // save's request was still in flight is correctly detected as a new
+      // diff against this baseline.
+      setOriginalGlobalWidgets: (globalWidgets) => {
+        set({ originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)) });
       },
     }),
     {

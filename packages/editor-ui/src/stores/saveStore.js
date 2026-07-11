@@ -34,9 +34,29 @@ const useAutoSave = create((set, get) => ({
 
     // Check if page state differs from saved state (catches undo/redo changes)
     const pageStore = usePageStore.getState();
-    const { page, originalPage } = pageStore;
+    const { page, originalPage, globalWidgets, originalGlobalWidgets } = pageStore;
 
     if (page && originalPage && JSON.stringify(page) !== JSON.stringify(originalPage)) {
+      return true;
+    }
+
+    // Same idea for header/footer — modifiedWidgets Set membership alone
+    // can't tell "still dirty from before a save" apart from "re-dirtied by a
+    // fresh edit while that save's request was still in flight" (re-adding an
+    // id already present is a no-op), so this value-based diff is the only
+    // reliable signal for that race.
+    if (
+      globalWidgets.header &&
+      originalGlobalWidgets.header &&
+      JSON.stringify(globalWidgets.header) !== JSON.stringify(originalGlobalWidgets.header)
+    ) {
+      return true;
+    }
+    if (
+      globalWidgets.footer &&
+      originalGlobalWidgets.footer &&
+      JSON.stringify(globalWidgets.footer) !== JSON.stringify(originalGlobalWidgets.footer)
+    ) {
       return true;
     }
 
@@ -135,16 +155,34 @@ const useAutoSave = create((set, get) => ({
         invalidateMediaCache(activeProject.id);
       }
 
-      set({
-        modifiedWidgets: new Set(),
-        structureModified: false,
-        themeSettingsModified: false,
-        lastSaved: new Date(),
+      // Clear only the widget ids this save actually attempted (the
+      // `modifiedWidgets` snapshot captured at entry), not whatever the live
+      // set holds now — an edit landing on a widget while the awaits above
+      // were still in flight isn't included in what was just saved, and must
+      // stay flagged dirty so hasUnsavedChanges() doesn't wrongly read clean
+      // (a caller gating on it — e.g. hosted's Save & Publish — would
+      // otherwise publish without that edit).
+      set((state) => {
+        const remaining = new Set(state.modifiedWidgets);
+        for (const id of modifiedWidgets) remaining.delete(id);
+        return {
+          modifiedWidgets: remaining,
+          structureModified: false,
+          themeSettingsModified: false,
+          lastSaved: new Date(),
+        };
       });
 
       if (page) {
         pageStore.setOriginalPage(page);
       }
+      // Rebaseline against the ENTRY-time globalWidgets snapshot (what this
+      // save actually sent), not the live pageStore state — if header/footer
+      // was edited again while the awaits above were in flight, the live
+      // state has already moved past this snapshot, so the next
+      // hasUnsavedChanges() check correctly sees a fresh diff instead of
+      // wrongly reading clean.
+      pageStore.setOriginalGlobalWidgets(globalWidgets);
 
       // Rebaseline undo history to the just-saved state (like page load does), so
       // Undo can't step past the save into stale pre-save values and re-dirty the UI.

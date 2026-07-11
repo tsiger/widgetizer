@@ -50,6 +50,7 @@ const { default: useAutoSave } = await import("../saveStore");
 const { default: usePageStore } = await import("../pageStore");
 const { default: useStaleProjectStore } = await import("../staleProjectStore.js");
 const { savePageContent } = await import("../../queries/pageManager");
+const { saveGlobalWidget } = await import("../../queries/previewManager");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -62,6 +63,7 @@ function resetStores() {
     page: null,
     originalPage: null,
     globalWidgets: { header: null, footer: null },
+    originalGlobalWidgets: { header: null, footer: null },
     themeSettingsSnapshot: null,
     loadedProjectId: null,
     activeLoadId: 0,
@@ -420,6 +422,59 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
       expect(useAutoSave.getState().structureModified).toBe(false);
       expect(useAutoSave.getState().themeSettingsModified).toBe(false);
+    });
+
+    it("preserves a widget modified while this save's requests are still in flight (a concurrent edit must not be silently dropped from dirty-tracking)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      const savePromise = useAutoSave.getState().save();
+
+      // A concurrent edit lands while this save's page-content request is
+      // still pending — it was never part of the snapshot this save decided
+      // to send, so it must survive the post-save clear.
+      useAutoSave.getState().markWidgetModified("header");
+
+      resolveSave({});
+      await savePromise;
+
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false); // this save's own widget: cleared
+      expect(useAutoSave.getState().modifiedWidgets.has("header")).toBe(true); // concurrent edit: preserved
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("detects a re-edit of the SAME widget made while its own save request is still in flight (Set membership alone can't tell this apart from 'still dirty from before')", async () => {
+      seedPageStore();
+      const originalHeader = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: originalHeader, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(originalHeader)), footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+
+      let resolveSave;
+      saveGlobalWidget.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      const savePromise = useAutoSave.getState().save();
+
+      // A fresh edit to the SAME widget lands while this save's own request
+      // for it is still pending. markWidgetModified("header") is a no-op
+      // (already in the Set), so only a value-based diff against the
+      // entry-time snapshot can catch this.
+      const reEditedHeader = { ...originalHeader, settings: { text: "v2" } };
+      usePageStore.setState((state) => ({
+        globalWidgets: { ...state.globalWidgets, header: reEditedHeader },
+      }));
+      useAutoSave.getState().markWidgetModified("header");
+
+      resolveSave({});
+      await savePromise;
+
+      expect(usePageStore.getState().originalGlobalWidgets.header).toEqual(originalHeader); // rebaselined to what was actually sent, not the live re-edit
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
     });
 
     it("updates lastSaved timestamp", async () => {
