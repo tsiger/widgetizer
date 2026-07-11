@@ -41,6 +41,16 @@ describe("SplitButton — mouse", () => {
     expect(screen.queryByRole("menu")).toBeNull();
   });
 
+  it("closes the menu when the primary button is clicked while it's open", () => {
+    const onClick = vi.fn();
+    render(<SplitButton primary={{ label: "Save", onClick }} items={[item()]} />);
+    fireEvent.click(screen.getByRole("button", { name: "More actions" }));
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
   it("closes on outside click", () => {
     render(
       <div>
@@ -106,7 +116,7 @@ describe("SplitButton — keyboard & focus (WAI-ARIA menu button)", () => {
     const caret = screen.getByRole("button", { name: "More actions" });
     fireEvent.click(caret);
     const menu = screen.getByRole("menu");
-    expect(menu).toHaveFocus();            // fails today: focus stuck on caret
+    expect(menu).toHaveFocus();
     fireEvent.keyDown(menu, { key: "Escape" });
     expect(screen.queryByRole("menu")).toBeNull();
     expect(caret).toHaveFocus();

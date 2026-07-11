@@ -136,7 +136,14 @@ export default function SplitButton({ primary, items = [], menuLabel = "More act
   const primaryButton = (
     <button
       type="button"
-      onClick={primary.onClick}
+      onClick={() => {
+        primary.onClick?.();
+        // The primary button lives inside rootRef alongside the caret/menu,
+        // so the outside-click handler's containment check never fires for
+        // it — close explicitly, or the dropdown stays visibly open after a
+        // primary click while it was expanded.
+        if (open) close(false);
+      }}
       disabled={primary.disabled}
       title={primary.title || undefined}
       aria-busy={primary.busy || undefined}
