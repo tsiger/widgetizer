@@ -126,11 +126,25 @@ const useAutoSave = create((set, get) => ({
       // Phase 1: mismatch-guarded writes (page content + global widgets)
       const guardedPromises = [];
 
-      if (globalWidgets.header && modifiedWidgets.has("header")) {
+      // Set membership alone can miss a widget re-edited (to the SAME id)
+      // while its own prior save was still in flight — re-adding an id
+      // already present is a no-op, so the Set never reflects that a fresh
+      // edit landed. Gate on a value-diff too (mirroring hasPageDiff below),
+      // or that re-edit would silently never get sent.
+      const hasHeaderDiff =
+        globalWidgets.header && pageStore.originalGlobalWidgets.header
+          ? JSON.stringify(globalWidgets.header) !== JSON.stringify(pageStore.originalGlobalWidgets.header)
+          : false;
+      const hasFooterDiff =
+        globalWidgets.footer && pageStore.originalGlobalWidgets.footer
+          ? JSON.stringify(globalWidgets.footer) !== JSON.stringify(pageStore.originalGlobalWidgets.footer)
+          : false;
+
+      if (globalWidgets.header && (modifiedWidgets.has("header") || hasHeaderDiff)) {
         guardedPromises.push(saveGlobalWidget("header", globalWidgets.header));
       }
 
-      if (globalWidgets.footer && modifiedWidgets.has("footer")) {
+      if (globalWidgets.footer && (modifiedWidgets.has("footer") || hasFooterDiff)) {
         guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer));
       }
 

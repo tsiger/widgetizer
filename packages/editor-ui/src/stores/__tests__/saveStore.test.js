@@ -477,6 +477,40 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
     });
 
+    it("actually resends a same-widget re-edit on the NEXT save, not just flags it dirty (the re-edit's own modifiedWidgets entry was consumed by the first save's clear)", async () => {
+      seedPageStore();
+      const originalHeader = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: originalHeader, footer: null },
+        originalGlobalWidgets: { header: JSON.parse(JSON.stringify(originalHeader)), footer: null },
+      });
+      useAutoSave.getState().markWidgetModified("header");
+
+      let resolveSave;
+      saveGlobalWidget.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const savePromise = useAutoSave.getState().save();
+
+      const reEditedHeader = { ...originalHeader, settings: { text: "v2" } };
+      usePageStore.setState((state) => ({
+        globalWidgets: { ...state.globalWidgets, header: reEditedHeader },
+      }));
+      useAutoSave.getState().markWidgetModified("header"); // no-op on the Set — "header" was already in it
+
+      resolveSave({});
+      await savePromise;
+
+      // At this point modifiedWidgets no longer contains "header" (the first
+      // save's clear removed it) — only the value-diff against
+      // originalGlobalWidgets still flags the re-edit as dirty. A second save
+      // (e.g. the next autosave tick) must still resend it.
+      saveGlobalWidget.mockClear();
+      await useAutoSave.getState().save();
+
+      expect(saveGlobalWidget).toHaveBeenCalledWith("header", reEditedHeader);
+      expect(usePageStore.getState().originalGlobalWidgets.header).toEqual(reEditedHeader);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
     it("updates lastSaved timestamp", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
