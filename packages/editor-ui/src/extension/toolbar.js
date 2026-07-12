@@ -1,6 +1,7 @@
 // Toolbar primary-action model — descriptor contract + the named-signal vocabulary
-// (Model C) the editor's primary-action control renders from. Pure + framework-free
-// so it is testable without React; the React control reads through these.
+// (Model C) the editor's primary-action control renders from. Framework-free logic
+// (testable without rendering) — the only React-adjacent dependency is the `icon`
+// component reference on DEFAULT_PRIMARY_ACTIONS, never rendered here.
 //
 // A ToolbarAction is pure data:
 //   { id, command, labelKey, titleKey?, busyLabelKey?, enabledWhen?, busyWhen?, icon?, menuItems? }
@@ -95,20 +96,11 @@ export const builtinToolbarPlugin = {
   commands: [
     {
       id: "save",
-      run: () => {
-        const s = useAutoSave.getState();
-        // Skip while ANY save is in flight — manual OR autosave — so a
-        // repeated trigger (held Ctrl+S, or a click/Ctrl+S landing during the
-        // 60s autosave tick) can't start a second, fully concurrent save()
-        // over the same content. busyWhen only reflects isSaving (autosave
-        // has no visible busy state), so this guard is the only thing
-        // catching the autosave case — mirrors hosted's
-        // waitForAnySaveToSettle(), built for the identical race on
-        // savePublish. Without it, two overlapping saves both resolve and
-        // usePageStore.temporal.getState().clear() runs twice, wiping the
-        // undo/redo stack mid-edit.
-        return s.isSaving || s.isAutoSaving ? undefined : s.save(false);
-      },
+      // The overlapping-save guard (manual vs. autosave, in either firing
+      // order) lives in saveStore's save() itself now — see its comment —
+      // since a guard here alone can't catch the autosave timer's own direct
+      // get().save(true) call, which never goes through this command.
+      run: () => useAutoSave.getState().save(false),
     },
   ],
 };

@@ -37,4 +37,31 @@ describe("buildRegistry", () => {
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("somethingWeird");
   });
+
+  it("warns on a command id collision but keeps the FIRST-registered command (later one is dropped from dispatch)", () => {
+    const warn = vi.fn();
+    const first = { name: "a", commands: [{ id: "save", run: () => "a" }] };
+    const second = { name: "b", commands: [{ id: "save", run: () => "b" }] };
+
+    const reg = buildRegistry([first, second], { warn });
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("save");
+    expect(warn.mock.calls[0][0]).toContain("a");
+    expect(warn.mock.calls[0][0]).toContain("b");
+    // Both entries are present (buildRegistry itself doesn't dedupe/drop) —
+    // it's commands.find(c => c.id === id) at the call site that only ever
+    // reaches the first one, so the collision is a silent shadow, not a hard error.
+    expect(reg.commands).toHaveLength(2);
+    expect(reg.commands.find((c) => c.id === "save").pluginName).toBe("a");
+  });
+
+  it("does not warn when command ids are distinct", () => {
+    const warn = vi.fn();
+    buildRegistry(
+      [{ name: "a", commands: [{ id: "save" }] }, { name: "b", commands: [{ id: "publish" }] }],
+      { warn },
+    );
+    expect(warn).not.toHaveBeenCalled();
+  });
 });

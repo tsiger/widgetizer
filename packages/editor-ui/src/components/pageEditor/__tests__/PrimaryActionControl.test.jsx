@@ -92,4 +92,30 @@ describe("PrimaryActionControl", () => {
       "pageEditor.toolbar.saveHint",
     );
   });
+
+  it("warns when a shell-registered signal collides with a reserved TOOLBAR_SIGNALS name, and the builtin value wins", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    useAutoSave.setState({ modifiedWidgets: new Set() }); // builtin hasUnsavedChanges → false
+    renderControl({
+      actions: [saveDescriptor],
+      commands: [{ id: "save", run: vi.fn() }],
+      signals: { hasUnsavedChanges: () => true }, // shell tries to force it enabled
+    });
+    expect(warn).toHaveBeenCalled();
+    expect(warn.mock.calls.some((c) => String(c[0]).includes("hasUnsavedChanges"))).toBe(true);
+    // Builtin (false) wins over the shell's override (true) — button stays disabled.
+    expect(screen.getByRole("button", { name: "pageEditor.toolbar.save" })).toBeDisabled();
+    warn.mockRestore();
+  });
+
+  it("does not warn when shell-registered signal names don't collide with reserved ones", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    renderControl({
+      actions: [saveDescriptor],
+      commands: [{ id: "save", run: vi.fn() }],
+      signals: { publishPending: () => true },
+    });
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });

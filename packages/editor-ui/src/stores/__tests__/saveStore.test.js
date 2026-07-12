@@ -411,6 +411,57 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().isAutoSaving).toBe(false);
     });
 
+    it("does not start a second save while a manual save is already in flight", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const firstSave = useAutoSave.getState().save(false);
+
+      await useAutoSave.getState().save(false); // a repeated trigger (held Ctrl+S) while isSaving is already true
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+
+      resolveSave({});
+      await firstSave;
+    });
+
+    it("does not let the 60s autosave timer's own save(true) call start while a manual save is in flight (the timer bypasses the `save` command entirely, so the guard must live here, not just at the command layer)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const manualSave = useAutoSave.getState().save(false);
+      expect(useAutoSave.getState().isSaving).toBe(true);
+
+      // Simulates resetAutoSaveTimer's setTimeout callback calling
+      // get().save(true) directly — no command wrapper involved.
+      await useAutoSave.getState().save(true);
+      expect(useAutoSave.getState().isAutoSaving).toBe(false); // never started
+      expect(savePageContent).toHaveBeenCalledTimes(1); // only the manual save's own request
+
+      resolveSave({});
+      await manualSave;
+      // Undo history clears exactly once (from the manual save), not twice.
+      expect(usePageStore.temporal.getState().pastStates).toHaveLength(0);
+    });
+
+    it("does not start an autosave while one is already in flight", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const firstSave = useAutoSave.getState().save(true);
+
+      await useAutoSave.getState().save(true);
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+
+      resolveSave({});
+      await firstSave;
+    });
+
     it("clears all modification flags after saving", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");

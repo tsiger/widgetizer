@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 14 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 15 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -60,6 +60,7 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ⬜ [46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — **low (latent)**](#46-splitbutton-menu-items-never-render-a-title-tooltip-unlike-the-primary-button-editor-ui---low-latent)
 - ⬜ [47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — **low (latent)**](#47-editorproviderpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui---low-latent)
 - ⬜ [48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — **low (latent)**](#48-savestores-headerfooter-dirty-diff-is-key-order-sensitive-not-truly-deep-equal-editor-ui---low-latent)
+- ⬜ [49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — **low (accepted UX gap)**](#49-clicking-save-during-a-background-autosave-silently-does-nothing--no-busy-state-no-toast-editor-ui---low-accepted-ux-gap)
 
 ---
 
@@ -2438,3 +2439,30 @@ pattern, same latent risk, not new to this change).
 
 **Hosted impact:** the `needs_publish`/`publishPending` symptom would surface there, but the root cause
 and fix are OSS-only (`saveStore.js`).
+
+---
+
+## 49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — ⬜ **low (accepted UX gap)**
+
+Surfaced 2026-07-12 in the 6th xhigh review pass, on the fix for §45/the autosave-vs-manual-save
+overlap race. `saveStore.save()` now guards against a save already being in flight (manual OR auto) at
+its own top, closing the race that used to wipe undo history when both fired concurrently. But the
+guard is a silent skip: `TOOLBAR_SIGNALS`/`busyWhen` only reflect `isSaving`, never `isAutoSaving`, so
+if the user clicks Save (or hits Ctrl+S) while the 60s autosave tick is mid-flight, the button stays
+fully active-looking the whole time and the click produces no busy indicator, no toast, no error —
+indistinguishable from nothing having happened.
+
+**Decision (2026-07-12):** left as-is. Autosave is meant to be an invisible background behavior by
+design; a click landing in this narrow window just means the edit will be captured by the autosave
+that's already running (or the next 60s tick, since `hasUnsavedChanges()` stays accurate throughout).
+Not incorrect, just unannounced — and the alternative (wiring `isAutoSaving` into the busy signal so the
+button visibly flashes "Saving..." on every autosave tick, not just user-initiated ones) was judged a
+bigger, more noticeable UX change to everyday editing than the narrow race window justifies.
+
+**Revisit if:** users report confusion from clicking Save and seeing no feedback during this window —
+at that point, either surface a lighter-weight signal (e.g. a toast confirming "already saving") or
+reconsider wiring `isAutoSaving` into the busy state.
+
+**Hosted impact:** none — same gap would apply to hosted's Save button (shared `editor-ui` component),
+but hosted's `savePublish` already has its own `waitForAnySaveToSettle()` guard so this specific plugin
+flow isn't affected.

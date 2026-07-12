@@ -104,27 +104,15 @@ describe("builtinToolbarPlugin", () => {
   afterEach(() => vi.restoreAllMocks());
   const saveCmd = () => builtinToolbarPlugin.commands.find((c) => c.id === "save");
 
-  it("contributes a `save` command that calls saveStore.save(false) when idle", async () => {
+  it("contributes a `save` command that calls saveStore.save(false)", async () => {
+    // The overlapping-save guard (manual vs. autosave) lives in saveStore's
+    // save() itself now — see saveStore.test.js — not in this command, since
+    // a guard here alone can't catch the autosave timer's own direct
+    // get().save(true) call. This command is now a thin, unconditional pass-through.
     const save = vi.fn().mockResolvedValue(undefined);
-    useAutoSave.setState({ save, isSaving: false });
+    useAutoSave.setState({ save });
     await saveCmd().run();
     expect(save).toHaveBeenCalledWith(false);
-  });
-
-  it("does not start a save while one is already in flight", async () => {
-    const save = vi.fn().mockResolvedValue(undefined);
-    useAutoSave.setState({ save, isSaving: true });
-    await saveCmd().run();
-    expect(save).not.toHaveBeenCalled();
-    useAutoSave.setState({ isSaving: false });
-  });
-
-  it("does not start a second, overlapping save while an autosave is already in flight (Ctrl+S/click racing the 60s tick)", async () => {
-    const save = vi.fn().mockResolvedValue(undefined);
-    useAutoSave.setState({ save, isSaving: false, isAutoSaving: true });
-    await saveCmd().run();
-    expect(save).not.toHaveBeenCalled();
-    useAutoSave.setState({ isAutoSaving: false });
   });
 });
 

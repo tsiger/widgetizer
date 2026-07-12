@@ -99,7 +99,19 @@ const useAutoSave = create((set, get) => ({
   },
 
   save: async (isAuto = false) => {
-    const { modifiedWidgets, structureModified, themeSettingsModified, hasUnsavedChanges } = get();
+    const { isSaving, isAutoSaving, modifiedWidgets, structureModified, themeSettingsModified, hasUnsavedChanges } =
+      get();
+
+    // A save — manual OR auto — is already in flight: skip. This is the
+    // single guard every caller relies on (the `save` toolbar command, and
+    // the 60s autosave timer's own direct get().save(true) call below in
+    // resetAutoSaveTimer) — putting it only in the command wrapper misses the
+    // timer's direct call entirely, letting a manual save and an autosave
+    // tick run concurrently regardless of which started first. Both would
+    // resolve and each calls usePageStore.temporal.getState().clear(),
+    // wiping the undo/redo stack mid-edit.
+    if (isSaving || isAutoSaving) return;
+
     const pageStore = usePageStore.getState();
     const { page, globalWidgets } = pageStore;
     const themeStore = useThemeStore.getState();
