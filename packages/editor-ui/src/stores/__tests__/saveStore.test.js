@@ -358,6 +358,49 @@ describe("saveStore (useAutoSave)", () => {
       expect(savePageContent).toHaveBeenCalledTimes(2); // w-2 finally gets saved
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
     });
+
+    it("does not orphan a newer timer armed by a fresh edit that lands while the tick's own save is still in flight", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1"); // arms timer T1
+      const timerT1 = useAutoSave.getState().autoSaveInterval;
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      await vi.advanceTimersByTimeAsync(60000); // T1 fires; its own save(true) call hangs mid-flight
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
+      // T1's tick is still suspended awaiting its own save() — hasn't reached
+      // its post-await code yet, so autoSaveInterval is untouched so far.
+      expect(useAutoSave.getState().autoSaveInterval).toBe(timerT1);
+
+      // A fresh edit lands while T1's own save is still in flight — this is
+      // markWidgetModified's own resetAutoSaveTimer() call, arming a NEW
+      // timer T2 and replacing T1's reference before T1's tick resumes.
+      useAutoSave.getState().markWidgetModified("w-2");
+      const timerT2 = useAutoSave.getState().autoSaveInterval;
+      expect(timerT2).not.toBe(timerT1);
+
+      resolveSave({});
+      await vi.advanceTimersByTimeAsync(0); // let T1's suspended save() resolve and its tick resume/bail
+
+      // T1's own post-await code must recognize it's no longer the tracked
+      // timer and bail — not clobber T2's reference (orphaning it, live and
+      // untracked) and not schedule a redundant third timer on top of it.
+      expect(useAutoSave.getState().autoSaveInterval).toBe(timerT2);
+      expect(vi.getTimerCount()).toBe(1);
+    });
+
+    it("does not defeat save()'s own stopAutoSave() (PROJECT_MISMATCH) by rescheduling anyway once the tick's save resolves", async () => {
+      seedPageStore();
+      usePageStore.setState({ loadedProjectId: "other-project" }); // mismatch vs the mocked active project
+      useAutoSave.getState().markWidgetModified("w-1"); // unsaved change + arms the timer
+
+      await vi.advanceTimersByTimeAsync(60000); // the tick fires; save(true) hits PROJECT_MISMATCH and stops autosave
+
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull(); // stayed stopped, not silently re-armed
+      expect(vi.getTimerCount()).toBe(0);
+    });
   });
 
   describe("stopAutoSave", () => {
@@ -463,20 +506,23 @@ describe("saveStore (useAutoSave)", () => {
       usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
       const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
 
-      let resolveSave;
-      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
-      const manualSave = useAutoSave.getState().save(false);
-      expect(useAutoSave.getState().isSaving).toBe(true);
+      try {
+        let resolveSave;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+        const manualSave = useAutoSave.getState().save(false);
+        expect(useAutoSave.getState().isSaving).toBe(true);
 
-      // Simulates resetAutoSaveTimer's setTimeout callback calling
-      // get().save(true) directly — no command wrapper involved.
-      await useAutoSave.getState().save(true);
-      expect(savePageContent).toHaveBeenCalledTimes(1); // only the manual save's own request
+        // Simulates resetAutoSaveTimer's setTimeout callback calling
+        // get().save(true) directly — no command wrapper involved.
+        await useAutoSave.getState().save(true);
+        expect(savePageContent).toHaveBeenCalledTimes(1); // only the manual save's own request
 
-      resolveSave({});
-      await manualSave;
-      expect(clearSpy).toHaveBeenCalledTimes(1); // from the manual save only, not the skipped autosave attempt
-      clearSpy.mockRestore();
+        resolveSave({});
+        await manualSave;
+        expect(clearSpy).toHaveBeenCalledTimes(1); // from the manual save only, not the skipped autosave attempt
+      } finally {
+        clearSpy.mockRestore();
+      }
     });
 
     it("does not let a manual save start while the 60s autosave timer's own save is already in flight (the reverse firing order)", async () => {
@@ -485,19 +531,22 @@ describe("saveStore (useAutoSave)", () => {
       usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
       const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
 
-      let resolveSave;
-      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
-      const autoSave = useAutoSave.getState().save(true); // simulates the 60s timer firing first
-      expect(useAutoSave.getState().isAutoSaving).toBe(true);
+      try {
+        let resolveSave;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+        const autoSave = useAutoSave.getState().save(true); // simulates the 60s timer firing first
+        expect(useAutoSave.getState().isAutoSaving).toBe(true);
 
-      // A manual click/Ctrl+S landing while that autosave is still in flight.
-      await useAutoSave.getState().save(false);
-      expect(savePageContent).toHaveBeenCalledTimes(1); // only the autosave's own request
+        // A manual click/Ctrl+S landing while that autosave is still in flight.
+        await useAutoSave.getState().save(false);
+        expect(savePageContent).toHaveBeenCalledTimes(1); // only the autosave's own request
 
-      resolveSave({});
-      await autoSave;
-      expect(clearSpy).toHaveBeenCalledTimes(1); // from the autosave only, not the skipped manual attempt
-      clearSpy.mockRestore();
+        resolveSave({});
+        await autoSave;
+        expect(clearSpy).toHaveBeenCalledTimes(1); // from the autosave only, not the skipped manual attempt
+      } finally {
+        clearSpy.mockRestore();
+      }
     });
 
     it("does not start an autosave while one is already in flight", async () => {

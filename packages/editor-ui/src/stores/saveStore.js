@@ -245,6 +245,19 @@ const useAutoSave = create((set, get) => ({
       if (hasUnsavedChanges()) {
         await get().save(true); // may no-op if another save is already in flight — see save()'s own guard
       }
+
+      // While the above was in flight, something else may have already
+      // touched autoSaveInterval: a fresh edit's own resetAutoSaveTimer()
+      // call (armed a newer live timer), or an explicit stop — save()'s own
+      // PROJECT_MISMATCH handling calls stopAutoSave() specifically to halt
+      // retries, and so can an external stopAutoSave()/reset() (e.g. the user
+      // discarding changes via the navigation guard). Only proceed if THIS
+      // tick's own timer id is still the one tracked; otherwise a newer timer
+      // is already handling it, or a stop was intentional — either way,
+      // touching state here would either orphan that newer timer (untracked,
+      // uncancellable) or defeat the stop by silently re-arming autosave.
+      if (get().autoSaveInterval !== timeout) return;
+
       set({ autoSaveInterval: null });
       // Content can still be dirty here for two reasons: save() above no-op'd
       // (another save was in flight when this tick fired) or it ran but a
