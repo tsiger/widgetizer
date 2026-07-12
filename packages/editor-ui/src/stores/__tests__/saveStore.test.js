@@ -58,6 +58,20 @@ const { saveGlobalWidget } = await import("../../queries/previewManager");
 
 function resetStores() {
   useAutoSave.getState().reset();
+  // reset() deliberately leaves isSaving/isAutoSaving/runningSave/
+  // queuedFollowUp alone in production (an in-flight save finishes on its
+  // own; only its write-back gets abandoned) — but a previous test can leave
+  // a dangling, still-pending run/follow-up chain (e.g. one using the
+  // default savePageContent mock, which resolves on its own schedule rather
+  // than being explicitly awaited by that test). Without a hard clear here,
+  // that stale `runningSave` reference leaks into the next test and makes
+  // its first save() call silently coalesce onto someone else's stale run.
+  useAutoSave.setState({
+    isSaving: false,
+    isAutoSaving: false,
+    runningSave: null,
+    queuedFollowUp: null,
+  });
 
   usePageStore.setState({
     page: null,
@@ -127,7 +141,8 @@ describe("saveStore (useAutoSave)", () => {
       useAutoSave.getState().markWidgetModified("w-1"); // unsaved change + arms the auto-save timer
       expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
 
-      await expect(useAutoSave.getState().save(false)).resolves.toBeUndefined();
+      const result = await useAutoSave.getState().save(false);
+      expect(result).toEqual({ status: "mismatch" });
 
       expect(useStaleProjectStore.getState().isStale).toBe(true);
       expect(useAutoSave.getState().autoSaveInterval).toBe(null);
@@ -347,65 +362,6 @@ describe("saveStore (useAutoSave)", () => {
       expect(second).not.toBe(first);
     });
 
-    it("reschedules instead of going silent when a tick's own save is skipped (another save was already in flight)", async () => {
-      seedPageStore();
-      useAutoSave.getState().markWidgetModified("w-1"); // arms the timer
-
-      let resolveBlockingSave;
-      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveBlockingSave = resolve; }));
-      const blockingSave = useAutoSave.getState().save(false); // a manual save starts, kept in flight
-      expect(useAutoSave.getState().isSaving).toBe(true);
-
-      // A second, distinct edit lands while that save is still in flight — not
-      // part of its entry-time snapshot, so it stays dirty after it resolves.
-      // Also re-arms the timer (markWidgetModified's own side effect).
-      useAutoSave.getState().markWidgetModified("w-2");
-
-      await vi.advanceTimersByTimeAsync(60000); // the tick fires while the manual save is still in flight
-      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull(); // rescheduled, not abandoned
-      expect(savePageContent).toHaveBeenCalledTimes(1); // the tick's own save(true) attempt was skipped by the guard
-
-      resolveBlockingSave({});
-      await blockingSave;
-      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true); // w-2 is still dirty
-
-      savePageContent.mockResolvedValueOnce({});
-      await vi.advanceTimersByTimeAsync(60000); // the rescheduled tick fires; nothing blocking now
-      expect(savePageContent).toHaveBeenCalledTimes(2); // w-2 finally gets saved
-      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
-    });
-
-    it("does not orphan a newer timer armed by a fresh edit that lands while the tick's own save is still in flight", async () => {
-      seedPageStore();
-      useAutoSave.getState().markWidgetModified("w-1"); // arms timer T1
-      const timerT1 = useAutoSave.getState().autoSaveInterval;
-
-      let resolveSave;
-      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
-
-      await vi.advanceTimersByTimeAsync(60000); // T1 fires; its own save(true) call hangs mid-flight
-      expect(useAutoSave.getState().isAutoSaving).toBe(true);
-      // T1's tick is still suspended awaiting its own save() — hasn't reached
-      // its post-await code yet, so autoSaveInterval is untouched so far.
-      expect(useAutoSave.getState().autoSaveInterval).toBe(timerT1);
-
-      // A fresh edit lands while T1's own save is still in flight — this is
-      // markWidgetModified's own resetAutoSaveTimer() call, arming a NEW
-      // timer T2 and replacing T1's reference before T1's tick resumes.
-      useAutoSave.getState().markWidgetModified("w-2");
-      const timerT2 = useAutoSave.getState().autoSaveInterval;
-      expect(timerT2).not.toBe(timerT1);
-
-      resolveSave({});
-      await vi.advanceTimersByTimeAsync(0); // let T1's suspended save() resolve and its tick resume/bail
-
-      // T1's own post-await code must recognize it's no longer the tracked
-      // timer and bail — not clobber T2's reference (orphaning it, live and
-      // untracked) and not schedule a redundant third timer on top of it.
-      expect(useAutoSave.getState().autoSaveInterval).toBe(timerT2);
-      expect(vi.getTimerCount()).toBe(1);
-    });
-
     it("does not defeat save()'s own stopAutoSave() (PROJECT_MISMATCH) by rescheduling anyway once the tick's save resolves", async () => {
       seedPageStore();
       usePageStore.setState({ loadedProjectId: "other-project" }); // mismatch vs the mocked active project
@@ -450,12 +406,15 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().themeSettingsModified).toBe(false);
     });
 
-    it("clears saving flags", () => {
+    it("does not force-clear isSaving/isAutoSaving — an in-flight save's own completion does that, not reset()", () => {
       useAutoSave.setState({ isSaving: true, isAutoSaving: true });
       useAutoSave.getState().reset();
 
-      expect(useAutoSave.getState().isSaving).toBe(false);
-      expect(useAutoSave.getState().isAutoSaving).toBe(false);
+      // Deliberately unchanged: forcing these false while a real save is
+      // still in flight was the actual bug this redesign fixes (see
+      // saveGeneration and reset()'s own comment).
+      expect(useAutoSave.getState().isSaving).toBe(true);
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
     });
 
     it("clears lastSaved", () => {
@@ -498,86 +457,164 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().isAutoSaving).toBe(false);
     });
 
-    it("does not start a second save while a manual save is already in flight", async () => {
+    it("coalesces a repeated manual save call into one follow-up instead of overlapping", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
 
-      let resolveSave;
-      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
-      const firstSave = useAutoSave.getState().save(false);
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
 
-      await useAutoSave.getState().save(false); // a repeated trigger (held Ctrl+S) while isSaving is already true
+      const second = useAutoSave.getState().save(false); // a repeated trigger (held Ctrl+S) while isSaving is already true
+      resolveFirst({});
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "clean" }); // the coalesced follow-up found nothing left to do, not a silent drop
       expect(savePageContent).toHaveBeenCalledTimes(1);
-
-      resolveSave({});
-      await firstSave;
     });
 
-    it("does not let the 60s autosave timer's own save(true) call start while a manual save is in flight (the timer bypasses the `save` command entirely, so the guard must live here, not just at the command layer)", async () => {
+    it("coalesces a repeated autosave call into one follow-up instead of overlapping", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
-      // Seed undo history so "cleared exactly once, not twice" is actually
-      // observable — clear() resets to [] either way, so a plain post-hoc
-      // pastStates check can't tell one call from two; spy on clear() itself.
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(true);
+
+      const second = useAutoSave.getState().save(true);
+      resolveFirst({});
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "clean" });
+      expect(savePageContent).toHaveBeenCalledTimes(1);
+    });
+
+    it("coalesces a fresh edit that lands mid-flight into a follow-up that actually sends it, not a silent no-op", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
+      expect(useAutoSave.getState().isSaving).toBe(true);
+
+      useAutoSave.getState().markWidgetModified("w-2"); // not part of the first save's entry-time snapshot
+      savePageContent.mockResolvedValueOnce({}); // the coalesced follow-up's own request
+
+      const second = useAutoSave.getState().save(false);
+      resolveFirst({});
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "success" });
+      expect(savePageContent).toHaveBeenCalledTimes(2); // the first save's own request, then the follow-up's
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    it("does not let the 60s autosave timer's own save(true) call start while a manual save is in flight — coalesces into one follow-up instead", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
       usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
       const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
 
       try {
-        let resolveSave;
-        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+        let resolveManual;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveManual = resolve; }));
         const manualSave = useAutoSave.getState().save(false);
         expect(useAutoSave.getState().isSaving).toBe(true);
 
-        // Simulates resetAutoSaveTimer's setTimeout callback calling
-        // get().save(true) directly — no command wrapper involved.
-        await useAutoSave.getState().save(true);
-        expect(savePageContent).toHaveBeenCalledTimes(1); // only the manual save's own request
+        const autoAttempt = useAutoSave.getState().save(true); // simulates resetAutoSaveTimer's tick calling get().save(true) directly
 
-        resolveSave({});
-        await manualSave;
-        expect(clearSpy).toHaveBeenCalledTimes(1); // from the manual save only, not the skipped autosave attempt
+        resolveManual({});
+        const [manualResult, autoResult] = await Promise.all([manualSave, autoAttempt]);
+
+        expect(manualResult).toEqual({ status: "success" });
+        expect(autoResult).toEqual({ status: "clean" });
+        expect(savePageContent).toHaveBeenCalledTimes(1);
+        expect(clearSpy).toHaveBeenCalledTimes(1);
       } finally {
         clearSpy.mockRestore();
       }
     });
 
-    it("does not let a manual save start while the 60s autosave timer's own save is already in flight (the reverse firing order)", async () => {
+    it("does not let a manual save start while the 60s autosave timer's own save is already in flight (the reverse firing order) — coalesces into one follow-up instead", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
       usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
       const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
 
       try {
-        let resolveSave;
-        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
-        const autoSave = useAutoSave.getState().save(true); // simulates the 60s timer firing first
+        let resolveAuto;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveAuto = resolve; }));
+        const autoSave = useAutoSave.getState().save(true);
         expect(useAutoSave.getState().isAutoSaving).toBe(true);
 
-        // A manual click/Ctrl+S landing while that autosave is still in flight.
-        await useAutoSave.getState().save(false);
-        expect(savePageContent).toHaveBeenCalledTimes(1); // only the autosave's own request
+        const manualAttempt = useAutoSave.getState().save(false);
 
-        resolveSave({});
-        await autoSave;
-        expect(clearSpy).toHaveBeenCalledTimes(1); // from the autosave only, not the skipped manual attempt
+        resolveAuto({});
+        const [autoResult, manualResult] = await Promise.all([autoSave, manualAttempt]);
+
+        expect(autoResult).toEqual({ status: "success" });
+        expect(manualResult).toEqual({ status: "clean" });
+        expect(savePageContent).toHaveBeenCalledTimes(1);
+        expect(clearSpy).toHaveBeenCalledTimes(1);
       } finally {
         clearSpy.mockRestore();
       }
     });
 
-    it("does not start an autosave while one is already in flight", async () => {
+    it("abandons its write-back if reset() fires while the save is still in flight (discard-and-leave)", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
+      const setOriginalPageSpy = vi.spyOn(usePageStore.getState(), "setOriginalPage");
+      const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
 
-      let resolveSave;
-      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
-      const firstSave = useAutoSave.getState().save(true);
+      try {
+        let resolveSave;
+        savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+        const savePromise = useAutoSave.getState().save(false);
 
-      await useAutoSave.getState().save(true);
-      expect(savePageContent).toHaveBeenCalledTimes(1);
+        useAutoSave.getState().reset(); // user confirms "discard changes" mid-flight
 
-      resolveSave({});
-      await firstSave;
+        resolveSave({});
+        const result = await savePromise;
+
+        expect(result).toEqual({ status: "abandoned" });
+        expect(setOriginalPageSpy).not.toHaveBeenCalled();
+        expect(clearSpy).not.toHaveBeenCalled();
+      } finally {
+        setOriginalPageSpy.mockRestore();
+        clearSpy.mockRestore();
+      }
+    });
+
+    it("rejects on a manual save failure so the caller's error handling (the toolbar's toast) fires", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockRejectedValueOnce(new Error("network down"));
+
+      await expect(useAutoSave.getState().save(false)).rejects.toThrow("network down");
+      expect(useAutoSave.getState().isSaving).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true); // nothing cleared — safe to retry
+    });
+
+    it("does not reject on an autosave failure — resolves failed and stays retriable, logged not thrown", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockRejectedValueOnce(new Error("network down"));
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      try {
+        const result = await useAutoSave.getState().save(true);
+        expect(result.status).toBe("failed");
+        expect(result.error.message).toBe("network down");
+        expect(useAutoSave.getState().isAutoSaving).toBe(false);
+        expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      } finally {
+        warnSpy.mockRestore();
+      }
     });
 
     it("clears all modification flags after saving", async () => {
@@ -586,8 +623,9 @@ describe("saveStore (useAutoSave)", () => {
       useAutoSave.getState().setStructureModified(true);
       useAutoSave.getState().setThemeSettingsModified(true);
 
-      await useAutoSave.getState().save();
+      const result = await useAutoSave.getState().save();
 
+      expect(result).toEqual({ status: "success" });
       expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
       expect(useAutoSave.getState().structureModified).toBe(false);
       expect(useAutoSave.getState().themeSettingsModified).toBe(false);
@@ -690,8 +728,9 @@ describe("saveStore (useAutoSave)", () => {
 
     it("is a no-op when there are no unsaved changes", async () => {
       seedPageStore();
-      await useAutoSave.getState().save();
+      const result = await useAutoSave.getState().save();
 
+      expect(result).toEqual({ status: "clean" });
       // lastSaved should still be null because nothing was saved
       expect(useAutoSave.getState().lastSaved).toBeNull();
     });
