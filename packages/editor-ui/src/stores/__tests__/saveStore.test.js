@@ -309,6 +309,22 @@ describe("saveStore (useAutoSave)", () => {
     it("returns false when page is null", () => {
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
     });
+
+    it("detects a page diff even when the only change is an undefined-valued key (JSON.stringify would silently drop it)", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], extra: undefined } } },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("does not report a diff when header/footer are rebuilt with the same values in a different key order", () => {
+      usePageStore.setState({
+        globalWidgets: { header: { type: "header", settings: { a: 1, b: 2 } }, footer: null },
+        originalGlobalWidgets: { header: { settings: { b: 2, a: 1 }, type: "header" }, footer: null },
+      });
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
   });
 
   // --------------------------------------------------------------------------

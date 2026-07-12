@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { isEqual } from "lodash";
 import { savePageContent } from "../queries/pageManager";
 import { saveGlobalWidget } from "../queries/previewManager";
 import { invalidateMediaCache } from "../queries/mediaManager";
@@ -36,7 +37,7 @@ const useAutoSave = create((set, get) => ({
     const pageStore = usePageStore.getState();
     const { page, originalPage, globalWidgets, originalGlobalWidgets } = pageStore;
 
-    if (page && originalPage && JSON.stringify(page) !== JSON.stringify(originalPage)) {
+    if (page && originalPage && !isEqual(page, originalPage)) {
       return true;
     }
 
@@ -48,14 +49,14 @@ const useAutoSave = create((set, get) => ({
     if (
       globalWidgets.header &&
       originalGlobalWidgets.header &&
-      JSON.stringify(globalWidgets.header) !== JSON.stringify(originalGlobalWidgets.header)
+      !isEqual(globalWidgets.header, originalGlobalWidgets.header)
     ) {
       return true;
     }
     if (
       globalWidgets.footer &&
       originalGlobalWidgets.footer &&
-      JSON.stringify(globalWidgets.footer) !== JSON.stringify(originalGlobalWidgets.footer)
+      !isEqual(globalWidgets.footer, originalGlobalWidgets.footer)
     ) {
       return true;
     }
@@ -145,11 +146,11 @@ const useAutoSave = create((set, get) => ({
       // or that re-edit would silently never get sent.
       const hasHeaderDiff =
         globalWidgets.header && pageStore.originalGlobalWidgets.header
-          ? JSON.stringify(globalWidgets.header) !== JSON.stringify(pageStore.originalGlobalWidgets.header)
+          ? !isEqual(globalWidgets.header, pageStore.originalGlobalWidgets.header)
           : false;
       const hasFooterDiff =
         globalWidgets.footer && pageStore.originalGlobalWidgets.footer
-          ? JSON.stringify(globalWidgets.footer) !== JSON.stringify(pageStore.originalGlobalWidgets.footer)
+          ? !isEqual(globalWidgets.footer, pageStore.originalGlobalWidgets.footer)
           : false;
 
       if (globalWidgets.header && (modifiedWidgets.has("header") || hasHeaderDiff)) {
@@ -162,7 +163,7 @@ const useAutoSave = create((set, get) => ({
 
       const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
       const hasPageDiff =
-        page && pageStore.originalPage ? JSON.stringify(page) !== JSON.stringify(pageStore.originalPage) : false;
+        page && pageStore.originalPage ? !isEqual(page, pageStore.originalPage) : false;
       if (page && (hasPageWidgetChanges || structureModified || hasPageDiff)) {
         guardedPromises.push(savePageContent(page.id, page));
       }
