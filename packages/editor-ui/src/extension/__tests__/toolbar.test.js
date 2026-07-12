@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { Save } from "lucide-react";
 import {
   TOOLBAR_SIGNALS,
   resolveActionState,
@@ -90,6 +91,10 @@ describe("DEFAULT_PRIMARY_ACTIONS", () => {
     expect(DEFAULT_PRIMARY_ACTIONS[0]).toMatchObject({ id: "save", command: "save", enabledWhen: "hasUnsavedChanges" });
     expect(DEFAULT_PRIMARY_ACTIONS[0].menuItems).toBeUndefined();
   });
+
+  it("carries the Save icon (the standalone OSS/Electron topbar has no other way to get one)", () => {
+    expect(DEFAULT_PRIMARY_ACTIONS[0].icon).toBe(Save);
+  });
   it("validates against its own builtin vocabulary", () => {
     expect(() => validatePrimaryActions(DEFAULT_PRIMARY_ACTIONS, { commandIds: ["save"] })).not.toThrow();
   });
@@ -112,6 +117,14 @@ describe("builtinToolbarPlugin", () => {
     await saveCmd().run();
     expect(save).not.toHaveBeenCalled();
     useAutoSave.setState({ isSaving: false });
+  });
+
+  it("does not start a second, overlapping save while an autosave is already in flight (Ctrl+S/click racing the 60s tick)", async () => {
+    const save = vi.fn().mockResolvedValue(undefined);
+    useAutoSave.setState({ save, isSaving: false, isAutoSaving: true });
+    await saveCmd().run();
+    expect(save).not.toHaveBeenCalled();
+    useAutoSave.setState({ isAutoSaving: false });
   });
 });
 

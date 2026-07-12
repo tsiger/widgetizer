@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 11 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 14 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -57,6 +57,9 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ⬜ [43. Full accessibility / WAI-ARIA APG conformance review for the project (`editor-ui` + all shells) — **investigate (a11y)**](#43-full-accessibility--wai-aria-apg-conformance-review-for-the-project-editor-ui--all-shells--investigate-a11y)
 - ⬜ [44. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — **low (test hygiene)**](#44-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--low-test-hygiene)
 - ⬜ [45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — **low (latent; hosted-wiring)**](#45-ctrls-bypasses-the-primaryactioncontrol-dispatch-seam--empty-ctx-no-busy-guard-no-error-toast-editor-ui--low-latent-hosted-wiring)
+- ⬜ [46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — **low (latent)**](#46-splitbutton-menu-items-never-render-a-title-tooltip-unlike-the-primary-button-editor-ui---low-latent)
+- ⬜ [47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — **low (latent)**](#47-editorproviderpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui---low-latent)
+- ⬜ [48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — **low (latent)**](#48-savestores-headerfooter-dirty-diff-is-key-order-sensitive-not-truly-deep-equal-editor-ui---low-latent)
 
 ---
 
@@ -2368,3 +2371,70 @@ action like Save & Publish. Left deliberately out of the OSS SplitButton branch.
 
 **Hosted impact:** this is the trigger — a hosted-wiring concern, addressed there (in shared
 `editor-ui`) when the first ctx-using command lands.
+
+---
+
+## 46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — ⬜ **low (latent)**
+
+Surfaced 2026-07-12 in the whole-branch review of the primary-action control. `PrimaryActionControl`'s
+`toView()` computes a `title` (from `titleKey`) uniformly for both the primary action and every menu
+item, and `SplitButton`'s primary button applies it (`title={primary.title || undefined}`), but the
+menu-item `<button role="menuitem">` never reads/spreads `it.title` — the capability silently no-ops
+for dropdown items.
+
+**Effect (low today):** no current `menuItems` entry sets `titleKey` (hosted's `savePublish` doesn't),
+so nothing is missing yet.
+
+**Fix:** add `title={it.title || undefined}` to the menu-item `<button>` in `SplitButton.jsx`, mirroring
+the primary button.
+
+**Hosted impact:** none yet — would matter the first time a hosted (or other) menu item sets `titleKey`.
+
+---
+
+## 47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — ⬜ **low (latent)**
+
+Surfaced 2026-07-12 in the whole-branch review. `signals = {}` (`EditorProvider`/`EditorShell`/
+`createEditorRoutes`) and `primaryActions = []`/`signals = {}` (`PluginProvider`) are plain
+default-parameter literals, recreated fresh on every render where the caller omits the prop —
+defeating `PluginProvider`'s own `useMemo([plugins, slots, primaryActions, signals])` the moment any
+of these components re-renders without an explicitly memoized prop.
+
+**Effect (low today):** both real call sites already avoid this — OSS calls `createEditorRoutes` once
+at module scope; hosted's `src/pages/Editor.jsx` explicitly memoizes `primaryActions`/`signals` with
+comments calling out exactly this hazard. Nothing in `EditorProvider`/`PluginProvider` itself enforces
+or warns about it, though, so the next caller that doesn't know to memoize would silently reintroduce
+wasted re-renders across every `useCommands`/`useNavItems`/`usePluginRoutes`/`usePrimaryActions`/
+`useToolbarSignals` consumer.
+
+**Fix (if it ever bites):** either document the memoization requirement prominently on the props, or
+have `PluginProvider` memoize its own stable-empty fallbacks internally (a module-level frozen `{}`/`[]`
+constant reused across calls, instead of a fresh literal per invocation) so an unmemoized caller can't
+defeat the downstream `useMemo`.
+
+**Hosted impact:** none today (hosted already memoizes correctly) — a robustness gap for future callers.
+
+---
+
+## 48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — ⬜ **low (latent)**
+
+Surfaced 2026-07-12 in the whole-branch review. The header/footer dirty-detection added for the
+same-widget-re-edit race (`hasUnsavedChanges()` and the mirrored `hasHeaderDiff`/`hasFooterDiff` in
+`save()`) relies on `JSON.stringify(a) !== JSON.stringify(b)`, which is sensitive to object-key
+insertion order, not true deep equality.
+
+**Effect (low today):** `globalWidgets.header`/`.footer` and the `originalGlobalWidgets` snapshot taken
+of it are always built the same way (`loadGlobalWidgets`'s object literal, or a `JSON.parse(JSON.stringify(...))`
+clone of it), so key order stays consistent in practice. Would only misfire if something ever rebuilds
+`globalWidgets.header`/`.footer` with the same values in a different property order (e.g. a
+widget-settings form re-merging defaults+overrides differently, or a project re-import/normalization
+step) — a spurious "dirty" reading that re-POSTs unchanged content on every autosave tick and can keep
+hosted's `needs_publish`/`publishPending` looking pending indefinitely.
+
+**Fix (if it ever bites):** swap the `JSON.stringify` comparison for a real deep-equal (the codebase
+doesn't currently depend on a deep-equal utility for this path; either hand-roll a small one or take a
+dependency), mirroring what would also apply to the pre-existing `page`/`originalPage` diff (same
+pattern, same latent risk, not new to this change).
+
+**Hosted impact:** the `needs_publish`/`publishPending` symptom would surface there, but the root cause
+and fix are OSS-only (`saveStore.js`).

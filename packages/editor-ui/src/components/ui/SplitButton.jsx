@@ -19,6 +19,21 @@ function primaryClass(disabled, hasMenu) {
 // The caret stays clickable even when every item is disabled (so the menu can
 // still be opened to see what's there), but reads visually as disabled —
 // matching primaryClass's disabled tone rather than the active pink.
+//
+// primaryClass's tone and this one are deliberately independent signals —
+// the primary reflects whether ITS OWN action is available, the caret
+// reflects whether the DROPDOWN has anything useful — so a disabled-grey
+// primary next to an active-pink caret is an intentional, meaningful state
+// (e.g. hosted's "Save" is grey with nothing new to save, but "Save &
+// Publish" stays available after a rollback re-flags needs_publish), not a
+// rendering glitch. The reverse — an enabled primary next to a fully-grey
+// caret — would read as broken (a live primary action with a dropdown that
+// has literally nothing to offer), so any caller wiring a menu's
+// enabledWhen signals should keep them a superset of the primary's own
+// (verified true today for hosted's only config: publishPending's OR
+// includes hasUnsavedChanges directly, so the caret is never fully disabled
+// while primary is enabled). SplitButton itself is presentational and
+// doesn't enforce this — it's a caller responsibility.
 function caretClass(allItemsDisabled) {
   const tone = allItemsDisabled
     ? "border-slate-300 bg-slate-200 hover:bg-slate-300 text-slate-500"

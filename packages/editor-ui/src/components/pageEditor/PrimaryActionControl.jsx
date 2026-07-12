@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import SplitButton from "../ui/SplitButton.jsx";
 import { usePrimaryActions, useToolbarSignals, useCommands } from "../../extension/PluginProvider.jsx";
-import { resolveActionState, readBuiltinToolbarSignals } from "../../extension/toolbar.js";
+import { resolveActionState, readBuiltinToolbarSignals, TOOLBAR_SIGNALS } from "../../extension/toolbar.js";
+import { defaultWarn } from "../../extension/registry.js";
 import useAutoSave from "../../stores/saveStore.js";
 import usePageStore from "../../stores/pageStore.js";
 import useProjectStore from "../../stores/projectStore.js";
@@ -59,6 +60,22 @@ export default function PrimaryActionControl() {
     Object.entries(shellSignals).map(([name, getter]) => [name, Boolean(getter())]),
   );
   const signals = { ...shellValues, ...readBuiltinToolbarSignals() };
+
+  // A shell registering a signal named "hasUnsavedChanges"/"isSaving" (the
+  // reserved builtin names) gets silently overwritten by the spread above —
+  // warn once per distinct collision set (keyed on the name, not the value,
+  // so this doesn't fire on every render) rather than let it be a silent no-op.
+  const collidingNames = Object.keys(shellSignals)
+    .filter((name) => TOOLBAR_SIGNALS.includes(name))
+    .sort()
+    .join(",");
+  useEffect(() => {
+    if (collidingNames) {
+      defaultWarn(
+        `[editor-ui] shell-registered signal(s) "${collidingNames}" collide with reserved TOOLBAR_SIGNALS names — the shell's getter is discarded, the builtin value wins.`,
+      );
+    }
+  }, [collidingNames]);
 
   const toView = (action) => {
     const st = resolveActionState(action, signals, { pending: !!pending[action.id] });

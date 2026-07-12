@@ -7,6 +7,7 @@
 // `command` is a registry command id (behavior lives there, not in the descriptor).
 // `menuItems` are the split-button dropdown entries — one level deep only.
 
+import { Save } from "lucide-react";
 import useAutoSave from "../stores/saveStore.js";
 import { defaultWarn } from "./registry.js";
 
@@ -82,6 +83,7 @@ export const DEFAULT_PRIMARY_ACTIONS = Object.freeze([
     enabledWhen: "hasUnsavedChanges",
     busyWhen: "isSaving",
     titleKey: "pageEditor.toolbar.saveHint",
+    icon: Save,
   }),
 ]);
 
@@ -95,9 +97,17 @@ export const builtinToolbarPlugin = {
       id: "save",
       run: () => {
         const s = useAutoSave.getState();
-        // Skip while a save is in flight so a repeated trigger (held Ctrl+S)
-        // can't start an overlapping save — the button path disables while busy.
-        return s.isSaving ? undefined : s.save(false);
+        // Skip while ANY save is in flight — manual OR autosave — so a
+        // repeated trigger (held Ctrl+S, or a click/Ctrl+S landing during the
+        // 60s autosave tick) can't start a second, fully concurrent save()
+        // over the same content. busyWhen only reflects isSaving (autosave
+        // has no visible busy state), so this guard is the only thing
+        // catching the autosave case — mirrors hosted's
+        // waitForAnySaveToSettle(), built for the identical race on
+        // savePublish. Without it, two overlapping saves both resolve and
+        // usePageStore.temporal.getState().clear() runs twice, wiping the
+        // undo/redo stack mid-edit.
+        return s.isSaving || s.isAutoSaving ? undefined : s.save(false);
       },
     },
   ],

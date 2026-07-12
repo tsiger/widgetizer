@@ -55,7 +55,20 @@ export function buildRegistry(plugins = [], { warn = defaultWarn } = {}) {
     const tag = (entry) => ({ ...entry, pluginName: name });
     for (const item of plugin.navItems ?? []) navItems.push(tag(item));
     for (const route of plugin.routes ?? []) routes.push(tag(route));
-    for (const command of plugin.commands ?? []) commands.push(tag(command));
+    for (const command of plugin.commands ?? []) {
+      // Both PrimaryActionControl's dispatch and EditorTopBar's Ctrl+S handler
+      // resolve a command via commands.find(c => c.id === id), which silently
+      // returns only the first match — a later plugin's command with a
+      // colliding id would never run, with no error anywhere. Warn loudly so
+      // this is at least visible in dev instead of a mystery no-op.
+      const existing = commands.find((c) => c.id === command.id);
+      if (existing) {
+        warn(
+          `[editor-ui] plugin "${name}" contributes command "${command.id}", which collides with the one already registered by "${existing.pluginName}" — the earlier command wins; this one will never run.`,
+        );
+      }
+      commands.push(tag(command));
+    }
   }
 
   return { navItems, routes, commands };
