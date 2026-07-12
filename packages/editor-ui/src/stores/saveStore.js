@@ -14,6 +14,13 @@ import useStaleProjectStore from "./staleProjectStore";
  * Provides both manual and automatic (60-second debounced) saving capabilities.
  */
 
+const BASE_AUTOSAVE_DELAY_MS = 60000;
+const MAX_AUTOSAVE_DELAY_MS = 600000;
+
+function autosaveDelay(failureCount) {
+  return Math.min(BASE_AUTOSAVE_DELAY_MS * 2 ** failureCount, MAX_AUTOSAVE_DELAY_MS);
+}
+
 const useAutoSave = create((set, get) => ({
   // State
   isSaving: false,
@@ -26,6 +33,7 @@ const useAutoSave = create((set, get) => ({
   runningSave: null,
   queuedFollowUp: null,
   saveGeneration: 0,
+  autoSaveFailureCount: 0,
 
   // Computed
   hasUnsavedChanges: () => {
@@ -77,7 +85,7 @@ const useAutoSave = create((set, get) => ({
     const { modifiedWidgets, resetAutoSaveTimer } = get();
     const newSet = new Set(modifiedWidgets);
     newSet.add(widgetId);
-    set({ modifiedWidgets: newSet });
+    set({ modifiedWidgets: newSet, autoSaveFailureCount: 0 });
     resetAutoSaveTimer();
   },
 
@@ -91,6 +99,7 @@ const useAutoSave = create((set, get) => ({
   setStructureModified: (modified) => {
     set({ structureModified: modified });
     if (modified) {
+      set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
     }
   },
@@ -98,6 +107,7 @@ const useAutoSave = create((set, get) => ({
   setThemeSettingsModified: (modified) => {
     set({ themeSettingsModified: modified });
     if (modified) {
+      set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
     }
   },
@@ -274,41 +284,40 @@ const useAutoSave = create((set, get) => ({
   },
 
   resetAutoSaveTimer: () => {
-    const { autoSaveInterval } = get();
+    const { autoSaveInterval, autoSaveFailureCount } = get();
 
     if (autoSaveInterval) {
       clearTimeout(autoSaveInterval);
     }
 
     const timeout = setTimeout(async () => {
-      const { hasUnsavedChanges } = get();
-      if (hasUnsavedChanges()) {
-        await get().save(true); // may no-op if another save is already in flight — see save()'s own guard
+      // This timer already fired — nothing left to cancel for it
+      // specifically. Clear the tracked id immediately so a fresh edit's own
+      // resetAutoSaveTimer() call (which may run synchronously, or during
+      // the save() await below) can freely arm its own timer without any
+      // risk of this tick clobbering it afterward.
+      set({ autoSaveInterval: null });
+
+      if (get().hasUnsavedChanges()) {
+        const result = await get().save(true);
+        if (result.status === "failed") {
+          set((s) => ({ autoSaveFailureCount: s.autoSaveFailureCount + 1 }));
+        } else if (result.status === "success") {
+          set({ autoSaveFailureCount: 0 });
+        } else if (result.status === "mismatch" || result.status === "abandoned") {
+          // An intentional stop happened during this attempt (PROJECT_MISMATCH's
+          // own stopAutoSave(), or a reset() from discard-and-leave) — do not
+          // reschedule, that would defeat it.
+          return;
+        }
       }
 
-      // While the above was in flight, something else may have already
-      // touched autoSaveInterval: a fresh edit's own resetAutoSaveTimer()
-      // call (armed a newer live timer), or an explicit stop — save()'s own
-      // PROJECT_MISMATCH handling calls stopAutoSave() specifically to halt
-      // retries, and so can an external stopAutoSave()/reset() (e.g. the user
-      // discarding changes via the navigation guard). Only proceed if THIS
-      // tick's own timer id is still the one tracked; otherwise a newer timer
-      // is already handling it, or a stop was intentional — either way,
-      // touching state here would either orphan that newer timer (untracked,
-      // uncancellable) or defeat the stop by silently re-arming autosave.
-      if (get().autoSaveInterval !== timeout) return;
-
-      set({ autoSaveInterval: null });
-      // Content can still be dirty here for two reasons: save() above no-op'd
-      // (another save was in flight when this tick fired) or it ran but a
-      // fresh edit landed mid-flight. Either way, reschedule instead of
-      // leaving no active timer — otherwise a dirty edit sits unsaved
-      // indefinitely until the user happens to make another edit (the only
-      // other thing that calls resetAutoSaveTimer) or clicks Save manually.
-      if (get().hasUnsavedChanges()) {
+      // Reschedule only if nothing else already armed a timer while the
+      // above was in flight (a fresh edit's own resetAutoSaveTimer() call).
+      if (get().autoSaveInterval == null && get().hasUnsavedChanges()) {
         get().resetAutoSaveTimer();
       }
-    }, 60000);
+    }, autosaveDelay(autoSaveFailureCount));
 
     set({ autoSaveInterval: timeout });
   },
@@ -337,6 +346,7 @@ const useAutoSave = create((set, get) => ({
       modifiedWidgets: new Set(),
       structureModified: false,
       themeSettingsModified: false,
+      autoSaveFailureCount: 0,
     });
   },
 }));

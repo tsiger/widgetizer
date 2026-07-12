@@ -612,6 +612,8 @@ git commit -m "fix: single-flight save() queue + generation-gated reset() in sav
 
 ### Task 3: `resetAutoSaveTimer` simplification + backoff
 
+> **Post-execution note (2026-07-12):** one small addition beyond what this section originally specified — `reset()` (from Task 2) now also clears `autoSaveFailureCount: 0` alongside its existing fields, added here since the field itself doesn't exist until this task. A discard clearing any accumulated retry backoff too is the obviously-correct behavior; not calling it out as its own step above.
+
 **Files:**
 - Modify: `packages/editor-ui/src/stores/saveStore.js`
 - Test: `packages/editor-ui/src/stores/__tests__/saveStore.test.js`

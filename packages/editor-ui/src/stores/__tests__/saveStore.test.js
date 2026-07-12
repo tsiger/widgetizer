@@ -373,6 +373,56 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().autoSaveInterval).toBeNull(); // stayed stopped, not silently re-armed
       expect(vi.getTimerCount()).toBe(0);
     });
+
+    it("does not double-schedule when a fresh edit already re-armed the timer while the tick's own save was in flight", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      await vi.advanceTimersByTimeAsync(60000); // tick fires, its own save(true) hangs mid-flight
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
+
+      useAutoSave.getState().markWidgetModified("w-2"); // re-arms its own timer while the tick's save is still in flight
+      const rearmedTimer = useAutoSave.getState().autoSaveInterval;
+
+      resolveSave({});
+      await vi.advanceTimersByTimeAsync(0); // let the tick's save() resolve and its reschedule-check run
+
+      expect(useAutoSave.getState().autoSaveInterval).toBe(rearmedTimer); // untouched — not clobbered, not doubled
+      expect(vi.getTimerCount()).toBe(1);
+    });
+  });
+
+  describe("resetAutoSaveTimer — backoff", () => {
+    it("increases the delay after a failed autosave attempt and resets it after a success", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      savePageContent.mockRejectedValueOnce(new Error("down"));
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      try {
+        await vi.advanceTimersByTimeAsync(60000); // base delay
+        expect(useAutoSave.getState().autoSaveFailureCount).toBe(1);
+
+        savePageContent.mockRejectedValueOnce(new Error("still down"));
+        await vi.advanceTimersByTimeAsync(120000); // backed off for failureCount=1
+        expect(useAutoSave.getState().autoSaveFailureCount).toBe(2);
+
+        savePageContent.mockResolvedValueOnce({});
+        await vi.advanceTimersByTimeAsync(240000); // backed off for failureCount=2
+        expect(useAutoSave.getState().autoSaveFailureCount).toBe(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it("resets the failure count on a fresh edit, not just on success", () => {
+      useAutoSave.setState({ autoSaveFailureCount: 3 });
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveFailureCount).toBe(0);
+    });
   });
 
   describe("stopAutoSave", () => {
