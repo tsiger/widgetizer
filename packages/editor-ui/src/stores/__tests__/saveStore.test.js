@@ -330,6 +330,34 @@ describe("saveStore (useAutoSave)", () => {
 
       expect(second).not.toBe(first);
     });
+
+    it("reschedules instead of going silent when a tick's own save is skipped (another save was already in flight)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1"); // arms the timer
+
+      let resolveBlockingSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveBlockingSave = resolve; }));
+      const blockingSave = useAutoSave.getState().save(false); // a manual save starts, kept in flight
+      expect(useAutoSave.getState().isSaving).toBe(true);
+
+      // A second, distinct edit lands while that save is still in flight — not
+      // part of its entry-time snapshot, so it stays dirty after it resolves.
+      // Also re-arms the timer (markWidgetModified's own side effect).
+      useAutoSave.getState().markWidgetModified("w-2");
+
+      await vi.advanceTimersByTimeAsync(60000); // the tick fires while the manual save is still in flight
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull(); // rescheduled, not abandoned
+      expect(savePageContent).toHaveBeenCalledTimes(1); // the tick's own save(true) attempt was skipped by the guard
+
+      resolveBlockingSave({});
+      await blockingSave;
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true); // w-2 is still dirty
+
+      savePageContent.mockResolvedValueOnce({});
+      await vi.advanceTimersByTimeAsync(60000); // the rescheduled tick fires; nothing blocking now
+      expect(savePageContent).toHaveBeenCalledTimes(2); // w-2 finally gets saved
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
   });
 
   describe("stopAutoSave", () => {
@@ -429,6 +457,11 @@ describe("saveStore (useAutoSave)", () => {
     it("does not let the 60s autosave timer's own save(true) call start while a manual save is in flight (the timer bypasses the `save` command entirely, so the guard must live here, not just at the command layer)", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
+      // Seed undo history so "cleared exactly once, not twice" is actually
+      // observable — clear() resets to [] either way, so a plain post-hoc
+      // pastStates check can't tell one call from two; spy on clear() itself.
+      usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
+      const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
 
       let resolveSave;
       savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
@@ -438,13 +471,33 @@ describe("saveStore (useAutoSave)", () => {
       // Simulates resetAutoSaveTimer's setTimeout callback calling
       // get().save(true) directly — no command wrapper involved.
       await useAutoSave.getState().save(true);
-      expect(useAutoSave.getState().isAutoSaving).toBe(false); // never started
       expect(savePageContent).toHaveBeenCalledTimes(1); // only the manual save's own request
 
       resolveSave({});
       await manualSave;
-      // Undo history clears exactly once (from the manual save), not twice.
-      expect(usePageStore.temporal.getState().pastStates).toHaveLength(0);
+      expect(clearSpy).toHaveBeenCalledTimes(1); // from the manual save only, not the skipped autosave attempt
+      clearSpy.mockRestore();
+    });
+
+    it("does not let a manual save start while the 60s autosave timer's own save is already in flight (the reverse firing order)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
+      const clearSpy = vi.spyOn(usePageStore.temporal.getState(), "clear");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const autoSave = useAutoSave.getState().save(true); // simulates the 60s timer firing first
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
+
+      // A manual click/Ctrl+S landing while that autosave is still in flight.
+      await useAutoSave.getState().save(false);
+      expect(savePageContent).toHaveBeenCalledTimes(1); // only the autosave's own request
+
+      resolveSave({});
+      await autoSave;
+      expect(clearSpy).toHaveBeenCalledTimes(1); // from the autosave only, not the skipped manual attempt
+      clearSpy.mockRestore();
     });
 
     it("does not start an autosave while one is already in flight", async () => {

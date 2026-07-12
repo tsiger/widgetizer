@@ -46,9 +46,13 @@ describe("buildRegistry", () => {
     const reg = buildRegistry([first, second], { warn });
 
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain("save");
-    expect(warn.mock.calls[0][0]).toContain("a");
-    expect(warn.mock.calls[0][0]).toContain("b");
+    expect(warn.mock.calls[0][0]).toContain('command "save"');
+    // Quoted and anchored to their actual role in the message, not just any
+    // incidental "a"/"b" substring (the fixed English wording alone already
+    // contains both letters, e.g. "command"/"contributes") — this would fail
+    // if the interpolated plugin names were ever swapped or wrong.
+    expect(warn.mock.calls[0][0]).toContain('plugin "b" contributes');
+    expect(warn.mock.calls[0][0]).toContain('registered by "a"');
     // Both entries are present (buildRegistry itself doesn't dedupe/drop) —
     // it's commands.find(c => c.id === id) at the call site that only ever
     // reaches the first one, so the collision is a silent shadow, not a hard error.

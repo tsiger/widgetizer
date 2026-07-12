@@ -2448,9 +2448,14 @@ Surfaced 2026-07-12 in the 6th xhigh review pass, on the fix for §45/the autosa
 overlap race. `saveStore.save()` now guards against a save already being in flight (manual OR auto) at
 its own top, closing the race that used to wipe undo history when both fired concurrently. But the
 guard is a silent skip: `TOOLBAR_SIGNALS`/`busyWhen` only reflect `isSaving`, never `isAutoSaving`, so
-if the user clicks Save (or hits Ctrl+S) while the 60s autosave tick is mid-flight, the button stays
-fully active-looking the whole time and the click produces no busy indicator, no toast, no error —
-indistinguishable from nothing having happened.
+the Save button itself stays fully active-looking the whole time the tick is mid-flight — its own
+enabled/disabled state gives no feedback. For Ctrl+S (§45, which bypasses `PrimaryActionControl`'s
+`dispatch` entirely) that's the whole story: no busy state, no toast, no error, indistinguishable from
+nothing having happened. For a mouse click, `dispatch()`'s own local `pending` state (set synchronously
+before `await runCommand(...)`, cleared in the `finally` after) still produces a brief busy-disabled
+flash — since even the guarded no-op return crosses a microtask boundary — so the click path gets a
+flicker of feedback the keyboard path doesn't; neither path gets anything explaining *why* nothing was
+saved.
 
 **Decision (2026-07-12):** left as-is. Autosave is meant to be an invisible background behavior by
 design; a click landing in this narrow window just means the edit will be captured by the autosave

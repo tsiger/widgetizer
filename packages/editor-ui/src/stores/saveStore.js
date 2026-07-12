@@ -240,12 +240,21 @@ const useAutoSave = create((set, get) => ({
       clearTimeout(autoSaveInterval);
     }
 
-    const timeout = setTimeout(() => {
+    const timeout = setTimeout(async () => {
       const { hasUnsavedChanges } = get();
       if (hasUnsavedChanges()) {
-        get().save(true);
+        await get().save(true); // may no-op if another save is already in flight — see save()'s own guard
       }
       set({ autoSaveInterval: null });
+      // Content can still be dirty here for two reasons: save() above no-op'd
+      // (another save was in flight when this tick fired) or it ran but a
+      // fresh edit landed mid-flight. Either way, reschedule instead of
+      // leaving no active timer — otherwise a dirty edit sits unsaved
+      // indefinitely until the user happens to make another edit (the only
+      // other thing that calls resetAutoSaveTimer) or clicks Save manually.
+      if (get().hasUnsavedChanges()) {
+        get().resetAutoSaveTimer();
+      }
     }, 60000);
 
     set({ autoSaveInterval: timeout });
