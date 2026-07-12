@@ -234,6 +234,48 @@ describe("saveStore (useAutoSave)", () => {
   });
 
   // --------------------------------------------------------------------------
+  // reconcileModifiedWidgets
+  // --------------------------------------------------------------------------
+
+  describe("reconcileModifiedWidgets", () => {
+    it("marks a widget modified when its content differs from the saved baseline", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "changed" } } } },
+      });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+    });
+
+    it("clears a widget's modified flag when its content matches the saved baseline again (undo reverted it)", () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1"); // simulate a prior edit; content itself is unchanged from the seed baseline
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false);
+    });
+
+    it("re-arms the autosave timer when it marks a widget modified", () => {
+      const page = seedPageStore();
+      usePageStore.setState({
+        page: { ...page, widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "changed" } } } },
+      });
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
+    });
+
+    it("reconciles header/footer against originalGlobalWidgets", () => {
+      const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
+      usePageStore.setState({
+        globalWidgets: { header: { ...header, settings: { text: "v2" } }, footer: null },
+        originalGlobalWidgets: { header, footer: null },
+      });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("header")).toBe(true);
+    });
+  });
+
+  // --------------------------------------------------------------------------
   // setStructureModified
   // --------------------------------------------------------------------------
 

@@ -51,6 +51,7 @@ export default function EditorTopBar({
       undo();
       // Push the restored theme snapshot back to themeStore (canonical owner)
       usePageStore.getState().syncThemeStoreFromSnapshot();
+      useAutoSave.getState().reconcileModifiedWidgets();
     }
   }, []);
 
@@ -59,6 +60,7 @@ export default function EditorTopBar({
     redo();
     // Push the restored theme snapshot back to themeStore (canonical owner)
     usePageStore.getState().syncThemeStoreFromSnapshot();
+    useAutoSave.getState().reconcileModifiedWidgets();
   }, []);
 
   useEffect(() => {

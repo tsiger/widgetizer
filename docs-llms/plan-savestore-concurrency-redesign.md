@@ -794,7 +794,7 @@ git commit -m "fix: simplify resetAutoSaveTimer and add retry backoff in saveSto
 - Consumes: `markWidgetModified`/`markWidgetUnmodified` (existing), `isEqual` (Task 1).
 - Produces: new store action `reconcileModifiedWidgets()`; `EditorTopBar.jsx`'s `safeUndo`/`safeRedo` call it after every temporal jump.
 
-- [ ] **Step 1: Write the failing tests (store level)**
+- [x] **Step 1: Write the failing tests (store level)**
 
 Add a new `describe("reconcileModifiedWidgets", ...)` block to `saveStore.test.js`:
 
@@ -838,12 +838,12 @@ Add a new `describe("reconcileModifiedWidgets", ...)` block to `saveStore.test.j
   });
 ```
 
-- [ ] **Step 2: Verify these fail**
+- [x] **Step 2: Verify these fail**
 
 Run: `npx vitest run packages/editor-ui/src/stores/__tests__/saveStore.test.js -t "reconcileModifiedWidgets"`
 Expected: FAIL — `reconcileModifiedWidgets` is not a function yet.
 
-- [ ] **Step 3: Implement `reconcileModifiedWidgets` in `saveStore.js`**
+- [x] **Step 3: Implement `reconcileModifiedWidgets` in `saveStore.js`**
 
 Add as a new action (near `markWidgetUnmodified`):
 
@@ -879,12 +879,12 @@ Add as a new action (near `markWidgetUnmodified`):
   },
 ```
 
-- [ ] **Step 4: Run and verify the store-level tests pass**
+- [x] **Step 4: Run and verify the store-level tests pass**
 
 Run: `npx vitest run packages/editor-ui/src/stores/__tests__/saveStore.test.js`
 Expected: all pass.
 
-- [ ] **Step 5: Write the failing tests (EditorTopBar wiring)**
+- [x] **Step 5: Write the failing tests (EditorTopBar wiring)**
 
 Add to `EditorTopBar.test.jsx`:
 
@@ -916,12 +916,12 @@ Add to `EditorTopBar.test.jsx`:
 
 Need `usePageStore` imported in this test file — add `import usePageStore from "../../../stores/pageStore.js";` alongside the existing `useAutoSave`/`useProjectStore` imports if not already present.
 
-- [ ] **Step 6: Verify these fail**
+- [x] **Step 6: Verify these fail**
 
 Run: `npx vitest run packages/editor-ui/src/components/pageEditor/__tests__/EditorTopBar.test.jsx -t "reconciles modifiedWidgets"`
 Expected: FAIL — `safeUndo`/`safeRedo` don't call it yet.
 
-- [ ] **Step 7: Implement in `EditorTopBar.jsx`**
+- [x] **Step 7: Implement in `EditorTopBar.jsx`**
 
 ```jsx
   const safeUndo = useCallback(() => {
@@ -943,17 +943,17 @@ Expected: FAIL — `safeUndo`/`safeRedo` don't call it yet.
   }, []);
 ```
 
-- [ ] **Step 8: Run and verify all pass**
+- [x] **Step 8: Run and verify all pass**
 
 Run: `npx vitest run packages/editor-ui/src/components/pageEditor/__tests__/EditorTopBar.test.jsx`
 Expected: all pass.
 
-- [ ] **Step 9: Run the full frontend suite**
+- [x] **Step 9: Run the full frontend suite**
 
 Run: `npm run test:frontend`
 Expected: all pass.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add packages/editor-ui/src/stores/saveStore.js packages/editor-ui/src/stores/__tests__/saveStore.test.js packages/editor-ui/src/components/pageEditor/EditorTopBar.jsx packages/editor-ui/src/components/pageEditor/__tests__/EditorTopBar.test.jsx

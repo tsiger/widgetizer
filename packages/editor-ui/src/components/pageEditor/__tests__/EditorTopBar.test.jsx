@@ -7,6 +7,7 @@ import { builtinToolbarPlugin, DEFAULT_PRIMARY_ACTIONS } from "../../../extensio
 import EditorTopBar from "../EditorTopBar.jsx";
 import useAutoSave from "../../../stores/saveStore.js";
 import useProjectStore from "../../../stores/projectStore.js";
+import usePageStore from "../../../stores/pageStore.js";
 
 vi.mock("../../../queries/pageManager", () => ({ getAllPages: vi.fn().mockResolvedValue([]) }));
 
@@ -53,6 +54,24 @@ describe("EditorTopBar", () => {
     );
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
     expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it("reconciles modifiedWidgets after Ctrl+Z (undo) so a revert-to-clean isn't left falsely dirty", () => {
+    const reconcileModifiedWidgets = vi.fn();
+    useAutoSave.setState({ reconcileModifiedWidgets });
+    usePageStore.temporal.setState({ pastStates: [{ page: { id: "home", widgets: {} } }], futureStates: [] });
+    renderTopBar();
+    fireEvent.keyDown(window, { key: "z", ctrlKey: true });
+    expect(reconcileModifiedWidgets).toHaveBeenCalled();
+  });
+
+  it("reconciles modifiedWidgets after Ctrl+Shift+Z (redo)", () => {
+    const reconcileModifiedWidgets = vi.fn();
+    useAutoSave.setState({ reconcileModifiedWidgets });
+    usePageStore.temporal.setState({ pastStates: [], futureStates: [{ page: { id: "home", widgets: {} } }] });
+    renderTopBar();
+    fireEvent.keyDown(window, { key: "z", ctrlKey: true, shiftKey: true });
+    expect(reconcileModifiedWidgets).toHaveBeenCalled();
   });
 
   it("renders PrimaryActionControl (shows the split-button caret when a descriptor has menuItems)", () => {

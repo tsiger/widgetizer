@@ -96,6 +96,36 @@ const useAutoSave = create((set, get) => ({
     set({ modifiedWidgets: newSet });
   },
 
+  // Diffs the current page/global-widget content against the last-saved
+  // baseline and reconciles modifiedWidgets to match — the one place that
+  // handles dirtiness NOT introduced through markWidgetModified (undo/redo,
+  // called by EditorTopBar's safeUndo/safeRedo after the temporal jump).
+  // Unlike markWidgetModified, this can also CLEAR a widget's dirty flag
+  // (when undo reverts it back to exactly its saved state).
+  reconcileModifiedWidgets: () => {
+    const { markWidgetModified, markWidgetUnmodified } = get();
+    const { page, originalPage, globalWidgets, originalGlobalWidgets } = usePageStore.getState();
+
+    if (page && originalPage) {
+      const ids = new Set([...Object.keys(page.widgets ?? {}), ...Object.keys(originalPage.widgets ?? {})]);
+      for (const id of ids) {
+        if (!isEqual(page.widgets?.[id], originalPage.widgets?.[id])) {
+          markWidgetModified(id);
+        } else {
+          markWidgetUnmodified(id);
+        }
+      }
+    }
+
+    for (const key of ["header", "footer"]) {
+      if (!isEqual(globalWidgets[key], originalGlobalWidgets[key])) {
+        markWidgetModified(key);
+      } else {
+        markWidgetUnmodified(key);
+      }
+    }
+  },
+
   setStructureModified: (modified) => {
     set({ structureModified: modified });
     if (modified) {
