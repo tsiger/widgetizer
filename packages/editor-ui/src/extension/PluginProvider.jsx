@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo } from "react";
 import { buildRegistry } from "./registry.js";
 import { createHookRunner } from "./hooks.js";
 import { resolveSlot } from "./slots.js";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "../lib/emptyValues.js";
 
 // React layer over the pure extension core: a single provider builds the merged
 // registry + hook runner from the plugin list and exposes them (plus the
@@ -15,7 +16,13 @@ const PluginContext = createContext(null);
  *           primaryActions?: Array<object>, signals?: Record<string, () => boolean>,
  *           children: React.ReactNode }} props
  */
-export function PluginProvider({ plugins = [], slots = {}, primaryActions = [], signals = {}, children }) {
+export function PluginProvider({
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
+  primaryActions = EMPTY_ARRAY,
+  signals = EMPTY_OBJECT,
+  children,
+}) {
   const value = useMemo(
     () => ({
       registry: buildRegistry(plugins),

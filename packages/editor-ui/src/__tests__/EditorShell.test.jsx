@@ -22,6 +22,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { EditorShell } from "../EditorShell.jsx";
 import PrimaryActionControl from "../components/pageEditor/PrimaryActionControl.jsx";
+import { usePrimaryActions, useToolbarSignals } from "../extension/PluginProvider.jsx";
 import useAutoSave from "../stores/saveStore.js";
 import useProjectStore from "../stores/projectStore.js";
 
@@ -73,5 +74,31 @@ describe("EditorShell — primaryActions/signals wiring", () => {
     expect(button).not.toBeDisabled();
     fireEvent.click(button);
     expect(save).toHaveBeenCalledWith(false); // the real builtinToolbarPlugin "save" command, reached via the default descriptor
+  });
+
+  it("keeps primaryActions/signals referentially stable across re-renders when omitted (§47 — shared frozen fallbacks, not fresh literals)", () => {
+    const seen = [];
+    function Probe() {
+      seen.push({ actions: usePrimaryActions(), signals: useToolbarSignals() });
+      return null;
+    }
+    // A fresh `<Probe/>`/slots object each render (as any real caller would
+    // produce) so React actually re-renders Probe both times, rather than
+    // bailing out early on an identical element reference — the thing under
+    // test is EditorShell's own omitted primaryActions/signals, not slots.
+    const { rerender } = render(
+      <MemoryRouter initialEntries={["/page-editor"]}>
+        <EditorShell slots={{ topbarBanner: <Probe /> }} />
+      </MemoryRouter>,
+    );
+    rerender(
+      <MemoryRouter initialEntries={["/page-editor"]}>
+        <EditorShell slots={{ topbarBanner: <Probe /> }} />
+      </MemoryRouter>,
+    );
+
+    expect(seen).toHaveLength(2);
+    expect(seen[0].actions).toBe(seen[1].actions); // DEFAULT_PRIMARY_ACTIONS: already a frozen module constant
+    expect(seen[0].signals).toBe(seen[1].signals); // EMPTY_OBJECT: was a fresh {} per render before the fix
   });
 });

@@ -34,6 +34,23 @@ describe("SplitButton — rendering", () => {
     render(<SplitButton primary={{ label: "Save", onClick: vi.fn() }} />);
     expect(screen.getByRole("button", { name: "Save" })).not.toHaveAttribute("aria-busy");
   });
+
+  it("applies a menu item's title as a tooltip, mirroring the primary button", () => {
+    render(
+      <SplitButton
+        primary={{ label: "Save", onClick: vi.fn() }}
+        items={[item({ title: "Save and publish the site" })]}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "More actions" }));
+    expect(screen.getByRole("menuitem")).toHaveAttribute("title", "Save and publish the site");
+  });
+
+  it("omits the title attribute from a menu item that doesn't set one", () => {
+    render(<SplitButton primary={{ label: "Save", onClick: vi.fn() }} items={[item()]} />);
+    fireEvent.click(screen.getByRole("button", { name: "More actions" }));
+    expect(screen.getByRole("menuitem")).not.toHaveAttribute("title");
+  });
 });
 
 describe("SplitButton — mouse", () => {

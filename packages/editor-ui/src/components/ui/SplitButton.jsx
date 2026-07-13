@@ -208,6 +208,7 @@ export default function SplitButton({ primary, items = [], menuLabel = "More act
                   }}
                   tabIndex={i === activeIndex ? 0 : -1}
                   disabled={it.disabled}
+                  title={it.title || undefined}
                   onClick={() => {
                     if (!it.disabled) {
                       it.onClick?.();

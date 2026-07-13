@@ -118,4 +118,29 @@ describe("PluginProvider — primary actions & signals", () => {
     );
     expect(screen.getByTestId("d").textContent).toBe("0/0");
   });
+
+  it("keeps its context value referentially stable across re-renders when plugins/slots/primaryActions/signals are all omitted (§47)", () => {
+    const seen = [];
+    function Probe() {
+      seen.push({ actions: usePrimaryActions(), signals: useToolbarSignals() });
+      return null;
+    }
+    // No props at all here on purpose — every render below re-evaluates
+    // PluginProvider's own default parameters, which must be shared frozen
+    // constants (not fresh `[]`/`{}` literals) for this to stay memoized.
+    const { rerender } = render(
+      <PluginProvider>
+        <Probe />
+      </PluginProvider>,
+    );
+    rerender(
+      <PluginProvider>
+        <Probe />
+      </PluginProvider>,
+    );
+
+    expect(seen).toHaveLength(2);
+    expect(seen[0].actions).toBe(seen[1].actions);
+    expect(seen[0].signals).toBe(seen[1].signals);
+  });
 });

@@ -7,6 +7,7 @@ import RequireActiveProject from "./components/layout/RequireActiveProject.jsx";
 import { setApiBase } from "./lib/apiBase.js";
 import { setPreviewRenderBase, setStandalonePreviewPath, setStandaloneCollectionPreviewPath } from "./lib/previewBase.js";
 import { RouteBaseProvider } from "./lib/routeBase.jsx";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "./lib/emptyValues.js";
 import useProjectStore from "./stores/projectStore.js";
 
 import Pages from "./pages/Pages.jsx";
@@ -50,10 +51,10 @@ export function EditorProvider({
   routeBase = "",
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
   primaryActions = DEFAULT_PRIMARY_ACTIONS,
-  signals = {},
+  signals = EMPTY_OBJECT,
   children,
 }) {
   const allPlugins = useMemo(() => [builtinNavPlugin, builtinToolbarPlugin, ...plugins], [plugins]);
@@ -93,10 +94,10 @@ export function EditorShell({
   routeBase,
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
   primaryActions = DEFAULT_PRIMARY_ACTIONS,
-  signals = {},
+  signals = EMPTY_OBJECT,
 }) {
   return (
     <EditorProvider
@@ -169,10 +170,10 @@ export function createEditorRoutes({
   apiBase,
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
   primaryActions = DEFAULT_PRIMARY_ACTIONS,
-  signals = {},
+  signals = EMPTY_OBJECT,
 } = {}) {
   return {
     path,
