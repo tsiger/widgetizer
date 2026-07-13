@@ -31,7 +31,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Building a new adapter implementation against the conformance suites
 - Tracing the render-engine scope-free boundary or the `require-scope-arg` lint rule
 
-**Key topics**: Five packages, OSS/hosted boundary, adapter contracts (Storage/AssetStorage incl. `stat()` + download byte-range/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` (incl. `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`) + constants, error types + status codes, conformance suites, `projectScopedRouter` mounts (incl. `/collections`), editor-ui seams (apiBase/editorFetch, routeBase, EditorProvider/EditorShell, extension registry/hooks/slots, tailwind preset), render-engine deps bag, preview-iframe runtime in `@widgetizer/core`, `require-scope-arg`
+**Key topics**: Five packages, OSS/hosted boundary, adapter contracts (Storage/AssetStorage incl. `stat()` + download byte-range/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` (incl. `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`) + constants, error types + status codes, conformance suites, `projectScopedRouter` mounts (incl. `/collections`), editor-ui seams (apiBase/editorFetch, routeBase, EditorProvider/EditorShell/createEditorRoutes incl. `primaryActions`/`signals`, extension registry/hooks/slots + the toolbar/primary-actions contract, tailwind preset), render-engine deps bag, preview-iframe runtime in `@widgetizer/core`, `require-scope-arg`
 
 ---
 
@@ -244,7 +244,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing editor features (preview, save, undo/redo)
 - Troubleshooting the preview protocol or navigation guard
 
-**Key topics**: Editor components, Zustand store data flow, load/edit/preview/save/undo-redo, postMessage preview protocol (`packages/editor-ui/src/queries/previewManager.js`, `packages/core/src/runtime/previewRuntime.js`), navigation guard (`packages/editor-ui/src/hooks/useNavigationGuard.js`), global-widget editing, pointer to core-hooks.md
+**Key topics**: Editor components (incl. `PrimaryActionControl`'s `SplitButton`-based primary-action toolbar control), Zustand store data flow, load/edit/preview/save (shared `useDispatchCommand` dispatch seam; `saveStore`'s single-flight/generation-gated concurrency, autosave retry backoff, `PROJECT_MISMATCH` handoff)/undo-redo, postMessage preview protocol (`packages/editor-ui/src/queries/previewManager.js`, `packages/core/src/runtime/previewRuntime.js`), navigation guard (`packages/editor-ui/src/hooks/useNavigationGuard.js`), global-widget editing, pointer to core-hooks.md
 
 ---
 

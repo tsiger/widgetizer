@@ -148,9 +148,8 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 
 ### Provider / shell / routes
 
-- `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, standaloneCollectionPreviewPath, routeBase, project, scope, plugins, slots })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`.
-- `EditorShell` — adds the editor's own `Layout` on top of `EditorProvider`.
-- `createEditorRoutes({ … })` — returns a react-router route object. `EditorShell` deliberately owns **no** router, so the host supplies a single data-router context (needed for `useBlocker`).
+- `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, standaloneCollectionPreviewPath, routeBase, project, scope, plugins, slots, primaryActions, signals })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, builtinToolbarPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`. `primaryActions` (default `DEFAULT_PRIMARY_ACTIONS`) and `signals` (default `{}`) pass straight through to `PluginProvider` — see the toolbar/primary-actions contract below.
+- `EditorShell` / `createEditorRoutes({ … })` — same prop set (incl. `primaryActions`/`signals`) threaded down to `EditorProvider`. `EditorShell` adds the editor's own `Layout`; `createEditorRoutes` returns a react-router route object. `EditorShell` deliberately owns **no** router, so the host supplies a single data-router context (needed for `useBlocker`).
 
 ### Extension system (`packages/editor-ui/src/extension/`)
 
@@ -158,6 +157,8 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 - `createHookRunner(plugins)` — runs the lifecycle `HOOK_EVENTS` defined in `packages/editor-ui/src/extension/hooks.js` (`before*` run sequentially and halt on the first `{ proceed: false }`; `after*` are fire-and-forget).
 - `SLOT_NAMES`: `sidebarHeader`, `sidebarFooter`, `topbarLeft`, `topbarRight`, `topbarBanner`, `overlay`, `publishConfirmation`.
 - `builtinNavPlugin` — supplies the default nav with `NAV_GROUPS` `site` and `tools`.
+- **Toolbar / primary-actions contract** (`extension/toolbar.js`): a `ToolbarAction` is pure data — `{ id, command, labelKey, titleKey?, busyLabelKey?, enabledWhen?, busyWhen?, icon?, menuItems? }` (`menuItems` are one-level-deep split-button dropdown entries; `command` names a registry command id, behavior lives there). `DEFAULT_PRIMARY_ACTIONS` is OSS's single plain Save action; `TOOLBAR_SIGNALS = ["hasUnsavedChanges", "isSaving"]` are the builtin enable/busy signal names resolved against `saveStore` (`readBuiltinToolbarSignals()`). `resolveActionState(action, signals, { pending })` derives `{ enabled, busy, labelKey }` for a control to render. `validatePrimaryActions(actions, { signalNames, commandIds })` throws (naming the offender) on an unknown signal/command reference, so a shell runs it in a test to catch a stale reference in CI. `builtinToolbarPlugin` contributes the `save` command (`saveStore.getState().save(false)`) through the same registry as user plugins.
+- `PluginProvider` also threads `primaryActions`/`signals` (shell-supplied, default `DEFAULT_PRIMARY_ACTIONS`/`{}`) alongside the registry/hooks/slots via context; `usePrimaryActions()` / `useToolbarSignals()` read them. The page editor's `PrimaryActionControl` merges these with `readBuiltinToolbarSignals()` (builtins win on a name collision) and renders via `SplitButton`, dispatching through `useDispatchCommand()` — see [Page Editor](core-page-editor.md) and [Custom Hooks](core-hooks.md).
 
 ### Tailwind v4 preset
 

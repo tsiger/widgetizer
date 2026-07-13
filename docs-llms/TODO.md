@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **33 done · 3 deferred · 12 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **35 done · 3 deferred · 10 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -57,8 +57,8 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **33 done ·
 - ⬜ [43. Full accessibility / WAI-ARIA APG conformance review for the project (`editor-ui` + all shells) — **investigate (a11y)**](#43-full-accessibility--wai-aria-apg-conformance-review-for-the-project-editor-ui--all-shells--investigate-a11y)
 - ⬜ [44. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — **low (test hygiene)**](#44-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--low-test-hygiene)
 - ✅ [45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — DONE 2026-07-13 (shared `useDispatchCommand` hook)](#45-ctrls-bypasses-the-primaryactioncontrol-dispatch-seam--empty-ctx-no-busy-guard-no-error-toast-editor-ui---done-2026-07-13)
-- ⬜ [46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — **low (latent)**](#46-splitbutton-menu-items-never-render-a-title-tooltip-unlike-the-primary-button-editor-ui---low-latent)
-- ⬜ [47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — **low (latent)**](#47-editorproviderpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui---low-latent)
+- ✅ [46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — DONE 2026-07-13](#46-splitbutton-menu-items-never-render-a-title-tooltip-unlike-the-primary-button-editor-ui---done-2026-07-13)
+- ✅ [47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — DONE 2026-07-13](#47-editorproviderpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui---done-2026-07-13)
 - ✅ [48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — DONE 2026-07-13 (saveStore concurrency redesign, Task 1)](#48-savestores-headerfooter-dirty-diff-is-key-order-sensitive-not-truly-deep-equal-editor-ui---done-2026-07-13)
 - ✅ [49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — DONE 2026-07-13 (saveStore concurrency redesign, Task 2)](#49-clicking-save-during-a-background-autosave-silently-does-nothing--no-busy-state-no-toast-editor-ui---done-2026-07-13)
 
@@ -2392,7 +2392,11 @@ action like Save & Publish. Left deliberately out of the OSS SplitButton branch.
 
 ---
 
-## 46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — ⬜ **low (latent)**
+## 46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — ✅ DONE 2026-07-13
+
+**Done note (2026-07-13).** Added `title={it.title || undefined}` to the menu-item `<button>` in
+`SplitButton.jsx`, mirroring the primary button. Covered by two new cases in `SplitButton.test.jsx`
+(applies a menu item's title; omits it when unset). Original finding below.
 
 Surfaced 2026-07-12 in the whole-branch review of the primary-action control. `PrimaryActionControl`'s
 `toView()` computes a `title` (from `titleKey`) uniformly for both the primary action and every menu
@@ -2410,7 +2414,16 @@ the primary button.
 
 ---
 
-## 47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — ⬜ **low (latent)**
+## 47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — ✅ DONE 2026-07-13
+
+**Done note (2026-07-13).** Added a shared `lib/emptyValues.js` (`EMPTY_ARRAY`/`EMPTY_OBJECT`, both
+`Object.freeze`d module constants) and swapped every `plugins = []`/`slots = {}`/`signals = {}` default
+parameter in `EditorProvider`, `EditorShell`, `createEditorRoutes`, and `PluginProvider` itself to
+reference them instead of a fresh literal (`primaryActions = DEFAULT_PRIMARY_ACTIONS` was already a
+stable module constant from `toolbar.js`, so it didn't need this). New tests in `EditorShell.test.jsx`
+and `PluginProvider.test.jsx` re-render with these props omitted and assert the context value's
+`primaryActions`/`signals` stay referentially identical across renders — they'd have failed before this
+fix. Original finding below.
 
 Surfaced 2026-07-12 in the whole-branch review. `signals = {}` (`EditorProvider`/`EditorShell`/
 `createEditorRoutes`) and `primaryActions = []`/`signals = {}` (`PluginProvider`) are plain

@@ -12,7 +12,7 @@ The editor's interface is divided into three main columns: a component list on t
 
 The `PageEditor` is composed of several specialized child components, each with a distinct responsibility:
 
-- **`EditorTopBar`**: Located at the top of the page, this component displays the page name and provides global actions. It contains controls for manual saving, opening a live preview in a reusable browser tab (web) or dedicated preview window (Electron), changing the preview mode (e.g., desktop, tablet, mobile), and shows the current save status (e.g., "All changes saved", "Saving..."). Fully localized.
+- **`EditorTopBar`**: Located at the top of the page, this component displays the page name (with a dirty-dot indicator when `hasUnsavedChanges()`), opens a live preview in a reusable browser tab (web) or dedicated preview window (Electron), lets you change the preview mode (e.g., desktop, mobile), and hosts the undo/redo buttons. Save renders via `<PrimaryActionControl />` (`components/pageEditor/PrimaryActionControl.jsx`) — a `SplitButton`-based control (`components/ui/SplitButton.jsx`) that resolves the shell-provided `primaryActions`/`signals` (default: a single plain Save action) into a primary button plus an optional dropdown, dispatching the clicked action's command through `useDispatchCommand()`. Fully localized.
 
 - **`WidgetList`**: The left-hand panel that displays the hierarchical structure of all widgets and their inner blocks for the current page. It's the main interface for:
   - Selecting widgets or blocks for editing.
@@ -94,12 +94,15 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 
 ### Saving Changes
 
-The editor is designed to save changes automatically, providing a seamless user experience.
+The editor saves automatically in the background, and on demand, through a single-flight save queue in `saveStore.js` (`useAutoSave`, 384 lines) that both paths share.
 
-1.  Most actions that alter page data—such as editing a setting, adding a widget, or reordering the list—also call a corresponding function on the `useAutoSave` store (e.g., `markWidgetModified`, `setStructureModified`).
-2.  These functions set internal dirty flags and also rely on deep comparison between current and original page/theme state so the `EditorTopBar` reflects the real save state after undo/redo operations.
-3.  The `useAutoSave` store implements a **debounced auto-save** strategy. Instead of a fixed interval, a 60-second timer is reset on every modification. This ensures that auto-saving only occurs after a period of inactivity, providing a smoother experience.
-4.  For immediate persistence, the user can also click the "Save" button in the `EditorTopBar` (or use the `Ctrl+S` / `Cmd+S` shortcut), which directly invokes the `save()` action.
+1.  Most actions that alter page data—such as editing a setting, adding a widget, or reordering the list—also call a corresponding function on the `useAutoSave` store (e.g., `markWidgetModified`, `setStructureModified`), which sets internal dirty flags and resets the auto-save timer. `hasUnsavedChanges()` additionally deep-compares current vs. original page/global-widget/theme state, so it stays correct after undo/redo independent of the flags.
+2.  **Auto-save**: a 60-second debounce timer (`resetAutoSaveTimer`) re-arms on every modification and calls `save(true)` when it fires. A failed auto-save is swallowed (never surfaced to the user, so a background retry doesn't interrupt mid-edit) and retried with exponential backoff — the delay doubles per consecutive failure (`60s × 2^failureCount`, capped at 10 minutes) — resetting to 60s on the next success.
+3.  **Manual save**: clicking Save (`<PrimaryActionControl />`'s `SplitButton`) and pressing `Ctrl+S`/`Cmd+S` both dispatch the registry's `save` command through the shared `useDispatchCommand()` hook — the same `{ projectId, runCommand, hooks }` ctx, per-action busy tracking, and error-toast handling for both paths, so they can't drift. The command itself calls `useAutoSave.getState().save(false)`.
+4.  **Single-flight coalescing**: `save()` tracks a `runningSave` promise and at most one `queuedFollowUp`. A call that arrives while a save is already in flight doesn't overlap or silently no-op — it joins the pending follow-up (or creates one) that re-invokes `save()` once the current run settles, so every caller observes the real outcome of that next run.
+5.  **Generation-gated `reset()`**: `reset()` (project switch/discard-and-leave) stops auto-save and bumps `saveGeneration`, but deliberately does not force-clear `isSaving`/`runningSave` — an in-flight save keeps running to completion, but its write-back (clearing dirty flags, rebaselining `originalPage`/`originalGlobalWidgets`, clearing undo history) is skipped, and the call resolves as `{ status: "abandoned" }` once it notices the generation moved on.
+6.  **`PROJECT_MISMATCH` handling**: if the active project changed out from under an in-flight save (e.g. another tab took over the singleton active project), `save()` resolves `{ status: "mismatch" }`, hands off to `staleProjectStore.markStale()` (the OSS shell renders the stale-project curtain), and stops auto-save — the tab recovers on reload, or once the project is re-activated elsewhere.
+7.  A save covers page content, global widgets (header/footer — only those actually diffed/modified), and theme settings (via `themeStore.saveSettings`), each gated independently so an edit landing on one channel mid-flight isn't lost or wrongly marked clean.
 
 ### Undo/Redo System
 

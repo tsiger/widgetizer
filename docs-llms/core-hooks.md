@@ -252,6 +252,32 @@ Editor-wide keyboard shortcut: <kbd>Delete</kbd> / <kbd>Backspace</kbd> removes 
 
 Both `isEditableTarget` and `resolveDeleteTarget` are exported for unit testing. Used in `PageEditor.jsx`.
 
+## Command Dispatch Hook
+
+### `useDispatchCommand` (`packages/editor-ui/src/hooks/useDispatchCommand.js`)
+
+Shared dispatch seam for triggering a registry command from outside a raw `cmd.run(...)` call. Both the toolbar's click path (`PrimaryActionControl`) and its keyboard-shortcut path (`EditorTopBar`'s `Ctrl+S`/`Cmd+S`) go through this hook, so the ctx shape, busy-tracking, and error-toast behavior can't drift between them.
+
+#### API Reference
+
+**Parameters:** None
+
+**Returns:**
+
+- `dispatch(actionId, commandId)` (async function): Looks up `commandId` in the plugin registry (`useCommands()`), builds a `{ projectId, hooks, runCommand }` ctx (`projectId` from the active project, `hooks` from `useHookRunner()`, `runCommand` re-entrant against the same ctx) and runs it. Tracks `pending[actionId]` around the call and shows an error toast on failure.
+- `pending` (`Record<string, boolean>`): Per-action busy flag, keyed by `actionId`, true while that action's `dispatch()` call is in flight.
+
+#### Behavior
+
+- An unknown `commandId` rejects with an internal (`err.internal = true`) error instead of showing a toast — a stale/missing command registration is a developer bug, not a user-facing failure.
+- Other thrown errors show their own `message` as the toast text (command errors in this codebase are already human-phrased — project-mismatch, unsaved-changes, veto, network-error text — so per-command messages aren't flattened into one generic string); a non-`Error` rejection or an internal error falls back to the translated `pageEditor.toolbar.actionFailed` message.
+- `pending` is keyed by `actionId` (the toolbar descriptor's id), not `commandId`, so multiple actions bound to the same command still track busy state independently.
+
+#### Used In
+
+- `PrimaryActionControl.jsx` (the primary/`SplitButton` click path)
+- `EditorTopBar.jsx` (the `Ctrl+S`/`Cmd+S` keyboard shortcut, bound specifically to the `"save"` command)
+
 ## Layout Hooks
 
 ### `useStickyActionBar` (`packages/editor-ui/src/hooks/useStickyActionBar.js`)
