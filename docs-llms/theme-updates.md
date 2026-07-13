@@ -23,6 +23,8 @@ The `latest/` snapshot is only built in the **user data directory** — the seed
 
 When `buildLatestSnapshot` runs, it first syncs any `updates/` folders from the seed into the user data directory, then builds `latest/` there.
 
+> **Note.** Theme-update reads and writes go through direct `fs-extra` / `path` calls (the controller and service both `import fs from "fs-extra"`), **not** the scope-first storage adapter — this subsystem operates on the global `themes/` and `data/themes/` trees rather than per-project, scoped content. Source-directory and metadata resolution (`getThemeSourceDir`, `readThemeSourceMetadata`) is gated by a 5-second cache (`THEME_SOURCE_CACHE_TTL_MS = 5000` in `themeController.js`), so a freshly built `latest/` may take up to ~5s to become visible to readers; `buildLatestSnapshot` calls `invalidateThemeSourceCache(themeId)` to clear it eagerly.
+
 ### Version Structure
 
 Theme authors create update folders in the **seed** directory:
@@ -39,6 +41,7 @@ themes/                          # Seed directory (source, git-tracked)
     templates/
     menus/
     snippets/
+    collection-types/
     updates/                     # Version update folders (partial updates)
       1.1.0/
         theme.json               # Required, version must match folder name
@@ -96,22 +99,19 @@ themes/arch/updates/             # In the seed directory
 - **Empty directories** in `deleted/` mean "delete this entire folder"
 - **Non-empty directories** are just path containers (e.g., `deleted/assets/` won't delete `assets/`, only the files inside)
 
-**Deletion eligibility (effect on projects):**
+**Deletion eligibility:**
 
-The snapshot build applies `deleted/` paths to `latest/` verbatim — there is no per-path enforcement at build time. Whether a deletion reaches projects depends on how `applyThemeUpdate` treats that path:
-
-| Path                | Propagates to projects? | Notes                  |
-| ------------------- | ----------------------- | ---------------------- |
-| `assets/`           | ✅ Yes                  | Theme infrastructure — folder replaced wholesale on update |
-| `widgets/`          | ✅ Yes                  | Theme infrastructure — folder replaced wholesale on update |
-| `snippets/`         | ✅ Yes                  | Theme infrastructure — folder replaced wholesale on update |
-| `locales/`          | ✅ Yes                  | Theme infrastructure — folder replaced wholesale on update |
-| `collection-types/` | ✅ Yes                  | Theme infrastructure — folder replaced wholesale on update |
-| `layout.liquid`     | ✅ Yes                  | Theme infrastructure   |
-| `templates/`        | ❌ No                   | Removed from the snapshot only — projects are add-new-only, so existing pages are never deleted (the template just stops being offered) |
-| `menus/`            | ❌ No                   | Removed from the snapshot only — projects are add-new-only, so existing menus are never deleted |
-| `pages/`            | ❌ No                   | Not a theme path — exists only in projects (protected user content) |
-| `uploads/`          | ❌ No                   | Not a theme path — exists only in projects (protected user content) |
+| Path            | Can be deleted? | Notes                  |
+| --------------- | --------------- | ---------------------- |
+| `assets/`       | ✅ Yes          | Theme infrastructure   |
+| `widgets/`      | ✅ Yes          | Theme infrastructure   |
+| `snippets/`     | ✅ Yes          | Theme infrastructure   |
+| `locales/`      | ✅ Yes          | Theme infrastructure   |
+| `layout.liquid` | ✅ Yes          | Theme infrastructure   |
+| `templates/`    | ❌ No           | User content, add-only |
+| `menus/`        | ❌ No           | User content, add-only |
+| `pages/`        | ❌ No           | Protected user content |
+| `uploads/`      | ❌ No           | Protected user content |
 
 ### Materialized Snapshot (`latest/`)
 
@@ -128,37 +128,37 @@ The `latest/` folder is a **composed, ready-to-use snapshot** built in `data/the
 
 - If a file exists in multiple versions, the **latest version wins**
 - `latest/` is rebuilt when a theme author clicks "Update" on the Themes page
-- Projects read theme files from `latest/` (or base if `latest/` doesn't exist)
+- Projects read theme files from `latest/` (or base if `latest/` doesn't exist). `getThemeSourceDir` returns `latest/` only when `latest/theme.json` exists; otherwise it falls back to the root theme — and this resolution is subject to the 5s source cache described above.
 - The seed directory (`themes/{name}/`) is never modified — only the user data directory is
 
 ## Update Eligibility
 
 ### Updatable Paths
 
-These theme files can be updated in projects:
+These theme files can be updated in projects (the `UPDATABLE_PATHS` list in `themeUpdateService.js`):
 
-| Path             | Behavior                              |
-| ---------------- | ------------------------------------- |
+| Path                | Behavior                              |
+| ------------------- | ------------------------------------- |
 | `layout.liquid`     | Replaced with new version             |
 | `assets/`           | Entire folder replaced                |
 | `widgets/`          | Entire folder replaced                |
 | `snippets/`         | Entire folder replaced                |
 | `locales/`          | Entire folder replaced                |
-| `collection-types/` | Entire folder replaced (theme-owned collection schemas + templates) |
+| `collection-types/` | Entire folder replaced (theme-owned)  |
 | `theme.json`        | **Merged** (see Settings Merge below) |
 | `screenshot.png`    | Replaced with new version             |
 
-`collection-types/` is in `themeUpdateService.UPDATABLE_PATHS` and treated exactly like `widgets/` — replaced wholesale from the theme source. This is safe because collection-type schemas/templates are **theme-only**: presets may seed item data (`collections/`) but never `collection-types/`, so a replace never reverts a preset-specific schema. See [Collections — Design Rationale](core-collections.md#10-design-rationale).
+`collection-types/` defines the schema/layout for collections and is **theme-owned**, so it is replaced wholesale on update. The collection **item data** under `data/projects/<folder>/collections/<type>/` is user content and stays protected — it is never touched by a theme update. See [Collections](core-collections.md).
 
 ### Protected Paths (Never Updated)
 
 User content is never modified:
 
-| Path           | Reason                            |
-| -------------- | --------------------------------- |
-| `pages/`       | User's page content               |
-| `uploads/`     | User's media files                |
-| `collections/` | User's collection item data       |
+| Path            | Reason                          |
+| --------------- | ------------------------------- |
+| `pages/`        | User's page content             |
+| `uploads/`      | User's media files              |
+| `collections/`  | User's collection item data     |
 
 ### Add-New-Only Paths
 
@@ -175,15 +175,13 @@ This allows theme authors to add new menus or page templates without overwriting
 
 ## Theme Settings Merge
 
-When updating `theme.json`, the system uses intelligent merging:
+When updating `theme.json`, the system uses intelligent merging (`mergeThemeSettings` in `themeUpdateService.js`):
 
 ### Rules
 
 1. **New settings** from the theme are **added** to the project
 2. **Existing user values** are **preserved** (not overwritten)
 3. **Removed settings** (deleted by theme author) are **removed** from the project
-
-User customizations live in each setting's `value` field (written by the editor; `default` stays the schema default, and the renderer uses `value` when present). The merge takes the new schema as the base and copies the user's `value` onto each setting whose `id` still exists.
 
 ### Example
 
@@ -210,7 +208,7 @@ User customizations live in each setting's `value` field (written by the editor;
   "settings": {
     "global": {
       "colors": [
-        { "id": "primary", "default": "#0000ff", "value": "#123456" }, // User changed this
+        { "id": "primary", "default": "#123456" }, // User changed this
         { "id": "secondary", "default": "#ff0000" },
         { "id": "old_color", "default": "#999999" } // Removed by theme author
       ]
@@ -226,7 +224,7 @@ User customizations live in each setting's `value` field (written by the editor;
   "settings": {
     "global": {
       "colors": [
-        { "id": "primary", "default": "#0000ff", "value": "#123456" }, // User value preserved
+        { "id": "primary", "default": "#123456" }, // User value preserved
         { "id": "secondary", "default": "#ff0000" },
         { "id": "accent", "default": "#00ff00" } // New setting added
         // old_color removed (not in new theme)
@@ -235,72 +233,6 @@ User customizations live in each setting's `value` field (written by the editor;
   }
 }
 ```
-
-## Bundled App Theme Updates
-
-Arch currently ships with the Widgetizer app, so app releases and Arch releases are version-aligned for the normal Electron/web-app update path:
-
-```
-Widgetizer 0.9.8 ships Arch 0.9.8
-Widgetizer 0.9.9 ships Arch 0.9.9
-Widgetizer 0.9.10 ships Arch 0.9.10
-```
-
-In this bundled flow, `themes/arch/` remains the full latest source theme that ships with the app. Existing user projects do not read directly from that bundled source; they use the installed runtime copy under `data/themes/arch/` and project files under `data/projects/<folder>/`. Therefore, a bundled app release that contains a theme update must also ship a seed update folder:
-
-```
-themes/arch/
-  theme.json              # latest full source, e.g. 0.9.9
-  widgets/
-  assets/
-  updates/
-    0.9.9/
-      theme.json          # required, version must be 0.9.9
-      ...changed files...
-```
-
-When the updated app runs, `buildLatestSnapshot` syncs seed update folders from `themes/arch/updates/` into `data/themes/arch/updates/`, then builds the runtime snapshot:
-
-```
-data/themes/arch/latest/
-```
-
-`latest/` is runtime-only. It is built under `data/themes/{name}/latest/` and should not be created or committed under `themes/{name}/latest/`.
-
-### Bundled Delta Helper
-
-Use `theme:update-delta` to generate the source-tree update folder from git history instead of hand-copying changed files:
-
-```bash
-npm run theme:update-delta -- themes/arch --dry-run
-npm run theme:update-delta -- themes/arch
-```
-
-Defaults:
-
-- Target version comes from `package.json`.
-- Baseline tag defaults to the highest semver app tag below the target version.
-- Output goes to `themes/arch/updates/<package.json version>/`.
-
-Explicit form:
-
-```bash
-npm run theme:update-delta -- themes/arch --from 0.9.8 --version 0.9.9 --dry-run
-npm run theme:update-delta -- themes/arch --from 0.9.8 --version 0.9.9
-```
-
-The script prints a message like:
-
-```
-Detected app version 0.9.9 from package.json.
-Using baseline tag: 0.9.8 (0.9.8)
-Version progression: 0.9.8 -> 0.9.9 (patch release).
-We will continue with arch update 0.9.9.
-```
-
-Real generation is blocked unless `themes/arch/theme.json` already matches the target version. For example, if `package.json` is `0.9.9`, then `themes/arch/theme.json` must also say `0.9.9`; the generated `themes/arch/updates/0.9.9/theme.json` must also say `0.9.9`. `buildLatestSnapshot` validates that each update folder's `theme.json` version matches the folder name.
-
-The helper does not build `latest/`, does not apply updates to projects, and does not change runtime behavior. It only creates the seed `updates/<version>/` folder that the existing runtime update system consumes.
 
 ## User Workflow
 
@@ -313,6 +245,8 @@ The helper does not build `latest/`, does not apply updates to projects, and doe
 5. Click "Update" button on the theme card
 6. System syncs seed updates into `data/themes/{name}/updates/` and builds `latest/` there
 7. Zip and distribute the entire theme folder (including `updates/`)
+
+> For bundled themes maintained in git (e.g. Arch), steps 1–3 can be generated automatically with `npm run theme:update-delta -- themes/{name} --from <old-version> --version <new-version>` (add `--dry-run` to preview). It git-diffs between release tags and writes the `updates/<version>/` folder — copied files for additions/edits plus `deleted/` markers for removals. See `scripts/theme-update-delta.js`.
 
 ### Distributing Theme Updates
 
@@ -334,6 +268,8 @@ When a user uploads this zip:
 - **New installation**: Entire theme is installed, `latest/` is built automatically
 - **Existing theme**: Only new update versions are imported (existing versions are skipped)
 - **Up to date**: If all versions already exist, upload is rejected with a clear message
+
+Both paths validate collection-type schemas before committing. An update-import validates the **merged** result (base + installed updates + the incoming deltas), not just the new delta in isolation, so it also catches a `slugPrefix` that only collides once a new collection sits next to an existing one. An invalid schema is rejected with HTTP 400 (per-collection errors) and the installed theme is left untouched. Upload validation details (zip structure checks, `theme.json` requirements, version handling) live in [Theme Management](core-themes.md).
 
 **Note**: The `latest/` folder in the zip (if present) is ignored; it's always rebuilt from scratch.
 
@@ -394,40 +330,38 @@ Projects track theme update information:
 
 ## API Endpoints
 
-| Method | Endpoint                                | Description                                 |
-| ------ | --------------------------------------- | ------------------------------------------- |
-| `GET`  | `/api/themes`                           | Get all themes with `hasPendingUpdate` flag |
-| `GET`  | `/api/themes/:id/versions`              | Get all versions for a theme                |
-| `POST` | `/api/themes/:id/update`                | Build `latest/` for a single theme          |
-| `GET`  | `/api/themes/update-count`              | Get count of themes with pending updates    |
+| Method | Endpoint                                 | Description                                 |
+| ------ | ---------------------------------------- | ------------------------------------------- |
+| `GET`  | `/api/themes`                            | Get all themes with `hasPendingUpdate` flag |
+| `GET`  | `/api/themes/:id/versions`               | Get all versions for a theme                |
+| `POST` | `/api/themes/:id/update`                 | Build `latest/` for a single theme          |
+| `GET`  | `/api/themes/update-count`               | Get count of themes with pending updates    |
 | `GET`  | `/api/projects/:id/theme-updates/status` | Check if project has theme update available |
-| `PUT`  | `/api/projects/:id/theme-updates`       | Toggle project `receiveThemeUpdates` preference |
-| `POST` | `/api/projects/:id/theme-updates/apply` | Apply theme update to project               |
+| `PUT`  | `/api/projects/:id/theme-updates`        | Toggle project `receiveThemeUpdates` preference |
+| `POST` | `/api/projects/:id/theme-updates/apply`  | Apply theme update to project               |
 
 ## Implementation Files
 
+### Backend (`@widgetizer/builder-server`)
+
+- `packages/builder-server/src/controllers/themeController.js` — Theme CRUD, `latest/` snapshot building (`buildLatestSnapshot`), source resolution, and the 5s source cache
+- `packages/builder-server/src/services/themeUpdateService.js` — Project update logic, `UPDATABLE_PATHS`, and `mergeThemeSettings`
+- `packages/builder-server/src/utils/semver.js` — Version parsing and comparison
+- `packages/builder-server/src/utils/updateStatus.js` — Shared update-status shaping on top of semver comparison
+- `packages/builder-server/src/routes/themes.js`, `packages/builder-server/src/routes/projects.js` — REST routes listed above
+
 ### Frontend
 
-- `src/pages/Themes.jsx` - Theme management UI with update buttons
-- `src/stores/themeUpdateStore.js` - Zustand store for admin-menu/theme-entry update badges
-- `src/queries/themeManager.js` - API client functions
-
-### Backend
-
-- `server/controllers/themeController.js` - Theme CRUD and snapshot building
-- `server/services/themeUpdateService.js` - Project update logic and settings merge
-- `server/utils/semver.js` - Version parsing and comparison
-- `server/utils/updateStatus.js` - Shared update-status shaping on top of semver comparison
-
-### Scripts
-
-- `scripts/theme-update-delta.js` - Builds source-tree bundled update folders such as `themes/arch/updates/0.9.9/` from git diff history
+- `app/src/pages/Themes.jsx` — Theme management UI with update buttons (admin shell)
+- `packages/editor-ui/src/stores/themeUpdateStore.js` — Zustand store for sidebar badge
+- `packages/editor-ui/src/queries/themeManager.js` — API client functions
 
 ---
 
 **See also:**
 
-- [Theme Management](core-themes.md) - Themes page and upload functionality
-- [Project Management](core-projects.md) - Project theme relationship
-- [Theming Guide](theming.md) - Theme structure and development
-- [Collections](core-collections.md) - Theme-owned `collection-types/` vs protected `collections/` item data
+- [Theme Management](core-themes.md) — Themes page, upload, and upload-validation details
+- [Project Management](core-projects.md) — Project theme relationship
+- [Collections](core-collections.md) — `collection-types/` vs. protected `collections/` item data
+- [Theming Guide](theming.md) — Theme structure and development
+- [Packages & Adapters](core-packages.md) — Package boundaries, adapters, scope-first contract

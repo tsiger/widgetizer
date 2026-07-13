@@ -67,28 +67,6 @@ A numeric input field.
 }
 ```
 
-### Date
-
-A native date picker. The stored value is a date-only string in `YYYY-MM-DD` format (or `""` when unset) — no time component, timezone-agnostic.
-
-```json
-{
-  "id": "published",
-  "type": "date",
-  "label": "Publication date"
-}
-```
-
-**Sorting (collection types):** a `date` field can be flagged `usedAsDate: true` to become a collection's sort key — `defaultSort: date_desc`/`date_asc` then orders items by it (items with no value sort last). See [Collections](core-collections.md).
-
-**Rendering on the published site:** format the value with the `| format_date` filter, which is timezone-safe and honors the theme's **Date format** setting, so users control the display visually without editing templates:
-
-```liquid
-<time datetime="{{ item.settings.published }}">{{ item.settings.published | format_date }}</time>
-```
-
-Pass an explicit token to override the theme setting for one call — `{{ value | format_date: 'D MMM YYYY' }}`. A blank or invalid value formats to `""`. Supported tokens: `MMMM D, YYYY`, `D MMMM YYYY`, `MMM D, YYYY`, `D MMM YYYY`, `MM/DD/YYYY`, `DD/MM/YYYY`, `YYYY-MM-DD`.
-
 ### Textarea
 
 A multi-line text input field.
@@ -105,15 +83,15 @@ A multi-line text input field.
 
 ### Rich Text
 
-A rich text editor with basic formatting (bold, italic, link, lists). The value is stored as HTML.
+A rich text editor (Tiptap/ProseMirror) with basic formatting (bold, italic, link, lists). The value is stored as HTML.
 
 **Additional Properties:**
 
 - **`placeholder`** (string, optional): Placeholder text shown when the editor is empty.
 - **`allow_source`** (boolean, optional): If `true`, shows an HTML source toggle button for advanced editing. Defaults to `false`.
-- **`allow_headings`** (boolean, optional): If `true`, adds H2/H3/H4 buttons to the toolbar (for long-form bodies like blog posts). Defaults to `false`, so simple richtext fields stay minimal. Like `allow_images`, this is a real contract **enforced at the render-time sanitizer, not just the toolbar**: h2–h4 survive only for fields that opt in, so source-mode / imported / API content can't add headings to a field that didn't. They're styled by the theme's `w-rte` container; H1 is intentionally excluded (reserved for the page/item title). Levels live in one place (`HEADING_LEVELS` in `RichTextInput.jsx`) so more can be added later.
-- **`allow_images`** (boolean, optional): If `true`, adds an Insert Image button that opens the Media Library picker (images only) and inserts a block `<img>`. The stored `src` is always the portable `/uploads/…` path (export-safe); the editor displays a browser-loadable URL via a NodeView (`ResolvedImage.js`) so the saved HTML never contains an absolute admin URL. It inserts the `large` size variant when one exists (falling back to `medium`, then the original), and `alt` comes from the media record. **The flag is a real contract, enforced at the render-time sanitizer — not just the editor UI:** a richtext field renders `<img>` only when its `allow_images` is set, so source-mode / imported / API content can't inject images into a field that didn't opt in. When allowed, `<img>` is kept only if its `src` is a valid in-project upload path (a single safe filename segment under `/uploads/images|files/`); external/`data:`/`javascript:` sources, directory traversal, spaces and query strings are all dropped. Used paths are usage-tracked like any other media. Rendering needs **no template work**: the pipeline resolves the stored path to the live media URL (preview) or `assets/…` (export) automatically. Defaults to `false`.
-- **`min_height`** (number, optional): The inline editor's minimum height in **pixels** (e.g. `320`) — a taller starting point for long-form fields (article body, project description) so they don't look cramped next to a textarea. The editor still grows with content and the Expand button still opens the full-screen view; this only raises the floor. Editor-only — no effect on rendered output. Default ≈ 5rem (80px).
+- **`allow_headings`** (boolean, optional): If `true`, exposes Heading 2 / Heading 3 / Heading 4 buttons in the toolbar (H1 is intentionally reserved for the page/article title). Defaults to `false`.
+- **`allow_images`** (boolean, optional): If `true`, adds an **Insert Image** toolbar button that opens the Media Library to insert an inline image. Stored as the portable `/uploads/…` path (the `large` variant is preferred). Defaults to `false`.
+- **`min_height`** (number, optional): Minimum editor height in pixels. Sets the `--richtext-min-height` CSS variable on the editor.
 
 ```json
 {
@@ -138,10 +116,28 @@ A rich text editor with basic formatting (bold, italic, link, lists). The value 
 }
 ```
 
+**With Headings and Inline Images:**
+
+```json
+{
+  "id": "body",
+  "type": "richtext",
+  "label": "tTheme:article.settings.body.label",
+  "allow_headings": true,
+  "allow_images": true,
+  "min_height": 240
+}
+```
+
 **Features:**
 
-- Formatting toolbar with Bold, Italic, Link, Bullet List, and Numbered List buttons (plus optional Heading and Insert Image buttons — see `allow_headings` / `allow_images`)
-- Link editor with URL input (auto-prefixes `https://` if missing)
+- Formatting toolbar with Bold, Italic, Link, Bullet List, and Numbered List buttons
+- **Unlink** button appears when the cursor is inside a link, to remove it
+- **Link to file** button (paperclip) opens the Media Library (`filterType="file"`) and links the selection to a file asset (e.g. a PDF). With nothing selected it inserts the file's name as the linked text. Stores the portable `/uploads/files/…` path
+- **Insert Image** button (when `allow_images` is set) inserts an inline Media Library image
+- Heading 2 / 3 / 4 buttons (when `allow_headings` is set)
+- Link editor with URL input — root-relative paths (`/uploads/files/x.pdf`, `/about.html`), anchors (`#section`), protocol-relative, and explicit `http(s)://`/`mailto:`/`tel:` URLs are kept verbatim; only a bare domain (`example.com`) gets `https://` prepended
+- **Internal target picker** — alongside the URL input, the link editor offers a page / collection-item picker in widget, block, global, and collection-item richtext (not theme-settings richtext). Selecting a target stores its uuid on the anchor (`data-page-uuid` / `data-collection-item-uuid`) so the link follows the target's renames and clears on delete, at parity with the structured `link` setting; the visible `href` is a fallback re-derived from the uuid at render. This is automatic per field location — there is no theme-author schema flag for it.
 - Expand button opens a larger modal for comfortable editing
 - Toolbar buttons highlight based on formatting at cursor position
 - Optional HTML source view for debugging or advanced editing
@@ -152,9 +148,7 @@ A rich text editor with basic formatting (bold, italic, link, lists). The value 
 
 **Usage in Templates:**
 
-Render richtext with `| raw` in Liquid templates. Richtext values are sanitized by
-DOMPurify before rendering, and Liquid autoescape would otherwise escape the
-allowed HTML tags:
+Output directly in Liquid templates with `| raw`. The value is stored as Tiptap HTML; widget/page and collection richtext are DOMPurify-sanitized at the server render boundary, while theme-setting richtext is sanitized when `theme.json` is saved:
 
 ```liquid
 <div class="content">
@@ -162,14 +156,18 @@ allowed HTML tags:
 </div>
 ```
 
-**Images need no special template handling.** A richtext field with `allow_images`
-renders the same way — just `| raw`. Inserted images store a portable `/uploads/…`
-path, and the render pipeline rewrites it to the mode-aware served base (the live media
-route in preview, `assets/…` in export) **automatically**, for every richtext field in
-widgets and collection items — the same resolution the `{% image %}` tag does for
-`image` settings. Authors don't (and shouldn't) add a filter. Implementation:
-`resolveRichtextMediaInWidgetData` / `resolveRichtextMediaInSettings` in
-`src/core/utils/richtextMedia.js`, applied during the widget/collection-item render gate.
+**Detecting "empty" rich text:**
+
+A richtext field is never truly `blank` when cleared — the editor leaves behind markup like `<p></p>` or `<p><br></p>`, so a plain `{% if x == blank %}` guard always thinks the field has content. Use the `rte_text` / `rte_blank` filters (defined in `packages/core/src/filters/rteFilter.js`) to key visibility/layout off real content presence. Always render the **raw original** for display — these filters are for the emptiness test only:
+
+```liquid
+{% unless widget.settings.copyright | rte_blank %}
+  <div class="copyright">{{ widget.settings.copyright | raw }}</div>
+{% endunless %}
+
+{% assign body_text = widget.settings.body | rte_text %}
+{% if body_text != blank %}…{% endif %}
+```
 
 **List Output Example:**
 
@@ -373,12 +371,12 @@ A specialized input with two dropdowns for selecting a font family and its corre
 
 ### Icon
 
-An icon picker that allows users to select from a library of available icons (loaded from the project's `assets/icons.json`, which supports both flat and grouped formats). The value is the icon name/identifier.
+An icon picker that renders a searchable grid of icons fetched from the project's `assets/icons.json`. The value is the icon name/identifier.
 
 **Additional Properties:**
 
-- **`options`** (string[], optional): Restricts the picker to an explicit subset of icon names.
-- **`allow_patterns`** (string[], optional): Restricts the picker to icons whose names match the given wildcard patterns (e.g., `"arrow-*"`).
+- **`options`** (array, optional): An explicit subset of icon names to allow. Only icons whose name is in this list are shown.
+- **`allow_patterns`** (array, optional): A list of name patterns to allow. A trailing `*` is a prefix wildcard (e.g. `"arrow-*"` matches `arrow-up`, `arrow-down`); an entry without `*` matches that exact name. Patterns combine with `options` and the search term.
 
 ```json
 {
@@ -386,6 +384,17 @@ An icon picker that allows users to select from a library of available icons (lo
   "type": "icon",
   "label": "tTheme:my_widget.settings.card_icon.label",
   "description": "tTheme:my_widget.settings.card_icon.description"
+}
+```
+
+**Restricted to a pattern subset:**
+
+```json
+{
+  "id": "card_icon",
+  "type": "icon",
+  "label": "tTheme:my_widget.settings.card_icon.label",
+  "allow_patterns": ["arrow-*", "check"]
 }
 ```
 
@@ -403,9 +412,9 @@ An image uploader that includes a preview, the ability to replace the image, and
 
 **Additional Properties:**
 
-- **`size`** (string, optional): `"full"` (default) or `"narrow"`. `"narrow"` caps the input width (compact preview) — useful for small image settings like favicons.
-- **`compact`** (boolean, optional): Legacy equivalent of `size: "narrow"`. When both are present, `size` wins. Defaults to `false`.
-- **`layout`** (string, optional): `"stacked"` (default) or `"row"`. Controls the input's shape in the editor: `"stacked"` shows a large full-width preview above the controls (best for a hero/cover image you want to see clearly); `"row"` shows a compact thumbnail with the controls beside it (denser — the same shape gallery rows use). Editor-only; it does not affect the rendered output. An unrecognized value falls back to `"stacked"`.
+- **`size`** (string, optional): Constrains the input width. `"full"` (default) uses the full available width; `"narrow"` caps at ~14rem — useful for small image settings like favicons.
+- **`layout`** (string, optional): Drives the input shape. `"stacked"` (default) puts a full-width preview above the Upload/Browse controls; `"row"` renders a fixed 100×100 thumbnail on the left with the controls in a column beside it.
+- **`compact`** (boolean, optional): **Legacy alias.** When `true` (and no `size` is set) it maps to `size: "narrow"`. Prefer `size` in new themes.
 
 **Features:**
 
@@ -428,112 +437,33 @@ An image uploader that includes a preview, the ability to replace the image, and
 }
 ```
 
-**Narrow Example:**
+**Narrow Example (favicon):**
 
 ```json
 {
   "id": "favicon",
   "type": "image",
-  "label": "tTheme:global.branding.settings.favicon.label",
+  "label": "tTheme:global.general.settings.favicon.label",
   "size": "narrow",
-  "description": "tTheme:global.branding.settings.favicon.description"
+  "description": "tTheme:global.general.settings.favicon.description"
 }
 ```
-
-### Gallery
-
-A repeatable list of images. Where `image` holds a **single** upload path, `gallery` lets the user add any number of images and reorder them by dragging. Usable in widget, theme, and collection-type schemas.
-
-The stored value is an **ordered array of upload-path strings**:
-
-```json
-"gallery": [
-  "/uploads/images/suite-01.jpg",
-  "/uploads/images/suite-02.jpg"
-]
-```
-
-- Each entry is an upload path, exactly like a single `image` value. Image **alt/title/caption** all live on the **media record** (edited via the Edit-metadata drawer), not in the gallery — so the gallery carries paths only.
-- Empty value is `[]`; order is authored (drag-to-reorder) and preserved on save.
-- The `GalleryInput` editor never commits a blank row, and any entry that is blank or not a valid `/uploads/images/...` path is dropped during **render sanitization** (writes store the raw value; sanitization happens at render, like other setting types) — so a template never receives an empty entry. A `required` gallery counts as missing until it has at least one valid path. (The value is a plain `string[]`; a non-string entry is dropped, never coerced.)
-
-```json
-{
-  "id": "gallery",
-  "type": "gallery",
-  "label": "tTheme:my_widget.settings.gallery.label",
-  "description": "tTheme:my_widget.settings.gallery.description"
-}
-```
-
-**Usage in Templates:**
-
-The value is a plain `string[]` — loop it directly (no special tag) and resolve each path with the existing `{% image %}` tag. Guard each entry so a stray empty one never renders:
-
-```liquid
-{% for img in item.settings.gallery %}
-  {% if img != blank %}
-    <figure>
-      {% image src: img, size: 'large' %}
-    </figure>
-  {% endif %}
-{% endfor %}
-```
-
-`{% image %}` resolves each path (depth-aware path + media metadata for alt/title) exactly as for a single `image`. Image **alt/title/caption** come from the media record; if a theme wants to display the caption, resolve it from the path with the `media_meta` filter (e.g. `{{ img | media_meta: 'caption' }}`).
-
-### Table
-
-A uniform **repeating-row** field: an ordered list of rows, each with a fixed set of typed **columns** declared in the schema. The author adds / reorders / deletes rows; the user fills each cell in a proper input — no delimiters. Currently a **collection-type** field (v1). **v1 column type: `text` only** (more types are added incrementally).
-
-```json
-{
-  "type": "table",
-  "id": "rates",
-  "label": "Rates",
-  "columns": [
-    { "id": "label", "type": "text", "label": "Season" },
-    { "id": "price", "type": "text", "label": "Price" }
-  ]
-}
-```
-
-The stored value is an **ordered array of row objects**, keyed by column `id`:
-
-```json
-"rates": [
-  { "label": "Low season", "price": "€320" },
-  { "label": "High season", "price": "€560" }
-]
-```
-
-- Each column is a mini setting definition (`id`, `type`, `label`). Column `id`s must be unique, match `^[a-zA-Z][a-zA-Z0-9_]*$`, and not be reserved keys (`__proto__`/`constructor`/`prototype`) — they become row-object keys and Liquid accessors.
-- Empty value is `[]`; row order is authored (drag-to-reorder), preserved on save. Blank rows are never committed; sanitization drops any row whose declared cells are all blank (after `trim`) and strips undeclared keys. A `required` table counts as missing until ≥1 row has a non-blank cell in a declared column.
-
-**Usage in Templates:**
-
-Loop the rows and read cells by column id:
-
-```liquid
-<table>
-  {% for r in item.settings.rates %}
-    <tr><td>{{ r.label }}</td><td>{{ r.price }}</td></tr>
-  {% endfor %}
-</table>
-```
-
-All cells are autoescaped strings.
 
 ### File
 
-A file asset selector for downloadable non-image assets (currently PDF and MP3). The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview.
+A file asset selector for downloadable documents and audio. The value is the storage path to the uploaded file (e.g. `/uploads/files/brochure.pdf`). Unlike the image input, this input is filename-oriented with no visual preview. Enabled file types in V1 are **PDF** and **MP3** (the shared "non-image" allowlist, `NON_IMAGE_ACCEPT` in `packages/editor-ui/src/utils/uploadValidation.js`); the model is allowlist-driven so more types can be added later via extension + MIME entries.
+
+**Backed by the File Assets model:** files are first-class Media Library assets in the same project-scoped store as images (SQLite owns metadata/usage, the filesystem owns the binary). Uploads route to `uploads/files/` (no image processing), participate in usage tracking and deletion protection, and are copied into the static export (`assets/files/`). See [core-media.md](core-media.md) and [core-export.md](core-export.md).
 
 **Features:**
 
-- **Upload**: Direct file upload from the OS file picker (accepts PDF, MP3)
-- **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets (documents + audio)
+- **Upload**: Direct file upload from the OS file picker (accepts PDF/MP3)
+- **Browse**: Opens `MediaSelectorDrawer` with `filterType="file"` to select from existing file assets
 - **Selected State**: Displays filename and extension badge with a clear button
-- **No Inline Metadata Editing**: `FileInput` itself does not expose metadata editing. File assets still have media-record metadata such as alt/title, managed from the Media Library drawer.
+- **No Metadata Editing**: File assets do not have alt text or title metadata
+- Shares the App Settings `media.maxFileSizeMB` upload limit (no separate file limit in V1)
+
+The `FileInput` component (`packages/editor-ui/src/components/settings/inputs/FileInput.jsx`) is registered as `type: "file"` in `SettingsRenderer`.
 
 ```json
 {
@@ -575,7 +505,7 @@ File paths are resolved using the `filePath` context variable (set by the render
 <a href="{{ file_url }}" target="_blank" rel="noopener">Download</a>
 ```
 
-Alternatively, users can copy a file URL from the Media Library and paste it into any generic link field. The export controller rewrites `/uploads/files/` paths to `assets/files/` in the exported HTML.
+Alternatively, users can copy a file URL from the Media Library and paste it into any generic link field (or use the **Link to file** button in a richtext field). The export controller rewrites `/uploads/files/` paths to `assets/files/` in the exported HTML.
 
 ### YouTube
 
@@ -639,45 +569,40 @@ Each menu has a stable `uuid` that never changes, even when the menu is renamed.
 3. **Rendering/Export**: The system resolves the UUID to the current menu data. If a menu was renamed, the reference still works because the UUID is unchanged.
 4. **Project Cloning**: When a project is cloned, all menu UUIDs are regenerated and widget references are updated to point to the new UUIDs.
 5. **Backward Compatibility**: Legacy slug-based references (e.g., `"main-menu"`) are resolved via slug fallback at render time and converted to UUIDs on first interaction in the editor.
-6. **Collection item templates**: A `menu` setting resolves to the same full menu object in collection item templates as in widgets (Finding #10) — the template receives `{ items: [...] }` (depth-aware `link` + `canonicalPath`), not a raw UUID.
+
+See [core-menus.md](core-menus.md) for the full menu model.
 
 ### Link
 
-A compound control for creating links. This is useful for buttons, banners, or any call-to-action element. It allows the user to select an internal page, a collection item page, or specify a custom URL. The value is an object containing the link's `href`, `text`, `target`, and optional stable-reference fields (`pageUuid` for pages, or `collectionItemUuid` + `collectionType` for collection item pages).
+A compound control for creating links. This is useful for buttons, banners, or any call-to-action element. It lets the user select an internal **page**, an internal **collection item**, or specify a custom URL. The value is an object containing the link's `href`, `text`, `target`, and optionally a stable reference (`pageUuid` for pages, or `collectionType` + `collectionItemUuid` for collection items).
 
-- **`href`** (string): The URL for the link. This can be a relative path to an internal page (e.g., `about.html`), a collection item page (e.g., `products/example.html`), or an absolute URL.
+- **`href`** (string): The URL for the link. This can be a relative path to an internal page (e.g., `about.html`), a collection item page (e.g., `news/my-post.html`), or an absolute URL.
 - **`text`** (string): The display text for the link (e.g., "Learn More").
 - **`target`** (string): The link target, either `_self` to open in the same tab or `_blank` to open in a new tab.
-- **`pageUuid`** (string, optional): For internal page links, stores the page's stable UUID. This ensures links remain valid even when pages are renamed—the system automatically resolves the UUID to the current page slug at render time.
-- **`collectionItemUuid`** (string, optional): For collection item page links, stores the item's stable UUID. The editor/runtime resolves it to the current `{slugPrefix}/{slug}.html` path.
-- **`collectionType`** (string, optional): Stored with `collectionItemUuid` so the link keeps enough collection context for editor display and cleanup.
+- **`pageUuid`** (string, optional): For internal **page** links, stores the page's stable UUID. The system resolves the UUID to the current page slug at render time, so links survive renames.
+- **`collectionType`** + **`collectionItemUuid`** (strings, optional): For internal **collection-item** links, stores the item's collection type and stable UUID. Resolved to `slugPrefix/itemSlug.html` at render time. These three reference forms are mutually exclusive — selecting one clears the others.
+
+The picker offers all pages plus the items of every `hasItemPages` collection, grouped (a "Pages" group + one group per collection); see `useLinkTargets` (`packages/editor-ui/src/hooks/useLinkTargets.js`).
 
 **Schema Properties:**
 
 - **`hide_text`** (boolean, optional): If `true`, hides the link text field in the editor UI. Useful for links that wrap entire cards or icons where no visible label is rendered.
 
-**How Internal Link References Work:**
+**How Stable Internal Links Work:**
 
-Stable references ensure internal links remain valid when pages or collection items are renamed:
+The UUID system ensures links remain valid even when the target is renamed or deleted:
 
-1. **Project Creation**: When a project is created from a theme, all internal page links in widget settings and menus are automatically enriched with `pageUuid`. This includes links defined in theme templates and schema defaults.
+1. **Project Creation**: When a project is created from a theme, internal page links in widget settings and menus are automatically enriched with `pageUuid`. This includes links defined in theme templates and schema defaults.
 
-2. **User Selection**: When a user selects an internal page from the dropdown, the system stores both:
-   - The `pageUuid` - the stable identifier that never changes
-   - The `href` - the current slug-based filename (e.g., `services.html`)
+2. **User Selection**: When a user selects an internal target from the dropdown, the system stores both the stable reference (`pageUuid`, or `collectionType` + `collectionItemUuid`) and the current `href` (slug-based filename).
 
-   When the user selects a collection item page, the system stores:
-   - The `collectionItemUuid` - the stable item identifier
-   - The `collectionType` - the collection that owns the item
-   - The `href` - the current collection-item URL (e.g., `products/example.html`)
+3. **Rendering/Export**: The system resolves the stable reference to the current slug. If the target was renamed, links automatically point to the new filename.
 
-3. **Rendering/Export**: The system resolves `pageUuid` or `collectionItemUuid` to the current slug. If a page or collection item was renamed, links automatically point to the new filename.
+4. **Deletion Cleanup**: When a page is deleted, all widget link settings referencing its `pageUuid` are automatically cleaned up — the link is cleared (`href: ""`) and the reference is removed from the JSON file. This applies to page widgets, global widgets (header/footer), and menu items.
 
-4. **Page Deletion Cleanup**: When a page is deleted, all widget link settings referencing its `pageUuid` are automatically cleaned up — the link is cleared (`href: ""`) and `pageUuid` is removed from the JSON file. This applies to page widgets, global widgets (header/footer), and menu items.
+5. **Project Cloning**: When a project is cloned, all UUIDs are regenerated and all widget/menu references are updated to point to the new UUIDs.
 
-5. **Project Cloning**: When a project is cloned, all page UUIDs are regenerated, and all widget/menu `pageUuid` references are updated to point to the new UUIDs.
-
-The UI for this setting type provides a choice between selecting from existing pages, selecting eligible collection item pages, or entering a custom URL, along with inputs for the link text and a toggle for the target.
+The UI for this setting type provides a choice between selecting from a list of existing pages/collection items or entering a custom URL, along with inputs for the link text and a toggle for the target.
 
 ```json
 {
@@ -704,6 +629,18 @@ The UI for this setting type provides a choice between selecting from existing p
 }
 ```
 
+**Example stored value (collection-item link):**
+
+```json
+{
+  "href": "news/my-post.html",
+  "text": "Read Post",
+  "target": "_self",
+  "collectionType": "news",
+  "collectionItemUuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+}
+```
+
 **Example stored value (custom URL):**
 
 ```json
@@ -725,9 +662,122 @@ The UI for this setting type provides a choice between selecting from existing p
 }
 ```
 
+### Date
+
+A native date picker. The stored value is a calendar-date string (`"YYYY-MM-DD"`) or `""` when unset — date-only, no time, timezone-agnostic.
+
+```json
+{
+  "id": "published_on",
+  "type": "date",
+  "label": "tTheme:news.fields.published_on.label",
+  "description": "tTheme:news.fields.published_on.description"
+}
+```
+
+**Collection sorting:** inside a collection-type schema a `date` field may be flagged `"usedAsDate": true` to mark it as the type's sort key; the type's `defaultSort` can then be `"date_desc"` / `"date_asc"` (items with a missing/blank date sort last). See [Collections](core-collections.md).
+
+**Usage in Templates:**
+
+Render with the `format_date` filter, which honours the theme's **Date format** global setting (implemented in `packages/core/src/filters/dateFilter.js`). Pass an explicit token to override:
+
+```liquid
+{{ item.settings.published_on | format_date }}
+{{ item.settings.published_on | format_date: 'D MMM YYYY' }}
+```
+
+Supported format tokens: `MMMM D, YYYY`, `D MMMM YYYY`, `MMM D, YYYY`, `D MMM YYYY`, `MM/DD/YYYY`, `DD/MM/YYYY`, `YYYY-MM-DD`. A blank or unrecognised value formats to `""`.
+
+### Gallery
+
+A repeatable list of images: where `image` stores one path, `gallery` stores an **ordered array** of upload-path strings (`["/uploads/images/a.jpg", "/uploads/images/b.jpg"]`). The empty value is `[]`. It composes the same image picker as the `image` type per row, with drag-to-reorder.
+
+```json
+{
+  "id": "photos",
+  "type": "gallery",
+  "label": "tTheme:portfolio.fields.photos.label",
+  "description": "tTheme:portfolio.fields.photos.description"
+}
+```
+
+**Features:**
+
+- Add / remove / drag-reorder image rows
+- Each row reuses the `image` input (Upload / Browse media library)
+- Authoring order is preserved
+
+**Notes:**
+
+- Each entry is a single `/uploads/images/…` path (filename segment only — no directory traversal, spaces, or query strings). **Render sanitization drops blank entries and any path that fails the image-path allowlist** (`isSafeImagePath`), so the store keeps what the editor wrote while the renderer emits only safe paths. See [Link & URL Safety](core-security.md).
+- Image alt/title/caption live on the **media record**, not in the gallery value.
+
+**Usage in Templates:**
+
+Loop directly, guard each entry, and resolve with the existing `{% image %}` tag:
+
+```liquid
+{% for src in widget.settings.photos %}
+  {% if src != blank %}
+    {% image src: src, size: 'large' %}
+  {% endif %}
+{% endfor %}
+```
+
+### Table
+
+A uniform repeating-row field: an **ordered array of row objects**, each keyed by the column `id`s declared in the schema. The empty value is `[]`. In v1 every column is `text`.
+
+**Additional Properties:**
+
+- **`columns`** (array, required): the row shape. Each column is `{ "id": string, "type": "text", "label": string }`. `id` must match `^[a-zA-Z][a-zA-Z0-9_]*$` and must not be a reserved name (`__proto__`, `constructor`, `prototype`). The `columns` array must be non-empty.
+
+```json
+{
+  "id": "rates",
+  "type": "table",
+  "label": "tTheme:pricing.fields.rates.label",
+  "columns": [
+    { "id": "label", "type": "text", "label": "tTheme:pricing.fields.rates.cols.label" },
+    { "id": "price", "type": "text", "label": "tTheme:pricing.fields.rates.cols.price" }
+  ]
+}
+```
+
+**Example stored value:**
+
+```json
+[
+  { "label": "Basic", "price": "$10" },
+  { "label": "Pro", "price": "$25" }
+]
+```
+
+**Features:**
+
+- Add / remove / drag-reorder rows
+- Cells typed per the declared columns (v1: text only)
+- **Render sanitization drops blank rows and any undeclared keys**; the editor never commits a row whose declared cells are all blank.
+
+**Usage in Templates:**
+
+Loop rows and read cells by their column `id` (all cells are autoescaped strings):
+
+```liquid
+<table>
+  {% for r in item.settings.rates %}
+    <tr><td>{{ r.label }}</td><td>{{ r.price }}</td></tr>
+  {% endfor %}
+</table>
+```
+
+> **v1 scope:** `table`, along with the `usedAsTitle` / `usedAsDate` flags, is designed for **collection-type** schemas (see [Collections](core-collections.md)); mechanically the input renders anywhere settings do. Column types beyond `text` are a planned extension.
+
 ---
 
 **See also:**
 
 - [Theming Guide](theming.md) - Theme structure, global settings, layout templates
 - [Widget Authoring Guide](theming-widgets.md) - Complete widget development reference
+- [Media Library](core-media.md) - Image and file asset architecture
+- [Static Export](core-export.md) - Asset copying and path rewriting in export

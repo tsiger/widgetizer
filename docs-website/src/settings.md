@@ -14,7 +14,7 @@ Sets the language for the Widgetizer admin interface. This affects all menus, bu
 
 - English
 
-Additional languages will be added in future releases. Changing the language takes effect immediately after saving — you don't need to restart the application.
+Additional languages will be added in future releases. Changing the language takes effect immediately after saving, so you don't need to restart the application.
 
 ### Date Format
 
@@ -40,17 +40,22 @@ Choose the format that matches your region or preference. The format you select 
 
 # Media & Upload Settings
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/app-settings-media.png" alt="Widgetizer general settings screen showing the Media and Upload tab with upload size, image quality, and image size controls." loading="lazy">
+  <figcaption>Media and upload settings apply across projects unless a theme provides its own image-size rules.</figcaption>
+</figure>
+
 ### File Upload Limits
 
 These settings control the maximum file size allowed for uploads across all projects. If a file exceeds these limits, it will be rejected with an error message.
 
 #### Maximum Image Upload Size
 
-Sets the maximum size for individual image files (JPEG, PNG, GIF, WebP, SVG).
+Sets the maximum size for an individual uploaded file (images, PDFs, and MP3 audio).
 
-- **Default:** 5 MB
+- **Default:** 50 MB
 - **Range:** 1 MB to 100 MB
-- **Applies to:** All image uploads across all projects
+- **Applies to:** All uploads across all projects
 
 ### Image Processing Configuration
 
@@ -159,27 +164,7 @@ Activates additional developer tools and diagnostics throughout the application.
 
 # Tips & Best Practices
 
-### File Upload Limits
-
-- Set limits based on your typical file sizes and storage capacity
-- Consider your hosting environment's limitations when setting maximum sizes
-- Larger limits allow more flexibility but may slow down uploads
-
-### Image Processing
-
-- **Quality:** 80-85 is usually perfect for most websites
-- **Sizes:** Disable sizes you don't use to save storage space
-- **Custom widths:** Match image sizes to your theme's design breakpoints
-- Let Widgetizer's automatic sizing do the work—it's smart about what to generate
-
-### Export Management
-
-- Keep enough versions to have backups but not so many that they consume excessive storage
-- Consider your storage capacity when setting the maximum versions to keep
-- Export projects regularly as backups, especially before making major changes
-
-### Storage Optimization
-
-- Disable unused image sizes to reduce storage usage
-- Regularly review and delete old export versions if storage is limited
-- Consider compressing large media files before uploading
+- Set upload limits to match your typical files and your host's constraints.
+- Quality of 80-85 suits most sites; disable sizes you don't use and match custom widths to your theme's breakpoints.
+- Keep enough export versions for a safety net without letting them pile up.
+- Export projects regularly as backups, especially before major changes.

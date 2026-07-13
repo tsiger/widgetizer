@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Shared editor styling (source scan + design tokens + editor component
+   classes) lives in @widgetizer/editor-ui so every shell — OSS and hosted —
+   reuses it instead of duplicating. Must come after the tailwindcss import:
+   the preset uses @apply. */
+@import "@widgetizer/editor-ui/tailwind-preset";
+
+@layer base {
+  /* Page-global base is kept shell-side so each shell owns its own chrome
+     (e.g. hosted uses a different background/design system). */
+  body {
+    @apply text-sm font-sans text-gray-900 bg-gray-50;
+  }
+}

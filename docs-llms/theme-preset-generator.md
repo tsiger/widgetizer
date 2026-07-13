@@ -13,7 +13,7 @@ This document exists to help generate presets that:
 Use this guide together with:
 
 - [theme-preset-file-format.md](theme-preset-file-format.md) — JSON file structures for all preset files (pages, header, footer, menus, preset.json)
-- [theme-presets-tracker.md](theme-presets-tracker.md) for preset ids and status only
+- [theme-preset-process.md](theme-preset-process.md) for preset ids and production status only
 - `themes/arch/theme.json`
 - widget `schema.json` files
 - widget `insights.md` files
@@ -146,6 +146,8 @@ Header transparency is not part of the spacing system.
 - `transparent_on_hero` is a header overlay behavior
 - it only works with supported opener widgets
 - it should not be used as the reason for unrelated spacing decisions
+
+**Contrast trap:** the transparent state engages whenever the page's *first widget* is a supporting hero widget (e.g. `banner`) — with or without an image. An imageless, light-scheme banner opener therefore renders the header in its light over-image styling on a light background: washed-out, unreadable. So when a preset's header uses `transparent_on_hero: true`, only the pages whose opener is a real image/dark hero may start with a banner; every other page opens with a `rich-text` or `split-content` title section instead (see how everafter and inkwell open their inner pages).
 
 Treat:
 
@@ -311,7 +313,7 @@ This file is a **prompt library consumed directly by `scripts/generate-images.js
 ]
 ```
 
-- `file` — output filename, flat (no path separators — see Filename rules below)
+- `file` — flat output filename, hyphenated (e.g. `"testimonials-melissa.jpg"`); no path separators — see the filename rules below
 - `width` / `height` — integers in pixels; see §11.3 for dimension rules
 - `prompt` — one prose paragraph. Cover subject, setting, lighting, composition, and things to avoid — but fold it into natural sentences, not labeled sections.
 
@@ -334,13 +336,13 @@ This file is a **prompt library consumed directly by `scripts/generate-images.js
 - **Keep prop lists short.** Three props max per image. Each additional prop is another thing FLUX can misrender, and prop-dense prompts trend toward styled-Pinterest-shot outputs rather than honest scene shots.
 - **Put the subject in the right 60–70% of the frame** for any banner/hero image with left-aligned heading text on top. Mention the left area is clear and calm so the model actually leaves room.
 
-**Critical rule:** Never put image file references in preset template JSON files. Widgets that accept images (banner, image-text, card-grid cards, profile-grid photos, steps, etc.) must omit the image setting entirely. The widget will render its built-in placeholder or empty state. Images are added by the user after project creation.
+**Critical rule:** Every image reference in preset JSON (templates and collection items) must correspond to an entry in this file. Templates reference `/uploads/images/<basename>.webp`, where `<basename>` is the generator entry's `file` with its extension replaced by `.webp` — the generator outputs `.jpg`, and `scripts/optimize-images.js` converts to lossless WebP before upload. Never reference an image that is not in the prompt library, and never invent a path. See §11 for the full rule.
 
 ### Phase 2.5: Image Usage Map
 
 After Phase 3 templates are written, **always** create `docs-llms/preset-plans/{preset-id}-images-usage.md`.
 
-This is the bridge between the image prompt library (Phase 2) and the template JSON (Phase 3). Because template JSON can't reference image files, the user has no way to know which generated image belongs where without this map.
+This is the bridge between the image prompt library (Phase 2) and the template JSON (Phase 3). Templates reference the images directly (§11), so this map is the human-readable cross-check: it proves every generated image has a home and every reference has a source, and it tells the person doing the production pass what to verify after upload.
 
 **Required shape:** one section per page, each with a table mapping widget ID → block ID → image filename → dimensions. List widgets on the page that have no images as a trailing note. At the end, include a count-by-category table summing to the total, and a list of user-supplied images that are outside the generator pipeline (logos, favicon, logo-cloud entries).
 
@@ -370,7 +372,7 @@ themes/arch/presets/{preset-id}/
 Then update:
 
 - `themes/arch/presets/presets.json`
-- `docs-llms/theme-presets-tracker.md`
+- the preset production status tracked in [theme-preset-process.md](theme-preset-process.md)
 
 ---
 
@@ -411,7 +413,7 @@ Read [theme-preset-file-format.md](theme-preset-file-format.md) before writing a
 
 ### 5.4 Non-negotiable rules
 
-Never use image file references in preset template JSON files. Omit image/photo settings entirely — widgets render their built-in placeholder or empty state. See §11 for the full rule.
+Never reference an image that is not in the preset's `{preset-id}-images.json` prompt library. Presets ship their images (packed media), and templates reference the `.webp` basenames of the library entries — see §11 for the full rule.
 
 Never guess:
 
@@ -664,15 +666,17 @@ Common `small` candidates:
 - `logo-cloud`
 - `key-figures` (when used as a compact stat strip)
 
+**`small` is also the docking setting.** When a widget sits directly under a *filled* section (an image hero, a highlight band), remember §2.3: the filled section's bottom spacing is padding *inside* its own surface, so it contributes no external gap. The widget below must bring its own breathing room — `top_spacing: small` gives the docked-but-not-touching look (the classic trust-bar-under-hero placement). `none` there makes the content collide with the band's edge.
+
 ### 10.4 When to use `none`
 
-Use `none` only when two adjacent widgets are meant to read as a single fused composition. Common cases:
+Spacing between two adjacent widgets is a *combination*: an unfilled widget's spacing is external margin that its neighbor can rely on; a filled widget's spacing is internal padding that its neighbor cannot. `none` is correct only when the gap is either provided by the other widget or deliberately unwanted:
 
-- A full-width image fused to the section below it
-- Two filled sections that share the same visual band
-- A split-content zigzag sequence where multiple instances chain together
+- **Avoiding a double gap** — the widget above is *unfilled* and its own bottom margin already provides the spacing (e.g. a grid with `top_spacing: none` directly under an unfilled `rich-text` page opener).
+- **True fusion** — two adjacent sections meant to read as a single band: same-scheme filled sections, back-to-back instances of the same widget (split-content zigzags), a full-width image glued to the section below it.
+- **First-widget hero under a transparent header** — top `none` so the hero slides under the header instead of showing a strip of page background.
 
-`none` on a filled/highlighted widget removes its internal padding, not just external whitespace. This is a stronger visual move — use it deliberately.
+Never use `none` as a generic "dock this under the hero" move — that's `small`'s job (§10.3). `none` on a filled/highlighted widget also removes its internal padding, not just external whitespace; that is a stronger visual move — use it deliberately.
 
 ### 10.5 What not to do
 
@@ -685,16 +689,17 @@ Use `none` only when two adjacent widgets are meant to read as a single fused co
 
 ## 11. Image Rules
 
-### 11.1 No images in preset templates
+### 11.1 Presets ship their images
 
-Preset template JSON files must **never** contain image file references. This rule is absolute — it applies to every widget type, every image setting, every block with a photo field.
+> **Convention change (0.9.9).** Presets used to ship without imagery (image settings omitted, placeholder states everywhere). Since the packed-media system landed, presets ship real images: binaries + metadata live in `presets/<id>/media/` and are seeded into every project at creation (see [theme-preset-process.md](theme-preset-process.md)), so templates reference them directly.
 
-When a widget has an `image`, `photo`, or similar setting:
+Every image setting in preset JSON is filled with an upload path derived from the Phase 2 prompt library:
 
-- **Omit the setting entirely.** Do not set it to an empty string. Do not set it to a placeholder filename. Just leave it out of the JSON.
-- The widget will render its built-in placeholder or empty state. This is the correct behavior for presets.
+- **Path shape:** `/uploads/images/<basename>.webp`, where `<basename>` is a `file` entry from `{preset-id}-images.json` with its extension replaced by `.webp`. (The generator outputs `.jpg`; `scripts/optimize-images.js` converts to lossless WebP; the `.webp` files are what get uploaded and packed.)
+- **One-to-one:** every referenced path must exist in the prompt library, and every library entry should be referenced somewhere (templates or collection items). An unreferenced entry is wasted generation budget; an unmatched reference is a broken image in every new project.
+- **Never invent paths.** No stock-photo names, no images "to be added later", no paths from other presets.
 
-Widgets that commonly accept images and must have their image settings omitted:
+Widgets that commonly carry images (fill these from the image plan):
 
 - `banner`, `split-hero`, `slideshow` — widget-level `image` setting
 - `image-text`, `image-callout`, `image-tabs` — widget-level `image` setting
@@ -706,17 +711,19 @@ Widgets that commonly accept images and must have their image settings omitted:
 - `comparison-slider` — `before_image` / `after_image` settings
 - `gallery`, `masonry-gallery`, `project-showcase` — per-item `image` in blocks
 
-Users add their own images after project creation. Presets provide structure, content, and design — not imagery.
+Because the binaries keep their `/uploads/images/<filename>` paths across projects, the references resolve as-is in every project created from the preset — no per-project reassignment.
 
-### 11.2 Why
+### 11.2 Why the paths must match the library
 
-Image file references in preset templates break when:
+The reference and the packed binary are joined only by the filename. A reference breaks when:
 
-- the image files do not exist in the project's uploads directory
-- the preset is applied to a new project (images are never copied)
-- the preset is previewed before image generation
+- the path doesn't match a generator entry's basename (typo, wrong extension, invented name)
+- the extension is `.jpg` instead of `.webp` (the `.jpg` is a pipeline intermediate; only `.webp` files are uploaded and packed)
+- an image was renamed during upload (filename collision) without updating the reference
 
-Broken image references produce visible errors (broken image icons, empty containers with incorrect aspect ratios, broken hero layouts) that make the preset look defective. Omitting images entirely produces clean placeholder states that the user understands and can fill.
+A broken reference produces a visibly defective preset in every project created from it: broken image icons, wrong aspect-ratio containers, collapsed hero layouts. The build isn't done until the cross-check in §11.4 passes in both directions.
+
+During the window before media is generated and packed, freshly created projects show broken image slots. That is expected mid-production state, not a reason to strip the references.
 
 ### 11.3 The images JSON — format and dimensions
 
@@ -734,7 +741,7 @@ Fold these into natural sentences — do not write `Subject: ... Setting: ...` a
 
 **Dimensions — match the widgetizer render pipeline.**
 
-Widgetizer generates four resized variants of every upload at `thumb` (150w), `small` (480w), `medium` (1024w), and `large` (1920w) — see `server/controllers/mediaController.js`. The `large` variant (1920w) is the biggest the frontend will ever request. Source images larger than ~1920w waste tokens and disk without improving anything the user sees.
+By default Widgetizer generates four resized variants of every upload at `thumb` (150w), `small` (480w), `medium` (1024w), and `large` (1920w) — see `packages/builder-server/src/controllers/mediaController.js`. These widths are defaults: a theme can override them via `settings.imageSizes` in its `theme.json` (the `thumb` variant is always kept for the media library). With Arch's defaults, the `large` variant (1920w) is the biggest the frontend will ever request. Source images larger than ~1920w waste tokens and disk without improving anything the user sees.
 
 Pick dimensions by **the widget that will render the image**, not by what "looks big." Aspect ratio should match the widget's configured `aspect_ratio` setting when one exists. Recommended source sizes:
 
@@ -763,13 +770,15 @@ Pick dimensions by **the widget that will render the image**, not by what "looks
 
 ### 11.4 Validation
 
-Before finalizing any preset, grep the preset's template directory for common image file extensions:
+Before finalizing any preset, cross-check references against the prompt library **in both directions**:
 
-```
-grep -r "\.jpg\|\.png\|\.jpeg\|\.webp" themes/arch/presets/{preset-id}/templates/
-```
+1. Collect every `/uploads/images/…` path in `themes/arch/presets/{preset-id}/templates/` and `collections/`.
+2. Compute the expected set from `{preset-id}-images.json`: each `file` basename with a `.webp` extension.
+3. Every referenced path must be in the expected set (no unknown/invented references).
+4. Every expected path should be referenced somewhere; list intentional exceptions explicitly in `{preset-id}-images-usage.md`.
+5. No `.jpg`/`.png`/`.jpeg` references anywhere in preset JSON — shipped references are `.webp` only.
 
-If any matches are found in image/photo settings, remove them.
+The `{preset-id}-images-usage.md` map (Phase 2.5) is the human-readable form of this same cross-check — keep both in sync.
 
 ---
 
@@ -952,8 +961,10 @@ Before finalizing any preset, verify all of the following.
 
 ### Image validation
 
-- [ ] No image file references exist in any template JSON (grep for `.jpg`, `.png`, `.jpeg`, `.webp`)
-- [ ] Image/photo settings are omitted entirely, not set to empty strings
+- [ ] Every image reference in templates and collection items resolves to a `{preset-id}-images.json` entry (basename + `.webp`)
+- [ ] Every images.json entry is referenced somewhere (or listed as an intentional exception in the usage map)
+- [ ] All references use the `.webp` extension — no `.jpg`/`.png`/`.jpeg` paths in preset JSON
+- [ ] `{preset-id}-images-usage.md` exists and matches the actual references
 
 ### Schema validation
 
@@ -978,7 +989,7 @@ For every preset, deliver:
 - `themes/arch/presets/{preset-id}/templates/...`
 - `themes/arch/presets/{preset-id}/menus/...`
 - registry update in `themes/arch/presets/presets.json`
-- status update in `docs-llms/theme-presets-tracker.md`
+- production status update in [theme-preset-process.md](theme-preset-process.md)
 
 ---
 

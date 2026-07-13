@@ -1,0 +1,186 @@
+/**
+ * Whether `table` already has a column named `column`. Used to make
+ * forward-only "add column" migrations idempotent when a database already
+ * contains the target column. `table` is always a literal constant in this file
+ * (never user input), so interpolating it into PRAGMA is safe.
+ * @param {import('better-sqlite3').Database} db
+ * @param {string} table
+ * @param {string} column
+ * @returns {boolean}
+ */
+function columnExists(db, table, column) {
+  return db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === column);
+}
+
+const migrations = [
+  {
+    version: 1,
+    description: "Initial schema - projects, app_settings, media, exports",
+    up(db) {
+      db.exec(`
+        CREATE TABLE projects (
+          id TEXT PRIMARY KEY,
+          folder_name TEXT NOT NULL UNIQUE,
+          name TEXT NOT NULL,
+          description TEXT DEFAULT '',
+          site_title TEXT DEFAULT '',
+          theme TEXT,
+          theme_version TEXT,
+          preset TEXT,
+          receive_theme_updates INTEGER DEFAULT 0,
+          site_url TEXT DEFAULT '',
+          last_theme_update_at TEXT,
+          last_theme_update_version TEXT,
+          created TEXT NOT NULL,
+          updated TEXT NOT NULL
+        );
+
+        CREATE TABLE app_settings (
+          key TEXT PRIMARY KEY,
+          value TEXT
+        );
+
+        CREATE TABLE media_files (
+          id TEXT PRIMARY KEY,
+          project_id TEXT NOT NULL,
+          filename TEXT NOT NULL,
+          original_name TEXT NOT NULL,
+          type TEXT NOT NULL,
+          size INTEGER NOT NULL,
+          uploaded TEXT NOT NULL,
+          path TEXT NOT NULL,
+          alt TEXT DEFAULT '',
+          title TEXT DEFAULT '',
+          width INTEGER,
+          height INTEGER,
+          FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE INDEX idx_media_project ON media_files(project_id);
+        CREATE INDEX idx_media_path ON media_files(project_id, path);
+
+        CREATE TABLE media_sizes (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          media_file_id TEXT NOT NULL,
+          size_name TEXT NOT NULL,
+          path TEXT NOT NULL,
+          width INTEGER NOT NULL,
+          height INTEGER NOT NULL,
+          FOREIGN KEY (media_file_id) REFERENCES media_files(id) ON DELETE CASCADE,
+          UNIQUE(media_file_id, size_name)
+        );
+
+        CREATE TABLE media_usage (
+          media_file_id TEXT NOT NULL,
+          used_in TEXT NOT NULL,
+          FOREIGN KEY (media_file_id) REFERENCES media_files(id) ON DELETE CASCADE,
+          PRIMARY KEY (media_file_id, used_in)
+        );
+
+        CREATE INDEX idx_media_usage_used_in ON media_usage(used_in);
+
+        CREATE TABLE exports (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          project_id TEXT NOT NULL,
+          version INTEGER NOT NULL,
+          timestamp TEXT NOT NULL,
+          output_dir TEXT,
+          status TEXT NOT NULL DEFAULT 'success',
+          FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE INDEX idx_exports_project ON exports(project_id);
+        CREATE UNIQUE INDEX idx_exports_project_version ON exports(project_id, version);
+      `);
+    },
+  },
+  {
+    version: 2,
+    description: "Add owner_id to projects",
+    up(db) {
+      // Opaque owner string (no FK to a users table): OSS sets 'default',
+      // hosted sets the Clerk user id. NOT NULL DEFAULT avoids any
+      // NULL-means-anyone ambiguity; existing rows inherit 'default'.
+      db.exec("ALTER TABLE projects ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'default'");
+      db.exec("CREATE INDEX idx_projects_owner_id ON projects(owner_id)");
+    },
+  },
+  {
+    version: 3,
+    description: "Add caption column to media_files",
+    up(db) {
+      // Guard the ALTER so databases that already contain caption continue
+      // through the forward-only migration sequence.
+      if (!columnExists(db, "media_files", "caption")) {
+        db.exec("ALTER TABLE media_files ADD COLUMN caption TEXT DEFAULT ''");
+      }
+    },
+  },
+  {
+    version: 4,
+    description: "Backfill projects.owner_id for master-history databases",
+    up(db) {
+      // Ensure owner_id and its index exist even when earlier migration records
+      // are present but the column is not.
+      if (!columnExists(db, "projects", "owner_id")) {
+        db.exec("ALTER TABLE projects ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'default'");
+      }
+      db.exec("CREATE INDEX IF NOT EXISTS idx_projects_owner_id ON projects(owner_id)");
+    },
+  },
+];
+
+export const DEFAULT_TRACKING_TABLE = "_migrations";
+
+// The tracking-table name is a SQL identifier, so it can't be bound as a
+// parameter — it's interpolated. It's operator-supplied config (never user
+// input), but we still validate it as a plain identifier to fail loudly on
+// typos and keep interpolation safe.
+const SAFE_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+/**
+ * Run all pending migrations in order.
+ * Each migration is wrapped in a transaction.
+ * @param {import('better-sqlite3').Database} db
+ * @param {{ trackingTable?: string }} [options]
+ *   trackingTable — name of the table that records applied versions.
+ *   Defaults to `_migrations` (backward compatible). Hosted passes a
+ *   namespaced name (e.g. `_widgetizer_migrations`) when running these
+ *   migrations against a database it shares with its own migration system.
+ */
+export function runMigrations(db, { trackingTable = DEFAULT_TRACKING_TABLE } = {}) {
+  if (!SAFE_IDENTIFIER.test(trackingTable)) {
+    throw new Error(`Invalid trackingTable name: ${JSON.stringify(trackingTable)}`);
+  }
+
+  // Create migrations table if it doesn't exist
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS ${trackingTable} (
+      version INTEGER PRIMARY KEY,
+      description TEXT,
+      applied_at TEXT DEFAULT (datetime('now'))
+    );
+  `);
+
+  const appliedVersions = new Set(
+    db.prepare(`SELECT version FROM ${trackingTable}`).all().map((row) => row.version),
+  );
+
+  for (const migration of migrations) {
+    if (appliedVersions.has(migration.version)) continue;
+
+    const runMigration = db.transaction(() => {
+      migration.up(db);
+      db.prepare(`INSERT INTO ${trackingTable} (version, description) VALUES (?, ?)`).run(
+        migration.version,
+        migration.description,
+      );
+    });
+
+    runMigration();
+
+    if (process.env.NODE_ENV !== "test") {
+      console.log(`[DB] Applied migration v${migration.version}: ${migration.description}`);
+    }
+  }
+}

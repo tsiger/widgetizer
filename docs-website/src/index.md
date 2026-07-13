@@ -1,60 +1,57 @@
 ---
-description: Widgetizer is a visual website builder for creating high-performance static websites. Your content lives in human-readable files, and the published site is pure static HTML.
+description: Widgetizer is a visual website builder. You build pages by arranging widgets, then publish to fast, static HTML you can host anywhere.
 ---
 
-Widgetizer is a powerful, yet simple, visual website builder designed to create high-performance static websites. It is specifically built for creating small websites, providing the tools to bring your vision to life without the complexity of traditional web development.
+Widgetizer is a visual website builder: you build each page by stacking ready-made blocks called **widgets**, hence the name. It's made for small, fast websites, without the complexity of traditional web development.
 
-# Core Philosophy
+# How It Works
 
-Widgetizer is built on two fundamental principles: **simplicity** and **portability**.
+### Widgets and Blocks
 
-### 1. File-Based Content
+Widgets are the building blocks of a page: a **Hero Banner**, a **Gallery**, a **Text** section, a **Video Popup**, and so on. You add them, drag them into the order you want, and adjust each one's settings like colors, alignment, and spacing.
 
-Your page content, global widgets (header/footer), menus, theme files, and uploaded media all live as plain files inside your project folder. Page content is stored as readable JSON, themes are normal Liquid templates, and uploads are the original binaries you put in. A small local SQLite database (`data/widgetizer.db`) tracks editor metadata such as the project list, media metadata and usage, app settings, and export history — but the content itself is always on disk.
+Some widgets hold **blocks**, the smaller repeatable units inside them. In a "Features" widget, each feature is a block: add as many as you need, reorder them, or remove them without touching the rest of the page.
 
-### 2. Privacy & Static Output
-
-You own your data: it stays on your machine, in files you can read. When you publish, Widgetizer exports your project to a folder of static HTML, CSS, JS, and assets — no database, no server-side processing, no vendor lock-in. Drop the export onto any static host and you're live.
-
-# Key Concepts
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/page-editor-selected-widget.png" alt="Widgetizer page editor showing a selected Card Grid widget with the widget tree, live page canvas, and settings panel visible." loading="lazy">
+  <figcaption>The editor keeps the widget tree, live canvas, and selected-widget settings visible together.</figcaption>
+</figure>
 
 ### Projects
 
-A [Project](projects.html) is a container for your website. It holds all the pages, images, menus, and design settings specific to that site. You can manage multiple projects simultaneously, switching between them with a single click.
+A [Project](projects.html) is one website. It holds that site's pages, images, menus, and design settings. You can keep several projects and switch between them with a click.
 
 ### Themes
 
-A [Theme](themes.html) is a ready-made design package that defines the "look and feel" of your site. When you start a new project, you choose a theme as your foundation. You can then customize colors, typography, and other global styles to make it uniquely yours.
-
-### Visual Editing with Widgets
-
-Building pages in Widgetizer is as easy as arranging building blocks.
-
-- **What is a Widget?** Widgets are the main building blocks of your page. Examples include a **Hero Banner**, a **Text Widget**, a **Gallery**, or a **Video Popup**. Each widget is self-contained and comes with its own set of customization options (like background colors, alignment, and spacing).
-- **What is a Block?** Blocks are smaller, flexible units _inside_ certain widgets. For example, if you have a "Features" widget, each individual feature is a **block**. This allows you to add as many features as you need, reorder them, or remove them without affecting the overall layout of the widget.
+A [Theme](themes.html) is a ready-made design you build on. You pick one when you start a project, then customize colors, typography, and other styles to make it your own.
 
 ### Media Library
 
-The [Media Library](media.html) is your central hub for images.
+The [Media Library](media.html) is where your images live. Widgetizer resizes each upload automatically so pages load fast, and it tracks which page uses which image, so you never delete something that's still live on your site.
 
-- **Automatic Optimization**: When you upload an image, Widgetizer automatically creates different sizes to ensure your site loads instantly on both mobile and desktop.
-- **Usage Tracking**: The system knows exactly which page is using which image, protecting you from accidentally deleting something that's currently live on your site.
+### Menus
 
-### Navigation Menus
+Build your site's [navigation menus](menus.html) with drag-and-drop. Create sub-menus and link each item to your pages.
 
-Easily manage your site's [navigation menus](menus.html) through a simple drag-and-drop interface. Create hierarchical menus (with sub-menus) and link them to your pages with ease.
+### Collections
 
-# The Workflow: From Idea to Live Site
+Some themes include [Collections](collections.html): repeatable content types like News, Projects, or Services. Each collection holds many items of the same shape, and the theme decides how they look. It's a lightweight CMS built right into the theme.
 
-Working with Widgetizer follows a simple, three-step journey:
+# Your Files, Your Site
 
-1.  **Create**: Start a new project by choosing a theme that fits your needs.
-2.  **Build**: Use the visual editor to add widgets, customize their settings, and fill them with your content. Arrange blocks within widgets to create dynamic layouts.
-3.  **Publish**: When your site is ready, use the [Export](export.html) feature. Widgetizer converts your project into a collection of fast, secure, static HTML files.
+Everything in a project is a plain file on your machine: pages as readable JSON, themes as normal Liquid templates, and your original uploaded images. Nothing is locked away in a proprietary format.
+
+When you [Export](export.html), Widgetizer turns the whole project into plain static HTML, CSS, and assets. No database, no server. Drop that folder onto any host and you're live.
+
+# The Workflow
+
+1. **Create**: start a project and pick a theme.
+2. **Build**: add widgets, fill them with your content, and arrange them into a page.
+3. **Publish**: export to static files and put them online.
 
 # Why Widgetizer?
 
-- **Speed**: Static sites are naturally faster than dynamic ones.
-- **Security**: The exported site has no database or server-side processing, so there are fewer "moving parts" for hackers to target.
-- **Simplicity**: Focus on content and design without worrying about technical stacks or server maintenance.
-- **Control**: Your data stays on your machine, in files you can read.
+- **Fast**: static sites load quicker than dynamic ones.
+- **Secure**: no database or server code means far less for an attacker to target.
+- **Simple**: focus on content and design, not servers and technical stacks.
+- **Yours**: your data stays on your machine, in files you can read.

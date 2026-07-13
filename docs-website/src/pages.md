@@ -4,6 +4,11 @@ description: Create and manage pages in Widgetizer. Configure page settings, SEO
 
 Pages are the individual sections of your website. Each page can have its own content, layout, and SEO settings. You'll use the page editor to add widgets and build your content, but first you need to create the pages themselves.
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/pages-list.png" alt="Widgetizer Pages screen showing a project with seven pages, search, page actions, and a New page button." loading="lazy">
+  <figcaption>The Pages screen lists every page in the active project and keeps creation, search, and page actions close by.</figcaption>
+</figure>
+
 # Creating a New Page
 
 1. Click the **"New Page"** button
@@ -28,7 +33,9 @@ The filename is automatically generated from your page name, but you can edit it
 
 **Special filenames:**
 
-- **`index`** or **`home`**: These will be your homepage
+- **`index`**: This is your homepage. It exports to `index.html`, the file web servers load by default for your domain.
+
+> **Important:** Every project needs a page with the filename `index`. It becomes your homepage, and the site can't be exported without one. If you don't have an `index` page yet, create one or rename an existing page to `index`.
 
 ### SEO Settings (Collapsible Section)
 
@@ -96,7 +103,7 @@ If you change a page's filename, the file will be renamed automatically when you
 - Old filename: `about` → `about.html`
 - New filename: `about-us` → `about-us.html`
 
-> **Warning:** If your page is already published and indexed by search engines, changing the filename will break existing links to that page.
+> **Warning:** Renaming a page only affects links from _outside_ your project. Internal links (menu items, rich-text links, and widget link settings) are stored as stable references, so they follow the rename automatically and won't break. What can break are external links to the old URL: search-engine results, links from other websites, and visitors' bookmarks. Once a page is public, rename it with care.
 
 # Deleting Pages
 
@@ -123,32 +130,8 @@ Click the **copy icon** to duplicate a page. This creates an exact copy with all
 
 # Tips & Best Practices
 
-### Homepage
-
-Always create a page with the filename `index` or `home` to serve as your homepage.
-
-### SEO
-
-- Write unique titles and descriptions for each page
-- Keep titles under 60 characters
-- Keep meta descriptions between 150-160 characters
-- Use descriptive, keyword-rich filenames
-
-### Social Sharing
-
-- Add social media images to important pages (1200x630px recommended)
-- Use the **Social Media Title** field for share-friendly titles
-- Make sure your project has a Site URL set for absolute URLs in social tags
-- Test how your page looks when shared using tools like Facebook's Sharing Debugger
-
-### Organization
-
-- Use clear, descriptive page names
-- Keep filenames simple and readable
-- Consider your site structure before creating pages
-
-### Search Engine Control
-
-- Pick one of the "Don't Index" options for pages you don't want in search results (thank you pages, member-only pages, etc.)
-- Set canonical URLs when you have duplicate or similar content
-- "Don't Index" pages are automatically added to `robots.txt` and excluded from `sitemap.xml` when you [export](export.html)
+- Give your homepage the filename `index`; every project needs one.
+- Write a unique title (under 60 characters) and meta description (150-160 characters) for each page, and use clear, descriptive filenames.
+- Add a 1200x630px social image to important pages, and set a Site URL in your project so social tags use absolute URLs.
+- Use a "Don't Index" option for pages you want kept out of search (thank-you, member-only); they're added to `robots.txt` and excluded from `sitemap.xml` on [export](export.html).
+- Set a canonical URL when you have duplicate or similar content.

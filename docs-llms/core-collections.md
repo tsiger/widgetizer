@@ -1,401 +1,163 @@
-# Collections System (Custom Post Types)
+# Collections
 
-This document describes the **Collections** system: structured, repeatable content types — Portfolios, Team Members, Testimonials, Blog Posts, etc. — defined by themes and authored by users through a CMS interface. Collection data is readable from any widget via a Liquid filter, and collection types can optionally export individual static HTML pages per item.
+Collections are theme-defined content types — News, Projects, Services, Team, FAQ, etc. — that let an end user manage many uniform records ("items") and, optionally, render one page per item. A theme ships the **collection-type** definitions (the schema + an optional page template); the project owner authors **items** against them in the editor.
 
-> **Status: ✅ Implemented.** This document reflects the working implementation on the `collections` branch. It supersedes the earlier planning docs (spec/plan/blockers), whose decision rationale is folded into the "Design Rationale" section below.
-
-## Overview
-
-The system has three layers:
-
-- **Theme authors** define collection *types* (schemas, and optionally an item-page template) inside the theme.
-- **Users** add/edit/delete collection *items* through a familiar CMS interface (sidebar nav, listing table, schema-driven add/edit form).
-- **Widgets** read collection data dynamically via the `| collection` Liquid filter.
-- **Export** optionally generates an individual static HTML page per item (opt-in per type via `hasItemPages: true`).
-
-Collections are **per-project content** like pages and menus. Schemas are **theme-owned** (replaced on theme update); item data is **protected user content** (never touched by updates).
+This document describes the shipped subsystem on the workspace-package architecture: every stateful operation is **scope-first** and routes through the storage adapter, the `| collection` Liquid filter reads from the render context (never by importing the backend), and item pages render at `slugPrefix/itemSlug/` depth through the pure render engine. For the adapter/`Scope`/`LIMIT_KEYS` contract see [Packages & Adapter Architecture](core-packages.md); for the field setting types see [Setting Types](theming-setting-types.md).
 
 ---
 
-## 1. Architecture & Storage Layout
+## 1. Collection types (theme-owned schemas)
 
-Collections mirror the existing `templates/` → `pages/` split: theme-owned *definitions* live under `collection-types/` and are copied into the project with the rest of the theme package; user-owned *item data* lives separately under `collections/`.
+A collection type is defined by `collection-types/{type}/schema.json` in the theme (copied into the project on creation/seed). Types are **theme-owned**: there is no "create a collection type" API — the set of types a project has is whatever its theme seeded.
 
-```
-data/projects/{folderName}/
-├── collection-types/                 # theme-owned definitions (copied from theme; replaced on update)
-│   ├── portfolio/
-│   │   ├── schema.json
-│   │   └── template.liquid           # optional, only when hasItemPages: true
-│   └── team/
-│       └── schema.json
-├── collections/                      # protected user item data (never touched by theme updates)
-│   ├── portfolio/
-│   │   ├── _order.json               # manual ordering (optional)
-│   │   ├── project-alpha.json
-│   │   └── website-redesign.json
-│   └── team/
-│       └── john-doe.json
-├── pages/
-├── menus/
-└── theme.json
-```
+**Top-level schema keys** (validated by `validateCollectionSchema`):
 
-**Authoring source** (theme): `themes/{theme}/collection-types/{type}/schema.json` (and optional `template.liquid`).
+| Key | Notes |
+|---|---|
+| `type` (required) | Machine id; must match `^[a-z0-9-]+$` and the folder name. |
+| `settings` (required) | Array of field definitions (the item's editable fields). |
+| `displayName` / `displayNamePlural` | Human labels (singular / plural). |
+| `icon` | Icon identifier for the sidebar nav. |
+| `slugPrefix` | URL/output prefix; defaults to `type`; must match `^[a-z0-9-]+$`; `assets` is reserved. |
+| `hasItemPages` | `true` → each item renders a standalone page (requires a `template.liquid`). |
+| `defaultSort` | One of `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc`. |
+| `schemaVersion` | Carried onto items as-is (used for migration bookkeeping). |
 
-Runtime APIs, rendering, and export read the **project copy** under `collection-types/`, never `data/themes/{theme}/`, so each project stays pinned to its applied theme version. Path helpers live in `server/config.js` (`getProjectCollectionsDir`, `getProjectCollectionDir`, `getProjectCollectionItemPath`, `getProjectCollectionOrderPath`, `getProjectCollectionTypesDir`, `getProjectCollectionSchemaPath`, `getProjectCollectionTemplatePath`).
+**Field rules:**
 
-Because new-project creation, theme-sync, project ZIP import/export, and project duplication all copy the whole project/theme tree, both `collection-types/` and `collections/` are carried automatically.
+- **Allowed field types** are the standard editor setting types — validated via `isSupportedSettingType` against `SUPPORTED_SETTING_TYPES` (`packages/core/src/config/settingTypes.js`), the single source of truth shared with the editor's `SettingsRenderer`. An item is a **flat record**, so the repeater-style keys `multiple`, `repeater`, and `blocks` are **disallowed** (use a `table` or `gallery` for repetition within a field). For the per-type authoring shapes — including the `richtext` toolbar options — see [Setting Types](theming-setting-types.md).
+- **`usedAsTitle: true`** — exactly one field, which must be `text`. It supplies the item's title and the auto-generated slug.
+- **`usedAsDate: true`** — at most one field, which must be `date`. It becomes the sort key for `date_desc` / `date_asc` (items with a blank date sort last).
+- **`required: true`** — the item fails validation until the field has a non-empty value.
+- **`table`** columns are `text`-only in v1; each column id must match `^[a-zA-Z][a-zA-Z0-9_]*$` and must not be `__proto__` / `constructor` / `prototype`.
 
 ---
 
-## 2. Collection Type Schema (`schema.json`)
+## 2. Storage layout (relative keys via the adapter)
 
-A collection type reuses existing setting types (the same ones widgets and `theme.json` use), with a few collection-specific top-level fields and three field-level flags.
+The service never builds absolute paths. It computes **relative keys** and hands them to the storage adapter with `scope`, which confines them under the per-tenant project root (OSS: `data/projects/<folderName>/`; hosted: the tenant's storage prefix) and runs the traversal guard:
 
-**Example schema** (a `portfolio` type with item pages):
+```js
+collection-types/{type}/schema.json      // type definition (theme-seeded)
+collection-types/{type}/template.liquid  // item-page template (when hasItemPages)
+collections/{type}/{slug}.json           // one file per item
+collections/{type}/_order.json           // manual ordering (defaultSort: "manual")
+```
+
+Schemas and templates live on the **collection-type** path (seeded from the theme); authored item data lives on the **collections** path.
+
+**Item record shape** (`collections/{type}/{slug}.json`):
 
 ```json
 {
-  "type": "portfolio",
+  "id": "…",
+  "uuid": "stable-uuid",
+  "slug": "my-first-post",
   "schemaVersion": 1,
-  "displayName": "Portfolio Item",
-  "displayNamePlural": "Portfolio",
-  "icon": "Briefcase",
-  "description": "Case studies and project showcases.",
-  "slugPrefix": "portfolio",
-  "hasItemPages": true,
-  "sortable": true,
-  "defaultSort": "manual",
-  "settings": [
-    { "type": "header", "id": "content_header", "label": "Content" },
-    { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
-    { "type": "textarea", "id": "description", "label": "Description" },
-    { "type": "image", "id": "featured_image", "label": "Featured image" },
-    { "type": "text", "id": "client", "label": "Client" },
-    { "type": "text", "id": "year", "label": "Year" },
-    { "type": "link", "id": "external_url", "label": "Project link", "hide_text": true }
-  ]
+  "created": "2026-06-18T10:00:00.000Z",
+  "updated": "2026-06-18T10:05:00.000Z",
+  "settings": { "title": "My First Post", "body": "<p>…</p>" },
+  "seo": { "description": "…" }
 }
 ```
 
-### Schema field reference
-
-| Field               | Type    | Purpose                                                                          |
-| ------------------- | ------- | -------------------------------------------------------------------------------- |
-| `type`              | string  | Unique collection identifier (`^[a-z0-9-]+$`, must match the folder name)         |
-| `schemaVersion`     | number  | Bumped by the theme author when the schema changes; drives data migration        |
-| `displayName`       | string  | Singular label shown in the UI                                                   |
-| `displayNamePlural` | string  | Plural label shown in the sidebar/listing                                        |
-| `description`       | string  | Optional help text                                                               |
-| `icon`              | string  | Lucide icon name for the sidebar (falls back to `Database` if unknown)           |
-| `slugPrefix`        | string  | URL prefix when `hasItemPages: true` (e.g. `portfolio/foo.html`); defaults to `type` |
-| `hasItemPages`      | boolean | If true, export generates an individual HTML page per item (see §8)              |
-| `sortable`          | boolean | If true, users can manually reorder items via a drag handle                      |
-| `defaultSort`       | string  | `manual` \| `created_desc` \| `created_asc` \| `title_asc` \| `title_desc` \| `date_desc` \| `date_asc` |
-| `settings`          | array   | Field definitions reusing existing setting types                                 |
-
-### Field-level flags
-
-- **`usedAsTitle: true`** — marks the field used as the item's display name in listings and as the source for auto-generated slugs. **Exactly one non-`header` setting must declare this**, and it must be a `text` field.
-- **`usedAsDate: true`** — marks a `date` field as the collection's sort key for `defaultSort: date_desc`/`date_asc` (and the `| collection: sort: ...` filter option). **At most one** non-`header` setting may declare it, and it must be a `date` field. Items with no value in that field sort to the **end**. Optional — only needed for date-ordered collections (e.g. a blog).
-- **`required: true`** — enforced on save and on export.
-
-For multiple images, use the `gallery` field type — an ordered list of image upload paths (a `string[]`; the `image` type holds a single value). Per-image `alt`/`title`/`caption` live on the media record, not the gallery. See [Setting Types](theming-setting-types.md).
-
-### SEO (item pages)
-
-Item-page SEO is **at parity with page SEO** (Finding #12), not a schema-field convention. Every `hasItemPages` item carries its own page-shaped `seo` object — `{ description, og_title, og_image, og_type, twitter_card, canonical_url, robots }` — edited through the **same** SEO editor pages use (`src/components/settings/SeoFields.jsx`, surfaced in `CollectionItemForm` when `hasItemPages`). Schemas declare **no** `seo_*` fields. The object lives top-level on the item JSON (alongside `settings`) and is sanitized on save exactly like page SEO. Defaults: `og_type: "article"` (items are content), `robots: "index,follow"`; an empty `canonical_url` auto-resolves from `siteUrl + slugPrefix/slug`. The shared `SeoTag` renders the tags (title/og/twitter/canonical) with the same fallbacks as pages, and `robots` containing `noindex` excludes the item from `sitemap.xml` and adds its path to `robots.txt`.
-
-### Validation (`validateCollectionSchema`)
-
-`collectionService` validates and normalizes schemas before returning anything to the UI or Liquid. Theme **upload** runs the same validation up front (`validateThemeCollectionSchemas`) and rejects the upload if any schema fails. Rules:
-
-- `type` and folder name must match and use `^[a-z0-9-]+$`.
-- `slugPrefix` must be `^[a-z0-9-]+$`; defaults to `type` when omitted.
-- Exactly one non-`header` setting must declare `usedAsTitle: true`, and it must be `type: "text"`.
-- At most one non-`header` setting may declare `usedAsDate: true`, and it must be `type: "date"`. `defaultSort: date_desc`/`date_asc` requires a `usedAsDate` field to exist.
-- `defaultSort` must be one of the seven allowed values — `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc` (defaults to `manual`).
-- `settings` may only use setting types in `src/core/config/supportedSettingTypes.js` (`SUPPORTED_SETTING_TYPES`) — the single source of truth shared by the renderer and the backend validator: `header`, `text`, `number`, `date`, `textarea`, `richtext`, `code`, `color`, `range`, `select`, `checkbox`, `radio`, `font_picker`, `menu`, `image`, `gallery`, `table`, `file`, `link`, `youtube`, `icon`. (`table` is a uniform repeating-row field — see [Setting Types](theming-setting-types.md); v1 columns are `text`-only.)
-- `multiple`, `blocks`, repeater, relationship, and taxonomy fields are **rejected**, not silently ignored.
-- Two collections in the same project cannot share a `slugPrefix`; a `slugPrefix` cannot collide with an export-owned root directory (`assets`).
-- At runtime, invalid schemas are **skipped** from the sidebar/API and logged with their folder path. Theme upload **rejects** the whole upload if any schema is invalid.
-
-Labels (`displayName`, `displayNamePlural`, field `label`/`description`) follow the same i18n convention as widget schemas: prefer `tTheme:` locale keys, with direct English strings also supported. `SettingsRenderer` resolves `tTheme:` keys via `useThemeLocale()` — no frontend change needed.
+`uuid` is stable across renames (internal links target it). `created` is never mutated; `updated` is monotonic. `seo` is present only for `hasItemPages` types. Out-of-schema keys left by a schema change are retained on disk and surfaced as **archived** data until explicitly discarded (no silent data loss on read).
 
 ---
 
-## 3. Item Data Model
+## 3. Service API (`collectionService.js`, scope-first)
 
-Items are stored as one JSON file per item: `collections/{type}/{item-slug}.json`.
+`packages/builder-server/src/services/collectionService.js`. Every stateful function takes `(storage, scope, …)`; the pure helpers take plain data.
 
-```json
-{
-  "id": "project-alpha",
-  "uuid": "8a4c9b2e-9b6f-4c2c-9b6f-4c2c8a4c9b2e",
-  "slug": "project-alpha",
-  "schemaVersion": 1,
-  "created": "2026-01-22T10:00:00Z",
-  "updated": "2026-01-22T14:30:00Z",
-  "settings": {
-    "title": "Project Alpha",
-    "featured_image": "/uploads/images/alpha-hero.jpg",
-    "external_url": { "href": "https://example.com/alpha", "target": "_blank" }
-  },
-  "seo": {
-    "description": "A short summary for search and social.",
-    "og_title": "",
-    "og_image": "/uploads/images/alpha-social.jpg",
-    "og_type": "article",
-    "twitter_card": "summary",
-    "canonical_url": "",
-    "robots": "index,follow"
-  }
-}
-```
+**Schema reads** — `listCollectionSchemas(storage, scope)`, `getCollectionSchema(storage, scope, type)`, `loadCollectionTemplate(storage, scope, type)`. Pure validation: `validateCollectionSchema(schema, folderName)`, `validateThemeCollectionSchemas(themeSourceDir)` (theme-upload gate).
 
-| Field           | Notes                                                                                          |
-| --------------- | ---------------------------------------------------------------------------------------------- |
-| `id`            | Equals current `slug`; updated on rename; used as the filename basename                         |
-| `uuid`          | Stable UUID v4, generated on create, **never mutated**, survives rename                         |
-| `slug`          | Equals `id` (both the filesystem name and the in-file slug are authoritative)                   |
-| `schemaVersion` | Bumped to the current schema version on the next save after normalization                       |
-| `created`       | ISO 8601, set on create, never mutated                                                          |
-| `updated`       | ISO 8601, **strictly monotonic** on every write (see §7)                                         |
-| `settings`      | User-entered values keyed by schema field `id`                                                  |
-| `seo`           | Page-shaped SEO object (`description`/`og_title`/`og_image`/`og_type`/`twitter_card`/`canonical_url`/`robots`) for `hasItemPages` items — parity with page SEO (Finding #12, see §8); omitted for list-only collections |
-| `_archived`     | **In-memory only**, never written. Holds values for fields the current schema no longer defines (see §4) |
+**Item CRUD** — `listCollectionItems(storage, scope, type, { sort, limit, offset })`, `readCollectionItem(…)`, `readRawCollectionItem(…)` (preserves archived settings), `writeCollectionItem(storage, scope, type, item, previousSlug)` (create / update / rename), `deleteCollectionItem(…)`, `bulkDeleteCollectionItems(…)`, `duplicateCollectionItem(…)` (fresh uuid + timestamps), `discardArchivedCollectionItem(…)`.
 
-Item `uuid`s exist in v1 even though no v1 feature references items by UUID — they let Phase 3 relationships land without a backfill across every project.
+**Validation / normalization (pure)** — `normalizeCollectionItem(rawItem, schema)` (adds `title`, `invalid`, `validationErrors`, `_archived`), `buildCollectionItemData(schema, input, existingItem)` (throws `CollectionValidationError` / `CollectionSlugConflictError`).
 
-### Manual ordering (`_order.json`)
+**Render prep / links / order** — `prepareCollectionItemForRender(item, schema, pagesByUuid, outputPathPrefix, menuDeps, mediaBasePaths)` (resolve links/menus, sanitize, resolve richtext media), `resolveCollectionItemLinks(…)`, `loadCollectionItemsByUuid(storage, scope)` (uuid → `{ slugPrefix, slug }`), `reorderCollectionItems(storage, scope, type, order)`, `buildCollectionItemPageData(schema, item, siteUrl)`.
 
-```json
-{ "order": ["project-alpha", "website-redesign", "mobile-app"] }
-```
+`normalizeCollectionItem` separates any out-of-schema key into an in-memory `_archived` map and re-checks every `required` field, setting `invalid: true` plus a per-field `validationErrors` list — so the editor can surface stale data and missing values on read without rewriting the file. `listCollectionItems` additionally **recovers from duplicate-uuid rename crashes**: if two files share a `uuid` (the gap between writing the new slug and deleting the old one), the one with the newer `updated` wins and the loser is excluded from the listing but never deleted (a save cleans it up via `cleanupDuplicateUuidSiblings`).
 
-- Ignored unless `defaultSort` is `manual`.
-- Listed slugs appear first in that order; items missing from `_order.json` are appended, sorted `created_desc`.
-- Stale slugs (whose `.json` no longer exists) are ignored on read and pruned on the next order/delete write.
-- The underscore prefix keeps it from being read as an item; writes go through the atomic helper (§7).
+The `slug` rule (`^[a-z0-9-]+$`) is enforced in `buildCollectionItemData` as defense-in-depth, independent of the route-layer validation below.
 
 ---
 
-## 4. Slug Rules & Schema Migration
+## 4. Routes & tenant isolation
 
-### Slug rules and collision handling
+Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", collectionsRoutes)`, so collections inherit the same isolation as pages/menus/media — including in hosted, which mounts the same `projectScopedRouter` (no hosted-specific collection route). `resolveActiveProject` runs first and supplies `req.scope` + `req.adapters`; the write-guard rejects a `:projectId` / `X-Project-Id` ≠ `scope.projectId` with `409 PROJECT_MISMATCH`. The `:collectionType` and `:itemSlug` params are validated against `^[a-z0-9-]+$` at the route layer.
 
-- Item slugs are auto-generated from the `usedAsTitle` field via `sanitizeSlug()`; the user can override. Validated `^[a-z0-9-]+$` server-side in both the route validators and the write service (belt-and-braces against path traversal).
-- **Slug isolation**: item pages live under `{slugPrefix}/`, so `portfolio/about.html` coexists with a root `about.html`. Page slugs and item slugs are not in the same namespace; collision checks operate on full output paths, reserving real output directories (`assets/`) and requiring unique `slugPrefix` across collection types.
-- **Uniqueness within a collection**: create/rename to an existing slug returns a 409 with `{ error, message, conflictingSlug }` rather than overwriting.
-- **Rename** writes the new file, deletes the old, rewrites the `_order.json` entry, and swaps the `collection:{type}/{slug}` media-usage source. The edit page re-routes with `navigate(newUrl, { replace: true })`.
-- Hard-coded slug links in templates/content are not rewritten on rename. Internal links from items to **pages** (stored as `link` objects with `pageUuid`) **are** resolved at render time (§6).
+| Method | Path (under `/collections`) | Controller |
+|---|---|---|
+| GET | `/schemas` | list all type schemas |
+| GET | `/schema/:collectionType` | one type schema |
+| GET | `/:collectionType` | list items (`?sort=&limit=&offset=`) |
+| GET | `/:collectionType/:itemSlug` | one item |
+| POST | `/:collectionType` | create item |
+| PUT | `/:collectionType/:itemSlug` | update / rename item |
+| DELETE | `/:collectionType/:itemSlug` | delete item |
+| POST | `/:collectionType/bulk-delete` | `{ itemSlugs: [] }` |
+| POST | `/:collectionType/:itemSlug/duplicate` | duplicate item |
+| POST | `/:collectionType/:itemSlug/discard-archived` | drop archived out-of-schema settings |
+| POST | `/:collectionType/reorder` | `{ order: [] }` (manual ordering) |
 
-### Schema versioning & migration (warn before drop)
-
-When a theme bumps `schemaVersion`, existing items may have stale or missing fields. On read, `normalizeCollectionItem` returns an **in-memory normalized item**:
-
-- Fields no longer in the schema are **separated** into the in-memory `_archived` map (so the form and render only deal with current-schema fields), but the **on-disk `settings` object retains them** — a read never erases data.
-- Missing required fields are filled with type-appropriate empty defaults; the item is flagged `invalid: true` with `validationErrors`.
-- `schemaVersion` is bumped in memory; nothing is persisted by GET handlers.
-
-**Orphaned values are never dropped silently.** The write path (`buildCollectionItemData` / `writeCollectionItem`) **merges back** on-disk settings keys that are absent from both the current schema and the incoming payload, so an ordinary save cannot lose data in a dropped field. Discarding archived data is **explicit**: the editor shows a plain-language "Leftover content" notice listing each orphaned field by a friendly name, behind a confirmed **Remove this content** action — only that removes the keys. This is strictly safer than pages/globals, which keep orphaned settings on disk indefinitely with no cleanup affordance.
-
-Switching **themes** runs the same normalization: unknown fields go to `_archived` (kept on disk), missing required fields are filled and the item is flagged `invalid`. No field data is lost without an explicit confirmed discard.
+**Status codes:** validation failure → `400` (`{ error, validationErrors }`); slug conflict on create/rename → `409` (`{ error, conflictingSlug }`); per-collection item cap exceeded → `422` (see §7). Writes set `Cache-Control: no-store`.
 
 ---
 
-## 5. Backend: Service, Controller, Routes
+## 5. The `| collection` Liquid filter
 
-### Service (`server/services/collectionService.js`)
-
-The service owns all filesystem/schema logic so Liquid, export, and HTTP handlers share one implementation. Key exports:
-
-| Function | Responsibility |
-| --- | --- |
-| `validateCollectionSchema` / `listCollectionSchemas` / `validateThemeCollectionSchemas` / `getCollectionSchema` | Schema validation + load (runtime and theme-upload paths); `listCollectionSchemas` returns UI-safe schemas |
-| `normalizeCollectionItem` | In-memory schema migration (archive unknown fields, fill required, flag invalid) |
-| `listCollectionItems` / `readCollectionItem` / `readRawCollectionItem` | Read + normalize items; apply sort/`limit`/`offset`; `readRaw` returns un-normalized data for the editor |
-| `loadCollectionTemplate` | Read `template.liquid` from the project copy (returns `null` if missing) |
-| `buildCollectionItemData` | Apply defaults, preserve `created`/`uuid`, generate/sanitize slug, enforce required, set monotonic `updated`, merge back archived keys |
-| `writeCollectionItem` / `deleteCollectionItem` / `bulkDeleteCollectionItems` / `duplicateCollectionItem` / `reorderCollectionItems` | Atomic, slug-safe writes with `_order.json` + media-usage sync |
-| `resolveCollectionItemLinks` | Link resolution (`pageUuid` → slug + depth prefixing) — see §6 |
-| `prepareCollectionItemForRender` | Render gate: clone, resolve links, resolve `menu`-type settings (when given `menuDeps`, §6/Finding #10), then sanitize item settings (richtext/link). **Every** item render path goes through this, not bare `resolveCollectionItemLinks` |
-| `buildCollectionItemPageData` | Build the page-shaped object for the layout/SeoTag during export — see §8 |
-| `shapeItemSeo` | Build the page-shaped item `seo` object (defaults + optional HTML-strip), shared by the save/normalize/render paths (Finding #12) |
-| `loadCollectionItemsByUuid` | Map every `hasItemPages` item `uuid → { slugPrefix, slug }`, for resolving collection-item menu targets (Finding #11) |
-| `discardArchivedCollectionItem` | Explicitly remove on-disk orphaned (out-of-schema) setting keys on a confirmed user action (Finding #8) |
-| `CollectionSlugConflictError` / `CollectionValidationError` | Typed errors the controller maps to 409/400 |
-
-Slug helpers come from `server/utils/slugHelpers.js`; the service does not duplicate slug rules.
-
-### Controller & routes
-
-`server/controllers/collectionController.js` exposes eleven handlers; `server/routes/collections.js` mounts them at `/api/collections` in `server/createApp.js`. Routes use `express-validator` + `resolveActiveProject` (no `:projectId` segment — collections are site-workspace content, and `apiFetch` injects `X-Project-Id`).
-
-| Method & path | Handler |
-| --- | --- |
-| `GET /schemas` | `getCollectionSchemas` |
-| `GET /schema/:collectionType` | `getCollectionSchema` |
-| `GET /:collectionType` | `getAllItems` (sorted; supports limit/offset/filter) |
-| `GET /:collectionType/:itemSlug` | `getItem` |
-| `POST /:collectionType` | `createItem` (201) |
-| `PUT /:collectionType/:itemSlug` | `updateItem` (200, or 409 on slug conflict) |
-| `DELETE /:collectionType/:itemSlug` | `deleteItem` |
-| `POST /:collectionType/bulk-delete` | `bulkDeleteItems` (200, or 207 with `{ deleted, notFound, errors }`) |
-| `POST /:collectionType/:itemSlug/duplicate` | `duplicateItem` (201) |
-| `POST /:collectionType/:itemSlug/discard-archived` | `discardArchivedItem` (the confirmed "Leftover content" removal, §4) |
-| `POST /:collectionType/reorder` | `reorderItems` |
-
-All write responses set `Cache-Control: no-store`. The controllers wire media-usage sync (§ [Media](core-media.md)) on every create/update/delete/duplicate.
-
----
-
-## 6. Render-Time Link Resolution
-
-Two distinct concerns keep item links correct:
-
-- **Render-time resolution** (`resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, collectionItemsByUuid)`): walks an item's `settings`, resolving any link object's `pageUuid` → current page slug **or `collectionItemUuid` → the target item's current `{slugPrefix}/{slug}.html`** (collection item pages are first-class `link` targets, parity with menus — finding #11), prefixing internal hrefs for depth (publish mode) and clearing dead refs to `{ href: "", text: "", target: "_self" }`. The identical `collectionItemUuid` branch lives in the **widget** link resolver (`resolveLinkValue` / `resolveWidgetPageLinks` in `renderingService.js`), which loads the item map whenever a widget has `menu` **or** `link` settings (`schemaHasLinkSetting`). Applied by the `| collection` filter loader (§7-Liquid) and the per-item export loop (§8). API GET endpoints return **raw** items (un-resolved refs) so the editor's link picker can show the page/item name. The shared `link`-setting picker (`LinkInput` via `useLinkTargets`) lists pages and `hasItemPages` collection items grouped in the shared `<Combobox>` — sorted alphabetically (case-insensitive: pages A–Z, collection groups A–Z by display name, items A–Z within each group, independent of the collection's `defaultSort`) — storing `collectionType` + `collectionItemUuid` exactly as the menu editor does.
-- **Storage cleanup** (`server/utils/linkEnrichment.js`): `cleanupDeletedPageReferences`, `enrichNewProjectReferences`, and `remapDuplicatedProjectUuids` walk `collections/*/*.json` (plus widget/global page JSON) so dead `pageUuid` refs are stripped on page delete, seeded preset items are wired up, and duplicated projects get fresh item `uuid`s plus remapped references. The collection-item stable ref (`collectionItemUuid`) gets the same treatment across menus **and** `link` settings: `cleanupDeletedCollectionItemReferences` clears it on item delete, `remapDuplicatedProjectUuids` remaps it on duplication, and `remapCollectionItemLinkRefs` (+ `remapCollectionItemMenuRefs`) repoint preset refs at freshly seeded items (#11). Touched items are rewritten atomically and re-synced into media usage.
-
-### Depth-aware prefixing (`server/utils/linkPrefixer.js`)
-
-Item pages export one directory deep (`{slugPrefix}/{slug}.html`), so every internal URL needs a relative prefix to reach the export root. A render global, `outputPathPrefix`, holds that prefix (`""` for root pages, `"../"` for item pages) and is consulted **only in publish mode**.
-
-`linkPrefixer.js` exports:
-
-- `normalize(href)` — WHATWG URL preprocessing: strip leading/trailing C0 controls + space (step 1), then strip embedded tab/LF/CR (step 2), so classification matches what a browser actually does.
-- `prefixInternalHref(href, outputPathPrefix)` — type-safe; passes through any URI scheme (anchored RFC-3986 regex, no allowlist), protocol-relative `//`, `#`, `?`, and root-absolute `/`; prefixes everything else. A no-op when `outputPathPrefix` is `""`, so root pages render byte-identical to before.
-
-The same helper is shared by the widget link resolver (`resolveLinkValue` / `resolveWidgetPageLinks`) in `server/services/renderingService.js`, the menu resolver (`resolveMenuItemLinks` / `resolveMenuPageLinks`) in `server/services/menuResolver.js` (finding #10), and the collection-item resolver (`resolveCollectionItemLinks` / `prepareCollectionItemForRender`) in `server/services/collectionService.js`. Every asset-emitting tag (`assetTag`, `renderHeaderAssets` including preload `href`/`imagesrcset`, `renderFooterAssets`, `placeholderImageTag`, `renderEnqueuedAssetTags`) and the `imagePath`/`filePath`/`site_icons` globals also consult `outputPathPrefix` in publish mode. See [Export](core-export.md) for the export-side wiring.
-
-### Menu active-state (`currentCanonicalPath`)
-
-Because menu hrefs are now depth-prefixed (`../about.html`), `src/core/snippets/menu.liquid` can no longer compare the href to identify the active item. Each resolved menu item carries a separate un-prefixed `canonicalPath`; the snippet compares it against a per-render `currentCanonicalPath` global for `is-active`/`aria-current`. `currentCanonicalPath` is set on **every** render path — `previewController.js`, the page-export loop, the `renderSingleWidget` morph path, and the collection-item loop — not only for item pages. Themes that override the core `menu.liquid` snippet must adopt the `canonicalPath`/`currentCanonicalPath` comparison.
-
----
-
-## 7. Concurrency & Atomic Writes
-
-Every collection item write — create, update, rename, duplicate, delete, and `_order.json` — uses `writeJsonAtomic(filepath, data)` from `server/utils/atomicFs.js`, not the raw "write then maybe delete" pattern pages use:
-
-1. Serialize the data.
-2. Write to a **UUID-suffixed** temp path (`${filepath}.${randomUUID()}.tmp`) with the `wx` flag. The unique suffix is critical — a shared `${filepath}.tmp` would collide when two writes to the same item overlap (two tabs, or a save racing a duplicate).
-3. `fs.rename` (atomic within a volume on Linux/macOS/Windows).
-4. `finally`-block cleanup of orphan temp files. `listCollectionItems` filters `*.tmp` so orphans are invisible to readers (`isAtomicTmpFile`).
-
-### Three write operations + crash recovery
-
-- **Update without rename** (most common): single atomic overwrite, then media-usage refresh. No `_order.json` change.
-- **Rename** (same `uuid` preserved): write new file → unlink old → update `_order.json` → swap media-usage source. A crash between "write new" and "delete old" leaves two files sharing a `uuid` (the only legitimate case). Recovery on read: group by `uuid`, keep the file with the newer `updated` (lexicographic filename tie-break), exclude the loser, and log a warning — **never delete on read**. The loser is removed on the winner's next save.
-- **Duplicate** (new `uuid`, new slug): atomic write of a fresh item; insert after the source in `_order.json`. Never reuses the source `uuid`, so the rename-recovery grouping never fires for duplicates.
-
-`updated` is set via `Math.max(Date.now(), prev + 1)` for **all three** operations, so it's strictly monotonic even under backward clock skew or future-dated imports — which keeps the "pick newer `updated`" recovery rule deterministic.
-
-Concurrency control is last-write-wins (no `ETag`/`If-Match`), matching pages. Media-usage staleness after a mid-rename crash is repaired by the next `refreshMediaUsageAfterStructuralChange` (project import/duplication/theme-update apply, or the manual refresh endpoint).
-
----
-
-## Liquid Filter (`| collection`)
-
-Widgets read collection data via a Liquid filter — the most common use case (a "recent work" grid, team list, logo wall, testimonials carousel) needs no individual item pages.
+`packages/core/src/filters/collectionFilter.js` lets a theme template pull items:
 
 ```liquid
-{% assign portfolio_items = 'portfolio' | collection %}
-{% for item in portfolio_items %}
-  <h3>{{ item.settings.title }}</h3>
-  {% image src: item.settings.featured_image, size: 'medium' %}
-  {% if item.url %}<a href="{{ item.url }}">View case study</a>{% endif %}
+{% assign posts = 'news' | collection: limit: 6, sort: 'date_desc' %}
+{% for post in posts %}
+  <a href="{{ post.url }}">{{ post.settings.title }}</a>
 {% endfor %}
-
-{% assign recent = 'portfolio' | collection: limit: 6, sort: 'created_desc' %}
 ```
 
-Item shape: `{ id, uuid, slug, url, created, updated, settings }`. `url` is computed by the loader (not stored): `null` when `hasItemPages: false`; otherwise `{outputPathPrefix}{slugPrefix}/{slug}.html` — depth-prefixed in publish mode, the plain relative path in preview mode (where the standalone site preview intercepts clicks on nested item links and routes them to its own item-preview route, §9).
-
-Implementation:
-
-- `src/core/filters/collectionFilter.js` exports `registerCollectionFilter(engine)` (and `normalizeCollectionFilterArgs`), registered in `configureLiquidEngine()`. It lives under `src/core/`, so it imports **no** backend module — it only reads a `getCollectionItems` loader off `this.context.globals` (the backend-attached loader is what consults `projectId`, `outputPathPrefix`, etc.) and returns `[]` when no loader is wired.
-- `createBaseRenderContext` attaches the `getCollectionItems` loader once per render. The loader calls `collectionService.listCollectionItems`, applies `prepareCollectionItemForRender` per item (resolves `pageUuid` links, resolves any schema-declared `menu` settings to full menu objects when the collection declares one — lazily loading `menuDeps`, #10 — **and** sanitizes richtext/link settings — sanitize-after-resolve), computes `item.url`, and caches results per `(type, options)` in a per-render `globals.collectionCache` Map. The cache is **per-render** (not global) because `outputPathPrefix` differs between root pages and item pages.
-- Supported options: `limit`, `sort`, `offset`.
-- **`invalid: true` items are excluded by default** (matching export's refusal to publish them); non-production runs (`NODE_ENV !== "production"`) log the skipped type/slug values. `limit`/`offset` are applied **after** the invalid filter, so an invalid item never consumes a slot in the returned window. There is no `includeInvalid` option in v1.
-
-The filter intentionally bypasses the per-widget settings sandbox — collection data is global, read-only project data, scoped to the active project; any widget may read any collection.
+- **Options:** `limit`, `offset`, `sort` (one of the `defaultSort` values).
+- **Returned item shape:** `{ id, uuid, slug, url, created, updated, settings }`. `settings` is already link-resolved and sanitized.
+- **`url`** is computed, not stored: `null` when `hasItemPages` is `false`; otherwise `` `${outputPathPrefix}${slugPrefix}/${slug}.html` `` so it is correct at whatever depth the current page renders.
+- **Purity:** the filter reads items via a `getCollectionItems(type, args)` loader injected on the render `globals`. Core/render-engine never import builder-server — the shell supplies the loader (`buildRenderDeps` in OSS, `buildCloudRenderDeps` in hosted), and the loader is the only thing bound to `{ storage, scope }`.
 
 ---
 
-## 8. Individual Item Pages (Export)
+## 6. Item pages & depth prefixing
 
-Opt-in via `hasItemPages: true`. The theme must ship `template.liquid` for that type; collections that only render inside widgets (e.g. a list-only `team` type) leave `hasItemPages: false` and need no template.
+When `hasItemPages: true` and the type ships a `template.liquid`, each item renders a standalone page one directory deep, so `news/my-post.html` coexists with a root `about.html`.
 
-The template renders **inside** the theme's main layout (header/footer/main slots), exactly like page templates. Available context: `item` (`id`, `uuid`, `slug`, `url`, `created`, `updated`, `settings.*`), `collection` (the schema), `page` (the page-shaped object below), plus the usual `project`/`theme`/`mediaFiles`/`imagePath`/`filePath`/`site_icons`. It is rendered through `renderLiquidTemplate(projectId, templateString, context, sharedGlobals)` — a helper exported from `renderingService.js` that runs an ad-hoc template string through the cached per-project engine. Both item-page render paths — the export loop and the in-app preview — build the finished page through **one** shared `renderCollectionItemPage()` in `renderingService.js` (resolve item → header/footer → page-shaped data → template → layout), so the two can never drift (the page-render analogue of how every widget goes through `renderWidget`); each caller supplies only its mode-specific `sharedGlobals` and post-processing (export: format/storage-rewrite/markdown/write; preview: token injection). Schema-declared `menu` settings resolve to a full menu object (`items[]` with depth-aware `link` + `canonicalPath`), the same shape widgets receive (finding #10), so an item template can `{% render 'menu', menu: item.settings.<id> %}`.
+**Depth model.** Root pages render with `outputPathPrefix: ""`; item pages render with `outputPathPrefix: "../"`. The pure helper `prefixInternalHref(href, outputPathPrefix)` (`packages/core/src/utils/linkPrefixer.js`) prepends the prefix to **relative** internal hrefs only — it leaves any URI scheme, protocol-relative (`//…`), anchor (`#…`), query-only (`?…`), and root-absolute (`/…`) href untouched. Menu links resolve through the render-engine `menuResolver.js` with the same depth awareness. Asset paths are rewritten on export: `/uploads/images/ → ../assets/images/`, `/uploads/files/ → ../assets/files/`.
 
-The full export wiring (two-pass validation, subdirectory creation, per-item `sharedGlobals` isolation, page-shaped object, SEO mapping, body-class override, sitemap/robots/manifest, markdown parity) lives in [Site Exporting → Collection item pages](core-export.md#collection-item-pages-export). The essentials:
+**Page-shaped object** (`buildCollectionItemPageData`): `id = "{slugPrefix}-{slug}"`, `slug = "{slugPrefix}/{slug}"`, `name` from the `usedAsTitle` field, plus a per-item `seo` object at parity with page SEO. The five author-editable SEO fields are `description`, `og_title`, `og_image`, `canonical_url`, and `robots` (defaulting to `index,follow`); `shapeItemSeo` also fills the non-UI defaults `og_type: "article"` and `twitter_card: "summary"`. This lets item pages flow through the same layout, SEO, sitemap, and markdown-export paths as regular pages.
 
-- **Page-shaped object** (`buildCollectionItemPageData`): `id` = `{slugPrefix}-{slug}` (CSS-safe), `slug` = `{slugPrefix}/{slug}` (path-shaped), plus the item's own page-shaped `seo` object (Finding #12 — parity with page SEO): `robots`, `description`, `og_title`, manual `og_image`, `og_type: "article"`, and `canonical_url` (explicit author value, else auto-built from `siteUrl + slugPrefix/slug`).
-- **Body class**: `renderPageLayout` honors a `contentSections.bodyClass` override; items get `collection-{type} item-{slug}` instead of `page-{slug}`, so a `.page-portfolio` rule for the index page never leaks onto item pages.
-- **SeoTag** (`src/core/tags/SeoTag.js`): social images resolve from a constant `assets/images` base (not the depth-aware `imagePath`), preserving the existing two output forms — absolute `${siteUrl}/assets/images/...` when `siteUrl` is set, root-absolute `/assets/images/...` when not — so existing page output is byte-for-byte unchanged. Canonical URLs for items are always explicit, so the SeoTag auto-derive fallback isn't reached for them.
+**Render helpers** (`renderingService.js`): `buildCollectionRenderDeps({ storage, scope })` assembles the lazy collection capability (`buildCollectionItemsLoader`, `getCollectionSchemas`, `loadCollectionItemsByUuid`); `renderCollectionItemPageWithDeps(deps, args)` renders one item page (injecting `prepareItem: prepareCollectionItemForRender`, `buildItemPageData: buildCollectionItemPageData`). Export is fail-fast on a bad item; a multi-tenant host that streams publishes may instead warn-and-skip an invalid item (or a `hasItemPages` type with no template) so one bad record can't fail the whole publish.
 
----
-
-## 9. Frontend
-
-| File | Purpose |
-| --- | --- |
-| `src/queries/collectionManager.js` | API client mirroring the controller surface; uses `apiFetch` (injects `X-Project-Id`) |
-| `src/hooks/useCollections.js` | `{ schemas, loading, error, refetch }` with a module-level cache (matches `useAppSettings`) |
-| `src/hooks/useCollectionItems.js` | `{ items, loading, error, refetch }` for one type |
-| `src/pages/CollectionItems.jsx` | Listing table (search, multi-select bulk delete, row actions, drag-reorder when `sortable`, "Needs attention" filter for invalid items) |
-| `src/pages/CollectionItemAdd.jsx` / `CollectionItemEdit.jsx` | Add/edit routes; edit re-routes with `navigate(newPath, { replace: true })` on slug change |
-| `src/components/collections/CollectionItemForm.jsx` | Shared schema-driven form: `react-hook-form`, renders fields via `SettingsRenderer`, `useGuardedFormPage(isDirty)`, slug auto-generated from the `usedAsTitle` field, inline required-field validation, invalid items load with `validationErrors` pre-populated; a **Preview** button in the bottom action bar (for `hasItemPages` types) opens the saved item in the navigable site preview — disabled until the item is saved; a collapsible **SEO** section (shared `SeoFields`, parity with `PageForm`) shows for `hasItemPages` types (Finding #12); a **"Leftover content"** notice with a confirmed discard surfaces any archived fields (Finding #8) |
-| `src/lib/openSitePreview.js` | One-liner that opens a `/preview/...` path in the shared preview window — the Electron IPC bridge in the desktop app, `window.open` on the web. Used by the page editor's Preview button and both collection-item preview entry points |
-| `src/pages/CollectionItemPagePreview.jsx` | Thin child route of `SitePreviewLayout` (`/preview/collection/:prefix/:slug`): resolves a nested item URL's `slugPrefix` to a `hasItemPages` collection, loads the saved item, and requests a render token via the same `POST /api/preview/collection` flow — so clicking an item link while browsing the standalone site preview navigates into the item page |
-
-Routes are registered in `src/App.jsx` (`collections/:type`, `.../add`, `.../:slug/edit`, plus the site-preview route `/preview/collection/:prefix/:slug`). The sidebar (`src/components/layout/Sidebar.jsx`) calls `useCollections()` and renders one nav entry per type after Pages/Menus, with a Lucide icon resolved from the schema `icon` string (fallback `Database`); the label adapter accepts a pre-resolved `label` alongside the existing `labelKey`.
-
-There is no autosave or undo/redo for collection items in v1 — explicit save plus the navigation guard is sufficient. These are deliberate omissions, not gaps.
-
-### Item preview
-
-Item pages are previewed through the **shared, navigable site preview** — the same one the page editor's Preview button opens — so an item is seen inside the real site, with a working header / menu / links to other pages and items. Preview always shows the item's **last saved** state.
-
-- **Entry points** — the edit form's **Preview** button (bottom action bar, disabled until the item is saved) and a **Preview** action in each listing row's `…` menu (gated on `hasItemPages`) both open `/preview/collection/:prefix/:slug` in the preview window via `openSitePreview()`. You also reach the same route by clicking an item link while already browsing the site preview. `CollectionItemPagePreview` resolves the URL `slugPrefix` to a `hasItemPages` collection, loads the saved item, and requests a render token.
-- **Endpoint** — `POST /api/preview/collection` (`createCollectionPreviewToken` in `previewController.js`) renders a collection item's `{ collectionType, slug, settings }` against the active project's theme: it loads the schema + `template.liquid`, renders through the shared `renderCollectionItemPage()` pipeline (§8) in `"preview"` mode, injects the base tag + standalone runtime (whose in-iframe link clicks `SitePreviewLayout` intercepts to navigate between pages and items), and returns `{ token }`; the client points an iframe at `/render/:token`. Guards: `400` when `collectionType` is missing, `400` "Preview unavailable" when the collection has no `template.liquid` (or the type is unknown).
+**Export output:** `{outputDir}/{slugPrefix}/{slug}.html` (+ an optional `{slug}.md` markdown alternate), included in the sitemap.
 
 ---
 
-## 10. Design Rationale
+## 7. Limits & sanitization
 
-Three high-severity design conflicts were resolved before implementation; the reasons (not the full history) are kept here because they constrain how the feature must evolve.
+**Limits** (via the `LimitsAdapter` over `scope`; OSS `LocalLimitsAdapter` returns `Infinity`, hosted `CloudLimitsAdapter` returns finite tier ceilings — see [Cross-Tenant Safety](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract)):
 
-- **Collection-type schemas are theme-only; presets seed item data only.** An earlier design let presets override a collection-type schema, but theme updates replace `collection-types/` wholesale from the theme source (never a preset), so the first update would silently revert the schema and then drop user data in the now-orphaned fields. Resolution: presets may seed **only** `collections/` item data, never `collection-types/`; a preset shipping a `collection-types/` folder is rejected at theme upload. A theme that wants a richer collection for a preset must define that as the theme's own base schema (or a distinct `type`). This makes the "replace on update" model safe and is why `resolvePresetPaths` returns `collectionsDir` but never a `collectionTypesDir`. See [Theme Presets](theme-presets.md) and [Theme Updates](theme-updates.md).
-- **Schema migration warns before dropping data.** Moving removed-field values to an in-memory-only `_archived` map would permanently lose them on the next save. The earlier justification ("matches the rest of Widgetizer") was false — pages/globals keep orphaned settings on disk indefinitely. Resolution: on-disk `settings` keep orphaned keys, the write path merges them back, and removal requires an explicit confirmed "Discard archived data" action (§4).
-- **`currentCanonicalPath` is wired into every render path.** Rewriting `menu.liquid` to compare a new `currentCanonicalPath` global, while only setting that global in the item-page loop, would have silently broken `is-active`/`aria-current` on every normal page (the byte-equality test wouldn't catch active-state). Resolution: set it in preview, the page-export loop, the morph path, and the item loop (§6).
+- **`MAX_COLLECTION_ITEMS`** — enforced in `createItem`: at or over the cap returns `422`. This is the per-collection DoS ceiling that bounds export-time enumeration.
+- **`MAX_COLLECTIONS`** — a reserved per-project collection-type ceiling. Because types are theme-seeded (no create-type API), there is no creation endpoint to gate; the key exists for hosts that bound seeding/import.
 
-Two lower-severity decisions worth keeping: SeoTag **preserves** current social-image output (no `og:image` regression for pages without `siteUrl`); and `resolveWidgetPageLinks`/`resolveMenuItemLinks` dropped their empty-`pagesByUuid` short-circuit so hand-typed custom URLs still get depth-prefixed on item pages.
-
----
-
-## 11. Out of Scope
-
-Deliberately deferred:
-
-- `{% collection ... as items %}` tag form (per-block scoping, cursor pagination).
+**Sanitization** runs on every item write and again at render (`prepareCollectionItemForRender`), reusing the page pipeline: DOMPurify for `richtext`, `sanitizeImagePath` (strict `/uploads/images/…`) for each `gallery` entry and required-field image validation, `sanitizeImageSettingValue` for plain `image` fields, `sanitizeHref` for `link` fields, per-column sanitization for `table` (blank rows + undeclared keys dropped), and `YYYY-MM-DD` coercion for `date`. After sanitizing, `prepareCollectionItemForRender` calls `resolveRichtextMediaInSettings` (`packages/core/src/utils/richtextMedia.js`) with the render mode's `mediaBasePaths` so embedded `<img>`/file references in `richtext` fields resolve to the served base (preview → live media URL, publish → `assets/`) without the theme author wiring anything in the template. It then calls `resolveRichtextLinksInSettings` (`packages/core/src/utils/richtextLinks.js`) to resolve stable internal-link refs embedded in richtext anchors (`data-page-uuid` / `data-collection-item-uuid`) to their current slugs — depth-aware, clearing dangling refs — the richtext analogue of the structured `link` resolution above. See [Link & URL Safety](core-security.md#12-link--url-safety).
 
 ---
 
-## Tests
+## 8. Preview
 
-Backend coverage lives in `server/tests/`: `collections.test.js`, `collectionApi.test.js`, `collectionItems.test.js`, `collectionFilter.test.js`, `collectionItemExport.test.js`, `collectionItemPageData.test.js`, `collectionLinkEnrichment.test.js`, `collectionMediaUsage.test.js`, `collectionPresetSeeding.test.js`, `renderCollectionItemPage.test.js`, `menuResolver.test.js` — covering schema validation, CRUD + slug/UUID invariants, atomic-write crash recovery, the Liquid filter, depth-aware export, the page-shaped object, the shared item-page render pipeline, link enrichment, media usage, and preset seeding. Item-preview guard paths (missing `collectionType`, template-less collection) are covered in `preview.test.js`.
+The editor's item-edit form has a **Preview** button (enabled once the item is saved) that opens the standalone item route (`/preview/collection/:prefix/:slug`). That route loads the saved item and calls `previewCollectionItem()` against `/preview/collection`, which renders through the same item-page pipeline and returns a one-time render token; in-preview link clicks bubble up and navigate within the site's preview space. A multi-tenant host swaps in its own scope-bound `/preview/collection` renderer over the same pipeline.
 
 ---
 
-## See Also
+**See also:**
 
-- [Theming Guide](theming.md) — authoring collection types and using `| collection` in templates
-- [Setting Types Reference](theming-setting-types.md) — setting types available in collection schemas
-- [Site Exporting](core-export.md) — collection item-page export, depth-aware paths, sitemap/robots/manifest
-- [Media Library](core-media.md) — collection media usage tracking and "Used in" display
-- [Theme Updates](theme-updates.md) — `collection-types/` updatable, `collections/` protected
-- [Theme Presets](theme-presets.md) — seeding `collections/` item data
-- [Database & Storage](core-database.md) — filesystem vs SQLite boundaries
+- [Setting Types](theming-setting-types.md) — the field types a collection schema may use (incl. `date`, `gallery`, `table`)
+- [Theming Guide](theming.md) — theme structure, where `collection-types/` lives
+- [Site Exporting](core-export.md) — how item pages join the export
+- [Platform Security](core-security.md) — sanitization, URL safety, cross-tenant isolation
+- [Packages & Adapter Architecture](core-packages.md) — the `Scope` / storage-adapter / `LIMIT_KEYS` contract

@@ -1,0 +1,28 @@
+# Run Widgetizer locally with one command:
+#
+#   docker compose up --build
+#
+# Then open http://localhost:3001
+
+services:
+  widgetizer:
+    build: .
+    image: widgetizer:latest
+    container_name: widgetizer
+    ports:
+      # host:container. Change the LEFT number to serve on a different host port.
+      - "3001:3001"
+    environment:
+      # The address you type in the browser to reach the app. The live preview
+      # uses it to load images/assets. Keep as-is for local use; when hosting,
+      # set it to your real address (e.g. https://builder.example.com or
+      # http://<server-ip>:3001).
+      SERVER_URL: http://localhost:3001
+    volumes:
+      # Named volume that keeps your projects, database, uploads and installed
+      # themes between restarts. `docker compose down -v` wipes it.
+      - widgetizer-data:/data
+    restart: unless-stopped
+
+volumes:
+  widgetizer-data:

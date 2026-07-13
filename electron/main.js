@@ -4,6 +4,7 @@ const { autoUpdater } = pkg;
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { isSafePreviewPath } from "./previewPath.js";
 
 // Constants
 const DEFAULT_PORT = "3001";
@@ -167,7 +168,7 @@ function startServer() {
 
   const isDev = getIsDev();
   // Server files live inside app.asar
-  const serverEntry = path.join(appRoot, "server", "index.js");
+  const serverEntry = path.join(appRoot, "electron", "server-bootstrap.js");
 
   log(`Starting server from: ${serverEntry}`);
   log(`Server will use DATA_ROOT: ${dataRoot}`);
@@ -464,14 +465,11 @@ function createPreviewWindow() {
   return previewWindow;
 }
 
-// The preview window carries the app preload bridge, so a previewPath arriving over IPC is
-// untrusted: only ever open a real in-app /preview/... route (a page id, or a collection
-// item). Without this, an absolute or protocol-relative path (e.g. "//evil.com/x") resolves
-// to remote content in getRendererUrl and would load it into the privileged preview window.
-const SAFE_PREVIEW_PATH = /^\/preview\/(?:collection\/[a-z0-9-]+\/[a-z0-9-]+|[A-Za-z0-9_-]+)$/;
-
+// previewPath arrives over IPC and is untrusted; isSafePreviewPath (electron/previewPath.js)
+// is the guard that keeps a hostile path from loading remote content into the privileged
+// preview window. See that module for the full rationale.
 async function openPreviewWindow(previewPath) {
-  if (typeof previewPath !== "string" || !SAFE_PREVIEW_PATH.test(previewPath)) {
+  if (!isSafePreviewPath(previewPath)) {
     log(`Ignoring unsafe preview path: ${JSON.stringify(previewPath)}`);
     return;
   }
@@ -843,7 +841,7 @@ function setupAutoUpdater() {
     autoUpdater.checkForUpdates().catch((err) => {
       log(`Update check failed: ${err.message}`);
     });
-  }, 10000);
+  }, 5000);
 }
 
 // App lifecycle

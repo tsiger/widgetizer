@@ -24,12 +24,14 @@ Once you've created a menu, you can build its structure:
 
 ### Link Types
 
-#### Page Link
+#### Page or Collection Item Link
 
-Links to one of your website pages.
+Links to one of your website pages. If your theme defines [collections](collections.html) with item pages, you can also link to a specific collection item (a news article, project, service, etc.).
 
 - **Label**: The text shown in the menu (e.g., "About Us")
-- **Page**: Select which page to link to from the dropdown
+- **Link to**: Pick a page or collection item from the dropdown
+
+> **Note:** Internal links are stored as stable references. If you later rename the page or item's filename, the menu link follows the change automatically instead of breaking.
 
 #### Custom URL
 
@@ -41,6 +43,11 @@ Links to any URL, internal or external.
 # Creating Sub-Menus (Nested Items)
 
 You can create dropdown menus with up to **3 total levels** (including the top-level menu items).
+
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/menu-structure-nested.png" alt="Widgetizer menu structure editor showing a Services parent item with nested child menu items." loading="lazy">
+  <figcaption>The structure editor uses indentation to show which menu items are nested under a parent item.</figcaption>
+</figure>
 
 ### How to Create a Sub-Menu
 
@@ -104,7 +111,7 @@ To change a menu's name or description:
 
 Want to create a similar menu? Click the **copy icon** to duplicate a menu. This creates an exact copy with all menu items and nested structure.
 
-The duplicate will be named "[Original Name] (Copy)" — and "(Copy 2)", "(Copy 3)", etc. if a copy already exists.
+The duplicate will be named "[Original Name] (Copy)", and "(Copy 2)", "(Copy 3)", etc. if a copy already exists.
 
 ### Deleting a Menu
 
@@ -126,30 +133,8 @@ For theme developers, see [Menus & Snippets](theme-dev-menus-snippets.html) for 
 
 # Tips & Best Practices
 
-### Menu Organization
-
-- Keep top-level items concise (5-7 items maximum recommended)
-- Use clear, descriptive labels
-- Group related pages under parent items
-
-### Navigation Hierarchy
-
-- Use the first level for main sections of your site
-- Use the second level for sub-sections
-- Use the third level sparingly (too deep makes navigation confusing)
-
-### Multiple Menus
-
-- Create separate menus for different locations (header, footer, sidebar)
-- Use descriptive names like "Main Navigation", "Footer Links", "Quick Links"
-
-### External Links
-
-- Always include `https://` for external URLs
-- Consider opening external links in a new tab (check your theme settings)
-
-### Link Labels
-
-- Use action-oriented text when appropriate ("Get Started", "Contact Us")
-- Keep labels short (1-4 words is ideal)
-- Avoid generic labels like "Click Here"
+- Keep the top level short (5-7 items) and group related pages under parents.
+- Use the first level for main sections, the second for sub-sections, and the third sparingly.
+- Name menus by location, like "Main Navigation" and "Footer Links".
+- Always include `https://` on external URLs, and consider opening them in a new tab (check your theme settings).
+- Keep labels short and action-oriented ("Get Started", "Contact Us"); avoid "Click Here".

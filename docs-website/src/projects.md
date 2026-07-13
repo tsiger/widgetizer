@@ -16,18 +16,33 @@ At any given time, one project is marked as **active**. This is the project you'
 2. Fill in the project details:
    - **Title** (required): The display name for your project
    - **Theme** (required): Choose a design theme for your project
-   - **Preset** (if available): Some themes offer preset variants — different color schemes, typography, or demo content. When you select a theme that has presets, a visual card grid appears below the theme dropdown. Pick the preset that best matches your needs, or keep the default.
+   - **Preset** (if available): Some themes offer preset variants: different color schemes, typography, or demo content. When you select a theme that has presets, a visual card grid appears below the theme dropdown. Pick the preset that best matches your needs, or keep the default.
 3. Expand **"More settings"** to configure additional options:
    - **Folder Name** (required): Auto-generated from the title, but you can customize it
    - **Notes** (optional): Personal notes about the project for your own reference
    - **Website Address** (optional): The URL where your site will be hosted
 4. Click **"Create Project"**
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/project-create-presets.png" alt="Widgetizer new project form showing title, theme selector, and visual style preset cards." loading="lazy">
+  <figcaption>Theme presets appear as visual cards during project creation when the selected theme provides them.</figcaption>
+</figure>
+
+### How Theme and Preset Relate
+
+Think of project creation as: **Theme -> Preset -> Project**.
+
+- **Theme** defines the design system, widgets, page templates, settings, and any collection types.
+- **Preset** applies a starting style and optional starter content to that theme.
+- **Project** is your editable copy. After creation, you can change content, settings, pages, menus, media, and collection items without changing the original theme or preset.
+
+For the built-in library, many starter cards are presets of the default **Arch** theme. They may look like separate theme choices because they can include complete demo sites, but they share the same underlying theme and widget system. See [Themes](themes.html) for the full explanation.
+
 ### Understanding the Fields
 
 - **Title**: The display name shown throughout Widgetizer.
-- **[Theme](themes.html)**: Defines the look and feel of your site. **Note:** You cannot change the theme after creating a project, so choose carefully!
-- **Preset**: A variant of the chosen theme with different colors, fonts, and/or demo content. Presets are only applied at project creation — once created, your project is independent and fully customizable.
+- **[Theme](themes.html)**: Defines the look and feel, available widgets, templates, settings, and theme-owned content types for your site. **Note:** You cannot change the theme after creating a project, so choose carefully!
+- **Preset**: A starting point inside the chosen theme, with different colors, fonts, and/or demo content. Presets are only applied at project creation. Once created, your project is independent and fully customizable.
 - **Folder Name**: The folder where your project files are stored and exported. This is automatically generated from the title as a URL-friendly slug (e.g., "My Site" becomes `my-site`).
 - **Notes**: Personal notes for your own reference. Useful for remembering what each project is for.
 - **Website Address**: The base URL where your site will be hosted (e.g., `https://example.com`). This is used for:

@@ -18,7 +18,8 @@
  */
 import path from "path";
 import fs from "fs-extra";
-import { THEMES_SEED_DIR, getProjectPagesDir, getProjectMenusDir } from "../server/config.js";
+import { THEMES_SEED_DIR, getProjectPagesDir, getProjectMenusDir } from "../packages/builder-server/src/config.js";
+import { stripRichtextLinkRefs } from "../packages/core/src/utils/richtextLinks.js";
 
 function parseArgs(argv) {
   const args = {};
@@ -47,14 +48,23 @@ async function walkJson(dir) {
 }
 
 // Internal-link references are re-derived from the link's href (slug) at project
-// creation (enrichNewProjectReferences). A demo's per-project pageUuid is stale in
-// a preset, so strip it here, just like the page's own uuid.
-function stripLinkPageUuids(node) {
+// creation (enrichNewProjectReferences + the post-seed richtext enrichment). A demo's
+// per-project refs are stale in a preset, so strip them here, just like the page's own
+// uuid: structured-link `pageUuid`, and richtext anchors' `data-page-uuid` /
+// `data-collection-item-uuid` attrs inside richtext string values.
+function stripStaleLinkRefs(node) {
   if (Array.isArray(node)) {
-    node.forEach(stripLinkPageUuids);
+    node.forEach((v, i) => {
+      if (typeof v === "string") node[i] = stripRichtextLinkRefs(v);
+      else stripStaleLinkRefs(v);
+    });
   } else if (node && typeof node === "object") {
     if ("href" in node && "pageUuid" in node) delete node.pageUuid;
-    for (const key of Object.keys(node)) stripLinkPageUuids(node[key]);
+    for (const key of Object.keys(node)) {
+      const v = node[key];
+      if (typeof v === "string") node[key] = stripRichtextLinkRefs(v);
+      else stripStaleLinkRefs(v);
+    }
   }
 }
 
@@ -118,7 +128,7 @@ async function main() {
     const rel = path.relative(pagesDir, pageFile);
     const page = await fs.readJSON(pageFile);
     delete page.uuid; // per-instance id, regenerated when a project is created
-    stripLinkPageUuids(page); // pageUuid is re-derived from href at creation; a demo's is stale in a preset
+    stripStaleLinkRefs(page); // structured pageUuid + richtext data-*-uuid are re-derived from href at creation
     menuRefs += convertMenuRefsToIds(page, menuUuidToId); // menu uuid -> id; enrichment remaps at creation
 
     const targetPath = path.join(templatesDir, rel);

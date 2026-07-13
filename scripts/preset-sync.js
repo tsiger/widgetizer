@@ -3,8 +3,8 @@ import fs from "fs-extra";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { v4 as uuidv4 } from "uuid";
-import { processTemplatesRecursive } from "../server/utils/templateHelpers.js";
-import { enrichNewProjectReferences } from "../server/utils/linkEnrichment.js";
+import { processTemplatesRecursive } from "../packages/builder-server/src/utils/templateHelpers.js";
+import { enrichNewProjectReferences } from "../packages/builder-server/src/utils/linkEnrichment.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(__dirname, "..");
@@ -301,13 +301,13 @@ export async function syncProjectThemeJson(srcDir, projectDest, settingsOverride
   await fs.outputFile(path.join(projectDest, "theme.json"), JSON.stringify(nextThemeJson, null, 2));
 }
 
-export async function syncPresetProject({ srcDir, project, projectDest, presetId }) {
+export async function syncPresetProject({ srcDir, projectDest, presetId }) {
   const presetSources = await resolvePresetSources(srcDir, presetId);
 
   await syncProjectThemeJson(srcDir, projectDest, presetSources.settingsOverrides);
   await syncTemplatesToProject(presetSources.templatesSourceDir, path.join(projectDest, "pages"));
   await syncMenusToProject(presetSources.menusSourceDir, path.join(projectDest, "menus"));
-  await enrichNewProjectReferences(project);
+  await enrichNewProjectReferences(path.join(projectDest, "pages"), path.join(projectDest, "menus"));
 }
 
 export function shouldRebuildProject(relPath, presetId, presetSources) {

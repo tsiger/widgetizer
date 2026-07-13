@@ -1,0 +1,33 @@
+{
+  "name": "@widgetizer/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json",
+    "./errors": "./src/errors.js",
+    "./adapters": "./src/adapters.js",
+    "./test-helpers/storage": "./test-helpers/storageConformance.js",
+    "./test-helpers/asset-storage": "./test-helpers/assetStorageConformance.js",
+    "./test-helpers/publish": "./test-helpers/publishConformance.js",
+    "./test-helpers/limits": "./test-helpers/limitsConformance.js",
+    "./test-helpers/scope-resolver": "./test-helpers/scopeResolverConformance.js",
+    "./youtube": "./src/utils/youtubeHelpers.js",
+    "./blockLimits": "./src/utils/blockLimits.js",
+    "./mimeTypes": "./src/utils/mimeTypes.js",
+    "./pathSecurity": "./src/utils/pathSecurity.js",
+    "./urlSafety": "./src/utils/urlSafety.js",
+    "./richtextMedia": "./src/utils/richtextMedia.js",
+    "./richtextLinks": "./src/utils/richtextLinks.js",
+    "./linkPrefixer": "./src/utils/linkPrefixer.js",
+    "./dateFormat": "./src/utils/dateFormat.js",
+    "./config/settingTypes": "./src/config/settingTypes.js",
+    "./config/fonts.json": "./src/config/fonts.json",
+    "./locales/*": "./src/locales/*"
+  },
+  "dependencies": {
+    "liquidjs": "^10.26.0"
+  }
+}

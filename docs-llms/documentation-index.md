@@ -2,407 +2,428 @@
 
 This document serves as a comprehensive index to all documentation in the Widgetizer project. Use this guide to quickly find the appropriate documentation for your needs, whether you're developing, troubleshooting, or understanding system architecture.
 
----
-
-## 📚 Core System Documentation
-
-### **[project-overview.md](project-overview.md)** - Project Overview
-
-**Purpose**: High-level orientation — what Widgetizer is, the tech stack, and the key concepts at a glance **When to use**:
-
-- First read when getting oriented in the codebase
-- Quick refresher on the content model and major subsystems
-
-**Key topics**: Product summary, stack, hybrid storage model, key concepts (projects, pages, widgets, themes, collections, export)
+> The codebase lives in npm-workspace packages behind adapter contracts. The two authoritative maps are **[core-architecture.md](core-architecture.md)** (orientation) and **[core-packages.md](core-packages.md)** (adapters / DI / `Scope` / `LIMIT_KEYS`). Per-subsystem docs defer the contract to those two rather than re-deriving it.
 
 ---
+
+## 🗺️ Authoritative Maps
+
+### **[core-architecture.md](core-architecture.md)** - Application Architecture
+
+**Purpose**: Authoritative orientation map (#1 of 2) — a thin index of how the package codebase fits together and where each subsystem lives, deferring all per-subsystem detail to the dedicated docs **When to use**:
+
+- Understanding the real package split (admin-shell FE in `app/src/`, site-workspace FE in `packages/editor-ui/src/`, backend in `packages/builder-server/src/`, shared primitives in `packages/core/src/`, preview-iframe runtime in `packages/core/src/runtime/`)
+- Onboarding new developers and finding where a subsystem lives
+- Tracing the DI assembly and scoped routers at a high level
+- Locating which dedicated doc owns a given subsystem
+
+**Key topics**: Workspace package layout & shells, `createEditorApp`/`setupBuilderServer`/`initDb` DI assembly, scoped routers, `req.scope`/`req.adapters`/write-guard, admin vs site shell routing, one-line index rows per subsystem (Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor, Core Widgets, Collections), pointer to core-packages.md for adapter contracts and `LIMIT_KEYS`
+
+---
+
+### **[core-packages.md](core-packages.md)** - Packages & Adapter Architecture
+
+**Purpose**: Authoritative adapter/package map (#2 of 2) — the five packages, the OSS/hosted adapter boundary, adapter contracts + `Scope` shape, `LIMIT_KEYS`/errors/conformance, DI assembly, editor-ui seams, render-engine scope-free boundary, and the `require-scope-arg` lint rule **When to use**:
+
+- Understanding the five packages and the OSS/hosted boundary
+- Working with the adapter contracts, `Scope` shape, `LIMIT_KEYS`, or error types
+- Wiring or mounting the backend (`setupBuilderServer`, `createEditorApp`, `initDb`) or embedding the editor (`EditorProvider`, `createEditorRoutes`)
+- Building a new adapter implementation against the conformance suites
+- Tracing the render-engine scope-free boundary or the `require-scope-arg` lint rule
+
+**Key topics**: Five packages, OSS/hosted boundary, adapter contracts (Storage/AssetStorage incl. `stat()` + download byte-range/Publish/Limits/ScopeResolver), `Scope`, `LIMIT_KEYS` (incl. `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`) + constants, error types + status codes, conformance suites, `projectScopedRouter` mounts (incl. `/collections`), editor-ui seams (apiBase/editorFetch, routeBase, EditorProvider/EditorShell, extension registry/hooks/slots, tailwind preset), render-engine deps bag, preview-iframe runtime in `@widgetizer/core`, `require-scope-arg`
+
+---
+
+## 📚 Theme Development & Authoring
 
 ### **[theming.md](theming.md)** - Theme Development & Structure
 
-**Purpose**: Complete guide to creating and customizing themes **When to use**:
+**Purpose**: Canonical theme-authoring entry point — theme structure, `theme.json` manifest/global settings, `layout.liquid`, Liquid tags, widgets/blocks/templates/menus/assets/locales/presets, and advanced features, tightened to defer deep detail to the dedicated docs **When to use**:
 
 - Building new themes from scratch
 - Understanding theme structure and file organization
-- Working with Liquid templates and widgets
-- Implementing global components (header/footer)
-- Managing theme assets and CSS variables
+- Working with Liquid templates, tags, and global components (header/footer)
+- Managing theme assets, CSS variables, and locales (i18n)
 - Implementing scroll reveal animations
 
-**Key topics**: Theme manifest, layout templates, widgets, global settings, menu rendering, asset management, scroll reveal animations, export behavior, theme presets, theme locales (i18n)
+**Key topics**: Theme manifest, layout template, Liquid tags & filters (`rte_text`/`rte_blank`, richtext + `| raw`, incl. stable internal-link refs in richtext anchors), widgets, blocks, global settings, menu rendering & collection-item link targets (`collectionItemUuid`/`collectionType`), asset management, scroll reveal animations, theme locales, pointers to theming-setting-types.md, theme-presets.md, and core-export.md
 
 ---
 
 ### **[theming-widgets.md](theming-widgets.md)** - Widget Authoring Guide
 
-**Purpose**: Complete guide to creating widgets for themes **When to use**:
+**Purpose**: Canonical theme-author widget-authoring guide — `widget.liquid` skeleton, JS isolation + editor lifecycle events, the enqueue asset system, schema conventions, standardized block types, accessibility, and an authoring checklist, slimmed so token tables live in arch-design-system.md and setting-type JSON in theming-setting-types.md **When to use**:
 
-- Building new widgets from scratch
-- Understanding widget file structure (schema.json + widget.liquid)
-- Implementing design tokens and CSS patterns
-- Working with typography and layout utilities
-- Adding JavaScript interactivity to widgets
-- Implementing scroll reveal animations
-- Following accessibility best practices
+- Building new widgets from scratch (schema.json + widget.liquid)
+- Adding JavaScript interactivity with editor lifecycle events
+- Using the enqueue asset system
+- Implementing standardized block types and following accessibility practices
 
-**Key topics**: Widget structure, CSS design tokens, typography system, layout utilities, component patterns, JavaScript initialization, scroll reveal animations, schema conventions, accessibility, blocks, theme locales (tTheme: prefix i18n)
-
----
-
-### **[theme-design-system.md](theme-design-system.md)** - Arch Theme Design System
-
-**Purpose**: Complete reference for the Arch theme's visual design language, CSS custom properties, layout system, component patterns, and modifiers **When to use**:
-
-- Understanding the Arch theme's design tokens and CSS variables
-- Looking up spacing, typography, or color token values
-- Understanding the color scheme system (standard/highlight)
-- Working with layout containers, grids, and content width modifiers
-- Using component classes (cards, buttons, forms, icons)
-- Implementing scroll reveal animations
-- Understanding the CSS variable pipeline from theme.json to rendered CSS
-- Following widget template conventions
-
-**Key topics**: Design tokens, color schemes, typography system, spacing scale, layout containers, grid system, card/button/form/icon components, block system, header/footer globals, utility classes, reveal animations, responsive breakpoints, CSS variable pipeline, widget conventions
+**Key topics**: Widget structure, JS isolation & editor lifecycle events, enqueue asset system, schema conventions, standardized block types (heading/text/button), color-scheme inline-style pattern, accessibility, authoring checklist, cross-references to arch-design-system.md (design tokens) and theming-setting-types.md (setting JSON)
 
 ---
 
 ### **[theming-setting-types.md](theming-setting-types.md)** - Setting Types Reference
 
-**Purpose**: Comprehensive reference for all available setting types in theme.json and widget schemas **When to use**:
+**Purpose**: Authoritative author-facing catalog of all theme/widget setting types with schema properties, JSON examples, and Liquid usage — now also the home for the shipped `file` setting type **When to use**:
 
-- Defining settings in theme.json global configuration
+- Defining settings in `theme.json` global configuration
 - Creating widget schemas with proper setting types
-- Understanding setting properties and behaviors
-- Implementing CSS variable output
+- Understanding setting properties, CSS variable output, and i18n labels
+- Looking up the `file` setting type or richtext/link options
 
-**Key topics**: Setting types (color, text, range, select, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys)
+**Key topics**: Setting types (color, text, range, select, date, gallery, table, icon, youtube, richtext, code, `file`, etc.), common properties, CSS variable generation, i18n label resolution (tTheme: keys), collection field flags (`usedAsTitle`/`usedAsDate`), richtext `allow_headings`/`allow_images`/`min_height` + stable internal-link refs in richtext anchors (`data-page-uuid`/`data-collection-item-uuid`), structured link targets (`pageUuid`/`collectionType`/`collectionItemUuid`), icon `allow_patterns`, `rte_text`/`rte_blank`
+
+---
+
+### **[arch-design-system.md](arch-design-system.md)** - Arch Theme Design System
+
+**Purpose**: Reference for the **Arch THEME's** CSS-custom-property design system — tokens, color schemes, typography, spacing, grid/carousel, component/block patterns, header/footer, body-class style settings, and the `theme.json` → `{% theme_settings %}` → `base.css` pipeline (renamed from `theme-design-system.md` to disambiguate from the editor-UI style guide) **When to use**:
+
+- Understanding the Arch theme's design tokens and CSS variables
+- Looking up spacing, typography, or color token values
+- Working with the `.color-scheme-{standard|highlight}-{primary|secondary}` system
+- Using layout containers, grids, carousels, and component/block classes
+- Tracing the CSS variable pipeline from theme.json to rendered CSS
+
+**Key topics**: Design tokens (`--space-*`/`--font-size-*` tables, single source), color-scheme classes, typography (Inter heading + body defaults), spacing scale (`spacing-airy` 1.2, `--section-padding-block` × `--spacing-scale`), layout containers, grid/carousel system, card/button/form/icon components, block system, header/footer globals, `--card-shadow` token, reveal animations, responsive breakpoints, widget inventory (56 page + 2 global), snippets inventory, CSS variable pipeline
+
+---
+
+## 🎨 Theme & Content Distribution
+
+### **[core-themes.md](core-themes.md)** - Theme Management Interface
+
+**Purpose**: The Themes management page (UI + CRUD routes) — list/upload/update/delete, sidebar update badge, theme locales/site-icon — with deep update/preset mechanics deferred to theme-updates.md and theme-presets.md **When to use**:
+
+- Understanding theme upload, installation, and validation
+- Working with theme preview cards and the update badge
+- Implementing theme management UI
+- Troubleshooting theme installation or deletion safeguards
+
+**Key topics**: Theme display, admin-shell routing (`app/src/pages/Themes.jsx`), upload/validation, update badge, deletion safeguards, theme locale behavior, site-icon snippet, `resolvePresetPaths` return shape, locale route + `resolveActiveProject` middleware, note that `themeController` is intentionally path-based (not scope-first)
 
 ---
 
 ### **[theme-updates.md](theme-updates.md)** - Theme Update System
 
-**Purpose**: Documents the theme versioning and update system for distributing theme improvements to projects **When to use**:
+**Purpose**: Authoritative doc for the theme-update subsystem — seed/user-data split, partial/delta folders, `deleted/` removals, materialized `latest/` snapshot, `theme.json` settings merge, per-project `receiveThemeUpdates`, version validation, and the REST API surface **When to use**:
 
-- Understanding how theme updates work
+- Understanding how theme updates work and which files are updated vs. protected
 - Publishing new theme versions
 - Applying theme updates to projects
-- Understanding which files are updated vs. protected
+- Tracing the settings-merge behavior
 
-**Key topics**: Version folders, latest snapshot, update eligibility, settings merge, project update flow, developer tools
+**Key topics**: Version folders, partial/delta folders, `deleted/` removals, materialized `latest/` snapshot (5s source cache), settings merge, updatable paths (incl. `collection-types`; `collections/` item data protected), `receiveThemeUpdates`, version validation, REST API, note that update writes use direct fs-extra (not the scope-first storage adapter)
 
 ---
 
 ### **[theme-presets.md](theme-presets.md)** - Theme Presets
 
-**Purpose**: Specification for theme preset variants that override settings and/or demo content **When to use**:
+**Purpose**: Concise current-state conceptual overview of theme presets (what they are, the directory/registry/fallback model) that points to theme-preset-file-format.md (format), core-projects.md (creation flow), and theme-preset-process.md (authoring) **When to use**:
 
-- Understanding how presets work (directory structure, fallback chain, settings overrides)
-- Creating preset variants for themes
-- Understanding the project creation flow with presets
-- Working with the preset selection UI
+- Understanding what presets are and the directory/registry/fallback model
+- Orienting before diving into preset file format or the authoring workflow
+- Understanding settings overrides and the collections/media seeding dimension at a high level
 
-**Key topics**: Preset registry, settings overrides, template/menu fallback chain, preset resolution, UI integration
-
----
-
-### **[theme-preset-file-format.md](theme-preset-file-format.md)** - Preset File Format Reference
-
-**Purpose**: Exact file-level reference for authoring a preset (template JSON shape, menus, settings overrides, registry entry) **When to use**:
-
-- Writing or validating preset files by hand or via generation
-- Looking up the required keys of preset templates (`widgets`/`widgetsOrder`/`name`/`slug`), menu files, or `presets.json`
-
-**Key topics**: Template JSON shape, widget/block instance format, menus, `settings.json` overrides, footer/header block types, SEO fields
+**Key topics**: Preset concept, directory/registry/fallback model, settings overrides, collections/media seeding (one-line), pointers to theme-preset-file-format.md, core-projects.md, and theme-preset-process.md
 
 ---
 
-### **[theme-preset-process.md](theme-preset-process.md)** - Preset Creation Process
+### **[theme-preset-file-format.md](theme-preset-file-format.md)** - Preset File Format
 
-**Purpose**: The end-to-end workflow for building and shipping a new theme preset **When to use**:
+**Purpose**: Structural reference for the JSON files that make up an Arch theme preset — `preset.json` overrides, page/header/footer/menu template shapes, link objects, color-scheme strings, the `presets.json` registry, and the runtime fields that must NOT appear in source **When to use**:
 
-- Creating a new preset from scratch (content plan → files → images → screenshot → demo)
-- Syncing preset work into a local project for testing
+- Authoring or validating preset JSON files
+- Understanding preset overrides and template shapes
+- Working with link objects and color-scheme strings in presets
+- Understanding which runtime fields to omit from source
 
-**Key topics**: Step-by-step preset workflow, sync scripts (`theme:sync`, `preset:sync`), screenshots, live demo URLs, checklist
-
----
-
-### **[theme-preset-generator.md](theme-preset-generator.md)** - Preset Image Generation
-
-**Purpose**: Conventions and tooling for generating preset images (`{preset-id}-images.json` + `scripts/generate-images.js`) **When to use**:
-
-- Authoring image manifests for a preset
-- Running or modifying the image generation script
-
-**Key topics**: Flat image manifest format (file/width/height/prompt), generation script behavior, image size variants, prompt conventions
+**Key topics**: `preset.json` overrides, page/header/footer/menu template shapes, `collections/` + `media/` seeding directories, link objects (incl. `collectionItemUuid`/`collectionType` auto-remap like `pageUuid`), color-scheme strings, `presets.json` registry (`liveDemo`, `{default, presets:[...]}` envelope), no-gallery/table field types note, `rte_text`/`rte_blank` helpers, omit-runtime-fields rule
 
 ---
 
-### **[theme-presets-tracker.md](theme-presets-tracker.md)** - Preset Status Tracker
+### **[theme-preset-process.md](theme-preset-process.md)** - Preset Production Workflow
 
-**Purpose**: Working tracker for preset IDs, production status, and shipped Arch presets **When to use**:
+**Purpose**: Step-by-step manual production workflow for producing a polished Arch preset, matched to the current bundled-preset-media pipeline (pack-once seeding rather than per-project manual upload) **When to use**:
 
-- Checking which preset IDs already exist
-- Updating preset production/completion status
-- Auditing which presets have synced files, generated images, and screenshots
+- Producing a new polished Arch preset end to end
+- Packing media into a preset once via the seeding pipeline
+- Syncing themes/presets and setting up the `liveDemo` convention
 
-**Key topics**: Preset status table, preset IDs, completion tracking, generated asset checklist
-
----
-
-### **[core-widgets.md](core-widgets.md)** - Core Widgets System
-
-**Purpose**: Explains the built-in, theme-agnostic widgets that ship with Widgetizer **When to use**:
-
-- Understanding which widgets are always available
-- Learning how themes can opt-out via `useCoreWidgets`
-- Adding new core widgets to the platform
-
-**Key topics**: Spacer, Divider, opt-out flag, loading & rendering flow, file structure
+**Key topics**: Pack-once media seeding (`themes/arch/presets/<id>/media/` + `manifest.json`, `projectController.seedPresetMedia`, `scripts/pack-preset-media.js`), `npm run theme:sync`/`preset:sync`, `liveDemo` URL convention, `default` key + blank preset, collections dimension, package-path code references
 
 ---
 
-### **[core-form-widget.md](core-form-widget.md)** - Form Widget & Forms Manifest
+### **[theme-preset-generator.md](theme-preset-generator.md)** - Preset Generation Playbook
 
-**Purpose**: Documents the `core-form` contact/inquiry widget and the export-time `widgetizer.forms.json` manifest it pairs with for the Widgetizer Hosted forms service **When to use**:
+**Purpose**: Working authoring playbook for generating high-quality Arch presets — a 4-phase workflow plus color/spacing/typography/icon/image/differentiation rules — largely independent of the package architecture **When to use**:
 
-- Understanding the markup contract the hosted Worker recognises (`data-widgetizer-form`, honeypot, Turnstile placeholder, status element)
-- Configuring form widgets (fields, choices, consent, info/social sidebar blocks)
-- Understanding how form/field/option identifiers are auto-derived from labels at export time
-- Troubleshooting export-time form validation errors (label collisions, per-site/field/option limits)
+- Generating a high-quality Arch preset from a brief
+- Applying color/spacing/typography/icon/image rules
+- Differentiating presets from one another
 
-**Key topics**: Form widget settings/blocks, derived identifier model (handleize), honeypot & Turnstile contract, manifest emitter (`buildFormsManifest`), per-site/field/option limits, export pipeline wiring, layout recipes
-
----
-
-## 🏛️ Platform Architecture
-
-### **[core-security.md](core-security.md)** - Platform Security
-
-**Purpose**: Outlines the core security measures protecting the application, its data, and users. **When to use**:
-
-- Understanding the server's security layers
-- Reviewing protection against common vulnerabilities
-- Configuring the application for a production environment
-
-**Key topics**: Rate Limiting, HTTP Security Headers, CORS Whitelisting, Input Validation, Global Error Handling, Environment Configuration
+**Key topics**: 4-phase workflow, color/spacing/typography rules, icon & image guidance (flat hyphenated media names, no path separators), differentiation rules, image-variant generation (theme-overridable defaults)
 
 ---
 
-### **[core-ux.md](core-ux.md)** - Core UX Patterns & Audit
+## 🏛️ Core Subsystems
 
-**Purpose**: Documents standard UX patterns, workflows, and implementation status **When to use**:
+### **[core-projects.md](core-projects.md)** - Project Management System
 
-- Understanding standard user flows (creation, deletion, etc.)
-- Checking implementation status of core features
-- Implementing consistent UI behaviors (toasts, redirects)
-- Reviewing UX guidelines (consistency, feedback, protection)
+**Purpose**: Project-management workflow — admin-shell Projects pages/forms, project create/duplicate/export/import/edit, theme-copy + preset application + link enrichment on creation, project-switch isolation, and the `/api/projects` route table **When to use**:
 
-**Key topics**: Project/Page/Menu/Collection-item management workflows, project export/import, toast notifications, redirect patterns, confirmation modals
+- Understanding the project lifecycle and creation flow
+- Implementing project-related features
+- Working with the project store/queries and active-project handling
+- Troubleshooting project state or the scope-first resolver
 
----
-
-### **[core-design-system.md](core-design-system.md)** - App UI Design System
-
-**Purpose**: The admin app's own UI design language (not theme CSS) — Tailwind conventions, shared components, focus/color patterns **When to use**:
-
-- Building or restyling admin UI components
-- Keeping new UI consistent with existing buttons, forms, and focus states
-
-**Key topics**: Tailwind 4 conventions, Button/IconButton variants, form controls, focus-visible rings, lucide icons
+**Key topics**: Project CRUD, admin-shell pages (`app/src/` ProjectsList/ProjectForm/ProjectImportModal), stores/queries in `packages/editor-ui/src/`, `apiFetch` + `X-Project-Id` from `getActiveProjectId()`, theme-copy + preset application + link enrichment on creation, scope-first resolver (`req.scope` via `req.adapters.scopeResolver`), ZIP import/export, `siteTitle`, `/api/projects` route table
 
 ---
 
 ### **[core-project-id-architecture.md](core-project-id-architecture.md)** - Project Identity System
 
-**Purpose**: Explains the dual-identifier system (UUID vs FolderName) for projects **When to use**:
+**Purpose**: The durable UUID-vs-folderName project identity model — stable UUID for API/metadata vs mutable filesystem folderName, rename = directory move + metadata update, export naming — reframed around the scope-first model **When to use**:
 
 - Understanding how projects are identified and stored
 - Implementing project renaming logic
 - Working with filesystem paths vs API IDs
 - Troubleshooting "project not found" errors
 
-**Key topics**: UUID vs FolderName, controller implementation, filesystem organization, renaming workflows
-
----
-
-## 🎨 Content Management
-
-### **[core-projects.md](core-projects.md)** - Project Management System
-
-**Purpose**: Complete workflow for project creation, management, and updates **When to use**:
-
-- Understanding project lifecycle and data flow
-- Implementing project-related features
-- Troubleshooting project state management
-- Working with the project store (Zustand)
-
-**Key topics**: Project CRUD operations, admin-shell routing, active project management, workspace entry flow, project ZIP import/export, `siteTitle`, state management, backend API endpoints, preset selection during creation
+**Key topics**: UUID vs folderName, scope-first handlers (`req.scope` + injected adapters), rename = directory move + metadata update, still-path-based exceptions (`theme.json` via `getProjectThemeJsonPath`, some non-adapter page reads), OSS active-project routes vs host-mounted project-id editor routes, pointer to core-packages.md for the Scope/adapter contract
 
 ---
 
 ### **[core-pages.md](core-pages.md)** - Page Management System
 
-**Purpose**: Page creation, editing, and management within projects **When to use**:
+**Purpose**: End-to-end page CRUD — page JSON model/storage, Pages list/forms/bulk UI, client API wrapper, Express routes + controller (create/read/update/delete/duplicate/bulk-delete/savePageContent), UUID preservation, slug uniqueness, media-usage sync, and deleted-page cleanup **When to use**:
 
 - Understanding page data structure and storage
-- Implementing page-related functionality
-- Working with page metadata and widgets
-- Managing page routing and slugs
+- Implementing page CRUD and bulk operations
+- Working with slugs, UUID preservation, and media-usage sync
+- Troubleshooting page limits or slug conflicts
 
-**Key topics**: Page JSON structure, workspace-only routing, CRUD operations, slug generation, widget integration, SEO title behavior
+**Key topics**: Page JSON structure, scope-first storage (`req.scope` + `req.adapters.storage`; `fs-extra` only in non-adapter render/export helpers), Pages list/forms/bulk UI, `generateUniqueSlug` (`(Copy)` name), `MAX_WIDGETS_PER_PAGE` 422 cap, 409 explicit-slug-conflict, bulkDelete 207/400 semantics, pointer to core-hooks.md for `usePageSelection`
+
+---
+
+### **[core-menus.md](core-menus.md)** - Navigation Menu System
+
+**Purpose**: Menu-management subsystem — per-project menu JSON storage, `pageUuid`/`collectionItemUuid` link-resolution lifecycle, React menu editor pages/components, client API helper, and Express routes/controller CRUD + duplicate **When to use**:
+
+- Building navigation systems
+- Understanding the menu data model and link targets
+- Implementing menu editing interfaces
+- Working with menu depth/item caps and render-time link resolution
+
+**Key topics**: Menu JSON (top-level `uuid`, `item_<uuid>` ids, `pageUuid` + `collectionItemUuid`/`collectionType` link targets), editor pages/components in `packages/editor-ui/src/`, scope-first StorageAdapter path (`getMenuById` is the non-adapter render read), `MAX_MENU_DEPTH=32`/`MAX_MENU_ITEMS` caps + 422 over-cap, render-time resolution (`render-engine/menuResolver.js`), `linkEnrichment.js` clone/delete cleanup (also covers richtext stable-link anchors)
+
+---
+
+### **[core-collections.md](core-collections.md)** - Collections (CMS) System
+
+**Purpose**: The collections subsystem — theme-owned collection-type schemas, scope-first item CRUD/storage, the `| collection` Liquid filter, item-page rendering with depth prefixing, limits, and sanitization **When to use**:
+
+- Authoring or understanding collection-type schemas (fields, `slugPrefix`, `hasItemPages`, `usedAsTitle`/`usedAsDate`)
+- Working with the scope-first `collectionService` and collection routes
+- Using the `| collection` Liquid filter in templates
+- Understanding item-page depth prefixing, SEO, and export output
+
+**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), per-item SEO (`robots: index,follow` default), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
 
 ---
 
 ### **[core-page-editor.md](core-page-editor.md)** - Visual Page Editor
 
-**Purpose**: Central page editing interface and component orchestration **When to use**:
+**Purpose**: Architecture and behavior of the visual Page Editor in editor-ui — component structure, Zustand store data flow, load/edit/preview/save/undo-redo, the postMessage preview protocol, navigation guard, and global-widget editing **When to use**:
 
 - Understanding the page editor architecture
-- Working with editor components and state management
-- Implementing editor features and workflows
-- Troubleshooting editor functionality
+- Working with editor components and the Zustand store
+- Implementing editor features (preview, save, undo/redo)
+- Troubleshooting the preview protocol or navigation guard
 
-**Key topics**: Editor components, state management stores, widget selection, settings panels, auto-save
-
----
-
-### **[core-collections.md](core-collections.md)** - Collections System (Custom Post Types)
-
-**Purpose**: Theme-defined structured content types (Portfolio, Team, Testimonials, Blog Posts) authored as items via a CMS, read by widgets via a Liquid filter, with optional per-item static page export **When to use**:
-
-- Defining collection types in a theme (`collection-types/{type}/schema.json`)
-- Understanding collection item storage, schema migration, and slug rules
-- Working with the `| collection` Liquid filter or item-page templates
-- Implementing or tracing collection CRUD, export, media usage, or link resolution
-
-**Key topics**: Collection schema + field flags (`usedAsTitle`), item data model + page-shaped `seo` object (item SEO at parity with page SEO) + `_order.json`, schema migration (warn-before-drop), service/controller/routes, `| collection` filter (incl. `menu` settings resolved in item templates), individual item-page export (depth-aware paths, SEO mapping), atomic writes + crash recovery, link resolution (incl. collection items as stable menu targets), design rationale, deferred Phase 3 scope
-
----
-
-## 🗂️ Content Organization
-
-### **[core-menus.md](core-menus.md)** - Navigation Menu System
-
-**Purpose**: Menu creation, management, and hierarchical structure handling **When to use**:
-
-- Building navigation systems
-- Understanding menu data structure
-- Implementing menu editing interfaces
-- Working with nested menu items
-
-**Key topics**: Menu JSON structure, workspace-only routing, drag-and-drop editing, backend API, file-based storage
+**Key topics**: Editor components, Zustand store data flow, load/edit/preview/save/undo-redo, postMessage preview protocol (`packages/editor-ui/src/queries/previewManager.js`, `packages/core/src/runtime/previewRuntime.js`), navigation guard (`packages/editor-ui/src/hooks/useNavigationGuard.js`), global-widget editing, pointer to core-hooks.md
 
 ---
 
 ### **[core-media.md](core-media.md)** - Media Library System
 
-**Purpose**: File upload, storage, and media management **When to use**:
+**Purpose**: Canonical Media Library reference — per-project storage/resizing, the SQLite metadata model, usage tracking, audio/range streaming, the Media page + hooks, and the media controller/routes/usage service — now also absorbing the shipped file-assets library/usage facts **When to use**:
 
-- Implementing file upload functionality
-- Understanding media storage and metadata
-- Working with image processing and thumbnails
-- Managing media library interfaces
-- Understanding usage tracking and deletion protection
+- Implementing file upload (images, files/PDF, audio) functionality
+- Understanding media storage, resizing, and metadata
+- Working with usage tracking and deletion protection
+- Troubleshooting upload size limits or streaming
 
-**Key topics**: File storage (images and file assets), metadata management, upload workflows, thumbnail generation, bulk operations, usage tracking (with recursive link scanning), deletion protection, file setting input, Copy URL
-
----
-
-### **[core-file-assets.md](core-file-assets.md)** - File Assets Architecture
-
-**Purpose**: Architecture and product decisions for file asset support (PDF uploads, file setting type, export handling). Implemented. **When to use**:
-
-- Understanding why file assets were designed as a Media Library extension
-- Reviewing confirmed product decisions (filter model, URL strategy, file input design)
-- Planning future file type expansion (allowlist strategy)
-- Understanding the relationship between file assets, usage tracking, and export
-
-**Key topics**: file assets, PDF-first rollout, media-library filter model, copy URL workflow, dedicated FileInput component, `file` setting type, usage tracking for files, export path rewriting, extensible allowlist strategy
-
----
-
-## 🛠️ Theme & Content Distribution
-
-### **[core-themes.md](core-themes.md)** - Theme Management Interface
-
-**Purpose**: User interface for viewing and uploading themes **When to use**:
-
-- Understanding theme upload and installation
-- Working with theme preview cards
-- Implementing theme management UI
-- Troubleshooting theme installation
-
-**Key topics**: Theme display, admin-shell routing, upload process, validation, in-use theme indicator, admin-menu update badges, theme presets, preset API, deletion safeguards, theme locale behavior, site icon snippet
+**Key topics**: Per-project storage/resizing, SQLite metadata, projectScopedRouter media routes (`'/'`, `'/:fileId'`, `'/bulk-delete'`, `'/refresh-usage'`, `'/:fileId/usage'` via `X-Project-Id`; `uploadWithLimit` middleware), `MEDIA_ACCEPT`/`NON_IMAGE_ACCEPT`, `getMediaCategory` (PDF → `uploads/files/`), audio byte-range (HTTP 206) streaming, usage tracking (pages/global/site settings/og_image/embedded-richtext/collection items, recursive scan), decompression-bomb guards, two-gate size enforcement, deletion protection, Copy URL
 
 ---
 
 ### **[core-export.md](core-export.md)** - Static Site Export & Version Management
 
-**Purpose**: Exporting projects to static HTML websites with comprehensive version control **When to use**:
+**Purpose**: The site-export pipeline — editor-ui export UI, server-side static-HTML generation (versioning/render/SEO/formatting/validation/asset copying/history), the export-management API, and scope-bound filesystem-backed serving — now also owning the file-asset export path **When to use**:
 
 - Understanding the export process and version management
-- Working with static site generation
+- Working with static site generation and validation ordering
 - Implementing export functionality and history tracking
-- Managing export versions and storage limits
 - Troubleshooting export issues
 
-**Key topics**: Export workflow, workspace-only routing, version control system, asset copying, HTML generation, export history API, ZIP downloads, automatic cleanup, smart file detection, root export metadata, site icons
+**Key topics**: `exportProjectToDir()` core with fail-fast validation-before-write, scope-resolved endpoints (`X-Project-Id`, no `:projectId` in path), versioning/history (`sizeBytes`/`hasIssuesReport`/`developerMode`, `cleanupProjectExports`, failed-export recording), `renderingService` split (render-engine + builder-server), collection item-page export + two-pass validation, forms manifest + `manifest.collections`, markdown alternate link, file-asset export (`assets/files/`, `/uploads/files/` rewrite, `filePath` var), `collectionDeps` adapter threading, ZIP downloads, site icons
 
 ---
 
-## ⚙️ Configuration & Settings
+### **[core-widgets.md](core-widgets.md)** - Core Widgets System
+
+**Purpose**: The built-in `core-` widgets library — purpose, file layout, schema metadata (`isCore`/`category`), the `useCoreWidgets` opt-out, and the scope/adapter-resolved load/render flow **When to use**:
+
+- Understanding which widgets are always available
+- Learning how themes opt out via `useCoreWidgets`
+- Adding new core widgets to the platform
+
+**Key topics**: Spacer, Divider (core-form deferred to core-form-widget.md), `packages/core/src/widgets/` + `CORE_WIDGETS_DIR` resolution, `isCore`/`category` schema metadata, `useCoreWidgets` opt-out, `GET /api/widgets` load flow (`getProjectWidgets`/`getCoreWidgets`), render path `deps.coreWidgetsDir/<type>/widget.liquid`, `hasPreview`, asar read-only behavior
+
+---
+
+### **[core-form-widget.md](core-form-widget.md)** - Form Widget & Forms Manifest
+
+**Purpose**: The `core-form` contact/inquiry widget plus the export-time `widgetizer.forms.json` manifest it pairs with for the Widgetizer Hosted forms service **When to use**:
+
+- Understanding the markup contract the hosted Worker recognises (`data-widgetizer-form`, honeypot, Turnstile placeholder, status element)
+- Configuring form widgets (fields, choices, consent, info/social sidebar blocks)
+- Understanding how form/field/option identifiers are auto-derived from labels at export time
+- Troubleshooting export-time form validation errors
+
+**Key topics**: Form widget settings/blocks, derived identifier model (handleize), honeypot & Turnstile contract, manifest emitter (`buildFormsManifest`), per-site/field/option limits, export pipeline wiring, layout recipes
+
+---
+
+## 🗄️ Data & Persistence
+
+### **[core-database.md](core-database.md)** - Database & Storage Architecture
+
+**Purpose**: Focused hybrid-persistence reference — the SQLite metadata vs filesystem content boundary, DB init/pragmas/DI connection, schema tables + migration history, and the repository layer **When to use**:
+
+- Understanding where data is stored now
+- Tracing migrations and the DB/filesystem boundary
+- Planning changes to repositories or persisted metadata
+- Wiring the DB connection via DI
+
+**Key topics**: Tables and relationships, 4-migration history (`owner_id`, `caption`, backfill, `_migrations` tracking), Connection & DI (`initDb({ getConnection })` vs `getDb()` fallback, pragmas), repository pattern, scope-first/adapter-agnostic framing, DB vs filesystem boundaries (incl. `collections/<type>/<slug>.json`), pointers to core-packages.md and core-export.md
+
+---
+
+## ⚙️ Configuration & Cross-Cutting
 
 ### **[core-appSettings.md](core-appSettings.md)** - Global Application Settings
 
-**Purpose**: System-level configuration management **When to use**:
+**Purpose**: The App Settings page (global config: general/media/export/developer) and its schema-driven UI + server-side enforcement — a thin orientation that defers image-size/export-version detail to core-media/core-export and the scope contract to core-packages **When to use**:
 
 - Managing global application settings
 - Understanding server-side setting enforcement
-- Implementing setting validation
-- Working with nested setting objects
+- Implementing setting validation and schema defaults
 
-**Key topics**: Global settings management, admin-shell routing, server-side validation, theme-aware image-size overrides, setting persistence, English-only language availability, default date format, developer mode export validation
+**Key topics**: Schema-driven UI (`AppSettings.jsx`/`AppSettingsPanel.jsx` in `app/src/`, `useAppSettings.js` + `appSettings.schema.json` in `packages/editor-ui/src/`), active-project-scoped upload (`POST '/'`, `X-Project-Id`/`req.scope`), two-stage enforcement (multer limits-adapter cap + controller `getSetting` comparison), `useGuardedFormPage`, schema defaults (maxFileSizeMB 50, quality 85), pointers to core-media.md/core-export.md/core-packages.md
 
 ---
 
 ### **[core-hooks.md](core-hooks.md)** - Custom React Hooks
 
-**Purpose**: Documentation for reusable React hooks used throughout the application **When to use**:
+**Purpose**: Index of editor-ui custom React hooks (confirmation modal, navigation guards, selection, media management, export state, app settings, date formatting, theme locale, link targets) — APIs + where used, with subsystem-deep hooks demoted to one-line pointers **When to use**:
 
-- Understanding confirmation modal patterns
-- Implementing navigation protection
-- Working with selection state management
-- Building media management interfaces
-- Creating consistent user interactions
+- Understanding confirmation-modal and navigation-guard patterns
+- Implementing selection state or guarded form pages
+- Working with link-target and theme-locale hooks
+- Finding which hook a subsystem uses
 
-**Key topics**: useConfirmationModal/useConfirmationAction, useNavigationGuard, useGuardedFormPage, usePageSelection, media hooks, export hooks, app settings hooks, collections & link target hooks
-
----
-
-## 🗺️ Architecture & Reference
-
-### **[core-architecture.md](core-architecture.md)** - Application Architecture
-
-**Purpose**: Comprehensive documentation of the app's architecture across all major sections **When to use**:
-
-- Understanding how frontend, queries, routes, controllers, and services connect
-- Onboarding new developers to the codebase
-- Planning refactoring or improvements
-- Finding where specific functionality is implemented
-
-**Key topics**: Admin vs site shell routing, Projects, Pages, Menus, Media, Themes, Export, App Settings, Preview, Page Editor architecture; improvement opportunities
+**Key topics**: `useConfirmationModal`/`useConfirmationAction`, `useNavigationGuard`/`useFormNavigationGuard(hasUnsavedChanges, skipRef)`/`useGuardedFormPage`, `usePageSelection`, `useLinkTargets` (collection-item uuid targets), `useDeleteKeyShortcut`, `useStickyActionBar`, media/export/app-settings hooks (pointers), `useThemeLocale` (developer-mode cache invalidation), `useFormatDate`; all under `packages/editor-ui/src/hooks/*`
 
 ---
 
-### **[core-database.md](core-database.md)** - Database & Storage Architecture
+### **[core-security.md](core-security.md)** - Platform Security
 
-**Purpose**: Documents the SQLite schema, legacy JSON import path, and the hybrid storage model (DB metadata + filesystem content) **When to use**:
+**Purpose**: Single security reference — input validation/sanitization, helmet/CORS, SVG sanitization, error handling, advanced-theme raw-code injection, upload limits, import/export path-traversal, preview isolation, the cross-tenant contract, and link/URL safety **When to use**:
 
-- Understanding where data is stored now
-- Tracing legacy import behavior and compatibility wrappers
-- Planning changes to repositories/controllers that touch persisted metadata
+- Understanding the server's security layers
+- Reviewing protection against common vulnerabilities
+- Configuring the application for a production environment
+- Tracing the cross-tenant isolation floor
 
-**Key topics**: Tables and relationships, migrations, import/backups, repository pattern, DB vs filesystem boundaries
+**Key topics**: Input validation, two-tier (2mb/10mb) JSON body parser, HTTP security headers/helmet, CORS, SVG sanitization (incl. tenant), global error handling, gallery/table setting-type sanitizers, richtext `allow_headings`/`allow_images` opt-in tag sets + path-validated `<img>` + stable-link `data-*-uuid` anchor allowlist, `rte_text`/`rte_blank` filters, `collectionItemUuid` link enrichment (structured + richtext), Project-Switch Isolation + write-guard, cross-tenant contract (cites core-packages.md for Scope/`LIMIT_KEYS`), Link & URL safety (`sanitizeHref`/`safe_url`, image-path allowlist), `createEditorApp({ adapters })` entry point
+
+---
+
+### **[core-ux.md](core-ux.md)** - Core UX Patterns
+
+**Purpose**: Thin cross-cutting UX-principles doc — toasts, confirmation modals, navigation guards, redirect/go-with-the-flow conventions, and the bulk-delete pattern — with per-domain enumerations replaced by pointers to the dedicated docs **When to use**:
+
+- Understanding standard user flows and feedback conventions
+- Implementing consistent toasts, redirects, and confirmation modals
+- Applying the bulk-delete pattern
+
+**Key topics**: Toast notifications, confirmation modals (themes use in-app `ConfirmationModal`; in-use guard is a disabled menu item, 409 fallback), navigation guards, redirect/go-with-the-flow conventions, bulk-delete pattern, scope-first/adapter-injected + quota/`LIMIT_KEYS` shaping note, pointers to the per-domain core-* docs
+
+---
+
+### **[core-editor-ui-style-guide.md](core-editor-ui-style-guide.md)** - Editor/Admin App Style Guide
+
+**Purpose**: Standalone visual style guide for the **ADMIN/EDITOR app chrome** (pink accent + slate neutrals, typography, spacing, Tailwind/HTML snippets for buttons/inputs/tables/cards/badges/toasts/modals/sidebar/layout) — renamed from `core-design-system.md` to disambiguate from the Arch theme design system **When to use**:
+
+- Building or styling editor/admin UI chrome (not theme output)
+- Looking up the pink-accent + slate palette, typography, or spacing
+- Reusing Tailwind/HTML snippets for buttons/inputs/tables/cards/badges/toasts/modals/sidebar
+- Finding the in-repo implementation of the style system
+
+**Key topics**: Pink accent + slate neutrals, typography, spacing, snippet catalogue (buttons/inputs/tables/cards/badges/toasts/modals/sidebar/layout), sidebar width (`--sidebar-width` 14rem/w-56), Tailwind ^4.1.x, Implementation-in-this-repo (`packages/editor-ui/src/styles/preset.css`, `app/src/index.css`, `packages/editor-ui/src/components/ui/Button.jsx`, page-editor narrow-sidebar overrides)
+
+---
+
+## 💻 Desktop Builds
+
+### **[core-electron.md](core-electron.md)** - Electron Desktop App
+
+**Purpose**: Electron-runtime-specific guide — preview window, error handling, runtime data paths, the `utilityProcess`/dynamic-port server model, and local Windows update testing — with release/auto-update and asar-bundling detail cross-linked to CLAUDE.md and core-packages.md **When to use**:
+
+- Running Electron in development mode
+- Building production distributions for macOS and Windows
+- Understanding runtime paths, the dynamic-port server model, and packaging
+- Code signing and distribution
+
+**Key topics**: Preview window, error handling, runtime data paths, `utilityProcess` dynamic-port server (`{ type: "server-ready", port }`), `electron/builder.config.mjs` (mac block; package.json has no build key), Windows NSIS `Widgetizer-Setup-x.x.x.exe`, dev port 3000, `scripts/build-electron.mjs` build entry + `server-bootstrap.js`, FE citations (`UpdateBanner` in `app/src/`, Layout/ErrorBoundary in `packages/editor-ui`), cross-links to CLAUDE.md (release/auto-update) and core-packages.md (asar bundling)
+
+---
+
+## 🚪 Conceptual & Future
+
+### **[project-overview.md](project-overview.md)** - What Is Widgetizer
+
+**Purpose**: High-level conceptual "what is Widgetizer" front door (hybrid storage, portability, end-user concepts, Create/Build/Export) — intentionally code-path-free **When to use**:
+
+- Getting a high-level mental model of the product
+- Explaining Widgetizer to a non-developer audience
+- Understanding the end-user Create/Build/Export flow
+
+**Key topics**: Hybrid storage, portability, end-user concepts (Pages, Widgets, Media — images/files/audio, Menus, Collections), theme presets, Create/Build/Export flow
+
+---
+
+### **[future-mcp.md](future-mcp.md)** - Future: Widgetizer MCP Server
+
+**Purpose**: Proposal and rationale for a local MCP (Model Context Protocol) server that lets MCP-compatible LLM clients drive Widgetizer through its existing local API and documented schema rules **When to use**:
+
+- Evaluating the case for a Widgetizer MCP server
+- Understanding the proposed MCP-tool ↔ REST-API mapping and resource model
+- Planning LLM-driven site scaffolding use cases
+
+**Key topics**: docs-llms as proof of concept, REST-API → MCP-tool mapping, self-describing widget schemas as MCP resources, local-first architecture, tool-agnostic reach, use cases (site scaffolding from a prompt)
+
+---
+
+## ✅ Project Tracking
+
+- **[TODO.md](TODO.md)** — Living task/issue tracker for in-flight work; not a reference doc.
+- **[user-test-checklist.md](user-test-checklist.md)** — Standalone manual user-test checklist (no codebase knowledge assumed): IDs/actions/expected results, test pack/setup, and run waves for confirming create/edit/preview/export/backup/import/update/delete flows.
 
 ---
 
@@ -410,23 +431,23 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **Theme Developers**
 
-Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `theme-updates.md`, `theme-presets.md` Secondary: `core-export.md`, `core-menus.md`, `core-collections.md`
+Primary docs: `theming.md`, `theming-widgets.md`, `theming-setting-types.md`, `arch-design-system.md`, `theme-updates.md`, `theme-presets.md` Secondary: `theme-preset-file-format.md`, `theme-preset-process.md`, `theme-preset-generator.md`, `core-export.md`, `core-menus.md`, `core-collections.md`
 
 ### **Frontend Developers**
 
-Primary docs: `core-page-editor.md`, `core-projects.md`, `core-pages.md` Secondary: `core-media.md`, `core-appSettings.md`, `core-form-widget.md`
+Primary docs: `core-page-editor.md`, `core-projects.md`, `core-pages.md`, `core-editor-ui-style-guide.md` Secondary: `core-media.md`, `core-appSettings.md`, `core-hooks.md`, `core-form-widget.md`
 
 ### **Backend Developers**
 
-Primary docs: `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `core-pages.md`, `core-menus.md`, `core-appSettings.md`, `core-collections.md`, `core-form-widget.md`
+Primary docs: `core-packages.md`, `core-database.md`, `core-export.md`, `core-media.md`, `core-projects.md` Secondary: `core-pages.md`, `core-menus.md`, `core-collections.md`, `core-appSettings.md`, `core-security.md`
 
 ### **System Architects**
 
-Primary docs: `theming.md`, `core-projects.md`, `core-hooks.md`, `core-architecture.md` Secondary: All other documents for comprehensive understanding
+Primary docs: `core-architecture.md`, `core-packages.md`, `core-security.md` Secondary: All other documents for comprehensive understanding
 
 ### **Content Managers / End-Users**
 
-Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`, `core-menus.md`
+Primary docs: `project-overview.md`, `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`, `core-menus.md`, `core-collections.md`, `user-test-checklist.md`
 
 ---
 
@@ -435,52 +456,16 @@ Primary docs: `core-themes.md`, `core-page-editor.md` Secondary: `core-media.md`
 1. **Structure** – Each document includes overview, implementation details, and workflows.
 2. **Code Examples** – Practical examples with proper syntax highlighting.
 3. **API References** – Complete endpoint documentation with parameters.
-4. **File Paths** – Exact file locations for reference.
+4. **File Paths** – Exact file locations for reference (package paths).
 5. **Cross-References** – Links to related docs where applicable.
 
----
-
-## 💻 Desktop Builds
-
-### **[core-electron.md](core-electron.md)** - Electron Desktop App
-
-**Purpose**: Guide for developing, building, and distributing the Electron desktop application **When to use**:
-
-- Running Electron in development mode
-- Building production distributions for macOS and Windows
-- Understanding runtime paths and app packaging
-- Code signing and distribution
-
-**Key topics**: Development workflow, production build, runtime paths, app icons, distribution, code signing
-
----
-
-## 🧪 Plans & Explorations
-
-These are **not** reference docs — they capture plans and design explorations and may describe things that do not exist yet.
-
-### **[future-collection-item-editor.md](future-collection-item-editor.md)** - Composable Collection Item Templates (exploration)
-
-Design notes for making collection item-page layouts user-composable in the page editor (blocks model). Deferred — trigger and verdict recorded in its §8.
-
-### **[future-mcp.md](future-mcp.md)** - MCP Integration (exploration)
-
-Exploration notes for exposing Widgetizer functionality over MCP.
-
-### **[mvp-oss-form-widget.md](mvp-oss-form-widget.md)** - Hosted Forms / Core Form Widget
-
-Plan and decisions for the `core-form` widget and the export-time `widgetizer.forms.json` manifest.
-
-### **[future-theme-package.md](future-theme-package.md)** - Theme Packaging Script (planned)
-
-Design spec for a `theme-package` script that builds a distributable theme bundle (frozen base + per-release deltas) from a theme's git tags. Not yet implemented — records the agreed model and locked decisions.
-
----
-
-## 🔄 Maintenance Notes
-
-- **theming.md** – Most comprehensive, covers theme system architecture.
-- **theming-setting-types.md** – Reference document, stable API definitions.
-- All other docs – Feature-specific implementation guides.
-
 When adding new features, always update the relevant documentation **and** this index.
+
+---
+
+## 🗄️ Archived / Historical
+
+These docs describe completed work or superseded designs. They are kept for history and are not part of the current reference set.
+
+- **[archive/core-file-assets.md](archive/core-file-assets.md)** — Original file-assets architecture/decisions proposal. Its durable facts now live in core-media.md (library/usage), core-export.md (export path), and theming-setting-types.md (the `file` setting type).
+- **[archive/theme-presets-tracker.md](archive/theme-presets-tracker.md)** — Completed theme-presets implementation tracker (all rows done).

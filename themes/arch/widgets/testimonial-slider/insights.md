@@ -58,7 +58,7 @@ Four reviews with explicit star ratings (mix of 4 and 5 stars to feel authentic)
 
 ### 6. Hero Follow-Up
 
-Two to three testimonials placed directly below a hero widget. `highlight-primary` scheme, `top_spacing: none` so there is no gap after the hero. Autoplay on, speed 7000 ms for a calm cadence. Include avatars and titles.
+Two to three testimonials placed directly below a hero widget. `highlight-primary` scheme, `top_spacing: small` so the slider docks close under the hero — an image hero's bottom spacing is internal padding, so `none` would press the slider against the image edge (`none` only works if the hero shares the same highlight scheme and the two should fuse into one band). Autoplay on, speed 7000 ms for a calm cadence. Include avatars and titles.
 
 **Good for:** Homepage designs where the hero makes a promise and the testimonials immediately validate it.
 

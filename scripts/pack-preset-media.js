@@ -10,7 +10,7 @@
  *   themes/<theme>/presets/<preset>/media/
  *     images/        # all the project's image binaries (originals + variants)
  *     manifest.json  # { files: [...] } — consumed at project creation by
- *                    # seedPresetMedia (server/controllers/projectController.js)
+ *                    # seedPresetMedia (packages/builder-server/src/controllers/projectController.js)
  *
  * Usage:
  *   node scripts/pack-preset-media.js --project <folder> [--theme arch] [--preset <id>]
@@ -20,9 +20,9 @@
  */
 import path from "path";
 import fs from "fs-extra";
-import { THEMES_SEED_DIR, getProjectImagesDir } from "../server/config.js";
-import { getDb } from "../server/db/index.js";
-import { getMediaFiles } from "../server/db/repositories/mediaRepository.js";
+import { THEMES_SEED_DIR, getProjectImagesDir } from "../packages/builder-server/src/config.js";
+import { getDb } from "../packages/builder-server/src/db/index.js";
+import { getMediaFiles } from "../packages/builder-server/src/db/repositories/mediaRepository.js";
 
 function parseArgs(argv) {
   const args = {};

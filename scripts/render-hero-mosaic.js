@@ -82,7 +82,7 @@ function parseHex(hex) {
 const fillRgb = parseHex(fillColor);
 const accentRgb = parseHex(accentColor);
 
-// ---------- simulation (ported from hero-mosaic.js) ----------
+// ---------- simulation ----------
 
 // Cube size scales with the smaller dimension so it looks consistent across resolutions.
 const sizeScale = Math.min(width, height) / 720;

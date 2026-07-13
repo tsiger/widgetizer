@@ -1,0 +1,144 @@
+import path from "path";
+import { createRequire } from "node:module";
+import { getMediaCategory } from "./utils/mimeTypes.js";
+
+const require = createRequire(import.meta.url);
+
+// Base directories with environment variable support.
+// APP_ROOT is set by Electron to the app.asar path, or defaults to cwd for non-Electron use.
+export const APP_ROOT = process.env.APP_ROOT ? path.resolve(process.env.APP_ROOT) : process.cwd();
+
+// UNPACKED_ROOT points to app.asar.unpacked in packaged Electron builds.
+// Files that must be served via express.static() or res.sendFile() need to be on real disk
+// (not inside an asar archive), so they are unpacked and accessed via this path.
+// In non-Electron environments, this defaults to APP_ROOT (same directory).
+export const UNPACKED_ROOT = process.env.UNPACKED_ROOT
+  ? path.resolve(process.env.UNPACKED_ROOT)
+  : APP_ROOT;
+
+export const DATA_DIR = process.env.DATA_ROOT ? path.resolve(process.env.DATA_ROOT) : path.join(APP_ROOT, "data");
+
+// Seed themes directory — the source of truth for themes that ship with the app.
+// Themes are copied from here into the user data directory on first use.
+export const THEMES_SEED_DIR = process.env.THEMES_ROOT
+  ? path.resolve(process.env.THEMES_ROOT)
+  : path.join(APP_ROOT, "themes");
+
+// Core widget definitions + Liquid snippets are read via fs during rendering,
+// so resolve the core package root to real files in both workspace dev and
+// packaged Electron.
+const CORE_PKG_DIR = path.dirname(require.resolve("@widgetizer/core/package.json"));
+
+// CORE_WIDGETS_DIR stays overridable via env: backend tests point it at an
+// isolated fixture dir (previously achieved by overriding APP_ROOT, which no
+// longer drives this path).
+export const CORE_WIDGETS_DIR = process.env.CORE_WIDGETS_DIR
+  ? path.resolve(process.env.CORE_WIDGETS_DIR)
+  : path.join(CORE_PKG_DIR, "src", "widgets");
+
+export const CORE_SNIPPETS_DIR = path.join(CORE_PKG_DIR, "src", "snippets");
+
+// Frontend locale files are read via fs for preview empty-states. Resolve the
+// directory through the package's own exports so it works in both web
+// (workspace symlink) and packaged Electron (bundled under
+// node_modules/@widgetizer/core) without guessing an APP_ROOT path.
+export const LOCALES_DIR = path.dirname(require.resolve("@widgetizer/core/locales/en.json"));
+
+// Static paths — served via express.static() or res.sendFile(), so must be real files on disk.
+// In packaged Electron builds these are unpacked from the asar archive.
+export const STATIC_DIST_DIR = path.join(UNPACKED_ROOT, "dist");
+// Core assets (placeholder SVGs) are served via res.sendFile, which needs real
+// files on disk, so resolve to the unpacked package copy under node_modules. In
+// web/dev, UNPACKED_ROOT = APP_ROOT and the node_modules path resolves via the
+// workspace symlink.
+export const STATIC_CORE_ASSETS_DIR = path.join(
+  UNPACKED_ROOT,
+  "node_modules",
+  "@widgetizer",
+  "core",
+  "src",
+  "assets",
+);
+// Preview-iframe runtime modules (previewRuntime.js + its standalonePreviewTarget.js
+// sibling) are served raw via express.static(/runtime) as plain ES modules, so
+// they must resolve to real files on disk in dev and packaged Electron.
+export const STATIC_PREVIEW_RUNTIME_DIR = path.join(
+  UNPACKED_ROOT,
+  "node_modules",
+  "@widgetizer",
+  "core",
+  "src",
+  "runtime",
+);
+
+// Helper to check if a path is inside an asar archive
+export function isAsarPath(p) {
+  return p.includes(".asar" + path.sep) || p.includes(".asar/");
+}
+
+// Database path
+export const getDbPath = () => path.join(DATA_DIR, "widgetizer.db");
+
+// Publish directory for exports
+export const PUBLISH_DIR = path.join(DATA_DIR, "publish");
+export const getPublishDir = () => PUBLISH_DIR;
+
+// Themes directory (user data — installed themes)
+export const getThemesDir = () => path.join(DATA_DIR, "themes");
+
+// Theme paths
+export const getThemeDir = (themeId) => path.join(getThemesDir(), themeId);
+export const getThemeJsonPath = (themeId) => path.join(getThemeDir(themeId), "theme.json");
+export const getThemeWidgetsDir = (themeId) => path.join(getThemeDir(themeId), "widgets");
+export const getThemeTemplatesDir = (themeId) => path.join(getThemeDir(themeId), "templates");
+
+// Theme versioning paths
+export const getThemeUpdatesDir = (themeId) => path.join(getThemeDir(themeId), "updates");
+export const getThemeLatestDir = (themeId) => path.join(getThemeDir(themeId), "latest");
+export const getThemeVersionDir = (themeId, version) => path.join(getThemeUpdatesDir(themeId), version);
+
+// Theme preset paths
+export const getThemePresetsDir = (themeId) => path.join(getThemeDir(themeId), "presets");
+export const getThemePresetsJsonPath = (themeId) => path.join(getThemePresetsDir(themeId), "presets.json");
+export const getThemePresetDir = (themeId, presetId) => path.join(getThemePresetsDir(themeId), presetId);
+
+// Project paths
+export const getProjectDir = (projectId) => path.join(DATA_DIR, "projects", projectId);
+
+// Project Page paths
+export const getProjectPagesDir = (projectId) => path.join(getProjectDir(projectId), "pages");
+export const getPagePath = (projectId, pageId) =>
+  path.join(getProjectPagesDir(projectId), `${pageId}.json`);
+
+// Project Menu paths
+export const getProjectMenusDir = (projectId) => path.join(getProjectDir(projectId), "menus");
+export const getMenuPath = (projectId, menuId) =>
+  path.join(getProjectMenusDir(projectId), `${menuId}.json`);
+
+// Project theme paths
+export const getProjectThemeDir = (projectId) => path.join(getProjectDir(projectId), "theme");
+export const getProjectThemeJsonPath = (projectId) =>
+  path.join(getProjectDir(projectId), "theme.json");
+
+// Project Media paths
+export const getProjectUploadsDir = (projectId) => path.join(getProjectDir(projectId), "uploads");
+export const getProjectImagesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "images");
+export const getProjectFilesDir = (projectId) => path.join(getProjectUploadsDir(projectId), "files");
+export const getImagePath = (projectId, filename) =>
+  path.join(getProjectImagesDir(projectId), filename);
+
+// Re-export from centralized MIME utils so existing importers keep working
+export { getMediaCategory };
+
+/**
+ * Resolve the upload directory for a given project and media category.
+ * @param {string} projectFolderName
+ * @param {string} [mimeType] - MIME type used to determine the target subdirectory
+ */
+export function getMediaDir(projectFolderName, mimeType) {
+  const category = getMediaCategory(mimeType);
+  if (category === "file") {
+    return getProjectFilesDir(projectFolderName);
+  }
+  return getProjectImagesDir(projectFolderName);
+}

@@ -1,183 +1,118 @@
-# App Settings (`AppSettings.jsx`)
+# App Settings (`app/src/pages/AppSettings.jsx`)
 
 ## Overview
 
-The `AppSettings` page is responsible for managing global configurations that apply across the entire application, rather than to a specific project. These are system-level settings that control the application's behavior. Key examples include setting the maximum file upload size for the media manager and configuring image processing settings.
+The **App Settings** page manages global configuration that applies across the entire application rather than to a single project. These are system-level settings that control application behavior — for example the maximum upload size for the media manager and the image-processing configuration. The system is **schema-driven** and completely isolated from the theme settings system.
 
-After the workspace merge, App Settings lives in the admin shell at `/app-settings`, separate from the site workspace routes.
-
-The App Settings system has been **refactored** to use a clean, modular architecture with dedicated components that are completely isolated from the theme settings system.
+App Settings lives in the admin shell at `/app-settings`, separate from the site workspace routes.
 
 ## Route Context
 
-- `/app-settings` is rendered inside `ProjectPickerLayout` (admin shell).
+- `/app-settings` is rendered inside the admin shell (`ProjectPickerLayout`).
 - The page is available even when there is no active project.
-- When an active project exists, `AppSettings.jsx` also loads the current theme with `getTheme(activeProject.theme)` so the UI can react to theme-defined image sizes.
+- When an active project exists, `AppSettings.jsx` also loads the current theme with `getTheme(activeProject.theme)` so the UI can react to theme-defined image sizes (see [Theme Override Behavior](#theme-override-behavior)).
 
 ## Current Settings
 
+The setting catalog is defined declaratively in `packages/editor-ui/src/config/appSettings.schema.json`. Defaults below come from that schema and from the server-side `defaultSettings` in `packages/builder-server/src/db/repositories/settingsRepository.js` (the two are kept in sync).
+
 ### General Settings
 
-- **Default Language**: Sets the application's user interface language. The current shipped UI exposes **English only** while the locale infrastructure remains in place for future re-expansion.
-- **Date Format**: Configures how dates are displayed throughout the platform. The current default is `MMMM D, YYYY h:mm A` (for example, `December 31, 2024 2:15 PM`).
+- **Default Language** (`general.language`, default `en`): the UI language. The shipped UI exposes **English only**; the locale infrastructure remains in place for future re-expansion.
+- **Date Format** (`general.dateFormat`, default `MMMM D, YYYY h:mm A`, e.g. `December 31, 2024 2:15 PM`): how dates are displayed throughout the platform.
 
 ### Media Settings
 
-#### File Upload Limits
+- **Maximum Image File Size** (`media.maxFileSizeMB`, default **50**, range 1–100): per-file upload size limit applied across all projects.
+- **Image Quality** (`media.imageProcessing.quality`, default **85**, range 1–100): single quality setting applied to all generated image sizes during Sharp processing.
+- **Image Sizes** (`media.imageProcessing.sizes.*`): each of `thumb` (150px), `small` (480px), `medium` (1024px), `large` (1920px) can be enabled/disabled and have its width customized.
 
-- **Maximum Image File Size**: Controls the size limit for individual image uploads across all projects
+Image-size generation, theme overrides, and the Sharp pipeline are documented in detail in [core-media.md](core-media.md).
 
-#### Image Processing Configuration
+#### Theme Override Behavior
 
-- **Image Quality**: Single quality setting (1-100) that applies to all generated image sizes
-  - Higher values = better quality but larger file sizes
-  - Lower values = smaller files but reduced quality
-- **Image Sizes**: Configure which image sizes are generated and their dimensions:
-  - **Thumb** (default: 150px) - Used for preview thumbnails in the media library
-  - **Small** (default: 480px) - Optimized for mobile devices
-  - **Medium** (default: 1024px) - Standard responsive breakpoint
-  - **Large** (default: 1920px) - High-resolution displays
-  - Each size can be **enabled/disabled** and have its **width customized**
-
-**Theme Override Behavior:** When the active project's theme defines its own `imageSizes` in `theme.json`, the Image Sizes settings are hidden in the App Settings UI. A notice is displayed explaining that image sizes are managed by the theme. This logic is driven by a theme lookup in `AppSettings.jsx`, not by the settings hook itself. If no active project exists, the global Image Sizes controls remain visible. See [Media Library - Theme-Defined Image Sizes](core-media.md#theme-defined-image-sizes) for details.
+When the active project's theme defines its own `imageSizes` in `theme.json`, the Image Sizes group is hidden in the App Settings UI and a notice is shown explaining that image sizes are managed by the theme. This logic is driven by a theme lookup in `AppSettings.jsx` (it passes `hiddenGroups`/`groupMessages` to `AppSettingsPanel`), not by the settings hook. If no active project exists, the global Image Sizes controls remain visible. See [core-media.md](core-media.md) for the full theme-override contract.
 
 ### Export Management Settings
 
-#### Version Control
+- **Maximum Export Versions to Keep** (`export.maxVersionsToKeep`, default **10**, range 1–50): export versions retained per project; older exports are pruned when exceeded.
+- **Maximum Project Import Size** (`export.maxImportSizeMB`, default **500**, range 10–2000): max size for project import ZIPs, enforced on both client and server.
 
-- **Maximum Export Versions to Keep**: Controls how many export versions are retained per project (default: 10)
-  - When this limit is exceeded, the oldest exports are automatically deleted to save storage space
-  - Range: 1-50 versions
-  - Applies to all projects globally
-
-#### Project Import
-
-- **Maximum Project Import Size (MB)**: Controls the maximum file size for project import ZIP files (default: 500MB)
-  - Range: 10-2000 MB
-  - Increase this if you need to import large projects with many media files
-  - Enforced on both client and server side for security
+Export versioning and import sizing are documented in [core-export.md](core-export.md).
 
 ### Developer Tools
 
-These settings are intended for theme developers and advanced users.
-
-- **Enable Developer Mode**: When enabled, shows additional developer tools throughout the application
-  - Enables advanced debugging and development workflows
-  - Also enables export-time HTML validation and generation of `__export__issues.html` during static site exports
+- **Enable Developer Mode** (`developer.enabled`, default `false`): shows additional developer tools throughout the application and enables export-time HTML validation (generation of `__export__issues.html` during static site exports).
 
 ## Architecture Overview
 
-The App Settings system uses a **schema-driven architecture** that is completely isolated from theme settings, providing better maintainability and extensibility.
+The App Settings system uses a **schema-driven architecture** that is completely isolated from theme settings.
 
 ### Core Components
 
-#### `AppSettings.jsx` (Main Page)
+#### `AppSettings.jsx` (`app/src/pages/AppSettings.jsx`)
 
-The main page component (~130 lines) acts as an orchestrator:
+The main page component acts as an orchestrator:
 
-- **Layout Management**: Uses `PageLayout` for consistent page structure
-- **Loading States**: Displays loading spinners and error states
-- **Hook Integration**: Uses `useAppSettings` hook for all data management
-- **Theme Awareness**: Optionally loads the active project's theme so it can hide app-level image-size controls when the theme owns that configuration
-- **Save/Cancel Actions**: Provides save and cancel buttons with change tracking
-- **Navigation Guard**: Integrated `useFormNavigationGuard` prevents accidental navigation with unsaved changes
-- **Localization**: Fully localized using `react-i18next` for all user-facing text
+- **Layout** — uses `PageLayout` for consistent page structure.
+- **Loading / Error States** — renders a loading spinner and an error state from the hook.
+- **Hook Integration** — uses the `useAppSettings` hook for all data management.
+- **Theme Awareness** — optionally loads the active project's theme so it can hide app-level image-size controls when the theme owns that configuration.
+- **Save / Cancel Actions** — provides save, reset, and cancel buttons with change tracking.
+- **Navigation Guard** — calls `useGuardedFormPage(hasChanges)` to block accidental navigation away from unsaved changes and to render the pink dirty-dot in the page title via `getDirtyTitle`. App Settings is a stay-in-place page (no navigation after save), so it ignores the hook's `navigateSafely`. See [core-hooks.md](core-hooks.md).
+- **Localization** — fully localized with `react-i18next`.
 
-#### `AppSettingsPanel.jsx` (`src/components/settings/AppSettingsPanel.jsx`)
+#### `AppSettingsPanel.jsx` (`app/src/components/settings/AppSettingsPanel.jsx`)
 
 A dedicated component for rendering app settings:
 
-- **Schema-Driven Rendering**: Works directly with JSON schema format
-- **Tab Management**: Automatic tab generation from schema configuration
-- **Group Organization**: Supports setting groups with visual separators
-- **Vertical Tabs**: Consistent UI with theme settings but isolated architecture
-- **Native Schema Support**: No conversion logic - works directly with app settings format
-- **Localization**: Tab labels, section titles, and all text fully localized via translation keys
+- **Schema-Driven Rendering** — works directly with the JSON schema format (no conversion logic).
+- **Tab Management** — automatic tab generation from schema configuration (`general`, `media`, `export`, `developer`).
+- **Group Organization** — supports setting groups (e.g. `appSettings.groups.imageSizes`) with visual separators, and accepts `hiddenGroups` / `groupMessages` for the theme-override notice.
+- **Localization** — tab labels, section titles, and all text are translated via translation keys.
 
-#### `useAppSettings.js` Hook (`src/hooks/useAppSettings.js`)
+#### `useAppSettings.js` Hook (`packages/editor-ui/src/hooks/useAppSettings.js`)
 
 Centralized state management for app settings:
 
-- **State Management**: Settings data, loading states, and change tracking
-- **Schema Integration**: Loads and merges with JSON schema defaults
-- **Nested Object Support**: Handles dot-notation paths (e.g., `"media.maxFileSizeMB"`)
-- **Data Validation**: Type conversion and validation before saving
-- **Save/Cancel Logic**: Complete workflow management with undo functionality
+- **State Management** — settings data, loading states, and change tracking (compares against the originally loaded values).
+- **Schema Integration** — loads settings, then merges with schema defaults via dot-notation paths (`mergeWithDefaults`).
+- **Nested Object Support** — get/set nested values using dot notation (e.g. `media.imageProcessing.quality`).
+- **Type Conversion** — `processSettingsForSave` coerces `number`-typed fields before persisting.
+- **Save / Cancel Logic** — persists via the settings query manager, updates the in-module cache, and (if the language changed) calls `i18n.changeLanguage`.
 
 ### Schema-Driven Configuration
 
-The system uses **JSON Schema** files (`src/config/appSettings.schema.json`) to define:
+The schema (`packages/editor-ui/src/config/appSettings.schema.json`) defines:
 
-- **Setting Structure**: Types, labels, descriptions, and validation rules
-- **Tab Organization**: Automatic grouping into tabs (media, export, etc.)
-- **Group Headers**: Visual organization within tabs
-- **Default Values**: Fallback values for new installations
-- **Input Types**: Supports text, number, checkbox, range, select, and more
+- **`tabs`** — tab keys, labels, and descriptions (translation keys).
+- **`settings`** — per-setting `tab`, `type` (`select`, `number`, `checkbox`, …), `label`, `description`, `default`, validation bounds (`min`/`max`), `options`, and optional `group`.
 
-### Data Flow and State Management
-
-#### 1. Schema Loading and Defaults
-
-- `useAppSettings` loads the JSON schema on component mount
-- Merges loaded settings with schema defaults using dot-notation paths
-- Provides fallback values for missing or undefined settings
-
-#### 2. Settings Rendering
-
-- `AppSettingsPanel` processes the schema to organize settings by tabs
-- Automatically generates group headers and setting inputs
-- Uses `SettingsRenderer` for consistent input rendering across the application
-
-#### 3. Change Management
-
-- All changes are tracked in state with automatic change detection
-- Supports nested object updates using dot-notation (e.g., `"media.imageProcessing.quality"`)
-- Provides real-time feedback on unsaved changes
-
-#### 4. Save Validation and Processing
-
-- Pre-save validation ensures data types match schema requirements
-- Automatic type conversion (strings to numbers, etc.)
-- Comprehensive error handling with user feedback via toast notifications
-
-### Benefits of Refactored Architecture
-
-- **Complete Isolation**: No coupling with theme settings system
-- **Schema-Driven**: Easy to add new settings by updating JSON schema
-- **Maintainability**: Clean separation of concerns across components
-- **Extensibility**: New setting types can be added without architecture changes
-- **Consistency**: Same UI components as theme settings but isolated implementation
-- **Type Safety**: Schema validation prevents configuration errors
+Adding a new setting is a schema edit plus, where it must be enforced, server-side validation in `appSettingsController.js`.
 
 ## How App Settings Are Used
 
-Unlike theme settings, which are primarily consumed by the frontend via a global store, App Settings are mainly used by the **backend** to control system-level behavior.
+Unlike theme settings (consumed primarily by the frontend via a global store), App Settings are mainly used by the **backend** to control system-level behavior. Settings are persisted in SQLite and merged with defaults on read.
 
-### File Upload Size Validation
+### Persistence and Read Path
 
-The file size settings demonstrate server-side enforcement:
+- **Routes** — `packages/builder-server/src/routes/appSettings.js` exposes `GET /api/settings` and `PUT /api/settings`, mounted under the actor-scoped router in `setupBuilderServer.js`.
+- **Controller** — `packages/builder-server/src/controllers/appSettingsController.js` (`getAppSettings`, `updateAppSettings`, and the internal `getSetting(key)` used by other controllers). `updateAppSettings` validates media size limits and image-processing bounds before saving.
+- **Repository** — `packages/builder-server/src/db/repositories/settingsRepository.js` reads/writes the SQLite-backed settings store and deep-merges with `defaultSettings`.
 
-1.  When a user uploads files through the Media Manager, the files are sent directly to the server.
-2.  The backend route (`/api/media/projects/:projectId/media`) receives the files.
-3.  Before processing the upload, the server-side controller (`mediaController.js`) reads the size limit (`maxFileSizeMB`) directly from the SQLite-backed app settings store.
-4.  It compares each uploaded file's size against the limit. If a file is too large, the server rejects it and sends an error message back to the client.
+### File Upload Size Enforcement (two-stage)
+
+Uploads go to the **active-project-scoped** route `POST /api/media/` (mounted via `/media` on the project-scoped router). The active project is resolved from the `X-Project-Id` header into `req.scope` by the `resolveActiveProject` middleware — the project id stays out of the path. Two independent checks enforce the size cap:
+
+1. **Streaming multer cap (SA-02)** — the `uploadWithLimit` middleware (`mediaController.js`) reads the per-file byte cap from the injected limits adapter (`req.adapters.limits.getLimit(req.scope, LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES)`) and applies it as a multer `limits.fileSize`, so an oversize part is rejected (413) **before** the whole file is buffered into memory. A platform fallback (`DEFAULT_MAX_UPLOAD_BYTES`, 10 MB) is used when no limits adapter is wired.
+2. **Controller comparison** — `uploadProjectMedia` then reads `media.maxFileSizeMB` via `getSetting(...)` and compares each file's size against it, returning a per-file failure reason for anything over the configured limit.
+
+In OSS these two values agree: the `LocalLimitsAdapter` returns the same configured max that the controller check enforces. The scope-first call shape (`{ actor, projectId, folderName }`) and the limits-adapter / `LIMIT_KEYS` contract are documented in [core-packages.md](core-packages.md).
 
 ### Image Processing Configuration
 
-The image processing settings directly control how uploaded images are processed:
-
-1.  **Dynamic Loading**: When processing an image upload, the media controller calls `getImageProcessingSettings()` to load current configuration
-2.  **Quality Application**: The configured quality setting (1-100) is applied to all generated image sizes during the Sharp.js processing
-3.  **Size Generation**: Only enabled image sizes are generated, respecting the configured maximum widths:
-
-- If `thumb` is unavailable: the media UI falls back to the original image path
-- If `large` is disabled: no large images are generated, saving storage space
-- Custom widths are applied: e.g., changing `medium` from 1024px to 800px
-
-4.  **Immediate Effect**: Settings changes apply to all new uploads without requiring application restart
-
-This server-side validation and processing ensures that the constraints are always enforced securely, regardless of any frontend logic, while providing administrators full control over image processing behavior and storage requirements.
+When processing an upload, the media controller calls `getImageProcessingSettings(projectId)` to load the current quality and enabled sizes (with theme overrides applied), then generates only the enabled sizes at their configured widths. Changes take effect on the next upload with no restart. The Sharp pipeline, size-generation fallbacks, and theme-override resolution live in [core-media.md](core-media.md).
 
 ## Security Considerations
 
-All API endpoints described in this document are protected by input validation and CORS policies. File-size and image-dimension safety limits are enforced inline in each upload handler (mediaController, themeController, projectController) using values from app settings. For more details, see the **[Platform Security](core-security.md)** documentation.
+API endpoints are protected by input validation and CORS policies. File-size and image-dimension safety limits are enforced inline in the relevant upload handlers (`mediaController`, `themeController`, `projectController`) using values from app settings, plus the adapter-sourced streaming cap above. See [core-security.md](core-security.md) for the platform security model and [core-packages.md](core-packages.md) for the scope / limits-adapter contract.

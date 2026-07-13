@@ -13,7 +13,7 @@ The manifest lives at the root of your theme and contains metadata and a `settin
 The default Arch theme uses:
 
 - `themes/arch/theme.json`
-- Groups: `layout`, `colors`, `typography`, `privacy`, `advanced`
+- Groups: `general`, `colors`, `typography`, `style`, `social`, `advanced`
 
 You can add any groups you want. Groups are just sections in the Theme Settings UI, so name them to match your design system or product goals. Example group ideas:
 
@@ -29,17 +29,17 @@ For group item structure and field options, see [Setting Types](theme-dev-settin
 
 These fields are required for a theme to be valid:
 
-**`name`** — Human-friendly theme name shown in the UI.
+**`name`:** Human-friendly theme name shown in the UI.
 
-**`version`** — Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-structure.html#publishing-theme-updates) to track which version users have installed and to determine when updates are available.
+**`version`:** Semantic version string for the theme (e.g., `1.0.0`). This version is used by the [theme update system](theme-dev-distribution.html) to track which version users have installed and to determine when updates are available.
 
-**`author`** — Theme author or organization name.
+**`author`:** Theme author or organization name.
 
 # Optional Metadata
 
-**`description`** — A short description shown in the theme picker.
+**`description`:** A short description shown in the theme picker.
 
-**`useCoreWidgets`** — When `true` (or absent), core widgets are included alongside theme widgets. If `false`, core widgets are not exposed in the editor.
+**`useCoreWidgets`:** When `true` (or absent), core widgets are included alongside theme widgets. If `false`, core widgets are not exposed in the editor.
 
 # Theme-Defined Image Sizes (Optional)
 
@@ -65,9 +65,9 @@ When present, theme image sizes **replace** the app settings entirely for projec
 
 **Per-size properties:**
 
-- **`width`** (number) — Maximum width in pixels
-- **`enabled`** (boolean) — Whether to generate this size (default: `true`)
-- **`quality`** (number, optional) — JPEG/WebP quality 1–100; falls back to app setting if omitted
+- **`width`** (number): Maximum width in pixels
+- **`enabled`** (boolean): Whether to generate this size (default: `true`)
+- **`quality`** (number, optional): JPEG/WebP quality 1-100; falls back to app setting if omitted
 
 Templates can reference these sizes with the `{% image %}` tag, e.g. `{% image src: image, size: 'hero' %}`.
 
@@ -99,11 +99,12 @@ Global settings are defined in `settings.global`. Each key is a group that becom
 
 Arch defines:
 
-- `layout` (animations)
+- `general` (favicon, reveal animations, date format)
 - `colors` (standard and highlight color sets)
 - `typography` (heading and body font pickers)
-- `privacy` (Bunny Fonts toggle)
-- `advanced` (custom CSS and script injection)
+- `style` (corner style, spacing density, button shape)
+- `social` (social profile URLs)
+- `advanced` (Bunny Fonts toggle, custom CSS, and script injection)
 
 # Setting Types
 
@@ -132,7 +133,7 @@ For a complete list and properties, see [Setting Types](theme-dev-setting-types.
 
 # CSS Variables Output
 
-When `outputAsCssVar: true` is set, the `{% theme_settings %}` tag outputs a CSS variable in the `<head>`. See [Liquid Tags & Assets](theme-dev-liquid-assets.html) for tag details and [Design System & Utilities](theme-dev-design-system.html) for how tokens map to CSS variables.
+When `outputAsCssVar: true` is set, the `{% theme_settings %}` tag outputs a CSS variable in the `<head>`. See [Liquid Tags & Filters](theme-dev-liquid-assets.html) for tag details and [Design System & Utilities](theme-dev-design-system.html) for how tokens map to CSS variables.
 
 ### Naming Convention
 
@@ -159,6 +160,8 @@ Example:
 
 For body fonts, a `--{group}-body_font_bold-weight` variable is also generated to avoid faux bold rendering.
 
+The `{% fonts %}` tag also reads `font_picker` settings from the `typography` group. It loads external stylesheets only for Widgetizer's known web fonts; system font stacks intentionally produce no external request. Use `heading_font` and `body_font` ids when you want the same behavior Arch uses, including automatic bold-weight loading for `body_font`.
+
 # Accessing Theme Settings in Liquid
 
 All settings are available in templates through the `theme` object using the same group and ID structure.
@@ -168,7 +171,7 @@ All settings are available in templates through the `theme` object using the sam
 ```liquid
 {{ theme.colors.standard_bg_primary }}
 {{ theme.typography.heading_font.stack }}
-{% if theme.layout.enable_reveal_animations %}
+{% if theme.general.enable_reveal_animations %}
   <!-- Animation logic -->
 {% endif %}
 ```
@@ -182,6 +185,17 @@ If you include the `advanced` group, users can inject:
 - Custom scripts before `</body>` via `{% custom_footer_scripts %}`
 
 These tags must be present in `layout.liquid` for the settings to take effect. See [Layout & Templates](theme-dev-layout-templates.html) for required placeholders and tag placement.
+
+Use these exact setting ids if you want the built-in tags to pick them up:
+
+| Setting id | Suggested type | Consumed by |
+| :-- | :-- | :-- |
+| `custom_css` | `code` with `language: "css"` | `{% custom_css %}` |
+| `custom_head_scripts` | `code` with `language: "html"` | `{% custom_head_scripts %}` |
+| `custom_footer_scripts` | `code` with `language: "html"` | `{% custom_footer_scripts %}` |
+| `use_bunny_fonts` | `checkbox` | `{% fonts %}` provider selection compatibility |
+
+Custom CSS and scripts are deliberate raw output surfaces. They should be presented as advanced controls and documented for trusted site administrators, not casual content editors. For the detailed output contract, see [Liquid Tags & Filters](theme-dev-liquid-assets.html#seo-fonts-and-theme-settings).
 
 # Theme Localization (i18n)
 
@@ -262,7 +276,7 @@ Widget `displayName` and setting `label` fields support the same `tTheme:` prefi
 
 ### Supported Languages
 
-Widgetizer's admin interface currently ships with English; additional languages will be added in future releases. Your theme can provide a locale file for any language code you intend to support — the active locale matches the user's language setting in [App Settings](settings.html), and locale files for languages that aren't yet selectable in the UI sit dormant until they are.
+Widgetizer's admin interface currently ships with English; additional languages will be added in future releases. Your theme can provide a locale file for any language code you intend to support; the active locale matches the user's language setting in [App Settings](settings.html), and locale files for languages that aren't yet selectable in the UI sit dormant until they are.
 
 # Practical Guidance
 

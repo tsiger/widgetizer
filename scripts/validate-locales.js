@@ -10,7 +10,8 @@ import { join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const localesDir = join(__dirname, "..", "src", "locales");
+// Frontend locale files are validated from the shared core package.
+const localesDir = join(__dirname, "..", "packages", "core", "src", "locales");
 
 function flattenKeys(obj, prefix = "") {
   const keys = [];

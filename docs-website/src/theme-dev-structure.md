@@ -2,14 +2,14 @@
 description: Learn the folder structure for Widgetizer themes. Required files, directory layout, and how themes are discovered by the system.
 ---
 
-A theme in Widgetizer is a complete package with a predictable folder structure. This page documents the default theme layout, the minimum required files, and how the system discovers theme content. Theme authoring is meant to be as expressive as it can be — you can build minimal themes or highly opinionated systems.
+A theme in Widgetizer is a complete package with a predictable folder structure. This page documents the default theme layout, the minimum required files, and how the system discovers theme content. Theme authoring is meant to be as expressive as it can be; you can build minimal themes or highly opinionated systems.
 
 # Technologies Used in Themes
 
 Themes are built with familiar web technologies:
 
 - **HTML** for overall document structure (in `layout.liquid`)
-- **LiquidJS** for templating, data access, and reusable snippets (see [Liquid Tags & Assets](theme-dev-liquid-assets.html))
+- **LiquidJS** for templating, data access, and reusable snippets (see [Liquid Tags & Filters](theme-dev-liquid-assets.html))
 - **CSS** for base styles, tokens, and widget-level styling
 - **JavaScript** for widget behavior and advanced interactions
 
@@ -51,6 +51,10 @@ themes/my-theme/
 │   └── main-menu.json
 ├── snippets/
 │   └── icon.liquid
+├── collection-types/     # Optional: theme-defined content types (CMS)
+│   └── news/
+│       ├── schema.json
+│       └── template.liquid
 ├── locales/              # Translation files for i18n
 │   ├── en.json
 │   ├── fr.json
@@ -86,7 +90,7 @@ The theme manifest. It must include `name`, `version`, and `author` at minimum. 
 
 **`layout.liquid`**
 
-The main HTML wrapper for every page. This is where global assets are loaded and where page content is inserted. See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Assets](theme-dev-liquid-assets.html) for required placeholders and asset loading.
+The main HTML wrapper for every page. This is where global assets are loaded and where page content is inserted. See [Layout & Templates](theme-dev-layout-templates.html) and [Liquid Tags & Filters](theme-dev-liquid-assets.html) for required placeholders and asset loading.
 
 **`screenshot.png`**
 
@@ -117,7 +121,7 @@ A folder containing translation JSON files for theme localization. Each file is 
 
 **`presets/`** (optional)
 
-A folder containing preset variants of the theme. Each subfolder is one preset and contains its own `preset.json` (manifest with name, description, and overridden theme settings), `screenshot.png` (preview shown during project creation), and optionally `menus/` and `templates/` to ship preset-specific demo content. Presets are picked at project creation time — see [Themes](themes.html#theme-presets) for the user flow.
+A folder containing preset variants of the theme. Each subfolder is one preset and contains its own `preset.json` (manifest with name, description, and overridden theme settings), `screenshot.png` (preview shown during project creation), and optionally `menus/` and `templates/` to ship preset-specific demo content. Presets are picked at project creation time; see [Themes](themes.html#theme-presets) for the user flow.
 
 # What Widgetizer Loads
 
@@ -130,22 +134,45 @@ When a theme is selected for a project, the system loads:
 - `assets/` for theme-level assets
 - `menus/` for navigation menus
 - `snippets/` for reusable Liquid partials
+- `collection-types/*/` for collection schemas and item-page templates (when present)
 - `locales/` for translation strings (when present)
 - `presets/*/preset.json` for preset variants (when present)
 
 # Arch Theme Example
 
-The default theme lives in `themes/arch/` and includes all required components plus a full widget set. It’s a helpful example, but not a required blueprint — you can diverge in structure, naming, and organization as long as the core contract is met.
+The default theme lives in `themes/arch/`. Arch is Widgetizer's bundled production theme: a real design system, widget library, preset family, and reference implementation. It is useful because it shows how a single theme can support many site types through presets, without duplicating the underlying widget and layout code.
 
-### Key Arch Files
+Arch is not a required blueprint. You can build a much smaller theme, organize CSS differently, skip presets, or omit collections entirely as long as the core contract is met.
 
-- `themes/arch/theme.json`
-- `themes/arch/layout.liquid`
-- `themes/arch/templates/index.json`
-- `themes/arch/widgets/`
-- `themes/arch/assets/base.css`
-- `themes/arch/menus/main-menu.json`
-- `themes/arch/snippets/icon.liquid`
+At the current version, Arch includes 57 widget folders and 31 preset folders. Treat those numbers as scale, not a requirement.
+
+### Read Arch in This Order
+
+If you want to understand a real theme, open these files in order:
+
+1. `themes/arch/theme.json`: metadata, global settings, image-size rules, and theme setting groups.
+2. `themes/arch/layout.liquid`: the document wrapper, global tags, content placeholders, and asset output.
+3. `themes/arch/assets/base.css`: shared tokens, utility classes, color schemes, spacing, buttons, forms, and layout primitives.
+4. `themes/arch/widgets/`: the widget library. Each widget has a `schema.json` for the editor and a `widget.liquid` template for rendering.
+5. `themes/arch/templates/`: default page structures and global header/footer widget instances.
+6. `themes/arch/presets/`: starter sites built from the same theme. A preset can override settings, templates, menus, collection items, and starter media.
+7. `themes/arch/collection-types/`: theme-owned CMS types such as News, Projects, Services, and development/demo types.
+8. `themes/arch/snippets/` and `themes/arch/assets/icons.json`: shared Liquid helpers and icon data.
+9. `themes/arch/locales/`: translatable labels for theme settings, widget schemas, and editor UI text.
+
+### What Arch Demonstrates
+
+- A broad widget library with consistent schema patterns
+- A shared design system in `base.css`
+- Global settings that feed CSS variables and Liquid
+- Full presets for different business types
+- Collection types with optional item pages
+- Global widgets for header and footer
+- Localized labels using `tTheme:` keys
+
+### What Arch Is Not
+
+Arch is not a separate theme for every preset. Brewline, Brightside, Shearline, and the other starter cards are Arch presets. They may ship different starter content, but they share the same underlying theme contract.
 
 # Theme Copying in Projects
 
@@ -157,98 +184,8 @@ When a new project is created, the selected theme is copied into the project's d
 
 This ensures each project has its own theme files and can evolve independently.
 
-# Publishing Theme Updates
+# Distributing & Updating Themes
 
-Widgetizer supports a versioned update system that lets you distribute improvements to users of your theme.
+Themes are shared as zip files, and Widgetizer's versioned update system lets you ship improvements to existing projects without touching user content. The `updates/` and `latest/` folders shown in the layout above are part of that system.
 
-### Update Folder Structure
-
-Theme updates use a **partial update** (delta) approach. Each version folder in `updates/` contains only the files that changed:
-
-```
-themes/my-theme/
-├── theme.json              # Base version (e.g., 1.0.0)
-├── layout.liquid
-├── widgets/
-├── updates/
-│   ├── 1.1.0/
-│   │   ├── theme.json      # Required, version must be "1.1.0"
-│   │   └── widgets/
-│   │       └── new-widget/ # Only new/changed widgets
-│   └── 1.2.0/
-│       ├── theme.json      # Required, version must be "1.2.0"
-│       └── assets/
-│           └── base.css    # Only changed assets
-│   └── 1.3.0/
-│       ├── theme.json
-│       └── deleted/        # Deleted files
-│           └── assets/
-│               └── old.css
-└── latest/                 # Auto-generated snapshot
-```
-
-### Creating an Update
-
-1. Create a version folder (e.g., `updates/1.1.0/`)
-2. Add a `theme.json` with the matching version number
-3. Add only the files that changed (new widgets, updated CSS, etc.)
-4. (Optional) Add a `deleted/` folder to remove files from previous versions (see below)
-5. Go to the Themes page in Widgetizer and click "Update" on your theme
-6. The system builds the `latest/` snapshot by layering all versions
-
-### Deleting Files
-
-To remove files or folders from previous versions, add a `deleted/` folder to your update version. The structure inside `deleted/` mirrors the paths you want to remove:
-
-- **Files:** Add an empty file to mark it for deletion (e.g., `deleted/assets/old.css`)
-- **Folders:** Add an empty directory to delete the entire folder and its contents (e.g., `deleted/widgets/old-widget/`)
-- **Path Containers:** Non-empty directories in `deleted/` are treated as path containers and are not deleted themselves (only their key contents are).
-
-**Protected from Deletion:** User content (`pages/`, `uploads/`) and additive-only paths (`templates/`, `menus/`) cannot be deleted.
-
-### The `latest/` Folder
-
-The `latest/` folder is automatically generated—**do not edit it manually**. It's built by:
-
-1. Starting from the base theme files (root level)
-2. Applying each version folder in semver order
-3. For overlapping files, the latest version wins
-
-Projects read from `latest/` when it exists, ensuring they always get the most up-to-date theme.
-
-### Version Validation
-
-The system enforces:
-
-- Every version folder must contain a `theme.json`
-- The version in `theme.json` must match the folder name
-- Versions must be valid semver format (x.y.z)
-
-If validation fails, the build is aborted with an error message.
-
-### Distributing Updates
-
-To distribute your theme with updates:
-
-1. Zip the entire theme folder (including `updates/`)
-2. Share the zip file with users
-3. When users upload the zip, new versions are imported automatically
-4. The `latest/` folder in the zip is ignored—it's always rebuilt locally
-
-### What Gets Updated in Projects
-
-When users apply your theme update to their projects:
-
-| Path              | Behavior                                |
-| ----------------- | --------------------------------------- |
-| `layout.liquid`   | Replaced                                |
-| `widgets/`        | Replaced                                |
-| `assets/`         | Replaced                                |
-| `snippets/`       | Replaced                                |
-| `locales/`        | Replaced                                |
-| `screenshot.png`  | Replaced                                |
-| `theme.json`      | Settings merged (user values preserved) |
-| `menus/`          | New menus added, existing preserved     |
-| `templates/`      | New templates added, existing preserved |
-
-User content (`pages/`, `uploads/`) is never modified.
+See [Distributing & Updating Themes](theme-dev-distribution.html) for the full workflow: packaging, the partial update folders, deleting files, the `latest/` snapshot, and what gets updated vs. protected in projects.

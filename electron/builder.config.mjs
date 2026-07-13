@@ -10,10 +10,12 @@ export default {
   },
   files: [
     "dist",
-    "server",
-    "src/core",
-    "src/utils",
-    "src/locales",
+    // OSS shell server assembly — the only backend file under app/ (the rest of
+    // app/ is frontend source already bundled into dist/ by Vite). It composes
+    // the @widgetizer/* backend packages, which are bundled via dependencies.
+    "app/server-common.js",
+    // Core assets + preview-iframe runtime modules are supplied by
+    // @widgetizer/core and ride along via that dependency.
     "themes",
     "!themes/widgetizer/**",
     "electron",
@@ -24,8 +26,14 @@ export default {
     "themes/**",
     "!themes/widgetizer/**",
     "dist/**",
-    "src/core/assets/**",
-    "src/utils/previewRuntime.js",
+    // Core placeholder SVGs are served via res.sendFile, which needs real files
+    // on disk (not inside the asar).
+    "node_modules/@widgetizer/core/src/assets/**",
+    // Served raw via express.static(/runtime). previewRuntime.js imports its
+    // sibling standalonePreviewTarget.js by relative URL, so every served runtime
+    // module must be a real on-disk file (unpacked), not read from inside the asar.
+    // Top-level *.js only — __tests__ stays packed.
+    "node_modules/@widgetizer/core/src/runtime/*.js",
     "node_modules/sharp/**",
     "node_modules/@img/sharp-*/**",
     "node_modules/@img/sharp-libvips-*/**",

@@ -25,6 +25,10 @@ Every page in your project becomes an HTML file:
 - Other pages use their slug as the filename (e.g., `about.html`, `contact.html`)
 - All HTML is formatted with Prettier for clean, readable output
 
+### Collection Item Pages
+
+If your theme defines [collections](collections.html) with item pages, each item is exported to its own HTML file under the collection's prefix (for example `news/summer-sale.html`) and included in `sitemap.xml`. List-only items (those without an item page) are rendered wherever the theme's widgets display them.
+
 ### Assets
 
 The export includes all assets your site needs:
@@ -58,8 +62,8 @@ If you enable **"Also export pages as Markdown (.md)"** when creating an export,
 
 If your project has a Site URL configured, Widgetizer generates:
 
-- `sitemap.xml` — Lists all indexed pages for search engines
-- `robots.txt` — Search engine instructions, including pages marked as `noindex`
+- `sitemap.xml`: Lists all indexed pages for search engines
+- `robots.txt`: Search engine instructions, including pages marked as `noindex`
 
 # Export Versioning
 
@@ -70,19 +74,24 @@ Widgetizer keeps a history of your exports:
 - The maximum number of versions to keep is configurable in [App Settings](settings.html)
 - When the limit is exceeded, the oldest exports are automatically deleted
 
+<figure class="doc-screenshot">
+  <img src="assets/screenshots/export-history.png" alt="Widgetizer export screen showing create export controls and an export history table with Version 1 marked Success." loading="lazy">
+  <figcaption>The Export page shows the latest generated versions and their status after each run.</figcaption>
+</figure>
+
 # Export Options
 
 When creating an export, you can enable:
 
-**Also export pages as Markdown (.md)** — In addition to HTML, each page is written as a Markdown (`.md`) file. The Markdown contains the page content only (no layout), converted from the rendered HTML. Each file includes YAML frontmatter with the page title, description, and source file references. Useful for documentation, static site generators that accept Markdown, or content reuse. The checkbox is on the Export page next to the export button.
+**Also export pages as Markdown (.md)**: In addition to HTML, each page is written as a Markdown (`.md`) file. The Markdown contains the page content only (no layout), converted from the rendered HTML. Each file includes YAML frontmatter with the page title, description, and source file references. Useful for documentation, static site generators that accept Markdown, or content reuse. The checkbox is on the Export page next to the export button.
 
 # Viewing and Downloading Exports
 
 From the Export page, you can:
 
-- **View** — Opens the exported site in a new tab for preview
-- **Download** — Downloads the complete export as a ZIP file
-- **Delete** — Removes an export version (with confirmation)
+- **View:** Opens the exported site in a new tab for preview
+- **Download:** Downloads the complete export as a ZIP file
+- **Delete:** Removes an export version (with confirmation)
 
 # HTML Validation (Developer Mode)
 
@@ -112,26 +121,16 @@ If validation finds any issues, an `__export__issues.html` file is created in th
 
 For a successful export:
 
-- Your project must have at least one page with the slug `index` (the homepage) — see [Pages](pages.html)
+- Your project must have at least one page with the slug `index` (the homepage). See [Pages](pages.html).
 - All widgets and assets must be properly configured
 
 # Deploying Your Export
 
 The exported folder contains static HTML, CSS, JS, and media files that can be deployed to any web server or static hosting service. Simply upload the contents to your hosting provider's public directory.
 
-### Widgetizer Publisher (Free Hosting)
+### Managed Publishing (Coming Soon)
 
-[Widgetizer Publisher](https://publisher.widgetizer.org) is a free hosting service built specifically for Widgetizer sites. Upload your exported ZIP and get a live site at `your-site.mywidgetizer.org` in seconds.
-
-**What you get:**
-
-- **Instant hosting** --- upload your ZIP and your site is live immediately
-- **Built-in analytics** --- privacy-first pageview tracking is auto-injected into your HTML on upload (no cookies, no tracking identifiers, respects Do Not Track)
-- **Form submissions** --- if your site uses the contact form widget, submissions are collected and emailed to you automatically
-- **Version history** --- roll back to previous uploads at any time
-- **Custom subdomains** --- choose your `*.mywidgetizer.org` subdomain
-
-If you use the hosted editor at `editor.widgetizer.org`, publishing is even simpler --- one-click deploy directly from the app, with analytics and forms set up automatically.
+One-click publishing and hosting is part of the upcoming **commercial version of Widgetizer**, which will be available soon. It will deploy your site and handle [form submissions](forms.html) for you. We'll document it here once it's available.
 
 # Export vs. Project Export
 

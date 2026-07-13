@@ -1,0 +1,133 @@
+import {
+  getSettings,
+  saveSettings,
+  getSetting as repoGetSetting,
+  defaultSettings,
+  deepMerge,
+} from "../db/repositories/settingsRepository.js";
+
+/**
+ * Reads the application settings (merged with defaults).
+ * @returns {Promise<object>} The settings object
+ */
+export async function readAppSettingsFile() {
+  return getSettings();
+}
+
+/**
+ * Retrieves all application settings.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+export async function getAppSettings(req, res) {
+  try {
+    const settings = getSettings();
+    res.json(settings);
+  } catch {
+    res.status(500).json({ error: "Failed to get application settings." });
+  }
+}
+
+/**
+ * Updates application settings with validation for media and export options.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+export async function updateAppSettings(req, res) {
+  try {
+    const settings = req.body;
+    const currentSettings = getSettings();
+
+    if (typeof settings !== "object" || settings === null) {
+      return res.status(400).json({ error: "Invalid request body: Expected an object." });
+    }
+
+    const newSettings = deepMerge(currentSettings, settings);
+
+    if (!newSettings.media) {
+      newSettings.media = defaultSettings.media;
+    }
+
+    // Validate file size limits
+    if (newSettings.media) {
+      const sizeLimits = [
+        { key: "maxFileSizeMB", label: "Max Upload Size", min: 1, max: 100 },
+      ];
+
+      for (const { key, label, min, max } of sizeLimits) {
+        if (typeof newSettings.media[key] !== "undefined") {
+          const parsed = parseInt(newSettings.media[key], 10);
+          if (isNaN(parsed) || parsed < min || parsed > max) {
+            return res.status(400).json({ error: `Invalid ${label}. Must be between ${min} and ${max}.` });
+          }
+          newSettings.media[key] = parsed;
+        }
+      }
+    }
+
+    // Validation for imageProcessing settings
+    if (newSettings.media && newSettings.media.imageProcessing) {
+      const imgProcessing = newSettings.media.imageProcessing;
+
+      if (typeof imgProcessing.quality !== "undefined") {
+        const quality = parseInt(imgProcessing.quality, 10);
+        if (isNaN(quality) || quality < 1 || quality > 100) {
+          return res.status(400).json({ error: "Invalid image quality. Must be between 1-100." });
+        }
+        imgProcessing.quality = quality;
+      }
+
+      if (imgProcessing.sizes && typeof imgProcessing.sizes === "object") {
+        for (const [sizeName, sizeConfig] of Object.entries(imgProcessing.sizes)) {
+          if (sizeConfig && typeof sizeConfig === "object") {
+            if (typeof sizeConfig.width !== "undefined") {
+              const width = parseInt(sizeConfig.width, 10);
+              if (isNaN(width) || width <= 0) {
+                return res
+                  .status(400)
+                  .json({ error: `Invalid width for size '${sizeName}'. Must be a positive number.` });
+              }
+              sizeConfig.width = width;
+            }
+
+            if (typeof sizeConfig.enabled !== "undefined" && typeof sizeConfig.enabled !== "boolean") {
+              return res.status(400).json({ error: `Invalid enabled flag for size '${sizeName}'. Must be boolean.` });
+            }
+          }
+        }
+      }
+    }
+
+    // Validate export options
+    if (newSettings.export) {
+      const exportLimits = [
+        { key: "maxVersionsToKeep", label: "Export versions to keep", min: 1, max: 50 },
+        { key: "maxImportSizeMB", label: "Maximum project import size", min: 1, max: 2000 },
+      ];
+
+      for (const { key, label, min, max } of exportLimits) {
+        if (typeof newSettings.export[key] !== "undefined") {
+          const parsed = parseInt(newSettings.export[key], 10);
+          if (isNaN(parsed) || parsed < min || parsed > max) {
+            return res.status(400).json({ error: `Invalid ${label}. Must be between ${min} and ${max}.` });
+          }
+          newSettings.export[key] = parsed;
+        }
+      }
+    }
+
+    saveSettings(newSettings);
+    res.json({ message: "Settings updated successfully", settings: newSettings });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to update application settings." });
+  }
+}
+
+/**
+ * Retrieves a specific setting value by key path (e.g., "media.maxFileSizeMB").
+ * @param {string} key
+ * @returns {Promise<*>}
+ */
+export async function getSetting(key) {
+  return repoGetSetting(key);
+}

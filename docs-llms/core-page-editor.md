@@ -6,6 +6,8 @@ The `PageEditor` is the primary component for building and editing pages within 
 
 The editor's interface is divided into three main columns: a component list on the left, a live preview in the center, and a settings panel on the right. It supports a real-time preview that updates as you modify widgets and settings.
 
+> **Library note.** The page editor now ships inside the `@widgetizer/editor-ui` package (`packages/editor-ui/src/`), mounted by the OSS shell and embeddable in a host. Its API calls route through the `apiBase` singleton via `editorFetch` (auto-injecting `X-Project-Id`) and its internal links resolve through `useEditorPath`, so the editor is host-agnostic. See [Packages & Adapter Architecture](core-packages.md#the-editor-ui-library-seams).
+
 ## Component Structure
 
 The `PageEditor` is composed of several specialized child components, each with a distinct responsibility:
@@ -18,17 +20,15 @@ The `PageEditor` is composed of several specialized child components, each with 
   - Adding, duplicating, and deleting widgets.
   - Adding blocks to a widget.
 
-- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It has been refactored to work declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. In editor mode, link navigation is intercepted to avoid leaving the editor while still allowing widget/block selection. (`PreviewPanel` is the **editor's** live preview only; the standalone full-page preview is its own shell, `SitePreviewLayout` — see "Live Preview" below.)
+- **`PreviewPanel`**: The central panel that renders a live, interactive preview of the page. It works declaratively. Instead of being told _how_ to change, it simply receives the latest application state from the editor and uses a central `updatePreview` function to synchronize the `<iframe>`'s DOM. Link navigation is intercepted to avoid leaving the editor while still allowing widget/block selection. `PreviewPanel` is mounted **only** in the in-editor live preview; the standalone site preview uses a separate headless flow (`SitePreviewLayout` + `PagePreview` + `PreviewStage`, see "Previewing a Page" below).
 
 - **`SettingsPanel`**: The right-hand panel. When a widget or block is selected, this panel dynamically displays the relevant configuration options based on its schema. All changes made here are immediately applied to the selected component and reflected in the preview. Schema labels that use `tTheme:` prefixed keys are resolved at render time through the `useThemeLocale` hook's `tTheme()` function.
-
-- **`ThemeSelector`**: A "Settings" dropdown rendered inside the `EditorTopBar` that lists the theme's setting groups (colors, fonts, style, etc.). Selecting a group (via `setSelectedThemeGroup` in the widget store) opens that group's settings in the `SettingsPanel`; groups with unsaved changes show a dot indicator.
 
 - **`WidgetSelector`**: A modal dialog that opens when the user wants to add a new widget to the page. It presents a list of available widgets to choose from.
 
 - **`BlockSelector`**: Similar to the `WidgetSelector`, this modal allows the user to add a nested block (e.g., a slide in a carousel, a column in a grid) to a compatible widget.
 
-Note: deleting a widget or block in the editor happens immediately (no confirmation modal) — the action is recoverable via the undo/redo history.
+- **`ConfirmationModal`**: A generic modal used to confirm potentially destructive actions, ensuring the user doesn't accidentally delete content. It is used, for example, when deleting a widget. Localized messages and actions.
 
 ## State Management and Data Flow
 
@@ -46,9 +46,9 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
 ### Loading a Page
 
 1.  The `PageEditor` mounts and reads the `pageId` from the URL search parameters.
-2.  A `useEffect` hook, dependent on the `pageId` and the current active-project identity, triggers the data loading functions from the relevant stores. Project switches are also handled one level higher by `RequireActiveProject`, which resets project-scoped singleton stores and remounts the workspace subtree.
+2.  A `useEffect` hook, dependent on the `pageId` and the current active-project identity, triggers the data loading functions from the relevant stores. Project switches are also handled one level higher: `RequireActiveProject` remounts the workspace subtree by project ID, and the OSS shell resets project-scoped singleton stores via `projectSwitchCoordinator`.
 3.  It calls `usePageStore.getState().loadPage(pageId)` to fetch the page structure.
-4.  Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. The editor no longer performs its own explicit project-switch store reset; that reset is coordinated by `RequireActiveProject`.
+4. Simultaneously, it calls `useWidgetStore.getState().loadSchemas()`. `pageStore.loadPage()` fetches page data and global widgets, then ensures `themeStore` has theme settings for the same project before capturing a history snapshot for undo/redo. Project-switch store reset is coordinated by the OSS shell's `projectSwitchCoordinator`.
 5.  While data is being fetched, `LoadingSpinner` components are displayed to inform the user.
 
 ### Editing a Widget
@@ -61,7 +61,7 @@ The `PageEditor` does not manage complex state internally. Instead, it relies on
     - It calls `updateWidgetSettings()` from the `useWidgetStore` to update the data.
     - It calls `useAutoSave.getState().markWidgetModified()` to notify the save store that a change has occurred.
 6.  The `PreviewPanel`, subscribed to all relevant stores, detects the state change.
-7.  It triggers a master `updatePreview` function located in `src/queries/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
+7.  It triggers a master `updatePreview` function located in `packages/editor-ui/src/queries/previewManager.js`. This function intelligently diffs the new state against the previous state and applies only the necessary changes to the preview `<iframe>`. This ensures the preview is always a perfect, up-to-date reflection of the application state and resolves complex ordering and selection bugs.
 
 #### Preview Update Messages
 
@@ -74,10 +74,9 @@ The preview iframe communicates via `postMessage`. For non-structural changes, `
 | `LOAD_FONTS` | Font picker changes | Injects/updates Google Fonts `<link>` tag |
 | `UPDATE_STYLE_CLASSES` | Theme style settings change (shapes, card style, spacing, etc.) | Swaps body classes (e.g., `corner-sharp` → `corner-rounded`) to activate different CSS rulesets |
 | `UPDATE_BODY_CLASS` | Header transparent setting changes | Toggles a CSS class on `<body>` (e.g., `transparent-header`) |
-| `UPDATE_CUSTOM_CSS` / `UPDATE_CUSTOM_SCRIPTS` | Theme custom code settings change | Re-injects custom CSS / scripts (debounced 300ms) |
 | `UPDATE_WIDGET_SETTINGS` | Simple text/image changes | Optimistic instant feedback before morph completes |
 
-Handlers live in `src/utils/previewRuntime.js` (injected into the iframe).
+Handlers live in `packages/core/src/runtime/previewRuntime.js` (injected into the iframe).
 
 **Transparent header sync:** When the header's `transparent_on_hero` setting is toggled, the editor sends an `UPDATE_BODY_CLASS` message to add/remove the `transparent-header` class from the iframe's `<body>`. The preview runtime also manages `header-scrolled` state on the header element after morphs, since the theme's scroll listener (`scripts.js`) references the pre-morph element. A persistent scroll listener in the runtime re-queries the current header element from the DOM to keep the transparent/solid transition working correctly.
 
@@ -87,10 +86,11 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 
 1.  The user clicks the **Preview** button in the `EditorTopBar`.
 2.  In the web app, this opens or reuses a named browser tab at the `/preview/:pageId` URL.
-3.  In Electron, the toolbar uses IPC to open or reuse a dedicated `BrowserWindow` for preview, maximizing and focusing that window on subsequent opens.
-4.  `/preview` is a shared shell, `SitePreviewLayout`, that owns the toolbar, device toggle, the single `<iframe>` stage, and the cross-page navigation listener. `PagePreview` (`:pageId`) is a thin child route under it; collection item pages get a sibling child route, `CollectionItemPagePreview` (`collection/:prefix/:slug`).
-5.  Each child route resolves a render token and hands it to the shared stage, which points the `<iframe>` at the server-rendered HTML — an accurate representation of the final published page. `PagePreview` fetches a standalone page token via `fetchPreviewToken(..., "standalone")`; `CollectionItemPagePreview` posts the item to `previewCollectionItem` (`POST /api/preview/collection`) for its token.
-6.  Internal `.html` links navigate to other pages (and to collection item pages) within the same persistent shell, so the toolbar/stage never remount; external links remain disabled.
+3.  In Electron, the toolbar uses IPC to open or reuse a dedicated `BrowserWindow` for preview. New windows match the editor bounds with an offset; subsequent opens restore the window if minimized, then show and focus it.
+4.  The `/preview` route is a persistent `SitePreviewLayout` (separate from the main editor layout) that owns the toolbar + iframe stage; its children resolve a render for it. `PagePreview` handles `:pageId`; `CollectionItemPagePreview` handles `collection/:prefix/:slug`.
+5. These children are **headless one-shot resolvers** (they render `null`): `PagePreview` fetches the page data, mints a render token, and reports the resulting render src up to the layout via outlet context. `PagePreview` uses the headless preview flow instead of the live-edit `PreviewPanel`.
+6.  `SitePreviewLayout` displays that src in a shared `PreviewStage` `<iframe>`, providing an accurate representation of the final published page. Because the layout is persistent, navigating page↔item never remounts the toolbar/iframe.
+7.  Internal `.html` links in the preview post `NAVIGATE_PREVIEW` up to `SitePreviewLayout`, which routes to other `/preview/:slug` pages, while external links remain disabled.
 
 ### Saving Changes
 
@@ -122,38 +122,9 @@ The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zu
 
 ### Navigation Protection (`useNavigationGuard`)
 
-The page editor implements comprehensive navigation protection to prevent users from accidentally losing unsaved changes when attempting to leave the editor.
+The page editor protects against accidental loss of unsaved changes when the user tries to leave the editor. The `PageEditor` activates this by calling `useNavigationGuard()` (in `packages/editor-ui/src/hooks/useNavigationGuard.js`); the hook operates entirely through side effects and returns nothing.
 
-#### Implementation (`src/hooks/useNavigationGuard.js`)
-
-The `useNavigationGuard` hook provides a two-layer protection system and operates automatically via side effects:
-
-**Layer 1: Browser Navigation Protection**
-
-- Listens for the browser's `beforeunload` event
-- Prevents tab closing, URL changes, and browser back/forward navigation when there are unsaved changes
-- Shows the browser's standard "unsaved changes" warning dialog
-
-**Layer 2: Internal Navigation Protection**
-
-- Uses React Router's `useBlocker` to intercept all navigation attempts
-- Automatically blocks navigation when unsaved changes are detected
-- Shows a custom confirmation dialog (`window.confirm`) before allowing navigation
-- Resets unsaved changes state if user confirms leaving
-
-#### Usage in Page Editor
-
-The page editor integrates navigation protection automatically:
-
-1. **Automatic Setup**: The `PageEditor` component calls `useNavigationGuard()` to activate protection
-2. **No Return Value**: The hook operates entirely through side effects - no functions are returned
-3. **Universal Protection**: Automatically protects against all navigation (sidebar clicks, page switching, browser back/forward)
-
-#### Key Features
-
-- **Smart Detection**: Only triggers protection when there are actual unsaved changes
-- **User Choice**: Allows users to choose whether to discard changes or stay on the page
-- **Seamless Integration**: Works with both browser navigation and React Router navigation
+It layers a `beforeunload` listener (tab close, URL change, browser back/forward) over React Router's `useBlocker` (in-app navigation), and only engages when the save store reports actual unsaved changes. On confirm-to-leave it resets the unsaved-changes state. For the full hook contract — both protection layers, the confirmation flow, and integration notes — see [Custom Hooks](core-hooks.md).
 
 ### Editing Global Widgets
 
@@ -163,9 +134,9 @@ The page editor supports editing global widgets (header and footer) alongside re
 
 Global widgets appear in the `WidgetList` component as fixed, non-draggable items:
 
-- **Header Widget**: Displayed at the top of the widget list, labelled with the widget's display name (or its `name` setting)
-- **Footer Widget**: Displayed at the bottom of the widget list, labelled the same way
-- **Visual Distinction**: Global widgets are separated from the page widgets by horizontal divider lines and rendered via `FixedWidgetItem` (no drag handle)
+- **Header Widget**: Displayed at the top of the widget list with a "Global Header" label
+- **Footer Widget**: Displayed at the bottom of the widget list with a "Global Footer" label
+- **Visual Distinction**: Global widgets use a different visual styling (grey background) to distinguish them from page widgets
 
 #### Global Widget Settings
 

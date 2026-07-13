@@ -22,7 +22,8 @@ import {
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const rootDir = join(__dirname, "..");
-const coreWidgetsDir = join(rootDir, "src", "core", "widgets");
+// Core widget locale definitions are read from the shared core package.
+const coreWidgetsDir = join(rootDir, "packages", "core", "src", "widgets");
 const coreLocalesDir = join(coreWidgetsDir, "locales");
 
 /** Resolve the effective theme directory, preferring source themes during local dev. */
@@ -155,7 +156,7 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
 }
 
 function validateCoreLocales() {
-  console.log(`\n━━ core widgets (src/core/widgets) ━━`);
+  console.log(`\n━━ core widgets (packages/core/src/widgets) ━━`);
   const schemaKeys = collectSchemaKeysFromDir(coreWidgetsDir);
   return validateLocaleSet("core widgets", coreLocalesDir, schemaKeys);
 }

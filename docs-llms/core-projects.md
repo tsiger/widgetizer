@@ -1,23 +1,26 @@
 # Project Management Workflow
 
-This document provides a detailed overview of how projects are created, managed, and updated within the application. After the workspace merge, projects now live in a separate admin area and act as the entry point into the site workspace.
+This document provides a detailed overview of how projects are created, managed, and updated within the application. Projects live in a separate admin area and act as the entry point into the site workspace.
+
+> **Path note.** The Projects pages, `ProjectForm.jsx`, and `ProjectImportModal` live in the **OSS shell** under `app/src/`, while the project store and query manager they call live in the **`@widgetizer/editor-ui`** package under `packages/editor-ui/src/`. The backend routes live in **`@widgetizer/builder-server`** under `packages/builder-server/src/`. See [Packages & Adapter Architecture](core-packages.md).
 
 ## Core Components & Pages
 
-The project management UI is primarily handled by three pages:
+The project management UI is primarily handled by three OSS-shell pages (`app/src/pages/`):
 
 1.  **`Projects.jsx`**: The main project listing page.
 2.  **`ProjectsAdd.jsx`**: The page for creating a new project.
 3.  **`ProjectsEdit.jsx`**: The page for modifying an existing project.
 
-These pages rely on a central form component for handling user input:
+These pages rely on shared components in `app/src/components/projects/`:
 
 - **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address)
-  - Migrated to **react-hook-form** for improved validation and state management
+  - Built on **react-hook-form** for validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
   - Automatic slug generation from project name for new projects
   - **Preset selection**: When a theme with presets is selected, fetches presets via `GET /api/themes/{themeId}/presets` and displays a visual card grid with preset screenshots, names, and descriptions. The default preset is pre-selected. The selected preset ID is included in the form data as `preset`.
+- **`ProjectImportModal`**: The drag-and-drop ZIP import dialog used from the Projects page header (see [Importing a Project](#4-importing-a-project)).
 
 ## Client-Side Routing
 
@@ -31,16 +34,16 @@ The application uses `react-router-dom` to handle navigation between these pages
 ### Admin vs Workspace Flow
 
 - `/projects`, `/themes`, and `/app-settings` live inside `ProjectPickerLayout`, the admin shell.
-- `/pages`, `/menus`, `/media`, `/collections/:type`, `/settings`, and `/export-site` live inside the site workspace shell and require an active project.
+- `/pages`, `/menus`, `/media`, `/settings`, and `/export-site` live inside the site workspace shell and require an active project.
 - Project-selection routes can preserve a `next` query param. `resolveWorkspaceDestination()` normalizes that value so project creation/opening can return the user to the intended workspace tool (default: `/pages`).
 
 ---
 
 ## Data Flow & State Management
 
-Project state is managed by a central **Zustand store** defined in `src/stores/projectStore.js`. This store is the single source of truth for the currently active project and provides actions to interact with it.
+Project state is managed by a central **Zustand store** defined in `packages/editor-ui/src/stores/projectStore.js`. This store is the single source of truth for the currently active project and provides actions to interact with it.
 
-Data fetching and backend communication are handled by utility functions in `src/queries/projectManager.js`.
+Data fetching and backend communication are handled by utility functions in `packages/editor-ui/src/queries/projectManager.js`. These project-admin calls use `apiFetch`/`apiFetchJson` with **absolute** `/api/projects/...` paths (not the project-relative `editorFetch` helper used by the in-workspace editor queries). `apiFetch` injects the `X-Project-Id` header from `getActiveProjectId()` (`packages/editor-ui/src/lib/activeProjectId.js`), so the same code runs unchanged in the OSS SPA and embedded in a host. See [Packages & Adapter Architecture](core-packages.md#the-editor-ui-library-seams).
 
 ### The `projectManager.js` Utility
 
@@ -64,20 +67,18 @@ This file contains functions that make API calls to the backend:
 
 1.  **Navigation**: The user clicks the "New project" button on the `Projects.jsx` page, which navigates them to `/projects/add`.
 2.  **Rendering**: The `ProjectsAdd.jsx` page is rendered. It contains the `ProjectForm.jsx` component.
-3.  **Navigation Guard**: The page integrates `useGuardedFormPage` (a wrapper around `useFormNavigationGuard`) to prevent accidental navigation with unsaved changes.
+3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
 4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
 5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, description, site title, website address) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
 5b. **Preset Selection**: If the selected theme has presets, a visual card grid appears below the theme dropdown showing available presets (screenshot, name, description). The default preset is pre-selected. The user can click a different preset card to switch. Presets are fetched from `GET /api/themes/{themeId}/presets` via `getThemePresets()` in `themeManager.js`.
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
 8.  **API Call**: `ProjectsAdd.jsx`'s `handleSubmit` function calls `createProject(formData)` from `projectManager.js`, which sends a `POST` request to the backend API to create the new project.
-9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `widgets/`, `assets/`, `menus/`, `snippets/`, `collection-types/`, `theme.json`, and `locales/`. Theme `templates/` are not copied verbatim — they are processed into page JSON files under `pages/` via `processTemplatesRecursive` (each page template gets a fresh `uuid`, `slug`, and timestamps). In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into the installed themes directory (`data/themes/`) on first access. The `presets/` directory (along with the theme versioning directories `updates/` and `latest/`) is excluded from the project copy. These become the project's working theme files.
+9.  **Theme Copy to Project Data**: On successful creation, the selected theme's files are copied into the new project's data directory at `/data/projects/<folderName>/`, including `layout.liquid`, `templates/`, `widgets/`, `assets/`, `menus/`, `snippets/`, `theme.json`, and `locales/`. In packaged Electron builds, base themes are seeded from `app.asar.unpacked/themes/` into the installed themes directory (`data/themes/`) on first access. The `presets/` directory is excluded from the project copy. These become the project's working theme files. The dir-explicit core of this step (theme copy + preset application + template/menu processing) is extracted into `scaffoldProjectContent({ projectDir, theme, preset })` (`packages/builder-server/src/utils/projectScaffold.js`, re-exported from the package index) so a host can scaffold project content without going through the OSS controller. See [Packages & Adapter Architecture](core-packages.md).
 9b. **Preset Application**: If a preset was selected during creation, the system applies preset overrides after the theme copy:
     - **Templates**: If the preset has its own `templates/` directory, those templates are used instead of the root theme templates for the `processTemplatesRecursive` step.
     - **Menus**: If the preset has its own `menus/` directory, the root menus already copied into the project are removed and replaced with the preset's menus. This happens before menu enrichment (step 10).
     - **Settings Overrides**: The preset's `preset.json` contains a flat map of `{ setting_id: value }` overrides. The system walks the project's `theme.json > settings.global` groups and updates the `default` field for any setting whose `id` matches a key in the overrides map. This applies colors, fonts, animations, and any other theme settings defined by the preset.
-    - **Collections**: If the preset ships a `collections/` directory, its collection item data is seeded into the project (`seedPresetCollections`). Each item gets a fresh `uuid` and timestamps, and preset menu/link references to those items are remapped to the new UUIDs. Collection schemas always come from the theme's `collection-types/` — items whose type the theme doesn't define are skipped.
-    - **Media**: If the preset ships a `media/` directory, its starter images are copied into the project's `uploads/images/` and each entry in the preset's `manifest.json` is registered in the media database with a fresh project-scoped ID (`seedPresetMedia`).
     - The selected preset ID is stored in the project metadata as `preset`.
 9c. **Theme Locale Ownership**: The editor locale API reads the project's copied `locales/` files, not the shared installed theme copy under `data/themes/`. This means locale changes follow the same per-project update boundary as other theme files.
 10. **Link Enrichment**: After copying theme files, the system enriches all internal page links with `pageUuid`:
@@ -88,7 +89,7 @@ This file contains functions that make API calls to the backend:
 
 ### 1b. Access Without an Active Project
 
-If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no longer a separate "No Active Project" empty-state screen in the route guard. `RequireActiveProject` still keys the site-workspace `Outlet` by active project so the subtree remounts on project changes, but project-scoped store resets are coordinated higher in `App.jsx` through `handleActiveProjectChange()` / `projectSwitchCoordinator`.
+If a user navigates to any site-workspace route without an active project selected, `RequireActiveProject` redirects the user back to `/projects`. There is no separate "No Active Project" empty-state screen in the route guard. The same component keys the workspace outlet by project ID so site-workspace routes remount on project switch; the OSS shell observes active-project changes in `app/src/App.jsx` and resets `themeStore`, `widgetStore`, `saveStore`, and `pageStore` through `app/src/lib/projectSwitchCoordinator.js`.
 
 ### 2. Listing and Managing Projects
 
@@ -131,7 +132,6 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 5.  **Isolation**: Files are extracted to a temporary directory first for validation before any permanent changes.
 6.  **Project Creation**:
     - A new UUID is generated for the imported project
-    - If the project name collides with an existing project (case-insensitive), the import is renamed using the `(Copy)` / `(Copy N)` suffix scheme (`resolveProjectIdentity`, shared with project creation)
     - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
     - Project metadata is written to SQLite only after successful file copy
@@ -145,7 +145,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
 
 1.  **Navigation**: From the project list, clicking the "Edit" icon navigates the user to `/projects/edit/:id`.
 2.  **Data Fetching**: `ProjectsEdit.jsx` loads. In its `useEffect` hook, it calls `getAllProjects()` and finds the specific project matching the `id` from the URL parameters to populate the form. Because that list query is cached, successful project mutations invalidate it so the editor reload path sees fresh project metadata instead of stale list data.
-3.  **Navigation Guard**: `useGuardedFormPage` (a wrapper around `useFormNavigationGuard`) is integrated to prevent accidental navigation with unsaved changes.
+3.  **Navigation Guard**: `useFormNavigationGuard` is integrated to prevent accidental navigation with unsaved changes.
 4.  **Rendering**: The `ProjectForm.jsx` component is rendered with the `initialData` of the project being edited with several key features:
     - **Theme Restriction**: The "Theme" dropdown is disabled, as themes cannot be changed after creation to maintain consistency
     - **Project Folder Name**: Editable field for the project's folder name, independent of the project title
@@ -177,21 +177,20 @@ When the user switches projects, the app must ensure no data from the previous p
 
 ### How switching works
 
-`openProjectWorkspace()` in `Projects.jsx` calls `PUT /api/projects/active/:id` to set the new active project in SQLite, refreshes the Zustand store via `fetchActiveProject()`, then navigates to `/pages`. `App.jsx` observes the active-project change and delegates project-scoped frontend store resets to `projectSwitchCoordinator`; `RequireActiveProject` then remounts the site-workspace subtree with a project-keyed outlet.
+`openProjectWorkspace()` in `Projects.jsx` calls `PUT /api/projects/active/:id` to set the new active project in SQLite, refreshes the Zustand store via `fetchActiveProject()`, then navigates to `/pages`. `RequireActiveProject` remounts the site-workspace subtree with a project-keyed outlet, while `app/src/App.jsx` observes the active-project change and resets the project-scoped frontend stores via `projectSwitchCoordinator`.
 
 ### Server-side protection
 
-`resolveActiveProject` middleware is applied to all project-scoped routes. For write requests, it validates both the `X-Project-Id` header (injected by `apiFetch` from the Zustand store) and `req.params.projectId` against the server's active project. Either mismatch returns 409 `PROJECT_MISMATCH`. Controllers use `req.activeProject` from the middleware.
+`resolveActiveProject` middleware is applied to all project-scoped routes. Scope resolution is delegated to the injected adapter: the middleware calls `req.adapters.scopeResolver.resolveScope(req)` and attaches the resulting `req.scope` (`{ actor, projectId, folderName }`), so swapping adapters swaps tenancy behaviour with no route changes. For write requests, it validates both the `X-Project-Id` header (injected by `apiFetch` from the Zustand store) and `req.params.projectId` against the server's active project. Either mismatch returns 409 `PROJECT_MISMATCH`. Controllers read the resolved scope (and `req.activeProject`) from the middleware. See [Packages & Adapter Architecture](core-packages.md).
 
 ### Client-side protection
 
-- **App.jsx / projectSwitchCoordinator** clear singleton frontend stores on active-project changes.
-- **RequireActiveProject** is the route guard/remount boundary for site-workspace routes. It keys the route outlet by project ID so project-owned components remount cleanly.
+- **RequireActiveProject** is the central project-switch boundary for site-workspace routes. It clears singleton frontend stores on active-project changes and keys the route outlet by project ID so project-owned components remount cleanly.
 - **pageStore** uses an `activeLoadId` counter to discard stale async loads. Tracks `loadedProjectId` so `saveStore` can compare before saving.
-- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by `projectSwitchCoordinator` on real project switches.
-- **widgetStore** resets schemas and selection via `resetForProjectChange()`, reads the project ID internally via `getActiveProjectId()`, and now relies on `projectSwitchCoordinator` rather than page-local reset calls.
-- **saveStore** preserves edits when a stale save is rejected with `PROJECT_MISMATCH`, stops auto-save retries, and is reset centrally on project switches by `projectSwitchCoordinator`.
-- **Settings.jsx** reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but project-switch reset ownership now lives in `App.jsx` / `projectSwitchCoordinator` rather than the page component.
+- **themeStore** is the canonical owner of theme settings across Settings and the editor. It uses `activeLoadId` to drop stale loads, and its `resetForProjectChange()` action is invoked by the shared route boundary on real project switches.
+- **widgetStore** resets schemas and selection via `resetForProjectChange()`, reads the project ID internally via `getActiveProjectId()`, and now relies on the shared route boundary rather than page-local reset calls.
+- **saveStore** preserves edits when a stale save is rejected with `PROJECT_MISMATCH`, stops auto-save retries, and is reset centrally on project switches by the shared route boundary.
+- **Settings.jsx** reads/writes through `themeStore`; it still guards save completion against mid-flight project changes, but project-switch reset ownership now lives in the route boundary rather than the page component.
 - **useExportState / ExportCreator** guard history loads and export completion against project changes mid-flight
 
 ### Known limitation
@@ -202,7 +201,7 @@ When the user switches projects, the app must ensure no data from the previous p
 
 ## Backend API Endpoints
 
-The frontend `projectManager.js` communicates with a set of backend API endpoints defined in `server/routes/projects.js`. These routes handle the core logic of project management.
+The frontend `projectManager.js` communicates with a set of backend API endpoints defined in `packages/builder-server/src/routes/projects.js`. The OSS shell mounts the actor-scoped router (which carries `projectRoutes`) under `/api`, yielding the `/api/projects/...` URLs below. These routes handle the core logic of project management.
 
 | Method | Route | Controller Action | Description |
 | :-- | :-- | :-- | :-- |
@@ -215,11 +214,11 @@ The frontend `projectManager.js` communicates with a set of backend API endpoint
 | `POST` | `/api/projects/:id/duplicate` | `duplicateProject` | Creates a complete copy of a project. |
 | `POST` | `/api/projects/:projectId/export` | `exportProject` | Exports project as a downloadable ZIP file. |
 | `POST` | `/api/projects/import` | `importProject` | Imports a project from a ZIP file upload. |
-| `GET` | `/api/projects/:projectId/widgets` | `getProjectWidgets` | Retrieves all widget schemas for a project. |
-| `GET` | `/api/projects/:projectId/icons` | `getProjectIcons` | Retrieves all available icons for a project. |
 | `GET` | `/api/projects/:id/theme-updates/status` | `getThemeUpdateStatus` | Checks whether a newer theme version is available for the project. |
 | `PUT` | `/api/projects/:id/theme-updates` | `toggleProjectThemeUpdates` | Toggles the project's `receiveThemeUpdates` preference (`enabled: boolean`). |
 | `POST` | `/api/projects/:id/theme-updates/apply` | `applyProjectThemeUpdate` | Applies the currently available theme update to the project. |
+
+> **Note.** The active project's widget schemas and icon set are served by `projectController.getProjectWidgets` / `getProjectIcons`, but those routes live on the **project-scoped** router (`packages/builder-server/src/routes/widgets.js` and `icons.js`), mounted at `/api/widgets` and `/api/icons` — not under `/api/projects/...`. They are documented with the widget and theme tooling, not in the project route table above.
 
 ### Security Considerations
 
@@ -236,3 +235,4 @@ All API endpoints described in this document are protected by input validation a
 - [App Settings](core-appSettings.md) - Configure project import size limits
 - [Platform Security](core-security.md) - Security considerations for project import/export
 - [Theme Presets](theme-presets.md) - Preset variants applied during project creation
+- [Packages & Adapter Architecture](core-packages.md) - Adapters, DI, `Scope`, and `LIMIT_KEYS`

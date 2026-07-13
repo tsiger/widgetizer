@@ -10,21 +10,21 @@ The GPL v3 license gives you significant freedoms:
 
 ### Use It Freely
 
-- **Run Widgetizer for any purpose** — personal projects, commercial websites, non-profits, education, anything.
-- **No usage fees or royalties** — it's completely free to use.
-- **No registration or approval needed** — just download and start using it.
+- **Run Widgetizer for any purpose:** personal projects, commercial websites, non-profits, education, anything.
+- **No usage fees or royalties:** it's completely free to use.
+- **No registration or approval needed:** just download and start using it.
 
 ### Study and Modify
 
-- **Access the complete source code** — you can see exactly how Widgetizer works.
-- **Modify the code** — customize it, fix bugs, add features, or adapt it to your specific needs.
-- **Use it privately** — if you modify Widgetizer for your own use and don't share it with others, you have no obligations beyond those of any user.
+- **Access the complete source code:** you can see exactly how Widgetizer works.
+- **Modify the code:** customize it, fix bugs, add features, or adapt it to your specific needs.
+- **Use it privately:** if you modify Widgetizer for your own use and don't share it with others, you have no obligations beyond those of any user.
 
 ### Share and Distribute
 
-- **Give copies to others** — share Widgetizer with friends, clients, or the public.
-- **Charge money** — you can sell copies of Widgetizer or offer paid support services.
-- **Include it in larger projects** — as long as you follow the license terms.
+- **Give copies to others:** share Widgetizer with friends, clients, or the public.
+- **Charge money:** you can sell copies of Widgetizer or offer paid support services.
+- **Include it in larger projects:** as long as you follow the license terms.
 
 # Your Responsibilities
 
@@ -32,25 +32,25 @@ With these freedoms come some responsibilities, especially if you distribute Wid
 
 ### Keep It Open Source
 
-- **Share your source code** — if you distribute a modified version of Widgetizer, you must also provide the source code to your recipients.
-- **Use the same license** — any modified version you distribute must also be licensed under GPL v3. You cannot turn Widgetizer into proprietary software.
-- **Include license notices** — keep the copyright and license information intact in the code.
+- **Share your source code:** if you distribute a modified version of Widgetizer, you must also provide the source code to your recipients.
+- **Use the same license:** any modified version you distribute must also be licensed under GPL v3. You cannot turn Widgetizer into proprietary software.
+- **Include license notices:** keep the copyright and license information intact in the code.
 
 ### Be Transparent About Changes
 
-- **Mark your modifications** — if you distribute a modified version, clearly indicate what you changed and when.
-- **Don't misrepresent origins** — don't claim the original authors created your modifications.
+- **Mark your modifications:** if you distribute a modified version, clearly indicate what you changed and when.
+- **Don't misrepresent origins:** don't claim the original authors created your modifications.
 
 ### Respect Others' Freedom
 
-- **Don't add restrictions** — you cannot impose additional terms that restrict what others can do with Widgetizer.
-- **Provide installation info** — if you distribute Widgetizer in a device or product, you must provide the information needed for users to install modified versions.
+- **Don't add restrictions:** you cannot impose additional terms that restrict what others can do with Widgetizer.
+- **Provide installation info:** if you distribute Widgetizer in a device or product, you must provide the information needed for users to install modified versions.
 
 # Common Scenarios
 
 ### "I just want to build websites with Widgetizer"
 
-**No special obligations.** Use Widgetizer freely to create as many websites as you want. The sites you create are yours — the GPL doesn't apply to the websites you build, only to Widgetizer itself.
+**No special obligations.** Use Widgetizer freely to create as many websites as you want. The sites you create are yours; the GPL doesn't apply to the websites you build, only to Widgetizer itself.
 
 ### "I want to modify Widgetizer for my own use"
 

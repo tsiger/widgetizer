@@ -184,7 +184,7 @@ Use `maxBlocks` to cap how many blocks a widget can contain. This is useful for 
 
 - When the limit is reached, the "Add block" button and insertion zones are hidden
 - A counter (e.g., "5/5") appears in the editor
-- Existing blocks are never removed — if a widget already has more blocks than the limit (e.g., the limit was added later), they are preserved but no new blocks can be added
+- Existing blocks are never removed; if a widget already has more blocks than the limit (e.g., the limit was added later), they are preserved but no new blocks can be added
 - Works for both page widgets and global widgets (header/footer)
 
 # Step 2: The Template (widget.liquid)
@@ -323,7 +323,7 @@ Loop through `widget.blocksOrder` and look up each block in `widget.blocks`:
             <p class="quote-text" data-setting="text">{{ block.settings.text }}</p>
             <footer class="quote-attribution">
               {% if block.settings.avatar != blank %}
-                <img src="{% image src: block.settings.avatar, size: 'thumbnail', output: 'path' %}" alt="{{ block.settings.author }}" class="quote-avatar">
+                <img src="{% image src: block.settings.avatar, size: 'thumb', output: 'path' %}" alt="{{ block.settings.author }}" class="quote-avatar">
               {% endif %}
               <cite>
                 <span class="quote-author" data-setting="author">{{ block.settings.author }}</span>
@@ -475,7 +475,7 @@ Global widgets appear on every page. Only two are supported:
 
 They work exactly like regular widgets but are rendered via `{{ header }}` and `{{ footer }}` in `layout.liquid`.
 
-Global widgets support the full blocks system — block types, `maxBlocks`, `defaultBlocks`, and `blocksOrder`/`blocks` data — identical to page widgets. This means your header can have repeatable blocks (e.g., announcement bars, top-bar buttons) and your footer can have repeatable blocks (e.g., link columns, text rows).
+Global widgets support the full blocks system (block types, `maxBlocks`, `defaultBlocks`, and `blocksOrder`/`blocks` data), identical to page widgets. This means your header can have repeatable blocks (e.g., announcement bars, top-bar buttons) and your footer can have repeatable blocks (e.g., link columns, text rows).
 
 **Example: header with announcement block**
 
@@ -582,7 +582,7 @@ Here's a minimal but complete testimonial widget:
             <footer>
               <span class="quote-author" data-setting="author">{{ block.settings.author }}</span>
               {% if block.settings.role != blank %}
-                <span class="quote-role" data-setting="role">— {{ block.settings.role }}</span>
+                <span class="quote-role" data-setting="role">{{ block.settings.role }}</span>
               {% endif %}
             </footer>
           </blockquote>
@@ -620,7 +620,7 @@ This is typically used for hero banners and full-width image widgets where the h
 
 # Editor Lifecycle Events
 
-When your widget has blocks that aren't all visible at once — slides in a slideshow, panels in an accordion, tabs in a switcher — the editor needs a way to reveal the right block when a user selects it in the sidebar. Widgetizer dispatches custom DOM events on widget elements to make this possible.
+When your widget has blocks that aren't all visible at once (slides in a slideshow, panels in an accordion, tabs in a switcher), the editor needs a way to reveal the right block when a user selects it in the sidebar. Widgetizer dispatches custom DOM events on widget elements to make this possible.
 
 ## Design Mode Detection
 
@@ -646,7 +646,7 @@ All events are dispatched on the widget element (`[data-widget-id]`) and bubble 
 | `widget:block-deselect` | A block within this widget is deselected | `{ blockId }` |
 | `widget:updated` | Widget DOM was replaced (morph/re-render) | `{ widgetId }` |
 
-When selection changes, events fire in this order: `block-deselect` (old) → `deselect` (old) → `select` (new) → `block-select` (new). Events only fire when the state actually changes — selecting the same block twice does not re-fire.
+When selection changes, events fire in this order: `block-deselect` (old) → `deselect` (old) → `select` (new) → `block-select` (new). Events only fire when the state actually changes; selecting the same block twice does not re-fire.
 
 ## Example: Slideshow
 
@@ -698,7 +698,7 @@ if (window.Widgetizer?.designMode) {
 
 # Related Pages
 
-- [Setting Types](theme-dev-setting-types.html) — all available field types for settings
-- [Theme Objects & Context](theme-dev-objects-context.html) — what data is available in templates
-- [Liquid Tags & Assets](theme-dev-liquid-assets.html) — media tags, asset loading, and custom tags
-- [Design System & Utilities](theme-dev-design-system.html) — CSS tokens and utility classes
+- [Setting Types](theme-dev-setting-types.html): all available field types for settings
+- [Theme Objects & Context](theme-dev-objects-context.html): what data is available in templates
+- [Liquid Tags & Filters](theme-dev-liquid-assets.html): media tags, asset loading, and custom tags
+- [Design System & Utilities](theme-dev-design-system.html): CSS tokens and utility classes

@@ -2,6 +2,8 @@
 
 This document provides a comprehensive guide to creating and customizing themes in Widgetizer. A theme is a complete package that defines the visual appearance, layout structure, and functionality of a website.
 
+This is the canonical theme-authoring entry point. It covers theme structure, the `theme.json` manifest, `layout.liquid`, the Liquid tag set, and the widgets/blocks/templates/menus/assets/locales/presets model. Deep references are split out: see [Setting Types Reference](theming-setting-types.md), the [Widget Authoring Guide](theming-widgets.md), [Theme Presets](theme-presets.md), and [Export](core-export.md).
+
 ## 1. Introduction & Core Concepts
 
 ### What is a Theme?
@@ -58,10 +60,6 @@ A theme is organized as a directory with the following structure:
 │   └── en.json             # English locale (nested key-value pairs)
 ├── menus/                  # Navigation menu definitions
 │   └── main-nav.json       # Menu structure and items
-├── collection-types/       # Optional custom post types (see §9)
-│   └── portfolio/
-│       ├── schema.json     # Collection field schema
-│       └── template.liquid # Item-page template (only when hasItemPages: true)
 ├── presets/                # Optional preset variants
 │   ├── presets.json        # Preset registry (names, descriptions, default)
 │   ├── financial/
@@ -240,28 +238,31 @@ The `settings.global` object defines customizable options organized into logical
 
 ### Available Setting Types
 
-- `header`: Visual divider to group related settings into sections
-- `text`: Single-line text input. _(Can be used with `outputAsCssVar` if its value is a valid CSS value, like a color or size.)_
-- `number`: Numeric input with optional `min`/`max`.
-- `date`: Native date picker. Value is a date-only `YYYY-MM-DD` string. Render on the published site with the `| format_date` filter, which honors the theme's **Date format** setting (`date_format`) and is timezone-safe. A `date` field can drive collection sorting via the `usedAsDate` flag — see [Collections](core-collections.md).
-- `textarea`: Multi-line text input field. _(Can be used with `outputAsCssVar` if its value is a valid CSS value.)_
-- `richtext`: Rich text editor with basic formatting (bold, italic, links, lists). Value is HTML, sanitized via DOMPurify.
-  - **Emptiness checks:** a richtext value is never Liquid-`blank` when "empty" — the editor leaves behind markup like `<p></p>`, `<p><br></p>`, or `<p>&nbsp;</p>`, so `{% if x == blank %}` always treats it as filled. To gate layout/visibility on real content, use the `| rte_blank` (boolean) / `| rte_text` (collapsed plain text) filters instead: `{% unless widget.settings.copyright | rte_blank %}…{% endunless %}` to render only when filled, or `{% if widget.settings.copyright | rte_blank %}…{% endif %}` for the empty case. Always output the **raw original** (`{{ … | raw }}`) for display — these filters are for the emptiness test only, never for rendering.
-- `code`: Code editor with syntax highlighting (`language`: css/html/javascript). Output is intentionally raw.
-- `color`: Color picker with hex input and color swatch. _(Ideal for `outputAsCssVar`.)_
-- `checkbox`: Boolean toggle switch. _(Not typically used for direct CSS output, as its value is a boolean.)_
-- `range`: Numeric slider with min/max/step options. _(Ideal for `outputAsCssVar`. The output value is a unitless number, so you may need `calc()` in CSS, e.g., `width: calc(1px _ var(--my-range-var));`)\*
-- `select`: Dropdown menu with predefined options. _(Can be used with `outputAsCssVar` if the `value` of the selected option is a valid CSS value.)_
-- `radio`: Radio buttons for single selection from options. _(Can be used with `outputAsCssVar` if the `value` of the selected option is a valid CSS value.)_
-- `font_picker`: Font family and weight selector with CSS variable output. _(Specially designed for `outputAsCssVar`; it generates multiple variables for font properties, e.g., `--group-id-family` and `--group-id-weight`.)_
-- `image`: Image uploader with preview, browse, and metadata editing. _(Can be used with `outputAsCssVar` to output the image URL, suitable for `background-image: url(var(--my-image-var));`)_
-- `gallery`: Repeatable, reorderable list of images. Value is an ordered array of upload-path strings.
-- `icon`: Icon picker backed by the theme's `assets/icons.json`. Value is the icon name.
-- `file`: File asset selector for downloadable documents (PDF). Value is the storage path.
-- `youtube`: YouTube URL/ID input with embed options; rendered with the `{% youtube %}` tag.
-- `menu`: Dropdown populated with available navigation menus. _(Value is a menu ID; not used for CSS.)_
-- `link`: Link builder for internal pages or custom URLs with text and target options. _(Value is a complex object; not used for CSS.)_
-- `table`: Repeating typed rows (collection-type schemas only in v1). Value is an ordered array of row objects.
+Each setting in a group (and each widget/block setting) declares a `type`. The full catalog, with every property and JSON example, lives in the [Setting Types Reference](theming-setting-types.md). Quick index:
+
+- `header` — visual divider that groups related settings into a labeled section
+- `text` — single-line text input _(can use `outputAsCssVar` when the value is a valid CSS value)_
+- `textarea` — multi-line text input _(can use `outputAsCssVar`)_
+- `number` — numeric input with optional min/max/step
+- `richtext` — Tiptap HTML editor (bold/italic/link/lists). The server sanitizes stored HTML with DOMPurify at the save/render boundary; the editor is not the security boundary. Optional flags: `allow_source` (HTML source toggle), `allow_headings`, `allow_images`, `min_height`. Internal page/collection-item links authored in richtext (in widget/block/global and collection-item fields, not theme settings) are **stable refs** — stored as `data-*-uuid` anchor attributes that follow renames and clear on delete, like the structured `link` field; no schema flag needed. Output requires `| raw` — see [Liquid filters](#liquid-filters)
+- `code` — raw, intentionally **unsanitized** code editor (`language`, `rows`); used for CSS/HTML/JS injection
+- `color` — color picker with hex input and swatch _(ideal for `outputAsCssVar`)_
+- `checkbox` — boolean toggle switch
+- `range` — numeric slider with min/max/step (optional `unit`) _(ideal for `outputAsCssVar`)_
+- `select` — dropdown of predefined options _(value can be `outputAsCssVar` if it is a valid CSS value)_
+- `radio` — radio buttons for single selection _(value can be `outputAsCssVar`)_
+- `font_picker` — font family + weight selector; always emits CSS variables (`--group-id-family`, `--group-id-weight`)
+- `icon` — icon picker (resolves against the theme icon set / `icons.json`)
+- `image` — single-image uploader with preview/browse/metadata _(can `outputAsCssVar` the URL for `background-image`)_
+- `gallery` — ordered array of upload-path strings (the empty value is `[]`)
+- `youtube` — YouTube video data, consumed by the `{% youtube %}` tag
+- `date` — date value (in collection-type schemas can be the sort key via `usedAsDate`)
+- `file` — file uploader returning a download path
+- `table` — repeatable rows of typed columns (designed for collection-type schemas)
+- `menu` — dropdown of available navigation menus; value is a menu ID
+- `link` — link builder for internal pages, collection items, or custom URLs; value is an **object** (see [Link settings](#link-settings))
+
+For complete details on all available setting types and their properties, see the [Setting Types Reference](theming-setting-types.md).
 
 ### CSS Variables & Theme Object Access
 
@@ -343,8 +344,6 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 </html>
 ```
 
-> **Emitting author-entered URLs:** when a template outputs a user-provided URL into an `href` (social links, profile links, etc.), pass it through the `| safe_url` filter — e.g. `href="{{ social.facebook_url | safe_url }}"`. It blocks dangerous schemes (`javascript:`/`data:`/`vbscript:`, including tab/control-char-obfuscated variants), returning `""` for an unsafe value. Setting type `link` and menu links are sanitized automatically; plain `text`/URL values are **not**, because LiquidJS autoescape stops attribute breakout but not a dangerous URL scheme.
-
 ### Key Liquid Tags
 
 - `{% seo %}`: Automatically generates SEO meta tags (title, description, Open Graph, etc.)
@@ -360,6 +359,8 @@ The `layout.liquid` file defines the main HTML structure that wraps all page con
 - `{{ main_content }}`: The insertion point for page content (widgets)
 - `{{ footer }}`: Renders the global footer widget
 - `{{ body_class }}`: Dynamic CSS classes for the body element (page slugs are prefixed with `page-`, e.g., `page-about`)
+
+> **Note:** `header`, `main_content`, and `footer` are pre-rendered HTML, so they require `| raw` (autoescape is enabled globally — see [Liquid filters](#liquid-filters)).
 
 ### Available Template Variables (Layout Only)
 
@@ -421,9 +422,26 @@ Contains project metadata resolved from the SQLite-backed project store:
 <link rel="canonical" href="{{ project.siteUrl }}{{ page.slug }}">
 ```
 
-## 5. Liquid Tags
+## 5. Liquid Tags & Filters
 
 Widgetizer provides powerful Liquid tags to simplify common tasks in your templates.
+
+### Liquid filters
+
+LiquidJS runs with autoescape enabled globally (`outputEscape: "escape"`), so every `{{ ... }}` is HTML-escaped by default. Append `| raw` when the value is already trusted HTML: layout variables (`{{ header | raw }}`, `{{ main_content | raw }}`, `{{ footer | raw }}`), SVG icons, embed code, and **richtext** output.
+
+Two helper filters exist for richtext (`registerRteFilters` in `packages/core/src/filters/rteFilter.js`):
+
+- `rte_text` — collapses a richtext value to its plain text (strips tags, `&nbsp;`, and whitespace). Use for an emptiness test only.
+- `rte_blank` — boolean: `true` when the richtext value is visually empty (`<p></p>`, `<p><br></p>`, `&nbsp;`, …).
+
+Richtext fields are never truly `blank` when "empty" — the editor leaves markup like `<p></p>` behind, so the usual `{% if x == blank %}` guard (which works for `text`/`textarea`) always thinks the field has content. Gate visibility with the filters, but always render the **raw original** with `| raw` after DOMPurify has sanitized it:
+
+```liquid
+{% unless block.settings.text | rte_blank %}
+  <div class="rte">{{ block.settings.text | raw }}</div>
+{% endunless %}
+```
 
 ### Image tag
 
@@ -734,7 +752,7 @@ The priority system allows you to control the exact loading order of assets:
 {% enqueue_script src: "slideshow.js", priority: 40 %}
 
 {# Theme Overrides - Priority 50 (default) #}
-{% enqueue_style "theme.css" %}
+{% enqueue_style src: "theme.css", priority: 50 %}
 
 {# Non-critical/Print - Priority 90+ #}
 {% enqueue_style src: "print.css", location: "footer", priority: 90, media: "print" %}
@@ -801,7 +819,7 @@ Assets are loaded from different directories based on where the tag is used:
 - **Inside a widget template** (e.g., `widgets/slideshow/widget.liquid`): Loads from that widget's folder (`widgets/{widgetType}/`)
 - **Inside layout or snippets**: Loads from the theme `assets/` folder
 
-This means `{% asset "styles.css" %}` in the slideshow widget loads from `widgets/slideshow/styles.css`, while the same tag in `layout.liquid` loads from `assets/styles.css`.
+This means `{% asset src: "styles.css" %}` in the slideshow widget loads from `widgets/slideshow/styles.css`, while the same tag in `layout.liquid` loads from `assets/styles.css`.
 
 **Output:**
 
@@ -809,25 +827,6 @@ This means `{% asset "styles.css" %}` in the slideshow widget loads from `widget
 - **JavaScript files** (`.js`): Outputs `<script>` tag
 - **Image files** (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.svg`): Outputs `<img>` tag with metadata (alt, title) when available
 - **Other file types**: Returns the asset URL as a string
-
-**Examples:**
-
-```liquid
-{# In layout.liquid - loads from assets/ folder #}
-<head>
-  {% asset "base.css" %}
-  {% asset "theme.css", { "id": "theme-styles", "media": "screen" } %}
-</head>
-<body>
-  <!-- Content -->
-  {% asset "scripts.js" %}
-  {% asset "analytics.js", { "async": true } %}
-</body>
-
-{# In widgets/slideshow/widget.liquid - loads from widgets/slideshow/ folder #}
-{% asset "slideshow.css" %}
-{% asset "slideshow.js", { "defer": true } %}
-```
 
 **Asset Tag vs Enqueue Tags:**
 
@@ -1061,8 +1060,9 @@ Blocks are sub-components that can be dynamically added to widgets, providing fl
         {% elsif block.type == 'text' %}
           <p>{{ block.settings.text }}</p>
         {% elsif block.type == 'button' %}
-          <a href="{{ block.settings.link | default: '#' }}" class="button">
-            {{ block.settings.label | default: 'Click Me' }}
+          <a href="{{ block.settings.link.href }}" class="button"
+             {% if block.settings.link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}>
+            {{ block.settings.link.text | default: 'Click Me' }}
           </a>
         {% endif %}
       </div>
@@ -1070,6 +1070,8 @@ Blocks are sub-components that can be dynamically added to widgets, providing fl
   </div>
 {% endif %}
 ```
+
+> **Note:** A `link`-type setting stores an **object**, not a string — read `link.href`, `link.text`, and `link.target` (see [Link settings](#link-settings)). Do not write `{{ block.settings.link | default: '#' }}`; that would print the object.
 
 ### Defining Blocks in Widget Schema
 
@@ -1123,16 +1125,9 @@ Blocks are defined in the widget's JSON schema using the `"blocks"` array:
       "displayName": "tTheme:content_widget.blocks.button.name",
       "settings": [
         {
-          "type": "text",
-          "id": "label",
-          "label": "tTheme:content_widget.blocks.button.settings.label.label",
-          "default": "Click Me"
-        },
-        {
           "type": "link",
           "id": "link",
-          "label": "tTheme:content_widget.blocks.button.settings.link.label",
-          "default": "#"
+          "label": "tTheme:content_widget.blocks.button.settings.link.label"
         }
       ]
     }
@@ -1197,11 +1192,11 @@ For more complex block rendering, you can use conditional logic and include addi
 
           {% when 'button' %}
             <a
-              href="{{ block.settings.link | default: '#' }}"
+              href="{{ block.settings.link.href }}"
               class="button button--{{ block.settings.style | default: 'primary' }}"
-              {% if block.settings.openInNewTab %}target="_blank"{% endif %}
+              {% if block.settings.link.target == '_blank' %}target="_blank" rel="noopener"{% endif %}
             >
-              {{ block.settings.label | default: 'Button' }}
+              {{ block.settings.link.text | default: 'Button' }}
             </a>
 
           {% else %}
@@ -1280,10 +1275,8 @@ Use scoped CSS with widget IDs to style blocks without conflicts:
 
 **Button Block**
 
-- Button text input
-- Link picker (internal pages or external URLs)
+- Link picker (`link` setting — internal pages, collection items, or external URLs); the link object carries its own `text` and `target`
 - Style options (primary, secondary, etc.)
-- Target options (same window, new tab)
 
 ## 8. Templates
 
@@ -1349,88 +1342,13 @@ Global templates can also include default blocks (when the widget schema defines
 }
 ```
 
-## 9. Collection Types
-
-Themes can define **collection types** — structured custom post types (Portfolio, Team, Testimonials, Blog Posts) that users author as items through a CMS interface and that widgets read via the `| collection` Liquid filter. Each type is a folder under `collection-types/{type}/` containing a `schema.json` (and, when `hasItemPages: true`, a `template.liquid`).
-
-This is a theme-authoring summary. For the full system (storage model, migration, API, export, concurrency), see [Collections](core-collections.md).
-
-### Schema (`collection-types/{type}/schema.json`)
-
-The schema reuses the same setting types as widgets/`theme.json`, plus a few top-level fields and three field flags:
-
-```json
-{
-  "type": "portfolio",
-  "schemaVersion": 1,
-  "displayName": "Portfolio Item",
-  "displayNamePlural": "Portfolio",
-  "icon": "Briefcase",
-  "slugPrefix": "portfolio",
-  "hasItemPages": true,
-  "sortable": true,
-  "defaultSort": "manual",
-  "settings": [
-    { "type": "header", "id": "content_header", "label": "Content" },
-    { "type": "text", "id": "title", "label": "Title", "required": true, "usedAsTitle": true },
-    { "type": "image", "id": "featured_image", "label": "Featured image" },
-    { "type": "textarea", "id": "description", "label": "Description" }
-  ]
-}
-```
-
-Authoring rules (enforced at runtime and at theme upload):
-
-- `type` must match the folder name and be `^[a-z0-9-]+$`; `slugPrefix` must be `^[a-z0-9-]+$` (defaults to `type`).
-- **Exactly one** non-`header` setting must declare `usedAsTitle: true` (must be a `text` field) — it's the display name and the slug source.
-- `defaultSort` ∈ `manual` \| `created_desc` \| `created_asc` \| `title_asc` \| `title_desc`.
-- Only setting types in `supportedSettingTypes.js` are allowed; `multiple`/`blocks`/repeater/relationship/taxonomy fields are rejected. The `gallery` type is supported as an ordered array of uploaded image-path strings; image captions live on media records, not inside the gallery value. A *generic* repeater is not supported.
-- Two collections can't share a `slugPrefix`, and a `slugPrefix` can't be a reserved output dir (`assets`).
-- SEO is **not** a schema concern: `hasItemPages` items get a built-in page-shaped `seo` object and the same SEO editor pages use (Finding #12). Don't declare `seo_*` fields or `usedAsOgImage`.
-- Labels support `tTheme:` locale keys, same as widget schemas.
-
-### Item pages (`template.liquid`)
-
-When `hasItemPages: true`, export generates `{slugPrefix}/{itemSlug}.html` per item, rendering `collection-types/{type}/template.liquid` **inside** the theme's main layout (header/footer/main slots, like a page template). Context: `item` (`id`, `uuid`, `slug`, `url`, `created`, `updated`, `settings.*`), `collection` (the schema), `page` (a page-shaped SEO object), plus the usual `project`/`theme`/`mediaFiles`. A `menu`-type setting resolves to a full menu object (like widgets, finding #10) — render it with the `menu` snippet.
-
-```liquid
-<article class="portfolio-single">
-  <h1>{{ item.settings.title }}</h1>
-  {% image src: item.settings.featured_image, size: 'large' %}
-  <div class="content">{{ item.settings.description }}</div>
-  {% if item.settings.external_url.href %}
-    <a href="{{ item.settings.external_url.href }}" target="{{ item.settings.external_url.target }}">View project</a>
-  {% endif %}
-</article>
-```
-
-Collections that only render inside widgets (e.g. a testimonials carousel) set `hasItemPages: false` and ship no template. A `hasItemPages: true` collection with no `template.liquid` fails export with a clear error.
-
-> Item pages export one directory deep, so the core `menu.liquid` snippet and asset tags use depth-aware relative paths. Themes that override `menu.liquid` must adopt the `canonicalPath`/`currentCanonicalPath` active-state comparison — see [Collections §6](core-collections.md#6-render-time-link-resolution).
-
-### Reading collections in widgets (`| collection`)
-
-Any widget can read collection data without configuration:
-
-```liquid
-{% assign items = 'portfolio' | collection: limit: 6, sort: 'created_desc' %}
-{% for item in items %}
-  <h3>{{ item.settings.title }}</h3>
-  {% if item.url %}<a href="{{ item.url }}">View</a>{% endif %}
-{% endfor %}
-```
-
-Options: `limit`, `offset`, `sort`. `item.url` is `null` when `hasItemPages: false`. Invalid items (missing required fields) are excluded.
-
-### Presets and updates
-
-Collection-type schemas/templates are **theme-owned** and replaced wholesale on theme update; user item data (`collections/`) is protected. Presets may seed `collections/` item data only — never `collection-types/`. See [Theme Updates](theme-updates.md) and [Theme Presets](theme-presets.md).
-
-## 10. Navigation Menus
+## 9. Navigation Menus
 
 Menus are defined as JSON files in the `/menus/` directory and support nested navigation up to 4 levels deep.
 
 ### Menu Structure (`menus/main-nav.json`)
+
+Menu items target one of three things: a custom URL (`link` string), a page (stable `pageUuid`), or a collection-item page (stable `collectionItemUuid` + `collectionType`). Stable refs follow renames and clear automatically when the target is deleted; custom URLs are sanitized at render time.
 
 ```json
 {
@@ -1444,23 +1362,26 @@ Menus are defined as JSON files in the `/menus/` directory and support nested na
     },
     {
       "label": "About",
-      "link": "/about",
+      "pageUuid": "a1b2c3d4-...",
       "items": [
         {
           "label": "Our Story",
-          "link": "/about/story",
-          "items": []
-        },
-        {
-          "label": "Team",
-          "link": "/about/team",
+          "pageUuid": "e5f6a7b8-...",
           "items": []
         }
       ]
+    },
+    {
+      "label": "Spring Sale",
+      "collectionItemUuid": "c9d0e1f2-...",
+      "collectionType": "news",
+      "items": []
     }
   ]
 }
 ```
+
+At render time each item resolves to an emitted `link` (depth-aware, prefixed for item pages) plus an un-prefixed `canonicalPath` used for active-state matching (see `resolveMenuItemLinks` in `packages/render-engine/src/menuResolver.js`). The menu snippet reads `item.link` — authors do not handle `pageUuid`/`collectionItemUuid` directly.
 
 ### Rendering Menus
 
@@ -1490,20 +1411,39 @@ Use the `{% render 'menu' %}` tag with custom CSS classes to render navigation m
 
 The menu snippet automatically adds the `class_has_submenu` class to items that have child items, allowing you to style dropdown indicators and submenu behaviors.
 
-## 11. Assets Management
+### Link settings
+
+A `link`-type setting stores an **object**, not a string. The resolved shape carries:
+
+- `href` — the resolved URL (internal page slug, collection-item path, or custom URL)
+- `text` — the link label
+- `target` — `"_self"` or `"_blank"`
+
+Internally a link can hold a stable ref (`pageUuid`, or `collectionItemUuid` + `collectionType`) so it follows renames; the editor resolves these to a live `href` (see `resolveStoredLink` in `packages/editor-ui/src/utils/linkValueResolver.js`). In templates, read the resolved object:
+
+```liquid
+{% assign link = block.settings.link %}
+{% if link.href %}
+  <a href="{{ link.href }}"{% if link.target == '_blank' %} target="_blank" rel="noopener"{% endif %}>
+    {{ link.text }}
+  </a>
+{% endif %}
+```
+
+## 10. Assets Management
 
 ### CSS Files
 
 - `base.css`: Core theme styles (design tokens, utility classes, component styles)
 - Shared CSS files for complex widgets (e.g., `slideshow.css`)
-- Loaded via `{% asset "filename.css" %}` or `{% enqueue_style "filename.css" %}`
+- Loaded via `{% asset src: "filename.css" %}` or `{% enqueue_style src: "filename.css" %}`
 - Use `{% header_assets %}` or `{% footer_assets %}` to render enqueued styles
 
 ### JavaScript Files
 
 - `scripts.js`: Main theme scripts
 - Shared JS files for complex widgets (e.g., `slideshow.js`)
-- Loaded via `{% asset "filename.js" %}` or `{% enqueue_script "filename.js" %}`
+- Loaded via `{% asset src: "filename.js" %}` or `{% enqueue_script src: "filename.js" %}`
 - Use `{% header_assets %}` or `{% footer_assets %}` to render enqueued scripts
 
 ### Widget Styles & Scripts
@@ -1546,44 +1486,36 @@ Card-based widgets (e.g., `card-grid`, `icon-card-grid`) can offer a carousel la
 }
 ```
 
-The widget template conditionally renders carousel markup (navigation buttons, a `.carousel-track` container, and `.carousel-item` wrappers) when `widget.settings.layout == ‘carousel’`. The carousel behavior is powered by `carousel.js` in the theme’s `assets/` directory, which is conditionally enqueued by each widget that supports the carousel layout:
+The widget template conditionally renders carousel markup (navigation buttons, a `.carousel-track` container, and `.carousel-item` wrappers) when `widget.settings.layout == 'carousel'`. The carousel behavior is powered by `carousel.js` in the theme's `assets/` directory, which is conditionally enqueued by each widget that supports the carousel layout:
 
 ```liquid
-{% if widget.settings.layout == ‘carousel’ %}
+{% if widget.settings.layout == 'carousel' %}
   {% enqueue_script src: "carousel.js", defer: true, location: "footer", priority: 40, theme: true %}
 {% endif %}
 ```
 
-The `theme: true` option tells the enqueue system to resolve the asset from the theme `assets/` folder rather than the widget’s own folder. This is the correct approach for shared theme-level assets used across multiple widgets — `carousel.js` is only loaded when at least one carousel widget is present on the page, and the enqueue system deduplicates it automatically if multiple carousel widgets appear on the same page.
+The `theme: true` option tells the enqueue system to resolve the asset from the theme `assets/` folder rather than the widget's own folder. This is the correct approach for shared theme-level assets used across multiple widgets — `carousel.js` is only loaded when at least one carousel widget is present on the page, and the enqueue system deduplicates it automatically if multiple carousel widgets appear on the same page.
 
-For widget-specific assets (scripts/styles that belong to a single widget), place them in the widget’s folder and enqueue without `theme: true`:
+For widget-specific assets (scripts/styles that belong to a single widget), place them in the widget's folder and enqueue without `theme: true`:
 
 ```liquid
 {% enqueue_style src: "slideshow.css", priority: 30 %}
 {% enqueue_script src: "slideshow.js", priority: 30, defer: true %}
 ```
 
-These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority. When `enqueue_*` is called from a widget template without `theme: true`, assets are loaded from that widget’s folder. When called with `theme: true` or from `layout.liquid`/snippets, assets are loaded from the theme `assets/` folder.
+These will be automatically rendered by `{% header_assets %}` (for styles) and `{% footer_assets %}` (for scripts) in your layout template, sorted by priority. When `enqueue_*` is called from a widget template without `theme: true`, assets are loaded from that widget's folder. When called with `theme: true` or from `layout.liquid`/snippets, assets are loaded from the theme `assets/` folder.
 
 ### Assets During Export
 
-When exporting a project to static HTML:
+When a project is exported to static HTML, theme `assets/` are copied to the output, all widget `.css`/`.js` files are **flattened** into a single output `assets/` folder, and only images in active use are copied (with public size variants under `assets/images/`; `thumb` variants are skipped). Because widget assets are flattened, files with the same name from different widgets collide — always use unique, widget-prefixed filenames (e.g., `slideshow.css`, not `styles.css`).
 
-- **Theme Assets**: All files from `/assets/` are copied to the output directory
-- **Widget Assets**: All `.css` and `.js` files found in the `/widgets/` directory are **flattened** into the output `/assets/` directory
-- **Used Images Only**: Only tracked images in active use are copied during normal export
-- **Image Variants**: Public generated variants are copied into `assets/images/`, but `thumb` variants are skipped because they are only used by the media library UI
-- **Original Raster Files**: The original image is copied only when no public `large` variant exists; if `large` exists, it becomes the public delivery ceiling
-- **SVG Originals**: SVG files are always copied as-is
-- **Path Optimization**: Asset paths are converted to relative URLs for optimal static hosting
+> See [Export](core-export.md) for the full export pipeline, image-variant delivery rules, and path-rewriting details.
 
-> [!WARNING] Because widget assets are flattened during export, files with the same name from different widgets will collide. Always use unique, widget-prefixed filenames (e.g., `slideshow.css` instead of `styles.css`).
-
-## 12. Theme Locales
+## 11. Theme Locales
 
 Theme locale files provide the translated strings for all theme-owned `tTheme:` prefixed keys used in theme widget schemas and global settings. They live in the `locales/` directory at the theme root.
 
-Core widget translations are owned separately by the app in `src/core/widgets/locales/`. When a project is created, the theme's `locales/` directory is copied into the project. At runtime, the server merges the shared core locale data with the active project's copied theme locale data before returning it to the editor.
+Core widget translations are owned separately by the app in `packages/core/src/widgets/locales/`. When a project is created, the theme's `locales/` directory is copied into the project. At runtime, the server merges the shared core locale data with the active project's copied theme locale data before returning it to the editor.
 
 ### File Format
 
@@ -1606,10 +1538,10 @@ Each locale file (e.g., `locales/en.json`) is a nested JSON object. The dot-sepa
       "color_scheme": {
         "label": "Color Scheme",
         "options": {
-          "standard_primary": "Standard Primary",
-          "standard_secondary": "Standard Secondary",
-          "highlight_primary": "Highlight Primary",
-          "highlight_secondary": "Highlight Secondary"
+          "standard": "Standard",
+          "standard_accent": "Standard Accent",
+          "highlight": "Highlight",
+          "highlight_accent": "Highlight Accent"
         }
       }
     },
@@ -1650,8 +1582,6 @@ Each locale file (e.g., `locales/en.json`) is a nested JSON object. The dot-sepa
 
 Widget types with hyphens are converted to underscores in keys: `bento-grid` becomes `bento_grid`.
 
-**Shared keys:** settings and block types that repeat identically across many widgets (the Content/Display section headers, color scheme, spacing, and the standardized heading/text/button blocks) can live under a shared `global.widgets.*` namespace instead of per-widget keys — e.g. `tTheme:global.widgets.settings.content_header.label`, `tTheme:global.widgets.blocks.heading.settings.size.label`. Arch uses this for all shared block types so labels stay identical everywhere.
-
 ### How Translations Work
 
 1. Schemas reference locale keys using the `tTheme:` prefix (e.g., `"label": "tTheme:carousel.settings.title.label"`).
@@ -1677,9 +1607,9 @@ Run `npm run validate:theme-locales` to validate theme locale files. The validat
 
 1. Every theme-owned `tTheme:` key referenced in theme widget schemas and `theme.json` exists in the theme's `en.json`
 2. The theme's `en.json` contains no orphaned theme-owned keys that aren't referenced by any theme schema
-3. Shared core-widget locales are validated separately against `src/core/widgets/`
+3. Shared core-widget locales are validated separately against `packages/core/src/widgets/`
 
-## 13. Advanced Features
+## 12. Advanced Features
 
 ### Scroll Reveal Animations
 
@@ -1727,7 +1657,7 @@ The animation system requires two parts in `layout.liquid`:
 **1. CSS Override (in `<head>`)** - When animations are disabled, ensure elements remain visible:
 
 ```liquid
-{% unless theme.general.enable_reveal_animations %}
+{% unless theme.layout.enable_reveal_animations %}
   <style>.reveal { opacity: 1 !important; transform: none !important; }</style>
 {% endunless %}
 ```
@@ -1735,28 +1665,28 @@ The animation system requires two parts in `layout.liquid`:
 **2. Script Loading (in footer)** - Only load the animation script when enabled:
 
 ```liquid
-{% if theme.general.enable_reveal_animations %}
-  {% asset src: "reveal.js", defer: true %}
+{% if theme.layout.enable_reveal_animations %}
+  {% enqueue_script src: "reveal.js", priority: 50, defer: true %}
 {% endif %}
 ```
 
 #### Theme Setting Definition
 
-Add this to your `theme.json` under `settings.global` (Arch defines it in the `general` group):
+Add this to your `theme.json` under `settings.global`:
 
 ```json
-"general": [
+"layout": [
   {
     "type": "header",
-    "id": "animations_header",
-    "label": "tTheme:global.general.settings.animations_header.label"
+    "id": "layout_header",
+    "label": "tTheme:global.layout.settings.layout_header.label"
   },
   {
     "type": "checkbox",
     "id": "enable_reveal_animations",
-    "label": "tTheme:global.general.settings.enable_reveal_animations.label",
-    "default": false,
-    "description": "tTheme:global.general.settings.enable_reveal_animations.description"
+    "label": "tTheme:global.layout.settings.enable_reveal_animations.label",
+    "default": true,
+    "description": "tTheme:global.layout.settings.enable_reveal_animations.description"
   }
 ]
 ```
@@ -1992,99 +1922,27 @@ To enable these features in your theme, add the `advanced` settings group to you
 
 Then add the corresponding tags in your `layout.liquid` where you want the content to appear.
 
-## 14. Theme Presets
+## 13. Theme Presets
 
-Presets are named variants of a theme that can override **settings** (colors, fonts, etc.) and/or **demo content** (templates, menus, global widgets) while sharing the same theme codebase (layout, widgets, assets, snippets). Users pick a preset when creating a project. Once a project is created, it is independent from the preset.
+Presets are named variants of a theme that can override **settings** (colors, fonts, etc.) and/or **demo content** (templates, menus, global widgets) while sharing the same theme codebase (layout, widgets, assets, snippets). Users pick a preset when creating a project; once created, the project is independent from the preset.
 
-### Preset Directory Structure
-
-The `presets/` directory is optional. When present, it lives at the root of the theme alongside `widgets/`, `templates/`, etc.
+An optional `presets/` directory at the theme root holds a `presets.json` registry plus one folder per preset. Each preset folder may contain a `preset.json` (a flat `setting_id → value` override map applied over `theme.json` defaults), an optional `screenshot.png`, and optional `templates/` and `menus/` that fully replace the root ones. Content resolves with a per-preset → root fallback chain (`templates/`, `menus/`, `preset.json`, `screenshot.png`). The registry's `default` preset falls through to the root `templates/`/`menus/`/`theme.json` (no `presets/default/` directory needed), and themes without a `presets/` directory work unchanged.
 
 ```
 presets/
-  presets.json              # Registry of all presets
-  default/                  # Optional — if absent, root templates/menus are used
-    preset.json             # Settings overrides only
+  presets.json              # Registry: default + [{ id, name, description }]
   financial/
     preset.json             # Settings overrides (colors, fonts)
-    screenshot.png          # Preview shown in preset selector UI
-    templates/              # Full custom page templates
-      index.json
-      about.json
-      services.json
-      contact.json
-      global/
-        header.json
-        footer.json
+    screenshot.png          # Preview shown in the preset selector
+    templates/              # Full custom page templates (+ global/)
     menus/                  # Custom navigation
-      main-menu.json
-      footer-menu.json
-  coaching/                 # Same structure as financial
-  accounting/
-  legal/
 ```
 
-### presets.json (Preset Registry)
+When a user picks a theme with presets during project creation, a card grid of preset screenshots/names/descriptions appears below the theme dropdown, with the default pre-selected. The `presets/` directory is never copied into projects.
 
-```json
-{
-  "default": "default",
-  "presets": [
-    { "id": "default", "name": "Consulting Firm", "description": "Strategy & operations consulting with a professional, authoritative feel" },
-    { "id": "financial", "name": "Financial Advisor", "description": "Wealth management and financial planning with a trustworthy, premium look" },
-    { "id": "coaching", "name": "Business Coach", "description": "Executive coaching and leadership development with a warm, approachable tone" },
-    { "id": "accounting", "name": "Accounting Firm", "description": "Tax, audit, and advisory services with a clean, precise aesthetic" },
-    { "id": "legal", "name": "Law Firm", "description": "Legal services with a dignified, established presence" }
-  ]
-}
-```
+> For the registry/preset file formats, the resolution algorithm, and the project-creation seeding flow, see [Theme Presets](theme-presets.md), [Theme Preset File Format](theme-preset-file-format.md), and [Project Management](core-projects.md).
 
-- `"default"` field specifies which preset is pre-selected in the UI
-- The `"default"` preset falls through to root `templates/`, `menus/`, and `theme.json` defaults (no `presets/default/` directory needed)
-- All non-default presets include full `templates/`, `menus/`, `preset.json`, and `screenshot.png`
-- Themes without a `presets/` directory work exactly as before (zero breaking changes)
-
-### preset.json (Per-Preset Settings Overrides)
-
-Each preset can include a `preset.json` with a flat map of `setting_id → value`:
-
-```json
-{
-  "settings": {
-    "standard_bg_primary": "#fdfbf7",
-    "standard_accent": "#8b6f4e",
-    "heading_font": { "stack": "\"Cormorant Garamond\", serif", "weight": 500 },
-    "body_font": { "stack": "\"Nunito Sans\", sans-serif", "weight": 400 },
-    "enable_reveal_animations": true
-  }
-}
-```
-
-At project creation, these values replace the `default` field of matching settings in the project's `theme.json`. Only settings that differ from the base need to be specified — the full schema stays in the base `theme.json`.
-
-### Fallback Chain
-
-For any preset, the system resolves content with this fallback order:
-
-- **Templates**: `presets/{id}/templates/` → root `templates/`
-- **Menus**: `presets/{id}/menus/` → root `menus/`
-- **Settings**: `presets/{id}/preset.json` overrides → `theme.json` defaults
-- **Screenshot**: `presets/{id}/screenshot.png` → root `screenshot.png`
-
-### Preset Types
-
-Presets can be as simple or comprehensive as needed:
-
-- **Settings-only preset**: Just `preset.json` + optional `screenshot.png`. Uses root templates and menus with overridden colors/fonts.
-- **Full preset**: Includes `templates/`, `menus/`, `preset.json`, and `screenshot.png`. Provides completely different page content, navigation, and visual style.
-
-### Frontend Integration
-
-When a user selects a theme with presets during project creation, a visual card grid appears below the theme dropdown. Each card shows the preset's screenshot, name, and description. The default preset is pre-selected. The selected preset ID is submitted with the form data.
-
-For detailed implementation information, see [Theme Presets](theme-presets.md).
-
-## 15. Theme Development Workflow
+## 14. Theme Development Workflow
 
 1. **Planning**: Define the theme's purpose, target audience, and key features
 2. **Setup**: Create the basic theme structure and `theme.json` with global settings
@@ -2104,12 +1962,12 @@ This theming system provides a powerful and flexible foundation for creating bea
 
 ---
 
-## 16. Theme Lifecycle in Projects
+## 15. Theme Lifecycle in Projects
 
 When a new project is created, the selected theme is copied into the project's data directory so it can be customized independently of the source theme:
 
 - **Destination**: `/data/projects/<folderName>/`
-- **Copied items**: the entire theme directory — `layout.liquid`, `theme.json`, `widgets/`, `assets/`, `snippets/`, `locales/`, `menus/`, `collection-types/`, etc. The versioning directories (`updates/`, `latest/`) and `presets/` are excluded, and `templates/` is resolved through the selected preset (preset templates when present, root templates otherwise)
+- **Copied items**: `layout.liquid`, `templates/`, `widgets/`, `assets/`, and `menus/`
 
 If a preset was selected during creation, the system also applies preset overrides (custom templates, menus, and/or settings) after the theme copy. The `presets/` directory itself is never copied into projects. See [Project Management](core-projects.md) for the full creation workflow and [Theme Presets](theme-presets.md) for preset details.
 
