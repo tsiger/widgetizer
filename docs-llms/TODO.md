@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **35 done · 3 deferred · 10 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **35 done · 3 deferred · 12 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -61,6 +61,8 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **35 done ·
 - ✅ [47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — DONE 2026-07-13](#47-editorproviderpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui---done-2026-07-13)
 - ✅ [48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — DONE 2026-07-13 (saveStore concurrency redesign, Task 1)](#48-savestores-headerfooter-dirty-diff-is-key-order-sensitive-not-truly-deep-equal-editor-ui---done-2026-07-13)
 - ✅ [49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — DONE 2026-07-13 (saveStore concurrency redesign, Task 2)](#49-clicking-save-during-a-background-autosave-silently-does-nothing--no-busy-state-no-toast-editor-ui---done-2026-07-13)
+- ⬜ [50. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — **low (optional)**](#50-core-editor-ui-style-guidemd-has-no-split-button-component-pattern-docs-llms--low-optional)
+- ⬜ [51. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — **investigate (low)**](#51-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--investigate-low)
 
 ---
 
@@ -2263,9 +2265,9 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 
 ## 42. Kebab action-menus lack full WAI-ARIA a11y + duplicate open/close logic (`editor-ui`) — ⬜ **low (a11y / DRY)**
 
-Surfaced 2026-07-09 while speccing the page-editor **primary-action SplitButton** (see
-`experiment-docs/2026-07-09-editor-topbar-primary-action-splitbutton-design.md`), which audited the
-existing kebab/action menus as the house pattern the new control should match — and found they stop
+Surfaced 2026-07-09 while speccing the page-editor **primary-action SplitButton** (the design doc has
+since been removed — the work landed and its essentials are captured here and in §45-49), which audited
+the existing kebab/action menus as the house pattern the new control should match — and found they stop
 short of full menu-button accessibility.
 
 The row action-menus — `pages/Pages.jsx`, `pages/CollectionItems.jsx`,
@@ -2525,3 +2527,35 @@ reconsider wiring `isAutoSaving` into the busy state.
 **Hosted impact:** none — same gap would apply to hosted's Save button (shared `editor-ui` component),
 but hosted's `savePublish` already has its own `waitForAnySaveToSettle()` guard so this specific plugin
 flow isn't affected.
+
+---
+
+## 50. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — ⬜ **low (optional)**
+
+Surfaced 2026-07-13 auditing docs-llms for staleness against the `list-button` branch. This style guide
+reads as a Tailwind class/token reference rather than a component-API catalogue, and it has no existing
+precedent for documenting other composite interactive controls (menus, comboboxes) either — so the new
+`SplitButton`/`PrimaryActionControl` not appearing here isn't a factual error, just a possible gap if the
+guide is ever meant to grow into a component catalogue.
+
+**Fix (if wanted):** add a Split Button entry alongside the other button patterns, or explicitly scope
+the doc's intro to "tokens/classes only, not component APIs" so its silence here reads as deliberate.
+
+**Hosted impact:** none — OSS docs-llms only.
+
+---
+
+## 51. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — ⬜ **investigate (low)**
+
+Surfaced 2026-07-13 running the full backend suite (`npm test`) after the `list-button` §46/§47 fixes:
+`passes through when validation succeeds` (`packages/builder-server/src/tests/infrastructure.test.js`)
+failed once with `Unexpected token '<', "<!doctype "... is not valid JSON` — but passed cleanly running
+that file alone (`node --test packages/builder-server/src/tests/infrastructure.test.js`, 10/10). Not
+caused by anything in `list-button` (the working tree touched only `packages/editor-ui` at the time);
+the error text (an HTML response where JSON was expected) suggests a port collision or a stray server
+under test-parallelism, not a logic bug in `validateRequest` itself.
+
+**Fix:** investigate under the full-suite runner (not standalone) to reproduce, likely something about
+port/state sharing across `createEditorApp` instances spun up by parallel test files.
+
+**Hosted impact:** none — OSS backend test infra only.
