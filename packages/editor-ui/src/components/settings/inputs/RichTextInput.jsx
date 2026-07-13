@@ -536,8 +536,9 @@ export default function RichTextInput({
     [editor],
   );
 
-  // Link the current selection to a Media Library file (PDF). Stores the portable
-  // `/uploads/files/…` path; the export pipeline rewrites it to `assets/files/…`.
+  // Link the current selection to any Media Library asset (document, audio, or image).
+  // Stores the portable `/uploads/{files,images}/…` path; the export pipeline rewrites it
+  // (files → assets/files/…, images → assets/images/…) and usage tracking counts both.
   // With no text selected, inserts the file's name as the linked text.
   const handleLinkFile = useCallback(
     (file) => {
@@ -644,7 +645,10 @@ export default function RichTextInput({
           onClose={() => setPickerMode(null)}
           onSelect={pickerMode === "image" ? handleInsertImage : handleLinkFile}
           activeProject={activeProject}
-          filterType={pickerMode === "image" ? "image" : "file"}
+          // Image insert is locked to images; the "Link to file" picker links to ANY asset
+          // (images included), so it opens on "all" and shows the in-drawer type filter.
+          filterType={pickerMode === "image" ? "image" : "all"}
+          showTypeFilter={pickerMode === "fileLink"}
           elevated
         />
       )}

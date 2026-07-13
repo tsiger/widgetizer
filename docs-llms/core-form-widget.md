@@ -106,24 +106,38 @@ configuration violates the hosted contract, so a broken manifest never ships.
 
 To keep the editor friendly for non-technical users, the widget does not expose
 form keys, field keys, or option values. The hosted service needs them, so the
-export pipeline derives them silently using the same `handleize` slug rules the
-widget template uses (`packages/builder-server/src/services/formsManifestService.js`
-mirrors `packages/core/src/filters/handleizeFilter.js` exactly):
+export pipeline derives them silently. `formsManifestService.js` and the widget
+template both call the **same** `handleize` exported from
+`packages/core/src/filters/handleizeFilter.js`, so the manifest keys and the
+rendered HTML `name`/`value` attributes can never drift apart.
+
+`handleize` runs the same transliterating `slugify` (`strict`) used for page and
+project slugs, so non-Latin labels are converted, not stripped:
 
 - The **form identifier** comes from the form name (`"Contact"` → `contact`,
-  `"Quote Request"` → `quote-request`). Two forms with the same name on
-  different pages are treated as the same form.
+  `"Quote Request"` → `quote-request`, `"Επικοινωνία"` → `epikoinwnia`). Two
+  forms with the same name on different pages are treated as the same form.
 - The **field identifier** comes from each field's label (`"Email address"` →
-  `email-address`). Two fields with the same derived identifier inside one form
-  fail the export with a clear message naming both labels.
+  `email-address`, `"Το όνομα σας"` → `to-onoma-sas`). Two fields with the same
+  derived identifier inside one form fail the export with a clear message naming
+  both labels.
 - The **option value** for select/radio fields comes from each option line
   (`"General inquiry"` → `general-inquiry`).
 - The **max length** for each field is set silently by type to match the
   platform caps (text/tel/url 500, email 320, textarea 5000).
 
-All identifiers are validated at export time against the hosted contract
-(`/^[a-z0-9_-]{1,64}$/`). Error messages reference the form name or field
-label, never the derived key.
+**Untranslatable labels get a positional fallback.** A label with no
+transliterable letters or digits (CJK, emoji, punctuation-only) slugs to an empty
+string. Rather than failing the export, the field key falls back to its position
+(`field-1`, `field-2`, …) and an option value to `option-1`, `option-2`, … The
+human label is always preserved in the manifest; only the machine key is
+positional. The counters match the widget template's loops exactly so the HTML
+and manifest stay in sync. (An empty/whitespace-only label is still a hard error —
+that is a *missing* label, not an untranslatable one.)
+
+All derived keys satisfy the hosted contract (`/^[a-z0-9_-]{1,64}$/`), since
+`slugify(strict)` emits only `[a-z0-9-]` and the positional fallbacks are ASCII.
+Error messages reference the form name or field label, never the derived key.
 
 > **Key vs. option-value cap.** Form/field keys truncate at 64 chars; option
 > values truncate at 200. The manifest builder and the Liquid template apply the

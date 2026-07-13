@@ -133,7 +133,7 @@ A rich text editor (Tiptap/ProseMirror) with basic formatting (bold, italic, lin
 
 - Formatting toolbar with Bold, Italic, Link, Bullet List, and Numbered List buttons
 - **Unlink** button appears when the cursor is inside a link, to remove it
-- **Link to file** button (paperclip) opens the Media Library (`filterType="file"`) and links the selection to a file asset (e.g. a PDF). With nothing selected it inserts the file's name as the linked text. Stores the portable `/uploads/files/…` path
+- **Link to file** button (paperclip) opens the Media Library on all assets (`filterType="all"` with the in-drawer type filter, `showTypeFilter`) and links the selection to any asset (document, audio, or image). With nothing selected it inserts the file's name as the linked text. Stores the portable `/uploads/{files,images}/…` path
 - **Insert Image** button (when `allow_images` is set) inserts an inline Media Library image
 - Heading 2 / 3 / 4 buttons (when `allow_headings` is set)
 - Link editor with URL input — root-relative paths (`/uploads/files/x.pdf`, `/about.html`), anchors (`#section`), protocol-relative, and explicit `http(s)://`/`mailto:`/`tel:` URLs are kept verbatim; only a bare domain (`example.com`) gets `https://` prepended

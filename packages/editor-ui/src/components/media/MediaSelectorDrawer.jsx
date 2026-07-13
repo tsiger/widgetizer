@@ -14,6 +14,12 @@ import { showRejectedFiles } from "../../utils/uploadFeedback";
 import { IMAGE_ACCEPT, AUDIO_ACCEPT, NON_IMAGE_ACCEPT, MEDIA_ACCEPT, mapDropzoneRejections } from "../../utils/uploadValidation";
 
 /**
+ * @param {string} [filterType="all"] — Media type to show: `image`, `audio`, `file`
+ *   (non-image), or `all`. Fixed when `showTypeFilter` is off; when on it seeds the
+ *   in-drawer dropdown's initial value.
+ * @param {boolean} [showTypeFilter=false] — Render a type dropdown next to search (All /
+ *   Images / Audio / Files) so the user can switch type within the drawer. Off for
+ *   type-locked pickers (image/file settings); on for the richtext "Link to file" picker.
  * @param {boolean} [elevated=false] — Raises the drawer above an unusually high-z host
  *   (e.g. the richtext editor's expand overlay at z-1000). Default keeps the standard
  *   z-40/z-50 used everywhere else.
@@ -24,15 +30,21 @@ export default function MediaSelectorDrawer({
   onSelect,
   activeProject,
   filterType = "all",
+  showTypeFilter = false,
   elevated = false,
 }) {
   const { t } = useTranslation();
   const [mediaFiles, setMediaFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  // The in-drawer type dropdown (rendered only when `showTypeFilter`) seeds from the fixed
+  // `filterType` prop, then drives filtering itself. Type-locked pickers don't render it and
+  // keep the prop's type via `effectiveFilter` below.
+  const [activeFilter, setActiveFilter] = useState(filterType);
   const showToast = useToastStore((state) => state.showToast);
   const { settings } = useAppSettings();
   const maxSizeMB = settings?.media?.maxFileSizeMB ?? 50;
+  const effectiveFilter = showTypeFilter ? activeFilter : filterType;
 
   // Initialize media upload hook
   const { uploading, uploadProgress, handleUpload } = useMediaUpload({
@@ -83,14 +95,14 @@ export default function MediaSelectorDrawer({
       const originalName = (file.originalName || "").toLowerCase();
       const matchesSearch = displayName.includes(normalizedSearch) || originalName.includes(normalizedSearch);
 
-      if (filterType === "image") {
+      if (effectiveFilter === "image") {
         return matchesSearch && file.type && file.type.startsWith("image/");
       }
-      if (filterType === "audio") {
+      if (effectiveFilter === "audio") {
         return matchesSearch && file.type && file.type.startsWith("audio/");
       }
-      if (filterType === "file") {
-        // Any non-image asset (documents + audio) — so the richtext "Link to file" picker reaches audio.
+      if (effectiveFilter === "file") {
+        // "file" = any non-image asset (documents + audio), mirroring the media screen's "Files" option.
         return matchesSearch && file.type && !file.type.startsWith("image/");
       }
 
@@ -124,16 +136,16 @@ export default function MediaSelectorDrawer({
 
   // Restrict the in-drawer uploader to the active filter's types (and label it to match).
   const uploadAccept =
-    filterType === "image" ? IMAGE_ACCEPT
-      : filterType === "audio" ? AUDIO_ACCEPT
+    effectiveFilter === "image" ? IMAGE_ACCEPT
+      : effectiveFilter === "audio" ? AUDIO_ACCEPT
         // "file" = any non-image asset (documents + audio), matching the file filter, so a
-        // new MP3 can be uploaded from a filterType="file" picker, not just selected.
-        : filterType === "file" ? NON_IMAGE_ACCEPT
+        // new MP3 can be uploaded from a file-filtered picker, not just selected.
+        : effectiveFilter === "file" ? NON_IMAGE_ACCEPT
           : MEDIA_ACCEPT;
   const supportedLabel =
-    filterType === "image" ? t("components.mediaUploader.supportedImages")
-      : filterType === "audio" ? t("components.mediaUploader.supportedAudio")
-        : filterType === "file" ? t("components.mediaUploader.supportedFiles")
+    effectiveFilter === "image" ? t("components.mediaUploader.supportedImages")
+      : effectiveFilter === "audio" ? t("components.mediaUploader.supportedAudio")
+        : effectiveFilter === "file" ? t("components.mediaUploader.supportedFiles")
           : t("components.mediaUploader.supportedFormats");
 
   if (!visible) return null;
@@ -165,28 +177,43 @@ export default function MediaSelectorDrawer({
         </div>
 
         <div className="p-4 border-b border-slate-200">
-          <div className="relative">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={t("components.mediaSelector.searchPlaceholder")}
-              className="form-input pl-10"
-            />
-            <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
-          </div>
-          <div className="mt-3">
-            <FileUploader
-              onUpload={handleUpload}
-              onReject={handleUploaderReject}
-              uploading={uploading}
-              uploadProgress={uploadProgress}
-              accept={uploadAccept}
-              multiple={true}
-              maxSize={maxSizeMB * 1024 * 1024}
-              title={t("components.mediaSelector.upload")}
-              maxSizeText={`${supportedLabel} - ${maxSizeMB}MB max`}
-            />
+          <FileUploader
+            onUpload={handleUpload}
+            onReject={handleUploaderReject}
+            uploading={uploading}
+            uploadProgress={uploadProgress}
+            accept={uploadAccept}
+            multiple={true}
+            maxSize={maxSizeMB * 1024 * 1024}
+            title={t("components.mediaSelector.upload")}
+            maxSizeText={`${supportedLabel} - ${maxSizeMB}MB max`}
+          />
+          <div className="mt-3 flex items-center gap-2">
+            <div className="relative flex-1 min-w-0">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={t("components.mediaSelector.searchPlaceholder")}
+                className="form-input pl-10"
+              />
+              <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
+            </div>
+            {showTypeFilter && (
+              // w-auto overrides form-select's w-full so the select sizes to its content
+              // (locale-safe) instead of demanding 100% and overflowing; shrink-0 stops the
+              // flex-1 search box from squeezing it.
+              <select
+                value={activeFilter}
+                onChange={(e) => setActiveFilter(e.target.value)}
+                className="form-select w-auto shrink-0"
+              >
+                <option value="all">{t("components.mediaToolbar.all")}</option>
+                <option value="image">{t("components.mediaToolbar.images")}</option>
+                <option value="audio">{t("components.mediaToolbar.audio")}</option>
+                <option value="file">{t("components.mediaToolbar.files")}</option>
+              </select>
+            )}
           </div>
         </div>
 
@@ -208,9 +235,10 @@ export default function MediaSelectorDrawer({
                   contentClassName="max-w-64 whitespace-normal break-words text-center text-[11px] leading-4 shadow-lg"
                   wrapperClassName="block"
                   triggerClassName="block"
+                  portal
                 >
                   <div
-                    className="border border-slate-200 rounded-sm bg-slate-50 cursor-pointer hover:border-pink-400 transition-colors overflow-visible"
+                    className="border border-slate-200 rounded-sm bg-slate-50 cursor-pointer hover:border-pink-400 transition-colors"
                     onClick={() => onSelect(file)}
                   >
                     <div className="aspect-square relative bg-slate-100 flex items-center justify-center rounded-t-sm overflow-hidden">

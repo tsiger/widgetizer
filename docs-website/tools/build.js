@@ -66,8 +66,10 @@ function parseFrontmatter(content) {
 
 // Add id attributes to headings so in-page anchor links (#section) resolve.
 // Slug: lowercase the heading text (inline tags/entities stripped) and collapse
-// every run of non-alphanumeric characters to a single hyphen. Duplicate slugs on
-// the same page get a numeric suffix (-1, -2, …).
+// every run of non-letter/digit characters to a single hyphen. The class is
+// Unicode-aware (\p{L}\p{N} with the u flag) so a non-Latin heading keeps a
+// meaningful anchor instead of collapsing to the tag-name fallback. Duplicate
+// slugs on the same page get a numeric suffix (-1, -2, …).
 function addHeadingIds(html) {
   const used = new Map();
   return html.replace(/<(h[1-6])>([\s\S]*?)<\/\1>/g, (match, tag, inner) => {
@@ -80,7 +82,7 @@ function addHeadingIds(html) {
       .replace(/&#39;/g, "'");
     let slug = text
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/[^\p{L}\p{N}]+/gu, "-")
       .replace(/^-+|-+$/g, "");
     if (!slug) slug = tag;
     if (used.has(slug)) {
