@@ -62,7 +62,7 @@ describe("PrimaryActionControl", () => {
     const run = vi.fn().mockRejectedValue(new Error("boom"));
     renderControl({ actions: [saveDescriptor], commands: [{ id: "save", run }] });
     fireEvent.click(screen.getByRole("button", { name: "pageEditor.toolbar.save" }));
-    await waitFor(() => expect(showToast).toHaveBeenCalledWith("pageEditor.toolbar.actionFailed", "error"));
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith("boom", "error"));
   });
 
   it("renders menuItems as a split button", () => {

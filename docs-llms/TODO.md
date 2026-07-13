@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 15 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **33 done · 3 deferred · 12 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -56,11 +56,11 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ⬜ [42. Kebab action-menus lack full WAI-ARIA a11y + duplicate open/close logic (`editor-ui`) — **low (a11y / DRY)**](#42-kebab-action-menus-lack-full-wai-aria-a11y--duplicate-openclose-logic-editor-ui--low-a11y--dry)
 - ⬜ [43. Full accessibility / WAI-ARIA APG conformance review for the project (`editor-ui` + all shells) — **investigate (a11y)**](#43-full-accessibility--wai-aria-apg-conformance-review-for-the-project-editor-ui--all-shells--investigate-a11y)
 - ⬜ [44. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — **low (test hygiene)**](#44-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--low-test-hygiene)
-- ⬜ [45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — **low (latent; hosted-wiring)**](#45-ctrls-bypasses-the-primaryactioncontrol-dispatch-seam--empty-ctx-no-busy-guard-no-error-toast-editor-ui--low-latent-hosted-wiring)
+- ✅ [45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — DONE 2026-07-13 (shared `useDispatchCommand` hook)](#45-ctrls-bypasses-the-primaryactioncontrol-dispatch-seam--empty-ctx-no-busy-guard-no-error-toast-editor-ui---done-2026-07-13)
 - ⬜ [46. `SplitButton` menu items never render a `title` tooltip, unlike the primary button (`editor-ui`) — **low (latent)**](#46-splitbutton-menu-items-never-render-a-title-tooltip-unlike-the-primary-button-editor-ui---low-latent)
 - ⬜ [47. `EditorProvider`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — **low (latent)**](#47-editorproviderpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui---low-latent)
-- ⬜ [48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — **low (latent)**](#48-savestores-headerfooter-dirty-diff-is-key-order-sensitive-not-truly-deep-equal-editor-ui---low-latent)
-- ⬜ [49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — **low (accepted UX gap)**](#49-clicking-save-during-a-background-autosave-silently-does-nothing--no-busy-state-no-toast-editor-ui---low-accepted-ux-gap)
+- ✅ [48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — DONE 2026-07-13 (saveStore concurrency redesign, Task 1)](#48-savestores-headerfooter-dirty-diff-is-key-order-sensitive-not-truly-deep-equal-editor-ui---done-2026-07-13)
+- ✅ [49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — DONE 2026-07-13 (saveStore concurrency redesign, Task 2)](#49-clicking-save-during-a-background-autosave-silently-does-nothing--no-busy-state-no-toast-editor-ui---done-2026-07-13)
 
 ---
 
@@ -2351,7 +2351,24 @@ frontend suite stays green; keep it out of feature branches and do it as its own
 
 ---
 
-## 45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — ⬜ **low (latent; hosted-wiring)**
+## 45. Ctrl+S bypasses the PrimaryActionControl dispatch seam — empty ctx, no busy-guard, no error toast (`editor-ui`) — ✅ DONE 2026-07-13
+
+**Done note (2026-07-13).** Fixed by extracting the `dispatch`/`runCommand`/`pending` logic that used to
+live only inside `PrimaryActionControl` into a shared hook, `hooks/useDispatchCommand.js`. Both
+`PrimaryActionControl` (click path) and `EditorTopBar` (Ctrl+S) now call the same hook — `EditorTopBar`'s
+handler is `dispatchCommand("save", "save")`, bound to the **`save`** action specifically as this finding
+required (never "whatever the primary button is"), so the shortcut still can't map to a destructive/composite
+action like hosted's Save & Publish. Both paths now get an identical `{ projectId, runCommand, hooks }`
+ctx, busy-tracking, and error-toast behavior. Each caller gets its own independent `pending` state (not
+shared) — that's fine, since `saveStore.save()`'s own single-flight coalescing (a separate, later fix) is
+the actual correctness mechanism; `pending` here is only per-caller busy-UI. The `hooks` addition to ctx
+(via `useHookRunner()`, previously unused anywhere in the real dispatch path) also unblocks §17 in
+`widgetizer-hosted/docs/TODO.md`. **Accepted tradeoff (xhigh review, 2026-07-13):** `EditorTopBar` mounts
+a full `useDispatchCommand()` instance purely for `dispatch`, never reading its `pending` return value —
+every Ctrl+S press drives two extra re-renders of the whole EditorTopBar tree for state it discards.
+Left as-is: real but minor (a keyboard save is an infrequent, deliberate action, not a hot path), and
+avoiding it would need an opt-out-of-pending-tracking option on the hook — added API surface for a
+cosmetic win. Revisit if EditorTopBar's render cost ever actually matters. Original finding below.
 
 Surfaced 2026-07-10 in the whole-branch review of the primary-action control. The page-editor top bar
 dispatches Ctrl/Cmd+S by calling the `save` command directly (`EditorTopBar.jsx`:
@@ -2417,7 +2434,16 @@ defeat the downstream `useMemo`.
 
 ---
 
-## 48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — ⬜ **low (latent)**
+## 48. `saveStore`'s header/footer dirty-diff is key-order-sensitive, not truly deep-equal (`editor-ui`) — ✅ DONE 2026-07-13
+
+**Done note (2026-07-13).** Fixed as part of Task 1 of the `saveStore` concurrency redesign
+(`docs-llms/plan-savestore-concurrency-redesign.md`): every `JSON.stringify(a) !== JSON.stringify(b)`
+comparison in `saveStore.js` — `hasUnsavedChanges()`, the mirrored `hasHeaderDiff`/`hasFooterDiff` in
+`save()`, and the `page`/`originalPage` diff this finding called out as sharing the same latent risk —
+was replaced with `lodash.isEqual`. Not key-order-sensitive, and fixes a more serious sibling bug the
+redesign's audit found in the same pass: `JSON.stringify` silently drops `undefined`-valued object keys,
+so a real edit that clears a field to `undefined` could vanish from the diff entirely (a genuine
+data-loss path, not just a false positive). Original finding below.
 
 Surfaced 2026-07-12 in the whole-branch review. The header/footer dirty-detection added for the
 same-widget-re-edit race (`hasUnsavedChanges()` and the mirrored `hasHeaderDiff`/`hasFooterDiff` in
@@ -2442,7 +2468,22 @@ and fix are OSS-only (`saveStore.js`).
 
 ---
 
-## 49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — ⬜ **low (accepted UX gap)**
+## 49. Clicking Save during a background autosave silently does nothing — no busy state, no toast (`editor-ui`) — ✅ DONE 2026-07-13
+
+**Done note (2026-07-13).** The core complaint — a click landing during an in-flight save being
+indistinguishable from nothing having happened — is fixed by Task 2 of the `saveStore` concurrency
+redesign (`docs-llms/plan-savestore-concurrency-redesign.md`): the silent-skip guard this finding
+describes was replaced with a real single-flight coalescing queue (`runningSave` + `queuedFollowUp`). A
+`save()` call that arrives while one is already running no longer returns early with nothing to show for
+it — it coalesces onto a queued follow-up run that actually executes and sends the click's content, and
+the caller gets that follow-up's real `{status: ...}` outcome. So a manual save no longer silently drops
+the edit or relies on "the next 60s autosave tick will eventually catch it" — it's captured deterministically.
+
+The one part of the original finding that's still accurate: `TOOLBAR_SIGNALS`/`busyWhen` still only
+reflect `isSaving`, not `isAutoSaving`, so the Save button still doesn't visually flash "Saving..." during
+a pure background autosave tick. That's unchanged from the original **Decision (2026-07-12)** below — a
+deliberate tradeoff, not a new gap — and remains true only as a cosmetic residual now that the underlying
+silent-drop risk is gone. Original finding below.
 
 Surfaced 2026-07-12 in the 6th xhigh review pass, on the fix for §45/the autosave-vs-manual-save
 overlap race. `saveStore.save()` now guards against a save already being in flight (manual OR auto) at

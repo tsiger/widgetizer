@@ -7,7 +7,7 @@ import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
-import { useCommands } from "../../extension/PluginProvider.jsx";
+import { useDispatchCommand } from "../../hooks/useDispatchCommand.js";
 import PrimaryActionControl from "./PrimaryActionControl.jsx";
 
 export default function EditorTopBar({
@@ -18,7 +18,7 @@ export default function EditorTopBar({
 }) {
   const { t } = useTranslation();
   const { hasUnsavedChanges, stopAutoSave } = useAutoSave();
-  const commands = useCommands();
+  const { dispatch: dispatchCommand } = useDispatchCommand();
   const [pages, setPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
@@ -84,7 +84,13 @@ export default function EditorTopBar({
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault();
-        commands.find((c) => c.id === "save")?.run({});
+        // Bound to the "save" command specifically (never "whatever the
+        // primary button is"), so the shortcut can never map to a
+        // destructive/composite action like a hosted Save & Publish — and
+        // routed through the same dispatch seam PrimaryActionControl's click
+        // path uses, so ctx (projectId, runCommand, hooks), busy-tracking,
+        // and error-toast behavior can't drift between keyboard and click.
+        dispatchCommand("save", "save");
       }
 
       // Don't hijack undo/redo while the user is editing a text field — let the
@@ -112,7 +118,7 @@ export default function EditorTopBar({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [safeUndo, safeRedo, commands]);
+  }, [safeUndo, safeRedo, dispatchCommand]);
 
   // Handle click outside to close dropdown
   useEffect(() => {

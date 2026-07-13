@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { PluginProvider } from "../../../extension/PluginProvider.jsx";
 import { builtinToolbarPlugin, DEFAULT_PRIMARY_ACTIONS } from "../../../extension/toolbar.js";
@@ -8,6 +8,7 @@ import EditorTopBar from "../EditorTopBar.jsx";
 import useAutoSave from "../../../stores/saveStore.js";
 import useProjectStore from "../../../stores/projectStore.js";
 import usePageStore from "../../../stores/pageStore.js";
+import useToastStore from "../../../stores/toastStore.js";
 
 vi.mock("../../../queries/pageManager", () => ({ getAllPages: vi.fn().mockResolvedValue([]) }));
 
@@ -54,6 +55,44 @@ describe("EditorTopBar", () => {
     );
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
     expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it("passes a ctx with projectId and runCommand on Ctrl+S (through the same dispatch seam as a click)", () => {
+    useProjectStore.setState({ activeProject: { id: "p42" } });
+    const run = vi.fn().mockResolvedValue(undefined);
+    render(
+      <MemoryRouter>
+        <PluginProvider
+          plugins={[{ name: "t", commands: [{ id: "save", run }] }]}
+          primaryActions={DEFAULT_PRIMARY_ACTIONS}
+        >
+          <EditorTopBar pageName="Home" pageId="home" />
+        </PluginProvider>
+      </MemoryRouter>,
+    );
+    fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+    expect(run).toHaveBeenCalledTimes(1);
+    const ctx = run.mock.calls[0][0];
+    expect(ctx.projectId).toBe("p42");
+    expect(typeof ctx.runCommand).toBe("function");
+  });
+
+  it("surfaces an error toast when Ctrl+S's save command rejects (same as a failed click)", async () => {
+    const showToast = vi.fn();
+    useToastStore.setState({ showToast });
+    const run = vi.fn().mockRejectedValue(new Error("boom"));
+    render(
+      <MemoryRouter>
+        <PluginProvider
+          plugins={[{ name: "t", commands: [{ id: "save", run }] }]}
+          primaryActions={DEFAULT_PRIMARY_ACTIONS}
+        >
+          <EditorTopBar pageName="Home" pageId="home" />
+        </PluginProvider>
+      </MemoryRouter>,
+    );
+    fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith("boom", "error"));
   });
 
   it("reconciles modifiedWidgets after Ctrl+Z (undo) so a revert-to-clean isn't left falsely dirty", () => {

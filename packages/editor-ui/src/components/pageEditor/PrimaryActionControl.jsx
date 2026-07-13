@@ -1,26 +1,25 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import SplitButton from "../ui/SplitButton.jsx";
-import { usePrimaryActions, useToolbarSignals, useCommands } from "../../extension/PluginProvider.jsx";
+import { usePrimaryActions, useToolbarSignals } from "../../extension/PluginProvider.jsx";
 import { resolveActionState, readBuiltinToolbarSignals, TOOLBAR_SIGNALS } from "../../extension/toolbar.js";
 import { defaultWarn } from "../../extension/registry.js";
+import { useDispatchCommand } from "../../hooks/useDispatchCommand.js";
 import useAutoSave from "../../stores/saveStore.js";
 import usePageStore from "../../stores/pageStore.js";
-import useProjectStore from "../../stores/projectStore.js";
-import useToastStore from "../../stores/toastStore.js";
 
 // The page-editor's primary-action control. Reads the shell's ordered descriptors
 // and renders the first as a SplitButton, dispatching each action's `command`
-// through a { projectId, runCommand } ctx, tracking in-flight busy per action, and
-// surfacing failures via a toast. Enable/busy come from the merged signal map
-// (builtin ∪ shell-registered; builtins win). Publish-agnostic.
+// through useDispatchCommand's shared { projectId, runCommand, hooks } ctx —
+// the same seam the topbar's Ctrl+S shortcut uses, so ctx shape, busy-tracking,
+// and error-toast behavior can't drift between the click and keyboard paths.
+// Enable/busy come from the merged signal map (builtin ∪ shell-registered;
+// builtins win). Publish-agnostic.
 export default function PrimaryActionControl() {
   const { t } = useTranslation();
   const actions = usePrimaryActions();
   const shellSignals = useToolbarSignals();
-  const commands = useCommands();
-  const activeProjectId = useProjectStore((s) => s.activeProject?.id);
-  const showToast = useToastStore((s) => s.showToast);
+  const { dispatch: dispatchCommand, pending } = useDispatchCommand();
 
   // Re-render on save-store changes (dirty/saving flags) and on undo/redo, mirroring
   // the previous EditorTopBar save button's reactivity.
@@ -28,32 +27,7 @@ export default function PrimaryActionControl() {
   const [, force] = useState(0);
   useEffect(() => usePageStore.temporal.subscribe(() => force((c) => c + 1)), []);
 
-  const [pending, setPending] = useState({}); // { [actionId]: boolean }
-
-  const runCommand = useCallback(
-    (id, ctx) => {
-      const cmd = commands.find((c) => c.id === id);
-      if (!cmd) return Promise.reject(new Error(`Unknown command "${id}"`));
-      return Promise.resolve(cmd.run(ctx));
-    },
-    [commands],
-  );
-
-  const dispatch = useCallback(
-    async (action) => {
-      const ctx = { projectId: activeProjectId, runCommand: (id) => runCommand(id, ctx) };
-      setPending((p) => ({ ...p, [action.id]: true }));
-      try {
-        await runCommand(action.command, ctx);
-      } catch (err) {
-        console.error(`[editor-ui] toolbar command "${action.command}" failed:`, err);
-        showToast(t("pageEditor.toolbar.actionFailed"), "error");
-      } finally {
-        setPending((p) => ({ ...p, [action.id]: false }));
-      }
-    },
-    [activeProjectId, runCommand, showToast, t],
-  );
+  const dispatch = (action) => dispatchCommand(action.id, action.command);
 
   // Merge shell signals with builtins; builtins win on a name collision.
   const shellValues = Object.fromEntries(
