@@ -20,7 +20,14 @@ export function useDispatchCommand() {
   const runCommand = useCallback(
     (id, ctx) => {
       const cmd = commands.find((c) => c.id === id);
-      if (!cmd) return Promise.reject(new Error(`Unknown command "${id}"`));
+      if (!cmd) {
+        const err = new Error(`Unknown command "${id}"`);
+        // Developer-facing (a stale/missing command registration), not meant
+        // for a user-visible toast — dispatch()'s catch checks this flag to
+        // exclude it from the direct-message path below.
+        err.internal = true;
+        return Promise.reject(err);
+      }
       return Promise.resolve(cmd.run(ctx));
     },
     [commands],
@@ -38,9 +45,14 @@ export function useDispatchCommand() {
         // (project-mismatch, unsaved-changes, veto, and network-error text) —
         // show it directly so callers like hosted's savePublish, which throw
         // a specific message per failure case, aren't flattened into one
-        // generic toast. Falls back to the generic translated message only
-        // when a command throws without one.
-        showToast(err.message || t("pageEditor.toolbar.actionFailed"), "error");
+        // generic toast. Falls back to the generic translated message for
+        // anything that isn't a genuine, user-facing Error: a non-Error
+        // rejection (null/undefined/bare value — err.message would throw),
+        // this hook's own internal errors (e.g. "Unknown command", flagged
+        // above), or an empty message (indistinguishable from "none set" —
+        // an Error's own default message is itself "").
+        const message = err instanceof Error && !err.internal ? err.message : "";
+        showToast(message || t("pageEditor.toolbar.actionFailed"), "error");
       } finally {
         setPending((p) => ({ ...p, [actionId]: false }));
       }

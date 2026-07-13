@@ -75,6 +75,27 @@ describe("useDispatchCommand", () => {
     expect(showToast).toHaveBeenCalledWith("pageEditor.toolbar.actionFailed", "error");
   });
 
+  it("falls back to the generic message (does not crash) when a command rejects with a non-Error value", async () => {
+    const showToast = vi.fn();
+    useToastStore.setState({ showToast });
+    const run = vi.fn().mockRejectedValue(null);
+    const { result } = renderHook(() => useDispatchCommand(), { wrapper: wrapper({ commands: [{ id: "save", run }] }) });
+    await act(async () => {
+      await result.current.dispatch("save", "save");
+    });
+    expect(showToast).toHaveBeenCalledWith("pageEditor.toolbar.actionFailed", "error");
+  });
+
+  it("shows the generic message (not the raw internal string) when the command id doesn't resolve", async () => {
+    const showToast = vi.fn();
+    useToastStore.setState({ showToast });
+    const { result } = renderHook(() => useDispatchCommand(), { wrapper: wrapper({ commands: [] }) });
+    await act(async () => {
+      await result.current.dispatch("save", "save");
+    });
+    expect(showToast).toHaveBeenCalledWith("pageEditor.toolbar.actionFailed", "error");
+  });
+
   it("ctx.runCommand reuses the same ctx (including hooks) for nested command calls", async () => {
     const inner = vi.fn().mockResolvedValue("inner-result");
     const outer = vi.fn((ctx) => ctx.runCommand("inner"));
