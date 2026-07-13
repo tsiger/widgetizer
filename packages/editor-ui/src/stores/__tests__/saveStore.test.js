@@ -435,6 +435,25 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().autoSaveInterval).toBe(rearmedTimer); // untouched — not clobbered, not doubled
       expect(vi.getTimerCount()).toBe(1);
     });
+
+    it("does not reschedule after the tick's own autosave is abandoned by a reset() mid-flight (discard-and-leave)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1"); // unsaved change + arms the timer
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+
+      await vi.advanceTimersByTimeAsync(60000); // tick fires; its own save(true) hangs mid-flight
+      expect(useAutoSave.getState().isAutoSaving).toBe(true);
+
+      useAutoSave.getState().reset(); // user confirms "discard changes" while the tick's own autosave is still in flight
+
+      resolveSave({});
+      await vi.advanceTimersByTimeAsync(0); // let the tick's save() resolve to 'abandoned' and its reschedule-check run
+
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull(); // stayed stopped — an intentional stop happened mid-flight, rescheduling would defeat it
+      expect(vi.getTimerCount()).toBe(0);
+    });
   });
 
   describe("resetAutoSaveTimer — backoff", () => {
@@ -564,6 +583,36 @@ describe("saveStore (useAutoSave)", () => {
       expect(firstResult).toEqual({ status: "success" });
       expect(secondResult).toEqual({ status: "clean" }); // the coalesced follow-up found nothing left to do, not a silent drop
       expect(savePageContent).toHaveBeenCalledTimes(1);
+    });
+
+    it("coalesces a third save() call arriving while a follow-up is already queued (3+ rapid Ctrl+S keydown repeats)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
+
+      const second = useAutoSave.getState().save(false); // queues the follow-up (queuedFollowUp was null)
+      const queuedAfterSecond = useAutoSave.getState().queuedFollowUp;
+
+      const third = useAutoSave.getState().save(false); // arrives while queuedFollowUp is already set — must hit the `if (queuedFollowUp) return queuedFollowUp;` branch, not queue a second follow-up
+      const queuedAfterThird = useAutoSave.getState().queuedFollowUp;
+
+      // `save` is itself an async function, so every call returns a freshly
+      // wrapped Promise even when it resolves by adopting the SAME underlying
+      // value — so the stored `queuedFollowUp` (not the async call's own return
+      // value) is what actually proves the third call didn't queue a second,
+      // independent follow-up chain.
+      expect(queuedAfterThird).toBe(queuedAfterSecond);
+
+      resolveFirst({});
+      const [firstResult, secondResult, thirdResult] = await Promise.all([first, second, third]);
+
+      expect(firstResult).toEqual({ status: "success" });
+      expect(secondResult).toEqual({ status: "clean" });
+      expect(thirdResult).toEqual({ status: "clean" });
+      expect(savePageContent).toHaveBeenCalledTimes(1); // only the first save's own request — no overlapping/duplicate writes from the 2nd or 3rd call
     });
 
     it("coalesces a repeated autosave call into one follow-up instead of overlapping", async () => {
@@ -920,6 +969,53 @@ describe("saveStore (useAutoSave)", () => {
 
       // Auto-save should be stopped to prevent repeated failed save attempts
       expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // undo/redo racing an in-flight save
+  // --------------------------------------------------------------------------
+
+  describe("undo/redo racing an in-flight save", () => {
+    it("rebaselines originalPage to the entry-time (pre-undo) snapshot actually sent, so an undo mid-flight correctly leaves the page dirty against the server's new state", async () => {
+      const page = seedPageStore(); // page.widgets["w-1"].settings.text === "Hi"; originalPage matches
+      const editedPage = {
+        ...page,
+        widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "Changed" } } },
+      };
+      usePageStore.setState({ page: editedPage });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      // save() synchronously captures this "Changed" page (and the modifiedWidgets
+      // snapshot) at entry, before the request below is even sent.
+      const savePromise = useAutoSave.getState().save(false);
+
+      // While that save's request is still in flight, the user hits Ctrl+Z:
+      // EditorTopBar's safeUndo reverts pageStore's `page` back to the saved
+      // baseline ("Hi") and then calls reconcileModifiedWidgets() right after
+      // the temporal jump — reproduced here directly against the store.
+      usePageStore.setState({ page: JSON.parse(JSON.stringify(page)) });
+      useAutoSave.getState().reconcileModifiedWidgets();
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false); // undo reverted it back to exactly the baseline
+
+      resolveSave({});
+      const result = await savePromise;
+
+      expect(result).toEqual({ status: "success" });
+      // The in-flight save actually sent "Changed" (what it captured at entry) to
+      // the server — per the design (docs-llms/plan-savestore-concurrency-redesign.md),
+      // the write-back rebaselines originalPage to THAT captured snapshot, not to
+      // whatever pageStore's live `page` has become — because that's genuinely
+      // what the server now holds, regardless of a later local undo.
+      expect(usePageStore.getState().originalPage.widgets["w-1"].settings.text).toBe("Changed");
+      // The live page (post-undo, "Hi") now differs from that server-truth
+      // baseline — hasUnsavedChanges() must report dirty again even though
+      // modifiedWidgets itself is empty (the undo's reconcile cleared it) — only
+      // the value-based diff fallback catches this, which is exactly why it exists.
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
     });
   });
 });

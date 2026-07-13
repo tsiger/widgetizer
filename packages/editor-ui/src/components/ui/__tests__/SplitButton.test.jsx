@@ -19,6 +19,21 @@ describe("SplitButton — rendering", () => {
     expect(caret).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("menu")).toBeNull();
   });
+
+  it("applies the disabled attribute to the primary button when primary.disabled is true", () => {
+    render(<SplitButton primary={{ label: "Save", onClick: vi.fn(), disabled: true }} />);
+    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+  });
+
+  it("applies aria-busy to the primary button when primary.busy is true", () => {
+    render(<SplitButton primary={{ label: "Save", onClick: vi.fn(), busy: true }} />);
+    expect(screen.getByRole("button", { name: "Save" })).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("omits aria-busy from the primary button when primary.busy is falsy", () => {
+    render(<SplitButton primary={{ label: "Save", onClick: vi.fn() }} />);
+    expect(screen.getByRole("button", { name: "Save" })).not.toHaveAttribute("aria-busy");
+  });
 });
 
 describe("SplitButton — mouse", () => {

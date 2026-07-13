@@ -128,4 +128,54 @@ describe("useDispatchCommand", () => {
       resolveRun();
     });
   });
+
+  it("does not crash or log an error when the component unmounts before the awaited command resolves", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    let resolveRun;
+    const run = vi.fn(() => new Promise((r) => { resolveRun = r; }));
+    const { result, unmount } = renderHook(() => useDispatchCommand(), { wrapper: wrapper({ commands: [{ id: "save", run }] }) });
+
+    let dispatchPromise;
+    act(() => {
+      dispatchPromise = result.current.dispatch("save", "save");
+    });
+    await waitFor(() => expect(run).toHaveBeenCalledTimes(1));
+
+    unmount();
+
+    // The dispatch's own state updates (setPending in its `finally`) fire after
+    // unmount here — this must not throw or log an error.
+    await expect(
+      act(async () => {
+        resolveRun();
+        await dispatchPromise;
+      }),
+    ).resolves.not.toThrow();
+
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("runs concurrently (no dedupe/queueing) when dispatch() is called twice back-to-back on the same hook instance before the first resolves", async () => {
+    const resolveFns = [];
+    const run = vi.fn(() => new Promise((r) => { resolveFns.push(r); }));
+    const { result } = renderHook(() => useDispatchCommand(), { wrapper: wrapper({ commands: [{ id: "save", run }] }) });
+
+    let firstDispatch, secondDispatch;
+    act(() => {
+      firstDispatch = result.current.dispatch("save", "save");
+      secondDispatch = result.current.dispatch("save", "save");
+    });
+
+    // Nothing in the hook guards a rapid repeat before the first call settles —
+    // both invocations reach the command directly, concurrently.
+    expect(run).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      resolveFns.forEach((resolve) => resolve());
+      await Promise.all([firstDispatch, secondDispatch]);
+    });
+
+    expect(result.current.pending.save).toBe(false);
+  });
 });

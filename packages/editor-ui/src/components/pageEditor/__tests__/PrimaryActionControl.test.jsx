@@ -118,4 +118,23 @@ describe("PrimaryActionControl", () => {
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
+
+  it("renders nothing when primaryActions is empty", () => {
+    const { container } = renderControl({ actions: [], commands: [] });
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("renders only the first top-level action when multiple are provided; extras are silently ignored", () => {
+    const secondRun = vi.fn();
+    const actions = [saveDescriptor, { id: "second", command: "secondCmd", labelKey: "Second Action" }];
+    renderControl({
+      actions,
+      commands: [{ id: "save", run: vi.fn() }, { id: "secondCmd", run: secondRun }],
+    });
+
+    expect(screen.getByRole("button", { name: "pageEditor.toolbar.save" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Second Action" })).not.toBeInTheDocument();
+    // No dropdown either — the second top-level action isn't folded into a menu, it's just dropped.
+    expect(screen.queryByRole("button", { name: "pageEditor.toolbar.moreActions" })).not.toBeInTheDocument();
+  });
 });
