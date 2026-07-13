@@ -41,7 +41,7 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 
 - **Copy and paste widgets:** copy widgets within a page or across pages, with a right-click context menu and keyboard delete
 - **Sticky action bars:** save and action buttons stay pinned while you scroll long page, collection, and project forms
-- **Link to files from rich text:** rich-text links can now point at files in your Media Library
+- **Link to files from rich text:** rich-text links can now point at any file in your Media Library, including images, with a type filter (All / Images / Audio / Files) to narrow the picker
 - **Grouped, sorted link picker:** the link picker separates pages from collections and sorts entries alphabetically
 - **Widget inserter improvements:** a taller list, smarter positioning, and keyboard scrolling
 - **Compact settings sidebar:** a denser, easier-to-scan settings panel in the page editor
@@ -71,12 +71,16 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - **Mastodon icon:** added to the Arch icon set
 - **Dev-mode HTML validation:** development builds surface an export-issues column with WCAG checks
 - **Widget preview images:** ship a `preview.png` next to a widget's `schema.json` and it appears in the widget inserter
+- **Collection schema validation:** theme uploads are checked for broken collection-type schemas and rejected with a clear error
 
 ### Changed
 
 - **Theme update indicators:** clearer in-editor signals when a theme has an update, a fixed global update banner, and the option to opt in to updates at project creation
 - **Faster project creation:** new projects no longer copy excluded theme directories
 - **Safer saves:** local content is written with a temp-file-and-rename, so a save can't leave a half-written file
+- **Leaner exports:** exports include only the widget assets your pages actually use
+- **Rich-text media usage:** images embedded in rich-text fields now count as "in use" in the Media Library
+- **Wrong-project protection:** if the active project changes in another window, the editor shows a notice instead of letting you keep editing the wrong project
 
 ### Security
 
@@ -98,6 +102,13 @@ Collections bring a lightweight CMS to themes. A theme can define **collection t
 - Buttons default to `type="button"`, preventing accidental form submits
 - Fixed a React StrictMode crash in the rich-text link UI
 - The Media Library's Filename column now always shows the filename, rather than showing the image title when one was set
+- Form field names written in non-Latin scripts (Greek, Cyrillic, etc.) now transliterate to valid keys in the exported forms manifest, instead of coming out empty or broken; the same transliteration applies to export filenames and docs-site anchors
+- The file picker's filename tooltips no longer get cut off on the first row of results
+- Theme cards: the actions popover no longer gets clipped, and long "in use" labels no longer overflow
+- A failed project load no longer bounces the editor back to the project picker
+- The Media Library's "Used in" labels now show collection item titles
+- Refreshing media usage now rescans reliably
+- The icon grid and color picker render correctly in the narrow settings sidebar
 
 ### Under the Hood
 

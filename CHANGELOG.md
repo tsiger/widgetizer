@@ -1,25 +1,38 @@
 # Changelog
 
-## [0.9.9] - 2026-07-01
+## [0.9.9] - TBC
 
 ### Added
 
 - Theme-defined collections for lightweight CMS content types such as News, Projects, and Services, including optional per-item pages, SEO output, sitemap inclusion, collection item menu links, depth-aware export links, and in-editor item management
 - New Arch collection widgets: News Grid, Projects Grid, and Services Grid
 - New Arch Audio Player widget with MP3 playlist support
+- New Arch Table widget for rate sheets, tuition tables, size charts, and spec lists
+- New Bedrock preset (general contractor / construction) with full template content, menus, and starter media
+- Core Contact Form widget with a forms manifest written into exports (submissions are handled by Widgetizer Hosting; other static hosts need their own handler)
+- Docker support for self-hosting the web app (Dockerfile + docker-compose.yml)
+- Desktop app: automatic port selection at launch, and the window no longer auto-maximizes
 - Copy and paste for widgets within a page or across pages, including right-click context menu support and keyboard delete
 - Sticky action bars for long page, collection, and project forms
-- Rich-text links can now target Media Library files
+- Rich-text links can now target any Media Library file, including images, with an All / Images / Audio / Files type filter in the media picker
 - Grouped, sorted link picker for pages and collection items
-- Taller widget inserter with smarter positioning and keyboard scrolling
+- Taller widget inserter with smarter positioning, keyboard scrolling, and per-widget preview images (Arch ships previews for its full widget set)
 - Denser page-editor settings sidebar
+- "+ New page" quick action in the editor topbar
+- Menu item labels autofill from the target page and follow page changes
+- Canonical URLs derive from the project site URL when not set per page
+- Set active project from the projects list, with improved preset selection during project creation
+- Theme font picker language filter, with the current font scrolled into view
+- Vertically resizable Custom CSS / JS editor in Theme Settings
 - Export history now shows the total size of each export
 - Arch presets can seed starter media into new projects
 - Internal rich-text links now follow page and collection-item renames and clear automatically when the target is deleted
 - MP3 and audio uploads are supported
 - Gallery images can carry per-image captions
 - New theme setting types: `date`, `gallery`, and `table`
+- Opt-in rich-text images and headings for theme authors, with automatic media resolution
 - Theme-author filters and helpers for collections and rich text: `collection`, `rte_blank`, and `rte_text`
+- Mastodon icon in the Arch icon set
 - Dev-mode export HTML validation with an export issues report
 
 ### Changed
@@ -30,6 +43,10 @@
 - Local content saves now use temp-file-and-rename writes to avoid half-written files
 - Card and collection grid widgets now scale image sizes, padding, and corner radius by column count
 - Image Callout widget gained the Content color scheme
+- Exports copy only the widget assets pages actually use
+- Images embedded in rich text now count toward media usage tracking
+- Theme uploads validate collection-type schemas before install
+- The editor detects when the active project changes elsewhere and blocks editing with a notice
 - LiquidJS updated to 10.26+
 
 ### Fixed
@@ -40,6 +57,14 @@
 - Collection-item save button no longer remains disabled after re-editing
 - Buttons default to `type="button"` to avoid accidental form submits
 - Rich-text link UI no longer crashes under React StrictMode
+- Non-Latin text in form field keys, export filenames, and doc anchors is transliterated to ASCII (e.g. Greek, Cyrillic) instead of being dropped
+- Media picker file tooltips no longer clip on the first row of results
+- Media Library filename column always shows the filename instead of the image title
+- Theme card action popovers no longer clip, and long "in use" labels no longer overflow
+- A failed project load no longer bounces the editor to the project picker
+- Media "Used in" labels show collection item titles
+- Media usage refresh rescans correctly
+- Icon grid and color picker render correctly in the narrow settings sidebar
 
 ### Security
 
@@ -49,6 +74,7 @@
 - URL sanitization hardened across links, menus, and theme output
 - Theme-authored SVG icons are sanitized before injection
 - `og:image` is always emitted as an absolute URL
+- Desktop preview windows are restricted to safe internal paths, and the editor-preview bridge accepts messages only from the resolved peer origin
 - Additional Liquid rendering isolation hardening for hosted deployments
 
 ### Documentation

@@ -1,8 +1,8 @@
 ---
-description: Download Widgetizer for macOS or Windows, or run it with Node.js. Step-by-step installation for every platform.
+description: Download Widgetizer for macOS or Windows, run it on a server with Docker, or start it from source with Node.js.
 ---
 
-Widgetizer runs as a native desktop app for macOS and Windows: download it, install it, and start building. Prefer to run things yourself? You can also start it with Node.js.
+Widgetizer runs as a native desktop app for macOS and Windows: download it, install it, and start building. Want it on a server instead? Run it with Docker. And if you prefer your own development environment, you can start it from source with Node.js.
 
 # Download the Desktop App
 
@@ -56,6 +56,29 @@ The desktop app is the easiest way to use Widgetizer. It is a normal installer w
 > **Note for Windows users:** The first time you run the installer, Windows may show a blue **"Windows protected your PC"** screen. Widgetizer is code-signed with a genuine, purchased open-source certificate, but Microsoft SmartScreen can still flag brand-new releases until enough people have downloaded them. It is safe to continue: click **More info**, then **Run anyway**.
 
 Need an older version or the file checksums? See the full [GitHub Releases](https://github.com/tsiger/widgetizer/releases) page.
+
+# Run It with Docker
+
+Want Widgetizer on a home server or a VPS, or just prefer containers? The repository ships a `Dockerfile` and `docker-compose.yml` that package the web app (the editor and the API together, served on one port).
+
+All you need is **Docker Desktop** (Windows/Mac) or Docker Engine (Linux). Node.js is not required.
+
+```bash
+git clone https://github.com/tsiger/widgetizer.git
+cd widgetizer
+docker compose up --build
+```
+
+Then open **http://localhost:3001**. The first build takes a few minutes; later starts are fast.
+
+Everything you create (projects, database, uploads, installed themes) lives in a Docker volume named `widgetizer-data`, so it survives restarts and rebuilds. Run it in the background with `docker compose up -d`, stop it with `docker compose down`.
+
+Hosting it on a real server? Two things to set:
+
+1. **`SERVER_URL`** in `docker-compose.yml`: the address people type in the browser (for example `https://builder.example.com` or `http://<server-ip>:3001`). The live preview needs it to load images correctly.
+2. **HTTPS:** put the container behind a reverse proxy (nginx, Caddy, or Traefik) that forwards to port 3001.
+
+For the full guide, including useful commands and how the image is built, see [DOCKER.md](https://github.com/tsiger/widgetizer/blob/master/DOCKER.md) in the repository.
 
 # Run It with Node.js
 

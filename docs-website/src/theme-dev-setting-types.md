@@ -76,6 +76,7 @@ Features:
 
 - **Formatting toolbar** with Bold, Italic, Link, Bullet List, and Numbered List buttons
 - **Link editor** with URL input (auto-prefixes `https://` if missing)
+- **Link to file** button (paperclip) links the selected text to a file from the Media Library (a PDF, an audio file, or an image), with a type filter in the picker
 - **Expand button** opens a larger modal for comfortable editing
 - Active formatting is highlighted in the toolbar based on cursor position
 - **Keyboard shortcuts**: Type `-` + space for bullet list, `1.` + space for numbered list, Enter on empty item to exit list
