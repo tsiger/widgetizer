@@ -244,7 +244,7 @@ See [Custom Hooks](core-hooks.md) for hook-by-hook detail.
 - `MediaGrid` / `MediaGridItem` — thumbnail cards with usage badges; non-images show a `FileText` icon + extension badge.
 - `MediaList` / `MediaListItem` — table view with select-all and per-row detail.
 - `MediaDrawer` — slide-out metadata editor (alt, title, caption).
-- `MediaSelectorDrawer` — media browser used inside setting inputs to pick existing files. Supports an "Upload" button (OS file dialog), search, and a `filterType` (`image` / `file` / `all`) that adjusts upload accept types; images show thumbnails, files show an icon + extension badge.
+- `MediaSelectorDrawer` — media browser used inside setting inputs to pick existing files. Supports an "Upload" button (OS file dialog), search, and a `filterType` (`image` / `audio` / `file` / `all`) that adjusts upload accept types; images show thumbnails, files show an icon + extension badge. With `showTypeFilter`, it also renders a type dropdown next to search (All / Images / Audio / Files) so the user can switch type in-drawer — used by the richtext "Link to file" picker, which opens on `all`.
 
 The thumbnail/preview path falls back to the original image when a `thumb` variant is unavailable. Copy-URL is available on media items (copies the relative storage path) so a file URL can be pasted into generic link fields.
 
