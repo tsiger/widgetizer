@@ -5,6 +5,7 @@ import helmet from "helmet";
 
 import errorHandler from "./middleware/errorHandler.js";
 import { getThemesDir, STATIC_DIST_DIR, STATIC_PREVIEW_RUNTIME_DIR } from "./config.js";
+import { getThemeSourceDir } from "./controllers/themeController.js";
 import { setupBuilderServer } from "./setupBuilderServer.js";
 
 function applySharedMiddleware(app) {
@@ -35,7 +36,38 @@ function mountEditorApiRoutes(app, { adapters, plugins } = {}) {
   app.use("/api", actorScopedRouter);
   app.use("/api", projectScopedRouter);
 
-  // Serve theme assets (screenshots) from themes directory
+  // Serve theme assets (screenshots) from each theme's SOURCE dir, not the
+  // themes root: once a theme update is applied the live files move to
+  // latest/, so the root copy's screenshot goes stale and presets delivered
+  // via an update exist ONLY in latest/ (their screenshot would 404). Resolve
+  // per request (getThemeSourceDir caches, and invalidates on update) and
+  // delegate to a per-dir static handler with the theme segment stripped.
+  const themeStaticByDir = new Map();
+  app.use("/themes", async (req, res, next) => {
+    const themeId = req.path.split("/")[1];
+    // Strict allowlist: also keeps ".." out of the path we resolve.
+    if (!themeId || !/^[a-zA-Z0-9_-]+$/.test(themeId)) return next();
+    let sourceDir;
+    try {
+      sourceDir = await getThemeSourceDir(themeId);
+    } catch {
+      return next();
+    }
+    let handler = themeStaticByDir.get(sourceDir);
+    if (!handler) {
+      handler = express.static(sourceDir);
+      themeStaticByDir.set(sourceDir, handler);
+    }
+    // Strip the theme segment for the per-dir handler; restore on miss so the
+    // rest of the chain (root fallback, SPA catch-all) sees the original URL.
+    const originalUrl = req.url;
+    req.url = req.url.slice(`/${themeId}`.length) || "/";
+    handler(req, res, (err) => {
+      req.url = originalUrl;
+      next(err);
+    });
+  });
+  // Fallback for ids the allowlist rejects: previous root-static behavior.
   app.use("/themes", express.static(getThemesDir()));
 
   // iFrame runtime script (MUST be before production catch-all)

@@ -15,6 +15,7 @@ process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
 const { createEditorApp } = await import("../createApp.js");
+const { getThemeDir } = await import("../config.js");
 const errorHandler = (await import("../middleware/errorHandler.js")).default;
 const { standardJsonParser, editorJsonParser } = await import("../middleware/jsonParser.js");
 const { validateRequest } = await import("../middleware/validateRequest.js");
@@ -235,6 +236,71 @@ describe("createEditorApp", () => {
       assert.equal(app.get("trust proxy"), 1);
     } finally {
       process.env.NODE_ENV = originalEnv;
+    }
+  });
+});
+
+describe("theme assets served from the theme source dir", () => {
+  it("serves root assets when the theme has no latest/", async () => {
+    const themeDir = getThemeDir("assets-root-theme");
+    await fs.outputFile(path.join(themeDir, "presets", "p1", "screenshot.png"), "ROOT-PNG");
+
+    const app = await createEditorApp({ adapters: fakeAdapters() });
+    const { server, baseUrl } = await startServer(app);
+    try {
+      const res = await fetch(`${baseUrl}/themes/assets-root-theme/presets/p1/screenshot.png`);
+      assert.equal(res.status, 200);
+      assert.equal(await res.text(), "ROOT-PNG");
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("serves latest/ assets once built — including presets that exist ONLY in latest/", async () => {
+    // Reproduces the 0.9.8→0.9.9 Bedrock case: the root copy predates the
+    // preset, so its screenshot exists only in latest/. The stale root
+    // screenshot must also lose to the latest/ one.
+    const themeDir = getThemeDir("assets-latest-theme");
+    await fs.outputFile(path.join(themeDir, "screenshot.png"), "OLD-ROOT");
+    await fs.outputFile(path.join(themeDir, "latest", "theme.json"), JSON.stringify({ version: "9.9.9" }));
+    await fs.outputFile(path.join(themeDir, "latest", "screenshot.png"), "NEW-LATEST");
+    await fs.outputFile(
+      path.join(themeDir, "latest", "presets", "newpreset", "screenshot.png"),
+      "NEW-PRESET",
+    );
+
+    const app = await createEditorApp({ adapters: fakeAdapters() });
+    const { server, baseUrl } = await startServer(app);
+    try {
+      const presetRes = await fetch(`${baseUrl}/themes/assets-latest-theme/presets/newpreset/screenshot.png`);
+      assert.equal(presetRes.status, 200);
+      assert.equal(await presetRes.text(), "NEW-PRESET");
+
+      const themeRes = await fetch(`${baseUrl}/themes/assets-latest-theme/screenshot.png`);
+      assert.equal(themeRes.status, 200);
+      assert.equal(await themeRes.text(), "NEW-LATEST");
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("never serves files outside the themes dir for hostile ids", async () => {
+    // A ".."-shaped id must fail the allowlist and never resolve as a theme.
+    // (The SPA catch-all may still 200 with HTML — the assertion is that the
+    // secret's CONTENT is unreachable, not the status code.)
+    await fs.outputFile(path.join(TEST_ROOT, "secret.txt"), "TOP-SECRET");
+    await fs.outputFile(path.join(TEST_DATA_DIR, "secret.txt"), "TOP-SECRET");
+
+    const app = await createEditorApp({ adapters: fakeAdapters() });
+    const { server, baseUrl } = await startServer(app);
+    try {
+      for (const probe of ["%2e%2e", "..%2f..", ".."]) {
+        const res = await fetch(`${baseUrl}/themes/${probe}/secret.txt`);
+        const body = await res.text();
+        assert.ok(!body.includes("TOP-SECRET"), `traversal probe "${probe}" must not read outside themes/`);
+      }
+    } finally {
+      await stopServer(server);
     }
   });
 });
