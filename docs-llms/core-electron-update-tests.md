@@ -24,7 +24,7 @@ Set the version pair first:
 ```powershell
 $fromVersion = "0.9.8"
 $targetVersion = "0.9.9"
-$targetBranch = "experimentation"
+$targetBranch = "master"
 ```
 
 For a future test, only change those values, for example:
@@ -32,7 +32,7 @@ For a future test, only change those values, for example:
 ```powershell
 $fromVersion = "0.9.9"
 $targetVersion = "0.9.10"
-$targetBranch = "experimentation"
+$targetBranch = "master"
 ```
 
 Common paths:

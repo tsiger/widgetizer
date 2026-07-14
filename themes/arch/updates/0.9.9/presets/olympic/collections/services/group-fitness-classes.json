@@ -1,0 +1,13 @@
+{
+  "slug": "group-fitness-classes",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Group Fitness Classes",
+    "icon": "users-group",
+    "summary": "Coached classes across strength, conditioning, and mobility for people who train better in a room.",
+    "description": "<p>Our timetable runs morning to evening, so there is usually a class that fits your day. Sessions are capped so the coach can actually watch the room and help where needed, which keeps the coaching personal even in a group.</p><h2>What is on the timetable</h2><p>Formats rotate through strength circuits, intervals, and mobility, and every class scales for beginners and regulars alike. You can dip into different styles depending on what you feel like, or build a steady weekly routine around the ones you enjoy most.</p><ul><li>Strength circuits to build full-body power</li><li>Interval sessions for conditioning and pace</li><li>Mobility classes to keep you moving well</li></ul><p>Because numbers are limited, the coach has time to adjust movements for you rather than just calling the session from the front. If something does not suit you on the day, they will offer an option that does.</p><h3>Why classes keep people consistent</h3><p>Showing up with others tends to keep people consistent in a way that solo training does not always manage. A set time, a coach expecting you, and a few familiar faces make it far easier to keep turning up.</p><p>Arrive a few minutes early for your first class so the coach can learn any limits or niggles to work around. No experience is needed; just come ready to move at whatever pace suits you.</p>",
+    "price": "Included with membership",
+    "duration": "45 min",
+    "featured_image": "/uploads/images/olympic-services-group-fitness-classes.webp"
+  }
+}

@@ -16,9 +16,9 @@ Working checklist for the 0.9.9 release. Delete this file after the release ship
 - [x] `npm test` green (backend)
 - [x] `npm run test:frontend` green (Vitest)
 - [x] `npm run lint:all` clean
-- [ ] Implement the preset-media slimming first — see **[plan-preset-media.md](plan-preset-media.md)** (moves preset images out of the delta's reach; ~18 MB delta instead of 197 MB)
-- [ ] Regenerate the Arch update delta after the preset-media move (first generation from 2026-07-13 was 197 MB and is superseded; delete `themes/arch/updates/0.9.9/` and rerun)
-- [ ] Commit the delta (must ship in the packaged builds)
+- [x] Implement the preset-media slimming — done 2026-07-14, see **[plan-preset-media.md](plan-preset-media.md)** (all suites green: 1,323 backend tests, 22 delta-script tests, lint clean)
+- [x] Regenerate the Arch update delta: done 2026-07-14 — **23 MB** (was 197 MB), zero preset media inside, only the `video-modal.js` deletion marker
+- [ ] Commit the preset-media change + delta (must ship in the packaged builds)
 
 ## 2. Electron Builds
 
@@ -34,9 +34,21 @@ Working checklist for the 0.9.9 release. Delete this file after the release ship
 
 ### Windows (run here)
 
-- [ ] `npm run electron:build:win:unsigned` for the update rehearsal
+> Base fast path: the genuine release-day `Widgetizer-Setup-0.9.8.exe` (2026-04-26)
+> exists in `dist-electron/` — move it aside and install it as the baseline; no
+> base rebuild from the tag needed. The stale June 0.9.9 exe (495 MB, pre-slimming)
+> gets deleted; the rebuild should land ~250 MB.
+
+- [ ] `npm run electron:build:win:unsigned` for the update rehearsal; verify the
+      package contains `themes/arch/preset-media/` AND `themes/arch/updates/0.9.9/`
 - [ ] Run the full **[Electron update playbook](core-electron-update-tests.md)** (0.9.8 → 0.9.9):
       app auto-update, Arch theme update, opted-in project updates, opted-out project untouched
+- [ ] **Preset-media checks (new this release):**
+      - `data/themes/arch/latest/` contains NO preset media after the Arch update (delta is 23 MB)
+      - In the updated app, create a NEW project from Brewline or Bedrock → starter
+        images appear in the media library and on pages (packaged-seed lookup proof)
+      - Fresh-install pass: wipe state, install the new 0.9.9 exe directly, create a
+        preset project → images seed, and `data/themes/arch/` has NO `preset-media/` copy
 - [ ] After the rehearsal passes: `npm run electron:build:win` (signed) — final release artifacts
 - [ ] Fresh install from the signed setup exe: same smoke pass as Mac
 

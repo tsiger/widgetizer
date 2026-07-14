@@ -12,7 +12,10 @@ const ROOT = path.resolve(__dirname, "..");
 
 const BOOL_FLAGS = new Set(["dry-run", "force", "help"]);
 const VALUE_FLAGS = new Set(["from", "version"]);
-const EXCLUDED_TOP_LEVEL = new Set(["updates", "latest"]);
+// preset-media/ is deliberately never delta'd: starter images resolve from the
+// app's seed copy at project creation (resolvePresetPaths), so deltas and
+// runtime theme copies stay small.
+const EXCLUDED_TOP_LEVEL = new Set(["updates", "latest", "preset-media"]);
 const EXCLUDED_FILES = new Set([".theme-package.json"]);
 const DELETION_DIRS = new Set(["assets", "widgets", "snippets", "locales", "collection-types"]);
 const DELETION_FILES = new Set(["layout.liquid"]);

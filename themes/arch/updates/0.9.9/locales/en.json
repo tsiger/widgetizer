@@ -1,0 +1,2433 @@
+{
+  "global": {
+    "general": {
+      "name": "General",
+      "settings": {
+        "branding_header": {
+          "label": "Branding"
+        },
+        "favicon": {
+          "label": "Site Icon",
+          "description": "Used in browser tabs, bookmarks, and saved home screen shortcuts. Upload a square SVG for best results, or a square PNG at 512×512 or larger."
+        },
+        "animations_header": {
+          "label": "Animations"
+        },
+        "enable_reveal_animations": {
+          "label": "Enable scroll reveal animations",
+          "description": "Animate elements as they scroll into view"
+        },
+        "content_header": {
+          "label": "Content"
+        },
+        "date_format": {
+          "label": "Date format",
+          "description": "How dates (e.g. on news articles) are shown on your published site."
+        }
+      }
+    },
+    "colors": {
+      "name": "Colors",
+      "settings": {
+        "colors_standard_header": {
+          "label": "Standard Colors"
+        },
+        "standard_bg_primary": {
+          "label": "Primary Background"
+        },
+        "standard_bg_secondary": {
+          "label": "Secondary Background"
+        },
+        "standard_text_content": {
+          "label": "Content Text"
+        },
+        "standard_text_heading": {
+          "label": "Heading Text"
+        },
+        "standard_text_muted": {
+          "label": "Muted Text"
+        },
+        "standard_border_color": {
+          "label": "Border Color"
+        },
+        "standard_accent": {
+          "label": "Accent Color"
+        },
+        "standard_accent_text": {
+          "label": "Accent Text Color"
+        },
+        "standard_rating_star": {
+          "label": "Rating Star Color"
+        },
+        "colors_highlight_header": {
+          "label": "Highlight Colors"
+        },
+        "highlight_bg_primary": {
+          "label": "Primary Background"
+        },
+        "highlight_bg_secondary": {
+          "label": "Secondary Background"
+        },
+        "highlight_text_content": {
+          "label": "Content Text"
+        },
+        "highlight_text_heading": {
+          "label": "Heading Text"
+        },
+        "highlight_text_muted": {
+          "label": "Muted Text"
+        },
+        "highlight_border_color": {
+          "label": "Border Color"
+        },
+        "highlight_accent": {
+          "label": "Accent Color"
+        },
+        "highlight_accent_text": {
+          "label": "Accent Text Color"
+        },
+        "highlight_rating_star": {
+          "label": "Rating Star Color"
+        }
+      }
+    },
+    "typography": {
+      "name": "Typography",
+      "settings": {
+        "typography_header": {
+          "label": "Typography"
+        },
+        "heading_font": {
+          "label": "Heading Font"
+        },
+        "body_font": {
+          "label": "Body Font"
+        },
+        "heading_scale": {
+          "label": "Heading Text Size",
+          "description": "Adjust all heading sizes relatively across the site"
+        },
+        "body_scale": {
+          "label": "Body Text Size",
+          "description": "Adjust all body text sizes relatively across the site"
+        }
+      }
+    },
+    "style": {
+      "name": "Style",
+      "settings": {
+        "style_header": {
+          "label": "Visual Style"
+        },
+        "corner_style": {
+          "label": "Shapes",
+          "description": "Controls the roundness of buttons, cards, images, and form fields",
+          "options": {
+            "sharp": "Sharp",
+            "slightly_rounded": "Slightly rounded",
+            "rounded": "Rounded"
+          }
+        },
+        "spacing_density": {
+          "label": "Layout density",
+          "description": "Controls the amount of whitespace between sections and elements",
+          "options": {
+            "compact": "Compact",
+            "default": "Default",
+            "airy": "Airy"
+          }
+        },
+        "button_shape": {
+          "label": "Button shape",
+          "description": "Override corner shape specifically for buttons",
+          "options": {
+            "auto": "Same as corner shape",
+            "pill": "Pill",
+            "sharp": "Sharp"
+          }
+        }
+      }
+    },
+    "social": {
+      "name": "Social",
+      "settings": {
+        "social_header": {
+          "label": "Social Media"
+        },
+        "facebook_url": {
+          "label": "Facebook URL"
+        },
+        "instagram_url": {
+          "label": "Instagram URL"
+        },
+        "twitter_url": {
+          "label": "Twitter / X URL"
+        },
+        "linkedin_url": {
+          "label": "LinkedIn URL"
+        },
+        "youtube_url": {
+          "label": "YouTube URL"
+        },
+        "tiktok_url": {
+          "label": "TikTok URL"
+        },
+        "pinterest_url": {
+          "label": "Pinterest URL"
+        },
+        "github_url": {
+          "label": "GitHub URL"
+        },
+        "mastodon_url": {
+          "label": "Mastodon URL"
+        },
+        "bluesky_url": {
+          "label": "Bluesky URL"
+        },
+        "discord_url": {
+          "label": "Discord URL"
+        },
+        "reddit_url": {
+          "label": "Reddit URL"
+        },
+        "telegram_url": {
+          "label": "Telegram URL"
+        },
+        "threads_url": {
+          "label": "Threads URL"
+        },
+        "whatsapp_url": {
+          "label": "WhatsApp URL"
+        },
+        "mail_url": {
+          "label": "Email URL"
+        }
+      }
+    },
+    "advanced": {
+      "name": "Advanced",
+      "settings": {
+        "privacy_header": {
+          "label": "Privacy"
+        },
+        "use_bunny_fonts": {
+          "label": "Use Privacy-Friendly Font CDN",
+          "description": "Enable to serve Google Fonts from Bunny CDN (GDPR-compliant, no tracking)"
+        },
+        "advanced_header": {
+          "label": "Custom Code"
+        },
+        "custom_css": {
+          "label": "Custom CSS",
+          "description": "Add custom CSS rules — no need to include <style> tags, they are added automatically."
+        },
+        "custom_head_scripts": {
+          "label": "Custom Head Scripts",
+          "description": "Paste the full HTML including <script> tags. Injected in the <head> section."
+        },
+        "custom_footer_scripts": {
+          "label": "Custom Footer Scripts",
+          "description": "Paste the full HTML including <script> tags. Injected before the closing </body> tag."
+        }
+      }
+    },
+    "widgets": {
+      "settings": {
+        "display_header": {
+          "label": "Display"
+        },
+        "content_header": {
+          "label": "Content"
+        },
+        "options_header": {
+          "label": "Options"
+        },
+        "labels_header": {
+          "label": "Labels"
+        },
+        "cards_header": {
+          "label": "Cards"
+        },
+        "icon_header": {
+          "label": "Icon"
+        },
+        "appearance_header": {
+          "label": "Appearance"
+        },
+        "eyebrow": {
+          "label": "Eyebrow text"
+        },
+        "eyebrow_uppercase": {
+          "label": "Uppercase"
+        },
+        "title": {
+          "label": "Heading"
+        },
+        "description": {
+          "label": "Subheading"
+        },
+        "color_scheme": {
+          "label": "Color Scheme",
+          "options": {
+            "standard_primary": "Standard Primary",
+            "standard_secondary": "Standard Secondary",
+            "highlight_primary": "Highlight Primary",
+            "highlight_secondary": "Highlight Secondary"
+          }
+        },
+        "content_color_scheme": {
+          "label": "Content color scheme"
+        },
+        "top_spacing": {
+          "label": "Top spacing",
+          "options": {
+            "auto": "Auto",
+            "small": "Small",
+            "none": "None"
+          }
+        },
+        "bottom_spacing": {
+          "label": "Bottom spacing",
+          "options": {
+            "auto": "Auto",
+            "small": "Small",
+            "none": "None"
+          }
+        },
+        "card_layout": {
+          "label": "Card layout",
+          "options": {
+            "box": "Box",
+            "flat": "Flat"
+          }
+        },
+        "columns_desktop": {
+          "label": "Desktop columns"
+        },
+        "layout": {
+          "label": "Layout",
+          "options": {
+            "grid": "Grid",
+            "carousel": "Carousel",
+            "card": "Card",
+            "overlay": "Overlay"
+          }
+        },
+        "text_display": {
+          "label": "Text display",
+          "description": "Overlay layout only: reveal the card text on hover or keep it always visible.",
+          "options": {
+            "hover": "On hover",
+            "always": "Always"
+          }
+        },
+        "card_layout_only": {
+          "description": "Applies to the card layout only."
+        },
+        "fullwidth": {
+          "label": "Full width"
+        },
+        "image_position": {
+          "label": "Image position",
+          "options": {
+            "start": "Start",
+            "end": "End"
+          }
+        },
+        "aspect_ratio": {
+          "label": "Aspect ratio",
+          "options": {
+            "auto": "Auto",
+            "contain": "Contain",
+            "1 / 1": "1:1",
+            "4 / 3": "4:3",
+            "3 / 2": "3:2",
+            "3 / 4": "3:4",
+            "16 / 9": "16:9",
+            "21:9": "21:9"
+          }
+        },
+        "alignment": {
+          "label": "Alignment",
+          "options": {
+            "start": "Start",
+            "center": "Center"
+          }
+        },
+        "content_width": {
+          "label": "Content width",
+          "options": {
+            "narrow": "Narrow",
+            "medium": "Medium",
+            "wide": "Wide",
+            "fullwidth": "Fullwidth"
+          }
+        },
+        "video_url": {
+          "label": "Video URL (YouTube or Vimeo)"
+        },
+        "video_title": {
+          "label": "Video title (for accessibility)"
+        },
+        "icon_style": {
+          "label": "Icon style",
+          "options": {
+            "plain": "Plain",
+            "outline": "Outline",
+            "filled": "Filled"
+          }
+        },
+        "icon_size": {
+          "label": "Icon size",
+          "options": {
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large",
+            "xl": "Extra Large"
+          }
+        },
+        "icon_shape": {
+          "label": "Icon shape",
+          "options": {
+            "sharp": "Sharp",
+            "rounded": "Rounded",
+            "circle": "Circle"
+          }
+        },
+        "image": {
+          "label": "Image"
+        },
+        "background_image": {
+          "label": "Background image"
+        },
+        "overlay_color": {
+          "label": "Overlay color",
+          "description": "Applies only if there is a background image."
+        },
+        "link": {
+          "label": "Link"
+        },
+        "button_link": {
+          "label": "Button Link"
+        },
+        "button_style": {
+          "label": "Button style",
+          "options": {
+            "primary": "Primary",
+            "secondary": "Secondary"
+          }
+        },
+        "button_style_2": {
+          "label": "Button 2 style",
+          "options": {
+            "primary": "Primary",
+            "secondary": "Secondary"
+          }
+        },
+        "button_size": {
+          "label": "Button size",
+          "options": {
+            "small": "Small",
+            "medium": "Medium",
+            "large": "Large",
+            "xlarge": "Extra Large"
+          }
+        },
+        "options": {
+          "start": "Start",
+          "end": "End",
+          "left": "Left",
+          "right": "Right",
+          "top": "Top",
+          "bottom": "Bottom",
+          "center": "Center",
+          "none": "None"
+        },
+        "sidebar_position": {
+          "label": "Sidebar position"
+        }
+      },
+      "blocks": {
+        "info": {
+          "name": "Info",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "text": {
+              "label": "Text"
+            }
+          }
+        },
+        "social": {
+          "name": "Social Icons"
+        },
+        "heading": {
+          "name": "Heading",
+          "settings": {
+            "text": {
+              "label": "Text"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "lg": "Large",
+                "xl": "Extra Large",
+                "2xl": "2X Large",
+                "3xl": "3X Large",
+                "4xl": "4X Large",
+                "5xl": "5X Large",
+                "6xl": "6X Large",
+                "7xl": "7X Large",
+                "8xl": "8X Large",
+                "9xl": "9X Large"
+              }
+            }
+          }
+        },
+        "text": {
+          "name": "Text",
+          "settings": {
+            "text": {
+              "label": "Text"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "sm": "Small",
+                "base": "Base",
+                "lg": "Large"
+              }
+            },
+            "uppercase": {
+              "label": "Uppercase"
+            },
+            "muted": {
+              "label": "Muted color"
+            }
+          }
+        },
+        "button": {
+          "name": "Button Group",
+          "settings": {
+            "link": {
+              "label": "Button 1"
+            },
+            "style": {
+              "label": "Button 1 style",
+              "options": {
+                "primary": "Primary",
+                "secondary": "Secondary"
+              }
+            },
+            "link_2": {
+              "label": "Button 2"
+            },
+            "style_2": {
+              "label": "Button 2 style",
+              "options": {
+                "primary": "Primary",
+                "secondary": "Secondary"
+              }
+            },
+            "size": {
+              "label": "Button size",
+              "options": {
+                "small": "Small",
+                "medium": "Medium",
+                "large": "Large",
+                "xlarge": "Extra Large"
+              }
+            }
+          }
+        },
+        "icon": {
+          "name": "Icon",
+          "settings": {
+            "icon": {
+              "label": "Icon"
+            },
+            "style": {
+              "label": "Style",
+              "options": {
+                "plain": "Plain",
+                "outline": "Outline",
+                "filled": "Filled"
+              }
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "sm": "Small",
+                "md": "Medium",
+                "lg": "Large",
+                "xl": "Extra Large"
+              }
+            },
+            "shape": {
+              "label": "Shape",
+              "options": {
+                "sharp": "Sharp",
+                "rounded": "Rounded",
+                "circle": "Circle"
+              }
+            }
+          }
+        },
+        "rating": {
+          "name": "Rating",
+          "settings": {
+            "rating": {
+              "label": "Rating",
+              "options": {
+                "3": "★★★",
+                "4": "★★★★",
+                "5": "★★★★★"
+              }
+            }
+          }
+        },
+        "quote": {
+          "settings": {
+            "quote": {
+              "label": "Quote"
+            },
+            "avatar": {
+              "label": "Avatar"
+            },
+            "name": {
+              "label": "Name"
+            },
+            "title": {
+              "label": "Title / Company"
+            },
+            "rating": {
+              "label": "Star rating",
+              "options": {
+                "3": "3 stars",
+                "4": "4 stars",
+                "5": "5 stars",
+                "": "No rating"
+              }
+            }
+          }
+        },
+        "image": {
+          "name": "Image",
+          "settings": {
+            "image": {
+              "label": "Image"
+            },
+            "width": {
+              "label": "Width"
+            }
+          }
+        },
+        "card": {
+          "name": "Card",
+          "settings": {
+            "subtitle": {
+              "label": "Subtitle"
+            },
+            "title": {
+              "label": "Heading"
+            },
+            "description": {
+              "label": "Description"
+            },
+            "button_link": {
+              "label": "Button Link"
+            }
+          }
+        },
+        "text_block": {
+          "name": "Text",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "text": {
+              "label": "Text"
+            }
+          }
+        },
+        "menu_block": {
+          "name": "Menu",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "menu": {
+              "label": "Navigation Menu",
+              "description": "Select the menu to display"
+            }
+          }
+        },
+        "social_block": {
+          "name": "Social Icons",
+          "settings": {
+            "title": {
+              "label": "Title"
+            }
+          }
+        },
+        "features": {
+          "name": "Features",
+          "settings": {
+            "features": {
+              "label": "Features (one per line)",
+              "description": "Start a line with + for a checkmark or - for a cross."
+            }
+          }
+        },
+        "countdown": {
+          "name": "Countdown"
+        },
+        "numbered_item": {
+          "name": "Numbered Item",
+          "settings": {
+            "title": {
+              "label": "Title"
+            },
+            "description": {
+              "label": "Description"
+            },
+            "size": {
+              "label": "Size",
+              "options": {
+                "small": "Small",
+                "medium": "Medium",
+                "large": "Large",
+                "xlarge": "Extra Large"
+              }
+            },
+            "shape": {
+              "label": "Shape",
+              "options": {
+                "sharp": "Sharp",
+                "rounded": "Rounded",
+                "circle": "Circle"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "audio_player": {
+    "name": "Audio Player",
+    "settings": {
+      "show_covers": {
+        "label": "Show cover art"
+      },
+      "show_volume": {
+        "label": "Show volume control"
+      },
+      "show_speed": {
+        "label": "Show playback speed"
+      },
+      "show_download": {
+        "label": "Show download button"
+      }
+    },
+    "blocks": {
+      "track": {
+        "name": "Track",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "artist": {
+            "label": "Artist"
+          },
+          "audio": {
+            "label": "Audio file",
+            "description": "Select or upload an MP3."
+          },
+          "cover": {
+            "label": "Cover image"
+          }
+        }
+      }
+    }
+  },
+  "accordion": {
+    "name": "Accordion",
+    "settings": {
+      "style": {
+        "label": "Style",
+        "options": {
+          "separated": "Separated",
+          "connected": "Connected"
+        }
+      },
+      "allow_multiple": {
+        "label": "Allow multiple open"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Item",
+        "settings": {
+          "question": {
+            "label": "Question"
+          },
+          "answer": {
+            "label": "Answer"
+          }
+        }
+      }
+    }
+  },
+  "action_bar": {
+    "name": "Action Bar"
+  },
+  "banner": {
+    "name": "Banner",
+    "settings": {
+      "height": {
+        "label": "Height",
+        "options": {
+          "auto": "Auto",
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
+        }
+      },
+      "vertical_alignment": {
+        "label": "Vertical alignment"
+      }
+    }
+  },
+  "bento_grid": {
+    "name": "Bento Grid",
+    "settings": {
+      "gap": {
+        "label": "Gap Size",
+        "options": {
+          "0": "None",
+          "var(--space-sm)": "Small",
+          "var(--space-md)": "Medium",
+          "var(--space-lg)": "Large",
+          "var(--space-xl)": "Extra Large"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Bento Item",
+        "settings": {
+          "layout_header": {
+            "label": "Layout"
+          },
+          "col_span": {
+            "label": "Column Span"
+          },
+          "row_span": {
+            "label": "Row Span"
+          },
+          "background_color": {
+            "label": "Block Background"
+          },
+          "text_color": {
+            "label": "Text color",
+            "options": {
+              "dark": "Dark",
+              "light": "Light"
+            }
+          },
+          "alignment": {
+            "label": "Text Alignment"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      }
+    }
+  },
+  "card_grid": {
+    "name": "Card Grid",
+    "settings": {
+      "image_position": {
+        "label": "Image position"
+      }
+    },
+    "blocks": {
+      "card": {
+        "settings": {}
+      }
+    }
+  },
+  "news_grid": {
+    "name": "News Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "sort": {
+        "label": "Sort by",
+        "options": {
+          "date_desc": "Newest first",
+          "date_asc": "Oldest first",
+          "title_asc": "Title A-Z",
+          "title_desc": "Title Z-A"
+        }
+      },
+      "show_image": {
+        "label": "Show image"
+      },
+      "show_date": {
+        "label": "Show date"
+      },
+      "show_excerpt": {
+        "label": "Show excerpt"
+      },
+      "show_read_more": {
+        "label": "Show 'Read more' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
+      }
+    }
+  },
+  "checkerboard": {
+    "name": "Checkerboard",
+    "blocks": {
+      "card": {
+        "name": "Card",
+        "settings": {
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Description"
+          }
+        }
+      }
+    }
+  },
+  "comparison_slider": {
+    "name": "Comparison Slider",
+    "settings": {
+      "before_image": {
+        "label": "Before image"
+      },
+      "after_image": {
+        "label": "After image"
+      },
+      "before_label": {
+        "label": "Before label"
+      },
+      "after_label": {
+        "label": "After label"
+      },
+      "orientation": {
+        "label": "Slider orientation",
+        "options": {
+          "horizontal": "Horizontal",
+          "vertical": "Vertical"
+        }
+      },
+      "initial_position": {
+        "label": "Initial slider position"
+      },
+      "show_labels": {
+        "label": "Show before/after labels"
+      }
+    }
+  },
+  "comparison_table": {
+    "name": "Comparison Table",
+    "settings": {
+      "feature_column_label": {
+        "label": "Feature column label"
+      }
+    },
+    "blocks": {
+      "column": {
+        "name": "Column",
+        "settings": {
+          "name": {
+            "label": "Column name"
+          },
+          "badge": {
+            "label": "Badge text (optional)"
+          },
+          "featured": {
+            "label": "Featured (highlighted)"
+          },
+          "link": {
+            "label": "CTA Button"
+          }
+        }
+      },
+      "feature": {
+        "name": "Feature Row",
+        "settings": {
+          "name": {
+            "label": "Feature name"
+          },
+          "values": {
+            "label": "Values for each column (one per line: yes, no, or custom text)"
+          }
+        }
+      }
+    }
+  },
+  "contact_details": {
+    "name": "Contact Details",
+    "settings": {
+      "layout": {
+        "options": {
+          "first_featured": "First featured",
+          "last_featured": "Last featured",
+          "equal": "Equal"
+        }
+      }
+    }
+  },
+  "content_switcher": {
+    "name": "Content Switcher",
+    "settings": {
+      "switcher_header": {
+        "label": "Switcher"
+      },
+      "switcher_type": {
+        "label": "Switcher Style",
+        "options": {
+          "toggle": "Toggle (2 Options)",
+          "tabs": "Tabs (Up to 3 Options)"
+        }
+      },
+      "option_1_label": {
+        "label": "Option 1 Label"
+      },
+      "option_2_label": {
+        "label": "Option 2 Label"
+      },
+      "option_3_label": {
+        "label": "Option 3 Label (Tabs only)"
+      },
+      "columns": {
+        "label": "Columns per state"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Content Item",
+        "settings": {
+          "price": {
+            "label": "Price / Value (Optional)"
+          },
+          "link": {
+            "label": "Link / CTA"
+          },
+          "target_option": {
+            "label": "Assign to Option",
+            "options": {
+              "1": "Option 1",
+              "2": "Option 2",
+              "3": "Option 3"
+            }
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "text": {
+            "label": "Text"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "countdown": {
+    "name": "Countdown Timer",
+    "settings": {
+      "target_date": {
+        "label": "Target date (YYYY-MM-DD HH:MM)"
+      },
+      "expired_message": {
+        "label": "Message when expired"
+      },
+      "button": {
+        "label": "Call-to-action button"
+      },
+      "show_seconds": {
+        "label": "Show seconds"
+      },
+      "style": {
+        "options": {
+          "cards": "Cards",
+          "minimal": "Minimal"
+        },
+        "label": "Style"
+      }
+    }
+  },
+  "data_table": {
+    "name": "Table",
+    "settings": {
+      "columns": {
+        "label": "Columns",
+        "options": {
+          "2": "2 columns",
+          "3": "3 columns",
+          "4": "4 columns"
+        }
+      },
+      "show_header": {
+        "label": "Show header row"
+      },
+      "column_1_header": {
+        "label": "Column 1 heading"
+      },
+      "column_2_header": {
+        "label": "Column 2 heading"
+      },
+      "column_3_header": {
+        "label": "Column 3 heading"
+      },
+      "column_4_header": {
+        "label": "Column 4 heading"
+      },
+      "note": {
+        "label": "Additional note"
+      },
+      "style": {
+        "label": "Table style",
+        "options": {
+          "lines": "Lines",
+          "striped": "Striped",
+          "plain": "Plain"
+        }
+      },
+      "first_column_emphasis": {
+        "label": "Bold first column"
+      },
+      "align_last_column": {
+        "label": "Align last column"
+      }
+    },
+    "blocks": {
+      "row": {
+        "name": "Row",
+        "settings": {
+          "cell_1": {
+            "label": "Column 1"
+          },
+          "cell_2": {
+            "label": "Column 2"
+          },
+          "cell_3": {
+            "label": "Column 3",
+            "description": "Shown when the table uses 3 or more columns"
+          },
+          "cell_4": {
+            "label": "Column 4",
+            "description": "Shown when the table uses 4 columns"
+          }
+        }
+      }
+    }
+  },
+  "embed": {
+    "name": "Embed Widget",
+    "settings": {
+      "code": {
+        "label": "Embed Code (HTML/JS/Iframe)"
+      },
+      "max_width": {
+        "label": "Container Width",
+        "options": {
+          "narrow": "Narrow",
+          "wide": "Wide",
+          "fullwidth": "Fullwidth",
+          "medium": "Medium"
+        }
+      },
+      "alignment": {
+        "label": "Alignment"
+      }
+    }
+  },
+  "event_list": {
+    "name": "Event List",
+    "blocks": {
+      "event": {
+        "name": "Event",
+        "settings": {
+          "day": {
+            "label": "Day (number)"
+          },
+          "month": {
+            "label": "Month (short)"
+          },
+          "title": {
+            "label": "Event title"
+          },
+          "location": {
+            "label": "Location & time"
+          },
+          "button_link": {
+            "label": "Button"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "features_split": {
+    "name": "Features Split",
+    "settings": {
+      "content_position": {
+        "label": "Content position"
+      },
+      "show_divider": {
+        "label": "Show divider"
+      }
+    },
+    "blocks": {
+      "feature": {
+        "name": "Feature",
+        "settings": {
+          "icon": {
+            "label": "Icon"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "footer": {
+    "name": "Footer",
+    "settings": {
+      "copyright": {
+        "label": "Copyright text"
+      }
+    },
+    "blocks": {
+      "logo_text": {
+        "name": "Logo & Text",
+        "settings": {
+          "logo_text": {
+            "label": "Logo text"
+          },
+          "logo": {
+            "label": "Logo image"
+          },
+          "logo_width": {
+            "label": "Logo width"
+          },
+          "text": {
+            "label": "Text"
+          }
+        }
+      },
+      "badges_block": {
+        "name": "Badges",
+        "settings": {
+          "title": {
+            "label": "Title"
+          },
+          "max_height": {
+            "label": "Badge max height",
+            "description": "Caps the height of each badge image to keep them visually consistent"
+          },
+          "badge_image": {
+            "label": "Image"
+          },
+          "badge_link": {
+            "label": "Link"
+          },
+          "badge_1_header": {
+            "label": "Badge 1"
+          },
+          "badge_2_header": {
+            "label": "Badge 2"
+          },
+          "badge_3_header": {
+            "label": "Badge 3"
+          },
+          "badge_4_header": {
+            "label": "Badge 4"
+          }
+        }
+      }
+    }
+  },
+  "gallery": {
+    "name": "Gallery",
+    "settings": {
+      "staggered": {
+        "label": "Staggered layout"
+      }
+    },
+    "blocks": {
+      "image": {
+        "name": "Image",
+        "settings": {
+          "caption": {
+            "label": "Caption"
+          }
+        }
+      }
+    }
+  },
+  "header": {
+    "name": "Header",
+    "settings": {
+      "logo_header": {
+        "label": "Logo"
+      },
+      "logoImage": {
+        "label": "Logo image",
+        "description": "Upload a logo image. If provided, this will be displayed instead of the text logo."
+      },
+      "logoMaxWidth": {
+        "label": "Logo Max Width",
+        "description": "Maximum width of the logo image"
+      },
+      "logoText": {
+        "label": "Logo Text",
+        "description": "Text to display in the header logo"
+      },
+      "contact_header": {
+        "label": "Contact Details"
+      },
+      "contactDetailsLine1": {
+        "label": "Contact Details 1",
+        "description": "First line of contact info (e.g., phone)"
+      },
+      "contactDetailsLine2": {
+        "label": "Contact Details 2",
+        "description": "Second line of contact info (e.g., address)"
+      },
+      "contact_position": {
+        "label": "Contact details position",
+        "options": {
+          "logo": "Next to logo",
+          "menu": "Next to menu button"
+        }
+      },
+      "navigation_header": {
+        "label": "Navigation"
+      },
+      "headerNavigation": {
+        "label": "Navigation Menu",
+        "description": "Select the menu to display in the header"
+      },
+      "ctaButtonLink": {
+        "label": "CTA Button",
+        "description": "Call-to-action button (leave text empty to hide)"
+      },
+      "ctaButtonStyle": {
+        "label": "Button style",
+        "options": {
+          "primary": "Primary",
+          "secondary": "Secondary"
+        }
+      },
+      "full_width": {
+        "label": "Full Width",
+        "description": "When enabled, the header stretches across the full viewport. When disabled, it stays centered in a container."
+      },
+      "sticky": {
+        "label": "Sticky Header",
+        "description": "When enabled, the header stays fixed at the top when scrolling"
+      },
+      "transparent_on_hero": {
+        "label": "Transparent on hero",
+        "description": "Header becomes transparent over banner, slideshow, and video popup widgets"
+      },
+      "transparent_logo": {
+        "label": "Transparent header logo",
+        "description": "Alternative logo displayed when the header is transparent (e.g. a light version)"
+      },
+      "center_nav": {
+        "label": "Center Navigation",
+        "description": "Centers the navigation menu in the header with the logo on the left and CTA on the right (desktop only)"
+      }
+    }
+  },
+  "icon_card_grid": {
+    "name": "Icon Card Grid",
+    "settings": {
+      "featured_image": {
+        "label": "Featured image"
+      },
+      "featured_image_position": {
+        "label": "Image position"
+      }
+    },
+    "blocks": {
+      "card": {
+        "settings": {
+          "icon": {
+            "label": "Icon"
+          }
+        }
+      }
+    }
+  },
+  "icon_list": {
+    "name": "Icon List",
+    "blocks": {
+      "item": {
+        "name": "Item",
+        "settings": {
+          "icon": {
+            "label": "Icon"
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "image": {
+    "settings": {
+      "link": {
+        "description": "Optional link when image is clicked."
+      },
+      "fullwidth": {
+        "description": "Display image at full browser width."
+      }
+    },
+    "name": "Image"
+  },
+  "image_callout": {
+    "name": "Image Callout",
+    "settings": {}
+  },
+  "image_hotspots": {
+    "name": "Image Hotspots",
+    "settings": {
+      "image_alt": {
+        "label": "Image alt text"
+      }
+    },
+    "blocks": {
+      "hotspot": {
+        "name": "Hotspot",
+        "settings": {
+          "title": {
+            "label": "Tooltip title"
+          },
+          "description": {
+            "label": "Tooltip description"
+          },
+          "position_x": {
+            "label": "Horizontal position (%)"
+          },
+          "position_y": {
+            "label": "Vertical position (%)"
+          },
+          "layout_header": {
+            "label": "Layout"
+          }
+        }
+      }
+    }
+  },
+  "image_tabs": {
+    "name": "Image Tabs",
+    "blocks": {
+      "tab": {
+        "name": "Tab",
+        "settings": {
+          "title": {
+            "label": "Tab title"
+          },
+          "description": {
+            "label": "Tab description"
+          }
+        }
+      }
+    }
+  },
+  "image_text": {
+    "name": "Image + Text",
+    "settings": {
+      "text_position": {
+        "label": "Text vertical position"
+      },
+      "content_color_scheme": {
+        "label": "Content color scheme",
+        "options": {
+          "none": "None",
+          "standard_primary": "Standard Primary",
+          "standard_secondary": "Standard Secondary",
+          "highlight_primary": "Highlight Primary",
+          "highlight_secondary": "Highlight Secondary"
+        }
+      }
+    }
+  },
+  "job_listing": {
+    "name": "Job Listing",
+    "settings": {
+      "show_filters": {
+        "label": "Show department filters"
+      }
+    },
+    "blocks": {
+      "job": {
+        "name": "Job",
+        "settings": {
+          "title": {
+            "label": "Job title"
+          },
+          "department": {
+            "label": "Department"
+          },
+          "location": {
+            "label": "Location"
+          },
+          "type": {
+            "label": "Employment type",
+            "options": {
+              "full-time": "Full-Time",
+              "part-time": "Part-Time",
+              "contract": "Contract",
+              "internship": "Internship"
+            }
+          },
+          "apply_link": {
+            "label": "Apply button"
+          }
+        }
+      }
+    }
+  },
+  "key_figures": {
+    "name": "Key Figures",
+    "settings": {
+      "layout": {
+        "options": {
+          "grid": "Grid",
+          "carousel": "Carousel"
+        },
+        "label": "Layout"
+      },
+      "animate": {
+        "label": "Animate numbers"
+      }
+    },
+    "blocks": {
+      "figure": {
+        "name": "Figure",
+        "settings": {
+          "suffix": {
+            "label": "Suffix"
+          },
+          "number": {
+            "label": "Number"
+          },
+          "label": {
+            "label": "Label"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "logo_cloud": {
+    "name": "Logo Cloud",
+    "blocks": {
+      "logo": {
+        "name": "Logo",
+        "settings": {
+          "name": {
+            "label": "Company Name"
+          }
+        }
+      }
+    }
+  },
+  "map": {
+    "name": "Map",
+    "settings": {
+      "address": {
+        "label": "Address"
+      },
+      "embed_url": {
+        "label": "Google Maps embed URL"
+      },
+      "directions_link": {
+        "label": "Get directions link"
+      },
+      "height": {
+        "label": "Map height",
+        "options": {
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
+        }
+      },
+      "show_address": {
+        "label": "Show address below map"
+      }
+    }
+  },
+  "masonry_gallery": {
+    "name": "Masonry Gallery",
+    "blocks": {
+      "item": {
+        "name": "Gallery Item",
+        "settings": {
+          "category": {
+            "label": "Category"
+          },
+          "title": {
+            "label": "Heading"
+          }
+        }
+      }
+    },
+    "settings": {
+      "gap": {
+        "label": "Spacing",
+        "options": {
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
+        }
+      }
+    }
+  },
+  "numbered_cards": {
+    "name": "Numbered Cards",
+    "blocks": {
+      "step": {
+        "name": "Step",
+        "settings": {
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "numbered_service_list": {
+    "name": "Numbered Service List",
+    "blocks": {
+      "service": {
+        "name": "Service",
+        "settings": {
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Description"
+          }
+        }
+      }
+    },
+    "settings": {
+      "show_numbers": {
+        "label": "Show numbers"
+      },
+      "show_dividers": {
+        "label": "Show dividers"
+      }
+    }
+  },
+  "priced_list": {
+    "name": "Priced List",
+    "settings": {
+      "layout": {
+        "label": "Layout",
+        "options": {
+          "single-column": "Single column",
+          "two-column": "Two columns"
+        }
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Menu Item",
+        "settings": {
+          "name": {
+            "label": "Item name"
+          },
+          "price": {
+            "label": "Price"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "pricing": {
+    "name": "Pricing",
+    "blocks": {
+      "plan": {
+        "name": "Plan",
+        "settings": {
+          "title": {
+            "label": "Plan name"
+          },
+          "period": {
+            "label": "Period"
+          },
+          "featured": {
+            "label": "Featured plan"
+          },
+          "price": {
+            "label": "Price / Value (Optional)"
+          },
+          "features": {
+            "label": "Features (one per line)",
+            "description": "Start a line with + for a checkmark or - for a cross."
+          }
+        }
+      }
+    }
+  },
+  "profile_grid": {
+    "name": "Profile Grid",
+    "settings": {
+      "image_style": {
+        "label": "Image style",
+        "description": "Circle displays a small round avatar. Full displays the image at full width within the card.",
+        "options": {
+          "circle": "Circle",
+          "full": "Full"
+        }
+      },
+      "aspect_ratio": {
+        "description": "Applies only when image style is set to Full."
+      }
+    },
+    "blocks": {
+      "profile": {
+        "name": "Team Member",
+        "settings": {
+          "photo": {
+            "label": "Photo"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "role": {
+            "label": "Role / Title"
+          },
+          "specialty": {
+            "label": "Specialty"
+          },
+          "bio": {
+            "label": "Bio"
+          },
+          "social_header": {
+            "label": "Social Media"
+          },
+          "linkedin": {
+            "label": "LinkedIn URL"
+          },
+          "twitter": {
+            "label": "Twitter URL"
+          },
+          "instagram": {
+            "label": "Instagram URL"
+          },
+          "facebook": {
+            "label": "Facebook URL"
+          },
+          "github": {
+            "label": "GitHub URL"
+          },
+          "youtube": {
+            "label": "YouTube URL"
+          },
+          "tiktok": {
+            "label": "TikTok URL"
+          },
+          "pinterest": {
+            "label": "Pinterest URL"
+          },
+          "bluesky": {
+            "label": "Bluesky URL"
+          },
+          "discord": {
+            "label": "Discord URL"
+          },
+          "meta": {
+            "label": "Meta URL"
+          },
+          "reddit": {
+            "label": "Reddit URL"
+          },
+          "telegram": {
+            "label": "Telegram URL"
+          },
+          "threads": {
+            "label": "Threads URL"
+          },
+          "whatsapp": {
+            "label": "WhatsApp URL"
+          },
+          "email": {
+            "label": "Email"
+          }
+        }
+      }
+    }
+  },
+  "projects_grid": {
+    "name": "Projects Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "show_summary": {
+        "label": "Show summary"
+      },
+      "show_client": {
+        "label": "Show client"
+      },
+      "show_year": {
+        "label": "Show year"
+      },
+      "show_read_more": {
+        "label": "Show 'View project' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
+      }
+    }
+  },
+  "services_grid": {
+    "name": "Services Grid",
+    "settings": {
+      "limit": {
+        "label": "Number of items",
+        "description": "Set to 0 to show all items."
+      },
+      "show_icon": {
+        "label": "Show icon"
+      },
+      "show_summary": {
+        "label": "Show summary"
+      },
+      "show_price": {
+        "label": "Show price"
+      },
+      "show_duration": {
+        "label": "Show duration"
+      },
+      "show_read_more": {
+        "label": "Show 'View service' button"
+      },
+      "view_all_link": {
+        "label": "'View all' link"
+      }
+    }
+  },
+  "project_showcase": {
+    "name": "Project Showcase",
+    "settings": {
+      "text_display": {
+        "label": "Text Display",
+        "options": {
+          "hover": "On Hover",
+          "always": "Always"
+        }
+      }
+    },
+    "blocks": {
+      "project": {
+        "name": "Project",
+        "settings": {
+          "title": {
+            "label": "Project Title"
+          },
+          "description": {
+            "label": "Short Description"
+          },
+          "link": {
+            "label": "Project Link"
+          }
+        }
+      }
+    }
+  },
+  "rich_text": {
+    "name": "Rich Text",
+    "settings": {
+      "text_alignment": {
+        "label": "Text alignment"
+      }
+    }
+  },
+  "schedule_table": {
+    "name": "Schedule Table",
+    "settings": {
+      "note": {
+        "label": "Additional note"
+      },
+      "week_start_day": {
+        "label": "Week starts on",
+        "options": {
+          "0": "Sunday",
+          "1": "Monday"
+        }
+      },
+      "highlight_today": {
+        "label": "Highlight current day",
+        "description": "Emphasize today's row with an accent border and bold text"
+      }
+    },
+    "blocks": {
+      "day": {
+        "settings": {
+          "day": {
+            "label": "Day"
+          },
+          "hours": {
+            "label": "Hours"
+          },
+          "closed": {
+            "label": "Closed"
+          }
+        },
+        "name": "Day"
+      }
+    }
+  },
+  "sliding_panels": {
+    "name": "Sliding Panels",
+    "blocks": {
+      "panel": {
+        "name": "Panel",
+        "settings": {
+          "title": {
+            "label": "Heading"
+          },
+          "subtitle": {
+            "label": "Subtitle"
+          }
+        }
+      }
+    }
+  },
+  "slideshow": {
+    "name": "Slideshow",
+    "settings": {
+      "autoplay": {
+        "label": "Auto-rotate slides"
+      },
+      "autoplay_speed": {
+        "label": "Change slides every"
+      },
+      "height": {
+        "label": "Height",
+        "options": {
+          "auto": "Auto",
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
+        }
+      }
+    },
+    "blocks": {
+      "slide": {
+        "name": "Slide",
+        "settings": {
+          "heading_text": {
+            "label": "Heading Text"
+          },
+          "heading_size": {
+            "label": "Heading Size",
+            "options": {
+              "lg": "Large",
+              "xl": "Extra Large",
+              "2xl": "2X Large",
+              "3xl": "3X Large",
+              "4xl": "4X Large",
+              "5xl": "5X Large",
+              "6xl": "6X Large",
+              "7xl": "7X Large",
+              "8xl": "8X Large",
+              "9xl": "9X Large"
+            }
+          },
+          "text_content": {
+            "label": "Text Content"
+          },
+          "text_size": {
+            "label": "Text Size",
+            "options": {
+              "sm": "Small",
+              "base": "Base",
+              "lg": "Large"
+            }
+          },
+          "text_uppercase": {
+            "label": "Uppercase"
+          },
+          "text_muted": {
+            "label": "Muted color"
+          },
+          "button_link_2": {
+            "label": "Button 2"
+          },
+          "color_scheme": {
+            "label": "Color Scheme",
+            "options": {
+              "standard_primary": "Standard Primary",
+              "standard_secondary": "Standard Secondary",
+              "highlight_primary": "Highlight Primary",
+              "highlight_secondary": "Highlight Secondary"
+            }
+          }
+        }
+      }
+    }
+  },
+  "split_content": {
+    "name": "Split Content",
+    "settings": {
+      "balance": {
+        "label": "Balance",
+        "options": {
+          "left_heavy": "Left heavy",
+          "equal": "Equal",
+          "right_heavy": "Right heavy"
+        }
+      },
+      "sticky_column": {
+        "label": "Sticky column (desktop)"
+      }
+    },
+    "blocks": {
+      "heading": {
+        "settings": {
+          "position": {
+            "label": "Column"
+          }
+        }
+      },
+      "text": {
+        "settings": {
+          "position": {
+            "label": "Column"
+          }
+        }
+      },
+      "button": {
+        "settings": {
+          "alignment": {
+            "label": "Alignment",
+            "options": {
+              "start": "Start",
+              "center": "Center"
+            }
+          },
+          "position": {
+            "label": "Column"
+          }
+        }
+      }
+    }
+  },
+  "scrolling_text": {
+    "name": "Scrolling Text",
+    "settings": {
+      "text": {
+        "label": "Text"
+      },
+      "separator": {
+        "label": "Separator"
+      },
+      "speed": {
+        "label": "Speed"
+      },
+      "rotate": {
+        "label": "Rotation angle"
+      },
+      "font_size": {
+        "label": "Font size",
+        "options": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "xl": "Extra Large"
+        }
+      },
+      "bg_color": {
+        "label": "Background color"
+      },
+      "text_color": {
+        "label": "Text color"
+      }
+    }
+  },
+  "social_icons": {
+    "settings": {
+      "icon_size": {
+        "label": "Icon size"
+      }
+    },
+    "name": "Social Icons"
+  },
+  "split_hero": {
+    "name": "Split Hero",
+    "settings": {}
+  },
+  "steps": {
+    "name": "Steps",
+    "blocks": {
+      "step": {
+        "name": "Step",
+        "settings": {
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Description"
+          }
+        }
+      }
+    }
+  },
+  "testimonial_slider": {
+    "name": "Testimonial Slider",
+    "settings": {
+      "autoplay": {
+        "label": "Autoplay"
+      },
+      "autoplay_speed": {
+        "label": "Autoplay speed"
+      }
+    },
+    "blocks": {
+      "quote": {
+        "name": "Quote"
+      }
+    }
+  },
+  "testimonial_hero": {
+    "name": "Testimonial Hero",
+    "settings": {
+      "logo": {
+        "label": "Company Logo"
+      },
+      "author_image": {
+        "label": "Author Image"
+      }
+    }
+  },
+  "testimonials": {
+    "name": "Testimonials",
+    "blocks": {
+      "quote": {
+        "name": "Testimonial"
+      }
+    }
+  },
+  "timeline": {
+    "name": "Timeline",
+    "settings": {
+      "layout": {
+        "options": {
+          "centered": "Centered (Alternating)",
+          "vertical": "Vertical",
+          "horizontal": "Horizontal"
+        },
+        "label": "Layout"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Timeline Item",
+        "settings": {
+          "date": {
+            "label": "Date/Phase"
+          },
+          "duration": {
+            "label": "Duration (optional)"
+          },
+          "features": {
+            "label": "Features/bullet points (one per line)",
+            "description": "Start a line with + for a checkmark or - for a cross."
+          },
+          "title": {
+            "label": "Heading"
+          },
+          "description": {
+            "label": "Subheading"
+          }
+        }
+      }
+    }
+  },
+  "trust_bar": {
+    "name": "Trust Bar",
+    "settings": {
+      "show_dividers": {
+        "label": "Show dividers"
+      }
+    },
+    "blocks": {
+      "item": {
+        "name": "Item",
+        "settings": {
+          "icon": {
+            "label": "Icon"
+          },
+          "title": {
+            "label": "Title"
+          },
+          "text": {
+            "label": "Description"
+          }
+        }
+      }
+    }
+  },
+  "video_embed": {
+    "name": "YouTube/Vimeo",
+    "settings": {}
+  },
+  "video_popup": {
+    "name": "Video Popup",
+    "settings": {
+      "video_header": {
+        "label": "Video"
+      },
+      "overlay_color": {
+        "description": "Adjust alpha for overlay intensity"
+      },
+      "height": {
+        "label": "Height",
+        "options": {
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large"
+        }
+      },
+      "play_button_style": {
+        "label": "Play button style",
+        "options": {
+          "light": "Light",
+          "dark": "Dark"
+        }
+      }
+    }
+  },
+  "team_highlight": {
+    "name": "Team Highlight",
+    "settings": {
+      "signature_image": {
+        "label": "Signature image"
+      },
+      "image_ratio": {
+        "label": "Image ratio",
+        "options": {
+          "portrait": "Portrait",
+          "square": "Square",
+          "auto": "Auto"
+        }
+      }
+    },
+    "blocks": {
+      "member": {
+        "name": "Member",
+        "settings": {
+          "photo": {
+            "label": "Photo"
+          },
+          "name": {
+            "label": "Name"
+          },
+          "role": {
+            "label": "Role"
+          },
+          "specialty": {
+            "label": "Specialty"
+          },
+          "bio": {
+            "label": "Bio"
+          },
+          "social_header": {
+            "label": "Social Media"
+          },
+          "linkedin": {
+            "label": "LinkedIn URL"
+          },
+          "twitter": {
+            "label": "Twitter URL"
+          },
+          "instagram": {
+            "label": "Instagram URL"
+          },
+          "facebook": {
+            "label": "Facebook URL"
+          },
+          "email": {
+            "label": "Email"
+          },
+          "github": {
+            "label": "GitHub URL"
+          },
+          "youtube": {
+            "label": "YouTube URL"
+          },
+          "tiktok": {
+            "label": "TikTok URL"
+          },
+          "pinterest": {
+            "label": "Pinterest URL"
+          },
+          "bluesky": {
+            "label": "Bluesky URL"
+          },
+          "discord": {
+            "label": "Discord URL"
+          },
+          "meta": {
+            "label": "Meta URL"
+          },
+          "reddit": {
+            "label": "Reddit URL"
+          },
+          "telegram": {
+            "label": "Telegram URL"
+          },
+          "threads": {
+            "label": "Threads URL"
+          },
+          "whatsapp": {
+            "label": "WhatsApp URL"
+          }
+        }
+      }
+    }
+  },
+  "class_schedule": {
+    "name": "Class schedule",
+    "empty": "No classes scheduled.",
+    "settings": {
+      "note": {
+        "label": "Footer note",
+        "description": "Optional disclaimer shown below the schedule (e.g. holiday hours, booking info)."
+      },
+      "layout": {
+        "label": "Layout",
+        "options": {
+          "tabs": "Tabs (day switcher)",
+          "accordion": "Accordion (collapsible days)",
+          "list": "List (all days visible)"
+        }
+      },
+      "week_start_day": {
+        "label": "Week starts on",
+        "options": {
+          "monday": "Monday",
+          "sunday": "Sunday"
+        }
+      },
+      "default_day": {
+        "label": "Default active day",
+        "description": "'Today' auto-selects based on the visitor's current day (tabs layout only).",
+        "options": {
+          "today": "Today (auto)"
+        }
+      },
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "hide_empty_days": {
+        "label": "Hide days with no classes"
+      },
+      "show_time": {
+        "label": "Show class time"
+      },
+      "show_duration": {
+        "label": "Show class duration"
+      },
+      "show_instructor": {
+        "label": "Show instructor name"
+      },
+      "show_level": {
+        "label": "Show difficulty level badge"
+      },
+      "show_description": {
+        "label": "Show class description"
+      },
+      "show_book_button": {
+        "label": "Show book button"
+      }
+    },
+    "blocks": {
+      "class": {
+        "name": "Class",
+        "settings": {
+          "day": {
+            "label": "Day of week"
+          },
+          "time": {
+            "label": "Start time"
+          },
+          "duration": {
+            "label": "Duration"
+          },
+          "title": {
+            "label": "Class name"
+          },
+          "instructor": {
+            "label": "Instructor"
+          },
+          "level": {
+            "label": "Difficulty level",
+            "options": {
+              "all_levels": "All levels",
+              "beginner": "Beginner",
+              "intermediate": "Intermediate",
+              "advanced": "Advanced"
+            }
+          },
+          "description": {
+            "label": "Short description"
+          },
+          "book_link": {
+            "label": "Book / reserve link"
+          }
+        }
+      }
+    }
+  }
+}

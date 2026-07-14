@@ -1,0 +1,370 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "slideshow",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "alignment": "center",
+        "autoplay": true,
+        "autoplay_speed": 5000
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Baked Fresh Every Morning",
+            "heading_size": "5xl",
+            "text_content": "Sourdough, pastries, and cakes made from scratch with local ingredients — because good bread takes time.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "See Our Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_link_2": {
+              "text": "Order a Cake",
+              "href": "custom-cakes.html",
+              "target": "_self"
+            },
+            "button_style_2": "secondary",
+            "button_size": "medium",
+            "overlay_color": "#2e1f2ecc",
+            "color_scheme": "highlight-primary",
+            "image": "/uploads/images/slide-1.webp"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "heading_text": "Custom Cakes for Every Occasion",
+            "heading_size": "5xl",
+            "text_content": "Birthdays, weddings, and everything in between. Tell us your vision — we'll make it delicious.",
+            "text_size": "lg",
+            "button_link": {
+              "text": "Start Your Order",
+              "href": "custom-cakes.html",
+              "target": "_self"
+            },
+            "button_style": "primary",
+            "button_size": "medium",
+            "overlay_color": "#2e1f2ecc",
+            "color_scheme": "highlight-primary",
+            "image": "/uploads/images/slide-2.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "slide-1",
+        "slide-2"
+      ]
+    },
+    "trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "alignment": "centered",
+        "show_dividers": true,
+        "icon_style": "plain",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "clock",
+            "title": "Baked Daily",
+            "text": "Everything made fresh before sunrise"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "title": "Real Ingredients",
+            "text": "Organic flour, local butter, free-range eggs"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Made With Love",
+            "text": "Family recipes passed down three generations"
+          }
+        }
+      },
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3"
+      ]
+    },
+    "categories": {
+      "type": "sliding-panels",
+      "settings": {
+        "eyebrow": "What We Bake",
+        "title": "From the Oven to Your Table",
+        "heading_alignment": "center",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "panel-1": {
+          "type": "panel",
+          "settings": {
+            "title": "Sourdough & Bread",
+            "subtitle": "24-hour fermented loaves, baguettes, and focaccia",
+            "button_link": {
+              "text": "See Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/panel-bread.webp"
+          }
+        },
+        "panel-2": {
+          "type": "panel",
+          "settings": {
+            "title": "Pastries",
+            "subtitle": "Croissants, danishes, morning buns, and more",
+            "button_link": {
+              "text": "See Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/panel-pastries.webp"
+          }
+        },
+        "panel-3": {
+          "type": "panel",
+          "settings": {
+            "title": "Cakes & Celebrations",
+            "subtitle": "Custom cakes, layer cakes, tarts, and seasonal specials",
+            "button_link": {
+              "text": "Order a Cake",
+              "href": "custom-cakes.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/panel-cakes.webp"
+          }
+        },
+        "panel-4": {
+          "type": "panel",
+          "settings": {
+            "title": "Cookies & Treats",
+            "subtitle": "Chocolate chip, brownies, lemon bars, and blondies",
+            "button_link": {
+              "text": "See Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/panel-cookies.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "panel-1",
+        "panel-2",
+        "panel-3",
+        "panel-4"
+      ]
+    },
+    "cake_teaser": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/cake-teaser.webp"
+      },
+      "blocks": {
+        "cake-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Dream It, We'll Bake It",
+            "size": "3xl"
+          }
+        },
+        "cake-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Whether it's a three-tier wedding showpiece or a simple chocolate cake for Tuesday, we'll make it from scratch and decorate it by hand. Just give us 72 hours and a rough idea — we'll handle the rest.</p>",
+            "size": "base"
+          }
+        },
+        "cake-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Any size, any flavor, any design\n+ Tastings available by appointment\n+ Delivery within 20 miles\n+ 72-hour minimum notice"
+          }
+        },
+        "cake-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Start Your Order",
+              "href": "custom-cakes.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cake-heading",
+        "cake-text",
+        "cake-features",
+        "cake-button"
+      ]
+    },
+    "testimonial": {
+      "type": "testimonial-hero",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-primary",
+        "author_image": "/uploads/images/testimonial-couple.webp"
+      },
+      "blocks": {
+        "quote-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>\"They made the most beautiful cake for our daughter's first birthday. Three tiers, wildflowers, and it tasted even better than it looked. We've ordered from Crumbly for every celebration since.\"</p>",
+            "size": "lg"
+          }
+        },
+        "quote-name": {
+          "type": "heading",
+          "settings": {
+            "text": "Tom & Maria K.",
+            "size": "lg"
+          }
+        },
+        "quote-role": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Custom cake customers</p>",
+            "size": "sm",
+            "muted": true
+          }
+        }
+      },
+      "blocksOrder": [
+        "quote-text",
+        "quote-name",
+        "quote-role"
+      ]
+    },
+    "recent_bakes": {
+      "type": "project-showcase",
+      "settings": {
+        "eyebrow": "From the Oven",
+        "title": "Recent Bakes",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "aspect_ratio": "1 / 1",
+        "text_display": "hover",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "bake-1": {
+          "type": "project",
+          "settings": {
+            "title": "Classic Sourdough",
+            "description": "24-hour ferment",
+            "image": "/uploads/images/bake-sourdough.webp"
+          }
+        },
+        "bake-2": {
+          "type": "project",
+          "settings": {
+            "title": "Almond Croissants",
+            "description": "Frangipane filled",
+            "image": "/uploads/images/bake-croissants.webp"
+          }
+        },
+        "bake-3": {
+          "type": "project",
+          "settings": {
+            "title": "Lemon Layer Cake",
+            "description": "Olive oil & citrus",
+            "image": "/uploads/images/bake-lemon-cake.webp"
+          }
+        },
+        "bake-4": {
+          "type": "project",
+          "settings": {
+            "title": "Chocolate Chip Cookies",
+            "description": "Brown butter & sea salt",
+            "image": "/uploads/images/bake-cookies.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "bake-1",
+        "bake-2",
+        "bake-3",
+        "bake-4"
+      ]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Smells Better in Person",
+            "size": "2xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Open Tuesday through Sunday from 7 AM.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Find the Bakery",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "trust_bar",
+    "categories",
+    "cake_teaser",
+    "testimonial",
+    "recent_bakes",
+    "cta"
+  ],
+  "id": "index",
+  "created": "2026-04-16T14:40:08.896Z",
+  "updated": "2026-04-16T14:47:36.693Z"
+}

@@ -1,0 +1,171 @@
+{% comment %}
+  Audio Player — a themed MP3 player with an optional playlist (one block per track).
+  Tracks come from blocks; the audio source is a `file` setting (MP3 from the Media Library).
+  Progressive enhancement: a native <audio controls> works without JS; audio-player.js
+  swaps in the custom transport (play/pause, seek, time, prev/next, volume, speed, download).
+{% endcomment %}
+{% enqueue_style src: "audio-player.css", priority: 30 %}
+{% enqueue_script src: "audio-player.js", priority: 30, defer: true %}
+
+{% assign track_count = widget.blocksOrder.size %}
+{% assign show_covers = widget.settings.show_covers %}
+{% assign has_heading = false %}
+{% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}
+  {% assign has_heading = true %}
+{% endif %}
+
+{% comment %} First track seeds the initial "now playing" state (JS updates it on track change). {% endcomment %}
+{% assign first_block = widget.blocks[widget.blocksOrder.first] %}
+{% assign first_url = '' %}
+{% if first_block.settings.audio != blank %}
+  {% assign first_name = first_block.settings.audio | split: '/' | last %}
+  {% assign first_url = filePath | append: '/' | append: first_name %}
+{% endif %}
+{% assign first_cover = '' %}
+{% if first_block.settings.cover != blank %}
+  {% capture first_cover %}{% image src: first_block.settings.cover, size: 'medium', output: 'url' %}{% endcapture %}
+  {% assign first_cover = first_cover | strip %}
+{% endif %}
+
+<section
+  id="{{ widget.id }}"
+  class="widget widget-audio-player widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}style="--widget-bg-color: var(--bg-primary);"{% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="audio-player"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    {% if has_heading %}
+      <div class="widget-header{% if widget.settings.heading_alignment == 'start' %} widget-header--align-start{% endif %}">
+        {% assign header_delay = 0 %}
+        {% if widget.settings.eyebrow != blank %}
+          <span class="w-eyebrow{% if widget.settings.eyebrow_uppercase %} t-uppercase{% endif %} reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="eyebrow">{{ widget.settings.eyebrow }}</span>
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.title != blank %}
+          {% if widget.index == 1 %}
+            <h1 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h1>
+          {% else %}
+            <h2 class="w-headline reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="title">{{ widget.settings.title }}</h2>
+          {% endif %}
+          {% assign header_delay = header_delay | plus: 1 %}
+        {% endif %}
+        {% if widget.settings.description != blank %}
+          <p class="w-description reveal reveal-up" style="--reveal-delay: {{ header_delay }}" data-setting="description">{{ widget.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="widget-content">
+      <div class="ap{% if track_count <= 1 %} ap--single{% endif %}{% unless show_covers %} ap--no-covers{% endunless %} reveal reveal-up">
+        {% comment %} Single shared audio element. `controls` is the no-JS fallback; JS hides it. {% endcomment %}
+        <audio class="ap-audio" preload="metadata" controls{% if first_url != blank %} src="{{ first_url }}"{% endif %}></audio>
+
+        {% if show_covers %}
+        <div class="ap-cover">
+          <img class="ap-cover-img" alt=""{% if first_cover != blank %} src="{{ first_cover }}"{% else %} hidden{% endif %} />
+          <span class="ap-cover-fallback"{% if first_cover != blank %} hidden{% endif %} aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12" /><circle cx="6" cy="18" r="3" /><circle cx="16" cy="16" r="3" /></svg>
+          </span>
+        </div>
+        {% endif %}
+
+        <div class="ap-panel">
+          <div class="ap-now">
+            <p class="ap-now-title w-title t-lg">{{ first_block.settings.title }}</p>
+            <p class="ap-now-artist w-body t-sm t-muted">{{ first_block.settings.artist }}</p>
+          </div>
+
+          <div class="ap-seek-row">
+            <input type="range" class="ap-seek" min="0" max="0" value="0" step="0.1" aria-label="Seek" disabled />
+            <div class="ap-times">
+              <span class="ap-time ap-time-current">0:00</span>
+              <span class="ap-time-sep" aria-hidden="true">/</span>
+              <span class="ap-time ap-time-duration">0:00</span>
+            </div>
+          </div>
+
+          <div class="ap-transport">
+            <button type="button" class="ap-btn ap-prev" aria-label="Previous track">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 6h2v12H7zM20 6 11 12l9 6z" /></svg>
+            </button>
+            <button type="button" class="ap-btn ap-btn--primary ap-play" aria-label="Play" aria-pressed="false">
+              <svg class="ap-icon-play" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+              <svg class="ap-icon-pause" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /></svg>
+            </button>
+            <button type="button" class="ap-btn ap-next" aria-label="Next track">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M15 6h2v12h-2zM4 6l9 6-9 6z" /></svg>
+            </button>
+
+            {% if widget.settings.show_speed %}
+              <button type="button" class="ap-btn ap-speed" aria-label="Playback speed">1×</button>
+            {% endif %}
+
+            {% if widget.settings.show_volume %}
+              <div class="ap-volume-wrap">
+                <button type="button" class="ap-btn ap-mute" aria-label="Mute" aria-pressed="false">
+                  <svg class="ap-icon-volume" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a9 9 0 0 1 0 12" /></svg>
+                  <svg class="ap-icon-muted" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" /><path d="m16 9 5 6M21 9l-5 6" /></svg>
+                </button>
+                <input type="range" class="ap-volume" min="0" max="1" step="0.05" value="1" aria-label="Volume" />
+              </div>
+            {% endif %}
+
+            {% if widget.settings.show_download %}
+              <a class="ap-btn ap-download" download aria-label="Download current track"{% if first_url != blank %} href="{{ first_url }}"{% endif %}>
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" /></svg>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        {% comment %} Playlist — always rendered as the JS track source; hidden by CSS when single. {% endcomment %}
+        <ol class="ap-playlist">
+          {% for blockId in widget.blocksOrder %}
+            {% assign block = widget.blocks[blockId] %}
+            {% assign t_url = '' %}
+            {% if block.settings.audio != blank %}
+              {% assign t_name = block.settings.audio | split: '/' | last %}
+              {% assign t_url = filePath | append: '/' | append: t_name %}
+            {% endif %}
+            {% assign t_cover = '' %}
+            {% if block.settings.cover != blank %}
+              {% capture t_cover %}{% image src: block.settings.cover, size: 'small', output: 'url' %}{% endcapture %}
+              {% assign t_cover = t_cover | strip %}
+            {% endif %}
+            <li class="ap-track-item" data-block-id="{{ blockId }}">
+              <button
+                type="button"
+                class="ap-track{% if forloop.first %} is-active{% endif %}"
+                data-src="{{ t_url }}"
+                data-title="{{ block.settings.title | escape }}"
+                data-artist="{{ block.settings.artist | escape }}"
+                data-cover="{{ t_cover }}"
+                aria-label="Play {{ block.settings.title | escape }}"
+              >
+                <span class="ap-track-index" aria-hidden="true">{{ forloop.index }}</span>
+                {% if show_covers %}
+                <span class="ap-track-thumb" aria-hidden="true">
+                  {% if t_cover != blank %}
+                    <img src="{{ t_cover }}" alt="" />
+                  {% else %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12" /><circle cx="6" cy="18" r="3" /><circle cx="16" cy="16" r="3" /></svg>
+                  {% endif %}
+                </span>
+                {% endif %}
+                <span class="ap-track-text">
+                  <span class="ap-track-title w-title t-base" data-setting="title">{{ block.settings.title }}</span>
+                  {% if block.settings.artist != blank %}
+                    <span class="ap-track-artist w-body t-sm t-muted" data-setting="artist">{{ block.settings.artist }}</span>
+                  {% endif %}
+                </span>
+                <span class="ap-track-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+              </button>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>

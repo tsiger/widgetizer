@@ -1,0 +1,204 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "contact_intro": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "content_width": "medium",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Find Us",
+            "size": "5xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We're tucked into the corner of Oak and 5th, right next to the bookshop. Look for the green awning — and follow the smell of fresh-roasted coffee.</p>",
+            "size": "lg"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text"
+      ]
+    },
+    "contact_map": {
+      "type": "map",
+      "settings": {
+        "title": "",
+        "address": "142 Oak Street, Portland, OR 97214",
+        "heading_alignment": "center",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary",
+        "directions_link": {
+          "href": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.25280949928!2d-74.11976373946229!3d40.69766374859258!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1234567890",
+          "text": "Directions",
+          "target": "_self"
+        }
+      },
+      "blocks": {
+        "info-1": {
+          "type": "info",
+          "settings": {
+            "title": "Phone",
+            "text": "<p>(503) 555-0187</p>"
+          }
+        },
+        "info-2": {
+          "type": "info",
+          "settings": {
+            "title": "Email",
+            "text": "<p>hello@sample.com</p>"
+          }
+        },
+        "block_5c3dd411-03dd-462d-96a7-50d8589ed996": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": [
+        "info-1",
+        "info-2",
+        "block_5c3dd411-03dd-462d-96a7-50d8589ed996"
+      ]
+    },
+    "hours": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "Hours",
+        "title": "When We're Open",
+        "heading_alignment": "center",
+        "week_start_day": "1",
+        "sidebar_position": "end",
+        "note": "Closed on major holidays",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "day-1": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-2": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-3": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-4": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-5": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "6:30 AM – 6:00 PM"
+          }
+        },
+        "day-6": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "7:00 AM – 5:00 PM"
+          }
+        },
+        "day-7": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "7:00 AM – 5:00 PM"
+          }
+        }
+      },
+      "blocksOrder": [
+        "day-1",
+        "day-2",
+        "day-3",
+        "day-4",
+        "day-5",
+        "day-6",
+        "day-7"
+      ]
+    },
+    "faq": {
+      "type": "accordion",
+      "settings": {
+        "eyebrow": "Good to Know",
+        "title": "Quick Answers",
+        "heading_alignment": "center",
+        "style": "separated",
+        "allow_multiple": false,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "item",
+          "settings": {
+            "question": "Do you have wifi?",
+            "answer": "<p>Yes — free wifi for all customers. We do have a laptop-free zone at the bar for those who want to unplug. The communal table and window seats are fair game for working.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "item",
+          "settings": {
+            "question": "What dairy alternatives do you offer?",
+            "answer": "<p>We stock oat milk, almond milk, and coconut milk. Oat is our default — it steams beautifully and pairs best with espresso. All alternatives are available at no extra charge.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "item",
+          "settings": {
+            "question": "Is the patio dog-friendly?",
+            "answer": "<p>Absolutely. Dogs are welcome on the back patio. We keep a water bowl by the door and have been known to hand out the occasional treat.</p>"
+          }
+        },
+        "faq-4": {
+          "type": "item",
+          "settings": {
+            "question": "Can I buy beans to take home?",
+            "answer": "<p>Yes — we sell all of our house-roasted beans by the bag (250g or 1kg). Whole bean or ground to your preferred method. We also offer a monthly subscription if you want fresh beans delivered to your door.</p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "contact_intro",
+    "contact_map",
+    "hours",
+    "faq"
+  ],
+  "id": "contact",
+  "created": "2026-04-16T10:30:13.559Z",
+  "updated": "2026-04-16T10:46:56.746Z"
+}

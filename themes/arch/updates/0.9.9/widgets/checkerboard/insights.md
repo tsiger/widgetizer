@@ -1,0 +1,101 @@
+# Checkerboard Widget — Insights
+
+## Description
+
+An alternating grid of image tiles and text/CTA cards that creates a visually dynamic, magazine-style layout for showcasing services, features, or portfolio work.
+
+---
+
+## Settings Levers
+
+| Setting | Values | Visual Effect |
+|---|---|---|
+| `eyebrow` | Any text | Small label above the headline — adds context or category framing |
+| `eyebrow_uppercase` | `true` / `false` (default) | Uppercases the eyebrow text for a more formal label treatment |
+| `title` | Any text (default: "What We Do") | Main section headline; renders as `<h1>` when the widget is first on the page, `<h2>` otherwise |
+| `description` | Any text | Subheading paragraph below the title — sets expectations for the grid below |
+| `heading_alignment` | `start`, `center` (default) | Controls whether the header block is centered or left-aligned; left works better when the grid itself is asymmetric |
+| `columns_desktop` | 2 -- 4 (default: 4) | Number of grid columns on desktop; fewer columns = larger tiles, more visual weight per card |
+| `color_scheme` | `standard-primary`, `standard-secondary`, `highlight-primary`, `highlight-secondary` | `standard-primary`: no extra background or border. `standard-secondary`: secondary background on content tiles. `highlight-primary` and `highlight-secondary`: add a border to tiles plus padded container; accent variants swap content tile background to secondary color |
+| `top_spacing` | `auto` (default), `small`, `none` | `small` reduces spacing for tighter rhythm; `none` removes it entirely for flush stacking |
+| `bottom_spacing` | `auto` (default), `small`, `none` | Same as above for the bottom edge |
+
+---
+
+## Available Blocks
+
+| Block Type | Key Settings | Notes |
+|---|---|---|
+| `card` | `image`, `title`, `description` (richtext), `button_link` (text + href + target) | Each card is **either** an image tile **or** a text content tile — never both. If an image is set, only the image shows (full-bleed, cover-fit, 1:1 aspect); title/description/button are ignored. If no image is set, the card renders title + description + optional button on a solid background. This either/or behavior is the whole point of the widget — alternate image and text tiles to create the checkerboard pattern. If you need cards with both image and text, use card-grid instead. Max 12 blocks. |
+
+---
+
+## Layout Recipes
+
+### 1. Classic Services Grid (4 columns, 8 cards)
+
+Alternate text cards and image cards in a 4-column layout so the pattern forms a true checkerboard: text, image, text, image on the first row, then image, text, image, text on the second.
+
+- **Settings**: `columns_desktop: 4`, `color_scheme: standard-secondary`, `heading_alignment: center`
+- **Blocks**: 8 cards — odd positions get title + description + "Learn More" button; even positions get a photo
+- **Good for**: Service overview pages where each service needs a brief explanation and a supporting photo
+
+### 2. Two-Column Feature Spotlight (2 columns, 4 cards)
+
+Large tiles that give each service or product substantial real estate. Two rows of two, alternating image and content.
+
+- **Settings**: `columns_desktop: 2`, `color_scheme: highlight-primary`, `heading_alignment: start`, `eyebrow: "Our Specialties"`
+- **Blocks**: 4 cards — card 1: content with title + rich description; card 2: image; card 3: image; card 4: content
+- **Good for**: Landing pages or about pages where you want fewer, more impactful items
+
+### 3. Portfolio Mosaic (3 columns, 6 cards)
+
+Heavy on images with only a couple of text cards sprinkled in. Feels like a curated gallery with just enough context.
+
+- **Settings**: `columns_desktop: 3`, `color_scheme: standard-primary`, `heading_alignment: center`, `title: "Recent Work"`
+- **Blocks**: 6 cards — 4 image-only cards and 2 text cards (positions 3 and 6) with project category + short blurb
+- **Good for**: Portfolio or gallery sections where the work itself should dominate
+
+### 4. Stacked Info Strip (2 columns, 6 cards)
+
+Three rows of alternating content, creating a long-scroll storytelling section. Each row pairs a photo with a narrative block.
+
+- **Settings**: `columns_desktop: 2`, `color_scheme: highlight-secondary`, `top_spacing: none`, `bottom_spacing: none`
+- **Blocks**: 6 cards — rows alternate image-left/text-right and text-left/image-right
+- **Good for**: "How it works" or process explanation sections, step-by-step guides
+
+### 5. Image Wall With Single CTA (4 columns, 8 cards)
+
+Seven image tiles and one text card placed strategically (e.g., position 4 or 5) to break the pattern with a call to action.
+
+- **Settings**: `columns_desktop: 4`, `color_scheme: standard-primary`, `heading_alignment: center`, `title: "Our Space"`
+- **Blocks**: 8 cards — 7 photos of a venue/space/product, 1 text card with "Book a Tour" CTA
+- **Good for**: Showcasing a physical space or product line while funneling visitors toward one action
+
+### 6. Compact Duo (2 columns, 2 cards)
+
+The smallest useful configuration: one image and one content block side by side. Functions almost like a split hero.
+
+- **Settings**: `columns_desktop: 2`, `color_scheme: highlight-primary`, `heading_alignment: start`, `eyebrow: "Featured"`, `title: ""`
+- **Blocks**: 2 cards — one image, one content card with title + description + button
+- **Good for**: Highlighting a single service, announcement, or seasonal promotion
+
+---
+
+## Differentiation Tips
+
+- **Each card is either image or text, never both.** This is the fundamental design rule. A card with an image becomes a pure photo tile — any title/description/button on that card is ignored. A card without an image becomes a pure text tile. The alternating pattern of visual and informational tiles is what makes the checkerboard distinctive. If you need cards that combine image and text, use card-grid instead.
+
+- **Every layout must mix image and text tiles.** An all-text checkerboard is just a worse card-grid. An all-image checkerboard is just a worse gallery. The widget only earns its place when the alternation creates visual rhythm.
+
+- **Use empty-content cards intentionally**: Cards with only an image and no text become visual breathing room. Place them between heavy content cards to keep the section from feeling like a wall of text.
+
+- **Column count changes the personality**: 2 columns reads editorial and premium. 3 columns is balanced and versatile. 4 columns feels energetic and information-dense. Match the column count to the brand tone.
+
+- **Accent color schemes on content tiles**: The `standard-secondary` and `highlight-secondary` schemes give content tiles a distinct background color, which strengthens the visual contrast between image and text tiles. Use these when images have varied brightness levels and you need the text tiles to hold their own.
+
+- **Spacing tuning for full-bleed sections**: Directly below an image or filled hero, use `top_spacing: small` — the hero's bottom spacing is internal padding, so the checkerboard must bring its own gap, and `none` would slam the tiles against the hero's edge. Reserve `none` for fusion: a neighboring section that shares the checkerboard's color scheme and should read as one continuous band, or an unfilled widget above whose own bottom margin already provides the spacing.
+
+- **The 12-block max is generous**: Most effective layouts use 4-8 blocks. Going beyond 8 risks overwhelming the visitor. If you have 12 items, consider whether some should be grouped differently or split across two widget instances.
+
+- **Button placement matters**: Only text cards can have buttons. Place your highest-priority CTA on a card that sits in the first or second row where it is visible without scrolling, especially on 2-column layouts.

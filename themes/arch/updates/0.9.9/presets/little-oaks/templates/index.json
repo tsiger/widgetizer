@@ -1,0 +1,381 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero_split": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "standard-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none",
+        "image": "/uploads/images/hero-children-playing.webp"
+      },
+      "blocks": {
+        "hero-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Daycare & Preschool in Asheville</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Where Little Ones Learn, Play, and Grow",
+            "size": "6xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A warm, nurturing environment for children ages 6 weeks to 5 years. Play-based learning, qualified teachers, and a community that feels like family.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Schedule a Tour",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium",
+            "link_2": {
+              "href": "programs.html",
+              "text": "Our Programs",
+              "target": "_self"
+            },
+            "style_2": "secondary"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-eyebrow",
+        "hero-heading",
+        "hero-text",
+        "hero-button"
+      ]
+    },
+    "credentials_strip": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_style": "filled",
+        "icon_size": "lg",
+        "icon_shape": "rounded",
+        "alignment": "center",
+        "show_dividers": true,
+        "color_scheme": "standard-secondary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "trust-1": {
+          "type": "item",
+          "settings": {
+            "icon": "certificate",
+            "title": "State Licensed",
+            "text": "Fully licensed and inspected"
+          }
+        },
+        "trust-2": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Low Ratios",
+            "text": "Small groups, personal attention"
+          }
+        },
+        "trust-3": {
+          "type": "item",
+          "settings": {
+            "icon": "school-bell",
+            "title": "Qualified Teachers",
+            "text": "Degree-holding early educators"
+          }
+        },
+        "trust-4": {
+          "type": "item",
+          "settings": {
+            "icon": "plant",
+            "title": "Outdoor Learning",
+            "text": "Garden and nature play daily"
+          }
+        }
+      },
+      "blocksOrder": [
+        "trust-1",
+        "trust-2",
+        "trust-3",
+        "trust-4"
+      ]
+    },
+    "programs_overview": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "Programs",
+        "eyebrow_uppercase": true,
+        "title": "Programs by Age Group",
+        "description": "Each program is designed for a specific stage of development, with age-appropriate curriculum and caring, qualified teachers.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "box",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4:3",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "program-1": {
+          "type": "card",
+          "settings": {
+            "title": "Infants",
+            "subtitle": "6 weeks – 12 months",
+            "description": "<p>A gentle, secure environment where babies explore through sensory play, tummy time, and one-on-one bonding with dedicated caregivers.</p>",
+            "image": "/uploads/images/infant-room.webp"
+          }
+        },
+        "program-2": {
+          "type": "card",
+          "settings": {
+            "title": "Toddlers",
+            "subtitle": "1 – 2 years",
+            "description": "<p>Active discovery through music, movement, art, and early language. Structured routines that build confidence and independence.</p>",
+            "image": "/uploads/images/toddler-room.webp"
+          }
+        },
+        "program-3": {
+          "type": "card",
+          "settings": {
+            "title": "Preschool",
+            "subtitle": "3 – 4 years",
+            "description": "<p>Play-based learning in literacy, math, science, and social skills. Circle time, creative projects, and outdoor exploration every day.</p>",
+            "image": "/uploads/images/preschool-class.webp"
+          }
+        },
+        "program-4": {
+          "type": "card",
+          "settings": {
+            "title": "Pre-K",
+            "subtitle": "4 – 5 years",
+            "description": "<p>Kindergarten readiness with structured academics, problem-solving, and collaborative projects that build school-ready skills.</p>",
+            "image": "/uploads/images/teaching-philosophy.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "program-1",
+        "program-2",
+        "program-3",
+        "program-4"
+      ]
+    },
+    "philosophy_section": {
+      "type": "image-text",
+      "settings": {
+        "image_position": "start",
+        "text_position": "center",
+        "color_scheme": "standard-secondary",
+        "image": "/uploads/images/teaching-philosophy-1.webp"
+      },
+      "blocks": {
+        "philosophy-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Approach</p>",
+            "size": "sm",
+            "uppercase": true
+          }
+        },
+        "philosophy-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Learning Through Play",
+            "size": "4xl"
+          }
+        },
+        "philosophy-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We believe children learn best when they are curious, engaged, and having fun. Our play-based curriculum is grounded in early childhood development research and guided by teachers who understand that every child grows at their own pace.</p>",
+            "size": "base"
+          }
+        },
+        "philosophy-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "about.html",
+              "text": "Our Philosophy",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "philosophy-eyebrow",
+        "philosophy-heading",
+        "philosophy-text",
+        "philosophy-button"
+      ]
+    },
+    "stats_section": {
+      "type": "key-figures",
+      "settings": {
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 4,
+        "card_layout": "flat",
+        "animate": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "stat-1": {
+          "type": "figure",
+          "settings": {
+            "number": "15",
+            "label": "Years of Care"
+          }
+        },
+        "stat-2": {
+          "type": "figure",
+          "settings": {
+            "number": "12",
+            "label": "Caring Teachers"
+          }
+        },
+        "stat-3": {
+          "type": "figure",
+          "settings": {
+            "number": "120",
+            "suffix": "+",
+            "label": "Happy Families"
+          }
+        },
+        "stat-4": {
+          "type": "figure",
+          "settings": {
+            "number": "4",
+            "suffix": ":1",
+            "label": "Child-to-Teacher Ratio"
+          }
+        }
+      },
+      "blocksOrder": [
+        "stat-1",
+        "stat-2",
+        "stat-3",
+        "stat-4"
+      ]
+    },
+    "parent_reviews": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "From Our Families",
+        "eyebrow_uppercase": true,
+        "title": "What Parents Say",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "box",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "review-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Dropping off my daughter was the hardest thing I have ever done. Within a week, she was running to the door every morning. The teachers at Little Oaks made her feel safe from day one.",
+            "name": "Jessica Morales",
+            "title": "Parent of a 3-year-old",
+            "rating": "5"
+          }
+        },
+        "review-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Both of our boys went through Little Oaks. The structure, the outdoor time, the way they handle transitions between age groups — it is thoughtful and consistent. We could not have asked for better care.",
+            "name": "Michael and Sarah Dunn",
+            "title": "Parents of two graduates",
+            "rating": "5"
+          }
+        },
+        "review-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "My son started in the infant room and is now in Pre-K. He reads, counts, and has best friends he has known since he was a baby. Little Oaks is not just childcare — it is a community.",
+            "name": "Angela Park",
+            "title": "Parent of a 5-year-old",
+            "rating": "5"
+          }
+        }
+      },
+      "blocksOrder": [
+        "review-1",
+        "review-2",
+        "review-3"
+      ]
+    },
+    "tour_cta": {
+      "type": "action-bar",
+      "settings": {
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Come See Us",
+            "size": "3xl"
+          }
+        },
+        "cta-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The best way to know if Little Oaks is right for your family is to visit. We would love to show you around.</p>",
+            "size": "base",
+            "muted": true
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "href": "contact.html",
+              "text": "Schedule a Tour",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-text",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero_split",
+    "credentials_strip",
+    "programs_overview",
+    "philosophy_section",
+    "stats_section",
+    "parent_reviews",
+    "tour_cta"
+  ],
+  "id": "index",
+  "created": "2026-04-17T16:20:56.787Z",
+  "updated": "2026-04-17T16:46:11.578Z"
+}

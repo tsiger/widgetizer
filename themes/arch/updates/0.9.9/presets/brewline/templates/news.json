@@ -1,0 +1,40 @@
+{
+  "name": "News",
+  "slug": "news",
+  "widgets": {
+    "news_archive": {
+      "type": "news-grid",
+      "settings": {
+        "eyebrow": "",
+        "eyebrow_uppercase": false,
+        "title": "News",
+        "description": "Updates, articles and announcements.",
+        "heading_alignment": "center",
+        "view_all_link": {
+          "text": "View all news",
+          "href": "",
+          "target": "_self"
+        },
+        "limit": 0,
+        "sort": "date_desc",
+        "columns_desktop": 3,
+        "aspect_ratio": "16 / 9",
+        "show_image": true,
+        "show_date": true,
+        "show_excerpt": true,
+        "show_read_more": true,
+        "color_scheme": "standard-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto"
+      },
+      "blocks": {},
+      "blocksOrder": []
+    }
+  },
+  "widgetsOrder": [
+    "news_archive"
+  ],
+  "id": "news",
+  "created": "2026-06-18T14:26:27.803Z",
+  "updated": "2026-06-18T14:26:27.803Z"
+}

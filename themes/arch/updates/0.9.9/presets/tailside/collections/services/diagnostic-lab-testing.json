@@ -1,0 +1,13 @@
+{
+  "slug": "diagnostic-lab-testing",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Diagnostic Lab Testing",
+    "icon": "flask",
+    "summary": "Blood, urine, and other tests that explain what is going on beneath the surface.",
+    "description": "<p>When a pet seems unwell, the right test often points us straight to the cause. Animals cannot tell us what hurts, so a clear set of results gives us facts to work from instead of guesswork.</p><h2>What we can test</h2><p>Our in-house lab handles many results the same day, from routine screens to checks before anaesthetic. We can look at blood, urine, and other samples to build a picture of how the organs are working and whether anything is out of range.</p><ul><li>Blood tests covering organ function and blood cell counts</li><li>Urine analysis to check the kidneys and bladder</li><li>Pre-anaesthetic screens before a planned procedure</li></ul><p>Because much of this is run on site, we can often act quickly rather than waiting days for answers. For more specialised work we use trusted external labs and keep you posted on timing.</p><h3>Making sense of the results</h3><p>We walk you through what each number means in plain terms, then agree a sensible plan together. A result on its own is rarely the whole story, so we read it alongside your pet's history and how they have been at home.</p><p>Some tests, such as fasting blood work, go more smoothly with a little preparation, and we will let you know in advance if that applies. If anything needs rechecking later, we will explain why and when, so there are no surprises.</p>",
+    "price": "From $90",
+    "duration": "30 min",
+    "featured_image": "/uploads/images/tailside-services-diagnostic-lab-testing.webp"
+  }
+}

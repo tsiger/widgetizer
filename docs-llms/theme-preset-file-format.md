@@ -31,10 +31,20 @@ themes/arch/presets/{preset-id}/
   collections/                 # Optional — seeded collection items
     <type>/
       <item-slug>.json         # One file per collection item
-  media/                       # Optional — starter image binaries + manifest
-    images/
+  media/                       # Optional — per-preset starter media (generic layout;
+    images/                    #   Arch instead uses theme-root preset-media/, below)
       <preset-id>-...-.webp    # Original + responsive derivatives
     manifest.json              # Media metadata for the seeded binaries
+```
+
+Arch keeps starter media OUT of the preset folders, in a theme-root pool keyed
+by preset id (same inner layout — `images/` + `manifest.json`):
+
+```
+themes/arch/preset-media/
+  <preset-id>/
+    images/
+    manifest.json
 ```
 
 Why the full-preset convention exists:
@@ -44,15 +54,23 @@ Why the full-preset convention exists:
 - it makes review and maintenance easier
 - it better matches Arch's goal of each preset being a complete industry-specific site
 
-### `collections/` and `media/`
+### `collections/` and starter media
 
-`collections/` is present only when a preset seeds collection content (e.g. a blog/news list, a services grid, a projects portfolio). `media/` is standard for every non-blank preset since 0.9.9 — presets ship their imagery as packed media, and template/collection image fields reference those files directly (see [theme-preset-generator.md](theme-preset-generator.md) §11):
+`collections/` is present only when a preset seeds collection content (e.g. a blog/news list, a services grid, a projects portfolio). Starter media is standard for every non-blank preset since 0.9.9 — presets ship their imagery as packed media, and template/collection image fields reference those files directly (see [theme-preset-generator.md](theme-preset-generator.md) §11):
 
 - **`collections/<type>/<item-slug>.json`** — one JSON file per collection item, seeded into the new project's `collections/<type>/` directory at project creation. The `<type>` directory name must match a collection type defined in `themes/arch/collection-types/<type>/` (see [core-collections.md](core-collections.md)). Item shape is documented in §11.
-- **`media/images/`** — the starter image binaries the preset references (originals plus their `-medium` / `-small` / `-thumb` responsive derivatives), copied into the project's `uploads/images/` on seed.
-- **`media/manifest.json`** — the media metadata (`filename`, `path`, `width`, `height`, `alt`, `sizes`, …) that seeds the per-project media records so the seeded binaries are tracked, usage-counted, and exportable. See [core-media.md](core-media.md).
+- **`images/`** — the starter image binaries the preset references (originals plus their `-medium` / `-small` / `-thumb` responsive derivatives), copied into the project's `uploads/images/` on seed.
+- **`manifest.json`** — the media metadata (`filename`, `path`, `width`, `height`, `alt`, `sizes`, …) that seeds the per-project media records so the seeded binaries are tracked, usage-counted, and exportable. See [core-media.md](core-media.md).
 
-If a preset has no collections, omit `collections/`; `media/` stays (it carries the page-template imagery). During initial generation — before images are produced and packed — `media/` may not exist yet; it is created by the production pass (`npm run preset:media`, see [theme-preset-process.md](theme-preset-process.md)).
+**Where starter media lives — two layouts, one lookup.** At project creation, `resolvePresetPaths` looks for media in this order (first hit wins):
+
+1. `presets/<id>/media/` in the runtime theme — the per-preset layout, right default for uploaded/community themes (typically one preset).
+2. `preset-media/<id>/` in the app's seed copy (`themes/`) — the theme-root pool bundled themes use. Kept out of update deltas, runtime theme copies, and per-project copies, so ~180 MB of Arch imagery ships exactly once. The preset-name match is the opt-in; there is no flag.
+3. `preset-media/<id>/` in the runtime theme — a ZIP-installed theme using the theme-root layout (its installed copy is its distribution copy).
+
+No media in any location → nothing is seeded; that's a valid preset (the default `arch` preset has no media and no image references). **Filenames in `preset-media/` are append-only across theme versions** — add files freely, never rename or delete, because older preset templates reference them by name.
+
+If a preset has no collections, omit `collections/`. During initial generation — before images are produced and packed — media may not exist yet; it is created by the production pass (`npm run preset:media`, see [theme-preset-process.md](theme-preset-process.md)), which writes to `themes/arch/preset-media/<id>/`.
 
 ### Screenshot exception
 

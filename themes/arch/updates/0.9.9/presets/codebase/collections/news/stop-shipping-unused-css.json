@@ -1,0 +1,11 @@
+{
+  "slug": "stop-shipping-unused-css",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Stop Shipping CSS Nobody Sees",
+    "date": "2026-02-11",
+    "excerpt": "Most marketing sites load a stylesheet two or three times larger than the page actually uses.",
+    "body": "<p>When a site feels slow on a phone, the cause is rarely a single big image. More often it is a pile of styles and scripts loaded on every page whether they are needed or not.</p><p>Here is the habit we follow on every Codebase build.</p><ul><li>Split CSS so each page loads only the components it renders.</li><li>Defer scripts that are not needed for the first paint.</li><li>Measure on a real mid range Android, not a top end laptop.</li></ul><p>The result is usually a page that feels instant, even on a tired connection.</p><h2>Why the bloat builds up</h2><p>Most of this is not anyone's fault. A site grows over a few years, a plugin gets added here, a widget there, and each one drags in its own stylesheet that loads everywhere. Nobody set out to ship a stylesheet three times too large, it just accumulated.</p><p>The fix is mostly discipline rather than cleverness. We keep a clear picture of which components live on which pages, and we let the build tool strip out everything a given page never touches.</p><h3>One thing you can check today</h3><p>Open your homepage on a normal phone over mobile data and count the seconds until you can read and tap something. If it is more than two or three, the page is almost certainly carrying weight it does not use.</p><p>You do not need our help to start. Trimming the obvious dead styles and pushing non-essential scripts to load later will get you most of the way. We are happy to look if you want a second pair of eyes, but a lot of this you can do yourself.</p>",
+    "featured_image": "/uploads/images/codebase-news-stop-shipping-unused-css.webp"
+  }
+}

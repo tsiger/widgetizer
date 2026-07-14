@@ -1,0 +1,26 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Shearline",
+    "logoMaxWidth": 170,
+    "contactDetailsLine1": "(555) 020-0149",
+    "contactDetailsLine2": "Tue–Sat, by appointment",
+    "contact_position": "menu",
+    "headerNavigation": "main-menu",
+    "center_nav": true,
+    "ctaButtonLink": {
+      "href": "stylists.html",
+      "text": "Pick a stylist",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/shearline-logo-dark.png",
+    "transparent_logo": "/uploads/images/shearline-logo-light-v2.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
+}

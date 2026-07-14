@@ -14,7 +14,7 @@ function stamp() {
 }
 
 // Directories excluded from the project destination (matches copyThemeToProject logic)
-const PROJECT_EXCLUDES = new Set(["templates", "presets", "updates", "latest"]);
+const PROJECT_EXCLUDES = new Set(["templates", "presets", "updates", "latest", "preset-media"]);
 
 function parseArgs(argv) {
   const result = {};
@@ -104,9 +104,15 @@ function isGitPath(filePath) {
 
 function initialSync() {
   console.log(`[${stamp()}] [sync] Full copy: themes/${themeId} → data/themes/${themeId}`);
+  // preset-media/ is skipped to match production seeding (ensureThemesDirectory):
+  // project creation resolves it from the seed (themes/) directly.
   cpSync(srcDir, themeDest, {
     recursive: true,
-    filter: (src) => !isGitPath(src),
+    filter: (src) => {
+      if (isGitPath(src)) return false;
+      const rel = path.relative(srcDir, src);
+      return !rel || rel.split(path.sep)[0] !== "preset-media";
+    },
   });
 
   if (!projectDest) return;

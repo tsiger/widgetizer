@@ -1,0 +1,221 @@
+<section
+  id="{{ widget.id }}"
+  class="widget widget-image-callout widget-{{ widget.id }} color-scheme-{{ widget.settings.color_scheme }} {% if widget.settings.image_position == 'end' %}layout-image-end{% endif %}{% if widget.settings.top_spacing != 'auto' %} spacing-top-{{ widget.settings.top_spacing }}{% endif %}{% if widget.settings.bottom_spacing != 'auto' %} spacing-bottom-{{ widget.settings.bottom_spacing }}{% endif %}"
+  {% unless widget.settings.color_scheme == 'standard-primary' %}
+    style="--widget-bg-color: var(--bg-primary);"
+  {% endunless %}
+  data-widget-id="{{ widget.id }}"
+  data-widget-type="image-callout"
+  {% if widget.index != null %}data-widget-index="{{ widget.index }}"{% endif %}
+>
+  <style>
+    .widget-{{ widget.id }} {
+      & .callout-wrapper {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        overflow: hidden;
+      }
+
+      & .callout-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 40rem;
+        overflow: hidden;
+      }
+
+      & .callout-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-lg);
+      }
+
+      & .callout-content {
+        background-color: var(--bg-primary);
+        padding: var(--space-xl);
+        border: var(--border-width-thin) solid var(--border-color);
+        border-radius: var(--radius-md);
+        position: relative;
+        z-index: 2;
+      }
+
+      @media (min-width: 750px) {
+        & .callout-image-wrapper {
+          height: 50rem;
+        }
+
+        & .callout-content {
+          padding: var(--space-3xl);
+        }
+      }
+
+      @media (min-width: 990px) {
+        & .callout-wrapper {
+          grid-template-columns: repeat(12, 1fr);
+          align-items: center;
+          gap: 0;
+        }
+
+        & .callout-image-wrapper {
+          grid-column: 1 / 7;
+          grid-row: 1;
+          height: 60rem;
+        }
+
+        & .callout-content {
+          grid-column: 6 / 13;
+          grid-row: 1;
+          padding: var(--space-4xl);
+          margin-inline-start: -2rem;
+        }
+      }
+
+      @media (min-width: 1200px) {
+        & .callout-content {
+          padding: var(--space-5xl);
+          margin-inline-start: -3rem;
+        }
+      }
+
+      /* Variant: Image Right */
+      &.layout-image-end {
+        @media (min-width: 990px) {
+          & .callout-image-wrapper {
+            grid-column: 7 / 13;
+            grid-row: 1;
+          }
+
+          & .callout-content {
+            grid-column: 1 / 8;
+            grid-row: 1;
+            margin-inline-start: 0;
+            margin-inline-end: -2rem;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          & .callout-content {
+            margin-inline-end: -3rem;
+          }
+        }
+      }
+    }
+  </style>
+
+  <div class="widget-container {% unless widget.settings.color_scheme == 'standard-primary' %}widget-container-padded{% endunless %}">
+    <div class="callout-wrapper">
+      <div class="callout-image-wrapper reveal reveal-fade">
+        {% if widget.settings.image != blank %}
+          {% image src: widget.settings.image, size: 'large', srcset: true, sizes: '(max-width: 989px) 100vw, (max-width: 1420px) 58vw, 828px', class: 'callout-image' %}
+        {% else %}
+          <div class="callout-image" style="background-image: url({% placeholder_image output: 'url' %}); background-size: cover; background-position: center;"></div>
+        {% endif %}
+      </div>
+
+      <div class="callout-content content-flow widget-content-align-start color-scheme-{{ widget.settings.content_color_scheme }}">
+        {% for blockId in widget.blocksOrder %}
+          {% assign block = widget.blocks[blockId] %}
+          {% case block.type %}
+            {% when 'heading' %}
+              {% assign size_class = 't-' | append: block.settings.size %}
+              {% if widget.index == 1 %}
+                <h1 class="w-headline {{ size_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
+                  {{ block.settings.text }}
+                </h1>
+              {% else %}
+                <h2 class="w-headline {{ size_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
+                  {{ block.settings.text }}
+                </h2>
+              {% endif %}
+
+            {% when 'text' %}
+              {% unless block.settings.text | rte_blank %}
+              {% assign size_class = 't-' | append: block.settings.size %}
+              {% assign style_class = '' %}
+              {% if block.settings.uppercase %}{% assign style_class = style_class | append: ' t-uppercase' %}{% endif %}
+              {% if block.settings.muted %}{% assign style_class = style_class | append: ' t-muted' %}{% endif %}
+              <div class="w-body w-rte {{ size_class }}{{ style_class }} reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}" data-setting="text">
+                {{ block.settings.text | raw }}
+              </div>
+              {% endunless %}
+
+            {% when 'features' %}
+              {% if block.settings.features != blank %}
+                <ul class="features-list reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+                  {% assign normalized_features = block.settings.features | replace: '\r\n', '\n' %}
+                  {% assign features_list = normalized_features | split: '\n' %}
+                  {% for feature in features_list %}
+                    {% assign trimmed_feature = feature | strip %}
+                    {% if trimmed_feature != blank %}
+                      {% assign feature_text = trimmed_feature %}
+                      {% assign icon_name = '' %}
+                      {% assign first_char = trimmed_feature | slice: 0, 1 %}
+                      {% if first_char == '+' %}
+                        {% assign icon_name = 'check' %}
+                        {% assign feature_text = trimmed_feature | remove_first: '+' | strip %}
+                      {% elsif first_char == '-' %}
+                        {% assign icon_name = 'x' %}
+                        {% assign feature_text = trimmed_feature | remove_first: '-' | strip %}
+                      {% endif %}
+                      <li class="feature-item w-body">
+                        {% if icon_name != blank %}
+                          <span class="feature-icon">
+                            {% render 'icon', icon: icon_name, class: 'feature-icon-svg' %}
+                          </span>
+                        {% endif %}
+                        <span>{{ feature_text }}</span>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+
+            {% when 'button' %}
+              {% if block.settings.link.text != blank or block.settings.link_2.text != blank %}
+                <div class="widget-actions reveal reveal-up" style="--reveal-delay: {{ forloop.index0 }}" data-block-id="{{ blockId }}">
+                  {% if block.settings.link.text != blank %}
+                    {% if block.settings.size != 'small' and block.settings.size != blank %}
+                      {% assign size_class = 'widget-button-' | append: block.settings.size %}
+                    {% else %}
+                      {% assign size_class = '' %}
+                    {% endif %}
+                    <a
+                      href="{{ block.settings.link.href }}"
+                      class="widget-button {{ size_class }} {% if block.settings.style == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+                      data-setting="link"
+                      {% if block.settings.link.target == '_blank' %}
+                        target="_blank" rel="noopener"
+                      {% endif %}
+                    >
+                      {{ block.settings.link.text }}
+                    </a>
+                  {% endif %}
+                  {% if block.settings.link_2.text != blank %}
+                    {% if block.settings.size != 'small' and block.settings.size != blank %}
+                      {% assign size_class = 'widget-button-' | append: block.settings.size %}
+                    {% else %}
+                      {% assign size_class = '' %}
+                    {% endif %}
+                    <a
+                      href="{{ block.settings.link_2.href }}"
+                      class="widget-button {{ size_class }} {% if block.settings.style_2 == 'primary' %}widget-button-primary{% else %}widget-button-secondary{% endif %}"
+                      data-setting="link_2"
+                      {% if block.settings.link_2.target == '_blank' %}
+                        target="_blank" rel="noopener"
+                      {% endif %}
+                    >
+                      {{ block.settings.link_2.text }}
+                    </a>
+                  {% endif %}
+                </div>
+              {% endif %}
+          {% endcase %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

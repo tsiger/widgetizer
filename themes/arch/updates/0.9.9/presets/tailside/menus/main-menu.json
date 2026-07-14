@@ -1,0 +1,26 @@
+{
+  "id": "main-menu",
+  "name": "Main Menu",
+  "items": [
+    {
+      "label": "Services",
+      "link": "services.html",
+      "items": []
+    },
+    {
+      "label": "New Patients",
+      "link": "new-patients.html",
+      "items": []
+    },
+    {
+      "label": "About",
+      "link": "about.html",
+      "items": []
+    },
+    {
+      "label": "News",
+      "link": "news.html",
+      "items": []
+    }
+  ]
+}

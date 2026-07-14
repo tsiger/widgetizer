@@ -1,0 +1,11 @@
+{
+  "slug": "spring-security-checkup",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Book a Free Spring Security Checkup",
+    "date": "2026-04-13",
+    "excerpt": "Through April we are running no-cost reviews to find the gaps before someone else does.",
+    "body": "<p>Security is not a thing you set up once and forget. New staff, new software, and old passwords all open small gaps over time, and they tend to go unnoticed until they matter.</p><p>For the month of April, Uplink is offering a free security checkup to local businesses. We review your backups, your access controls, and your most obvious risks, then hand you a plain-language summary of what to fix first.</p><h2>What we look at</h2><p>The review is practical rather than technical. We are looking for the gaps that real incidents tend to walk through, the kind that build up quietly as a business grows and changes. Most are straightforward to close once someone actually points them out.</p><ul><li>Whether your backups exist and would genuinely restore</li><li>Who has access to what, and whether that still makes sense</li><li>Old accounts and weak passwords that should have gone long ago</li></ul><h3>No obligation, just a clearer picture</h3><p>There is no obligation attached. We would simply rather help you find the weak spots now than be called in after they have been found for you.</p><p>You will not be sold anything in the room. The point is to leave you with an honest, readable account of where you stand and what to deal with first, if you fix it yourselves or ask anyone to help. A free hour now is a great deal cheaper than the alternative.</p>",
+    "featured_image": "/uploads/images/uplink-news-spring-security-checkup.webp"
+  }
+}

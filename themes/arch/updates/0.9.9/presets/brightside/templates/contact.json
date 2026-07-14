@@ -1,0 +1,206 @@
+{
+  "name": "Contact",
+  "slug": "contact",
+  "widgets": {
+    "hero": {
+      "type": "banner",
+      "settings": {
+        "image": "/uploads/images/contact-hero.webp",
+        "height": "small",
+        "fullwidth": true,
+        "alignment": "center",
+        "vertical_alignment": "center",
+        "overlay_color": "#0f1d2e80",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Contact Us",
+            "size": "4xl"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading"
+      ]
+    },
+    "contact_info": {
+      "type": "image-text",
+      "settings": {
+        "image": "/uploads/images/contact-reception.webp",
+        "image_position": "start",
+        "text_position": "flex-start",
+        "content_color_scheme": "none",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "contact-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Book an Appointment",
+            "size": "2xl"
+          }
+        },
+        "contact-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Call us, walk in, or book online — whatever works best for you.</p>",
+            "size": "base"
+          }
+        },
+        "contact-details": {
+          "type": "text",
+          "settings": {
+            "text": "<p>320 Park Avenue, Suite 4B<br>New York, NY 10022</p><p>reception@brightsidedental.com<br>(212) 555-0312</p>",
+            "size": "base"
+          }
+        },
+        "contact-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Book Online",
+              "href": "#",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "contact-heading",
+        "contact-text",
+        "contact-details",
+        "contact-button"
+      ]
+    },
+    "hours": {
+      "type": "schedule-table",
+      "settings": {
+        "eyebrow": "",
+        "title": "Office Hours",
+        "description": "",
+        "heading_alignment": "center",
+        "note": "Emergency appointments available outside regular hours",
+        "sidebar_position": "end",
+        "week_start_day": "1",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "day-mon": {
+          "type": "day",
+          "settings": {
+            "day": "Monday",
+            "hours": "8:00 AM – 6:00 PM"
+          }
+        },
+        "day-tue": {
+          "type": "day",
+          "settings": {
+            "day": "Tuesday",
+            "hours": "8:00 AM – 6:00 PM"
+          }
+        },
+        "day-wed": {
+          "type": "day",
+          "settings": {
+            "day": "Wednesday",
+            "hours": "8:00 AM – 6:00 PM"
+          }
+        },
+        "day-thu": {
+          "type": "day",
+          "settings": {
+            "day": "Thursday",
+            "hours": "8:00 AM – 6:00 PM"
+          }
+        },
+        "day-fri": {
+          "type": "day",
+          "settings": {
+            "day": "Friday",
+            "hours": "8:00 AM – 6:00 PM"
+          }
+        },
+        "day-sat": {
+          "type": "day",
+          "settings": {
+            "day": "Saturday",
+            "hours": "9:00 AM – 2:00 PM"
+          }
+        },
+        "day-sun": {
+          "type": "day",
+          "settings": {
+            "day": "Sunday",
+            "hours": "",
+            "closed": true
+          }
+        },
+        "info-emergency": {
+          "type": "info",
+          "settings": {
+            "title": "Emergencies",
+            "text": "<p>Dental emergency outside office hours?<br>Call our after-hours line:<br><strong>(212) 555-0313</strong></p>"
+          }
+        }
+      },
+      "blocksOrder": [
+        "day-mon",
+        "day-tue",
+        "day-wed",
+        "day-thu",
+        "day-fri",
+        "day-sat",
+        "day-sun",
+        "info-emergency"
+      ]
+    },
+    "map": {
+      "type": "map",
+      "settings": {
+        "eyebrow": "",
+        "title": "Find Us",
+        "description": "",
+        "heading_alignment": "start",
+        "address": "320 Park Avenue, Suite 4B, New York, NY 10022",
+        "embed_url": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.183!2d-73.9856644!3d40.7484405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1700000000000",
+        "height": "medium",
+        "show_address": true,
+        "sidebar_position": "end",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "info-getting-here": {
+          "type": "info",
+          "settings": {
+            "title": "Getting Here",
+            "text": "<p>Subway: 51st St station (6 train), 3-minute walk<br>Parking: garage next door, validated for patients</p>"
+          }
+        },
+        "social-1": {
+          "type": "social",
+          "settings": {}
+        }
+      },
+      "blocksOrder": [
+        "info-getting-here",
+        "social-1"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "contact_info",
+    "hours",
+    "map"
+  ],
+  "id": "contact",
+  "created": "2026-04-16T12:01:48.313Z",
+  "updated": "2026-04-16T13:12:04.324Z"
+}

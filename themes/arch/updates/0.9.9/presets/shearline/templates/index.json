@@ -1,0 +1,497 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "home_opener": {
+      "type": "banner",
+      "settings": {
+        "height": "large",
+        "fullwidth": true,
+        "content_width": "medium",
+        "alignment": "center",
+        "vertical_alignment": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/hero.webp",
+        "overlay_color": "#0a1e385e"
+      },
+      "blocks": {
+        "opener-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Hair, cut with intention</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": false
+          }
+        },
+        "opener-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Cuts that hold their shape between visits.",
+            "size": "6xl"
+          }
+        },
+        "opener-subtitle": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A small studio of four stylists. Editorial cuts, considered color, no bar, no pretense.</p>",
+            "size": "lg",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "opener-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Pick a stylist",
+              "href": "stylists.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "See the work",
+              "href": "work.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "opener-eyebrow",
+        "opener-heading",
+        "opener-subtitle",
+        "opener-buttons"
+      ]
+    },
+    "home_services_teaser": {
+      "type": "card-grid",
+      "settings": {
+        "eyebrow": "What we do",
+        "eyebrow_uppercase": true,
+        "title": "Six things, done properly.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "alignment": "start",
+        "image_position": "top",
+        "aspect_ratio": "4 / 3",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "svc-womens": {
+          "type": "card",
+          "settings": {
+            "title": "Women's cut",
+            "description": "<p>Consultation, shampoo, precision cut, style.</p>",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/service-card-womens.webp"
+          }
+        },
+        "svc-mens": {
+          "type": "card",
+          "settings": {
+            "title": "Men's cut",
+            "description": "<p>Classic, fade, or editorial — same attention to shape.</p>",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/service-card-mens.webp"
+          }
+        },
+        "svc-single-color": {
+          "type": "card",
+          "settings": {
+            "title": "Single-process color",
+            "description": "<p>All-over, root touch-up, or gloss.</p>",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/service-card-color.webp"
+          }
+        },
+        "svc-balayage": {
+          "type": "card",
+          "settings": {
+            "title": "Balayage & highlights",
+            "description": "<p>Hand-painted, foil, or combined — consultation first.</p>",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/service-card-balayage.webp"
+          }
+        },
+        "svc-treatments": {
+          "type": "card",
+          "settings": {
+            "title": "Treatments",
+            "description": "<p>Olaplex, keratin smoothing, deep conditioning.</p>",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/service-card-treatments.webp"
+          }
+        },
+        "svc-blowout": {
+          "type": "card",
+          "settings": {
+            "title": "Blowout & styling",
+            "description": "<p>Event-ready finishes, standalone or paired.</p>",
+            "button_link": {
+              "text": "See pricing",
+              "href": "services.html",
+              "target": "_self"
+            },
+            "image": "/uploads/images/service-card-blowout.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "svc-womens",
+        "svc-mens",
+        "svc-single-color",
+        "svc-balayage",
+        "svc-treatments",
+        "svc-blowout"
+      ]
+    },
+    "home_stylists": {
+      "type": "profile-grid",
+      "settings": {
+        "eyebrow": "The chairs",
+        "eyebrow_uppercase": true,
+        "title": "Pick the stylist before the date.",
+        "description": "Each of us specializes. Short cuts, blonding, textured hair, men's — we match by what you're growing toward.",
+        "heading_alignment": "center",
+        "image_style": "full",
+        "aspect_ratio": "3/4",
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "stylist-rowan": {
+          "type": "profile",
+          "settings": {
+            "name": "Rowan Ellis",
+            "role": "Lead Stylist & Founder",
+            "specialty": "Precision bobs, fringe, short cuts",
+            "bio": "Twelve years at the chair, trained at a Vidal Sassoon academy. Rowan built Shearline around one idea — a cut that still looks good three weeks later.",
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-rowan.webp"
+          }
+        },
+        "stylist-sloane": {
+          "type": "profile",
+          "settings": {
+            "name": "Sloane Park",
+            "role": "Senior Colorist",
+            "specialty": "Balayage, blonding, color correction",
+            "bio": "Nine years specializing in color. Sloane is the person to book for balayage that grows out beautifully and for the rescues when someone else got it wrong.",
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-sloane.webp"
+          }
+        },
+        "stylist-mara": {
+          "type": "profile",
+          "settings": {
+            "name": "Mara Okafor",
+            "role": "Stylist",
+            "specialty": "Textured & curly hair, long layers",
+            "bio": "Seven years focused on curly and textured hair — from defined coils to loose waves. If another stylist has told you your hair is hard to cut, book with Mara.",
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-mara.webp"
+          }
+        },
+        "stylist-theo": {
+          "type": "profile",
+          "settings": {
+            "name": "Theo Vance",
+            "role": "Stylist",
+            "specialty": "Men's cuts, fades, beard work",
+            "bio": "Eight years in men's grooming. Theo works the whole range — quiet executive cuts, skin fades, textured crops, and the beards that come with them.",
+            "instagram": "https://instagram.com/",
+            "photo": "/uploads/images/stylist-theo.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "stylist-rowan",
+        "stylist-sloane",
+        "stylist-mara",
+        "stylist-theo"
+      ]
+    },
+    "home_recent_work": {
+      "type": "masonry-gallery",
+      "settings": {
+        "eyebrow": "Recent work",
+        "eyebrow_uppercase": true,
+        "title": "From this month's chairs.",
+        "heading_alignment": "center",
+        "alignment": "start",
+        "columns_desktop": 3,
+        "gap": "medium",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "work-01": {
+          "type": "item",
+          "settings": {
+            "title": "Eliza",
+            "category": "Short cut",
+            "image": "/uploads/images/work-home-1.webp"
+          }
+        },
+        "work-02": {
+          "type": "item",
+          "settings": {
+            "title": "Nadia",
+            "category": "Balayage",
+            "image": "/uploads/images/work-home-2.webp"
+          }
+        },
+        "work-03": {
+          "type": "item",
+          "settings": {
+            "title": "Iris",
+            "category": "Long & Lengths",
+            "image": "/uploads/images/work-home-3.webp"
+          }
+        },
+        "work-04": {
+          "type": "item",
+          "settings": {
+            "title": "Marco",
+            "category": "Men's",
+            "image": "/uploads/images/work-home-5.webp"
+          }
+        },
+        "work-05": {
+          "type": "item",
+          "settings": {
+            "title": "Ayo",
+            "category": "Textured",
+            "image": "/uploads/images/work-home-4.webp"
+          }
+        },
+        "work-06": {
+          "type": "item",
+          "settings": {
+            "title": "Juno",
+            "category": "Color",
+            "image": "/uploads/images/work-home-6.webp"
+          }
+        },
+        "work-07": {
+          "type": "item",
+          "settings": {
+            "title": "Clara",
+            "category": "Editorial",
+            "image": "/uploads/images/work-home-7.webp"
+          }
+        },
+        "work-08": {
+          "type": "item",
+          "settings": {
+            "title": "Dev",
+            "category": "Men's",
+            "image": "/uploads/images/work-home-8.webp"
+          }
+        },
+        "work-09": {
+          "type": "item",
+          "settings": {
+            "title": "Maren",
+            "category": "Short cut",
+            "image": "/uploads/images/work-home-9.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "work-01",
+        "work-02",
+        "work-03",
+        "work-04",
+        "work-05",
+        "work-06",
+        "work-07",
+        "work-08",
+        "work-09"
+      ]
+    },
+    "home_philosophy": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "auto",
+        "bottom_spacing": "auto",
+        "image": "/uploads/images/philosophy-scene.webp"
+      },
+      "blocks": {
+        "philosophy-eyebrow": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How we work</p>",
+            "size": "sm",
+            "uppercase": true,
+            "muted": true
+          }
+        },
+        "philosophy-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "We consult first, cut second.",
+            "size": "4xl"
+          }
+        },
+        "philosophy-body": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every appointment begins with a real conversation — your stylist looking at what your hair is actually doing, not just what you asked for on the booking form.</p><p>For color, we strand-test before we commit. Ammonia-free options are available for every service. And we price by time and product, not by gender — the same cut costs the same, whoever's in the chair.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": false
+          }
+        },
+        "philosophy-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "How a first visit works",
+              "href": "new-clients.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "philosophy-eyebrow",
+        "philosophy-heading",
+        "philosophy-body",
+        "philosophy-button"
+      ]
+    },
+    "home_voices": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "What people say",
+        "eyebrow_uppercase": true,
+        "title": "Clients who've been with their stylist the longest.",
+        "heading_alignment": "center",
+        "layout": "grid",
+        "columns_desktop": 3,
+        "card_layout": "flat",
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "quote-long-color": {
+          "type": "quote",
+          "settings": {
+            "quote": "I've been with Sloane since 2019. She's the only person who's ever given me color that still looks good at week ten. I don't let anyone else near my head.",
+            "name": "Anna L.",
+            "title": "With Sloane since 2019",
+            "rating": "5"
+          }
+        },
+        "quote-textured": {
+          "type": "quote",
+          "settings": {
+            "quote": "Mara is the first stylist who treated my curls like they were the point. I stopped straightening before appointments. Every salon should cut textured hair like this.",
+            "name": "Zara O.",
+            "title": "Textured hair, finally understood",
+            "rating": "5"
+          }
+        },
+        "quote-mens": {
+          "type": "quote",
+          "settings": {
+            "quote": "Same cut, same attention, half the boutique surcharge — Shearline is one of the few salons that doesn't charge me extra for being a man with hair longer than two inches.",
+            "name": "Jonas R.",
+            "title": "With Theo since 2022",
+            "rating": "4"
+          }
+        }
+      },
+      "blocksOrder": [
+        "quote-long-color",
+        "quote-textured",
+        "quote-mens"
+      ]
+    },
+    "home_closing": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-secondary"
+      },
+      "blocks": {
+        "close-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Pick a stylist.",
+            "size": "3xl"
+          }
+        },
+        "close-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tuesdays through Saturdays, by appointment.</p>",
+            "size": "base",
+            "uppercase": false,
+            "muted": true
+          }
+        },
+        "close-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See the stylists",
+              "href": "stylists.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "size": "large"
+          }
+        }
+      },
+      "blocksOrder": [
+        "close-heading",
+        "close-text",
+        "close-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "home_opener",
+    "home_services_teaser",
+    "home_stylists",
+    "home_recent_work",
+    "home_philosophy",
+    "home_voices",
+    "home_closing"
+  ],
+  "id": "index",
+  "created": "2026-04-23T15:28:19.006Z",
+  "updated": "2026-04-24T09:42:35.721Z"
+}

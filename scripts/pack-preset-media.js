@@ -7,10 +7,14 @@
  * the project's media records from the DB and copies the image binaries from
  * disk, then writes into the SEED theme dir (themes/, the git-tracked source):
  *
- *   themes/<theme>/presets/<preset>/media/
+ *   themes/<theme>/preset-media/<preset>/
  *     images/        # all the project's image binaries (originals + variants)
  *     manifest.json  # { files: [...] } — consumed at project creation by
  *                    # seedPresetMedia (packages/builder-server/src/controllers/projectController.js)
+ *
+ * preset-media/ sits at the theme root (not inside the preset) so it stays out
+ * of update deltas and runtime theme copies; resolvePresetPaths reads it from
+ * the seed at project creation.
  *
  * Usage:
  *   node scripts/pack-preset-media.js --project <folder> [--theme arch] [--preset <id>]
@@ -58,10 +62,12 @@ async function main() {
   const srcImagesDir = getProjectImagesDir(project);
   if (!(await fs.pathExists(srcImagesDir))) fail(`Source images dir not found: ${srcImagesDir}`);
 
+  // The preset itself must exist (the name match is what ties media to it),
+  // but the media lands in the theme-root preset-media/ folder, not the preset.
   const presetDir = path.join(THEMES_SEED_DIR, theme, "presets", presetId);
   if (!(await fs.pathExists(presetDir))) fail(`Preset not found: themes/${theme}/presets/${presetId}`);
 
-  const mediaDir = path.join(presetDir, "media");
+  const mediaDir = path.join(THEMES_SEED_DIR, theme, "preset-media", presetId);
   const destImagesDir = path.join(mediaDir, "images");
 
   // Mirror the project's image binaries into the preset (clean slate each run so
@@ -91,7 +97,7 @@ async function main() {
   const copiedCount = (await fs.readdir(destImagesDir)).length;
   console.log(
     `✓ Packaged ${manifest.files.length} image(s) (${copiedCount} files incl. variants) ` +
-      `from project "${project}" → themes/${theme}/presets/${presetId}/media/`,
+      `from project "${project}" → themes/${theme}/preset-media/${presetId}/`,
   );
 }
 

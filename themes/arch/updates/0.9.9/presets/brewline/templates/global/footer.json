@@ -1,0 +1,43 @@
+{
+  "type": "footer",
+  "settings": {
+    "copyright": "© 2026 Brewline Coffee. All rights reserved.",
+    "color_scheme": "highlight-secondary",
+    "layout": "equal"
+  },
+  "blocks": {
+    "logo_text_1": {
+      "type": "logo_text",
+      "settings": {
+        "text": "<p>Specialty coffee roasted in-house, served with care. A neighborhood cafe for those who appreciate the craft behind every cup.</p>",
+        "logo": "/uploads/images/brewlinelight.png",
+        "logo_width": 160
+      }
+    },
+    "text_block_1": {
+      "type": "text_block",
+      "settings": {
+        "title": "Hours",
+        "text": "<p>Monday — Friday: 6:30 AM – 6 PM<br>Saturday — Sunday: 7 AM – 5 PM</p>"
+      }
+    },
+    "menu_block_1": {
+      "type": "menu_block",
+      "settings": {
+        "title": "Explore"
+      }
+    },
+    "social_block_1": {
+      "type": "social_block",
+      "settings": {
+        "title": "Follow Along"
+      }
+    }
+  },
+  "blocksOrder": [
+    "logo_text_1",
+    "text_block_1",
+    "menu_block_1",
+    "social_block_1"
+  ]
+}

@@ -183,7 +183,15 @@ async function _ensureThemesDirectoryOnce() {
         if (!entry.isDirectory()) continue;
         const dest = path.join(userThemesDir, entry.name);
         if (await fs.pathExists(dest)) continue; // already installed
-        await fs.copy(path.join(THEMES_SEED_DIR, entry.name), dest);
+        // Skip preset-media/: project creation resolves it from the seed directly
+        // (see resolvePresetPaths), so copying it would waste ~180MB per install.
+        const seedThemeDir = path.join(THEMES_SEED_DIR, entry.name);
+        await fs.copy(seedThemeDir, dest, {
+          filter: (src) => {
+            const rel = path.relative(seedThemeDir, src);
+            return rel === "" || rel.split(path.sep)[0] !== "preset-media";
+          },
+        });
         provisioned += 1;
       }
       if (provisioned > 0) {
@@ -609,15 +617,32 @@ export async function resolvePresetPaths(themeId, presetId) {
     // No preset collections to seed
   }
 
-  // Resolve preset media/ (starter image binaries + manifest). Seeded into the
+  // Resolve preset media (starter image binaries + manifest). Seeded into the
   // project's uploads/images and registered in the media DB at creation time.
+  // Lookup order:
+  //   1. presets/<id>/media in the runtime theme — the per-preset layout any
+  //      theme author can use, unchanged.
+  //   2. preset-media/<id> in the app seed — bundled themes (Arch) keep heavy
+  //      starter images out of deltas and runtime copies; the seed is always
+  //      current, so updated installs seed current images.
+  //   3. preset-media/<id> in the runtime theme — a ZIP-installed theme using
+  //      the theme-root layout (its installed copy IS its distribution copy).
+  // The preset-name match is the opt-in. No media anywhere → seed nothing
+  // (valid: the default arch preset has no media and no image refs).
   let mediaDir = null;
-  const presetMediaDir = path.join(presetDir, "media");
-  try {
-    await fs.access(presetMediaDir);
-    mediaDir = presetMediaDir;
-  } catch {
-    // No preset media to seed
+  const mediaCandidates = [
+    path.join(presetDir, "media"),
+    path.join(THEMES_SEED_DIR, themeId, "preset-media", presetId),
+    path.join(sourceDir, "preset-media", presetId),
+  ];
+  for (const candidate of mediaCandidates) {
+    try {
+      await fs.access(candidate);
+      mediaDir = candidate;
+      break;
+    } catch {
+      // Not here; try the next location.
+    }
   }
 
   return { templatesDir, menusDir, settingsOverrides, collectionsDir, mediaDir };
@@ -1021,7 +1046,7 @@ export async function copyThemeToProject(themeName, projectDir, excludeDirs = []
     // Copy theme directory to project, skipping excluded top-level dirs during the
     // copy (filter) rather than copying everything and deleting after. This avoids
     // copying then throwing away large dirs like presets/ (200MB+ for Arch).
-    const allExcludes = new Set([...excludeDirs, "updates", "latest", "presets"]);
+    const allExcludes = new Set([...excludeDirs, "updates", "latest", "presets", "preset-media"]);
     await fs.cp(sourceDir, projectDir, {
       recursive: true,
       filter: (src) => {

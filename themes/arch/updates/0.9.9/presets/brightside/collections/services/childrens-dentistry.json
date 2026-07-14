@@ -1,0 +1,13 @@
+{
+  "slug": "childrens-dentistry",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Children's Dentistry",
+    "icon": "heart",
+    "summary": "Gentle, unhurried visits that help children feel at ease in the chair.",
+    "description": "<p>Good habits start early, and so does feeling comfortable at the dentist. We see children from their first tooth right through their school years, and our aim is to make the chair feel familiar long before any real treatment is ever needed.</p><h2>What a visit looks like</h2><p>We keep appointments calm and friendly, taking time to explain what we are doing in words a child understands. We check growing teeth, watch how the bite is developing, and show children how to brush in a way that actually sticks. There is never any rush, and we let little ones set the pace where we can.</p><ul><li>A gentle look at teeth, gums, and how the jaw is growing</li><li>Brushing and flossing shown in a way children can copy at home</li><li>Honest guidance for parents on snacks, drinks, and daily care</li></ul><p>Parents get practical advice on diet and home care without the scare tactics. We will flag anything worth keeping an eye on and tell you plainly when something is fine and simply needs watching.</p><h3>A small tip for home</h3><p>Children copy what they see, so brushing together as a family tends to work far better than reminders alone. Letting a child hold the brush first, then helping finish the job, builds confidence and keeps the routine going.</p><p>If a visit ever feels like too much on the day, that is completely normal. We would rather end on a good note and build up slowly than push through, so early appointments stay positive ones.</p>",
+    "price": "From $70",
+    "duration": "30 min",
+    "featured_image": "/uploads/images/brightside-services-childrens-dentistry.webp"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Framelight",
+    "logoMaxWidth": 180,
+    "contactDetailsLine1": "hello@example.com",
+    "contactDetailsLine2": "By appointment",
+    "contact_position": "menu",
+    "headerNavigation": "main-menu",
+    "center_nav": true,
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Inquire",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "highlight-primary",
+    "logoImage": "/uploads/images/framelight-logo-white.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
+}

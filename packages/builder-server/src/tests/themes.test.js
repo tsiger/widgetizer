@@ -1643,18 +1643,21 @@ describe("copyThemeToProject excludes presets", () => {
     const presetsDir = path.join(getThemeDir(COPY_PRESET_THEME), "presets");
     await fs.ensureDir(presetsDir);
     await fs.outputFile(path.join(presetsDir, "presets.json"), JSON.stringify({ presets: [] }));
+    // theme-root starter-media pool — must never reach projects either
+    await fs.outputFile(path.join(getThemeDir(COPY_PRESET_THEME), "preset-media", "p1", "images", "a.jpg"), "x");
   });
 
   after(async () => {
     await fs.remove(getThemeDir(COPY_PRESET_THEME));
   });
 
-  it("does not copy presets/ to project directory", async () => {
+  it("does not copy presets/ or preset-media/ to project directory", async () => {
     const targetDir = path.join(TEST_ROOT, "copy-no-presets-target");
     await fs.ensureDir(targetDir);
 
     await copyThemeToProject(COPY_PRESET_THEME, targetDir);
     assert.ok(!(await fs.pathExists(path.join(targetDir, "presets"))));
+    assert.ok(!(await fs.pathExists(path.join(targetDir, "preset-media"))));
 
     await fs.remove(targetDir);
   });

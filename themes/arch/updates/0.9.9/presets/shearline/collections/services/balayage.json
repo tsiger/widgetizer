@@ -1,0 +1,13 @@
+{
+  "slug": "balayage",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Balayage",
+    "icon": "wand",
+    "summary": "Hand-painted lightening for a soft, grown-out look that needs little upkeep.",
+    "description": "<p>Colour is painted on by hand rather than wrapped in foils, so the lighter pieces blend naturally into your roots. The result is a soft, sun-graduated look that grows out without a hard line, which is why so many people choose it.</p><h2>What the appointment involves</h2><p>This is a longer appointment, so plan for it. We begin with a consultation to agree on placement and tone, then paint the lightener freehand, let it develop, and rinse before moving on to a toner that sets the final shade.</p><ul><li>A consultation to plan placement and depth</li><li>Freehand lightening, developing time, and a toner</li><li>A cut or trim to finish if you would like one</li></ul><p>Because the colour is built up by hand, no two heads look quite the same, and we tailor how light and how high we go to your starting colour. We finish with a blow-dry so you can see how the pieces fall.</p><h3>Upkeep and aftercare</h3><p>Since the regrowth is soft, you can leave a good while between visits, often three to four months, which makes it a low-fuss option for busy people. A toner refresh in between keeps the tone looking fresh if you want it.</p><p>To protect the colour, we suggest a sulphate-free shampoo and the occasional bonding or toning treatment at home. If your hair has been coloured before, bring that history to your consultation, since previous colour affects how the lightener lifts.</p>",
+    "price": "From $160",
+    "duration": "180 min",
+    "featured_image": "/uploads/images/shearline-services-balayage.webp"
+  }
+}

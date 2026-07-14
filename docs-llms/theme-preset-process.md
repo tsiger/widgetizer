@@ -15,15 +15,23 @@ mechanics (registry, fallback, media seeding) see [theme-presets.md](theme-prese
 ## How preset media works
 
 **Preset media is packed once into the
-seed theme, not uploaded per project.** A preset ships its images and their
-metadata under `themes/arch/presets/<id>/media/`, and the backend seeds them
-automatically into every project created from that preset.
+seed theme, not uploaded per project.** Arch ships its preset images and their
+metadata in the theme-root pool `themes/arch/preset-media/<id>/`, and the
+backend seeds them automatically into every project created from that preset.
+The pool sits outside `presets/` so it never enters update deltas, runtime
+theme copies, or per-project theme copies — the images ship exactly once, in
+the app itself, and are read from the seed at project creation.
 
 ```
-themes/arch/presets/<id>/media/
+themes/arch/preset-media/<id>/
   images/          # image binaries (originals + pre-generated variants)
   manifest.json    # { files: [...] } — alt/title/caption/sizes per image
 ```
+
+(Uploaded/community themes typically use the per-preset layout instead —
+`presets/<id>/media/`, same inner structure — which is checked first; see
+[theme-preset-file-format.md](theme-preset-file-format.md) for the lookup
+order.)
 
 - At project creation, `projectController.seedPresetMedia`
   (`packages/builder-server/src/controllers/projectController.js`) copies
@@ -37,7 +45,7 @@ themes/arch/presets/<id>/media/
 - `scripts/pack-preset-media.js` does the reverse: it reads a finished project's
   media records from SQLite (`mediaRepository.getMediaFiles`), copies the image
   binaries from disk, and writes them plus a regenerated `manifest.json` back
-  into `themes/arch/presets/<id>/media/`. Run it via `npm run preset:media`.
+  into `themes/arch/preset-media/<id>/`. Run it via `npm run preset:media`.
 
 The practical consequence: you only touch image metadata (alt/title/caption)
 **once**, in the source project, then pack it. Every future project from the
@@ -62,9 +70,10 @@ preset inherits it.
    collection items, **and any already-packed starter media** applied.
 
 The project now lives at `data/projects/<folder>/` and is independent from the
-preset source files. If the preset already has packed media (a `media/` dir), the
-project opens with real photography instead of placeholders; if not, you'll
-generate and pack it in Steps 2–3 below.
+preset source files. If the preset already has packed media (a
+`preset-media/<id>/` dir at the theme root), the project opens with real
+photography instead of placeholders; if not, you'll generate and pack it in
+Steps 2–3 below.
 
 ---
 
@@ -103,9 +112,9 @@ The script (`scripts/pack-preset-media.js`):
 
 - copies every image binary (originals + variants) from
   `data/projects/<folder>/uploads/images/` into
-  `themes/arch/presets/<id>/media/images/` (clean slate each run, so removed
+  `themes/arch/preset-media/<id>/images/` (clean slate each run, so removed
   images don't linger),
-- regenerates `themes/arch/presets/<id>/media/manifest.json` from the project's
+- regenerates `themes/arch/preset-media/<id>/manifest.json` from the project's
   DB records, dropping project-specific fields (`id`/`uploaded`/`usedIn`) so
   `seedPresetMedia` can assign fresh project-scoped values.
 
@@ -229,8 +238,9 @@ an object with a `default` key and a `presets` array:
 - `default` names the preset selected by default in the creation form (currently
   `blank`).
 - The `blank` preset is registered here but ships **no** `templates/`, `menus/`,
-  or `media/` — it falls back to the theme root and produces an empty starter
-  site. It is the default and must stay in the registry.
+  or starter media (no `preset-media/<id>/` entry) — it falls back to the theme
+  root and produces an empty starter site. It is the default and must stay in
+  the registry.
 - `liveDemo` is optional — add it after the demo is deployed (Step 9). The URL
   convention is `https://demos.widgetizer.org/<preset-id>/` (note the trailing
   slash).

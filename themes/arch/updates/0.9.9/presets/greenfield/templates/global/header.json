@@ -1,0 +1,24 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Greenfield",
+    "contactDetailsLine1": "(503) 555-0147",
+    "contactDetailsLine2": "",
+    "contact_position": "logo",
+    "ctaButtonLink": {
+      "href": "contact.html",
+      "text": "Free Estimate",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": false,
+    "full_width": false,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/greenfieldlogodark.png",
+    "transparent_logo": "/uploads/images/greenfieldlogolight.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
+}

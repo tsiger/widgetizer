@@ -1,0 +1,24 @@
+{
+  "type": "header",
+  "settings": {
+    "logoText": "Brewline",
+    "contactDetailsLine1": "Quick order",
+    "contactDetailsLine2": "+30 210 123 4567",
+    "contact_position": "menu",
+    "ctaButtonLink": {
+      "href": "menu.html",
+      "text": "View Menu",
+      "target": "_self"
+    },
+    "ctaButtonStyle": "primary",
+    "center_nav": true,
+    "full_width": true,
+    "sticky": true,
+    "transparent_on_hero": true,
+    "color_scheme": "standard-primary",
+    "logoImage": "/uploads/images/brewlinedark.png",
+    "transparent_logo": "/uploads/images/brewlinetransparent.png"
+  },
+  "blocks": {},
+  "blocksOrder": []
+}

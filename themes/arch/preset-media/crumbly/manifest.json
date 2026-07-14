@@ -1,0 +1,1100 @@
+{
+  "files": [
+    {
+      "filename": "crumbly-news-hot-cross-buns-are-back.webp",
+      "originalName": "crumbly-news-hot-cross-buns-are-back.webp",
+      "type": "image/webp",
+      "size": 58266,
+      "path": "/uploads/images/crumbly-news-hot-cross-buns-are-back.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Hot Cross Buns Are Back for the Season",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/crumbly-news-hot-cross-buns-are-back-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/crumbly-news-hot-cross-buns-are-back-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/crumbly-news-hot-cross-buns-are-back-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "crumbly-news-sourdough-now-daily.webp",
+      "originalName": "crumbly-news-sourdough-now-daily.webp",
+      "type": "image/webp",
+      "size": 61802,
+      "path": "/uploads/images/crumbly-news-sourdough-now-daily.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Our Sourdough Is Now Baked Every Day",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/crumbly-news-sourdough-now-daily-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/crumbly-news-sourdough-now-daily-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/crumbly-news-sourdough-now-daily-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "crumbly-news-ten-thousand-loaves-for-the-pantry.webp",
+      "originalName": "crumbly-news-ten-thousand-loaves-for-the-pantry.webp",
+      "type": "image/webp",
+      "size": 101968,
+      "path": "/uploads/images/crumbly-news-ten-thousand-loaves-for-the-pantry.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Ten Thousand Loaves for the Food Pantry",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/crumbly-news-ten-thousand-loaves-for-the-pantry-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/crumbly-news-ten-thousand-loaves-for-the-pantry-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/crumbly-news-ten-thousand-loaves-for-the-pantry-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "crumbly-news-the-four-am-shift.webp",
+      "originalName": "crumbly-news-the-four-am-shift.webp",
+      "type": "image/webp",
+      "size": 58460,
+      "path": "/uploads/images/crumbly-news-the-four-am-shift.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "What Happens at Four in the Morning",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/crumbly-news-the-four-am-shift-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/crumbly-news-the-four-am-shift-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/crumbly-news-the-four-am-shift-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "crumbly-news-why-your-bread-goes-stale.webp",
+      "originalName": "crumbly-news-why-your-bread-goes-stale.webp",
+      "type": "image/webp",
+      "size": 81300,
+      "path": "/uploads/images/crumbly-news-why-your-bread-goes-stale.webp",
+      "width": 1600,
+      "height": 896,
+      "alt": "Why Your Bread Goes Stale and How to Slow It Down",
+      "title": "",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/crumbly-news-why-your-bread-goes-stale-medium.webp",
+          "width": 1024,
+          "height": 573
+        },
+        "small": {
+          "path": "/uploads/images/crumbly-news-why-your-bread-goes-stale-small.webp",
+          "width": 480,
+          "height": 269
+        },
+        "thumb": {
+          "path": "/uploads/images/crumbly-news-why-your-bread-goes-stale-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "crumblylogo.png",
+      "originalName": "crumbly_logo.png",
+      "type": "image/png",
+      "size": 6563,
+      "path": "/uploads/images/crumblylogo.png",
+      "width": 918,
+      "height": 206,
+      "alt": "Crumbly bakery logo in purple",
+      "title": "Crumbly logo",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/crumblylogo-small.png",
+          "width": 480,
+          "height": 108
+        },
+        "thumb": {
+          "path": "/uploads/images/crumblylogo-thumb.png",
+          "width": 150,
+          "height": 34
+        }
+      }
+    },
+    {
+      "filename": "contact-cakes.webp",
+      "originalName": "contact-cakes.webp",
+      "type": "image/webp",
+      "size": 22966,
+      "path": "/uploads/images/contact-cakes.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hands tying a satin ribbon on a cake box in the bakery",
+      "title": "Cake packaging",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/contact-cakes-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/contact-cakes-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-hands.webp",
+      "originalName": "space-hands.webp",
+      "type": "image/webp",
+      "size": 39518,
+      "path": "/uploads/images/space-hands.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Baker kneading bread dough on a floured wooden surface",
+      "title": "Kneading dough",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-hands-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-hands-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-bread-wall.webp",
+      "originalName": "space-bread-wall.webp",
+      "type": "image/webp",
+      "size": 70288,
+      "path": "/uploads/images/space-bread-wall.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Wooden shelves filled with artisan bread loaves and baguettes",
+      "title": "The bread wall",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-bread-wall-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-bread-wall-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-cafe.webp",
+      "originalName": "space-cafe.webp",
+      "type": "image/webp",
+      "size": 23816,
+      "path": "/uploads/images/space-cafe.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Cozy bakery cafe seating area with chalkboard menu and warm lighting",
+      "title": "The cafe",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-cafe-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-cafe-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-oven.webp",
+      "originalName": "space-oven.webp",
+      "type": "image/webp",
+      "size": 28772,
+      "path": "/uploads/images/space-oven.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Sourdough loaves coming out of a commercial deck oven",
+      "title": "The oven",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-oven-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-oven-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-shaping.webp",
+      "originalName": "space-shaping.webp",
+      "type": "image/webp",
+      "size": 63466,
+      "path": "/uploads/images/space-shaping.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Hands shaping a round bread dough on a floured surface",
+      "title": "Shaping bread",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-shaping-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-shaping-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "space-display.webp",
+      "originalName": "space-display.webp",
+      "type": "image/webp",
+      "size": 48708,
+      "path": "/uploads/images/space-display.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Glass bakery display case filled with croissants, tarts, and pastries",
+      "title": "The display case",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/space-display-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/space-display-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "bento-cinnamon.webp",
+      "originalName": "bento-cinnamon.webp",
+      "type": "image/webp",
+      "size": 35150,
+      "path": "/uploads/images/bento-cinnamon.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Warm cinnamon roll being pulled apart with dripping glaze",
+      "title": "Cinnamon roll",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bento-cinnamon-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/bento-cinnamon-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "bento-cakes.webp",
+      "originalName": "bento-cakes.webp",
+      "type": "image/webp",
+      "size": 17166,
+      "path": "/uploads/images/bento-cakes.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Slice of layered cake with passion fruit filling on a white plate",
+      "title": "Cake slice",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bento-cakes-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/bento-cakes-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "bake-croissants-1.webp",
+      "originalName": "bake-croissants.webp",
+      "type": "image/webp",
+      "size": 67004,
+      "path": "/uploads/images/bake-croissants-1.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Three almond croissants dusted with powdered sugar on a baking tray",
+      "title": "Almond croissants",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bake-croissants-1-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bake-croissants-1-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bento-cookies-1.webp",
+      "originalName": "bento-cookies.webp",
+      "type": "image/webp",
+      "size": 61590,
+      "path": "/uploads/images/bento-cookies-1.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Stack of assorted cookies on a wooden board with chocolate chips",
+      "title": "Cookie stack",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bento-cookies-1-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/bento-cookies-1-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "bento-croissants.webp",
+      "originalName": "bento-croissants.webp",
+      "type": "image/webp",
+      "size": 43072,
+      "path": "/uploads/images/bento-croissants.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Basket of fresh butter croissants in a sunlit bakery",
+      "title": "Fresh croissants",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bento-croissants-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/bento-croissants-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "gallery-hero.webp",
+      "originalName": "gallery-hero.webp",
+      "type": "image/webp",
+      "size": 232256,
+      "path": "/uploads/images/gallery-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Hands kneading bread dough on a floured marble surface",
+      "title": "Gallery",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/gallery-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/gallery-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/gallery-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "cake-lemon.webp",
+      "originalName": "cake-lemon.webp",
+      "type": "image/webp",
+      "size": 28424,
+      "path": "/uploads/images/cake-lemon.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Lemon cake with glaze, lemon slices, and fresh thyme on a blue plate",
+      "title": "Lemon drizzle cake",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/cake-lemon-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/cake-lemon-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "cake-pastel.webp",
+      "originalName": "cake-pastel.webp",
+      "type": "image/webp",
+      "size": 12666,
+      "path": "/uploads/images/cake-pastel.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Two-tier pink cake with fondant flowers and piped buttercream",
+      "title": "Pastel flower cake",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/cake-pastel-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/cake-pastel-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "cake-naked.webp",
+      "originalName": "cake-naked.webp",
+      "type": "image/webp",
+      "size": 42478,
+      "path": "/uploads/images/cake-naked.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Naked layer cake with fresh berries and cream on a wooden stand",
+      "title": "Berry naked cake",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/cake-naked-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/cake-naked-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "cake-chocolate.webp",
+      "originalName": "cake-chocolate.webp",
+      "type": "image/webp",
+      "size": 37236,
+      "path": "/uploads/images/cake-chocolate.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Dark chocolate drip cake with gold birthday candles",
+      "title": "Chocolate celebration cake",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/cake-chocolate-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/cake-chocolate-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "cake-wedding.webp",
+      "originalName": "cake-wedding.webp",
+      "type": "image/webp",
+      "size": 29238,
+      "path": "/uploads/images/cake-wedding.webp",
+      "width": 592,
+      "height": 800,
+      "alt": "Two-tier white wedding cake adorned with wildflowers on a marble stand",
+      "title": "Wildflower wedding cake",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/cake-wedding-small.webp",
+          "width": 480,
+          "height": 649
+        },
+        "thumb": {
+          "path": "/uploads/images/cake-wedding-thumb.webp",
+          "width": 150,
+          "height": 203
+        }
+      }
+    },
+    {
+      "filename": "cakes-hero.webp",
+      "originalName": "cakes-hero.webp",
+      "type": "image/webp",
+      "size": 61158,
+      "path": "/uploads/images/cakes-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Row of decorated cakes displayed on a rustic wooden table in the bakery",
+      "title": "Our cakes",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/cakes-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/cakes-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/cakes-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "custom-orders.webp",
+      "originalName": "custom-orders.webp",
+      "type": "image/webp",
+      "size": 38218,
+      "path": "/uploads/images/custom-orders.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Three-tier buttercream wedding cake with wildflowers in the bakery",
+      "title": "Custom cake orders",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/custom-orders-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/custom-orders-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "menu-hero.webp",
+      "originalName": "menu-hero.webp",
+      "type": "image/webp",
+      "size": 97746,
+      "path": "/uploads/images/menu-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Assorted breads, croissants, and pastries spread on a wooden table",
+      "title": "Our menu",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/menu-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/menu-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/menu-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "team-priya.webp",
+      "originalName": "team-priya.webp",
+      "type": "image/webp",
+      "size": 9640,
+      "path": "/uploads/images/team-priya.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Priya, cake decorator holding a piping bag, smiling by a pink cake",
+      "title": "Priya",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-priya-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-jordan.webp",
+      "originalName": "team-jordan.webp",
+      "type": "image/webp",
+      "size": 12348,
+      "path": "/uploads/images/team-jordan.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Jordan, head baker in white chef coat, standing by croissant trays",
+      "title": "Jordan",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-jordan-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "team-nina.webp",
+      "originalName": "team-nina.webp",
+      "type": "image/webp",
+      "size": 9988,
+      "path": "/uploads/images/team-nina.webp",
+      "width": 400,
+      "height": 400,
+      "alt": "Nina, baker in a flour-dusted apron, smiling in the bakery",
+      "title": "Nina",
+      "caption": "",
+      "sizes": {
+        "thumb": {
+          "path": "/uploads/images/team-nina-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "about-founder.webp",
+      "originalName": "about-founder.webp",
+      "type": "image/webp",
+      "size": 28590,
+      "path": "/uploads/images/about-founder.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Bakery founder in a flour-dusted apron, standing by shelves of fresh bread",
+      "title": "Our founder",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/about-founder-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/about-founder-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "about-hero.webp",
+      "originalName": "about-hero.webp",
+      "type": "image/webp",
+      "size": 64304,
+      "path": "/uploads/images/about-hero.webp",
+      "width": 1920,
+      "height": 592,
+      "alt": "Charming bakery storefront with striped awning and chalkboard sign",
+      "title": "Our bakery",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/about-hero-medium.webp",
+          "width": 1024,
+          "height": 316
+        },
+        "small": {
+          "path": "/uploads/images/about-hero-small.webp",
+          "width": 480,
+          "height": 148
+        },
+        "thumb": {
+          "path": "/uploads/images/about-hero-thumb.webp",
+          "width": 150,
+          "height": 46
+        }
+      }
+    },
+    {
+      "filename": "panel-cakes.webp",
+      "originalName": "panel-cakes.webp",
+      "type": "image/webp",
+      "size": 76800,
+      "path": "/uploads/images/panel-cakes.webp",
+      "width": 800,
+      "height": 1024,
+      "alt": "Decorated cakes with roses and berries in a glass display case",
+      "title": "Cake display",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/panel-cakes-small.webp",
+          "width": 480,
+          "height": 614
+        },
+        "thumb": {
+          "path": "/uploads/images/panel-cakes-thumb.webp",
+          "width": 150,
+          "height": 192
+        }
+      }
+    },
+    {
+      "filename": "panel-cookies.webp",
+      "originalName": "panel-cookies.webp",
+      "type": "image/webp",
+      "size": 128536,
+      "path": "/uploads/images/panel-cookies.webp",
+      "width": 800,
+      "height": 1024,
+      "alt": "Grid of assorted cookies, brownies, and blondies on parchment paper",
+      "title": "Cookie selection",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/panel-cookies-small.webp",
+          "width": 480,
+          "height": 614
+        },
+        "thumb": {
+          "path": "/uploads/images/panel-cookies-thumb.webp",
+          "width": 150,
+          "height": 192
+        }
+      }
+    },
+    {
+      "filename": "panel-pastries.webp",
+      "originalName": "panel-pastries.webp",
+      "type": "image/webp",
+      "size": 70464,
+      "path": "/uploads/images/panel-pastries.webp",
+      "width": 800,
+      "height": 1024,
+      "alt": "Fresh croissants and berry Danish pastries steaming on a marble tray",
+      "title": "Pastries",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/panel-pastries-small.webp",
+          "width": 480,
+          "height": 614
+        },
+        "thumb": {
+          "path": "/uploads/images/panel-pastries-thumb.webp",
+          "width": 150,
+          "height": 192
+        }
+      }
+    },
+    {
+      "filename": "panel-bread.webp",
+      "originalName": "panel-bread.webp",
+      "type": "image/webp",
+      "size": 147972,
+      "path": "/uploads/images/panel-bread.webp",
+      "width": 800,
+      "height": 1024,
+      "alt": "Bakery display case filled with breads, pastries, cakes, and tarts",
+      "title": "Bread selection",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/panel-bread-small.webp",
+          "width": 480,
+          "height": 614
+        },
+        "thumb": {
+          "path": "/uploads/images/panel-bread-thumb.webp",
+          "width": 150,
+          "height": 192
+        }
+      }
+    },
+    {
+      "filename": "bake-cookies.webp",
+      "originalName": "bake-cookies.webp",
+      "type": "image/webp",
+      "size": 75072,
+      "path": "/uploads/images/bake-cookies.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Chocolate chunk cookies with sea salt on brown parchment paper",
+      "title": "Chocolate cookies",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bake-cookies-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bake-cookies-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bake-lemon-cake.webp",
+      "originalName": "bake-lemon-cake.webp",
+      "type": "image/webp",
+      "size": 20866,
+      "path": "/uploads/images/bake-lemon-cake.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Lemon layer cake with buttercream and lemon slice topping on a cake stand",
+      "title": "Lemon cake",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bake-lemon-cake-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bake-lemon-cake-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bake-croissants.webp",
+      "originalName": "bake-croissants.webp",
+      "type": "image/webp",
+      "size": 67004,
+      "path": "/uploads/images/bake-croissants.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Three almond croissants dusted with powdered sugar on a baking tray",
+      "title": "Almond croissants",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bake-croissants-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bake-croissants-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "bake-sourdough.webp",
+      "originalName": "bake-sourdough.webp",
+      "type": "image/webp",
+      "size": 37410,
+      "path": "/uploads/images/bake-sourdough.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Sourdough loaf split open showing airy crumb structure",
+      "title": "Sourdough crumb",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/bake-sourdough-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/bake-sourdough-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "testimonial-couple.webp",
+      "originalName": "testimonial-couple.webp",
+      "type": "image/webp",
+      "size": 34830,
+      "path": "/uploads/images/testimonial-couple.webp",
+      "width": 800,
+      "height": 800,
+      "alt": "Happy couple laughing with slices of wedding cake at an outdoor celebration",
+      "title": "Happy customers",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/testimonial-couple-small.webp",
+          "width": 480,
+          "height": 480
+        },
+        "thumb": {
+          "path": "/uploads/images/testimonial-couple-thumb.webp",
+          "width": 150,
+          "height": 150
+        }
+      }
+    },
+    {
+      "filename": "cake-teaser.webp",
+      "originalName": "cake-teaser.webp",
+      "type": "image/webp",
+      "size": 32766,
+      "path": "/uploads/images/cake-teaser.webp",
+      "width": 800,
+      "height": 592,
+      "alt": "Baker piping buttercream rosettes onto a layered cake",
+      "title": "Cake decorating",
+      "caption": "",
+      "sizes": {
+        "small": {
+          "path": "/uploads/images/cake-teaser-small.webp",
+          "width": 480,
+          "height": 355
+        },
+        "thumb": {
+          "path": "/uploads/images/cake-teaser-thumb.webp",
+          "width": 150,
+          "height": 111
+        }
+      }
+    },
+    {
+      "filename": "slide-2.webp",
+      "originalName": "slide-2.webp",
+      "type": "image/webp",
+      "size": 72532,
+      "path": "/uploads/images/slide-2.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Three-tier buttercream cake with wildflowers in the bakery",
+      "title": "Celebration cake",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/slide-2-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/slide-2-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/slide-2-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    },
+    {
+      "filename": "slide-1.webp",
+      "originalName": "slide-1.webp",
+      "type": "image/webp",
+      "size": 166986,
+      "path": "/uploads/images/slide-1.webp",
+      "width": 1920,
+      "height": 1072,
+      "alt": "Freshly baked sourdough loaves cooling on a wire rack",
+      "title": "Fresh from the oven",
+      "caption": "",
+      "sizes": {
+        "medium": {
+          "path": "/uploads/images/slide-1-medium.webp",
+          "width": 1024,
+          "height": 572
+        },
+        "small": {
+          "path": "/uploads/images/slide-1-small.webp",
+          "width": 480,
+          "height": 268
+        },
+        "thumb": {
+          "path": "/uploads/images/slide-1-thumb.webp",
+          "width": 150,
+          "height": 84
+        }
+      }
+    }
+  ]
+}

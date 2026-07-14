@@ -1,0 +1,11 @@
+{
+  "slug": "free-site-audits-this-spring",
+  "schemaVersion": 1,
+  "settings": {
+    "title": "Free Site Health Checks Through April",
+    "date": "2026-04-08",
+    "excerpt": "Spring is a quiet stretch for us, so we are giving away thirty minute reviews of slow or aging sites.",
+    "body": "<p>Every spring our pipeline thins out for a few weeks, and rather than fill the gap with busywork we would rather spend it helping local businesses.</p><p>Through the end of April we will run a free thirty minute health check on your existing site. We look at load speed, broken links, mobile layout, and anything that might be quietly costing you visitors.</p><h2>What we check in thirty minutes</h2><p>Thirty minutes is not long, so we spend it on the things that move the needle rather than a line-by-line code review. We open your site the way a customer would, on a phone first, and note what gets in the way.</p><ul><li>How fast the first page loads on a normal connection.</li><li>Links and forms that are broken or point nowhere.</li><li>Whether the layout holds up on a small screen.</li><li>Anything obvious that confuses a first-time visitor.</li></ul><p>You walk away with a short written list, ranked by impact. No pitch attached, though we are happy to talk if something on the list needs real work.</p><h3>How to book one</h3><p>Send us your address and a sentence about what you think is wrong. The more honest you are about the part that bugs you, the more useful the half hour will be. We are booking these on a first come basis, and the slots near the end of April tend to fill first.</p><p>If nothing major turns up, that is good news and the review costs you nothing. We would rather you knew your site was healthy than spend money fixing a problem you do not have.</p>",
+    "featured_image": "/uploads/images/codebase-news-free-site-audits-this-spring.webp"
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "name": "Home",
+  "slug": "index",
+  "widgets": {
+    "hero": {
+      "type": "split-hero",
+      "settings": {
+        "image_position": "end",
+        "color_scheme": "highlight-primary",
+        "top_spacing": "none",
+        "bottom_spacing": "none",
+        "image": "/uploads/images/home-hero.webp"
+      },
+      "blocks": {
+        "hero-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Coffee Worth Waking Up For",
+            "size": "5xl"
+          }
+        },
+        "hero-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Single-origin beans, roasted in-house, brewed with intention. Welcome to Brewline — your neighborhood specialty coffee shop.</p>",
+            "size": "lg"
+          }
+        },
+        "hero-buttons": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "View Our Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Our Story",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "hero-heading",
+        "hero-text",
+        "hero-buttons"
+      ]
+    },
+    "marquee": {
+      "type": "scrolling-text",
+      "settings": {
+        "text": "Freshly Roasted  ·  Single Origin  ·  Pour Over  ·  Espresso  ·  Cold Brew  ·  House-Made Pastries",
+        "separator": "·",
+        "speed": 3,
+        "rotate": 0,
+        "font_size": "md",
+        "bg_color": "#2d6a4f",
+        "text_color": "#ffffff",
+        "top_spacing": "none",
+        "bottom_spacing": "none"
+      }
+    },
+    "intro": {
+      "type": "image-callout",
+      "settings": {
+        "image_position": "start",
+        "color_scheme": "standard-primary",
+        "image": "/uploads/images/intro-sourcing.webp"
+      },
+      "blocks": {
+        "intro-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "From Bean to Cup, Every Detail Matters",
+            "size": "3xl"
+          }
+        },
+        "intro-text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We source our beans directly from small farms in Ethiopia, Colombia, and Guatemala. Every batch is roasted in our shop, dialed in each morning, and brewed to bring out the best each origin has to offer.</p>",
+            "size": "base"
+          }
+        },
+        "intro-features": {
+          "type": "features",
+          "settings": {
+            "features": "+ Direct-trade partnerships with 12 farms\n+ Roasted fresh every week\n+ Brewing methods: pour over, espresso, cold brew, AeroPress"
+          }
+        },
+        "intro-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "Learn About Our Process",
+              "href": "about.html",
+              "target": "_self"
+            },
+            "style": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "intro-heading",
+        "intro-text",
+        "intro-features",
+        "intro-button"
+      ]
+    },
+    "drinks": {
+      "type": "image-tabs",
+      "settings": {
+        "eyebrow": "What We Brew",
+        "title": "Find Your Cup",
+        "description": "Whether you're a black coffee purist or a lavender latte adventurer, we've got something for you.",
+        "heading_alignment": "center",
+        "image_position": "start",
+        "color_scheme": "standard-secondary"
+      },
+      "blocks": {
+        "tab-1": {
+          "type": "tab",
+          "settings": {
+            "title": "Espresso",
+            "description": "<p>Bold, concentrated, and perfectly extracted. The foundation of everything we do — from a straight double shot to a velvety flat white. Our house blend balances chocolate and citrus notes, pulled fresh to order.</p>",
+            "image": "/uploads/images/tab-espresso.webp"
+          }
+        },
+        "tab-2": {
+          "type": "tab",
+          "settings": {
+            "title": "Pour Over",
+            "description": "<p>Single-origin, hand-poured. The purest way to taste what makes each bean unique. We rotate origins weekly and dial in every morning. Ask your barista what's on — they'll talk your ear off about it.</p>",
+            "image": "/uploads/images/tab-pourover.webp"
+          }
+        },
+        "tab-3": {
+          "type": "tab",
+          "settings": {
+            "title": "Cold Brew",
+            "description": "<p>Steeped for 20 hours. Smooth, bold, and naturally sweet — no bitterness in sight. Served over ice, on tap. Our most popular order when the temperature climbs above 70°F.</p>",
+            "image": "/uploads/images/tab-coldbrew.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "tab-1",
+        "tab-2",
+        "tab-3"
+      ]
+    },
+    "testimonials": {
+      "type": "testimonial-slider",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 6000,
+        "color_scheme": "standard-primary"
+      },
+      "blocks": {
+        "quote-1": {
+          "type": "quote",
+          "settings": {
+            "quote": "I've been coming here every morning for two years and the consistency is remarkable. The baristas know my order and my name. That matters more than you'd think.",
+            "name": "Rachel T.",
+            "title": "Daily regular",
+            "rating": "5",
+            "avatar": "/uploads/images/team-kai.webp"
+          }
+        },
+        "quote-2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Best pour over in the city, hands down. You can tell they actually care about the sourcing — the Ethiopian single-origin was a revelation.",
+            "name": "Marcus W.",
+            "title": "Coffee enthusiast",
+            "rating": "5",
+            "avatar": "/uploads/images/team-sam.webp"
+          }
+        },
+        "quote-3": {
+          "type": "quote",
+          "settings": {
+            "quote": "Great wifi, amazing pastries, and coffee that's worth the detour. My go-to spot for remote work days.",
+            "name": "Jen S.",
+            "title": "Remote worker",
+            "rating": "4",
+            "avatar": "/uploads/images/team-lena.webp"
+          }
+        }
+      },
+      "blocksOrder": [
+        "quote-1",
+        "quote-2",
+        "quote-3"
+      ]
+    },
+    "cta": {
+      "type": "action-bar",
+      "settings": {
+        "fullwidth": false,
+        "color_scheme": "highlight-primary",
+        "top_spacing": "small",
+        "bottom_spacing": "small"
+      },
+      "blocks": {
+        "cta-heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Your Morning Ritual Starts Here",
+            "size": "2xl"
+          }
+        },
+        "cta-button": {
+          "type": "button",
+          "settings": {
+            "link": {
+              "text": "See the Menu",
+              "href": "menu.html",
+              "target": "_self"
+            },
+            "style": "primary",
+            "link_2": {
+              "text": "Find Us",
+              "href": "contact.html",
+              "target": "_self"
+            },
+            "style_2": "secondary",
+            "size": "medium"
+          }
+        }
+      },
+      "blocksOrder": [
+        "cta-heading",
+        "cta-button"
+      ]
+    }
+  },
+  "widgetsOrder": [
+    "hero",
+    "marquee",
+    "intro",
+    "drinks",
+    "testimonials",
+    "cta"
+  ],
+  "id": "index",
+  "created": "2026-04-16T10:30:13.564Z",
+  "updated": "2026-04-16T10:37:55.736Z"
+}
