@@ -547,6 +547,8 @@ before(async () => {
   await fs.writeFile(path.join(projectDir, "assets", ".DS_Store"), "junk");
   await fs.ensureDir(path.join(projectDir, "assets", "__MACOSX"));
   await fs.writeFile(path.join(projectDir, "assets", "__MACOSX", "foo"), "junk");
+  // Render-time icon source — inlined into HTML at render, never fetched by pages.
+  await fs.writeFile(path.join(projectDir, "assets", "icons.json"), JSON.stringify({ star: { body: "<svg/>" } }));
 
   // -----------------------------------------------------------
   // 10. Widget assets (CSS/JS in widgets dir)
@@ -775,6 +777,10 @@ describe("exportProject", () => {
     // ...but system junk is filtered out.
     assert.ok(!(await fs.pathExists(path.join(exportDir, "assets", ".DS_Store"))), ".DS_Store must not be exported");
     assert.ok(!(await fs.pathExists(path.join(exportDir, "assets", "__MACOSX"))), "__MACOSX must not be exported");
+    assert.ok(
+      !(await fs.pathExists(path.join(exportDir, "assets", "icons.json"))),
+      "icons.json is render-time only and must not be exported",
+    );
   });
 
   it("copies image size variants", async () => {

@@ -677,7 +677,14 @@ Per aspera ad astra
         // absolute path; normalize to a relative, forward-slash path so the junk
         // check works on Windows (where the absolute path is backslash-separated).
         await fs.copy(projectAssetsDir, outputAssetsDir, {
-          filter: (src) => isExportableEntry(path.relative(projectAssetsDir, src).split(path.sep).join("/")),
+          filter: (src) => {
+            const rel = path.relative(projectAssetsDir, src).split(path.sep).join("/");
+            // icons.json is a render-time source: the icon snippet inlines its
+            // SVGs into the HTML, so no published page ever fetches it. Keep
+            // the ~1MB file out of exports.
+            if (rel === "icons.json") return false;
+            return isExportableEntry(rel);
+          },
         });
       } else {
         console.warn(`Project assets directory not found: ${projectAssetsDir}`);
