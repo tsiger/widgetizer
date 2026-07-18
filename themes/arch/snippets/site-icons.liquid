@@ -4,6 +4,9 @@
 {% if site_icons.legacyIconHref != blank and site_icons.legacyIconHref != site_icons.primaryIconHref %}
 <link rel="icon" href="{{ site_icons.legacyIconHref }}" type="image/png" sizes="32x32">
 {% endif %}
+{% if site_icons.serpIconHref != blank %}
+<link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">
+{% endif %}
 {% if site_icons.appleTouchIconHref != blank %}
 <link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">
 {% endif %}

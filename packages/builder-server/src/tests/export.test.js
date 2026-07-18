@@ -261,6 +261,7 @@ before(async () => {
   <title>{{ page.seo.title }}</title>
   {% if site_icons.primaryIconHref != blank %}<link rel="icon" href="{{ site_icons.primaryIconHref }}" {% if site_icons.primaryIconType != blank %}type="{{ site_icons.primaryIconType }}"{% endif %}{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}
   {% if site_icons.legacyIconHref != blank and site_icons.legacyIconHref != site_icons.primaryIconHref %}<link rel="icon" href="{{ site_icons.legacyIconHref }}" type="image/png" sizes="32x32">{% endif %}
+  {% if site_icons.serpIconHref != blank %}<link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">{% endif %}
   {% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}
   {% if site_icons.manifestHref != blank %}<link rel="manifest" href="{{ site_icons.manifestHref }}">{% endif %}
   {% seo %}
@@ -675,6 +676,7 @@ describe("exportProject", () => {
     const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
     assert.ok(html.includes('rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any"'));
     assert.ok(html.includes('rel="icon" href="favicon-32.png" type="image/png" sizes="32x32"'));
+    assert.ok(html.includes('rel="icon" href="icon-192.png" type="image/png" sizes="192x192"'));
     assert.ok(html.includes('rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180"'));
     assert.ok(html.includes('rel="manifest" href="site.webmanifest"'));
   });
@@ -700,6 +702,22 @@ describe("exportProject", () => {
     assert.ok(await fs.pathExists(path.join(exportDir, "icon-192.png")));
     assert.ok(await fs.pathExists(path.join(exportDir, "icon-512.png")));
     assert.ok(await fs.pathExists(path.join(exportDir, "site.webmanifest")));
+  });
+
+  it("generates a valid single-entry favicon.ico with embedded PNG", async () => {
+    const exportDir = await getLatestExportDir();
+    const ico = await fs.readFile(path.join(exportDir, "favicon.ico"));
+    // ICONDIR: reserved=0, type=1 (icon), count=1
+    assert.equal(ico.readUInt16LE(0), 0);
+    assert.equal(ico.readUInt16LE(2), 1);
+    assert.equal(ico.readUInt16LE(4), 1);
+    // ICONDIRENTRY: 32×32, data offset 22, length matches the rest of the file
+    assert.equal(ico.readUInt8(6), 32);
+    assert.equal(ico.readUInt8(7), 32);
+    assert.equal(ico.readUInt32LE(18), 22);
+    assert.equal(ico.readUInt32LE(14), ico.length - 22);
+    // Embedded image is a PNG (signature at the declared offset)
+    assert.equal(ico.subarray(22, 30).toString("hex"), "89504e470d0a1a0a");
   });
 
   it("generates sitemap.xml with site URL", async () => {

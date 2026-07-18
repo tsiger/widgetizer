@@ -138,6 +138,7 @@ before(async () => {
 <head>
   <title>{{ page.name }}</title>
   {% if site_icons.primaryIconHref != blank %}<link rel="icon" href="{{ site_icons.primaryIconHref }}" {% if site_icons.primaryIconType != blank %}type="{{ site_icons.primaryIconType }}"{% endif %}{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}
+  {% if site_icons.serpIconHref != blank %}<link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">{% endif %}
   {% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}
   {% seo %}
 </head>
@@ -655,6 +656,8 @@ describe("renderPageLayout", () => {
     assert.ok(
       html.includes(`rel="apple-touch-icon" href="/api/media/projects/${PROJECT_ID}/uploads/images/site-icon.svg"`),
     );
+    // Derived sizes (icon-192 etc.) exist only in exports — runtime must not link them.
+    assert.ok(!html.includes('sizes="192x192"'));
   });
 
   it("injects header, main content, and footer", async () => {

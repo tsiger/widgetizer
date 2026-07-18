@@ -98,6 +98,7 @@ const LAYOUT =
   `{% if site_icons.primaryIconSizes != blank %} sizes="{{ site_icons.primaryIconSizes }}"{% endif %}>{% endif %}\n` +
   `{% if site_icons.legacyIconHref != blank and site_icons.legacyIconHref != site_icons.primaryIconHref %}` +
   `<link rel="icon" href="{{ site_icons.legacyIconHref }}" type="image/png" sizes="32x32">{% endif %}\n` +
+  `{% if site_icons.serpIconHref != blank %}<link rel="icon" href="{{ site_icons.serpIconHref }}" type="image/png" sizes="192x192">{% endif %}\n` +
   `{% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}\n` +
   `{% if site_icons.manifestHref != blank %}<link rel="manifest" href="{{ site_icons.manifestHref }}">{% endif %}\n` +
   `{% header_assets %}\n` +
@@ -280,6 +281,7 @@ describe("depth-1 item render — full path chain is prefixed", () => {
   it("favicon / apple-touch / manifest refs are prefixed", () => {
     assert.match(html, /<link rel="icon" href="\.\.\/favicon\.svg"/);
     assert.match(html, /href="\.\.\/favicon-32\.png"/);
+    assert.match(html, /href="\.\.\/icon-192\.png" type="image\/png" sizes="192x192"/);
     assert.match(html, /<link rel="apple-touch-icon" href="\.\.\/apple-touch-icon\.png"/);
     assert.match(html, /<link rel="manifest" href="\.\.\/site\.webmanifest"/);
   });
@@ -325,6 +327,7 @@ describe("depth-0 root render — no ../ leakage", () => {
     assert.match(html, /imagesrcset="a\.jpg 320w, b\.jpg 640w"/);
     assert.match(html, /<link rel="icon" href="favicon\.svg"/);
     assert.match(html, /href="favicon-32\.png"/);
+    assert.match(html, /href="icon-192\.png" type="image\/png" sizes="192x192"/);
     assert.match(html, /<link rel="apple-touch-icon" href="apple-touch-icon\.png"/);
     assert.match(html, /<link rel="manifest" href="site\.webmanifest"/);
   });

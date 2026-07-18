@@ -125,6 +125,7 @@ describe("prefixSiteIcons", () => {
     primaryIconType: "image/svg+xml",
     primaryIconSizes: "any",
     legacyIconHref: "favicon-32.png",
+    serpIconHref: "icon-192.png",
     appleTouchIconHref: "apple-touch-icon.png",
     manifestHref: "site.webmanifest",
   };
@@ -139,6 +140,7 @@ describe("prefixSiteIcons", () => {
     const out = prefixSiteIcons(icons, "../");
     expect(out.primaryIconHref).toBe("../favicon.svg");
     expect(out.legacyIconHref).toBe("../favicon-32.png");
+    expect(out.serpIconHref).toBe("../icon-192.png");
     expect(out.appleTouchIconHref).toBe("../apple-touch-icon.png");
     expect(out.manifestHref).toBe("../site.webmanifest");
     expect(out.primaryIconType).toBe("image/svg+xml");
