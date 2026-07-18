@@ -64,8 +64,11 @@ export const SeoTag = {
         metaTags.push(`<meta property="og:image" content="${escapeHtml(ogImageUrl)}">`);
       }
 
-      // Twitter Card tags - large image card only when we have a resolved image
-      const twitterCard = ogImageUrl ? seo.twitter_card || "summary_large_image" : "summary";
+      // Twitter Card tags: derived purely from image presence. The stored
+      // seo.twitter_card is deliberately ignored: no UI exposes it, and the
+      // editor persists a phantom "summary" on every save that would otherwise
+      // permanently block the large-image card.
+      const twitterCard = ogImageUrl ? "summary_large_image" : "summary";
 
       metaTags.push(`<meta name="twitter:card" content="${escapeHtml(twitterCard)}">`);
       metaTags.push(`<meta name="twitter:title" content="${escapeHtml(ogTitle)}">`);

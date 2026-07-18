@@ -24,6 +24,17 @@ describe("SeoTag og:image (absolute-only hardening)", () => {
     expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
   });
 
+  it("derives the large card even when a phantom twitter_card 'summary' is stored", () => {
+    // Every editor save persists twitter_card: "summary" although no UI exposes
+    // it, so the card type must be derived from image presence, not the stored value.
+    const html = render({
+      page: pageWith({ og_image: "/uploads/images/hero.jpg", twitter_card: "summary" }),
+      project: { siteUrl: "https://example.com" },
+      mediaFiles: {},
+    });
+    expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
+  });
+
   it("omits og:image and twitter:image entirely when there is no siteUrl", () => {
     const html = render({
       page: pageWith({ og_image: "/uploads/images/hero.jpg" }),
