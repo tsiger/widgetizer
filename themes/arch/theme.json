@@ -1,6 +1,6 @@
 {
   "name": "Arch",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "description": "The default Widgetizer theme",
   "author": "Widgetizer",
   "settings": {
@@ -43,13 +43,34 @@
           "description": "tTheme:global.general.settings.date_format.description",
           "default": "MMMM D, YYYY",
           "options": [
-            { "value": "MMMM D, YYYY", "label": "December 31, 2026" },
-            { "value": "D MMMM YYYY", "label": "31 December 2026" },
-            { "value": "MMM D, YYYY", "label": "Dec 31, 2026" },
-            { "value": "D MMM YYYY", "label": "31 Dec 2026" },
-            { "value": "MM/DD/YYYY", "label": "12/31/2026" },
-            { "value": "DD/MM/YYYY", "label": "31/12/2026" },
-            { "value": "YYYY-MM-DD", "label": "2026-12-31" }
+            {
+              "value": "MMMM D, YYYY",
+              "label": "December 31, 2026"
+            },
+            {
+              "value": "D MMMM YYYY",
+              "label": "31 December 2026"
+            },
+            {
+              "value": "MMM D, YYYY",
+              "label": "Dec 31, 2026"
+            },
+            {
+              "value": "D MMM YYYY",
+              "label": "31 Dec 2026"
+            },
+            {
+              "value": "MM/DD/YYYY",
+              "label": "12/31/2026"
+            },
+            {
+              "value": "DD/MM/YYYY",
+              "label": "31/12/2026"
+            },
+            {
+              "value": "YYYY-MM-DD",
+              "label": "2026-12-31"
+            }
           ]
         }
       ],
