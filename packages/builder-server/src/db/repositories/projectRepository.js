@@ -39,8 +39,8 @@ export function getProjectFolderName(projectId) {
 export function createProject(project) {
   const db = getDb();
   db.prepare(`
-    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
-    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, last_theme_update_at, last_theme_update_version, created, updated)
+    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
   `).run({
     id: project.id,
     folderName: project.folderName,
@@ -52,6 +52,7 @@ export function createProject(project) {
     preset: project.preset || null,
     receiveThemeUpdates: project.receiveThemeUpdates ? 1 : 0,
     siteUrl: project.siteUrl || "",
+    cleanUrls: project.cleanUrls ? 1 : 0,
     lastThemeUpdateAt: project.lastThemeUpdateAt || null,
     lastThemeUpdateVersion: project.lastThemeUpdateVersion || null,
     created: project.created,
@@ -83,6 +84,7 @@ export function updateProject(id, updates) {
       ? (updates.receiveThemeUpdates ? 1 : 0)
       : current.receive_theme_updates,
     siteUrl: updates.siteUrl !== undefined ? (updates.siteUrl || "") : current.site_url,
+    cleanUrls: updates.cleanUrls !== undefined ? (updates.cleanUrls ? 1 : 0) : current.clean_urls,
     lastThemeUpdateAt: updates.lastThemeUpdateAt !== undefined ? updates.lastThemeUpdateAt : current.last_theme_update_at,
     lastThemeUpdateVersion: updates.lastThemeUpdateVersion !== undefined ? updates.lastThemeUpdateVersion : current.last_theme_update_version,
     updated: updates.updated || new Date().toISOString(),
@@ -100,6 +102,7 @@ export function updateProject(id, updates) {
       preset = @preset,
       receive_theme_updates = @receiveThemeUpdates,
       site_url = @siteUrl,
+      clean_urls = @cleanUrls,
       last_theme_update_at = @lastThemeUpdateAt,
       last_theme_update_version = @lastThemeUpdateVersion,
       updated = @updated
@@ -217,8 +220,8 @@ export function writeProjectsData(data) {
 
     // Upsert each project
     const upsert = db.prepare(`
-      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, last_theme_update_at, last_theme_update_version, created, updated)
-      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, last_theme_update_at, last_theme_update_version, created, updated)
+      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
       ON CONFLICT(id) DO UPDATE SET
         folder_name = @folderName,
         name = @name,
@@ -229,6 +232,7 @@ export function writeProjectsData(data) {
         preset = @preset,
         receive_theme_updates = @receiveThemeUpdates,
         site_url = @siteUrl,
+        clean_urls = @cleanUrls,
         last_theme_update_at = @lastThemeUpdateAt,
         last_theme_update_version = @lastThemeUpdateVersion,
         updated = @updated
@@ -246,6 +250,7 @@ export function writeProjectsData(data) {
         preset: p.preset || null,
         receiveThemeUpdates: p.receiveThemeUpdates ? 1 : 0,
         siteUrl: p.siteUrl || "",
+        cleanUrls: p.cleanUrls ? 1 : 0,
         lastThemeUpdateAt: p.lastThemeUpdateAt || null,
         lastThemeUpdateVersion: p.lastThemeUpdateVersion || null,
         created: p.created,
@@ -275,6 +280,7 @@ function rowToProject(row) {
     preset: row.preset,
     receiveThemeUpdates: !!row.receive_theme_updates,
     siteUrl: row.site_url,
+    cleanUrls: !!row.clean_urls,
     created: row.created,
     updated: row.updated,
   };

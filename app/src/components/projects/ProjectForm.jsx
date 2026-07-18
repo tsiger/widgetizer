@@ -11,7 +11,7 @@ import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "@widgetizer/editor-ui/queries/themeManager";
 
 export default function ProjectForm({
-  initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "" },
+  initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "", cleanUrls: false },
   onSubmit,
   isSubmitting,
   submitLabel = "Save",
@@ -46,6 +46,7 @@ export default function ProjectForm({
       siteTitle: initialData.siteTitle || "",
       theme: initialData.theme || "",
       siteUrl: initialData.siteUrl || "",
+      cleanUrls: initialData.cleanUrls || false,
       receiveThemeUpdates: initialData.receiveThemeUpdates || false,
       preset: "",
     },
@@ -112,6 +113,7 @@ export default function ProjectForm({
         siteTitle: initialData.siteTitle || "",
         theme: initialData.theme || "",
         siteUrl: initialData.siteUrl || "",
+        cleanUrls: initialData.cleanUrls || false,
         receiveThemeUpdates: initialData.receiveThemeUpdates || false,
         preset: "",
       });
@@ -203,6 +205,7 @@ export default function ProjectForm({
           siteTitle: "",
           theme: "",
           siteUrl: "",
+          cleanUrls: false,
           receiveThemeUpdates: false,
           preset: "",
         });
@@ -419,6 +422,18 @@ export default function ProjectForm({
                 />
                 {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
                 <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
+              </div>
+
+              <div className="form-field">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    {...register("cleanUrls")}
+                    className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-500"
+                  />
+                  <span className="form-label !mb-0">{t("forms.project.cleanUrlsLabel")}</span>
+                </label>
+                <p className="form-description ml-7">{t("forms.project.cleanUrlsHelp")}</p>
               </div>
 
               <div className="form-field">

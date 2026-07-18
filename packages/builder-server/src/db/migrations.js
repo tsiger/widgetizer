@@ -128,6 +128,17 @@ const migrations = [
       db.exec("CREATE INDEX IF NOT EXISTS idx_projects_owner_id ON projects(owner_id)");
     },
   },
+  {
+    version: 5,
+    description: "Add clean_urls to projects",
+    up(db) {
+      // Whether SEO URLs (canonical, sitemap, robots) drop the .html extension
+      // to match hosts that publish pages at extensionless paths.
+      if (!columnExists(db, "projects", "clean_urls")) {
+        db.exec("ALTER TABLE projects ADD COLUMN clean_urls INTEGER DEFAULT 0");
+      }
+    },
+  },
 ];
 
 export const DEFAULT_TRACKING_TABLE = "_migrations";

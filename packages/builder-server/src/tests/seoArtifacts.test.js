@@ -38,6 +38,15 @@ describe("buildSitemap", () => {
     assert.equal(await buildSitemap(PAGES, ""), null);
     assert.equal(await buildSitemap(PAGES, "not-a-url"), null);
   });
+
+  it("emits extensionless URLs with cleanUrls (pages + collection items)", async () => {
+    const items = [{ slugPrefix: "news", items: [{ slug: "hello", updated: "2026-06-04T10:00:00.000Z" }] }];
+    const xml = await buildSitemap(PAGES, SITE_URL, items, true);
+    assert.ok(xml.includes(`<loc>${SITE_URL}/</loc>`), "homepage stays the bare root");
+    assert.ok(xml.includes(`<loc>${SITE_URL}/about</loc>`), "page URL has no extension");
+    assert.ok(xml.includes(`<loc>${SITE_URL}/news/hello</loc>`), "item URL has no extension");
+    assert.ok(!xml.includes(".html"), "no .html anywhere");
+  });
 });
 
 describe("buildRobotsTxt", () => {
@@ -52,5 +61,13 @@ describe("buildRobotsTxt", () => {
   it("returns null for a missing or invalid siteUrl", () => {
     assert.equal(buildRobotsTxt(PAGES, ""), null);
     assert.equal(buildRobotsTxt(PAGES, "not-a-url"), null);
+  });
+
+  it("disallows the extensionless path with cleanUrls (prefix also covers .html)", () => {
+    const items = [{ slugPrefix: "news", items: [{ slug: "secret", seo: { robots: "noindex" } }] }];
+    const robots = buildRobotsTxt(PAGES, SITE_URL, items, true);
+    assert.ok(robots.includes("Disallow: /hidden"));
+    assert.ok(!robots.includes("Disallow: /hidden.html"));
+    assert.ok(robots.includes("Disallow: /news/secret"));
   });
 });

@@ -23,16 +23,18 @@ function isValidSiteUrl(siteUrl) {
  * @param {Array<object>} pagesDataArray
  * @param {string} siteUrl
  * @param {Array<{slugPrefix: string, items: Array<object>}>} [itemPagesForSeo]
+ * @param {boolean} [cleanUrls=false] - emit extensionless URLs (hosts that publish pages without .html)
  * @returns {Promise<string|null>}
  */
-export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []) {
+export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false) {
   if (!isValidSiteUrl(siteUrl)) return null;
 
+  const ext = cleanUrls ? "" : ".html";
   const sitemapUrls = pagesDataArray
     .filter((page) => !page.seo?.robots?.includes("noindex"))
     .map((page) => {
       const isHomepage = page.slug === "index" || page.slug === "home";
-      const pageUrl = isHomepage ? new URL("/", siteUrl).href : new URL(`${page.slug}.html`, siteUrl).href;
+      const pageUrl = isHomepage ? new URL("/", siteUrl).href : new URL(`${page.slug}${ext}`, siteUrl).href;
       const lastMod = page.updated || page.gcreated || new Date().toISOString();
       return `
   <url>
@@ -45,7 +47,7 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
   for (const { slugPrefix, items } of itemPagesForSeo || []) {
     for (const item of items) {
       if (item.seo?.robots?.includes("noindex")) continue;
-      const loc = new URL(`${slugPrefix}/${item.slug}.html`, siteUrl).href;
+      const loc = new URL(`${slugPrefix}/${item.slug}${ext}`, siteUrl).href;
       const lastMod = item.updated || new Date().toISOString();
       collectionSitemapUrls.push(`
   <url>
@@ -70,11 +72,14 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
  * @param {Array<object>} pagesDataArray
  * @param {string} siteUrl
  * @param {Array<{slugPrefix: string, items: Array<object>}>} [itemPagesForSeo]
+ * @param {boolean} [cleanUrls=false] - emit extensionless Disallow paths (they also
+ *   prefix-match the .html variants, so both address forms stay blocked)
  * @returns {string|null}
  */
-export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = []) {
+export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false) {
   if (!isValidSiteUrl(siteUrl)) return null;
 
+  const ext = cleanUrls ? "" : ".html";
   const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
   // Single Set so a page and an item never emit duplicate Disallow lines.
   const disallowSet = new Set();
@@ -82,12 +87,12 @@ export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = []) {
     if (!page.seo?.robots?.includes("noindex")) continue;
     const pageId = page.id || page.slug;
     if (!pageId) continue;
-    const filename = pageId === "index" || pageId === "home" ? "index.html" : `${pageId}.html`;
+    const filename = pageId === "index" || pageId === "home" ? `index${ext || ".html"}` : `${pageId}${ext}`;
     disallowSet.add(`/${filename}`);
   }
   for (const { slugPrefix, items } of itemPagesForSeo || []) {
     for (const item of items) {
-      if (item.seo?.robots?.includes("noindex")) disallowSet.add(`/${slugPrefix}/${item.slug}.html`);
+      if (item.seo?.robots?.includes("noindex")) disallowSet.add(`/${slugPrefix}/${item.slug}${ext}`);
     }
   }
   const disallowPaths = Array.from(disallowSet);

@@ -280,7 +280,7 @@ export async function getActiveProject(req, res) {
  */
 export async function createProject(req, res) {
   try {
-    const { name, folderName: providedFolderName, description, theme, siteTitle, siteUrl, receiveThemeUpdates, preset } = req.body;
+    const { name, folderName: providedFolderName, description, theme, siteTitle, siteUrl, cleanUrls, receiveThemeUpdates, preset } = req.body;
 
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
@@ -293,6 +293,10 @@ export async function createProject(req, res) {
 
     if (!isOptionalBoolean(receiveThemeUpdates)) {
       return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
+    }
+
+    if (!isOptionalBoolean(cleanUrls)) {
+      return res.status(400).json({ error: "cleanUrls must be a boolean." });
     }
 
     // If a folder name is explicitly provided, validate its format. Collisions on
@@ -346,6 +350,7 @@ export async function createProject(req, res) {
       preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates ?? false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
+      cleanUrls: cleanUrls ?? false, // SEO URLs without .html (extensionless hosts)
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -491,6 +496,10 @@ export async function updateProject(req, res) {
       return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
     }
 
+    if (!isOptionalBoolean(updates.cleanUrls)) {
+      return res.status(400).json({ error: "cleanUrls must be a boolean." });
+    }
+
     // Sanitize site title and siteUrl if provided
     const sanitizedSiteTitle = updates.siteTitle !== undefined
       ? (updates.siteTitle && updates.siteTitle.trim() !== "" ? stripHtmlTags(updates.siteTitle.trim()) : "")
@@ -505,6 +514,7 @@ export async function updateProject(req, res) {
       description: updates.description,
       siteTitle: sanitizedSiteTitle,
       siteUrl: sanitizedSiteUrl,
+      cleanUrls: updates.cleanUrls,
       receiveThemeUpdates: updates.receiveThemeUpdates,
     });
 
@@ -807,6 +817,7 @@ export async function exportProject(req, res) {
         receiveThemeUpdates: project.receiveThemeUpdates || false,
         preset: project.preset || null,
         siteUrl: project.siteUrl || "",
+        cleanUrls: project.cleanUrls || false,
         created: project.created,
         updated: project.updated,
       },
@@ -1060,6 +1071,7 @@ export async function importProject(req, res) {
         receiveThemeUpdates: manifest.project.receiveThemeUpdates || false,
         preset: manifest.project.preset || null,
         siteUrl: manifest.project.siteUrl || "",
+        cleanUrls: manifest.project.cleanUrls || false,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };

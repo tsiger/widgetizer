@@ -330,6 +330,16 @@ describe("normalize + render helpers (pure)", () => {
     assert.equal(page.name, "Hello");
     assert.equal(page.seo.canonical_url, "https://example.com/news/hello.html");
   });
+
+  it("buildCollectionItemPageData drops the canonical .html extension with cleanUrls", () => {
+    const page = svc.buildCollectionItemPageData(
+      NEWS_SCHEMA,
+      { slug: "hello", uuid: "u", settings: { title: "Hello" }, seo: {} },
+      "https://example.com",
+      true,
+    );
+    assert.equal(page.seo.canonical_url, "https://example.com/news/hello");
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -43,7 +43,7 @@ function columnExists(db, table, column) {
 }
 
 // Every version this branch's runner should converge a database to.
-const ALL_VERSIONS = [1, 2, 3, 4];
+const ALL_VERSIONS = [1, 2, 3, 4, 5];
 
 describe("runMigrations", () => {
   it("creates the full initial schema on a fresh database", () => {
@@ -133,7 +133,7 @@ describe("runMigrations", () => {
     db.prepare("INSERT INTO _migrations (version, description) VALUES (1, 'init')").run();
     db.prepare("INSERT INTO projects (id, folder_name, name) VALUES ('old','of','Old')").run();
 
-    runMigrations(db); // applies v2, v3, v4
+    runMigrations(db); // applies v2 through v5
 
     assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
     const row = db.prepare("SELECT owner_id FROM projects WHERE id = 'old'").get();
@@ -156,7 +156,7 @@ describe("runMigrations", () => {
 
     assert.equal(columnExists(db, "projects", "owner_id"), false, "precondition: owner_id missing");
 
-    runMigrations(db); // should apply v3 (caption guard skips) and v4 (adds owner_id)
+    runMigrations(db); // should apply v3 (caption guard skips), v4 (adds owner_id), and v5
 
     assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
     assert.ok(columnExists(db, "projects", "owner_id"), "owner_id should be backfilled");
@@ -180,7 +180,7 @@ describe("runMigrations", () => {
 
     assert.equal(columnExists(db, "media_files", "caption"), false, "precondition: caption missing");
 
-    runMigrations(db); // should apply v3 (adds caption) and v4 (owner_id guard skips)
+    runMigrations(db); // should apply v3 (adds caption), v4 (owner_id guard skips), and v5
 
     assert.deepEqual(appliedVersions(db, DEFAULT_TRACKING_TABLE), ALL_VERSIONS);
     assert.ok(columnExists(db, "media_files", "caption"), "caption should be added");

@@ -73,3 +73,45 @@ describe("SeoTag og:image (absolute-only hardening)", () => {
     expect(html).toContain('<meta name="twitter:card" content="summary">');
   });
 });
+
+describe("SeoTag canonical URL", () => {
+  it("auto-generates <slug>.html from siteUrl by default", () => {
+    const html = render({ page: pageWith({}), project: { siteUrl: "https://example.com" }, mediaFiles: {} });
+    expect(html).toContain('<link rel="canonical" href="https://example.com/about.html">');
+  });
+
+  it("drops the .html extension when the project has cleanUrls", () => {
+    const html = render({
+      page: pageWith({}),
+      project: { siteUrl: "https://example.com", cleanUrls: true },
+      mediaFiles: {},
+    });
+    expect(html).toContain('<link rel="canonical" href="https://example.com/about">');
+    expect(html).not.toContain("about.html");
+  });
+
+  it("canonicalizes the homepage to the bare root regardless of cleanUrls", () => {
+    for (const cleanUrls of [false, true]) {
+      const html = render({
+        page: { slug: "index", name: "Home", seo: {} },
+        project: { siteUrl: "https://example.com", cleanUrls },
+        mediaFiles: {},
+      });
+      expect(html).toContain('<link rel="canonical" href="https://example.com/">');
+    }
+  });
+
+  it("lets an explicit page-level canonical win over cleanUrls generation", () => {
+    const html = render({
+      page: pageWith({ canonical_url: "https://other.example.com/custom" }),
+      project: { siteUrl: "https://example.com", cleanUrls: true },
+      mediaFiles: {},
+    });
+    expect(html).toContain('<link rel="canonical" href="https://other.example.com/custom">');
+  });
+
+  it("emits no canonical without a siteUrl", () => {
+    const html = render({ page: pageWith({}), project: { siteUrl: "", cleanUrls: true }, mediaFiles: {} });
+    expect(html).not.toContain('rel="canonical"');
+  });
+});

@@ -453,6 +453,7 @@ describe("readProjectsData / writeProjectsData", () => {
         preset: null,
         receiveThemeUpdates: false,
         siteUrl: "",
+        cleanUrls: false,
         created: now,
         updated: now,
       }],
@@ -650,6 +651,21 @@ describe("createProject", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /receiveThemeUpdates.*boolean/i);
+  });
+
+  it("stores cleanUrls flag (defaults to false)", async () => {
+    const defaulted = await createTestProject("Clean URLs Default");
+    assert.equal(defaulted.cleanUrls, false);
+    const enabled = await createTestProject("Clean URLs On", { cleanUrls: true });
+    assert.equal(enabled.cleanUrls, true);
+  });
+
+  it("rejects non-boolean cleanUrls on create", async () => {
+    const res = await callController(createProject, {
+      body: { name: "String Clean URLs", description: "", theme: TEST_THEME_ID, cleanUrls: "yes" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /cleanUrls.*boolean/i);
   });
 
   it("stores siteTitle", async () => {

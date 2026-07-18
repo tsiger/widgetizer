@@ -915,7 +915,7 @@ async function renderCollectionItemPage(
   // Page-shaped object drives the layout title/SEO/body class. Built BEFORE the
   // template render so the item template receives the page/collection/project
   // context, not just item.
-  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl);
+  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl, projectData?.cleanUrls);
 
   // Render the collection type's template.liquid against the item context.
   const themeSnippetsDir = path.join(deps.projectDir, "snippets");

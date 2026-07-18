@@ -166,6 +166,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
   const projectFolderName = projectData.folderName;
   const projectDir = getProjectDir(projectFolderName);
   const siteUrl = projectData.siteUrl || "";
+  const cleanUrls = !!projectData.cleanUrls;
 
   const version = exportRepo.getNextVersion(projectId);
   const outputBaseDir = getPublishDir();
@@ -263,11 +264,11 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // item pages included via itemPagesForSeo) ---
     if (siteUrl && siteUrl.trim() !== "") {
       try {
-        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo);
+        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls);
         if (sitemapXml) {
           await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapXml);
         }
-        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo);
+        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls);
         if (robotsTxt) {
           await fs.writeFile(path.join(outputDir, "robots.txt"), robotsTxt);
         }

@@ -37,7 +37,7 @@ export const SeoTag = {
 
       // Canonical URL: explicit page-level value wins; otherwise auto-generate
       // from siteUrl + slug (homepage canonicalizes to the bare root).
-      const canonicalUrl = resolveCanonicalUrl(seo.canonical_url, project?.siteUrl, page.slug);
+      const canonicalUrl = resolveCanonicalUrl(seo.canonical_url, project?.siteUrl, page.slug, project?.cleanUrls);
       if (canonicalUrl) {
         metaTags.push(`<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
       }
@@ -126,7 +126,9 @@ function getPublicImageFilename(filename, mediaFiles) {
   return filename;
 }
 
-function resolveCanonicalUrl(explicitUrl, siteUrl, slug) {
+// With cleanUrls the canonical drops the .html extension, matching hosts that
+// publish pages at extensionless paths (Netlify/Cloudflare Pages/Vercel style).
+function resolveCanonicalUrl(explicitUrl, siteUrl, slug, cleanUrls = false) {
   if (explicitUrl && explicitUrl.trim()) return explicitUrl.trim();
   if (!siteUrl || !siteUrl.trim()) return "";
 
@@ -138,7 +140,8 @@ function resolveCanonicalUrl(explicitUrl, siteUrl, slug) {
   }
 
   const isHomepage = slug === "index" || slug === "home";
-  return isHomepage ? `${base}/` : `${base}/${slug}.html`;
+  if (isHomepage) return `${base}/`;
+  return cleanUrls ? `${base}/${slug}` : `${base}/${slug}.html`;
 }
 
 // Helper function to escape HTML entities

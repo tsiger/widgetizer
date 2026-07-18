@@ -1174,9 +1174,10 @@ function isValidSiteUrl(siteUrl) {
  * @param {object} schema - normalized collection schema
  * @param {object} item - normalized (and link-resolved) collection item
  * @param {string} siteUrl - project siteUrl ("" when unset)
+ * @param {boolean} [cleanUrls=false] - drop the .html extension from the canonical
  * @returns {object} page-shaped object
  */
-export function buildCollectionItemPageData(schema, item, siteUrl) {
+export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = false) {
   const fieldSettings = (schema.settings || []).filter((s) => s.type !== HEADER_TYPE);
   const titleField = fieldSettings.find((s) => s.usedAsTitle);
   const settings = item.settings || {};
@@ -1189,7 +1190,7 @@ export function buildCollectionItemPageData(schema, item, siteUrl) {
     seo.canonical_url && seo.canonical_url.trim()
       ? seo.canonical_url.trim()
       : validSiteUrl
-        ? `${canonicalBase}/${schema.slugPrefix}/${item.slug}.html`
+        ? `${canonicalBase}/${schema.slugPrefix}/${item.slug}${cleanUrls ? "" : ".html"}`
         : "";
 
   return {
