@@ -17,6 +17,7 @@
 {% if show_view_all and widget.settings.heading_alignment == 'start' %}{% assign view_all_in_header = true %}{% endif %}
 {% assign has_heading_text = false %}
 {% if widget.settings.title != blank or widget.settings.description != blank or widget.settings.eyebrow != blank %}{% assign has_heading_text = true %}{% endif %}
+{% assign read_more_label = widget.settings.read_more_text | default: 'Read more' %}
 
 {% capture view_all_button %}<a href="{{ widget.settings.view_all_link.href }}" class="widget-button widget-button-secondary widget-button-medium" data-setting="view_all_link"{% if widget.settings.view_all_link.target == '_blank' %} target="_blank" rel="noopener"{% endif %}>{{ widget.settings.view_all_link.text | default: 'View all' }}</a>{% endcapture %}
 
@@ -257,7 +258,7 @@
                   {% endif %}
                   {% if widget.settings.show_read_more and item.url %}
                     <div class="widget-card-footer">
-                      <a href="{{ item.url }}" class="widget-button widget-button-secondary" aria-label="Read more: {{ item.settings.title }}">Read more</a>
+                      <a href="{{ item.url }}" class="widget-button widget-button-secondary" aria-label="{{ read_more_label }}: {{ item.settings.title }}">{{ read_more_label }}</a>
                     </div>
                   {% endif %}
                 </div>

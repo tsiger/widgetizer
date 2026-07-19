@@ -129,6 +129,12 @@
       "default": true
     },
     {
+      "type": "text",
+      "id": "read_more_text",
+      "label": "tTheme:global.widgets.settings.read_more_text.label",
+      "default": "View project"
+    },
+    {
       "type": "header",
       "id": "appearance_header",
       "label": "tTheme:global.widgets.settings.appearance_header.label"

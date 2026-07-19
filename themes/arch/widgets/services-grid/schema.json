@@ -136,6 +136,12 @@
       "default": true
     },
     {
+      "type": "text",
+      "id": "read_more_text",
+      "label": "tTheme:global.widgets.settings.read_more_text.label",
+      "default": "View service"
+    },
+    {
       "type": "header",
       "id": "icon_header",
       "label": "tTheme:global.widgets.settings.icon_header.label"
