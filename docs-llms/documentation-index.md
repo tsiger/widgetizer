@@ -420,6 +420,18 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[future-multilang.md](future-multilang.md)** - Future: Multilanguage Support
+
+**Purpose**: Locked design decisions for per-language pages within one project (rejected alternatives, activation, seeding, tabs/chips UX, per-language slugs and `pages/<lang>/` layout, shared media with per-language metadata, zero-config export) **When to use**:
+
+- Designing or implementing any multilanguage feature
+- Checking which multilang approaches were already rejected and why
+- Understanding the per-language page/slug/file-layout contract before touching page identity code
+
+**Key topics**: Per-language pages with loose translation links, project language setting, skeleton-only seeding, language tabs + status chips, per-language header/footer/menus, shared media library with per-language alt/title/caption, `/lang/` export prefix + hreflang, slug uniqueness per language
+
+---
+
 ## ✅ Project Tracking
 
 - **[TODO.md](TODO.md)** — Living task/issue tracker for in-flight work; not a reference doc.
