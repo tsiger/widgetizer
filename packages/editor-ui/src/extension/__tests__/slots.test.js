@@ -11,6 +11,7 @@ describe("slots", () => {
       "topbarBanner",
       "overlay",
       "publishConfirmation",
+      "pageEditorActions",
     ]);
   });
 

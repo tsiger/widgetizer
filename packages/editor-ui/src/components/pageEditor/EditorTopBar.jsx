@@ -7,6 +7,7 @@ import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
+import { SlotOutlet } from "../../extension/PluginProvider.jsx";
 
 export default function EditorTopBar({
   pageName,
@@ -289,6 +290,11 @@ export default function EditorTopBar({
           <Save size={18} />
           {isSaving ? t("pageEditor.toolbar.saving") : t("pageEditor.toolbar.save")}
         </button>
+
+        {/* Shell-provided actions (e.g. hosted's Publish button). Sits at the
+            far right as the primary action. Empty in the OSS app — the desktop
+            shell provides no node for this slot. */}
+        <SlotOutlet name="pageEditorActions" />
       </div>
     </div>
   );
