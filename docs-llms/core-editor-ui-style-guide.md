@@ -20,15 +20,22 @@ A standalone visual style guide for the **admin/editor app chrome** — the pink
 
 The primary brand color used for interactive elements, focus states, and highlights.
 
+Class names stay `pink-*`, but Tailwind's default pink **ramp is remapped to the
+Widgetizer brand magenta (#E60076)** via an `@theme` override in the shared
+editor-ui preset (`packages/editor-ui/src/styles/preset.css`). So `bg-pink-600`
+etc. render magenta — the hexes below are the remapped values, not Tailwind's
+defaults. A handful of components carry the same magenta as literal hex where
+they can't use utilities (CodeInput/RangeInput/RichTextInput, previewRuntime).
+
 | Token      | Hex     | Usage                                               |
 | ---------- | ------- | --------------------------------------------------- |
-| `pink-50`  | #fdf2f8 | Selected row backgrounds, error message backgrounds |
-| `pink-100` | #fce7f3 | Primary badge backgrounds                           |
-| `pink-200` | #fbcfe8 | Primary badge borders                               |
-| `pink-500` | #ec4899 | Icons, links, focus rings, checkmarks               |
-| `pink-600` | #db2777 | Primary buttons, active sidebar items               |
-| `pink-700` | #be185d | Button hover states, link hovers                    |
-| `pink-800` | #9d174d | Button active/pressed states                        |
+| `pink-50`  | #fff0f8 | Selected row backgrounds, error message backgrounds |
+| `pink-100` | #ffd6eb | Primary badge backgrounds                           |
+| `pink-200` | #ffa3d3 | Primary badge borders                               |
+| `pink-500` | #e60076 | Icons, links, focus rings, checkmarks               |
+| `pink-600` | #c20064 | Primary buttons, active sidebar items               |
+| `pink-700` | #99004f | Button hover states, link hovers                    |
+| `pink-800` | #70003a | Button active/pressed states                        |
 
 ### Neutral — Slate
 
@@ -1074,7 +1081,7 @@ Applied to all focusable elements via the editor's base layer (`*:focus-visible`
 *:focus-visible {
   outline: none;
   ring-width: 2px;
-  ring-color: #ec4899; /* pink-500 */
+  ring-color: #e60076; /* pink-500 */
   ring-offset: 0;
 }
 ```

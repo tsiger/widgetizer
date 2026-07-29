@@ -674,14 +674,14 @@ function createOverlayContainer() {
   const style = document.createElement("style");
   style.textContent = `
     .wz-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 99999; }
-    .wz-selection-box { position: absolute; border: 2px solid #f472b6; box-shadow: 0 0 12px rgba(236,72,153,0.25); pointer-events: none; }
-    .wz-hover-box { position: absolute; border: 1px solid #f9a8d4; background: rgba(236,72,153,0.05); pointer-events: none; }
+    .wz-selection-box { position: absolute; border: 2px solid #f63197; box-shadow: 0 0 12px rgba(236,72,153,0.25); pointer-events: none; }
+    .wz-hover-box { position: absolute; border: 1px solid #f96cb5; background: rgba(236,72,153,0.05); pointer-events: none; }
     .wz-block-selection { position: absolute; border: 2px solid #60a5fa; box-shadow: 0 0 8px rgba(59,130,246,0.2); pointer-events: none; }
     .wz-block-hover { position: absolute; border: 1px solid #93c5fd; background: rgba(59,130,246,0.05); pointer-events: none; }
-    .wz-widget-label { padding: 1px 8px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: white; background: #ec4899; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
-    .wz-hover-label { position: absolute; transform: translateX(-50%); left: 50%; padding: 1px 6px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #db2777; background: #fce7f3; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
+    .wz-widget-label { padding: 1px 8px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: white; background: #e60076; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
+    .wz-hover-label { position: absolute; transform: translateX(-50%); left: 50%; padding: 1px 6px; font-size: 11px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #c20064; background: #ffd6eb; border-radius: 4px; white-space: nowrap; pointer-events: none; line-height: 18px; }
     .wz-reorder-btn { pointer-events: auto; padding: 2px; border-radius: 4px; background: white; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; display: flex; align-items: center; line-height: 0; }
-    .wz-reorder-btn:hover { background: #fdf2f8; border-color: #f9a8d4; }
+    .wz-reorder-btn:hover { background: #fff0f8; border-color: #f96cb5; }
     .wz-reorder-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
     .wz-reorder-btn[disabled]:hover { background: white; border-color: #e2e8f0; }
     .wz-controls { position: absolute; transform: translateX(-50%); left: 50%; display: flex; align-items: center; gap: 4px; pointer-events: auto; }
