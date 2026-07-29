@@ -241,7 +241,7 @@
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 600;
-  background: #c0005a; /* magenta-600 */
+  background: #e0006d; /* magenta-600 */
   color: #ffffff;
   cursor: pointer;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -249,7 +249,7 @@
 }
 
 .code-done-button:hover {
-  background: #99004f; /* magenta-700 */
+  background: #c0005a; /* magenta-700 */
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
 }
 

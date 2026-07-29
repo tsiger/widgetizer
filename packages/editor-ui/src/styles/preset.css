@@ -39,10 +39,14 @@
   --color-pink-200: #FFA3D3;
   --color-pink-300: #F96CB5;
   --color-pink-400: #F63197;
+  /* The editor uses pink-600 for primary buttons/active nav and pink-700 for
+     their hover; the hosted dashboard uses -500 for the same. Keep 500 and 600
+     both on the brand accent so BOTH apps' primaries render #E0006D, with the
+     hover one stop darker (#C0005A). */
   --color-pink-500: #E0006D;
-  --color-pink-600: #C0005A;
-  --color-pink-700: #99004F;
-  --color-pink-800: #70003A;
+  --color-pink-600: #E0006D;
+  --color-pink-700: #C0005A;
+  --color-pink-800: #99004F;
   --color-pink-900: #4F0029;
   --color-pink-950: #33001A;
 }
