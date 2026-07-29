@@ -26,7 +26,7 @@
 @source "..";
 
 /* Brand accent — remap Tailwind's default `pink` ramp to Widgetizer magenta
-   (#E60076). The editor colours its accent with pink-* utilities in ~200 places
+   (#E0006D). The editor colours its accent with pink-* utilities in ~200 places
    (buttons, focus rings, active states); overriding the ramp here recolours all
    of them at once, in the one file every shell imports — so the OSS and hosted
    editors share the brand magenta without touching a single component. Stops
@@ -39,8 +39,8 @@
   --color-pink-200: #FFA3D3;
   --color-pink-300: #F96CB5;
   --color-pink-400: #F63197;
-  --color-pink-500: #E60076;
-  --color-pink-600: #C20064;
+  --color-pink-500: #E0006D;
+  --color-pink-600: #C0005A;
   --color-pink-700: #99004F;
   --color-pink-800: #70003A;
   --color-pink-900: #4F0029;

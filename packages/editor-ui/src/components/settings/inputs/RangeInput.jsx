@@ -56,9 +56,9 @@ export default function RangeInput({ id, value = 0, onChange, min = 0, max = 100
           onChangeComplete={handleSliderChangeComplete}
           styles={{
             rail: { backgroundColor: "#e2e8f0", height: 6 },
-            track: { backgroundColor: "#e60076", height: 6 },
+            track: { backgroundColor: "#e0006d", height: 6 },
             handle: {
-              backgroundColor: "#e60076",
+              backgroundColor: "#e0006d",
               border: "2px solid #ffffff",
               opacity: 1,
               width: "18px",

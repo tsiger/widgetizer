@@ -9,9 +9,9 @@
 }
 
 .richtext-editor:focus-within {
-  border-color: #e60076; /* magenta-500 */
+  border-color: #e0006d; /* magenta-500 */
   outline: none;
-  box-shadow: 0 0 0 1px #e60076; /* matches form-input focus */
+  box-shadow: 0 0 0 1px #e0006d; /* matches form-input focus */
 }
 
 .richtext-editor.is-hidden {
@@ -53,7 +53,7 @@
 }
 
 .richtext-menubar-button.is-active {
-  background: #c20064; /* magenta-600 */
+  background: #c0005a; /* magenta-600 */
   color: #ffffff;
 }
 
@@ -120,8 +120,8 @@
 
 .richtext-link-input:focus {
   outline: none;
-  border-color: #e60076; /* magenta-500 */
-  box-shadow: 0 0 0 1px #e60076;
+  border-color: #e0006d; /* magenta-500 */
+  box-shadow: 0 0 0 1px #e0006d;
 }
 
 .richtext-link-icon-button {
@@ -133,7 +133,7 @@
   flex-shrink: 0;
   border: none;
   border-radius: 0.25rem;
-  background: #c20064; /* magenta-600 */
+  background: #c0005a; /* magenta-600 */
   color: #ffffff;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -210,14 +210,14 @@
 }
 
 .richtext-editor .tiptap img.ProseMirror-selectednode {
-  outline: 2px solid #c20064; /* magenta-600 */
+  outline: 2px solid #c0005a; /* magenta-600 */
   outline-offset: 2px;
 }
 
 /* Match the theme's rich-text link rule (.w-rte a): accent color, no underline,
    underline on hover — so the editor reads the same as the published article. */
 .richtext-editor .tiptap a {
-  color: #c20064; /* magenta-600 */
+  color: #c0005a; /* magenta-600 */
   text-decoration: none;
   cursor: pointer;
   transition: text-decoration 0.15s ease;
@@ -404,7 +404,7 @@
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 600;
-  background: #c20064; /* magenta-600 */
+  background: #c0005a; /* magenta-600 */
   color: #ffffff;
   cursor: pointer;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);

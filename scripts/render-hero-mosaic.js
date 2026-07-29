@@ -8,7 +8,7 @@
  * Options (--key=value):
  *   --bg=#0b0b10            background color
  *   --fill=#ffffff          cube fill color (matches --fill CSS var)
- *   --accent=#e60076        accent color (matches --accent CSS var)
+ *   --accent=#e0006d        accent color (matches --accent CSS var)
  *   --cubes=120             cube count (defaults scale with area)
  *   --frames=900            simulation frames to run before capturing
  *   --seed=42               PRNG seed for reproducible output
@@ -46,7 +46,7 @@ const height = parseInt(positional[2] || "1080", 10);
 
 const bg = opts.transparent ? null : opts.bg || "#0b0b10";
 const fillColor = opts.fill || "#ffffff";
-const accentColor = opts.accent || "#e60076";
+const accentColor = opts.accent || "#e0006d";
 const useContentZone = !opts["no-content-zone"];
 
 // Defaults scale with area (original was 50 cubes for ~1280x720).

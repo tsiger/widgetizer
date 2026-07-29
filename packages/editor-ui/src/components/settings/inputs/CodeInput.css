@@ -116,7 +116,7 @@
 
 .code-input-wrapper :global(.token.function),
 .code-input-wrapper :global(.token.class-name) {
-  color: #e60076;
+  color: #e0006d;
 }
 
 /* Hidden state when expanded */
@@ -241,7 +241,7 @@
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 600;
-  background: #c20064; /* magenta-600 */
+  background: #c0005a; /* magenta-600 */
   color: #ffffff;
   cursor: pointer;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
