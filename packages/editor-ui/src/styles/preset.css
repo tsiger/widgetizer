@@ -60,6 +60,18 @@
     --sidebar-logo-width: 10rem;
   }
 
+  /* Anti-flash for loading indicators (LoadingSpinner): invisible for the
+     first 200ms, so fast responses render content without a loader flicker;
+     slow ones fade the spinner in. */
+  @keyframes wz-loader-appear {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .wz-loader-appear {
+    opacity: 0;
+    animation: wz-loader-appear 200ms ease-out 200ms forwards;
+  }
+
   button {
     @apply cursor-pointer;
   }

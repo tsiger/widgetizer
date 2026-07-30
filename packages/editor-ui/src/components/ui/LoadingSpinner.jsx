@@ -1,6 +1,8 @@
 export default function LoadingSpinner({ message = "Loading..." }) {
   return (
-    <div className="p-6 text-center">
+    // wz-loader-appear (preset.css): invisible for the first 200ms so fast
+    // loads never flash a spinner.
+    <div className="p-6 text-center wz-loader-appear">
       <svg
         className="mx-auto h-10 w-10 text-slate-400 animate-spin"
         xmlns="http://www.w3.org/2000/svg"
