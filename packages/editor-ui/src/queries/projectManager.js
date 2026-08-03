@@ -231,13 +231,15 @@ export async function exportProject(projectId) {
       await throwApiError(response, "Failed to export project");
     }
 
-    // Get filename from Content-Disposition header or use default
+    // Get filename from Content-Disposition header or use default. The quoted form is matched
+    // explicitly: a greedy `"?(.+)"?` keeps the closing quote, and Chromium then rewrites that
+    // illegal character to `_` when saving on Windows, producing `<name>.zip_`.
     const contentDisposition = response.headers.get("Content-Disposition");
     let filename = "project-export.zip";
     if (contentDisposition) {
-      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      const filenameMatch = contentDisposition.match(/filename="([^"]+)"|filename=([^;]+)/i);
       if (filenameMatch) {
-        filename = filenameMatch[1];
+        filename = (filenameMatch[1] ?? filenameMatch[2]).trim();
       }
     }
 
