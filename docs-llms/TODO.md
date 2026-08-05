@@ -10,7 +10,7 @@ explicit permission, never switch branch / never push.
 
 ## Contents
 
-_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 7 open · 1 wontfix**_
+_Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done · 3 deferred · 8 open · 1 wontfix**_
 
 - ✅ [1. Relative preview asset URLs (robustness) — DONE 2026-07-01](#1-relative-preview-asset-urls-robustness---done-2026-07-01)
 - ❌ [2. Bundled theme updates on the OSS desktop app (product/design decision) — WONTFIX 2026-06-27](#2-bundled-theme-updates-on-the-oss-desktop-app-productdesign-decision)
@@ -53,6 +53,8 @@ _Legend: ✅ done · ⏸️ deferred · ⬜ open · ❌ wontfix — **30 done ·
 - ⬜ [39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — **39a moderate (data-integrity) · 39b/39c low (latent under concurrency)**](#39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server)
 - ⬜ [40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — **low (security; OSS-standalone only)** — from security-audit SA-21](#40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
 - ⬜ [41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — **investigate (perf; hosted-impacting)**](#41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--investigate-perf-hosted-impacting)
+- ⬜ [42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — **low (OSS-standalone) / moderate (hosted)**](#42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--low-oss-standalone--moderate-hosted--stored-xss-needs-confirmation)
+- ⬜ [43. Render-engine containment — two edges left open (`render-engine` / `core`) — **low**](#43-render-engine-containment--two-edges-left-open-render-engine--core--low)
 
 ---
 
@@ -2276,3 +2278,20 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 **Test.** A crafted upload with `filename="x.html"` + an allowed MIME is **rejected** by the filter; legit `.pdf`/`.mp3`/image uploads still pass and PDFs still serve inline. If the serve-side mitigation lands: a stored non-image asset serves with `Content-Disposition: attachment`.
 
 **Effect:** low for OSS-standalone (self-XSS, local-only, crafted-request-only); moderate for hosted **if** uploads are served via this controller (stored XSS on the app origin) — confirm the hosted asset-serving path.
+
+---
+
+## 43. Render-engine containment — two edges left open (`render-engine` / `core`) — **low**
+
+Residue from the path-containment + escaping work (see commits touching `safePath.js` /
+`escapeHtml.js`); both are open, neither is reachable today.
+
+- **LiquidJS resolves `{% render %}` / `{% include %}` partials itself**, under
+  `root: [themeSnippetsDir, coreSnippetsDir]` set in `getOrCreateEngine`. `resolveInside` guards the
+  files the engine opens directly, but not that resolution. Snippet names come from theme templates,
+  which no tenant can author, so they are not attacker-controlled today — the exposure appears only
+  if templates ever become user-supplied (a theme marketplace, a custom-template feature).
+- **Three escape helpers in `core`.** `@widgetizer/core/escapeHtml` is now the shared one, but
+  `SeoTag.js` still has a private string-based copy and `previewRuntime.js` a DOM-based one. Point
+  `SeoTag.js` at the shared helper; `previewRuntime.js` can move too, though being browser-only its
+  DOM version is defensible.
