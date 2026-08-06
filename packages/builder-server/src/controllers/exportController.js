@@ -21,6 +21,7 @@ import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import { buildFormsManifest } from "../services/formsManifestService.js";
 import TurndownService from "turndown";
 import { buildAssetVersionToken } from "@widgetizer/core/assetUrl";
+import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 import * as exportRepo from "../db/repositories/exportRepository.js";
 
 const PACKAGE_JSON_PATH = path.join(APP_ROOT, "package.json");
@@ -890,9 +891,14 @@ Per aspera ad astra
 
     // Write widgetizer.forms.json if the project contains any core-form widgets.
     // Validation errors throw with statusCode 400 and are surfaced by the request handler.
+    // The distinct-forms ceiling comes from the limits adapter (OSS: Infinity);
+    // the hosted-contract default applies when no adapter is wired.
+    const formsCap = await collectionDeps?.limits?.getLimit?.(collectionScope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
+    const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
     const { manifest: formsManifest, warnings: formsWarnings } = buildFormsManifest(
       pagesDataArray,
       appVersion,
+      maxForms,
     );
     for (const warning of formsWarnings) {
       console.warn(`[forms manifest] ${warning}`);
@@ -929,10 +935,13 @@ export async function exportProject(req, res) {
     }
 
     // Pass the scope-aware collection capability so `| collection` filters in
-    // exported pages read items through the same storage adapter as the API path.
+    // exported pages read items through the same storage adapter as the API path,
+    // plus the limits adapter for export-time ceilings (forms per site).
     // Kept separate from `req.body` options so a client can't inject it.
     const collectionDeps =
-      req.adapters?.storage && req.scope ? { storage: req.adapters.storage, scope: req.scope } : null;
+      req.adapters?.storage && req.scope
+        ? { storage: req.adapters.storage, scope: req.scope, limits: req.adapters.limits }
+        : null;
     const result = await exportProjectToDir(projectId, req.body || {}, collectionDeps);
 
     res.json({

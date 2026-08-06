@@ -1,11 +1,11 @@
 import { handleize } from "@widgetizer/core";
+import { MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 
 const FORM_WIDGET_TYPE = "core-form";
 const MANIFEST_SCHEMA_VERSION = 1;
 const GENERATOR_NAME = "widgetizer";
 const WIDGET_IDENTIFIER = "widgetizer/core-form";
 
-const MAX_FORMS_PER_SITE = 5;
 const MAX_FIELDS_PER_FORM = 30;
 const MAX_OPTIONS_PER_FIELD = 50;
 const MAX_OPTION_LENGTH = 200;
@@ -251,11 +251,14 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
  *
  * @param {Array<{id: string, slug?: string, widgets?: object, widgetsOrder?: string[]}>} pagesDataArray
  * @param {string} generatorVersion - widgetizer app version
+ * @param {number} [maxForms] - Distinct-form ceiling, resolved by the caller from the
+ *                 limits adapter (OSS: Infinity). Defaults to the hosted-contract value
+ *                 so direct callers keep the historical behavior.
  * @returns {{manifest: object|null, warnings: string[]}}
  * @throws {Error} If any validation against the hosted contract fails. The error carries
  *                 a `formsErrors` array listing every problem (collected, not bailing on first).
  */
-export function buildFormsManifest(pagesDataArray, generatorVersion) {
+export function buildFormsManifest(pagesDataArray, generatorVersion, maxForms = MAX_FORMS_PER_SITE) {
   const errors = [];
   const warnings = [];
   const formsByKey = new Map();
@@ -293,9 +296,9 @@ export function buildFormsManifest(pagesDataArray, generatorVersion) {
     }
   }
 
-  if (formsByKey.size > MAX_FORMS_PER_SITE) {
+  if (formsByKey.size > maxForms) {
     errors.push(
-      `This site has ${formsByKey.size} distinct forms, more than the ${MAX_FORMS_PER_SITE} limit. ` +
+      `This site has ${formsByKey.size} distinct forms, more than the ${maxForms} limit. ` +
         `Reduce the number of unique form names used across pages.`,
     );
   }

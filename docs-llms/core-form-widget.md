@@ -219,7 +219,7 @@ Enforced by the hosted service; the manifest builder applies the matching
 
 Limits enforced at export time (`packages/builder-server/src/services/formsManifestService.js`):
 
-- **Max 5 forms per site** (distinct derived form keys)
+- **Forms per site** (distinct derived form keys) — adapter-backed via `LIMIT_KEYS.MAX_FORMS_PER_SITE`: OSS is unbounded (`Infinity` from the local limits adapter); the hosted-contract default is 5, which also applies when no limits adapter is wired
 - **Max 30 fields per form**
 - **Max 50 options per choice field**, each value/label ≤ 200 chars
 - Form/field keys match `/^[a-z0-9_-]{1,64}$/`

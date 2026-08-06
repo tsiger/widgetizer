@@ -301,7 +301,7 @@ describe("buildFormsManifest", () => {
     assert.equal(fields[1].label, "!!!");
   });
 
-  it("throws when site exceeds 5 unique forms", () => {
+  it("throws when site exceeds 5 unique forms (default cap, no adapter wired)", () => {
     const pages = [];
     for (let i = 0; i < 6; i++) {
       const widget = makeFormWidget({ formName: `Form ${i}`, blocks: SIMPLE_FIELDS });
@@ -310,6 +310,22 @@ describe("buildFormsManifest", () => {
     assert.throws(
       () => buildFormsManifest(pages, APP_VERSION),
       (err) => err.formsErrors.some((m) => m.includes("more than the 5 limit")),
+    );
+  });
+
+  it("respects the caller-supplied cap (OSS resolves Infinity from the limits adapter)", () => {
+    const pages = [];
+    for (let i = 0; i < 6; i++) {
+      const widget = makeFormWidget({ formName: `Form ${i}`, blocks: SIMPLE_FIELDS });
+      pages.push(makePage({ id: `page-${i}`, widgets: { w: widget } }));
+    }
+    // Unbounded (OSS): 6 forms build fine.
+    const { manifest } = buildFormsManifest(pages, APP_VERSION, Infinity);
+    assert.equal(manifest.forms.length, 6);
+    // A tighter hosted cap still throws, with the cap echoed in the message.
+    assert.throws(
+      () => buildFormsManifest(pages, APP_VERSION, 2),
+      (err) => err.formsErrors.some((m) => m.includes("more than the 2 limit")),
     );
   });
 

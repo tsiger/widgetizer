@@ -43,6 +43,7 @@ describe("LocalLimitsAdapter (impl-specific)", () => {
     const a = new LocalLimitsAdapter(makeDb());
     const scope = makeScope("a");
     expect(await a.getLimit(scope, LIMIT_KEYS.MAX_PAGES_PER_PROJECT)).toBe(Infinity);
+    expect(await a.getLimit(scope, LIMIT_KEYS.MAX_FORMS_PER_SITE)).toBe(Infinity);
     expect(await a.getLimit(scope, LIMIT_KEYS.CUSTOM_DOMAIN_ALLOWED)).toBe(true);
     expect(await a.getLimit(scope, LIMIT_KEYS.ANALYTICS_TIER)).toBe("none");
   });
