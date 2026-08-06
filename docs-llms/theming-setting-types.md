@@ -398,6 +398,30 @@ An icon picker that renders a searchable grid of icons fetched from the project'
 }
 ```
 
+**Search behaviour (`packages/editor-ui/src/utils/iconSearch.js`)**
+
+The picker's search box matches far more than the icon name, and orders results by relevance (exact name → prefix → hyphen token → keyword → synonym → group). It draws on four sources:
+
+1. **The icon name** — including hyphen-separated tokens, so `left` finds `file-arrow-left`.
+2. **Per-icon `keywords`** — optional, supplied by the theme in `icons.json` (see below).
+3. **A curated synonym map** (`iconSynonyms.js`) mapping what users type to name fragments, so `delete` finds `trash` and `photo` finds `camera`. Fragments match on word boundaries only — a whole name, a `fragment-` prefix, or a full token — so short fragments cannot pull in accidental hits. Synonym terms also match while being typed (any term of 3+ characters matches every entry it prefixes), so results narrow steadily instead of blinking out between `pay` and `payment`.
+4. **The group name**, so typing `weather` surfaces that whole category.
+
+Multiple words are ANDed: `arrow left` requires both.
+
+**Adding keywords to an icon set.** Entries in `assets/icons.json` may carry an optional `keywords` array alongside `body`. This is for set-specific vocabulary the shared synonym map should not carry; the built-in synonyms already cover common English terms, so most themes need nothing here.
+
+```json
+{
+  "prefix": "tabler",
+  "groups": {
+    "System": {
+      "trash": { "body": "<path .../>", "keywords": ["bin", "rubbish", "wastebasket"] }
+    }
+  }
+}
+```
+
 **Usage in Templates:**
 
 ```liquid
