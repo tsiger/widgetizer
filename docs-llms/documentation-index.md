@@ -420,6 +420,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[future-plugins.md](future-plugins.md)** - Future: Data-Source Plugins
+
+**Purpose**: Design notes for a plugin system that pulls external content (WordPress first) into collections, built on the existing `plugins` seams and the adapter/DI precedent **When to use**:
+
+- Evaluating how external content sources would land in Widgetizer collections
+- Understanding the `SourcePlugin` / `SyncContext` capability-closure contract
+- Weighing the ownership model (mirror/seed/merge) or the egress/SSRF risk surface
+- Comparing against Astro's Content Layer loader API
+
+**Key topics**: existing `plugins` seams (`projectScopedRoutes`, registry, hooks, slots), injected collection loader as precedent, Astro Content Layer mapping (`meta` conditional fetch, `digest` write elision), `SyncContext` capability closures (no raw `storage`/`fetch`), sync ledger tables, ownership modes, `EgressAdapter` + SSRF guard, WordPress `_embed`/`modified_gmt`/deletion-invisibility, taxonomy vocabulary gap, phasing
+
+---
+
 ## ✅ Project Tracking
 
 - **[TODO.md](TODO.md)** — Living task/issue tracker for in-flight work; not a reference doc.
