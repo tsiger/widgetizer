@@ -89,6 +89,14 @@ Thin wrapper around `useConfirmationModal` that removes the repeated modal-wirin
 
 Pages still own their mutation logic and localized copy; this hook only eliminates the `modalState`/`openModal`/`closeModal`/`handleConfirm` plumbing and the manual `<ConfirmationModal />` props.
 
+### `useConfirm` (`packages/editor-ui/src/components/ui/ConfirmProvider.jsx`)
+
+App-level confirmation dialog, mounted once by `EditorProvider` (so both the OSS shell and hosted get it). `useConfirm()` returns `confirm(options) => Promise<boolean>` — `true` on confirm, `false` on cancel/Escape/backdrop. The returned promise also carries `.cancel()`, which closes the dialog and resolves `false`, but only while that request is still the open one — so a caller unmounting mid-prompt cleans up without closing someone else's dialog. Opening a second dialog supersedes the first, resolving it `false` rather than leaving its caller awaiting forever.
+
+Use this when the asking code is not a component that renders (side-effect-only hooks like the navigation guards). Pages with a visible destructive action should keep using `useConfirmationAction`, which returns an element they render themselves.
+
+**Why it exists**: `window.confirm()` is unusable in the Electron build. On Windows the native dialog leaves the window believing it lost focus, so every input goes dead until the user alt-tabs away and back — an upstream bug open since 2019 ([electron#31917](https://github.com/electron/electron/issues/31917), [#40212](https://github.com/electron/electron/issues/40212), [#41603](https://github.com/electron/electron/issues/41603)), still reproducible on Electron 42 / Windows 11 and not reproducible on macOS. The only reliable fix is never calling the native dialog. Note the guards' `beforeunload` layer is still a native dialog — that one is unavoidable, and only fires on window close/refresh.
+
 ## Navigation & Protection Hooks
 
 ### `useNavigationGuard` (`packages/editor-ui/src/hooks/useNavigationGuard.js`)
@@ -128,7 +136,7 @@ function PageEditor() {
 
 - Integrates with `saveStore` to check for unsaved changes
 - Uses React Router's `useBlocker` to intercept navigation
-- Automatically shows confirmation dialogs when blocking navigation
+- Awaits the app-level `useConfirm()` dialog when blocking navigation
 - Uses the `beforeunload` event for browser navigation protection
 
 #### Integration Points
@@ -179,7 +187,7 @@ function ProjectForm() {
 #### Key Features
 
 - **Layer 1 — Browser protection**: `beforeunload` handler blocks tab close / refresh / external URL changes while dirty (and `skipRef` is not set).
-- **Layer 2 — Internal protection**: `useBlocker` blocks React Router navigation while dirty and the location is actually changing; shows a `window.confirm` dialog and proceeds or resets accordingly.
+- **Layer 2 — Internal protection**: `useBlocker` blocks React Router navigation while dirty and the location is actually changing; awaits the app-level `useConfirm()` dialog and proceeds or resets accordingly. Because the prompt is async, the blocker simply stays `"blocked"` until the user answers.
 - **Bypass**: `skipRef.current === true` short-circuits both layers.
 
 Most pages consume this indirectly through `useGuardedFormPage` rather than calling it directly.

@@ -337,7 +337,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with link-target and theme-locale hooks
 - Finding which hook a subsystem uses
 
-**Key topics**: `useConfirmationModal`/`useConfirmationAction`, `useNavigationGuard`/`useFormNavigationGuard(hasUnsavedChanges, skipRef)`/`useGuardedFormPage`, `usePageSelection`, `useLinkTargets` (collection-item uuid targets), `useDeleteKeyShortcut`, `useStickyActionBar`, media/export/app-settings hooks (pointers), `useThemeLocale` (developer-mode cache invalidation), `useFormatDate`; all under `packages/editor-ui/src/hooks/*`
+**Key topics**: `useConfirmationModal`/`useConfirmationAction`, `useConfirm` (app-level async confirm; replaces `window.confirm`, which breaks focus on Electron/Windows), `useNavigationGuard`/`useFormNavigationGuard(hasUnsavedChanges, skipRef)`/`useGuardedFormPage`, `usePageSelection`, `useLinkTargets` (collection-item uuid targets), `useDeleteKeyShortcut`, `useStickyActionBar`, media/export/app-settings hooks (pointers), `useThemeLocale` (developer-mode cache invalidation), `useFormatDate`; all under `packages/editor-ui/src/hooks/*`
 
 ---
 

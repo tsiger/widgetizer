@@ -124,7 +124,7 @@ The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zu
 
 The page editor protects against accidental loss of unsaved changes when the user tries to leave the editor. The `PageEditor` activates this by calling `useNavigationGuard()` (in `packages/editor-ui/src/hooks/useNavigationGuard.js`); the hook operates entirely through side effects and returns nothing.
 
-It layers a `beforeunload` listener (tab close, URL change, browser back/forward) over React Router's `useBlocker` (in-app navigation), and only engages when the save store reports actual unsaved changes. On confirm-to-leave it resets the unsaved-changes state. For the full hook contract — both protection layers, the confirmation flow, and integration notes — see [Custom Hooks](core-hooks.md).
+It layers a `beforeunload` listener (tab close, URL change, browser back/forward) over React Router's `useBlocker` (in-app navigation), and only engages when the save store reports actual unsaved changes. In-app navigation prompts through the app-level `useConfirm()` dialog rather than `window.confirm` (which breaks focus in the Electron/Windows build — see [Custom Hooks](core-hooks.md)); on confirm-to-leave it resets the unsaved-changes state. For the full hook contract — both protection layers, the confirmation flow, and integration notes — see [Custom Hooks](core-hooks.md).
 
 ### Editing Global Widgets
 

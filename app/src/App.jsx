@@ -17,6 +17,7 @@ import AdminMenu from "./components/layout/AdminMenu";
 import UpdateBanner from "./components/layout/UpdateBanner";
 import DebugStatePanel from "./components/dev/DebugStatePanel";
 import ToastContainer from "@widgetizer/editor-ui/components/ui/ToastContainer.jsx";
+import { ConfirmProvider } from "@widgetizer/editor-ui/components/ui/ConfirmProvider.jsx";
 import ErrorBoundary from "@widgetizer/editor-ui/components/ui/ErrorBoundary.jsx";
 import StaleProjectCurtain from "@widgetizer/editor-ui/components/ui/StaleProjectCurtain.jsx";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
@@ -101,12 +102,19 @@ const router = createBrowserRouter([
   },
 ]);
 
-// Wrapper component to include ToastContainer
+// Wrapper component to include ToastContainer.
+//
+// ConfirmProvider wraps the whole router, not just the editor: the picker routes
+// (Projects add/edit, App settings) use the navigation guards too, and they live
+// outside EditorProvider — which mounts its own ConfirmProvider for hosted, where
+// this shell doesn't exist. Nesting is harmless; each consumer takes the nearest.
 function AppWithToast() {
   return (
     <>
       <UpdateBanner />
-      <RouterProvider router={router} />
+      <ConfirmProvider>
+        <RouterProvider router={router} />
+      </ConfirmProvider>
       <LanguageInitializer />
       <ToastContainer />
     </>

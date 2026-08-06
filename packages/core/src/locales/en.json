@@ -234,6 +234,12 @@
     "error": "Error",
     "success": "Success",
     "unsavedChanges": "You have unsaved changes",
+    "leaveConfirm": {
+      "title": "Unsaved changes",
+      "message": "You have unsaved changes. If you leave this page, they will be lost.",
+      "confirm": "Discard changes",
+      "cancel": "Keep editing"
+    },
     "appTitle": "Widgetizer",
     "close": "Close",
     "aria": {

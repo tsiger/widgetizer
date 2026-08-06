@@ -6,6 +6,7 @@ import RequireActiveProject from "./components/layout/RequireActiveProject.jsx";
 import { setApiBase } from "./lib/apiBase.js";
 import { setPreviewRenderBase, setStandalonePreviewPath, setStandaloneCollectionPreviewPath } from "./lib/previewBase.js";
 import { RouteBaseProvider } from "./lib/routeBase.jsx";
+import { ConfirmProvider } from "./components/ui/ConfirmProvider.jsx";
 import useProjectStore from "./stores/projectStore.js";
 
 import Pages from "./pages/Pages.jsx";
@@ -76,7 +77,11 @@ export function EditorProvider({
 
   return (
     <PluginProvider plugins={allPlugins} slots={slots}>
-      <RouteBaseProvider base={routeBase}>{children}</RouteBaseProvider>
+      {/* Mounted here rather than in Layout so hosted — which supplies its own
+          chrome around EditorProvider — gets the navigation guards' confirm too. */}
+      <ConfirmProvider>
+        <RouteBaseProvider base={routeBase}>{children}</RouteBaseProvider>
+      </ConfirmProvider>
     </PluginProvider>
   );
 }
