@@ -8,6 +8,7 @@
  * {% header_assets %}
  */
 import { prefixInternalHref } from "../utils/linkPrefixer.js";
+import { buildAssetUrl } from "../utils/assetUrl.js";
 
 /**
  * Prefix every candidate URL in a srcset/imagesrcset string for the given
@@ -41,9 +42,6 @@ export const RenderHeaderAssetsTag = {
       const scripts = context.globals?.enqueuedScripts;
 
       const globals = context.globals || {};
-      const apiUrl = globals.apiUrl || "";
-      const projectId = globals.projectId || "";
-      const renderMode = globals.renderMode || "preview";
       // Depth-aware prefix for nested item pages ("" at the export root).
       const outputPathPrefix = globals.outputPathPrefix || "";
 
@@ -99,17 +97,11 @@ export const RenderHeaderAssetsTag = {
 
       // Render styles first (sorted)
       headerStyles.forEach(({ filepath, options }) => {
-        let assetUrl;
-        if (renderMode === "publish") {
-          const version = globals.exportVersion;
-          assetUrl = version
-            ? `${outputPathPrefix}assets/${filepath}?v=${version}`
-            : `${outputPathPrefix}assets/${filepath}`;
-        } else if (options.source === "widget" && options.widgetType) {
-          assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
-        } else {
-          assetUrl = `${apiUrl}/api/preview/assets/${projectId}/assets/${filepath}`;
-        }
+        const assetUrl = buildAssetUrl(filepath, {
+          globals,
+          source: options.source,
+          widgetType: options.widgetType,
+        });
 
         let tag = `<link rel="stylesheet" href="${assetUrl}"`;
         if (options.media) tag += ` media="${options.media}"`;
@@ -121,17 +113,11 @@ export const RenderHeaderAssetsTag = {
 
       // Render scripts second (sorted)
       headerScripts.forEach(({ filepath, options }) => {
-        let assetUrl;
-        if (renderMode === "publish") {
-          const version = globals.exportVersion;
-          assetUrl = version
-            ? `${outputPathPrefix}assets/${filepath}?v=${version}`
-            : `${outputPathPrefix}assets/${filepath}`;
-        } else if (options.source === "widget" && options.widgetType) {
-          assetUrl = `${apiUrl}/api/preview/assets/${projectId}/widgets/${options.widgetType}/${filepath}`;
-        } else {
-          assetUrl = `${apiUrl}/api/preview/assets/${projectId}/assets/${filepath}`;
-        }
+        const assetUrl = buildAssetUrl(filepath, {
+          globals,
+          source: options.source,
+          widgetType: options.widgetType,
+        });
 
         let tag = `<script src="${assetUrl}"`;
         if (options.defer === true) tag += " defer";

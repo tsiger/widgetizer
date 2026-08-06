@@ -851,6 +851,8 @@ describe("exportProject", () => {
     assert.equal(manifest.themeId, "__export_test_theme__");
     assert.equal(manifest.themeVersion, "1.0.0");
     assert.equal(manifest.exportVersion, 1);
+    // Cache-busting token stamped on this export's CSS/JS: <export>-<appVersion>-<UTC stamp>
+    assert.match(manifest.assetVersion, /^1-[\w.-]+-\d{8}T\d{6}$/);
     assert.equal(manifest.projectName, "Export Test Project");
     assert.ok(manifest.exportedAt, "Should have exportedAt timestamp");
     assert.ok(manifest.widgetizerVersion, "Should have widgetizerVersion");

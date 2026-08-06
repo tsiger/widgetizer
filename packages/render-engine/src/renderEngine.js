@@ -27,6 +27,7 @@ import {
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
+import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
 /**
@@ -955,21 +956,14 @@ async function renderCollectionItemPage(
  * are included in the morph response and picked up by the preview runtime.
  */
 function renderEnqueuedAssetTags(sharedGlobals) {
-  const apiUrl = sharedGlobals.apiUrl || "";
-  const projectId = sharedGlobals.projectId || "";
-  const renderMode = sharedGlobals.renderMode || "preview";
   let output = "";
 
-  function resolveUrl(filepath, opts) {
-    if (renderMode === "publish") {
-      const version = sharedGlobals.exportVersion;
-      return version ? `assets/${filepath}?v=${version}` : `assets/${filepath}`;
-    }
-    if (opts.source === "widget" && opts.widgetType) {
-      return `${apiUrl}/api/preview/assets/${projectId}/widgets/${opts.widgetType}/${filepath}`;
-    }
-    return `${apiUrl}/api/preview/assets/${projectId}/assets/${filepath}`;
-  }
+  const resolveUrl = (filepath, opts) =>
+    buildAssetUrl(filepath, {
+      globals: sharedGlobals,
+      source: opts.source,
+      widgetType: opts.widgetType,
+    });
 
   const styles = sharedGlobals.enqueuedStyles;
   if (styles?.size > 0) {

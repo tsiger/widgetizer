@@ -14,6 +14,7 @@
     "./test-helpers/publish": "./test-helpers/publishConformance.js",
     "./test-helpers/limits": "./test-helpers/limitsConformance.js",
     "./test-helpers/scope-resolver": "./test-helpers/scopeResolverConformance.js",
+    "./assetUrl": "./src/utils/assetUrl.js",
     "./youtube": "./src/utils/youtubeHelpers.js",
     "./blockLimits": "./src/utils/blockLimits.js",
     "./mimeTypes": "./src/utils/mimeTypes.js",

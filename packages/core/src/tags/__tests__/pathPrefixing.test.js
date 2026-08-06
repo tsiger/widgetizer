@@ -46,9 +46,12 @@ describe("assetTag — publish path prefixing", () => {
 
   it("JS with cache-busting version: prefix precedes assets/, query preserved", async () => {
     const tpl = '{% asset src: "app.js" %}';
-    expect(await render(tpl, publishGlobals("", { exportVersion: 5 }))).toBe('<script src="assets/app.js?v=5"></script>');
-    expect(await render(tpl, publishGlobals("../", { exportVersion: 5 }))).toBe(
-      '<script src="../assets/app.js?v=5"></script>',
+    const v = "5-0.9.10-20260806T142530";
+    expect(await render(tpl, publishGlobals("", { assetVersion: v }))).toBe(
+      `<script src="assets/app.js?v=${v}"></script>`,
+    );
+    expect(await render(tpl, publishGlobals("../", { assetVersion: v }))).toBe(
+      `<script src="../assets/app.js?v=${v}"></script>`,
     );
   });
 

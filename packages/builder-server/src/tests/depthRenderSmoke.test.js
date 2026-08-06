@@ -260,7 +260,8 @@ describe("depth-1 item render — full path chain is prefixed", () => {
   });
 
   it("asset-tag URL is prefixed", () => {
-    assert.match(html, /href="\.\.\/assets\/base\.css(\?v=\d+)?"/);
+    // The cache-busting token is required, not optional: <export>-<appVersion>-<UTC stamp>.
+    assert.match(html, /href="\.\.\/assets\/base\.css\?v=\d+-[\w.-]+-\d{8}T\d{6}"/);
   });
 
   it("image src is prefixed (and lazy)", () => {
@@ -317,7 +318,7 @@ describe("depth-0 root render — no ../ leakage", () => {
   });
 
   it("emits the canonical un-prefixed asset / image / placeholder forms (non-vacuity)", () => {
-    assert.match(html, /href="assets\/base\.css(\?v=\d+)?"/);
+    assert.match(html, /href="assets\/base\.css\?v=\d+-[\w.-]+-\d{8}T\d{6}"/);
     assert.match(html, /<img[^>]+src="assets\/images\/hero\.jpg"/);
     assert.match(html, /src="assets\/placeholder\.svg"/);
   });

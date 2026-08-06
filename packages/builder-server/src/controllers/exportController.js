@@ -20,6 +20,7 @@ import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import { buildFormsManifest } from "../services/formsManifestService.js";
 import TurndownService from "turndown";
+import { buildAssetVersionToken } from "@widgetizer/core/assetUrl";
 import * as exportRepo from "../db/repositories/exportRepository.js";
 
 const PACKAGE_JSON_PATH = path.join(APP_ROOT, "package.json");
@@ -169,6 +170,12 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
   const cleanUrls = !!projectData.cleanUrls;
 
   const version = exportRepo.getNextVersion(projectId);
+  const appVersion = await getAppVersion();
+  // One token for the whole export, stamped on every CSS/JS URL as ?v=…. The
+  // export number restarts at 1 on a different machine (the counter lives in the
+  // local DB), so the token carries a build timestamp to stay collision-free for
+  // users who move a project between computers.
+  const assetVersion = buildAssetVersionToken({ exportNumber: version, appVersion });
   const outputBaseDir = getPublishDir();
   const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
@@ -331,7 +338,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         siteIcons: generatedSiteIcons,
         enqueuedStyles: new Map(),
         enqueuedScripts: new Map(),
-        exportVersion: version, // For cache busting
+        assetVersion, // For cache busting
         currentCanonicalPath: `${pageData.slug || ""}.html`,
       };
 
@@ -551,7 +558,7 @@ Per aspera ad astra
             collectionCache: new Map(),
             pagesByUuid: pagesByUuidForItems,
             collectionItemsByUuid: collectionItemsByUuidForItems,
-            exportVersion: version,
+            assetVersion,
             outputPathPrefix: "../",
             currentCanonicalPath: `${schema.slugPrefix}/${item.slug}.html`,
           };
@@ -867,13 +874,14 @@ Per aspera ad astra
     // --- End File Asset Copy ---
 
     // Write manifest.json with export metadata
-    const appVersionForManifest = await getAppVersion();
     const manifest = {
       generator: "widgetizer",
-      widgetizerVersion: appVersionForManifest,
+      widgetizerVersion: appVersion,
       themeId: projectData.theme,
       themeVersion: projectData.themeVersion || null,
       exportVersion: version,
+      // The ?v= token on this export's CSS/JS URLs, for tracing a live page back here.
+      assetVersion,
       exportedAt: new Date().toISOString(),
       projectName: projectData.name,
       collections: manifestCollections,
@@ -884,7 +892,7 @@ Per aspera ad astra
     // Validation errors throw with statusCode 400 and are surfaced by the request handler.
     const { manifest: formsManifest, warnings: formsWarnings } = buildFormsManifest(
       pagesDataArray,
-      appVersionForManifest,
+      appVersion,
     );
     for (const warning of formsWarnings) {
       console.warn(`[forms manifest] ${warning}`);

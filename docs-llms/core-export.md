@@ -80,7 +80,7 @@ Once validation passes, the writes begin (`fs.ensureDir(outputDir)` onward).
 7. **SEO files** (conditional on `siteUrl`) — `buildSitemap` and `buildRobotsTxt` (`services/seoArtifacts.js`) write `sitemap.xml` and `robots.txt` with absolute URLs. Collection item pages are included via `itemPagesForSeo` (valid items of `hasItemPages` collections, in listing order). When the project's **Clean URLs** setting (`projects.clean_urls`) is on, sitemap/robots URLs and the auto-generated canonicals (SeoTag + collection item pages) drop the `.html` extension to match hosts that publish extensionless paths; exported filenames and internal links are unaffected.
 8. **Render global widgets** — header and footer are rendered per page (so each page captures its own enqueued styles/scripts) in `"publish"` render mode, which keeps asset paths relative (`assets/images/logo.png`) instead of absolute API URLs.
    - **Transparent header**: when the header has `transparent_on_hero`, the first widget of each page is checked; if its `schema.json` declares `"supportsTransparentHeader": true` (`widgetSupportsTransparentHeader`), a `transparent-header` class is added to that page's `<body>`.
-9. **Render pages** — for each page: render its widgets in order (skipping `header`/`footer`), wrap via `renderPageLayout` (which applies `layout.liquid`), then post-process (steps 10–13). The page `sharedGlobals` carry `renderMode: "publish"`, `exportVersion` (cache busting), `siteIcons`, and `currentCanonicalPath`.
+9. **Render pages** — for each page: render its widgets in order (skipping `header`/`footer`), wrap via `renderPageLayout` (which applies `layout.liquid`), then post-process (steps 10–13). The page `sharedGlobals` carry `renderMode: "publish"`, `assetVersion` (the cache-busting token stamped on CSS/JS URLs — see [§Asset cache busting](#asset-cache-busting)), `siteIcons`, and `currentCanonicalPath`.
 10. **Format** — each page's HTML is run through **Prettier** (`formatHtml`). On failure the unformatted HTML is written with a warning.
 11. **Storage-path rewrite** — after formatting, any remaining raw `/uploads/` paths are rewritten to published locations: `/uploads/images/` → `assets/images/`, `/uploads/files/` → `assets/files/`. Dedicated tags (`{% image %}`) already resolve via context variables in publish mode; this is the safety net for paths pasted into generic link fields (e.g. a button `href` of `/uploads/files/brochure.pdf`).
 12. **HTML validation** (developer mode only) — see [§5](#5-developer-mode-html-validation).
@@ -134,6 +134,23 @@ All copying happens **after** HTML generation, into the export's `assets/` tree:
 
 The file-asset path (copy to `assets/files/`, `/uploads/files/` → `assets/files/` rewrite, and the `filePath` render variable supplied to widget templates) is what makes referenced PDFs downloadable from the exported static site. See [Media Library](core-media.md) for the shared image/file media model and usage tracking, and [Setting Types](theming-setting-types.md) for the `file` setting type that themes use to reference a file asset.
 
+### Asset cache busting
+
+Exported **CSS and JS** URLs carry a `?v=` token so a re-exported site is not served from a stale browser or CDN cache. Images and other binaries are not versioned.
+
+The token is built once per export by `buildAssetVersionToken` (`packages/core/src/utils/assetUrl.js`), passed to every render as the `assetVersion` global, and appended by `buildAssetUrl` — the single function all asset-emitting sites go through (`{% asset %}`, `{% header_assets %}`, `{% footer_assets %}`, and the render engine's enqueued-asset writer). Format:
+
+```
+assets/base.css?v=3-0.9.10-20260806T142530
+                   │  │      └─ build time, compact ISO 8601, UTC
+                   │  └─ Widgetizer version that produced the export
+                   └─ per-project export number
+```
+
+It is deliberately readable: viewing source on a live site tells you which export is deployed, which Widgetizer version built it, and when.
+
+The **timestamp is what guarantees uniqueness**. The export number is a per-machine counter derived from the local SQLite `exports` table, so a user who backs up a project and imports it on another computer restarts at 1 — without the timestamp that second machine would re-issue `?v=1` for completely different bytes, and clients holding the old cache entry would keep serving the stale asset.
+
 ## 5. Developer Mode (HTML Validation)
 
 When **Developer Mode** is enabled in App Settings (`developer.enabled`), each exported page and item page is validated after formatting via `validateHtml` (`utils/htmlProcessor.js`, built on `html-validate`) with a relaxed ruleset suited to widget-based HTML — it allows inline styles, dynamic widget patterns, style tags inside sections/headers, and Prettier formatting (lowercase doctype, self-closing tags).
@@ -144,7 +161,7 @@ Issues are collected across all pages and item pages with severity, line/column,
 
 Written after asset copying:
 
-- **`manifest.json`** (always) — `{ generator: "widgetizer", widgetizerVersion, themeId, themeVersion, exportVersion, exportedAt, projectName, collections }`. `collections` is `manifestCollections` from the two-pass validation: one entry per collection with `{ type, itemPages, itemCount }`.
+- **`manifest.json`** (always) — `{ generator: "widgetizer", widgetizerVersion, themeId, themeVersion, exportVersion, assetVersion, exportedAt, projectName, collections }`. `assetVersion` is the `?v=` token stamped on this export's CSS/JS, so a live page can be traced back to the export that produced it. `collections` is `manifestCollections` from the two-pass validation: one entry per collection with `{ type, itemPages, itemCount }`.
 - **`widgetizer.forms.json`** (only when the project contains `core-form` widgets) — `buildFormsManifest(pages, appVersion)` (`services/formsManifestService.js`) produces a forms manifest describing each form's fields. Manifest validation errors throw `statusCode 400` and are surfaced to the client; non-fatal warnings are logged. See [Form Widget](core-form-widget.md).
 - **`site.webmanifest`** (when site icons were generated) — references `icon-192.png` and `icon-512.png`.
 

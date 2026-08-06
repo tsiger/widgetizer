@@ -1,4 +1,5 @@
 import { Hash } from "liquidjs";
+import { buildAssetUrl } from "../utils/assetUrl.js";
 
 export const AssetTag = {
   parse(tagToken) {
@@ -40,39 +41,20 @@ export const AssetTag = {
 
     // Get context globals
     const globals = context.globals || {};
-    const apiUrl = globals.apiUrl || "";
-    const activeProjectId = globals.projectId || "";
-    const renderMode = globals.renderMode || "preview"; // Default to preview
-    // Depth-aware prefix for nested item pages ("" at the export root).
-    const outputPathPrefix = globals.outputPathPrefix || "";
 
     // Determine file type from extension
     const isCSS = filepath.endsWith(".css");
     const isJS = filepath.endsWith(".js");
     const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(filepath);
 
-    let assetUrl;
-    if (renderMode === "publish") {
-      // For publish mode, use a relative path assuming all assets are in a top-level 'assets' folder
-      // Add cache busting version for CSS and JS files
-      const version = globals.exportVersion;
-      if ((isCSS || isJS) && version) {
-        assetUrl = `${outputPathPrefix}assets/${filepath}?v=${version}`;
-      } else {
-        assetUrl = `${outputPathPrefix}assets/${filepath}`;
-      }
-    } else {
-      // For preview mode, use the existing API route
-      // Determine the source folder based on the current template context
-      if (context.environments.widget && context.environments.widget.type) {
-        // Inside a widget template: load from widgets/{widgetType}/
-        const widgetType = context.environments.widget.type;
-        assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/widgets/${widgetType}/${filepath}`;
-      } else {
-        // In layout/snippets: load from assets/
-        assetUrl = `${apiUrl}/api/preview/assets/${activeProjectId}/assets/${filepath}`;
-      }
-    }
+    // In preview mode an asset referenced from inside a widget template is served
+    // from that widget's own directory rather than the shared assets/ folder.
+    const widgetType = context.environments?.widget?.type || null;
+    const assetUrl = buildAssetUrl(filepath, {
+      globals,
+      source: widgetType ? "widget" : null,
+      widgetType,
+    });
 
     // Build attributes string
     let attributes = "";
