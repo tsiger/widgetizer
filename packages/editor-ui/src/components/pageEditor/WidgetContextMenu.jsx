@@ -122,6 +122,8 @@ export default function WidgetContextMenu({
         >
           <Trash2 size={14} />
           <span>{t("pageEditor.actions.deleteWidget")}</span>
+          {/* Chrome-style shortcut hint; the key itself is handled by useDeleteKeyShortcut. */}
+          <span className="ml-auto pl-4 text-xs text-red-300">Del</span>
         </button>
       </div>
     </>
