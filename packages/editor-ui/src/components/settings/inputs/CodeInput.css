@@ -6,10 +6,20 @@
 
 .code-input-container {
   display: flex;
+  /* min-height:0 lets the columns be clipped by the container's height rather
+     than stretching it to fit their content. */
+  min-height: 0;
   border: 1px solid rgb(203 213 225);
   border-radius: 0.125rem;
   background: white;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Drag-to-resize acts on the container so the gutter grows with the code box.
+   `resize` requires a non-visible overflow to take effect. */
+.code-input-container-resizable {
+  resize: vertical;
+  overflow: hidden;
 }
 
 .code-input-container:focus-within {
@@ -40,11 +50,9 @@
 .code-editor {
   flex: 1;
   position: relative;
+  min-width: 0;
+  min-height: 0;
   overflow: auto;
-}
-
-.code-editor-resizable {
-  resize: vertical;
 }
 
 /* Code editor textarea styling */

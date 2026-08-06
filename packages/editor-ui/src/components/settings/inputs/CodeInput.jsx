@@ -33,46 +33,37 @@ export default function CodeInput({
     return value.split("\n").length || 1;
   }, [value]);
 
-  // Sync scrolling between editor and line numbers
+  // Keep the gutter aligned with the code. The scrolling element is the editor
+  // container itself (it owns `overflow: auto`) — the inner <pre> and <textarea>
+  // are laid out at full content height and never scroll, so listening on them
+  // silently did nothing.
   useEffect(() => {
     const editorContainer = editorContainerRef.current;
-    if (!editorContainer) return;
+    const lineNumbers = lineNumbersRef.current;
+    if (!editorContainer || !lineNumbers) return;
 
-    const handleScroll = (e) => {
-      if (lineNumbersRef.current) {
-        lineNumbersRef.current.scrollTop = e.target.scrollTop;
-      }
+    const handleScroll = () => {
+      lineNumbers.scrollTop = editorContainer.scrollTop;
     };
 
-    // Find the scrollable element (the pre or textarea inside)
-    const scrollableElement = editorContainer.querySelector("pre") || editorContainer.querySelector("textarea");
-    if (scrollableElement) {
-      scrollableElement.addEventListener("scroll", handleScroll);
-      return () => {
-        scrollableElement.removeEventListener("scroll", handleScroll);
-      };
-    }
-  }, [value]);
+    editorContainer.addEventListener("scroll", handleScroll);
+    return () => editorContainer.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Sync scrolling for expanded editor
   useEffect(() => {
+    if (!isExpanded) return;
     const editorContainer = expandedEditorContainerRef.current;
-    if (!editorContainer || !isExpanded) return;
+    const lineNumbers = expandedLineNumbersRef.current;
+    if (!editorContainer || !lineNumbers) return;
 
-    const handleScroll = (e) => {
-      if (expandedLineNumbersRef.current) {
-        expandedLineNumbersRef.current.scrollTop = e.target.scrollTop;
-      }
+    const handleScroll = () => {
+      lineNumbers.scrollTop = editorContainer.scrollTop;
     };
 
-    const scrollableElement = editorContainer.querySelector("pre") || editorContainer.querySelector("textarea");
-    if (scrollableElement) {
-      scrollableElement.addEventListener("scroll", handleScroll);
-      return () => {
-        scrollableElement.removeEventListener("scroll", handleScroll);
-      };
-    }
-  }, [value, isExpanded]);
+    editorContainer.addEventListener("scroll", handleScroll);
+    return () => editorContainer.removeEventListener("scroll", handleScroll);
+  }, [isExpanded]);
 
   // Get the appropriate Prism language
   const getPrismLanguage = () => {
@@ -115,14 +106,21 @@ export default function CodeInput({
 
   const languageLabel = language === "css" ? "CSS" : language === "javascript" || language === "js" ? "JavaScript" : "HTML";
 
+  // The container owns the visible height and both columns stretch to fill it.
+  // Sizing the gutter from its own content instead lets it outgrow the code box
+  // as soon as the code is taller than the visible area — the gutter would run
+  // on to line 24 beside an editor still showing 12 and scrolling internally.
+  // Putting the height here also survives a drag-resize, which a static cap on
+  // the gutter could not.
   const renderEditor = (expanded = false) => (
-    <div className={`code-input-container ${expanded ? "code-input-container-expanded" : ""}`}>
+    <div
+      className={`code-input-container ${expanded ? "code-input-container-expanded" : ""}${
+        !expanded && resizable ? " code-input-container-resizable" : ""
+      }`}
+      style={expanded ? undefined : { height: `${rows * 1.5}rem` }}
+    >
       {/* Line numbers */}
-      <div
-        ref={expanded ? expandedLineNumbersRef : lineNumbersRef}
-        className="code-line-numbers"
-        style={expanded || resizable ? undefined : { maxHeight: `${rows * 1.5}rem` }}
-      >
+      <div ref={expanded ? expandedLineNumbersRef : lineNumbersRef} className="code-line-numbers">
         {Array.from({ length: lineCount }, (_, i) => (
           <div key={i} className="code-line-number">
             {i + 1}
@@ -131,17 +129,7 @@ export default function CodeInput({
       </div>
 
       {/* Code editor */}
-      <div
-        ref={expanded ? expandedEditorContainerRef : editorContainerRef}
-        className={`code-editor${!expanded && resizable ? " code-editor-resizable" : ""}`}
-        style={
-          expanded
-            ? undefined
-            : resizable
-              ? { height: `${rows * 1.5}rem`, minHeight: `${rows * 1.5}rem` }
-              : { minHeight: `${rows * 1.5}rem`, maxHeight: `${rows * 1.5}rem` }
-        }
-      >
+      <div ref={expanded ? expandedEditorContainerRef : editorContainerRef} className="code-editor">
         <Editor
           ref={expanded ? undefined : editorRef}
           value={value}
