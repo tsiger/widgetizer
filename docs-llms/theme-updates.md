@@ -25,6 +25,8 @@ When `buildLatestSnapshot` runs, it first syncs any `updates/` folders from the 
 
 > **Note.** Theme-update reads and writes go through direct `fs-extra` / `path` calls (the controller and service both `import fs from "fs-extra"`), **not** the scope-first storage adapter — this subsystem operates on the global `themes/` and `data/themes/` trees rather than per-project, scoped content. Source-directory and metadata resolution (`getThemeSourceDir`, `readThemeSourceMetadata`) is gated by a 5-second cache (`THEME_SOURCE_CACHE_TTL_MS = 5000` in `themeController.js`), so a freshly built `latest/` may take up to ~5s to become visible to readers; `buildLatestSnapshot` calls `invalidateThemeSourceCache(themeId)` to clear it eagerly.
 
+The **seed directory** isn't limited to a single root: `THEMES_EXTRA_ROOTS` names additional seed roots that are searched *before* `THEMES_ROOT`. Multiple roots are separated by the OS path-list delimiter (`path.delimiter` — `:` on macOS/Linux, `;` on Windows), e.g. `THEMES_EXTRA_ROOTS=/srv/partner-themes:/srv/client-themes`. The first root containing `<id>/theme.json` owns that theme wholesale — its base version, `updates/`, `presets/`, and preset media all resolve from that root, not from `THEMES_ROOT`. `theme.json` is required to claim ownership. This is meant for an embedding host that wants to ship themes beyond the bundled set, or to intentionally shadow a bundled theme with its own version, without touching the seed directory's contents.
+
 ### Version Structure
 
 Theme authors create update folders in the **seed** directory:

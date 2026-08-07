@@ -6,7 +6,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
-import { getProjectDir, getProjectThemeJsonPath } from "../config.js";
+import { getProjectDir } from "../config.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getThemeSourceDir, readThemeSourceMetadata } from "../controllers/themeController.js";
@@ -168,45 +168,16 @@ function mergeSettingsArray(userArray, newArray) {
 }
 
 /**
- * Apply a theme update to a project.
+ * Apply a theme update to a project directory — the file-level core of an update.
  * Copies updatable theme files (layout, assets, widgets, snippets), adds new menus
- * and templates without overwriting existing ones, merges theme.json settings,
- * and updates project metadata.
- * @param {string} projectId - The project's UUID
- * @returns {Promise<{success: boolean, previousVersion: string, newVersion: string, message?: string}>} Update result
- * @throws {Error} If project not found
+ * and templates without overwriting existing ones, and merges theme.json settings.
+ * Pure filesystem work: no database access, no path resolution, no media-usage refresh.
+ * @param {object} params
+ * @param {string} params.themeSourceDir - Directory holding the theme source to apply
+ * @param {string} params.projectDir - The project's content directory
+ * @returns {Promise<{newVersion: string|null}>} The version from the theme source's theme.json, or null if unreadable
  */
-export async function applyThemeUpdate(projectId) {
-  const project = projectRepo.getProjectById(projectId);
-
-  if (!project) {
-    throw new Error(`Project not found: ${projectId}`);
-  }
-
-  const themeName = project.theme;
-  const previousVersion = project.themeVersion;
-
-  // Check if update is available
-  const updateStatus = await checkForUpdates(projectId);
-  if (!updateStatus.hasUpdate) {
-    return {
-      success: false,
-      message: "No update available",
-      previousVersion,
-      newVersion: previousVersion,
-    };
-  }
-
-  const projectFolderName = await getProjectFolderName(projectId);
-  const projectDir = getProjectDir(projectFolderName);
-
-  // Get theme source directory (latest/ if exists, otherwise root)
-  const themeSourceDir = await getThemeSourceDir(themeName);
-
-  console.log(
-    `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,
-  );
-
+export async function applyThemeUpdateToDir({ themeSourceDir, projectDir }) {
   // 1. Copy updatable paths from theme to project
   for (const itemPath of UPDATABLE_PATHS) {
     const sourcePath = path.join(themeSourceDir, itemPath);
@@ -288,10 +259,11 @@ export async function applyThemeUpdate(projectId) {
     console.warn(`[applyThemeUpdate] Failed to add new templates: ${error.message}`);
   }
 
+  const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
+
   // 3. Merge theme.json
   try {
-    const projectThemeJsonPath = getProjectThemeJsonPath(projectFolderName);
-    const newThemeJsonPath = path.join(themeSourceDir, "theme.json");
+    const projectThemeJsonPath = path.join(projectDir, "theme.json");
 
     const userThemeJson = await fs.readJson(projectThemeJsonPath);
     const newThemeJson = await fs.readJson(newThemeJsonPath);
@@ -304,6 +276,59 @@ export async function applyThemeUpdate(projectId) {
     console.warn(`[applyThemeUpdate] Failed to merge theme.json: ${error.message}`);
     // This is more critical, but we still continue
   }
+
+  let newVersion = null;
+  try {
+    newVersion = (await fs.readJson(newThemeJsonPath)).version ?? null;
+  } catch {
+    // Theme source theme.json missing or unreadable — caller decides what to do
+  }
+
+  return { newVersion };
+}
+
+/**
+ * Apply a theme update to a project.
+ * Copies updatable theme files (layout, assets, widgets, snippets), adds new menus
+ * and templates without overwriting existing ones, merges theme.json settings,
+ * and updates project metadata.
+ * @param {string} projectId - The project's UUID
+ * @returns {Promise<{success: boolean, previousVersion: string, newVersion: string, message?: string}>} Update result
+ * @throws {Error} If project not found
+ */
+export async function applyThemeUpdate(projectId) {
+  const project = projectRepo.getProjectById(projectId);
+
+  if (!project) {
+    throw new Error(`Project not found: ${projectId}`);
+  }
+
+  const themeName = project.theme;
+  const previousVersion = project.themeVersion;
+
+  // Check if update is available
+  const updateStatus = await checkForUpdates(projectId);
+  if (!updateStatus.hasUpdate) {
+    return {
+      success: false,
+      message: "No update available",
+      previousVersion,
+      newVersion: previousVersion,
+    };
+  }
+
+  const projectFolderName = await getProjectFolderName(projectId);
+  const projectDir = getProjectDir(projectFolderName);
+
+  // Get theme source directory (latest/ if exists, otherwise root)
+  const themeSourceDir = await getThemeSourceDir(themeName);
+
+  console.log(
+    `[applyThemeUpdate] Updating project ${projectId} from ${previousVersion} to ${updateStatus.latestVersion}`,
+  );
+
+  // 1-3. File-level update (updatable paths, new menus, new templates, theme.json merge)
+  await applyThemeUpdateToDir({ themeSourceDir, projectDir });
 
   // 4. Update project metadata
   projectRepo.updateProject(projectId, {

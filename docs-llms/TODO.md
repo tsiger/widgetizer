@@ -39,6 +39,8 @@ explicit per-action permission.
 - [42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — **low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)**](#42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--low-oss-standalone--moderate-hosted--stored-xss-needs-confirmation)
 - [43. Render-engine containment — two edges left open (`render-engine` / `core`) — **low**](#43-render-engine-containment--two-edges-left-open-render-engine--core--low)
 - [44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`)](#44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core)
+- [45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)](#45-dead-code--empty-branch-in-mergesettingsarray-builder-server)
+- [46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
 
 ---
 
@@ -474,6 +476,35 @@ programmatically). These are traps waiting on a preset author who nests a direct
 - [ ] `seedPresetMedia` scope-first; source-flattening + duplicate-basename warning in place.
 - [ ] `selectPublishMedia` in `@widgetizer/core` with full unit tests; `exportController` delegates to it.
 - [ ] An export of a fixture project containing a richtext *image link* includes the linked file.
+
+---
+
+## 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)
+
+`packages/builder-server/src/services/themeUpdateService.js:162-163`, inside `mergeSettingsArray`:
+
+```js
+if (userItem.default !== undefined && newItem.default === undefined) {
+  // Don't preserve default if new schema removed it
+}
+```
+
+The branch body is empty — just the comment, no statement. Since `merged` already starts as a spread of
+`newItem` (which has no `default` key in this case), the condition is a no-op either way. Remove the dead
+branch, or implement whatever it was meant to guard (unclear from the comment alone — re-derive intent
+from `mergeSettingsArray`'s callers before deciding).
+
+---
+
+## 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)
+
+`packages/builder-server/src/controllers/themeController.js`, `buildLatestSnapshot`: the rebuild removes
+the existing `latest/` directory (`fs.remove(latestDir)`) and then re-layers base + updates into a fresh
+`latest/` via `layerThemeSnapshot`. Between the removal and the last file being copied back in, any
+concurrent reader of `latest/` (e.g. project scaffold copying a theme mid-rebuild) can observe a missing
+or half-built directory. Consider building into a temp sibling directory and atomically renaming it onto
+`latestDir` once complete, so readers only ever see the old complete tree or the new complete tree, never
+an in-between state.
 
 ---
 

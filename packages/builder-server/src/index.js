@@ -69,7 +69,18 @@ export { refreshAllMediaUsageFromDir } from "./services/mediaUsageService.js";
 // dir. Hosted's create route calls it with the per-tenant dir; OSS wraps it as
 // enrichSeededRichtextLinks(folderName) inside seedPresetCollections.
 export { enrichSeededRichtextLinksFromDir } from "./utils/linkEnrichment.js";
-export { listThemes, listThemePresets, resolvePresetPaths } from "./controllers/themeController.js";
+export {
+  listThemes,
+  listThemePresets,
+  resolvePresetPaths,
+  ensureThemesDirectory,
+  buildLatestSnapshot,
+  getThemeSourceDir,
+} from "./controllers/themeController.js";
+// Theme-update pipeline (check/toggle/apply) for hosted's own theme-update UI —
+// dir-explicit and scope-free like the readers above, so hosted drives the same
+// update logic against its per-tenant working dir instead of forking it.
+export { checkForUpdates, toggleThemeUpdates, applyThemeUpdateToDir } from "./services/themeUpdateService.js";
 // Global app settings (image sizes, dev mode, export limits) — the editor's
 // client reads these via GET /api/settings; hosted exposes a read-only route.
 export { readAppSettingsFile } from "./controllers/appSettingsController.js";

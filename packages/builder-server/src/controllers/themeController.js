@@ -3,7 +3,7 @@ import path from "path";
 import multer from "multer";
 import {
   DATA_DIR,
-  THEMES_SEED_DIR,
+  THEMES_SEED_DIRS,
   CORE_WIDGETS_DIR,
   getThemesDir,
   getThemeDir,
@@ -13,6 +13,7 @@ import {
   getThemeVersionDir,
   getProjectDir,
 } from "../config.js";
+import { resolveSeedThemeDir, listSeedThemeIds } from "../utils/themeSeedRoots.js";
 import { getAllProjects, getProjectById } from "../db/repositories/projectRepository.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { sortVersions, getLatestVersion, isValidVersion } from "../utils/semver.js";
@@ -172,31 +173,45 @@ async function _ensureThemesDirectoryOnce() {
 
   // Provision any seed theme that isn't installed yet. Per-theme (not
   // skip-if-dir-exists) so this self-heals an empty/partial themes dir left by an
-  // earlier failed seed (e.g. THEMES_SEED_DIR was missing) and picks up
-  // newly-added seed themes.
+  // earlier failed seed (e.g. a seed root was missing) and picks up
+  // newly-added seed themes. Each theme is owned wholesale by the first seed root
+  // that contains <id>/theme.json.
   try {
-    const seedExists = await fs.pathExists(THEMES_SEED_DIR);
-    if (seedExists) {
-      const seedThemes = await fs.readdir(THEMES_SEED_DIR, { withFileTypes: true });
-      let provisioned = 0;
-      for (const entry of seedThemes) {
-        if (!entry.isDirectory()) continue;
-        const dest = path.join(userThemesDir, entry.name);
-        if (await fs.pathExists(dest)) continue; // already installed
-        // Skip preset-media/: project creation resolves it from the seed directly
-        // (see resolvePresetPaths), so copying it would waste ~180MB per install.
-        const seedThemeDir = path.join(THEMES_SEED_DIR, entry.name);
-        await fs.copy(seedThemeDir, dest, {
-          filter: (src) => {
-            const rel = path.relative(seedThemeDir, src);
-            return rel === "" || rel.split(path.sep)[0] !== "preset-media";
-          },
-        });
-        provisioned += 1;
+    const seedIds = await listSeedThemeIds();
+
+    // Shadowing is intentional but easy to trip over, so surface it once at startup.
+    if (THEMES_SEED_DIRS.length > 1) {
+      for (const themeId of seedIds) {
+        const owners = [];
+        for (const root of THEMES_SEED_DIRS) {
+          if (await fs.pathExists(path.join(root, themeId, "theme.json"))) owners.push(root);
+        }
+        if (owners.length > 1) {
+          console.log(
+            `[ensureThemesDirectory] Theme "${themeId}" in ${owners[0]} shadows ${owners.slice(1).join(", ")}`,
+          );
+        }
       }
-      if (provisioned > 0) {
-        console.log(`[ensureThemesDirectory] Provisioned ${provisioned} default theme(s)`);
-      }
+    }
+
+    let provisioned = 0;
+    for (const themeId of seedIds) {
+      const dest = path.join(userThemesDir, themeId);
+      if (await fs.pathExists(dest)) continue; // already installed
+      const seedThemeDir = await resolveSeedThemeDir(themeId);
+      if (!seedThemeDir) continue; // dir without theme.json — not a theme
+      // Skip preset-media/: project creation resolves it from the seed directly
+      // (see resolvePresetPaths), so copying it would waste ~180MB per install.
+      await fs.copy(seedThemeDir, dest, {
+        filter: (src) => {
+          const rel = path.relative(seedThemeDir, src);
+          return rel === "" || rel.split(path.sep)[0] !== "preset-media";
+        },
+      });
+      provisioned += 1;
+    }
+    if (provisioned > 0) {
+      console.log(`[ensureThemesDirectory] Provisioned ${provisioned} default theme(s)`);
     }
   } catch (error) {
     console.warn(`[ensureThemesDirectory] Failed to provision default themes: ${error.message}`);
@@ -299,10 +314,9 @@ export async function getThemeVersions(themeId) {
   }
 
   // Get versions from updates/ directories (both user data and seed/source)
-  const updatesDirs = [
-    getThemeUpdatesDir(themeId),
-    path.join(THEMES_SEED_DIR, themeId, "updates"),
-  ];
+  const seedThemeDir = await resolveSeedThemeDir(themeId);
+  const updatesDirs = [getThemeUpdatesDir(themeId)];
+  if (seedThemeDir) updatesDirs.push(path.join(seedThemeDir, "updates"));
 
   for (const updatesDir of updatesDirs) {
     try {
@@ -429,10 +443,11 @@ export async function buildLatestSnapshot(themeId) {
   // Sync update folders from the seed (source) directory into the user data directory.
   // This allows theme authors to create updates in themes/{name}/updates/ and have
   // them picked up automatically without requiring a ZIP upload.
-  const seedUpdatesDir = path.join(THEMES_SEED_DIR, themeId, "updates");
+  const seedThemeDir = await resolveSeedThemeDir(themeId);
+  const seedUpdatesDir = seedThemeDir ? path.join(seedThemeDir, "updates") : null;
   const dataUpdatesDir = getThemeUpdatesDir(themeId);
   try {
-    if (await fs.pathExists(seedUpdatesDir)) {
+    if (seedUpdatesDir && (await fs.pathExists(seedUpdatesDir))) {
       const seedEntries = await fs.readdir(seedUpdatesDir, { withFileTypes: true });
       for (const entry of seedEntries) {
         if (entry.isDirectory() && isValidVersion(entry.name)) {
@@ -630,9 +645,10 @@ export async function resolvePresetPaths(themeId, presetId) {
   // The preset-name match is the opt-in. No media anywhere → seed nothing
   // (valid: the default arch preset has no media and no image refs).
   let mediaDir = null;
+  const seedThemeDir = await resolveSeedThemeDir(themeId);
   const mediaCandidates = [
     path.join(presetDir, "media"),
-    path.join(THEMES_SEED_DIR, themeId, "preset-media", presetId),
+    ...(seedThemeDir ? [path.join(seedThemeDir, "preset-media", presetId)] : []),
     path.join(sourceDir, "preset-media", presetId),
   ];
   for (const candidate of mediaCandidates) {

@@ -581,6 +581,12 @@ describe("buildLatestSnapshot", () => {
 
     const seedUpdateDir = path.join(THEMES_SEED_DIR, repairedTheme, "updates", "1.1.0");
     await fs.ensureDir(seedUpdateDir);
+    // A seed theme is identified by its root theme.json — without it the seed dir
+    // is not a theme and its updates/ are not consulted.
+    await fs.writeFile(
+      path.join(THEMES_SEED_DIR, repairedTheme, "theme.json"),
+      JSON.stringify({ name: repairedTheme, version: "1.0.0" }),
+    );
     await fs.writeFile(path.join(seedUpdateDir, "theme.json"), JSON.stringify({ name: repairedTheme, version: "1.1.0" }));
     await fs.writeFile(path.join(seedUpdateDir, "seed-file.txt"), "from seed");
 
