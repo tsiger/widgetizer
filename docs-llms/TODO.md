@@ -9,6 +9,8 @@
 - **Reference scope —** this repo only. **Never cite `widgetizer-hosted/` or the umbrella repo** — the OSS builder ships standalone and must not document, or depend on, anything downstream of it.
 - **Section numbers are stable.** Never renumber: historical commit messages cite these numbers (`... (TODO §12)`), and renumbering would silently repoint them. A closed item's number is retired, not reused.
 - **Lifecycle.** One commit adds an item. A later commit fixes it and marks it done. A third commit deletes the body and adds a row to the reference table at the bottom. **The body is not preserved in this file** — the table's two hashes are how you recover it: the *Fix* commit shows what changed, and the *Body at* commit is the last one where the full write-up is still readable (`git show <hash>:docs-llms/TODO.md`).
+- **Every open item must carry a priority.** Tag each item **High**, **Medium**, or **Low** with a `**Priority:**` line right under its heading, and list it in the matching Contents section. New items need a priority assigned when they're added; re-file the item (heading tag + Contents section) if its priority changes later.
+- **Heading format.** `## [status icon] N. Title (optional `package`/area) — optional priority detail — optional other markers`. Status icon: ⬜ open, ⏸️ deferred (✅ done / ❌ wontfix are for the completed reference table only). Priority detail is optional extra nuance beyond the bare High/Medium/Low bucket (e.g. differing severity across surfaces); omit it if the bucket alone says everything. Other markers are optional notes like `investigate`, `not started`, `blocked on X`, or a `deferred yyyy-mm-dd` date. The Contents entry for an item must always match its heading text verbatim.
 - **Layout:** these instructions → contents → open items → completed reference table.
 
 Open work for the OSS builder.
@@ -26,25 +28,37 @@ explicit per-action permission.
 
 ## Contents
 
-- [4. Deferred — Playwright E2E smoke (OSS)](#4-deferred--playwright-e2e-smoke-oss)
-- [17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — ⏸️ DEFERRED 2026-06-26 — **low (process)**](#17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting---deferred-2026-06-26--low-process)
-- [30. Extract project lifecycle duplicate/import into dir-explicit cores](#30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores)
-- [32. Theme-upload update-import validation smells (`builder-server`)](#32-theme-upload-update-import-validation-smells-builder-server)
-- [33. Editor-ui duplication smells (`editor-ui`)](#33-editor-ui-duplication-smells-editor-ui)
-- [37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`)](#37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui)
-- [38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`)](#38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server)
-- [39. SQLite transaction-boundary audit — media/project repositories (`builder-server`)](#39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server)
-- [40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — **low (security; OSS-standalone only)**](#40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
-- [41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — **investigate (perf; hosted-impacting)**](#41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--investigate-perf-hosted-impacting)
-- [42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — **low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)**](#42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--low-oss-standalone--moderate-hosted--stored-xss-needs-confirmation)
-- [43. Render-engine containment — two edges left open (`render-engine` / `core`) — **low**](#43-render-engine-containment--two-edges-left-open-render-engine--core--low)
-- [44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`)](#44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core)
-- [45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)](#45-dead-code--empty-branch-in-mergesettingsarray-builder-server)
-- [46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
+### High priority
+
+_None open._
+
+### Medium priority
+
+- [⏸️ 30. Extract project lifecycle duplicate/import into dir-explicit cores — moderate (architectural / hosted-readiness) — blocked on hosted duplicate/import](#-30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores--moderate-architectural--hosted-readiness--blocked-on-hosted-duplicateimport)
+- [⬜ 39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — 39a moderate (data-integrity), 39b/39c low (concurrency)](#-39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server--39a-moderate-data-integrity-39b39c-low-concurrency)
+- [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
+- [⬜ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)](#-42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--low-oss-standalone--moderate-hosted--stored-xss-needs-confirmation)
+- [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
+- [⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
+- [⬜ 48. Unmerged `list-button` branch — SplitButton feature + independent `saveStore` fixes (`editor-ui`) — medium (fix half is data-integrity) — decide rebase vs fresh-branch port](#-48-unmerged-list-button-branch--splitbutton-feature--independent-savestore-fixes-editor-ui--medium-fix-half-is-data-integrity--decide-rebase-vs-fresh-branch-port)
+
+### Low priority
+
+- [⏸️ 4. Playwright E2E smoke (OSS)](#-4-playwright-e2e-smoke-oss)
+- [⏸️ 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — low (process) — deferred 2026-06-26](#-17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting--low-process--deferred-2026-06-26)
+- [⬜ 32. Theme-upload update-import validation smells (`builder-server`) — low — investigate](#-32-theme-upload-update-import-validation-smells-builder-server--low--investigate)
+- [⬜ 33. Editor-ui duplication smells (`editor-ui`) — low (maintainability) — investigate](#-33-editor-ui-duplication-smells-editor-ui--low-maintainability--investigate)
+- [⬜ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — low (cosmetic)](#-37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui--low-cosmetic)
+- [⬜ 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — low — investigate](#-38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server--low--investigate)
+- [⬜ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — low (security; OSS-standalone only)](#-40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
+- [⬜ 43. Render-engine containment — two edges left open (`render-engine` / `core`) — low](#-43-render-engine-containment--two-edges-left-open-render-engine--core--low)
+- [⬜ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)](#-45-dead-code--empty-branch-in-mergesettingsarray-builder-server)
 
 ---
 
-## 4. Deferred — Playwright E2E smoke (OSS)
+## ⏸️ 4. Playwright E2E smoke (OSS)
+
+**Priority:** Low
 
 No end-to-end browser tests exist yet (only `node:test` server + Vitest client/component
 suites). Planned "later" for OSS: a **Web smoke** (create → edit → export). **Electron E2E is
@@ -55,7 +69,9 @@ audit tracks coverage gaps meanwhile.
 
 ---
 
-## 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — ⏸️ DEFERRED 2026-06-26 — **low (process)**
+## ⏸️ 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — low (process) — deferred 2026-06-26
+
+**Priority:** Low
 
 **Deferred (2026-06-26):** The one *proven* escape (the item-page body-class assertion) was already
 fixed as part of §15 (exact match + `!includes("page-news")`). The broader sweep is defensive-only with
@@ -109,7 +125,9 @@ discipline applies to hosted's own ported suites if/when audited, but that's sep
 
 ---
 
-## 30. Extract project lifecycle duplicate/import into dir-explicit cores
+## ⏸️ 30. Extract project lifecycle duplicate/import into dir-explicit cores — moderate (architectural / hosted-readiness) — blocked on hosted duplicate/import
+
+**Priority:** Medium
 
 **Status:** ⏸️ deferred — scoped under §28 (2026-06-29), promoted to its own item 2026-06-29. The OSS
 reads/theme-CRUD half of §28 is done; this is the **lifecycle (exception 4) tail**. Blocked on hosted
@@ -146,7 +164,9 @@ shell-wrapper job rather than a re-fork if/when hosted wants them.
 
 ---
 
-## 32. Theme-upload update-import validation smells (`builder-server`)
+## ⬜ 32. Theme-upload update-import validation smells (`builder-server`) — low — investigate
+
+**Priority:** Low
 
 **Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `1c831b4b` (§22: gate collection
 schemas on the theme **update-import** path). Two minor smells in the new validation path; neither is a
@@ -174,7 +194,9 @@ and the double log is cosmetic. Confirm reachability before deciding to fix.
 
 ---
 
-## 33. Editor-ui duplication smells (`editor-ui`)
+## ⬜ 33. Editor-ui duplication smells (`editor-ui`) — low (maintainability) — investigate
+
+**Priority:** Low
 
 **Status:** ⬜ open (investigate) — surfaced 2026-07-01 reviewing OSS `331ccf8b` (user-test-checklist batch).
 Two DRY / maintainability smells to weigh; refactor-only, no behavior change intended.
@@ -196,7 +218,9 @@ when a third consumer appears.
 
 ---
 
-## 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`)
+## ⬜ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — low (cosmetic)
+
+**Priority:** Low
 
 **Status:** ⬜ open — surfaced 2026-07-07 while reviewing error/empty-state components as a model for §36's
 `WorkspaceLoadFailed` (`EmptyState` was rejected as the model *because* it's unstyled). A concrete,
@@ -225,7 +249,9 @@ server/contract change.
 
 ---
 
-## 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`)
+## ⬜ 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — low — investigate
+
+**Priority:** Low
 
 **Status:** ⬜ open (investigate) — surfaced 2026-07-07 during §36 (cold-boot race). Likely an intentional
 master-parity fallback; flag-don't-fix unless there's appetite to change it.
@@ -253,7 +279,9 @@ mirrors master and covers deleted-active / missing-record / migrated-data edge c
 
 ---
 
-## 39. SQLite transaction-boundary audit — media/project repositories (`builder-server`)
+## ⬜ 39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — 39a moderate (data-integrity), 39b/39c low (concurrency)
+
+**Priority:** Medium
 
 **Status:** ⬜ open — surfaced 2026-07-08 auditing every `db.transaction(...)` site across the repositories.
 
@@ -295,7 +323,9 @@ through the mounted routes, so **39a** also affects the hosted media-upload path
 
 ---
 
-## 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — **low (security; OSS-standalone only)**
+## ⬜ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — low (security; OSS-standalone only)
+
+**Priority:** Low
 
 **Status:** ⬜ open — carried in from a 2026-06-19 security audit (its finding id was **SA-21**). The reproduction is restated in full below, so this item stands alone.
 
@@ -313,7 +343,9 @@ through the mounted routes, so **39a** also affects the hosted media-upload path
 
 ---
 
-## 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — **investigate (perf; hosted-impacting)**
+## ⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)
+
+**Priority:** Medium
 
 **Status:** ⬜ open — surfaced 2026-07-09 during a read-only render/sanitize CPU benchmark (scratchpad only; no repo changes). Reproducible; root cause uncharacterized.
 
@@ -351,7 +383,9 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 
 ---
 
-## 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — **low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)**
+## ⬜ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)
+
+**Priority:** Medium
 
 **Status:** ⬜ open — surfaced 2026-07-09 while scoping ZIP media-upload support. **Pre-existing** (affects PDF/audio uploads today, independent of ZIP); newly written up, not carried from the SA register.
 
@@ -379,7 +413,9 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 
 ---
 
-## 43. Render-engine containment — two edges left open (`render-engine` / `core`) — **low**
+## ⬜ 43. Render-engine containment — two edges left open (`render-engine` / `core`) — low
+
+**Priority:** Low
 
 Residue from the path-containment + escaping work (see commits touching `safePath.js` /
 `escapeHtml.js`); both are open, neither is reachable today.
@@ -396,7 +432,9 @@ Residue from the path-containment + escaping work (see commits touching `safePat
 
 ---
 
-## 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`)
+## ⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started
+
+**Priority:** Medium
 
 **Status:** ⬜ open, not started. Analysis verified against code **2026-08-04**; re-check the file:line
 references before acting. Migrated here 2026-08-06 from a standalone planning doc.
@@ -479,7 +517,9 @@ programmatically). These are traps waiting on a preset author who nests a direct
 
 ---
 
-## 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)
+## ⬜ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)
+
+**Priority:** Low
 
 `packages/builder-server/src/services/themeUpdateService.js:162-163`, inside `mergeSettingsArray`:
 
@@ -496,7 +536,9 @@ from `mergeSettingsArray`'s callers before deciding).
 
 ---
 
-## 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)
+## ⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)
+
+**Priority:** Medium
 
 `packages/builder-server/src/controllers/themeController.js`, `buildLatestSnapshot`: the rebuild removes
 the existing `latest/` directory (`fs.remove(latestDir)`) and then re-layers base + updates into a fresh
@@ -505,6 +547,43 @@ concurrent reader of `latest/` (e.g. project scaffold copying a theme mid-rebuil
 or half-built directory. Consider building into a temp sibling directory and atomically renaming it onto
 `latestDir` once complete, so readers only ever see the old complete tree or the new complete tree, never
 an in-between state.
+
+---
+
+## ⬜ 48. Unmerged `list-button` branch — SplitButton feature + independent `saveStore` fixes (`editor-ui`) — medium (fix half is data-integrity) — decide rebase vs fresh-branch port
+
+**Priority:** Medium
+
+The pushed `list-button` branch (forked from master 2026-07-13, 19 commits, `065d5360`..`f03c2f60`)
+carries two distinct halves. *(This item is numbered §48, skipping §47: the branch's own TODO edits
+claim §45–§47 for different items, and its commit messages cite those numbers — reusing §47 on
+master would silently repoint them.)*
+
+**(a) Feature:** the page-editor topbar primary-action SplitButton (`065d5360`, `ae05f192`,
+`cbfff4cb`) and the shared Ctrl+S/click dispatch seam `useDispatchCommand` (`4582a315`). Whether
+this ships is a product/UX call still to be made.
+
+**(b) Independent fixes to bugs still live on master** — `saveStore.js`/`pageStore.js` are untouched
+on master since the fork, so all of these defects exist today:
+
+- autosave/manual-save overlap race, both directions (`a92cbdb3`) — no in-flight tracking at all;
+- a header/footer edit made while its own save is in flight is missed or flagged-but-never-resent —
+  silent loss of the second edit (`0e7ab252`, `c4c9cb6a`);
+- autosave timer goes permanently silent on a skipped tick / gets clobbered (`6b6a456a`, `d4eb5b03`);
+- the structural fix under all of the above: single-flight save queue, generation-gated `reset()`,
+  retry backoff (`99d0d584`, `c28cc5ef`; design doc in `b019dcd3`);
+- key-order-sensitive `JSON.stringify` dirty-diffing → `lodash isEqual` (`cd35c26d`);
+- undo/redo not integrated with dirty tracking (`2419335a`);
+- review-round hardening: another autosave race, silent extension collisions, error-toast
+  crash/leak (`f94da15d`, `0f5f622e`). Plus ~500 lines of new saveStore/dispatch tests (`77fde401`).
+
+**The (b) half is worth landing regardless of (a)'s fate.** Caveat: some (b) commits sit textually
+on top of (a)'s refactors, so extraction is a small rebase exercise, not clean cherry-picks.
+
+**Weigh rebasing the branch against a fresh branch that ports the pieces.** Master has moved ~129
+commits past the fork, and the branch's TODO §-numbering collides with master's — with that much
+divergence, porting (b) first (and (a) later if wanted) onto a fresh branch may be cheaper and
+safer than rebasing all 19 commits. Close whichever path loses.
 
 ---
 
