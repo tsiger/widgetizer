@@ -27,7 +27,7 @@ export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizati
 // DB-only via the shared getDb() singleton, no scope/adapter needed.
 export { updateThemeSettingsMediaUsage } from "./services/mediaUsageService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
-export { buildRuntimeSiteIcons } from "./utils/siteIconHelpers.js";
+export { buildRuntimeSiteIcons, generateExportSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
 
 // Collection enumeration + item-page render for hosted's cloud render/export
