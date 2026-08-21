@@ -1,6 +1,7 @@
 import { Liquid } from "liquidjs";
 import fs from "fs/promises";
 import path from "path";
+import { resolveInside } from "./safePath.js";
 import {
   ThemeSettingsTag,
   AssetTag,
@@ -24,6 +25,7 @@ import {
   registerDateFilter,
   registerCollectionFilter,
 } from "@widgetizer/core";
+import { escapeHtml } from "@widgetizer/core/escapeHtml";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
@@ -290,7 +292,13 @@ async function loadMenuMaps(deps) {
     for (const file of files) {
       if (!file.endsWith(".json")) continue;
       try {
-        const content = await fs.readFile(path.join(menusDir, file), "utf8");
+        // `file` comes from readdir so it can't traverse, but it can be a
+        // symlink out of the project — resolveInside catches that. Base is the
+        // PROJECT dir, not menusDir: a symlinked menus/ would otherwise be
+        // validated against itself and pass.
+        const menuPath = await resolveInside(deps.projectDir, "menus", file);
+        if (!menuPath) continue;
+        const content = await fs.readFile(menuPath, "utf8");
         const menu = JSON.parse(content);
         if (menu.uuid) {
           byUuid.set(menu.uuid, menu);
@@ -375,7 +383,9 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   // Check if icons need to be reloaded (new project, or file changed in preview mode)
   let shouldReloadIcons = !global.iconsCache.has(projectId);
 
-  const iconsPath = path.join(deps.projectDir, "assets", "icons.json");
+  // Fixed name; guarded so a symlinked icons.json can't pull JSON in from
+  // outside the project. null → the reads below fail and icons stay empty.
+  const iconsPath = await resolveInside(deps.projectDir, "assets", "icons.json");
 
   if (!shouldReloadIcons && renderMode === "preview") {
     // In preview mode, check if file has been modified since last cache
@@ -539,21 +549,33 @@ async function renderWidget(
     // Determine if this is a core widget (prefixed with "core-")
     const isCoreWidget = type.startsWith("core-");
 
-    // Determine the correct path based on widget type
-    let widgetPath;
-    let schemaPath;
+    // Determine the correct base + folder for this widget type. `type` comes
+    // from page JSON and is NOT validated on save, so it is treated as hostile:
+    // every path below is resolved through resolveInside, which contains it
+    // within the base it belongs to. Without that, a type of "../../<other
+    // project>/widgets/hero" reads another project's template and renders it
+    // into this page — and "core-../.." satisfies the core-widget branch too.
+    let baseDir;
+    let widgetFolder;
     if (isCoreWidget) {
       // Core widget (folder structure)
-      widgetPath = path.join(deps.coreWidgetsDir, type, "widget.liquid");
-      schemaPath = path.join(deps.coreWidgetsDir, type, "schema.json");
+      baseDir = deps.coreWidgetsDir;
+      widgetFolder = [type];
     } else if (type === "header" || type === "footer") {
       // Global theme widget (folder structure)
-      widgetPath = path.join(projectDir, "widgets", "global", type, "widget.liquid");
-      schemaPath = path.join(projectDir, "widgets", "global", type, "schema.json");
+      baseDir = projectDir;
+      widgetFolder = ["widgets", "global", type];
     } else {
       // Regular theme widget (folder structure)
-      widgetPath = path.join(projectDir, "widgets", type, "widget.liquid");
-      schemaPath = path.join(projectDir, "widgets", type, "schema.json");
+      baseDir = projectDir;
+      widgetFolder = ["widgets", type];
+    }
+
+    const widgetPath = await resolveInside(baseDir, ...widgetFolder, "widget.liquid");
+    const schemaPath = await resolveInside(baseDir, ...widgetFolder, "schema.json");
+    if (!widgetPath) {
+      console.warn(`Widget type escapes its allowed directory, refusing to render: ${type}`);
+      return `<div class="widget-error">Widget template not found: ${escapeHtml(type)}.liquid</div>`;
     }
 
     // Read the widget template
@@ -563,7 +585,7 @@ async function renderWidget(
     } catch (error) {
       // If template not found, return an informative error message instead of crashing
       console.warn(`Widget template not found at ${widgetPath}. Error: ${error.message}`);
-      return `<div class="widget-error">Widget template not found: ${type}.liquid</div>`;
+      return `<div class="widget-error">Widget template not found: ${escapeHtml(type)}.liquid</div>`;
     }
 
     // Load schema from schema.json file
@@ -747,13 +769,17 @@ async function renderWidget(
   } catch (error) {
     console.error(`Error rendering widget ${widgetId} (Project: ${deps.projectId}):`, error);
     // Return a more informative error message in the HTML
-    return `<div class="widget-error" data-widget-id="${widgetId}" data-widget-type="${widgetData?.type || "unknown"}">
+    // Everything interpolated here comes from page JSON (widget id and type are
+    // author-controlled keys/values) or from an error message that can quote it.
+    // Unescaped, a type carrying a quote would break out of the data-* attribute.
+    const safeType = escapeHtml(widgetData?.type) || "unknown";
+    return `<div class="widget-error" data-widget-id="${escapeHtml(widgetId)}" data-widget-type="${safeType}">
       <p><strong>Error rendering widget!</strong></p>
-      <p>Type: ${widgetData?.type || "unknown"}</p>
-      <p>ID: ${widgetId}</p>
-      <pre style="white-space: pre-wrap; word-wrap: break-word; background-color: #fdd; padding: 5px; border: 1px solid red;">${
-        error.message
-      }\n${error.stack}</pre>
+      <p>Type: ${safeType}</p>
+      <p>ID: ${escapeHtml(widgetId)}</p>
+      <pre style="white-space: pre-wrap; word-wrap: break-word; background-color: #fdd; padding: 5px; border: 1px solid red;">${escapeHtml(
+        error.message,
+      )}\n${escapeHtml(error.stack)}</pre>
     </div>`;
   }
 }
@@ -783,14 +809,17 @@ async function renderPageLayout(
   try {
     // 1. Fetch layout.liquid for the project
     const projectDir = deps.projectDir;
-    const layoutPath = path.join(projectDir, "layout.liquid");
+    // Fixed name, so no traversal here — but a symlinked layout.liquid would
+    // still be read and rendered, so it goes through the same guard.
+    const layoutPath = await resolveInside(projectDir, "layout.liquid");
 
     let layoutTemplate;
     try {
+      if (!layoutPath) throw new Error("layout.liquid resolves outside the project directory");
       layoutTemplate = await fs.readFile(layoutPath, "utf-8");
     } catch (readErr) {
-      console.error(`Layout template not found at ${layoutPath}`);
-      return `<html><body><h1>Error: Layout template not found</h1><pre>${readErr.message}</pre></body></html>`;
+      console.error(`Layout template not readable under ${projectDir}`);
+      return `<html><body><h1>Error: Layout template not found</h1><pre>${escapeHtml(readErr.message)}</pre></body></html>`;
     }
 
     // 2. Create context for layout render (use shared globals)
@@ -829,7 +858,7 @@ async function renderPageLayout(
     return renderedHtml;
   } catch (error) {
     console.error(`Error rendering page layout for project ${deps.projectId}:`, error);
-    return `<html><body><h1>Error rendering page</h1><pre>${error.message}</pre></body></html>`;
+    return `<html><body><h1>Error rendering page</h1><pre>${escapeHtml(error.message)}</pre></body></html>`;
   }
 }
 
@@ -1005,12 +1034,12 @@ async function widgetSupportsTransparentHeader(deps, widgetType) {
     const projectDir = deps.projectDir;
     const isCoreWidget = widgetType.startsWith("core-");
 
-    let schemaPath;
-    if (isCoreWidget) {
-      schemaPath = path.join(deps.coreWidgetsDir, widgetType, "schema.json");
-    } else {
-      schemaPath = path.join(projectDir, "widgets", widgetType, "schema.json");
-    }
+    // Same untrusted `type` as renderWidget — contain it here too, or this
+    // read becomes the traversal that one closes.
+    const schemaPath = isCoreWidget
+      ? await resolveInside(deps.coreWidgetsDir, widgetType, "schema.json")
+      : await resolveInside(projectDir, "widgets", widgetType, "schema.json");
+    if (!schemaPath) return false;
 
     const schemaContent = await fs.readFile(schemaPath, "utf-8");
     const schema = JSON.parse(schemaContent);

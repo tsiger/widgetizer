@@ -18,6 +18,7 @@
     "./youtube": "./src/utils/youtubeHelpers.js",
     "./blockLimits": "./src/utils/blockLimits.js",
     "./mimeTypes": "./src/utils/mimeTypes.js",
+    "./escapeHtml": "./src/utils/escapeHtml.js",
     "./pathSecurity": "./src/utils/pathSecurity.js",
     "./urlSafety": "./src/utils/urlSafety.js",
     "./richtextMedia": "./src/utils/richtextMedia.js",

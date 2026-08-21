@@ -11,6 +11,8 @@ Themes are structured directories that define the layout, styles, and functional
 - `theme.json`: Theme metadata and configuration.
 - `screenshot.png`: A 1280x720 preview image of the theme, displayed on the card in the Themes UI.
 
+The seed directory defaults to `themes/` (or `THEMES_ROOT` if set) but an embedding host can layer in extra seed roots via `THEMES_EXTRA_ROOTS` — multiple roots separated by the OS path-list delimiter (`path.delimiter` — `:` on macOS/Linux, `;` on Windows), e.g. `THEMES_EXTRA_ROOTS=/srv/partner-themes:/srv/client-themes`. Extra roots are searched **before** the default seed directory; the first root containing `<id>/theme.json` owns that theme wholesale (base + updates + presets + preset media). `theme.json` is required to claim ownership — a root without it for a given `<id>` is skipped. This lets an embedding host ship additional themes alongside the bundled set, or intentionally shadow a bundled theme with its own version.
+
 ### Theme Directory Structure
 
 A theme directory carries its authored content plus two system-managed areas — `updates/` (per-version partial update folders) and `latest/` (a materialized snapshot composed from the base version plus all updates in semver order). An optional `presets/` directory holds named theme variants used only at project creation:

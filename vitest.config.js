@@ -21,6 +21,7 @@ export default mergeConfig(
         // the Node test runner (npm test), so it is intentionally excluded here.
         "packages/core/src/**/*.test.js",
         "packages/adapters-local/src/**/*.test.js",
+        "packages/render-engine/src/**/*.test.js",
         "packages/editor-ui/src/**/*.test.{js,jsx}",
       ],
     },
