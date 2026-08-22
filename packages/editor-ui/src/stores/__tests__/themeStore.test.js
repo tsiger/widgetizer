@@ -149,6 +149,51 @@ describe("themeStore", () => {
       expect(useThemeStore.getState().originalSettings).toEqual(correctedSettings);
     });
 
+    it("preserves a mid-flight edit made while the warnings reload was in flight — live settings keep the edit, baseline is the server copy, still reported dirty", async () => {
+      seedSettings();
+
+      saveThemeSettings.mockResolvedValueOnce({
+        warnings: ["primary_color was out of range"],
+      });
+      const correctedSettings = {
+        settings: {
+          global: {
+            colors: [
+              { id: "primary_color", type: "color", value: "#corrected" },
+              { id: "secondary_color", type: "color", value: "#00ff00" },
+            ],
+          },
+        },
+      };
+      let resolveGet;
+      getThemeSettings.mockImplementationOnce(() => new Promise((resolve) => { resolveGet = resolve; }));
+
+      const savePromise = useThemeStore.getState().saveSettings("project-a");
+
+      // Let saveThemeSettings' microtask resolve so getThemeSettings (and its
+      // resolveGet assignment) is actually reached before we edit mid-flight.
+      await Promise.resolve();
+      await Promise.resolve();
+
+      // An edit lands while the follow-up GET is still in flight.
+      useThemeStore.getState().updateThemeSetting("colors", "secondary_color", "#edited-mid-flight");
+      const midFlightSettings = useThemeStore.getState().settings;
+
+      resolveGet(correctedSettings);
+      await savePromise;
+
+      // The live draft must survive — not clobbered by the warnings reload.
+      expect(useThemeStore.getState().settings).toEqual(midFlightSettings);
+      const secondary = useThemeStore.getState().settings.settings.global.colors
+        .find((s) => s.id === "secondary_color");
+      expect(secondary.value).toBe("#edited-mid-flight");
+      // The baseline still rebaselines to the fresh server copy.
+      expect(useThemeStore.getState().originalSettings).toEqual(correctedSettings);
+      // Since settings != originalSettings now, the draft correctly reads dirty
+      // so the next save resends it.
+      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
+    });
+
     it("marks settings as saved without refetch when no warnings", async () => {
       seedSettings();
 

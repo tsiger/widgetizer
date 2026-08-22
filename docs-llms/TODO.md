@@ -41,6 +41,7 @@ _None open._
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
 - [⬜ 48. Unmerged `list-button` branch — SplitButton feature + independent `saveStore` fixes (`editor-ui`) — medium (fix half is data-integrity) — decide rebase vs fresh-branch port](#-48-unmerged-list-button-branch--splitbutton-feature--independent-savestore-fixes-editor-ui--medium-fix-half-is-data-integrity--decide-rebase-vs-fresh-branch-port)
+- [⬜ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`)](#-50-structure-only-undoredo-doesnt-re-arm-the-autosave-timer-editor-ui)
 
 ### Low priority
 
@@ -54,6 +55,8 @@ _None open._
 - [⬜ 43. Render-engine containment — two edges left open (`render-engine` / `core`) — low](#-43-render-engine-containment--two-edges-left-open-render-engine--core--low)
 - [⬜ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)](#-45-dead-code--empty-branch-in-mergesettingsarray-builder-server)
 - [⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)](#-49-linkenrichmentjs-bypasses-the-storage-adapter--raw-fs-writes-to-project-content-builder-server--low-architectural-hygiene)
+- [⬜ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`)](#-51-queued-save-flavor-inheritance-across-a-third-overlapping-save-call-editor-ui)
+- [⬜ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — low — latent](#-52-synchronous-subscriber-re-entry-window-in-savestoresave-editor-ui--low--latent)
 
 ---
 
@@ -594,6 +597,13 @@ registry commands) — is deliberately **not** ported: it is extensibility plumb
 and it remains on the branch, resurrectable if pluggable toolbar actions are ever genuinely
 needed. Consequence: Ctrl+S remains plain save.
 
+**(b) landed on `0.9.10`.** The saveStore-port commit (`fix(editor-ui): port saveStore/pageStore
+concurrency redesign from list-button`) carries the `saveStore`/`pageStore` concurrency fixes +
+tests, the undo/redo reconciliation wired into `EditorTopBar`, `.catch` at the manual-save
+callsites, and the post-review hardening (generation-gated error paths, theme-settings mid-flight
+edit preservation). (a) — the `SplitButton` feature half — is unaffected by this and stays open
+per the decision above.
+
 ---
 
 ## ⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)
@@ -619,6 +629,77 @@ during project scaffolding/lifecycle (some callsites, e.g. `projectScaffold.js`,
 hold a `scope`), so the conversion involves threading scope/adapter through those paths — a
 contained refactor, but not free. Until then, the constraint stands that these helpers only work
 where project storage is the local filesystem.
+
+---
+
+## ⬜ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`)
+
+**Priority:** Medium (low end)
+
+`saveStore.js`'s `reconcileModifiedWidgets` diffs per-widget content only (`page.widgets[id]` vs
+`originalPage.widgets[id]`, plus header/footer). A redo that reintroduces only a
+`widgetsOrder`/page-settings/theme-only change — nothing inside any individual widget's own
+content — marks no widget dirty and arms no autosave timer.
+
+This is a narrow data-loss window, not a silent one: `hasUnsavedChanges()` still does a whole-page
+`isEqual(page, originalPage)` diff, so the nav guard and a manual save both still catch it and work
+correctly. Only the 60-second autosave timer stays unarmed until some *other* edit re-arms it. Any
+subsequent edit (which does go through `markWidgetModified`/`setStructureModified`) re-arms the
+timer as normal, closing the window.
+
+**Candidate one-line fix:** in `reconcileModifiedWidgets`, also call `resetAutoSaveTimer()` (or
+whatever sets `autoSaveFailureCount`/arms the timer) when the whole-page diff is non-empty, mirroring
+what `hasUnsavedChanges()` already checks.
+
+---
+
+## ⬜ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`)
+
+**Priority:** Low
+
+`saveStore.js`'s coalescing branch has a third-caller-in queues onto the *second* caller's follow-up
+promise (`get().save(isAuto)`), which was itself built with the *second* caller's `isAuto` flavor —
+not necessarily the third caller's own. Concretely:
+
+- a manual save arriving while an autosave's follow-up is queued inherits the follow-up's `isAuto:
+  true` flavor: on failure this resolves `{ status: "failed" }` (autosave's silent-retry contract)
+  rather than rejecting, so the caller relying on the rejection (its `.catch`/`console.error`, see
+  the comment at `saveStore.js`'s manual-save catch branch) never fires;
+- the reverse — an autosave tick's own `save(true)` call inheriting a queued manual save's `isAuto:
+  false` flavor — throws on failure instead of resolving `{ status: "failed" }`; `resetAutoSaveTimer`'s
+  tick callback doesn't catch around `get().save(true)`, so that throw becomes an unhandled rejection
+  and the timer's own failure-count backoff never increments.
+
+Needs a 3-caller overlap plus a failure on the queued run to hit either branch — narrow window,
+hasn't been observed outside code inspection. Cheap hardening regardless of the flavor-inheritance
+question: wrap the autosave tick's `await get().save(true)` (in `resetAutoSaveTimer`) in a
+try/catch that maps a throw to `{ status: "failed" }`, so a mis-flavored inherited save can't produce
+an unhandled rejection there even if the inheritance itself isn't changed.
+
+May be worth folding in while touching this area: `reconcileModifiedWidgets` rebuilds a `Set` copy
+per widget id via `markWidgetModified`/`markWidgetUnmodified` and re-triggers
+`resetAutoSaveTimer()` per call — harmless churn at realistic widget counts, not worth its own item.
+
+---
+
+## ⬜ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — low — latent
+
+**Priority:** Low
+
+`save()` calls `set({ isSaving: true })` (or `isAutoSaving: true`) before `runningSave` is installed
+a few lines later. Zustand's vanilla store notifies `.subscribe()` listeners synchronously on `set`,
+so if any subscriber's callback itself called `save()` during that window, it would run before
+`runningSave` is populated, miss the single-flight coalescing branch entirely, and start an
+independent, overlapping save.
+
+No such subscriber exists today — the only `.subscribe()` caller on this store is a dev-only debug
+panel, and it doesn't call `save()`. This is a latent hazard rather than an active bug: `editor-ui`
+ships as a library other consumers can build on, and a future subscriber that reacts to `isSaving`
+by triggering its own save would hit this window with no defense.
+
+Candidate fix: move the `isSaving`/`isAutoSaving` `set()` to after `runningSave` is installed (or
+install a non-null sentinel in `runningSave` before the first `set()` in `save()`), so no
+subscriber notification can escape while the single-flight guard is still unset.
 
 ---
 

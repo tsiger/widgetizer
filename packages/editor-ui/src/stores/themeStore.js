@@ -95,9 +95,18 @@ const useThemeStore = create((set, get) => ({
       const freshData = await getThemeSettings(resolvedProjectId);
       // Only apply if still the same project
       if (get().loadedProjectId === resolvedProjectId) {
+        // `settings` was captured by identity before the await above, and
+        // updateThemeSetting always produces a new object — so `get().settings
+        // === settings` is a sound "no edit happened during this round-trip"
+        // test. The baseline always rebaselines to the fresh server copy, but
+        // the LIVE draft is only overwritten when it hasn't moved: an edit made
+        // during its own in-flight save must survive the warnings reload, not
+        // get silently clobbered. If the draft moved, it now differs from the
+        // fresh baseline, so hasUnsavedThemeChanges() correctly reads dirty and
+        // the next save resends it.
         set({
-          settings: freshData,
           originalSettings: JSON.parse(JSON.stringify(freshData)),
+          ...(get().settings === settings ? { settings: freshData } : {}),
         });
       }
     } else {

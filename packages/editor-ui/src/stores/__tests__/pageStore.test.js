@@ -367,6 +367,11 @@ describe("pageStore", () => {
       expect(state.loadedProjectId).toBe("project-a");
       expect(Object.keys(state.page.widgets)).toEqual(["w-1"]);
       expect(state.globalWidgets.header.type).toBe("header");
+      // originalGlobalWidgets is set alongside globalWidgets on a successful
+      // load — an independent deep-copy clone, not the same reference (so a
+      // later live-state mutation can't retroactively move the save baseline).
+      expect(state.originalGlobalWidgets).toEqual(state.globalWidgets);
+      expect(state.originalGlobalWidgets).not.toBe(state.globalWidgets);
       // The snapshot should reflect what themeStore loaded
       expect(state.themeSettingsSnapshot).toEqual(themeData);
     });
@@ -383,6 +388,7 @@ describe("pageStore", () => {
       const state = usePageStore.getState();
       expect(state.page).toBeNull();
       expect(state.globalWidgets).toEqual({ header: null, footer: null });
+      expect(state.originalGlobalWidgets).toEqual({ header: null, footer: null });
       expect(state.themeSettingsSnapshot).toBeNull();
       expect(state.loadedProjectId).toBe("project-b");
       expect(state.error).toBe("boom");
@@ -557,6 +563,35 @@ describe("pageStore", () => {
 
       page.title = "Mutated";
       expect(usePageStore.getState().originalPage.title).toBe("Original");
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // setOriginalGlobalWidgets
+  // --------------------------------------------------------------------------
+
+  describe("setOriginalGlobalWidgets", () => {
+    it("stores a deep copy of the provided globalWidgets", () => {
+      const globalWidgets = {
+        header: { type: "header", settings: { logo: "logo.png" }, blocks: {}, blocksOrder: [] },
+        footer: null,
+      };
+      usePageStore.getState().setOriginalGlobalWidgets(globalWidgets);
+
+      const stored = usePageStore.getState().originalGlobalWidgets;
+      expect(stored).toEqual(globalWidgets);
+      expect(stored).not.toBe(globalWidgets); // deep copy
+    });
+
+    it("stored copy is independent of the source object", () => {
+      const globalWidgets = {
+        header: { type: "header", settings: { logo: "logo.png" }, blocks: {}, blocksOrder: [] },
+        footer: null,
+      };
+      usePageStore.getState().setOriginalGlobalWidgets(globalWidgets);
+
+      globalWidgets.header.settings.logo = "mutated.png";
+      expect(usePageStore.getState().originalGlobalWidgets.header.settings.logo).toBe("logo.png");
     });
   });
 });

@@ -49,6 +49,7 @@ export default function EditorTopBar({
       undo();
       // Push the restored theme snapshot back to themeStore (canonical owner)
       usePageStore.getState().syncThemeStoreFromSnapshot();
+      useAutoSave.getState().reconcileModifiedWidgets();
     }
   }, []);
 
@@ -57,6 +58,7 @@ export default function EditorTopBar({
     redo();
     // Push the restored theme snapshot back to themeStore (canonical owner)
     usePageStore.getState().syncThemeStoreFromSnapshot();
+    useAutoSave.getState().reconcileModifiedWidgets();
   }, []);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function EditorTopBar({
         e.preventDefault();
         // Prevent multiple simultaneous saves if one is already in progress
         if (hasUnsavedChanges() && !isSaving) {
-          save(false);
+          save(false).catch((err) => console.error("Failed to save:", err));
         }
       }
 
@@ -278,7 +280,7 @@ export default function EditorTopBar({
         </div>
 
         <button
-          onClick={() => save(false)}
+          onClick={() => save(false).catch((err) => console.error("Failed to save:", err))}
           disabled={!hasUnsavedChanges() || isSaving}
           title={`${t("pageEditor.toolbar.save")} (Ctrl+S)`}
           className={`flex items-center justify-center gap-2 px-3 h-9 min-w-24 rounded-sm text-sm ${
