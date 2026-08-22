@@ -28,9 +28,9 @@ function primaryClass(disabled, hasMenu) {
 // "Save & Publish" stays available after a state change re-flags pending
 // work), not a rendering glitch. The reverse — an enabled primary next to a
 // fully-grey caret — would read as broken (a live primary action with a
-// dropdown that has literally nothing to offer), so any caller wiring a
-// menu's enabledWhen signals should keep them a superset of the primary's
-// own; this ensures the caret is never fully disabled while the primary is
+// dropdown that has literally nothing to offer), so any caller wiring its
+// items' disabled flags should keep the enabled set a superset of the
+// primary's own; this ensures the caret is never fully disabled while the primary is
 // enabled. SplitButton itself is presentational and doesn't enforce this —
 // it's a caller responsibility.
 function caretClass(allItemsDisabled) {
@@ -40,6 +40,12 @@ function caretClass(allItemsDisabled) {
   return `flex items-center justify-center px-2 h-9 rounded-r-sm border-l ${tone}`;
 }
 
+// Caller responsibility: `items` must stay stable (same members, same order)
+// while the menu is open. `activeIndex` is a position into the current
+// `items` array, while DOM focus follows the item node keyed by `it.id` — if
+// a caller reorders or removes items mid-open, the index and the focused node
+// can drift apart, so Enter can act on a different item than the one visibly
+// focused.
 export default function SplitButton({ primary, items = [], menuLabel = "More actions" }) {
   const hasMenu = items.length > 0;
   const [open, setOpen] = useState(false);

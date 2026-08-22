@@ -22,6 +22,9 @@ class MockXMLHttpRequest {
   open(method, url) {
     this.method = method;
     this.url = url;
+    // Mirrors real XHR: absent a redirect, responseURL equals the requested
+    // URL. Tests simulating a followed redirect override this before onload.
+    this.responseURL = url;
   }
 
   setRequestHeader(key, value) {
@@ -155,6 +158,24 @@ describe("uploadFormData", () => {
     xhr.responseText = JSON.stringify({ error: "Invalid project export" });
     xhr.onload();
     await promise.catch(() => {});
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("does not notify a mutation-success subscriber when the request was followed through a redirect", async () => {
+    const { uploadFormData } = await import("../uploadRequest");
+    const { subscribeMutationSuccess } = await import("../mutationEvents");
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    const promise = uploadFormData("/api/media/projects/test/media", {});
+    const xhr = xhrInstances[0];
+    xhr.status = 200;
+    // Simulate a followed redirect: the final URL differs from the requested one.
+    xhr.responseURL = "http://api.test/login";
+    xhr.responseText = JSON.stringify({ ok: true });
+    xhr.onload();
+    await promise;
 
     expect(handler).not.toHaveBeenCalled();
   });

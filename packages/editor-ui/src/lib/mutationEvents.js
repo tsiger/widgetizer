@@ -20,7 +20,12 @@ export function subscribeMutationSuccess(handler) {
 export function notifyMutationSuccess(event) {
   for (const handler of listeners) {
     try {
-      handler(event);
+      const result = handler(event);
+      // A listener can return a rejecting promise (async handler) instead of
+      // throwing synchronously; without this, that rejection is unhandled.
+      if (result && typeof result.then === "function") {
+        result.catch((error) => console.error("[mutationEvents] listener failed:", error));
+      }
     } catch (error) {
       console.error("[mutationEvents] listener failed:", error);
     }

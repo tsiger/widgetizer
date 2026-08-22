@@ -78,8 +78,15 @@ export async function uploadFormData(path, formData, { onProgress, signal } = {}
       if (xhr.status >= 200 && xhr.status < 300) {
         // Uploads go through XMLHttpRequest rather than apiFetch, so this is
         // the seam's second announce point — mirrors apiFetch's hook so any
-        // subscriber sees mutations from both paths.
-        notifyMutationSuccess({ method: "POST", path });
+        // subscriber sees mutations from both paths. XHR follows redirects
+        // transparently, so a followed redirect (responseURL differs from
+        // the requested URL) means the upload endpoint never actually ran —
+        // skip the announce in that case, same reasoning as apiFetch's
+        // `!response.redirected` guard.
+        const followedRedirect = xhr.responseURL && xhr.responseURL !== API_URL(path);
+        if (!followedRedirect) {
+          notifyMutationSuccess({ method: "POST", path });
+        }
         resolveOnce({ ok: true, status: xhr.status, data });
         return;
       }

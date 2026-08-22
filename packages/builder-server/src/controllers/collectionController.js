@@ -171,7 +171,11 @@ export async function deleteItem(req, res) {
     if (!result.deleted) return noStore(res).status(404).json({ error: "Item not found" });
     await removeCollectionItemFromMediaUsage(scope.projectId, collectionType, itemSlug);
     if (existing?.uuid) {
-      await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: existing.uuid });
+      try {
+        await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: existing.uuid });
+      } catch (cleanupError) {
+        console.warn(`Failed to clean up references for deleted item ${itemSlug} (${existing.uuid}):`, cleanupError.message);
+      }
     }
     noStore(res).json({ success: true, slug: itemSlug });
   } catch (err) {
@@ -206,7 +210,11 @@ export async function bulkDeleteItems(req, res) {
     }
     const deletedUuids = result.deleted.map((slug) => uuidBySlug.get(slug)).filter(Boolean);
     if (deletedUuids.length > 0) {
-      await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: deletedUuids });
+      try {
+        await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: deletedUuids });
+      } catch (cleanupError) {
+        console.warn(`Failed to clean up references for deleted items ${deletedUuids.join(", ")}:`, cleanupError.message);
+      }
     }
     const partial = result.notFound.length > 0 || result.errors.length > 0;
     noStore(res)

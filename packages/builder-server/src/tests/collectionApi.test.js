@@ -234,4 +234,62 @@ describe("item mutations", () => {
     assert.deepEqual(res._json.deleted, ["a"]);
     assert.deepEqual(res._json.notFound, ["missing"]);
   });
+
+  // Best-effort reference-cleanup: a storage error during cleanup (e.g. a
+  // non-ENOENT `list` failure) must not turn an already-committed delete into
+  // a 500 — the item is gone either way, so the response must still say so.
+  function makeThrowingListStorage() {
+    // Delegates everything to the real adapter except `list`, which throws —
+    // aliased so the `local/require-scope-arg` lint rule (which pattern-matches
+    // the literal `storage` identifier) doesn't misread this pass-through
+    // wrapper as an unscoped adapter call.
+    const realAdapter = storage;
+    return {
+      read: (...args) => realAdapter.read(...args),
+      write: (...args) => realAdapter.write(...args),
+      delete: (...args) => realAdapter.delete(...args),
+      exists: (...args) => realAdapter.exists(...args),
+      stat: (...args) => realAdapter.stat(...args),
+      getProjectBase: (...args) => realAdapter.getProjectBase(...args),
+      list: async () => {
+        throw Object.assign(new Error("EIO: storage listing failed"), { code: "EIO" });
+      },
+    };
+  }
+
+  it("deleteItem still returns success when reference cleanup throws a non-ENOENT error", async () => {
+    await createNews({ settings: { title: "Cleanup Boom" } });
+    const res = mockRes();
+    await collectionController.deleteItem(
+      {
+        params: { collectionType: "news", itemSlug: "cleanup-boom" },
+        body: {},
+        query: {},
+        activeProject,
+        scope,
+        adapters: { storage: makeThrowingListStorage(), limits },
+      },
+      res,
+    );
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json, { success: true, slug: "cleanup-boom" });
+  });
+
+  it("bulkDeleteItems still reports deletions when reference cleanup throws a non-ENOENT error", async () => {
+    await createNews({ settings: { title: "Bulk Cleanup Boom" } });
+    const res = mockRes();
+    await collectionController.bulkDeleteItems(
+      {
+        params: { collectionType: "news" },
+        body: { itemSlugs: ["bulk-cleanup-boom"] },
+        query: {},
+        activeProject,
+        scope,
+        adapters: { storage: makeThrowingListStorage(), limits },
+      },
+      res,
+    );
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.deleted, ["bulk-cleanup-boom"]);
+  });
 });

@@ -40,7 +40,6 @@ _None open._
 - [⬜ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)](#-42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--low-oss-standalone--moderate-hosted--stored-xss-needs-confirmation)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
-- [⬜ 48. Unmerged `list-button` branch — SplitButton feature + independent `saveStore` fixes (`editor-ui`) — medium (fix half is data-integrity) — decide rebase vs fresh-branch port](#-48-unmerged-list-button-branch--splitbutton-feature--independent-savestore-fixes-editor-ui--medium-fix-half-is-data-integrity--decide-rebase-vs-fresh-branch-port)
 - [⬜ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`)](#-50-structure-only-undoredo-doesnt-re-arm-the-autosave-timer-editor-ui)
 
 ### Low priority
@@ -554,58 +553,6 @@ an in-between state.
 
 ---
 
-## ⬜ 48. Unmerged `list-button` branch — SplitButton feature + independent `saveStore` fixes (`editor-ui`) — medium (fix half is data-integrity) — decide rebase vs fresh-branch port
-
-**Priority:** Medium
-
-The pushed `list-button` branch (forked from master 2026-07-13, 19 commits, `065d5360`..`f03c2f60`)
-carries two distinct halves. *(This item is numbered §48, skipping §47: the branch's own TODO edits
-claim §45–§47 for different items, and its commit messages cite those numbers — reusing §47 on
-master would silently repoint them.)*
-
-**(a) Feature:** the page-editor topbar primary-action SplitButton (`065d5360`, `ae05f192`,
-`cbfff4cb`) and the shared Ctrl+S/click dispatch seam `useDispatchCommand` (`4582a315`). Whether
-this ships is a product/UX call still to be made.
-
-**(b) Independent fixes to bugs still live on master** — `saveStore.js`/`pageStore.js` are untouched
-on master since the fork, so all of these defects exist today:
-
-- autosave/manual-save overlap race, both directions (`a92cbdb3`) — no in-flight tracking at all;
-- a header/footer edit made while its own save is in flight is missed or flagged-but-never-resent —
-  silent loss of the second edit (`0e7ab252`, `c4c9cb6a`);
-- autosave timer goes permanently silent on a skipped tick / gets clobbered (`6b6a456a`, `d4eb5b03`);
-- the structural fix under all of the above: single-flight save queue, generation-gated `reset()`,
-  retry backoff (`99d0d584`, `c28cc5ef`; design doc in `b019dcd3`);
-- key-order-sensitive `JSON.stringify` dirty-diffing → `lodash isEqual` (`cd35c26d`);
-- undo/redo not integrated with dirty tracking (`2419335a`);
-- review-round hardening: another autosave race, silent extension collisions, error-toast
-  crash/leak (`f94da15d`, `0f5f622e`). Plus ~500 lines of new saveStore/dispatch tests (`77fde401`).
-
-**The (b) half is worth landing regardless of (a)'s fate.** Caveat: some (b) commits sit textually
-on top of (a)'s refactors, so extraction is a small rebase exercise, not clean cherry-picks.
-
-**Weigh rebasing the branch against a fresh branch that ports the pieces.** Master has moved ~129
-commits past the fork, and the branch's TODO §-numbering collides with master's — with that much
-divergence, porting (b) first (and (a) later if wanted) onto a fresh branch may be cheaper and
-safer than rebasing all 19 commits. Close whichever path loses.
-
-**Decided 2026-08-22: fresh port, not a rebase; the branch stays pushed as a parts bin and closes
-when the port lands.** What ports to `0.9.10`: all of (b) — the `saveStore`/`pageStore` fixes with
-their tests — plus, from (a), `SplitButton.jsx` **as a dumb component only** (with its tests). The
-rest of (a) — the toolbar-extension machinery (descriptors, named signals, `useDispatchCommand`,
-registry commands) — is deliberately **not** ported: it is extensibility plumbing with no consumer,
-and it remains on the branch, resurrectable if pluggable toolbar actions are ever genuinely
-needed. Consequence: Ctrl+S remains plain save.
-
-**(b) landed on `0.9.10`.** The saveStore-port commit (`fix(editor-ui): port saveStore/pageStore
-concurrency redesign from list-button`) carries the `saveStore`/`pageStore` concurrency fixes +
-tests, the undo/redo reconciliation wired into `EditorTopBar`, `.catch` at the manual-save
-callsites, and the post-review hardening (generation-gated error paths, theme-settings mid-flight
-edit preservation). (a) — the `SplitButton` feature half — is unaffected by this and stays open
-per the decision above.
-
----
-
 ## ⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)
 
 **Priority:** Low
@@ -739,3 +686,4 @@ Bodies live in git, not here. `Fix` is the first commit that implemented the ite
 | 34 | `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) | ✅ DONE 2026-07-07 | `36d081d7` | `efc6e957` |
 | 35 | Create-from-preset + Refresh Usage don't track media usage (embedding-host-facing; fixed in `builder-server`) | ✅ DONE 2026-07-02 | `cae73b17` | `efc6e957` |
 | 36 | Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) | ✅ DONE 2026-07-07 | `2e0dc1c9` | `efc6e957` |
+| 48 | Unmerged `list-button` branch — SplitButton feature + independent `saveStore` fixes (`editor-ui`) | ✅ RESOLVED 2026-08-22 | `4bd1509a`, `d2a50a85` | `d2a50a85` |

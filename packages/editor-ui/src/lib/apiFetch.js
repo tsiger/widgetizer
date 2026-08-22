@@ -32,7 +32,10 @@ export async function apiFetch(path, options = {}) {
   const response = await fetch(url, { ...options, headers });
 
   const method = (options.method || "GET").toUpperCase();
-  if (response.ok && !NON_MUTATING_METHODS.has(method)) {
+  // A followed redirect (e.g. an intermediary bouncing to a login page) lands
+  // on a 200 response that is not the mutation endpoint succeeding, so it must
+  // not be announced as one.
+  if (response.ok && !response.redirected && !NON_MUTATING_METHODS.has(method)) {
     // Announced as passed in (apiBase included for editor calls). Filtering is
     // the subscriber's job — read-shaped POSTs (preview render, export,
     // media refresh-usage) are still announced here.

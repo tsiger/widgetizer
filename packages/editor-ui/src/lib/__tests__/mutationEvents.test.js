@@ -39,4 +39,23 @@ describe("mutationEvents", () => {
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
   });
+
+  it("an async listener that rejects logs the error without an unhandled rejection, and other listeners still run", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const bad = vi.fn(() => Promise.reject(new Error("async boom")));
+    const good = vi.fn();
+    subscribeMutationSuccess(bad);
+    subscribeMutationSuccess(good);
+
+    notifyMutationSuccess({ method: "POST", path: "/api/async" });
+    expect(good).toHaveBeenCalledTimes(1);
+
+    // Let the rejected promise's microtask queue drain before asserting the
+    // error was logged (this is exactly where an unhandled rejection would
+    // otherwise surface).
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(errorSpy).toHaveBeenCalledWith("[mutationEvents] listener failed:", expect.any(Error));
+    errorSpy.mockRestore();
+  });
 });

@@ -60,7 +60,7 @@ function makeFsStorage(baseDir) {
       try {
         return await fs.readdir(resolve(relDir));
       } catch (error) {
-        if (error.code === "ENOENT" || error.code === "ENOTDIR") return [];
+        if (error.code === "ENOENT") return [];
         throw error;
       }
     },

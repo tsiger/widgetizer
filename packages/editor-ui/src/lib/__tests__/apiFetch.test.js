@@ -139,6 +139,17 @@ describe("apiFetch", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it("does not notify for a followed redirect, even when the final response is ok", async () => {
+    getActiveProjectId.mockReturnValue(null);
+    fetchMock.mockResolvedValue({ ok: true, redirected: true });
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    await apiFetch("/api/pages", { method: "POST" });
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
   it("does not notify when the response is not ok", async () => {
     getActiveProjectId.mockReturnValue(null);
     fetchMock.mockResolvedValue({ ok: false });
