@@ -13,6 +13,7 @@ describe("apiFetch", () => {
   let getActiveProjectId;
   let apiFetch;
   let apiFetchJson;
+  let subscribeMutationSuccess;
 
   beforeEach(async () => {
     vi.resetModules();
@@ -21,6 +22,7 @@ describe("apiFetch", () => {
 
     ({ getActiveProjectId } = await import("../activeProjectId"));
     ({ apiFetch, apiFetchJson } = await import("../apiFetch"));
+    ({ subscribeMutationSuccess } = await import("../mutationEvents"));
     getActiveProjectId.mockReset();
   });
 
@@ -112,5 +114,52 @@ describe("apiFetch", () => {
         message: "The active project has changed.",
       },
     });
+  });
+
+  it("notifies a mutation-success subscriber for a successful POST", async () => {
+    getActiveProjectId.mockReturnValue(null);
+    fetchMock.mockResolvedValue({ ok: true });
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    await apiFetch("/api/pages", { method: "POST" });
+
+    expect(handler).toHaveBeenCalledWith({ method: "POST", path: "/api/pages" });
+  });
+
+  it("does not notify for GET requests, including calls with no method at all", async () => {
+    getActiveProjectId.mockReturnValue(null);
+    fetchMock.mockResolvedValue({ ok: true });
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    await apiFetch("/api/pages", { method: "GET" });
+    await apiFetch("/api/pages");
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("does not notify when the response is not ok", async () => {
+    getActiveProjectId.mockReturnValue(null);
+    fetchMock.mockResolvedValue({ ok: false });
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    await apiFetch("/api/pages", { method: "POST" });
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("still resolves with the response when a mutation-success handler throws", async () => {
+    getActiveProjectId.mockReturnValue(null);
+    fetchMock.mockResolvedValue({ ok: true });
+    const handler = vi.fn(() => {
+      throw new Error("boom");
+    });
+    subscribeMutationSuccess(handler);
+
+    const response = await apiFetch("/api/pages", { method: "POST" });
+
+    expect(response.ok).toBe(true);
   });
 });

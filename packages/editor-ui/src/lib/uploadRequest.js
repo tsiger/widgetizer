@@ -1,5 +1,6 @@
 import { API_URL } from "./config";
 import { getActiveProjectId } from "./activeProjectId";
+import { notifyMutationSuccess } from "./mutationEvents";
 
 function parseResponseBody(responseText) {
   if (!responseText) return null;
@@ -75,6 +76,10 @@ export async function uploadFormData(path, formData, { onProgress, signal } = {}
       const data = parseResponseBody(xhr.responseText);
 
       if (xhr.status >= 200 && xhr.status < 300) {
+        // Uploads go through XMLHttpRequest rather than apiFetch, so this is
+        // the seam's second announce point — mirrors apiFetch's hook so any
+        // subscriber sees mutations from both paths.
+        notifyMutationSuccess({ method: "POST", path });
         resolveOnce({ ok: true, status: xhr.status, data });
         return;
       }

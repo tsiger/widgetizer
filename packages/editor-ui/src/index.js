@@ -20,3 +20,10 @@ export { EditorShell, EditorProvider, createEditorRoutes } from "./EditorShell.j
 // (fallback: Database). Shared so a host reproducing the collection nav outside the
 // editor shell renders the same per-collection icons as editor-ui's Sidebar.
 export { resolveLucideIcon } from "./utils/lucideIcon.js";
+// Fires `{ method, path }` after every successful (`response.ok`) modifying
+// apiFetch call; an embedding shell subscribes to react to mutations.
+export { subscribeMutationSuccess } from "./lib/mutationEvents.js";
+// A two-part button: primary action + optional dropdown menu. Presentational
+// only — the caller resolves labels/handlers/enabled state per half. Implements
+// WAI-ARIA menu-button pattern; open/close/outside/Escape are encapsulated.
+export { default as SplitButton } from "./components/ui/SplitButton.jsx";

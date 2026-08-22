@@ -1,6 +1,9 @@
 import { API_URL } from "./config";
 import { getActiveProjectId } from "./activeProjectId";
 import { getApiBase } from "./apiBase";
+import { notifyMutationSuccess } from "./mutationEvents";
+
+const NON_MUTATING_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 export class ApiError extends Error {
   constructor(message, { status = 0, statusText = "", code, data } = {}) {
@@ -27,6 +30,14 @@ export async function apiFetch(path, options = {}) {
   }
 
   const response = await fetch(url, { ...options, headers });
+
+  const method = (options.method || "GET").toUpperCase();
+  if (response.ok && !NON_MUTATING_METHODS.has(method)) {
+    // Announced as passed in (apiBase included for editor calls). Filtering is
+    // the subscriber's job — read-shaped POSTs (preview render, export,
+    // media refresh-usage) are still announced here.
+    notifyMutationSuccess({ method, path });
+  }
 
   return response;
 }

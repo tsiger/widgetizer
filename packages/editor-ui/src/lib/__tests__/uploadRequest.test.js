@@ -41,6 +41,7 @@ class MockXMLHttpRequest {
 
 describe("uploadFormData", () => {
   beforeEach(() => {
+    vi.resetModules();
     xhrInstances.length = 0;
     globalThis.XMLHttpRequest = MockXMLHttpRequest;
   });
@@ -124,5 +125,68 @@ describe("uploadFormData", () => {
     });
 
     expect(xhr.method).toBe("POST");
+  });
+
+  it("notifies a mutation-success subscriber for a successful upload", async () => {
+    const { uploadFormData } = await import("../uploadRequest");
+    const { subscribeMutationSuccess } = await import("../mutationEvents");
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    const promise = uploadFormData("/api/media/projects/test/media", {});
+    const xhr = xhrInstances[0];
+    xhr.status = 201;
+    xhr.responseText = JSON.stringify({ ok: true });
+    xhr.onload();
+    await promise;
+
+    expect(handler).toHaveBeenCalledWith({ method: "POST", path: "/api/media/projects/test/media" });
+  });
+
+  it("does not notify a mutation-success subscriber for a failed upload", async () => {
+    const { uploadFormData } = await import("../uploadRequest");
+    const { subscribeMutationSuccess } = await import("../mutationEvents");
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    const promise = uploadFormData("/api/projects/import", {});
+    const xhr = xhrInstances[0];
+    xhr.status = 400;
+    xhr.responseText = JSON.stringify({ error: "Invalid project export" });
+    xhr.onload();
+    await promise.catch(() => {});
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("does not notify a mutation-success subscriber for a network error", async () => {
+    const { uploadFormData } = await import("../uploadRequest");
+    const { subscribeMutationSuccess } = await import("../mutationEvents");
+    const handler = vi.fn();
+    subscribeMutationSuccess(handler);
+
+    const promise = uploadFormData("/api/media/projects/test/media", {});
+    const xhr = xhrInstances[0];
+    xhr.onerror();
+    await promise.catch(() => {});
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("still resolves when a mutation-success handler throws", async () => {
+    const { uploadFormData } = await import("../uploadRequest");
+    const { subscribeMutationSuccess } = await import("../mutationEvents");
+    const handler = vi.fn(() => {
+      throw new Error("boom");
+    });
+    subscribeMutationSuccess(handler);
+
+    const promise = uploadFormData("/api/media/projects/test/media", {});
+    const xhr = xhrInstances[0];
+    xhr.status = 201;
+    xhr.responseText = JSON.stringify({ ok: true });
+    xhr.onload();
+
+    await expect(promise).resolves.toMatchObject({ ok: true, status: 201 });
   });
 });
