@@ -53,6 +53,7 @@ _None open._
 - [⬜ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — low (security; OSS-standalone only)](#-40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
 - [⬜ 43. Render-engine containment — two edges left open (`render-engine` / `core`) — low](#-43-render-engine-containment--two-edges-left-open-render-engine--core--low)
 - [⬜ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)](#-45-dead-code--empty-branch-in-mergesettingsarray-builder-server)
+- [⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)](#-49-linkenrichmentjs-bypasses-the-storage-adapter--raw-fs-writes-to-project-content-builder-server--low-architectural-hygiene)
 
 ---
 
@@ -584,6 +585,40 @@ on top of (a)'s refactors, so extraction is a small rebase exercise, not clean c
 commits past the fork, and the branch's TODO §-numbering collides with master's — with that much
 divergence, porting (b) first (and (a) later if wanted) onto a fresh branch may be cheaper and
 safer than rebasing all 19 commits. Close whichever path loses.
+
+**Decided 2026-08-22: fresh port, not a rebase; the branch stays pushed as a parts bin and closes
+when the port lands.** What ports to `0.9.10`: all of (b) — the `saveStore`/`pageStore` fixes with
+their tests — plus, from (a), `SplitButton.jsx` **as a dumb component only** (with its tests). The
+rest of (a) — the toolbar-extension machinery (descriptors, named signals, `useDispatchCommand`,
+registry commands) — is deliberately **not** ported: it is extensibility plumbing with no consumer,
+and it remains on the branch, resurrectable if pluggable toolbar actions are ever genuinely
+needed. Consequence: Ctrl+S remains plain save.
+
+---
+
+## ⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)
+
+**Priority:** Low
+
+`builder-server` is adapter-agnostic by contract: project content persists through
+`storage.write/.delete` so an embedding shell can supply any storage backend. But
+`src/utils/linkEnrichment.js` (~48 raw `fs` calls) rewrites project content files directly —
+pages, menus, collection items — via `fs.outputFile` against a resolved directory. Any shell whose
+storage adapter is not "the same local filesystem the dir path points at" silently loses these
+writes, and adapter-level hooks (e.g. write observation/accounting an adapter may implement) never
+see them.
+
+The two delete-time reference scrubbers (`cleanupDeletedPageReferencesFromDir`,
+`cleanupDeletedCollectionItemReferencesFromDir`) are being converted to `storage.list/read/write`
+on `0.9.10` as their own commit (their callsites already hold `scope` + `storage`) — this item
+tracks the **remaining** functions: the create/duplicate/import-time enrichment and uuid-remap
+helpers (`enrichNewProjectReferences`, `remapDuplicatedProjectUuids`,
+`remapCollectionItemMenuRefs`, `remapCollectionItemLinkRefs`, `enrichSeededRichtextLinks*`, and
+the internal `updatePageWidgets`/`updateGlobalWidgets`/`updateCollectionItems` walkers). They run
+during project scaffolding/lifecycle (some callsites, e.g. `projectScaffold.js`, don't currently
+hold a `scope`), so the conversion involves threading scope/adapter through those paths — a
+contained refactor, but not free. Until then, the constraint stands that these helpers only work
+where project storage is the local filesystem.
 
 ---
 
