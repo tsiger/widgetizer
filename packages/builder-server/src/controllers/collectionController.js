@@ -20,7 +20,7 @@ import {
   updateCollectionItemMediaUsage,
   removeCollectionItemFromMediaUsage,
 } from "../services/mediaUsageService.js";
-import { cleanupDeletedCollectionItemReferencesFromDir } from "../utils/linkEnrichment.js";
+import { cleanupDeletedCollectionItemReferences } from "../utils/linkEnrichment.js";
 
 /** Map a service error to an HTTP response, or 500 for the unexpected. */
 function respondError(res, err) {
@@ -171,8 +171,7 @@ export async function deleteItem(req, res) {
     if (!result.deleted) return noStore(res).status(404).json({ error: "Item not found" });
     await removeCollectionItemFromMediaUsage(scope.projectId, collectionType, itemSlug);
     if (existing?.uuid) {
-      const projectDir = storage.getProjectBase(scope);
-      await cleanupDeletedCollectionItemReferencesFromDir({ projectDir, deletedItemUuids: existing.uuid });
+      await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: existing.uuid });
     }
     noStore(res).json({ success: true, slug: itemSlug });
   } catch (err) {
@@ -207,8 +206,7 @@ export async function bulkDeleteItems(req, res) {
     }
     const deletedUuids = result.deleted.map((slug) => uuidBySlug.get(slug)).filter(Boolean);
     if (deletedUuids.length > 0) {
-      const projectDir = storage.getProjectBase(scope);
-      await cleanupDeletedCollectionItemReferencesFromDir({ projectDir, deletedItemUuids: deletedUuids });
+      await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: deletedUuids });
     }
     const partial = result.notFound.length > 0 || result.errors.length > 0;
     noStore(res)

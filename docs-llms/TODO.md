@@ -618,10 +618,9 @@ storage adapter is not "the same local filesystem the dir path points at" silent
 writes, and adapter-level hooks (e.g. write observation/accounting an adapter may implement) never
 see them.
 
-The two delete-time reference scrubbers (`cleanupDeletedPageReferencesFromDir`,
-`cleanupDeletedCollectionItemReferencesFromDir`) are being converted to `storage.list/read/write`
-on `0.9.10` as their own commit (their callsites already hold `scope` + `storage`) — this item
-tracks the **remaining** functions: the create/duplicate/import-time enrichment and uuid-remap
+The two delete-time reference scrubbers now write through the storage adapter
+(`cleanupDeletedPageReferences`, `cleanupDeletedCollectionItemReferences`; scope-first, all IO via
+`storage.list/read/write`) — this item tracks the **remaining** functions: the create/duplicate/import-time enrichment and uuid-remap
 helpers (`enrichNewProjectReferences`, `remapDuplicatedProjectUuids`,
 `remapCollectionItemMenuRefs`, `remapCollectionItemLinkRefs`, `enrichSeededRichtextLinks*`, and
 the internal `updatePageWidgets`/`updateGlobalWidgets`/`updateCollectionItems` walkers). They run

@@ -2,8 +2,8 @@
  * Collection link-integrity test suite.
  *
  * Covers the linkEnrichment.js functions that walk collection items on disk:
- *  - cleanupDeletedPageReferencesFromDir: clear pageUuid link refs + sync media usage
- *  - cleanupDeletedCollectionItemReferencesFromDir: clear menu/widget/item refs in bulk
+ *  - cleanupDeletedPageReferences: clear pageUuid link refs + sync media usage
+ *  - cleanupDeletedCollectionItemReferences: clear menu/widget/item refs in bulk
  *  - enrichNewProjectReferences: convert slug-format link hrefs to pageUuid refs
  *  - remapDuplicatedProjectUuids: remap pageUuid refs, regenerate item uuids, and
  *    remap stable collectionItemUuid refs in menus/widgets
@@ -31,13 +31,47 @@ process.env.NODE_ENV = "test";
 
 const { getProjectDir, getProjectPagesDir, getProjectMenusDir } = await import("../config.js");
 const {
-  cleanupDeletedPageReferencesFromDir,
-  cleanupDeletedCollectionItemReferencesFromDir,
+  cleanupDeletedPageReferences,
+  cleanupDeletedCollectionItemReferences,
   enrichNewProjectReferences,
   remapDuplicatedProjectUuids,
   remapCollectionItemMenuRefs,
   remapCollectionItemLinkRefs,
 } = await import("../utils/linkEnrichment.js");
+
+// fs-backed StorageAdapter fake over a real project dir — exercises the new
+// scope-first scrubber API while keeping the on-disk fixtures/SQLite media-usage
+// wiring these tests depend on.
+function makeFsStorage(baseDir) {
+  const resolve = (rel) => path.join(baseDir, rel);
+  return {
+    async read(scope, rel) {
+      try {
+        return await fs.readFile(resolve(rel));
+      } catch (error) {
+        if (error.code === "ENOENT") return null;
+        throw error;
+      }
+    },
+    async write(scope, rel, content) {
+      await fs.outputFile(resolve(rel), content);
+    },
+    async list(scope, relDir) {
+      try {
+        return await fs.readdir(resolve(relDir));
+      } catch (error) {
+        if (error.code === "ENOENT" || error.code === "ENOTDIR") return [];
+        throw error;
+      }
+    },
+    async exists(scope, rel) {
+      return fs.pathExists(resolve(rel));
+    },
+    getProjectBase(_scope) {
+      return baseDir;
+    },
+  };
+}
 const { updateCollectionItemMediaUsage, getMediaUsage } = await import(
   "../services/mediaUsageService.js"
 );
@@ -47,6 +81,10 @@ const { closeDb } = await import("../db/index.js");
 
 const PROJECT_ID = "coll-link-uuid";
 const PROJECT_FOLDER = "coll-link-project";
+
+const storage = makeFsStorage(getProjectDir(PROJECT_FOLDER));
+const SCOPE = { actor: { id: "tester", kind: "user" }, projectId: null, folderName: PROJECT_FOLDER };
+const SCOPE_WITH_PROJECT = { actor: { id: "tester", kind: "user" }, projectId: PROJECT_ID, folderName: PROJECT_FOLDER };
 
 function itemPath(type, slug) {
   return path.join(getProjectDir(PROJECT_FOLDER), "collections", type, `${slug}.json`);
@@ -121,17 +159,17 @@ beforeEach(async () => {
 });
 
 // ============================================================================
-// cleanupDeletedPageReferencesFromDir — collection items
+// cleanupDeletedPageReferences — collection items
 // ============================================================================
 
-describe("cleanupDeletedPageReferencesFromDir — collection items", () => {
+describe("cleanupDeletedPageReferences — collection items", () => {
   it("clears link settings that point to the deleted page", async () => {
     await writeItem("portfolio", "alpha", {
       title: "Alpha",
       cta: { pageUuid: "DELETED", href: "", text: "Go", target: "_self" },
       other: { pageUuid: "KEEP", href: "", text: "Stay", target: "_self" },
     });
-    await cleanupDeletedPageReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedPageUuid: "DELETED" });
+    await cleanupDeletedPageReferences(storage, SCOPE, { deletedPageUuid: "DELETED" });
     const item = await readItem("portfolio", "alpha");
     assert.deepEqual(item.settings.cta, { href: "", text: "", target: "_self" });
     assert.equal(item.settings.other.pageUuid, "KEEP"); // untouched
@@ -149,7 +187,7 @@ describe("cleanupDeletedPageReferencesFromDir — collection items", () => {
     await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", await readItem("portfolio", "alpha"));
     assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, ["collection:portfolio/alpha"]);
 
-    await cleanupDeletedPageReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedPageUuid: "DELETED", projectId: PROJECT_ID });
+    await cleanupDeletedPageReferences(storage, SCOPE_WITH_PROJECT, { deletedPageUuid: "DELETED" });
     assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);
   });
 });
@@ -163,7 +201,7 @@ describe("richtext stable links — integrity wiring", () => {
     await writePageWidgets("home", "home-uuid", {
       w1: { type: "text", settings: { body: '<p>see <a href="x.html" data-page-uuid="DELETED">our page</a> now</p>' } },
     });
-    await cleanupDeletedPageReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedPageUuid: "DELETED" });
+    await cleanupDeletedPageReferences(storage, SCOPE, { deletedPageUuid: "DELETED" });
     assert.equal((await readPage("home")).widgets.w1.settings.body, "<p>see our page now</p>");
   });
 
@@ -171,7 +209,7 @@ describe("richtext stable links — integrity wiring", () => {
     await writePageWidgets("home", "home-uuid", {
       w1: { type: "text", settings: { body: '<a href="news/x.html" data-collection-item-uuid="item-gone">x</a>' } },
     });
-    await cleanupDeletedCollectionItemReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedItemUuids: "item-gone" });
+    await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: "item-gone" });
     assert.equal((await readPage("home")).widgets.w1.settings.body, "x");
   });
 
@@ -196,10 +234,10 @@ describe("richtext stable links — integrity wiring", () => {
 });
 
 // ============================================================================
-// cleanupDeletedCollectionItemReferencesFromDir — menu / widget / item refs
+// cleanupDeletedCollectionItemReferences — menu / widget / item refs
 // ============================================================================
 
-describe("cleanupDeletedCollectionItemReferencesFromDir — menu refs", () => {
+describe("cleanupDeletedCollectionItemReferences — menu refs", () => {
   it("clears menu items pointing at the deleted item, leaves other refs intact", async () => {
     await writeMenu("main", [
       { id: "i1", label: "Suite", link: "rooms/suite.html", collectionType: "rooms", collectionItemUuid: "item-suite" },
@@ -207,7 +245,7 @@ describe("cleanupDeletedCollectionItemReferencesFromDir — menu refs", () => {
       { id: "i3", label: "About", link: "about.html", pageUuid: "page-about" },
     ]);
 
-    await cleanupDeletedCollectionItemReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedItemUuids: "item-suite" });
+    await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: "item-suite" });
 
     const menu = await readMenu("main");
     assert.equal(menu.items[0].link, "");
@@ -222,7 +260,7 @@ describe("cleanupDeletedCollectionItemReferencesFromDir — menu refs", () => {
       { id: "i1", label: "A", link: "rooms/a.html", collectionItemUuid: "item-a" },
       { id: "i2", label: "B", link: "rooms/b.html", collectionItemUuid: "item-b" },
     ]);
-    await cleanupDeletedCollectionItemReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedItemUuids: ["item-a", "item-b"] });
+    await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: ["item-a", "item-b"] });
     const menu = await readMenu("main");
     assert.equal(menu.items[0].link, "");
     assert.equal(menu.items[1].link, "");
@@ -238,7 +276,7 @@ describe("cleanupDeletedCollectionItemReferencesFromDir — menu refs", () => {
         },
       },
     });
-    await cleanupDeletedCollectionItemReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedItemUuids: "item-suite" });
+    await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: "item-suite" });
     const page = await readPage("home");
     assert.deepEqual(page.widgets.w1.settings.cta, { href: "", text: "", target: "_self" });
     assert.equal(page.widgets.w1.settings.keep.collectionItemUuid, "item-villa"); // untouched
@@ -249,7 +287,7 @@ describe("cleanupDeletedCollectionItemReferencesFromDir — menu refs", () => {
       title: "Alpha",
       related: { collectionType: "rooms", collectionItemUuid: "item-suite", href: "rooms/suite.html", text: "Suite", target: "_self" },
     });
-    await cleanupDeletedCollectionItemReferencesFromDir({ projectDir: getProjectDir(PROJECT_FOLDER), deletedItemUuids: "item-suite" });
+    await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: "item-suite" });
     const item = await readItem("portfolio", "alpha");
     assert.deepEqual(item.settings.related, { href: "", text: "", target: "_self" });
   });

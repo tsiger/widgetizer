@@ -181,6 +181,99 @@ async function updateCollectionItems(collectionsDir, itemTransformer) {
   return touched;
 }
 
+// --- Storage-adapter walkers -----------------------------------------------
+// The delete-time scrubbers below run against live projects after arbitrary
+// user edits, so their writes must be adapter-visible: an embedding shell can
+// only observe content mutations that go through storage.write. The
+// create/duplicate/import-time enrichment helpers above keep the raw-fs
+// walkers — they run before a project is editable/publishable.
+
+async function updatePageWidgetsViaStorage(storage, scope, widgetProcessor) {
+  const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
+  for (const pageFile of pageFiles) {
+    const buf = await storage.read(scope, `pages/${pageFile}`);
+    if (buf == null) continue;
+    const page = JSON.parse(buf.toString("utf8"));
+    if (page.type === "header" || page.type === "footer") continue;
+
+    let modified = false;
+    const processedWidgets = {};
+    for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
+      const processed = widgetProcessor(widget);
+      processedWidgets[widgetId] = processed;
+      if (JSON.stringify(processed) !== JSON.stringify(widget)) modified = true;
+    }
+    if (modified) {
+      page.widgets = processedWidgets;
+      await storage.write(scope, `pages/${pageFile}`, JSON.stringify(page, null, 2));
+    }
+  }
+}
+
+async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor) {
+  for (const widgetType of ["header", "footer"]) {
+    const key = `pages/global/${widgetType}.json`;
+    const buf = await storage.read(scope, key);
+    if (buf == null) continue;
+    const widget = JSON.parse(buf.toString("utf8"));
+    const processed = widgetProcessor(widget);
+    if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+      await storage.write(scope, key, JSON.stringify(processed, null, 2));
+    }
+  }
+}
+
+async function updateCollectionItemsViaStorage(storage, scope, itemTransformer) {
+  const touched = [];
+  // storage.list returns flat entry names with no file/dir discrimination;
+  // collection type directories are the extensionless entries. Listing a
+  // non-directory that slips through is tolerated the same way the fs walker
+  // tolerates an unreadable type dir: skip it.
+  const typeEntries = (await storage.list(scope, "collections")).filter((name) => !name.includes("."));
+  for (const type of typeEntries) {
+    let names;
+    try {
+      names = (await storage.list(scope, `collections/${type}`)).filter(
+        (name) => name.endsWith(".json") && name !== "_order.json",
+      );
+    } catch {
+      continue;
+    }
+    for (const name of names) {
+      const slug = name.replace(/\.json$/, "");
+      const key = `collections/${type}/${name}`;
+      try {
+        const buf = await storage.read(scope, key);
+        if (buf == null) continue;
+        const item = JSON.parse(buf.toString("utf8"));
+        const { item: nextItem, changed } = itemTransformer(item, type, slug);
+        if (changed) {
+          await storage.write(scope, key, JSON.stringify(nextItem, null, 2));
+          touched.push({ type, slug, item: nextItem });
+        }
+      } catch (error) {
+        console.warn(`[linkEnrichment] Failed to process collection item ${type}/${name}: ${error.message}`);
+      }
+    }
+  }
+  return touched;
+}
+
+async function cleanupMenusViaStorage(storage, scope, itemTransformer) {
+  const menuFiles = (await storage.list(scope, "menus")).filter((name) => name.endsWith(".json"));
+  for (const menuFile of menuFiles) {
+    const key = `menus/${menuFile}`;
+    const buf = await storage.read(scope, key);
+    if (buf == null) continue;
+    const menu = JSON.parse(buf.toString("utf8"));
+    const cleanedItems = processMenuItems(menu.items, itemTransformer);
+    if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
+      menu.items = cleanedItems;
+      await storage.write(scope, key, JSON.stringify(menu, null, 2));
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -433,76 +526,41 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 }
 
 /**
- * Clean up all references to a deleted page across the project.
- * Removes orphaned pageUuid references from widget link settings (pages + globals)
- * and menu items, unwraps richtext anchors targeting the deleted page, writing back
- * only files that were actually modified.
- *
- * Dir-explicit: operates on pages/, menus/, collections/ under the supplied `projectDir`
- * (hosted passes getProjectBase(scope); OSS passes getProjectDir(folderName)).
- * @param {object} args
- * @param {string} args.projectDir - The project working directory
- * @param {string} args.deletedPageUuid - The UUID of the deleted page
- * @param {string|null} [args.projectId=null] - When provided, refreshes media usage
- *   for any collection item whose link settings were cleared.
+ * Blank every reference to a deleted page — widget link objects, richtext
+ * hrefs, menu items — across pages, global widgets, menus and collection
+ * items. All IO goes through the storage adapter so an embedding shell
+ * observes each write.
  */
-export async function cleanupDeletedPageReferencesFromDir({ projectDir, deletedPageUuid, projectId = null }) {
-  const pagesDir = path.join(projectDir, "pages");
-  const menusDir = path.join(projectDir, "menus");
-  const collectionsDir = path.join(projectDir, "collections");
-
-  // Clean widget link settings in pages and global widgets
+export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid }) {
   const deletedPageUuids = new Set([deletedPageUuid]);
   const cleanValue = (value) => {
     if (isLinkObject(value) && value.pageUuid === deletedPageUuid) {
       return { href: "", text: "", target: "_self" };
     }
-    // Richtext anchors targeting the deleted page → unwrap to plain text.
     if (typeof value === "string") {
       return cleanupRichtextLinkRefs(value, { pageUuids: deletedPageUuids });
     }
     return value;
   };
-
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
 
-  await updatePageWidgets(pagesDir, widgetProcessor);
-  await updateGlobalWidgets(pagesDir, widgetProcessor);
-
-  // Clean menu items
-  if (await fs.pathExists(menusDir)) {
-    const menuFiles = await fs.readdir(menusDir);
-    for (const menuFile of menuFiles) {
-      if (!menuFile.endsWith(".json")) continue;
-
-      const menuPath = path.join(menusDir, menuFile);
-      const content = await fs.readFile(menuPath, "utf8");
-      const menu = JSON.parse(content);
-
-      const cleanedItems = processMenuItems(menu.items, (item) => {
-        if (item.pageUuid === deletedPageUuid) {
-          item.link = "";
-          delete item.pageUuid;
-        }
-        return item;
-      });
-
-      if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
-        menu.items = cleanedItems;
-        await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
-      }
+  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor);
+  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor);
+  await cleanupMenusViaStorage(storage, scope, (item) => {
+    if (item.pageUuid === deletedPageUuid) {
+      item.link = "";
+      delete item.pageUuid;
     }
-  }
+    return item;
+  });
 
-  // Clean collection item link settings, then keep media usage in sync for each
-  // touched item (a cleared link may have removed an upload reference).
-  const touched = await updateCollectionItems(collectionsDir, (item) =>
+  const touched = await updateCollectionItemsViaStorage(storage, scope, (item) =>
     transformItemSettings(item, cleanValue),
   );
-  if (projectId) {
+  if (scope.projectId) {
     for (const { type, slug, item } of touched) {
       try {
-        await syncCollectionItemMediaUsageOnWrite(projectId, type, slug, item, null);
+        await syncCollectionItemMediaUsageOnWrite(scope.projectId, type, slug, item, null);
       } catch (error) {
         console.warn(`[linkEnrichment] Failed to sync media usage for ${type}/${slug}: ${error.message}`);
       }
@@ -511,71 +569,39 @@ export async function cleanupDeletedPageReferencesFromDir({ projectDir, deletedP
 }
 
 /**
- * Clean up references to deleted collection item page(s) (#11) across the project:
- * menu items, widget/block `link` settings (pages + globals), and collection-item
- * `link` settings. Clears the link and drops the stable-ref fields
- * (`collectionItemUuid`/`collectionType`) on anything pointing at a deleted item.
- * Render-time resolution already clears dead refs; this prunes them from disk so
- * they never re-surface (parity with `cleanupDeletedPageReferencesFromDir`).
- *
- * Dir-explicit: operates on pages/, menus/, collections/ under the supplied `projectDir`
- * (hosted passes getProjectBase(scope); OSS passes getProjectDir(folderName)).
- * @param {object} args
- * @param {string} args.projectDir - The project working directory
- * @param {string|string[]|Set<string>} args.deletedItemUuids - uuid(s) of deleted items
+ * Blank every reference to deleted collection items across pages, global
+ * widgets, collection items and menus. Accepts a Set, array, or single uuid.
+ * Adapter-only IO, same as cleanupDeletedPageReferences.
  */
-export async function cleanupDeletedCollectionItemReferencesFromDir({ projectDir, deletedItemUuids }) {
+export async function cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids }) {
   const uuids =
     deletedItemUuids instanceof Set
       ? deletedItemUuids
       : new Set(Array.isArray(deletedItemUuids) ? deletedItemUuids : [deletedItemUuids]);
   if (uuids.size === 0) return;
 
-  const pagesDir = path.join(projectDir, "pages");
-  const menusDir = path.join(projectDir, "menus");
-  const collectionsDir = path.join(projectDir, "collections");
-
-  // Clear widget/block + collection-item `link` settings pointing at a deleted item.
   const cleanValue = (value) => {
     if (isLinkObject(value) && value.collectionItemUuid && uuids.has(value.collectionItemUuid)) {
       return { href: "", text: "", target: "_self" };
     }
-    // Richtext anchors targeting a deleted item → unwrap to plain text.
     if (typeof value === "string") {
       return cleanupRichtextLinkRefs(value, { itemUuids: uuids });
     }
     return value;
   };
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
-  await updatePageWidgets(pagesDir, widgetProcessor);
-  await updateGlobalWidgets(pagesDir, widgetProcessor);
-  await updateCollectionItems(collectionsDir, (item) =>
-    transformItemSettings(item, cleanValue),
-  );
 
-  // Clear menu items pointing at a deleted item (keep the item, drop the ref).
-  if (!(await fs.pathExists(menusDir))) return;
-  const menuFiles = await fs.readdir(menusDir);
-  for (const menuFile of menuFiles) {
-    if (!menuFile.endsWith(".json")) continue;
-
-    const menuPath = path.join(menusDir, menuFile);
-    const menu = JSON.parse(await fs.readFile(menuPath, "utf8"));
-
-    const cleanedItems = processMenuItems(menu.items, (item) => {
-      if (item.collectionItemUuid && uuids.has(item.collectionItemUuid)) {
-        item.link = "";
-        delete item.collectionItemUuid;
-        delete item.collectionType;
-      }
-      return item;
-    });
-
-    if (JSON.stringify(cleanedItems) !== JSON.stringify(menu.items)) {
-      menu.items = cleanedItems;
-      await fs.outputFile(menuPath, JSON.stringify(menu, null, 2));
+  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor);
+  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor);
+  await updateCollectionItemsViaStorage(storage, scope, (item) => transformItemSettings(item, cleanValue));
+  await cleanupMenusViaStorage(storage, scope, (item) => {
+    if (item.collectionItemUuid && uuids.has(item.collectionItemUuid)) {
+      item.link = "";
+      delete item.collectionItemUuid;
+      delete item.collectionType;
     }
-  }
+    return item;
+  });
 }
 
 /**

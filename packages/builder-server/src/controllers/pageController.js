@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
-import { cleanupDeletedPageReferencesFromDir } from "../utils/linkEnrichment.js";
+import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
@@ -255,13 +255,12 @@ export async function deletePage(req, res) {
       pageId,
     });
 
-    // Clean up orphaned references in menus and widget links. Resolve the project
-    // working dir via the injected storage adapter so this runs against the correct
-    // per-tenant tree in hosted (Cloud) and DATA_DIR in OSS (Local).
+    // Clean up orphaned references in menus and widget links, via the scope-aware
+    // storage adapter so this runs against the correct per-tenant tree in hosted
+    // (Cloud) and DATA_DIR in OSS (Local).
     if (deletedPageUuid) {
       try {
-        const projectDir = storage.getProjectBase(scope);
-        await cleanupDeletedPageReferencesFromDir({ projectDir, deletedPageUuid, projectId: scope.projectId });
+        await cleanupDeletedPageReferences(storage, scope, { deletedPageUuid });
       } catch (cleanupError) {
         console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
       }
@@ -325,10 +324,9 @@ export async function bulkDeletePages(req, res) {
   }
 
   // Clean up orphaned references for all deleted pages (per-tenant dir via the adapter).
-  const projectDir = storage.getProjectBase(scope);
   for (const uuid of deletedUuids) {
     try {
-      await cleanupDeletedPageReferencesFromDir({ projectDir, deletedPageUuid: uuid, projectId: scope.projectId });
+      await cleanupDeletedPageReferences(storage, scope, { deletedPageUuid: uuid });
     } catch (cleanupError) {
       console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
     }

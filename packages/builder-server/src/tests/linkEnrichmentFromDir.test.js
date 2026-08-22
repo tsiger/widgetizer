@@ -24,9 +24,39 @@ process.env.NODE_ENV = "test";
 const { getProjectDir } = await import("../config.js");
 const {
   enrichSeededRichtextLinksFromDir,
-  cleanupDeletedPageReferencesFromDir,
-  cleanupDeletedCollectionItemReferencesFromDir,
+  cleanupDeletedPageReferences,
+  cleanupDeletedCollectionItemReferences,
 } = await import("../utils/linkEnrichment.js");
+
+// Minimal in-memory StorageAdapter: proves the scrubbers perform ALL their IO
+// through the adapter surface (getProjectBase throws — nothing may touch fs).
+function makeMemoryStorage(initialFiles = {}) {
+  const files = new Map(Object.entries(initialFiles)); // "pages/home.json" -> JSON string
+  return {
+    async read(scope, rel) {
+      return files.has(rel) ? Buffer.from(files.get(rel)) : null;
+    },
+    async write(scope, rel, content) {
+      files.set(rel, content.toString());
+    },
+    async list(scope, relDir) {
+      const prefix = `${relDir}/`;
+      const names = new Set();
+      for (const key of files.keys()) {
+        if (key.startsWith(prefix)) names.add(key.slice(prefix.length).split("/")[0]);
+      }
+      return [...names];
+    },
+    async exists(scope, rel) {
+      return files.has(rel);
+    },
+    getProjectBase() {
+      throw new Error("scrubbers must not resolve filesystem paths");
+    },
+    _files: files,
+  };
+}
+const SCOPE = { actor: { id: "tester", kind: "user" }, projectId: null, folderName: "scratch-project" };
 
 // A scratch project working dir that is deliberately NOT under DATA_DIR/projects/…,
 // so passing it proves the cores are dir-explicit (they never touch getProjectDir).
@@ -105,35 +135,82 @@ describe("enrichSeededRichtextLinksFromDir", () => {
   });
 });
 
-describe("cleanupDeletedPageReferencesFromDir", () => {
-  it("unwraps a richtext anchor pointing at a deleted page, from the supplied projectDir", async () => {
-    await writePage("home", "page-home", {
-      w1: {
-        type: "text",
-        settings: { body: '<p>see <a href="x.html" data-page-uuid="DELETED">our page</a> now</p>' },
-      },
+describe("cleanupDeletedPageReferences", () => {
+  it("cleanupDeletedPageReferences blanks links via the storage adapter only", async () => {
+    const storage = makeMemoryStorage({
+      "pages/home.json": JSON.stringify({
+        title: "Home",
+        widgets: {
+          w1: { settings: { link: { pageUuid: "dead-uuid", href: "/x", text: "X" } } },
+          w2: {
+            settings: {
+              body: '<p>see <a href="x.html" data-page-uuid="dead-uuid">our page</a> now</p>',
+            },
+          },
+        },
+      }),
+      "pages/about.json": JSON.stringify({ title: "About", widgets: {} }),
+      "menus/main.json": JSON.stringify({ items: [{ label: "X", link: "/x", pageUuid: "dead-uuid" }] }),
     });
 
-    await cleanupDeletedPageReferencesFromDir({ projectDir: PROJECT_DIR, deletedPageUuid: "DELETED" });
+    await cleanupDeletedPageReferences(storage, SCOPE, { deletedPageUuid: "dead-uuid" });
 
-    assert.equal((await readPage("home")).widgets.w1.settings.body, "<p>see our page now</p>");
+    const home = JSON.parse(storage._files.get("pages/home.json"));
+    assert.deepEqual(home.widgets.w1.settings.link, { href: "", text: "", target: "_self" });
+    assert.equal(home.widgets.w2.settings.body, "<p>see our page now</p>");
+    const menu = JSON.parse(storage._files.get("menus/main.json"));
+    assert.equal(menu.items[0].link, "");
+    assert.equal("pageUuid" in menu.items[0], false);
+    // Untouched file's stored string is unchanged — no gratuitous rewrites.
+    assert.equal(storage._files.get("pages/about.json"), JSON.stringify({ title: "About", widgets: {} }));
   });
 });
 
-describe("cleanupDeletedCollectionItemReferencesFromDir", () => {
-  it("unwraps a richtext anchor pointing at a deleted item, from the supplied projectDir", async () => {
-    await writePage("home", "page-home", {
-      w1: {
-        type: "text",
-        settings: { body: '<a href="news/x.html" data-collection-item-uuid="item-gone">x</a>' },
-      },
+describe("cleanupDeletedCollectionItemReferences", () => {
+  it("cleanupDeletedCollectionItemReferences blanks links via the storage adapter only", async () => {
+    const storage = makeMemoryStorage({
+      "pages/home.json": JSON.stringify({
+        title: "Home",
+        widgets: {
+          w1: {
+            settings: {
+              cta: { collectionType: "rooms", collectionItemUuid: "item-a", href: "/x", text: "X", target: "_self" },
+            },
+          },
+          w2: {
+            settings: { body: '<a href="news/x.html" data-collection-item-uuid="item-a">x</a>' },
+          },
+        },
+      }),
+      "pages/about.json": JSON.stringify({ title: "About", widgets: {} }),
+      "collections/rooms/alpha.json": JSON.stringify({
+        uuid: "item-a",
+        settings: {
+          related: { collectionType: "rooms", collectionItemUuid: "item-a", href: "/x", text: "X", target: "_self" },
+        },
+      }),
+      "menus/main.json": JSON.stringify({
+        items: [
+          { label: "Suite", link: "/x", collectionType: "rooms", collectionItemUuid: "item-a" },
+          { label: "Villa", link: "/y", collectionType: "rooms", collectionItemUuid: "item-b" },
+        ],
+      }),
     });
 
-    await cleanupDeletedCollectionItemReferencesFromDir({
-      projectDir: PROJECT_DIR,
-      deletedItemUuids: "item-gone",
-    });
+    // Array form (bulk-delete shape) — at least one array case per the brief.
+    await cleanupDeletedCollectionItemReferences(storage, SCOPE, { deletedItemUuids: ["item-a"] });
 
-    assert.equal((await readPage("home")).widgets.w1.settings.body, "x");
+    const home = JSON.parse(storage._files.get("pages/home.json"));
+    assert.deepEqual(home.widgets.w1.settings.cta, { href: "", text: "", target: "_self" });
+    assert.equal(home.widgets.w2.settings.body, "x");
+    const item = JSON.parse(storage._files.get("collections/rooms/alpha.json"));
+    assert.deepEqual(item.settings.related, { href: "", text: "", target: "_self" });
+    const menu = JSON.parse(storage._files.get("menus/main.json"));
+    assert.equal(menu.items[0].link, "");
+    assert.equal("collectionItemUuid" in menu.items[0], false);
+    assert.equal("collectionType" in menu.items[0], false);
+    assert.equal(menu.items[1].collectionItemUuid, "item-b"); // untouched
+    // Untouched file's stored string is unchanged — no gratuitous rewrites.
+    assert.equal(storage._files.get("pages/about.json"), JSON.stringify({ title: "About", widgets: {} }));
   });
 });
