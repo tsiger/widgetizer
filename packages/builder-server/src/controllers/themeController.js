@@ -71,7 +71,7 @@ function getCachedThemeEntry(cache, key) {
   return null;
 }
 
-async function getCachedThemeValue(cache, key, loader) {
+export async function getCachedThemeValue(cache, key, loader) {
   const cached = getCachedThemeEntry(cache, key);
 
   if (cached?.promise) {
@@ -82,26 +82,29 @@ async function getCachedThemeValue(cache, key, loader) {
     return cached.value;
   }
 
+  // Both settlement paths write back only while this load's own record is
+  // still the current entry — an invalidation (or a newer load) during the
+  // flight must stick, not be overwritten by a late-resolving stale value.
+  const record = { promise: null, expiresAt: 0 };
   const pending = loader()
     .then((value) => {
-      cache.set(key, {
-        value,
-        expiresAt: Date.now() + THEME_SOURCE_CACHE_TTL_MS,
-      });
+      if (cache.get(key) === record) {
+        cache.set(key, {
+          value,
+          expiresAt: Date.now() + THEME_SOURCE_CACHE_TTL_MS,
+        });
+      }
       return value;
     })
     .catch((error) => {
-      const current = cache.get(key);
-      if (current?.promise === pending) {
+      if (cache.get(key) === record) {
         cache.delete(key);
       }
       throw error;
     });
 
-  cache.set(key, {
-    promise: pending,
-    expiresAt: 0,
-  });
+  record.promise = pending;
+  cache.set(key, record);
 
   return pending;
 }
@@ -393,9 +396,12 @@ async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
   await fs.ensureDir(targetDir);
 
   // 1. Base (root) files, excluding the updates/ and latest/ staging trees
+  // (latest.tmp / latest.old are buildLatestSnapshot's in-progress and
+  // renamed-aside siblings — never part of the theme's own content, and
+  // possibly present as stale crash leftovers).
   const baseEntries = await fs.readdir(baseDir, { withFileTypes: true });
   for (const entry of baseEntries) {
-    if (entry.name === "updates" || entry.name === "latest") continue;
+    if (["updates", "latest", "latest.tmp", "latest.old"].includes(entry.name)) continue;
     await fs.copy(path.join(baseDir, entry.name), path.join(targetDir, entry.name));
   }
 
@@ -426,7 +432,13 @@ async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
 
       console.log(`[layerThemeSnapshot] Applied version ${version}`);
     } catch (error) {
-      console.warn(`[layerThemeSnapshot] Could not apply version ${version}:`, error.message);
+      // Fatal, not warn-and-continue: a skipped update would produce a
+      // silently under-layered snapshot that can still claim the newest
+      // version. Failing the whole build is safe — buildLatestSnapshot's
+      // rename-aside swap keeps the previous complete snapshot in place,
+      // and the update-import validation caller likewise wants a corrupt
+      // effective theme rejected rather than approximated.
+      throw new Error(`Failed to apply theme update ${version}: ${error.message}`);
     }
   }
 }
@@ -436,7 +448,25 @@ async function layerThemeSnapshot({ baseDir, updates, targetDir }) {
  * Only called when updates exist.
  * @param {string} themeId - Theme identifier
  */
+// Rebuilds of one theme share the latest.tmp staging dir and the promotion
+// swap, so overlapping calls (e.g. an update import racing a boot-time sync)
+// could delete each other's staging tree or even the just-promoted latest/.
+// Serialize per theme: each call chains behind the in-flight build and then
+// performs its own full rebuild.
+const latestBuildChains = new Map();
+
 export async function buildLatestSnapshot(themeId) {
+  const prev = latestBuildChains.get(themeId) ?? Promise.resolve();
+  const run = prev.catch(() => {}).then(() => buildLatestSnapshotSerial(themeId));
+  latestBuildChains.set(themeId, run);
+  try {
+    return await run;
+  } finally {
+    if (latestBuildChains.get(themeId) === run) latestBuildChains.delete(themeId);
+  }
+}
+
+async function buildLatestSnapshotSerial(themeId) {
   const themeDir = getThemeDir(themeId);
   const latestDir = getThemeLatestDir(themeId);
 
@@ -529,22 +559,73 @@ export async function buildLatestSnapshot(themeId) {
 
   console.log(`[buildLatestSnapshot] Building latest/ for ${themeId} with versions: ${versions.join(", ")}`);
 
-  // Remove existing latest/ directory
-  try {
-    await fs.remove(latestDir);
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      console.warn(`Could not remove existing latest/ for ${themeId}:`, error.message);
-    }
-  }
-
-  // Layer base + updates (ascending order) into a fresh latest/.
+  // Layer the new snapshot into a temp sibling, then swap it in with two
+  // renames. Rebuilding latest/ in place (remove, then re-copy file by file)
+  // exposed concurrent readers — project scaffolds, renders — to a missing or
+  // half-built tree for the whole multi-file copy, and a failed rebuild lost
+  // the previous snapshot entirely. The old tree is renamed aside rather than
+  // removed first: a recursive remove of a large snapshot takes real time,
+  // and for its whole duration new readers would fall back to the theme root
+  // and silently scaffold the stale base version. With rename-aside, latest/
+  // is absent only between the two renames (two syscalls plus one event-loop
+  // turn), the expensive delete happens after the new tree is live, and a
+  // midway build failure leaves the old latest/ restorable. Residual: a
+  // reader already mid-walk inside latest/ at swap time still races the path
+  // flip (it fails loudly rather than reading a mixed tree) — fully fixing
+  // that needs versioned snapshot dirs, deliberately out of scope.
+  const tmpDir = path.join(themeDir, "latest.tmp");
+  const oldDir = path.join(themeDir, "latest.old");
   const sortedUpdateVersions = sortVersions(updateVersions);
-  await layerThemeSnapshot({
-    baseDir: themeDir,
-    updates: sortedUpdateVersions.map((version) => ({ version, dir: getThemeVersionDir(themeId, version) })),
-    targetDir: latestDir,
-  });
+  try {
+    await fs.remove(tmpDir); // stale leftover from a crashed build
+    // A crash between the two promotion renames parks the previous snapshot
+    // at latest.old with latest/ missing — restore it before anything else,
+    // so even a layering failure below still leaves a serving snapshot. An
+    // undeletable stale latest.old is warned, not fatal: it's excluded from
+    // copies and harmless to leave parked.
+    if (!(await fs.pathExists(latestDir)) && (await fs.pathExists(oldDir))) {
+      await fs.rename(oldDir, latestDir);
+    } else {
+      await fs.remove(oldDir).catch((error) => {
+        console.warn(`[buildLatestSnapshot] Could not clear stale latest.old for ${themeId}:`, error.message);
+      });
+    }
+    await layerThemeSnapshot({
+      baseDir: themeDir,
+      updates: sortedUpdateVersions.map((version) => ({ version, dir: getThemeVersionDir(themeId, version) })),
+      targetDir: tmpDir,
+    });
+    const hadLatest = await fs.pathExists(latestDir);
+    if (hadLatest) {
+      await fs.rename(latestDir, oldDir);
+    }
+    try {
+      await fs.rename(tmpDir, latestDir);
+    } catch (renameError) {
+      // Promotion failed with the old tree already set aside — restore it
+      // (best-effort) rather than losing the snapshot, then fail loudly.
+      if (hadLatest) {
+        await fs.rename(oldDir, latestDir).catch((rollbackError) => {
+          console.warn(
+            `[buildLatestSnapshot] Rollback of latest.old failed for ${themeId} (snapshot parked at latest.old):`,
+            rollbackError.message,
+          );
+        });
+      }
+      throw renameError;
+    }
+    // Only after the new tree is live: delete the old one (the expensive
+    // recursive remove readers must never wait behind). Best-effort — the
+    // promotion already succeeded, so a failed delete must not fail the
+    // build (or skip the cache invalidation below); the parked tree is
+    // retried at the next build's stale cleanup.
+    await fs.remove(oldDir).catch((error) => {
+      console.warn(`[buildLatestSnapshot] Could not delete set-aside latest.old for ${themeId}:`, error.message);
+    });
+  } finally {
+    // No-op on success (renamed away); clears the partial tree on failure.
+    await fs.remove(tmpDir);
+  }
 
   console.log(`[buildLatestSnapshot] Successfully built latest/ for ${themeId}`);
   invalidateThemeSourceCache(themeId);

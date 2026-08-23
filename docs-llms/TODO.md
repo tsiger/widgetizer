@@ -39,7 +39,7 @@ _None open._
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
 - [✅ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — fixed, pending reference-table move](#-42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--fixed-pending-reference-table-move)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
-- [⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
+- [✅ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`) — fixed, pending reference-table move](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server--fixed-pending-reference-table-move)
 - [✅ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`) — fixed, pending reference-table move](#-50-structure-only-undoredo-doesnt-re-arm-the-autosave-timer-editor-ui--fixed-pending-reference-table-move)
 
 ### Low priority
@@ -62,6 +62,8 @@ _None open._
 - [⬜ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — low — latent](#-56-editorshellpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui--low--latent)
 - [⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)](#-57-core-editor-ui-style-guidemd-has-no-split-button-component-pattern-docs-llms--low-optional)
 - [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
+- [✅ 59. `getCachedThemeValue` — an in-flight loader can repopulate an invalidated cache entry (`builder-server`) — fixed, pending reference-table move](#-59-getcachedthemevalue--an-in-flight-loader-can-repopulate-an-invalidated-cache-entry-builder-server--fixed-pending-reference-table-move)
+- [✅ 60. `layerThemeSnapshot` swallows per-update apply errors, so a partial snapshot can be promoted (`builder-server`) — fixed, pending reference-table move](#-60-layerthemesnapshot-swallows-per-update-apply-errors-so-a-partial-snapshot-can-be-promoted-builder-server--fixed-pending-reference-table-move)
 
 ---
 
@@ -564,9 +566,38 @@ from `mergeSettingsArray`'s callers before deciding).
 
 ---
 
-## ⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)
+## ✅ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`) — fixed, pending reference-table move
 
 **Priority:** Medium
+
+**Status:** ✅ **DONE 2026-08-23** — the snapshot is layered into a `latest.tmp` sibling and
+promoted with a **rename-aside swap** (`latest → latest.old`, `latest.tmp → latest`, then delete
+`latest.old`), builds are **serialized per theme** (an in-process chain — overlapping calls, e.g.
+an update import racing hosted's boot-time sync, previously shared the staging dir and could
+delete each other's just-promoted `latest/`), and a promotion failure **renames the set-aside
+tree back** instead of losing it. Three designs were measured under an adversarial A/B stress
+harness (250-file theme, back-to-back rebuilds, concurrent scanner + real `copyThemeToProject`
+readers): in-place rebuild ≈1100 bad observations/run; temp + `remove`+`rename` ≈440 (the
+recursive remove is not a metadata op — readers fell back to the stale base for its whole
+duration); final rename-aside + serialization ≈170, with **zero mixed trees and zero silent
+mixed copies** — remaining bad observations are the one event-loop turn between the two renames
+plus readers already mid-walk at swap time, which fail loudly (fixing those needs versioned
+snapshot dirs, deliberately out of scope). `layerThemeSnapshot`'s base-copy exclusion also skips
+`latest.tmp`/`latest.old` so stale crash leftovers are never copied into a snapshot. Pinned by
+`tests/buildLatestSnapshotAtomicity.test.js` (failed rebuild preserves the previous snapshot;
+3-way concurrent rebuilds × 10 rounds never leave `latest/` missing or torn — reliably red
+pre-serialization; success leaves no temp). Known pre-existing limits filed and fixed same day
+(§59/§60). Second-review hardening (same day): a crash between the two promotion renames is now
+recovered at the next build's start (the parked `latest.old` is restored before layering, so
+even a subsequent failure leaves a serving snapshot); a failed delete of the set-aside tree no
+longer fails a completed promotion (best-effort + warn, retried next build); a rollback failure
+is warned, not silent — each behavior pinned by its own test. Accepted residuals: a
+`deleted/`-marker removal failure during layering is still warn-and-continue (no deterministic
+test is possible without fs mocking; near-theoretical — it requires a removal failure inside a
+tree the build itself just created); build serialization is in-process only (both shells run a
+single server process); and readers already mid-walk inside `latest/` at swap time fail loudly
+(versioned snapshot dirs would be the full fix, deliberately out of scope). Original
+finding below.
 
 `packages/builder-server/src/controllers/themeController.js`, `buildLatestSnapshot`: the rebuild removes
 the existing `latest/` directory (`fs.remove(latestDir)`) and then re-layers base + updates into a fresh
@@ -829,6 +860,63 @@ stray server under test-parallelism, not a logic bug in `validateRequest` itself
 
 **Fix:** investigate under the full-suite runner (not standalone) to reproduce — likely something
 about port/state sharing across `createEditorApp` instances spun up by parallel test files.
+
+---
+
+## ✅ 59. `getCachedThemeValue` — an in-flight loader can repopulate an invalidated cache entry (`builder-server`) — fixed, pending reference-table move
+
+**Priority:** Low
+
+**Status:** ✅ **DONE 2026-08-23** — both settlement paths of the pending loader now write back
+only while the load's own record is still the current cache entry (identity check on the record,
+mirroring what the error path already did), so an invalidation or a newer load during the flight
+sticks. Pinned by `tests/themeSourceCache.test.js` (invalidated in-flight load doesn't
+repopulate; late load doesn't overwrite a newer entry). Original finding below.
+
+Surfaced 2026-08-23 in the §46 review. `getCachedThemeValue`
+(`controllers/themeController.js`) caches a pending loader's result via
+`loader().then((value) => cache.set(key, …))` — the `.then` writes back unconditionally, without
+checking that its promise is still the current cache entry. A load already in flight when
+`invalidateThemeSourceCache` runs (e.g. from a `buildLatestSnapshot` promotion) therefore
+finishes *after* the invalidation and resurrects the pre-rebuild value — a stale source dir or
+parsed `theme.json` — for up to one more TTL period (5s).
+
+**Effect (low):** a bounded staleness window after a theme rebuild, on top of the TTL staleness
+the cache already accepts by design.
+
+**Fix:** in the pending loader's `.then`, only `cache.set` when the map's current entry is still
+this load's own pending record; pin with a test that invalidates mid-load and asserts the late
+result is not cached.
+
+---
+
+## ✅ 60. `layerThemeSnapshot` swallows per-update apply errors, so a partial snapshot can be promoted (`builder-server`) — fixed, pending reference-table move
+
+**Priority:** Low
+
+**Status:** ✅ **DONE 2026-08-23** — per-update apply errors are now fatal to the build (the
+decision went to fatal-on-error: §46's rename-aside swap keeps the previous complete snapshot on
+failure, so failing loudly no longer destroys `latest/`; the update-import validation caller
+likewise now rejects a corrupt effective theme instead of approximating it). Pinned by a
+`buildLatestSnapshotAtomicity.test.js` case: a valid-looking update with an unreadable payload
+makes the rebuild reject and leaves the previous snapshot serving. Original finding below.
+
+Surfaced 2026-08-23 in the §46 review; the behavior predates the atomic swap. Each update
+version's apply step is wrapped in catch-and-warn (`[layerThemeSnapshot] Could not apply version
+…`), so an unreadable or corrupt update dir doesn't reject the build — layering continues and
+the resulting tree (base + whichever updates applied) is promoted as `latest/`. The §46 swap
+guarantees a *complete previous* snapshot survives a failed build, but this path isn't a failed
+build: it "succeeds" with a silently under-layered snapshot whose `theme.json` may still claim
+the newest version (a later update's theme.json can land while an earlier one was skipped).
+
+**Effect (low):** requires a damaged update dir; consequence is a theme serving mixed-version
+content while reporting the newest version — confusing rather than destructive, and self-heals
+once the update dir is repaired and any rebuild runs.
+
+**Fix (decide first):** either make per-update apply errors fatal to the build (the swap now
+makes that safe — the previous snapshot survives), or keep best-effort but skip promotion when
+any update failed. Fatal-on-error is probably right now that failure no longer destroys
+`latest/`; it was arguably the lesser evil only under the old in-place rebuild.
 
 ---
 
