@@ -3,6 +3,7 @@ import path from "path";
 import archiver from "archiver";
 import { getProjectDir, getPublishDir, APP_ROOT, STATIC_CORE_ASSETS_DIR } from "../config.js";
 import { isWithinDirectory } from "../utils/pathSecurity.js";
+import { createKeyedSerializer } from "../utils/serializeByKey.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { renderWidget, renderPageLayout, renderCollectionItemPage, widgetSupportsTransparentHeader } from "../services/renderingService.js";
@@ -66,6 +67,27 @@ async function getDirectorySize(dirPath) {
   return total;
 }
 
+// Export operations (export, delete, cleanup) allocate version numbers and
+// touch the shared per-project output dirs across long await spans, so
+// overlapping operations on one project interfere (duplicate versions, shared
+// dirs, deleting an in-flight export's output). Serialize them per project.
+const serializeExportOps = createKeyedSerializer();
+
+/**
+ * Run fn under the per-project export lock, serialized with every export
+ * operation (export, delete, cleanup). For callers outside this module whose
+ * work must not interleave with exports — project deletion holds it across
+ * export cleanup AND the project-row removal, so an export can't slip into the
+ * gap and complete against a half-deleted project. NOT reentrant: calling it
+ * (or any serialized export operation) again for the same project from inside
+ * fn deadlocks — use the withinLock escape hatch on cleanupProjectExports.
+ * @param {string} projectId
+ * @param {() => Promise<any>} fn
+ */
+export function withExportOpLock(projectId, fn) {
+  return serializeExportOps(projectId, fn);
+}
+
 // Helper function to record an export and trim old versions
 async function recordExport(projectId, version, outputDir, status = "success") {
   const exportRecord = exportRepo.recordExport(projectId, version, outputDir, status);
@@ -103,49 +125,81 @@ async function recordExport(projectId, version, outputDir, status = "success") {
  * @returns {Promise<{deletedDirs: number, deletedHistory: boolean}>} Cleanup results
  * @throws {Error} If cleanup fails
  */
-export async function cleanupProjectExports(projectId) {
+export async function cleanupProjectExports(projectId, { withinLock = false } = {}) {
   try {
     await getProjectFolderName(projectId);
     console.log(`Cleaning up exports for deleted project: ${projectId}`);
 
-    const records = exportRepo.getExports(projectId);
-
-    if (records.length === 0) {
-      console.log(`No export history found for project ${projectId}`);
-      return { deletedDirs: 0, deletedHistory: false };
+    // Serialized with the other export operations so an in-flight export can't
+    // add a row+dir mid-cleanup. Pass withinLock: true ONLY from inside a
+    // withExportOpLock section for the same project — the lock is not
+    // reentrant, so taking it twice deadlocks.
+    if (withinLock) {
+      return await cleanupProjectExportsLocked(projectId);
     }
-
-    // Delete all physical export directories for this project
-    const deletedDirs = [];
-    for (const record of records) {
-      const dir = resolveOutputDir(record.outputDir);
-      if (dir && (await fs.pathExists(dir))) {
-        try {
-          await fs.remove(dir);
-          deletedDirs.push(dir);
-          console.log(`Deleted export directory: ${dir}`);
-        } catch (error) {
-          console.warn(`Failed to delete export directory: ${dir}`, error);
-        }
-      }
-    }
-
-    // Remove all export records from the database
-    exportRepo.deleteAllExports(projectId);
-
-    console.log(
-      `Cleaned up ${deletedDirs.length} export directories and removed export history for project ${projectId}`,
-    );
-    return { deletedDirs: deletedDirs.length, deletedHistory: true };
+    return await serializeExportOps(projectId, () => cleanupProjectExportsLocked(projectId));
   } catch (error) {
     console.error(`Error cleaning up exports for project ${projectId}:`, error);
     throw error;
   }
 }
 
+// The cleanup body; must run under the per-project export lock. Directories
+// first, rows second: if the process dies mid-removal, the surviving rows
+// still point at the leftover dirs, so a retried cleanup can finish the job —
+// deleting the rows first would leave untracked dirs nothing can find again.
+// Under the lock the record list cannot diverge from what an in-flight export
+// writes, so reading it before the removals is safe.
+//
+// Removal-failure policy: cleanup still deletes ALL rows and the caller's
+// project deletion proceeds. Keeping rows for a retry would be futile — the
+// only caller is project deletion, whose project-row cascade wipes the rows
+// regardless — and aborting the deletion would make a project undeletable
+// over one stuck directory. The cost is an orphaned directory, so orphans are
+// warned loudly with their paths and reported in the return value.
+async function cleanupProjectExportsLocked(projectId) {
+  const records = exportRepo.getExports(projectId);
+
+  if (records.length === 0) {
+    console.log(`No export history found for project ${projectId}`);
+    return { deletedDirs: 0, deletedHistory: false, orphanedDirs: [] };
+  }
+
+  const deletedDirs = [];
+  const orphanedDirs = [];
+  for (const record of records) {
+    const dir = resolveOutputDir(record.outputDir);
+    if (dir && (await fs.pathExists(dir))) {
+      try {
+        await fs.remove(dir);
+        deletedDirs.push(dir);
+        console.log(`Deleted export directory: ${dir}`);
+      } catch (error) {
+        orphanedDirs.push(dir);
+        console.warn(`Failed to delete export directory: ${dir}`, error);
+      }
+    }
+  }
+
+  exportRepo.deleteAllExports(projectId);
+
+  if (orphanedDirs.length > 0) {
+    console.warn(
+      `[cleanupProjectExports] ${orphanedDirs.length} export director${orphanedDirs.length === 1 ? "y" : "ies"} could not be removed and ${orphanedDirs.length === 1 ? "is" : "are"} now untracked — remove manually: ${orphanedDirs.join(", ")}`,
+    );
+  }
+  console.log(
+    `Cleaned up ${deletedDirs.length} export directories and removed export history for project ${projectId}`,
+  );
+  return { deletedDirs: deletedDirs.length, deletedHistory: true, orphanedDirs };
+}
+
 /**
  * Exports a project to a directory of static HTML files with assets, sitemap, and robots.txt.
  * This is the core export logic used by the export endpoint.
+ * Callers MUST hold the per-project export lock (withExportOpLock): this
+ * function allocates the version at the start and records it only at the end,
+ * so an unserialized caller reintroduces the duplicate-version/shared-dir race.
  * @param {string} projectId - Project UUID
  * @param {object} [options] - Export options
  * @param {boolean} [options.exportMarkdown=false] - Also export pages as markdown
@@ -257,7 +311,10 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     }
 
     // --- Validation passed: from here on, disk writes are safe ---
-    await fs.ensureDir(outputDir);
+    // emptyDir, not ensureDir: a crash leftover (or a version number freed by
+    // a failed delete) can leave stale files at this path, and they must not
+    // survive into the new bundle.
+    await fs.emptyDir(outputDir);
     await fs.ensureDir(outputAssetsDir);
     await fs.ensureDir(outputImagesDir);
     const generatedSiteIcons = await generateExportSiteIcons({
@@ -942,7 +999,26 @@ export async function exportProject(req, res) {
       req.adapters?.storage && req.scope
         ? { storage: req.adapters.storage, scope: req.scope, limits: req.adapters.limits }
         : null;
-    const result = await exportProjectToDir(projectId, req.body || {}, collectionDeps);
+
+    // Serialized per project: version allocation happens at the start of the
+    // export but the history row lands only at the end, so an overlapping
+    // export of the same project would claim the same version and output dir.
+    // Failure recording stays INSIDE the serialized section — releasing the
+    // chain before the failure row is written would let the next export race
+    // the failure row's own version allocation.
+    const result = await serializeExportOps(projectId, async () => {
+      try {
+        return await exportProjectToDir(projectId, req.body || {}, collectionDeps);
+      } catch (error) {
+        try {
+          const version = exportRepo.getNextVersion(projectId);
+          await recordExport(projectId, version, null, "failed");
+        } catch (recordError) {
+          console.error("Failed to record export failure:", recordError);
+        }
+        throw error;
+      }
+    });
 
     res.json({
       success: true,
@@ -952,13 +1028,6 @@ export async function exportProject(req, res) {
       exportRecord: result.exportRecord,
     });
   } catch (error) {
-    // Try to record failed export
-    try {
-      const version = exportRepo.getNextVersion(projectId);
-      await recordExport(projectId, version, null, "failed");
-    } catch (recordError) {
-      console.error("Failed to record export failure:", recordError);
-    }
     // Handle errors with explicit status codes (e.g., no index page)
     if (error.statusCode) {
       return res.status(error.statusCode).json({
@@ -1277,23 +1346,36 @@ export async function deleteExport(req, res) {
     // Validate project belongs to this user
     await getProjectFolderName(projectId);
 
-    const exports = exportRepo.getExports(projectId);
+    // Serialized with the other export operations: deleting the highest
+    // version frees its number for MAX(version)+1, so a concurrent export
+    // could otherwise reuse the version/dir while this removal is mid-flight.
+    const status = await serializeExportOps(projectId, async () => {
+      const exports = exportRepo.getExports(projectId);
 
-    if (exports.length === 0) {
-      return res.status(404).json({ error: "No exports found for this project" });
-    }
+      if (exports.length === 0) {
+        return { notFound: "No exports found for this project" };
+      }
 
-    // Delete the export record from the database
-    const deleted = exportRepo.deleteExportRecord(projectId, parseInt(version));
+      const record = exports.find((e) => e.version === parseInt(version));
+      if (!record) {
+        return { notFound: "Export version not found" };
+      }
 
-    if (!deleted) {
-      return res.status(404).json({ error: "Export version not found" });
-    }
+      // Directory first, row second: if the removal fails, the row survives
+      // and keeps the version number reserved — deleting the row first would
+      // hand the version to the next export while the old files still exist.
+      const dir = resolveOutputDir(record.outputDir);
+      if (dir && (await fs.pathExists(dir))) {
+        await fs.remove(dir);
+      }
 
-    // Delete the physical directory if it exists
-    const dir = resolveOutputDir(deleted.outputDir);
-    if (dir && (await fs.pathExists(dir))) {
-      await fs.remove(dir);
+      exportRepo.deleteExportRecord(projectId, parseInt(version));
+
+      return {};
+    });
+
+    if (status.notFound) {
+      return res.status(404).json({ error: status.notFound });
     }
 
     res.json({

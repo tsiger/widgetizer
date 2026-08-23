@@ -915,6 +915,113 @@ describe("export versioning", () => {
 });
 
 // ========================================================================
+// Concurrent export serialization
+// ========================================================================
+
+describe("concurrent exports are serialized per project", () => {
+  before(async () => {
+    await cleanExportHistory();
+  });
+
+  it("two overlapping exports get distinct versions and dirs, both recorded success", async () => {
+    const [res1, res2] = await Promise.all([
+      callController(exportProject, { params: { projectId: PROJECT_ID } }),
+      callController(exportProject, { params: { projectId: PROJECT_ID } }),
+    ]);
+
+    assert.equal(res1._status, 200, `first export should succeed: ${JSON.stringify(res1._json)}`);
+    assert.equal(res2._status, 200, `second export should succeed: ${JSON.stringify(res2._json)}`);
+    assert.notEqual(res1._json.version, res2._json.version, "overlapping exports must not share a version");
+    assert.notEqual(res1._json.outputDir, res2._json.outputDir, "overlapping exports must not share an output dir");
+
+    const history = readExportHistory(PROJECT_ID);
+    assert.equal(history.length, 2, "exactly two history rows — no bogus extra failure row");
+    assert.ok(history.every((h) => h.status === "success"), "both exports recorded as success");
+  });
+
+  it("a failed export does not block the next export on the SAME project", async () => {
+    // No index page → the export rejects during validation (an empty pages dir
+    // is enough); the chain for THIS key must release past the rejection, so
+    // the second call — queued concurrently behind the failing one — must
+    // still settle rather than hang.
+    const EMPTY_ID = "export-serial-fail-uuid";
+    const EMPTY_FOLDER = "export-serial-fail-project";
+    projectRepo.createProject({
+      id: EMPTY_ID,
+      folderName: EMPTY_FOLDER,
+      name: "Serial Fail",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    });
+    await fs.ensureDir(path.join(getProjectDir(EMPTY_FOLDER), "pages"));
+    try {
+      const scope = { projectId: EMPTY_ID, folderName: EMPTY_FOLDER };
+      const [first, second] = await Promise.all([
+        callController(exportProject, { params: { projectId: EMPTY_ID }, scope }),
+        callController(exportProject, { params: { projectId: EMPTY_ID }, scope }),
+      ]);
+      assert.notEqual(first._status, 200, "export without an index page should fail");
+      assert.notEqual(second._status, 200, "the queued export should fail the same way, not hang");
+    } finally {
+      projectRepo.deleteProject(EMPTY_ID);
+    }
+  });
+
+  it("a reused version dir cannot leak stale files into a new export", async () => {
+    // Crash leftovers (or a freed version number) can leave junk at the next
+    // version's output path; the export must start from an empty dir.
+    const next = exportRepo.getNextVersion(PROJECT_ID);
+    const staleFile = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${next}`, "stale.html");
+    await fs.outputFile(staleFile, "junk from a previous life");
+
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+
+    assert.equal(res._status, 200);
+    assert.equal(res._json.version, next);
+    assert.ok(!(await fs.pathExists(staleFile)), "stale file must not survive into the new export");
+  });
+
+  it("an export overlapping project deletion cannot leave an orphan export bundle", async () => {
+    // The dangerous interleave: project deletion cleans up exports, releases,
+    // and only then removes the project row — an export slipping into that gap
+    // completes against a project that is about to vanish, leaving a bundle
+    // dir no history row tracks. The deletion must hold the export lock across
+    // cleanup AND the row removal. (The pre-fix window is a microtask-ordering
+    // accident, so this test pins the invariant end-state rather than a
+    // deterministic failure.)
+    const DEL_ID = "export-del-race-uuid";
+    const DEL_FOLDER = "export-del-race-project";
+    await fs.copy(getProjectDir(PROJECT_FOLDER), getProjectDir(DEL_FOLDER));
+    projectRepo.createProject({
+      id: DEL_ID,
+      folderName: DEL_FOLDER,
+      name: "Delete Race",
+      theme: "__export_test_theme__",
+      themeVersion: "1.0.0",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    });
+    const scope = { projectId: DEL_ID, folderName: DEL_FOLDER };
+    try {
+      const seeded = await callController(exportProject, { params: { projectId: DEL_ID }, scope });
+      assert.equal(seeded._status, 200, "seed export should succeed");
+
+      const { deleteProjectById } = await import("../services/projectService.js");
+      const deletion = deleteProjectById(DEL_ID);
+      const racing = callController(exportProject, { params: { projectId: DEL_ID }, scope });
+      await Promise.all([deletion, racing]);
+
+      const leftovers = (await fs.readdir(PUBLISH_DIR)).filter((n) => n.startsWith(`${DEL_FOLDER}-v`));
+      assert.deepEqual(leftovers, [], "no export bundle may survive the project deletion");
+      assert.equal(exportRepo.getExports(DEL_ID).length, 0, "no history rows may survive either");
+    } finally {
+      projectRepo.deleteProject(DEL_ID);
+      await fs.remove(getProjectDir(DEL_FOLDER));
+    }
+  });
+});
+
+// ========================================================================
 // exportProject — validation and edge cases
 // ========================================================================
 
@@ -1337,6 +1444,32 @@ describe("deleteExport", () => {
       params: {},
     });
     assert.equal(res._status, 400);
+  });
+
+  // chmod-000 blocks removal only on POSIX and only for unprivileged users.
+  it("a failed directory removal does not free the version number", { skip: process.platform === "win32" || process.getuid?.() === 0 }, async () => {
+    // If the bundle dir can't be removed, the history row must survive —
+    // deleting the row first would hand the version to the next export while
+    // the old directory still exists.
+    const res = await callController(exportProject, { params: { projectId: PROJECT_ID } });
+    assert.equal(res._status, 200);
+    const version = res._json.version;
+    const dir = path.join(PUBLISH_DIR, `${PROJECT_FOLDER}-v${version}`);
+    await fs.chmod(dir, 0o000); // non-empty dir with no permissions → removal fails
+
+    try {
+      const del = await callController(deleteExport, {
+        params: { projectId: PROJECT_ID, version: String(version) },
+      });
+      assert.equal(del._status, 500, "the delete should report the fs failure");
+      const versions = readExportHistory(PROJECT_ID).map((e) => e.version);
+      assert.ok(versions.includes(version), "history row must survive so the version stays reserved");
+    } finally {
+      await fs.chmod(dir, 0o755);
+      await callController(deleteExport, {
+        params: { projectId: PROJECT_ID, version: String(version) },
+      });
+    }
   });
 });
 

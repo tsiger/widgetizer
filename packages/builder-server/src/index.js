@@ -27,6 +27,10 @@ export { sanitizeWidgetData, sanitizeThemeSettings } from "./services/sanitizati
 // DB-only via the shared getDb() singleton, no scope/adapter needed.
 export { updateThemeSettingsMediaUsage } from "./services/mediaUsageService.js";
 export { preprocessThemeSettings } from "./utils/themeHelpers.js";
+// Per-key async serialization (in-process). The OSS export operations use it to
+// serialize per project; embedding hosts can wrap their own long-running
+// per-site operations (their export/publish orchestration) with the same primitive.
+export { createKeyedSerializer } from "./utils/serializeByKey.js";
 export { buildRuntimeSiteIcons, generateExportSiteIcons } from "./utils/siteIconHelpers.js";
 export { CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR, getThemesDir } from "./config.js";
 

@@ -38,7 +38,7 @@ _None open._
 - [⬜ 39. SQLite transaction-boundary audit — repositories, services, controllers (`builder-server`) — 39a moderate (data-integrity), rest low (concurrency)](#-39-sqlite-transaction-boundary-audit--repositories-services-controllers-builder-server--39a-moderate-data-integrity-rest-low-concurrency)
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
-- [⬜ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — medium (low end) — decide serialization design first](#-62-export-lifecycle-races--version-reservation-and-fsdb-cleanup-arent-coordinated-builder-server--medium-low-end--decide-serialization-design-first)
+- [✅ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — fixed, pending reference-table move](#-62-export-lifecycle-races--version-reservation-and-fsdb-cleanup-arent-coordinated-builder-server--fixed-pending-reference-table-move)
 
 ### Low priority
 
@@ -56,6 +56,7 @@ _None open._
 - [⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)](#-57-core-editor-ui-style-guidemd-has-no-split-button-component-pattern-docs-llms--low-optional)
 - [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
 - [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
+- [⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)](#-63-localpublishadapterpublish-shares-the-exports-version-counter-without-the-export-lock-adapters-local--low--latent-no-production-caller)
 
 ---
 
@@ -743,11 +744,53 @@ them). Keep the concrete-origin targeting; the point is only to stop firing into
 
 ---
 
-## ⬜ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — medium (low end) — decide serialization design first
+## ✅ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — fixed, pending reference-table move
 
 **Priority:** Medium
 
-**Status:** ⬜ open — surfaced 2026-08-23 in the §39 re-audit (second-model review contributed the two
+**Status:** ✅ **DONE 2026-08-23** — design **(a)** implemented: export operations are serialized
+per project through a new shared primitive, `createKeyedSerializer()`
+(`utils/serializeByKey.js`, exported from the package barrel so embedding hosts can wrap their own
+per-site operations with it). `exportProject`, `deleteExport`, and `cleanupProjectExports` all run
+their allocation/DB/fs work inside the per-project chain; failure recording happens **inside** the
+serialized section (releasing the chain before the failure row is written would let the next
+export race that row's version allocation — a review-contributed requirement); and
+`cleanupProjectExports` and `deleteExport` both run under the lock with directories removed
+**before** rows (see the review paragraph below for the ordering rationale on each). Pinned by `tests/serializeByKey.test.js` (same-key ordering, cross-key
+concurrency, value/rejection propagation, chain survives a failure) and two `export.test.js`
+cases (overlapping same-project exports get distinct versions/dirs, both success, no bogus extra
+history row — red pre-fix on the unique-index collision; a failed export doesn't block the next).
+**Multi-process upgrade path, on file:** the chain is in-process only; if the server ever runs
+multiple processes, keep it and add a cross-process reservation — at export start, an immediate
+transaction inserts a "pending" history row, whose unique `(project_id, version)` index makes
+version allocation a cross-process lock; completion updates that row. The pending-row costs
+(crash ghosts, trim interaction, history-UI noise) are deliberately not paid until that topology
+exists.
+
+**Second-model review of the implementation (same day) — adopted:** project deletion now holds the
+export lock across cleanup AND the project-row removal (`withExportOpLock` exported;
+`cleanupProjectExports` gained a `withinLock` escape hatch since the lock is not reentrant) — the
+pre-fix window was a microtask-ordering accident, closed contractually and pinned by an
+invariant-end-state test (no orphan bundle survives a deletion overlapping an export);
+`cleanupProjectExports` reverted to directories-first so a crash mid-removal stays retryable (rows
+still point at leftover dirs); `deleteExport` likewise removes the directory before the row, so a
+failed removal keeps the version reserved (pinned: chmod-000 dir → 500 and the row survives);
+`exportProjectToDir` now `emptyDir`s its output path so crash leftovers or a freed version number
+can't leak stale files into a new bundle (pinned); the same-key failure test and a
+queued-follower-behind-live-rejection helper test tightened per review; `exportProjectToDir`'s doc
+states callers must hold the lock; the serializer documents its non-reentrancy. **Declined /
+residual:** export *readers* (`getExportFiles`, `downloadExport`, `getExportHistory`, serve) stay
+unserialized — racing a delete yields a 404/failed download, and queueing downloads behind
+multi-second exports would be worse; the review's `LocalPublishAdapter` finding is **§63**.
+A re-check round settled the last open policy: cleanup's swallowed removal failures (pre-existing
+behavior) stay **accept-and-warn** — keeping rows for retry is futile since project deletion's
+cascade wipes them regardless, and aborting deletion would make a project undeletable over one
+stuck directory — but orphans are now loud (per-path warning + `orphanedDirs` in the return
+value). The chmod-based test is skipped on win32/root where permissions can't block removal; the
+deletion-overlap test pins the invariant end-state rather than a deterministic interleave
+(accepted — the pre-fix window was a microtask-ordering accident). Original finding below.
+
+**Original status:** ⬜ open — surfaced 2026-08-23 in the §39 re-audit (second-model review contributed the two
 cleanup-path findings). Three symptoms of one root cause: **export version allocation and the
 filesystem/DB lifecycle around it aren't coordinated**, so overlapping export operations on the same
 project interfere. Unlike §39's latents these are **live in-process races** (the gaps are `await` spans,
@@ -788,6 +831,32 @@ truthful return values; this item is about the controller-level coordination *ar
 
 **Effect:** medium (low end) — mixed/corrupt export output and misreported failures, but only under
 overlapping same-project exports; no editor-content data loss.
+
+---
+
+---
+
+## ⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)
+
+**Priority:** Low
+
+Surfaced 2026-08-23 by the §62 implementation review. `LocalPublishAdapter.publish()`
+(`packages/adapters-local/src/LocalPublishAdapter.js`) has the same allocation gap §62 closed in
+the export controller: it reads `MAX(version)+1` from the shared `exports` table, streams the
+render output across a long await span, then inserts the history row — with no serialization at
+all, and no way to share the controller's per-project lock (different package; it receives a bare
+db handle). Two overlapping `publish()` calls would collide on the unique
+`(project_id, version)` index; a `publish()` overlapping a controller export shares the version
+counter without sharing its lock. Its output layout also differs
+(`publish/<folder>/v<N>/` vs the controller's `<folder>-v<N>`), so the shared counter is the only
+contended resource today.
+
+**Latent, not live:** the adapter is constructed by the OSS shell (`app/server-common.js`) for
+PublishAdapter contract conformance, but nothing in `builder-server` invokes `adapters.publish`
+— only tests exercise it. **Fix when a real caller appears (decide then):** route calls through
+the export lock (`withExportOpLock`), or give the PublishAdapter contract an explicit
+serialization/allocation story (e.g. the pending-row reservation §62's done-note sketches for
+multi-process) rather than bolting the controller's in-process lock onto an adapter boundary.
 
 ---
 

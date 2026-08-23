@@ -25,19 +25,26 @@ export async function deleteProjectById(projectId) {
   const projectName = project.name;
   const projectFolderName = project.folderName;
 
-  // Clean up export files BEFORE DB deletion (ON DELETE CASCADE would remove
-  // export records, making it impossible to find export directories).
-  try {
-    const { cleanupProjectExports } = await import("../controllers/exportController.js");
-    await cleanupProjectExports(projectId);
-  } catch (exportCleanupError) {
-    console.warn(`[deleteProjectById] Export cleanup failed for ${projectId}:`, exportCleanupError);
-    // Non-fatal: proceed with deletion even if export cleanup fails
-  }
+  // Export cleanup and the project-row removal run under one per-project
+  // export lock: cleanup must precede the DB deletion (ON DELETE CASCADE would
+  // remove export records, making it impossible to find export directories),
+  // and the row must be gone before the lock releases — otherwise an export
+  // queued behind the cleanup still sees a valid project and leaves an orphan
+  // bundle after the deletion completes.
+  const { withExportOpLock, cleanupProjectExports } = await import("../controllers/exportController.js");
+  let newActiveProjectId = null;
+  await withExportOpLock(projectId, async () => {
+    try {
+      await cleanupProjectExports(projectId, { withinLock: true });
+    } catch (exportCleanupError) {
+      console.warn(`[deleteProjectById] Export cleanup failed for ${projectId}:`, exportCleanupError);
+      // Non-fatal: proceed with deletion even if export cleanup fails
+    }
 
-  // Delete from SQLite (cascades to media_files, media_sizes, media_usage,
-  // exports) and reassign the active project in one transaction.
-  const newActiveProjectId = projectRepo.deleteProjectAndReassignActive(projectId);
+    // Delete from SQLite (cascades to media_files, media_sizes, media_usage,
+    // exports) and reassign the active project in one transaction.
+    newActiveProjectId = projectRepo.deleteProjectAndReassignActive(projectId);
+  });
 
   // Delete project directory from disk
   const projectDir = getProjectDir(projectFolderName);
