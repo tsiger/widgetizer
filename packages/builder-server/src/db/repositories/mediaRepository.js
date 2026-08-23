@@ -208,12 +208,20 @@ export function updateMediaUsageForSource(projectId, sourceId, fileIds) {
 // ==========================================
 
 /**
- * Insert a media file row and its sizes. Used by both addMediaFile and writeMediaData.
+ * Insert a media file row and its sizes, atomically. Used by both addMediaFile
+ * and writeMediaData. Self-wrapped in a transaction so a failure among the
+ * media_sizes inserts can't commit a media_files row with missing variants
+ * (broken thumbnails nothing ever repairs); the wrap nests as a savepoint
+ * under writeMediaData's own transaction.
  * @param {import('better-sqlite3').Database} db
  * @param {string} projectId
  * @param {object} fileData
  */
 function insertMediaFile(db, projectId, fileData) {
+  db.transaction(() => insertMediaFileStatements(db, projectId, fileData))();
+}
+
+function insertMediaFileStatements(db, projectId, fileData) {
   db.prepare(`
     INSERT INTO media_files (id, project_id, filename, original_name, type, size, uploaded, path, alt, title, caption, width, height)
     VALUES (@id, @projectId, @filename, @originalName, @type, @size, @uploaded, @path, @alt, @title, @caption, @width, @height)

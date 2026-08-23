@@ -34,7 +34,7 @@ Upload size is enforced at **two** points:
 1. **Streaming gate (SA-02)** — `uploadWithLimit` builds a per-request `multer` whose `limits.fileSize` is sourced from the `LimitsAdapter` (`LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES`). An oversize part is rejected mid-stream **before** the whole file is buffered into memory; `errorHandler` maps multer's `LIMIT_FILE_SIZE` to `413`. OSS returns a finite cap from app settings (default fallback `10 MB` when no adapter is wired); hosted returns its tenant ceiling.
 2. **Post-buffer gate** — inside `uploadProjectMedia`, each buffered file is re-checked against `media.maxFileSizeMB` (App Settings); over-limit files are reported in `rejectedFiles` with a human-readable reason rather than throwing.
 
-The streaming gate is the DoS-safe floor; the post-buffer gate enforces the user-configurable per-file limit. File-type acceptance is enforced by multer's `fileFilter` against `ALLOWED_MIME_TYPES`.
+The streaming gate is the DoS-safe floor; the post-buffer gate enforces the user-configurable per-file limit. File-type acceptance is enforced by multer's `fileFilter` (`mediaUploadFileFilter`): the declared MIME must be in `ALLOWED_MIME_TYPES`, the extension in `ALLOWED_UPLOAD_EXTENSIONS`, **and the two must agree** (the MIME must be the extension's canonical content type; `audio/mp3` alias accepted for `.mp3`). The declared MIME is client-controlled while the stored extension drives the served `Content-Type` and processing branches on MIME — so allowlisting each independently isn't enough (e.g. an SVG declared `image/jpeg` would skip SVG sanitization).
 
 ### Image Sizes (App Settings + Theme Overrides)
 
@@ -114,6 +114,7 @@ MIME/accept definitions are centralized:
 
 - **Backend** (`packages/builder-server/src/utils/mimeTypes.js`):
   - `ALLOWED_MIME_TYPES` — upload allowlist: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `application/pdf`, `audio/mpeg`, `audio/mp3`.
+  - `ALLOWED_UPLOAD_EXTENSIONS` — the extension half of upload acceptance (`.jpg .jpeg .png .gif .webp .svg .pdf .mp3`), mirroring `ALLOWED_MIME_TYPES`. Both must pass: the declared MIME alone is client-controlled, and serving derives the response `Content-Type` from the stored extension — a MIME-only check would let a crafted `x.html` upload in and back out as executable `text/html`.
   - `ZIP_MIME_TYPES` — ZIP archive validation (project import / theme upload).
   - `getMediaCategory(mimeType)` — `"image"` for image MIME types, `"file"` for everything else (PDF, audio); decides the upload subdir inline in the controller.
   - `getContentType(ext)` / `CONTENT_TYPES` — re-exported from `@widgetizer/core/mimeTypes` (single source of truth shared with the local asset adapter); resolves an extension to a MIME type for `Content-Type` headers.
@@ -203,7 +204,7 @@ Browser-native loads (`<img src>`, downloads) and the metadata editor cannot car
 
 ### Upload Flow (`uploadProjectMedia`)
 
-1. `multer` (memory storage) buffers each file; `fileFilter` rejects MIME types outside `ALLOWED_MIME_TYPES`.
+1. `multer` (memory storage) buffers each file; `fileFilter` (`mediaUploadFileFilter`) rejects files whose declared MIME is outside `ALLOWED_MIME_TYPES`, whose extension is outside `ALLOWED_UPLOAD_EXTENSIONS`, or whose MIME doesn't match the extension's canonical content type.
 2. A sequential pre-pass assigns a collision-free slugified filename per file (deduped against adapter keys + names assigned this request).
 3. Per file, in parallel (`Promise.allSettled`):
    - Re-check `media.maxFileSizeMB` (post-buffer gate); over-limit → `rejectedFiles`.

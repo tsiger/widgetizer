@@ -37,7 +37,7 @@ _None open._
 - [⏸️ 30. Extract project lifecycle duplicate/import into dir-explicit cores — moderate (architectural / hosted-readiness) — blocked on hosted duplicate/import](#-30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores--moderate-architectural--hosted-readiness--blocked-on-hosted-duplicateimport)
 - [⬜ 39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — 39a moderate (data-integrity), 39b/39c low (concurrency)](#-39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server--39a-moderate-data-integrity-39b39c-low-concurrency)
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
-- [⬜ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)](#-42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--low-oss-standalone--moderate-hosted--stored-xss-needs-confirmation)
+- [✅ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — fixed, pending reference-table move](#-42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--fixed-pending-reference-table-move)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
 - [⬜ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`)](#-50-structure-only-undoredo-doesnt-re-arm-the-autosave-timer-editor-ui)
@@ -56,6 +56,12 @@ _None open._
 - [⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)](#-49-linkenrichmentjs-bypasses-the-storage-adapter--raw-fs-writes-to-project-content-builder-server--low-architectural-hygiene)
 - [⬜ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`)](#-51-queued-save-flavor-inheritance-across-a-third-overlapping-save-call-editor-ui)
 - [⬜ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — low — latent](#-52-synchronous-subscriber-re-entry-window-in-savestoresave-editor-ui--low--latent)
+- [⬜ 53. Kebab action-menus lack full WAI-ARIA menu a11y + copy-pasted open/close logic (`editor-ui`) — low (a11y / DRY)](#-53-kebab-action-menus-lack-full-wai-aria-menu-a11y--copy-pasted-openclose-logic-editor-ui--low-a11y--dry)
+- [⬜ 54. Full accessibility / WAI-ARIA APG conformance review (`editor-ui` + all shells) — low — investigate (a11y)](#-54-full-accessibility--wai-aria-apg-conformance-review-editor-ui--all-shells--low--investigate-a11y)
+- [⬜ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — low (test hygiene)](#-55-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--low-test-hygiene)
+- [⬜ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — low — latent](#-56-editorshellpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui--low--latent)
+- [⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)](#-57-core-editor-ui-style-guidemd-has-no-split-button-component-pattern-docs-llms--low-optional)
+- [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
 
 ---
 
@@ -288,7 +294,12 @@ mirrors master and covers deleted-active / missing-record / migrated-data edge c
 
 **Status:** ⬜ open — surfaced 2026-07-08 auditing every `db.transaction(...)` site across the repositories.
 
-**39a — Atomicity gap: `addMediaFile` isn't transactional (moderate, data-integrity).**
+**39a — Atomicity gap: `addMediaFile` isn't transactional (moderate, data-integrity). ✅ DONE
+2026-08-23** — `insertMediaFile` is now self-wrapped in `db.transaction(...)` (nests as a savepoint
+under `writeMediaData`'s existing transaction), so a failure among the size inserts rolls back the
+`media_files` row too. Pinned by `tests/mediaInsertAtomicity.test.js` (failure leaves no row;
+success and the nested `writeMediaData` caller unchanged). 39b/39c below remain open. Original
+finding:
 `insertMediaFile` (`packages/builder-server/src/db/repositories/mediaRepository.js:216`) writes a
 `media_files` row **plus** N `media_sizes` rows across separate statements. `writeMediaData` wraps this helper
 in a `db.transaction(...)`, but `addMediaFile` (`mediaRepository.js:95`) calls it **bare**, and its callers
@@ -386,11 +397,25 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 
 ---
 
-## ⬜ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — low (OSS-standalone) / moderate (hosted — stored XSS, needs confirmation)
+## ✅ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — fixed, pending reference-table move
 
 **Priority:** Medium
 
-**Status:** ⬜ open — surfaced 2026-07-09 while scoping ZIP media-upload support. **Pre-existing** (affects PDF/audio uploads today, independent of ZIP); newly written up, not carried from the SA register.
+**Status:** ✅ **DONE 2026-08-23** — `mediaUploadFileFilter` now requires an allowed declared
+MIME, an allowed extension (`ALLOWED_UPLOAD_EXTENSIONS` in `utils/mimeTypes.js`, mirroring
+`ALLOWED_MIME_TYPES`), **and that the two agree** (the MIME must be the extension's canonical
+content type, `audio/mp3` alias kept), on both upload paths (the base `upload` multer and
+`uploadWithLimit`'s per-request instance). A crafted `x.html` + `application/pdf` upload is
+rejected at the filter; so is an allowed-but-mismatched pair like `evil.svg` declared
+`image/jpeg`, which would otherwise skip SVG sanitization (processing branches on MIME, serving
+on extension — found in follow-up review). Pinned by `tests/mediaUploadFilter.test.js`; `core-media.md` updated
+(gating description, constants list, upload flow step 1). The optional serve-side
+`Content-Disposition: attachment` hardening was deliberately not added — the extension allowlist
+closes the vector at the root. The hosted-side "needs confirmation" was confirmed before fixing:
+its serving path derives `Content-Type` from the stored extension the same way, so hosted
+inherits this fix via the vendored package. Original finding below.
+
+Surfaced 2026-07-09 while scoping ZIP media-upload support. **Pre-existing** (affects PDF/audio uploads today, independent of ZIP); newly written up, not carried from the SA register.
 
 **What.** Three points key off *different* signals that don't have to agree:
 
@@ -646,6 +671,152 @@ by triggering its own save would hit this window with no defense.
 Candidate fix: move the `isSaving`/`isAutoSaving` `set()` to after `runningSave` is installed (or
 install a non-null sentinel in `runningSave` before the first `set()` in `save()`), so no
 subscriber notification can escape while the single-flight guard is still unset.
+
+---
+
+## ⬜ 53. Kebab action-menus lack full WAI-ARIA menu a11y + copy-pasted open/close logic (`editor-ui`) — low (a11y / DRY)
+
+**Priority:** Low
+
+Surfaced 2026-07-09 while speccing the page-editor SplitButton, which audited the existing
+kebab/action menus as the house pattern to match — and found they stop short of full menu-button
+accessibility.
+
+The row action-menus — `pages/Pages.jsx`, `pages/CollectionItems.jsx`,
+`components/media/MediaListItem.jsx`, `components/export/ExportHistoryTable.jsx` (plus the
+`aria-haspopup` picker in `components/settings/inputs/FontPickerInput.jsx`) — share a consistent
+**visual** pattern (an `IconButton` + `MoreVertical` trigger with translated `aria-label`,
+`aria-haspopup="menu"`, `aria-expanded`; an absolutely-positioned white rounded-border shadow menu;
+a shared `menuButtonClass` for items; close-on-select). But the a11y stops at the trigger
+attributes:
+
+- the dropdown container has **no `role="menu"`** and items have **no `role="menuitem"`**;
+- **no roving focus / Arrow-key (Home/End) navigation** — items rely on plain tab order;
+- **no focus management** — opening doesn't move focus into the menu, and Escape/close doesn't
+  return focus to the trigger;
+- **no `aria-controls`** linking trigger↔menu;
+- the **click-outside + Escape `useEffect`s are copy-pasted per component** (a `document`
+  `mousedown` + `keydown` listener in each) — a DRY smell as much as an a11y one.
+
+**Effect (low):** keyboard/AT users can open these menus but can't operate them as a proper menu
+(no arrow-key navigation, focus neither moved in nor returned on close). Purely an accessibility +
+maintainability gap — mouse users are unaffected and no data/behaviour is wrong.
+
+**Fix:** the primitive now exists — `components/ui/SplitButton.jsx` implements the full WAI-ARIA
+menu-button pattern (`role="menu"`/`menuitem`, roving `tabindex`, Arrow/Home/End,
+focus-in-on-open + focus-return-on-close, click-outside/Escape). Extract its **menu half into a
+reusable `useMenu` hook** (or shared menu component) and retrofit these kebab menus onto it —
+closing the a11y gaps and deleting the per-component `document` listeners in one pass. The
+SplitButton differs structurally (primary button **+** caret vs. a single kebab), so the reusable
+unit is the **menu + `useMenu`**, not the whole control.
+
+---
+
+## ⬜ 54. Full accessibility / WAI-ARIA APG conformance review (`editor-ui` + all shells) — low — investigate (a11y)
+
+**Priority:** Low
+
+Surfaced 2026-07-10 while building the page-editor SplitButton. That control implements the full
+WAI-ARIA menu-button pattern, which raised a broader question the project has never answered
+deliberately: **what accessibility bar do we hold, and do we want WAI-ARIA APG conformance as a
+standard?**
+
+Two concrete inputs motivated this:
+
+- **SplitButton disabled menu items** use native `disabled` (announced + non-focusable), *not* the
+  APG "disabled-but-focusable via `aria-disabled` only" pattern (which lets keyboard/AT users
+  arrow onto a disabled item to learn *why* it's unavailable). That was a deliberate minimal
+  choice for one small menu, not a project-wide stance — the convention should be decided once,
+  globally, and applied consistently.
+- The kebab/action menus (§53) already stop short of full menu-button a11y.
+
+**Scope:** a project-wide audit — semantic roles, focus management, keyboard operability, `aria-*`
+correctness, contrast, tap-target sizes — across `editor-ui` and the OSS shells (`app/`,
+`electron/`), deciding whether to adopt APG conformance. If adopted, apply the disabled-item
+convention (and the rest) consistently, including retrofitting §53's kebab menus.
+
+**Effect:** current keyboard/AT support is partial-but-usable; this is about raising and
+standardizing the bar, not fixing a break. Because `editor-ui` is vendored into embedding hosts,
+whatever convention is adopted propagates to them automatically.
+
+---
+
+## ⬜ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — low (test hygiene)
+
+**Priority:** Low
+
+Surfaced 2026-07-10 during the SplitButton work. `packages/editor-ui`'s jsdom component tests
+deliberately render **without** an i18n provider — the convention is that `t(key)` returns the key
+verbatim and tests assert on the key strings. But nothing initializes an i18next instance (the
+root `vitest.setup.js` doesn't; the real instance lives only in the app shell, `app/src/i18n.js`,
+which the tests don't load), so `react-i18next`'s `useTranslation()` emits a **"You will need to
+pass in an i18next instance"** warning on every such render — ~23 jsdom component test files
+across `editor-ui` trigger it. Pre-existing and repo-wide, not tied to any one feature.
+
+**Effect (low):** noisy stderr in the frontend test run — no failures, no behavioural impact.
+
+**Fix:** initialize a **minimal, resource-less** i18next instance in `vitest.setup.js`
+(`i18n.use(initReactI18next).init({ lng: "en", resources: {} })`). With no resources a missing key
+still falls back to the key string, so the assert-on-keys strategy is preserved — the warning just
+goes away. Global test-infra change (touches every suite), so validate the full frontend suite
+stays green; do it as its own pass, not inside a feature branch.
+
+---
+
+## ⬜ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — low — latent
+
+**Priority:** Low
+
+Surfaced 2026-07-12 reviewing the SplitButton work. The `plugins = []` / `slots = {}` default
+parameters (`extension/PluginProvider.jsx:16`, and `EditorShell.jsx`'s `EditorProvider`, shell
+component, `editorRouteChildren` and `createEditorRoutes`) are plain literals, recreated fresh on
+every render where the caller omits the prop — defeating `PluginProvider`'s own `useMemo` on
+`[plugins, slots]` the moment any of these components re-renders without an explicitly memoized
+prop.
+
+**Effect (low today):** the real call sites avoid it (OSS composes its routes once at module
+scope; embedding hosts memoize the props they pass). Nothing in the components themselves enforces
+or warns about it, though, so the next caller that doesn't know to memoize would silently
+reintroduce wasted re-renders across every `useCommands`/`useNavItems`/`usePluginRoutes`/`useSlot`
+consumer.
+
+**Fix:** swap the default literals for shared module-level frozen constants (e.g. a small
+`lib/emptyValues.js` exporting `EMPTY_ARRAY`/`EMPTY_OBJECT`, `Object.freeze`d) so an unmemoized
+caller can't defeat the downstream `useMemo`; pin with tests that re-render with the props omitted
+and assert the context value stays referentially identical across renders.
+
+---
+
+## ⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)
+
+**Priority:** Low
+
+Surfaced 2026-07-13 auditing docs-llms for staleness after the SplitButton work. The style guide
+reads as a Tailwind class/token reference rather than a component-API catalogue, and it has no
+precedent for documenting other composite interactive controls (menus, comboboxes) either — so
+`components/ui/SplitButton.jsx` not appearing there isn't a factual error, just a possible gap if
+the guide is ever meant to grow into a component catalogue.
+
+**Fix (if wanted):** add a Split Button entry alongside the other button patterns, or explicitly
+scope the doc's intro to "tokens/classes only, not component APIs" so its silence reads as
+deliberate.
+
+---
+
+## ⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate
+
+**Priority:** Low
+
+Surfaced 2026-07-13 running the full backend suite (`npm test`): `passes through when validation
+succeeds` (`packages/builder-server/src/tests/infrastructure.test.js`) failed once with
+`Unexpected token '<', "<!doctype "... is not valid JSON` — but passed cleanly running that file
+alone (`node --test packages/builder-server/src/tests/infrastructure.test.js`, 10/10). The working
+tree at the time touched only `packages/editor-ui`, so the failure isn't tied to any backend
+change; the error text (an HTML response where JSON was expected) suggests a port collision or a
+stray server under test-parallelism, not a logic bug in `validateRequest` itself.
+
+**Fix:** investigate under the full-suite runner (not standalone) to reproduce — likely something
+about port/state sharing across `createEditorApp` instances spun up by parallel test files.
 
 ---
 

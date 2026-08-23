@@ -7,7 +7,7 @@ import slugify from "slugify";
 import DOMPurify from "isomorphic-dompurify";
 import { getThemeJsonPath } from "../config.js";
 import { LIMIT_KEYS } from "@widgetizer/core/adapters";
-import { ALLOWED_MIME_TYPES, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
+import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsageFromDir } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
@@ -138,9 +138,20 @@ export async function atomicUpdateMediaFile(projectId, transformFn) {
 // uploadProjectMedia (it needs the adapter to dedup against the store).
 const storage = multer.memoryStorage();
 
-// Configure multer file filter
-const fileFilter = (req, file, cb) => {
-  if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+// Configure multer file filter. Both signals must pass and agree: the declared
+// MIME is client-controlled, while the stored extension determines both the
+// response Content-Type and which processing/sanitization path is required.
+export const mediaUploadFileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname || "").toLowerCase();
+  const extensionMime = getContentType(ext);
+  const mimeMatchesExtension = file.mimetype === extensionMime
+    || (ext === ".mp3" && file.mimetype === "audio/mp3");
+
+  if (
+    ALLOWED_MIME_TYPES.includes(file.mimetype)
+    && ALLOWED_UPLOAD_EXTENSIONS.includes(ext)
+    && mimeMatchesExtension
+  ) {
     cb(null, true);
   } else {
     cb(new Error("Invalid file type. Supported types: images, audio (MP3), and PDF."), false);
@@ -151,7 +162,7 @@ const fileFilter = (req, file, cb) => {
 // set here — it is applied per-request by uploadWithLimit from the limits adapter.
 export const upload = multer({
   storage,
-  fileFilter,
+  fileFilter: mediaUploadFileFilter,
 });
 
 // Platform fallback when no limits adapter is wired (kept in sync with hosted's
@@ -173,7 +184,7 @@ export async function uploadWithLimit(req, res, next) {
   try {
     const cap = await req.adapters?.limits?.getLimit?.(req.scope, LIMIT_KEYS.MAX_UPLOAD_SIZE_BYTES);
     const fileSize = Number.isFinite(cap) ? cap : DEFAULT_MAX_UPLOAD_BYTES;
-    multer({ storage, fileFilter, limits: { fileSize, files: 10 } }).array("files", 10)(req, res, next);
+    multer({ storage, fileFilter: mediaUploadFileFilter, limits: { fileSize, files: 10 } }).array("files", 10)(req, res, next);
   } catch (err) {
     next(err);
   }
