@@ -678,6 +678,25 @@ describe("mergeThemeSettings", () => {
     assert.equal(accent.value, "#green", "New setting should use default");
   });
 
+  it("does not resurrect a default the new schema removed", () => {
+    // The merged item starts as a copy of the NEW schema item, so a `default`
+    // the theme author removed must stay removed even when the user's stored
+    // copy still carries one (only the user's `value` is preserved).
+    const userTheme = {
+      version: "1.0.0",
+      settings: { colors: [{ id: "primary", value: "#custom", default: "#old-default" }] },
+    };
+    const newTheme = {
+      version: "1.1.0",
+      settings: { colors: [{ id: "primary", value: "#new" }] },
+    };
+
+    const merged = mergeThemeSettings(userTheme, newTheme);
+    const primary = merged.settings.colors.find((s) => s.id === "primary");
+    assert.equal(primary.value, "#custom", "User value should be preserved");
+    assert.equal("default" in primary, false, "Removed default must not be resurrected");
+  });
+
   it("drops settings removed by theme author", () => {
     const userTheme = {
       version: "1.0.0",

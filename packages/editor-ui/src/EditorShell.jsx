@@ -20,6 +20,7 @@ import MenuStructure from "./pages/MenuStructure.jsx";
 import Media from "./pages/Media.jsx";
 import Settings from "./pages/Settings.jsx";
 import ExportSite from "./pages/ExportSite.jsx";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "./lib/emptyValues.js";
 import CollectionItems from "./pages/CollectionItems.jsx";
 import CollectionItemAdd from "./pages/CollectionItemAdd.jsx";
 import CollectionItemEdit from "./pages/CollectionItemEdit.jsx";
@@ -49,8 +50,8 @@ export function EditorProvider({
   routeBase = "",
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
   children,
 }) {
   const allPlugins = useMemo(() => [builtinNavPlugin, ...plugins], [plugins]);
@@ -94,8 +95,8 @@ export function EditorShell({
   routeBase,
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
 }) {
   return (
     <EditorProvider
@@ -118,7 +119,7 @@ export function EditorShell({
 // editor-scoped stores reset on project switch. Both shells render the same
 // built-in set; plugin-contributed `routes` are merged into the same gated group
 // (so e.g. a hosted Forms/Analytics nav item has a route to render).
-function editorRouteChildren(plugins = []) {
+function editorRouteChildren(plugins = EMPTY_ARRAY) {
   const pluginRoutes = plugins.flatMap((p) => (Array.isArray(p?.routes) ? p.routes : []));
   return [
     {
@@ -165,8 +166,8 @@ export function createEditorRoutes({
   apiBase,
   project,
   scope,
-  plugins = [],
-  slots = {},
+  plugins = EMPTY_ARRAY,
+  slots = EMPTY_OBJECT,
 } = {}) {
   return {
     path,

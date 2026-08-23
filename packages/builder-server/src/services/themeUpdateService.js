@@ -154,13 +154,11 @@ function mergeSettingsArray(userArray, newArray) {
       return newItem;
     }
 
-    // Preserve user's value if they have one
+    // Preserve user's value if they have one. Everything else — including a
+    // `default` the new schema removed — comes from the new item alone.
     const merged = { ...newItem };
     if (userItem.value !== undefined) {
       merged.value = userItem.value;
-    }
-    if (userItem.default !== undefined && newItem.default === undefined) {
-      // Don't preserve default if new schema removed it
     }
 
     return merged;

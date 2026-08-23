@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { useState } from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import {
   PluginProvider,
   SlotOutlet,
@@ -60,6 +61,31 @@ describe("PluginProvider (React layer)", () => {
       </PluginProvider>,
     );
     expect(screen.getByTestId("wrap").textContent).toBe("");
+  });
+
+  it("keeps the context value referentially stable across re-renders when plugins/slots are omitted", () => {
+    // Default-parameter literals ([] / {}) are recreated on every render where
+    // the caller omits the prop, silently defeating the provider's useMemo for
+    // any non-memoizing caller. The defaults must be stable module constants.
+    const seen = [];
+    function IdentityProbe() {
+      seen.push(useNavItems());
+      return null;
+    }
+    function Host() {
+      const [, setTick] = useState(0);
+      return (
+        <PluginProvider>
+          <IdentityProbe />
+          <button onClick={() => setTick((t) => t + 1)}>rerender</button>
+        </PluginProvider>
+      );
+    }
+    render(<Host />);
+    fireEvent.click(screen.getByRole("button", { name: "rerender" }));
+
+    expect(seen.length).toBeGreaterThanOrEqual(2);
+    expect(seen[seen.length - 1]).toBe(seen[0]);
   });
 
   it("provides a hook runner through context", () => {

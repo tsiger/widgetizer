@@ -8,8 +8,31 @@ import { getThemesDir, STATIC_DIST_DIR, STATIC_PREVIEW_RUNTIME_DIR } from "./con
 import { getThemeSourceDir } from "./controllers/themeController.js";
 import { setupBuilderServer } from "./setupBuilderServer.js";
 
+// The API is unauthenticated and 127.0.0.1-bound, so CORS is the only thing
+// keeping a foreign website open in the same browser from reading/mutating
+// local projects cross-origin. Grant it exclusively to local origins — that
+// keeps the dev split-origin flow (Vite :3000 → API :3001) working, while
+// same-origin consumers (Electron, packaged web serving the SPA from this
+// same Express) never need CORS at all. Foreign origins get no ACAO header.
+const LOCAL_ORIGIN_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+
+function isLocalOrigin(origin) {
+  if (!origin) return true;
+
+  try {
+    const url = new URL(origin);
+    return ["http:", "https:"].includes(url.protocol) && LOCAL_ORIGIN_HOSTS.has(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
 function applySharedMiddleware(app) {
-  app.use(cors());
+  app.use(
+    cors({
+      origin: (origin, callback) => callback(null, isLocalOrigin(origin)),
+    }),
+  );
 
   app.use(
     helmet({

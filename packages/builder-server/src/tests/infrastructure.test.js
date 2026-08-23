@@ -227,6 +227,73 @@ describe("createEditorApp", () => {
     }
   });
 
+  it("does not grant CORS to a foreign web origin", async () => {
+    // The API is unauthenticated and 127.0.0.1-bound; a blanket allow-all lets
+    // any website open in the same browser read and mutate local projects
+    // cross-origin. Foreign origins must get no ACAO header at all.
+    const app = await createEditorApp({ adapters: fakeAdapters() });
+    const { server, baseUrl } = await startServer(app);
+
+    try {
+      for (const origin of [
+        "https://evil.example",
+        "http://localhost.evil.example",
+        "http://localhost:65536",
+        "null",
+        "file:///tmp/widgetizer.html",
+        "app://widgetizer",
+      ]) {
+        const response = await fetch(`${baseUrl}/health`, { headers: { Origin: origin } });
+        assert.equal(response.status, 200);
+        assert.equal(response.headers.get("access-control-allow-origin"), null);
+      }
+
+      const preflight = await fetch(`${baseUrl}/health`, {
+        method: "OPTIONS",
+        headers: {
+          Origin: "https://evil.example",
+          "Access-Control-Request-Method": "GET",
+        },
+      });
+      assert.equal(preflight.headers.get("access-control-allow-origin"), null);
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("still grants CORS to the local dev split-origin flow", async () => {
+    const app = await createEditorApp({ adapters: fakeAdapters() });
+    const { server, baseUrl } = await startServer(app);
+
+    try {
+      for (const origin of [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://[::1]:65535",
+        "HTTP://LOCALHOST:3000",
+      ]) {
+        const response = await fetch(`${baseUrl}/health`, { headers: { Origin: origin } });
+        assert.equal(response.status, 200);
+        assert.equal(response.headers.get("access-control-allow-origin"), origin);
+        assert.equal(response.headers.get("access-control-allow-credentials"), null);
+      }
+
+      const preflightOrigin = "http://localhost:3000";
+      const preflight = await fetch(`${baseUrl}/health`, {
+        method: "OPTIONS",
+        headers: {
+          Origin: preflightOrigin,
+          "Access-Control-Request-Method": "GET",
+        },
+      });
+      assert.equal(preflight.status, 204);
+      assert.equal(preflight.headers.get("access-control-allow-origin"), preflightOrigin);
+      assert.equal(preflight.headers.get("access-control-allow-credentials"), null);
+    } finally {
+      await stopServer(server);
+    }
+  });
+
   it("enables trust proxy in production mode", async () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";

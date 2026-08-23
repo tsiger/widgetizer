@@ -48,22 +48,23 @@ _None open._
 - [⏸️ 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — low (process) — deferred 2026-06-26](#-17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting--low-process--deferred-2026-06-26)
 - [⬜ 32. Theme-upload update-import validation smells (`builder-server`) — low — investigate](#-32-theme-upload-update-import-validation-smells-builder-server--low--investigate)
 - [⬜ 33. Editor-ui duplication smells (`editor-ui`) — low (maintainability) — investigate](#-33-editor-ui-duplication-smells-editor-ui--low-maintainability--investigate)
-- [⬜ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — low (cosmetic)](#-37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui--low-cosmetic)
+- [✅ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — fixed, pending reference-table move](#-37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui--fixed-pending-reference-table-move)
 - [⬜ 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — low — investigate](#-38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server--low--investigate)
-- [⬜ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — low (security; OSS-standalone only)](#-40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--low-security-oss-standalone-only)
+- [✅ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — fixed, pending reference-table move](#-40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--fixed-pending-reference-table-move)
 - [⬜ 43. Render-engine containment — two edges left open (`render-engine` / `core`) — low](#-43-render-engine-containment--two-edges-left-open-render-engine--core--low)
-- [⬜ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)](#-45-dead-code--empty-branch-in-mergesettingsarray-builder-server)
+- [✅ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`) — fixed, pending reference-table move](#-45-dead-code--empty-branch-in-mergesettingsarray-builder-server--fixed-pending-reference-table-move)
 - [⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)](#-49-linkenrichmentjs-bypasses-the-storage-adapter--raw-fs-writes-to-project-content-builder-server--low-architectural-hygiene)
 - [⬜ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`)](#-51-queued-save-flavor-inheritance-across-a-third-overlapping-save-call-editor-ui)
 - [⬜ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — low — latent](#-52-synchronous-subscriber-re-entry-window-in-savestoresave-editor-ui--low--latent)
 - [⬜ 53. Kebab action-menus lack full WAI-ARIA menu a11y + copy-pasted open/close logic (`editor-ui`) — low (a11y / DRY)](#-53-kebab-action-menus-lack-full-wai-aria-menu-a11y--copy-pasted-openclose-logic-editor-ui--low-a11y--dry)
 - [⬜ 54. Full accessibility / WAI-ARIA APG conformance review (`editor-ui` + all shells) — low — investigate (a11y)](#-54-full-accessibility--wai-aria-apg-conformance-review-editor-ui--all-shells--low--investigate-a11y)
-- [⬜ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — low (test hygiene)](#-55-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--low-test-hygiene)
-- [⬜ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — low — latent](#-56-editorshellpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui--low--latent)
+- [✅ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — fixed, pending reference-table move](#-55-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--fixed-pending-reference-table-move)
+- [✅ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — fixed, pending reference-table move](#-56-editorshellpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui--fixed-pending-reference-table-move)
 - [⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)](#-57-core-editor-ui-style-guidemd-has-no-split-button-component-pattern-docs-llms--low-optional)
 - [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
 - [✅ 59. `getCachedThemeValue` — an in-flight loader can repopulate an invalidated cache entry (`builder-server`) — fixed, pending reference-table move](#-59-getcachedthemevalue--an-in-flight-loader-can-repopulate-an-invalidated-cache-entry-builder-server--fixed-pending-reference-table-move)
 - [✅ 60. `layerThemeSnapshot` swallows per-update apply errors, so a partial snapshot can be promoted (`builder-server`) — fixed, pending reference-table move](#-60-layerthemesnapshot-swallows-per-update-apply-errors-so-a-partial-snapshot-can-be-promoted-builder-server--fixed-pending-reference-table-move)
+- [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
 
 ---
 
@@ -229,7 +230,14 @@ when a third consumer appears.
 
 ---
 
-## ⬜ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — low (cosmetic)
+## ✅ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — fixed, pending reference-table move
+
+**Status:** ✅ **DONE 2026-08-23** — restyled with Tailwind utilities matching the house pattern
+(`ExportCreator`'s empty variant: centered column, slate palette); the dead `empty-state*`
+semantic classes are gone. API unchanged (`icon`/`title`/`description`/`action`/`className`).
+Pinned by the new `components/ui/__tests__/EmptyState.test.jsx` (renders, no dead class names,
+caller `className` appended). The Themes-page call site needs no change. Hosted ships its own
+separate `src/components/EmptyState.jsx` and is unaffected. Original finding below.
 
 **Priority:** Low
 
@@ -339,7 +347,15 @@ through the mounted routes, so **39a** also affects the hosted media-upload path
 
 ---
 
-## ⬜ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — low (security; OSS-standalone only)
+## ✅ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — fixed, pending reference-table move
+
+**Status:** ✅ **DONE 2026-08-23** — `applySharedMiddleware` now grants CORS only to local
+origins (`localhost` / `127.0.0.1` / `[::1]`, any port, via a `cors` origin callback); foreign
+web origins get **no** ACAO header, and requests without an `Origin` (same-origin, Electron,
+curl) are unaffected. The dev split-origin flow (:3000 → :3001) keeps working. Pinned by two
+`infrastructure.test.js` cases (foreign origin gets no ACAO — red pre-fix against the `*` grant;
+localhost/127.0.0.1 origins are echoed). Embedding hosts supply their own middleware stack and
+never run this code. Original finding below.
 
 **Priority:** Low
 
@@ -547,7 +563,14 @@ programmatically). These are traps waiting on a preset author who nests a direct
 
 ---
 
-## ⬜ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`)
+## ✅ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`) — fixed, pending reference-table move
+
+**Status:** ✅ **DONE 2026-08-23** — intent re-derived from the merge shape before deleting: the
+merged item starts as a spread of the NEW schema item and only the user's `value` is ever
+preserved, so "don't preserve a default the new schema removed" already holds structurally — the
+branch guarded nothing. Deleted, with the intent pinned by a `mergeThemeSettings` unit test
+("does not resurrect a default the new schema removed") so a future rewrite can't regress it
+silently. Original finding below.
 
 **Priority:** Low
 
@@ -784,7 +807,12 @@ whatever convention is adopted propagates to them automatically.
 
 ---
 
-## ⬜ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — low (test hygiene)
+## ✅ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — fixed, pending reference-table move
+
+**Status:** ✅ **DONE 2026-08-23** — `vitest.setup.js` now initializes a minimal, resource-less
+i18next instance (`lng: "en"`, empty resources, `escapeValue: false`), so `t(key)` still falls
+back to the key string and the suites' assert-on-keys convention is preserved. Warning count in
+the full frontend run went 6 → 0; whole suite verified green. Original finding below.
 
 **Priority:** Low
 
@@ -806,7 +834,14 @@ stays green; do it as its own pass, not inside a feature branch.
 
 ---
 
-## ⬜ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — low — latent
+## ✅ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — fixed, pending reference-table move
+
+**Status:** ✅ **DONE 2026-08-23** — added `lib/emptyValues.js` (`EMPTY_ARRAY`/`EMPTY_OBJECT`,
+frozen module constants) and swapped every `plugins = []` / `slots = {}` default in
+`PluginProvider`, `EditorShell`'s provider/shell/`editorRouteChildren`/`createEditorRoutes`
+sites to reference them. Pinned by a `PluginProvider` test that re-renders with the props
+omitted and asserts the context value stays referentially identical (red pre-fix). Original
+finding below.
 
 **Priority:** Low
 
@@ -917,6 +952,33 @@ once the update dir is repaired and any rebuild runs.
 makes that safe — the previous snapshot survives), or keep best-effort but skip promotion when
 any update failed. Fatal-on-error is probably right now that failure no longer destroys
 `latest/`; it was arguably the lesser evil only under the old in-place rebuild.
+
+---
+
+## ⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)
+
+**Priority:** Low
+
+Surfaced 2026-08-23 during a manual Electron smoke pass (dev split-origin setup). Editor→preview
+messages deliberately target the preview's concrete origin (`getPreviewTargetOrigin()` in
+`lib/previewBase.js`) instead of `"*"`, so a message can never be delivered to an unexpected
+document. The flip side: while the preview iframe is mounting or reloading, its document is still
+the initial `about:blank`, which **inherits the parent (editor) origin** — a message fired during
+that gap (e.g. an early `UPDATE_CSS_VARIABLES` / `LOAD_FONTS` push from `previewManager.js`) is
+aimed at the API origin but arrives at an editor-origin window, so the browser drops it and logs
+`Failed to execute 'postMessage' on 'DOMWindow': The target origin provided (…) does not match
+the recipient window's origin (…)`.
+
+**Effect (low, cosmetic):** console noise only. Nothing is lost — the preview runtime announces
+`PREVIEW_READY` once its real document is up and the editor re-syncs then
+(`PreviewPanel.jsx`); the drop is the origin-scoping safety mechanism working as designed. In
+same-origin production the mismatch can't occur (parent and preview share an origin), so this is
+a dev/split-origin-only warning.
+
+**Fix (if wanted):** gate the editor→preview sends on the iframe's loaded/ready state — either
+queue messages until `PREVIEW_READY` arrives for the current document generation, or simply skip
+sends while the iframe is known to be loading (the post-`PREVIEW_READY` re-sync already covers
+them). Keep the concrete-origin targeting; the point is only to stop firing into the gap.
 
 ---
 

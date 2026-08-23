@@ -5,12 +5,12 @@
 
 export default function EmptyState({ icon, title, description, action, className = "", ...props }) {
   return (
-    <div className={`empty-state ${className}`} {...props}>
-      {icon && <div className="empty-state-icon">{icon}</div>}
+    <div className={`flex flex-col items-center px-6 py-16 text-center ${className}`} {...props}>
+      {icon && <div className="mb-4 text-slate-400">{icon}</div>}
 
-      {title && <h3 className="empty-state-title">{title}</h3>}
+      {title && <h3 className="mb-2 text-xl font-semibold text-slate-900">{title}</h3>}
 
-      {description && <p className="empty-state-description">{description}</p>}
+      {description && <p className="mb-6 max-w-xl text-slate-600">{description}</p>}
 
       {action && action}
     </div>
