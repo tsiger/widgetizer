@@ -289,6 +289,49 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
     });
 
+    it("re-arms the autosave timer for a structure-only difference (undo/redo of a reorder)", () => {
+      const widget = { type: "rich-text", settings: { text: "Hi" } };
+      const page = {
+        id: "page-1",
+        title: "Test",
+        widgets: { "w-1": { ...widget }, "w-2": { ...widget } },
+        widgetsOrder: ["w-1", "w-2"],
+      };
+      usePageStore.setState({
+        page: JSON.parse(JSON.stringify(page)),
+        originalPage: JSON.parse(JSON.stringify(page)),
+        loadedProjectId: "test-project",
+        loading: false,
+      });
+      // Undo/redo of a reorder: every widget's content matches the baseline,
+      // only the page-level widgetsOrder differs.
+      usePageStore.setState({
+        page: { ...JSON.parse(JSON.stringify(page)), widgetsOrder: ["w-2", "w-1"] },
+      });
+
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+      useAutoSave.getState().reconcileModifiedWidgets();
+
+      // The per-widget ledger is correctly empty — nothing content-level changed —
+      // but the whole-page diff is dirty, so the timer must still be armed.
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
+    });
+
+    it("re-arms the autosave timer for a theme-settings-only difference (undo/redo of a theme edit)", () => {
+      // Undo/redo restores theme settings into themeStore (via
+      // syncThemeStoreFromSnapshot); the page itself matches its baseline, so
+      // only the canonical theme diff reads dirty.
+      seedPageStore();
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+
+      expect(useAutoSave.getState().autoSaveInterval).toBeNull();
+      useAutoSave.getState().reconcileModifiedWidgets();
+
+      expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull();
+    });
+
     it("reconciles header/footer against originalGlobalWidgets", () => {
       const header = { type: "header", settings: { text: "v1" }, blocks: {}, blocksOrder: [] };
       usePageStore.setState({

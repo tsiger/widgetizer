@@ -124,6 +124,20 @@ const useAutoSave = create((set, get) => ({
         markWidgetUnmodified(key);
       }
     }
+
+    // Differences that live outside any widget's content arm nothing in the
+    // per-widget pass above, yet hasUnsavedChanges() correctly reads them as
+    // dirty: structure-only page changes (widgetsOrder, page settings) via
+    // its whole-page diff, and theme settings via themeStore's canonical
+    // diff (undo/redo restores them through syncThemeStoreFromSnapshot).
+    // Arm the autosave timer for those too, or an undone/redone reorder or
+    // theme edit sits unsaved until the next content edit happens to re-arm
+    // it — save() persists both (hasPageDiff / hasThemeDrift).
+    const hasPageDiff = page && originalPage && !isEqual(page, originalPage);
+    if (hasPageDiff || useThemeStore.getState().hasUnsavedThemeChanges()) {
+      set({ autoSaveFailureCount: 0 });
+      get().resetAutoSaveTimer();
+    }
   },
 
   setStructureModified: (modified) => {

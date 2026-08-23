@@ -40,7 +40,7 @@ _None open._
 - [✅ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — fixed, pending reference-table move](#-42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--fixed-pending-reference-table-move)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [⬜ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`)](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server)
-- [⬜ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`)](#-50-structure-only-undoredo-doesnt-re-arm-the-autosave-timer-editor-ui)
+- [✅ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`) — fixed, pending reference-table move](#-50-structure-only-undoredo-doesnt-re-arm-the-autosave-timer-editor-ui--fixed-pending-reference-table-move)
 
 ### Low priority
 
@@ -603,9 +603,21 @@ where project storage is the local filesystem.
 
 ---
 
-## ⬜ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`)
+## ✅ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`) — fixed, pending reference-table move
 
 **Priority:** Medium (low end)
+
+**Status:** ✅ **DONE 2026-08-23** — `reconcileModifiedWidgets` now also arms the autosave timer
+(and resets the failure count) when the whole-page diff is non-empty **or** themeStore's canonical
+`hasUnsavedThemeChanges()` reads dirty — the same checks `hasUnsavedChanges()` and `save()`
+(`hasPageDiff` / `hasThemeDrift`) already use, so an armed timer always fires a save that actually
+persists the difference. The theme arm matters because undo/redo restores theme settings via
+`syncThemeStoreFromSnapshot`, outside the page object (found in follow-up review). Pinned by two
+saveStore tests (structure-only reorder diff and theme-settings-only diff → per-widget ledger
+empty, timer armed); hosted's vendored contract suite verified green. Accepted residual: a no-op
+redo (`safeRedo` doesn't guard on empty `futureStates`, unlike `safeUndo`) still runs the
+reconcile, so it can restart the debounce and clear a backoff while dirty — harmless timer churn,
+one live timer either way. Original finding below.
 
 `saveStore.js`'s `reconcileModifiedWidgets` diffs per-widget content only (`page.widgets[id]` vs
 `originalPage.widgets[id]`, plus header/footer). A redo that reintroduces only a
