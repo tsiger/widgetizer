@@ -547,6 +547,45 @@ describe("saveStore (useAutoSave)", () => {
       }
     });
 
+    it("maps a manual-flavored throw from a coalesced follow-up back to a failed attempt — backoff still advances, no unhandled rejection", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false); // manual save in flight
+      const second = useAutoSave.getState().save(false); // queues a MANUAL-flavored follow-up
+
+      // The tick fires while the manual save is still in flight: its
+      // save(true) joins the queued manual-flavored follow-up, whose failure
+      // contract is a throw — which the tick must map back to "failed".
+      await vi.advanceTimersByTimeAsync(60000);
+
+      // Dirty the page WITHOUT markWidgetModified — that would arm a fresh
+      // base-delay timer and reset the failure count, and the tick's
+      // reschedule-check preserves an existing timer, which would mask the
+      // backed-off reschedule this test exists to prove. A raw page edit
+      // keeps the follow-up from short-circuiting to "clean" while leaving
+      // the tick's own reschedule as the only timer.
+      usePageStore.setState((state) => ({ page: { ...state.page, title: "edited mid-flight" } }));
+      savePageContent.mockRejectedValueOnce(new Error("network down")); // the follow-up's own request fails
+
+      resolveFirst({});
+      await expect(first).resolves.toEqual({ status: "success" });
+      await expect(second).rejects.toThrow("network down"); // the manual caller's own contract, untouched
+      await vi.advanceTimersByTimeAsync(0); // let the tick's catch/bookkeeping run
+
+      expect(useAutoSave.getState().autoSaveFailureCount).toBe(1); // the throw was counted as a failed attempt
+      expect(useAutoSave.getState().autoSaveInterval).not.toBeNull(); // and the tick rescheduled
+
+      // ...with the backed-off delay (120s for failureCount=1), not the base 60s.
+      savePageContent.mockClear();
+      await vi.advanceTimersByTimeAsync(60000);
+      expect(savePageContent).not.toHaveBeenCalled(); // base delay elapsed — the backed-off tick hasn't fired yet
+      await vi.advanceTimersByTimeAsync(60000);
+      expect(savePageContent).toHaveBeenCalledTimes(1); // fires at the 120s backoff
+    });
+
     it("resets the failure count on a fresh edit, not just on success", () => {
       useAutoSave.setState({ autoSaveFailureCount: 3 });
       useAutoSave.getState().markWidgetModified("w-1");
@@ -771,6 +810,67 @@ describe("saveStore (useAutoSave)", () => {
         expect(clearSpy).toHaveBeenCalledTimes(1);
       } finally {
         clearSpy.mockRestore();
+      }
+    });
+
+    it("rejects to a manual caller who joined an autosave-flavored queued follow-up, when that follow-up fails (flavor upgrade)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+      const first = useAutoSave.getState().save(false);
+
+      const autoJoin = useAutoSave.getState().save(true); // queues an autosave-flavored follow-up
+      expect(useAutoSave.getState().queuedFollowUp.isAuto).toBe(true);
+
+      const manualJoin = useAutoSave.getState().save(false); // manual caller joins → upgrades the queued flavor
+      expect(useAutoSave.getState().queuedFollowUp.isAuto).toBe(false);
+
+      useAutoSave.getState().markWidgetModified("w-2"); // keeps the follow-up from short-circuiting to "clean"
+      savePageContent.mockRejectedValueOnce(new Error("network down")); // the follow-up's own request fails
+
+      resolveFirst({});
+      await expect(first).resolves.toEqual({ status: "success" });
+      // Without the upgrade, the follow-up would run autosave-flavored and
+      // resolve { status: "failed" } — silently bypassing the manual caller's
+      // rejection-based error handling.
+      await expect(manualJoin).rejects.toThrow("network down");
+      await expect(autoJoin).rejects.toThrow("network down"); // same underlying run; the production auto caller (the tick) maps this back itself
+    });
+
+    it("keeps a re-entrant save() from a synchronous isSaving subscriber inside the single-flight guard (no overlapping run)", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveFirst;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+
+      // A subscriber that reacts to isSaving flipping true by calling save()
+      // itself — zustand notifies synchronously, so this re-enters save()
+      // during the original call's own stack. It must hit the coalescing
+      // branch (runningSave installed before the flag is set), not start an
+      // independent second run.
+      const reentrant = [];
+      const unsubscribe = useAutoSave.subscribe((state, prev) => {
+        if (state.isSaving && !prev.isSaving) {
+          reentrant.push(useAutoSave.getState().save(false));
+        }
+      });
+
+      try {
+        const first = useAutoSave.getState().save(false);
+        expect(reentrant).toHaveLength(1); // the subscriber did fire and re-enter
+        expect(useAutoSave.getState().queuedFollowUp).not.toBeNull(); // ...and was coalesced into a follow-up
+
+        resolveFirst({});
+        const [firstResult, reentrantResult] = await Promise.all([first, ...reentrant]);
+
+        expect(firstResult).toEqual({ status: "success" });
+        expect(reentrantResult).toEqual({ status: "clean" });
+        expect(savePageContent).toHaveBeenCalledTimes(1); // exactly one run's request — no overlap
+      } finally {
+        unsubscribe();
       }
     });
 

@@ -103,38 +103,45 @@ const useAutoSave = create((set, get) => ({
   // Unlike markWidgetModified, this can also CLEAR a widget's dirty flag
   // (when undo reverts it back to exactly its saved state).
   reconcileModifiedWidgets: () => {
-    const { markWidgetModified, markWidgetUnmodified } = get();
     const { page, originalPage, globalWidgets, originalGlobalWidgets } = usePageStore.getState();
+
+    // Built as one pass into a single Set + one set() call (rather than
+    // per-id markWidgetModified/markWidgetUnmodified round-trips, each of
+    // which would rebuild the Set and re-arm the autosave timer).
+    const next = new Set(get().modifiedWidgets);
 
     if (page && originalPage) {
       const ids = new Set([...Object.keys(page.widgets ?? {}), ...Object.keys(originalPage.widgets ?? {})]);
       for (const id of ids) {
         if (!isEqual(page.widgets?.[id], originalPage.widgets?.[id])) {
-          markWidgetModified(id);
+          next.add(id);
         } else {
-          markWidgetUnmodified(id);
+          next.delete(id);
         }
       }
     }
 
     for (const key of ["header", "footer"]) {
       if (!isEqual(globalWidgets[key], originalGlobalWidgets[key])) {
-        markWidgetModified(key);
+        next.add(key);
       } else {
-        markWidgetUnmodified(key);
+        next.delete(key);
       }
     }
 
-    // Differences that live outside any widget's content arm nothing in the
-    // per-widget pass above, yet hasUnsavedChanges() correctly reads them as
-    // dirty: structure-only page changes (widgetsOrder, page settings) via
-    // its whole-page diff, and theme settings via themeStore's canonical
-    // diff (undo/redo restores them through syncThemeStoreFromSnapshot).
-    // Arm the autosave timer for those too, or an undone/redone reorder or
-    // theme edit sits unsaved until the next content edit happens to re-arm
-    // it — save() persists both (hasPageDiff / hasThemeDrift).
+    set({ modifiedWidgets: next });
+
+    // Arm the autosave timer once, for ANY dirtiness this reconcile can see —
+    // not just the per-widget ledger. Differences that live outside any
+    // widget's content leave `next` untouched, yet hasUnsavedChanges()
+    // correctly reads them as dirty: structure-only page changes
+    // (widgetsOrder, page settings) via its whole-page diff, and theme
+    // settings via themeStore's canonical diff (undo/redo restores them
+    // through syncThemeStoreFromSnapshot). Without those, an undone/redone
+    // reorder or theme edit sits unsaved until the next content edit happens
+    // to re-arm the timer — save() persists both (hasPageDiff / hasThemeDrift).
     const hasPageDiff = page && originalPage && !isEqual(page, originalPage);
-    if (hasPageDiff || useThemeStore.getState().hasUnsavedThemeChanges()) {
+    if (next.size > 0 || hasPageDiff || useThemeStore.getState().hasUnsavedThemeChanges()) {
       set({ autoSaveFailureCount: 0 });
       get().resetAutoSaveTimer();
     }
@@ -165,13 +172,27 @@ const useAutoSave = create((set, get) => ({
     // rather than a repeated click racing the in-flight request or being
     // dropped on the floor with no signal either way.
     if (runningSave) {
-      if (queuedFollowUp) return queuedFollowUp;
-      const followUp = runningSave.then(
-        () => get().save(isAuto),
-        () => get().save(isAuto),
+      if (queuedFollowUp) {
+        // A manual caller joining an already-queued follow-up upgrades its
+        // flavor to manual — the follow-up hasn't started yet (its `.isAuto`
+        // is read only when the running save settles), and a manual caller
+        // relies on the manual failure contract (a rejection reaching its
+        // .catch), which an autosave-flavored run would swallow into
+        // `{ status: "failed" }`. The reverse (an autosave joining a
+        // manual-flavored follow-up) keeps manual: the autosave tick maps a
+        // resulting throw back to "failed" itself (see resetAutoSaveTimer).
+        if (!isAuto) queuedFollowUp.isAuto = false;
+        return queuedFollowUp.promise;
+      }
+      const followUp = { isAuto };
+      // `followUp.isAuto` is read at execution time, not captured now — a
+      // later caller with manual flavor may have upgraded it (above).
+      followUp.promise = runningSave.then(
+        () => get().save(followUp.isAuto),
+        () => get().save(followUp.isAuto),
       );
       set({ queuedFollowUp: followUp });
-      return followUp;
+      return followUp.promise;
     }
 
     if (!get().hasUnsavedChanges()) return { status: "clean" };
@@ -179,12 +200,6 @@ const useAutoSave = create((set, get) => ({
     // Captured now so a reset() that fires while this save is in flight can
     // be detected before any write-back below applies — see reset()'s comment.
     const myGeneration = get().saveGeneration;
-
-    if (isAuto) {
-      set({ isAutoSaving: true });
-    } else {
-      set({ isSaving: true });
-    }
 
     // Guards against a run that settles synchronously (e.g. the
     // PROJECT_MISMATCH pre-check below throws before this IIFE's first real
@@ -360,6 +375,20 @@ const useAutoSave = create((set, get) => ({
     } else {
       installed = true;
       set({ runningSave: run });
+      // The visible in-progress flag is set only AFTER `runningSave` is
+      // installed: zustand notifies .subscribe() listeners synchronously on
+      // set(), so a subscriber that reacted to isSaving/isAutoSaving by
+      // calling save() would re-enter right here — with the guard installed
+      // first, that re-entry hits the coalescing branch above instead of
+      // starting an independent, overlapping run. (Skipped entirely on the
+      // settledBeforeInstall path — the run's finally has already executed,
+      // so setting the flag now would wedge it true with nothing left to
+      // clear it.)
+      if (isAuto) {
+        set({ isAutoSaving: true });
+      } else {
+        set({ isSaving: true });
+      }
     }
     return run;
   },
@@ -380,7 +409,18 @@ const useAutoSave = create((set, get) => ({
       set({ autoSaveInterval: null });
 
       if (get().hasUnsavedChanges()) {
-        const result = await get().save(true);
+        let result;
+        try {
+          result = await get().save(true);
+        } catch (err) {
+          // The coalescing branch can hand this tick a manual-flavored
+          // follow-up (a user's own save was queued first, or upgraded the
+          // queued flavor), whose failure contract is a throw rather than
+          // `{ status: "failed" }`. Map it back so an inherited manual
+          // flavor can't become an unhandled rejection here, and the
+          // failure-count backoff below still advances.
+          result = { status: "failed", error: err };
+        }
         if (result.status === "failed") {
           set((s) => ({ autoSaveFailureCount: s.autoSaveFailureCount + 1 }));
         } else if (result.status === "success") {

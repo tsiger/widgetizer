@@ -49,8 +49,8 @@ _None open._
 - [⬜ 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — low — investigate](#-38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server--low--investigate)
 - [⬜ 43. Render-engine containment — two edges left open (`render-engine` / `core`) — low](#-43-render-engine-containment--two-edges-left-open-render-engine--core--low)
 - [⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)](#-49-linkenrichmentjs-bypasses-the-storage-adapter--raw-fs-writes-to-project-content-builder-server--low-architectural-hygiene)
-- [⬜ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`)](#-51-queued-save-flavor-inheritance-across-a-third-overlapping-save-call-editor-ui)
-- [⬜ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — low — latent](#-52-synchronous-subscriber-re-entry-window-in-savestoresave-editor-ui--low--latent)
+- [✅ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`) — fixed, pending reference-table move](#-51-queued-save-flavor-inheritance-across-a-third-overlapping-save-call-editor-ui--fixed-pending-reference-table-move)
+- [✅ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — fixed, pending reference-table move](#-52-synchronous-subscriber-re-entry-window-in-savestoresave-editor-ui--fixed-pending-reference-table-move)
 - [⬜ 53. Kebab action-menus lack full WAI-ARIA menu a11y + copy-pasted open/close logic (`editor-ui`) — low (a11y / DRY)](#-53-kebab-action-menus-lack-full-wai-aria-menu-a11y--copy-pasted-openclose-logic-editor-ui--low-a11y--dry)
 - [⬜ 54. Full accessibility / WAI-ARIA APG conformance review (`editor-ui` + all shells) — low — investigate (a11y)](#-54-full-accessibility--wai-aria-apg-conformance-review-editor-ui--all-shells--low--investigate-a11y)
 - [⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)](#-57-core-editor-ui-style-guidemd-has-no-split-button-component-pattern-docs-llms--low-optional)
@@ -565,9 +565,19 @@ where project storage is the local filesystem.
 
 ---
 
-## ⬜ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`)
+## ✅ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`) — fixed, pending reference-table move
 
 **Priority:** Low
+
+**Fixed 2026-08-23** (the commit adding this note is the fix commit for the reference-table row). Three-part
+fix in `saveStore.js`: (1) `queuedFollowUp` is now `{ isAuto, promise }`, and a manual caller
+joining an already-queued autosave-flavored follow-up upgrades its flavor to manual (the follow-up
+reads `.isAuto` at execution time), so the manual failure contract (rejection) is preserved;
+(2) `resetAutoSaveTimer`'s tick wraps its `await get().save(true)` in a try/catch mapping a throw
+(an inherited manual flavor) to `{ status: "failed" }`, so the backoff still advances and no
+unhandled rejection escapes; (3) the fold-in below: `reconcileModifiedWidgets` now builds one Set
+in a single pass with one `set()` and one timer arm. Covered by three new tests in
+`saveStore.test.js`.
 
 `saveStore.js`'s coalescing branch has a third-caller-in queues onto the *second* caller's follow-up
 promise (`get().save(isAuto)`), which was itself built with the *second* caller's `isAuto` flavor —
@@ -594,9 +604,16 @@ per widget id via `markWidgetModified`/`markWidgetUnmodified` and re-triggers
 
 ---
 
-## ⬜ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — low — latent
+## ✅ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — fixed, pending reference-table move
 
 **Priority:** Low
+
+**Fixed 2026-08-23** (the commit adding this note is the fix commit for the reference-table row). The
+`isSaving`/`isAutoSaving` `set()` moved to after `set({ runningSave: run })`, so by the time any
+subscriber is notified the single-flight guard is already installed and a re-entrant `save()` hits
+the coalescing branch. On the `settledBeforeInstall` path the flag set is skipped entirely (the
+run's finally has already executed; setting it afterward would wedge it true). Covered by a new
+re-entrant-subscriber test in `saveStore.test.js`.
 
 `save()` calls `set({ isSaving: true })` (or `isAutoSaving: true`) before `runningSave` is installed
 a few lines later. Zustand's vanilla store notifies `.subscribe()` listeners synchronously on `set`,
