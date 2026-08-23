@@ -13,6 +13,7 @@ import { getMediaUsage, refreshAllMediaUsageFromDir } from "../services/mediaUsa
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
+import { getDb } from "../db/index.js";
 
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { readMediaFile } from "../services/mediaService.js";
@@ -116,19 +117,28 @@ export async function writeMediaFile(projectId, data) {
 }
 
 /**
- * Atomically reads media data, applies a transform function, and writes it back.
- * SQLite transactions handle atomicity natively — no write locks needed.
+ * Reads media data, applies a transform function, and writes it back inside a
+ * single immediate SQLite transaction, so the read-modify-write is atomic even
+ * against a second connection sharing the DB file. transformFn must be
+ * synchronous (mutate mediaData in place): the transaction cannot span an
+ * await, so a transformFn returning a thenable is rejected rather than
+ * silently committing pre-mutation state.
  * @param {string} projectId - The project UUID
- * @param {function(Object): void} transformFn - Function that receives mediaData and mutates it in place
-
+ * @param {function(Object): void} transformFn - Synchronous function that receives mediaData and mutates it in place
  * @returns {Promise<Object>} The transformed media data
  */
 export async function atomicUpdateMediaFile(projectId, transformFn) {
   await getProjectFolderName(projectId);
-  const mediaData = mediaRepo.getMediaFiles(projectId);
-  transformFn(mediaData);
-  mediaRepo.writeMediaData(projectId, mediaData);
-  return mediaData;
+  const db = getDb();
+  return db.transaction(() => {
+    const mediaData = mediaRepo.getMediaFiles(projectId);
+    const result = transformFn(mediaData);
+    if (result && typeof result.then === "function") {
+      throw new Error("atomicUpdateMediaFile requires a synchronous transformFn; async transforms cannot run inside the transaction");
+    }
+    mediaRepo.writeMediaData(projectId, mediaData);
+    return mediaData;
+  }).immediate();
 }
 
 // Files are buffered in memory (file.buffer); their bytes are persisted through

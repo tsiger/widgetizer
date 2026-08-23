@@ -8,7 +8,12 @@ import { getDb } from "../index.js";
  */
 export function getMediaFiles(projectId) {
   const db = getDb();
+  // Read-only transaction so the three table reads see one consistent
+  // snapshot if a second connection ever shares the DB file.
+  return db.transaction(() => getMediaFilesStatements(db, projectId))();
+}
 
+function getMediaFilesStatements(db, projectId) {
   const files = db.prepare("SELECT * FROM media_files WHERE project_id = ? ORDER BY uploaded DESC").all(projectId);
 
   if (files.length === 0) return { files: [] };
@@ -46,13 +51,17 @@ export function getMediaFiles(projectId) {
  */
 export function getMediaFileById(projectId, fileId) {
   const db = getDb();
-  const row = db.prepare("SELECT * FROM media_files WHERE id = ? AND project_id = ?").get(fileId, projectId);
-  if (!row) return null;
+  // Read-only transaction so the three table reads see one consistent
+  // snapshot if a second connection ever shares the DB file.
+  return db.transaction(() => {
+    const row = db.prepare("SELECT * FROM media_files WHERE id = ? AND project_id = ?").get(fileId, projectId);
+    if (!row) return null;
 
-  const sizeRows = db.prepare("SELECT * FROM media_sizes WHERE media_file_id = ?").all(fileId);
-  const usageRows = db.prepare("SELECT used_in FROM media_usage WHERE media_file_id = ?").all(fileId);
+    const sizeRows = db.prepare("SELECT * FROM media_sizes WHERE media_file_id = ?").all(fileId);
+    const usageRows = db.prepare("SELECT used_in FROM media_usage WHERE media_file_id = ?").all(fileId);
 
-  return rowToMediaFile(row, sizeRows, usageRows.map((r) => r.used_in));
+    return rowToMediaFile(row, sizeRows, usageRows.map((r) => r.used_in));
+  })();
 }
 
 /**
@@ -153,20 +162,23 @@ export function updateFileMetadata(projectId, fileId, metadata) {
  */
 export function replaceMediaUsage(projectId, usageMap) {
   const db = getDb();
+  // Write-first transaction: the DELETE subquery replaces a preliminary
+  // SELECT-then-DELETE, so a deferred transaction never has to upgrade a read
+  // snapshot to a write lock (un-waitable SQLITE_BUSY_SNAPSHOT if a second
+  // connection ever shares the DB file). The INSERT … SELECT keeps the insert
+  // path scoped to this project's files, which the id-list previously enforced.
   const txn = db.transaction(() => {
-    // Get all file IDs for this project
-    const fileIds = db.prepare("SELECT id FROM media_files WHERE project_id = ?").all(projectId).map((r) => r.id);
-    if (fileIds.length === 0) return;
+    db.prepare(
+      "DELETE FROM media_usage WHERE media_file_id IN (SELECT id FROM media_files WHERE project_id = ?)"
+    ).run(projectId);
 
-    // Delete all usage for this project's files
-    const placeholders = fileIds.map(() => "?").join(",");
-    db.prepare(`DELETE FROM media_usage WHERE media_file_id IN (${placeholders})`).run(...fileIds);
-
-    // Re-insert from the usage map
-    const insertUsage = db.prepare("INSERT OR IGNORE INTO media_usage (media_file_id, used_in) VALUES (?, ?)");
+    const insertUsage = db.prepare(`
+      INSERT OR IGNORE INTO media_usage (media_file_id, used_in)
+      SELECT id, ? FROM media_files WHERE id = ? AND project_id = ?
+    `);
     for (const [fileId, usedInList] of usageMap) {
       for (const usedIn of usedInList) {
-        insertUsage.run(fileId, usedIn);
+        insertUsage.run(usedIn, fileId, projectId);
       }
     }
   });
@@ -175,29 +187,28 @@ export function replaceMediaUsage(projectId, usageMap) {
 
 /**
  * Update media_usage for a single source (page, global widget, theme settings) in one transaction.
- * Removes all usage rows with this sourceId for the project's files, then re-inserts for the given fileIds.
- * Safe for parallel calls with different sourceIds since each only touches its own rows.
+ * Removes all usage rows with this sourceId for the project's files, then re-inserts for the given
+ * fileIds. Note SQLite serializes ALL writes on one db-level lock (no row-level locking), so calls
+ * for different sourceIds commute logically but still execute strictly one at a time.
  * @param {string} projectId
  * @param {string} sourceId - The usage source (page slug, "global:header", "global:theme-settings", etc.)
  * @param {string[]} fileIds - File IDs that should have this sourceId in their usedIn
  */
 export function updateMediaUsageForSource(projectId, sourceId, fileIds) {
   const db = getDb();
+  // Write-first transaction with a project-scoped insert — same rationale as
+  // replaceMediaUsage above.
   const txn = db.transaction(() => {
-    // Get all file IDs for this project
-    const allFileIds = db.prepare("SELECT id FROM media_files WHERE project_id = ?").all(projectId).map((r) => r.id);
-    if (allFileIds.length === 0) return;
-
-    // Delete only usage rows matching this sourceId for this project's files
-    const placeholders = allFileIds.map(() => "?").join(",");
     db.prepare(
-      `DELETE FROM media_usage WHERE used_in = ? AND media_file_id IN (${placeholders})`
-    ).run(sourceId, ...allFileIds);
+      "DELETE FROM media_usage WHERE used_in = ? AND media_file_id IN (SELECT id FROM media_files WHERE project_id = ?)"
+    ).run(sourceId, projectId);
 
-    // Re-insert for the specific files that reference this source
-    const insertUsage = db.prepare("INSERT OR IGNORE INTO media_usage (media_file_id, used_in) VALUES (?, ?)");
+    const insertUsage = db.prepare(`
+      INSERT OR IGNORE INTO media_usage (media_file_id, used_in)
+      SELECT id, ? FROM media_files WHERE id = ? AND project_id = ?
+    `);
     for (const fileId of fileIds) {
-      insertUsage.run(fileId, sourceId);
+      insertUsage.run(sourceId, fileId, projectId);
     }
   });
   txn();

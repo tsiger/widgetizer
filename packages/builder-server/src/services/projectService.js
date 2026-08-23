@@ -35,16 +35,9 @@ export async function deleteProjectById(projectId) {
     // Non-fatal: proceed with deletion even if export cleanup fails
   }
 
-  // Delete from SQLite (cascades to media_files, media_sizes, media_usage, exports)
-  projectRepo.deleteProject(projectId);
-
-  // Reassign active project if the deleted one was active
-  let newActiveProjectId = projectRepo.getActiveProjectId();
-  if (newActiveProjectId === projectId || !newActiveProjectId) {
-    const remainingProjects = projectRepo.getAllProjects();
-    newActiveProjectId = remainingProjects[0]?.id || null;
-    projectRepo.setActiveProjectId(newActiveProjectId);
-  }
+  // Delete from SQLite (cascades to media_files, media_sizes, media_usage,
+  // exports) and reassign the active project in one transaction.
+  const newActiveProjectId = projectRepo.deleteProjectAndReassignActive(projectId);
 
   // Delete project directory from disk
   const projectDir = getProjectDir(projectFolderName);

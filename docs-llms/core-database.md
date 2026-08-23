@@ -13,7 +13,7 @@ The backend (`@widgetizer/builder-server`) is **adapter-agnostic and scope-first
 
 SQLite backs metadata storage to provide:
 
-- atomic updates and concurrency safety
+- atomic updates and concurrency safety — where operations use correct transaction boundaries; see § Transactions & concurrency below
 - relational queries and cascade behavior
 - export/version bookkeeping
 - reliable startup migrations
@@ -41,6 +41,18 @@ Pragmas applied to the fallback connection:
 - `journal_mode = WAL`
 - `foreign_keys = ON`
 - `busy_timeout = 5000`
+
+### Transactions & concurrency
+
+The concurrency model, stated once so transaction-shape bugs don't keep being reintroduced:
+
+- **One synchronous better-sqlite3 connection per process** — that is the assumption, not exclusive ownership of the DB file. A second process (or worker thread) opening the same file is a supported-but-rare configuration, and the rules below are what keep it safe.
+- **In-process, statements never interleave — except across `await` gaps.** better-sqlite3 is synchronous, so a run of consecutive SQL calls with no `await` between them is effectively atomic against other requests in the same process. The moment an `await` separates a read from the write that depends on it, another request can run in the gap. **Never split a read-modify-write across an `await`;** do the whole sequence synchronously inside one `db.transaction`.
+- **Multi-statement writes are wrapped in `db.transaction`, self-wrapped in the repository helper** rather than left to callers. Nesting is safe: better-sqlite3 turns an inner transaction into a `SAVEPOINT` when one is already open (`insertMediaFile` under `writeMediaData` is the precedent). Transaction callbacks must be synchronous — better-sqlite3 rolls back and throws if the transaction callback itself returns a thenable, but it cannot see a thenable that an inner helper returns and the callback discards (e.g. a transform callback passed *into* the transaction) — such async work would silently run after commit, so guard those call sites explicitly (`atomicUpdateMediaFile` is the precedent).
+- **Acquire the write lock before taking a read snapshot.** A default `db.transaction` runs `BEGIN DEFERRED`: if its first statement is a read, it takes a read snapshot and only upgrades to the write lock at the first write — and that upgrade fails with `SQLITE_BUSY_SNAPSHOT` if another connection committed in between. `busy_timeout` does **not** wait this out (the snapshot is stale forever; SQLite returns immediately). So a transaction that writes must either make its **first statement a write** (fold the SELECT into the DELETE/UPDATE as a subquery) or be invoked via **`.immediate()`**.
+- **Multi-statement reads that need a consistent snapshot get a (default, deferred) read transaction.** Without one, each statement is its own snapshot and a concurrent writer on another connection can tear the result (e.g. a file row read before a delete, its sizes after).
+- **All writes serialize on one db-level lock.** SQLite has no row-level locking; "touches different rows" never means "safe in parallel" — parallel writers merely queue.
+- **Migrations** each run in their own transaction (including the tracking-table insert), but the applied-versions list is read once *outside* them — two processes cold-starting the same file can both decide a migration is pending. The loser fails loudly and rolls back — on non-idempotent DDL (e.g. v1's `CREATE TABLE`) or, at latest, on the tracking table's primary key; the database stays consistent either way, the startup just errors.
 
 ### Migration history
 

@@ -35,12 +35,10 @@ _None open._
 ### Medium priority
 
 - [⏸️ 30. Extract project lifecycle duplicate/import into dir-explicit cores — moderate (architectural / hosted-readiness) — blocked on hosted duplicate/import](#-30-extract-project-lifecycle-duplicateimport-into-dir-explicit-cores--moderate-architectural--hosted-readiness--blocked-on-hosted-duplicateimport)
-- [⬜ 39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — 39a moderate (data-integrity), 39b/39c low (concurrency)](#-39-sqlite-transaction-boundary-audit--mediaproject-repositories-builder-server--39a-moderate-data-integrity-39b39c-low-concurrency)
+- [⬜ 39. SQLite transaction-boundary audit — repositories, services, controllers (`builder-server`) — 39a moderate (data-integrity), rest low (concurrency)](#-39-sqlite-transaction-boundary-audit--repositories-services-controllers-builder-server--39a-moderate-data-integrity-rest-low-concurrency)
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
-- [✅ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — fixed, pending reference-table move](#-42-media-upload-allowlist-trusts-the-client-declared-mime-while-serve-derives-content-type-from-the-stored-extension-builder-server--fixed-pending-reference-table-move)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
-- [✅ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`) — fixed, pending reference-table move](#-46-buildlatestsnapshot-rebuilds-latest-non-atomically-builder-server--fixed-pending-reference-table-move)
-- [✅ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`) — fixed, pending reference-table move](#-50-structure-only-undoredo-doesnt-re-arm-the-autosave-timer-editor-ui--fixed-pending-reference-table-move)
+- [⬜ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — medium (low end) — decide serialization design first](#-62-export-lifecycle-races--version-reservation-and-fsdb-cleanup-arent-coordinated-builder-server--medium-low-end--decide-serialization-design-first)
 
 ### Low priority
 
@@ -48,22 +46,15 @@ _None open._
 - [⏸️ 17. Test-strictness audit — ported tests may have dropped master's *exclusion* assertions (cross-cutting) — low (process) — deferred 2026-06-26](#-17-test-strictness-audit--ported-tests-may-have-dropped-masters-exclusion-assertions-cross-cutting--low-process--deferred-2026-06-26)
 - [⬜ 32. Theme-upload update-import validation smells (`builder-server`) — low — investigate](#-32-theme-upload-update-import-validation-smells-builder-server--low--investigate)
 - [⬜ 33. Editor-ui duplication smells (`editor-ui`) — low (maintainability) — investigate](#-33-editor-ui-duplication-smells-editor-ui--low-maintainability--investigate)
-- [✅ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — fixed, pending reference-table move](#-37-emptystatejsx-renders-unstyled--empty-state-classes-have-no-matching-css-editor-ui--fixed-pending-reference-table-move)
 - [⬜ 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — low — investigate](#-38-mutation-on-get--getactiveproject-writes-the-active-id-on-a-read-builder-server--low--investigate)
-- [✅ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — fixed, pending reference-table move](#-40-oss-mounts-allow-all-cors-on-the-unauthenticated-localhost-api-builder-server--fixed-pending-reference-table-move)
 - [⬜ 43. Render-engine containment — two edges left open (`render-engine` / `core`) — low](#-43-render-engine-containment--two-edges-left-open-render-engine--core--low)
-- [✅ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`) — fixed, pending reference-table move](#-45-dead-code--empty-branch-in-mergesettingsarray-builder-server--fixed-pending-reference-table-move)
 - [⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)](#-49-linkenrichmentjs-bypasses-the-storage-adapter--raw-fs-writes-to-project-content-builder-server--low-architectural-hygiene)
 - [⬜ 51. Queued-save flavor inheritance across a third overlapping `save()` call (`editor-ui`)](#-51-queued-save-flavor-inheritance-across-a-third-overlapping-save-call-editor-ui)
 - [⬜ 52. Synchronous-subscriber re-entry window in `saveStore.save()` (`editor-ui`) — low — latent](#-52-synchronous-subscriber-re-entry-window-in-savestoresave-editor-ui--low--latent)
 - [⬜ 53. Kebab action-menus lack full WAI-ARIA menu a11y + copy-pasted open/close logic (`editor-ui`) — low (a11y / DRY)](#-53-kebab-action-menus-lack-full-wai-aria-menu-a11y--copy-pasted-openclose-logic-editor-ui--low-a11y--dry)
 - [⬜ 54. Full accessibility / WAI-ARIA APG conformance review (`editor-ui` + all shells) — low — investigate (a11y)](#-54-full-accessibility--wai-aria-apg-conformance-review-editor-ui--all-shells--low--investigate-a11y)
-- [✅ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — fixed, pending reference-table move](#-55-vitest-setup-lacks-an-i18n-instance-so-provider-less-component-tests-warn-editor-ui-tests--fixed-pending-reference-table-move)
-- [✅ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — fixed, pending reference-table move](#-56-editorshellpluginprovider-default-param-objectarray-literals-defeat-memoization-for-a-non-memoizing-caller-editor-ui--fixed-pending-reference-table-move)
 - [⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)](#-57-core-editor-ui-style-guidemd-has-no-split-button-component-pattern-docs-llms--low-optional)
 - [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
-- [✅ 59. `getCachedThemeValue` — an in-flight loader can repopulate an invalidated cache entry (`builder-server`) — fixed, pending reference-table move](#-59-getcachedthemevalue--an-in-flight-loader-can-repopulate-an-invalidated-cache-entry-builder-server--fixed-pending-reference-table-move)
-- [✅ 60. `layerThemeSnapshot` swallows per-update apply errors, so a partial snapshot can be promoted (`builder-server`) — fixed, pending reference-table move](#-60-layerthemesnapshot-swallows-per-update-apply-errors-so-a-partial-snapshot-can-be-promoted-builder-server--fixed-pending-reference-table-move)
 - [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
 
 ---
@@ -230,44 +221,6 @@ when a third consumer appears.
 
 ---
 
-## ✅ 37. `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) — fixed, pending reference-table move
-
-**Status:** ✅ **DONE 2026-08-23** — restyled with Tailwind utilities matching the house pattern
-(`ExportCreator`'s empty variant: centered column, slate palette); the dead `empty-state*`
-semantic classes are gone. API unchanged (`icon`/`title`/`description`/`action`/`className`).
-Pinned by the new `components/ui/__tests__/EmptyState.test.jsx` (renders, no dead class names,
-caller `className` appended). The Themes-page call site needs no change. Hosted ships its own
-separate `src/components/EmptyState.jsx` and is unaffected. Original finding below.
-
-**Priority:** Low
-
-**Status:** ⬜ open — surfaced 2026-07-07 while reviewing error/empty-state components as a model for §36's
-`WorkspaceLoadFailed` (`EmptyState` was rejected as the model *because* it's unstyled). A concrete,
-low-severity defect.
-
-**What.** `packages/editor-ui/src/components/ui/EmptyState.jsx` emits semantic class names — `empty-state`,
-`empty-state-icon`, `empty-state-title`, `empty-state-description` — but **no CSS in the repo matches them.**
-The only `empty-state` rules that exist are `preview-empty-state*` (a *different* prefix, defined inline in the
-preview iframe by `builder-server/src/controllers/previewController.js`). So the component renders as a bare
-`<div><h3><p>` with only whatever `className` the caller passes.
-
-**Live surface.** Used by the Themes page (`app/src/pages/Themes.jsx:414`) as the "no themes" state (no
-`icon` / `action` / extra `className`), so it currently shows an unstyled title + description. It's also
-re-exported from `components/ui/index.js`, so any future consumer inherits the dead styling.
-
-**Fix options.** Add the missing `empty-state*` CSS, or (preferred, to match the rest of `ui/`) restyle with
-Tailwind utilities like the sibling components — e.g. `ExportCreator`'s `variant="empty"` branch already does a
-centered empty-state layout inline. Then re-check the call site.
-
-**Scope.** Pure `@widgetizer/editor-ui`; a fix flows to web / Electron / hosted via the vendored package. No
-server/contract change.
-
-**Effect:** low (cosmetic) — a low-traffic empty state renders unstyled; no data or correctness impact.
-
----
-
----
-
 ## ⬜ 38. Mutation-on-GET — `getActiveProject` writes the active id on a read (`builder-server`) — low — investigate
 
 **Priority:** Low
@@ -289,6 +242,16 @@ write-on-read under concurrency and breaks GET idempotency.
 resolve-without-persist and let an explicit action set it), weighed against master-parity — this fallback
 mirrors master and covers deleted-active / missing-record / migrated-data edge cases (per its own comment).
 
+**Two more active-project wrinkles for the same investigation** (from the 2026-08-23 transaction-boundary
+re-audit; both live here because any fix reshapes the same auto-activation design):
+- `getActiveProject`'s multi-read (active id → project row → project list at
+  `projectController.js:254-263`) has no wrapping transaction, so under a second DB connection it can mix
+  snapshots; because of the optional fallback write, a wrap would need `.immediate()`, not a read txn.
+- Project creation reads the current active id (`projectController.js:359`), inserts (`:362`), then
+  **awaits** media seeding/usage refresh before conditionally setting active (`:377`) — two overlapping
+  first-project creations can both decide they're "first" and race the active-project choice (in-process,
+  across the await gap).
+
 **Scope.** OSS `builder-server`. **Hosted impact:** none — hosted resolves scope per-request via
 `CloudScopeResolver` and doesn't use the OSS singleton active-project model, so it never reaches this handler.
 
@@ -298,11 +261,39 @@ mirrors master and covers deleted-active / missing-record / migrated-data edge c
 
 ---
 
-## ⬜ 39. SQLite transaction-boundary audit — media/project repositories (`builder-server`) — 39a moderate (data-integrity), 39b/39c low (concurrency)
+## ⬜ 39. SQLite transaction-boundary audit — repositories, services, controllers (`builder-server`) — 39a moderate (data-integrity), rest low (concurrency)
 
 **Priority:** Medium
 
 **Status:** ⬜ open — surfaced 2026-07-08 auditing every `db.transaction(...)` site across the repositories.
+**Re-audited 2026-08-23** against current code (the original findings had aged): 39b/39c confirmed
+unchanged; scope extended with same-class findings 39d–39i below. The re-audit and the fix designs
+were independently verified by a second-model review, which also contributed the design corrections
+baked in below (write-lock-first rule, scoped inserts, `RETURNING`) and findings 39h and the two
+active-project races (the latter noted under §38, not here). The export-lifecycle races found in the
+same re-audit are **§62** (different subsystem, needs a design decision).
+
+**39b–39g + 39i: ✅ DONE 2026-08-23** — implemented exactly as specified in the sub-items below.
+Pinned by `tests/transactionBoundaries.test.js` (cross-project usage scoping for both rewritten
+writers, thenable rejection + sync-transform success for `atomicUpdateMediaFile`, three
+delete-and-reassign cases for the new repository helper — all watched red pre-fix). The
+second-model review of the finished implementation passed every prescription and contributed three
+accuracy corrections, folded in: better-sqlite3 itself rolls back and throws on a thenable returned
+by the transaction callback (the doc now points at the *nested discarded* thenable as the real
+hazard), the migrations-race loser can fail on non-idempotent DDL before the tracking-table PK, and
+the test file's header now states plainly that the transaction *shapes* (`.immediate()`, read-only
+wraps) are doc-pinned rather than test-pinned. **Accepted residuals:** no worker-thread
+second-connection reproduction test (judged not worth the complexity for a latent hazard — a second
+connection would be needed to observe any of 39b–39f misbehaving); **39h stays open (deferred)** as
+the one remaining sub-item. Suites: full backend green, lint clean, embedding-host suites verified
+against the change.
+
+**The governing rule (applies to every sub-item):** with better-sqlite3's default `BEGIN DEFERRED`,
+a transaction whose first statement is a read takes a read snapshot; upgrading to a write later can
+fail with an **un-waitable `SQLITE_BUSY_SNAPSHOT`** if another connection committed in between
+(`busy_timeout` does not cover it). So: **acquire the write lock before taking a read snapshot** —
+make the transaction's first statement a write, or use `db.transaction(...).immediate()`. Harmless
+on today's single connection; latent the moment a second process/worker shares the DB file.
 
 **39a — Atomicity gap: `addMediaFile` isn't transactional (moderate, data-integrity). ✅ DONE
 2026-08-23** — `insertMediaFile` is now self-wrapped in `db.transaction(...)` (nests as a savepoint
@@ -319,57 +310,86 @@ partial/missing size variants → broken/missing thumbnails on render. **Fix:** 
 two-table write in a transaction (self-wrap the helper so both `addMediaFile` and `writeMediaData` are covered
 — better-sqlite3 nests via savepoints, so `writeMediaData` calling a now-transactional helper is fine).
 
-**39b — Read-then-write transactions are concurrency-fragile (low, latent correctness).**
-`replaceMediaUsage` (`mediaRepository.js:156`), `updateMediaUsageForSource` (`:186`), and `writeProjectsData`
-(`repositories/projectRepository.js:204`) each `SELECT id FROM …` and then `DELETE`/`INSERT` **inside one
-`db.transaction()`**. better-sqlite3's default `BEGIN DEFERRED` takes the write lock lazily, so a
-read-then-write can fail with an **un-waitable `SQLITE_BUSY_SNAPSHOT`** if another connection commits between
-the read and the write. Harmless on a single connection today, but a latent hazard the moment the DB file is
-shared by multiple processes/workers. **Fix (preferred):** fold the `SELECT id FROM media_files WHERE
-project_id = ?` into the `DELETE` as a correlated subquery (`… WHERE media_file_id IN (SELECT id FROM
-media_files WHERE project_id = ?)`), making the txn **write-only** — no snapshot hazard and one fewer round
-trip. **Or:** run these write txns via better-sqlite3's `.immediate()` variant. Also fix the misleading
-"safe for parallel calls" comment on `updateMediaUsageForSource`: SQLite serializes **all** writes on one
+**39b — Read-then-write transactions violate the write-lock-first rule (low, latent correctness).**
+`replaceMediaUsage` (`mediaRepository.js:154`), `updateMediaUsageForSource` (`:184`), and `writeProjectsData`
+(`repositories/projectRepository.js:205`) each `SELECT id FROM …` and then `DELETE`/`INSERT` inside one
+default `db.transaction()`. **Fix (media pair):** fold the SELECT into the DELETE as a correlated subquery
+(`… WHERE media_file_id IN (SELECT id FROM media_files WHERE project_id = ?)`) so the first statement is a
+write, **and** scope the re-inserts to the project (`INSERT … SELECT id, ? FROM media_files WHERE id = ?
+AND project_id = ?`) — dropping the preliminary id-list must not widen the insert path to accept another
+project's fileIds. **Fix (`writeProjectsData`, tests-only caller):** just `.immediate()` — a `NOT IN`
+rewrite is delicate (empty-list SQL, parameter limits) for no production benefit. Also fix the misleading
+"safe for parallel calls" comment at `mediaRepository.js:179`: SQLite serializes **all** writes on one
 db-level lock (no row-level locking), so parallel calls touching disjoint rows still contend.
 
-**39c — Multi-read getter without a read transaction (low, robustness).**
-`getMediaFileById` (`mediaRepository.js:47`) does 3 reads across `media_files` / `media_sizes` / `media_usage`
-with no wrapping transaction, so under concurrent connections it can observe a **torn snapshot**. Harmless on
-a single connection; wrap the reads in a `DEFERRED` read-only transaction for snapshot consistency if the DB
-is ever shared.
+**39c — Multi-read getters without a read transaction (low, robustness).**
+`getMediaFileById` (`mediaRepository.js:47`, 3 reads), `getMediaFiles` (`:9`, 3 reads), and
+`readProjectsData` (`projectRepository.js:194`, 2 reads; tests-only caller) can each observe a **torn
+snapshot** under a second connection. Wrap each in a default (deferred, read-only) `db.transaction` —
+correct here because they never write.
 
-**Scope.** OSS `builder-server`. **Hosted impact:** hosted shares this connection and drives all of the above
-through the mounted routes, so **39a** also affects the hosted media-upload path.
+**39d — exportRepository SELECT-then-DELETE pairs return rows they may not have deleted (low, latent).**
+`deleteExportRecord` (`exportRepository.js:67`), `deleteAllExports` (`:87`), `trimExports` (`:105`) each
+SELECT rows/output dirs, then DELETE in a separate autocommit statement — under a concurrent writer the
+returned list can diverge from what was actually deleted. **Fix:** collapse each to a single
+`DELETE … RETURNING` statement (trim via a subquery-driven delete + `RETURNING`) — one statement, no
+transaction needed, list provably matches. (Filesystem cleanup driven by the returned dirs stays
+non-atomic by nature; the coordination gaps around it are §62.)
 
-**Effect:** 39a moderate (data-integrity — real, low-probability); 39b/39c low (latent under concurrency).
+**39e — `updateProject` read-modify-write is unwrapped (low, latent).**
+`projectRepository.js:69`: SELECT current row → merge in JS → UPDATE, as separate autocommit statements.
+Fully synchronous, so in-process safe; cross-process it's a lost update. **Fix:** wrap in
+`db.transaction(...).immediate()` — a default wrap would *introduce* the snapshot-upgrade hazard the
+governing rule describes.
 
----
+**39f — `deleteProjectById`'s DB portion is unwrapped (low, latent).**
+`projectService.js:39-46`: delete project → read active id → maybe reassign, contiguous and synchronous
+(the awaits sit before/after). **Fix:** extract into a repository helper wrapped in `db.transaction`
+(first statement is the DELETE, so default deferred is fine) — keeps the transaction boundary in the DB
+layer and excludes the filesystem awaits.
 
----
+**39g — `atomicUpdateMediaFile` isn't the single transaction its name/comment claim (low).**
+`mediaController.js:118-131`: one `await getProjectFolderName()` *precedes* the read, then read →
+`transformFn` → write run synchronously — so there is **no** in-process window (an earlier version of
+this finding overclaimed one; refuted in review), but read and write are still two separate transactions,
+and the "SQLite transactions handle atomicity natively" comment oversells that. Decided (2026-08-23):
+keep the function and make it genuinely atomic. **Fix:** after the folder-name await, run read +
+transform + write inside one `db.transaction(...).immediate()` (first operation is a read; nested
+`writeMediaData` becomes a savepoint), **throw if `transformFn` returns a thenable** (an async transform
+would otherwise be silently ignored and commit pre-mutation state), and rewrite the comment. No
+production callers today (tests only) — this hardens the exported API for future callers.
 
-## ✅ 40. OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) — fixed, pending reference-table move
+**39h — `refreshAllMediaUsage` full-rebuild can overwrite fresher per-source updates (low, live but
+self-healing).** `mediaUsageService.js:~425-539`: reads media, then a long **awaited filesystem scan**
+of pages/globals/theme/collections, then `replaceMediaUsage` writes the whole usage map. A per-source
+usage update (e.g. a page save) landing mid-scan is overwritten by the stale rebuild. This is an
+in-process race across await gaps — a transaction can't fix it; it needs serialization against the
+per-source updates or a generation check. Usage tracking self-heals on the next save/refresh, so:
+**deferred** — fix if/when usage staleness is ever observed in practice; not part of the current pass.
 
-**Status:** ✅ **DONE 2026-08-23** — `applySharedMiddleware` now grants CORS only to local
-origins (`localhost` / `127.0.0.1` / `[::1]`, any port, via a `cors` origin callback); foreign
-web origins get **no** ACAO header, and requests without an `Origin` (same-origin, Electron,
-curl) are unaffected. The dev split-origin flow (:3000 → :3001) keeps working. Pinned by two
-`infrastructure.test.js` cases (foreign origin gets no ACAO — red pre-fix against the `*` grant;
-localhost/127.0.0.1 origins are echoed). Embedding hosts supply their own middleware stack and
-never run this code. Original finding below.
+**39i — Document the concurrency model (docs, do with the fixes).** `docs-llms/core-database.md` never
+states the model, which is how this class keeps being reintroduced. Add a **"Transactions &
+concurrency"** subsection to §2: one synchronous better-sqlite3 connection **per process** (not
+exclusive ownership of the DB file); statements never interleave in-process *except across `await`
+gaps* — never split a read-modify-write across an await; multi-statement writes are self-wrapped in
+`db.transaction` (savepoint nesting is safe — the `insertMediaFile` precedent); the write-lock-first
+rule above; multi-statement reads needing a consistent snapshot get a read transaction; migrations'
+applied-versions list is read outside the per-migration transactions, so concurrent first-runs race
+benignly (loud primary-key failure + rollback). Qualify §1's "atomic updates and concurrency safety"
+as holding only where operations use correct transaction boundaries. Fix the two wrong comments
+(39b, 39g) in the same pass.
 
-**Priority:** Low
+**Verified non-findings (2026-08-23, for future re-auditors):** migrations each run in their own
+transaction including the tracking insert; all six production `db.transaction()` callbacks are
+synchronous; `insertMediaFile`'s self-wrap correctly nests as a savepoint under `writeMediaData`;
+`updateAppSettings` (`appSettingsController.js:36`) is read-merge-write but fully synchronous —
+in-process safe, cross-process lost-update accepted (no fix planned).
 
-**Status:** ⬜ open — carried in from a 2026-06-19 security audit (its finding id was **SA-21**). The reproduction is restated in full below, so this item stands alone.
+**Scope.** OSS `builder-server`. Embedding hosts share this connection through the mounted routes, so
+the fixes travel with the package.
 
-`applySharedMiddleware` (`packages/builder-server/src/createApp.js:11`) mounts a bare `app.use(cors())` — `Access-Control-Allow-Origin: *`, no origin allowlist — on the unauthenticated, single-tenant localhost API. The server binds **127.0.0.1** only (`app/server-common.js:67`, so not network-reachable), but any other origin open in the same browser can `fetch('http://localhost:3001/api/projects')` cross-origin (ACAO `*`, no creds needed), and a JSON `POST`/`DELETE` to a project route passes the preflight → cross-origin **read + state-change** of the user's local projects. (Electron uses an ephemeral port, making targeting harder.)
-
-**Exposure is OSS-standalone only.** `applySharedMiddleware` runs when the OSS shells assemble the app; an embedding host supplies its own middleware stack and never executes this `cors()` call, so the issue does not travel with `builder-server` when it is embedded.
-
-**Fix.** Replace bare `cors()` with an origin allowlist (the configured frontend origin), or enable permissive CORS **only in dev** — production/Electron serve the SPA same-origin from the same Express, so CORS is unneeded there. Keep byte-neutral for the legit dev split-origin (:3000 → :3001) flow.
-
-**Test.** Integration: a request with a disallowed `Origin` does **not** receive `Access-Control-Allow-Origin: *` (restricted to the allowlisted/dev origin); the legit dev origin still works.
-
-**Effect:** low — OSS-standalone only; the browser-mediated exposure is bounded to the user's own machine + local content.
+**Effect:** 39a moderate (done); 39b–39g low (latent under a second connection; 39g also API-hardening);
+39h low (live but self-healing, deferred); 39i docs.
 
 ---
 
@@ -410,50 +430,6 @@ If the root cause is a cheap reset/config, prefer that over process-level band-a
 **Test.** Once the mechanism is known: a regression guard asserting per-call sanitize time (or a proxy — e.g. jsdom node/handle count) stays within a bound across a fixed number of calls; and, if a window-reset fix lands, that the reset actually flattens the curve.
 
 **Effect:** low for OSS-standalone (short-lived, low render volume); moderate for a long-lived host process (render-latency creep + a restart-treadmill contribution). No correctness impact — sanitized output is unchanged.
-
----
-
----
-
-## ✅ 42. Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) — fixed, pending reference-table move
-
-**Priority:** Medium
-
-**Status:** ✅ **DONE 2026-08-23** — `mediaUploadFileFilter` now requires an allowed declared
-MIME, an allowed extension (`ALLOWED_UPLOAD_EXTENSIONS` in `utils/mimeTypes.js`, mirroring
-`ALLOWED_MIME_TYPES`), **and that the two agree** (the MIME must be the extension's canonical
-content type, `audio/mp3` alias kept), on both upload paths (the base `upload` multer and
-`uploadWithLimit`'s per-request instance). A crafted `x.html` + `application/pdf` upload is
-rejected at the filter; so is an allowed-but-mismatched pair like `evil.svg` declared
-`image/jpeg`, which would otherwise skip SVG sanitization (processing branches on MIME, serving
-on extension — found in follow-up review). Pinned by `tests/mediaUploadFilter.test.js`; `core-media.md` updated
-(gating description, constants list, upload flow step 1). The optional serve-side
-`Content-Disposition: attachment` hardening was deliberately not added — the extension allowlist
-closes the vector at the root. The hosted-side "needs confirmation" was confirmed before fixing:
-its serving path derives `Content-Type` from the stored extension the same way, so hosted
-inherits this fix via the vendored package. Original finding below.
-
-Surfaced 2026-07-09 while scoping ZIP media-upload support. **Pre-existing** (affects PDF/audio uploads today, independent of ZIP); newly written up, not carried from the SA register.
-
-**What.** Three points key off *different* signals that don't have to agree:
-
-- **Acceptance keys on the client-declared MIME.** The media `fileFilter` (`packages/builder-server/src/controllers/mediaController.js:142`) admits a file solely because `file.mimetype` is in `ALLOWED_MIME_TYPES` (`utils/mimeTypes.js:16`). That mimetype is the multipart-declared `Content-Type` — attacker-controlled.
-- **Storage keeps the original extension verbatim.** `uniqueName` slugifies only the basename and re-appends `path.extname(originalname)` (`mediaController.js:254-257`), so a `.html` extension survives into `uploads/files/`.
-- **Serve keys on the stored extension.** `serveProjectMedia` sets the response `Content-Type` from `getContentType(path.extname(key))` (`mediaController.js:612`), not from the declared or sniffed type.
-
-**The vector.** A hand-crafted multipart `POST /api/media` pairing `filename="x.html"` with an allowed `Content-Type` (`application/pdf` today, `application/zip` once ZIP lands) passes the filter, is stored as `x.html`, and is later served as `Content-Type: text/html` from the API origin → the browser renders and executes it. `helmet`'s `nosniff` does **not** help: the server *itself* declares `text/html`, so there is nothing to sniff. The normal UI can't reach this (the dropzone `accept` gates on extension) — it takes a crafted request.
-
-**Why low for OSS / why flagged for hosted.** On the OSS desktop app the only actor who can craft that upload is the sole local user, hitting a 127.0.0.1-bound API — self-XSS on your own machine, negligible (same local single-user trust model as `core-security.md` §8's advanced-theme raw-code and this file's §40 local-CORS). It matters for **Widgetizer Hosted**: uploads are served from the authenticated app origin and can be opened/shared across actors, so a stored `text/html` masquerading as an allowed upload is a genuine stored-XSS on the app origin. **Hosted impact needs confirmation** — depends on whether hosted serves uploads through this same controller (extension-derived Content-Type) or via signed object-storage URLs with a forced/stored content-type; if the former, the vector applies.
-
-**ZIP note.** Adding `.zip` to the allowlist does **not** worsen this — a genuine ZIP serves as `application/zip`/`octet-stream` (download, inert). ZIP just makes it timely to close the underlying gap while in this code.
-
-**Fix (root cause).** Add an **extension allowlist** to `fileFilter`: reject unless `path.extname(file.originalname).toLowerCase()` is in an allowed-extension set mirroring `ALLOWED_MIME_TYPES` (`.jpg/.jpeg/.png/.gif/.webp/.svg/.pdf/.mp3` [+`.zip`]). This rejects `x.html` regardless of the declared MIME and is byte-neutral for legitimate uploads. **Defense-in-depth (optional):** send `Content-Disposition: attachment` for the non-image (`files/`) serve category so even a mismatched stored file downloads instead of executing — but keep PDFs inline (their inline view is desirable UX), so gate the disposition on category/extension rather than applying it blanket.
-
-**Scope.** `@widgetizer/builder-server` (`mediaController` `fileFilter` + optionally the serve headers). The theme-upload/import filters have the same MIME-only shape — fold in a shared extension-allowlist helper only if convenient. Docs: `core-media.md` (§ "Media Type Configuration" / "Upload Flow") and `core-security.md` §1/§9 describe the fileFilter as MIME-allowlist-enforced without noting the extension/served-type mismatch — update when fixed.
-
-**Test.** A crafted upload with `filename="x.html"` + an allowed MIME is **rejected** by the filter; legit `.pdf`/`.mp3`/image uploads still pass and PDFs still serve inline. If the serve-side mitigation lands: a stored non-image asset serves with `Content-Disposition: attachment`.
-
-**Effect:** low for OSS-standalone (self-XSS, local-only, crafted-request-only); moderate for hosted **if** uploads are served via this controller (stored XSS on the app origin) — confirm the hosted asset-serving path.
 
 ---
 
@@ -563,75 +539,6 @@ programmatically). These are traps waiting on a preset author who nests a direct
 
 ---
 
-## ✅ 45. Dead code — empty branch in `mergeSettingsArray` (`builder-server`) — fixed, pending reference-table move
-
-**Status:** ✅ **DONE 2026-08-23** — intent re-derived from the merge shape before deleting: the
-merged item starts as a spread of the NEW schema item and only the user's `value` is ever
-preserved, so "don't preserve a default the new schema removed" already holds structurally — the
-branch guarded nothing. Deleted, with the intent pinned by a `mergeThemeSettings` unit test
-("does not resurrect a default the new schema removed") so a future rewrite can't regress it
-silently. Original finding below.
-
-**Priority:** Low
-
-`packages/builder-server/src/services/themeUpdateService.js:162-163`, inside `mergeSettingsArray`:
-
-```js
-if (userItem.default !== undefined && newItem.default === undefined) {
-  // Don't preserve default if new schema removed it
-}
-```
-
-The branch body is empty — just the comment, no statement. Since `merged` already starts as a spread of
-`newItem` (which has no `default` key in this case), the condition is a no-op either way. Remove the dead
-branch, or implement whatever it was meant to guard (unclear from the comment alone — re-derive intent
-from `mergeSettingsArray`'s callers before deciding).
-
----
-
-## ✅ 46. `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`) — fixed, pending reference-table move
-
-**Priority:** Medium
-
-**Status:** ✅ **DONE 2026-08-23** — the snapshot is layered into a `latest.tmp` sibling and
-promoted with a **rename-aside swap** (`latest → latest.old`, `latest.tmp → latest`, then delete
-`latest.old`), builds are **serialized per theme** (an in-process chain — overlapping calls, e.g.
-an update import racing hosted's boot-time sync, previously shared the staging dir and could
-delete each other's just-promoted `latest/`), and a promotion failure **renames the set-aside
-tree back** instead of losing it. Three designs were measured under an adversarial A/B stress
-harness (250-file theme, back-to-back rebuilds, concurrent scanner + real `copyThemeToProject`
-readers): in-place rebuild ≈1100 bad observations/run; temp + `remove`+`rename` ≈440 (the
-recursive remove is not a metadata op — readers fell back to the stale base for its whole
-duration); final rename-aside + serialization ≈170, with **zero mixed trees and zero silent
-mixed copies** — remaining bad observations are the one event-loop turn between the two renames
-plus readers already mid-walk at swap time, which fail loudly (fixing those needs versioned
-snapshot dirs, deliberately out of scope). `layerThemeSnapshot`'s base-copy exclusion also skips
-`latest.tmp`/`latest.old` so stale crash leftovers are never copied into a snapshot. Pinned by
-`tests/buildLatestSnapshotAtomicity.test.js` (failed rebuild preserves the previous snapshot;
-3-way concurrent rebuilds × 10 rounds never leave `latest/` missing or torn — reliably red
-pre-serialization; success leaves no temp). Known pre-existing limits filed and fixed same day
-(§59/§60). Second-review hardening (same day): a crash between the two promotion renames is now
-recovered at the next build's start (the parked `latest.old` is restored before layering, so
-even a subsequent failure leaves a serving snapshot); a failed delete of the set-aside tree no
-longer fails a completed promotion (best-effort + warn, retried next build); a rollback failure
-is warned, not silent — each behavior pinned by its own test. Accepted residuals: a
-`deleted/`-marker removal failure during layering is still warn-and-continue (no deterministic
-test is possible without fs mocking; near-theoretical — it requires a removal failure inside a
-tree the build itself just created); build serialization is in-process only (both shells run a
-single server process); and readers already mid-walk inside `latest/` at swap time fail loudly
-(versioned snapshot dirs would be the full fix, deliberately out of scope). Original
-finding below.
-
-`packages/builder-server/src/controllers/themeController.js`, `buildLatestSnapshot`: the rebuild removes
-the existing `latest/` directory (`fs.remove(latestDir)`) and then re-layers base + updates into a fresh
-`latest/` via `layerThemeSnapshot`. Between the removal and the last file being copied back in, any
-concurrent reader of `latest/` (e.g. project scaffold copying a theme mid-rebuild) can observe a missing
-or half-built directory. Consider building into a temp sibling directory and atomically renaming it onto
-`latestDir` once complete, so readers only ever see the old complete tree or the new complete tree, never
-an in-between state.
-
----
-
 ## ⬜ 49. `linkEnrichment.js` bypasses the storage adapter — raw `fs` writes to project content (`builder-server`) — low (architectural hygiene)
 
 **Priority:** Low
@@ -654,39 +561,6 @@ during project scaffolding/lifecycle (some callsites, e.g. `projectScaffold.js`,
 hold a `scope`), so the conversion involves threading scope/adapter through those paths — a
 contained refactor, but not free. Until then, the constraint stands that these helpers only work
 where project storage is the local filesystem.
-
----
-
-## ✅ 50. Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`) — fixed, pending reference-table move
-
-**Priority:** Medium (low end)
-
-**Status:** ✅ **DONE 2026-08-23** — `reconcileModifiedWidgets` now also arms the autosave timer
-(and resets the failure count) when the whole-page diff is non-empty **or** themeStore's canonical
-`hasUnsavedThemeChanges()` reads dirty — the same checks `hasUnsavedChanges()` and `save()`
-(`hasPageDiff` / `hasThemeDrift`) already use, so an armed timer always fires a save that actually
-persists the difference. The theme arm matters because undo/redo restores theme settings via
-`syncThemeStoreFromSnapshot`, outside the page object (found in follow-up review). Pinned by two
-saveStore tests (structure-only reorder diff and theme-settings-only diff → per-widget ledger
-empty, timer armed); hosted's vendored contract suite verified green. Accepted residual: a no-op
-redo (`safeRedo` doesn't guard on empty `futureStates`, unlike `safeUndo`) still runs the
-reconcile, so it can restart the debounce and clear a backoff while dirty — harmless timer churn,
-one live timer either way. Original finding below.
-
-`saveStore.js`'s `reconcileModifiedWidgets` diffs per-widget content only (`page.widgets[id]` vs
-`originalPage.widgets[id]`, plus header/footer). A redo that reintroduces only a
-`widgetsOrder`/page-settings/theme-only change — nothing inside any individual widget's own
-content — marks no widget dirty and arms no autosave timer.
-
-This is a narrow data-loss window, not a silent one: `hasUnsavedChanges()` still does a whole-page
-`isEqual(page, originalPage)` diff, so the nav guard and a manual save both still catch it and work
-correctly. Only the 60-second autosave timer stays unarmed until some *other* edit re-arms it. Any
-subsequent edit (which does go through `markWidgetModified`/`setStructureModified`) re-arms the
-timer as normal, closing the window.
-
-**Candidate one-line fix:** in `reconcileModifiedWidgets`, also call `resetAutoSaveTimer()` (or
-whatever sets `autoSaveFailureCount`/arms the timer) when the whole-page diff is non-empty, mirroring
-what `hasUnsavedChanges()` already checks.
 
 ---
 
@@ -807,64 +681,6 @@ whatever convention is adopted propagates to them automatically.
 
 ---
 
-## ✅ 55. Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) — fixed, pending reference-table move
-
-**Status:** ✅ **DONE 2026-08-23** — `vitest.setup.js` now initializes a minimal, resource-less
-i18next instance (`lng: "en"`, empty resources, `escapeValue: false`), so `t(key)` still falls
-back to the key string and the suites' assert-on-keys convention is preserved. Warning count in
-the full frontend run went 6 → 0; whole suite verified green. Original finding below.
-
-**Priority:** Low
-
-Surfaced 2026-07-10 during the SplitButton work. `packages/editor-ui`'s jsdom component tests
-deliberately render **without** an i18n provider — the convention is that `t(key)` returns the key
-verbatim and tests assert on the key strings. But nothing initializes an i18next instance (the
-root `vitest.setup.js` doesn't; the real instance lives only in the app shell, `app/src/i18n.js`,
-which the tests don't load), so `react-i18next`'s `useTranslation()` emits a **"You will need to
-pass in an i18next instance"** warning on every such render — ~23 jsdom component test files
-across `editor-ui` trigger it. Pre-existing and repo-wide, not tied to any one feature.
-
-**Effect (low):** noisy stderr in the frontend test run — no failures, no behavioural impact.
-
-**Fix:** initialize a **minimal, resource-less** i18next instance in `vitest.setup.js`
-(`i18n.use(initReactI18next).init({ lng: "en", resources: {} })`). With no resources a missing key
-still falls back to the key string, so the assert-on-keys strategy is preserved — the warning just
-goes away. Global test-infra change (touches every suite), so validate the full frontend suite
-stays green; do it as its own pass, not inside a feature branch.
-
----
-
-## ✅ 56. `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) — fixed, pending reference-table move
-
-**Status:** ✅ **DONE 2026-08-23** — added `lib/emptyValues.js` (`EMPTY_ARRAY`/`EMPTY_OBJECT`,
-frozen module constants) and swapped every `plugins = []` / `slots = {}` default in
-`PluginProvider`, `EditorShell`'s provider/shell/`editorRouteChildren`/`createEditorRoutes`
-sites to reference them. Pinned by a `PluginProvider` test that re-renders with the props
-omitted and asserts the context value stays referentially identical (red pre-fix). Original
-finding below.
-
-**Priority:** Low
-
-Surfaced 2026-07-12 reviewing the SplitButton work. The `plugins = []` / `slots = {}` default
-parameters (`extension/PluginProvider.jsx:16`, and `EditorShell.jsx`'s `EditorProvider`, shell
-component, `editorRouteChildren` and `createEditorRoutes`) are plain literals, recreated fresh on
-every render where the caller omits the prop — defeating `PluginProvider`'s own `useMemo` on
-`[plugins, slots]` the moment any of these components re-renders without an explicitly memoized
-prop.
-
-**Effect (low today):** the real call sites avoid it (OSS composes its routes once at module
-scope; embedding hosts memoize the props they pass). Nothing in the components themselves enforces
-or warns about it, though, so the next caller that doesn't know to memoize would silently
-reintroduce wasted re-renders across every `useCommands`/`useNavItems`/`usePluginRoutes`/`useSlot`
-consumer.
-
-**Fix:** swap the default literals for shared module-level frozen constants (e.g. a small
-`lib/emptyValues.js` exporting `EMPTY_ARRAY`/`EMPTY_OBJECT`, `Object.freeze`d) so an unmemoized
-caller can't defeat the downstream `useMemo`; pin with tests that re-render with the props omitted
-and assert the context value stays referentially identical across renders.
-
----
-
 ## ⬜ 57. `core-editor-ui-style-guide.md` has no Split Button component pattern (`docs-llms`) — low (optional)
 
 **Priority:** Low
@@ -898,63 +714,6 @@ about port/state sharing across `createEditorApp` instances spun up by parallel 
 
 ---
 
-## ✅ 59. `getCachedThemeValue` — an in-flight loader can repopulate an invalidated cache entry (`builder-server`) — fixed, pending reference-table move
-
-**Priority:** Low
-
-**Status:** ✅ **DONE 2026-08-23** — both settlement paths of the pending loader now write back
-only while the load's own record is still the current cache entry (identity check on the record,
-mirroring what the error path already did), so an invalidation or a newer load during the flight
-sticks. Pinned by `tests/themeSourceCache.test.js` (invalidated in-flight load doesn't
-repopulate; late load doesn't overwrite a newer entry). Original finding below.
-
-Surfaced 2026-08-23 in the §46 review. `getCachedThemeValue`
-(`controllers/themeController.js`) caches a pending loader's result via
-`loader().then((value) => cache.set(key, …))` — the `.then` writes back unconditionally, without
-checking that its promise is still the current cache entry. A load already in flight when
-`invalidateThemeSourceCache` runs (e.g. from a `buildLatestSnapshot` promotion) therefore
-finishes *after* the invalidation and resurrects the pre-rebuild value — a stale source dir or
-parsed `theme.json` — for up to one more TTL period (5s).
-
-**Effect (low):** a bounded staleness window after a theme rebuild, on top of the TTL staleness
-the cache already accepts by design.
-
-**Fix:** in the pending loader's `.then`, only `cache.set` when the map's current entry is still
-this load's own pending record; pin with a test that invalidates mid-load and asserts the late
-result is not cached.
-
----
-
-## ✅ 60. `layerThemeSnapshot` swallows per-update apply errors, so a partial snapshot can be promoted (`builder-server`) — fixed, pending reference-table move
-
-**Priority:** Low
-
-**Status:** ✅ **DONE 2026-08-23** — per-update apply errors are now fatal to the build (the
-decision went to fatal-on-error: §46's rename-aside swap keeps the previous complete snapshot on
-failure, so failing loudly no longer destroys `latest/`; the update-import validation caller
-likewise now rejects a corrupt effective theme instead of approximating it). Pinned by a
-`buildLatestSnapshotAtomicity.test.js` case: a valid-looking update with an unreadable payload
-makes the rebuild reject and leaves the previous snapshot serving. Original finding below.
-
-Surfaced 2026-08-23 in the §46 review; the behavior predates the atomic swap. Each update
-version's apply step is wrapped in catch-and-warn (`[layerThemeSnapshot] Could not apply version
-…`), so an unreadable or corrupt update dir doesn't reject the build — layering continues and
-the resulting tree (base + whichever updates applied) is promoted as `latest/`. The §46 swap
-guarantees a *complete previous* snapshot survives a failed build, but this path isn't a failed
-build: it "succeeds" with a silently under-layered snapshot whose `theme.json` may still claim
-the newest version (a later update's theme.json can land while an earlier one was skipped).
-
-**Effect (low):** requires a damaged update dir; consequence is a theme serving mixed-version
-content while reporting the newest version — confusing rather than destructive, and self-heals
-once the update dir is repaired and any rebuild runs.
-
-**Fix (decide first):** either make per-update apply errors fatal to the build (the swap now
-makes that safe — the previous snapshot survives), or keep best-effort but skip promotion when
-any update failed. Fatal-on-error is probably right now that failure no longer destroys
-`latest/`; it was arguably the lesser evil only under the old in-place rebuild.
-
----
-
 ## ⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)
 
 **Priority:** Low
@@ -979,6 +738,56 @@ a dev/split-origin-only warning.
 queue messages until `PREVIEW_READY` arrives for the current document generation, or simply skip
 sends while the iframe is known to be loading (the post-`PREVIEW_READY` re-sync already covers
 them). Keep the concrete-origin targeting; the point is only to stop firing into the gap.
+
+---
+
+---
+
+## ⬜ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — medium (low end) — decide serialization design first
+
+**Priority:** Medium
+
+**Status:** ⬜ open — surfaced 2026-08-23 in the §39 re-audit (second-model review contributed the two
+cleanup-path findings). Three symptoms of one root cause: **export version allocation and the
+filesystem/DB lifecycle around it aren't coordinated**, so overlapping export operations on the same
+project interfere. Unlike §39's latents these are **live in-process races** (the gaps are `await` spans,
+not second connections) — but they need two overlapping exports of the same project, which a single
+local user rarely produces (double-clicking a slow export is the realistic path).
+
+- **Version reservation gap.** `exportProjectToDir` calls `exportRepo.getNextVersion` at
+  `exportController.js:173`, then awaits validation/rendering/extensive fs work, creates the shared
+  output dir `${folder}-v${version}` (`:260`), and only inserts the history row at `:916`. Two
+  overlapping same-project exports get the same version → both write into the **same output dir**
+  (interleaved/mixed files), and the loser's insert fails on the unique `idx_exports_project_version`
+  (`migrations.js:93`) **after** its fs work completed — a completed export reported as failed, plus the
+  route's catch allocating a *separate* "failed" history row (`:954-960`).
+- **`cleanupProjectExports` (`exportController.js:111-134`)** reads the records, awaits directory
+  removals, then calls `deleteAllExports` while **ignoring its returned list** — an export that
+  completes mid-cleanup gets its DB row deleted without its directory being removed (orphan dir).
+- **`deleteExport` (`exportController.js:1287-1296`)** deletes the DB row **before** awaiting the
+  directory removal. Deleting the highest version lets a concurrent export's `MAX(version)+1` reuse
+  that version/directory — which the still-running removal then deletes from under it.
+
+**Fix (decide first).** Two candidate designs, evaluated in review:
+- **(a) Serialize export operations per project** via an in-process promise chain — the pattern
+  `themeController.js:451-466` already uses for snapshot builds (map keyed by project,
+  `prev.catch(() => {}).then(...)`, identity-checked cleanup). The chain must cover **allocation
+  through success/failure recording** (not just `exportProjectToDir` — a rejection must not release
+  the chain before the route records the failure), and should also cover deletion/cleanup so the
+  version-reuse and orphan-dir races close for free. Preferred under the current single-process model.
+- **(b) Reserve the version up front** (insert a pending row atomically via `.immediate()`, update it
+  on completion). Stronger cross-process, but leaves pending rows on crash, surfaces "pending" in the
+  export-history UI, and interacts badly with retention/trim of in-flight rows — needs recovery rules.
+  Not worth it unless multi-process export ever becomes real.
+
+**Test.** Two concurrent exports of one project: distinct versions, distinct output dirs, both recorded
+as success. Cleanup/delete during an in-flight export: no orphan dir, no version reuse.
+
+**Scope.** OSS `builder-server` export subsystem. §39d's `DELETE … RETURNING` gives the repository
+truthful return values; this item is about the controller-level coordination *around* them.
+
+**Effect:** medium (low end) — mixed/corrupt export output and misreported failures, but only under
+overlapping same-project exports; no editor-content data loss.
 
 ---
 
@@ -1019,4 +828,14 @@ Bodies live in git, not here. `Fix` is the first commit that implemented the ite
 | 34 | `copyThemeToProject` exclude-filter widened from dirs to entries (`builder-server`) | ✅ DONE 2026-07-07 | `36d081d7` | `efc6e957` |
 | 35 | Create-from-preset + Refresh Usage don't track media usage (embedding-host-facing; fixed in `builder-server`) | ✅ DONE 2026-07-02 | `cae73b17` | `efc6e957` |
 | 36 | Cold-boot race bounces the editor to the picker on an aborted active-project fetch (`editor-ui`) | ✅ DONE 2026-07-07 | `2e0dc1c9` | `efc6e957` |
+| 37 | `EmptyState.jsx` renders unstyled — `empty-state*` classes have no matching CSS (`editor-ui`) | ✅ DONE 2026-08-23 | `9279c720` | `9279c720` |
+| 40 | OSS mounts allow-all `cors()` on the unauthenticated localhost API (`builder-server`) | ✅ DONE 2026-08-23 | `9279c720` | `9279c720` |
+| 42 | Media upload allowlist trusts the client-declared MIME while serve derives Content-Type from the stored extension (`builder-server`) | ✅ DONE 2026-08-23 | `bef9e9ec` | `9279c720` |
+| 45 | Dead code — empty branch in `mergeSettingsArray` (`builder-server`) | ✅ DONE 2026-08-23 | `9279c720` | `9279c720` |
+| 46 | `buildLatestSnapshot` rebuilds `latest/` non-atomically (`builder-server`) | ✅ DONE 2026-08-23 | `d9c9a8bb` | `9279c720` |
 | 48 | Unmerged `list-button` branch — SplitButton feature + independent `saveStore` fixes (`editor-ui`) | ✅ RESOLVED 2026-08-22 | `4bd1509a`, `d2a50a85` | `d2a50a85` |
+| 50 | Structure-only undo/redo doesn't re-arm the autosave timer (`editor-ui`) | ✅ DONE 2026-08-23 | `d61ab806` | `9279c720` |
+| 55 | Vitest setup lacks an i18n instance so provider-less component tests warn (`editor-ui` tests) | ✅ DONE 2026-08-23 | `9279c720` | `9279c720` |
+| 56 | `EditorShell`/`PluginProvider` default-param object/array literals defeat memoization for a non-memoizing caller (`editor-ui`) | ✅ DONE 2026-08-23 | `9279c720` | `9279c720` |
+| 59 | `getCachedThemeValue` — an in-flight loader can repopulate an invalidated cache entry (`builder-server`) | ✅ DONE 2026-08-23 | `d9c9a8bb` | `9279c720` |
+| 60 | `layerThemeSnapshot` swallows per-update apply errors, so a partial snapshot can be promoted (`builder-server`) | ✅ DONE 2026-08-23 | `d9c9a8bb` | `9279c720` |

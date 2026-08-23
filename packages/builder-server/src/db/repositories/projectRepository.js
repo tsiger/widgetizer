@@ -68,6 +68,15 @@ export function createProject(project) {
  */
 export function updateProject(id, updates) {
   const db = getDb();
+  // Immediate transaction: the read-merge-write must hold the write lock from
+  // the start — a deferred wrap would take a read snapshot first and could die
+  // with un-waitable SQLITE_BUSY_SNAPSHOT on the upgrade if a second connection
+  // ever shares the DB file, and no wrap at all makes the merge a lost-update
+  // window for such a connection.
+  return db.transaction(() => updateProjectStatements(db, id, updates)).immediate();
+}
+
+function updateProjectStatements(db, id, updates) {
   const current = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
   if (!current) return null;
 
@@ -192,10 +201,13 @@ export function setActiveProjectId(id) {
  * @returns {{projects: Array<object>, activeProjectId: string|null}}
  */
 export function readProjectsData() {
-  return {
+  const db = getDb();
+  // Read-only transaction so both reads see one consistent snapshot if a
+  // second connection ever shares the DB file.
+  return db.transaction(() => ({
     projects: getAllProjects(),
     activeProjectId: getActiveProjectId(),
-  };
+  }))();
 }
 
 /**
@@ -204,6 +216,8 @@ export function readProjectsData() {
  */
 export function writeProjectsData(data) {
   const db = getDb();
+  // Immediate transaction: the id-list read precedes the writes, so the write
+  // lock must be taken up front (see updateProject for the rationale).
   const txn = db.transaction(() => {
     // Get current project IDs in DB
     const currentIds = new Set(
@@ -262,7 +276,31 @@ export function writeProjectsData(data) {
     setActiveProjectId(data.activeProjectId || null);
   });
 
-  txn();
+  txn.immediate();
+}
+
+/**
+ * Delete a project and, when it was the active one (or none was active),
+ * reassign the active id to the first remaining project — in one transaction,
+ * so no observer of a second connection can see the deleted project still
+ * active. The transaction's first statement is the DELETE, so a default
+ * deferred transaction already takes the write lock up front.
+ * @param {string} id - Project UUID
+ * @returns {string|null} The active project id after the deletion
+ */
+export function deleteProjectAndReassignActive(id) {
+  const db = getDb();
+  return db.transaction(() => {
+    db.prepare("DELETE FROM projects WHERE id = ?").run(id);
+
+    let activeId = getActiveProjectId();
+    if (activeId === id || !activeId) {
+      const remaining = getAllProjects();
+      activeId = remaining[0]?.id || null;
+      setActiveProjectId(activeId);
+    }
+    return activeId;
+  })();
 }
 
 /**
