@@ -57,6 +57,7 @@ _None open._
 - [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
 - [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
 - [⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)](#-63-localpublishadapterpublish-shares-the-exports-version-counter-without-the-export-lock-adapters-local--low--latent-no-production-caller)
+- [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
 
 ---
 
@@ -874,6 +875,62 @@ PublishAdapter contract conformance, but nothing in `builder-server` invokes `ad
 the export lock (`withExportOpLock`), or give the PublishAdapter contract an explicit
 serialization/allocation story (e.g. the pending-row reservation §62's done-note sketches for
 multi-process) rather than bolting the controller's in-process lock onto an adapter boundary.
+
+---
+
+## ⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate
+
+**Priority:** Low
+
+Surfaced 2026-08-24 by a full audit of every `showToast` call site and its surrounding UI.
+Success feedback is generally fine without toasts (navigation, list mutation, dirty-dot
+clearing, drawers closing). The problem is the *failure* side: the toast is the **only**
+server-error channel in the editor — there is no banner/alert component, no page renders an
+`error` state (`ErrorBoundary` is mounted only at the OSS shell root, `app/src/App.jsx`, and
+only catches render crashes, not these handled errors), and no form ever feeds a server
+rejection back through `setError`
+(messages like a duplicate-slug conflict reach the toast and nowhere else). A toast is
+transient; several of the states it papers over affirmatively claim the *wrong* outcome even
+with toasts working:
+
+- **Load failures render as empty states.** `pages/Pages.jsx` and `pages/Menus.jsx` list-load
+  catches leave the array empty and clear `loading`, so a fetch failure renders "No pages/menus
+  yet — create your first…". Same shape in `hooks/useMediaState.js` (media grid) and
+  `hooks/useExportState.js` (export history; its message is also hardcoded English, not
+  translated). `components/media/MediaSelectorDrawer.jsx`'s load catch is `console.error` only —
+  no toast at all — so the drawer shows "no files" with zero signal anywhere.
+- **Item-load failures render blank bodies.** `pages/PagesEdit.jsx`, `pages/CollectionItemAdd.jsx`
+  and `pages/CollectionItemEdit.jsx` gate the form on the fetched object and render an empty page
+  under the title when it stays null. (`pages/MenusEdit.jsx` at least shows a "not found" body.)
+- **Confirm dialogs close on failure exactly as on success.** `hooks/useConfirmationModal.js`
+  calls `onConfirm(...)` without awaiting it, then `closeModal()` unconditionally — a failed
+  delete (media in use, export-history delete) dismisses the dialog as if it worked, leaving a
+  row that "mysteriously" survives.
+- **Rejected uploads erase their own evidence.** `hooks/useMediaUpload.js` *deletes* a rejected
+  file's progress row instead of marking it errored, and the progress panel unmounts when
+  `uploading` clears — a fully-rejected batch ends with the UI back at idle. In
+  `settings/inputs/ImageInput.jsx` / `FileInput.jsx`, the oversize pre-check returns *before*
+  `setUploading(true)`, so picking a too-big file doesn't even flick the spinner.
+- **Export failure destroys prior evidence.** `components/export/ExportCreator.jsx` clears
+  `lastExport` (the green success panel) at submit start and has no error counterpart, so a
+  failed export looks like a reset. Also `useExportState.loadExportHistory`'s catch is
+  console-only: after a successful export whose refresh fails, the new export never appears with
+  no feedback of any kind.
+- **Theme-settings warnings change values under the user.** `pages/Settings.jsx` puts server
+  warnings (values silently corrected) in a toast while `themeStore.saveSettings` reloads
+  canonical settings and rebaselines — inputs visibly change with the explanation living only in
+  a transient toast. Settings also has no in-flight save state (buttons stay double-clickable).
+- **Slug validation errors can be invisible.** `components/collections/CollectionItemForm.jsx`
+  renders the slug field and its error inside the collapsed "More settings" block (`showMore`
+  defaults false) — a slug failure blocks submit with nothing visible until expanded.
+- **Side effect in render:** `pages/MenuStructure.jsx` calls `showToast` in the render body of
+  its not-found branch.
+
+**Fix (investigate — a pattern decision, not one change):** distinguish load-failure from empty
+(an error state with retry vs. the empty-state CTA), await `onConfirm` in the confirmation modal
+and surface its failure, keep/mark failed upload rows, give export a persistent error surface,
+route server rejections into forms via `setError`, and hoist or duplicate the slug error outside
+the collapsed section. Individually small; worth one sweep so the pieces land consistently.
 
 ---
 

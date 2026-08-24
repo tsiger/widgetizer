@@ -39,12 +39,13 @@ export default function useMediaSelection({ activeProject, showToast, setFiles, 
   const handleDelete = async (data) => {
     try {
       if (data.isBulkDelete) {
-        const result = await deleteMultipleMedia(activeProject.id, selectedFiles);
+        const fileIds = data.fileIds;
+        const result = await deleteMultipleMedia(activeProject.id, fileIds);
 
         // Check if result has filesInUse (partial deletion scenario)
         if (result.filesInUse && result.filesInUse.length > 0) {
           // Remove successfully deleted files from the list
-          const deletedFileIds = selectedFiles.filter((id) => !result.filesInUse.some((file) => file.id === id));
+          const deletedFileIds = fileIds.filter((id) => !result.filesInUse.some((file) => file.id === id));
           setFiles((prev) => prev.filter((file) => !deletedFileIds.includes(file.id)));
           setSelectedFiles((prev) => prev.filter((id) => !deletedFileIds.includes(id)));
 
@@ -68,11 +69,12 @@ export default function useMediaSelection({ activeProject, showToast, setFiles, 
           }
         } else {
           // All files deleted successfully
-          setFiles((prev) => prev.filter((file) => !selectedFiles.includes(file.id)));
-          setSelectedFiles([]);
+          const deletedFileIds = new Set(fileIds);
+          setFiles((prev) => prev.filter((file) => !deletedFileIds.has(file.id)));
+          setSelectedFiles((prev) => prev.filter((id) => !deletedFileIds.has(id)));
           showToast(
             result.message ||
-              `Successfully deleted ${selectedFiles.length} file${selectedFiles.length !== 1 ? "s" : ""}`,
+              `Successfully deleted ${fileIds.length} file${fileIds.length !== 1 ? "s" : ""}`,
             "success",
           );
         }
@@ -134,7 +136,7 @@ export default function useMediaSelection({ activeProject, showToast, setFiles, 
       confirmText: "Delete",
       cancelText: "Cancel",
       variant: "danger",
-      data: { isBulkDelete: true },
+      data: { fileIds: selectedFiles, isBulkDelete: true },
     });
   };
 

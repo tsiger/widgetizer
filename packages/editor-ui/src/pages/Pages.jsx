@@ -27,7 +27,15 @@ export default function Pages() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
-  const { selectedPages, togglePageSelection, selectAllPages, clearSelection, isAllSelected } = usePageSelection();
+  const {
+    selectedPages,
+    togglePageSelection,
+    selectAllPages,
+    deselectPage,
+    deselectPages,
+    clearSelection,
+    isAllSelected,
+  } = usePageSelection();
   const { formatDate } = useFormatDate();
   const showToast = useToastStore((state) => state.showToast);
   const activeProject = useProjectStore((state) => state.activeProject);
@@ -37,10 +45,13 @@ export default function Pages() {
     try {
       if (data.isBulkDelete) {
         await bulkDeletePages(data.pageIds);
+        deselectPages(data.pageIds);
         showToast(t("pages.toasts.deleteBulkSuccess", { count: data.pageIds.length }), "success");
-        clearSelection();
       } else {
         await deletePage(data.pageId);
+        // The deleted page may also be checkbox-selected; drop it so the
+        // selection count and bulk actions don't keep referencing a gone id.
+        deselectPage(data.pageId);
         showToast(t("pages.toasts.deleteSuccess"), "success");
       }
       if (activeProject) {

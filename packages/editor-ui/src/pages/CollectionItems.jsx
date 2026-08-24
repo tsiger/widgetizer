@@ -130,10 +130,14 @@ export default function CollectionItems() {
     try {
       if (data.isBulkDelete) {
         await bulkDeleteCollectionItems(type, data.slugs);
+        const deletedSlugs = new Set(data.slugs);
+        setSelectedSlugs((prev) => prev.filter((slug) => !deletedSlugs.has(slug)));
         showToast(t("collections.toasts.deleteBulkSuccess", { count: data.slugs.length }), "success");
-        setSelectedSlugs([]);
       } else {
         await deleteCollectionItem(type, data.slug);
+        // The deleted item may also be checkbox-selected; drop it so the
+        // selection count and bulk actions don't keep referencing a gone slug.
+        setSelectedSlugs((prev) => prev.filter((s) => s !== data.slug));
         showToast(t("collections.toasts.deleteSuccess"), "success");
       }
       afterMutation();
