@@ -3,6 +3,7 @@
 // hosted's cloud render loop produce identical output from one source.
 
 import { formatXml } from "../utils/htmlProcessor.js";
+import { isHomeSlug } from "@widgetizer/core/internalHref";
 
 function isValidSiteUrl(siteUrl) {
   if (!siteUrl || siteUrl.trim() === "") return false;
@@ -33,7 +34,7 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
   const sitemapUrls = pagesDataArray
     .filter((page) => !page.seo?.robots?.includes("noindex"))
     .map((page) => {
-      const isHomepage = page.slug === "index" || page.slug === "home";
+      const isHomepage = isHomeSlug(page.slug);
       const pageUrl = isHomepage ? new URL("/", siteUrl).href : new URL(`${page.slug}${ext}`, siteUrl).href;
       const lastMod = page.updated || page.gcreated || new Date().toISOString();
       return `
@@ -87,7 +88,7 @@ export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cl
     if (!page.seo?.robots?.includes("noindex")) continue;
     const pageId = page.id || page.slug;
     if (!pageId) continue;
-    const filename = pageId === "index" || pageId === "home" ? `index${ext || ".html"}` : `${pageId}${ext}`;
+    const filename = isHomeSlug(pageId) ? `index${ext || ".html"}` : `${pageId}${ext}`;
     disallowSet.add(`/${filename}`);
   }
   for (const { slugPrefix, items } of itemPagesForSeo || []) {

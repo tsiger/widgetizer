@@ -1,5 +1,7 @@
 // Purpose: Liquid tag to output SEO meta tags
 
+import { isHomeSlug } from "../utils/internalHref.js";
+
 export const SeoTag = {
   parse(tagToken) {
     this.tagName = tagToken.name;
@@ -142,7 +144,7 @@ function resolveCanonicalUrl(explicitUrl, siteUrl, slug, cleanUrls = false) {
     return "";
   }
 
-  const isHomepage = slug === "index" || slug === "home";
+  const isHomepage = isHomeSlug(slug);
   if (isHomepage) return `${base}/`;
   return cleanUrls ? `${base}/${slug}` : `${base}/${slug}.html`;
 }
