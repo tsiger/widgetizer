@@ -24,6 +24,7 @@
     "./richtextMedia": "./src/utils/richtextMedia.js",
     "./richtextLinks": "./src/utils/richtextLinks.js",
     "./linkPrefixer": "./src/utils/linkPrefixer.js",
+    "./internalHref": "./src/utils/internalHref.js",
     "./dateFormat": "./src/utils/dateFormat.js",
     "./config/settingTypes": "./src/config/settingTypes.js",
     "./config/fonts.json": "./src/config/fonts.json",
