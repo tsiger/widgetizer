@@ -29,6 +29,7 @@ import { escapeHtml } from "@widgetizer/core/escapeHtml";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
+import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
@@ -153,9 +154,10 @@ function schemaHasLinkSetting(schema) {
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @param {string} [outputPathPrefix] - "" at root, "../" for nested item pages
  * @param {Map} [collectionItemsByUuid] - Map of item uuid -> { slugPrefix, slug }
+ * @param {boolean} [cleanUrls] - The project's Clean URLs setting; picks the href shape
  * @returns {object} Resolved link object
  */
-function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
+function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null, cleanUrls = false) {
   if (!linkValue || typeof linkValue !== "object") {
     return linkValue;
   }
@@ -169,7 +171,7 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
     if (entry) {
       return {
         ...linkValue,
-        href: prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix),
+        href: itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix }),
       };
     }
     // Collection item was deleted - clear the link
@@ -188,7 +190,7 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
     // Page exists - update href to current slug, depth-aware for nested pages
     return {
       ...linkValue,
-      href: prefixInternalHref(`${page.slug}.html`, outputPathPrefix),
+      href: pageHref(page.slug, { cleanUrls, outputPathPrefix }),
     };
   } else {
     // Page was deleted - clear the link
@@ -208,7 +210,7 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {object} Widget data with resolved links
  */
-function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null) {
+function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null, cleanUrls = false) {
   const pagesEmpty = !pagesByUuid || pagesByUuid.size === 0;
   const itemsEmpty = !collectionItemsByUuid || collectionItemsByUuid.size === 0;
   if (!widgetData || (pagesEmpty && itemsEmpty)) {
@@ -222,7 +224,7 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", 
   if (resolved.settings && typeof resolved.settings === "object") {
     for (const [key, value] of Object.entries(resolved.settings)) {
       if (isLinkObject(value)) {
-        resolved.settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
+        resolved.settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid, cleanUrls);
       }
     }
   }
@@ -233,7 +235,13 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", 
       if (block && block.settings && typeof block.settings === "object") {
         for (const [key, value] of Object.entries(block.settings)) {
           if (isLinkObject(value)) {
-            resolved.blocks[blockId].settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
+            resolved.blocks[blockId].settings[key] = resolveLinkValue(
+              value,
+              pagesByUuid,
+              outputPathPrefix,
+              collectionItemsByUuid,
+              cleanUrls,
+            );
           }
         }
       }
@@ -478,7 +486,8 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   // Expose depth-aware path globals (defaults keep pages at the export root).
   // `outputPathPrefix` prefixes relative asset/link URLs; `currentCanonicalPath`
   // is the un-prefixed path of the page being rendered, used for menu
-  // active-state matching.
+  // active-state matching. `cleanUrls` — the project's Clean URLs setting;
+  // stamped by `renderWidget` on first use when absent.
   if (globals.outputPathPrefix === undefined) globals.outputPathPrefix = outputPathPrefix;
   if (globals.currentCanonicalPath === undefined) globals.currentCanonicalPath = "";
   // Published date format (theme-owned, set via the `date_format` theme setting).
@@ -665,6 +674,20 @@ async function renderWidget(
     // and all preview, "../" when rendering inside a nested collection item page).
     const outputPathPrefix = (sharedGlobals && sharedGlobals.outputPathPrefix) || "";
 
+    // The project's Clean URLs setting picks the shape of every uuid-resolved
+    // internal link this widget emits. Ordinary pages render header/widgets
+    // before the layout loads the project row, so the engine stamps the flag
+    // itself on first use and caches it on sharedGlobals like pagesByUuid —
+    // a caller may pre-set it; a render with no shared globals gets false.
+    let cleanUrls = false;
+    if (sharedGlobals) {
+      if (sharedGlobals.cleanUrls === undefined) {
+        const projectData = await getProjectData(deps);
+        sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
+      }
+      cleanUrls = sharedGlobals.cleanUrls === true;
+    }
+
     // Whether the widget (or its blocks) declares any `menu` or `link` setting.
     // Both setting types can target a collection item (collectionItemUuid), so
     // either drives loading the item uuid -> { slugPrefix, slug } map (#11 parity
@@ -701,7 +724,13 @@ async function renderWidget(
     // shared menuResolver — the single source of truth shared with collection-item
     // rendering: depth-aware links, collection-item targets (#11), and custom-link
     // sanitization. A missing/empty value or unknown menu yields { items: [] }.
-    const menuDeps = { menuMaps, pagesByUuid, collectionItemsByUuid: collectionItemsByUuid || new Map(), outputPathPrefix };
+    const menuDeps = {
+      menuMaps,
+      pagesByUuid,
+      collectionItemsByUuid: collectionItemsByUuid || new Map(),
+      outputPathPrefix,
+      cleanUrls,
+    };
     resolveMenuSettings(enhancedSettings, schema.settings, menuDeps);
     for (const block of Object.values(enhancedBlocks)) {
       if (block && block.type && block.settings && Array.isArray(blockSchemas[block.type])) {
@@ -716,6 +745,7 @@ async function renderWidget(
       pagesByUuid,
       outputPathPrefix,
       collectionItemsByUuid,
+      cleanUrls,
     );
 
     // Sanitize settings based on schema types (text, richtext, link, etc.)
@@ -737,6 +767,7 @@ async function renderWidget(
       pagesByUuid,
       collectionItemsByUuid,
       outputPathPrefix,
+      cleanUrls,
     });
 
     // Create widget context for template
@@ -828,6 +859,20 @@ async function renderPageLayout(
     // 3. Load project data
     const projectData = await getProjectData(deps);
 
+    // Stamp Clean URLs here too: a layout whose own filters resolve internal
+    // links (`| collection`) runs without any widget having stamped the flag.
+    // A caller-set value still wins, as it does in renderWidget.
+    if (sharedGlobals && sharedGlobals.cleanUrls === undefined) sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
+    // The layout's `project` context is what `{% seo %}` reads the canonical's
+    // shape from. It carries the flag this render's links were emitted with
+    // (a caller-seeded or first-use stamp on sharedGlobals), not the row just
+    // loaded: a toggle landing between the two reads must not split a page's
+    // canonical from its links.
+    const layoutProjectData =
+      projectData && sharedGlobals && sharedGlobals.cleanUrls !== undefined
+        ? { ...projectData, cleanUrls: sharedGlobals.cleanUrls === true }
+        : projectData;
+
     // 4. Add page-specific context with separated content sections
     const pageSlugClass = pageData?.slug ? `page-${pageData.slug}` : "";
     // A caller may pass `bodyClass` to REPLACE the page-{slug} default (collection
@@ -841,7 +886,7 @@ async function renderPageLayout(
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
       page: pageData,
-      project: projectData,
+      project: layoutProjectData,
       page_title: buildPageTitle(pageData, projectData),
       body_class: bodyClasses,
     };
@@ -916,9 +961,16 @@ async function renderCollectionItemPage(
   // present. Menu maps are engine-internal (fs-based) — load them lazily if the
   // caller didn't supply them, so prep below sees the same maps the layout will.
   if (!sharedGlobals.menuMaps) sharedGlobals.menuMaps = await loadMenuMaps(deps);
+  // Item pages have the project row in hand, so the flag is stamped here rather
+  // than lazily as renderWidget does; a caller-set value still wins.
+  if (sharedGlobals.cleanUrls === undefined) sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
   const menuDeps =
     sharedGlobals.menuMaps || sharedGlobals.collectionItemsByUuid
-      ? { menuMaps: sharedGlobals.menuMaps, collectionItemsByUuid: sharedGlobals.collectionItemsByUuid }
+      ? {
+          menuMaps: sharedGlobals.menuMaps,
+          collectionItemsByUuid: sharedGlobals.collectionItemsByUuid,
+          cleanUrls: sharedGlobals.cleanUrls === true,
+        }
       : null;
 
   // Base context first: its mode-aware media bases (imagePath/filePath) resolve
@@ -945,7 +997,7 @@ async function renderCollectionItemPage(
   // Page-shaped object drives the layout title/SEO/body class. Built BEFORE the
   // template render so the item template receives the page/collection/project
   // context, not just item.
-  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl, projectData?.cleanUrls);
+  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl, sharedGlobals.cleanUrls === true);
 
   // Render the collection type's template.liquid against the item context.
   const themeSnippetsDir = path.join(deps.projectDir, "snippets");
