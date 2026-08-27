@@ -15,7 +15,7 @@
  * Render resolution runs on the per-render clone; stored values keep the portable form.
  */
 
-import { prefixInternalHref } from "./linkPrefixer.js";
+import { pageHref, itemHref } from "./internalHref.js";
 
 // Render content is DOMPurify-normalized (double-quoted), but the on-disk lifecycle
 // helpers also run on RAW stored HTML (source-mode / imported / preset), which may use
@@ -47,24 +47,28 @@ function stripAttrs(openTag, ...res) {
  *   - uuid found → rewrite `href`.
  * External anchors (no data-uuid) pass through untouched.
  * @param {*} html
- * @param {{ pagesByUuid?: Map, collectionItemsByUuid?: Map, outputPathPrefix?: string }} deps
+ * @param {{ pagesByUuid?: Map, collectionItemsByUuid?: Map, outputPathPrefix?: string, cleanUrls?: boolean }} deps
+ * `cleanUrls` (the project's Clean URLs setting) picks the emitted shape — `.html` file name, or extensionless address.
  * @returns {*} rewritten string (or input unchanged when not a non-empty string / no refs)
  */
-export function resolveRichtextLinkRefs(html, { pagesByUuid, collectionItemsByUuid, outputPathPrefix = "" } = {}) {
+export function resolveRichtextLinkRefs(
+  html,
+  { pagesByUuid, collectionItemsByUuid, outputPathPrefix = "", cleanUrls = false } = {},
+) {
   if (typeof html !== "string" || html === "" || !html.includes("data-")) return html;
   return html.replace(ANCHOR_OPEN_TAG_RE, (openTag) => {
     const itemMatch = openTag.match(ITEM_UUID_ATTR_RE);
     if (itemMatch) {
       if (!collectionItemsByUuid) return openTag; // map unavailable → fallback to stored href
       const entry = collectionItemsByUuid.get(itemMatch[1]);
-      if (entry) return setHref(openTag, prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix));
+      if (entry) return setHref(openTag, itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix }));
       return stripAttrs(openTag, HREF_ATTR_RE, ITEM_UUID_ATTR_RE); // deleted → neutralize
     }
     const pageMatch = openTag.match(PAGE_UUID_ATTR_RE);
     if (pageMatch) {
       if (!pagesByUuid) return openTag;
       const page = pagesByUuid.get(pageMatch[1]);
-      if (page) return setHref(openTag, prefixInternalHref(`${page.slug}.html`, outputPathPrefix));
+      if (page) return setHref(openTag, pageHref(page.slug, { cleanUrls, outputPathPrefix }));
       return stripAttrs(openTag, HREF_ATTR_RE, PAGE_UUID_ATTR_RE);
     }
     return openTag;

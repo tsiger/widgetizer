@@ -66,6 +66,23 @@ describe("resolveRichtextLinkRefs", () => {
     expect(resolveRichtextLinkRefs(null, deps)).toBe(null);
     expect(resolveRichtextLinkRefs("<p>no links</p>", deps)).toBe("<p>no links</p>");
   });
+
+  it("emits extensionless hrefs when deps.cleanUrls is true (page, item, home, depth)", () => {
+    const pages = new Map([["page-1", { slug: "about-us" }], ["page-home", { slug: "index" }]]);
+    const on = { pagesByUuid: pages, collectionItemsByUuid, outputPathPrefix: "", cleanUrls: true };
+    const onNested = { ...on, outputPathPrefix: "../" };
+    expect(resolveRichtextLinkRefs('<a href="x.html" data-page-uuid="page-1">x</a>', on)).toBe('<a href="about-us" data-page-uuid="page-1">x</a>');
+    expect(resolveRichtextLinkRefs('<a href="x.html" data-collection-item-uuid="item-1">y</a>', on)).toBe('<a href="news/hello-world" data-collection-item-uuid="item-1">y</a>');
+    expect(resolveRichtextLinkRefs('<a href="index.html" data-page-uuid="page-home">h</a>', on)).toBe('<a href="./" data-page-uuid="page-home">h</a>');
+    expect(resolveRichtextLinkRefs('<a href="index.html" data-page-uuid="page-home">h</a>', onNested)).toBe('<a href="../" data-page-uuid="page-home">h</a>');
+    expect(resolveRichtextLinkRefs('<a href="x.html" data-page-uuid="page-1">x</a>', onNested)).toBe('<a href="../about-us" data-page-uuid="page-1">x</a>');
+  });
+
+  it("still neutralises deleted refs and leaves external anchors alone with cleanUrls on", () => {
+    const on = { pagesByUuid, collectionItemsByUuid, outputPathPrefix: "", cleanUrls: true };
+    expect(resolveRichtextLinkRefs('<a href="gone.html" data-page-uuid="nope">x</a>', on)).toBe("<a>x</a>");
+    expect(resolveRichtextLinkRefs('<a href="https://e.com/a.html">x</a>', on)).toBe('<a href="https://e.com/a.html">x</a>');
+  });
 });
 
 describe("resolveRichtextLinksInWidgetData", () => {
