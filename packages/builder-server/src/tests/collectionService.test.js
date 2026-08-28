@@ -320,6 +320,45 @@ describe("normalize + render helpers (pure)", () => {
     assert.equal(out.settings.cta.href, "../about.html");
   });
 
+  it("prepareCollectionItemForRender emits extensionless page and item links when menuDeps.cleanUrls is on", () => {
+    const pages = new Map([["p1", { slug: "about" }], ["ph", { slug: "index" }]]);
+    const itemsByUuid = new Map([["i1", { slugPrefix: "news", slug: "beta" }]]);
+    const item = {
+      id: "a",
+      slug: "a",
+      settings: {
+        title: "A",
+        cta: { pageUuid: "p1", href: "x.html", text: "A", target: "_self" },
+        home: { pageUuid: "ph", href: "index.html", text: "H", target: "_self" },
+        other: { collectionItemUuid: "i1", href: "y.html", text: "B", target: "_self" },
+        typed: { href: "contact.html", text: "T", target: "_self" },
+      },
+    };
+    const schema = {
+      ...NEWS_SCHEMA,
+      settings: [...NEWS_SCHEMA.settings, { type: "link", id: "home" }, { type: "link", id: "other" }, { type: "link", id: "typed" }],
+    };
+    const out = svc.prepareCollectionItemForRender(item, schema, pages, "../", {
+      menuMaps: null,
+      collectionItemsByUuid: itemsByUuid,
+      cleanUrls: true,
+    });
+    assert.equal(out.settings.cta.href, "../about");
+    assert.equal(out.settings.home.href, "../");
+    assert.equal(out.settings.other.href, "../news/beta");
+    assert.equal(out.settings.typed.href, "../contact.html");
+  });
+
+  it("prepareCollectionItemForRender keeps .html when menuDeps.cleanUrls is absent", () => {
+    const pages = new Map([["p1", { slug: "about" }]]);
+    const item = { id: "a", slug: "a", settings: { title: "A", cta: { pageUuid: "p1", href: "x.html", text: "A", target: "_self" } } };
+    const out = svc.prepareCollectionItemForRender(item, NEWS_SCHEMA, pages, "", {
+      menuMaps: null,
+      collectionItemsByUuid: new Map(),
+    });
+    assert.equal(out.settings.cta.href, "about.html");
+  });
+
   it("buildCollectionItemPageData yields a page-shaped object with nested slug", () => {
     const page = svc.buildCollectionItemPageData(
       NEWS_SCHEMA,

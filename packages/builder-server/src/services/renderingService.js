@@ -27,6 +27,7 @@ import {
 } from "@widgetizer/render-engine";
 
 import { schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
+import { itemHref } from "@widgetizer/core/internalHref";
 import { getProjectDir, CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -92,6 +93,7 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
         menuDeps = {
           menuMaps: globals.menuMaps || { byUuid: new Map(), bySlug: new Map() },
           collectionItemsByUuid: globals.collectionItemsByUuid,
+          cleanUrls: globals.cleanUrls === true,
         };
       }
 
@@ -114,7 +116,7 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
           filePath: fileBasePath,
         });
         const url = schema?.hasItemPages
-          ? `${outputPathPrefix}${schema.slugPrefix}/${resolved.slug}.html`
+          ? itemHref(schema.slugPrefix, resolved.slug, { cleanUrls: globals.cleanUrls === true, outputPathPrefix })
           : null;
         return {
           id: resolved.id,
