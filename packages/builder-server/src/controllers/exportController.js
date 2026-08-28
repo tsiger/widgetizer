@@ -398,6 +398,9 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         enqueuedScripts: new Map(),
         assetVersion, // For cache busting
         currentCanonicalPath: `${pageData.slug || ""}.html`,
+        // The flag snapshotted above, so a toggle landing mid-export cannot
+        // split this page's links/canonical from the sitemap or other pages.
+        cleanUrls,
       };
 
       // Render header if exists (for each page to capture enqueued assets)
@@ -619,6 +622,7 @@ Per aspera ad astra
             assetVersion,
             outputPathPrefix: "../",
             currentCanonicalPath: `${schema.slugPrefix}/${item.slug}.html`,
+            cleanUrls,
           };
 
           // One shared pipeline renders the item page — header/footer + resolved

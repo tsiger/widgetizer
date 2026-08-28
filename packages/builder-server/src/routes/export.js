@@ -87,6 +87,48 @@ function exportDirBelongsToScope(req, exportDir) {
   return exportDir.startsWith(prefix) && /^\d+$/.test(exportDir.slice(prefix.length));
 }
 
+/**
+ * Resolve a viewer request to the file to send, or null. Beyond the exact
+ * path, an extensionless request also tries `<path>.html` then
+ * `<path>/index.html` — projects with Clean URLs on emit links like `about`
+ * that a real host resolves to `about.html`; a directory-style request
+ * (`about/`) tries the flat file then its index. Every candidate is confined
+ * to the selected export directory (never merely the publish root), so a
+ * fallback can never reach a sibling export.
+ *
+ * @param {string} publishDir - the global publish directory
+ * @param {string} exportDir - the export's directory name (already scope-checked)
+ * @param {string} requestedPath - normalized request path, no leading slash
+ * @returns {string|null} absolute path of a regular file, or null
+ */
+export function resolveExportFile(publishDir, exportDir, requestedPath) {
+  const exportRoot = path.resolve(publishDir, exportDir);
+  if (!isWithinDirectory(exportRoot, path.resolve(publishDir))) return null;
+
+  const trailingSlash = requestedPath.endsWith("/");
+  const trimmed = requestedPath.replace(/\/+$/, "");
+  const base = path.resolve(exportRoot, trimmed);
+  const lastSegment = trimmed.split("/").pop() || "";
+
+  let candidates;
+  if (trailingSlash) {
+    candidates = [`${base}.html`, path.join(base, "index.html")];
+  } else if (lastSegment.includes(".")) {
+    candidates = [base];
+  } else {
+    candidates = [base, `${base}.html`, path.join(base, "index.html")];
+  }
+
+  for (const candidate of candidates) {
+    const abs = path.resolve(candidate);
+    if (!isWithinDirectory(abs, exportRoot)) continue;
+    if (!fs.existsSync(abs)) continue;
+    if (!fs.statSync(abs).isFile()) continue;
+    return abs;
+  }
+  return null;
+}
+
 function serveExportFile(req, res) {
   try {
     const { exportDir } = req.params;
@@ -95,47 +137,19 @@ function serveExportFile(req, res) {
     }
     const requestedPath = normalizeExportPath(req.params.filePath ?? req.params[0]);
 
-    const userPublishDir = getPublishDir();
-    const fullPath = path.join(userPublishDir, exportDir, requestedPath);
-
-    // Security check: ensure the path is within the publish directory
-    const resolvedPath = path.resolve(fullPath);
-    const publishPath = path.resolve(userPublishDir);
-
-    if (!isWithinDirectory(resolvedPath, publishPath)) {
-      console.error(`Security check failed: ${resolvedPath} not within ${publishPath}`);
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    // Check if file exists
-    if (!fs.existsSync(resolvedPath)) {
-      console.error(`File not found: ${resolvedPath}`);
+    const fileToSend = resolveExportFile(getPublishDir(), exportDir, requestedPath);
+    if (!fileToSend) {
+      console.error(`File not found: ${path.join(exportDir, requestedPath)}`);
       return res.status(404).json({ error: "File not found", path: requestedPath });
     }
 
-    // Check if it's a directory
-    const stats = fs.statSync(resolvedPath);
-    if (stats.isDirectory()) {
-      // If directory, try index.html inside it
-      const indexPath = path.join(resolvedPath, "index.html");
-      if (fs.existsSync(indexPath)) {
-        const resolvedIndexPath = path.resolve(indexPath);
-        if (!isWithinDirectory(resolvedIndexPath, publishPath)) {
-          return res.status(403).json({ error: "Access denied" });
-        }
-        return res.sendFile(resolvedIndexPath);
-      }
-      return res.status(404).json({ error: "File not found", path: requestedPath });
-    }
-
-    // Determine content type
-    const ext = path.extname(resolvedPath).toLowerCase();
+    const ext = path.extname(fileToSend).toLowerCase();
     res.setHeader("Content-Type", getContentType(ext));
 
     // Use sendFile instead of manual streaming for better error handling
-    res.sendFile(resolvedPath, (err) => {
+    res.sendFile(fileToSend, (err) => {
       if (err) {
-        console.error(`Error sending file ${resolvedPath}:`, err);
+        console.error(`Error sending file ${fileToSend}:`, err);
         if (!res.headersSent) {
           res.status(500).json({ error: "Failed to serve file", message: err.message });
         }
@@ -143,7 +157,6 @@ function serveExportFile(req, res) {
     });
   } catch (error) {
     console.error("Error serving export file:", error);
-    console.error("Stack:", error.stack);
     if (!res.headersSent) {
       res.status(500).json({ error: "Failed to serve file", message: error.message });
     }

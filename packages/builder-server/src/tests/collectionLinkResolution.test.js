@@ -27,7 +27,7 @@ process.env.NODE_ENV = "test";
 
 const { getProjectDir } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { renderWidget } = await import("../services/renderingService.js");
+const { renderWidget, renderPageLayout } = await import("../services/renderingService.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
@@ -38,6 +38,11 @@ const RAW_THEME = { settings: { global: { general: [], colors: [] } } };
 const storage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
 const scope = { actor: { id: "default", kind: "local" }, projectId: PROJECT_ID, folderName: PROJECT_FOLDER };
 const collectionDeps = { storage, scope };
+
+// The Clean URLs sibling project (its row carries cleanUrls: true).
+const CLEAN_PROJECT_ID = "colllink-clean-uuid";
+const CLEAN_PROJECT_FOLDER = "colllink-clean-project";
+const cleanScope = { actor: { id: "default", kind: "local" }, projectId: CLEAN_PROJECT_ID, folderName: CLEAN_PROJECT_FOLDER };
 
 const PORTFOLIO_SCHEMA = {
   type: "portfolio",
@@ -75,6 +80,7 @@ before(async () => {
   await projectRepo.writeProjectsData({
     projects: [
       { id: PROJECT_ID, folderName: PROJECT_FOLDER, name: "Coll Link", theme: "__t__", created: new Date().toISOString() },
+      { id: CLEAN_PROJECT_ID, folderName: CLEAN_PROJECT_FOLDER, name: "Coll Link Clean", theme: "__t__", cleanUrls: true, created: new Date().toISOString() },
     ],
     activeProjectId: PROJECT_ID,
   });
@@ -215,5 +221,120 @@ describe("widget menu resolution via the shared resolver", () => {
     assert.ok(html.includes("[portfolio/alpha.html]"), html); // collection-item target resolved
     assert.ok(html.includes("[https://example.com]"), html); // safe custom URL kept
     assert.ok(!html.includes("javascript:"), `dangerous menu link must be sanitized — got: ${html}`);
+  });
+});
+
+// --- Clean URLs: the engine stamps sharedGlobals.cleanUrls from the project row ---
+
+async function renderCleanLinkWidget(linkValue, sharedGlobals = {}) {
+  const dir = path.join(getProjectDir(CLEAN_PROJECT_FOLDER), "widgets", "link-widget");
+  await fs.ensureDir(dir);
+  await fs.writeFile(path.join(dir, "widget.liquid"), `<a href="{{ widget.settings.cta.href }}">{{ widget.settings.cta.text }}</a>`);
+  await fs.writeFile(path.join(dir, "schema.json"), JSON.stringify(LINK_WIDGET_SCHEMA));
+  return renderWidget(
+    CLEAN_PROJECT_ID,
+    "link-widget",
+    { type: "link-widget", settings: { cta: linkValue } },
+    RAW_THEME,
+    "publish",
+    sharedGlobals,
+    null,
+    { storage, scope: cleanScope },
+  );
+}
+
+describe("Clean URLs — link settings", () => {
+  before(async () => {
+    const dir = getProjectDir(CLEAN_PROJECT_FOLDER);
+    await fs.ensureDir(path.join(dir, "pages", "global"));
+    await fs.ensureDir(path.join(dir, "widgets"));
+    await fs.writeJson(path.join(dir, "pages", "about.json"), { id: "about", uuid: "u-about", slug: "about", name: "About", widgets: {}, widgetsOrder: [] });
+    await fs.writeJson(path.join(dir, "pages", "index.json"), { id: "index", uuid: "u-index", slug: "index", name: "Home", widgets: {}, widgetsOrder: [] });
+    // eslint-disable-next-line local/require-scope-arg -- the second project's own scope
+    await storage.write(cleanScope, "collection-types/portfolio/schema.json", JSON.stringify(PORTFOLIO_SCHEMA, null, 2));
+    // eslint-disable-next-line local/require-scope-arg -- the second project's own scope
+    await storage.write(
+      cleanScope,
+      "collections/portfolio/alpha.json",
+      JSON.stringify({ id: "alpha", uuid: "u-alpha", slug: "alpha", schemaVersion: 1, created: "2026-01-02T00:00:00.000Z", updated: "2026-01-02T00:00:00.000Z", settings: { title: "Alpha" } }),
+    );
+  });
+
+  it("emits an extensionless item href when the project's cleanUrls is on, with no caller-set flag", async () => {
+    const globals = {};
+    const html = await renderCleanLinkWidget({ collectionItemUuid: "u-alpha", href: "portfolio/stale.html", text: "Go", target: "_self" }, globals);
+    assert.ok(html.includes('href="portfolio/alpha"'), html);
+    assert.equal(globals.cleanUrls, true, "engine stamps the flag on sharedGlobals");
+  });
+
+  it("emits an extensionless page href and ./ for the home page", async () => {
+    const about = await renderCleanLinkWidget({ pageUuid: "u-about", href: "stale.html", text: "A", target: "_self" }, {});
+    assert.ok(about.includes('href="about"'), about);
+    const home = await renderCleanLinkWidget({ pageUuid: "u-index", href: "index.html", text: "H", target: "_self" }, {});
+    assert.ok(home.includes('href="./"'), home);
+  });
+
+  it("depth-prefixes: ../ home and ../portfolio/alpha inside an item page", async () => {
+    const home = await renderCleanLinkWidget({ pageUuid: "u-index", href: "index.html", text: "H", target: "_self" }, { outputPathPrefix: "../" });
+    assert.ok(home.includes('href="../"'), home);
+    const item = await renderCleanLinkWidget({ collectionItemUuid: "u-alpha", href: "x.html", text: "Go", target: "_self" }, { outputPathPrefix: "../" });
+    assert.ok(item.includes('href="../portfolio/alpha"'), item);
+  });
+
+  it("leaves a custom .html link exactly as typed", async () => {
+    const html = await renderCleanLinkWidget({ href: "contact.html", text: "C", target: "_self" }, {});
+    assert.ok(html.includes('href="contact.html"'), html);
+  });
+
+  it("a caller-set sharedGlobals.cleanUrls = false wins over the project row", async () => {
+    const html = await renderCleanLinkWidget({ pageUuid: "u-about", href: "stale.html", text: "A", target: "_self" }, { cleanUrls: false });
+    assert.ok(html.includes('href="about.html"'), html);
+  });
+
+  it("the original (flag-off) project still emits .html", async () => {
+    const html = await renderLinkWidget({ collectionItemUuid: "u-alpha", href: "portfolio/stale.html", text: "Go", target: "_self" }, {});
+    assert.ok(html.includes('href="portfolio/alpha.html"'), html);
+  });
+});
+
+// --- Clean URLs: the page layout stamps the flag even when no widget rendered ---
+
+// A layout that resolves internal links itself (`| collection`), with no widget
+// rendered before it — the render path that has no other chance to stamp.
+const CLEAN_LAYOUT = `<html><body>{% assign items = 'portfolio' | collection %}{% for i in items %}<a class="list" href="{{ i.url }}">{{ i.slug }}</a>{% endfor %}</body></html>`;
+
+describe("Clean URLs — page layout with no widgets", () => {
+  before(async () => {
+    await fs.writeFile(path.join(getProjectDir(CLEAN_PROJECT_FOLDER), "layout.liquid"), CLEAN_LAYOUT);
+  });
+
+  it("stamps cleanUrls from the project row, so layout-level listing urls are extensionless", async () => {
+    const globals = {};
+    const html = await renderPageLayout(
+      CLEAN_PROJECT_ID,
+      { mainContent: "" },
+      { id: "about", uuid: "u-about", slug: "about", name: "About" },
+      RAW_THEME,
+      "publish",
+      globals,
+      { storage, scope: cleanScope },
+    );
+    assert.equal(globals.cleanUrls, true, "the layout render stamps the flag on sharedGlobals");
+    assert.ok(html.includes('class="list" href="portfolio/alpha"'), html);
+  });
+
+  it("a caller-set sharedGlobals.cleanUrls = false still wins", async () => {
+    const globals = { cleanUrls: false };
+    const html = await renderPageLayout(
+      CLEAN_PROJECT_ID,
+      { mainContent: "" },
+      { id: "about", uuid: "u-about", slug: "about", name: "About" },
+      RAW_THEME,
+      "publish",
+      globals,
+      { storage, scope: cleanScope },
+    );
+    assert.equal(globals.cleanUrls, false);
+    assert.ok(html.includes('class="list" href="portfolio/alpha.html"'), html);
   });
 });

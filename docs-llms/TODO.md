@@ -39,6 +39,7 @@ _None open._
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [✅ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — fixed, pending reference-table move](#-62-export-lifecycle-races--version-reservation-and-fsdb-cleanup-arent-coordinated-builder-server--fixed-pending-reference-table-move)
+- [⬜ 66. Editor surfaces raw server error strings — `Slug "suite" already exists`, `Validation failed` — instead of field-anchored, localized messages (`editor-ui` / `builder-server`) — medium (UX) — sweep all error paths](#-66-editor-surfaces-raw-server-error-strings--slug-suite-already-exists-validation-failed--instead-of-field-anchored-localized-messages-editor-ui--builder-server--medium-ux--sweep-all-error-paths)
 
 ### Low priority
 
@@ -57,7 +58,10 @@ _None open._
 - [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
 - [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
 - [⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)](#-63-localpublishadapterpublish-shares-the-exports-version-counter-without-the-export-lock-adapters-local--low--latent-no-production-caller)
+- [⬜ 67. Export viewer confinement is lexical — a symlink inside an export dir escapes it (`builder-server`) — low](#-67-export-viewer-confinement-is-lexical--a-symlink-inside-an-export-dir-escapes-it-builder-server--low)
+- [⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low](#-68-a-website-address-with-a-path-or-query-produces-inconsistent-sitemap-robots-and-canonical-urls-builder-server--core--low)
 - [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
+- [⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low](#-65-raw-html-internal-hrefs-under-clean-urls--user-typed-links-theme-liquid-schema-defaults-core--render-engine--themes--low)
 
 ---
 
@@ -931,6 +935,183 @@ with toasts working:
 and surface its failure, keep/mark failed upload rows, give export a persistent error surface,
 route server rejections into forms via `setError`, and hoist or duplicate the slug error outside
 the collapsed section. Individually small; worth one sweep so the pieces land consistently.
+
+---
+
+## ⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low
+
+**Priority:** Low
+
+Clean URLs only reshapes hrefs the engine itself resolved from a stable uuid
+(`pageHref` / `itemHref` in `packages/core/src/utils/internalHref.js`, consumed by
+`packages/render-engine/src/menuResolver.js` and `collectionService.js`'s richtext/link
+resolution). Three sources never go through that resolution and so keep emitting a raw
+`.html` (or whatever string was authored) even when a project's Clean URLs setting is on:
+
+- **Custom menu/link strings** — an author-typed `link` (no `pageUuid` /
+  `collectionItemUuid`) is passed through `prefixInternalHref` / `sanitizeHref` only, and
+  is emitted exactly as authored (`resolveMenuItemLinks`'s `else if (typeof item.link ===
+  "string" ...)` branch).
+- **Theme Liquid** — the arch header logo (`themes/arch/widgets/global/header/widget.liquid`)
+  is a hand-written home href. Since 2026-08-28 it picks its own shape from
+  `globals.cleanUrls` (`./` / `../` when on, `{{ globals.outputPathPrefix }}index.html`
+  otherwise) — a theme-side workaround that re-encodes the `pageHref` home rule in Liquid.
+  **Still open:** the engine should expose the home link once (e.g. a `globals.homeHref`
+  computed via `pageHref("index", …)`, or a `home_url` filter) so themes never carry that
+  rule themselves; then the arch template can go back to one expression.
+- **Schema defaults** — `themes/arch/widgets/global/header/schema.json:89-97` ships the
+  header CTA's default `link` setting as `{ "href": "contact.html", ... }`.
+
+**Decision (2026-08-27):** left as authored. None of these three sources carry a stable
+uuid to resolve from, so there is no render-time signal that distinguishes "this string is
+an internal page path" from an arbitrary author-typed href; rewriting them would mean
+guessing at authorial intent from string shape alone.
+
+**Questions to revisit:**
+
+- Should the renderer normalise a relative `.html` href it did not resolve (i.e. one with
+  no scheme, not root-absolute, not anchor/query-only) when the project's Clean URLs flag
+  is on, rather than leaving raw `.html` strings mixed into an otherwise extensionless
+  site?
+- Which paths still produce a raw string given presets are uuid-enriched at project
+  creation (`enrichNewProjectReferences` in
+  `packages/builder-server/src/utils/linkEnrichment.js`) — is the arch header logo/CTA the
+  only theme-authored gap, or do other themes/widgets ship similar hardcoded `.html`
+  hrefs?
+
+---
+
+## ⬜ 66. Editor surfaces raw server error strings — `Slug "suite" already exists`, `Validation failed` — instead of field-anchored, localized messages (`editor-ui` / `builder-server`) — medium (UX) — sweep all error paths
+
+**Priority:** Medium
+
+**Symptom (2026-08-28, collection item form).** Typing a filename that another item already
+uses shows the toast `Slug "suite" already exists`; typing the reserved `index` shows
+`Validation failed`. The first uses the word "slug" while the field is labelled **Filename**
+(`packages/core/src/locales/en.json` → `collectionsForm.slugLabel`); the second says nothing
+about *what* failed. Neither is localized, and neither is attached to the field.
+
+**Root cause.** `CollectionItemForm.jsx`'s submit handler
+(`packages/editor-ui/src/components/collections/CollectionItemForm.jsx`, `onSubmitHandler`
+catch) does `showToast(err.message || …)`, i.e. it echoes whatever the server wrote:
+
+- `SLUG_CONFLICT` → `collectionController.js` `respondError` sends
+  `{ error: "Slug already exists", message: err.message, conflictingSlug }`, and `err.message`
+  is `CollectionSlugConflictError`'s server-authored string (`collectionService.js`).
+- `VALIDATION` → it sends `{ error: "Validation failed", validationErrors: [{ fieldId, reason }] }`
+  with no `message`, so `apiFetch.js`'s `getErrorMessage` falls back to `data.error`. The
+  `validationErrors` array — the only part that says *which field* and *why* (e.g.
+  `{ fieldId: "slug", reason: "reserved slug" }`) — is dropped on the floor. The form reads
+  `validationErrors` only when seeding a loaded-invalid item, and even there skips
+  `fieldId === "slug"`.
+
+So every server-side validation failure on that form reads "Validation failed"; the reserved
+`index` filename rule only made it visible.
+
+**Fix for these two.** Client-side, localized, anchored to the field; leave the server strings as
+the API's contract (they are what logs and non-editor callers see):
+
+- In the submit catch, read `err.data` (`ApiError` already carries the JSON body):
+  `conflictingSlug` → set the slug field error from a new `collectionsForm.slugTaken`
+  (*"Filename "{slug}" is already in use"*); `validationErrors` → map per entry
+  (`slug` + `"reserved slug"` → new `collectionsForm.slugReserved`: *""index" can't be used as
+  a filename — it would name the collection's own page"*; other ids →
+  `collectionsForm.fieldRequired`). Toast only when nothing could be mapped.
+- Drop the `fieldId !== "slug"` skip in the seeding effect so a loaded-invalid item shows its
+  filename problem too.
+- Pages have the identical mismatch: `pageController.js` sends *"A page with the slug "x"
+  already exists…"* while `PageForm.jsx` labels the field "Filename" (`pages.filenameLabel`).
+  Give `PageForm` the same `slugTaken` treatment.
+
+**When picking this up, sweep — don't fix just these two.** The pattern is systemic: the editor
+has ~24 `showToast(err.message || t(...))` sites and builder-server has ~100
+`res.status(4xx).json({ error: … })` responses, most with hand-written English `message`s. Do
+one pass and file/fix what it finds:
+
+1. `grep -rn "showToast(err.message\|showToast(error.message\|err?.message ||" packages/editor-ui/src`
+   — every hit echoes a server string to the user. For each, decide: field-anchored error
+   (validation, conflicts, limits), localized toast, or silent + logged.
+2. `grep -rn "\.status(4[0-9][0-9]).json({ error:" packages/builder-server/src` — list the
+   `error` / `message` strings. Any that a user can trigger from the editor needs either a
+   stable `code` the client can map to a locale key, or structured data (`validationErrors`,
+   `conflictingSlug`, limits) the client can render — not prose.
+3. Compare every user-visible string against the field labels in
+   `packages/core/src/locales/en.json`: "slug" vs "Filename", "page"/"item" vs the
+   collection's display name, internal names (`settings`, `uuid`, `scope`) leaking through.
+4. Check the generic fallbacks: `apiFetch.js` `getErrorMessage` (uses `data.message`, then
+   `data.error`, then the caller's fallback) — if a response carries only structured fields,
+   the caller's fallback must be a real localized sentence, never `Request failed`.
+5. Forms to walk with a deliberately wrong input: page create/rename, collection item
+   create/rename/duplicate, menu item link, media upload (size/type limits), theme install /
+   update, project create/duplicate/import, form submissions settings, SEO fields.
+
+Overlaps with §64 (error feedback is toast-only / misleading failure states): §64 is about
+*where* errors show; this item is about *what they say*. Fix them together if the same files are
+open.
+
+---
+
+## ⬜ 67. Export viewer confinement is lexical — a symlink inside an export dir escapes it (`builder-server`) — low
+
+**Priority:** Low
+
+`resolveExportFile` (`packages/builder-server/src/routes/export.js`) confines every candidate
+to the selected export directory with `isWithinDirectory` (`packages/core/src/utils/pathSecurity.js`),
+which is a `path.relative` check on the *lexical* path. `fs.statSync` and `res.sendFile` both
+follow symlinks, and neither the export root nor the candidate is `realpath`ed first. So an
+export dir containing `about.html -> ../other-export/secret.html` (or an absolute target) passes
+the containment check — the symlink's own path is inside the export — and the viewer serves the
+target. Pre-existing: the pre-rewrite viewer had the same lexical check and the same follow.
+
+How a symlink gets into an export: the asset copy (`exportController.js`, `fs.copy(projectAssetsDir,
+outputAssetsDir, { filter })`) runs fs-extra's copy without `dereference`, and fs-extra recreates a
+symlink it meets as a symlink (`fs-extra/lib/copy/copy.js`, `onLink`). So a symlink placed under a
+project's `assets/` — by hand, or by any future importer that preserves links — is carried into
+every export verbatim. No builder code path creates one today (multer uploads and the theme
+installer's zip extraction write regular files), which is why this is low: the attacker needs write
+access to the project's asset dir, and in the OSS shell that is the same user the viewer serves.
+Worth closing anyway — the viewer is the one place that serves files out of a directory the
+render pipeline populates.
+
+Fix: realpath in two steps, because realpathing the export root alone still accepts an export root
+that is itself a symlink out of the publish dir — `fs.realpathSync` the publish dir and the export
+root and check the root is within the publish dir, then realpath each existing candidate and check
+it is within the real root (or `lstat` and refuse symlinks outright at the viewer, and/or pass
+`dereference: true` to the export's asset copy so a symlink is materialised as a file). Add two
+`exportView.test.js` cases — a symlinked candidate and a symlinked export root — alongside the
+existing traversal tests.
+
+---
+
+## ⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low
+
+**Priority:** Low
+
+`isValidSiteUrl` (`packages/core/src/utils/urlSafety.js`) accepts any http(s) URL with a dotted
+host, path and query included (`safeUrlFilter.test.js` pins `https://www.example.co.uk/path?q=1`
+as valid). The SEO builders then disagree on how to join a page onto it:
+
+- `buildSitemap` (`packages/builder-server/src/services/seoArtifacts.js`) uses
+  `new URL("/", siteUrl)` for the home page and *relative* `new URL(`${slug}${ext}`, siteUrl)`
+  for pages and items — relative resolution replaces the last path segment.
+- `buildRobotsTxt` uses `new URL("sitemap.xml", siteUrl)` — same replacement.
+- `resolveCanonicalUrl` (`packages/core/src/tags/SeoTag.js`) and `buildItemPageData`'s canonical
+  (`packages/builder-server/src/services/collectionService.js`) concatenate strings onto the
+  normalised `siteUrl`.
+
+For `siteUrl = https://example.com/sites/foo`: About's canonical is
+`https://example.com/sites/foo/about`, its sitemap entry `https://example.com/sites/about`, the
+home entry `https://example.com/`, and robots points at `https://example.com/sites/sitemap.xml`.
+With a query, a canonical becomes `https://example.com/sites/foo?q=1/about`. Independent of the
+Clean URLs setting (both shapes are affected the same way) and pre-existing — `seoArtifacts.test.js`
+only ever uses an origin-root fixture.
+
+Fix options: (a) reject a path/query/hash in the Website Address at validation time and say so in
+the settings form (simplest — the builder's output layout is flat, a sub-path deployment is
+already unsupported elsewhere); or (b) normalise `siteUrl` once to a directory base (strip query
+and hash, force a trailing slash) and route every SEO URL — pages, items, home, sitemap, robots,
+canonicals — through one helper. Either way, test a path base with and without a trailing slash
+under both Clean URLs values.
 
 ---
 

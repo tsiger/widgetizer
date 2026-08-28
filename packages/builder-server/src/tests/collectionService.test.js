@@ -200,6 +200,36 @@ describe("create + read items", () => {
   it("returns null reading a missing item", async () => {
     assert.equal(await svc.readCollectionItem(storage, scope, "news", "ghost"), null);
   });
+
+  // CollectionValidationError's message is the fixed "Collection item validation failed";
+  // the per-field detail lives on `err.validationErrors` — assert on that, never on the message.
+  const reserved = (err) => {
+    assert.equal(err.name, "CollectionValidationError");
+    assert.deepEqual(err.validationErrors, [{ fieldId: "slug", reason: "reserved slug" }]);
+    return true;
+  };
+
+  it("refuses index as an item slug on create (reserved: it names the directory itself)", async () => {
+    await assert.rejects(() => createItem({ slug: "index", settings: { title: "Idx" } }), reserved);
+    // A title that slugifies to the reserved name is refused the same way.
+    await assert.rejects(() => createItem({ settings: { title: "Index" } }), reserved);
+    // "home" is only special for pages (the site root); as an item slug it is ordinary.
+    const home = await createItem({ slug: "home", settings: { title: "H" } });
+    assert.equal(home.slug, "home");
+  });
+
+  it("refuses renaming an item onto a reserved slug, but still saves an existing reserved-slug item in place", async () => {
+    await createItem({ slug: "a", settings: { title: "A" } });
+    const a = await svc.readRawCollectionItem(storage, scope, "news", "a");
+    assert.throws(() => svc.buildCollectionItemData(NEWS_SCHEMA, { slug: "index", settings: { title: "A" } }, a), reserved);
+    // A pre-existing item named "index" (written before the rule): an in-place update keeps working.
+    const legacy = { ...a, slug: "index" };
+    const out = svc.buildCollectionItemData(NEWS_SCHEMA, { slug: "index", settings: { title: "A2" } }, legacy);
+    assert.equal(out.item.slug, "index");
+    // Renaming that legacy item away from "index" is allowed (the rule only guards the destination slug).
+    const renamed = svc.buildCollectionItemData(NEWS_SCHEMA, { slug: "home", settings: { title: "A2" } }, legacy);
+    assert.equal(renamed.item.slug, "home");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -318,6 +348,45 @@ describe("normalize + render helpers (pure)", () => {
     const item = { slug: "p", settings: { title: "T", cta: { href: "", pageUuid: "pg" } } };
     const out = svc.prepareCollectionItemForRender(item, NEWS_SCHEMA, pages, "../");
     assert.equal(out.settings.cta.href, "../about.html");
+  });
+
+  it("prepareCollectionItemForRender emits extensionless page and item links when menuDeps.cleanUrls is on", () => {
+    const pages = new Map([["p1", { slug: "about" }], ["ph", { slug: "index" }]]);
+    const itemsByUuid = new Map([["i1", { slugPrefix: "news", slug: "beta" }]]);
+    const item = {
+      id: "a",
+      slug: "a",
+      settings: {
+        title: "A",
+        cta: { pageUuid: "p1", href: "x.html", text: "A", target: "_self" },
+        home: { pageUuid: "ph", href: "index.html", text: "H", target: "_self" },
+        other: { collectionItemUuid: "i1", href: "y.html", text: "B", target: "_self" },
+        typed: { href: "contact.html", text: "T", target: "_self" },
+      },
+    };
+    const schema = {
+      ...NEWS_SCHEMA,
+      settings: [...NEWS_SCHEMA.settings, { type: "link", id: "home" }, { type: "link", id: "other" }, { type: "link", id: "typed" }],
+    };
+    const out = svc.prepareCollectionItemForRender(item, schema, pages, "../", {
+      menuMaps: null,
+      collectionItemsByUuid: itemsByUuid,
+      cleanUrls: true,
+    });
+    assert.equal(out.settings.cta.href, "../about");
+    assert.equal(out.settings.home.href, "../");
+    assert.equal(out.settings.other.href, "../news/beta");
+    assert.equal(out.settings.typed.href, "../contact.html");
+  });
+
+  it("prepareCollectionItemForRender keeps .html when menuDeps.cleanUrls is absent", () => {
+    const pages = new Map([["p1", { slug: "about" }]]);
+    const item = { id: "a", slug: "a", settings: { title: "A", cta: { pageUuid: "p1", href: "x.html", text: "A", target: "_self" } } };
+    const out = svc.prepareCollectionItemForRender(item, NEWS_SCHEMA, pages, "", {
+      menuMaps: null,
+      collectionItemsByUuid: new Map(),
+    });
+    assert.equal(out.settings.cta.href, "about.html");
   });
 
   it("buildCollectionItemPageData yields a page-shaped object with nested slug", () => {

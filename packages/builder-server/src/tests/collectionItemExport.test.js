@@ -16,37 +16,32 @@ import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
-import os from "os";
 
-const TEST_ROOT = path.join(os.tmpdir(), `widgetizer-coll-export-test-${Date.now()}`);
-const TEST_DATA_DIR = path.join(TEST_ROOT, "data");
-
-process.env.DATA_ROOT = TEST_DATA_DIR;
-process.env.THEMES_ROOT = path.join(TEST_ROOT, "themes");
-process.env.NODE_ENV = "test";
-
-// Silence production console noise; failures still surface via assertions.
-const _log = console.log;
-const _warn = console.warn;
-const _error = console.error;
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
-
-const { getProjectDir, getProjectPagesDir, getProjectThemeJsonPath, getPublishDir } = await import("../config.js");
-const projectRepo = await import("../db/repositories/projectRepository.js");
-const { exportProject } = await import("../controllers/exportController.js");
-const { closeDb, getDb } = await import("../db/index.js");
-const exportRepo = await import("../db/repositories/exportRepository.js");
-const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
+import { createExportHarness } from "./helpers/exportHarness.js";
 
 const PROJECT_ID = "coll-export-uuid";
 const PROJECT_FOLDER = "coll-export-project";
 const SITE_URL = "https://collections.example.com";
-const PUBLISH_DIR = getPublishDir();
 
-const storage = new LocalStorageAdapter({ dataRoot: TEST_DATA_DIR });
-const scope = { actor: { id: "default", kind: "local" }, projectId: PROJECT_ID, folderName: PROJECT_FOLDER };
+const {
+  storage,
+  scope,
+  getProjectDir,
+  PUBLISH_DIR,
+  runExport,
+  latestExportDir,
+  resetExports,
+  seedProjectScaffold,
+  cleanup,
+} = await createExportHarness({
+  rootPrefix: "widgetizer-coll-export-test",
+  projectId: PROJECT_ID,
+  projectFolder: PROJECT_FOLDER,
+  siteUrl: SITE_URL,
+  projectName: "Collection Export Project",
+  siteTitle: "Coll Export Site",
+  theme: "__coll_export_theme__",
+});
 
 const NEWS_SCHEMA = {
   type: "news",
@@ -81,104 +76,12 @@ const newsItem = (slug, title, created) => ({
   settings: { title, body: `<p>Body of ${title}</p>` },
 });
 
-function mockReq({ params = {}, body = {} } = {}) {
-  return {
-    params,
-    body,
-    scope: { projectId: params.projectId, folderName: PROJECT_FOLDER, actor: scope.actor },
-    adapters: { storage },
-    app: { locals: {} },
-    [Symbol.for("express-validator#contexts")]: [],
-  };
-}
-
-function mockRes() {
-  const res = {
-    _status: 200,
-    _json: null,
-    headersSent: false,
-    status(code) { res._status = code; return res; },
-    json(data) { res._json = data; res.headersSent = true; return res; },
-    setHeader() { return res; },
-  };
-  return res;
-}
-
-async function runExport(body = {}) {
-  const res = mockRes();
-  await exportProject(mockReq({ params: { projectId: PROJECT_ID }, body }), res);
-  return res;
-}
-
-function latestExportDir() {
-  const exports = exportRepo.getExports(PROJECT_ID);
-  if (!exports.length) return null;
-  const dir = exports[0].outputDir;
-  return path.isAbsolute(dir) ? dir : path.join(PUBLISH_DIR, dir);
-}
-
-async function resetExports() {
-  getDb().prepare("DELETE FROM exports").run();
-  const entries = await fs.readdir(PUBLISH_DIR).catch(() => []);
-  for (const e of entries) {
-    if (e.startsWith(PROJECT_FOLDER)) await fs.remove(path.join(PUBLISH_DIR, e));
-  }
-}
-
-// Write the project's renderable scaffold (DB row, layout, theme, index page).
-async function seedProjectScaffold() {
-  await projectRepo.writeProjectsData({
-    projects: [
-      {
-        id: PROJECT_ID,
-        folderName: PROJECT_FOLDER,
-        name: "Collection Export Project",
-        siteTitle: "Coll Export Site",
-        theme: "__coll_export_theme__",
-        themeVersion: "1.0.0",
-        siteUrl: SITE_URL,
-        created: new Date().toISOString(),
-        updated: new Date().toISOString(),
-      },
-    ],
-    activeProjectId: PROJECT_ID,
-  });
-
-  const projectDir = getProjectDir(PROJECT_FOLDER);
-  const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
-  await fs.ensureDir(path.join(pagesDir, "global"));
-  await fs.ensureDir(path.join(projectDir, "snippets"));
-  await fs.ensureDir(path.join(projectDir, "widgets"));
-
-  await fs.outputFile(
-    getProjectThemeJsonPath(PROJECT_FOLDER),
-    JSON.stringify({ settings: { global: { general: [], colors: [] } } }, null, 2),
-  );
-
-  // Layout renders the page SEO title + main content; body class lets us assert
-  // the collection/item body class flows through for item pages.
-  await fs.writeFile(
-    path.join(projectDir, "layout.liquid"),
-    `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>{{ page.seo.title }}</title>{% seo %}</head>` +
-      `<body class="{{ body_class }}">{{ header | raw }}<main>{{ main_content | raw }}</main>{{ footer | raw }}</body></html>`,
-  );
-
-  await fs.writeFile(
-    path.join(pagesDir, "index.json"),
-    JSON.stringify({ name: "Home", slug: "index", uuid: "p-index", seo: { title: "Home" }, widgets: {}, widgetsOrder: [] }),
-  );
-}
-
 before(async () => {
   await seedProjectScaffold();
 });
 
 after(async () => {
-  console.log = _log;
-  console.warn = _warn;
-  console.error = _error;
-  closeDb();
-  await fs.remove(TEST_ROOT);
+  await cleanup();
 });
 
 describe("collection item-page export — happy path", () => {

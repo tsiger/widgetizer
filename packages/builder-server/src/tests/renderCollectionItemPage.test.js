@@ -114,8 +114,10 @@ async function seedProjectScaffold() {
   await storage.write(scope, "collections/news/alpha.json", JSON.stringify(ALPHA));
 }
 
-/** Render the alpha item at a given mode/depth via the scope-first wrapper. */
-function renderAlpha(renderMode, outputPathPrefix) {
+/** Render the alpha item at a given mode/depth via the scope-first wrapper.
+ *  `cleanUrls` pre-seeds sharedGlobals (as the export does); `projectData` and
+ *  `siteUrl` override the caller-supplied row. */
+function renderAlpha(renderMode, outputPathPrefix, { cleanUrls, projectData, siteUrl = "" } = {}) {
   const sharedGlobals = {
     projectId: PROJECT_ID,
     apiUrl: "",
@@ -128,6 +130,7 @@ function renderAlpha(renderMode, outputPathPrefix) {
     collectionItemsByUuid: new Map(),
     outputPathPrefix,
     currentCanonicalPath: `news/alpha.html`,
+    ...(cleanUrls === undefined ? {} : { cleanUrls }),
   };
   return renderCollectionItemPage(
     PROJECT_ID,
@@ -140,8 +143,8 @@ function renderAlpha(renderMode, outputPathPrefix) {
       sharedGlobals,
       headerData: null,
       footerData: null,
-      projectData: { name: "RCIP Project", siteTitle: "RCIP Site" },
-      siteUrl: "",
+      projectData: projectData || { name: "RCIP Project", siteTitle: "RCIP Site" },
+      siteUrl,
     },
     { storage, scope },
   );
@@ -192,3 +195,34 @@ for (const { mode, prefix, label } of [
     });
   });
 }
+
+describe("renderCollectionItemPage — the item canonical follows the render's stamped Clean URLs flag", () => {
+  // An export seeds sharedGlobals.cleanUrls from its one snapshot; the row it
+  // passes as projectData may disagree with it (e.g. a toggle landing between
+  // the two reads). The canonical must follow the stamped flag — the one every
+  // link on the page was emitted with — never the row.
+  const SITE = "https://rcip.example.com";
+
+  it("stamped OFF + row ON → .html canonical", async () => {
+    const { itemPageData } = await renderAlpha("publish", "../", {
+      cleanUrls: false,
+      projectData: { name: "P", siteTitle: "S", cleanUrls: true },
+      siteUrl: SITE,
+    });
+    assert.equal(itemPageData.seo.canonical_url, `${SITE}/news/alpha.html`);
+  });
+
+  it("stamped ON + row OFF → extensionless canonical", async () => {
+    const { itemPageData } = await renderAlpha("publish", "../", {
+      cleanUrls: true,
+      projectData: { name: "P", siteTitle: "S", cleanUrls: false },
+      siteUrl: SITE,
+    });
+    assert.equal(itemPageData.seo.canonical_url, `${SITE}/news/alpha`);
+  });
+
+  it("no stamp → the row decides (first-use stamp), .html when the row has no flag", async () => {
+    const { itemPageData } = await renderAlpha("publish", "../", { siteUrl: SITE });
+    assert.equal(itemPageData.seo.canonical_url, `${SITE}/news/alpha.html`);
+  });
+});

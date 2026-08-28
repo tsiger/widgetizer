@@ -15,6 +15,7 @@ import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
+import { isReservedItemSlug } from "../services/collectionService.js";
 import { isValidSiteUrl } from "@widgetizer/core/urlSafety";
 import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
@@ -89,6 +90,17 @@ export async function seedPresetCollections(folderName, presetCollectionsDir) {
 
     for (const name of names) {
       const slug = name.replace(/\.json$/, "");
+      // The same gate the item API applies on create: a preset must not seed
+      // an item slug the API would refuse (an `index` item is reachable as the
+      // collection directory itself, so it can never own one address). Its
+      // uuid never enters oldToNewItemUuid, so preset menu/link refs to it
+      // resolve like refs to a deleted item (the link clears at render).
+      if (isReservedItemSlug(slug)) {
+        console.warn(
+          `[ProjectController] Skipping preset collection item "${type}/${name}": "${slug}" is a reserved item slug.`,
+        );
+        continue;
+      }
       const raw = await fs.readJSON(path.join(srcTypeDir, name));
       const now = new Date().toISOString();
       const newUuid = randomUUID();
@@ -97,10 +109,16 @@ export async function seedPresetCollections(folderName, presetCollectionsDir) {
       await fs.outputFile(path.join(destTypeDir, `${slug}.json`), JSON.stringify(seeded, null, 2));
     }
 
-    // Carry over a manual order file verbatim if the preset shipped one.
+    // Carry over a manual order file if the preset shipped one, minus any slug
+    // skipped above (the order rewriter prunes stale slugs on its next write
+    // anyway; this keeps the seeded project clean from the start).
     const orderSrc = path.join(srcTypeDir, "_order.json");
     if (await fs.pathExists(orderSrc)) {
-      await fs.copy(orderSrc, path.join(destTypeDir, "_order.json"));
+      const orderData = await fs.readJSON(orderSrc);
+      if (Array.isArray(orderData?.order)) {
+        orderData.order = orderData.order.filter((s) => !isReservedItemSlug(s));
+      }
+      await fs.outputFile(path.join(destTypeDir, "_order.json"), JSON.stringify(orderData, null, 2));
     }
   }
 
@@ -350,7 +368,7 @@ export async function createProject(req, res) {
       preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates ?? false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
-      cleanUrls: cleanUrls ?? false, // SEO URLs without .html (extensionless hosts)
+      cleanUrls: cleanUrls ?? false, // internal links + SEO URLs without .html (extensionless hosts)
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };

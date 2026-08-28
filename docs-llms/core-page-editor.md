@@ -90,7 +90,7 @@ The editor provides a way to see a true, live preview of the page, exactly as an
 4.  The `/preview` route is a persistent `SitePreviewLayout` (separate from the main editor layout) that owns the toolbar + iframe stage; its children resolve a render for it. `PagePreview` handles `:pageId`; `CollectionItemPagePreview` handles `collection/:prefix/:slug`.
 5. These children are **headless one-shot resolvers** (they render `null`): `PagePreview` fetches the page data, mints a render token, and reports the resulting render src up to the layout via outlet context. `PagePreview` uses the headless preview flow instead of the live-edit `PreviewPanel`.
 6.  `SitePreviewLayout` displays that src in a shared `PreviewStage` `<iframe>`, providing an accurate representation of the final published page. Because the layout is persistent, navigating page↔item never remounts the toolbar/iframe.
-7.  Internal `.html` links in the preview post `NAVIGATE_PREVIEW` up to `SitePreviewLayout`, which routes to other `/preview/:slug` pages, while external links remain disabled.
+7.  Internal links in the preview (`about.html`, `rooms/suite.html`, or their extensionless Clean-URLs forms `about`, `rooms/suite`, `./`) post `NAVIGATE_PREVIEW` up to `SitePreviewLayout`, which routes to other `/preview/:slug` pages, while external links remain disabled.
 
 ### Saving Changes
 

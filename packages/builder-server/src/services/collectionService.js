@@ -23,6 +23,7 @@ import { randomUUID } from "node:crypto";
 
 import { isSupportedSettingType } from "@widgetizer/core/config/settingTypes";
 import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
+import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { resolveRichtextMediaInSettings } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
 import { resolveMenuSettings } from "@widgetizer/render-engine";
@@ -37,6 +38,17 @@ import {
 const SLUG_RE = /^[a-z0-9-]+$/;
 const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc", "date_desc", "date_asc"];
 const RESERVED_SLUG_PREFIXES = new Set(["assets"]);
+// Item slugs a web server would read as "the directory itself": an item at
+// rooms/index.html is reachable as /rooms/ as well as /rooms/index, so it can
+// never own one unambiguous address. Refused on create/rename; an item that
+// already carries the slug keeps saving in place. Only "index" has that
+// server-level meaning — "home" is special for pages (a site root), not items.
+const RESERVED_ITEM_SLUGS = new Set(["index"]);
+
+/** Whether `slug` may never be given to a NEW item (see RESERVED_ITEM_SLUGS). */
+export function isReservedItemSlug(slug) {
+  return RESERVED_ITEM_SLUGS.has(slug);
+}
 // v1 constructs that must be rejected, not silently ignored (Section 1).
 const DISALLOWED_SETTING_KEYS = ["multiple", "repeater", "blocks"];
 
@@ -738,6 +750,9 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
   if (!SLUG_RE.test(slug)) {
     throw new CollectionValidationError([{ fieldId: "slug", reason: "invalid slug" }]);
   }
+  if (RESERVED_ITEM_SLUGS.has(slug) && existingItem?.slug !== slug) {
+    throw new CollectionValidationError([{ fieldId: "slug", reason: "reserved slug" }]);
+  }
 
   const settings = {};
   const validationErrors = [];
@@ -1021,7 +1036,7 @@ function isLinkObject(value) {
   return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
 }
 
-function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null) {
+function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null, cleanUrls = false) {
   const { pageUuid, collectionItemUuid } = linkValue;
   // Stable reference to a collection item page (#11 parity): resolve its current
   // slug so renames follow and deletes clear the link.
@@ -1030,7 +1045,7 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
     if (!entry) {
       return { href: "", text: "", target: "_self" }; // item deleted — clear the link
     }
-    return { ...linkValue, href: prefixInternalHref(`${entry.slugPrefix}/${entry.slug}.html`, outputPathPrefix) };
+    return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix }) };
   }
   if (!pageUuid) {
     // Custom URL — depth-prefix internal-looking hrefs, leave the rest as-is.
@@ -1040,7 +1055,7 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
   if (!page) {
     return { href: "", text: "", target: "_self" }; // page deleted — clear the link
   }
-  return { ...linkValue, href: prefixInternalHref(`${page.slug}.html`, outputPathPrefix) };
+  return { ...linkValue, href: pageHref(page.slug, { cleanUrls, outputPathPrefix }) };
 }
 
 /**
@@ -1049,17 +1064,21 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
  * Returns a deep clone; the input item is never mutated. v1 schemas are flat, so
  * a single pass over top-level settings suffices.
  *
+ * Resolved hrefs take the shape `pageHref` / `itemHref` pick for `cleanUrls`
+ * (`.html` file name, or extensionless); custom hrefs are emitted as authored.
  * @param {object} item - a collection item ({ settings })
  * @param {Map} pagesByUuid - uuid -> page ({ slug })
  * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
+ * @param {Map} [collectionItemsByUuid] - item uuid -> { slugPrefix, slug }
+ * @param {boolean} [cleanUrls] - the project's Clean URLs setting; picks the href shape
  * @returns {object} resolved clone
  */
-export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null) {
+export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null, cleanUrls = false) {
   if (!item?.settings) return item;
   const resolved = JSON.parse(JSON.stringify(item));
   for (const [key, value] of Object.entries(resolved.settings)) {
     if (isLinkObject(value)) {
-      resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid);
+      resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid, cleanUrls);
     }
   }
   return resolved;
@@ -1081,9 +1100,10 @@ export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, 
  * @param {object} schema - Collection-type schema ({ settings })
  * @param {Map} pagesByUuid - uuid -> page ({ slug })
  * @param {string} outputPathPrefix - "" at root, "../" for nested item pages
- * @param {object} [menuDeps] - { menuMaps, collectionItemsByUuid } to resolve
- *   `menu`-type settings into menu objects. When omitted, menu
- *   settings pass through unresolved (back-compat).
+ * @param {object} [menuDeps] - { menuMaps, collectionItemsByUuid, cleanUrls } to resolve
+ *   `menu`-type settings into menu objects, and to pick the href shape of every
+ *   uuid-resolved link. When omitted, menu settings pass through unresolved
+ *   (back-compat) and links keep `.html`.
  * @returns {object} resolved + sanitized clone
  */
 export function prepareCollectionItemForRender(
@@ -1094,9 +1114,12 @@ export function prepareCollectionItemForRender(
   menuDeps = null,
   mediaBasePaths = null,
 ) {
+  // The project's Clean URLs setting travels with the render deps: the caller
+  // (the `| collection` filter, the item-page render) reads it off globals.
+  const cleanUrls = menuDeps?.cleanUrls === true;
   // Forward the collection-item map so `link` settings that target another
   // collection item resolve (and clear on delete), parity with pageUuid (#11).
-  const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, menuDeps?.collectionItemsByUuid || null);
+  const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, menuDeps?.collectionItemsByUuid || null, cleanUrls);
   // Resolve menu-type settings the same way widgets do (shared menuResolver), so
   // an item template gets a full menu object instead of a raw UUID string.
   if (menuDeps && menuDeps.menuMaps && resolved && resolved.settings) {
@@ -1105,6 +1128,7 @@ export function prepareCollectionItemForRender(
       pagesByUuid,
       collectionItemsByUuid: menuDeps.collectionItemsByUuid || new Map(),
       outputPathPrefix,
+      cleanUrls,
     });
   }
   sanitizeCollectionItemData(resolved, schema);
@@ -1122,6 +1146,7 @@ export function prepareCollectionItemForRender(
       pagesByUuid,
       collectionItemsByUuid: menuDeps?.collectionItemsByUuid || null,
       outputPathPrefix,
+      cleanUrls,
     });
   }
   return resolved;

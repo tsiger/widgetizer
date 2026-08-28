@@ -37,8 +37,44 @@ describe("getStandalonePreviewTarget", () => {
     expect(getStandalonePreviewTarget("javascript:alert(1)")).toBeNull();
   });
 
+  it("blocks any URI scheme, not just the common ones — a scheme is never an extensionless page", () => {
+    expect(getStandalonePreviewTarget("sms:+1555")).toBeNull();
+    expect(getStandalonePreviewTarget("webcal:events")).toBeNull();
+    expect(getStandalonePreviewTarget("urn:isbn:123")).toBeNull();
+    expect(getStandalonePreviewTarget("SMS:+1555")).toBeNull();
+    expect(getStandalonePreviewTarget("data:text/html,hi")).toBeNull();
+  });
+
   it("blocks unsupported internal paths", () => {
     expect(getStandalonePreviewTarget("/")).toBeNull();
-    expect(getStandalonePreviewTarget("/foo/bar")).toBeNull();
+    // Two dotless segments are a Clean URLs item link (spec §4.4), not unsupported.
+    expect(getStandalonePreviewTarget("/foo/bar")).toBe("/preview/collection/foo/bar");
+  });
+
+  it("maps extensionless page links (Clean URLs) to the page preview route", () => {
+    expect(getStandalonePreviewTarget("about")).toBe("/preview/about");
+    expect(getStandalonePreviewTarget("./about")).toBe("/preview/about");
+    expect(getStandalonePreviewTarget("../about")).toBe("/preview/about");
+    expect(getStandalonePreviewTarget("about?x=1#top")).toBe("/preview/about");
+  });
+
+  it("maps extensionless item links to the collection preview route", () => {
+    expect(getStandalonePreviewTarget("rooms/suite")).toBe("/preview/collection/rooms/suite");
+    expect(getStandalonePreviewTarget("../rooms/suite")).toBe("/preview/collection/rooms/suite");
+  });
+
+  it("maps the clean home link shapes to the index preview", () => {
+    expect(getStandalonePreviewTarget("./")).toBe("/preview/index");
+    expect(getStandalonePreviewTarget("../")).toBe("/preview/index");
+    expect(getStandalonePreviewTarget("index")).toBe("/preview/index");
+    expect(getStandalonePreviewTarget("home")).toBe("/preview/home");
+  });
+
+  it("still returns null for non-navigable hrefs", () => {
+    expect(getStandalonePreviewTarget("/")).toBeNull();
+    expect(getStandalonePreviewTarget("assets/site.css")).toBeNull();
+    expect(getStandalonePreviewTarget("a/b/c")).toBeNull();
+    expect(getStandalonePreviewTarget("mailto:x@y.z")).toBeNull();
+    expect(getStandalonePreviewTarget("//cdn/x")).toBeNull();
   });
 });

@@ -66,7 +66,7 @@ const item = (slug, title, created) => ({
 
 // Render a widget whose template uses the `| collection` filter, passing the
 // scope-aware collectionDeps so the loader is wired onto globals.
-async function renderListWidget(template) {
+async function renderListWidget(template, sharedGlobals = null) {
   const dir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "coll-list");
   await fs.ensureDir(dir);
   await fs.writeFile(path.join(dir, "widget.liquid"), template);
@@ -77,7 +77,7 @@ async function renderListWidget(template) {
     { type: "coll-list", settings: {} },
     RAW_THEME,
     "preview",
-    null,
+    sharedGlobals,
     null,
     collectionDeps,
   );
@@ -143,6 +143,19 @@ describe("| collection filter", () => {
       `{% assign items = 'portfolio' | collection: sort: 'title_asc' %}{% for i in items %}<a href="{{ i.url }}"></a>{% endfor %}`,
     );
     assert.ok(html.includes('href="portfolio/alpha.html"'), html);
+  });
+
+  it("item.url follows the project's Clean URLs setting", async () => {
+    for (const { cleanUrls, expected } of [
+      { cleanUrls: false, expected: "portfolio/alpha.html" },
+      { cleanUrls: true, expected: "portfolio/alpha" },
+    ]) {
+      const html = await renderListWidget(
+        `{% assign items = 'portfolio' | collection: sort: 'title_asc', limit: 1 %}{% for i in items %}<a href="{{ i.url }}"></a>{% endfor %}`,
+        { cleanUrls },
+      );
+      assert.ok(html.includes(`href="${expected}"`), `cleanUrls: ${cleanUrls} — got: ${html}`);
+    }
   });
 
   it("combines limit and sort (limit counts valid items)", async () => {

@@ -231,7 +231,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Using the `| collection` Liquid filter in templates
 - Understanding item-page depth prefixing, SEO, and export output
 
-**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), per-item SEO (`robots: index,follow` default), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
+**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), Clean URLs link shapes (`internalHref.js` `pageHref`/`itemHref`, `menuDeps.cleanUrls`, `globals.cleanUrls`), reserved `index` item slug, per-item SEO (`robots: index,follow` default), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
 
 ---
 
@@ -270,7 +270,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing export functionality and history tracking
 - Troubleshooting export issues
 
-**Key topics**: `exportProjectToDir()` core with fail-fast validation-before-write, scope-resolved endpoints (`X-Project-Id`, no `:projectId` in path), versioning/history (`sizeBytes`/`hasIssuesReport`/`developerMode`, `cleanupProjectExports`, failed-export recording), `renderingService` split (render-engine + builder-server), collection item-page export + two-pass validation, forms manifest + `manifest.collections`, markdown alternate link, file-asset export (`assets/files/`, `/uploads/files/` rewrite, `filePath` var), `collectionDeps` adapter threading, ZIP downloads, site icons
+**Key topics**: `exportProjectToDir()` core with fail-fast validation-before-write, scope-resolved endpoints (`X-Project-Id`, no `:projectId` in path), versioning/history (`sizeBytes`/`hasIssuesReport`/`developerMode`, `cleanupProjectExports`, failed-export recording), `renderingService` split (render-engine + builder-server), collection item-page export + two-pass validation, Clean URLs (one flag snapshot per export → links, canonicals, sitemap/robots; file names unchanged; viewer `<path>.html` fallback), forms manifest + `manifest.collections`, markdown alternate link, file-asset export (`assets/files/`, `/uploads/files/` rewrite, `filePath` var), `collectionDeps` adapter threading, ZIP downloads, site icons
 
 ---
 
