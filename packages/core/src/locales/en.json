@@ -192,7 +192,7 @@
       "siteUrlLabel": "Website Address",
       "siteUrlHelp": "The URL of your live website (e.g., https://mysite.com). Use this if you already know the domain where this site will be hosted.",
       "cleanUrlsLabel": "Clean URLs",
-      "cleanUrlsHelp": "Enable if your host serves pages without the .html extension, e.g. /about instead of /about.html. Search engine URLs (canonical links and the sitemap) will drop the extension to match.",
+      "cleanUrlsHelp": "Enable if your host serves pages without the .html extension, e.g. /about instead of /about.html. Menu, button and text links to your own pages, canonical links and the sitemap then drop the extension. Links you typed by hand are emitted as written. The exported site must be served by a host that resolves /about to about.html.",
       "siteUrlInvalid": "Please enter a valid URL (e.g., https://mysite.com)",
       "loadingThemes": "Loading themes...",
       "loadThemesError": "Failed to load themes. Please restart the application.",

@@ -93,7 +93,7 @@ Once validation passes, the writes begin (`fs.ensureDir(outputDir)` onward).
     -->
     ```
 
-    The file is written as `index.html` when the page slug is `index` or `home`, otherwise `<slug>.html`.
+    The file is written as `index.html` when the page slug is `index` or `home`, otherwise `<slug>.html`. Internal links inside the HTML follow the project's Clean URLs setting (see `internalHref.js`); file names do not.
 14. **Markdown alternate + `.md`** (when `exportMarkdown` is true) — a `<link rel="alternate" type="text/markdown" href="…">` is injected into `<head>` (absolute href when `siteUrl` is a valid URL, otherwise the relative `.md` filename). The page content (widget HTML only, no layout) is then converted to Markdown via `TurndownService` (ATX headings, fenced code blocks, `-` bullets). Non-content elements (`style`, `script`, `noscript`, `form`, `input`, `button`, `select`, `textarea`) are removed and inline style/script/form blocks plus placeholder images are stripped before conversion. Each `.md` is written with YAML frontmatter (`title`, `description`, `source_url.html`, `source_url.md`). Markdown errors are logged and do **not** fail the export.
 
 After pages: collection item pages ([§3](#3-collection-item-page-export)), the validation report ([§5](#5-developer-mode-html-validation)), asset copying ([§4](#4-asset-copying)), and metadata files ([§6](#6-export-metadata-files)).
@@ -206,7 +206,9 @@ All export actions mount under `/api/export` (the `export` router is attached to
 | `GET /api/export/files/:exportDir` | `exportDir` (scope-bound) | Entry-file info for an export |
 | `GET /api/export/download/:exportDir` | `exportDir` (scope-bound) | Download an export as a ZIP |
 | `GET /api/export/view/:exportDir` | `exportDir` (scope-bound) | Serve the export entry file (`index.html`) for preview |
-| `GET /api/export/view/:exportDir/*filePath` | `exportDir` (scope-bound) | Serve a specific exported file for preview |
+| `GET /api/export/view/:exportDir/*filePath` | `exportDir` (scope-bound) | Serve a specific exported file for preview; an extensionless path also tries `<path>.html` then `<path>/index.html`; a trailing-slash path tries `<path>.html` then `<path>/index.html` |
+
+Every candidate is confined to the selected export directory, and a request that escapes it answers 404 — the route does not distinguish "outside the export" from "missing".
 
 ### Smart entry-file detection
 

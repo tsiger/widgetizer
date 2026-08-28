@@ -58,6 +58,7 @@ _None open._
 - [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
 - [⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)](#-63-localpublishadapterpublish-shares-the-exports-version-counter-without-the-export-lock-adapters-local--low--latent-no-production-caller)
 - [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
+- [⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low](#-65-raw-html-internal-hrefs-under-clean-urls--user-typed-links-theme-liquid-schema-defaults-core--render-engine--themes--low)
 
 ---
 
@@ -931,6 +932,44 @@ with toasts working:
 and surface its failure, keep/mark failed upload rows, give export a persistent error surface,
 route server rejections into forms via `setError`, and hoist or duplicate the slug error outside
 the collapsed section. Individually small; worth one sweep so the pieces land consistently.
+
+---
+
+## ⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low
+
+**Priority:** Low
+
+Clean URLs only reshapes hrefs the engine itself resolved from a stable uuid
+(`pageHref` / `itemHref` in `packages/core/src/utils/internalHref.js`, consumed by
+`packages/render-engine/src/menuResolver.js` and `collectionService.js`'s richtext/link
+resolution). Three sources never go through that resolution and so keep emitting a raw
+`.html` (or whatever string was authored) even when a project's Clean URLs setting is on:
+
+- **Custom menu/link strings** — an author-typed `link` (no `pageUuid` /
+  `collectionItemUuid`) is passed through `prefixInternalHref` / `sanitizeHref` only, and
+  is emitted exactly as authored (`resolveMenuItemLinks`'s `else if (typeof item.link ===
+  "string" ...)` branch).
+- **Theme Liquid** — `themes/arch/widgets/global/header/widget.liquid:34` hardcodes the
+  logo link as `{{ globals.outputPathPrefix }}index.html`.
+- **Schema defaults** — `themes/arch/widgets/global/header/schema.json:89-97` ships the
+  header CTA's default `link` setting as `{ "href": "contact.html", ... }`.
+
+**Decision (2026-08-27):** left as authored. None of these three sources carry a stable
+uuid to resolve from, so there is no render-time signal that distinguishes "this string is
+an internal page path" from an arbitrary author-typed href; rewriting them would mean
+guessing at authorial intent from string shape alone.
+
+**Questions to revisit:**
+
+- Should the renderer normalise a relative `.html` href it did not resolve (i.e. one with
+  no scheme, not root-absolute, not anchor/query-only) when the project's Clean URLs flag
+  is on, rather than leaving raw `.html` strings mixed into an otherwise extensionless
+  site?
+- Which paths still produce a raw string given presets are uuid-enriched at project
+  creation (`enrichNewProjectReferences` in
+  `packages/builder-server/src/utils/linkEnrichment.js`) — is the arch header logo/CTA the
+  only theme-authored gap, or do other themes/widgets ship similar hardcoded `.html`
+  hrefs?
 
 ---
 
