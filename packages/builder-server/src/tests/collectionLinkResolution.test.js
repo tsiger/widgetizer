@@ -27,7 +27,7 @@ process.env.NODE_ENV = "test";
 
 const { getProjectDir } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { renderWidget } = await import("../services/renderingService.js");
+const { renderWidget, renderPageLayout } = await import("../services/renderingService.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
 
@@ -294,5 +294,47 @@ describe("Clean URLs — link settings", () => {
   it("the original (flag-off) project still emits .html", async () => {
     const html = await renderLinkWidget({ collectionItemUuid: "u-alpha", href: "portfolio/stale.html", text: "Go", target: "_self" }, {});
     assert.ok(html.includes('href="portfolio/alpha.html"'), html);
+  });
+});
+
+// --- Clean URLs: the page layout stamps the flag even when no widget rendered ---
+
+// A layout that resolves internal links itself (`| collection`), with no widget
+// rendered before it — the render path that has no other chance to stamp.
+const CLEAN_LAYOUT = `<html><body>{% assign items = 'portfolio' | collection %}{% for i in items %}<a class="list" href="{{ i.url }}">{{ i.slug }}</a>{% endfor %}</body></html>`;
+
+describe("Clean URLs — page layout with no widgets", () => {
+  before(async () => {
+    await fs.writeFile(path.join(getProjectDir(CLEAN_PROJECT_FOLDER), "layout.liquid"), CLEAN_LAYOUT);
+  });
+
+  it("stamps cleanUrls from the project row, so layout-level listing urls are extensionless", async () => {
+    const globals = {};
+    const html = await renderPageLayout(
+      CLEAN_PROJECT_ID,
+      { mainContent: "" },
+      { id: "about", uuid: "u-about", slug: "about", name: "About" },
+      RAW_THEME,
+      "publish",
+      globals,
+      { storage, scope: cleanScope },
+    );
+    assert.equal(globals.cleanUrls, true, "the layout render stamps the flag on sharedGlobals");
+    assert.ok(html.includes('class="list" href="portfolio/alpha"'), html);
+  });
+
+  it("a caller-set sharedGlobals.cleanUrls = false still wins", async () => {
+    const globals = { cleanUrls: false };
+    const html = await renderPageLayout(
+      CLEAN_PROJECT_ID,
+      { mainContent: "" },
+      { id: "about", uuid: "u-about", slug: "about", name: "About" },
+      RAW_THEME,
+      "publish",
+      globals,
+      { storage, scope: cleanScope },
+    );
+    assert.equal(globals.cleanUrls, false);
+    assert.ok(html.includes('class="list" href="portfolio/alpha.html"'), html);
   });
 });
