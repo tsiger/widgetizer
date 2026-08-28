@@ -62,6 +62,7 @@ Migrations live in `db/migrations.js` as an ordered list, each wrapped in a tran
 - **v2 — Add `owner_id` to `projects`.** `ALTER TABLE projects ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'default'` plus `idx_projects_owner_id`. The value is an opaque owner string (no FK to a users table): OSS sets `'default'`, hosted sets the Clerk user id.
 - **v3 — Add `caption` to `media_files`.** Guarded `ALTER` (`columnExists` check), so it is a no-op on databases that already have the column.
 - **v4 — Backfill `projects.owner_id`.** Forward-only, idempotent: ensures `owner_id` (and its index, via `CREATE INDEX IF NOT EXISTS`) is present on every database.
+- **v5 — Add `clean_urls` to `projects`.** Guarded `ALTER TABLE projects ADD COLUMN clean_urls INTEGER DEFAULT 0`: the project's Clean URLs setting (extensionless internal links, canonicals, sitemap and robots).
 
 > The guarded `ALTER`s and the v4 backfill keep databases from different histories convergent on the same final schema.
 

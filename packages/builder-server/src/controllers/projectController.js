@@ -368,7 +368,7 @@ export async function createProject(req, res) {
       preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates ?? false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
-      cleanUrls: cleanUrls ?? false, // SEO URLs without .html (extensionless hosts)
+      cleanUrls: cleanUrls ?? false, // internal links + SEO URLs without .html (extensionless hosts)
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };

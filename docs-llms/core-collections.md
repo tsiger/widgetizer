@@ -118,7 +118,7 @@ Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", c
 
 - **Options:** `limit`, `offset`, `sort` (one of the `defaultSort` values).
 - **Returned item shape:** `{ id, uuid, slug, url, created, updated, settings }`. `settings` is already link-resolved and sanitized.
-- **`url`** is computed, not stored: `null` when `hasItemPages` is `false`; otherwise `` `${outputPathPrefix}${slugPrefix}/${slug}.html` `` so it is correct at whatever depth the current page renders.
+- **`url`** is computed, not stored: `null` when `hasItemPages` is `false`; otherwise `itemHref(slugPrefix, slug, { cleanUrls, outputPathPrefix })` — `` `${outputPathPrefix}${slugPrefix}/${slug}.html` ``, or the extensionless `` `${outputPathPrefix}${slugPrefix}/${slug}` `` when the project's Clean URLs setting is on — so it is correct at whatever depth the current page renders.
 - **Purity:** the filter reads items via a `getCollectionItems(type, args)` loader injected on the render `globals`. Core/render-engine never import builder-server — the shell supplies the loader (`buildRenderDeps` in OSS, `buildCloudRenderDeps` in hosted), and the loader is the only thing bound to `{ storage, scope }`.
 
 ---

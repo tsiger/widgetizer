@@ -139,7 +139,7 @@ Without step 3 the Greek header still points at the English menus. Note this is 
 
 #### 7a. File shape and Clean URLs
 
-The language is a folder; nothing about the existing file shape changes. Clean URLs keeps doing exactly what it does today — it rewrites **SEO URLs only** (canonical links and the sitemap), never the exported filenames or internal links.
+The language is a folder; nothing about the existing file shape changes. Clean URLs keeps doing exactly what it does today — it picks the emitted shape of SEO URLs (canonical links and the sitemap) **and of every uuid-resolved internal link** (`pageHref` / `itemHref` in `internalHref.js`), never the exported filenames; author-typed hrefs are emitted as written. Switcher links must go through the same helpers so they follow the flag.
 
 | | file on disk | canonical / sitemap URL |
 |---|---|---|
@@ -147,7 +147,7 @@ The language is a folder; nothing about the existing file shape changes. Clean U
 | Clean URLs **on** | `el/contact.html` | `/el/contact` |
 
 - **hreflang URLs follow Clean URLs**, since they are SEO URLs like the canonical.
-- **The language switcher emits ordinary internal links**, so it keeps `.html` like every other link in the output.
+- **The language switcher emits ordinary internal links**, so it takes the same shape as every other uuid-resolved link in the output — `.html` file names, or extensionless when Clean URLs is on (`pageHref` / `itemHref`).
 
 #### 7b. An enabled language with no homepage is skipped
 
@@ -170,7 +170,7 @@ One array, two consumers with different rules, so each entry carries both link f
 | `language` | code as stored, lowercase (`el`) |
 | `hreflang` | canonically cased code for markup (`el`, `pt-BR`) |
 | `label` | the language's **native** name (`Ελληνικά`, not "Greek") — a switcher is read by someone who does not yet read the current language |
-| `href` | internal link for the switcher: **depth-aware and always file-shaped** (`../el/contact.html`) |
+| `href` | internal link for the switcher: **depth-aware and Clean-URLs-aware** (`../el/contact.html`, or `../el/contact` when the setting is on) |
 | `seoUrl` | **absolute** and Clean-URL-aware (`https://site.com/el/contact`) |
 | `active` | this is the page being rendered |
 | `fallback` | `true` when this points at the language's homepage because no sibling exists |

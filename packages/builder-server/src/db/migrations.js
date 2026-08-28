@@ -132,8 +132,9 @@ const migrations = [
     version: 5,
     description: "Add clean_urls to projects",
     up(db) {
-      // Whether SEO URLs (canonical, sitemap, robots) drop the .html extension
-      // to match hosts that publish pages at extensionless paths.
+      // Whether the rendered site addresses pages without the .html extension:
+      // every uuid-resolved internal link, canonicals, sitemap and robots follow
+      // it (file names never change) — for hosts that serve extensionless paths.
       if (!columnExists(db, "projects", "clean_urls")) {
         db.exec("ALTER TABLE projects ADD COLUMN clean_urls INTEGER DEFAULT 0");
       }

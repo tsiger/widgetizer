@@ -18,7 +18,8 @@ function isValidSiteUrl(siteUrl) {
 /**
  * Build the formatted sitemap.xml for the given pages, or null when siteUrl is
  * missing/invalid. noindex pages are excluded; the homepage maps to the bare
- * site root and every other page to `<slug>.html`. Collection item pages (from
+ * site root and every other page to `<slug>.html` — or `<slug>` when `cleanUrls`
+ * is set, matching the links the pages emit. Collection item pages (from
  * `itemPagesForSeo`) follow the page URLs, grouped by type in listing order;
  * noindex items are excluded.
  * @param {Array<object>} pagesDataArray

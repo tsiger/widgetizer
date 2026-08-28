@@ -604,7 +604,7 @@ A compound control for creating links. This is useful for buttons, banners, or a
 - **`text`** (string): The display text for the link (e.g., "Learn More").
 - **`target`** (string): The link target, either `_self` to open in the same tab or `_blank` to open in a new tab.
 - **`pageUuid`** (string, optional): For internal **page** links, stores the page's stable UUID. The system resolves the UUID to the current page slug at render time, so links survive renames.
-- **`collectionType`** + **`collectionItemUuid`** (strings, optional): For internal **collection-item** links, stores the item's collection type and stable UUID. Resolved to `slugPrefix/itemSlug.html` at render time. These three reference forms are mutually exclusive — selecting one clears the others.
+- **`collectionType`** + **`collectionItemUuid`** (strings, optional): For internal **collection-item** links, stores the item's collection type and stable UUID. Resolved at render time to `slugPrefix/itemSlug.html`, or the extensionless `slugPrefix/itemSlug` when the project's Clean URLs setting is on (the stored `href` keeps `.html`). These three reference forms are mutually exclusive — selecting one clears the others.
 
 The picker offers all pages plus the items of every `hasItemPages` collection, grouped (a "Pages" group + one group per collection); see `useLinkTargets` (`packages/editor-ui/src/hooks/useLinkTargets.js`).
 
@@ -620,7 +620,7 @@ The UUID system ensures links remain valid even when the target is renamed or de
 
 2. **User Selection**: When a user selects an internal target from the dropdown, the system stores both the stable reference (`pageUuid`, or `collectionType` + `collectionItemUuid`) and the current `href` (slug-based filename).
 
-3. **Rendering/Export**: The system resolves the stable reference to the current slug. If the target was renamed, links automatically point to the new filename.
+3. **Rendering/Export**: The system resolves the stable reference to the current slug and emits it in the shape the project's Clean URLs setting picks (`about.html` / `rooms/suite.html`, or `about` / `rooms/suite` with home as `./`). If the target was renamed, links automatically follow the new slug.
 
 4. **Deletion Cleanup**: When a page is deleted, all widget link settings referencing its `pageUuid` are automatically cleaned up — the link is cleared (`href: ""`) and the reference is removed from the JSON file. This applies to page widgets, global widgets (header/footer), and menu items.
 

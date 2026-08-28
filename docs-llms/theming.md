@@ -403,9 +403,12 @@ Contains project metadata resolved from the SQLite-backed project store:
 {{ project.description }} <!-- Project description -->
 {{ project.theme }}       <!-- Active theme ID -->
 {{ project.siteUrl }}     <!-- Full site URL -->
+{{ project.cleanUrls }}   <!-- Clean URLs setting (boolean); {% seo %} reads it for the canonical -->
 {{ project.created }}     <!-- Project creation timestamp -->
 {{ project.updated }}     <!-- Project last updated timestamp -->
 ```
+
+The same setting is on the render globals as `globals.cleanUrls`, next to `globals.outputPathPrefix`. Menu, link and richtext links are resolved for you in the right shape; a theme that hand-writes an internal href (e.g. the arch header logo's home link) branches on `globals.cleanUrls == true` to emit `./` / `../` instead of `index.html` / `../index.html`.
 
 **Example usage in `layout.liquid`:**
 
@@ -1381,7 +1384,7 @@ Menu items target one of three things: a custom URL (`link` string), a page (sta
 }
 ```
 
-At render time each item resolves to an emitted `link` (depth-aware, prefixed for item pages) plus an un-prefixed `canonicalPath` used for active-state matching (see `resolveMenuItemLinks` in `packages/render-engine/src/menuResolver.js`). The menu snippet reads `item.link` — authors do not handle `pageUuid`/`collectionItemUuid` directly.
+At render time each item resolves to an emitted `link` (depth-aware, prefixed for item pages; `.html` file name or — when the project's Clean URLs setting is on — the extensionless address, with home as `./` / `../`) plus an un-prefixed `.html` `canonicalPath` used for active-state matching (see `resolveMenuItemLinks` in `packages/render-engine/src/menuResolver.js`). The menu snippet reads `item.link` — authors do not handle `pageUuid`/`collectionItemUuid` directly.
 
 ### Rendering Menus
 

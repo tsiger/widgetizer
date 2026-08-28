@@ -1064,6 +1064,8 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
  * Returns a deep clone; the input item is never mutated. v1 schemas are flat, so
  * a single pass over top-level settings suffices.
  *
+ * Resolved hrefs take the shape `pageHref` / `itemHref` pick for `cleanUrls`
+ * (`.html` file name, or extensionless); custom hrefs are emitted as authored.
  * @param {object} item - a collection item ({ settings })
  * @param {Map} pagesByUuid - uuid -> page ({ slug })
  * @param {string} outputPathPrefix - "" at root, "../" for nested item pages

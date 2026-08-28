@@ -58,6 +58,8 @@ _None open._
 - [⬜ 58. Flaky `infrastructure.test.js` test in the full backend suite (`builder-server` tests) — low — investigate](#-58-flaky-infrastructuretestjs-test-in-the-full-backend-suite-builder-server-tests--low--investigate)
 - [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
 - [⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)](#-63-localpublishadapterpublish-shares-the-exports-version-counter-without-the-export-lock-adapters-local--low--latent-no-production-caller)
+- [⬜ 67. Export viewer confinement is lexical — a symlink inside an export dir escapes it (`builder-server`) — low](#-67-export-viewer-confinement-is-lexical--a-symlink-inside-an-export-dir-escapes-it-builder-server--low)
+- [⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low](#-68-a-website-address-with-a-path-or-query-produces-inconsistent-sitemap-robots-and-canonical-urls-builder-server--core--low)
 - [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
 - [⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low](#-65-raw-html-internal-hrefs-under-clean-urls--user-typed-links-theme-liquid-schema-defaults-core--render-engine--themes--low)
 
@@ -1046,6 +1048,70 @@ one pass and file/fix what it finds:
 Overlaps with §64 (error feedback is toast-only / misleading failure states): §64 is about
 *where* errors show; this item is about *what they say*. Fix them together if the same files are
 open.
+
+---
+
+## ⬜ 67. Export viewer confinement is lexical — a symlink inside an export dir escapes it (`builder-server`) — low
+
+**Priority:** Low
+
+`resolveExportFile` (`packages/builder-server/src/routes/export.js`) confines every candidate
+to the selected export directory with `isWithinDirectory` (`packages/core/src/utils/pathSecurity.js`),
+which is a `path.relative` check on the *lexical* path. `fs.statSync` and `res.sendFile` both
+follow symlinks, and neither the export root nor the candidate is `realpath`ed first. So an
+export dir containing `about.html -> ../other-export/secret.html` (or an absolute target) passes
+the containment check — the symlink's own path is inside the export — and the viewer serves the
+target. Pre-existing: the pre-rewrite viewer had the same lexical check and the same follow.
+
+How a symlink gets into an export: the asset copy (`exportController.js`, `fs.copy(projectAssetsDir,
+outputAssetsDir, { filter })`) runs fs-extra's copy without `dereference`, and fs-extra recreates a
+symlink it meets as a symlink (`fs-extra/lib/copy/copy.js`, `onLink`). So a symlink placed under a
+project's `assets/` — by hand, or by any future importer that preserves links — is carried into
+every export verbatim. No builder code path creates one today (multer uploads and the theme
+installer's zip extraction write regular files), which is why this is low: the attacker needs write
+access to the project's asset dir, and in the OSS shell that is the same user the viewer serves.
+Worth closing anyway — the viewer is the one place that serves files out of a directory the
+render pipeline populates.
+
+Fix: realpath in two steps, because realpathing the export root alone still accepts an export root
+that is itself a symlink out of the publish dir — `fs.realpathSync` the publish dir and the export
+root and check the root is within the publish dir, then realpath each existing candidate and check
+it is within the real root (or `lstat` and refuse symlinks outright at the viewer, and/or pass
+`dereference: true` to the export's asset copy so a symlink is materialised as a file). Add two
+`exportView.test.js` cases — a symlinked candidate and a symlinked export root — alongside the
+existing traversal tests.
+
+---
+
+## ⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low
+
+**Priority:** Low
+
+`isValidSiteUrl` (`packages/core/src/utils/urlSafety.js`) accepts any http(s) URL with a dotted
+host, path and query included (`safeUrlFilter.test.js` pins `https://www.example.co.uk/path?q=1`
+as valid). The SEO builders then disagree on how to join a page onto it:
+
+- `buildSitemap` (`packages/builder-server/src/services/seoArtifacts.js`) uses
+  `new URL("/", siteUrl)` for the home page and *relative* `new URL(`${slug}${ext}`, siteUrl)`
+  for pages and items — relative resolution replaces the last path segment.
+- `buildRobotsTxt` uses `new URL("sitemap.xml", siteUrl)` — same replacement.
+- `resolveCanonicalUrl` (`packages/core/src/tags/SeoTag.js`) and `buildItemPageData`'s canonical
+  (`packages/builder-server/src/services/collectionService.js`) concatenate strings onto the
+  normalised `siteUrl`.
+
+For `siteUrl = https://example.com/sites/foo`: About's canonical is
+`https://example.com/sites/foo/about`, its sitemap entry `https://example.com/sites/about`, the
+home entry `https://example.com/`, and robots points at `https://example.com/sites/sitemap.xml`.
+With a query, a canonical becomes `https://example.com/sites/foo?q=1/about`. Independent of the
+Clean URLs setting (both shapes are affected the same way) and pre-existing — `seoArtifacts.test.js`
+only ever uses an origin-root fixture.
+
+Fix options: (a) reject a path/query/hash in the Website Address at validation time and say so in
+the settings form (simplest — the builder's output layout is flat, a sub-path deployment is
+already unsupported elsewhere); or (b) normalise `siteUrl` once to a directory base (strip query
+and hash, force a trailing slash) and route every SEO URL — pages, items, home, sitemap, robots,
+canonicals — through one helper. Either way, test a path base with and without a trailing slash
+under both Clean URLs values.
 
 ---
 
