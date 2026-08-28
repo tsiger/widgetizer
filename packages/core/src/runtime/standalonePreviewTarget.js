@@ -4,6 +4,9 @@
  *
  *   "about.html"               -> "/preview/about"
  *   "rooms/suite-caldera.html" -> "/preview/collection/rooms/suite-caldera"
+ *   "about"                    -> "/preview/about"
+ *   "rooms/suite"              -> "/preview/collection/rooms/suite"
+ *   "./" / "../"               -> "/preview/index"
  *   "#anchor" / external / "/" -> null
  *
  * Single source of truth, shared across a bundle boundary: `previewRuntime.js`
@@ -17,15 +20,10 @@ export function getStandalonePreviewTarget(href) {
   const trimmed = href.trim();
   if (!trimmed || trimmed.startsWith("#")) return null;
 
-  const lower = trimmed.toLowerCase();
-  if (
-    lower.startsWith("http:") ||
-    lower.startsWith("https:") ||
-    lower.startsWith("mailto:") ||
-    lower.startsWith("tel:") ||
-    lower.startsWith("javascript:") ||
-    trimmed.startsWith("//")
-  ) {
+  // Any URI scheme (RFC 3986 `scheme:`) is external — http(s), mailto, tel,
+  // javascript, but also sms/webcal/urn/data. An extensionless internal link
+  // never contains a colon, so this must run before the extensionless matches.
+  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed) || trimmed.startsWith("//")) {
     return null;
   }
 
@@ -35,16 +33,33 @@ export function getStandalonePreviewTarget(href) {
     return `/preview/${previewMatch[1]}`;
   }
 
-  const htmlMatch = withoutQuery.match(/^\/?([^/]+)\.html$/);
+  // Clean URLs home shapes: "./" at the root, "../" from an item page.
+  if (/^(\.\.?\/)+$/.test(withoutQuery)) return "/preview/index";
+
+  // Drop leading "./" / "../" depth segments and a leading slash; what remains
+  // is the site-relative path in one of four shapes.
+  const rel = withoutQuery.replace(/^(\.\.?\/)+/, "").replace(/^\//, "");
+
+  const htmlMatch = rel.match(/^([^/]+)\.html$/);
   if (htmlMatch) {
     return `/preview/${htmlMatch[1]}`;
   }
 
   // Nested collection item URLs (e.g. "rooms/suite-caldera.html") route to the
   // item preview keyed by slugPrefix; the route resolves prefix -> type.
-  const itemMatch = withoutQuery.match(/^\/?([^/]+)\/([^/]+)\.html$/);
+  const itemMatch = rel.match(/^([^/]+)\/([^/]+)\.html$/);
   if (itemMatch) {
     return `/preview/collection/${itemMatch[1]}/${itemMatch[2]}`;
+  }
+
+  // Extensionless forms (project Clean URLs on): "about", "rooms/suite".
+  const cleanPageMatch = rel.match(/^([^/.]+)$/);
+  if (cleanPageMatch) {
+    return `/preview/${cleanPageMatch[1]}`;
+  }
+  const cleanItemMatch = rel.match(/^([^/.]+)\/([^/.]+)$/);
+  if (cleanItemMatch) {
+    return `/preview/collection/${cleanItemMatch[1]}/${cleanItemMatch[2]}`;
   }
 
   return null;
