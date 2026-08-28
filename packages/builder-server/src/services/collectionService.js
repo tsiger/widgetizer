@@ -38,6 +38,17 @@ import {
 const SLUG_RE = /^[a-z0-9-]+$/;
 const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc", "date_desc", "date_asc"];
 const RESERVED_SLUG_PREFIXES = new Set(["assets"]);
+// Item slugs a web server would read as "the directory itself": an item at
+// rooms/index.html is reachable as /rooms/ as well as /rooms/index, so it can
+// never own one unambiguous address. Refused on create/rename; an item that
+// already carries the slug keeps saving in place. Only "index" has that
+// server-level meaning — "home" is special for pages (a site root), not items.
+const RESERVED_ITEM_SLUGS = new Set(["index"]);
+
+/** Whether `slug` may never be given to a NEW item (see RESERVED_ITEM_SLUGS). */
+export function isReservedItemSlug(slug) {
+  return RESERVED_ITEM_SLUGS.has(slug);
+}
 // v1 constructs that must be rejected, not silently ignored (Section 1).
 const DISALLOWED_SETTING_KEYS = ["multiple", "repeater", "blocks"];
 
@@ -738,6 +749,9 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
   const slug = sanitizeSlug(rawSlug, "item");
   if (!SLUG_RE.test(slug)) {
     throw new CollectionValidationError([{ fieldId: "slug", reason: "invalid slug" }]);
+  }
+  if (RESERVED_ITEM_SLUGS.has(slug) && existingItem?.slug !== slug) {
+    throw new CollectionValidationError([{ fieldId: "slug", reason: "reserved slug" }]);
   }
 
   const settings = {};
