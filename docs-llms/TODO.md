@@ -39,6 +39,7 @@ _None open._
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [✅ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — fixed, pending reference-table move](#-62-export-lifecycle-races--version-reservation-and-fsdb-cleanup-arent-coordinated-builder-server--fixed-pending-reference-table-move)
+- [⬜ 66. Editor surfaces raw server error strings — `Slug "suite" already exists`, `Validation failed` — instead of field-anchored, localized messages (`editor-ui` / `builder-server`) — medium (UX) — sweep all error paths](#-66-editor-surfaces-raw-server-error-strings--slug-suite-already-exists-validation-failed--instead-of-field-anchored-localized-messages-editor-ui--builder-server--medium-ux--sweep-all-error-paths)
 
 ### Low priority
 
@@ -970,6 +971,76 @@ guessing at authorial intent from string shape alone.
   `packages/builder-server/src/utils/linkEnrichment.js`) — is the arch header logo/CTA the
   only theme-authored gap, or do other themes/widgets ship similar hardcoded `.html`
   hrefs?
+
+---
+
+## ⬜ 66. Editor surfaces raw server error strings — `Slug "suite" already exists`, `Validation failed` — instead of field-anchored, localized messages (`editor-ui` / `builder-server`) — medium (UX) — sweep all error paths
+
+**Priority:** Medium
+
+**Symptom (2026-08-28, collection item form).** Typing a filename that another item already
+uses shows the toast `Slug "suite" already exists`; typing the reserved `index` shows
+`Validation failed`. The first uses the word "slug" while the field is labelled **Filename**
+(`packages/core/src/locales/en.json` → `collectionsForm.slugLabel`); the second says nothing
+about *what* failed. Neither is localized, and neither is attached to the field.
+
+**Root cause.** `CollectionItemForm.jsx`'s submit handler
+(`packages/editor-ui/src/components/collections/CollectionItemForm.jsx`, `onSubmitHandler`
+catch) does `showToast(err.message || …)`, i.e. it echoes whatever the server wrote:
+
+- `SLUG_CONFLICT` → `collectionController.js` `respondError` sends
+  `{ error: "Slug already exists", message: err.message, conflictingSlug }`, and `err.message`
+  is `CollectionSlugConflictError`'s server-authored string (`collectionService.js`).
+- `VALIDATION` → it sends `{ error: "Validation failed", validationErrors: [{ fieldId, reason }] }`
+  with no `message`, so `apiFetch.js`'s `getErrorMessage` falls back to `data.error`. The
+  `validationErrors` array — the only part that says *which field* and *why* (e.g.
+  `{ fieldId: "slug", reason: "reserved slug" }`) — is dropped on the floor. The form reads
+  `validationErrors` only when seeding a loaded-invalid item, and even there skips
+  `fieldId === "slug"`.
+
+So every server-side validation failure on that form reads "Validation failed"; the reserved
+`index` filename rule only made it visible.
+
+**Fix for these two.** Client-side, localized, anchored to the field; leave the server strings as
+the API's contract (they are what logs and non-editor callers see):
+
+- In the submit catch, read `err.data` (`ApiError` already carries the JSON body):
+  `conflictingSlug` → set the slug field error from a new `collectionsForm.slugTaken`
+  (*"Filename "{slug}" is already in use"*); `validationErrors` → map per entry
+  (`slug` + `"reserved slug"` → new `collectionsForm.slugReserved`: *""index" can't be used as
+  a filename — it would name the collection's own page"*; other ids →
+  `collectionsForm.fieldRequired`). Toast only when nothing could be mapped.
+- Drop the `fieldId !== "slug"` skip in the seeding effect so a loaded-invalid item shows its
+  filename problem too.
+- Pages have the identical mismatch: `pageController.js` sends *"A page with the slug "x"
+  already exists…"* while `PageForm.jsx` labels the field "Filename" (`pages.filenameLabel`).
+  Give `PageForm` the same `slugTaken` treatment.
+
+**When picking this up, sweep — don't fix just these two.** The pattern is systemic: the editor
+has ~24 `showToast(err.message || t(...))` sites and builder-server has ~100
+`res.status(4xx).json({ error: … })` responses, most with hand-written English `message`s. Do
+one pass and file/fix what it finds:
+
+1. `grep -rn "showToast(err.message\|showToast(error.message\|err?.message ||" packages/editor-ui/src`
+   — every hit echoes a server string to the user. For each, decide: field-anchored error
+   (validation, conflicts, limits), localized toast, or silent + logged.
+2. `grep -rn "\.status(4[0-9][0-9]).json({ error:" packages/builder-server/src` — list the
+   `error` / `message` strings. Any that a user can trigger from the editor needs either a
+   stable `code` the client can map to a locale key, or structured data (`validationErrors`,
+   `conflictingSlug`, limits) the client can render — not prose.
+3. Compare every user-visible string against the field labels in
+   `packages/core/src/locales/en.json`: "slug" vs "Filename", "page"/"item" vs the
+   collection's display name, internal names (`settings`, `uuid`, `scope`) leaking through.
+4. Check the generic fallbacks: `apiFetch.js` `getErrorMessage` (uses `data.message`, then
+   `data.error`, then the caller's fallback) — if a response carries only structured fields,
+   the caller's fallback must be a real localized sentence, never `Request failed`.
+5. Forms to walk with a deliberately wrong input: page create/rename, collection item
+   create/rename/duplicate, menu item link, media upload (size/type limits), theme install /
+   update, project create/duplicate/import, form submissions settings, SEO fields.
+
+Overlaps with §64 (error feedback is toast-only / misleading failure states): §64 is about
+*where* errors show; this item is about *what they say*. Fix them together if the same files are
+open.
 
 ---
 
