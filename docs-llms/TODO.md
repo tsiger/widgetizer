@@ -950,8 +950,13 @@ resolution). Three sources never go through that resolution and so keep emitting
   `collectionItemUuid`) is passed through `prefixInternalHref` / `sanitizeHref` only, and
   is emitted exactly as authored (`resolveMenuItemLinks`'s `else if (typeof item.link ===
   "string" ...)` branch).
-- **Theme Liquid** — `themes/arch/widgets/global/header/widget.liquid:34` hardcodes the
-  logo link as `{{ globals.outputPathPrefix }}index.html`.
+- **Theme Liquid** — the arch header logo (`themes/arch/widgets/global/header/widget.liquid`)
+  is a hand-written home href. Since 2026-08-28 it picks its own shape from
+  `globals.cleanUrls` (`./` / `../` when on, `{{ globals.outputPathPrefix }}index.html`
+  otherwise) — a theme-side workaround that re-encodes the `pageHref` home rule in Liquid.
+  **Still open:** the engine should expose the home link once (e.g. a `globals.homeHref`
+  computed via `pageHref("index", …)`, or a `home_url` filter) so themes never carry that
+  rule themselves; then the arch template can go back to one expression.
 - **Schema defaults** — `themes/arch/widgets/global/header/schema.json:89-97` ships the
   header CTA's default `link` setting as `{ "href": "contact.html", ... }`.
 

@@ -16,6 +16,7 @@ import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
 import fs from "fs-extra";
 import path from "path";
+import { fileURLToPath } from "node:url";
 
 import { createExportHarness } from "./helpers/exportHarness.js";
 
@@ -277,5 +278,53 @@ describe("export — a Clean URLs toggle mid-export does not split the bundle", 
     assert.ok(item.includes(`<link rel="canonical" href="${SITE_URL}/news/alpha">`), item);
     const sitemap = await fs.readFile(path.join(dir, "sitemap.xml"), "utf8");
     assert.ok(sitemap.includes(`<loc>${SITE_URL}/about</loc>`), sitemap);
+  });
+});
+
+// The arch theme's header logo is a hand-written Liquid href (no uuid to
+// resolve), so it decides the home-link shape itself from `globals.cleanUrls`.
+// Render the REAL theme template through the export to pin that decision at
+// both depths under both flag values.
+describe("export — arch header logo home link", () => {
+  const ARCH_HEADER_DIR = fileURLToPath(new URL("../../../../themes/arch/widgets/global/header/", import.meta.url));
+  const headerDir = () => path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "header");
+
+  before(async () => {
+    await fs.copy(path.join(ARCH_HEADER_DIR, "widget.liquid"), path.join(headerDir(), "widget.liquid"));
+    await fs.copy(path.join(ARCH_HEADER_DIR, "schema.json"), path.join(headerDir(), "schema.json"));
+    await fs.writeFile(
+      path.join(getProjectPagesDir(PROJECT_FOLDER), "global", "header.json"),
+      JSON.stringify({ type: "header", settings: { headerNavigation: "m-main", logoText: "Arch" } }),
+    );
+  });
+
+  after(async () => {
+    // Put the suite's own nav header back for anything that runs after this file.
+    await fs.outputFile(path.join(headerDir(), "widget.liquid"), NAV_TEMPLATE);
+    await fs.outputFile(path.join(headerDir(), "schema.json"), JSON.stringify(NAV_WIDGET_SCHEMA));
+  });
+
+  async function exportWith(cleanUrls) {
+    await resetExports();
+    projectRepo.updateProject(PROJECT_ID, { cleanUrls });
+    const res = await runExport();
+    assert.equal(res._status, 200, `export failed: ${JSON.stringify(res._json)}`);
+    return latestExportDir();
+  }
+
+  it("Clean URLs ON: ./ at the root, ../ from an item page", async () => {
+    const dir = await exportWith(true);
+    const about = await readCompact(dir, "about.html");
+    assert.ok(about.includes('<a href="./" class="header-logo">'), about);
+    const item = await readCompact(dir, "news", "alpha.html");
+    assert.ok(item.includes('<a href="../" class="header-logo">'), item);
+  });
+
+  it("Clean URLs OFF: index.html at the root, ../index.html from an item page", async () => {
+    const dir = await exportWith(false);
+    const about = await readCompact(dir, "about.html");
+    assert.ok(about.includes('<a href="index.html" class="header-logo">'), about);
+    const item = await readCompact(dir, "news", "alpha.html");
+    assert.ok(item.includes('<a href="../index.html" class="header-logo">'), item);
   });
 });
