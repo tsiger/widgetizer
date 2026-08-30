@@ -60,6 +60,7 @@ _None open._
 - [⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)](#-63-localpublishadapterpublish-shares-the-exports-version-counter-without-the-export-lock-adapters-local--low--latent-no-production-caller)
 - [⬜ 67. Export viewer confinement is lexical — a symlink inside an export dir escapes it (`builder-server`) — low](#-67-export-viewer-confinement-is-lexical--a-symlink-inside-an-export-dir-escapes-it-builder-server--low)
 - [⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low](#-68-a-website-address-with-a-path-or-query-produces-inconsistent-sitemap-robots-and-canonical-urls-builder-server--core--low)
+- [⬜ 70. Widget assets enqueued with a sub-path (`vendor/lib.js`) render a nested URL but are flattened to `assets/<basename>` on export (`builder-server` / `core`) — low](#-70-widget-assets-enqueued-with-a-sub-path-vendorlibjs-render-a-nested-url-but-are-flattened-to-assetsbasename-on-export-builder-server--core--low)
 - [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
 - [⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low](#-65-raw-html-internal-hrefs-under-clean-urls--user-typed-links-theme-liquid-schema-defaults-core--render-engine--themes--low)
 
@@ -1114,6 +1115,12 @@ canonicals — through one helper. Either way, test a path base with and without
 under both Clean URLs values.
 
 ---
+
+## ⬜ 70. Widget assets enqueued with a sub-path (`vendor/lib.js`) render a nested URL but are flattened to `assets/<basename>` on export (`builder-server` / `core`) — low
+
+**Priority:** Low
+
+`enqueue_script` / `enqueue_style` (and, since they resolve the same way, script/style `enqueue_preload`s) accept any path relative to the asset folder, and `buildAssetUrl` (`packages/core/src/utils/assetUrl.js`) keeps it: a widget that enqueues `vendor/lib.js` gets `/api/preview/assets/<id>/widgets/<type>/vendor/lib.js` in preview — which the preview route serves, nested paths included — and `assets/vendor/lib.js?v=…` in an export. The export, however, ships widget files by **basename only**: `exportProjectToDir` (`packages/builder-server/src/controllers/exportController.js`, the "Copy Widget Assets" step) walks `widgets/**` for CSS/JS, keeps the ones whose basename was enqueued, and copies each to `assets/<basename>`. So the published page requests `assets/vendor/lib.js` while the file landed at `assets/lib.js` — a 404 in production that preview never shows. Theme-level `assets/` is copied as a tree, so sub-paths there are fine; the gap is widget folders only. Nothing shipped is affected (Arch's widget assets are all flat, one file per widget dir). Two consistent fixes: preserve the relative sub-path when flattening (`assets/vendor/lib.js`) and match enqueued *paths* rather than basenames — or reject sub-paths in widget-origin enqueues with a render-time warning and document "widget assets must sit directly in the widget folder" in `docs-llms/theming.md`. The `theming.md` note that same-named widget files overwrite each other on export applies to whichever is chosen.
 
 ## Completed — reference table
 

@@ -21,7 +21,7 @@ import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { generateExportSiteIcons } from "../utils/siteIconHelpers.js";
 import { buildFormsManifest } from "../services/formsManifestService.js";
 import TurndownService from "turndown";
-import { buildAssetVersionToken } from "@widgetizer/core/assetUrl";
+import { buildAssetVersionToken, splitAssetRef } from "@widgetizer/core/assetUrl";
 import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 import * as exportRepo from "../db/repositories/exportRepository.js";
 
@@ -229,8 +229,10 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
   // One token for the whole export, stamped on every CSS/JS URL as ?v=…. The
   // export number restarts at 1 on a different machine (the counter lives in the
   // local DB), so the token carries a build timestamp to stay collision-free for
-  // users who move a project between computers.
-  const assetVersion = buildAssetVersionToken({ exportNumber: version, appVersion });
+  // users who move a project between computers. The same instant is recorded as
+  // manifest.exportedAt so the page's token and the manifest agree to the second.
+  const exportedAt = new Date();
+  const assetVersion = buildAssetVersionToken({ exportNumber: version, appVersion, date: exportedAt });
   const outputBaseDir = getPublishDir();
   const outputDir = path.join(outputBaseDir, `${projectFolderName}-v${version}`);
     const outputAssetsDir = path.join(outputDir, "assets");
@@ -380,10 +382,12 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // Basenames of every asset enqueued while rendering pages and collection items.
     // The project's widgets/ dir holds every theme widget's CSS/JS, used or not —
     // this set is what lets the copy step below ship only the used ones.
+    // Keys are the raw enqueue `src`, which may carry an author query/fragment
+    // that the emitted URL keeps; the file on disk is named by the path part.
     const enqueuedAssetFiles = new Set();
     const collectEnqueuedAssets = (globals) => {
-      for (const src of globals.enqueuedStyles.keys()) enqueuedAssetFiles.add(path.basename(src));
-      for (const src of globals.enqueuedScripts.keys()) enqueuedAssetFiles.add(path.basename(src));
+      for (const src of globals.enqueuedStyles.keys()) enqueuedAssetFiles.add(path.basename(splitAssetRef(src).path));
+      for (const src of globals.enqueuedScripts.keys()) enqueuedAssetFiles.add(path.basename(splitAssetRef(src).path));
     };
 
     for (const pageData of pagesDataArray) {
@@ -784,8 +788,9 @@ Per aspera ad astra
     const projectWidgetsDir = path.join(projectDir, "widgets");
     try {
       if (await fs.pathExists(projectWidgetsDir)) {
-        // Recursively find .css and .js files in the widgets directory
-        const widgetAssetFiles = await findFilesRecursive(projectWidgetsDir, [/.css$/, /.js$/]);
+        // Recursively find .css and .js files in the widgets directory (any case,
+        // matching what the asset tags treat as a stylesheet/script)
+        const widgetAssetFiles = await findFilesRecursive(projectWidgetsDir, [/\.css$/i, /\.js$/i]);
 
         // Copy only assets a rendered page actually enqueued — the widgets dir
         // holds every theme widget's CSS/JS, whether the site uses it or not.
@@ -944,7 +949,7 @@ Per aspera ad astra
       exportVersion: version,
       // The ?v= token on this export's CSS/JS URLs, for tracing a live page back here.
       assetVersion,
-      exportedAt: new Date().toISOString(),
+      exportedAt: exportedAt.toISOString(),
       projectName: projectData.name,
       collections: manifestCollections,
     };

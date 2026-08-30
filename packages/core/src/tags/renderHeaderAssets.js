@@ -8,13 +8,24 @@
  * {% header_assets %}
  */
 import { prefixInternalHref } from "../utils/linkPrefixer.js";
-import { buildAssetUrl } from "../utils/assetUrl.js";
+import { buildAssetUrl, splitAssetRef } from "../utils/assetUrl.js";
 
 /**
  * Prefix every candidate URL in a srcset/imagesrcset string for the given
  * output depth, preserving each `<url> <descriptor>` pair. At the export root
  * (empty prefix) the original string is returned byte-for-byte.
  */
+/**
+ * Depth-prefix a preload href the author supplied as-is. `{% image … output:
+ * 'path' %}` already emits `<outputPathPrefix>assets/images/…` in publish mode,
+ * so a src that starts with the current prefix is left alone rather than
+ * prefixed a second time (`../../assets/…` on a collection item page).
+ */
+function prefixPreloadHref(href, outputPathPrefix) {
+  if (outputPathPrefix && typeof href === "string" && href.startsWith(outputPathPrefix)) return href;
+  return prefixInternalHref(href, outputPathPrefix);
+}
+
 function prefixSrcset(srcset, outputPathPrefix) {
   if (!outputPathPrefix || typeof srcset !== "string") return srcset;
   return srcset
@@ -23,10 +34,10 @@ function prefixSrcset(srcset, outputPathPrefix) {
       const trimmed = part.trim();
       if (!trimmed) return trimmed;
       const spaceIdx = trimmed.indexOf(" ");
-      if (spaceIdx === -1) return prefixInternalHref(trimmed, outputPathPrefix);
+      if (spaceIdx === -1) return prefixPreloadHref(trimmed, outputPathPrefix);
       const url = trimmed.slice(0, spaceIdx);
       const descriptor = trimmed.slice(spaceIdx); // leading space + e.g. "320w"
-      return `${prefixInternalHref(url, outputPathPrefix)}${descriptor}`;
+      return `${prefixPreloadHref(url, outputPathPrefix)}${descriptor}`;
     })
     .join(", ");
 }
@@ -51,9 +62,36 @@ export const RenderHeaderAssetsTag = {
       const preloads = globals.enqueuedPreloads;
       if (preloads && preloads.size > 0) {
         preloads.forEach((options, src) => {
-          // Preload sources can be relative asset paths or absolute URLs; only
-          // genuinely-relative internal hrefs get the depth prefix.
-          let assetUrl = prefixInternalHref(src, outputPathPrefix);
+          // A preload only helps when its href is byte-identical to the request
+          // it warms, so scripts, styles and fonts given as a path relative to
+          // the theme's assets/ folder resolve through the same builder the real
+          // request uses — assets/ path, depth prefix, ?v= token (CSS/JS only),
+          // or the preview API route. Scripts/styles follow enqueue_script's
+          // origin rule (the widget's own folder inside a widget, unless
+          // theme: true); fonts always resolve against the theme's assets/,
+          // because the export never ships widget-folder fonts. Anything that
+          // is already a URL — a scheme, a leading "/", an explicit assets/
+          // prefix — is the author's own and is only depth-prefixed, which is
+          // how image preloads (fed by {% image … output: 'path' %}) work.
+          const as = String(options.as || "").toLowerCase(); // browsers match `as` case-insensitively
+          // Classify on the path alone: an author query may legitimately contain
+          // "/" or ":" (`?next=/dashboard`) and must not demote a relative path.
+          const srcPath = splitAssetRef(src).path;
+          // Scheme match is case-insensitive (`HTTPS:`); the `assets/` prefix is
+          // exact — `Assets/x.js` is a sub-folder of the theme's assets/, not the prefix.
+          const isThemeRelative =
+            srcPath !== "" &&
+            !/^[a-z][a-z0-9+.-]*:/i.test(srcPath) &&
+            !/^(?:\/|assets\/)/.test(srcPath) &&
+            !srcPath.includes("\\");
+          let assetUrl;
+          if (isThemeRelative && (as === "script" || as === "style")) {
+            assetUrl = buildAssetUrl(src, { globals, source: options.source, widgetType: options.widgetType });
+          } else if (isThemeRelative && as === "font") {
+            assetUrl = buildAssetUrl(src, { globals });
+          } else {
+            assetUrl = prefixPreloadHref(src, outputPathPrefix);
+          }
 
           // Construct the link tag
           const attrs = [`<link rel="preload" href="${assetUrl}"`];

@@ -55,6 +55,28 @@ describe("buildAssetUrl — publish mode", () => {
     expect(buildAssetUrl("app.js", { globals })).toBe("assets/app.js?v=3-0.9.10-20260806T142530");
   });
 
+  it("busts caches regardless of extension case", () => {
+    const globals = publish({ assetVersion: "3-0.9.10-20260806T142530" });
+    expect(buildAssetUrl("theme.CSS", { globals })).toBe("assets/theme.CSS?v=3-0.9.10-20260806T142530");
+    expect(buildAssetUrl("app.JS", { globals })).toBe("assets/app.JS?v=3-0.9.10-20260806T142530");
+  });
+
+  it("does not treat .mjs, .json, .jsx or .css.map as cache-bustable", () => {
+    const globals = publish({ assetVersion: "3-0.9.10-20260806T142530" });
+    for (const f of ["bundle.mjs", "data.json", "view.jsx", "base.css.map"]) {
+      expect(buildAssetUrl(f, { globals })).toBe(`assets/${f}`);
+    }
+  });
+
+  it("appends the token after an existing query and before a fragment", () => {
+    const globals = publish({ assetVersion: "3-0.9.10-20260806T142530" });
+    expect(buildAssetUrl("main.js?channel=stable", { globals })).toBe(
+      "assets/main.js?channel=stable&v=3-0.9.10-20260806T142530",
+    );
+    expect(buildAssetUrl("base.css#print", { globals })).toBe("assets/base.css?v=3-0.9.10-20260806T142530#print");
+    expect(buildAssetUrl("main.js?a=1#top", { globals })).toBe("assets/main.js?a=1&v=3-0.9.10-20260806T142530#top");
+  });
+
   it("leaves other asset types unversioned", () => {
     const globals = publish({ assetVersion: "3-0.9.10-20260806T142530" });
     expect(buildAssetUrl("hero.jpg", { globals })).toBe("assets/hero.jpg");

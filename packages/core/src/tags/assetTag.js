@@ -1,5 +1,5 @@
 import { Hash } from "liquidjs";
-import { buildAssetUrl } from "../utils/assetUrl.js";
+import { buildAssetUrl, splitAssetRef } from "../utils/assetUrl.js";
 
 export const AssetTag = {
   parse(tagToken) {
@@ -42,10 +42,12 @@ export const AssetTag = {
     // Get context globals
     const globals = context.globals || {};
 
-    // Determine file type from extension
-    const isCSS = filepath.endsWith(".css");
-    const isJS = filepath.endsWith(".js");
-    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(filepath);
+    // Determine file type from extension (any case, ignoring ?query / #fragment),
+    // the same way buildAssetUrl decides which files get the cache-busting token.
+    const { path: assetPath } = splitAssetRef(filepath);
+    const isCSS = /\.css$/i.test(assetPath);
+    const isJS = /\.js$/i.test(assetPath);
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(assetPath);
 
     // In preview mode an asset referenced from inside a widget template is served
     // from that widget's own directory rather than the shared assets/ folder.
@@ -63,8 +65,8 @@ export const AssetTag = {
     if (integrity) attributes += ` integrity="${integrity}"`;
 
     // For images, check if we have metadata in the context
-    if (isImage && context.mediaDimensions && context.mediaDimensions[filepath]) {
-      const imageData = context.mediaDimensions[filepath];
+    if (isImage && context.mediaDimensions && context.mediaDimensions[assetPath]) {
+      const imageData = context.mediaDimensions[assetPath];
       if (imageData.alt) attributes += ` alt="${imageData.alt}"`;
       if (imageData.title) attributes += ` title="${imageData.title}"`;
     }

@@ -636,13 +636,23 @@ Registers a resource preload directive for the `<head>`. This is critical for op
 **Usage:**
 
 ```liquid
-{% enqueue_preload src: "hero.jpg", as: "image", fetchpriority: "high" %}
-{% enqueue_preload src: "font.woff2", as: "font", type: "font/woff2", crossorigin: true %}
+{% capture lcp_image_url %}{% image src: block.settings.image, size: 'large', output: 'path' %}{% endcapture %}
+{% enqueue_preload src: lcp_image_url, as: "image", fetchpriority: "high" %}
+{% enqueue_preload src: "fonts/Inter.woff2", as: "font", type: "font/woff2", crossorigin: true %}
+{% enqueue_preload src: "main.js", as: "script" %}
 ```
+
+A preload only helps when its href is byte-identical to the request it warms — a preload whose URL differs from the real request is downloaded twice and ignored (with a console warning). The tag therefore resolves `src` the same way the real request will be resolved:
+
+- **`as: "script"` / `"style"`** — a path relative to the theme's `assets/` folder (`main.js`, `vendor/lib.js`) resolves exactly like `enqueue_script` / `enqueue_style`: same `assets/` path, depth prefix and `?v=` cache-busting token in exports, same preview route in the editor (a widget's own route inside a widget; add `theme: true` for a theme-level file, as with `enqueue_script`).
+- **`as: "font"`** — a path relative to `assets/` (`fonts/Inter.woff2`) resolves against the theme's `assets/` folder in both modes, matching the `url("fonts/Inter.woff2")` in the stylesheet that declares the `@font-face` (CSS `url()`s resolve relative to the stylesheet, so the same relative path works in preview and export). Fonts carry no `?v=` token, and always resolve to the theme folder even inside a widget, because the export ships widget-folder CSS/JS only. Remember `crossorigin: true` — browsers require it for font preloads.
+- **Everything else** — image preloads, or any `src` that is already a URL (a scheme, a leading `/`, or an explicit `assets/` prefix) — is used as given. A plain relative path is depth-prefixed on nested pages; a path that already carries the depth prefix is left alone. For images pass the output of `{% image … output: 'path' %}`: it is mode-correct, already depth-prefixed, and picks the right size variant.
+
+Preloads are worth it for resources the browser cannot see in the HTML — fonts and CSS background images above all, the first-viewport image, or a footer script on a very long page. Preloading a file that already has its own `<link>`/`<script>` tag in `<head>` gains nothing: the browser's lookahead parser finds that tag just as early.
 
 **Options:**
 
-- `src`: (String, required) The URL of the resource to preload.
+- `src`: (String, required) The URL of the resource to preload, or — for scripts, styles and fonts — a path relative to the theme's `assets/` folder, resolved as described above.
 - `as`: (String, required) The type of content (e.g., `"image"`, `"script"`, `"font"`, `"style"`).
 - `type`: (String, optional) The MIME type (e.g., `"image/jpeg"`, `"font/woff2"`).
 - `fetchpriority`: (String, optional) Priority hint: `"high"`, `"low"`, or `"auto"`.

@@ -136,9 +136,9 @@ The file-asset path (copy to `assets/files/`, `/uploads/files/` → `assets/file
 
 ### Asset cache busting
 
-Exported **CSS and JS** URLs carry a `?v=` token so a re-exported site is not served from a stale browser or CDN cache. Images and other binaries are not versioned.
+Exported **CSS and JS** URLs (`.css` / `.js`, any case) carry a `?v=` token so a re-exported site is not served from a stale browser or CDN cache. An author-supplied query survives — `main.js?channel=stable` becomes `main.js?channel=stable&v=…` — and a `#fragment` stays last. Images and other binaries are not versioned.
 
-The token is built once per export by `buildAssetVersionToken` (`packages/core/src/utils/assetUrl.js`), passed to every render as the `assetVersion` global, and appended by `buildAssetUrl` — the single function all asset-emitting sites go through (`{% asset %}`, `{% header_assets %}`, `{% footer_assets %}`, and the render engine's enqueued-asset writer). Format:
+The token is built once per export by `buildAssetVersionToken` (`packages/core/src/utils/assetUrl.js`), passed to every render as the `assetVersion` global, and appended by `buildAssetUrl` — the single function every stylesheet/script-emitting site goes through (`{% asset %}`, `{% header_assets %}` including its `as: "script"`/`"style"` preloads, `{% footer_assets %}`, and the render engine's enqueued-asset writer). Format:
 
 ```
 assets/base.css?v=3-0.9.10-20260806T142530
@@ -149,7 +149,7 @@ assets/base.css?v=3-0.9.10-20260806T142530
 
 It is deliberately readable: viewing source on a live site tells you which export is deployed, which Widgetizer version built it, and when.
 
-The **timestamp is what guarantees uniqueness**. The export number is a per-machine counter derived from the local SQLite `exports` table, so a user who backs up a project and imports it on another computer restarts at 1 — without the timestamp that second machine would re-issue `?v=1` for completely different bytes, and clients holding the old cache entry would keep serving the stale asset.
+The **timestamp is what makes the token effectively unique**. The export number is a per-machine counter derived from the local SQLite `exports` table, so a user who backs up a project and imports it on another computer restarts at 1 — without the timestamp that second machine would re-issue `?v=1` for completely different bytes, and clients holding the old cache entry would keep serving the stale asset. The stamp is second-granular: a collision needs the same export number, Widgetizer version and UTC second — two machines exporting the same restored project at once, or one machine that deleted its export history (which lowers the counter) and re-exported within the same second. Accepted as negligible. The version segment keeps only letters, digits, dots and dashes: semver's build-metadata `+` is stripped but the text after it stays (`1.2.3+build.7` → `1.2.3build.7`); prerelease suffixes (`-beta.1`) survive intact.
 
 ## 5. Developer Mode (HTML Validation)
 

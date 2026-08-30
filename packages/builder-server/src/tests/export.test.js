@@ -265,11 +265,13 @@ before(async () => {
   {% if site_icons.appleTouchIconHref != blank %}<link rel="apple-touch-icon" href="{{ site_icons.appleTouchIconHref }}" sizes="180x180">{% endif %}
   {% if site_icons.manifestHref != blank %}<link rel="manifest" href="{{ site_icons.manifestHref }}">{% endif %}
   {% seo %}
+  {% header_assets %}
 </head>
 <body class="{{ body_class }}">
   {{ header | raw }}
   <main>{{ main_content | raw }}</main>
   {{ footer | raw }}
+  {% footer_assets %}
 </body>
 </html>`,
   );
@@ -566,10 +568,14 @@ before(async () => {
     path.join(widgetAssetsDir, "widget.liquid"),
     `{% enqueue_style src: "hero-slider.css" %}
 {% enqueue_script src: "hero-slider.js", defer: true %}
+{% enqueue_style src: "Hero.CSS?variant=a" %}
 <div class="hero-slider">slides</div>`,
   );
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.css"), ".hero { display: flex; }");
   await fs.writeFile(path.join(widgetAssetsDir, "hero-slider.js"), "// slider init");
+  // Uppercase extension + author query: the copier must match on the real
+  // filename (any case), ignoring the query the tag emits in the URL.
+  await fs.writeFile(path.join(widgetAssetsDir, "Hero.CSS"), ".hero-variant { color: red; }");
 
   const unusedWidgetDir = path.join(projectDir, "widgets", "audio-player");
   await fs.ensureDir(unusedWidgetDir);
@@ -856,6 +862,32 @@ describe("exportProject", () => {
     assert.equal(manifest.projectName, "Export Test Project");
     assert.ok(manifest.exportedAt, "Should have exportedAt timestamp");
     assert.ok(manifest.widgetizerVersion, "Should have widgetizerVersion");
+  });
+
+  it("stamps manifest.assetVersion on the enqueued CSS/JS URLs in the exported HTML", async () => {
+    // The manifest field exists so a live page traces back to its export, which
+    // only holds if the token in the page is the very same string.
+    const exportDir = await getLatestExportDir();
+    const { assetVersion } = await fs.readJson(path.join(exportDir, "manifest.json"));
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes(`assets/hero-slider.css?v=${assetVersion}`), "enqueued style should carry the manifest token");
+    assert.ok(html.includes(`assets/hero-slider.js?v=${assetVersion}`), "enqueued script should carry the manifest token");
+  });
+
+  it("copies an uppercase widget file enqueued with a query, and joins the token to that query", async () => {
+    const exportDir = await getLatestExportDir();
+    assert.ok(await fs.pathExists(path.join(exportDir, "assets", "Hero.CSS")), "Hero.CSS should be copied");
+    const { assetVersion } = await fs.readJson(path.join(exportDir, "manifest.json"));
+    const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
+    assert.ok(html.includes(`assets/Hero.CSS?variant=a&v=${assetVersion}`), "query kept, token appended with &");
+  });
+
+  it("manifest.exportedAt is the same instant as the token's timestamp", async () => {
+    const exportDir = await getLatestExportDir();
+    const { assetVersion, exportedAt } = await fs.readJson(path.join(exportDir, "manifest.json"));
+    const tokenStamp = assetVersion.split("-").pop();
+    const exportedAtStamp = exportedAt.replace(/[-:]/g, "").replace(/\.\d+Z$/, "");
+    assert.equal(tokenStamp, exportedAtStamp);
   });
 
   it("records export in history", async () => {
