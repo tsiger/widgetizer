@@ -399,7 +399,12 @@ function createWindow() {
     }
   });
 
-  // Don't let a stuck beforeunload handler prevent window close
+  // Don't let a stuck beforeunload handler prevent window close. Electron shows no
+  // leave-page prompt of its own, and this can't distinguish a hung page from the
+  // navigation guards' legitimate "unsaved changes" objection — so on desktop the
+  // window closes without asking and unsaved edits are discarded. The in-app
+  // guards only cover navigation inside the app. Whether the desktop app
+  // should warn on close instead is an open product question.
   mainWindow.webContents.on("will-prevent-unload", (event) => {
     log("Renderer attempted to prevent unload — allowing close");
     event.preventDefault();

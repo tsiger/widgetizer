@@ -16,6 +16,11 @@ export {
 } from "./extension/PluginProvider.jsx";
 export { builtinNavPlugin, NAV_GROUPS, groupNavItems } from "./extension/builtinNav.js";
 export { EditorShell, EditorProvider, createEditorRoutes } from "./EditorShell.jsx";
+// Per-window UI surfaces. EditorProvider mounts neither — the embedding shell
+// mounts each exactly once (toast outlet; the confirm dialog the navigation
+// guards prompt through — useConfirm() throws without the provider above it).
+export { default as ToastContainer } from "./components/ui/ToastContainer.jsx";
+export { ConfirmProvider, useConfirm } from "./components/ui/ConfirmProvider.jsx";
 // Resolves a collection schema's PascalCase `icon` name to a lucide-react component
 // (fallback: Database). Shared so a host reproducing the collection nav outside the
 // editor shell renders the same per-collection icons as editor-ui's Sidebar.

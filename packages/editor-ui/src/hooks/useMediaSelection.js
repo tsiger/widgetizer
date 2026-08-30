@@ -116,8 +116,9 @@ export default function useMediaSelection({ activeProject, showToast, setFiles, 
     }
   };
 
-  const openDeleteConfirmation = (fileId, fileName) => {
+  const openDeleteConfirmation = (fileId, fileName, returnFocusTo = null) => {
     openModal({
+      returnFocusTo,
       title: "Delete File",
       message: `Are you sure you want to delete "${fileName}"? This action cannot be undone.`,
       confirmText: "Delete",

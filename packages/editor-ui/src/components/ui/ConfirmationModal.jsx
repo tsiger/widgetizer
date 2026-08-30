@@ -2,6 +2,16 @@ import { useEffect, useId, useRef } from "react";
 import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+// Open dialogs, oldest first. Only the newest (last) may act on keys: with two
+// dialogs up — a page-local confirmation under the navigation guard's prompt —
+// the older instance's capture listener runs first and would otherwise answer
+// an Escape meant for the dialog the user actually sees, while its
+// stopImmediatePropagation starved the visible one. Open order matches visual
+// order here: with a backdrop covering the page, a second dialog can only
+// appear through non-pointer means (navigation blocking), and that one is
+// provider-mounted, rendering later in the DOM.
+const openDialogs = [];
+
 export default function ConfirmationModal({
   isOpen,
   onClose,
@@ -11,10 +21,22 @@ export default function ConfirmationModal({
   confirmText,
   cancelText,
   variant = "danger", // or "warning", "info"
+  // Where focus goes when the dialog closes: an element or a ref to one. Defaults
+  // to whatever was focused when the dialog opened, which is wrong when the
+  // opener unmounts in the same click — a row menu's "Delete" item closes its
+  // menu and opens this dialog in one batched update, so by the time the open
+  // effect looks, nothing is focused. Those callers pass the menu's trigger.
+  returnFocusTo = null,
 }) {
   const { t } = useTranslation();
   const dialogRef = useRef(null);
   const cancelRef = useRef(null);
+  // Read at close time, not captured at open: the caller decides the target
+  // when it opens the dialog, and the ref may only be populated later.
+  const returnFocusToRef = useRef(returnFocusTo);
+  useEffect(() => {
+    returnFocusToRef.current = returnFocusTo;
+  });
   const titleId = useId();
   const messageId = useId();
 
@@ -27,21 +49,58 @@ export default function ConfirmationModal({
     const previouslyFocused = document.activeElement;
     cancelRef.current?.focus();
     return () => {
-      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+      const explicit = returnFocusToRef.current;
+      const target = (explicit && "current" in explicit ? explicit.current : explicit) || previouslyFocused;
+      // A target that left the DOM (its row was deleted, the page navigated) or
+      // was never anything (body) is skipped rather than focused to no effect.
+      if (target instanceof HTMLElement && target.isConnected && target !== document.body) target.focus();
     };
   }, [isOpen]);
 
-  // Escape cancels; Tab cycles within the dialog so focus can't wander behind it.
+  // While open, the dialog owns the keyboard, the way the native confirm() it
+  // replaced did. The listener runs in the capture phase on `document` and
+  // swallows every key — propagation AND default — except an explicit
+  // allowlist: Escape (cancel), Tab (the trap below), Enter/Space (activate the
+  // focused button). Why so strict: expanded rich-text/code editors, row menus
+  // and media drawers listen for Escape on `document`; the page editor's
+  // Delete/Backspace, undo/redo and Ctrl/Cmd+S listen on `window`; and an
+  // unstopped Ctrl/Cmd+S would fall through to the browser's own save-page UI.
+  // Nothing behind an open confirm may act, visibly or invisibly. Keys the
+  // browser reserves for itself (Ctrl/Cmd+W/T/N) cannot be blocked by any page;
+  // tab-close is still caught by the guards' beforeunload layer. If this dialog
+  // ever gains a text input, the allowlist must widen to typing keys.
+  //
+  // One rung of the event ladder is out of reach: a WINDOW-capture keydown
+  // listener fires before this handler and cannot be silenced from here. Don't
+  // register one anywhere in an app that shows this dialog — a repo test
+  // (noCaptureKeydown) trips if one appears.
   useEffect(() => {
     if (!isOpen) return;
 
+    const token = {};
+    openDialogs.push(token);
+
     const handleKeyDown = (e) => {
+      // Not the topmost dialog: leave the key for the one that is.
+      if (openDialogs[openDialogs.length - 1] !== token) return;
       if (e.key === "Escape") {
         e.preventDefault();
+        e.stopImmediatePropagation();
         onClose();
         return;
       }
-      if (e.key !== "Tab") return;
+      // Allowlisted keys keep their DEFAULT action (button activation, Tab
+      // movement) — but still must not reach listeners behind the dialog.
+      if (e.key === "Enter" || e.key === " ") {
+        e.stopImmediatePropagation();
+        return;
+      }
+      if (e.key !== "Tab") {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+      e.stopImmediatePropagation();
 
       const focusable = dialogRef.current?.querySelectorAll("button");
       if (!focusable?.length) return;
@@ -57,8 +116,12 @@ export default function ConfirmationModal({
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => {
+      const i = openDialogs.indexOf(token);
+      if (i !== -1) openDialogs.splice(i, 1);
+      document.removeEventListener("keydown", handleKeyDown, true);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -75,8 +138,13 @@ export default function ConfirmationModal({
   };
 
   return (
+    // z-[1100]: deliberately above every app overlay — the expanded rich-text /
+    // code editors (z-1000) and any z-50 modal (e.g. an embedding shell's own
+    // dialogs) — because this dialog can open *while* those are up (browser
+    // Back on a dirty page) and it holds the keyboard, so it must be the thing
+    // the user sees. The native confirm() it replaced always sat on top.
     <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[1100] p-4"
       onClick={onClose}
     >
       <div

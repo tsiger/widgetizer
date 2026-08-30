@@ -35,7 +35,8 @@ export function ConfirmProvider({ children }) {
   /**
    * Open the dialog and resolve to the user's answer.
    *
-   * @param {object} [opts] - title, message, confirmText, cancelText, variant
+   * @param {object} [opts] - title, message, confirmText, cancelText, variant,
+   *   returnFocusTo (element or ref; see ConfirmationModal)
    * @returns {Promise<boolean> & { cancel: () => void }} resolves true on
    *   confirm, false on cancel/Escape/backdrop. `cancel()` closes the dialog and
    *   resolves false — but only while *this* request is the open one, so a
@@ -82,6 +83,7 @@ export function ConfirmProvider({ children }) {
         confirmText={options?.confirmText}
         cancelText={options?.cancelText}
         variant={options?.variant ?? "danger"}
+        returnFocusTo={options?.returnFocusTo}
       />
     </ConfirmContext.Provider>
   );

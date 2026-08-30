@@ -133,6 +133,9 @@ export default function Projects() {
       cancelText: t("projects.deleteModal.cancel"),
       variant: "danger",
       data: { projectId: id, projectName: name },
+      // Opened from the row menu, which closes on the same click — hand focus
+      // back to its trigger, not to the menu item that is about to unmount.
+      returnFocusTo: menuRef.current?.querySelector('[aria-haspopup="menu"]'),
     });
   };
 

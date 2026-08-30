@@ -61,6 +61,7 @@ _None open._
 - [⬜ 67. Export viewer confinement is lexical — a symlink inside an export dir escapes it (`builder-server`) — low](#-67-export-viewer-confinement-is-lexical--a-symlink-inside-an-export-dir-escapes-it-builder-server--low)
 - [⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low](#-68-a-website-address-with-a-path-or-query-produces-inconsistent-sitemap-robots-and-canonical-urls-builder-server--core--low)
 - [⬜ 70. Widget assets enqueued with a sub-path (`vendor/lib.js`) render a nested URL but are flattened to `assets/<basename>` on export (`builder-server` / `core`) — low](#-70-widget-assets-enqueued-with-a-sub-path-vendorlibjs-render-a-nested-url-but-are-flattened-to-assetsbasename-on-export-builder-server--core--low)
+- [⬜ 71. Navigation-guard tests mock `useBlocker` — router state transitions and the answer-dropping race are unpinned (`editor-ui`) — low (test depth)](#-71-navigation-guard-tests-mock-useblocker--router-state-transitions-and-the-answer-dropping-race-are-unpinned-editor-ui--low-test-depth)
 - [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
 - [⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low](#-65-raw-html-internal-hrefs-under-clean-urls--user-typed-links-theme-liquid-schema-defaults-core--render-engine--themes--low)
 
@@ -676,6 +677,8 @@ unit is the **menu + `useMenu`**, not the whole control.
 
 ---
 
+
+Also part of this redesign: after a **confirmed** row delete, `ConfirmationModal`'s `returnFocusTo` target (the row's ⋯ trigger) is removed along with the row, so focus falls to `body` — only the cancel path truly restores (`packages/editor-ui/src/components/ui/ConfirmationModal.jsx`, the row-menu callers). A generic landing target doesn't exist; per-page policy (next row's trigger? the list heading?) is a menu-a11y design question, decided together with the WAI-ARIA menu work.
 ## ⬜ 54. Full accessibility / WAI-ARIA APG conformance review (`editor-ui` + all shells) — low — investigate (a11y)
 
 **Priority:** Low
@@ -1121,6 +1124,12 @@ under both Clean URLs values.
 **Priority:** Low
 
 `enqueue_script` / `enqueue_style` (and, since they resolve the same way, script/style `enqueue_preload`s) accept any path relative to the asset folder, and `buildAssetUrl` (`packages/core/src/utils/assetUrl.js`) keeps it: a widget that enqueues `vendor/lib.js` gets `/api/preview/assets/<id>/widgets/<type>/vendor/lib.js` in preview — which the preview route serves, nested paths included — and `assets/vendor/lib.js?v=…` in an export. The export, however, ships widget files by **basename only**: `exportProjectToDir` (`packages/builder-server/src/controllers/exportController.js`, the "Copy Widget Assets" step) walks `widgets/**` for CSS/JS, keeps the ones whose basename was enqueued, and copies each to `assets/<basename>`. So the published page requests `assets/vendor/lib.js` while the file landed at `assets/lib.js` — a 404 in production that preview never shows. Theme-level `assets/` is copied as a tree, so sub-paths there are fine; the gap is widget folders only. Nothing shipped is affected (Arch's widget assets are all flat, one file per widget dir). Two consistent fixes: preserve the relative sub-path when flattening (`assets/vendor/lib.js`) and match enqueued *paths* rather than basenames — or reject sub-paths in widget-origin enqueues with a render-time warning and document "widget assets must sit directly in the widget folder" in `docs-llms/theming.md`. The `theming.md` note that same-named widget files overwrite each other on export applies to whichever is chosen.
+
+## ⬜ 71. Navigation-guard tests mock `useBlocker` — router state transitions and the answer-dropping race are unpinned (`editor-ui`) — low (test depth)
+
+**Priority:** Low
+
+`useFormNavigationGuard.test.jsx` and `useNavigationGuard.test.jsx` (`packages/editor-ui/src/hooks/__tests__/`) replace `react-router-dom`'s `useBlocker` with a mutable stub (`rr.state` / `rr.proceed` / `rr.reset`), so they only cover "blocked → user answers". They never drive react-router's real state machine: `blocked → proceeding → unblocked` after `proceed()`, a second navigation arriving while already `blocked` (react-router keeps `state === "blocked"` and swaps `proceed`/`reset` — the hooks rely on `blockerRef` to pick up the new pair), or a browser Back (POP) block. The race the hooks are built around — keying the effect on `blocker.state` rather than the blocker object so an effect cleanup can't cancel the prompt between the click and the handler — is likewise unpinned; the re-render test says in its own comment that it also passes against the old `[blocker]` dependency. (The shell-mount coverage itself is already tree-level: `app/src/__tests__/confirmProviderMount.test.jsx` renders the real `<App/>` around a `useConfirm()` probe, and `confirmProviderCoverage.test.js` keeps only the negative check that no mount creeps back into `EditorShell.jsx`.) Fix: render the guards inside a `createMemoryRouter` (`RouterProvider` + a two-route app, one dirty) and navigate for real, asserting the blocker transitions and that a re-navigation while blocked proceeds to the *latest* target; keep the stub tests for the answer/side-effect ordering they already pin. Worth doing alongside any change to the guards' close/quit behaviour, since that is where the next edit to these hooks lands.
 
 ## Completed — reference table
 

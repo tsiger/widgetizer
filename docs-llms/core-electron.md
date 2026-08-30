@@ -217,7 +217,7 @@ Runtime resilience is split between a React boundary in the renderer and native 
 - **React ErrorBoundary** (`packages/editor-ui/src/components/ui/ErrorBoundary.jsx`) — wraps the app in `app/src/App.jsx`. Catches render errors and shows a recovery screen with Dashboard and Reload buttons. Shows a stack trace in dev mode.
 - **Unresponsive window** (`main.js` `mainWindow.on("unresponsive")`) — dialog offers "Wait" or "Reload" when the renderer hangs.
 - **Renderer crash** (`render-process-gone`) — shows the error page with a Retry button.
-- **Blocked window close** (`will-prevent-unload`) — forces close when a stuck `beforeunload` handler tries to block it.
+- **Blocked window close** (`will-prevent-unload`) — forces close when a `beforeunload` handler tries to block it. Electron never shows a leave-page prompt of its own, and this handler cannot tell a hung page from the navigation guards' legitimate "unsaved changes" objection, so on desktop the window closes without asking and unsaved edits are discarded (the in-app guards only cover navigation *inside* the app). Whether desktop should warn on close is an open product question.
 - **Uncaught exceptions** (`process.on("uncaughtException")`) — logs the error and shows a dialog, but skips the dialog during app quit to prevent blocking shutdown.
 
 ## Auto-Update (renderer side)

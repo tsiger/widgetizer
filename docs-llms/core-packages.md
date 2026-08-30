@@ -151,6 +151,7 @@ Lives in builder-server. It delegates to `req.adapters.scopeResolver.resolveScop
 - `EditorProvider({ apiBase, previewRenderBase, standalonePreviewPath, standaloneCollectionPreviewPath, routeBase, project, scope, plugins, slots })` — binds the singletons, seeds the project store, composes `[builtinNavPlugin, ...plugins]`, and wraps children in `PluginProvider` + `RouteBaseProvider`.
 - `EditorShell` — adds the editor's own `Layout` on top of `EditorProvider`.
 - `createEditorRoutes({ … })` — returns a react-router route object. `EditorShell` deliberately owns **no** router, so the host supplies a single data-router context (needed for `useBlocker`).
+- `ConfirmProvider` / `useConfirm`, `ToastContainer` — per-window surfaces the **host shell mounts once** above the router (EditorProvider mounts neither). The navigation guards prompt through `useConfirm()`, which throws without a `ConfirmProvider` above it; the toast store renders nowhere without a `ToastContainer`.
 
 ### Extension system (`packages/editor-ui/src/extension/`)
 

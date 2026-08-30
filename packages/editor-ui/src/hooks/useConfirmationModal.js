@@ -6,7 +6,7 @@ import { useState } from "react";
  *
  * @param {Function} onConfirm - Callback executed when user confirms the action, receives modal data as argument
  * @returns {{
- *   modalState: {isOpen: boolean, title: string, message: string, confirmText: string, cancelText: string, variant: string, data: any},
+ *   modalState: {isOpen: boolean, title: string, message: string, confirmText: string, cancelText: string, variant: string, data: any, returnFocusTo: HTMLElement|React.RefObject|null},
  *   openModal: (options?: Object) => void,
  *   closeModal: () => void,
  *   handleConfirm: () => void
@@ -25,12 +25,16 @@ export default function useConfirmationModal(onConfirm) {
     cancelText: "Cancel",
     variant: "danger",
     data: null,
+    returnFocusTo: null,
   });
 
   const openModal = (options = {}) => {
     setModalState({
       ...modalState,
       isOpen: true,
+      // Per-open, never inherited: a bulk-delete opened after a row delete must
+      // not hand focus back to the earlier row's menu trigger.
+      returnFocusTo: null,
       ...options,
     });
   };

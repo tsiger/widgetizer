@@ -106,6 +106,9 @@ export default function Menus() {
       cancelText: t("menus.deleteModal.cancel"),
       variant: "danger",
       data: { id, name },
+      // Opened from the row menu, which closes on the same click — hand focus
+      // back to its trigger, not to the menu item that is about to unmount.
+      returnFocusTo: menuRef.current?.querySelector('[aria-haspopup="menu"]'),
     });
   };
 

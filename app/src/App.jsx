@@ -104,10 +104,11 @@ const router = createBrowserRouter([
 
 // Wrapper component to include ToastContainer.
 //
-// ConfirmProvider wraps the whole router, not just the editor: the picker routes
-// (Projects add/edit, App settings) use the navigation guards too, and they live
-// outside EditorProvider — which mounts its own ConfirmProvider for hosted, where
-// this shell doesn't exist. Nesting is harmless; each consumer takes the nearest.
+// ConfirmProvider is the shell's job, like ToastContainer: one confirm surface
+// per window, mounted once around the whole router so both the editor routes
+// and the picker routes (Projects add/edit, App settings — outside
+// EditorProvider) can use the navigation guards. EditorProvider deliberately
+// does not mount one; every embedding shell mounts its own.
 function AppWithToast() {
   return (
     <>

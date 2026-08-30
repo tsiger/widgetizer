@@ -130,6 +130,9 @@ export default function Pages() {
       cancelText: t("pages.deleteModal.cancel"),
       variant: "danger",
       data: { pageId, pageName, isBulkDelete: false },
+      // Opened from the row menu, which closes on the same click — hand focus
+      // back to its trigger, not to the menu item that is about to unmount.
+      returnFocusTo: menuRef.current?.querySelector('[aria-haspopup="menu"]'),
     });
   };
 

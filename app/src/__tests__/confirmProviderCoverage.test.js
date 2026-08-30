@@ -6,12 +6,15 @@ import { fileURLToPath } from "node:url";
 // The navigation guards call useConfirm(), which throws if no <ConfirmProvider>
 // is above it. That is a render-time crash on the page, not a test failure, so
 // it shipped once already: the OSS picker routes (Projects add/edit, App
-// settings) use the guards but live outside EditorProvider, which was the only
-// place mounting the provider.
+// settings) use the guards but live outside EditorProvider, which at the time
+// was the only place mounting the provider.
 //
-// This checks the shells rather than the pages: every root that hosts guard
-// consumers must mount the provider. It cannot see a brand-new third shell —
-// it fails when a mount is removed while consumers still exist.
+// The rule now: the confirm dialog is one surface per window, so the *shell*
+// mounts it (like ToastContainer) and EditorProvider does not. The OSS mount
+// itself is proven tree-level by confirmProviderMount.test.jsx (a probe route
+// rendered through the real <App/>); this file pins the other half — that no
+// second mount creeps back into EditorProvider. Embedding shells are covered
+// by their own repos' tests.
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 
 const GUARD_HOOKS = /use(GuardedFormPage|FormNavigationGuard|NavigationGuard)|useConfirm\b/;
@@ -38,18 +41,11 @@ const consumersUnder = (dir) =>
     .map((f) => path.relative(ROOT, f).replace(/\\/g, "/"));
 
 describe("ConfirmProvider covers every shell that uses the navigation guards", () => {
-  it("the OSS shell mounts it — its picker routes use the guards", () => {
-    const consumers = consumersUnder("app/src");
-    // Non-vacuity: if this ever empties, the assertion below proves nothing.
-    expect(consumers.length).toBeGreaterThan(0);
-    expect(readFileSync(path.join(ROOT, "app/src/App.jsx"), "utf8")).toMatch(/<ConfirmProvider>/);
-  });
-
-  it("the editor shell mounts it — hosted composes EditorProvider without the OSS shell", () => {
-    const consumers = consumersUnder("packages/editor-ui/src");
-    expect(consumers.length).toBeGreaterThan(0);
-    expect(readFileSync(path.join(ROOT, "packages/editor-ui/src/EditorShell.jsx"), "utf8")).toMatch(
-      /<ConfirmProvider>/,
+  it("EditorProvider does not mount it — shells own the confirm surface, so nesting never comes back", () => {
+    // Non-vacuity: editor-ui does contain guard consumers; they rely on the shell.
+    expect(consumersUnder("packages/editor-ui/src").length).toBeGreaterThan(0);
+    expect(readFileSync(path.join(ROOT, "packages/editor-ui/src/EditorShell.jsx"), "utf8")).not.toMatch(
+      /<ConfirmProvider/,
     );
   });
 });
