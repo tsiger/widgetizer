@@ -1,6 +1,6 @@
 # Future: Schema.org / JSON-LD
 
-> **Status: direction locked 2026-08-06; sharpened 2026-09-09 — open questions resolved, scope trimmed, placed as stage 2 of the series.** The series (groundwork → pagination → **structured data** → multilang) and its cross-stage build order live in `future-multilang-implementation-plan.md` (§Series order). Nothing is built yet.
+> **Status: direction locked 2026-08-06; sharpened 2026-09-09 — open questions resolved, scope trimmed, placed as stage 3 of the series.** The series (groundwork → breadcrumbs → pagination → **structured data** → multilang) and its cross-stage build order live in `future-roadmap.md`. Nothing is built yet.
 >
 > One answer per question below. The 2026-08 open questions are resolved in §Resolved questions, not re-argued in the body.
 
@@ -128,14 +128,9 @@ The collection schema declares meaning in a small closed block; core owns the bu
 - Values come from the **visible** fields named in the block, never silently from the SEO description or social image — Google requires page-content parity.
 - The only supported `type` in the first release is `BlogPosting`. Adding a type means adding a core builder *and* a content model that can supply its required fields.
 
-### Breadcrumbs — auto-detected, no UI
+### Breadcrumbs — from the stage-1 trail
 
-A breadcrumb may only point at a destination that really exists:
-
-- If **exactly one** page contains a listing widget for the item's collection, the trail is *Home → that page → item*.
-- Otherwise (none, or more than one) the trail is *Home → item*.
-
-"Contains a listing widget for the collection" is read from the widget schema's `collection` declaration introduced by pagination (`future-pagination-design.md` §1) — the same fact the pager uses. Deterministic, nothing to configure, and a deleted or renamed listing page silently degrades to *Home → item* on the next render.
+`BreadcrumbList` is built from the same array the visible breadcrumb renders (`page.breadcrumbs`, `future-breadcrumbs-design.md`): parent page or menu position for pages, the listing anchor or the single listing page for items, Home detected by slug. Only linkable entries are emitted; the node is omitted when the trail has fewer than two entries (the homepage). A deleted parent or anchor degrades on the next render exactly as the visible breadcrumb does. Nothing to configure here, and the visible trail and the JSON-LD can never disagree.
 
 ---
 
@@ -190,16 +185,16 @@ Everything else is the feature.
 
 ---
 
-## Build steps (stage 2 of the series)
+## Build steps (stage 3 of the series)
 
-Prerequisites already landed by earlier stages: the Site URL base helper and `page_url` filter (stage 0), derived output depth and the addressing module (stage 1). Multilang plan step 3 (global widgets get `page` and `project` in context) lands **here**, as step 1.
+Prerequisites already landed by earlier stages: the Site URL base helper and `page_url` filter (stage 0); the breadcrumb trail, the widget `collection` declaration and the listing anchor (stage 1); derived output depth and the addressing module (stage 2). Multilang plan step 3 (global widgets get `page` and `project` in context) lands **here**, as step 1.
 
 1. **Global-widget render context** — `renderPageLayout` / `renderCollectionItemPage` in `packages/render-engine/src/renderEngine.js` pass page and project into the header/footer `renderWidget` calls; `renderSingleWidget` in `packages/builder-server/src/controllers/previewController.js` does the same for the canvas. Test: a footer template reads `project.siteUrl`.
 2. **Data model + validation** — the next migration version adds `site_identity TEXT` to `projects` (`packages/builder-server/src/db/migrations.js`); `packages/core/src/utils/siteIdentity.js` (new) owns the shape, validation, the derive rules (kind from category, name from Site Title) and the readiness computation; `projectRepository.js` maps it; `projectController.js` validates on create/update and round-trips it through export/import/duplicate.
 3. **Graph builder + safe serializer** — `packages/core/src/structuredData/` (new): `buildGraph(context)` returns nodes; `serializeJsonLd(nodes)` prunes empties and escapes `</script`. `SeoTag.js` appends the script. Tests: stable ids, pruning, breakout attempts, no Site URL → URL-dependent nodes absent.
 4. **Homepage and ordinary pages** — `WebSite` + identity + `WebPage` on the homepage, `WebPage` elsewhere (paginated copies included); readiness warning surfaced in the export result.
 5. **Collection contract + News** — `structuredData` block validation in `collectionService.js`; the `BlogPosting` builder; the block added to `themes/arch/collection-types/news/schema.json`; item pages emit it. Tests: missing field refused, parity with visible values, absolute image URL under both Clean URLs values.
-6. **Breadcrumbs** — listing-page detection from the widget `collection` declaration; `BreadcrumbList` on item pages. Tests: zero / one / two listing pages.
+6. **Breadcrumbs** — `BreadcrumbList` from `page.breadcrumbs` on every page whose trail has two or more linkable entries. Tests: page with menu ancestors, item with an anchor, item without one (Home → item), homepage (no node).
 7. **Project details UI** — Website readiness line; Site identity section; Business details section; opening-hours editor (`app/src/components/projects/ProjectForm.jsx`, strings in `packages/core/src/locales/en.json`).
 8. **Theme** — `project.identity` in the base render context (`renderingService.js` `buildRenderDeps`); "Use business details" toggle in Arch's footer and contact-details widget; social dual-read in the footer.
 9. **Warnings, validation, docs** — preview/export reporting; developer-mode validation entries; `docs-llms/core-collections.md` (the `structuredData` block), theme authoring docs, `docs-llms/user-test-checklist.md`.
@@ -235,7 +230,7 @@ Prerequisites already landed by earlier stages: the Site URL base helper and `pa
 
 | # | question | resolution |
 |---|---|---|
-| 1 | How is a breadcrumb listing page verified? | Auto-detect: exactly one page with a listing widget for the collection → use it; otherwise Home → item. No UI. |
+| 1 | How is a breadcrumb listing page verified? | Stage 1 (breadcrumbs): the listing **anchor** flag on a listing widget, falling back to the single page that lists the collection; otherwise Home → item. Visible breadcrumb and JSON-LD share one trail. |
 | 2 | Social profiles: in scope or deferred? | In scope, as a dual-read period — project fields added, Arch prefers them, theme fields stay as fallback. |
 | 3 | Where does "page purpose" live? | Nowhere — dropped with question 4. |
 | 4 | Do About/Contact page types earn their cost? | No. Ordinary pages emit `WebPage`. |

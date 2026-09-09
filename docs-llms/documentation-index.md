@@ -420,11 +420,11 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (four features in series)
+### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (seven items in series)
 
-**Purpose**: Entry point for the planned feature series — groundwork (page-link filter, Site URL helper) → collection pagination → structured data → multilang — with what each stage ships, which doc holds its design, what it lands for later stages, and the reading order when picking the work up **When to use**:
+**Purpose**: Entry point for the planned series — groundwork (page-link filter, Site URL helper) → breadcrumbs → collection pagination → structured data → multilang → undo-history fix → rename to "Widgetizer Desktop" — with what each stage ships, which doc holds its design, what it lands for later stages, and the reading order when picking the work up; the undo-history and rename stages are specified inline **When to use**:
 
-- Starting or resuming any of the four features
+- Starting or resuming any of the seven items
 - Deciding what must be finished before a given feature can begin
 - Finding which `future-*` doc to open
 
@@ -468,15 +468,39 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
+### **[future-breadcrumbs-design.md](future-breadcrumbs-design.md)** - Future: Breadcrumbs
+
+**Purpose**: Locked design for breadcrumbs (stage 1 of the series) — core computes one trail per page (parent page → menu position for pages; listing anchor → single listing page for items; homepage by slug), exposes it as `page.breadcrumbs` / `globals.breadcrumbs`, and themes render it with a core snippet or their own markup; introduces the widget-schema `collection` declaration and the listing anchor that pagination and structured data reuse **When to use**:
+
+- Adding breadcrumbs to a theme (the Widgetizer marketing-site theme is the first consumer)
+- Touching the parent-page field, the listing-anchor toggle, or the `collection` widget-schema block
+- Building `BreadcrumbList` structured data from the trail
+
+**Key topics**: Trail sources and fallbacks, home detection and label, unlinkable ancestors, the frozen `breadcrumbs` contract, the core `breadcrumbs` snippet and its params, `theme.json` `settings.breadcrumbs.menu`, engine/editor work, multilang note, definition of done
+
+---
+
 ### **[future-structured-data-design.md](future-structured-data-design.md)** - Future: Schema.org / JSON-LD
 
-**Purpose**: Locked design for automatic structured data — one safe JSON-LD graph through the existing SEO tag, project-owned site identity and business details that Arch can display in the footer, a closed collection-schema mapping contract (Arch News → `BlogPosting`), auto-detected breadcrumbs, and the stage-2 build steps **When to use**:
+**Purpose**: Locked design for automatic structured data — one safe JSON-LD graph through the existing SEO tag, project-owned site identity and business details that Arch can display in the footer, a closed collection-schema mapping contract (Arch News → `BlogPosting`), breadcrumbs from the shared stage-1 trail, and the stage-3 build steps **When to use**:
 
 - Implementing or reviewing structured data / JSON-LD output
 - Adding identity or business fields to Project details, or displaying them in a theme
 - Checking what was deliberately left out (About/Contact page types, widget-level schema, custom JSON-LD editors) and why
 
 **Key topics**: Three rules for a non-technical audience (visible data, zero vocabulary, derive don't ask), stable facts vs translatable text, social profiles dual-read, `structuredData` collection-schema block, breadcrumb auto-detection from the widget `collection` declaration, readiness line, cut order, resolved questions
+
+---
+
+### **[future-image-optimization.md](future-image-optimization.md)** - Future: Image Optimization
+
+**Purpose**: Standalone backlog item (not part of the feature series) — why uploaded PNGs stay heavy (format never changed, PNG quality quantises to a palette, no reprocess action, missing `sizes` hints), measured WebP/AVIF gains, and four approaches: silent WebP conversion on upload, theme `sizes` hints, a one-button cleanup for existing libraries built from the existing CLI script, and preset-style quality settings **When to use**:
+
+- Deciding how to reduce image weight for non-technical users
+- Touching the upload pipeline, the `{% image %}` tag, or the media settings
+- Promoting `scripts/optimize-project-media.mjs` into a product feature
+
+**Key topics**: Format conversion at upload, retained originals, near-lossless for graphics, `sizes` audit in Arch, reference-rewriting cleanup job, quality presets, `og:image` crawler caveat, definition of done
 
 ---
 

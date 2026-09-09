@@ -4,7 +4,7 @@
 >
 > Revised 2026-08-06 after two review passes (Codex, Claude) and a product decision round. Both review passes are folded into the sections below — there is one answer per question here, not a discussion thread.
 >
-> Revised 2026-09-09 (fifth revision): four additions folded in — enabled language codes are reserved names (§8a), one Site URL base helper is a phase-one blocker (§Implementation Contracts, blocker 4), the hreflang set rules are locked (§7d) and `dir` joins the §7c contract, and menus move to language folders (§5). The step-by-step build order lives in `future-multilang-implementation-plan.md`, where multilang is the last stage of a four-stage series (groundwork → pagination → structured data → multilang).
+> Revised 2026-09-09 (fifth revision): four additions folded in — enabled language codes are reserved names (§8a), one Site URL base helper is a phase-one blocker (§Implementation Contracts, blocker 4), the hreflang set rules are locked (§7d) and `dir` joins the §7c contract, and menus move to language folders (§5). The step-by-step build order lives in `future-multilang-implementation-plan.md`, where multilang is stage 4 of the series in `future-roadmap.md` (groundwork → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename).
 
 ---
 

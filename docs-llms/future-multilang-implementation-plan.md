@@ -8,7 +8,7 @@
 
 ## Where this sits
 
-Multilang is the **last of four stages** built in series — groundwork → pagination → structured data → multilang. The series table, what each stage lands for the next, and the reading order are in `future-roadmap.md`. This doc's Phase 0 holds the shared groundwork steps (0 and 1 are stage 0; 3 ships in stage 2; 4 and the path half of 6 ship in stage 1) and marks each with the stage it lands in. By the time multilang starts, only step 2 is still open.
+Multilang is **stage 4 of the series** — groundwork → breadcrumbs → pagination → structured data → multilang, followed by two independent items (undo-history fix, rename to "Widgetizer Desktop") that wait on nothing. The series table, what each stage lands for the next, and the reading order are in `future-roadmap.md`. This doc's Phase 0 holds the shared groundwork steps (0 and 1 are stage 0; 3 ships in stage 3; 4 and the path half of 6 ship in stage 2) and marks each with the stage it lands in. By the time multilang starts, only step 2 is still open.
 
 ---
 
@@ -39,7 +39,7 @@ Four contracts the design calls blockers, plus the series' stage-0 filter. Each 
 
 ### Step 1. One Site URL base helper (§Blocker 4) — *lands in stage 0 (groundwork)*
 
-**Why first:** JSON-LD ids (stage 2), hreflang, per-language canonicals and sitemap entries all start from the Site URL, and today three code paths join onto it three different ways.
+**Why first:** JSON-LD ids (stage 3), hreflang, per-language canonicals and sitemap entries all start from the Site URL, and today three code paths join onto it three different ways.
 
 - `packages/core/src/utils/urlSafety.js` — `isValidSiteUrl` additionally rejects a query or hash. Keep accepting a path (GitHub-Pages-style `user.github.io/repo/` is a legitimate deploy).
 - `packages/core/src/utils/internalHref.js` (beside `isHomeSlug`) — add `siteUrlBase(siteUrl)` returning a normalised directory base with one trailing slash, and `absoluteSiteUrl(siteUrl, path)` that joins a site-relative path onto it. Both pure.
@@ -59,16 +59,16 @@ Four contracts the design calls blockers, plus the series' stage-0 filter. Each 
 
 **Done when:** `mediaUsage.test.js` and `collectionMediaUsage.test.js` prove two pages with the same slug in different folders keep independent usage, and deleting one leaves the other's media marked in-use.
 
-### Step 3. Global widgets render with `page` and `project` in context (§Blocker 2) — *lands in stage 2 (structured data)*
+### Step 3. Global widgets render with `page` and `project` in context (§Blocker 2) — *lands in stage 3 (structured data)*
 
-**Why:** the footer's "Use business details" toggle (stage 2) and the header's language switcher (this stage) both read project and page data, but header/footer render through `renderWidget`, which receives none.
+**Why:** the footer's "Use business details" toggle (stage 3) and the header's language switcher (this stage) both read project and page data, but header/footer render through `renderWidget`, which receives none.
 
 - `packages/render-engine/src/renderEngine.js` — `renderPageLayout` and `renderCollectionItemPage` pass the page object and project data into the two `renderWidget` calls for header/footer (today the last argument is `null`). `createBaseRenderContext` exposes them as `page` / `project` for global widgets the same way page-level widgets already see them.
 - Preview's single-widget path (`renderSingleWidget` in `packages/builder-server/src/controllers/previewController.js`) supplies the current page too, so the canvas and the export agree.
 
 **Done when:** a render test asserts a header template can read `page.slug` and `project.siteUrl`; `depthRenderSmoke.test.js` still passes unchanged.
 
-### Step 4. Derived output depth (§Blocker 3) — *lands in stage 1 (pagination)*
+### Step 4. Derived output depth (§Blocker 3) — *lands in stage 2 (pagination)*
 
 **Why:** `exportController.js` passes `outputPathPrefix: "../"` as a literal; a paginated copy (`blog/page/2.html`) and a Greek news item both live two levels deep. Pagination needs this first, so it ships there; multilang only verifies it still holds at depth 3 (`el/news/story.html` is depth 2; `el/blog/page/2.html` is depth 3).
 
@@ -84,7 +84,7 @@ Four contracts the design calls blockers, plus the series' stage-0 filter. Each 
 
 ### Step 5. Project languages setting (§1, §1a, §1b, §8a)
 
-- `packages/builder-server/src/db/migrations.js` — the next migration version adds `default_language TEXT NOT NULL DEFAULT 'en'` and `languages TEXT NOT NULL DEFAULT '[]'` (JSON array of *additional* codes) to `projects`. Existing rows get `en` / `[]` (§1b). (Version numbers are not pinned here: stage 2 adds its own migration first.)
+- `packages/builder-server/src/db/migrations.js` — the next migration version adds `default_language TEXT NOT NULL DEFAULT 'en'` and `languages TEXT NOT NULL DEFAULT '[]'` (JSON array of *additional* codes) to `projects`. Existing rows get `en` / `[]` (§1b). (Version numbers are not pinned here: stage 3 adds its own migration first.)
 - `packages/builder-server/src/db/repositories/projectRepository.js` — `rowToProject` maps `defaultLanguage` / `languages`; `createProject` / `updateProject` write them.
 - `packages/core/src/utils/languages.js` (new) — `LANGUAGE_CODE_RE` (`^[a-z]{2}(-[a-z0-9]{2,8})?$`), `RTL_LANGUAGES` (rejected in v1), `nativeLanguageName(code)`, `hreflangCase(code)` (`pt-br` → `pt-BR`), `languageDir(code)`. Shared by form and controller like `isValidSiteUrl` is.
 - `packages/builder-server/src/controllers/projectController.js` — validate on create/update: codes match the regex, lowercase stored, RTL refused, default not in `languages`, **default language editable only while `languages` is empty** (§1a), **a code equal to an existing root page slug or collection `slugPrefix` is refused with the conflicting name** (§8a). Adding a language calls the seeding service (step 9); removing one calls the removal service (step 10). Manifest round-trip in `exportProject` / `importProject`; `duplicateProject` copies both fields.
@@ -92,7 +92,7 @@ Four contracts the design calls blockers, plus the series' stage-0 filter. Each 
 
 **Done when:** project API tests cover every rejection above; a single-language project round-trips export/import/duplicate with `en` / `[]`.
 
-### Step 6. The addressing layer (§Implementation Contracts) — *started in stage 1, extended here*
+### Step 6. The addressing layer (§Implementation Contracts) — *started in stage 2, extended here*
 
 One module, pure functions, no I/O. Everything after this step calls it. Pagination creates `contentAddress.js` with output paths, public paths, preview mapping and reserved-name checks for pages, items and paged copies (see `future-pagination-design.md`, §Implementation contracts). This step adds the **language dimension** to every builder below — the shape of the module does not change, only its inputs.
 
@@ -113,7 +113,7 @@ One module, pure functions, no I/O. Everything after this step calls it. Paginat
 
 ### Step 7. Storage and API readers/writers go through the addressing layer (§5, §8, §8a)
 
-- **Pages** — `packages/builder-server/src/controllers/pageController.js`: every `pages/…` string becomes a `contentAddress` call. `getAllPages` lists the root folder plus each `pages/<lang>/` and stamps the resolved `language` on each model. `createPage` / `updatePage` accept `language`; `generateUniqueSlug` (`packages/builder-server/src/utils/slugHelpers.js`) checks uniqueness inside the language folder only. **Root page slugs equal to an enabled language code are refused** (§8a); the `page` reservation from stage 1 applies in every language folder. Page model gains `translationGroupId`; on create it is the page's own uuid (a group of one), so no backfill of existing pages is needed.
+- **Pages** — `packages/builder-server/src/controllers/pageController.js`: every `pages/…` string becomes a `contentAddress` call. `getAllPages` lists the root folder plus each `pages/<lang>/` and stamps the resolved `language` on each model. `createPage` / `updatePage` accept `language`; `generateUniqueSlug` (`packages/builder-server/src/utils/slugHelpers.js`) checks uniqueness inside the language folder only. **Root page slugs equal to an enabled language code are refused** (§8a); the `page` reservation from stage 2 applies in every language folder. Page model gains `translationGroupId`; on create it is the page's own uuid (a group of one), so no backfill of existing pages is needed.
 - **Globals** — `getGlobalWidgets` / `saveGlobalWidget` in `pageController.js` and `readGlobalWidgetFromDir` in `packages/builder-server/src/utils/projectContentFs.js` take a language.
 - **Menus** — `packages/builder-server/src/controllers/menuController.js`: menus live in `menus/<lang>/`; list merges all folders and stamps `language`; create takes a language.
 - **Collection items** — `packages/builder-server/src/services/collectionService.js`: `listCollectionItems`, `readCollectionItem`, `writeCollectionItem`, `deleteCollectionItem`, `duplicateCollectionItem`, `reorderCollectionItems` go through `itemKey`; uniqueness and `RESERVED_ITEM_SLUGS` (`index`) apply per language folder; **`RESERVED_SLUG_PREFIXES` grows the project's enabled language codes** (§8a); items gain `translationGroupId` like pages.
@@ -129,6 +129,7 @@ One module, pure functions, no I/O. Everything after this step calls it. Paginat
 - `loadPagesByUuid` in `packages/render-engine/src/renderEngine.js` and `loadCollectionItemsByUuid` in `collectionService.js` load every language, and each entry carries its resolved `language`.
 - `packages/render-engine/src/menuResolver.js` (`resolveMenuItemLinks`, `resolveMenuPageLinks`), the richtext resolution inside `renderWidget`, and the link-setting resolution pass the target's language into `pageHref` / `itemHref` so a cross-language link renders as `../el/contact` from an English page (§4a). Author-typed strings stay untouched (§2a).
 - `canonicalPath` stays the file path, per language.
+- Breadcrumb trails (stage 1, `future-breadcrumbs-design.md`) are per language automatically because menus are; a `parentPageUuid` that points at another language's page resolves to that page's translation sibling in the current language, else is ignored. Listing anchors live on per-language pages and need nothing.
 
 **Done when:** `collectionLinkResolution.test.js` and a menu-resolver test cover same-language, cross-language and cross-depth targets under both Clean URLs values.
 
@@ -269,7 +270,7 @@ Every component below renders nothing new while `projectStore.isMultilang` is fa
 1 Site URL helper ─┤  (stage 0)
 2 usage ids ───────┤  (this stage)
 3 global context ──┼─► 5 setting ─► 6 addressing ─► 7 storage/API ─► 8 links
-4 derived depth ───┘  (3: stage 2; 4 and the path half of 6: stage 1)
+4 derived depth ───┘  (3: stage 3; 4 and the path half of 6: stage 2)
                                                         │
                                                         ├─► 9 add ─► 10 remove ─► 11 create version
                                                         │                              │
@@ -280,4 +281,4 @@ Every component below renders nothing new while `projectStore.isMultilang` is fa
                                                                      22 theme ◄── 19          23 dates   24 upgrade   25 docs
 ```
 
-Steps 0 and 1 are stage 0. Step 4 and the path half of step 6 ship inside pagination (stage 1). Step 3 ships inside structured data (stage 2). When multilang starts, step 2 is the only prerequisite left. Steps 12–17 can be built in parallel once 11 lands. Step 23 is independent of everything and is scheduled last only for that reason.
+Steps 0 and 1 are stage 0. Step 4 and the path half of step 6 ship inside pagination (stage 2). Step 3 ships inside structured data (stage 3). When multilang starts, step 2 is the only prerequisite left. Steps 12–17 can be built in parallel once 11 lands. Step 23 is independent of everything and is scheduled last only for that reason.

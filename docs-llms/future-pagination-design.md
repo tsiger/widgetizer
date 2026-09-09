@@ -1,6 +1,6 @@
 # Future: Collection Pagination
 
-> **Status: direction locked 2026-09-09, detailed design in this doc.** Pagination is stage 1 of a four-stage series — groundwork (page-link filter, Site URL helper) → pagination → structured data → multilang — and deliberately lands groundwork the later stages need. The build order across all three lives in `future-multilang-implementation-plan.md` (§Series order). Design vocabulary follows `future-multilang-design.md`.
+> **Status: direction locked 2026-09-09, detailed design in this doc.** Pagination is stage 2 of the series in `future-roadmap.md` — groundwork (page-link filter, Site URL helper) → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename — and deliberately lands groundwork the later stages need. The shared groundwork steps, with files and done-when criteria, are Phase 0 of `future-multilang-implementation-plan.md`. Design vocabulary follows `future-multilang-design.md`.
 
 ---
 
@@ -27,7 +27,8 @@ A collection listing stays what it is today — a widget the user drops on any p
 - Sort must be **total**: the loader breaks ties (by created date, then uuid) so an item can never appear on two pages or on none.
 - **One paginating widget per page.** A page can only be split one way. The editor refuses to flip a second switch and names the widget that already paginates; the server enforces the same rule on page save (a hidden option is not enforcement).
 - Other listing widgets on the same page keep working as teasers — `limit` N, no pager — and the existing "view all" link setting keeps pointing wherever the author sent it. A teaser on Home linking to Blog is the expected pattern.
-- Which widgets can paginate is declared by the **widget schema** — a top-level `collection` block naming the collection the widget lists and the per-page setting, e.g. `"collection": { "type": "news", "perPageSetting": "limit" }`. The editor shows the switch only on widgets with the block, the engine knows which setting is the slice size, and structured data (stage 2) reads the same declaration to find a collection's listing page for breadcrumbs.
+- Which widgets can paginate is declared by the **widget schema**'s top-level `collection` block, introduced by breadcrumbs (stage 1) with `type`; pagination adds `perPageSetting` — `"collection": { "type": "news", "perPageSetting": "limit" }`. The editor shows the switch only on widgets with the block and the engine knows which setting is the slice size.
+- **Paginate implies anchor.** Turning Paginate on makes the widget the collection's listing anchor (stage 1) when none is set; when another page already holds the anchor, the editor says so and offers to move it. A teaser never paginates, and the paginated page is by definition the collection's main page — one flag, one meaning.
 
 ### 2. URL shape
 
@@ -82,14 +83,14 @@ Pagination lands the pieces multilang needs regardless. Do them here, in this sh
 
 ---
 
-## Build steps (stage 1 of the series)
+## Build steps (stage 2 of the series)
 
 Each step ships green (`npm test`, `npm run test:frontend`, `npm run lint:all`) and leaves a project without paginating widgets byte-identical on export.
 
 1. **Reserved name `page`** — `packages/builder-server/src/services/collectionService.js` (`RESERVED_ITEM_SLUGS`), a matching page-slug check in `packages/builder-server/src/controllers/pageController.js` / `packages/builder-server/src/utils/slugHelpers.js`; localized messages in `packages/core/src/locales/en.json`. Tests: create/rename refusal for pages and items.
 2. **Derived output depth** — `outputPathPrefixFor(outputPath)` in `packages/core/src/utils/linkPrefixer.js`; `exportProjectToDir` in `packages/builder-server/src/controllers/exportController.js` drops the literal; `depthRenderSmoke.test.js` gains a depth-2 case.
 3. **Addressing module** — `packages/core/src/utils/contentAddress.js` with output/public/preview path builders for pages, items and paged copies, and their inverses. Vitest suite pins both Clean URLs shapes at depths 0–2.
-4. **Schema + settings** — `collection` block (collection type + per-page setting) in the Arch listing widget schemas (`themes/arch/widgets/news-grid`, `projects-grid`, `services-grid`); a `paginate` boolean setting the editor surfaces only for widgets with the block; per-page ≥ 1 validation; the one-per-page rule in the page save path (server) and in the settings panel (`packages/editor-ui/src/components/pageEditor/SettingsPanel.jsx`).
+4. **Schema + settings** — `perPageSetting` added to the `collection` block breadcrumbs introduced in the Arch listing widget schemas (`themes/arch/widgets/news-grid`, `projects-grid`, `services-grid`); Paginate-implies-anchor wiring; a `paginate` boolean setting the editor surfaces only for widgets with the block; per-page ≥ 1 validation; the one-per-page rule in the page save path (server) and in the settings panel (`packages/editor-ui/src/components/pageEditor/SettingsPanel.jsx`).
 5. **Engine** — `pageHref` gains a page number; the render context builds `pagination` for the paginating widget and injects `offset` into its `| collection` call (`packages/render-engine/src/renderEngine.js`, `packages/core/src/filters/collectionFilter.js`); the collection loader in `packages/builder-server/src/services/renderingService.js` exposes a sorted count and a total sort tie-break. `packages/core/src/tags/SeoTag.js` emits the title suffix, self-canonical, prev/next, inherited robots.
 6. **Arch pager** — a shared pager snippet under `themes/arch`, used by the three listing widgets; theme docs record the `pagination` contract.
 7. **Exporter** — one render per slice; extra sitemap entries through `buildSitemap` in `packages/builder-server/src/services/seoArtifacts.js`; forms manifest scans the base page only (`packages/builder-server/src/services/formsManifestService.js`). Tests: layout under both shapes, homepage pagination at the root, short-collection no-op, sitemap entries, single form stream.
