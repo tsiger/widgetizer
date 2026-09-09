@@ -3,6 +3,8 @@
 > **Status: Direction locked, detailed design pending.** This doc records the decisions already made so deeper design work builds on them instead of re-opening settled questions. Target: the simplest workable multilang for small-to-medium sites.
 >
 > Revised 2026-08-06 after two review passes (Codex, Claude) and a product decision round. Both review passes are folded into the sections below — there is one answer per question here, not a discussion thread.
+>
+> Revised 2026-09-09 (fifth revision): four additions folded in — enabled language codes are reserved names (§8a), one Site URL base helper is a phase-one blocker (§Implementation Contracts, blocker 4), the hreflang set rules are locked (§7d) and `dir` joins the §7c contract, and menus move to language folders (§5). The step-by-step build order lives in `future-multilang-implementation-plan.md`, where multilang is the last stage of a four-stage series (groundwork → pagination → structured data → multilang).
 
 ---
 
@@ -111,13 +113,14 @@ The original intent — don't let authors wire cross-language links *by accident
 ### 5. Per-language singletons
 
 - **Header/footer**: independent per-language instances (no shared-with-overrides machinery). Default globals stay at `pages/global/`; non-default at `pages/<lang>/global/`.
-- **Menus**: multiple menus already exist per project; menus stay in `menus/` and get a `language` tag (empty = default, per §1a-i).
+- **Menus**: multiple menus already exist per project. Default-language menus stay in `menus/`; non-default menus live in `menus/<lang>/`. Language is **derived from the folder**, like pages, items and globals — never a stored tag.
+  - *Why folders and not a `language` field:* §1a-i's argument — a stored tag can drift from where the file lives, a derived one cannot — applies to menus exactly as it does to pages. One convention keeps the addressing layer to a single rule, and removing a language (§1c) is deleting a folder. Menus are referenced by uuid, so header/footer and the pickers are unaffected. (Revised 2026-09-09: an earlier revision kept menus flat with an empty-means-default tag; that was the one content type breaking the derived-language rule.)
 
 #### 5a. Seeding order: menus first, then remap
 
 Adding a language copies singletons in a fixed order, because the header and footer reference menus *by uuid*:
 
-1. Copy the default language's menus, giving each a **fresh uuid**
+1. Copy the default language's menus into `menus/<lang>/`, giving each a **fresh uuid**
 2. Keep an old-uuid → new-uuid map
 3. Copy header/footer, rewriting their **menu references** through that map
 
@@ -174,6 +177,7 @@ One array, two consumers with different rules, so each entry carries both link f
 | `seoUrl` | **absolute** and Clean-URL-aware (`https://site.com/el/contact`) |
 | `active` | this is the page being rendered |
 | `fallback` | `true` when this points at the language's homepage because no sibling exists |
+| `dir` | text direction of the language — `ltr` for everything v1 accepts; `rtl` reserved. In the contract from day one so RTL support (§1b) never changes a shipped theme's switcher |
 
 **`href` and `seoUrl` cannot be one field.** The switcher is a link inside a static page, so it needs a relative path to a real file; hreflang is metadata for crawlers, so it needs an absolute canonical URL. One value cannot be both.
 
@@ -184,6 +188,15 @@ One array, two consumers with different rules, so each entry carries both link f
 Locking this shape early matters because the switcher is a theme feature: once themes ship against it, it cannot be changed retroactively.
 
 The same array is supplied to collection item pages (§9a), so a theme's switcher works identically there.
+
+#### 7d. hreflang set rules
+
+Locked now because both rules shape what `page.translations` must carry, and §7c cannot change once a theme ships against it.
+
+- **Every set includes a self-referential entry.** The page being rendered lists itself (the `active: true` entry, with its own `seoUrl`). Search engines treat a set without a self-reference as invalid and ignore it, so this is not optional.
+- **Every set includes `x-default`, pointing at the default-language sibling.** When no default-language sibling exists, `x-default` points at the default-language homepage — the same fallback target the switcher already uses. This is the one place a `fallback: true` entry is legitimate in hreflang output, and only for `x-default`: an ordinary language alternate still never points at a fallback (§7c).
+- **A single-language project emits no hreflang at all** — no self-reference, no `x-default`. The block is part of the multilang UI that stays invisible with one language (§1).
+- **Site title stays project-wide in v1.** A per-language site title is real but separable work; it is recorded under §Open Questions and does not block the contract.
 
 ### 8. Slugs are unique per language, not per project
 
@@ -207,6 +220,18 @@ collections/news/el/story.json  →  el/news/story.html   →  mysite.com/el/new
 - Uniqueness checks scope to the language folder. Page uuids (and collection item uuids) stay globally unique, so links and menus are unaffected.
 - Nothing forces slug parity either: Greek `epikoinonia` pairs with English `contact` through the translation group, not the slug.
 - **Why locked early:** everything downstream keys off page identity — `getAllPages` listing, media-usage source strings, link resolution, export paths. Deciding the layout first makes the language folder part of the page's path from day one; retrofitting it later means a migration.
+
+#### 8a. Enabled language codes are reserved names
+
+A language folder and a same-named page or collection prefix are one public address. `pages/el.json` exports to `el.html` while Greek exports under `el/`; with Clean URLs on, `/el` is the URL of both. A collection whose `slugPrefix` is `el` collides the same way at `/el/<item>`. Preview is unaffected — its routes carry an explicit content namespace (§Assumptions) — but the published site has nothing to disambiguate with.
+
+- **A root-level page slug and a collection `slugPrefix` may not equal an enabled language code.** Rejected on create and rename with a message naming the language.
+- **Enabling a language whose code equals an existing root page slug or `slugPrefix` is refused**, naming the conflicting page or collection, so the author renames it first. Enforcement is in the service layer, not only the picker — the same rule as RTL in §1b.
+- Only *enabled* codes are reserved, not every string matching the language regex — a two-letter page called `tv` on a project with no such language is fine.
+- The existing reserved-prefix mechanism (`assets`) is the natural home for the collection side; pages need the equivalent check.
+- **`page` is reserved as well**, in every language folder and as an item slug — it is the pagination segment (`blog/page/2`, `el/page/2` for a paginated Greek homepage). Pagination ships before multilang and introduces the reservation; see `future-pagination-design.md`.
+
+Non-root slugs are unaffected by the language rule: `pages/el/it.json` is the Greek page named "it", not Italian.
 
 ### 9. Collections are in scope for v1
 
@@ -267,6 +292,8 @@ Callers pass language plus content identity; they never assemble `pages/<lang>/.
 
 3. **Output depth must be derived, not hardcoded.** `exportController.js` passes `outputPathPrefix: "../"` as a literal. Replacing it with another literal is insufficient — the correct prefix depends on the final path (`el/news/story.html` is two levels deep, `news/story.html` one). Note `depthRenderSmoke.test.js` only exercises depth-1 today, so nothing currently guards this.
 
+4. **Every absolute SEO URL must come from one Site URL base helper.** Today the canonical (page, item, and og:image) is built by concatenating onto the Site URL, while the sitemap and `robots.txt` resolve relative URLs against it — three join styles that already disagree the moment the Site URL carries a path or query (`https://example.com/sites/foo` yields a canonical under `/sites/foo/`, a sitemap entry under `/sites/`, and a home entry at the origin root). Multilang pushes a `/<lang>/` segment through every one of these, then adds hreflang `seoUrl`s (§7c) and per-language sitemap entries on top. Land the helper first: reject query and hash at validation, normalise the Site URL once to a directory base, expose one join in `@widgetizer/core` beside `isHomeSlug`, and route canonical, og:image, sitemap, robots and hreflang through it. Collapse the three `isValidSiteUrl` copies (core, the sitemap builder, the collection service — the latter two accept anything `new URL()` parses) into the core one. Test a path base with and without a trailing slash under both Clean URLs values. This is a prerequisite of §7c/§7d, not a cleanup.
+
 ### Assumptions that must change
 
 - Page API/storage readers enumerate only root-level `pages/*.json` (`listPagesFromDir` filters `isFile()`, so subfolders are invisible); global widgets are fixed at `pages/global/{header,footer}.json`.
@@ -299,7 +326,7 @@ For v1: **move** Arch's hardcoded visitor-facing strings into per-language heade
 
 ## Open Questions (for the next design round)
 
-- **SEO details:** self-referential hreflang entries, `x-default`, and whether site-facing `siteTitle` becomes per-language.
+- **SEO details:** whether site-facing `siteTitle` becomes per-language (hreflang self-reference and `x-default` are decided — §7d).
 - **Per-language 404 page** in exports.
 - **Editor-side language indicators** beyond the tabs/chips/menus already specified.
 
@@ -322,9 +349,18 @@ This is not covered by the theme-string work above: these strings live in core, 
 
 ## Note for the next reviewer
 
-Fourth revision. All review passes and product decision rounds are folded into the sections above — one authoritative answer per question, no appended discussion, and no historical change-log here: the sections themselves are the record. (Earlier revisions of this note summarized superseded states of the doc and had drifted out of sync with it — per review, the summaries are gone.)
+Fifth revision. All review passes and product decision rounds are folded into the sections above — one authoritative answer per question, no appended discussion, and no historical change-log here: the sections themselves are the record. (Earlier revisions of this note summarized superseded states of the doc and had drifted out of sync with it — per review, the summaries are gone.)
 
-**This round's corrections, applied:**
+**This round's additions (2026-09-09), applied:**
+
+| raised | now |
+|---|---|
+| language codes collide with root page slugs and collection prefixes on the published site | §8a — enabled codes are reserved names both ways, enforced in the service |
+| absolute SEO URLs are joined three different ways onto the Site URL; multilang multiplies it | §Blocker 4 — one Site URL base helper in core, landed before hreflang |
+| hreflang self-reference and `x-default` left open while §7c is about to freeze | §7d locked; `dir` added to §7c |
+| menus were the one content type carrying a stored language tag | §5 — menus in `menus/<lang>/`, language derived from the folder |
+
+**Previous round's corrections (2026-08-06), applied:**
 
 | raised | now |
 |---|---|
@@ -338,6 +374,6 @@ Fourth revision. All review passes and product decision rounds are folded into t
 
 **Worth a look:**
 
-1. **§7c is the last thing that should move.** It is a frozen theme contract in both link forms; once a theme ships a switcher against it, it cannot change. If a field is still missing — `dir` for future RTL, a region label — this is the moment.
+1. **§7c is the last thing that should move.** It is a frozen theme contract in both link forms; once a theme ships a switcher against it, it cannot change. `dir` is now in; if a field is still missing — a region label, say — this is the moment.
 2. **§9a assumes collections mirror the pages workflow exactly.** Deliberate, but collections carry different volumes: if a hundred news items make tabs-and-chips the wrong shape, say so now.
 3. **Separate form streams (v1) is a product call, not a technical limit.** Defensible on its own merits, but if per-language submission splitting is unacceptable to users, stable form ids become a v1 dependency and that changes scope.

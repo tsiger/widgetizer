@@ -420,7 +420,19 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[future-multilang.md](future-multilang.md)** - Future: Multilanguage Support
+### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (four features in series)
+
+**Purpose**: Entry point for the planned feature series — groundwork (page-link filter, Site URL helper) → collection pagination → structured data → multilang — with what each stage ships, which doc holds its design, what it lands for later stages, and the reading order when picking the work up **When to use**:
+
+- Starting or resuming any of the four features
+- Deciding what must be finished before a given feature can begin
+- Finding which `future-*` doc to open
+
+**Key topics**: Series order, per-stage design docs, cross-stage groundwork (derived output depth, addressing module, global-widget context, stable-vs-translatable split), rules that hold across all stages
+
+---
+
+### **[future-multilang-design.md](future-multilang-design.md)** - Future: Multilanguage Support
 
 **Purpose**: Locked design decisions for per-language pages within one project (rejected alternatives, activation, seeding, tabs/chips UX, per-language slugs and `pages/<lang>/` layout, shared media with per-language metadata, zero-config export) **When to use**:
 
@@ -428,7 +440,43 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Checking which multilang approaches were already rejected and why
 - Understanding the per-language page/slug/file-layout contract before touching page identity code
 
-**Key topics**: Per-language pages with loose translation links, project language setting, skeleton-only seeding, language tabs + status chips, per-language header/footer/menus, shared media library with per-language alt/title/caption, `/lang/` export prefix + hreflang, slug uniqueness per language
+**Key topics**: Per-language pages with loose translation links, project language setting, skeleton-only seeding, language tabs + status chips, per-language header/footer/menus, shared media library with per-language alt/title/caption, `/lang/` export prefix + hreflang (self-reference + `x-default` rules), slug uniqueness per language, enabled language codes reserved as page/collection names, single Site URL base helper as a prerequisite
+
+---
+
+### **[future-multilang-implementation-plan.md](future-multilang-implementation-plan.md)** - Future: Multilanguage Implementation Plan
+
+**Purpose**: Ordered, step-by-step build plan for the design locked in `future-multilang-design.md` — prerequisites first, then the addressing layer, storage/API, editor UI, rendering/export, collections, forms, dates, theme — each step naming the files it touches and what "done" means **When to use**:
+
+- Starting or resuming multilang implementation work
+- Deciding what must land before a given multilang feature can be built
+- Checking a step's exit criteria before moving to the next
+
+**Key topics**: series order (groundwork → pagination → structured data → multilang), phase-one blockers (media-usage ids, global render context, derived output depth, Site URL base helper), addressing layer contract, per-step file lists and done-when criteria, test coverage per step
+
+---
+
+### **[future-pagination-design.md](future-pagination-design.md)** - Future: Collection Pagination
+
+**Purpose**: Locked design for paginating collection listings as copies of the hosting page (`blog.html`, `blog/page/2.html`) — rejected alternatives, the one-switch authoring model, URL shape under both Clean URLs modes, SEO rules, the frozen `pagination` theme contract, and the ordered build steps **When to use**:
+
+- Implementing or reviewing collection pagination
+- Checking which pagination approaches were rejected (theme listing pages, client-side load-more) and why
+- Understanding what pagination lands for multilang (derived output depth, the addressing layer, the `page` reserved name)
+
+**Key topics**: Paginate switch + items per page, one paginating widget per page, `page/<n>` URL segment, `page` reserved slug, self-canonical + number-only title suffix + sitemap inclusion, `pagination` render object, exporter renders one copy per slice, preview page number
+
+---
+
+### **[future-structured-data-design.md](future-structured-data-design.md)** - Future: Schema.org / JSON-LD
+
+**Purpose**: Locked design for automatic structured data — one safe JSON-LD graph through the existing SEO tag, project-owned site identity and business details that Arch can display in the footer, a closed collection-schema mapping contract (Arch News → `BlogPosting`), auto-detected breadcrumbs, and the stage-2 build steps **When to use**:
+
+- Implementing or reviewing structured data / JSON-LD output
+- Adding identity or business fields to Project details, or displaying them in a theme
+- Checking what was deliberately left out (About/Contact page types, widget-level schema, custom JSON-LD editors) and why
+
+**Key topics**: Three rules for a non-technical audience (visible data, zero vocabulary, derive don't ask), stable facts vs translatable text, social profiles dual-read, `structuredData` collection-schema block, breadcrumb auto-detection from the widget `collection` declaration, readiness line, cut order, resolved questions
 
 ---
 
