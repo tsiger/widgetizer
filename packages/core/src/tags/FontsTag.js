@@ -77,11 +77,15 @@ export const FontsTag = {
       return ""; // No Google Fonts to load
     }
 
-    // Check if user enabled privacy-friendly font CDN (Bunny Fonts)
+    // Check if user enabled privacy-friendly font CDN (Bunny Fonts).
+    // Falls back to the schema default, like the font pickers above: a project
+    // carries no `value` until the setting is saved, so reading `value` alone
+    // silently ignored a theme that ships this on and sent visitors to Google.
     const privacySettings = rawSettings?.settings?.global?.privacy;
-    const useBunnyFonts = Array.isArray(privacySettings)
-      ? privacySettings.find((s) => s.id === "use_bunny_fonts")?.value || false
-      : false;
+    const bunnySetting = Array.isArray(privacySettings)
+      ? privacySettings.find((s) => s.id === "use_bunny_fonts")
+      : undefined;
+    const useBunnyFonts = (bunnySetting?.value !== undefined ? bunnySetting.value : bunnySetting?.default) || false;
 
     // Build output: preconnect links + stylesheet link
     let output = "";
