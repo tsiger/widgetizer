@@ -13,8 +13,11 @@ function stamp() {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
-// Directories excluded from the project destination (matches copyThemeToProject logic)
-const PROJECT_EXCLUDES = new Set(["templates", "presets", "updates", "latest", "preset-media"]);
+// Directories excluded from the project destination (matches copyThemeToProject logic).
+// `menus` is project content after creation: the scaffolder stamps each menu with a
+// uuid and widgets store that uuid. Copying the theme's menus back over would strip
+// the uuids and leave every menu setting pointing at nothing.
+const PROJECT_EXCLUDES = new Set(["templates", "presets", "updates", "latest", "preset-media", "menus"]);
 
 function parseArgs(argv) {
   const result = {};
