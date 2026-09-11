@@ -15,7 +15,7 @@ Multilang is **stage 4 of the series** — groundwork → breadcrumbs → pagina
 ## Ground rules
 
 1. **Land the steps in order.** Every step is a mergeable unit that leaves `npm test`, `npm run test:frontend` and `npm run lint:all` green. Later steps assume earlier ones.
-2. **Single-language projects must not change behaviour at any step.** Until step 12 nothing is visible in the editor. A project with one language must export byte-for-byte what it exports today (allowing for the deliberate `<html lang>` change in step 19). Keep a fixture project and diff its export before and after each step.
+2. **Preserve existing correct single-language behaviour.** Keep a fixture project and diff its export before and after each step. Allow only explicitly tested corrections to generated URLs in step 1 and the deliberate `<html lang>` change in step 19; unrelated output must remain byte-identical. Step 1's Site URL validation feedback is also an intentional editor change before the language UI lands.
 3. **Language logic lives in the addressing layer (step 6), nowhere else.** A `language !== defaultLanguage` branch outside `@widgetizer/core`'s addressing helpers is a review blocker — that is the whole point of §Implementation Contracts.
 4. **Persisted is empty; resolved is never empty** (§1a-i). Files in the root folder carry no `language`; every loaded model has one. No consumer writes its own fallback.
 5. **Backend stays adapter-agnostic and scope-first.** New storage paths go through the `StorageAdapter` with `scope`; never assemble `pages/<lang>/…` outside the addressing layer.
@@ -29,13 +29,17 @@ Four contracts the design calls blockers, plus the series' stage-0 filter. Each 
 
 ### Step 0. `page_url` filter — one way for a theme to link to a page (series stage 0)
 
-**Why:** `themes/arch/widgets/global/header/widget.liquid` builds the logo's home href with an inline `{% if globals.cleanUrls %}` that re-implements the home rule `pageHref` already owns; the header CTA default in the same widget's `schema.json` ships a raw `contact.html`. Every later theme link — the pager, the language switcher — needs the same shape logic, so it must exist once.
+**Why:** `themes/arch/widgets/global/header/widget.liquid` builds the logo's home href with an inline `{% if globals.cleanUrls %}` that re-implements the home rule `pageHref` already owns. Every later theme link — the pager, the language switcher — needs the same shape logic, so expose the existing helpers to templates rather than replacing them.
+
+**Review note — existing preset links already work.** Anastis's `clean-urls-links` merge (`fdb936dc`) supplies the page/item helpers and their existing consumers. During project creation, `enrichNewProjectReferences` in `packages/builder-server/src/utils/linkEnrichment.js` connects matching template links such as `contact.html` to actual pages by adding `pageUuid`; this covers page and global widgets. The user verified a new Arch Consulting project shows the Contact page selected in the picker. A literal `.html` link in preset source is therefore not evidence of a defect. The base Arch header template also supplies an empty CTA link, distinct from the header schema's fallback default.
+
+Schema defaults used when adding widgets later are a separate path: reproduce a failure there before proposing a fix. Do not introduce another reference format or rewrite working preset links. Preserve page-picker references and deliberately custom URLs; a missing target page must not acquire a fabricated reference.
 
 - `packages/core/src/filters/pageUrlFilter.js` (new) — `page_url` takes a slug and returns `pageHref(slug, { cleanUrls, outputPathPrefix })` read from `globals`; a matching `item_url: slugPrefix` wraps `itemHref`. Registered with the other core filters in `packages/render-engine/src/renderEngine.js`. Author-typed hrefs are untouched (§2a).
-- `themes/arch/widgets/global/header/widget.liquid` — the logo href becomes `{{ 'index' | page_url }}`; the CTA default becomes a page link where the schema allows it.
+- `themes/arch/widgets/global/header/widget.liquid` — the logo href becomes `{{ 'index' | page_url }}`. A CTA-default change is not an assumed deliverable; it requires a separately demonstrated failing case as described above.
 - Multilang (step 8) later adds the target language as an optional argument; the filter's signature is designed for it now.
 
-**Done when:** the header renders the same href as today at depth 0 and 1, under both Clean URLs values, with no conditional in the template; a filter test pins the four combinations.
+**Done when:** the header renders the same href as today at depth 0 and 1, under both Clean URLs values, with no conditional in the template; filter tests cover page and item links, including home. Verify the result in preview and export, and preserve preset/page-picker links following page slug changes.
 
 ### Step 1. One Site URL base helper (§Blocker 4) — *lands in stage 0 (groundwork)*
 
@@ -44,10 +48,12 @@ Four contracts the design calls blockers, plus the series' stage-0 filter. Each 
 - `packages/core/src/utils/urlSafety.js` — `isValidSiteUrl` additionally rejects a query or hash. Keep accepting a path (GitHub-Pages-style `user.github.io/repo/` is a legitimate deploy).
 - `packages/core/src/utils/internalHref.js` (beside `isHomeSlug`) — add `siteUrlBase(siteUrl)` returning a normalised directory base with one trailing slash, and `absoluteSiteUrl(siteUrl, path)` that joins a site-relative path onto it. Both pure.
 - Route through them: `resolveCanonicalUrl` and `resolveImageUrl` in `packages/core/src/tags/SeoTag.js`; the item canonical in `buildCollectionItemPageData` (`packages/builder-server/src/services/collectionService.js`); `buildSitemap` and `buildRobotsTxt` in `packages/builder-server/src/services/seoArtifacts.js`.
-- Delete the two private `isValidSiteUrl` copies (`seoArtifacts.js`, `collectionService.js`); import the core one.
+- Delete the two private `isValidSiteUrl` copies (`seoArtifacts.js`, `collectionService.js`); import the core one. Preserve the distinction between an optional valid setting and a usable rendering base: core validation accepts an empty Site URL, while the existing private checks reject it to omit generated SEO output. Keep explicit missing-base handling so export without a Site URL still succeeds and skips only output requiring that base. Define safe handling for previously stored URLs rejected by the stricter validation; never crash export or silently invent a replacement address.
+- In `buildRobotsTxt`, include the Site URL's base pathname in page/item `Disallow` paths as well as fixing the absolute `Sitemap:` address. For a site under `/bakery/`, a rule for `private` must target `/bakery/private`, not `/private`. This is a path correction, not a redesign of robots/noindex policy.
+- Preserve explicit canonical overrides and external social-image URLs; only automatically generated site-relative addresses use the shared base.
 - Form + controller: `app/src/components/projects/ProjectForm.jsx` and `packages/builder-server/src/controllers/projectController.js` surface the new rejection with a localized message (`packages/core/src/locales/en.json`, next to `siteUrlInvalid`).
 
-**Done when:** `seoArtifacts.test.js` and a new `SeoTag` test cover a Site URL with a path, with and without a trailing slash, under both Clean URLs values, and every emitted URL (canonical, og:image, sitemap `<loc>`, robots `Sitemap:`) shares one base.
+**Done when:** `seoArtifacts.test.js` and SEO-tag/collection-item coverage exercise root and subfolder Site URLs, with and without a trailing slash, under both Clean URLs values. Every automatically generated absolute URL (canonical, og:image, sitemap `<loc>`, robots `Sitemap:`) shares one base, including the homepage; robots page/item paths retain the base pathname. Cover empty and invalid bases, query/hash rejection, and preservation of explicit overrides. Export diffs contain only the intended URL corrections.
 
 ### Step 2. Collision-proof media-usage identities (§Blocker 1)
 

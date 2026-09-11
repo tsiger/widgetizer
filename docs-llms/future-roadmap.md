@@ -4,7 +4,7 @@
 
 | stage | what ships | design doc | what it lands for later stages |
 |---|---|---|---|
-| **0. Groundwork** | **(a)** A `page_url` filter (`'index' | page_url`) replacing the Arch header logo's inline Clean-URLs `if`; also fixes the header CTA default that ships as a raw `contact.html`. **(b)** One Site URL base helper so every absolute URL — canonical, og:image, sitemap, robots, later JSON-LD ids and hreflang — is joined the same way. | `future-multilang-implementation-plan.md`, steps 0 and 1 | One way for a theme to link to a page; one way to build an absolute URL. |
+| **0. Groundwork** | **(a)** A `page_url` filter (`'index' | page_url`) exposing the existing link helpers and replacing the Arch header logo's inline Clean-URLs `if`. Preset CTA links already gain page references during setup; change defaults only if a failing case is demonstrated. **(b)** One Site URL base helper so every generated absolute URL — canonical, og:image, sitemap, robots, later JSON-LD ids and hreflang — is joined the same way. | `future-multilang-implementation-plan.md`, steps 0 and 1 | One way for a theme to link to a page; one way to build an absolute URL. |
 | **1. Breadcrumbs** | Core computes one trail per page — parent page, else menu position, for pages; listing anchor, else the single listing page, for items; homepage by slug — and themes draw it with a core snippet or their own markup. Needed by the Widgetizer marketing-site theme. | `future-breadcrumbs-design.md` | The widget-schema `collection` declaration and the listing **anchor** flag (pagination and structured data both consume them); the `breadcrumbs` trail that structured data's `BreadcrumbList` reuses; the optional parent-page field. |
 | **2. Collection pagination** | Paginated copies of the page hosting a listing widget (`blog.html`, `blog/page/2.html`), switched on per widget. | `future-pagination-design.md` | Derived output depth, the addressing module (output / public / preview paths), the `page` reserved name; extends the `collection` declaration with the per-page setting. |
 | **3. Structured data** | Automatic JSON-LD through the existing SEO tag; project-owned site identity and business details that Arch shows in the footer. | `future-structured-data-design.md` | Global widgets rendering with `page` and `project` in context; the split between stable facts and translatable text. |
@@ -44,7 +44,7 @@ Done when: a fresh install shows "Widgetizer Desktop" everywhere a user can see 
 
 ## Rules that hold across all stages
 
-- A single-language, non-paginated project must export byte-for-byte what it exports today after every stage (allowing for the deliberate `<html lang>` change in multilang).
+- Preserve correct single-language, non-paginated exports byte-for-byte, allowing explicitly tested URL corrections in groundwork and the deliberate `<html lang>` change in multilang.
 - Path and URL logic lives in `@widgetizer/core` helpers (`internalHref.js`, the addressing module), never in a theme template or a controller.
 - Theme-facing contracts — the `pagination` object, `page.translations`, `project.identity` — are frozen once Arch ships against them. Get the fields right before that.
 - The task tracker is never cited from these docs; reasons go inline.
