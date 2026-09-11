@@ -26,7 +26,7 @@ logs/
 .claude/
 .electron-home/
 themes/widgetizer/
-themes/widgetizer-saas/
+themes/widgetizer-saas-theme/
 temp/
 tmp/
 temp-webp/
