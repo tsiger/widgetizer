@@ -1,5 +1,6 @@
 {
   "type": "projects-grid",
+  "collection": { "type": "projects" },
   "displayName": "tTheme:projects_grid.name",
   "aliases": ["portfolio", "work", "case studies", "projects", "showcase"],
   "settings": [

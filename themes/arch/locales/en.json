@@ -20,6 +20,10 @@
         "content_header": {
           "label": "Content"
         },
+        "show_breadcrumbs": {
+          "label": "Show breadcrumbs",
+          "description": "Display the trail of parent pages above each page's content. Set a page's parent in its page settings."
+        },
         "date_format": {
           "label": "Date format",
           "description": "How dates (e.g. on news articles) are shown on your published site."

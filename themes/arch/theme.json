@@ -72,6 +72,13 @@
               "label": "2026-12-31"
             }
           ]
+        },
+        {
+          "type": "checkbox",
+          "id": "show_breadcrumbs",
+          "label": "tTheme:global.general.settings.show_breadcrumbs.label",
+          "default": false,
+          "description": "tTheme:global.general.settings.show_breadcrumbs.description"
         }
       ],
       "colors": [

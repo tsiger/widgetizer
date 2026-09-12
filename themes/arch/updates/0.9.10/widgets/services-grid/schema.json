@@ -1,5 +1,6 @@
 {
   "type": "services-grid",
+  "collection": { "type": "services" },
   "displayName": "tTheme:services_grid.name",
   "aliases": ["services", "offerings", "treatments", "what we do", "pricing"],
   "settings": [

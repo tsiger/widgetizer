@@ -1,5 +1,6 @@
 {
   "type": "news-grid",
+  "collection": { "type": "news" },
   "displayName": "tTheme:news_grid.name",
   "aliases": ["blog", "articles", "latest news", "posts", "news", "press"],
   "settings": [
