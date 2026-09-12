@@ -38,7 +38,14 @@ export function registerCollectionFilter(engine) {
   engine.registerFilter("collection", function (collectionType, ...args) {
     if (!collectionType || typeof collectionType !== "string") return [];
 
-    const globals = this.context.get(["globals"]);
+    // Two sources: `{% render %}` isolates the environment scope, so inside a
+    // snippet `context.get(["globals"])` is undefined. The engine passes the same
+    // bag as LiquidJS's `globals` render option, and `context.globals` survives
+    // that isolation. Reading only the environment would make a listing inside a
+    // snippet silently return []. (Do not reach for the loader with
+    // `context.get(["getCollectionItems"])` — a scope lookup CALLS a function it
+    // finds, so that returns the loader's result, not the loader.)
+    const globals = this.context.get(["globals"]) || this.context.globals;
     const loader = globals?.getCollectionItems;
     if (typeof loader !== "function") {
       // No loader wired (e.g. a non-render context). Return empty rather than
