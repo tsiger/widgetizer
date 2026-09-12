@@ -282,12 +282,13 @@ export default function Projects() {
                       title={project.name}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-start gap-2">
+                        <div className="flex items-baseline gap-2">
                           <span className="block min-w-0 break-words font-semibold">{project.name}</span>
                           {showActiveBadge && (
                             <Badge
                               variant="success"
-                              className="inline-flex shrink-0 whitespace-nowrap px-3 py-0.5 text-[11px] font-semibold"
+                              size="sm"
+                              className="inline-flex shrink-0 items-center whitespace-nowrap"
                             >
                               {t("projects.badges.active")}
                             </Badge>
