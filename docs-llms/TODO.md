@@ -59,9 +59,10 @@ _None open._
 - [⬜ 61. Editor→preview postMessages fired before the iframe's document loads are dropped with a console warning (`editor-ui`) — low (cosmetic / log noise)](#-61-editorpreview-postmessages-fired-before-the-iframes-document-loads-are-dropped-with-a-console-warning-editor-ui--low-cosmetic--log-noise)
 - [⬜ 63. `LocalPublishAdapter.publish` shares the exports version counter without the export lock (`adapters-local`) — low — latent (no production caller)](#-63-localpublishadapterpublish-shares-the-exports-version-counter-without-the-export-lock-adapters-local--low--latent-no-production-caller)
 - [⬜ 67. Export viewer confinement is lexical — a symlink inside an export dir escapes it (`builder-server`) — low](#-67-export-viewer-confinement-is-lexical--a-symlink-inside-an-export-dir-escapes-it-builder-server--low)
-- [⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low](#-68-a-website-address-with-a-path-or-query-produces-inconsistent-sitemap-robots-and-canonical-urls-builder-server--core--low)
+- [✅ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — fixed, pending reference-table move](#-68-a-website-address-with-a-path-or-query-produces-inconsistent-sitemap-robots-and-canonical-urls-builder-server--core--fixed-pending-reference-table-move)
 - [⬜ 70. Widget assets enqueued with a sub-path (`vendor/lib.js`) render a nested URL but are flattened to `assets/<basename>` on export (`builder-server` / `core`) — low](#-70-widget-assets-enqueued-with-a-sub-path-vendorlibjs-render-a-nested-url-but-are-flattened-to-assetsbasename-on-export-builder-server--core--low)
 - [⬜ 71. Navigation-guard tests mock `useBlocker` — router state transitions and the answer-dropping race are unpinned (`editor-ui`) — low (test depth)](#-71-navigation-guard-tests-mock-useblocker--router-state-transitions-and-the-answer-dropping-race-are-unpinned-editor-ui--low-test-depth)
+- [⬜ 72. Theme update zips cannot carry a bumped base version, so an author who bumps `theme.json` breaks every existing install (`builder-server`) — low (author UX) — needs a decision](#-72-theme-update-zips-cannot-carry-a-bumped-base-version-so-an-author-who-bumps-themejson-breaks-every-existing-install-builder-server--low-author-ux--needs-a-decision)
 - [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
 - [⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low](#-65-raw-html-internal-hrefs-under-clean-urls--user-typed-links-theme-liquid-schema-defaults-core--render-engine--themes--low)
 
@@ -1094,7 +1095,7 @@ existing traversal tests.
 
 ---
 
-## ⬜ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — low
+## ✅ 68. A Website Address with a path or query produces inconsistent sitemap, robots and canonical URLs (`builder-server` / `core`) — fixed, pending reference-table move
 
 **Priority:** Low
 
@@ -1124,6 +1125,13 @@ and hash, force a trailing slash) and route every SEO URL — pages, items, home
 canonicals — through one helper. Either way, test a path base with and without a trailing slash
 under both Clean URLs values.
 
+**Fixed 2026-09-12 (`b2783af4`)** with option (b) plus the query/hash half of (a). `siteUrlBase`,
+`absoluteSiteUrl` and `siteUrlPathname` in `packages/core/src/utils/internalHref.js` normalise the
+address once; the canonical, og:image, item canonical, sitemap, robots and the export's markdown
+alternate link all join through them. A path base is supported (a project-subfolder deploy is
+legitimate); a query or fragment is now rejected at validation, with its own message in the project
+form. `robots.txt` Disallow paths carry the base pathname, which they previously dropped.
+
 ---
 
 ## ⬜ 70. Widget assets enqueued with a sub-path (`vendor/lib.js`) render a nested URL but are flattened to `assets/<basename>` on export (`builder-server` / `core`) — low
@@ -1137,6 +1145,35 @@ under both Clean URLs values.
 **Priority:** Low
 
 `useFormNavigationGuard.test.jsx` and `useNavigationGuard.test.jsx` (`packages/editor-ui/src/hooks/__tests__/`) replace `react-router-dom`'s `useBlocker` with a mutable stub (`rr.state` / `rr.proceed` / `rr.reset`), so they only cover "blocked → user answers". They never drive react-router's real state machine: `blocked → proceeding → unblocked` after `proceed()`, a second navigation arriving while already `blocked` (react-router keeps `state === "blocked"` and swaps `proceed`/`reset` — the hooks rely on `blockerRef` to pick up the new pair), or a browser Back (POP) block. The race the hooks are built around — keying the effect on `blocker.state` rather than the blocker object so an effect cleanup can't cancel the prompt between the click and the handler — is likewise unpinned; the re-render test says in its own comment that it also passes against the old `[blocker]` dependency. (The shell-mount coverage itself is already tree-level: `app/src/__tests__/confirmProviderMount.test.jsx` renders the real `<App/>` around a `useConfirm()` probe, and `confirmProviderCoverage.test.js` keeps only the negative check that no mount creeps back into `EditorShell.jsx`.) Fix: render the guards inside a `createMemoryRouter` (`RouterProvider` + a two-route app, one dirty) and navigate for real, asserting the blocker transitions and that a re-navigation while blocked proceeds to the *latest* target; keep the stub tests for the answer/side-effect ordering they already pin. Worth doing alongside any change to the guards' close/quit behaviour, since that is where the next edit to these hooks lands.
+
+## ⬜ 72. Theme update zips cannot carry a bumped base version, so an author who bumps `theme.json` breaks every existing install (`builder-server`) — low (author UX) — needs a decision
+
+**Priority:** Low
+
+A distributed theme zip must keep its **original** base `theme.json` version forever and add each
+release as a folder under `updates/`; the base is the floor the layers build on, not a running
+version number. `uploadTheme` (`packages/builder-server/src/controllers/themeController.js`)
+enforces that: a zip whose base differs from the installed base is rejected with 409.
+
+The natural thing for an author to do — bump `theme.json` to 1.1.0 and ship the delta beside it,
+which is exactly what the bundled Arch theme does — is therefore refused for everyone who already
+installed the theme, while a fresh install of that same zip works. Two mental models in one
+codebase, and the rejection message can only tell the author to undo the bump.
+
+Supporting the bumped-base zip needs a decision first: does the incoming base **replace** the
+installed one (and what then happens to the installed `updates/` folders, which would all become
+history at or below the new base), or is it ignored and the delta layered onto the installed base
+as today? Replacing is closer to what the author means and matches how a bundled theme upgrades,
+but it overwrites files the user's projects were never updated from.
+
+Do not fix by loosening the version check alone: import validation layers from the installed base
+to judge the incoming delta, so any change here must keep validation composing the same tree
+`buildLatestSnapshot` will build. Whatever is chosen, reject a zip that lacks the update data an
+existing install would need, with a message that says which version is missing.
+
+Raised 2026-09-12 alongside the newer-than-base layering fix (`4630d8f5`), which made the
+fixed-base workflow correct but left this shape unsupported. Author-facing rules are documented in
+`docs-website/src/theme-dev-distribution.md`.
 
 ## Completed — reference table
 

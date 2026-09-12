@@ -1301,13 +1301,13 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] EXPZIP-003 - Check for one exported HTML file per page.
   Expected: Each page is present as an `.html` file.
 
-- [ ] EXPZIP-004 - With the project's Clean URLs setting off (default), open an exported page's source.
+- [ ] EXPZIP-003A - With the project's Clean URLs setting off (default), open an exported page's source.
   Expected: Menu, button and text links to other pages end in `.html` (`about.html`, `news/alpha.html`, home `index.html`); the canonical tag and `sitemap.xml` use `.html` too.
 
-- [ ] EXPZIP-005 - Turn on Clean URLs (Project settings › More settings), export again, open the same page's source.
+- [ ] EXPZIP-003B - Turn on Clean URLs (Project settings › More settings), export again, open the same page's source.
   Expected: Those links are extensionless (`about`, `news/alpha`, home `./`; from a collection item page `../about`, `../`); canonical tag and `sitemap.xml` drop `.html`; the exported file names are still `about.html` / `news/alpha.html`. A link you typed by hand (e.g. `contact.html`) is unchanged.
 
-- [ ] EXPZIP-006 - View the Clean URLs export in the built-in export viewer and click an extensionless link.
+- [ ] EXPZIP-003C - View the Clean URLs export in the built-in export viewer and click an extensionless link.
   Expected: `about` opens `about.html`; the home link opens the index page.
 
 - [ ] EXPZIP-004 - If Markdown export was enabled, check for matching `.md` files.

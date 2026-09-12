@@ -162,7 +162,8 @@ export default function ExportHistoryTable({
                 <td className="py-3 px-4 whitespace-nowrap">
                   <Badge
                     variant={exportRecord.status === "success" ? "success" : "error"}
-                    className="inline-flex whitespace-nowrap px-3 py-0.5 text-xs font-semibold"
+                    size="sm"
+                    className="inline-flex items-center whitespace-nowrap"
                   >
                     {exportRecord.status.charAt(0).toUpperCase() + exportRecord.status.slice(1)}
                   </Badge>
