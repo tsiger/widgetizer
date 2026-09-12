@@ -1,0 +1,44 @@
+{%- comment -%}
+Breadcrumbs Snippet
+Params:
+  class_nav: Classes for the nav element
+  class_list: Classes for the ol element
+  class_item: Classes for li elements
+  class_link: Classes for a elements
+  class_current: Classes for the last (current) item
+  separator: Text drawn between crumbs (default none; most themes use CSS)
+  home_label: Overrides the first crumb's label (e.g. a translated "Home")
+  aria_label: Accessible name for the nav element (default "Breadcrumb")
+  show_home: Set to false to drop the first crumb
+Globals (via LiquidJS globals):
+  breadcrumbs: Trail for the page being rendered, Home first and the current
+    page last; empty on the homepage, where this snippet renders nothing.
+    Each entry: label, href, canonicalPath, current, home.
+{%- endcomment -%}
+
+{%- if breadcrumbs.size > 0 -%}
+  <nav class="{{ class_nav }}" aria-label="{{ aria_label | default: 'Breadcrumb' }}">
+    <ol class="{{ class_list }}">
+      {%- for crumb in breadcrumbs -%}
+        {%- unless crumb.home and show_home == false -%}
+          {%- assign label = crumb.label -%}
+          {%- if crumb.home and home_label != blank -%}
+            {%- assign label = home_label -%}
+          {%- endif -%}
+          <li class="{{ class_item }}{% if crumb.current and class_current != blank %} {{ class_current }}{% endif %}">
+            {%- if crumb.current -%}
+              <span aria-current="page">{{ label }}</span>
+            {%- elsif crumb.href -%}
+              <a href="{{ crumb.href }}" class="{{ class_link }}">{{ label }}</a>
+            {%- else -%}
+              <span>{{ label }}</span>
+            {%- endif -%}
+            {%- if separator != blank and forloop.last == false -%}
+              <span aria-hidden="true">{{ separator }}</span>
+            {%- endif -%}
+          </li>
+        {%- endunless -%}
+      {%- endfor -%}
+    </ol>
+  </nav>
+{%- endif -%}
