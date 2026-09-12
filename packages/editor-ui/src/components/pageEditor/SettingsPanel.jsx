@@ -5,6 +5,7 @@ import useWidgetStore from "../../stores/widgetStore";
 import useAutoSave from "../../stores/saveStore";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
+import useCollections from "../../hooks/useCollections";
 
 export default function SettingsPanel({
   selectedWidget,
@@ -18,6 +19,7 @@ export default function SettingsPanel({
   onBackToWidget,
 }) {
   const { t } = useTranslation();
+  const { schemas: collectionSchemas } = useCollections();
   const { tTheme } = useThemeLocale();
   const { globalWidgets, updateThemeSetting } = usePageStore();
   const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
@@ -109,10 +111,28 @@ export default function SettingsPanel({
     placeholder: t("pageEditor.widgetName.placeholder"),
   };
 
+  // A listing widget can be marked as its collection's main page, which is what
+  // breadcrumbs hang that collection's items under. Injected here rather than
+  // declared per widget: it applies to any widget whose schema says what it
+  // lists, and no theme should have to repeat it.
+  const listedCollectionType = currentWidgetSchema?.collection?.type;
+  const listedCollection = (collectionSchemas || []).find((schema) => schema.type === listedCollectionType);
+  const anchorSetting = listedCollectionType
+    ? {
+        id: "listing_anchor",
+        type: "checkbox",
+        label: t("pageEditor.listingAnchor.label", {
+          collection: listedCollection?.displayNamePlural || listedCollection?.displayName || listedCollectionType,
+        }),
+        description: t("pageEditor.listingAnchor.description"),
+        default: false,
+      }
+    : null;
+
   // Combine settings with name setting at the end for widgets (not global widgets, blocks, or theme settings)
   const allSettings =
     !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings
-      ? [...settings, widgetNameHeader, widgetNameSetting]
+      ? [...settings, ...(anchorSetting ? [anchorSetting] : []), widgetNameHeader, widgetNameSetting]
       : settings;
 
   return (

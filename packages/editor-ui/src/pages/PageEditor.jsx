@@ -13,6 +13,8 @@ import usePageStore from "../stores/pageStore";
 import useThemeStore from "../stores/themeStore";
 import useProjectStore from "../stores/projectStore";
 import useWidgetStore from "../stores/widgetStore";
+import useAutoSave from "../stores/saveStore";
+import useToastStore from "../stores/toastStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
 import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
 
@@ -53,6 +55,19 @@ export default function PageEditor() {
       useWidgetStore.getState().loadSchemas();
     }
   }, [searchParams, activeProject?.id]);
+
+  // A save can move a collection's listing anchor onto this page, clearing it on
+  // another. The store records that as data; announcing it belongs here, where
+  // the i18n provider is — and where a failure cannot turn a completed save into
+  // a reported failure.
+  const listingAnchorMoved = useAutoSave((state) => state.listingAnchorMoved);
+  useEffect(() => {
+    if (!listingAnchorMoved?.pages?.length) return;
+    useToastStore
+      .getState()
+      .showToast(t("pageEditor.listingAnchor.moved", { pages: listingAnchorMoved.pages.join(", ") }), "info");
+    useAutoSave.getState().clearListingAnchorMoved();
+  }, [listingAnchorMoved, t]);
 
   // Handle block selection (cross-component coordination)
   const handleBlockSelect = (blockId) => {

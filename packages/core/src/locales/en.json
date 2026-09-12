@@ -151,6 +151,10 @@
       "filenameRequired": "Filename is required",
       "filenameNotEmpty": "Filename cannot be empty",
       "filenameInvalid": "Filename must contain at least one letter or number",
+      "hierarchyTitle": "Page Hierarchy",
+      "parentPageLabel": "Parent page",
+      "parentPageNone": "None — this is a top-level page",
+      "parentPageHelp": "Used by breadcrumbs to show where this page sits, e.g. Home › About › Our Team. Leave as None unless this page belongs under another one.",
       "seoTitle": "SEO Settings",
       "metaDescription": "Meta Description",
       "metaDescriptionHelp": "A short summary shown in search results (150-160 characters).",
@@ -501,6 +505,11 @@
     "error": "Error: {{message}}",
     "noPageSelected": "No page selected. Please select a page from the Pages list.",
     "noWidgetsFound": "No widgets found",
+    "listingAnchor": {
+      "label": "Main {{collection}} page",
+      "description": "Marks this page as the home of this collection. Its items show it in their breadcrumbs, e.g. Home › Blog › A post. Only one page per collection.",
+      "moved": "This is now the main page for that collection — moved from {{pages}}."
+    },
     "widgetName": {
       "header": "Internal name",
       "label": "Widget Name",

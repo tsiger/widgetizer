@@ -8,6 +8,8 @@ import useToastStore from "../../stores/toastStore";
 import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
+import { isHomeSlug } from "@widgetizer/core/internalHref";
+import { getAllPages } from "../../queries/pageManager";
 
 export default function PageForm({
   initialData = { name: "", slug: "" },
@@ -47,12 +49,52 @@ export default function PageForm({
         canonical_url: initialData.seo?.canonical_url || "",
         robots: initialData.seo?.robots || "index,follow",
       },
+      parentPageUuid: initialData.parentPageUuid || "",
     },
   });
 
   // Watch fields for auto-slug and media display
   const name = watch("name");
   const ogImage = watch("seo.og_image");
+
+  // Candidates for the parent picker. Loaded here so both callers (add + edit)
+  // get the field without threading a prop through each.
+  const [allPages, setAllPages] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    getAllPages()
+      .then((pages) => {
+        if (!cancelled) setAllPages(Array.isArray(pages) ? pages : []);
+      })
+      .catch(() => {
+        // A failed load just leaves the picker empty; the field is optional.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // A page cannot parent itself, its own descendants (that is a cycle), or be
+  // parented by the homepage — every trail already starts there.
+  const parentOptions = (() => {
+    const descendants = new Set();
+    if (initialData.uuid) {
+      descendants.add(initialData.uuid);
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (const page of allPages) {
+          if (page.uuid && !descendants.has(page.uuid) && descendants.has(page.parentPageUuid)) {
+            descendants.add(page.uuid);
+            grew = true;
+          }
+        }
+      }
+    }
+    return allPages
+      .filter((page) => page.uuid && !descendants.has(page.uuid) && !isHomeSlug(page.slug))
+      .sort((a, b) => String(a.name || a.slug).localeCompare(String(b.name || b.slug)));
+  })();
 
   // Notify parent of dirty state changes
   useEffect(() => {
@@ -175,7 +217,28 @@ export default function PageForm({
         {t("forms.project.moreSettings")}
       </button>
 
-      {/* SEO Fields - Collapsible */}
+      {/* Hierarchy + SEO - Collapsible */}
+      {showMoreSettings && (
+        <div className="max-w-xl form-section">
+          <h3 className="form-section-title">{t("forms.page.hierarchyTitle")}</h3>
+
+          <div className="form-field">
+            <label htmlFor="parent-page" className="form-label">
+              {t("forms.page.parentPageLabel")}
+            </label>
+            <select id="parent-page" {...register("parentPageUuid")} className="form-select">
+              <option value="">{t("forms.page.parentPageNone")}</option>
+              {parentOptions.map((page) => (
+                <option key={page.uuid} value={page.uuid}>
+                  {page.name || page.slug}
+                </option>
+              ))}
+            </select>
+            <p className="form-description">{t("forms.page.parentPageHelp")}</p>
+          </div>
+        </div>
+      )}
+
       {showMoreSettings && (
         <div className="max-w-xl form-section">
           <h3 className="form-section-title">{t("forms.page.seoTitle")}</h3>

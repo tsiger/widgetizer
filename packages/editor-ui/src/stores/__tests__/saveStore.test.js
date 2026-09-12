@@ -874,6 +874,59 @@ describe("saveStore (useAutoSave)", () => {
       }
     });
 
+    // The server tells a save which page it took a listing anchor from. Reading
+    // that response AFTER the generation check would add a yield point past the
+    // guard, letting a discarded save still record the move and write back.
+    it("records a moved listing anchor on a save that completes", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      savePageContent.mockResolvedValueOnce({ success: true, listingAnchorMovedFrom: ["Blog"] });
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(useAutoSave.getState().listingAnchorMoved?.pages).toEqual(["Blog"]);
+    });
+
+    it("does not record a moved listing anchor when reset() discards the save mid-flight", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let resolveSave;
+      savePageContent.mockImplementationOnce(() => new Promise((resolve) => { resolveSave = resolve; }));
+      const savePromise = useAutoSave.getState().save(false);
+
+      useAutoSave.getState().reset(); // user confirms "discard changes" mid-flight
+      resolveSave({ success: true, listingAnchorMovedFrom: ["Blog"] });
+
+      expect(await savePromise).toEqual({ status: "abandoned" });
+      expect(useAutoSave.getState().listingAnchorMoved).toBe(null);
+    });
+
+    // The narrow window: a reset that lands after the generation check but while
+    // an await is still yielding. Reading the page response after that check
+    // reopens it — the save is abandoned yet still writes back. The thenable
+    // fires reset on its SECOND await (Promise.all consumes the first), which is
+    // exactly where a post-check read would sit.
+    it("leaves no window for a reset between the discard check and the write-back", async () => {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      let awaited = 0;
+      savePageContent.mockImplementationOnce(() => ({
+        then(onFulfilled, onRejected) {
+          awaited += 1;
+          if (awaited === 2) useAutoSave.getState().reset();
+          return Promise.resolve({ success: true, listingAnchorMovedFrom: ["Blog"] }).then(onFulfilled, onRejected);
+        },
+      }));
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "abandoned" });
+      expect(useAutoSave.getState().listingAnchorMoved).toBe(null);
+    });
+
     it("abandons its write-back if reset() fires while the save is still in flight (discard-and-leave)", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");

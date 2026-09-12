@@ -26,6 +26,9 @@ const useAutoSave = create((set, get) => ({
   isSaving: false,
   isAutoSaving: false,
   lastSaved: null,
+  // Set when a save moved a collection's listing anchor onto this page; read and
+  // cleared by a mounted component, which has the i18n provider this store does not.
+  listingAnchorMoved: null,
   modifiedWidgets: new Set(),
   structureModified: false,
   themeSettingsModified: false,
@@ -255,11 +258,19 @@ const useAutoSave = create((set, get) => ({
 
         const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");
         const hasPageDiff = page && pageStore.originalPage ? !isEqual(page, pageStore.originalPage) : false;
+        // Kept separately from the fan-out so its response can be read: the
+        // server reports which page it took a listing anchor from, if any.
+        let pageSave = null;
         if (page && (hasPageWidgetChanges || structureModified || hasPageDiff)) {
-          guardedPromises.push(savePageContent(page.id, page));
+          pageSave = savePageContent(page.id, page);
+          guardedPromises.push(pageSave);
         }
 
         await Promise.all(guardedPromises);
+        // Read the page response here, not after the generation check below:
+        // awaiting a settled promise still yields, and a reset landing in that
+        // gap would slip past the guard it is supposed to be caught by.
+        const pageSaveResult = pageSave ? await pageSave : null;
 
         // Phase 2: theme settings via themeStore's canonical save path.
         // This handles warning/correction reloads from the server automatically.
@@ -295,6 +306,13 @@ const useAutoSave = create((set, get) => ({
             structureModified: false,
             themeSettingsModified: false,
             lastSaved: new Date(),
+            // One page per collection can be its listing anchor, and the server
+            // moves it on save. Recorded as data for a mounted component to
+            // announce: this store has no i18n provider and must never fail a
+            // completed save over a message.
+            listingAnchorMoved: pageSaveResult?.listingAnchorMovedFrom?.length
+              ? { pages: pageSaveResult.listingAnchorMovedFrom }
+              : state.listingAnchorMoved,
           };
         });
 
@@ -451,6 +469,8 @@ const useAutoSave = create((set, get) => ({
     }
   },
 
+  clearListingAnchorMoved: () => set({ listingAnchorMoved: null }),
+
   reset: () => {
     const { stopAutoSave, saveGeneration } = get();
     stopAutoSave();
@@ -464,6 +484,7 @@ const useAutoSave = create((set, get) => ({
     set({
       saveGeneration: saveGeneration + 1,
       lastSaved: null,
+      listingAnchorMoved: null,
       modifiedWidgets: new Set(),
       structureModified: false,
       themeSettingsModified: false,
