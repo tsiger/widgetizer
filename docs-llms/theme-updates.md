@@ -121,13 +121,21 @@ The `latest/` folder is a **composed, ready-to-use snapshot** built in `data/the
 
 1. Sync any new `updates/` folders from the seed into `data/themes/{name}/updates/`
 2. Start from the base version (root theme files)
-3. Apply each version folder in `updates/` in semver order
+3. Apply, in semver order, only the version folders **newer than the base** — a folder at or
+   below the base describes changes the base already contains, so re-applying it would copy
+   its older files back over the base, let its `theme.json` decide the version `latest/`
+   claims, and re-run its `deleted/` removals against content the base has since restored
 4. For each version, copy its files over the previous state
 5. For each version, process `deleted/` folder removals
 6. Result: `latest/` contains the complete, up-to-date theme
 
 **Key behaviors:**
 
+- **No `latest/` is built when no version folder is newer than the base.** The base already
+  *is* the newest state, so readers fall back to it (`getThemeSourceDir`). A bundled theme
+  whose base is bumped every release therefore normally has no `latest/` at all; its
+  accumulated version folders exist to serve users whose installed base is older — see
+  §Two audiences below
 - If a file exists in multiple versions, the **latest version wins**
 - `latest/` is rebuilt when a theme author clicks "Update" on the Themes page
 - Projects read theme files from `latest/` (or base if `latest/` doesn't exist). `getThemeSourceDir` returns `latest/` only when `latest/theme.json` exists; otherwise it falls back to the root theme — and this resolution is subject to the 5s source cache described above.
@@ -265,13 +273,46 @@ arch.zip
       1.2.0/
 ```
 
+**The base version in a distributed zip never changes.** A released zip keeps its original
+base (`1.0.0` above) forever and accumulates `updates/<version>/` folders; the base is the
+floor the layers build on, not the current version. Bumping it breaks every existing
+install: the importer requires the zip's base to equal the **installed root base version**
+(not merely one of the installed versions), and rejects a mismatch with HTTP 409 naming both
+versions. Supporting a zip that carries a bumped full base plus the delta is a separate,
+unbuilt workflow — it needs a decision on whether the installed base is replaced or
+kept-and-layered.
+
+This differs from a **bundled** theme such as Arch, which ships inside the app: its base
+*is* bumped every release (see §Two audiences).
+
 When a user uploads this zip:
 
 - **New installation**: Entire theme is installed, `latest/` is built automatically
-- **Existing theme**: Only new update versions are imported (existing versions are skipped)
-- **Up to date**: If all versions already exist, upload is rejected with a clear message
+- **Existing theme**: Only new update versions are imported (existing versions are skipped);
+  a folder at or below the installed base is accepted and then never applied
+- **Up to date**: If the base matches and no folder is new, upload is rejected with a clear
+  message
+- **Base mismatch**: Rejected before anything is written
 
 Both paths validate collection-type schemas before committing. An update-import validates the **merged** result (base + installed updates + the incoming deltas), not just the new delta in isolation, so it also catches a `slugPrefix` that only collides once a new collection sits next to an existing one. An invalid schema is rejected with HTTP 400 (per-collection errors) and the installed theme is left untouched. Upload validation details (zip structure checks, `theme.json` requirements, version handling) live in [Theme Management](core-themes.md).
+
+### Two audiences, one set of version folders
+
+`data/themes/<id>` is provisioned **once** (`_ensureThemesDirectoryOnce` skips a theme whose
+folder already exists) and is never refreshed by an app upgrade. That splits every release
+into two audiences, and the same `updates/<version>/` folder serves both — which is why the
+newer-than-base filter matters:
+
+| | installed base | the release's own version folder | what they get |
+|---|---|---|---|
+| **Fresh install** | already the new version | equal to the base → **ignored**, no `latest/` | the base, directly |
+| **Upgrading user** | still the old version | newer than their base → **applied** | `latest/` composed to the new version |
+
+So a release that touches a bundled theme needs **both**: the base files fixed (for fresh
+installs) *and* an `updates/<that version>/` folder carrying the changed files (for everyone
+already installed). Fixing only the base leaves existing users with the old files and no
+notification; adding only the folder leaves the shipped theme wrong for new installs.
+Nothing in the build enforces this pairing.
 
 **Note**: The `latest/` folder in the zip (if present) is ignored; it's always rebuilt from scratch.
 

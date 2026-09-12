@@ -14,6 +14,14 @@ To distribute a theme, zip its folder, including the `updates/` directory if you
 
 The `latest/` folder inside a zip is ignored; it's always rebuilt locally (see below).
 
+> **Leave the base `theme.json` version alone.** Your first release sets it — say `1.0.0` — and
+> every later zip keeps that same base version, adding the new release as a folder under
+> `updates/`. The base is the floor your updates build on, not a running version number.
+> Bumping it is the one mistake that breaks existing users: the importer requires the zip's
+> base version to match the base they already have, and rejects the upload otherwise. A fresh
+> install of that same zip still ends up on your newest version, because the update folders
+> are applied during installation.
+
 # The Update System
 
 Theme updates use a **partial update** (delta) approach. Each version folder under `updates/` contains only the files that changed:
@@ -63,10 +71,15 @@ User content (`pages/`, `uploads/`) and additive-only paths (`templates/`, `menu
 `latest/` is generated automatically; **never edit it by hand**. It's built by:
 
 1. Starting from the base theme files (root level).
-2. Applying each version folder in semver order.
+2. Applying, in semver order, the version folders **newer than the installed base**.
 3. Letting the newest version win for any overlapping file.
 
 Projects read from `latest/` when it exists, so they always get the most up-to-date theme.
+
+Folders at or below the installed base are skipped: they describe changes that base already
+contains, so re-applying them would put older files back. If *no* folder is newer than the
+base, no `latest/` is built at all and projects read the base directly — which is already
+correct. That is the normal state right after someone installs your latest zip.
 
 ### Version Validation
 
@@ -75,6 +88,17 @@ The build is aborted with an error unless:
 - Every version folder contains a `theme.json`.
 - The `version` in each `theme.json` matches its folder name.
 - Versions are valid semver (`x.y.z`).
+
+An upload onto an already-installed theme is rejected when:
+
+- The zip's base `theme.json` version differs from the installed base version. The message
+  names both versions; the fix is to restore your original base version and ship the change
+  as a new folder under `updates/`.
+- The base matches but the zip adds no version the user doesn't already have — reported as
+  already up to date.
+
+Rejections happen before anything is written, so a bad upload never leaves a half-updated
+theme behind.
 
 # What Gets Updated in Projects
 

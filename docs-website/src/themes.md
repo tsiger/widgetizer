@@ -112,6 +112,11 @@ When a theme author releases an update:
 3. **Update**: Click **"Update"** on a theme card to install the latest version
 4. **Apply to Projects**: Projects using that theme will show an update indicator
 
+A theme that ships with Widgetizer, such as Arch, can show an update right after you install a
+new version of the app, without you uploading anything. Updating the app brings the new theme
+files along, but your installed copy of the theme is left as it is so nothing changes under
+your projects unexpectedly. The update is offered so you can take it when you're ready.
+
 ### Applying Updates to Your Projects
 
 After a theme is updated:

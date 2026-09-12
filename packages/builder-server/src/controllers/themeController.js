@@ -16,7 +16,7 @@ import {
 import { resolveSeedThemeDir, listSeedThemeIds } from "../utils/themeSeedRoots.js";
 import { getAllProjects, getProjectById } from "../db/repositories/projectRepository.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
-import { sortVersions, getLatestVersion, isValidVersion } from "../utils/semver.js";
+import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "../utils/semver.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage } from "../services/mediaUsageService.js";
@@ -512,8 +512,21 @@ async function buildLatestSnapshotSerial(themeId) {
   const baseTheme = JSON.parse(baseThemeData);
   const baseVersion = baseTheme.version;
 
-  // Validate that all update version folders have a theme.json with matching version
-  const updateVersions = versions.filter((v) => v !== baseVersion);
+  // Only versions NEWER than the base are layered on. A theme keeps every
+  // version folder it has ever shipped, so once the base is bumped to 0.9.20 the
+  // 0.9.9–0.9.19 folders are history, not pending work: the base already
+  // contains their result. Layering them would copy their older files back over
+  // the base (and their theme.json, making latest/ claim an old version), and
+  // re-run their deleted/ removals against content the base has since restored.
+  // Filtering on `!== baseVersion` alone did exactly that.
+  const updateVersions = versions.filter((v) => isNewerVersion(baseVersion, v));
+  if (updateVersions.length === 0) {
+    // Every folder is at or below the base: the base IS the latest state, and a
+    // latest/ built from it would be a pointless copy that readers then prefer.
+    console.log(`[buildLatestSnapshot] No updates newer than base v${baseVersion} for ${themeId}, skipping latest/ build`);
+    invalidateThemeSourceCache(themeId);
+    return;
+  }
   const missingThemeJson = [];
   const versionMismatches = [];
 
@@ -1482,8 +1495,22 @@ export async function uploadTheme(req, res) {
 
   // Get existing versions if theme exists
   let existingVersions = [];
+  // The installed ROOT base version, distinct from `existingVersions` (which also
+  // lists installed update folders). The fixed-base import workflow pins the
+  // zip's base to this exact version, and the validation layering below filters
+  // against it so it composes the same tree buildLatestSnapshot will.
+  let installedBaseVersion = null;
   if (themeExists) {
     existingVersions = await getThemeVersions(themeFolderName);
+    try {
+      const installedBaseJson = await fs.readJson(getThemeJsonPath(themeFolderName));
+      installedBaseVersion = installedBaseJson.version;
+    } catch (error) {
+      console.error(`[uploadTheme] Could not read installed base theme.json for ${themeFolderName}:`, error.message);
+      return res.status(500).json({
+        message: `Cannot import updates: the installed theme '${themeFolderName}' has an unreadable theme.json.`,
+      });
+    }
   }
 
   // Determine what to install
@@ -1495,17 +1522,21 @@ export async function uploadTheme(req, res) {
     // Filter out update versions that are already installed
     newUpdateVersions = updateVersionsInZip.filter((v) => !existingVersions.includes(v));
 
-    // If base version already exists and no new updates, reject
-    if (existingVersions.includes(uploadedVersion) && newUpdateVersions.length === 0) {
+    // The zip's base must be the installed ROOT base, not merely one of the
+    // installed versions: an update folder's version passing for the base would
+    // make the validation layering below start from a different floor than the
+    // final build, so the tree that was approved is not the tree that ships.
+    // Checked before the up-to-date case so a mismatch reports the real reason.
+    if (uploadedVersion !== installedBaseVersion) {
       return res.status(409).json({
-        message: `Theme '${themeFolderName}' is already up to date. Base version ${uploadedVersion} and all update versions are already installed.`,
+        message: `Cannot import updates: zip has base version ${uploadedVersion} but installed theme '${themeFolderName}' has base version ${installedBaseVersion || "unknown"}. An update zip must keep the installed base version and carry the new release in updates/.`,
       });
     }
 
-    // If base version doesn't match, we can't safely merge
-    if (!existingVersions.includes(uploadedVersion)) {
+    // Base matches and nothing new to add.
+    if (newUpdateVersions.length === 0) {
       return res.status(409).json({
-        message: `Cannot import updates: zip has base version ${uploadedVersion} but installed theme has base version ${existingVersions[0] || "unknown"}. Base versions must match.`,
+        message: `Theme '${themeFolderName}' is already up to date. Base version ${uploadedVersion} and all update versions are already installed.`,
       });
     }
 
@@ -1596,8 +1627,15 @@ export async function uploadTheme(req, res) {
         // and leave the installed theme untouched. The merge mirrors
         // buildLatestSnapshot.
         const newVersionSet = new Set(newUpdateVersions);
+        // Newer-than-the-installed-base only, exactly as buildLatestSnapshot
+        // layers: anything at or below the base is history the base already
+        // contains. Validating against a composition that re-applied those
+        // folders would judge the incoming delta against files the theme no
+        // longer ships. Filtered on the installed base rather than the zip's
+        // version so this stays aligned with the final build even if the
+        // base-equality guard above is ever relaxed.
         const orderedUpdateVersions = sortVersions([...new Set([...existingVersions, ...newUpdateVersions])]).filter(
-          (version) => version !== uploadedVersion,
+          (version) => isNewerVersion(installedBaseVersion, version),
         );
         const validateDir = path.join(userThemesDir, `_validate_${Date.now()}`);
         try {

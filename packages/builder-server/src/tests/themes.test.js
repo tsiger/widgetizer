@@ -1296,6 +1296,42 @@ describe("uploadTheme — theme update", () => {
     assert.equal(res._status, 409);
     assert.ok(res._json.message.includes("base version"));
   });
+
+  // The guard must compare against the installed ROOT base, not "any installed
+  // version". By this point 1.1.0 is installed as an update folder, so a zip
+  // claiming 1.1.0 as its base used to pass: validation would then layer from a
+  // 1.1.0 floor while the final build layers from the real 1.0.0 base, approving
+  // a different tree than the one that ships.
+  it("rejects a zip whose base matches an installed UPDATE version rather than the base", async () => {
+    const installedBase = (await fs.readJson(path.join(getThemeDir(EXISTING_THEME), "theme.json"))).version;
+    assert.equal(installedBase, "1.0.0");
+    assert.ok((await getThemeVersions(EXISTING_THEME)).includes("1.1.0"), "1.1.0 must be installed as an update");
+
+    const buffer = buildThemeZip(EXISTING_THEME, {
+      version: "1.1.0", // an installed update version, not the installed base
+      updates: [{ version: "1.2.0", files: { "assets/later.css": "later" } }],
+    });
+
+    const res = await callController(uploadTheme, { file: buffer });
+    assert.equal(res._status, 409);
+    assert.match(res._json.message, /base version 1\.1\.0 but installed theme .* base version 1\.0\.0/);
+    // Nothing was imported.
+    assert.equal(await fs.pathExists(path.join(getThemeDir(EXISTING_THEME), "updates", "1.2.0")), false);
+  });
+
+  it("still accepts the matching-base zip that carries a further release", async () => {
+    const buffer = buildThemeZip(EXISTING_THEME, {
+      version: "1.0.0",
+      updates: [
+        { version: "1.1.0", files: { "assets/patch.css": "patched" } },
+        { version: "1.2.0", files: { "assets/later.css": "later" } },
+      ],
+    });
+
+    const res = await callController(uploadTheme, { file: buffer });
+    assert.equal(res._status, 201);
+    assert.deepEqual(res._json.theme.addedVersions, ["1.2.0"]);
+  });
 });
 
 // ============================================================================

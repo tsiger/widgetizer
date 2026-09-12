@@ -28,7 +28,9 @@ process.env.THEMES_ROOT = TEST_THEMES_DIR;
 process.env.NODE_ENV = "test";
 
 // Import the functions we're testing (after env setup)
-const { buildLatestSnapshot, getThemeVersions } = await import("../controllers/themeController.js");
+const { buildLatestSnapshot, getThemeVersions, themeHasPendingUpdates } = await import(
+  "../controllers/themeController.js"
+);
 const { getThemeDir } = await import("../config.js");
 
 // ============================================================================
@@ -556,5 +558,153 @@ describe("Error handling", () => {
     } finally {
       await fs.remove(baseOnlyDir);
     }
+  });
+});
+
+// -----------------------------------------------------------------------
+// Versions at or below the base are history, not pending work
+// -----------------------------------------------------------------------
+
+// A theme keeps every version folder it has ever shipped. Once its base is
+// bumped, the folders up to that version describe changes the base already
+// contains, so layering them would copy older files back over the base, let an
+// old theme.json decide what version latest/ claims, and re-run deleted/
+// removals against content the base has since restored.
+describe("Stale version folders (at or below the base)", () => {
+  const staleThemeId = "__test_theme_stale_versions__";
+  const staleThemeDir = getThemeDir(staleThemeId);
+  const latest = (...p) => path.join(staleThemeDir, "latest", ...p);
+
+  async function writeVersion(dir, version, files) {
+    await fs.ensureDir(dir);
+    await fs.writeJson(path.join(dir, "theme.json"), { name: "Stale Theme", version });
+    for (const [rel, content] of Object.entries(files)) {
+      await fs.outputFile(path.join(dir, rel), content);
+    }
+  }
+
+  // Base 1.2.0 ships the current files. 1.0.0 and 1.1.0 are shipped history;
+  // 1.3.0 is a genuine pending update.
+  async function seed({ withNewer }) {
+    await fs.remove(staleThemeDir);
+    await writeVersion(staleThemeDir, "1.2.0", {
+      "layout.liquid": "base 1.2.0",
+      "assets/keep.css": "base keep",
+      "widgets/restored/widget.liquid": "restored by base",
+    });
+    await writeVersion(path.join(staleThemeDir, "updates", "1.0.0"), "1.0.0", { "layout.liquid": "old 1.0.0" });
+    await writeVersion(path.join(staleThemeDir, "updates", "1.1.0"), "1.1.0", {
+      "layout.liquid": "old 1.1.0",
+      "assets/keep.css": "old keep",
+      // 1.1.0 deleted the widget the base now ships again. A placeholder inside
+      // deleted/ must name the real path it removes.
+      "deleted/widgets/restored/widget.liquid": "",
+    });
+    await writeVersion(path.join(staleThemeDir, "updates", "1.2.0"), "1.2.0", { "layout.liquid": "equal-to-base" });
+    if (withNewer) {
+      await writeVersion(path.join(staleThemeDir, "updates", "1.3.0"), "1.3.0", { "layout.liquid": "new 1.3.0" });
+    }
+  }
+
+  after(async () => {
+    await fs.remove(staleThemeDir);
+  });
+
+  it("builds no latest/ when every folder is at or below the base", async () => {
+    await seed({ withNewer: false });
+    await buildLatestSnapshot(staleThemeId);
+    // Without latest/, readers fall back to the base — which is already correct.
+    assert.equal(await fs.pathExists(path.join(staleThemeDir, "latest")), false);
+  });
+
+  it("layers only the newer version, leaving base files from older folders alone", async () => {
+    await seed({ withNewer: true });
+    await buildLatestSnapshot(staleThemeId);
+
+    assert.equal(await fs.readFile(latest("layout.liquid"), "utf8"), "new 1.3.0");
+    assert.equal(await fs.readFile(latest("assets", "keep.css"), "utf8"), "base keep");
+    assert.equal((await fs.readJson(latest("theme.json"))).version, "1.3.0");
+  });
+
+  it("does not re-run a stale folder's deletion against content the base restored", async () => {
+    await seed({ withNewer: true });
+    await buildLatestSnapshot(staleThemeId);
+
+    assert.equal(await fs.pathExists(latest("widgets", "restored", "widget.liquid")), true);
+  });
+
+  it("still rejects a malformed folder that IS newer than the base", async () => {
+    await seed({ withNewer: false });
+    // Newer than base, but its theme.json disagrees with the folder name.
+    const dir = path.join(staleThemeDir, "updates", "1.4.0");
+    await fs.ensureDir(dir);
+    await fs.writeJson(path.join(dir, "theme.json"), { name: "Stale Theme", version: "9.9.9" });
+
+    await assert.rejects(
+      () => buildLatestSnapshot(staleThemeId),
+      (err) => {
+        assert.match(err.message, /version mismatch/);
+        return true;
+      },
+    );
+  });
+});
+
+// -----------------------------------------------------------------------
+// The upgrade path: an installed base that is older than the shipped one
+// -----------------------------------------------------------------------
+
+// data/themes/<id> is provisioned once and never refreshed, so a user who
+// upgrades the app keeps the base they first installed. The release's update
+// folder is what carries the new files to them: it is newer than THEIR base, so
+// it layers — while for a fresh install, whose base already equals it, the same
+// folder is correctly ignored. Both halves are exercised here.
+describe("Upgrade path (installed base older than the shipped version)", () => {
+  const upgradeThemeId = "__test_theme_upgrade_path__";
+  const upgradeThemeDir = getThemeDir(upgradeThemeId);
+  const latest = (...p) => path.join(upgradeThemeDir, "latest", ...p);
+
+  async function writeVersion(dir, version, files) {
+    await fs.ensureDir(dir);
+    await fs.writeJson(path.join(dir, "theme.json"), { name: "Upgrade Theme", version });
+    for (const [rel, content] of Object.entries(files)) {
+      await fs.outputFile(path.join(dir, rel), content);
+    }
+  }
+
+  // installedBase is what the user's data dir holds; both release folders are
+  // present either way, exactly as they ship.
+  async function seed(installedBase) {
+    await fs.remove(upgradeThemeDir);
+    await writeVersion(upgradeThemeDir, installedBase, {
+      "widgets/card/widget.liquid": `base ${installedBase}`,
+    });
+    await writeVersion(path.join(upgradeThemeDir, "updates", "1.0.0"), "1.0.0", {
+      "widgets/card/widget.liquid": "v1.0.0 card",
+    });
+    await writeVersion(path.join(upgradeThemeDir, "updates", "1.1.0"), "1.1.0", {
+      "widgets/card/widget.liquid": "v1.1.0 card",
+    });
+  }
+
+  after(async () => {
+    await fs.remove(upgradeThemeDir);
+  });
+
+  it("upgrading user: the release folder layers over their older base", async () => {
+    await seed("1.0.0");
+    assert.equal(await themeHasPendingUpdates(upgradeThemeId), true);
+
+    await buildLatestSnapshot(upgradeThemeId);
+    assert.equal(await fs.readFile(latest("widgets", "card", "widget.liquid"), "utf8"), "v1.1.0 card");
+    assert.equal((await fs.readJson(latest("theme.json"))).version, "1.1.0");
+  });
+
+  it("fresh install: the same folders are inert and the base is served as-is", async () => {
+    await seed("1.1.0");
+    assert.equal(await themeHasPendingUpdates(upgradeThemeId), false);
+
+    await buildLatestSnapshot(upgradeThemeId);
+    assert.equal(await fs.pathExists(path.join(upgradeThemeDir, "latest")), false);
   });
 });
