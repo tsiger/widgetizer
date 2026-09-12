@@ -470,13 +470,13 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[future-breadcrumbs-design.md](future-breadcrumbs-design.md)** - Future: Breadcrumbs
 
-**Purpose**: Locked design for breadcrumbs (stage 1 of the series) — core computes one trail per page (parent page → menu position for pages; listing anchor → single listing page for items; homepage by slug), exposes it as `page.breadcrumbs` / `globals.breadcrumbs`, and themes render it with a core snippet or their own markup; introduces the widget-schema `collection` declaration and the listing anchor that pagination and structured data reuse **When to use**:
+**Purpose**: Locked design for breadcrumbs (stage 1 of the series) — core computes one trail per page from explicit associations only (parent page for pages; listing anchor → single listing page for items; homepage by slug; no parent means Home → page), exposes it as `page.breadcrumbs` / `globals.breadcrumbs`, and themes render it with a core snippet or their own markup; introduces the widget-schema `collection` declaration and the listing anchor that pagination and structured data reuse **When to use**:
 
 - Adding breadcrumbs to a theme (the Widgetizer marketing-site theme is the first consumer)
 - Touching the parent-page field, the listing-anchor toggle, or the `collection` widget-schema block
 - Building `BreadcrumbList` structured data from the trail
 
-**Key topics**: Trail sources and fallbacks, home detection and label, unlinkable ancestors, the frozen `breadcrumbs` contract, the core `breadcrumbs` snippet and its params, `theme.json` `settings.breadcrumbs.menu`, engine/editor work, multilang note, definition of done
+**Key topics**: Trail sources and fallbacks, why menu position was dropped from v1, home detection and label, the frozen `breadcrumbs` contract, the core `breadcrumbs` snippet and its params, engine/editor work, multilang note, definition of done
 
 ---
 

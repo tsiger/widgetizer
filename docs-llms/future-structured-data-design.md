@@ -130,7 +130,7 @@ The collection schema declares meaning in a small closed block; core owns the bu
 
 ### Breadcrumbs — from the stage-1 trail
 
-`BreadcrumbList` is built from the same array the visible breadcrumb renders (`page.breadcrumbs`, `future-breadcrumbs-design.md`): parent page or menu position for pages, the listing anchor or the single listing page for items, Home detected by slug. Only linkable entries are emitted; the node is omitted when the trail has fewer than two entries (the homepage). A deleted parent or anchor degrades on the next render exactly as the visible breadcrumb does. Nothing to configure here, and the visible trail and the JSON-LD can never disagree.
+`BreadcrumbList` is built from the same array the visible breadcrumb renders (`page.breadcrumbs`, `future-breadcrumbs-design.md`): an explicit parent page for pages, the listing anchor or the single listing page for items, Home detected by slug. Nothing is inferred from navigation — deliberately, so a nav reorder cannot silently rewrite published structured data. Only linkable entries are emitted; the node is omitted when the trail has fewer than two entries (the homepage). A deleted parent or anchor degrades on the next render exactly as the visible breadcrumb does. Nothing to configure here, and the visible trail and the JSON-LD can never disagree.
 
 ---
 
@@ -194,7 +194,7 @@ Prerequisites already landed by earlier stages: the Site URL base helper and `pa
 3. **Graph builder + safe serializer** — `packages/core/src/structuredData/` (new): `buildGraph(context)` returns nodes; `serializeJsonLd(nodes)` prunes empties and escapes `</script`. `SeoTag.js` appends the script. Tests: stable ids, pruning, breakout attempts, no Site URL → URL-dependent nodes absent.
 4. **Homepage and ordinary pages** — `WebSite` + identity + `WebPage` on the homepage, `WebPage` elsewhere (paginated copies included); readiness warning surfaced in the export result.
 5. **Collection contract + News** — `structuredData` block validation in `collectionService.js`; the `BlogPosting` builder; the block added to `themes/arch/collection-types/news/schema.json`; item pages emit it. Tests: missing field refused, parity with visible values, absolute image URL under both Clean URLs values.
-6. **Breadcrumbs** — `BreadcrumbList` from `page.breadcrumbs` on every page whose trail has two or more linkable entries. Tests: page with menu ancestors, item with an anchor, item without one (Home → item), homepage (no node).
+6. **Breadcrumbs** — `BreadcrumbList` from `page.breadcrumbs` on every page whose trail has two or more linkable entries. Tests: page with a parent chain, page with no parent (Home → page — one linkable ancestor plus the page, so a node is emitted), item with an anchor, item without one (Home → item), homepage (no node).
 7. **Project details UI** — Website readiness line; Site identity section; Business details section; opening-hours editor (`app/src/components/projects/ProjectForm.jsx`, strings in `packages/core/src/locales/en.json`).
 8. **Theme** — `project.identity` in the base render context (`renderingService.js` `buildRenderDeps`); "Use business details" toggle in Arch's footer and contact-details widget; social dual-read in the footer.
 9. **Warnings, validation, docs** — preview/export reporting; developer-mode validation entries; `docs-llms/core-collections.md` (the `structuredData` block), theme authoring docs, `docs-llms/user-test-checklist.md`.
