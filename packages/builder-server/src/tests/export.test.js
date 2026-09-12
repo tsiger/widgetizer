@@ -1636,10 +1636,10 @@ describe("exportProject with markdown", () => {
     const html = await fs.readFile(path.join(exportDir, "index.html"), "utf8");
     assert.ok(html.includes('rel="alternate"'), "Should have alternate link tag");
     assert.ok(html.includes('type="text/markdown"'), "Should specify text/markdown type");
-    assert.ok(
-      html.includes(`href="${SITE_URL}/index.md"`) || html.includes(`href="${SITE_URL}index.md"`),
-      "Should use absolute URL when siteUrl is set",
-    );
+    // Pinned exactly: the markdown alternate is one of the generated absolute
+    // addresses and shares the Site URL base helper with the canonicals and the
+    // sitemap, so the trailing slash in the stored value cannot change it.
+    assert.ok(html.includes(`href="${SITE_URL}/index.md"`), "Should use the absolute URL built from siteUrl");
   });
 
   it("about.html alternate link points to about.md", async () => {

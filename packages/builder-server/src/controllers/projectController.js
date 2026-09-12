@@ -16,7 +16,7 @@ import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
 import { isReservedItemSlug } from "../services/collectionService.js";
-import { isValidSiteUrl } from "@widgetizer/core/urlSafety";
+import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
@@ -39,6 +39,18 @@ async function ensureDirectories() {
 
 function isOptionalBoolean(value) {
   return value === undefined || typeof value === "boolean";
+}
+
+/**
+ * Message for a rejected Site URL. A query or fragment gets its own wording
+ * because the address is otherwise fine and the fix is to delete a piece of it —
+ * the generic "enter a valid URL" sends the user hunting for the wrong problem.
+ * Mirrors the project form's inline validation.
+ */
+function siteUrlRejection(value) {
+  return siteUrlHasQueryOrFragment(value)
+    ? "Invalid Website Address. Remove the ? query or # part — this is the address your site lives at, and page paths are added onto it (e.g., https://mysite.com or https://mysite.com/blog/)."
+    : "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com).";
 }
 
 /**
@@ -306,7 +318,7 @@ export async function createProject(req, res) {
     }
 
     if (!isValidSiteUrl(siteUrl)) {
-      return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
+      return res.status(400).json({ error: siteUrlRejection(siteUrl) });
     }
 
     if (!isOptionalBoolean(receiveThemeUpdates)) {
@@ -507,7 +519,7 @@ export async function updateProject(req, res) {
     }
 
     if (updates.siteUrl !== undefined && !isValidSiteUrl(updates.siteUrl)) {
-      return res.status(400).json({ error: "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com)." });
+      return res.status(400).json({ error: siteUrlRejection(updates.siteUrl) });
     }
 
     if (!isOptionalBoolean(updates.receiveThemeUpdates)) {

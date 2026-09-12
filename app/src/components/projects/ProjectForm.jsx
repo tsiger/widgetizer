@@ -6,7 +6,7 @@ import { apiFetch } from "@widgetizer/editor-ui/lib/apiFetch";
 import LoadingSpinner from "@widgetizer/editor-ui/components/ui/LoadingSpinner.jsx";
 import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import { formatSlug } from "@widgetizer/editor-ui/utils/slugUtils";
-import { isValidSiteUrl } from "@widgetizer/core/urlSafety";
+import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "@widgetizer/editor-ui/queries/themeManager";
 
@@ -414,7 +414,11 @@ export default function ProjectForm({
                   {...register("siteUrl", {
                     validate: (value) =>
                       isValidSiteUrl(value) ||
-                      t("forms.project.siteUrlInvalid") ||
+                      // A query/fragment is the one rejection worth naming: the
+                      // address is otherwise fine and the fix is to delete a bit.
+                      (siteUrlHasQueryOrFragment(value)
+                        ? t("forms.project.siteUrlNoQueryOrFragment")
+                        : t("forms.project.siteUrlInvalid")) ||
                       "Please enter a valid URL (e.g., https://mysite.com)",
                   })}
                   className="form-input"

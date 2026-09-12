@@ -73,6 +73,30 @@ export function isValidSiteUrl(value) {
     return false;
   }
   if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+  // A query or fragment cannot be part of an address that page paths are
+  // appended to: `?x=1` would land mid-URL in every generated canonical,
+  // og:image and sitemap entry. A path is fine and deliberately kept — a
+  // GitHub-Pages-style `user.github.io/repo/` is a legitimate deploy target.
+  if (url.search || url.hash) return false;
   // Require a dotted host so single-label hosts (localhost, foo) are rejected.
   return url.hostname.includes(".");
+}
+
+/**
+ * True when the only thing wrong with `value` as a Site URL is a trailing query
+ * or fragment — i.e. cutting it off would leave a valid address. Lets the form
+ * and the controller explain that specific rejection instead of repeating the
+ * generic "enter a valid URL", and keeps the two from drifting apart.
+ *
+ * @param {*} value
+ * @returns {boolean}
+ */
+export function siteUrlHasQueryOrFragment(value) {
+  if (!value || typeof value !== "string" || !value.trim()) return false;
+  const trimmed = value.trim();
+  const cut = trimmed.search(/[?#]/);
+  // `cut === 0` would leave an empty string, which isValidSiteUrl accepts as the
+  // optional-field case — not a reason to claim the query is the problem.
+  if (cut <= 0) return false;
+  return isValidSiteUrl(trimmed.slice(0, cut));
 }

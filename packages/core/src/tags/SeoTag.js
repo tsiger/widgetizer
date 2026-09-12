@@ -1,6 +1,6 @@
 // Purpose: Liquid tag to output SEO meta tags
 
-import { isHomeSlug } from "../utils/internalHref.js";
+import { isHomeSlug, absoluteSiteUrl } from "../utils/internalHref.js";
 
 export const SeoTag = {
   parse(tagToken) {
@@ -109,14 +109,11 @@ function resolveImageUrl(rawValue, siteUrl, mediaFiles = {}) {
     return rawValue;
   }
 
-  // Need an absolute base to build a usable social URL.
-  if (!siteUrl || !siteUrl.trim()) return "";
-
   // Extract the filename from the stored path: "/uploads/images/hero.jpg" → "hero.jpg".
   const filename = rawValue.split("/").pop();
   const publicFilename = getPublicImageFilename(filename, mediaFiles);
-  const cleanSiteUrl = siteUrl.replace(/\/$/, "");
-  return `${cleanSiteUrl}/assets/images/${publicFilename}`;
+  // "" when there is no usable base, so the caller omits the tag.
+  return absoluteSiteUrl(siteUrl, `assets/images/${publicFilename}`);
 }
 
 function getPublicImageFilename(filename, mediaFiles) {
@@ -135,18 +132,12 @@ function getPublicImageFilename(filename, mediaFiles) {
 // publish pages at extensionless paths (Netlify/Cloudflare Pages/Vercel style).
 function resolveCanonicalUrl(explicitUrl, siteUrl, slug, cleanUrls = false) {
   if (explicitUrl && explicitUrl.trim()) return explicitUrl.trim();
-  if (!siteUrl || !siteUrl.trim()) return "";
 
-  let base;
-  try {
-    base = new URL(siteUrl).href.replace(/\/$/, "");
-  } catch {
-    return "";
-  }
-
-  const isHomepage = isHomeSlug(slug);
-  if (isHomepage) return `${base}/`;
-  return cleanUrls ? `${base}/${slug}` : `${base}/${slug}.html`;
+  // The homepage canonicalizes to the base itself (its trailing slash included);
+  // every other page is the base plus its path. A subfolder Site URL is kept by
+  // the shared helper rather than re-derived here.
+  if (isHomeSlug(slug)) return absoluteSiteUrl(siteUrl, "");
+  return absoluteSiteUrl(siteUrl, cleanUrls ? slug : `${slug}.html`);
 }
 
 // Helper function to escape HTML entities

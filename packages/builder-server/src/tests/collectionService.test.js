@@ -409,6 +409,39 @@ describe("normalize + render helpers (pure)", () => {
     );
     assert.equal(page.seo.canonical_url, "https://example.com/news/hello");
   });
+
+  // The item canonical shares the Site URL base helper with page canonicals, the
+  // sitemap and robots, so a subfolder Site URL survives here too — in either
+  // trailing-slash form.
+  const item = { slug: "hello", uuid: "u", settings: { title: "Hello" }, seo: {} };
+
+  it("buildCollectionItemPageData keeps a subfolder Site URL", () => {
+    for (const siteUrl of ["https://example.com/repo", "https://example.com/repo/"]) {
+      assert.equal(
+        svc.buildCollectionItemPageData(NEWS_SCHEMA, item, siteUrl).seo.canonical_url,
+        "https://example.com/repo/news/hello.html",
+      );
+      assert.equal(
+        svc.buildCollectionItemPageData(NEWS_SCHEMA, item, siteUrl, true).seo.canonical_url,
+        "https://example.com/repo/news/hello",
+      );
+    }
+  });
+
+  it("buildCollectionItemPageData omits the canonical when the Site URL is unusable", () => {
+    for (const siteUrl of ["", "not-a-url", "https://example.com/?utm=x", "https://example.com/#top"]) {
+      assert.equal(svc.buildCollectionItemPageData(NEWS_SCHEMA, item, siteUrl).seo.canonical_url, "");
+    }
+  });
+
+  it("buildCollectionItemPageData lets an explicit item canonical win", () => {
+    const page = svc.buildCollectionItemPageData(
+      NEWS_SCHEMA,
+      { ...item, seo: { canonical_url: "https://other.example.net/custom" } },
+      "https://example.com/repo/",
+    );
+    assert.equal(page.seo.canonical_url, "https://other.example.net/custom");
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -126,3 +126,58 @@ describe("SeoTag canonical URL", () => {
     expect(html).not.toContain('rel="canonical"');
   });
 });
+
+// The canonical and the social image are two of the four generated absolute
+// addresses (the sitemap and robots are the others), and they now share one Site
+// URL base helper. A Site URL living in a subfolder is the case that used to come
+// out differently depending on which of them built the URL.
+describe("SeoTag — subfolder Site URL", () => {
+  for (const siteUrl of ["https://example.com/repo", "https://example.com/repo/"]) {
+    it(`keeps the subfolder on the canonical and og:image — "${siteUrl}"`, () => {
+      const html = render({
+        page: pageWith({ og_image: "/uploads/images/hero.jpg" }),
+        project: { siteUrl },
+        mediaFiles: {},
+      });
+      expect(html).toContain('<link rel="canonical" href="https://example.com/repo/about.html">');
+      expect(html).toContain('content="https://example.com/repo/assets/images/hero.jpg"');
+    });
+
+    it(`canonicalizes the homepage to the subfolder base — "${siteUrl}"`, () => {
+      for (const cleanUrls of [false, true]) {
+        const html = render({
+          page: { slug: "index", name: "Home", seo: {} },
+          project: { siteUrl, cleanUrls },
+          mediaFiles: {},
+        });
+        expect(html).toContain('<link rel="canonical" href="https://example.com/repo/">');
+      }
+    });
+
+    it(`drops the extension under cleanUrls but keeps the subfolder — "${siteUrl}"`, () => {
+      const html = render({ page: pageWith({}), project: { siteUrl, cleanUrls: true }, mediaFiles: {} });
+      expect(html).toContain('<link rel="canonical" href="https://example.com/repo/about">');
+    });
+  }
+
+  // Tightened validation rejects a query or fragment; a value stored before that
+  // behaves as an unset Site URL — output omitted, never guessed at.
+  it("omits both when the stored Site URL carries a query or fragment", () => {
+    const html = render({
+      page: pageWith({ og_image: "/uploads/images/hero.jpg" }),
+      project: { siteUrl: "https://example.com/?utm=x" },
+      mediaFiles: {},
+    });
+    expect(html).not.toContain('rel="canonical"');
+    expect(html).not.toContain("og:image");
+  });
+
+  it("still passes an author's absolute og_image through untouched", () => {
+    const html = render({
+      page: pageWith({ og_image: "https://cdn.example.net/shared.png" }),
+      project: { siteUrl: "https://example.com/repo/" },
+      mediaFiles: {},
+    });
+    expect(html).toContain('content="https://cdn.example.net/shared.png"');
+  });
+});

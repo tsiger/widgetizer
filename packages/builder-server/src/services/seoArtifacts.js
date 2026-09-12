@@ -3,23 +3,14 @@
 // hosted's cloud render loop produce identical output from one source.
 
 import { formatXml } from "../utils/htmlProcessor.js";
-import { isHomeSlug } from "@widgetizer/core/internalHref";
-
-function isValidSiteUrl(siteUrl) {
-  if (!siteUrl || siteUrl.trim() === "") return false;
-  try {
-    new URL(siteUrl);
-    return true;
-  } catch {
-    return false;
-  }
-}
+import { isHomeSlug, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "@widgetizer/core/internalHref";
 
 /**
  * Build the formatted sitemap.xml for the given pages, or null when siteUrl is
- * missing/invalid. noindex pages are excluded; the homepage maps to the bare
- * site root and every other page to `<slug>.html` — or `<slug>` when `cleanUrls`
- * is set, matching the links the pages emit. Collection item pages (from
+ * missing/unusable as a base. noindex pages are excluded; the homepage maps to
+ * the Site URL base itself (subfolder included) and every other page to
+ * `<slug>.html` — or `<slug>` when `cleanUrls` is set, matching the links the
+ * pages emit. Collection item pages (from
  * `itemPagesForSeo`) follow the page URLs, grouped by type in listing order;
  * noindex items are excluded.
  * @param {Array<object>} pagesDataArray
@@ -29,14 +20,18 @@ function isValidSiteUrl(siteUrl) {
  * @returns {Promise<string|null>}
  */
 export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false) {
-  if (!isValidSiteUrl(siteUrl)) return null;
+  // No usable base means no absolute <loc> can be built, so there is no sitemap
+  // to write. `siteUrlBase` is the single gate the canonicals use too.
+  if (!siteUrlBase(siteUrl)) return null;
 
   const ext = cleanUrls ? "" : ".html";
   const sitemapUrls = pagesDataArray
     .filter((page) => !page.seo?.robots?.includes("noindex"))
     .map((page) => {
       const isHomepage = isHomeSlug(page.slug);
-      const pageUrl = isHomepage ? new URL("/", siteUrl).href : new URL(`${page.slug}${ext}`, siteUrl).href;
+      // The homepage is the base itself. `new URL("/", base)` would resolve to
+      // the HOST root and silently drop a subfolder Site URL's own path.
+      const pageUrl = isHomepage ? absoluteSiteUrl(siteUrl, "") : absoluteSiteUrl(siteUrl, `${page.slug}${ext}`);
       const lastMod = page.updated || page.gcreated || new Date().toISOString();
       return `
   <url>
@@ -49,7 +44,7 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
   for (const { slugPrefix, items } of itemPagesForSeo || []) {
     for (const item of items) {
       if (item.seo?.robots?.includes("noindex")) continue;
-      const loc = new URL(`${slugPrefix}/${item.slug}${ext}`, siteUrl).href;
+      const loc = absoluteSiteUrl(siteUrl, `${slugPrefix}/${item.slug}${ext}`);
       const lastMod = item.updated || new Date().toISOString();
       collectionSitemapUrls.push(`
   <url>
@@ -79,10 +74,10 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
  * @returns {string|null}
  */
 export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false) {
-  if (!isValidSiteUrl(siteUrl)) return null;
+  if (!siteUrlBase(siteUrl)) return null;
 
   const ext = cleanUrls ? "" : ".html";
-  const sitemapUrl = new URL("sitemap.xml", siteUrl).href;
+  const sitemapUrl = absoluteSiteUrl(siteUrl, "sitemap.xml");
   // Single Set so a page and an item never emit duplicate Disallow lines.
   const disallowSet = new Set();
   for (const page of pagesDataArray) {
@@ -90,11 +85,15 @@ export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cl
     const pageId = page.id || page.slug;
     if (!pageId) continue;
     const filename = isHomeSlug(pageId) ? `index${ext || ".html"}` : `${pageId}${ext}`;
-    disallowSet.add(`/${filename}`);
+    // Robots paths resolve against the HOST root, not the site's base, so a site
+    // under /bakery/ must disallow /bakery/private — a bare /private protects
+    // nothing.
+    disallowSet.add(siteUrlPathname(siteUrl, filename));
   }
   for (const { slugPrefix, items } of itemPagesForSeo || []) {
     for (const item of items) {
-      if (item.seo?.robots?.includes("noindex")) disallowSet.add(`/${slugPrefix}/${item.slug}${ext}`);
+      if (item.seo?.robots?.includes("noindex"))
+        disallowSet.add(siteUrlPathname(siteUrl, `${slugPrefix}/${item.slug}${ext}`));
     }
   }
   const disallowPaths = Array.from(disallowSet);

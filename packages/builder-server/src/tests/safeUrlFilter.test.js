@@ -11,7 +11,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { Liquid } from "liquidjs";
 
-import { sanitizeHref, normalize, isValidSiteUrl } from "@widgetizer/core/urlSafety";
+import { sanitizeHref, normalize, isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { registerSafeUrlFilter } from "@widgetizer/core";
 
 describe("urlSafety.isValidSiteUrl", () => {
@@ -25,7 +25,10 @@ describe("urlSafety.isValidSiteUrl", () => {
   it("accepts proper http(s) URLs with a dotted host", () => {
     assert.equal(isValidSiteUrl("https://mysite.com"), true);
     assert.equal(isValidSiteUrl("http://cssigniter.com"), true);
-    assert.equal(isValidSiteUrl("  https://www.example.co.uk/path?q=1  "), true);
+    // A path is deliberately kept: a project-subfolder deploy (GitHub Pages
+    // style `user.github.io/repo/`) is a legitimate Site URL.
+    assert.equal(isValidSiteUrl("  https://www.example.co.uk/path  "), true);
+    assert.equal(isValidSiteUrl("https://user.github.io/repo/"), true);
   });
 
   it("rejects malformed / non-web / authority-less values", () => {
@@ -36,6 +39,25 @@ describe("urlSafety.isValidSiteUrl", () => {
     assert.equal(isValidSiteUrl("https://localhost"), false); // single-label host
     assert.equal(isValidSiteUrl("https://foo"), false);
     assert.equal(isValidSiteUrl("ftp://example.com"), false); // non-http(s)
+  });
+
+  // Page paths are appended to this value, so a query or fragment would land in
+  // the middle of every generated canonical, og:image and sitemap entry.
+  it("rejects a query or fragment", () => {
+    assert.equal(isValidSiteUrl("https://www.example.co.uk/path?q=1"), false);
+    assert.equal(isValidSiteUrl("https://mysite.com?utm_source=x"), false);
+    assert.equal(isValidSiteUrl("https://mysite.com/#top"), false);
+    assert.equal(isValidSiteUrl("  https://mysite.com/blog/?page=2  "), false);
+  });
+
+  it("names a query or fragment as the reason when the address is otherwise fine", () => {
+    assert.equal(siteUrlHasQueryOrFragment("https://mysite.com?utm_source=x"), true);
+    assert.equal(siteUrlHasQueryOrFragment("https://mysite.com/blog/#top"), true);
+    // Broken for other reasons, or not broken at all: not this message's job.
+    assert.equal(siteUrlHasQueryOrFragment("https://localhost?x=1"), false);
+    assert.equal(siteUrlHasQueryOrFragment("https://mysite.com"), false);
+    assert.equal(siteUrlHasQueryOrFragment("?x=1"), false);
+    assert.equal(siteUrlHasQueryOrFragment(""), false);
   });
 });
 

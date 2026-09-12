@@ -23,7 +23,7 @@ import { randomUUID } from "node:crypto";
 
 import { isSupportedSettingType } from "@widgetizer/core/config/settingTypes";
 import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
-import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { pageHref, itemHref, absoluteSiteUrl } from "@widgetizer/core/internalHref";
 import { resolveRichtextMediaInSettings } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
 import { resolveMenuSettings } from "@widgetizer/render-engine";
@@ -1175,17 +1175,6 @@ export async function loadCollectionItemsByUuid(storage, scope) {
   return map;
 }
 
-/** True when `siteUrl` is a non-empty, parseable absolute URL. */
-function isValidSiteUrl(siteUrl) {
-  if (!siteUrl || !siteUrl.trim()) return false;
-  try {
-    new URL(siteUrl);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Map a normalized collection item + its schema into the page-shaped object that
  * renderPageLayout and SeoTag consume for an item page (docs-llms/core-collections.md §6). The
@@ -1209,14 +1198,12 @@ export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = f
   const titleValue = (titleField && settings[titleField.id]) || item.slug;
 
   const seo = shapeItemSeo(item.seo);
-  const validSiteUrl = isValidSiteUrl(siteUrl);
-  const canonicalBase = validSiteUrl ? siteUrl.replace(/\/$/, "") : "";
+  // One shared base, same as page canonicals and the sitemap; "" when the Site
+  // URL is unset or unusable, which leaves the canonical omitted.
   const canonical_url =
     seo.canonical_url && seo.canonical_url.trim()
       ? seo.canonical_url.trim()
-      : validSiteUrl
-        ? `${canonicalBase}/${schema.slugPrefix}/${item.slug}${cleanUrls ? "" : ".html"}`
-        : "";
+      : absoluteSiteUrl(siteUrl, `${schema.slugPrefix}/${item.slug}${cleanUrls ? "" : ".html"}`);
 
   return {
     id: `${schema.slugPrefix}-${item.slug}`,

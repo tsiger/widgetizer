@@ -23,6 +23,7 @@ import { buildFormsManifest } from "../services/formsManifestService.js";
 import TurndownService from "turndown";
 import { buildAssetVersionToken, splitAssetRef } from "@widgetizer/core/assetUrl";
 import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
+import { siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
 import * as exportRepo from "../db/repositories/exportRepository.js";
 
 const PACKAGE_JSON_PATH = path.join(APP_ROOT, "package.json");
@@ -347,13 +348,11 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     }
     // --- End of new SEO file generation ---
 
-    let validSiteUrl = false;
-    if (siteUrl && siteUrl.trim() !== "") {
-      try {
-        new URL(siteUrl);
-        validSiteUrl = true;
-      } catch { /* invalid URL */ }
-    }
+    // The markdown alternate links below are absolute when there is a usable Site
+    // URL base, and relative otherwise. Same gate as the canonicals and the
+    // sitemap, so one unusable Site URL does not make some outputs absolute and
+    // others not.
+    const mdBase = siteUrlBase(siteUrl);
 
     const headerData = await readGlobalWidgetFromDir(projectDir, "header");
     const footerData = await readGlobalWidgetFromDir(projectDir, "footer");
@@ -518,12 +517,7 @@ Per aspera ad astra
       // Inject markdown alternate link into <head> when markdown export is enabled
       if (exportMarkdown) {
         const mdFilename = pageData.id === "index" || pageData.id === "home" ? "index.md" : `${pageData.id}.md`;
-        let mdHref = mdFilename;
-        if (validSiteUrl) {
-          try {
-            mdHref = new URL(mdFilename, siteUrl).href;
-          } catch { /* fall back to relative */ }
-        }
+        const mdHref = mdBase ? absoluteSiteUrl(siteUrl, mdFilename) : mdFilename;
         processedHtml = processedHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
       }
 
@@ -681,12 +675,11 @@ Per aspera ad astra
 
           // Markdown alternate link → the item's .md (same dir; absolute when siteUrl valid).
           if (exportMarkdown) {
-            let mdHref = `${item.slug}.md`;
-            if (validSiteUrl) {
-              try {
-                mdHref = new URL(`${schema.slugPrefix}/${item.slug}.md`, siteUrl).href;
-              } catch { /* fall back to relative */ }
-            }
+            // Relative fallback stays same-dir (the item's own folder); the
+            // absolute form carries the collection prefix.
+            const mdHref = mdBase
+              ? absoluteSiteUrl(siteUrl, `${schema.slugPrefix}/${item.slug}.md`)
+              : `${item.slug}.md`;
             itemHtml = itemHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
           }
 

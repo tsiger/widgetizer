@@ -194,6 +194,7 @@
       "cleanUrlsLabel": "Clean URLs",
       "cleanUrlsHelp": "Enable if your host serves pages without the .html extension, e.g. /about instead of /about.html. Menu, button and text links to your own pages, canonical links and the sitemap then drop the extension. Links you typed by hand are emitted as written. The exported site must be served by a host that resolves /about to about.html.",
       "siteUrlInvalid": "Please enter a valid URL (e.g., https://mysite.com)",
+      "siteUrlNoQueryOrFragment": "Remove the ? query or # part — this is the address your site lives at, and page paths are added onto it (e.g., https://mysite.com or https://mysite.com/blog/)",
       "loadingThemes": "Loading themes...",
       "loadThemesError": "Failed to load themes. Please restart the application.",
       "moreSettings": "More settings",
