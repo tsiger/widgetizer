@@ -2989,3 +2989,26 @@ b {
 .breadcrumbs-item.is-current {
   color: var(--text-content);
 }
+
+/* A transparent header is absolutely positioned over the first widget, so a
+   breadcrumb in normal flow would both push the hero down and sit underneath the
+   header. Lift it out of the flow and lay it over the hero, clear of the header,
+   in the light-on-dark colours the transparent header already assumes. */
+.transparent-header .site-breadcrumbs {
+  position: absolute;
+  inset-inline: 0;
+  top: var(--header-sticky-offset, 4.5rem);
+  z-index: 998;
+  color: var(--colors-highlight_text_content, #fff);
+}
+
+.transparent-header .breadcrumbs-item::before,
+.transparent-header .breadcrumbs-link {
+  color: inherit;
+}
+
+.transparent-header .breadcrumbs-item.is-current,
+.transparent-header .breadcrumbs-link:hover,
+.transparent-header .breadcrumbs-link:focus-visible {
+  color: var(--colors-highlight_text_heading, #fff);
+}
