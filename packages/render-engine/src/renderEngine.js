@@ -31,6 +31,7 @@ import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia
 import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
@@ -278,6 +279,147 @@ async function loadPagesByUuid(deps) {
     console.warn(`Could not load pages for link resolution: ${error.message}`);
     return new Map();
   }
+}
+
+/**
+ * Index which pages list each collection, for collection-item breadcrumbs. Only
+ * the widget types actually placed on a page are read, so a project pays for its
+ * own widgets rather than the theme's whole catalogue. Cached per render.
+ * @param {RenderDeps} deps
+ * @param {Map} pagesByUuid
+ */
+async function loadListingIndex(deps, pagesByUuid) {
+  const types = new Set();
+  for (const page of pagesByUuid.values()) {
+    for (const widget of Object.values(page?.widgets || {})) {
+      if (widget?.type) types.add(widget.type);
+    }
+  }
+
+  const schemas = {};
+  await Promise.all(
+    [...types].map(async (type) => {
+      const schemaPath = await resolveInside(deps.projectDir, "widgets", type, "schema.json");
+      if (!schemaPath) return;
+      try {
+        schemas[type] = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
+      } catch {
+        // A widget without a readable schema simply declares no collection.
+      }
+    }),
+  );
+
+  return indexListingPages(pagesByUuid.values(), schemas);
+}
+
+/**
+ * The breadcrumb trail for whatever is being rendered, computed once and cached
+ * on `sharedGlobals` so header, footer, every widget and the layout all read the
+ * same array.
+ *
+ * Pages resolve lazily from `currentCanonicalPath` — the caller renders the
+ * header before the engine ever sees the page. Collection items cannot: the
+ * trail needs the item's title, which the path does not carry, so
+ * `renderCollectionItemPage` seeds the trail itself before rendering the header.
+ *
+ * @param {RenderDeps} deps
+ * @param {object|null} sharedGlobals
+ * @returns {Promise<Array>}
+ */
+async function ensureBreadcrumbs(deps, sharedGlobals) {
+  if (!sharedGlobals) return [];
+  if (sharedGlobals.breadcrumbs) return sharedGlobals.breadcrumbs;
+
+  const canonicalPath = sharedGlobals.currentCanonicalPath || "";
+  const target = canonicalPath.endsWith(".html") ? canonicalPath.slice(0, -5) : canonicalPath;
+  if (!target) {
+    sharedGlobals.breadcrumbs = [];
+    return sharedGlobals.breadcrumbs;
+  }
+
+  if (!sharedGlobals.pagesByUuid) sharedGlobals.pagesByUuid = await loadPagesByUuid(deps);
+  const pagesByUuid = sharedGlobals.pagesByUuid;
+  const shape = {
+    pagesByUuid,
+    cleanUrls: sharedGlobals.cleanUrls === true,
+    outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+  };
+
+  // A nested path is a collection item. Item pages normally seed the trail
+  // themselves in renderCollectionItemPage; this resolves the preview's
+  // single-widget morph, which re-renders a header in isolation and knows only
+  // the path — without it, editing a header while previewing an item would
+  // blank its breadcrumb.
+  if (target.includes("/")) {
+    const resolved = await resolveItemFromPath(deps, target);
+    if (!sharedGlobals.listingPages) {
+      sharedGlobals.listingPages = await loadListingIndex(deps, pagesByUuid);
+    }
+    sharedGlobals.breadcrumbs = resolved
+      ? buildBreadcrumbs({
+          ...shape,
+          item: resolved.item,
+          collectionType: resolved.collectionType,
+          listingPages: sharedGlobals.listingPages,
+        })
+      : [];
+    return sharedGlobals.breadcrumbs;
+  }
+
+  const page = [...pagesByUuid.values()].find((candidate) => candidate?.slug === target) || null;
+  sharedGlobals.breadcrumbs = page ? buildBreadcrumbs({ ...shape, page }) : [];
+  return sharedGlobals.breadcrumbs;
+}
+
+/**
+ * Resolve `newsPrefix/story` to the collection type and the item's display
+ * title, by matching the path's first segment against each collection schema's
+ * `slugPrefix`.
+ *
+ * The path reaches here from a preview morph request body, so both segments go
+ * through `resolveInside` before touching the filesystem.
+ *
+ * @param {RenderDeps} deps
+ * @param {string} target - extension-stripped item path
+ * @returns {Promise<{collectionType: string, item: {slug: string, name: string, slugPrefix: string}}|null>}
+ */
+async function resolveItemFromPath(deps, target) {
+  const separator = target.indexOf("/");
+  const slugPrefix = target.slice(0, separator);
+  const slug = target.slice(separator + 1);
+  if (!slugPrefix || !slug || slug.includes("/")) return null;
+
+  let types;
+  try {
+    types = await fs.readdir(path.join(deps.projectDir, "collection-types"));
+  } catch {
+    return null;
+  }
+
+  for (const type of types) {
+    try {
+      const schemaPath = await resolveInside(deps.projectDir, "collection-types", type, "schema.json");
+      if (!schemaPath) continue;
+      const schema = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
+      if (schema?.slugPrefix !== slugPrefix) continue;
+
+      const itemPath = await resolveInside(deps.projectDir, "collections", type, `${slug}.json`);
+      if (!itemPath) return null;
+      const item = JSON.parse(await fs.readFile(itemPath, "utf-8"));
+      const titleField = (schema.settings || []).find((setting) => setting.usedAsTitle);
+      return {
+        collectionType: schema.type || type,
+        item: {
+          slug,
+          name: (titleField && item?.settings?.[titleField.id]) || slug,
+          slugPrefix,
+        },
+      };
+    } catch {
+      // Unreadable schema or item: keep looking, then give up quietly.
+    }
+  }
+  return null;
 }
 
 /**
@@ -690,6 +832,13 @@ async function renderWidget(
       cleanUrls = sharedGlobals.cleanUrls === true;
     }
 
+    // Breadcrumbs reach header/footer through the globals bag, so a theme can
+    // draw the trail inside the header widget as well as in the layout. Built
+    // AFTER the Clean URLs stamp above: the trail is cached on the first widget
+    // that asks for it, and every crumb href is shaped by that flag. Export
+    // callers pre-seed it, so getting this order wrong only shows up in preview.
+    await ensureBreadcrumbs(deps, sharedGlobals);
+
     // Whether the widget (or its blocks) declares any `menu` or `link` setting.
     // Both setting types can target a collection item (collectionItemUuid), so
     // either drives loading the item uuid -> { slugPrefix, slug } map (#11 parity
@@ -882,12 +1031,14 @@ async function renderPageLayout(
     // `extraBodyClasses` always appends (e.g. the transparent-header channel).
     const baseBodyClass = contentSections.bodyClass !== undefined ? contentSections.bodyClass : pageSlugClass;
     const bodyClasses = [baseBodyClass, contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
+    const breadcrumbs = await ensureBreadcrumbs(deps, sharedGlobals);
+
     const renderContext = {
       ...baseContext,
       header: contentSections.headerContent || "",
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
-      page: pageData,
+      page: pageData ? { ...pageData, breadcrumbs } : pageData,
       project: layoutProjectData,
       page_title: buildPageTitle(pageData, projectData),
       body_class: bodyClasses,
@@ -984,6 +1135,28 @@ async function renderCollectionItemPage(
     imagePath: baseContext.imagePath,
     filePath: baseContext.filePath,
   });
+
+  // Seed the trail before the header renders: an item's label comes from the item,
+  // which `ensureBreadcrumbs` cannot recover from the path alone.
+  if (!sharedGlobals.breadcrumbs) {
+    if (!sharedGlobals.pagesByUuid) sharedGlobals.pagesByUuid = await loadPagesByUuid(deps);
+    if (!sharedGlobals.listingPages) {
+      sharedGlobals.listingPages = await loadListingIndex(deps, sharedGlobals.pagesByUuid);
+    }
+    const titleField = (schema.settings || []).find((setting) => setting.usedAsTitle);
+    sharedGlobals.breadcrumbs = buildBreadcrumbs({
+      item: {
+        slug: resolvedItem.slug,
+        name: (titleField && resolvedItem.settings?.[titleField.id]) || resolvedItem.slug,
+        slugPrefix: schema.slugPrefix,
+      },
+      collectionType: schema.type,
+      pagesByUuid: sharedGlobals.pagesByUuid,
+      listingPages: sharedGlobals.listingPages,
+      cleanUrls: sharedGlobals.cleanUrls === true,
+      outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+    });
+  }
 
   // Render header/footer with the item's globals so their enqueued assets are
   // captured before the layout emits them.
