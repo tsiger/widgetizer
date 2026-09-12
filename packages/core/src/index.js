@@ -34,3 +34,4 @@ export * from "./filters/safeUrlFilter.js";
 export * from "./filters/rteFilter.js";
 export * from "./filters/dateFilter.js";
 export * from "./filters/collectionFilter.js";
+export * from "./filters/pageUrlFilter.js";

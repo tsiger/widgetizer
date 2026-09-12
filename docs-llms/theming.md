@@ -408,7 +408,7 @@ Contains project metadata resolved from the SQLite-backed project store:
 {{ project.updated }}     <!-- Project last updated timestamp -->
 ```
 
-The same setting is on the render globals as `globals.cleanUrls`, next to `globals.outputPathPrefix`. Menu, link and richtext links are resolved for you in the right shape; a theme that hand-writes an internal href (e.g. the arch header logo's home link) branches on `globals.cleanUrls == true` to emit `./` / `../` instead of `index.html` / `../index.html`.
+The same setting is on the render globals as `globals.cleanUrls`, next to `globals.outputPathPrefix`. Menu, link and richtext links are resolved for you in the right shape; a theme that hand-writes an internal href uses the `page_url` / `item_url` filters, which read both globals and emit the correct shape at the current depth — see §Link filters below. Reading the globals directly is the escape hatch for a link neither filter can build.
 
 **Example usage in `layout.liquid`:**
 
@@ -445,6 +445,27 @@ Richtext fields are never truly `blank` when "empty" — the editor leaves marku
   <div class="rte">{{ block.settings.text | raw }}</div>
 {% endunless %}
 ```
+
+### Link filters
+
+`page_url` and `item_url` are the supported way for a theme to link to a page or a collection item it knows the slug of (`packages/core/src/filters/pageUrlFilter.js`). Both read the project's Clean URLs setting and the current render depth off the globals, so the template never branches on either:
+
+```liquid
+<a href="{{ 'index' | page_url }}">Home</a>
+<a href="{{ 'contact' | page_url }}">Contact</a>
+<a href="{{ item.slug | item_url: 'news' }}">{{ item.settings.title }}</a>
+```
+
+| Clean URLs | depth | `{{ 'index' \| page_url }}` | `{{ 'contact' \| page_url }}` |
+|---|---|---|---|
+| off | root | `index.html` | `contact.html` |
+| off | item page | `../index.html` | `../contact.html` |
+| on | root | `./` | `contact` |
+| on | item page | `../` | `../contact` |
+
+The home link is the case worth using the filter for: with Clean URLs on it is `./` at the root and `../` one level deep, which plain prefixing cannot produce. Both filters return `""` for a missing slug (and `item_url` for a missing prefix), and work identically inside a `{% render %}`'d snippet.
+
+These are for hrefs the theme builds itself. Menu items, `link` settings and richtext links are already resolved into the right shape before the template sees them, and an author-typed URL is emitted as written — pass those through `| safe_url` instead.
 
 ### Image tag
 

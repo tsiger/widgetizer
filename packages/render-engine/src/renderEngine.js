@@ -24,6 +24,7 @@ import {
   registerRteFilters,
   registerDateFilter,
   registerCollectionFilter,
+  registerPageUrlFilters,
 } from "@widgetizer/core";
 import { escapeHtml } from "@widgetizer/core/escapeHtml";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
@@ -106,6 +107,7 @@ function configureLiquidEngine(engine) {
   registerRteFilters(engine);
   registerDateFilter(engine);
   registerCollectionFilter(engine);
+  registerPageUrlFilters(engine);
 }
 
 /**

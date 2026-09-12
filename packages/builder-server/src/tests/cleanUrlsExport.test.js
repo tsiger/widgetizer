@@ -282,9 +282,10 @@ describe("export — a Clean URLs toggle mid-export does not split the bundle", 
 });
 
 // The arch theme's header logo is a hand-written Liquid href (no uuid to
-// resolve), so it decides the home-link shape itself from `globals.cleanUrls`.
-// Render the REAL theme template through the export to pin that decision at
-// both depths under both flag values.
+// resolve): it links home through the `page_url` filter, which shapes the href
+// from `globals.cleanUrls` and the render depth. Render the REAL theme template
+// through the export to pin what the filter emits at both depths under both
+// flag values.
 describe("export — arch header logo home link", () => {
   const ARCH_HEADER_DIR = fileURLToPath(new URL("../../../../themes/arch/widgets/global/header/", import.meta.url));
   const headerDir = () => path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "header");

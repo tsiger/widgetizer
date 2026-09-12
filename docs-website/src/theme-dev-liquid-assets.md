@@ -119,6 +119,37 @@ Render the original richtext value with `| raw`; render the `rte_text` result as
 
 Structured `link` settings and internal page/collection links are already sanitized by the platform. Use `safe_url` when you place a raw user-entered text value into `href`, `src`, `action`, or a similar URL-bearing attribute.
 
+## `page_url` and `item_url`
+
+These build an internal link when your template knows the slug but nobody picked a target in
+the editor — a logo linking home, a "view all" button, a hand-written footer link. They read
+the project's Clean URLs setting and the current render depth for you, so the template never
+branches on either.
+
+```liquid
+<a href="{{ 'index' | page_url }}">Home</a>
+<a href="{{ 'contact' | page_url }}">Contact</a>
+<a href="{{ item.slug | item_url: 'news' }}">{{ item.settings.title }}</a>
+```
+
+The value is the page slug; for `item_url`, the collection's `slugPrefix` is the argument.
+
+| Clean URLs | page being rendered | `'index' \| page_url` | `'contact' \| page_url` |
+| :-- | :-- | :-- | :-- |
+| off | root page | `index.html` | `contact.html` |
+| off | item page | `../index.html` | `../contact.html` |
+| on | root page | `./` | `contact` |
+| on | item page | `../` | `../contact` |
+
+The home link is the case worth the filter: with Clean URLs on it is `./` at the root and
+`../` one level deep, which no amount of prefixing produces. Both filters return an empty
+string for a missing slug (or a missing prefix), and behave identically inside a
+`{% render %}`'d snippet.
+
+Use them only for links your theme invents. Menu items, `link` settings, and richtext links
+arrive already resolved to the right shape — emit those as-is — and a raw URL typed by the
+user goes through [`safe_url`](#safe_url) instead.
+
 ## `format_date`
 
 `format_date` formats a `YYYY-MM-DD` date value with the project's configured date format. You can pass a format string to override the project setting for one output.
