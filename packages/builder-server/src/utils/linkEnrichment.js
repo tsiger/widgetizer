@@ -210,6 +210,19 @@ async function updatePageWidgetsViaStorage(storage, scope, widgetProcessor) {
   }
 }
 
+/** Drop `parentPageUuid` from any page whose parent was just deleted. */
+async function clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid) {
+  const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
+  for (const pageFile of pageFiles) {
+    const buf = await storage.read(scope, `pages/${pageFile}`);
+    if (buf == null) continue;
+    const page = JSON.parse(buf.toString("utf8"));
+    if (page.parentPageUuid !== deletedPageUuid) continue;
+    delete page.parentPageUuid;
+    await storage.write(scope, `pages/${pageFile}`, JSON.stringify(page, null, 2));
+  }
+}
+
 async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor) {
   for (const widgetType of ["header", "footer"]) {
     const key = `pages/global/${widgetType}.json`;
@@ -491,6 +504,22 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     }
   }
 
+  // Step 3b: Point each page's parent at the duplicate's new uuid. A separate
+  // pass because Step 1 rewrites pages one at a time, before the uuid map is
+  // complete — a parent later in the walk would not yet be in it.
+  for (const pageFile of pageFiles) {
+    if (!pageFile.endsWith(".json")) continue;
+    const pagePath = path.join(pagesDir, pageFile);
+    const page = JSON.parse(await fs.readFile(pagePath, "utf8"));
+    if (!page.parentPageUuid) continue;
+    const newParentUuid = oldToNewUuid.get(page.parentPageUuid);
+    // An unknown parent belonged to another project; drop it rather than leave
+    // the duplicate pointing into the original.
+    if (newParentUuid) page.parentPageUuid = newParentUuid;
+    else delete page.parentPageUuid;
+    await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+  }
+
   // Step 4: Remap widget references in pages and global widgets
   const remapValue = (value) => {
     if (isLinkObject(value)) {
@@ -546,6 +575,9 @@ export async function cleanupDeletedPageReferences(storage, scope, { deletedPage
 
   await updatePageWidgetsViaStorage(storage, scope, widgetProcessor);
   await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor);
+  // A child left pointing at a deleted parent still renders (the breadcrumb
+  // builder falls back), but the page picker would show a dangling selection.
+  await clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid);
   await cleanupMenusViaStorage(storage, scope, (item) => {
     if (item.pageUuid === deletedPageUuid) {
       item.link = "";

@@ -151,9 +151,21 @@ export async function updatePage(req, res) {
     }
 
     // Construct the final page data for saving
+    const resolvedUuid = existingUuid || randomUUID();
+    // A page cannot be its own parent. The picker never offers it, and the
+    // breadcrumb builder would drop the loop anyway, but a direct API call
+    // should not be able to write it.
+    const parentPageUuid =
+      typeof pageData.parentPageUuid === "string" &&
+      pageData.parentPageUuid.trim() &&
+      pageData.parentPageUuid !== resolvedUuid
+        ? pageData.parentPageUuid.trim()
+        : undefined;
+
     const finalUpdatedPageData = {
       ...pageData, // Start with submitted data
-      uuid: existingUuid || randomUUID(), // Preserve existing uuid or generate new one if missing
+      parentPageUuid, // undefined drops the key entirely when cleared
+      uuid: resolvedUuid, // Preserve existing uuid or generate new one if missing
       id: finalNewSlug, // Use the final unique slug as ID
       slug: finalNewSlug, // Use the final unique slug
       name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
@@ -501,11 +513,98 @@ export async function savePageContent(req, res) {
       previousPageId: id,
     });
 
-    res.json({ success: true, message: "Page saved successfully" });
+    // One listing anchor per collection. Swept on save rather than when the
+    // checkbox is ticked: the editor holds the change until save, so clearing
+    // other pages earlier would strip an anchor for an edit the user then
+    // discarded. Runs after the write so the page that claimed the anchor is
+    // the one that keeps it.
+    const movedFrom = await clearListingAnchorsElsewhere({
+      scope,
+      storage,
+      keepPageId: pageData.slug,
+      widgets: updatedPageData.widgets,
+    });
+
+    res.json({
+      success: true,
+      message: "Page saved successfully",
+      ...(movedFrom.length ? { listingAnchorMovedFrom: movedFrom } : {}),
+    });
   } catch (error) {
     console.error(`Error saving page content for ${id}:`, error);
     res.status(500).json({ error: "Failed to save page content" });
   }
+}
+
+/**
+ * Clear `listing_anchor` on every OTHER page for the collections the just-saved
+ * page claims, so a collection has exactly one anchor. Returns the names of the
+ * pages it cleared, for the editor to report.
+ *
+ * Which collection a widget lists comes from its schema's `collection.type`, so
+ * a widget whose schema does not declare one can never hold an anchor.
+ */
+async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets }) {
+  const claimed = new Set();
+  for (const widget of Object.values(widgets || {})) {
+    if (widget?.settings?.listing_anchor && widget.type) claimed.add(widget.type);
+  }
+  if (claimed.size === 0) return [];
+
+  // Map the claimed widget types to the collections they list.
+  const claimedCollections = new Set();
+  for (const type of claimed) {
+    try {
+      const buf = await storage.read(scope, `widgets/${type}/schema.json`);
+      if (buf == null) continue;
+      const collectionType = JSON.parse(buf.toString("utf8"))?.collection?.type;
+      if (collectionType) claimedCollections.add(collectionType);
+    } catch {
+      // Unreadable schema: the widget declares nothing, so it claims nothing.
+    }
+  }
+  if (claimedCollections.size === 0) return [];
+
+  const schemaCache = new Map();
+  const collectionOf = async (type) => {
+    if (!schemaCache.has(type)) {
+      let collectionType = null;
+      try {
+        const buf = await storage.read(scope, `widgets/${type}/schema.json`);
+        if (buf != null) collectionType = JSON.parse(buf.toString("utf8"))?.collection?.type || null;
+      } catch {
+        collectionType = null;
+      }
+      schemaCache.set(type, collectionType);
+    }
+    return schemaCache.get(type);
+  };
+
+  const cleared = [];
+  const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
+  for (const pageFile of pageFiles) {
+    const pageId = pageFile.replace(/\.json$/, "");
+    if (pageId === keepPageId) continue;
+
+    const buf = await storage.read(scope, `pages/${pageFile}`);
+    if (buf == null) continue;
+    const page = JSON.parse(buf.toString("utf8"));
+
+    let modified = false;
+    for (const widget of Object.values(page.widgets || {})) {
+      if (!widget?.settings?.listing_anchor || !widget.type) continue;
+      const collectionType = await collectionOf(widget.type);
+      if (!collectionType || !claimedCollections.has(collectionType)) continue;
+      widget.settings.listing_anchor = false;
+      modified = true;
+    }
+
+    if (modified) {
+      await storage.write(scope, `pages/${pageFile}`, JSON.stringify(page, null, 2));
+      cleared.push(page.name || pageId);
+    }
+  }
+  return cleared;
 }
 
 /**
@@ -551,9 +650,22 @@ export async function duplicatePage(req, res) {
     const newName = generateCopyName(originalPageData.name, existingPageNames);
     const newSlug = await generateUniqueSlug(newName, (slug) => storage.exists(scope, `pages/${slug}.json`));
 
+    // A listing anchor belongs to one page per collection. Copying it would
+    // leave two pages claiming the same collection, which the save-time sweep
+    // never sees (a duplicate is written directly), so the tie-break would pick
+    // by slug rather than by what the user meant. The copy starts unclaimed.
+    const duplicatedWidgets = {};
+    for (const [widgetId, widget] of Object.entries(originalPageData.widgets || {})) {
+      duplicatedWidgets[widgetId] =
+        widget?.settings?.listing_anchor === true
+          ? { ...widget, settings: { ...widget.settings, listing_anchor: false } }
+          : widget;
+    }
+
     // Create the new page data
     const newPage = {
       ...originalPageData,
+      widgets: duplicatedWidgets,
       uuid: randomUUID(), // Generate new uuid for the copy (don't inherit from original)
       id: newSlug,
       name: newName,

@@ -913,3 +913,148 @@ describe("deletePage — re-syncs collection-item media usage", () => {
     assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);
   });
 });
+
+// ============================================================================
+// Breadcrumb hierarchy: parent pages and the listing anchor
+// ============================================================================
+
+describe("parentPageUuid", () => {
+  before(async () => {
+    await resetPages();
+  });
+
+  it("round-trips through update and read", async () => {
+    const parent = await createTestPage("About Us");
+    const child = await createTestPage("Our Team");
+
+    const res = await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: parent.uuid },
+    });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+
+    const read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal(read._json.parentPageUuid, parent.uuid);
+  });
+
+  it("drops the field when cleared", async () => {
+    const parent = await createTestPage("Parent To Clear");
+    const child = await createTestPage("Child To Clear");
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: parent.uuid },
+    });
+
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: "" },
+    });
+
+    const read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal("parentPageUuid" in read._json, false);
+  });
+
+  // The picker never offers the page itself, but a direct API call must not be
+  // able to write a self-parent either.
+  it("refuses to store a page as its own parent", async () => {
+    const page = await createTestPage("Self Parent");
+    await callController(updatePage, {
+      params: { id: page.slug },
+      body: { name: page.name, slug: page.slug, parentPageUuid: page.uuid },
+    });
+
+    const read = await callController(getPage, { params: { id: page.slug } });
+    assert.equal("parentPageUuid" in read._json, false);
+  });
+
+  it("clears the pointer on pages whose parent is deleted", async () => {
+    const parent = await createTestPage("Doomed Parent");
+    const child = await createTestPage("Surviving Child");
+    await callController(updatePage, {
+      params: { id: child.slug },
+      body: { name: child.name, slug: child.slug, parentPageUuid: parent.uuid },
+    });
+
+    await callController(deletePage, { params: { id: parent.slug } });
+
+    const read = await callController(getPage, { params: { id: child.slug } });
+    assert.equal(read._status, 200);
+    assert.equal("parentPageUuid" in read._json, false);
+  });
+});
+
+describe("listing anchor (one page per collection)", () => {
+  const gridWidget = (anchor) => ({
+    w1: { type: "news-grid", settings: { listing_anchor: anchor } },
+  });
+
+  before(async () => {
+    await resetPages();
+    // The widget's schema is what says which collection it lists — without it
+    // nothing can hold an anchor.
+    await fs.outputFile(
+      path.join(getProjectDir(activeProject.folderName), "widgets", "news-grid", "schema.json"),
+      JSON.stringify({ type: "news-grid", collection: { type: "news" }, settings: [] }),
+    );
+  });
+
+  const saveWith = async (slug, name, widgets) =>
+    callController(savePageContent, {
+      params: { id: slug },
+      body: { name, slug, widgets, widgetsOrder: Object.keys(widgets) },
+    });
+
+  it("moves the anchor off the previous page and reports which", async () => {
+    const first = await createTestPage("Blog");
+    const second = await createTestPage("News Archive");
+
+    await saveWith(first.slug, first.name, gridWidget(true));
+    const res = await saveWith(second.slug, second.name, gridWidget(true));
+
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.listingAnchorMovedFrom, ["Blog"]);
+
+    const firstRead = await callController(getPage, { params: { id: first.slug } });
+    assert.equal(firstRead._json.widgets.w1.settings.listing_anchor, false);
+    const secondRead = await callController(getPage, { params: { id: second.slug } });
+    assert.equal(secondRead._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("says nothing when the saved page claims no anchor", async () => {
+    const page = await createTestPage("Plain Listing");
+    const res = await saveWith(page.slug, page.name, gridWidget(false));
+    assert.equal("listingAnchorMovedFrom" in res._json, false);
+  });
+
+  // A duplicate is written directly, so the save-time sweep never sees it. Left
+  // alone, both pages would claim the collection and slug order would decide.
+  it("does not carry the anchor onto a duplicated page", async () => {
+    const original = await createTestPage("Anchored Original");
+    await saveWith(original.slug, original.name, gridWidget(true));
+
+    const dup = await callController(duplicatePage, { params: { id: original.slug } });
+    assert.equal(dup._status, 201, JSON.stringify(dup._json));
+
+    const copy = await callController(getPage, { params: { id: dup._json.slug } });
+    assert.equal(copy._json.widgets.w1.settings.listing_anchor, false);
+    // The original keeps it.
+    const kept = await callController(getPage, { params: { id: original.slug } });
+    assert.equal(kept._json.widgets.w1.settings.listing_anchor, true);
+  });
+
+  it("leaves a widget alone when its schema declares no collection", async () => {
+    await fs.outputFile(
+      path.join(getProjectDir(activeProject.folderName), "widgets", "plain-grid", "schema.json"),
+      JSON.stringify({ type: "plain-grid", settings: [] }),
+    );
+    const holder = await createTestPage("Holds Anchor");
+    const other = await createTestPage("Undeclared Widget");
+
+    await saveWith(holder.slug, holder.name, gridWidget(true));
+    await saveWith(other.slug, other.name, { w1: { type: "plain-grid", settings: { listing_anchor: true } } });
+
+    // The undeclared widget lists nothing, so it never took the news anchor away.
+    const holderRead = await callController(getPage, { params: { id: holder.slug } });
+    assert.equal(holderRead._json.widgets.w1.settings.listing_anchor, true);
+  });
+});
