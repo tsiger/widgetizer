@@ -387,6 +387,42 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - [ ] THEME-020 - Attempt to delete a theme used by projects.
   Expected: Delete is disabled and explains which projects use it.
 
+- [ ] THEME-021 - On a fresh install, open the Themes page and look at the bundled theme.
+  Expected: No update is offered. The theme that ships with the app is already current.
+
+- [ ] THEME-022 - Create a project on a fresh install and check its theme version on the Projects list.
+  Expected: It matches the version shown on the Themes page.
+
+- [ ] THEME-023 - Simulate an upgraded user: set `version` in `data/themes/arch/theme.json` to the previous release (e.g. `0.9.9`), reload the Themes page.
+  Expected: An update is offered for that theme.
+
+- [ ] THEME-024 - Continue from THEME-023: click Update on the theme.
+  Expected: It completes, and the theme now reports the current version.
+
+- [ ] THEME-025 - Continue from THEME-024: open a project that was on the older version.
+  Expected: The project shows an update indicator; applying it succeeds and the project's version advances.
+
+- [ ] THEME-026 - Continue from THEME-025: open the project's Menus and its Header widget's menu setting.
+  Expected: Menus are intact and the Header still has its menu selected. A theme update must never blank a nav.
+
+- [ ] THEME-027 - Continue from THEME-025: check a page that uses a widget changed in the update.
+  Expected: The widget renders with the new version; the page's own content and settings are unchanged.
+
+- [ ] THEME-028 - Turn off theme updates for one project, then repeat THEME-023 to THEME-025.
+  Expected: That project is never offered the update; other projects still are.
+
+- [ ] THEME-029 - Restore the real state after THEME-023: delete `data/themes/arch` and restart the app (or re-run the theme sync).
+  Expected: The theme is reinstalled at the current version and no update is offered.
+
+- [ ] THEME-030 - Upload a theme ZIP whose base version differs from the installed one.
+  Expected: Rejected, with a message naming both versions and explaining that the base version must stay put.
+
+- [ ] THEME-031 - Upload a theme ZIP that keeps the installed base version and adds a new folder under `updates/`.
+  Expected: Accepted; the new version is imported and offered to projects.
+
+- [ ] THEME-032 - Upload the exact same theme ZIP a second time.
+  Expected: Rejected as already up to date. Nothing changes.
+
 ---
 
 ## 5. Pages
@@ -1096,6 +1132,24 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] SITESET-010 - If custom code fields exist, enter harmless visible test code, save, preview, and export.
   Expected: The code appears only where intended by the theme.
 
+- [ ] SITESET-011 - Enter a Site URL with a query string (`https://example.com/?utm_source=x`) and save.
+  Expected: Rejected, and the message says to remove the `?` part rather than just "invalid URL".
+
+- [ ] SITESET-012 - Enter a Site URL with a `#` fragment (`https://example.com/#top`) and save.
+  Expected: Rejected the same way.
+
+- [ ] SITESET-013 - Enter a Site URL pointing at a subfolder (`https://example.com/blog/`) and save.
+  Expected: Accepted. A site published inside a folder is a normal setup.
+
+- [ ] SITESET-014 - Enter the same subfolder address without the trailing slash (`https://example.com/blog`) and save.
+  Expected: Accepted, and everything it generates later is identical to SITESET-013.
+
+- [ ] SITESET-015 - Enter clearly wrong values: `mysite.com`, `https://localhost`, `ftp://example.com`.
+  Expected: Each is rejected.
+
+- [ ] SITESET-016 - Clear the Site URL entirely and save.
+  Expected: Accepted. The field is optional.
+
 ---
 
 ## 13. General Application Settings
@@ -1286,6 +1340,39 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] EXPZIP-013 - Check for `.DS_Store` or obvious computer metadata files.
   Expected: System metadata files are not included.
 
+- [ ] EXPZIP-014 - With a plain Site URL (`https://example.com`), export and open `sitemap.xml`.
+  Expected: The homepage appears as `https://example.com/` and other pages as full addresses under it.
+
+- [ ] EXPZIP-015 - Same export: open `robots.txt`.
+  Expected: The `Sitemap:` line points at `https://example.com/sitemap.xml`.
+
+- [ ] EXPZIP-016 - Same export: open a page's HTML and find its canonical link.
+  Expected: It is the page's full address under the Site URL.
+
+- [ ] EXPZIP-017 - Set the Site URL to a subfolder (`https://example.com/blog/`), export, and check `sitemap.xml`.
+  Expected: Every address keeps `/blog/`, including the homepage. Nothing points at the bare domain.
+
+- [ ] EXPZIP-018 - Repeat EXPZIP-017 with the trailing slash removed from the Site URL.
+  Expected: The exported addresses are identical to EXPZIP-017.
+
+- [ ] EXPZIP-019 - With a subfolder Site URL, mark a page as noindex, export, and open `robots.txt`.
+  Expected: The Disallow line includes the folder (`/blog/secret.html`), not a bare `/secret.html`.
+
+- [ ] EXPZIP-020 - With a subfolder Site URL, set a page's social sharing image, export, and check that page's HTML.
+  Expected: The social image address includes the folder and is a complete web address.
+
+- [ ] EXPZIP-021 - Repeat EXPZIP-017 to EXPZIP-020 with Clean URLs turned on.
+  Expected: Same addresses without the `.html` endings.
+
+- [ ] EXPZIP-022 - Export a project with the Site URL left empty.
+  Expected: The export succeeds. `sitemap.xml` and `robots.txt` are simply not produced, and pages carry no canonical or social image address.
+
+- [ ] EXPZIP-023 - Set a page's own canonical address by hand, then export.
+  Expected: That page keeps exactly what you typed, regardless of the Site URL.
+
+- [ ] EXPZIP-024 - Export with markdown output enabled and open a page's HTML.
+  Expected: The markdown alternate link is a full address under the Site URL, folder included.
+
 ---
 
 ## 16. Cross-Cutting Usability and Safety
@@ -1415,6 +1502,27 @@ These tests cover stable internal references for structured `link` settings. Ric
 
 - [ ] LINK-031 - Author a richtext link via HTML source mode, including single-quoted attributes, then rename/delete the target and duplicate the project.
   Expected: The link resolves at render and is cleaned (on delete) / remapped (on duplication) on disk despite single-quoted source HTML.
+
+- [ ] LINK-032 - Turn Clean URLs off, open the homepage in preview, and click the header logo.
+  Expected: It returns to the homepage.
+
+- [ ] LINK-033 - Repeat LINK-032 with Clean URLs on.
+  Expected: Same result.
+
+- [ ] LINK-034 - Open a collection item page in preview (e.g. a News item) and click the header logo.
+  Expected: It returns to the homepage, not a missing page. Item pages sit one level deeper, which is where this usually breaks.
+
+- [ ] LINK-035 - Repeat LINK-034 with Clean URLs on.
+  Expected: Same result.
+
+- [ ] LINK-036 - Export the site, open the exported `index.html` from disk, and click the logo.
+  Expected: It stays on the homepage.
+
+- [ ] LINK-037 - From the same export, open an item page from disk (e.g. `news/<item>.html`) and click the logo.
+  Expected: It reaches the homepage.
+
+- [ ] LINK-038 - Repeat LINK-036 and LINK-037 on an export made with Clean URLs on.
+  Expected: Same results.
 
 ---
 
