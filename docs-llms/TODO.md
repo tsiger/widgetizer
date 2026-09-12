@@ -23,8 +23,8 @@ Open work for the OSS builder.
 > "master had X", it means *the pre-merge monolith* had X — do not expect to find it on `master`
 > today; that is usually the whole point of the finding.
 
-Conventions still in force: work on the `master` trunk; never commit, switch branch, or push without
-explicit per-action permission.
+Conventions still in force: never commit, switch branch, or push without explicit per-action
+permission. The working branch is decided per task — do not assume one.
 
 ## Contents
 
