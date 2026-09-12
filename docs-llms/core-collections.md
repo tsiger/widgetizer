@@ -123,6 +123,40 @@ Mounted in `setupBuilderServer.js` as `projectScopedRouter.use("/collections", c
 
 ---
 
+## 5a. Listing pages and the anchor
+
+A widget that lists a collection declares it at the top of its `schema.json`:
+
+```json
+"collection": { "type": "news" }
+```
+
+The template already names the collection (`'news' | collection`), but only at
+render time — the declaration is what lets code outside the render know which
+pages list what. `indexListingPages` (`packages/core/src/utils/breadcrumbs.js`)
+walks every page's widgets against the widget schemas and returns, per collection,
+the pages that list it and which one is its **anchor**.
+
+The anchor is the `listing_anchor` boolean on the listing widget's settings,
+surfaced by the editor as *"Main {displayNamePlural} page"* on any widget whose
+schema declares a collection (the setting is injected by `SettingsPanel.jsx`, not
+declared per widget). It marks that page as the collection's home: breadcrumbs
+hang the collection's items under it. With no anchor and exactly one page listing
+the collection, that page is used; with two and no anchor the relationship is
+ambiguous and items sit directly under Home.
+
+**One anchor per collection.** Enforced server-side when a page is saved
+(`clearListingAnchorsElsewhere` in `pageController.js`), not when the checkbox is
+ticked: the editor holds the change until save, so clearing another page earlier
+would strip its anchor for an edit the user might discard. The save response
+carries `listingAnchorMovedFrom` with the names of the pages it cleared, which
+the editor announces. A duplicated page starts unclaimed — it is written directly
+and the sweep never sees it. A duplicated *project* keeps its anchors, since the
+whole hierarchy is copied and stays internally consistent. If data ever holds two
+anchors anyway, the first page by slug wins so every render agrees.
+
+---
+
 ## 6. Item pages & depth prefixing
 
 When `hasItemPages: true` and the type ships a `template.liquid`, each item renders a standalone page one directory deep, so `news/my-post.html` coexists with a root `about.html`.

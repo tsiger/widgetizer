@@ -100,6 +100,12 @@ Available in `layout.liquid`:
 - `page.seo.twitter_card`
 - `page.seo.robots`
 - `page.seo.canonical_url`
+- `page.breadcrumbs` — the trail for this page, Home first and this page last;
+  empty on the homepage. Also on `globals.breadcrumbs` inside every widget, so a
+  header can draw it. Each entry has `label`, `href` (already depth- and
+  Clean-URLs-aware), `canonicalPath`, `current` and `home`. See
+  [Breadcrumbs](theme-dev-liquid-assets.html#breadcrumbs) for the ready-made
+  snippet.
 
 > **Note:** A collection item page exposes a `page` object too, built from the item (`page.slug` is `"{slugPrefix}/{slug}"`, `page.name` is the item title). This lets item pages flow through the same layout and SEO as regular pages. See [Collections](theme-dev-collections.html).
 

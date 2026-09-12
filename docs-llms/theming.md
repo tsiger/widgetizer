@@ -467,6 +467,38 @@ The home link is the case worth using the filter for: with Clean URLs on it is `
 
 These are for hrefs the theme builds itself. Menu items, `link` settings and richtext links are already resolved into the right shape before the template sees them, and an author-typed URL is emitted as written — pass those through `| safe_url` instead.
 
+### Breadcrumbs
+
+Core builds one breadcrumb trail per rendered page and hands it to the layout as `page.breadcrumbs` and to every widget (header and footer included) as `globals.breadcrumbs`. The theme decides whether and where to draw it:
+
+```liquid
+{% render 'breadcrumbs', class_nav: 'site-breadcrumbs', class_link: 'crumb', home_label: 'Home' %}
+```
+
+Params: `class_nav`, `class_list`, `class_item`, `class_link`, `class_current`, `separator` (text between crumbs; most themes draw one in CSS instead), `home_label`, `aria_label` (default "Breadcrumb"), `show_home` (default true). It emits `<nav aria-label><ol><li>` with `aria-current="page"` on the last crumb, and **nothing at all** when the trail is empty — which is the case on the homepage.
+
+Each entry carries:
+
+| field | meaning |
+|---|---|
+| `label` | text to show |
+| `href` | internal link, already depth- and Clean-URLs-aware |
+| `canonicalPath` | un-prefixed `.html` path of the target (`about.html`, `news/story.html`) |
+| `current` | `true` on the last entry |
+| `home` | `true` on the first entry |
+
+Loop it directly if you want your own markup:
+
+```liquid
+{% for crumb in page.breadcrumbs %}
+  <a href="{{ crumb.href }}">{{ crumb.label }}</a>
+{% endfor %}
+```
+
+**Where the hierarchy comes from.** A page's trail follows the parent page the user set in Page settings, and is `Home › page` when none is set — that is the normal shape, not a fallback to apologise for. A collection item hangs under the page whose listing widget is marked as that collection's main page, or under the single page that lists it. Nothing is inferred from menus or from the URL, so reordering navigation never changes a trail.
+
+For an item trail to work at all, the listing widget's schema must declare what it lists — see [Widget Schema](theming-widgets.md).
+
 ### Image tag
 
 The `{% image %}` tag is the recommended way to render images in your theme. It automatically handles generating the correct `src` for different image sizes, adds important attributes like `width`, `height`, and `alt`, and enables lazy loading by default.
@@ -981,6 +1013,29 @@ Beyond `type`, `displayName`, `settings`, `blocks`, and `defaultBlocks`, widget 
 | `aliases` | `string[]` | Alternative names/keywords for the widget selector search |
 | `maxBlocks` | `number` | Maximum number of blocks the widget can contain |
 | `supportsTransparentHeader` | `boolean` | When `true`, the header becomes transparent when this widget is first on a page and the header's "Transparent on hero" setting is enabled |
+| `collection` | `object` | Declares which collection a listing widget shows: `{ "type": "news" }` |
+
+**The `collection` declaration.** A widget that lists collection items names the
+collection inside its template (`{% assign items = 'news' | collection %}`), which
+nothing outside the render can read. Declaring it at the top of the schema is what
+lets the editor and the engine know:
+
+```json
+{
+  "type": "news-grid",
+  "collection": { "type": "news" },
+  "displayName": "News Grid"
+}
+```
+
+Two things use it today. Breadcrumbs finds an item's parent page by looking for
+the page carrying a widget that lists that collection. And the editor shows a
+**"Main {collection} page"** checkbox on such a widget — the `listing_anchor`
+setting — which marks its page as that collection's home when more than one page
+lists it. Only one page per collection can hold it; saving a page that claims it
+clears it elsewhere.
+
+Nothing needs declaring for a widget that does not list a collection.
 
 **Template file (`widget.liquid`):**
 

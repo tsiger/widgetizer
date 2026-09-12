@@ -44,6 +44,31 @@ The schema tells Widgetizer what settings to show in the editor and what block t
 - `defaultBlocks`: Array of block instances to pre-populate when the widget is added
 - `maxBlocks`: Maximum number of blocks allowed (integer). When omitted or `0`, blocks are unlimited
 - `aliases`: Array of alternative names for AI/search ("quote", "review", "feedback")
+- `collection`: For a widget that lists collection items, which collection it lists — `{ "type": "news" }`. See below
+
+## Declaring a Listed Collection
+
+If your widget shows items from a collection, say so at the top of the schema:
+
+```json
+{
+  "type": "news-grid",
+  "collection": { "type": "news" },
+  "displayName": "News Grid"
+}
+```
+
+Your template already names the collection (`{% assign items = 'news' | collection %}`),
+but only while it renders — nothing outside can read it. The declaration is what lets
+Widgetizer know which of the site's pages list what.
+
+It does two things. Breadcrumbs on a collection item find the item's parent page by
+looking for the page that carries a widget listing that collection. And the editor adds a
+**"Main {collection} page"** checkbox to your widget's settings, so a site owner with more
+than one listing page can say which is the collection's home; only one page per collection
+can hold it.
+
+Nothing to add for a widget that does not list a collection.
 
 ## Adding Widget Settings
 

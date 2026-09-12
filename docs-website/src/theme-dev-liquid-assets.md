@@ -739,6 +739,52 @@ On export, Widgetizer generates the needed favicon files and rewrites nested-pag
 
 # Snippets and Menus
 
+## Breadcrumbs
+
+Widgetizer builds one breadcrumb trail per page and hands it to your layout as
+`page.breadcrumbs`, and to every widget as `globals.breadcrumbs` — so you can put
+it in the layout or inside your header widget, whichever suits the design.
+
+```liquid
+{% render 'breadcrumbs', class_nav: 'site-breadcrumbs', class_link: 'crumb' %}
+```
+
+| Param | Purpose |
+| :-- | :-- |
+| `class_nav`, `class_list`, `class_item`, `class_link`, `class_current` | Classes for each element |
+| `separator` | Text between crumbs. Most themes draw one in CSS instead |
+| `home_label` | Replaces the first crumb's label |
+| `aria_label` | Accessible name for the nav (default "Breadcrumb") |
+| `show_home` | Set `false` to drop the first crumb |
+
+It emits `<nav aria-label><ol><li>`, marks the last crumb with `aria-current="page"`,
+and renders **nothing at all** when the trail is empty — which is the case on the
+homepage, so you do not need to guard the call.
+
+Prefer your own markup? Loop the array:
+
+```liquid
+{% for crumb in page.breadcrumbs %}
+  {% if crumb.current %}
+    <span aria-current="page">{{ crumb.label }}</span>
+  {% else %}
+    <a href="{{ crumb.href }}">{{ crumb.label }}</a>
+  {% endif %}
+{% endfor %}
+```
+
+Each entry has `label`, `href`, `canonicalPath` (the un-prefixed `.html` path, handy
+for matching), `current` and `home`.
+
+**Where the trail comes from.** For a page, the parent page its owner picked in Page
+settings — with no parent it is simply `Home › page`. For a collection item, the page
+whose listing widget is marked as that collection's main page, or the single page that
+lists it. Nothing is guessed from menus or URLs, so a site owner reordering navigation
+never changes a breadcrumb.
+
+For an item's trail to find its listing page, the listing widget's schema has to declare
+what it lists — see [the `collection` declaration](theme-dev-widgets-blocks.html).
+
 ## `{% render 'snippet_name' %}`
 
 Use Liquid's `render` tag to include snippets from `snippets/`.

@@ -105,6 +105,36 @@ If you change a page's filename, the file will be renamed automatically when you
 
 > **Warning:** Renaming a page only affects links from _outside_ your project. Internal links (menu items, rich-text links, and widget link settings) are stored as stable references, so they follow the rename automatically and won't break. What can break are external links to the old URL: search-engine results, links from other websites, and visitors' bookmarks. Once a page is public, rename it with care.
 
+### Page Hierarchy (Parent page)
+
+Under **More settings** you can give a page a **Parent page**. This says where the
+page sits in your site's structure — for example, "Our Team" belongs under "About Us".
+
+It is used for **breadcrumbs**: the small trail of links near the top of a page that
+shows the way back, like `Home › About Us › Our Team`. If your theme shows
+breadcrumbs and a page has no parent, its trail is simply `Home › Page`, which is
+right for most pages. Set a parent only where a page genuinely belongs under
+another one.
+
+A few things the picker takes care of: it won't offer the page itself, any page
+already beneath it, or the homepage (every trail starts there anyway). If you later
+delete a parent page, its children quietly go back to `Home › Page` — nothing breaks.
+
+Whether breadcrumbs appear at all is up to your theme. In Arch, turn them on in
+**Site settings › General › Show breadcrumbs**.
+
+### Blog and collection pages
+
+If your site has a collection — News, Projects, Services — its items get breadcrumbs
+too, showing the page that lists them: `Home › News › My Article`. Widgetizer works
+this out on its own when a single page lists that collection.
+
+If more than one page lists the same collection, it cannot guess which is the main
+one. Open the page you consider the collection's home, select the listing widget in
+the editor, and tick **"Main News page"** (the name matches your collection). Only
+one page per collection can be the main one — ticking it somewhere else moves it, and
+Widgetizer tells you which page it moved from.
+
 # Deleting Pages
 
 1. Go to the **Pages** list

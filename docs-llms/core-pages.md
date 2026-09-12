@@ -20,6 +20,7 @@ A typical page JSON file (`about-us.json`) looks like this:
   "slug": "about-us",
   "created": "2023-10-27T10:00:00.000Z",
   "updated": "2023-10-27T12:30:00.000Z",
+  "parentPageUuid": "9f8e7d6c-5b4a-3210-fedc-ba9876543210",
   "seo": {
     "title": "About Us",
     "description": "Learn more about our company and team",
@@ -46,6 +47,7 @@ A typical page JSON file (`about-us.json`) looks like this:
 
 - **`uuid`**: A stable, randomly-generated identifier (UUID v4) that never changes, even when the page is renamed or its slug changes. This identifier is used by [Link settings](theming-setting-types.md#link) and [menu items](core-menus.md) to reference pages resiliently. When a page is renamed, all links pointing to it via `uuid` automatically resolve to the new slug.
 - **`slug`**: The URL-friendly identifier derived from the page name, also used as the filename. This can change when the page is renamed.
+- **`parentPageUuid`** (optional): The page this one sits under, set with the Parent page picker in Page settings. It exists for [breadcrumbs](future-breadcrumbs-design.md) — pages are flat on disk and in their URLs, so this is the only statement of hierarchy. Absent means top level, which is the usual case; the key is dropped entirely when cleared rather than written empty. A page cannot be its own parent (refused server-side as well as in the picker), the picker hides the page's own descendants so a cycle cannot be built, and the trail builder stops at depth 10 regardless. Deleting a page clears the pointer on its children (`cleanupDeletedPageReferences`); duplicating a project remaps it to the copy's new uuids, dropping a parent that belonged to another project.
 
 ## 2. Frontend Implementation
 

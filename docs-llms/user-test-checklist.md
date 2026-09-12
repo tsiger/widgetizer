@@ -517,6 +517,21 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - [ ] PAGE-030 - Delete the last page in a project, then try Site preview.
   Expected: The app shows a sensible no-page or not-found state.
 
+- [ ] PAGE-031 - Open a page's More settings and look for Page Hierarchy.
+  Expected: A Parent page picker is there, set to "None - this is a top-level page".
+
+- [ ] PAGE-032 - Open the Parent page picker on a page that has children.
+  Expected: The page itself, its own children, and the homepage are not offered.
+
+- [ ] PAGE-033 - Set a parent page, save, and reopen the page.
+  Expected: The choice stuck.
+
+- [ ] PAGE-034 - Clear the parent back to None, save, and reopen.
+  Expected: It is None again.
+
+- [ ] PAGE-035 - Set a parent, then delete the parent page, then preview the child.
+  Expected: The child still opens and behaves as a top-level page. Nothing errors.
+
 ---
 
 ## 6. Visual Page Editor
@@ -924,6 +939,18 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [ ] COLL-029 - Create/edit/delete items using media, then check Media usage.
   Expected: Media usage updates correctly.
+
+- [ ] COLL-030 - Select a collection listing widget (e.g. News Grid) in the page editor.
+  Expected: Its settings include a "Main News page" checkbox, named after the collection.
+
+- [ ] COLL-031 - Select a widget that does not list a collection.
+  Expected: No such checkbox.
+
+- [ ] COLL-032 - Tick the checkbox on one page and save, then tick it on a second page and save.
+  Expected: A message says it moved, naming the first page. Reopening the first page shows it unticked.
+
+- [ ] COLL-033 - Duplicate a page that is a collection's main page.
+  Expected: The copy is not marked as the main page; the original still is.
 
 ---
 
@@ -1523,6 +1550,36 @@ These tests cover stable internal references for structured `link` settings. Ric
 
 - [ ] LINK-038 - Repeat LINK-036 and LINK-037 on an export made with Clean URLs on.
   Expected: Same results.
+
+- [ ] LINK-039 - Turn breadcrumbs on (Site settings > General > Show breadcrumbs) and preview the homepage.
+  Expected: No breadcrumb trail at all.
+
+- [ ] LINK-040 - Preview a page with no parent set.
+  Expected: Home > Page.
+
+- [ ] LINK-041 - Set a parent (and a parent's parent), then preview the deepest page.
+  Expected: The full trail in order, e.g. Home > About Us > Our Team. Every crumb but the last is a link; click them.
+
+- [ ] LINK-042 - Preview a collection item while exactly one page lists that collection.
+  Expected: Home > That Page > Item, with no configuration needed.
+
+- [ ] LINK-043 - Add the same listing widget to a second page, then preview the item again.
+  Expected: Home > Item. With two candidates it does not guess.
+
+- [ ] LINK-044 - Tick "Main News page" on one of them, save, and preview the item.
+  Expected: The trail is back to Home > That Page > Item.
+
+- [ ] LINK-045 - Give the main collection page a parent, then preview an item.
+  Expected: The item's trail grows too, e.g. Home > About Us > News > My Article.
+
+- [ ] LINK-046 - Export and open an exported page, then an exported item page, and click every crumb.
+  Expected: All land on the right page. From an item page the links reach back up a directory.
+
+- [ ] LINK-047 - Turn Clean URLs on, export again, and repeat LINK-046.
+  Expected: Same destinations, addresses without .html.
+
+- [ ] LINK-048 - Rename a page that appears in another page's trail, then preview that page.
+  Expected: The crumb shows the new name and still links correctly.
 
 ---
 
