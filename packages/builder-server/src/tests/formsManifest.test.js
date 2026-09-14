@@ -663,6 +663,51 @@ describe("widget.liquid rendering vs manifest consistency", () => {
     assert.match(html, /data-widgetizer-form-status/);
   });
 
+  it("renders the required-fields note, autocomplete hints and a hidden error slot per field", async () => {
+    const widget = {
+      id: "w1",
+      type: "core-form",
+      settings: { form_name: "Contact", style: "outlined", color_scheme: "standard-primary" },
+      blocks: {
+        b1: { type: "field", settings: { label: "Your name", type: "text", required: true } },
+        b2: { type: "field", settings: { label: "Email address", type: "email" } },
+        b3: { type: "field", settings: { label: "Phone", type: "tel" } },
+        b4: { type: "field", settings: { label: "Company", type: "text" } },
+        b5: { type: "choice", settings: { label: "Topic", type: "radio", options: "Sales\nSupport" } },
+        b6: { type: "consent", settings: { label: "I agree" } },
+      },
+      blocksOrder: ["b1", "b2", "b3", "b4", "b5", "b6"],
+      index: 1,
+    };
+    const engine = makeLiquidEngine();
+    const html = await engine.parseAndRender(WIDGET_TEMPLATE, { widget });
+
+    assert.match(html, /class="form-required-note"/);
+    assert.match(html, /<input[^>]*name="your-name"[^>]*autocomplete="name"/);
+    assert.match(html, /<input[^>]*name="email-address"[^>]*autocomplete="email"/);
+    assert.match(html, /<input[^>]*name="phone"[^>]*autocomplete="tel"/);
+    assert.doesNotMatch(html, /<input[^>]*name="company"[^>]*autocomplete=/);
+    for (const blockId of widget.blocksOrder) {
+      assert.match(html, new RegExp(`<p class="form-error" id="form-w1-${blockId}-error" hidden></p>`));
+    }
+    assert.deepEqual(extractInputNames(html), ["company", "email-address", "i-agree", "phone", "topic", "your-name"]);
+  });
+
+  it("omits the required-fields note when no field is required", async () => {
+    const widget = {
+      id: "w1",
+      type: "core-form",
+      settings: { form_name: "Contact", style: "outlined", color_scheme: "standard-primary" },
+      blocks: { b1: { type: "field", settings: { label: "Name", type: "text" } } },
+      blocksOrder: ["b1"],
+      index: 1,
+    };
+    const engine = makeLiquidEngine();
+    const html = await engine.parseAndRender(WIDGET_TEMPLATE, { widget });
+
+    assert.doesNotMatch(html, /form-required-note"/);
+  });
+
   it("transliterates non-Latin labels and keeps rendered names in sync with the manifest (Greek + CJK fallback)", async () => {
     const widget = {
       id: "w1",

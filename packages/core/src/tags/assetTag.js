@@ -22,6 +22,7 @@ export const AssetTag = {
      * - integrity: string (default: null)
      * - media: string (default: null) for CSS
      * - id: string (default: null)
+     * - alt: string for images (default: the media alt text, else "")
      */
     const options = yield this.hash.render(context);
     const {
@@ -32,6 +33,7 @@ export const AssetTag = {
       integrity = null,
       media = null,
       id = null,
+      alt = null,
     } = options;
 
     if (!filepath) {
@@ -65,10 +67,11 @@ export const AssetTag = {
     if (integrity) attributes += ` integrity="${integrity}"`;
 
     // For images, check if we have metadata in the context
-    if (isImage && context.mediaDimensions && context.mediaDimensions[assetPath]) {
-      const imageData = context.mediaDimensions[assetPath];
-      if (imageData.alt) attributes += ` alt="${imageData.alt}"`;
-      if (imageData.title) attributes += ` title="${imageData.title}"`;
+    if (isImage) {
+      const imageData = context.mediaDimensions?.[assetPath];
+      const finalAlt = alt ?? imageData?.alt ?? "";
+      attributes += ` alt="${String(finalAlt).replace(/&/g, "&amp;").replace(/"/g, "&quot;")}"`;
+      if (imageData?.title) attributes += ` title="${imageData.title}"`;
     }
 
     // Return the appropriate HTML tag based on file type

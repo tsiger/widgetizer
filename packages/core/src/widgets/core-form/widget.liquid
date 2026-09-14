@@ -1,8 +1,11 @@
 {% assign has_sidebar_blocks = false %}
+{% assign has_required_fields = false %}
 {% for blockId in widget.blocksOrder %}
   {% assign block = widget.blocks[blockId] %}
   {% if block.type == 'info' or block.type == 'social' %}
     {% assign has_sidebar_blocks = true %}
+  {% elsif block.settings.required %}
+    {% assign has_required_fields = true %}
   {% endif %}
 {% endfor %}
 
@@ -57,6 +60,18 @@
       & .form-required {
         color: var(--accent);
         font-weight: 500;
+      }
+
+      & .form-required-note,
+      & .form-error {
+        margin: 0;
+        font-size: calc(var(--font-size-sm) * var(--body-scale));
+        color: var(--text-content);
+      }
+
+      & .form-error {
+        font-weight: 500;
+        color: var(--text-heading);
       }
 
       & .form-input,
@@ -255,6 +270,9 @@
             action="/__widgetizer/forms/{{ form_key }}"
             method="post"
           >
+            {% if has_required_fields %}
+              <p class="form-required-note"><span class="form-required" aria-hidden="true">*</span> Required fields</p>
+            {% endif %}
             {% assign field_i = 0 %}
             {% for blockId in widget.blocksOrder %}
               {% assign block = widget.blocks[blockId] %}
@@ -289,10 +307,12 @@
                       id="{{ field_id }}"
                       name="{{ field_key }}"
                       class="form-input"
+                      {% if input_type == 'email' %}autocomplete="email"{% elsif input_type == 'tel' %}autocomplete="tel"{% elsif input_type == 'url' %}autocomplete="url"{% elsif field_key == 'name' or field_key == 'your-name' or field_key == 'full-name' %}autocomplete="name"{% endif %}
                       {% if block.settings.placeholder != blank %}placeholder="{{ block.settings.placeholder }}"{% endif %}
                       {% if block.settings.required %}required aria-required="true"{% endif %}
                     />
                   {% endif %}
+                  <p class="form-error" id="{{ field_id }}-error" hidden></p>
                 </div>
 
               {% when 'choice' %}
@@ -347,6 +367,7 @@
                       {% endfor %}
                     </select>
                   {% endif %}
+                  <p class="form-error" id="{{ field_id }}-error" hidden></p>
                 </div>
 
               {% when 'consent' %}
@@ -360,6 +381,7 @@
                   <span data-setting="label">{{ block.settings.label }}</span>
                   {% if block.settings.required %}<span class="form-required" aria-hidden="true">*</span>{% endif %}
                 </label>
+                <p class="form-error" id="{{ field_id }}-error" hidden></p>
               {% endcase %}
             {% endfor %}
 
@@ -407,4 +429,61 @@
       </div>
     </div>
   </div>
+
+  <script>
+    (function () {
+      var section = document.getElementById('{{ widget.id }}');
+      var form = section && section.querySelector('form[data-widgetizer-form]');
+      if (!form || form.dataset.fieldErrors) return;
+      form.dataset.fieldErrors = 'true';
+      var focusQueued = false;
+
+      function errorFor(field) {
+        var block = field.closest('[data-block-id]');
+        return block ? document.getElementById('form-{{ widget.id }}-' + block.getAttribute('data-block-id') + '-error') : null;
+      }
+
+      function describe(field, id, on) {
+        var ids = (field.getAttribute('aria-describedby') || '').split(' ').filter(function (token) {
+          return token && token !== id;
+        });
+        if (on) ids.push(id);
+        if (ids.length) field.setAttribute('aria-describedby', ids.join(' '));
+        else field.removeAttribute('aria-describedby');
+      }
+
+      form.addEventListener('invalid', function (event) {
+        var field = event.target;
+        var error = errorFor(field);
+        if (!error) return;
+        event.preventDefault();
+        error.textContent = field.validationMessage;
+        error.hidden = false;
+        field.setAttribute('aria-invalid', 'true');
+        describe(field, error.id, true);
+        if (!focusQueued) {
+          focusQueued = true;
+          field.focus();
+          setTimeout(function () { focusQueued = false; });
+        }
+      }, true);
+
+      function clearValid() {
+        Array.prototype.forEach.call(form.querySelectorAll('[aria-invalid="true"]'), function (field) {
+          if (!field.validity.valid) return;
+          field.removeAttribute('aria-invalid');
+          var error = errorFor(field);
+          if (!error) return;
+          describe(field, error.id, false);
+          if (!form.querySelector('[aria-describedby~="' + error.id + '"]')) {
+            error.textContent = '';
+            error.hidden = true;
+          }
+        });
+      }
+
+      form.addEventListener('input', clearValid);
+      form.addEventListener('change', clearValid);
+    })();
+  </script>
 </section>

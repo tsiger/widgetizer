@@ -201,6 +201,16 @@ would leak it or break the widget in the wrong environment.
 
 ---
 
+## Accessibility
+
+The widget adds these on top of the hosted markup contract. None of them are read by the Worker.
+
+- **Required-fields note.** When any block is required, the form opens with "* Required fields". The asterisk is `aria-hidden`; screen readers get the requirement from `required` / `aria-required` on each control.
+- **Autocomplete hints.** `email`, `tel` and `url` fields get the matching `autocomplete` token. A `text` field whose derived key is `name`, `your-name` or `full-name` gets `autocomplete="name"`; any other label gets none.
+- **Per-field errors.** Every field, choice and consent block renders an empty `<p class="form-error" id="form-<widgetId>-<blockId>-error" hidden>`. An inline script listens for the browser's `invalid` events: it suppresses the native bubble, writes the browser's `validationMessage` into that slot, sets `aria-invalid="true"`, links the slot through `aria-describedby` and focuses the first invalid control. It clears all three once the control is valid. Native constraint validation still gates submission, and the Worker's client script still owns submit and the `data-widgetizer-form-status` message.
+
+---
+
 ## Field types & validation caps
 
 Enforced by the hosted service; the manifest builder applies the matching

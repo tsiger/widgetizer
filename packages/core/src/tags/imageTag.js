@@ -31,7 +31,7 @@ export const ImageTag = {
     if (!mediaFile) {
       if (output === "url" || output === "path") return `${imageBasePath}/${filename}`;
       const attrs = [`src="${imageBasePath}/${filename}"`];
-      if (alt) attrs.push(`alt="${alt.replace(/"/g, "&quot;")}"`);
+      attrs.push(`alt="${String(alt ?? "").replace(/"/g, "&quot;")}"`);
       if (cssClass) attrs.push(`class="${cssClass}"`);
       if (options.loading) attrs.push(`loading="${options.loading}"`);
       else if (lazy) attrs.push('loading="lazy"');

@@ -73,7 +73,7 @@ describe("assetTag — publish path prefixing", () => {
 
   it("image: depth-1 gets ../", async () => {
     const tpl = '{% asset src: "diagram.png" %}';
-    expect(await render(tpl, publishGlobals("../"))).toBe('<img src="../assets/diagram.png">');
+    expect(await render(tpl, publishGlobals("../"))).toBe('<img src="../assets/diagram.png" alt="">');
   });
 });
 

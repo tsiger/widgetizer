@@ -450,6 +450,21 @@ describe("AssetTag", () => {
     const result = await render("{% asset %}", {}, { renderMode: "preview" });
     assert.equal(result.trim(), "");
   });
+
+  it("renders an empty alt on an asset image by default", async () => {
+    const result = await render('{% asset src: "logo.svg" %}', {}, { renderMode: "preview" });
+    assert.match(result, /<img [^>]*alt=""/);
+  });
+
+  it("renders an explicit alt on an asset image, escaping quotes", async () => {
+    const result = await render('{% asset src: "logo.svg", alt: "Say \\"hi\\"" %}', {}, { renderMode: "preview" });
+    assert.match(result, /alt="Say &quot;hi&quot;"/);
+  });
+
+  it("escapes ampersands in an asset image alt so entity-shaped text stays literal", async () => {
+    const result = await render('{% asset src: "logo.svg", alt: "Type &copy; here" %}', {}, { renderMode: "preview" });
+    assert.match(result, /alt="Type &amp;copy; here"/);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -608,7 +623,19 @@ describe("ImageTag", () => {
   it("renders fallback img for missing media file", async () => {
     const result = await render('{% image src: "missing.jpg" %}', {}, { renderMode: "preview" });
     assert.match(result, /src="[^"]*missing\.jpg"/);
+    assert.match(result, /alt=""/);
     assert.match(result, /loading="lazy"/);
+  });
+
+  it("keeps an explicit alt on the fallback img for a missing media file", async () => {
+    const result = await render('{% image src: "missing.jpg", alt: "A cat" %}', {}, { renderMode: "preview" });
+    assert.match(result, /alt="A cat"/);
+  });
+
+  it("renders an empty alt when the fallback img receives a null alt", async () => {
+    const result = await render('{% image src: "missing.jpg", alt: unset_alt %}', { unset_alt: null }, { renderMode: "preview" });
+    assert.match(result, /alt=""/);
+    assert.doesNotMatch(result, /alt="null"/);
   });
 
   it("handles SVG images without sizes lookup", async () => {
