@@ -53,7 +53,14 @@ export function registerCollectionFilter(engine) {
       return [];
     }
 
+    const options = normalizeCollectionFilterArgs(args);
+    const slice = globals.collectionSlice;
+    if (slice && slice.collectionType === collectionType) {
+      options.offset = slice.offset;
+      options.limit = slice.limit;
+    }
+
     // Returning a Promise makes this an async filter; LiquidJS awaits it.
-    return loader(collectionType, normalizeCollectionFilterArgs(args));
+    return loader(collectionType, options);
   });
 }

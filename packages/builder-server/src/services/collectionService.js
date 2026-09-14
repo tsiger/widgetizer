@@ -28,6 +28,7 @@ import { resolveRichtextMediaInSettings } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
 import { resolveMenuSettings } from "@widgetizer/render-engine";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
+import { isReservedItemSlug, isReservedSlugPrefix } from "@widgetizer/core/contentAddress";
 import {
   sanitizeCollectionItemData,
   sanitizeDateValue,
@@ -37,18 +38,6 @@ import {
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 const ALLOWED_SORTS = ["manual", "created_desc", "created_asc", "title_asc", "title_desc", "date_desc", "date_asc"];
-const RESERVED_SLUG_PREFIXES = new Set(["assets"]);
-// Item slugs a web server would read as "the directory itself": an item at
-// rooms/index.html is reachable as /rooms/ as well as /rooms/index, so it can
-// never own one unambiguous address. Refused on create/rename; an item that
-// already carries the slug keeps saving in place. Only "index" has that
-// server-level meaning — "home" is special for pages (a site root), not items.
-const RESERVED_ITEM_SLUGS = new Set(["index"]);
-
-/** Whether `slug` may never be given to a NEW item (see RESERVED_ITEM_SLUGS). */
-export function isReservedItemSlug(slug) {
-  return RESERVED_ITEM_SLUGS.has(slug);
-}
 // v1 constructs that must be rejected, not silently ignored (Section 1).
 const DISALLOWED_SETTING_KEYS = ["multiple", "repeater", "blocks"];
 
@@ -207,7 +196,7 @@ export function validateCollectionSchema(schema, folderName) {
   if (schema.hasItemPages === true) {
     if (typeof slugPrefix !== "string" || !SLUG_RE.test(slugPrefix)) {
       errors.push("`slugPrefix` must match ^[a-z0-9-]+$ when `hasItemPages` is true.");
-    } else if (RESERVED_SLUG_PREFIXES.has(slugPrefix)) {
+    } else if (isReservedSlugPrefix(slugPrefix)) {
       errors.push(`\`slugPrefix\` "${slugPrefix}" is reserved and cannot be used.`);
     }
   }
@@ -528,7 +517,8 @@ function pickNewerItemFile(a, b) {
   return a.name > b.name ? a : b;
 }
 
-const byCreatedDesc = (a, b) => (Date.parse(b.created) || 0) - (Date.parse(a.created) || 0);
+const byIdentity = (a, b) => String(a.uuid ?? a.slug).localeCompare(String(b.uuid ?? b.slug));
+const byCreatedDesc = (a, b) => (Date.parse(b.created) || 0) - (Date.parse(a.created) || 0) || byIdentity(a, b);
 
 async function applyManualOrder(items, storage, scope, collectionType) {
   let order = [];
@@ -578,11 +568,11 @@ async function sortItems(items, sort, storage, scope, collectionType, schema) {
     case "manual":
       return applyManualOrder(items, storage, scope, collectionType);
     case "created_asc":
-      return items.sort((a, b) => (Date.parse(a.created) || 0) - (Date.parse(b.created) || 0));
+      return items.sort((a, b) => (Date.parse(a.created) || 0) - (Date.parse(b.created) || 0) || byIdentity(a, b));
     case "title_asc":
-      return items.sort((a, b) => String(a.title).localeCompare(String(b.title)));
+      return items.sort((a, b) => String(a.title).localeCompare(String(b.title)) || byCreatedDesc(a, b));
     case "title_desc":
-      return items.sort((a, b) => String(b.title).localeCompare(String(a.title)));
+      return items.sort((a, b) => String(b.title).localeCompare(String(a.title)) || byCreatedDesc(a, b));
     case "date_asc":
     case "date_desc": {
       const dateField = (schema?.settings || []).find((s) => s.usedAsDate)?.id;
@@ -610,8 +600,14 @@ async function listItemFileNames(storage, scope, collectionType) {
  * @returns {Promise<object[]>}
  */
 export async function listCollectionItems(storage, scope, collectionType, options = {}) {
+  const loaded = await readCollectionItems(storage, scope, collectionType);
+  if (!loaded) return [];
+  return sortCollectionItems(storage, scope, collectionType, loaded, options);
+}
+
+export async function readCollectionItems(storage, scope, collectionType) {
   const schema = await getCollectionSchema(storage, scope, collectionType);
-  if (!schema) return [];
+  if (!schema) return null;
 
   const itemFileNames = await listItemFileNames(storage, scope, collectionType);
 
@@ -648,15 +644,33 @@ export async function listCollectionItems(storage, scope, collectionType, option
     byUuid.set(uuid, winner);
   }
 
-  let items = [...byUuid.values()].map((e) => normalizeCollectionItem(e.raw, schema));
+  return { schema, items: [...byUuid.values()].map((e) => normalizeCollectionItem(e.raw, schema)) };
+}
 
+export async function sortCollectionItems(storage, scope, collectionType, { schema, items }, options = {}) {
   const sort = options.sort ?? schema.defaultSort ?? "manual";
-  items = await sortItems(items, sort, storage, scope, collectionType, schema);
+  let sorted = await sortItems([...items], sort, storage, scope, collectionType, schema);
 
   const offset = options.offset ?? 0;
-  if (offset) items = items.slice(offset);
-  if (options.limit != null) items = items.slice(0, options.limit);
-  return items;
+  if (offset) sorted = sorted.slice(offset);
+  if (options.limit != null) sorted = sorted.slice(0, options.limit);
+  return sorted;
+}
+
+export function createCollectionReader({ storage, scope, snapshot = null }) {
+  const remember = (key, load) => {
+    if (!snapshot) return load();
+    if (!snapshot.has(key)) snapshot.set(key, load());
+    return snapshot.get(key);
+  };
+  const read = (collectionType) =>
+    remember(`read:${collectionType}`, () => readCollectionItems(storage, scope, collectionType));
+  const sorted = (collectionType, sortOptions = {}) =>
+    remember(`sorted:${collectionType}:${JSON.stringify(sortOptions)}`, async () => {
+      const loaded = await read(collectionType);
+      return loaded ? sortCollectionItems(storage, scope, collectionType, loaded, sortOptions) : [];
+    });
+  return { read, sorted };
 }
 
 /**
@@ -750,7 +764,7 @@ export function buildCollectionItemData(schema, input, existingItem = null) {
   if (!SLUG_RE.test(slug)) {
     throw new CollectionValidationError([{ fieldId: "slug", reason: "invalid slug" }]);
   }
-  if (RESERVED_ITEM_SLUGS.has(slug) && existingItem?.slug !== slug) {
+  if (isReservedItemSlug(slug) && existingItem?.slug !== slug) {
     throw new CollectionValidationError([{ fieldId: "slug", reason: "reserved slug" }]);
   }
 
@@ -1158,13 +1172,13 @@ export function prepareCollectionItemForRender(
  * references (#11) to their current page URL. Cached per render by the caller.
  * @returns {Promise<Map>} Map of uuid -> { slugPrefix, slug }
  */
-export async function loadCollectionItemsByUuid(storage, scope) {
+export async function loadCollectionItemsByUuid(storage, scope, reader = null) {
   const map = new Map();
   try {
     const schemas = await listCollectionSchemas(storage, scope);
     for (const schema of schemas) {
       if (!schema.hasItemPages) continue;
-      const items = await listCollectionItems(storage, scope, schema.type);
+      const items = reader ? await reader.sorted(schema.type) : await listCollectionItems(storage, scope, schema.type);
       for (const item of items) {
         if (item.uuid) map.set(item.uuid, { slugPrefix: schema.slugPrefix, slug: item.slug });
       }

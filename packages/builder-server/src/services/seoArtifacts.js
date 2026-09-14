@@ -4,6 +4,15 @@
 
 import { formatXml } from "../utils/htmlProcessor.js";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "@widgetizer/core/internalHref";
+import { pageOutputPath, publicPath } from "@widgetizer/core/contentAddress";
+
+const pagedSitePaths = (pageId, pageCounts, cleanUrls) => {
+  const paths = [];
+  for (let number = 2; number <= (pageCounts.get(pageId) || 1); number += 1) {
+    paths.push(publicPath(pageOutputPath(pageId, number), { cleanUrls }));
+  }
+  return paths;
+};
 
 /**
  * Build the formatted sitemap.xml for the given pages, or null when siteUrl is
@@ -17,9 +26,10 @@ import { isHomeSlug, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "@widg
  * @param {string} siteUrl
  * @param {Array<{slugPrefix: string, items: Array<object>}>} [itemPagesForSeo]
  * @param {boolean} [cleanUrls=false] - emit extensionless URLs (hosts that publish pages without .html)
+ * @param {Map<string, number>} [pageCounts] - page id -> number of paginated copies; 2+ adds `page/<n>` entries
  * @returns {Promise<string|null>}
  */
-export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false) {
+export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false, pageCounts = new Map()) {
   // No usable base means no absolute <loc> can be built, so there is no sitemap
   // to write. `siteUrlBase` is the single gate the canonicals use too.
   if (!siteUrlBase(siteUrl)) return null;
@@ -27,17 +37,21 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
   const ext = cleanUrls ? "" : ".html";
   const sitemapUrls = pagesDataArray
     .filter((page) => !page.seo?.robots?.includes("noindex"))
-    .map((page) => {
+    .flatMap((page) => {
       const isHomepage = isHomeSlug(page.slug);
       // The homepage is the base itself. `new URL("/", base)` would resolve to
       // the HOST root and silently drop a subfolder Site URL's own path.
       const pageUrl = isHomepage ? absoluteSiteUrl(siteUrl, "") : absoluteSiteUrl(siteUrl, `${page.slug}${ext}`);
       const lastMod = page.updated || page.gcreated || new Date().toISOString();
-      return `
+      const entry = (loc) => `
   <url>
-    <loc>${pageUrl}</loc>
+    <loc>${loc}</loc>
     <lastmod>${lastMod.split("T")[0]}</lastmod>
   </url>`;
+      const copies = pagedSitePaths(page.id || page.slug, pageCounts, cleanUrls).map((sitePath) =>
+        entry(absoluteSiteUrl(siteUrl, sitePath)),
+      );
+      return [entry(pageUrl), ...copies];
     });
 
   const collectionSitemapUrls = [];
@@ -71,9 +85,10 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
  * @param {Array<{slugPrefix: string, items: Array<object>}>} [itemPagesForSeo]
  * @param {boolean} [cleanUrls=false] - emit extensionless Disallow paths (they also
  *   prefix-match the .html variants, so both address forms stay blocked)
+ * @param {Map<string, number>} [pageCounts] - page id -> number of paginated copies
  * @returns {string|null}
  */
-export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false) {
+export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false, pageCounts = new Map()) {
   if (!siteUrlBase(siteUrl)) return null;
 
   const ext = cleanUrls ? "" : ".html";
@@ -89,6 +104,9 @@ export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cl
     // under /bakery/ must disallow /bakery/private — a bare /private protects
     // nothing.
     disallowSet.add(siteUrlPathname(siteUrl, filename));
+    for (const sitePath of pagedSitePaths(pageId, pageCounts, cleanUrls)) {
+      disallowSet.add(siteUrlPathname(siteUrl, sitePath));
+    }
   }
   for (const { slugPrefix, items } of itemPagesForSeo || []) {
     for (const item of items) {

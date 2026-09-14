@@ -6,10 +6,16 @@ import { isWithinDirectory } from "../utils/pathSecurity.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
-import { renderWidget, renderPageLayout, renderCollectionItemPage, widgetSupportsTransparentHeader } from "../services/renderingService.js";
+import {
+  renderWidget,
+  renderPageLayout,
+  renderCollectionItemPage,
+  widgetSupportsTransparentHeader,
+  planPagination,
+} from "../services/renderingService.js";
 import {
   listCollectionSchemas,
-  listCollectionItems,
+  createCollectionReader,
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
@@ -23,8 +29,16 @@ import { buildFormsManifest } from "../services/formsManifestService.js";
 import TurndownService from "turndown";
 import { buildAssetVersionToken, splitAssetRef } from "@widgetizer/core/assetUrl";
 import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
-import { siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
+import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
+import { outputPathPrefixFor } from "@widgetizer/core/linkPrefixer";
+import { pageOutputPath } from "@widgetizer/core/contentAddress";
 import * as exportRepo from "../db/repositories/exportRepository.js";
+
+function rewriteStoragePaths(html, outputPathPrefix) {
+  return html
+    .replaceAll("/uploads/images/", `${outputPathPrefix}assets/images/`)
+    .replaceAll("/uploads/files/", `${outputPathPrefix}assets/files/`);
+}
 
 const PACKAGE_JSON_PATH = path.join(APP_ROOT, "package.json");
 let cachedAppVersion = null;
@@ -244,6 +258,12 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const collectionStorage = collectionDeps?.storage || null;
     const collectionScope = collectionDeps?.scope || null;
     const collectionsEnabled = !!(collectionStorage && collectionScope);
+    // One read per collection for the whole export, so every consumer below sees the same items.
+    const collectionSnapshot = new Map();
+    const collectionReader = collectionsEnabled
+      ? createCollectionReader({ storage: collectionStorage, scope: collectionScope, snapshot: collectionSnapshot })
+      : null;
+    const renderCollectionDeps = collectionsEnabled ? { ...collectionDeps, snapshot: collectionSnapshot } : collectionDeps;
 
     // --- Read-only setup + ALL fail-fast validation BEFORE any disk write, so a
     // blocked export (missing homepage / invalid collection items / missing
@@ -277,7 +297,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const invalidCollectionItems = [];
     const missingTemplates = [];
     for (const schema of collectionSchemas) {
-      const items = await listCollectionItems(collectionStorage, collectionScope, schema.type);
+      const items = await collectionReader.sorted(schema.type);
       manifestCollections.push({ type: schema.type, itemPages: !!schema.hasItemPages, itemCount: items.length });
       for (const item of items) {
         if (item.invalid) {
@@ -313,6 +333,34 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       throw err;
     }
 
+    const paginationPlans = new Map();
+    if (collectionsEnabled) {
+      for (const pageData of pagesDataArray) {
+        const plan = await planPagination(
+          projectId,
+          pageData.widgets,
+          pageData.widgetsOrder,
+          { pageSlug: pageData.id },
+          renderCollectionDeps,
+        );
+        if (plan) paginationPlans.set(pageData.id, plan);
+      }
+    }
+    const pageCounts = new Map([...paginationPlans].map(([pageId, plan]) => [pageId, plan.total]));
+
+    const homepagePaginates = [...paginationPlans.keys()].some((pageId) => isHomeSlug(pageId));
+    const clashingCollection = homepagePaginates
+      ? collectionSchemas.find((schema) => schema.hasItemPages && schema.slugPrefix === "page")
+      : null;
+    if (clashingCollection) {
+      const err = new Error(
+        `Your homepage is split into pages, published at page/2.html, page/3.html and so on. The "${clashingCollection.displayNamePlural || clashingCollection.type}" collection publishes its items in the same page/ folder. Turn off "Split into pages" on the homepage, or give that collection a different slugPrefix.`,
+      );
+      err.statusCode = 400;
+      err.errorTitle = "Export failed: homepage pages clash with a collection";
+      throw err;
+    }
+
     // --- Validation passed: from here on, disk writes are safe ---
     // emptyDir, not ensureDir: a crash leftover (or a version number freed by
     // a failed delete) can leave stale files at this path, and they must not
@@ -332,11 +380,11 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // item pages included via itemPagesForSeo) ---
     if (siteUrl && siteUrl.trim() !== "") {
       try {
-        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls);
+        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
         if (sitemapXml) {
           await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapXml);
         }
-        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls);
+        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
         if (robotsTxt) {
           await fs.writeFile(path.join(outputDir, "robots.txt"), robotsTxt);
         }
@@ -389,7 +437,13 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       for (const src of globals.enqueuedScripts.keys()) enqueuedAssetFiles.add(path.basename(splitAssetRef(src).path));
     };
 
-    for (const pageData of pagesDataArray) {
+    const pageRenders = pagesDataArray.flatMap((pageData) => {
+      const plan = paginationPlans.get(pageData.id) || null;
+      return Array.from({ length: plan ? plan.total : 1 }, (_, index) => ({ pageData, plan, pageNumber: index + 1 }));
+    });
+
+    for (const { pageData, plan, pageNumber } of pageRenders) {
+      const outputFilename = pageOutputPath(pageData.id, pageNumber);
       // Create shared globals for this page (each page gets fresh enqueue Maps)
       const sharedGlobals = {
         projectId,
@@ -404,11 +458,13 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         // The flag snapshotted above, so a toggle landing mid-export cannot
         // split this page's links/canonical from the sitemap or other pages.
         cleanUrls,
+        outputPathPrefix: outputPathPrefixFor(outputFilename),
+        ...(plan ? { paginationPlan: { ...plan, current: pageNumber } } : {}),
       };
 
       // Render header if exists (for each page to capture enqueued assets)
       if (headerData) {
-        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, collectionDeps);
+        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
       }
 
       // Render page-specific widgets sequentially
@@ -434,14 +490,14 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
             "publish",
             sharedGlobals,
             widgetIndex,
-            collectionDeps,
+            renderCollectionDeps,
           );
         }
       }
 
       // Render footer if exists
       if (footerData) {
-        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, collectionDeps);
+        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
       }
 
       // Determine if transparent header should be active for this page
@@ -468,7 +524,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         rawThemeSettings,
         "publish",
         sharedGlobals,
-        collectionDeps,
+        renderCollectionDeps,
       );
 
       collectEnqueuedAssets(sharedGlobals);
@@ -483,9 +539,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       // Rewrite any remaining /uploads/ storage paths to their published asset locations.
       // Dedicated tags ({% image %}) already use the publish-mode base path, but generic
       // link fields store the raw storage path which needs rewriting here.
-      processedHtml = processedHtml
-        .replaceAll("/uploads/images/", "assets/images/")
-        .replaceAll("/uploads/files/", "assets/files/");
+      processedHtml = rewriteStoragePaths(processedHtml, sharedGlobals.outputPathPrefix);
 
       // Validate HTML (only when developer mode is enabled)
       if (devModeEnabled) {
@@ -493,7 +547,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         if (validation.issues.length > 0) {
           validationIssues.push({
             page: pageData.id,
-            filename: pageData.id === "index" || pageData.id === "home" ? "index.html" : `${pageData.id}.html`,
+            filename: outputFilename,
             issues: validation.issues,
           });
         }
@@ -510,12 +564,10 @@ Per aspera ad astra
       // Prepend easter egg at the very beginning of the HTML
       processedHtml = easterEggComment + processedHtml;
 
-      // Determine output filename (e.g., index.html for homepage, slug.html otherwise)
-      const outputFilename = pageData.id === "index" || pageData.id === "home" ? "index.html" : `${pageData.id}.html`;
       const outputFilePath = path.join(outputDir, outputFilename);
 
       // Inject markdown alternate link into <head> when markdown export is enabled
-      if (exportMarkdown) {
+      if (exportMarkdown && pageNumber === 1) {
         const mdFilename = pageData.id === "index" || pageData.id === "home" ? "index.md" : `${pageData.id}.md`;
         const mdHref = mdBase ? absoluteSiteUrl(siteUrl, mdFilename) : mdFilename;
         processedHtml = processedHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
@@ -525,7 +577,7 @@ Per aspera ad astra
       await fs.outputFile(outputFilePath, processedHtml);
 
       // Generate markdown version (content only, no layout) - if enabled
-      if (exportMarkdown) {
+      if (exportMarkdown && pageNumber === 1) {
         try {
           const turndown = new TurndownService({
             headingStyle: "atx",
@@ -567,7 +619,7 @@ Per aspera ad astra
     // For each hasItemPages collection, render every valid item to
     // {slugPrefix}/{itemSlug}.html with fresh per-item globals (no asset bleed),
     // the full header/footer/layout wrap, and the same HTML post-processing pages
-    // receive — at outputPathPrefix "../" since items live one dir deep. Runs
+    // receive — at the depth of each item's output path. Runs
     // BEFORE the validation report so item-page issues are included in it.
     if (collectionsEnabled) {
       // uuid -> page map for resolving item links (built once, shared across items).
@@ -578,14 +630,14 @@ Per aspera ad astra
       // Stable collection-item refs for resolving `menu`/`link`-type item settings
       // that target another item — loaded once, shared across every item. (Menu
       // maps are loaded lazily inside renderCollectionItemPage.)
-      const collectionItemsByUuidForItems = await loadCollectionItemsByUuid(collectionStorage, collectionScope);
+      const collectionItemsByUuidForItems = await loadCollectionItemsByUuid(collectionStorage, collectionScope, collectionReader);
       const itemAppVersion = await getAppVersion();
       const itemEasterEgg = `<!--\nMade with Widgetizer v${itemAppVersion}\nPer aspera ad astra\n-->\n`;
 
       for (const schema of collectionSchemas) {
         if (!schema.hasItemPages) continue;
 
-        const items = await listCollectionItems(collectionStorage, collectionScope, schema.type);
+        const items = await collectionReader.sorted(schema.type);
         const validItems = items.filter((item) => !item.invalid);
         if (validItems.length === 0) continue;
 
@@ -605,6 +657,7 @@ Per aspera ad astra
         await fs.ensureDir(collectionOutputDir);
 
         for (const item of validItems) {
+          const itemOutputPath = `${schema.slugPrefix}/${item.slug}.html`;
           // Fresh globals per item so enqueued assets never bleed between items.
           const sharedGlobals = {
             projectId,
@@ -618,8 +671,8 @@ Per aspera ad astra
             pagesByUuid: pagesByUuidForItems,
             collectionItemsByUuid: collectionItemsByUuidForItems,
             assetVersion,
-            outputPathPrefix: "../",
-            currentCanonicalPath: `${schema.slugPrefix}/${item.slug}.html`,
+            outputPathPrefix: outputPathPrefixFor(itemOutputPath),
+            currentCanonicalPath: itemOutputPath,
             cleanUrls,
           };
 
@@ -644,7 +697,7 @@ Per aspera ad astra
               projectData,
               siteUrl,
             },
-            collectionDeps,
+            renderCollectionDeps,
           );
           collectEnqueuedAssets(sharedGlobals);
           let itemHtml = itemHtmlRendered;
@@ -655,10 +708,7 @@ Per aspera ad astra
             console.warn(`Could not format HTML for ${schema.slugPrefix}/${item.slug}.html: ${itemFormat.error}.`);
           }
 
-          // Storage-path rewrite at the item's depth ("../").
-          itemHtml = itemHtml
-            .replaceAll("/uploads/images/", "../assets/images/")
-            .replaceAll("/uploads/files/", "../assets/files/");
+          itemHtml = rewriteStoragePaths(itemHtml, sharedGlobals.outputPathPrefix);
 
           if (devModeEnabled) {
             const validation = await validateHtml(itemHtml, `${schema.slugPrefix}/${item.slug}`);

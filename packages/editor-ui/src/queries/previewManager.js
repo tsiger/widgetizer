@@ -44,7 +44,7 @@ function extractFonts(settings) {
  * @returns {Promise<{token: string}>} Object with token property
  * @throws {Error} If the request fails
  */
-export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor") {
+export async function fetchPreviewToken(pageData, themeSettings, previewMode = "editor", pageNumber = 1) {
   try {
     return await editorFetchJson("/preview/token", {
       method: "POST",
@@ -55,6 +55,7 @@ export async function fetchPreviewToken(pageData, themeSettings, previewMode = "
         pageData,
         themeSettings,
         previewMode,
+        ...(pageNumber > 1 ? { pageNumber } : {}),
       }),
     }, { fallbackMessage: "Failed to create preview token" });
   } catch (error) {

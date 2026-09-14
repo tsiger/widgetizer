@@ -11,9 +11,11 @@ import {
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
+  planPagination,
 } from "../services/renderingService.js";
 import {
   getCollectionSchema,
+  listCollectionSchemas,
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
@@ -24,9 +26,10 @@ import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
 
 // Inject the runtime script and base tag into rendered HTML
-function injectRuntimeScript(html, previewMode = "editor") {
+function injectRuntimeScript(html, previewMode = "editor", collectionPrefixes = []) {
   const safeMode = previewMode === "standalone" ? "standalone" : "editor";
-  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}"></script>`;
+  const prefixes = collectionPrefixes.filter((prefix) => /^[a-z0-9-]+$/.test(prefix)).join(",");
+  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}" data-collection-prefixes="${prefixes}"></script>`;
   html = html.replace(/<\/body>/i, `${script}\n</body>`);
 
   // Editor mode: inject designMode flag in <head> so it's available before
@@ -56,6 +59,12 @@ function collectionDepsFromReq(req) {
   return storage && scope ? { storage, scope } : null;
 }
 
+async function itemPagePrefixes(collectionDeps) {
+  if (!collectionDeps) return [];
+  const schemas = await listCollectionSchemas(collectionDeps.storage, collectionDeps.scope);
+  return schemas.filter((schema) => schema.hasItemPages).map((schema) => schema.slugPrefix);
+}
+
 
 /**
  * Core rendering logic for preview HTML generation.
@@ -65,7 +74,8 @@ function collectionDepsFromReq(req) {
  * @param {string} previewMode - "editor" or "standalone"
  * @returns {Promise<string>} Rendered HTML string
  */
-async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDeps = null) {
+async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDeps = null, pageNumber = 1) {
+  if (collectionDeps) collectionDeps = { ...collectionDeps, snapshot: new Map() };
   const activeProjectId = projectRepo.getActiveProjectId();
 
   if (!activeProjectId) {
@@ -85,6 +95,15 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     enqueuedScripts: new Map(),
     currentCanonicalPath: `${pageData.slug || ""}.html`,
   };
+
+  const pagination = await planPagination(
+    activeProjectId,
+    pageData.widgets,
+    pageData.widgetsOrder,
+    { pageSlug: pageData.slug, currentPage: pageNumber },
+    collectionDeps,
+  );
+  if (pagination) sharedGlobals.paginationPlan = pagination;
 
   let headerContent = "";
   let mainContent = "";
@@ -221,7 +240,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   );
 
   renderedHtml = injectBaseTag(renderedHtml);
-  renderedHtml = injectRuntimeScript(renderedHtml, previewMode);
+  renderedHtml = injectRuntimeScript(renderedHtml, previewMode, await itemPagePrefixes(collectionDeps));
 
   return renderedHtml;
 }
@@ -234,8 +253,14 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
  */
 export async function generatePreview(req, res) {
   try {
-    const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDepsFromReq(req));
+    const { pageData, themeSettings: rawThemeSettings, previewMode, pageNumber } = req.body;
+    const html = await generatePreviewHtml(
+      pageData,
+      rawThemeSettings,
+      previewMode,
+      collectionDepsFromReq(req),
+      Number(pageNumber) || 1,
+    );
     res.send(html);
   } catch (error) {
     console.error("Error generating preview:", error);
@@ -255,8 +280,14 @@ export async function generatePreview(req, res) {
  */
 export async function createPreviewToken(req, res) {
   try {
-    const { pageData, themeSettings: rawThemeSettings, previewMode } = req.body;
-    const html = await generatePreviewHtml(pageData, rawThemeSettings, previewMode, collectionDepsFromReq(req));
+    const { pageData, themeSettings: rawThemeSettings, previewMode, pageNumber } = req.body;
+    const html = await generatePreviewHtml(
+      pageData,
+      rawThemeSettings,
+      previewMode,
+      collectionDepsFromReq(req),
+      Number(pageNumber) || 1,
+    );
     const token = generateToken(html);
     res.json({ token });
   } catch (error) {
@@ -404,7 +435,7 @@ export async function createCollectionPreviewToken(req, res) {
     );
 
     html = injectBaseTag(html);
-    html = injectRuntimeScript(html, "standalone");
+    html = injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps));
 
     const token = generateToken(html);
     res.json({ token });
@@ -438,7 +469,15 @@ export async function renderSingleWidget(req, res) {
       currentCanonicalPath: typeof currentCanonicalPath === "string" ? currentCanonicalPath : "",
     };
 
-    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null, collectionDepsFromReq(req));
+    const collectionDeps = collectionDepsFromReq(req);
+    const renderDeps = collectionDeps && { ...collectionDeps, snapshot: new Map() };
+    const pageSlug = sharedGlobals.currentCanonicalPath.replace(/\.html$/, "");
+    if (pageSlug && !pageSlug.includes("/")) {
+      const pagination = await planPagination(activeProjectId, { [widgetId]: widget }, [widgetId], { pageSlug }, renderDeps);
+      if (pagination) sharedGlobals.paginationPlan = pagination;
+    }
+
+    const renderedWidget = await renderWidget(activeProjectId, widgetId, widget, rawThemeSettings || {}, "preview", sharedGlobals, null, renderDeps);
 
     // Append enqueued asset tags so the preview runtime can load them on morph
     const assetTags = renderEnqueuedAssetTags(sharedGlobals);

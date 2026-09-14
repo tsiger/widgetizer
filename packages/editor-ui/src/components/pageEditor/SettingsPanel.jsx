@@ -6,6 +6,9 @@ import useAutoSave from "../../stores/saveStore";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import useCollections from "../../hooks/useCollections";
+import useToastStore from "../../stores/toastStore";
+
+const DEFAULT_ITEMS_PER_PAGE = 12;
 
 export default function SettingsPanel({
   selectedWidget,
@@ -21,9 +24,10 @@ export default function SettingsPanel({
   const { t } = useTranslation();
   const { schemas: collectionSchemas } = useCollections();
   const { tTheme } = useThemeLocale();
-  const { globalWidgets, updateThemeSetting } = usePageStore();
+  const { page, globalWidgets, updateThemeSetting } = usePageStore();
   const { updateWidgetSettings, updateGlobalWidgetSettings, updateBlockSettings } = useWidgetStore();
   const { markWidgetModified, setThemeSettingsModified } = useAutoSave();
+  const showToast = useToastStore((state) => state.showToast);
 
   const isGlobalWidget = !!selectedGlobalWidgetId;
   const isThemeSettings = !!selectedThemeGroup;
@@ -79,6 +83,28 @@ export default function SettingsPanel({
       updateBlockSettings(selectedWidgetId, selectedBlockId, settingId, value);
       markWidgetModified(selectedWidgetId);
     } else {
+      const perPageSetting = currentWidgetSchema?.collection?.perPageSetting;
+      if (settingId === "paginate" && value === true) {
+        const holder = Object.entries(page?.widgets || {}).find(
+          ([id, widget]) => id !== selectedWidgetId && widget?.settings?.paginate === true,
+        )?.[1];
+        if (holder) {
+          const holderName = holder.settings?.name || tTheme(widgetSchemas?.[holder.type]?.displayName) || holder.type;
+          showToast(t("pageEditor.paginate.onlyOne", { widget: holderName }), "error");
+          return;
+        }
+        updateWidgetSettings(selectedWidgetId, "listing_anchor", true);
+        const perPageDefault = Array.isArray(currentWidgetSchema?.settings)
+          ? currentWidgetSchema.settings.find((setting) => setting?.id === perPageSetting)?.default
+          : undefined;
+        if (perPageSetting && !(Number(currentValues?.[perPageSetting] ?? perPageDefault) >= 1)) {
+          updateWidgetSettings(selectedWidgetId, perPageSetting, DEFAULT_ITEMS_PER_PAGE);
+        }
+      } else if (settingId === "listing_anchor" && value === false && currentValues?.paginate) {
+        updateWidgetSettings(selectedWidgetId, "paginate", false);
+      } else if (settingId === perPageSetting && currentValues?.paginate && !(Number(value) >= 1)) {
+        value = 1;
+      }
       updateWidgetSettings(selectedWidgetId, settingId, value);
       markWidgetModified(selectedWidgetId);
     }
@@ -129,10 +155,27 @@ export default function SettingsPanel({
       }
     : null;
 
+  const paginateSetting =
+    listedCollectionType && currentWidgetSchema?.collection?.perPageSetting
+      ? {
+          id: "paginate",
+          type: "checkbox",
+          label: t("pageEditor.paginate.label"),
+          description: t("pageEditor.paginate.description"),
+          default: false,
+        }
+      : null;
+
   // Combine settings with name setting at the end for widgets (not global widgets, blocks, or theme settings)
   const allSettings =
     !isThemeSettings && !selectedBlockId && !isGlobalWidget && settings
-      ? [...settings, ...(anchorSetting ? [anchorSetting] : []), widgetNameHeader, widgetNameSetting]
+      ? [
+          ...settings,
+          ...(paginateSetting ? [paginateSetting] : []),
+          ...(anchorSetting ? [anchorSetting] : []),
+          widgetNameHeader,
+          widgetNameSetting,
+        ]
       : settings;
 
   return (

@@ -6,6 +6,9 @@
  *   "rooms/suite-caldera.html" -> "/preview/collection/rooms/suite-caldera"
  *   "about"                    -> "/preview/about"
  *   "rooms/suite"              -> "/preview/collection/rooms/suite"
+ *   "blog/page/2.html"         -> "/preview/paged/blog/2"
+ *   "page/2.html"              -> "/preview/paged/index/2", or "/preview/collection/page/2"
+ *                                 when `collectionPrefixes` includes "page"
  *   "./" / "../"               -> "/preview/index"
  *   "#anchor" / external / "/" -> null
  *
@@ -15,7 +18,7 @@
  * runtime consumer. Kept dependency-free (no `window`/`document`) so it stays
  * import-safe for unit tests.
  */
-export function getStandalonePreviewTarget(href) {
+export function getStandalonePreviewTarget(href, { collectionPrefixes = [] } = {}) {
   if (!href || typeof href !== "string") return null;
   const trimmed = href.trim();
   if (!trimmed || trimmed.startsWith("#")) return null;
@@ -39,6 +42,11 @@ export function getStandalonePreviewTarget(href) {
   // Drop leading "./" / "../" depth segments and a leading slash; what remains
   // is the site-relative path in one of four shapes.
   const rel = withoutQuery.replace(/^(\.\.?\/)+/, "").replace(/^\//, "");
+
+  const pagedMatch = rel.match(/^(?:([^/.]+)\/)?page\/([1-9]\d*)(?:\.html)?$/);
+  if (pagedMatch && (pagedMatch[1] || !collectionPrefixes.includes("page"))) {
+    return `/preview/paged/${pagedMatch[1] || "index"}/${pagedMatch[2]}`;
+  }
 
   const htmlMatch = rel.match(/^([^/]+)\.html$/);
   if (htmlMatch) {

@@ -135,3 +135,8 @@ export function cloneWidgetWithNewBlockIds(widget, generateBlockId) {
 
   return { ...cloned, blocks: newBlocks, blocksOrder: newBlocksOrder };
 }
+
+export function withoutListingFlags(widget) {
+  if (!widget?.settings?.paginate && !widget?.settings?.listing_anchor) return widget;
+  return { ...widget, settings: { ...widget.settings, paginate: false, listing_anchor: false } };
+}

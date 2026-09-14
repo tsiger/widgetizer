@@ -124,10 +124,13 @@ describe("validateCollectionSchema (pure)", () => {
   });
 
   it("rejects a reserved slugPrefix when hasItemPages", () => {
-    const bad = { ...NEWS_SCHEMA, slugPrefix: "assets" };
-    const { valid, errors } = svc.validateCollectionSchema(bad, "news");
+    const { valid, errors } = svc.validateCollectionSchema({ ...NEWS_SCHEMA, slugPrefix: "assets" }, "news");
     assert.equal(valid, false);
     assert.ok(errors.some((e) => e.includes("reserved")));
+  });
+
+  it("still accepts page as a slugPrefix, which existing collections may use", () => {
+    assert.equal(svc.validateCollectionSchema({ ...NEWS_SCHEMA, slugPrefix: "page" }, "news").valid, true);
   });
 });
 
@@ -165,6 +168,35 @@ describe("listCollectionSchemas / getCollectionSchema", () => {
 // ---------------------------------------------------------------------------
 // Item create / read / list
 // ---------------------------------------------------------------------------
+
+describe("listing order when sort keys tie", () => {
+  it("orders exact ties by uuid, whatever order storage lists the files in", async () => {
+    const created = "2026-03-01T00:00:00.000Z";
+    const tied = [
+      ["tie-zeta", "u-tie-1"],
+      ["tie-alpha", "u-tie-3"],
+      ["tie-mid", "u-tie-2"],
+    ];
+    for (const [slug, uuid] of tied) {
+      await storage.write(
+        scope,
+        `collections/news/${slug}.json`,
+        JSON.stringify({ id: slug, uuid, slug, schemaVersion: 1, created, updated: created, settings: { title: "Same" } }),
+      );
+    }
+    for (const sort of ["created_desc", "created_asc", "title_asc", "title_desc", "manual"]) {
+      const items = (await svc.listCollectionItems(storage, scope, "news", { sort })).filter((item) =>
+        item.slug.startsWith("tie-"),
+      );
+      assert.deepEqual(
+        items.map((item) => item.uuid),
+        ["u-tie-1", "u-tie-2", "u-tie-3"],
+        sort,
+      );
+    }
+    for (const [slug] of tied) await storage.delete(scope, `collections/news/${slug}.json`);
+  });
+});
 
 describe("create + read items", () => {
   it("creates an item, derives the slug from the title, and reads it back", async () => {
@@ -209,10 +241,12 @@ describe("create + read items", () => {
     return true;
   };
 
-  it("refuses index as an item slug on create (reserved: it names the directory itself)", async () => {
+  it("refuses index and page as item slugs on create", async () => {
     await assert.rejects(() => createItem({ slug: "index", settings: { title: "Idx" } }), reserved);
     // A title that slugifies to the reserved name is refused the same way.
     await assert.rejects(() => createItem({ settings: { title: "Index" } }), reserved);
+    await assert.rejects(() => createItem({ slug: "page", settings: { title: "P" } }), reserved);
+    await assert.rejects(() => createItem({ settings: { title: "Page" } }), reserved);
     // "home" is only special for pages (the site root); as an item slug it is ordinary.
     const home = await createItem({ slug: "home", settings: { title: "H" } });
     assert.equal(home.slug, "home");

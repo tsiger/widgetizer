@@ -14,6 +14,41 @@ const BLOG = page("blog", "Blog");
 const labels = (trail) => trail.map((c) => c.label);
 const hrefs = (trail) => trail.map((c) => c.href);
 
+describe("buildBreadcrumbs — paginated copies", () => {
+  it("links the page back to page 1 and ends on the page number", () => {
+    const trail = buildBreadcrumbs({
+      page: BLOG,
+      pagesByUuid: pagesByUuid(HOME, BLOG),
+      outputPathPrefix: "../../",
+      pageNumber: 2,
+    });
+    expect(labels(trail)).toEqual(["Home", "Blog", "2"]);
+    expect(hrefs(trail)).toEqual(["../../index.html", "../../blog.html", "../../blog/page/2.html"]);
+    expect(trail.map((c) => c.current)).toEqual([false, false, true]);
+    expect(trail[2].pageNumber).toBe(2);
+    expect(trail[2].canonicalPath).toBe("blog/page/2.html");
+  });
+
+  it("gives the homepage's later pages Home → page number", () => {
+    const trail = buildBreadcrumbs({
+      page: HOME,
+      pagesByUuid: pagesByUuid(HOME, BLOG),
+      cleanUrls: true,
+      outputPathPrefix: "../",
+      pageNumber: 3,
+    });
+    expect(labels(trail)).toEqual(["Home", "3"]);
+    expect(hrefs(trail)).toEqual(["../", "../page/3"]);
+    expect(trail[0].home).toBe(true);
+  });
+
+  it("leaves page 1 as an ordinary trail", () => {
+    const trail = buildBreadcrumbs({ page: BLOG, pagesByUuid: pagesByUuid(HOME, BLOG), pageNumber: 1 });
+    expect(labels(trail)).toEqual(["Home", "Blog"]);
+    expect(buildBreadcrumbs({ page: HOME, pagesByUuid: pagesByUuid(HOME), pageNumber: 1 })).toEqual([]);
+  });
+});
+
 describe("buildBreadcrumbs — pages", () => {
   it("gives a top-level page Home → page", () => {
     const trail = buildBreadcrumbs({ page: ABOUT, pagesByUuid: pagesByUuid(HOME, ABOUT) });

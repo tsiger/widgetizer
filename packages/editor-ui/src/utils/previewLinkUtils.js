@@ -7,5 +7,8 @@ export function isStandalonePreviewNavigationUrl(url) {
   // Accept flat page routes (/preview/about) and nested collection item routes
   // (/preview/collection/rooms/suite-caldera). Query strings and hashes are still
   // rejected.
-  return typeof url === "string" && /^\/preview\/(?:[^/?#]+|collection\/[^/?#]+\/[^/?#]+)$/.test(url);
+  return (
+    typeof url === "string" &&
+    /^\/preview\/(?:[^/?#]+|paged\/[^/?#]+\/[1-9]\d*|collection\/[^/?#]+\/[^/?#]+)$/.test(url)
+  );
 }

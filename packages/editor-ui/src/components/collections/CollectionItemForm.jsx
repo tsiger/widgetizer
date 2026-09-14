@@ -5,6 +5,7 @@ import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp, Eye, Info } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
+import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
 import { discardArchivedCollectionItem } from "../../queries/collectionManager";
 import { invalidateMediaCache } from "../../queries/mediaManager";
 import useConfirmationAction from "../../hooks/useConfirmationAction";
@@ -270,7 +271,10 @@ export default function CollectionItemForm({
 
   return (
     <>
-    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="space-y-6">
+    <form
+      onSubmit={rhfHandleSubmit(onSubmitHandler, (formErrors) => formErrors.slug && setShowMore(true))}
+      className="space-y-6"
+    >
       {/* Doubled setting-type rhythm: space-y-8 (32px) in place of .form-section's
           space-y-4, so schema fields breathe in the collection-item editor. */}
       <div className="max-w-xl space-y-8">
@@ -356,10 +360,15 @@ export default function CollectionItemForm({
                   id="slug"
                   {...register("slug", {
                     required: t("collectionsForm.slugRequired"),
-                    validate: (value) =>
-                      value.trim() === ""
-                        ? t("collectionsForm.slugNotEmpty")
-                        : formatSlug(value).length > 0 || t("collectionsForm.slugInvalid"),
+                    validate: (value) => {
+                      if (value.trim() === "") return t("collectionsForm.slugNotEmpty");
+                      const slug = formatSlug(value);
+                      if (!slug) return t("collectionsForm.slugInvalid");
+                      if (isReservedItemSlug(slug) && slug !== initialData.slug) {
+                        return t("collectionsForm.slugReserved", { slug });
+                      }
+                      return true;
+                    },
                   })}
                   onBlur={(e) => e.target.value && setValue("slug", formatSlug(e.target.value))}
                   className="form-input flex-1"

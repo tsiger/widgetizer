@@ -11,6 +11,7 @@
  * the `breadcrumbs` snippet.
  */
 import { isHomeSlug, pageHref, itemHref } from "./internalHref.js";
+import { pagedHref, pageOutputPath } from "./contentAddress.js";
 
 /** A parent chain longer than this is treated as broken data, not walked. */
 const MAX_DEPTH = 10;
@@ -94,6 +95,7 @@ function crumb(label, href, canonicalPath, flags = {}) {
  * @param {Map<string, {anchorPageUuid?: string|null, pageUuids?: string[]}>} [args.listingPages]
  * @param {boolean} [args.cleanUrls]
  * @param {string} [args.outputPathPrefix]
+ * @param {number} [args.pageNumber] - 2+ on a paginated copy, which ends the trail with a numbered crumb
  * @returns {Array<{label: string, href: string|null, canonicalPath: string|null, current: boolean, home: boolean}>}
  *   Home first, current page last. Empty on the homepage.
  */
@@ -105,6 +107,7 @@ export function buildBreadcrumbs({
   listingPages = new Map(),
   cleanUrls = false,
   outputPathPrefix = "",
+  pageNumber = 1,
 } = {}) {
   const hrefOpts = { cleanUrls, outputPathPrefix };
   const asCrumb = (p, flags) =>
@@ -112,7 +115,7 @@ export function buildBreadcrumbs({
 
   // The homepage carries no trail — it is the root, and a one-crumb "Home" says
   // nothing a visitor does not already know.
-  if (page && isHomeSlug(page.slug)) return [];
+  if (page && isHomeSlug(page.slug) && !(pageNumber > 1)) return [];
   if (!page && !item) return [];
 
   const trail = [];
@@ -136,6 +139,14 @@ export function buildBreadcrumbs({
         itemCanonicalPath(item.slugPrefix, item.slug),
         { current: true },
       ),
+    );
+  } else if (pageNumber > 1) {
+    if (!isHomeSlug(page.slug)) trail.push(asCrumb(page));
+    trail.push(
+      crumb(String(pageNumber), pagedHref(page.slug, pageNumber, hrefOpts), pageOutputPath(page.slug, pageNumber), {
+        current: true,
+        pageNumber,
+      }),
     );
   } else {
     trail.push(asCrumb(page, { current: true }));

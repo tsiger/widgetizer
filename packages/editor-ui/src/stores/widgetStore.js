@@ -14,6 +14,7 @@ import {
   buildDefaultWidget,
   cloneBlock,
   cloneWidgetWithNewBlockIds,
+  withoutListingFlags,
 } from "./widgetStoreHelpers";
 
 export { hasReachedMaxBlocks };
@@ -208,7 +209,9 @@ const useWidgetStore = create((set, get) => ({
     if (!page || !page.widgets[widgetId]) return null;
 
     const newWidgetId = get().generateWidgetId();
-    const newWidget = cloneWidgetWithNewBlockIds(page.widgets[widgetId], () => get().generateBlockId());
+    const newWidget = withoutListingFlags(
+      cloneWidgetWithNewBlockIds(page.widgets[widgetId], () => get().generateBlockId()),
+    );
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
 
     pageStore.setPage({
@@ -241,7 +244,7 @@ const useWidgetStore = create((set, get) => ({
     if (!page) return null;
 
     const newWidgetId = get().generateWidgetId();
-    const newWidget = cloneWidgetWithNewBlockIds(widgetClipboard, () => get().generateBlockId());
+    const newWidget = withoutListingFlags(cloneWidgetWithNewBlockIds(widgetClipboard, () => get().generateBlockId()));
     const currentOrder = page.widgetsOrder || Object.keys(page.widgets);
 
     pageStore.setPage({

@@ -15,7 +15,7 @@ import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlTags } from "../services/sanitizationService.js";
-import { isReservedItemSlug } from "../services/collectionService.js";
+import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";

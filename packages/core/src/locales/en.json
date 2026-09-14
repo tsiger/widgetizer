@@ -64,6 +64,7 @@
     "slugRequired": "Filename is required",
     "slugNotEmpty": "Filename cannot be empty",
     "slugInvalid": "Filename must contain at least one letter or number",
+    "slugReserved": "\"{{slug}}\" is reserved. Choose a different filename.",
     "create": "Create",
     "saveChanges": "Save changes",
     "backToList": "Back to list",
@@ -151,6 +152,7 @@
       "filenameRequired": "Filename is required",
       "filenameNotEmpty": "Filename cannot be empty",
       "filenameInvalid": "Filename must contain at least one letter or number",
+      "filenameReserved": "\"{{slug}}\" is reserved. Choose a different filename.",
       "hierarchyTitle": "Page Hierarchy",
       "parentPageLabel": "Parent page",
       "parentPageNone": "None — this is a top-level page",
@@ -505,10 +507,15 @@
     "error": "Error: {{message}}",
     "noPageSelected": "No page selected. Please select a page from the Pages list.",
     "noWidgetsFound": "No widgets found",
+    "paginate": {
+      "label": "Split into pages",
+      "description": "Shows this many items per page, with page links below the list. Makes this the main page for the collection.",
+      "onlyOne": "Only one list per page can be split into pages, and \"{{widget}}\" already is."
+    },
     "listingAnchor": {
       "label": "Main {{collection}} page",
       "description": "Marks this page as the home of this collection. Its items show it in their breadcrumbs, e.g. Home › Blog › A post. Only one page per collection.",
-      "moved": "This is now the main page for that collection — moved from {{pages}}."
+      "moved": "This is now the main page for that collection — moved from {{pages}}. If that page was split into pages, it no longer is."
     },
     "widgetName": {
       "header": "Internal name",

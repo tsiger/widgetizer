@@ -1,6 +1,7 @@
 // Purpose: Liquid tag to output SEO meta tags
 
 import { isHomeSlug, absoluteSiteUrl } from "../utils/internalHref.js";
+import { pageOutputPath, publicPath } from "../utils/contentAddress.js";
 
 export const SeoTag = {
   parse(tagToken) {
@@ -24,7 +25,10 @@ export const SeoTag = {
 
       const pageTitle = seo.title && seo.title.trim() ? seo.title.trim() : page.name || "";
       const siteTitle = project?.siteTitle && project.siteTitle.trim() ? project.siteTitle.trim() : "";
-      const htmlTitle = siteTitle ? `${pageTitle} - ${siteTitle}` : pageTitle;
+      const pagination = page.pagination?.total > 1 ? page.pagination : null;
+      const pageNumber = pagination ? pagination.current : 1;
+      const numberedTitle = pageNumber > 1 ? `${pageTitle} - ${pageNumber}` : pageTitle;
+      const htmlTitle = siteTitle ? `${numberedTitle} - ${siteTitle}` : numberedTitle;
       metaTags.push(`<title>${escapeHtml(htmlTitle)}</title>`);
 
       // Meta description - use seo.description if available
@@ -39,9 +43,20 @@ export const SeoTag = {
 
       // Canonical URL: explicit page-level value wins; otherwise auto-generate
       // from siteUrl + slug (homepage canonicalizes to the bare root).
-      const canonicalUrl = resolveCanonicalUrl(seo.canonical_url, project?.siteUrl, page.slug, project?.cleanUrls);
+      const pagedUrl = (number) =>
+        number > 1
+          ? absoluteSiteUrl(project?.siteUrl, publicPath(pageOutputPath(page.slug, number), { cleanUrls: project?.cleanUrls }))
+          : resolveCanonicalUrl("", project?.siteUrl, page.slug, project?.cleanUrls);
+      const canonicalUrl =
+        pageNumber > 1 ? pagedUrl(pageNumber) : resolveCanonicalUrl(seo.canonical_url, project?.siteUrl, page.slug, project?.cleanUrls);
       if (canonicalUrl) {
         metaTags.push(`<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
+      }
+      if (pagination) {
+        const prevUrl = pageNumber > 1 ? pagedUrl(pageNumber - 1) : "";
+        const nextUrl = pageNumber < pagination.total ? pagedUrl(pageNumber + 1) : "";
+        if (prevUrl) metaTags.push(`<link rel="prev" href="${escapeHtml(prevUrl)}">`);
+        if (nextUrl) metaTags.push(`<link rel="next" href="${escapeHtml(nextUrl)}">`);
       }
 
       // Open Graph tags

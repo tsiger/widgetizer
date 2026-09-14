@@ -70,6 +70,28 @@ describe("getStandalonePreviewTarget", () => {
     expect(getStandalonePreviewTarget("home")).toBe("/preview/home");
   });
 
+  it("maps paginated page copies to the paged page route", () => {
+    expect(getStandalonePreviewTarget("blog/page/2.html")).toBe("/preview/paged/blog/2");
+    expect(getStandalonePreviewTarget("../../blog/page/3")).toBe("/preview/paged/blog/3");
+    expect(getStandalonePreviewTarget("page/2.html")).toBe("/preview/paged/index/2");
+    expect(getStandalonePreviewTarget("../page/4")).toBe("/preview/paged/index/4");
+    expect(getStandalonePreviewTarget("collection/page/2.html")).toBe("/preview/paged/collection/2");
+    expect(getStandalonePreviewTarget("blog/page/0")).toBeNull();
+  });
+
+  it("sends page/<n> to the collection item when a collection publishes under page/", () => {
+    const withPagePrefix = { collectionPrefixes: ["news", "page"] };
+    expect(getStandalonePreviewTarget("page/2.html", withPagePrefix)).toBe("/preview/collection/page/2");
+    expect(getStandalonePreviewTarget("page/2", withPagePrefix)).toBe("/preview/collection/page/2");
+    expect(getStandalonePreviewTarget("../page/2", withPagePrefix)).toBe("/preview/collection/page/2");
+    expect(getStandalonePreviewTarget("blog/page/2.html", withPagePrefix)).toBe("/preview/paged/blog/2");
+    expect(getStandalonePreviewTarget("../../blog/page/3", withPagePrefix)).toBe("/preview/paged/blog/3");
+
+    const withoutPagePrefix = { collectionPrefixes: ["news"] };
+    expect(getStandalonePreviewTarget("page/2.html", withoutPagePrefix)).toBe("/preview/paged/index/2");
+    expect(getStandalonePreviewTarget("page/2", withoutPagePrefix)).toBe("/preview/paged/index/2");
+  });
+
   it("still returns null for non-navigable hrefs", () => {
     expect(getStandalonePreviewTarget("/")).toBeNull();
     expect(getStandalonePreviewTarget("assets/site.css")).toBeNull();

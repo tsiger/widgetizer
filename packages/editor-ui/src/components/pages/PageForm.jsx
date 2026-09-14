@@ -9,6 +9,7 @@ import useStickyActionBar from "../../hooks/useStickyActionBar";
 import Button from "../ui/Button";
 import ImageInput from "../settings/inputs/ImageInput";
 import { isHomeSlug } from "@widgetizer/core/internalHref";
+import { isReservedPageSlug } from "@widgetizer/core/contentAddress";
 import { getAllPages } from "../../queries/pageManager";
 
 export default function PageForm({
@@ -185,10 +186,15 @@ export default function PageForm({
               id="slug"
               {...register("slug", {
                 required: t("forms.page.filenameRequired"),
-                validate: (value) =>
-                  value.trim() === ""
-                    ? t("forms.page.filenameNotEmpty")
-                    : formatSlug(value).length > 0 || t("forms.page.filenameInvalid"),
+                validate: (value) => {
+                  if (value.trim() === "") return t("forms.page.filenameNotEmpty");
+                  const slug = formatSlug(value);
+                  if (!slug) return t("forms.page.filenameInvalid");
+                  if (isReservedPageSlug(slug) && slug !== initialData.slug) {
+                    return t("forms.page.filenameReserved", { slug });
+                  }
+                  return true;
+                },
               })}
               onBlur={handleSlugBlur}
               className="form-input flex-1"

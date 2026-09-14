@@ -307,6 +307,15 @@ describe("duplicateWidget", () => {
   it("returns null for nonexistent widget", () => {
     expect(useWidgetStore.getState().duplicateWidget("nope")).toBeNull();
   });
+
+  it("starts the duplicate with pagination and the listing anchor off", () => {
+    seedStores({ "w-1": { type: "test-widget", settings: { title: "Paged", paginate: true, listing_anchor: true }, blocks: {}, blocksOrder: [] } });
+    const newId = useWidgetStore.getState().duplicateWidget("w-1");
+    const page = usePageStore.getState().page;
+
+    expect(page.widgets[newId].settings).toMatchObject({ title: "Paged", paginate: false, listing_anchor: false });
+    expect(page.widgets["w-1"].settings).toMatchObject({ paginate: true, listing_anchor: true });
+  });
 });
 
 // ============================================================================
@@ -390,6 +399,14 @@ describe("pasteWidget", () => {
 
   it("returns null when the clipboard is empty", () => {
     expect(useWidgetStore.getState().pasteWidget(0)).toBeNull();
+  });
+
+  it("pastes with pagination and the listing anchor off", () => {
+    seedStores({ "w-1": { type: "test-widget", settings: { title: "Paged", paginate: true, listing_anchor: true }, blocks: {}, blocksOrder: [] } });
+    useWidgetStore.getState().copyWidget("w-1");
+    const newId = useWidgetStore.getState().pasteWidget(999);
+
+    expect(usePageStore.getState().page.widgets[newId].settings).toMatchObject({ paginate: false, listing_anchor: false });
   });
 });
 

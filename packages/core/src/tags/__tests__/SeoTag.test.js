@@ -12,6 +12,46 @@ function render(vars) {
 
 const pageWith = (seo) => ({ slug: "about", name: "About", seo });
 
+describe("SeoTag on a paginated page", () => {
+  const paged = (current, total = 3) => ({
+    slug: "blog",
+    name: "Blog",
+    seo: { canonical_url: "https://elsewhere.example.com/blog" },
+    pagination: { current, total },
+  });
+  const project = { siteUrl: "https://example.com/site/", siteTitle: "Site" };
+
+  it("numbers the title and points canonical, prev and next at the copies", () => {
+    const html = render({ page: paged(2), project });
+    expect(html).toContain("<title>Blog - 2 - Site</title>");
+    expect(html).toContain('<link rel="canonical" href="https://example.com/site/blog/page/2.html">');
+    expect(html).toContain('<link rel="prev" href="https://example.com/site/blog.html">');
+    expect(html).toContain('<link rel="next" href="https://example.com/site/blog/page/3.html">');
+  });
+
+  it("keeps page 1 as it was, adding only next", () => {
+    const html = render({ page: paged(1), project: { ...project, cleanUrls: true } });
+    expect(html).toContain("<title>Blog - Site</title>");
+    expect(html).toContain('<link rel="canonical" href="https://elsewhere.example.com/blog">');
+    expect(html).not.toContain('rel="prev"');
+    expect(html).toContain('<link rel="next" href="https://example.com/site/blog/page/2">');
+  });
+
+  it("links the last page back to the homepage root when the homepage paginates", () => {
+    const html = render({ page: { slug: "index", name: "Home", pagination: { current: 2, total: 2 } }, project });
+    expect(html).toContain('<link rel="prev" href="https://example.com/site/">');
+    expect(html).toContain('<link rel="canonical" href="https://example.com/site/page/2.html">');
+    expect(html).not.toContain('rel="next"');
+  });
+
+  it("emits no canonical, prev or next without a Site URL", () => {
+    const html = render({ page: paged(2), project: { siteTitle: "Site" } });
+    expect(html).toContain("<title>Blog - 2 - Site</title>");
+    expect(html).not.toContain('rel="canonical"');
+    expect(html).not.toContain('rel="prev"');
+  });
+});
+
 describe("SeoTag og:image (absolute-only hardening)", () => {
   it("emits an absolute og:image + twitter:image from siteUrl + published assets/images", () => {
     const html = render({

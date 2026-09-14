@@ -44,6 +44,10 @@ function getPreviewMode() {
 
 const PREVIEW_MODE = getPreviewMode();
 
+const COLLECTION_PREFIXES = (document.querySelector("script[data-preview-mode]")?.dataset?.collectionPrefixes || "")
+  .split(",")
+  .filter(Boolean);
+
 // ── CSS Variables + Fonts ───────────────────────────────────────────────────
 
 function updateCssVariables(variables) {
@@ -568,7 +572,7 @@ function setupInteractionHandler() {
       if (linkElement) {
         if (PREVIEW_MODE === "standalone") {
           const href = linkElement.getAttribute("href");
-          const targetUrl = getStandalonePreviewTarget(href);
+          const targetUrl = getStandalonePreviewTarget(href, { collectionPrefixes: COLLECTION_PREFIXES });
           event.preventDefault();
           event.stopPropagation();
 

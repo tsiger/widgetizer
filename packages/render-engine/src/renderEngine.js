@@ -32,6 +32,7 @@ import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@wid
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
+import { pagedHref } from "@widgetizer/core/contentAddress";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
@@ -124,11 +125,12 @@ function getProjectData(deps) {
   }
 }
 
-function buildPageTitle(pageData, projectData) {
-  const pageTitle =
+function buildPageTitle(pageData, projectData, pageNumber = 1) {
+  const baseTitle =
     pageData?.seo?.title && typeof pageData.seo.title === "string" && pageData.seo.title.trim()
       ? pageData.seo.title.trim()
       : pageData?.name || "";
+  const pageTitle = pageNumber > 1 ? `${baseTitle} - ${pageNumber}` : baseTitle;
   const siteTitle =
     projectData?.siteTitle && typeof projectData.siteTitle === "string" && projectData.siteTitle.trim()
       ? projectData.siteTitle.trim()
@@ -367,7 +369,9 @@ async function ensureBreadcrumbs(deps, sharedGlobals) {
   }
 
   const page = [...pagesByUuid.values()].find((candidate) => candidate?.slug === target) || null;
-  sharedGlobals.breadcrumbs = page ? buildBreadcrumbs({ ...shape, page }) : [];
+  sharedGlobals.breadcrumbs = page
+    ? buildBreadcrumbs({ ...shape, page, pageNumber: sharedGlobals.paginationPlan?.current || 1 })
+    : [];
   return sharedGlobals.breadcrumbs;
 }
 
@@ -420,6 +424,58 @@ async function resolveItemFromPath(deps, target) {
     }
   }
   return null;
+}
+
+async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPage = 1 } = {}) {
+  if (typeof deps.countCollectionItems !== "function") return null;
+  const order = Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? widgetsOrder : Object.keys(widgets || {});
+
+  for (const widgetId of order) {
+    const widget = widgets?.[widgetId];
+    if (widget?.settings?.paginate !== true || typeof widget.type !== "string") continue;
+
+    const schemaPath = await resolveInside(deps.projectDir, "widgets", widget.type, "schema.json");
+    if (!schemaPath) continue;
+    let schema;
+    try {
+      schema = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
+    } catch {
+      continue;
+    }
+
+    const collectionType = schema?.collection?.type;
+    const perPageSetting = schema?.collection?.perPageSetting;
+    if (!collectionType || typeof perPageSetting !== "string" || !Array.isArray(schema.settings)) continue;
+
+    const declared = schema.settings.find((setting) => setting?.id === perPageSetting);
+    const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
+    if (!Number.isInteger(perPage) || perPage < 1) continue;
+
+    const totalItems = await deps.countCollectionItems(collectionType);
+    const total = Math.ceil(totalItems / perPage);
+    if (total < 2) return null;
+
+    const current = Math.min(Math.max(Math.floor(Number(currentPage)) || 1, 1), total);
+    return { widgetId, collectionType, perPage, totalItems, total, current, pageSlug };
+  }
+  return null;
+}
+
+function buildPaginationContext(plan, { cleanUrls = false, outputPathPrefix = "" } = {}) {
+  const href = (pageNumber) => pagedHref(plan.pageSlug, pageNumber, { cleanUrls, outputPathPrefix });
+  const pages = [];
+  for (let number = 1; number <= plan.total; number += 1) {
+    pages.push({ number, href: href(number), current: number === plan.current });
+  }
+  return {
+    current: plan.current,
+    total: plan.total,
+    perPage: plan.perPage,
+    totalItems: plan.totalItems,
+    prevHref: plan.current > 1 ? href(plan.current - 1) : null,
+    nextHref: plan.current < plan.total ? href(plan.current + 1) : null,
+    pages,
+  };
 }
 
 /**
@@ -932,9 +988,11 @@ async function renderWidget(
     };
 
     // Merge with widget-specific context
+    const paginationPlan = sharedGlobals?.paginationPlan?.widgetId === widgetId ? sharedGlobals.paginationPlan : null;
     const renderContext = {
       ...baseContext,
       widget: widgetContext,
+      ...(paginationPlan ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) } : {}),
     };
 
     // Get theme snippets directory for this project
@@ -943,11 +1001,22 @@ async function renderWidget(
     // Get or create cached engine
     const engine = getOrCreateEngine(projectDir, themeSnippetsDir, deps.coreSnippetsDir);
 
+    if (paginationPlan) {
+      sharedGlobals.collectionSlice = {
+        collectionType: paginationPlan.collectionType,
+        offset: (paginationPlan.current - 1) * paginationPlan.perPage,
+        limit: paginationPlan.perPage,
+      };
+    }
+
     // Render the template
-    let rendered = await engine.parseAndRender(templateForRender, renderContext, {
-      globals: renderContext.globals,
-    });
-    return rendered;
+    try {
+      return await engine.parseAndRender(templateForRender, renderContext, {
+        globals: renderContext.globals,
+      });
+    } finally {
+      if (paginationPlan) delete sharedGlobals.collectionSlice;
+    }
   } catch (error) {
     console.error(`Error rendering widget ${widgetId} (Project: ${deps.projectId}):`, error);
     // Return a more informative error message in the HTML
@@ -1032,15 +1101,21 @@ async function renderPageLayout(
     const baseBodyClass = contentSections.bodyClass !== undefined ? contentSections.bodyClass : pageSlugClass;
     const bodyClasses = [baseBodyClass, contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
     const breadcrumbs = await ensureBreadcrumbs(deps, sharedGlobals);
+    const pagination = sharedGlobals?.paginationPlan
+      ? buildPaginationContext(sharedGlobals.paginationPlan, {
+          cleanUrls: sharedGlobals.cleanUrls === true,
+          outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+        })
+      : null;
 
     const renderContext = {
       ...baseContext,
       header: contentSections.headerContent || "",
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
-      page: pageData ? { ...pageData, breadcrumbs } : pageData,
+      page: pageData ? { ...pageData, breadcrumbs, ...(pagination ? { pagination } : {}) } : pageData,
       project: layoutProjectData,
-      page_title: buildPageTitle(pageData, projectData),
+      page_title: buildPageTitle(pageData, projectData, pagination?.current),
       body_class: bodyClasses,
     };
 
@@ -1282,4 +1357,5 @@ export {
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
+  planPagination,
 };

@@ -18,7 +18,7 @@ import { buildPreviewUrl } from "@widgetizer/editor-ui/lib/previewBase";
  * machinery; it just resolves the saved page to a render token once.
  */
 export default function PagePreview() {
-  const { pageId } = useParams();
+  const { pageId, pageNumber } = useParams();
   const { setPreview } = useOutletContext();
   const activeProjectId = useProjectStore((state) => state.activeProject?.id);
   const loadPage = usePageStore((state) => state.loadPage);
@@ -53,7 +53,12 @@ export default function PagePreview() {
       try {
         const { globalWidgets } = usePageStore.getState();
         const themeSettings = useThemeStore.getState().settings;
-        const { token } = await fetchPreviewToken({ ...page, globalWidgets }, themeSettings, "standalone");
+        const { token } = await fetchPreviewToken(
+          { ...page, globalWidgets },
+          themeSettings,
+          "standalone",
+          Number(pageNumber) || 1,
+        );
         if (!cancelled) setPreview({ src: buildPreviewUrl(token), loading: false, notFound: false });
       } catch {
         if (!cancelled) setPreview({ src: null, loading: false, notFound: true });
@@ -62,7 +67,7 @@ export default function PagePreview() {
     return () => {
       cancelled = true;
     };
-  }, [activeProjectId, loading, error, page, setPreview]);
+  }, [activeProjectId, loading, error, page, pageNumber, setPreview]);
 
   return null;
 }

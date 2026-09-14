@@ -9,8 +9,7 @@ import ProjectsAdd from "./pages/ProjectsAdd";
 import ProjectsEdit from "./pages/ProjectsEdit";
 import HomeRedirect from "./pages/HomeRedirect";
 import SitePreviewLayout from "./pages/SitePreviewLayout";
-import PagePreview from "./pages/PagePreview";
-import CollectionItemPagePreview from "./pages/CollectionItemPagePreview";
+import { previewRoutes } from "./previewRoutes";
 import NotFound from "./pages/NotFound";
 import RouteError from "./pages/RouteError";
 import AdminMenu from "./components/layout/AdminMenu";
@@ -91,10 +90,7 @@ const router = createBrowserRouter([
     path: "/preview",
     element: <SitePreviewLayout />,
     errorElement: <RouteError />,
-    children: [
-      { path: ":pageId", element: <PagePreview /> },
-      { path: "collection/:prefix/:slug", element: <CollectionItemPagePreview /> },
-    ],
+    children: previewRoutes,
   },
   {
     path: "*",

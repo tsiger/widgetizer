@@ -105,6 +105,7 @@ describe("PagePreview — one-shot token resolve", () => {
       { id: "contact", widgets: {}, globalWidgets: { header: {} } },
       {},
       "standalone",
+      1,
     );
     await waitFor(() => {
       const last = reports.at(-1);
@@ -112,6 +113,27 @@ describe("PagePreview — one-shot token resolve", () => {
       expect(last.loading).toBe(false);
       expect(last.src).toContain("/render/tok123");
     });
+  });
+
+  it("asks for the page number in the route", async () => {
+    projectState = { activeProject: { id: "p1" } };
+    pageState = { page: { id: "blog", widgets: {} }, loading: false, error: null, loadPage, globalWidgets: {} };
+    fetchPreviewToken.mockResolvedValue({ token: "tok2" });
+
+    render(
+      <MemoryRouter initialEntries={["/preview/paged/blog/2"]}>
+        <Routes>
+          <Route path="/preview" element={<CaptureLayout />}>
+            <Route path=":pageId" element={<PagePreview />} />
+            <Route path="paged/:pageId/:pageNumber" element={<PagePreview />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(fetchPreviewToken).toHaveBeenCalled());
+    expect(loadPage).toHaveBeenCalledWith("blog");
+    expect(fetchPreviewToken.mock.calls.at(-1)[3]).toBe(2);
   });
 
   it("reports notFound when the page is missing", () => {

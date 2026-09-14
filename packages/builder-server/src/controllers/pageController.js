@@ -5,6 +5,49 @@ import { stripHtmlTags } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
+import { isReservedPageSlug } from "@widgetizer/core/contentAddress";
+
+const pageSlugTaken = (storage, scope) => (slug) =>
+  isReservedPageSlug(slug) || storage.exists(scope, `pages/${slug}.json`);
+
+function reservedPageSlug(res, slug) {
+  return res.status(400).json({
+    error: "Reserved slug",
+    message: `"${slug}" is reserved and cannot be used as a page filename.`,
+  });
+}
+
+async function readWidgetSchema(storage, scope, type) {
+  if (typeof type !== "string" || !type) return null;
+  try {
+    const buf = await storage.read(scope, `widgets/${type}/schema.json`);
+    return buf == null ? null : JSON.parse(buf.toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+async function enforcePaginationRules({ scope, storage, widgets }) {
+  const paginators = [];
+  for (const widget of Object.values(widgets || {})) {
+    if (widget?.settings?.paginate !== true) continue;
+    const schema = await readWidgetSchema(storage, scope, widget.type);
+    const perPageSetting = schema?.collection?.perPageSetting;
+    if (!schema?.collection?.type || typeof perPageSetting !== "string" || !Array.isArray(schema.settings)) {
+      widget.settings.paginate = false;
+      continue;
+    }
+    const declared = schema.settings.find((setting) => setting?.id === perPageSetting);
+    const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
+    if (!Number.isInteger(perPage) || perPage < 1) {
+      return "Items per page must be a whole number of at least 1 when a list is split into pages.";
+    }
+    paginators.push(widget);
+  }
+  if (paginators.length > 1) return "Only one widget per page can split the page into pages.";
+  for (const widget of paginators) widget.settings.listing_anchor = true;
+  return null;
+}
 
 // Page/global-widget reads moved to the dir-explicit reader family
 // (utils/projectContentFs.js: listPagesFromDir / readGlobalWidgetFromDir) — the
@@ -100,7 +143,7 @@ export async function updatePage(req, res) {
       );
       desiredNewSlug = await generateUniqueSlug(
         pageData.name,
-        (slug) => storage.exists(scope, `pages/${slug}.json`),
+        pageSlugTaken(storage, scope),
       );
     } else {
       // Sanitize the provided slug through the shared helper
@@ -118,6 +161,7 @@ export async function updatePage(req, res) {
     if (oldSlug !== desiredNewSlug) {
       // For explicit slug changes, check if the new slug already exists (conflict)
       if (pageData.slug && typeof pageData.slug === "string" && pageData.slug.trim() !== "") {
+        if (isReservedPageSlug(desiredNewSlug)) return reservedPageSlug(res, desiredNewSlug);
         if (await storage.exists(scope, `pages/${desiredNewSlug}.json`)) {
           return res.status(409).json({
             error: "Slug already exists",
@@ -131,6 +175,11 @@ export async function updatePage(req, res) {
     } else {
       // Slug hasn't changed, keep it as is
       finalNewSlug = oldSlug;
+    }
+
+    if (pageData.widgets) {
+      const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+      if (paginationError) return res.status(422).json({ error: paginationError });
     }
 
     // Read old file first to preserve original creation date and uuid
@@ -182,7 +231,20 @@ export async function updatePage(req, res) {
       previousPageId: oldSlug,
     });
 
-    res.json({ success: true, data: finalUpdatedPageData });
+    const movedFrom = pageData.widgets
+      ? await clearListingAnchorsElsewhere({
+          scope,
+          storage,
+          keepPageId: finalNewSlug,
+          widgets: finalUpdatedPageData.widgets,
+        })
+      : [];
+
+    res.json({
+      success: true,
+      data: finalUpdatedPageData,
+      ...(movedFrom.length ? { listingAnchorMovedFrom: movedFrom } : {}),
+    });
   } catch (error) {
     console.error("Error updating page:", error);
     res.status(500).json({
@@ -400,10 +462,10 @@ export async function createPage(req, res) {
     let slug;
     if (pageData.slug && pageData.slug.trim()) {
       // User provided a slug, ensure it's unique
-      slug = await generateUniqueSlug(pageData.slug, (slug) => storage.exists(scope, `pages/${slug}.json`), { fallback: "page" });
+      slug = await generateUniqueSlug(pageData.slug, pageSlugTaken(storage, scope), { fallback: "page" });
     } else {
       // No slug provided, generate from name
-      slug = await generateUniqueSlug(pageData.name, (slug) => storage.exists(scope, `pages/${slug}.json`));
+      slug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope));
     }
 
     const newPage = {
@@ -458,6 +520,7 @@ export async function savePageContent(req, res) {
     if (!pageData.slug || !pageData.name || !pageData.widgets) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
     }
+    if (pageData.slug !== id && isReservedPageSlug(pageData.slug)) return reservedPageSlug(res, pageData.slug);
 
     // Cap the per-page widget count before persisting. Without this an
     // authenticated owner could store tens of thousands of widgets in one page,
@@ -476,6 +539,9 @@ export async function savePageContent(req, res) {
         .status(422)
         .json({ error: `Too many widgets on this page (${widgetCount}); the maximum is ${maxWidgets}.` });
     }
+
+    const paginationError = await enforcePaginationRules({ scope, storage, widgets: pageData.widgets });
+    if (paginationError) return res.status(422).json({ error: paginationError });
 
     // Read existing data to preserve timestamps etc.
     let existingData = {};
@@ -537,7 +603,7 @@ export async function savePageContent(req, res) {
 }
 
 /**
- * Clear `listing_anchor` on every OTHER page for the collections the just-saved
+ * Clear `listing_anchor` (and `paginate`, which needs it) on every OTHER page for the collections the just-saved
  * page claims, so a collection has exactly one anchor. Returns the names of the
  * pages it cleared, for the editor to report.
  *
@@ -554,28 +620,15 @@ async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widget
   // Map the claimed widget types to the collections they list.
   const claimedCollections = new Set();
   for (const type of claimed) {
-    try {
-      const buf = await storage.read(scope, `widgets/${type}/schema.json`);
-      if (buf == null) continue;
-      const collectionType = JSON.parse(buf.toString("utf8"))?.collection?.type;
-      if (collectionType) claimedCollections.add(collectionType);
-    } catch {
-      // Unreadable schema: the widget declares nothing, so it claims nothing.
-    }
+    const collectionType = (await readWidgetSchema(storage, scope, type))?.collection?.type;
+    if (collectionType) claimedCollections.add(collectionType);
   }
   if (claimedCollections.size === 0) return [];
 
   const schemaCache = new Map();
   const collectionOf = async (type) => {
     if (!schemaCache.has(type)) {
-      let collectionType = null;
-      try {
-        const buf = await storage.read(scope, `widgets/${type}/schema.json`);
-        if (buf != null) collectionType = JSON.parse(buf.toString("utf8"))?.collection?.type || null;
-      } catch {
-        collectionType = null;
-      }
-      schemaCache.set(type, collectionType);
+      schemaCache.set(type, (await readWidgetSchema(storage, scope, type))?.collection?.type || null);
     }
     return schemaCache.get(type);
   };
@@ -592,10 +645,11 @@ async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widget
 
     let modified = false;
     for (const widget of Object.values(page.widgets || {})) {
-      if (!widget?.settings?.listing_anchor || !widget.type) continue;
+      if (!(widget?.settings?.listing_anchor || widget?.settings?.paginate) || !widget.type) continue;
       const collectionType = await collectionOf(widget.type);
       if (!collectionType || !claimedCollections.has(collectionType)) continue;
       widget.settings.listing_anchor = false;
+      widget.settings.paginate = false;
       modified = true;
     }
 
@@ -648,7 +702,7 @@ export async function duplicatePage(req, res) {
     ).filter(Boolean);
 
     const newName = generateCopyName(originalPageData.name, existingPageNames);
-    const newSlug = await generateUniqueSlug(newName, (slug) => storage.exists(scope, `pages/${slug}.json`));
+    const newSlug = await generateUniqueSlug(newName, pageSlugTaken(storage, scope));
 
     // A listing anchor belongs to one page per collection. Copying it would
     // leave two pages claiming the same collection, which the save-time sweep
@@ -657,8 +711,8 @@ export async function duplicatePage(req, res) {
     const duplicatedWidgets = {};
     for (const [widgetId, widget] of Object.entries(originalPageData.widgets || {})) {
       duplicatedWidgets[widgetId] =
-        widget?.settings?.listing_anchor === true
-          ? { ...widget, settings: { ...widget.settings, listing_anchor: false } }
+        widget?.settings?.listing_anchor === true || widget?.settings?.paginate === true
+          ? { ...widget, settings: { ...widget.settings, listing_anchor: false, paginate: false } }
           : widget;
     }
 

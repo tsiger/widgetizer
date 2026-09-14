@@ -11,6 +11,7 @@ export {
   renderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
+  planPagination,
 } from "./renderEngine.js";
 
 // Pure `menu`-type setting resolver shared by widget and collection-item rendering.

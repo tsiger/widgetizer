@@ -23,6 +23,7 @@ import {
   renderCollectionItemPage as engineRenderCollectionItemPage,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader as engineWidgetSupportsTransparentHeader,
+  planPagination as enginePlanPagination,
   schemaHasMenuSetting,
 } from "@widgetizer/render-engine";
 
@@ -38,8 +39,7 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { sanitizeWidgetData } from "./sanitizationService.js";
 import {
   listCollectionSchemas,
-  listCollectionItems,
-  getCollectionSchema,
+  createCollectionReader,
   loadCollectionItemsByUuid,
   prepareCollectionItemForRender,
   buildCollectionItemPageData,
@@ -56,9 +56,9 @@ function schemaHasLinkSetting(schema) {
  * the same adapter as the API path) and over the live render `globals` +
  * mode-aware media base paths (passed in by the engine when it builds the render
  * context). Results are cached per (type, options) on `globals.collectionCache`.
- * @param {object} collectionDeps - { storage, scope }
+ * @param {{ storage: object, scope: object, reader: { read: Function, sorted: Function } }} collectionDeps
  */
-function makeCollectionItemsLoaderFactory({ storage, scope }) {
+function makeCollectionItemsLoaderFactory({ storage, scope, reader }) {
   return ({ globals, imageBasePath, fileBasePath }) =>
     async (collectionType, options = {}) => {
       const cacheKey = `${collectionType}:${JSON.stringify(options ?? {})}`;
@@ -70,10 +70,8 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
       // invalid items — so `limit` counts valid items (an invalid item must not
       // consume a slot in the returned window).
       const { limit, offset, ...sortOptions } = options ?? {};
-      const [items, schema] = await Promise.all([
-        listCollectionItems(storage, scope, collectionType, sortOptions),
-        getCollectionSchema(storage, scope, collectionType),
-      ]);
+      const [items, loaded] = await Promise.all([reader.sorted(collectionType, sortOptions), reader.read(collectionType)]);
+      const schema = loaded?.schema || null;
 
       const outputPathPrefix = globals.outputPathPrefix || "";
       const pagesByUuid = globals.pagesByUuid || new Map();
@@ -88,7 +86,7 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
       // richtext-only item must load the item map too, not just menu/link items.
       if (schemaHasMenuSetting(schema) || schemaHasLinkSetting(schema) || schemaHasRichtextSetting(schema)) {
         if (!globals.collectionItemsByUuid) {
-          globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope);
+          globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope, reader);
         }
         menuDeps = {
           menuMaps: globals.menuMaps || { byUuid: new Map(), bySlug: new Map() },
@@ -145,9 +143,10 @@ function makeCollectionItemsLoaderFactory({ storage, scope }) {
  * @param {{ storage: object, scope: object }} collectionDeps
  * @returns {{ buildCollectionItemsLoader: Function, getCollectionSchemas: Function, loadCollectionItemsByUuid: Function }}
  */
-function buildCollectionRenderDeps({ storage, scope }) {
+function buildCollectionRenderDeps({ storage, scope, snapshot = null }) {
+  const reader = createCollectionReader({ storage, scope, snapshot });
   return {
-    buildCollectionItemsLoader: makeCollectionItemsLoaderFactory({ storage, scope }),
+    buildCollectionItemsLoader: makeCollectionItemsLoaderFactory({ storage, scope, reader }),
     // Schema enumeration for the export item-page pass (and any caller that needs
     // to know which collections declare item pages). Scope-aware, adapter-backed.
     getCollectionSchemas: () => listCollectionSchemas(storage, scope),
@@ -155,7 +154,9 @@ function buildCollectionRenderDeps({ storage, scope }) {
     // target a collection item (collectionItemUuid) resolve to its current page
     // URL at render time (#11 parity with pageUuid). The engine calls this lazily
     // and caches the result per render; non-collection callers leave it unset.
-    loadCollectionItemsByUuid: () => loadCollectionItemsByUuid(storage, scope),
+    loadCollectionItemsByUuid: () => loadCollectionItemsByUuid(storage, scope, reader),
+    countCollectionItems: async (collectionType) =>
+      ((await reader.read(collectionType))?.items || []).filter((item) => !item.invalid).length,
   };
 }
 
@@ -217,6 +218,12 @@ async function renderPageLayout(
   return engineRenderPageLayout(deps, contentSections, pageData, rawThemeSettings, renderMode, sharedGlobals);
 }
 
+async function planPagination(projectId, widgets, widgetsOrder, options, collectionDeps = null) {
+  if (!collectionDeps) return null;
+  const deps = await buildRenderDeps(projectId, collectionDeps);
+  return enginePlanPagination(deps, widgets, widgetsOrder, options);
+}
+
 async function widgetSupportsTransparentHeader(projectId, widgetType) {
   try {
     const deps = await buildRenderDeps(projectId);
@@ -267,6 +274,7 @@ export {
   renderCollectionItemPageWithDeps,
   renderEnqueuedAssetTags,
   widgetSupportsTransparentHeader,
+  planPagination,
   buildRenderDeps,
   buildCollectionRenderDeps,
 };
