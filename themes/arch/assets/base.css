@@ -3005,3 +3005,47 @@ b {
 .transparent-header .breadcrumbs-link:focus-visible {
   color: var(--colors-highlight_text_heading, #fff);
 }
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.pagination {
+  margin-block-start: calc(var(--space-xl) * var(--spacing-scale));
+}
+
+.pagination-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pagination-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4rem;
+  min-height: 4rem;
+  padding-inline: var(--space-sm);
+  font-size: calc(var(--font-size-sm) * var(--body-scale));
+  color: var(--text-content);
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--radius-button);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+a.pagination-link:hover,
+a.pagination-link:focus-visible {
+  border-color: var(--accent);
+}
+
+.pagination-link.is-current {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}

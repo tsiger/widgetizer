@@ -267,6 +267,8 @@
           {% endfor %}
         </ul>
 
+        {% if pagination %}{% render 'pagination', pagination: pagination %}{% endif %}
+
         {% if show_view_all and view_all_in_header == false %}
           <div class="widget-actions grid-view-all reveal reveal-up">{{ view_all_button | raw }}</div>
         {% endif %}

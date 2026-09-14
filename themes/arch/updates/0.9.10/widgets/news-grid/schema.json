@@ -1,6 +1,6 @@
 {
   "type": "news-grid",
-  "collection": { "type": "news" },
+  "collection": { "type": "news", "perPageSetting": "limit" },
   "displayName": "tTheme:news_grid.name",
   "aliases": ["blog", "articles", "latest news", "posts", "news", "press"],
   "settings": [

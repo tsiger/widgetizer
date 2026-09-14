@@ -1,0 +1,19 @@
+<nav class="pagination" aria-label="Pagination">
+  <ul class="pagination-list">
+    {%- if pagination.prevHref -%}
+      <li><a class="pagination-link pagination-step" href="{{ pagination.prevHref }}" rel="prev">Previous</a></li>
+    {%- endif -%}
+    {%- for entry in pagination.pages -%}
+      <li>
+        {%- if entry.current -%}
+          <span class="pagination-link is-current" aria-current="page">{{ entry.number }}</span>
+        {%- else -%}
+          <a class="pagination-link" href="{{ entry.href }}">{{ entry.number }}</a>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+    {%- if pagination.nextHref -%}
+      <li><a class="pagination-link pagination-step" href="{{ pagination.nextHref }}" rel="next">Next</a></li>
+    {%- endif -%}
+  </ul>
+</nav>

@@ -1,6 +1,6 @@
 {
   "type": "projects-grid",
-  "collection": { "type": "projects" },
+  "collection": { "type": "projects", "perPageSetting": "limit" },
   "displayName": "tTheme:projects_grid.name",
   "aliases": ["portfolio", "work", "case studies", "projects", "showcase"],
   "settings": [
