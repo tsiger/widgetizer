@@ -63,6 +63,7 @@ _None open._
 - [⬜ 70. Widget assets enqueued with a sub-path (`vendor/lib.js`) render a nested URL but are flattened to `assets/<basename>` on export (`builder-server` / `core`) — low](#-70-widget-assets-enqueued-with-a-sub-path-vendorlibjs-render-a-nested-url-but-are-flattened-to-assetsbasename-on-export-builder-server--core--low)
 - [⬜ 71. Navigation-guard tests mock `useBlocker` — router state transitions and the answer-dropping race are unpinned (`editor-ui`) — low (test depth)](#-71-navigation-guard-tests-mock-useblocker--router-state-transitions-and-the-answer-dropping-race-are-unpinned-editor-ui--low-test-depth)
 - [⬜ 72. Theme update zips cannot carry a bumped base version, so an author who bumps `theme.json` breaks every existing install (`builder-server`) — low (author UX) — needs a decision](#-72-theme-update-zips-cannot-carry-a-bumped-base-version-so-an-author-who-bumps-themejson-breaks-every-existing-install-builder-server--low-author-ux--needs-a-decision)
+- [⬜ 73. The seo tag has no title separator option (`core`) — low (theme author option)](#-73-the-seo-tag-has-no-title-separator-option-core--low-theme-author-option)
 - [⬜ 64. Editor error feedback is toast-only, and several failure states render actively misleading UI (`editor-ui`) — low (UX robustness) — investigate](#-64-editor-error-feedback-is-toast-only-and-several-failure-states-render-actively-misleading-ui-editor-ui--low-ux-robustness--investigate)
 - [⬜ 65. Raw `.html` internal hrefs under Clean URLs — user-typed links, theme Liquid, schema defaults (`core` / `render-engine` / themes) — low](#-65-raw-html-internal-hrefs-under-clean-urls--user-typed-links-theme-liquid-schema-defaults-core--render-engine--themes--low)
 
@@ -1174,6 +1175,12 @@ existing install would need, with a message that says which version is missing.
 Raised 2026-09-12 alongside the newer-than-base layering fix (`4630d8f5`), which made the
 fixed-base workflow correct but left this shape unsupported. Author-facing rules are documented in
 `docs-website/src/theme-dev-distribution.md`.
+
+## ⬜ 73. The seo tag has no title separator option (`core`) — low (theme author option)
+
+**Priority:** Low
+
+`{% seo %}` (`packages/core/src/tags/SeoTag.js`) joins the page title, the page number on a paginated copy and the site title with a hardcoded ` - ` (`News - 2 - Site`), and `buildPageTitle` in `packages/render-engine/src/renderEngine.js` builds the layout's `page_title` the same way. A theme cannot choose `–`, `|` or `·`. Collection pagination kept the hyphen for consistency rather than add a contract mid-stage. Fix: an optional separator param on the tag (e.g. `{% seo separator: ' | ' %}`), escaped like the rest of the tag's output and applied in both places so `<title>` and `page_title` never disagree. Raised 2026-09-14.
 
 ## Completed — reference table
 

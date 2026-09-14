@@ -108,7 +108,7 @@ Because autoescaping is on globally, richtext **must** be rendered with the `raw
 {% endunless %}
 ```
 
-See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter) for the full rules and the `rte_text` / `rte_blank` helpers.
+See [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#escaping-model) for the full rules and the `rte_text` / `rte_blank` helpers.
 
 **`code`:** Code editor with syntax highlighting.
 

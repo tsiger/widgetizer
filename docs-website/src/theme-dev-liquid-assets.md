@@ -148,7 +148,7 @@ string for a missing slug (or a missing prefix), and behave identically inside a
 
 Use them only for links your theme invents. Menu items, `link` settings, and richtext links
 arrive already resolved to the right shape — emit those as-is — and a raw URL typed by the
-user goes through [`safe_url`](#safe_url) instead.
+user goes through [`safe_url`](#safe-url) instead.
 
 ## `format_date`
 
@@ -217,6 +217,10 @@ Supported options:
 | `limit` | Maximum number of items to return |
 | `offset` | Number of items to skip before returning results |
 | `sort` | Sort mode, such as date-based modes used by collection templates |
+
+On a page split into pages, Widgetizer sets `offset` and `limit` itself for the splitting
+widget's collection, so keep passing your normal `limit` and never compute offsets. See
+[Splitting a List into Pages](theme-dev-widgets-blocks.html).
 
 See [Collections](theme-dev-collections.html) for collection type schemas, item templates, and item-page behavior.
 
@@ -472,6 +476,7 @@ Title behavior:
 - `seo.title` is used when present.
 - Otherwise `page.name` is used.
 - When `project.siteTitle` exists, the final `<title>` becomes `Page title - Site title`.
+- On page 2 and later of a page split into pages, the number joins the title: `Page title - 2 - Site title`.
 
 Canonical behavior:
 
@@ -479,6 +484,7 @@ Canonical behavior:
 - Otherwise the tag uses `project.siteUrl` plus the page slug.
 - `index` and `home` slugs canonicalize to the site root.
 - If `project.siteUrl` is missing or invalid, no canonical tag is emitted.
+- On page 2 and later of a page split into pages, the canonical is that page's own address (`seo.canonical_url` applies to page 1 only), and `rel="prev"` / `rel="next"` links point at the neighbouring pages. Those need a site URL too.
 
 Open Graph image behavior:
 
@@ -754,12 +760,13 @@ it in the layout or inside your header widget, whichever suits the design.
 | `class_nav`, `class_list`, `class_item`, `class_link`, `class_current` | Classes for each element |
 | `separator` | Text between crumbs. Most themes draw one in CSS instead |
 | `home_label` | Replaces the first crumb's label |
+| `page_label` | Word before the number on page 2 and later of a page split into pages (default "Page") |
 | `aria_label` | Accessible name for the nav (default "Breadcrumb") |
 | `show_home` | Set `false` to drop the first crumb |
 
 It emits `<nav aria-label><ol><li>`, marks the last crumb with `aria-current="page"`,
 and renders **nothing at all** when the trail is empty — which is the case on the
-homepage, so you do not need to guard the call.
+homepage (its page 2 and later show `Home › Page 2`), so you do not need to guard the call.
 
 Prefer your own markup? Loop the array:
 
@@ -774,7 +781,9 @@ Prefer your own markup? Loop the array:
 ```
 
 Each entry has `label`, `href`, `canonicalPath` (the un-prefixed `.html` path, handy
-for matching), `current` and `home`.
+for matching), `current` and `home`. On page 2 and later of a page split into pages, the
+trail ends with one more crumb for the page number (it carries `pageNumber`), and the page's
+own crumb links back to page 1.
 
 **Where the trail comes from.** For a page, the parent page its owner picked in Page
 settings — with no parent it is simply `Home › page`. For a collection item, the page

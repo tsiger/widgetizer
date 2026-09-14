@@ -34,6 +34,7 @@ The filename is automatically generated from your page name, but you can edit it
 **Special filenames:**
 
 - **`index`**: This is your homepage. It exports to `index.html`, the file web servers load by default for your domain.
+- **`page`**: Reserved. Widgetizer uses a `page` folder for page 2, 3 and so on of long lists, so the editor asks you to choose a different filename.
 
 > **Important:** Every project needs a page with the filename `index`. It becomes your homepage, and the site can't be exported without one. If you don't have an `index` page yet, create one or rename an existing page to `index`.
 
@@ -134,6 +135,34 @@ one. Open the page you consider the collection's home, select the listing widget
 the editor, and tick **"Main News page"** (the name matches your collection). Only
 one page per collection can be the main one — ticking it somewhere else moves it, and
 Widgetizer tells you which page it moved from.
+
+### Splitting a long list into pages
+
+A list like News can grow long. Select the listing widget in the editor and tick
+**"Split into pages"**. The widget's number of items to show becomes **items per page**,
+and page links appear under the list.
+
+When you export, the page is published once for every page of items. For a News page,
+`news.html` shows the first items, `news/page/2.html` the next ones, and so on. Everything
+else on the page — header, text, other widgets, footer — repeats on each. If all items fit
+on one page, nothing extra is created.
+
+A few rules keep it simple:
+
+- Only one list per page can be split. If you tick a second one, Widgetizer tells you which
+  list already is.
+- Splitting a list makes its page the collection's main page (see above). If another page
+  was the main page, its list stops being split.
+- While a list is split, it shows at least 1 item per page.
+- Duplicating or pasting a split list, or duplicating its page, gives you a copy that isn't
+  split.
+- Pages 2 and later get their own title (`News - 2 - Your Site`), appear in `sitemap.xml`,
+  and follow the page's search engine indexing setting. With breadcrumbs on, they show
+  `Home › News › Page 2`.
+- In Site preview, the page links work, so you can click through every page.
+
+How the page links look is up to your theme. Arch shows numbered buttons with Previous and
+Next.
 
 # Deleting Pages
 

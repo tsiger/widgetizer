@@ -49,7 +49,7 @@ Menus can return in a later version if real sites ask for it. Nothing in the con
 
 ### Home
 
-The page whose slug satisfies `isHomeSlug` (`index` / `home`) — the rule canonicals, the sitemap and the header logo already use. Its href comes from `pageHref("index", …)`, so it is `./`, `../` or `index.html` as depth and Clean URLs dictate. **Label:** the page's name, overridable by the theme through the snippet's `home_label` (multilang later supplies the per-language word there). The homepage itself has an **empty trail**.
+The page whose slug satisfies `isHomeSlug` (`index` / `home`) — the rule canonicals, the sitemap and the header logo already use. Its href comes from `pageHref("index", …)`, so it is `./`, `../` or `index.html` as depth and Clean URLs dictate. **Label:** the page's name, overridable by the theme through the snippet's `home_label` (multilang later supplies the per-language word there). The homepage itself has an **empty trail** — on its first page; its paginated copies (`page/2.html` on) show `Home → Page 2`.
 
 ### Rules that apply everywhere
 
@@ -63,7 +63,7 @@ The page whose slug satisfies `isHomeSlug` (`index` / `home`) — the rule canon
 
 ## The contract — `breadcrumbs`
 
-An array, in order from Home to the current page; empty on the homepage. Available as `page.breadcrumbs` in the layout context and as `globals.breadcrumbs` inside every widget (header and footer included — they already receive the current page path the same way). Frozen once a theme ships against it.
+An array, in order from Home to the current page; empty on the homepage's first page. Available as `page.breadcrumbs` in the layout context and as `globals.breadcrumbs` inside every widget (header and footer included — they already receive the current page path the same way). Frozen once a theme ships against it.
 
 | field | meaning |
 |---|---|
@@ -72,6 +72,9 @@ An array, in order from Home to the current page; empty on the homepage. Availab
 | `canonicalPath` | un-prefixed `.html` path of the target (`about.html`, `news/story.html`); `null` when unlinkable |
 | `current` | `true` on the last entry |
 | `home` | `true` on the first entry |
+| `pageNumber` | added by pagination (stage 2): only on the extra last crumb of page 2+ of a paginated page |
+
+On those copies the page's own crumb stops being current and links to page 1; the numbered crumb's `label` is the number, and the core snippet prefixes it with `page_label` (default "Page").
 
 Structured data (stage 3) builds `BreadcrumbList` from this same array — the visible trail and the JSON-LD can never disagree.
 
@@ -85,7 +88,7 @@ Structured data (stage 3) builds `BreadcrumbList` from this same array — the v
 {% render 'breadcrumbs', class_nav: 'site-breadcrumbs', class_link: 'crumb', home_label: 'Home' %}
 ```
 
-Params: `class_nav`, `class_list`, `class_item`, `class_link`, `class_current`, `separator` (text; default none — themes usually draw it with CSS), `home_label`, `aria_label` (default "Breadcrumb"), `show_home` (default true). Output: `<nav aria-label><ol><li><a href aria-current="page">`, and nothing at all when the trail is empty. Themes that want their own markup loop `page.breadcrumbs` / `globals.breadcrumbs` directly.
+Params: `class_nav`, `class_list`, `class_item`, `class_link`, `class_current`, `separator` (text; default none — themes usually draw it with CSS), `home_label`, `page_label` (default "Page", added by pagination), `aria_label` (default "Breadcrumb"), `show_home` (default true). Output: `<nav aria-label><ol><li><a href aria-current="page">`, and nothing at all when the trail is empty. Themes that want their own markup loop `page.breadcrumbs` / `globals.breadcrumbs` directly.
 
 The snippet reads the trail off the globals bag, so it must tolerate `{% render %}` scope isolation the way `page_url` and `collection` do — read the environment first, fall back to `context.globals`.
 

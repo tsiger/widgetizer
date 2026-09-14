@@ -1,6 +1,21 @@
 # Future: Collection Pagination
 
-> **Status: direction locked 2026-09-09, detailed design in this doc.** Pagination is stage 2 of the series in `future-roadmap.md` — groundwork (page-link filter, Site URL helper) → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename — and deliberately lands groundwork the later stages need. The shared groundwork steps, with files and done-when criteria, are Phase 0 of `future-multilang-implementation-plan.md`. Design vocabulary follows `future-multilang-design.md`.
+> **Status: shipped 2026-09-14 on branch `0.9.10`; direction locked 2026-09-09.** Where the build departs from the design below, §What changed wins. Pagination is stage 2 of the series in `future-roadmap.md` — groundwork (page-link filter, Site URL helper) → breadcrumbs → pagination → structured data → multilang → undo-history fix → rename — and deliberately lands groundwork the later stages need. The shared groundwork steps, with files and done-when criteria, are Phase 0 of `future-multilang-implementation-plan.md`. Design vocabulary follows `future-multilang-design.md`.
+
+---
+
+## What changed during the build and review (2026-09-14)
+
+- **Collection prefix `page` stays allowed.** Reserving it made existing collections disappear from discovery. Instead the export refuses (`400`) when the homepage paginates and a `hasItemPages` collection publishes under `page/` — both would write into the same folder.
+- **Preview route is `/preview/paged/:pageId/:pageNumber`**, not a `/page/<n>` suffix on the page route (see §5).
+- **`pageHref` was not extended.** Paged links come from `pagedHref` in `packages/core/src/utils/contentAddress.js`, beside `pageOutputPath`, `publicPath`, `parsePagedPath` and `pagedPreviewPath`. A `home` slug links page 1 as `index`.
+- **The internal plan is `sharedGlobals.paginationPlan`.** Render globals are visible to Liquid, so naming it `pagination` would put a pager object in every widget. Only the paginating widget's context gets `pagination`.
+- **Copies keep the base page's `currentCanonicalPath`**, so menu active state matches page 1. From page 2 the breadcrumb trail ends `Home › Blog › Page 2`, with Blog linking to page 1; the word comes from the breadcrumbs snippet's `page_label`.
+- **Server rules** (`enforcePaginationRules`, run by both page save and page update): items per page must resolve to a whole number ≥ 1; `paginate` on a widget whose schema cannot paginate (or is malformed) is switched off; two paginating widgets → `422`; paginating forces the anchor, and losing the anchor turns `paginate` off on that page. Duplicating a page or widget, and pasting a widget, clear both flags.
+- **One collection snapshot per export and per page or widget preview request** (`createCollectionReader`), shared by validation, sitemap inputs, item links, item pages, listings and page counts. The collection item preview does not use one yet. Sorts are total — ties fall back to newest `created`, then `uuid` — so exact ties may reorder once in existing exports.
+- **No markdown for copies.** Only page 1 gets a `.md` file and the alternate link.
+- **Title suffix uses the existing separator:** `Blog - 2 - Site`.
+- **The pager lists every page number.** Arch's pager text (Previous, Next) is English, like its other small interface text.
 
 ---
 
@@ -34,13 +49,13 @@ A collection listing stays what it is today — a widget the user drops on any p
 
 - The segment is the literal word **`page`**: `blog/page/2`. `blog/2` would collide with item slugs when a collection shares the prefix, and `page` is the convention visitors and crawlers already know.
 - **Clean URLs applies as everywhere else:** `blog/page/2.html` on disk in both modes; links and SEO URLs emit `/blog/page/2` when the setting is on. Pager links go through the same helper as every other internal link (`pageHref` in `packages/core/src/utils/internalHref.js`, extended with a page number), never hand-built by a theme.
-- **`page` becomes a reserved name:** no page may be slugged `page` (in any folder — a language folder's homepage will use `<lang>/page/2` later), and no collection item may be slugged `page` (it would sit at `<prefix>/page` next to `<prefix>/page/2`). Same mechanism as the existing `index` reservation for items; pages get the equivalent check.
+- **`page` becomes a reserved name:** no page may be slugged `page` (in any folder — a language folder's homepage will use `<lang>/page/2` later), and no collection item may be slugged `page` (it would sit at `<prefix>/page` next to `<prefix>/page/2`). Same mechanism as the existing `index` reservation for items; pages get the equivalent check. A collection `slugPrefix` of `page` is not reserved (see §What changed).
 - Later, multilang puts the language folder in front and nothing else changes: `el/blog/page/2`.
 
 ### 3. SEO
 
-- Every copy has its **own self-referencing canonical**. Pages 2+ are distinct pages, not duplicates of page 1.
-- `<title>` gets a **number-only suffix** on pages 2+ (`Blog – 2 – Site`), deliberately language-free so it needs no translation later. Visible pager copy ("Next", "Previous") is the theme's, rendered from the pager data.
+- Every copy has its **own self-referencing canonical**. Pages 2+ are distinct pages, not duplicates of page 1. A custom `canonical_url` applies to page 1 only.
+- `<title>` gets a **number-only suffix** on pages 2+ (`Blog - 2 - Site`), deliberately language-free so it needs no translation later. Visible pager copy ("Next", "Previous") is the theme's, rendered from the pager data.
 - `rel="prev"` / `rel="next"` are emitted. Search engines mostly ignore them now; they are harmless and cheap.
 - **Pages 2+ go in the sitemap.** They are real, indexable pages.
 - **`noindex` is inherited** from the hosting page's SEO settings; the copies never get their own SEO panel.
@@ -63,7 +78,7 @@ The theme renders the pager from this (an Arch snippet shared by every listing w
 ### 5. Preview and editor
 
 - The editor canvas always edits page 1; the pager is visible and selectable there like any element. The preview panel is **navigable**: clicking a pager number renders that slice of the same page.
-- The preview request carries the page number; the in-iframe link mapper recognises the `/page/<n>` suffix on an internal link and maps it back to "this page, slice n". Preview routes keep their shape — no new namespace.
+- The preview request carries the page number. The in-iframe link mapper recognises a `…/page/<n>` link and opens `/preview/paged/<page>/<n>`. It needs its own route: `/preview/<page>/page/<n>` has the same shape as `/preview/collection/<prefix>/<slug>`, so a page named `collection` would collide with a collection published under `page/`. A root `page/<n>` link opens the collection item instead when a collection uses the `page` prefix; the preview runtime is told the item-page prefixes.
 
 ### 6. Forms and media on a paginated page
 
@@ -79,11 +94,13 @@ Pagination lands the pieces multilang needs regardless. Do them here, in this sh
 1. **Derived output depth.** `blog/page/2.html` is two levels deep; the exporter's literal `outputPathPrefix: "../"` cannot express it. Derive the prefix from the final output path (multilang plan, step 4).
 2. **The addressing layer starts here.** A `contentAddress` module in `@widgetizer/core` owns output paths (`pageOutputPath`, `pagedOutputPath`), public paths under both Clean URLs shapes, the preview mapping for a paged link, and the reserved-name checks. Multilang later adds the language dimension to the same functions (multilang plan, step 6) — nothing here should assume a root folder.
 3. **Links never hand-built.** Pager hrefs come from the same helper as menu and richtext links. This is also why the page-link filter (stage 0 of the series) lands first: the theme has one way to link to a page, and the pager uses it.
-4. **Counting without loading twice.** The exporter asks the collection loader for the sorted item count once per paginating widget (sort applied, no limit), computes `total`, then renders copies with `offset`. The loader's sort tie-break is part of the contract.
+4. **Counting without loading twice.** The exporter asks the collection loader for the sorted item count once per paginating widget (sort applied, no limit), computes `total`, then renders copies with `offset`. The loader's sort tie-break is part of the contract. Shipped as one collection snapshot per export, shared by every consumer.
 
 ---
 
 ## Build steps (stage 2 of the series)
+
+All nine shipped 2026-09-14. The depth-2 export test landed with step 7, once copies existed.
 
 Each step ships green (`npm test`, `npm run test:frontend`, `npm run lint:all`) and leaves a project without paginating widgets byte-identical on export.
 
@@ -101,5 +118,4 @@ Each step ships green (`npm test`, `npm run test:frontend`, `npm run lint:all`) 
 
 ## Open questions
 
-- Whether a pager needs first/last shortcuts or a windowed page list for very large collections (theme concern; the object already carries every page).
-- Whether the homepage should be allowed to paginate at all, or whether `page/2` at the site root reads wrongly. Allowed for now; revisit if it confuses users.
+Both resolved 2026-09-14: Arch's pager lists every page (no windowed list; the object carries every page, so a theme can still window it), and the homepage may paginate (`page/2.html` at the root).

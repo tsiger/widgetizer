@@ -73,7 +73,7 @@ Pull items into any widget or template with the `collection` filter. Pass the ty
 {% assign posts = 'news' | collection: limit: 6, sort: 'date_desc' %}
 ```
 
-**Options:** `limit` (use `0` for all items), `offset`, and `sort` (any of the `defaultSort` values).
+**Options:** `limit` (use `0` for all items), `offset`, and `sort` (any of the `defaultSort` values). A listing widget can also let site owners split its page into pages — see [Splitting a List into Pages](theme-dev-widgets-blocks.html).
 
 Each returned item has this shape:
 
@@ -157,7 +157,7 @@ A few things happen automatically for item pages:
 - **They render inside your `layout.liquid`:** header, `main_content`, and footer wrap the template, just like a regular page.
 - **SEO is wired for you.** Title, description, Open Graph, and canonical tags come from the item; you don't add SEO markup in `template.liquid`.
 - **Links are depth-aware.** Item pages live one directory deep, so internal links and assets are prefixed with `../` during export. Use the `{% image %}` tag and `item.url` / menu links and it's handled; don't hand-build `/uploads/...` paths.
-- **Richtext is escaped by default.** Render `richtext` fields with `| raw` (see [Autoescaping](theme-dev-liquid-assets.html#autoescaping-the-raw-filter)). Embedded images and internal links inside richtext resolve automatically.
+- **Richtext is escaped by default.** Render `richtext` fields with `| raw` (see [Autoescaping](theme-dev-liquid-assets.html#escaping-model)). Embedded images and internal links inside richtext resolve automatically.
 
 # Where Item Data Lives
 

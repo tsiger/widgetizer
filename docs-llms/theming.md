@@ -391,6 +391,10 @@ Contains data from the current page's JSON file:
 {{ page.seo.og_image }}      <!-- Social media image path -->
 {{ page.seo.robots }}        <!-- Robots directive -->
 {{ page.seo.canonical_url }} <!-- Canonical URL -->
+
+<!-- Added by core at render time -->
+{{ page.breadcrumbs }}       <!-- Breadcrumb trail (see §Breadcrumbs) -->
+{{ page.pagination }}        <!-- Only on a page split into pages: current, total, prevHref, nextHref, pages -->
 ```
 
 #### Project Object (`{{ project.* }}`)
@@ -475,7 +479,7 @@ Core builds one breadcrumb trail per rendered page and hands it to the layout as
 {% render 'breadcrumbs', class_nav: 'site-breadcrumbs', class_link: 'crumb', home_label: 'Home' %}
 ```
 
-Params: `class_nav`, `class_list`, `class_item`, `class_link`, `class_current`, `separator` (text between crumbs; most themes draw one in CSS instead), `home_label`, `aria_label` (default "Breadcrumb"), `show_home` (default true). It emits `<nav aria-label><ol><li>` with `aria-current="page"` on the last crumb, and **nothing at all** when the trail is empty — which is the case on the homepage.
+Params: `class_nav`, `class_list`, `class_item`, `class_link`, `class_current`, `separator` (text between crumbs; most themes draw one in CSS instead), `home_label`, `page_label` (default "Page" — the word before the number on page 2+ of a paginated page), `aria_label` (default "Breadcrumb"), `show_home` (default true). It emits `<nav aria-label><ol><li>` with `aria-current="page"` on the last crumb, and **nothing at all** when the trail is empty — which is the case on the homepage's first page (its page 2 and later show `Home › Page 2`).
 
 Each entry carries:
 
@@ -486,6 +490,7 @@ Each entry carries:
 | `canonicalPath` | un-prefixed `.html` path of the target (`about.html`, `news/story.html`) |
 | `current` | `true` on the last entry |
 | `home` | `true` on the first entry |
+| `pageNumber` | only on page 2+ of a paginated page, on the extra last crumb; its `label` is the number |
 
 Loop it directly if you want your own markup:
 
@@ -495,7 +500,7 @@ Loop it directly if you want your own markup:
 {% endfor %}
 ```
 
-**Where the hierarchy comes from.** A page's trail follows the parent page the user set in Page settings, and is `Home › page` when none is set — that is the normal shape, not a fallback to apologise for. A collection item hangs under the page whose listing widget is marked as that collection's main page, or under the single page that lists it. Nothing is inferred from menus or from the URL, so reordering navigation never changes a trail.
+**Where the hierarchy comes from.** A page's trail follows the parent page the user set in Page settings, and is `Home › page` when none is set — that is the normal shape, not a fallback to apologise for. A collection item hangs under the page whose listing widget is marked as that collection's main page, or under the single page that lists it. Nothing is inferred from menus or from the URL, so reordering navigation never changes a trail. On page 2 and later of a page split into pages, the page's own crumb links back to page 1 and the trail ends with a numbered crumb (`Home › Blog › Page 2`).
 
 For an item trail to work at all, the listing widget's schema must declare what it lists — see [Widget Schema](theming-widgets.md).
 
@@ -1013,7 +1018,7 @@ Beyond `type`, `displayName`, `settings`, `blocks`, and `defaultBlocks`, widget 
 | `aliases` | `string[]` | Alternative names/keywords for the widget selector search |
 | `maxBlocks` | `number` | Maximum number of blocks the widget can contain |
 | `supportsTransparentHeader` | `boolean` | When `true`, the header becomes transparent when this widget is first on a page and the header's "Transparent on hero" setting is enabled |
-| `collection` | `object` | Declares which collection a listing widget shows: `{ "type": "news" }` |
+| `collection` | `object` | Declares which collection a listing widget shows, and optionally which setting holds items per page: `{ "type": "news", "perPageSetting": "limit" }` |
 
 **The `collection` declaration.** A widget that lists collection items names the
 collection inside its template (`{% assign items = 'news' | collection %}`), which
@@ -1028,12 +1033,43 @@ lets the editor and the engine know:
 }
 ```
 
-Two things use it today. Breadcrumbs finds an item's parent page by looking for
+Several things use it. Breadcrumbs finds an item's parent page by looking for
 the page carrying a widget that lists that collection. And the editor shows a
 **"Main {collection} page"** checkbox on such a widget — the `listing_anchor`
 setting — which marks its page as that collection's home when more than one page
 lists it. Only one page per collection can hold it; saving a page that claims it
 clears it elsewhere.
+
+**Pagination.** Add `perPageSetting` — the id of the widget's own number setting for how many items to show — and the editor also offers a **"Split into pages"** checkbox on that widget:
+
+```json
+"collection": { "type": "news", "perPageSetting": "limit" }
+```
+
+With it on, export writes the whole page once per slice (`news.html`, `news/page/2.html`, …; `page/2.html` for the homepage) and the setting becomes items per page. The template does not change how it asks for items — Widgetizer applies the offset and limit to that widget's `| collection` call. It only has to draw the pager from `pagination`, which exists solely in the splitting widget's context (and as `page.pagination` in the layout):
+
+| field | meaning |
+|---|---|
+| `current` | page being shown, from 1 |
+| `total` | number of pages (always 2 or more when present) |
+| `perPage` | items per page |
+| `totalItems` | items in the collection |
+| `prevHref` / `nextHref` | links to the neighbouring pages, `null` at the ends |
+| `pages` | every page as `{ number, href, current }` |
+
+```liquid
+{% if pagination %}
+  <nav aria-label="Pagination">
+    {% if pagination.prevHref %}<a href="{{ pagination.prevHref }}" rel="prev">Previous</a>{% endif %}
+    {% for entry in pagination.pages %}
+      {% if entry.current %}<span aria-current="page">{{ entry.number }}</span>{% else %}<a href="{{ entry.href }}">{{ entry.number }}</a>{% endif %}
+    {% endfor %}
+    {% if pagination.nextHref %}<a href="{{ pagination.nextHref }}" rel="next">Next</a>{% endif %}
+  </nav>
+{% endif %}
+```
+
+Every href is already depth- and Clean-URLs-aware. When the collection fits on one page there is no `pagination` and nothing extra is written. Arch keeps this markup in `snippets/pagination.liquid`, rendered by its three grids. See [Collections §5b](core-collections.md) for the rules the editor and server enforce.
 
 Nothing needs declaring for a widget that does not list a collection.
 

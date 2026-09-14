@@ -952,6 +952,51 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] COLL-033 - Duplicate a page that is a collection's main page.
   Expected: The copy is not marked as the main page; the original still is.
 
+- [ ] COLL-034 - Select a News Grid in the page editor, then a widget that does not list a collection.
+  Expected: The grid shows "Split into pages" just above "Main News page"; the other widget shows neither.
+
+- [ ] COLL-035 - On a grid with fewer items than the collection holds, tick "Split into pages".
+  Expected: Page links appear under the list in the editor and "Main News page" ticks itself. If items to show was 0, it becomes 12.
+
+- [ ] COLL-036 - With "Split into pages" on, try to set items to show to 0.
+  Expected: It becomes 1. With the split off, 0 is allowed again.
+
+- [ ] COLL-037 - Add a second grid to the same page and tick "Split into pages" on it.
+  Expected: An error names the grid that is already split; the second grid stays unsplit.
+
+- [ ] COLL-038 - Split a grid on one page and save, then split a grid for the same collection on another page and save.
+  Expected: A message says the main page moved. Reopening the first page shows both checkboxes unticked.
+
+- [ ] COLL-039 - Duplicate a split grid, copy and paste it, and duplicate the whole page.
+  Expected: Every copy has "Split into pages" and "Main News page" off; the original keeps both.
+
+- [ ] COLL-040 - Open Site preview on the split page and click 2, Next and Previous, then a menu link and back.
+  Expected: Each page shows the next items, the active menu item stays on the page, and with breadcrumbs on page 2 shows Home > News > Page 2, where News goes back to page 1.
+
+- [ ] COLL-041 - Export with Clean URLs off and open the files from disk.
+  Expected: `news.html`, `news/page/2.html`, … exist, with no `news/page/1.html`. On every page the page links, breadcrumbs, logo, article links and images all work.
+
+- [ ] COLL-042 - Repeat COLL-041 with Clean URLs on, served from a host or local server.
+  Expected: Same pages, addresses without .html.
+
+- [ ] COLL-043 - With a Site URL set, export and view the source of page 2.
+  Expected: The title reads "News - 2 - Site title", the canonical points at page 2, prev and next links are present, and `sitemap.xml` lists pages 2 onwards.
+
+- [ ] COLL-044 - Set items per page to at least the number of items and export.
+  Expected: No page links and no `news/page` folder.
+
+- [ ] COLL-045 - Split a grid on the homepage and export.
+  Expected: `page/2.html` sits at the top of the export, and its links back to the homepage work.
+
+- [ ] COLL-046 - Try to name a new page "page", rename a page to "page", and name a News item "page".
+  Expected: Each is refused with a "reserved" message.
+
+- [ ] COLL-047 - Name a page "collection", split a grid on it, and open its page 2 in Site preview.
+  Expected: Its own page 2 opens, not an error.
+
+- [ ] COLL-048 - Apply the Arch 0.9.10 theme update to a project on 0.9.9, then reload the editor tab.
+  Expected: The News, Projects and Services grids offer "Split into pages".
+
 ---
 
 ## 10. Menus

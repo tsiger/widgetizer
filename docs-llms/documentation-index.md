@@ -458,13 +458,13 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[future-pagination-design.md](future-pagination-design.md)** - Future: Collection Pagination
 
-**Purpose**: Locked design for paginating collection listings as copies of the hosting page (`blog.html`, `blog/page/2.html`) — rejected alternatives, the one-switch authoring model, URL shape under both Clean URLs modes, SEO rules, the frozen `pagination` theme contract, and the ordered build steps **When to use**:
+**Purpose**: Design, shipped 2026-09-14, for paginating collection listings as copies of the hosting page (`blog.html`, `blog/page/2.html`) — what changed during the build, rejected alternatives, the one-switch authoring model, URL shape under both Clean URLs modes, SEO rules, the frozen `pagination` theme contract, and the build steps **When to use**:
 
 - Implementing or reviewing collection pagination
 - Checking which pagination approaches were rejected (theme listing pages, client-side load-more) and why
 - Understanding what pagination lands for multilang (derived output depth, the addressing layer, the `page` reserved name)
 
-**Key topics**: Paginate switch + items per page, one paginating widget per page, `page/<n>` URL segment, `page` reserved slug, self-canonical + number-only title suffix + sitemap inclusion, `pagination` render object, exporter renders one copy per slice, preview page number
+**Key topics**: Paginate switch + items per page, one paginating widget per page, `page/<n>` URL segment, `page` reserved slug, self-canonical + number-only title suffix + sitemap inclusion, `pagination` render object, exporter renders one copy per slice, `/preview/paged/` route, homepage vs `page/` collection clash, one collection snapshot per export
 
 ---
 
@@ -506,7 +506,6 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## ✅ Project Tracking
 
-- **[TODO.md](TODO.md)** — Living task/issue tracker for in-flight work; not a reference doc.
 - **[user-test-checklist.md](user-test-checklist.md)** — Standalone manual user-test checklist (no codebase knowledge assumed): IDs/actions/expected results, test pack/setup, and run waves for confirming create/edit/preview/export/backup/import/update/delete flows.
 
 ---

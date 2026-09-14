@@ -21,6 +21,7 @@ Theme development relies on a shared set of data objects. Some are available eve
 - `theme`
 - `widget`
 - `block` (inside block loops)
+- `pagination` (only in the widget that splits its page into pages)
 
 ### Available in collection item templates
 
@@ -83,6 +84,23 @@ Example loop:
 
 For schema structure and block patterns, see [Widgets & Blocks](theme-dev-widgets-blocks.html).
 
+# Pagination Object
+
+Available as `pagination` in the one widget that splits its page into pages, and as
+`page.pagination` in `layout.liquid` on that page. It is absent everywhere else, including
+when the whole collection fits on one page.
+
+- `pagination.current`: The page being shown, starting at 1
+- `pagination.total`: How many pages there are (always 2 or more)
+- `pagination.perPage`: Items per page
+- `pagination.totalItems`: Items in the collection
+- `pagination.prevHref`: Link to the previous page, or `null` on page 1
+- `pagination.nextHref`: Link to the next page, or `null` on the last page
+- `pagination.pages`: Every page, each with `number`, `href` and `current`
+
+All links are already correct for the page's depth and the Clean URLs setting. See
+[Splitting a List into Pages](theme-dev-widgets-blocks.html) for how to enable it.
+
 # Page Object
 
 Available in `layout.liquid`:
@@ -101,11 +119,14 @@ Available in `layout.liquid`:
 - `page.seo.robots`
 - `page.seo.canonical_url`
 - `page.breadcrumbs` — the trail for this page, Home first and this page last;
-  empty on the homepage. Also on `globals.breadcrumbs` inside every widget, so a
+  empty on the homepage, except on its page 2 and later (`Home › Page 2`). Also on `globals.breadcrumbs` inside every widget, so a
   header can draw it. Each entry has `label`, `href` (already depth- and
-  Clean-URLs-aware), `canonicalPath`, `current` and `home`. See
+  Clean-URLs-aware), `canonicalPath`, `current` and `home`, plus `pageNumber` on
+  the numbered crumb of page 2 and later. See
   [Breadcrumbs](theme-dev-liquid-assets.html#breadcrumbs) for the ready-made
   snippet.
+- `page.pagination` — on a page split into pages, the same object the splitting
+  widget gets. See [Pagination Object](#pagination-object).
 
 > **Note:** A collection item page exposes a `page` object too, built from the item (`page.slug` is `"{slugPrefix}/{slug}"`, `page.name` is the item title). This lets item pages flow through the same layout and SEO as regular pages. See [Collections](theme-dev-collections.html).
 
@@ -146,7 +167,7 @@ Available only inside a collection type's `template.liquid` (item pages). Full d
 
 # Layout-Only Variables
 
-The layout has access to rendered content placeholders. The three content placeholders are pre-rendered HTML and require the `raw` filter (see [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#autoescaping-the-raw-filter)):
+The layout has access to rendered content placeholders. The three content placeholders are pre-rendered HTML and require the `raw` filter (see [Autoescaping & the `raw` filter](theme-dev-liquid-assets.html#escaping-model)):
 
 - `{{ header | raw }}`
 - `{{ main_content | raw }}`
