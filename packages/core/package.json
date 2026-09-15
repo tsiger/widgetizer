@@ -27,6 +27,7 @@
     "./internalHref": "./src/utils/internalHref.js",
     "./breadcrumbs": "./src/utils/breadcrumbs.js",
     "./contentAddress": "./src/utils/contentAddress.js",
+    "./siteIdentity": "./src/utils/siteIdentity.js",
     "./dateFormat": "./src/utils/dateFormat.js",
     "./config/settingTypes": "./src/config/settingTypes.js",
     "./config/fonts.json": "./src/config/fonts.json",

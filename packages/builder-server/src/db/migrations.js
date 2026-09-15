@@ -140,6 +140,15 @@ const migrations = [
       }
     },
   },
+  {
+    version: 6,
+    description: "Add site_identity to projects",
+    up(db) {
+      if (!columnExists(db, "projects", "site_identity")) {
+        db.exec("ALTER TABLE projects ADD COLUMN site_identity TEXT NOT NULL DEFAULT '{}'");
+      }
+    },
+  },
 ];
 
 export const DEFAULT_TRACKING_TABLE = "_migrations";

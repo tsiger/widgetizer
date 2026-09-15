@@ -61,26 +61,27 @@ Stored on the project (one JSON column, `site_identity`, validated by a core mod
 
 **Stable facts — never translated:**
 
-- `category` — the most specific supported organization / business category. The identity kind is *derived* from it: a category under LocalBusiness makes the identity a local business; "Person" is itself a category; everything else is an organization.
-- `logo` — a dedicated identity image (media file id), separate from the Site Icon.
+- `category` — the most specific supported organization / business category. The identity kind is *derived* from it: each category row declares its kind (organization, person, local business) and the schema.org type it emits. The kind is declared rather than read off the schema.org hierarchy because some fitting types sit outside LocalBusiness there (VeterinaryCare). No category means organization.
+  - **The list is `SITE_IDENTITY_CATEGORIES` in `packages/core/src/utils/siteIdentity.js`.** The first release covers the business types of Arch's presets plus Organization, Person and a generic local business; a business with no exact schema.org type gets its own row with a broader type (a photographer is a LocalBusiness — not ProfessionalService, which schema.org deprecates). **When a new theme or preset brings a business type the list lacks, add a row.**
+- `logo` — a dedicated identity image, separate from the Site Icon, stored as its `/uploads/images/…` path like every image setting. Not a media file id: duplicate and import give every media file a new id, which would silently drop the logo from the copy.
 - `email`, `telephone`, `priceRange`.
-- `profiles` — canonical social / profile URLs, project-owned (§Social profiles).
-- `locations[]` — a list from day one, first UI edits only the primary; each with street, locality, region, postcode, country, and `openingHours` (per weekday: closed, or one or more ranges — split shifts are a list of ranges, not a special case).
+- `profiles` — one URL per named network (the networks Arch's footer offers: facebook, instagram, twitter, linkedin, youtube, tiktok, pinterest, github, mastodon, bluesky, discord, reddit, telegram, threads, whatsapp), project-owned (§Social profiles).
+- `locations[]` — a list from day one, first UI edits only the primary; each with street, locality, region, postcode, country (two-letter code), and `openingHours` (per weekday: an empty list is closed, otherwise one or more `{ opens, closes }` ranges in `HH:MM` — split shifts are a list of ranges, not a special case; a range may run past midnight; a day not listed is simply not stated).
 
 **Translatable text — one value now, per-language later:**
 
-- `publicName` — defaults from Site Title; editable.
-- `description` — short, optional.
-- `locations[].label` — the display name of a location, when it differs from the public name.
+- `text.publicName` — defaults from Site Title; editable.
+- `text.description` — short, optional.
+- `locations[].text.label` — the display name of a location, when it differs from the public name.
 
-Multilang later attaches a language to the second group only. Nothing in the first group ever moves.
+Every translatable value sits under a `text` key. Multilang later makes each `text` per-language. Nothing outside a `text` key ever moves.
 
 ### Social profiles — dual read
 
 Arch stores social URLs in its theme settings today and existing footers depend on them. The migration is a **dual-read period**, not a move:
 
 - Project details gains the profile fields (project-owned, canonical).
-- Core builds `sameAs` from project profiles when any are set.
+- Core builds `sameAs` from project profiles when any are set, and never reads theme settings — structured data works the same under a theme with no social settings at all.
 - Arch's footer and social widgets read project profiles first and fall back to their own theme settings when the project has none. Presets and theme updates are untouched.
 - A later cleanup can retire the theme fields once projects have migrated; not this release.
 

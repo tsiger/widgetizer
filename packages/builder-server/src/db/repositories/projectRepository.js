@@ -39,8 +39,8 @@ export function getProjectFolderName(projectId) {
 export function createProject(project) {
   const db = getDb();
   db.prepare(`
-    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, last_theme_update_at, last_theme_update_version, created, updated)
-    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, last_theme_update_at, last_theme_update_version, created, updated)
+    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
   `).run({
     id: project.id,
     folderName: project.folderName,
@@ -53,6 +53,7 @@ export function createProject(project) {
     receiveThemeUpdates: project.receiveThemeUpdates ? 1 : 0,
     siteUrl: project.siteUrl || "",
     cleanUrls: project.cleanUrls ? 1 : 0,
+    siteIdentity: JSON.stringify(project.siteIdentity || {}),
     lastThemeUpdateAt: project.lastThemeUpdateAt || null,
     lastThemeUpdateVersion: project.lastThemeUpdateVersion || null,
     created: project.created,
@@ -94,6 +95,9 @@ function updateProjectStatements(db, id, updates) {
       : current.receive_theme_updates,
     siteUrl: updates.siteUrl !== undefined ? (updates.siteUrl || "") : current.site_url,
     cleanUrls: updates.cleanUrls !== undefined ? (updates.cleanUrls ? 1 : 0) : current.clean_urls,
+    siteIdentity: updates.siteIdentity !== undefined
+      ? JSON.stringify(updates.siteIdentity || {})
+      : (current.site_identity ?? "{}"),
     lastThemeUpdateAt: updates.lastThemeUpdateAt !== undefined ? updates.lastThemeUpdateAt : current.last_theme_update_at,
     lastThemeUpdateVersion: updates.lastThemeUpdateVersion !== undefined ? updates.lastThemeUpdateVersion : current.last_theme_update_version,
     updated: updates.updated || new Date().toISOString(),
@@ -112,6 +116,7 @@ function updateProjectStatements(db, id, updates) {
       receive_theme_updates = @receiveThemeUpdates,
       site_url = @siteUrl,
       clean_urls = @cleanUrls,
+      site_identity = @siteIdentity,
       last_theme_update_at = @lastThemeUpdateAt,
       last_theme_update_version = @lastThemeUpdateVersion,
       updated = @updated
@@ -234,8 +239,8 @@ export function writeProjectsData(data) {
 
     // Upsert each project
     const upsert = db.prepare(`
-      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, last_theme_update_at, last_theme_update_version, created, updated)
-      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, last_theme_update_at, last_theme_update_version, created, updated)
+      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
       ON CONFLICT(id) DO UPDATE SET
         folder_name = @folderName,
         name = @name,
@@ -247,6 +252,7 @@ export function writeProjectsData(data) {
         receive_theme_updates = @receiveThemeUpdates,
         site_url = @siteUrl,
         clean_urls = @cleanUrls,
+        site_identity = @siteIdentity,
         last_theme_update_at = @lastThemeUpdateAt,
         last_theme_update_version = @lastThemeUpdateVersion,
         updated = @updated
@@ -265,6 +271,7 @@ export function writeProjectsData(data) {
         receiveThemeUpdates: p.receiveThemeUpdates ? 1 : 0,
         siteUrl: p.siteUrl || "",
         cleanUrls: p.cleanUrls ? 1 : 0,
+        siteIdentity: JSON.stringify(p.siteIdentity || {}),
         lastThemeUpdateAt: p.lastThemeUpdateAt || null,
         lastThemeUpdateVersion: p.lastThemeUpdateVersion || null,
         created: p.created,
@@ -303,6 +310,15 @@ export function deleteProjectAndReassignActive(id) {
   })();
 }
 
+function parseSiteIdentity(raw) {
+  try {
+    const parsed = JSON.parse(raw || "{}");
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
 /**
  * Convert a database row to the project shape controllers expect.
  */
@@ -319,6 +335,7 @@ function rowToProject(row) {
     receiveThemeUpdates: !!row.receive_theme_updates,
     siteUrl: row.site_url,
     cleanUrls: !!row.clean_urls,
+    siteIdentity: parseSiteIdentity(row.site_identity),
     created: row.created,
     updated: row.updated,
   };

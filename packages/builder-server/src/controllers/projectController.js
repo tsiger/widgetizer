@@ -14,9 +14,10 @@ import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlTags, stripHtmlToText } from "../services/sanitizationService.js";
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
+import { normalizeSiteIdentity } from "@widgetizer/core/siteIdentity";
 import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
@@ -41,6 +42,15 @@ function isOptionalBoolean(value) {
   return value === undefined || typeof value === "boolean";
 }
 
+function isOptionalString(value) {
+  return value === undefined || value === null || typeof value === "string";
+}
+
+function sanitizeOptionalText(value) {
+  if (value === undefined) return undefined;
+  return value && value.trim() !== "" ? stripHtmlTags(value.trim()) : "";
+}
+
 /**
  * Message for a rejected Site URL. A query or fragment gets its own wording
  * because the address is otherwise fine and the fix is to delete a piece of it —
@@ -51,6 +61,36 @@ function siteUrlRejection(value) {
   return siteUrlHasQueryOrFragment(value)
     ? "Invalid Website Address. Remove the ? query or # part — this is the address your site lives at, and page paths are added onto it (e.g., https://mysite.com or https://mysite.com/blog/)."
     : "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com).";
+}
+
+function stripTextFields(group, keys) {
+  if (!group || typeof group !== "object" || Array.isArray(group)) return group;
+  const stripped = { ...group };
+  for (const key of keys) {
+    if (typeof stripped[key] === "string") stripped[key] = stripHtmlToText(stripped[key]);
+  }
+  return stripped;
+}
+
+// Only human-readable text is tag-stripped. URLs, email, phone and the logo path
+// are left exactly as sent for core to accept or refuse: stripping re-serialises
+// through DOMPurify, which would silently rewrite a query string.
+function readSiteIdentity(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return normalizeSiteIdentity(raw);
+  const identity = stripTextFields(raw, ["priceRange"]);
+  identity.text = stripTextFields(raw.text, ["publicName", "description"]);
+  if (Array.isArray(raw.locations)) {
+    identity.locations = raw.locations.map((location) => {
+      const stripped = stripTextFields(location, ["streetAddress", "addressLocality", "addressRegion", "postalCode"]);
+      if (stripped !== location) stripped.text = stripTextFields(location.text, ["label"]);
+      return stripped;
+    });
+  }
+  return normalizeSiteIdentity(identity);
+}
+
+function siteIdentityRejection(errors) {
+  return { error: "Invalid business details.", fields: errors };
 }
 
 /**
@@ -317,8 +357,17 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "Project name is required." });
     }
 
+    for (const [field, value] of Object.entries({ description, siteTitle, siteUrl })) {
+      if (!isOptionalString(value)) return res.status(400).json({ error: `${field} must be a string.` });
+    }
+
     if (!isValidSiteUrl(siteUrl)) {
       return res.status(400).json({ error: siteUrlRejection(siteUrl) });
+    }
+
+    const { value: siteIdentity, errors: siteIdentityErrors } = readSiteIdentity(req.body.siteIdentity);
+    if (siteIdentityErrors.length) {
+      return res.status(400).json(siteIdentityRejection(siteIdentityErrors));
     }
 
     if (!isOptionalBoolean(receiveThemeUpdates)) {
@@ -381,6 +430,7 @@ export async function createProject(req, res) {
       receiveThemeUpdates: receiveThemeUpdates ?? false, // Opt-in flag (default: off)
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
       cleanUrls: cleanUrls ?? false, // internal links + SEO URLs without .html (extensionless hosts)
+      siteIdentity,
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -479,7 +529,34 @@ export async function updateProject(req, res) {
       }
     }
 
-    // Check if folderName is being updated and if it would be different
+    for (const field of ["description", "siteTitle", "siteUrl"]) {
+      if (!isOptionalString(updates[field])) return res.status(400).json({ error: `${field} must be a string.` });
+    }
+
+    if (updates.siteUrl !== undefined && !isValidSiteUrl(updates.siteUrl)) {
+      return res.status(400).json({ error: siteUrlRejection(updates.siteUrl) });
+    }
+
+    let siteIdentity;
+    if (updates.siteIdentity !== undefined) {
+      const { value, errors } = readSiteIdentity(updates.siteIdentity);
+      if (errors.length) return res.status(400).json(siteIdentityRejection(errors));
+      siteIdentity = value;
+    }
+
+    if (!isOptionalBoolean(updates.receiveThemeUpdates)) {
+      return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
+    }
+
+    if (!isOptionalBoolean(updates.cleanUrls)) {
+      return res.status(400).json({ error: "cleanUrls must be a boolean." });
+    }
+
+    const sanitizedSiteTitle = sanitizeOptionalText(updates.siteTitle);
+    const sanitizedSiteUrl = sanitizeOptionalText(updates.siteUrl);
+
+    // Everything that can reject or throw must run above: the rename below moves
+    // the directory before the row is written, so a failure after it strands the project.
     if (updates.folderName && updates.folderName.trim() !== currentFolderName) {
       const newFolderName = updates.folderName.trim();
 
@@ -518,26 +595,6 @@ export async function updateProject(req, res) {
       }
     }
 
-    if (updates.siteUrl !== undefined && !isValidSiteUrl(updates.siteUrl)) {
-      return res.status(400).json({ error: siteUrlRejection(updates.siteUrl) });
-    }
-
-    if (!isOptionalBoolean(updates.receiveThemeUpdates)) {
-      return res.status(400).json({ error: "receiveThemeUpdates must be a boolean." });
-    }
-
-    if (!isOptionalBoolean(updates.cleanUrls)) {
-      return res.status(400).json({ error: "cleanUrls must be a boolean." });
-    }
-
-    // Sanitize site title and siteUrl if provided
-    const sanitizedSiteTitle = updates.siteTitle !== undefined
-      ? (updates.siteTitle && updates.siteTitle.trim() !== "" ? stripHtmlTags(updates.siteTitle.trim()) : "")
-      : undefined;
-    const sanitizedSiteUrl = updates.siteUrl !== undefined
-      ? (updates.siteUrl && updates.siteUrl.trim() !== "" ? stripHtmlTags(updates.siteUrl.trim()) : "")
-      : undefined;
-
     const updatedProject = projectRepo.updateProject(id, {
       folderName: updates.folderName || currentFolderName,
       name: updates.name,
@@ -545,6 +602,7 @@ export async function updateProject(req, res) {
       siteTitle: sanitizedSiteTitle,
       siteUrl: sanitizedSiteUrl,
       cleanUrls: updates.cleanUrls,
+      siteIdentity,
       receiveThemeUpdates: updates.receiveThemeUpdates,
     });
 
@@ -848,6 +906,7 @@ export async function exportProject(req, res) {
         preset: project.preset || null,
         siteUrl: project.siteUrl || "",
         cleanUrls: project.cleanUrls || false,
+        siteIdentity: project.siteIdentity || {},
         created: project.created,
         updated: project.updated,
       },
@@ -1102,6 +1161,7 @@ export async function importProject(req, res) {
         preset: manifest.project.preset || null,
         siteUrl: manifest.project.siteUrl || "",
         cleanUrls: manifest.project.cleanUrls || false,
+        siteIdentity: readSiteIdentity(manifest.project.siteIdentity).value,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };

@@ -13,6 +13,18 @@ export function stripHtmlTags(value) {
   return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
 }
 
+/**
+ * Strip all HTML tags and return the plain text, with `&`, `<` and `>` kept as
+ * typed. stripHtmlTags returns re-serialised HTML instead, so once a tag is
+ * present it stores `&amp;` for `&`.
+ * @param {string} value - The input string
+ * @returns {string} Plain text with all HTML tags removed
+ */
+export function stripHtmlToText(value) {
+  if (typeof value !== "string") return value;
+  return DOMPurify.sanitize(value, { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true }).textContent;
+}
+
 // Safe inline formatting tags/attrs produced by the Tiptap editor. Headings and `<img>`
 // are NOT here: both are opt-in per field (`allow_headings` / `allow_images`) and added
 // to the allowlist only for fields that declare them (see sanitizeRichText), so the flags

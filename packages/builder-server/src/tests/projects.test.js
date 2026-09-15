@@ -454,6 +454,7 @@ describe("readProjectsData / writeProjectsData", () => {
         receiveThemeUpdates: false,
         siteUrl: "",
         cleanUrls: false,
+        siteIdentity: { category: "bakery", text: { publicName: "Crumbly" } },
         created: now,
         updated: now,
       }],
@@ -666,6 +667,28 @@ describe("createProject", () => {
     });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /cleanUrls.*boolean/i);
+  });
+
+  it("rejects a non-string description, siteTitle or siteUrl on create without scaffolding a folder", async () => {
+    for (const [field, value] of [["description", { text: "x" }], ["siteTitle", 42], ["siteUrl", 42]]) {
+      const res = await callController(createProject, {
+        body: { name: `Typed ${field}`, description: "", theme: TEST_THEME_ID, [field]: value },
+      });
+      assert.equal(res._status, 400);
+      assert.match(res._json.error, new RegExp(`${field}.*string`, "i"));
+    }
+    assert.equal(projectRepo.getAllProjects().length, 0);
+    assert.deepEqual(await fs.readdir(path.join(DATA_DIR, "projects")), []);
+  });
+
+  it("clears siteTitle when sent as null", async () => {
+    const project = await createTestProject("Null Title", { siteTitle: "Before" });
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Null Title", siteTitle: null },
+    });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.siteTitle, "");
   });
 
   it("stores siteTitle", async () => {
@@ -1965,4 +1988,212 @@ describe("exportProject -> importProject round-trip", () => {
       assert.ok(!originalIds.has(file.id), "Imported media IDs should be regenerated");
     }
   });
+});
+
+describe("siteIdentity", () => {
+  const IDENTITY = {
+    category: "bakery",
+    logo: "/uploads/images/logo.png",
+    email: "hello@crumbly.example",
+    profiles: { instagram: "https://instagram.com/crumbly" },
+    locations: [
+      {
+        streetAddress: "1 Baker St",
+        addressLocality: "Athens",
+        addressCountry: "GR",
+        openingHours: { monday: [{ opens: "07:00", closes: "14:00" }], sunday: [] },
+      },
+    ],
+    text: { publicName: "Crumbly" },
+  };
+
+  beforeEach(async () => {
+    await resetProjects();
+  });
+
+  it("defaults to an empty identity", async () => {
+    const project = await createTestProject("Identity Default");
+    assert.deepEqual(project.siteIdentity, {});
+    assert.deepEqual(projectRepo.getProjectById(project.id).siteIdentity, {});
+  });
+
+  it("stores a valid identity on create", async () => {
+    const project = await createTestProject("Identity Create", { siteIdentity: IDENTITY });
+    assert.deepEqual(projectRepo.getProjectById(project.id).siteIdentity, IDENTITY);
+  });
+
+  it("refuses an invalid identity on create and names the fields", async () => {
+    const res = await callController(createProject, {
+      body: {
+        name: "Identity Bad",
+        description: "",
+        theme: TEST_THEME_ID,
+        siteIdentity: { category: "spaceport", email: "nope" },
+      },
+    });
+    assert.equal(res._status, 400);
+    assert.deepEqual(res._json.fields, [
+      { field: "category", code: "unknown" },
+      { field: "email", code: "invalid" },
+    ]);
+    assert.equal(projectRepo.getAllProjects().length, 0);
+  });
+
+  it("replaces the identity on update, strips tags, and keeps it when omitted", async () => {
+    const project = await createTestProject("Identity Update", { siteIdentity: IDENTITY });
+
+    const updated = await callController(updateProject, {
+      params: { id: project.id },
+      body: {
+        name: "Identity Update",
+        siteIdentity: {
+          category: "person",
+          locations: [{ streetAddress: "<i>1</i> Baker & Sons St", text: { label: "<b>Main</b>" } }],
+          text: { publicName: "<b>Jo</b> Baker" },
+        },
+      },
+    });
+    assert.equal(updated._status, 200);
+    assert.deepEqual(updated._json.siteIdentity, {
+      category: "person",
+      locations: [{ streetAddress: "1 Baker & Sons St", text: { label: "Main" } }],
+      text: { publicName: "Jo Baker" },
+    });
+
+    const untouched = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Update Renamed" },
+    });
+    assert.deepEqual(untouched._json.siteIdentity, updated._json.siteIdentity);
+  });
+
+  it("refuses an invalid identity on update without changing the stored one", async () => {
+    const project = await createTestProject("Identity Update Bad", { siteIdentity: IDENTITY });
+    const res = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Update Bad", siteIdentity: { logo: "https://cdn.example.com/logo.png" } },
+    });
+    assert.equal(res._status, 400);
+    assert.deepEqual(res._json.fields, [{ field: "logo", code: "invalid" }]);
+    assert.deepEqual(projectRepo.getProjectById(project.id).siteIdentity, IDENTITY);
+  });
+
+  it("copies the identity to a duplicate", async () => {
+    const project = await createTestProject("Identity Duplicate", { siteIdentity: IDENTITY });
+    const res = await callController(duplicateProject, { params: { id: project.id } });
+    assert.equal(res._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(res._json.id).siteIdentity, IDENTITY);
+  });
+
+  it("round-trips the identity through export and import", async () => {
+    const project = await createTestProject("Identity Round Trip", { siteIdentity: IDENTITY });
+    const { res: exportRes, manifest } = await exportTestProject(project.id);
+    assert.equal(exportRes._status, 200);
+    assert.deepEqual(manifest.project.siteIdentity, IDENTITY);
+
+    const importRes = await callController(importProject, { file: zipBufferToTempFile(exportRes.getBuffer()) });
+    assert.equal(importRes._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(importRes._json.id).siteIdentity, IDENTITY);
+  });
+
+  it("keeps only the valid part of an imported identity", async () => {
+    const zipFile = buildImportZip(
+      {
+        formatVersion: "1.1",
+        project: {
+          name: "Identity Import",
+          theme: TEST_THEME_ID,
+          siteIdentity: { category: "spaceport", email: "hello@crumbly.example", profiles: { myspace: "https://myspace.com/x" } },
+        },
+      },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" } },
+    );
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(res._json.id).siteIdentity, { email: "hello@crumbly.example" });
+  });
+
+  it("prunes a day with non-string times on import instead of failing", async () => {
+    const zipFile = buildImportZip(
+      {
+        formatVersion: "1.1",
+        project: {
+          name: "Identity Import Hours",
+          theme: TEST_THEME_ID,
+          siteIdentity: {
+            locations: [
+              {
+                addressLocality: "Athens",
+                openingHours: {
+                  monday: [{ opens: { toString: null }, closes: "17:00" }],
+                  tuesday: [{ opens: ["09:00"], closes: "17:00" }],
+                  friday: [{ opens: "09:00", closes: "17:00" }],
+                },
+              },
+            ],
+          },
+        },
+      },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" } },
+    );
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 201);
+    assert.deepEqual(projectRepo.getProjectById(res._json.id).siteIdentity, {
+      locations: [{ addressLocality: "Athens", openingHours: { friday: [{ opens: "09:00", closes: "17:00" }] } }],
+    });
+  });
+
+  it("refuses non-string times on create with a field error, not a crash", async () => {
+    const res = await callController(createProject, {
+      body: {
+        name: "Identity Bad Hours",
+        description: "",
+        theme: TEST_THEME_ID,
+        siteIdentity: { locations: [{ openingHours: { monday: [{ opens: { toString: null }, closes: "17:00" }] } }] },
+      },
+    });
+    assert.equal(res._status, 400);
+    assert.deepEqual(res._json.fields, [{ field: "locations.0.openingHours.monday.0", code: "invalid" }]);
+  });
+
+  it("stores a profile URL exactly as given, or refuses it — never rewrites it", async () => {
+    const project = await createTestProject("Identity Url");
+    const url = "https://example.com/profile?query=foo&ref=site";
+    const kept = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Url", siteIdentity: { profiles: { facebook: url } } },
+    });
+    assert.equal(kept._status, 200);
+    assert.equal(projectRepo.getProjectById(project.id).siteIdentity.profiles.facebook, url);
+
+    const refused = await callController(updateProject, {
+      params: { id: project.id },
+      body: { name: "Identity Url", siteIdentity: { profiles: { facebook: "https://example.com/profile?query=<foo>&ref=site" } } },
+    });
+    assert.equal(refused._status, 400);
+    assert.deepEqual(refused._json.fields, [{ field: "profiles.facebook", code: "invalid" }]);
+    assert.equal(projectRepo.getProjectById(project.id).siteIdentity.profiles.facebook, url);
+  });
+
+  for (const [label, body] of [
+    ["invalid business details", { siteIdentity: { email: "nope" } }],
+    ["an invalid Site URL", { siteUrl: "not a url" }],
+    ["a non-boolean cleanUrls", { cleanUrls: "yes" }],
+    ["a non-string Site Title", { siteTitle: 42 }],
+    ["a non-string Site URL", { siteUrl: 42 }],
+    ["an object description", { description: { text: "x" } }],
+  ]) {
+    it(`leaves the folder and the row alone when a rename comes with ${label}`, async () => {
+      const project = await createTestProject(`Identity Rename ${label}`);
+      const oldDir = getProjectDir(project.folderName);
+      const res = await callController(updateProject, {
+        params: { id: project.id },
+        body: { name: project.name, folderName: `${project.folderName}-renamed`, ...body },
+      });
+      assert.equal(res._status, 400);
+      assert.ok(await fs.pathExists(oldDir), "the old directory should still exist");
+      assert.ok(!(await fs.pathExists(getProjectDir(`${project.folderName}-renamed`))), "no new directory");
+      assert.equal(projectRepo.getProjectById(project.id).folderName, project.folderName);
+    });
+  }
 });
