@@ -29,6 +29,7 @@ import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
 import { resolveMenuSettings } from "@widgetizer/render-engine";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { isReservedItemSlug, isReservedSlugPrefix } from "@widgetizer/core/contentAddress";
+import { validateCollectionStructuredData } from "@widgetizer/core/structuredData";
 import {
   sanitizeCollectionItemData,
   sanitizeDateValue,
@@ -181,6 +182,10 @@ export function validateCollectionSchema(schema, folderName) {
     );
   } else if (dateSettings.length === 1 && dateSettings[0].type !== "date") {
     errors.push("`usedAsDate` must be on a `date` setting.");
+  }
+
+  if (schema.structuredData !== undefined && Array.isArray(schema.settings)) {
+    errors.push(...validateCollectionStructuredData(schema.structuredData, schema.settings));
   }
 
   // --- defaultSort ---
@@ -1227,5 +1232,12 @@ export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = f
     created: item.created,
     updated: item.updated,
     seo: { ...seo, canonical_url },
+    // What {% seo %} needs to build the item's article data from its visible fields.
+    collectionItem: {
+      type: schema.type,
+      structuredData: schema.structuredData,
+      settingTypes: Object.fromEntries(fieldSettings.map((setting) => [setting.id, setting.type])),
+      settings,
+    },
   };
 }

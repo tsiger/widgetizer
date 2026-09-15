@@ -9,6 +9,7 @@ import {
   jsonLdScript,
 } from "../index.js";
 import { websiteNode, identityNode, webPageNode } from "../siteNodes.js";
+import { articleNode } from "../articleNode.js";
 
 const LINE_SEPARATOR = String.fromCharCode(0x2028);
 const PARAGRAPH_SEPARATOR = String.fromCharCode(0x2029);
@@ -131,7 +132,7 @@ describe("buildGraph", () => {
   const withSite = { page, project: { siteUrl: "https://example.com/site" } };
 
   it("registers the site nodes in output order", () => {
-    expect(GRAPH_BUILDERS).toEqual([websiteNode, identityNode, webPageNode]);
+    expect(GRAPH_BUILDERS).toEqual([websiteNode, identityNode, webPageNode, articleNode]);
     expect(buildGraph(withSite).map((node) => node["@type"])).toEqual(["WebPage"]);
   });
 

@@ -3,8 +3,10 @@
  *
  * Drives the real `exportProject` controller and reads the JSON-LD graph back out
  * of the exported HTML: the homepage's site and identity nodes, WebPage on every
- * other page and item, Clean URLs ids, the logo file actually shipped, the
- * readiness list in the export result, and no script at all without a Site URL.
+ * other page and item, the BlogPosting a collection schema declares (built from
+ * the same values the page shows), Clean URLs ids, the logo and featured image
+ * actually shipped, the readiness list in the export result, and no script at all
+ * without a Site URL.
  *
  * Run with: node --test packages/builder-server/src/tests/structuredDataExport.test.js
  */
@@ -69,7 +71,37 @@ const NEWS_SCHEMA = {
   hasItemPages: true,
   slugPrefix: "news",
   defaultSort: "manual",
-  settings: [{ type: "text", id: "title", label: "Title", required: true, usedAsTitle: true }],
+  structuredData: {
+    type: "BlogPosting",
+    headline: "title",
+    datePublished: "date",
+    description: "excerpt",
+    image: "featured_image",
+    articleBody: "body",
+  },
+  settings: [
+    { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+    { type: "date", id: "date", label: "Date", usedAsDate: true },
+    { type: "textarea", id: "excerpt", label: "Excerpt" },
+    { type: "image", id: "featured_image", label: "Featured image" },
+    { type: "richtext", id: "body", label: "Body" },
+  ],
+};
+
+const NEWS_TEMPLATE =
+  `<article><h1 class="headline">{{ item.settings.title }}</h1>` +
+  `<time>{{ item.settings.date }}</time><p class="excerpt">{{ item.settings.excerpt }}</p>` +
+  `<div class="body">{{ item.settings.body | raw }}</div></article>`;
+
+const ALPHA_SETTINGS = {
+  title: "Fresh bread & butter",
+  date: "2026-01-02",
+  excerpt: "Warm, crusty <and> honest",
+  featured_image: "/uploads/images/loaf.svg",
+  body:
+    "<p>Flour &amp; water.</p>" +
+    '<p>un<strong>break</strong>able <a href="https://example.com/?q=a>b">Read more</a></p>' +
+    "<p>We are <strong>open</strong>.</p><script>alert(1)</script>",
 };
 
 function graphOf(html) {
@@ -79,8 +111,12 @@ function graphOf(html) {
   return JSON.parse(scripts[0][1])["@graph"];
 }
 
+async function exportedHtml(dir, relativePath) {
+  return fs.readFile(path.join(dir, ...relativePath.split("/")), "utf8");
+}
+
 async function exportedGraph(dir, relativePath) {
-  return graphOf(await fs.readFile(path.join(dir, ...relativePath.split("/")), "utf8"));
+  return graphOf(await exportedHtml(dir, relativePath));
 }
 
 async function exportWith(projectChanges) {
@@ -101,7 +137,7 @@ before(async () => {
   );
 
   await storage.write(scope, "collection-types/news/schema.json", JSON.stringify(NEWS_SCHEMA, null, 2));
-  await storage.write(scope, "collection-types/news/template.liquid", `<article>{{ item.settings.title }}</article>`);
+  await storage.write(scope, "collection-types/news/template.liquid", NEWS_TEMPLATE);
   await storage.write(
     scope,
     "collections/news/alpha.json",
@@ -111,17 +147,19 @@ before(async () => {
       slug: "alpha",
       schemaVersion: 1,
       created: "2026-01-02T00:00:00.000Z",
-      updated: "2026-01-02T00:00:00.000Z",
-      settings: { title: "Alpha" },
+      updated: "2026-01-05T09:30:00.000Z",
+      settings: ALPHA_SETTINGS,
     }),
   );
 
-  await fs.outputFile(
-    path.join(projectDir, "uploads", "images", "logo.svg"),
-    `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>`,
-  );
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>`;
+  await fs.outputFile(path.join(projectDir, "uploads", "images", "logo.svg"), svg);
+  await fs.outputFile(path.join(projectDir, "uploads", "images", "loaf.svg"), svg);
   await writeMediaFile(PROJECT_ID, {
-    files: [{ id: "logo", filename: "logo.svg", type: "image/svg+xml", path: "/uploads/images/logo.svg", usedIn: [] }],
+    files: [
+      { id: "logo", filename: "logo.svg", type: "image/svg+xml", path: "/uploads/images/logo.svg", usedIn: [] },
+      { id: "loaf", filename: "loaf.svg", type: "image/svg+xml", path: "/uploads/images/loaf.svg", usedIn: [] },
+    ],
   });
 
   projectRepo.updateProject(PROJECT_ID, { siteIdentity: IDENTITY });
@@ -155,11 +193,12 @@ describe("export — structured data with a Site URL", () => {
     assert.deepEqual(bakery.sameAs, ["https://instagram.com/crumbly"]);
   });
 
-  it("ships the logo file the graph points at", async () => {
+  it("ships the logo and the featured image the graph points at", async () => {
     assert.ok(await fs.pathExists(path.join(dir, "assets", "images", "logo.svg")));
+    assert.ok(await fs.pathExists(path.join(dir, "assets", "images", "loaf.svg")));
   });
 
-  it("gives other pages and items only a WebPage", async () => {
+  it("gives an ordinary page only a WebPage", async () => {
     assert.deepEqual(await exportedGraph(dir, "about.html"), [
       {
         "@type": "WebPage",
@@ -169,11 +208,45 @@ describe("export — structured data with a Site URL", () => {
         isPartOf: { "@id": `${SITE}/#website` },
       },
     ]);
-    const item = await exportedGraph(dir, "news/alpha.html");
+  });
+
+  it("gives a News item its WebPage and a BlogPosting built from the fields the schema maps", async () => {
+    const graph = await exportedGraph(dir, "news/alpha.html");
     assert.deepEqual(
-      item.map((node) => [node["@type"], node["@id"]]),
-      [["WebPage", `${SITE}/news/alpha.html#webpage`]],
+      graph.map((node) => [node["@type"], node["@id"]]),
+      [
+        ["WebPage", `${SITE}/news/alpha.html#webpage`],
+        ["BlogPosting", `${SITE}/news/alpha.html#article`],
+      ],
     );
+    assert.deepEqual(graph[1], {
+      "@type": "BlogPosting",
+      "@id": `${SITE}/news/alpha.html#article`,
+      url: `${SITE}/news/alpha.html`,
+      headline: "Fresh bread & butter",
+      datePublished: "2026-01-02",
+      dateModified: "2026-01-05T09:30:00.000Z",
+      description: "Warm, crusty <and> honest",
+      image: `${SITE}/assets/images/loaf.svg`,
+      articleBody: "Flour & water.\nunbreakable Read more\nWe are open.",
+      isPartOf: { "@id": `${SITE}/news/alpha.html#webpage` },
+      publisher: { "@id": `${SITE}/#identity` },
+    });
+  });
+
+  it("matches what the page visibly shows", async () => {
+    const html = await exportedHtml(dir, "news/alpha.html");
+    const article = (await exportedGraph(dir, "news/alpha.html"))[1];
+    const visible = (className) =>
+      html
+        .match(new RegExp(`class="${className}"[^>]*>([\\s\\S]*?)</`))[1]
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .trim();
+    assert.equal(article.headline, visible("headline"));
+    assert.equal(article.description, visible("excerpt"));
+    assert.ok(!html.includes("<script>alert(1)</script>"), "the body is sanitized before render");
   });
 
   it("reports readiness in the export result", () => {
@@ -187,12 +260,15 @@ describe("export — structured data with a Site URL", () => {
 });
 
 describe("export — structured data with Clean URLs", () => {
-  it("drops .html from page ids", async () => {
+  it("drops .html from page and article ids, keeping absolute image URLs", async () => {
     const { dir } = await exportWith({ cleanUrls: true, siteUrl: SITE });
     const [page] = await exportedGraph(dir, "about.html");
     assert.equal(page["@id"], `${SITE}/about#webpage`);
-    const item = await exportedGraph(dir, "news/alpha.html");
-    assert.equal(item[0]["@id"], `${SITE}/news/alpha#webpage`);
+    const [itemPage, article] = await exportedGraph(dir, "news/alpha.html");
+    assert.equal(itemPage["@id"], `${SITE}/news/alpha#webpage`);
+    assert.equal(article["@id"], `${SITE}/news/alpha#article`);
+    assert.deepEqual(article.isPartOf, { "@id": `${SITE}/news/alpha#webpage` });
+    assert.equal(article.image, `${SITE}/assets/images/loaf.svg`);
   });
 });
 
@@ -201,6 +277,7 @@ describe("export — structured data without a Site URL", () => {
     const { dir, result } = await exportWith({ cleanUrls: false, siteUrl: "" });
     assert.equal(await exportedGraph(dir, "index.html"), null);
     assert.equal(await exportedGraph(dir, "about.html"), null);
+    assert.equal(await exportedGraph(dir, "news/alpha.html"), null);
     assert.deepEqual(result.structuredData.readiness[0], { item: "siteUrl", ok: false });
   });
 });

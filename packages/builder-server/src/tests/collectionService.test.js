@@ -132,6 +132,49 @@ describe("validateCollectionSchema (pure)", () => {
   it("still accepts page as a slugPrefix, which existing collections may use", () => {
     assert.equal(svc.validateCollectionSchema({ ...NEWS_SCHEMA, slugPrefix: "page" }, "news").valid, true);
   });
+
+  it("accepts a structuredData block and keeps it on the normalized schema", () => {
+    const block = { type: "BlogPosting", headline: "title", datePublished: "published", image: "hero", articleBody: "body" };
+    const { valid, errors, normalized } = svc.validateCollectionSchema({ ...NEWS_SCHEMA, structuredData: block }, "news");
+    assert.deepEqual(errors, []);
+    assert.equal(valid, true);
+    assert.deepEqual(normalized.structuredData, block);
+  });
+
+  it("refuses a structuredData block that maps a missing field or an unsupported type", () => {
+    const missing = svc.validateCollectionSchema(
+      { ...NEWS_SCHEMA, structuredData: { type: "BlogPosting", headline: "title", image: "cover" } },
+      "news",
+    );
+    assert.equal(missing.valid, false);
+    assert.ok(missing.errors.some((e) => e.includes('"cover", which is not a setting')), missing.errors.join("\n"));
+
+    const unsupported = svc.validateCollectionSchema({ ...NEWS_SCHEMA, structuredData: { type: "Recipe" } }, "news");
+    assert.equal(unsupported.valid, false);
+    assert.ok(unsupported.errors.some((e) => e.includes("must be one of: BlogPosting")));
+  });
+
+  it("refuses a non-string structuredData type without throwing", () => {
+    for (const type of [["BlogPosting"], { toString: null }]) {
+      const { valid, errors } = svc.validateCollectionSchema(
+        { ...NEWS_SCHEMA, structuredData: { type, headline: "title" } },
+        "news",
+      );
+      assert.equal(valid, false);
+      assert.ok(errors.some((e) => e.includes("must be one of: BlogPosting")), errors.join("\n"));
+    }
+  });
+
+  it("accepts the News schema Arch ships, and its 0.9.10 update copy matches it", async () => {
+    const repoRoot = new URL("../../../../", import.meta.url);
+    const base = await fs.readJson(new URL("themes/arch/collection-types/news/schema.json", repoRoot));
+    const update = await fs.readJson(new URL("themes/arch/updates/0.9.10/collection-types/news/schema.json", repoRoot));
+    const { valid, errors } = svc.validateCollectionSchema(base, "news");
+    assert.deepEqual(errors, []);
+    assert.equal(valid, true);
+    assert.equal(base.structuredData.type, "BlogPosting");
+    assert.deepEqual(update, base);
+  });
 });
 
 // ---------------------------------------------------------------------------
