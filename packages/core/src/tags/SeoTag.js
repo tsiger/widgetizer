@@ -2,6 +2,7 @@
 
 import { isHomeSlug, absoluteSiteUrl } from "../utils/internalHref.js";
 import { pageOutputPath, publicPath } from "../utils/contentAddress.js";
+import { structuredDataScript } from "../structuredData/index.js";
 
 export const SeoTag = {
   parse(tagToken) {
@@ -97,6 +98,14 @@ export const SeoTag = {
       // Twitter image (use same as og:image) - only when resolved
       if (ogImageUrl) {
         metaTags.push(`<meta name="twitter:image" content="${escapeHtml(ogImageUrl)}">`);
+      }
+
+      // Its own guard: a structured-data failure must not cost the page its title and meta tags.
+      try {
+        const script = structuredDataScript({ page, project, mediaFiles });
+        if (script) metaTags.push(script);
+      } catch (error) {
+        console.error("SEO Tag structured data error:", error);
       }
 
       return metaTags.join("\n\t\t");
