@@ -198,7 +198,7 @@ describe("export — structured data with a Site URL", () => {
     assert.ok(await fs.pathExists(path.join(dir, "assets", "images", "loaf.svg")));
   });
 
-  it("gives an ordinary page only a WebPage", async () => {
+  it("gives an ordinary page its WebPage and breadcrumb trail", async () => {
     assert.deepEqual(await exportedGraph(dir, "about.html"), [
       {
         "@type": "WebPage",
@@ -206,6 +206,15 @@ describe("export — structured data with a Site URL", () => {
         url: `${SITE}/about.html`,
         name: "About us",
         isPartOf: { "@id": `${SITE}/#website` },
+        breadcrumb: { "@id": `${SITE}/about.html#breadcrumb` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${SITE}/about.html#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+          { "@type": "ListItem", position: 2, name: "About", item: `${SITE}/about.html` },
+        ],
       },
     ]);
   });
@@ -217,6 +226,7 @@ describe("export — structured data with a Site URL", () => {
       [
         ["WebPage", `${SITE}/news/alpha.html#webpage`],
         ["BlogPosting", `${SITE}/news/alpha.html#article`],
+        ["BreadcrumbList", `${SITE}/news/alpha.html#breadcrumb`],
       ],
     );
     assert.deepEqual(graph[1], {

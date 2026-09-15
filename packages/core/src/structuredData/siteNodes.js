@@ -2,6 +2,7 @@ import { isHomeSlug } from "../utils/internalHref.js";
 import { currentPageNumber, pageSelfUrl, publishedImageUrl } from "../utils/publishedUrls.js";
 import { resolveSiteIdentity, WEEKDAYS } from "../utils/siteIdentity.js";
 import { siteNodeId, urlNodeId } from "./ids.js";
+import { breadcrumbItems } from "./breadcrumbNode.js";
 
 // schema.org files these types outside LocalBusiness, so a local business of
 // that type declares LocalBusiness as well.
@@ -116,5 +117,6 @@ export function webPageNode(context) {
     description: textOr(seo.description, undefined),
     isPartOf: { "@id": siteNodeId(siteUrl, "website") },
     about: homepageIdentity(context) ? { "@id": siteNodeId(siteUrl, "identity") } : undefined,
+    breadcrumb: breadcrumbItems(context).length ? { "@id": urlNodeId(url, "breadcrumb") } : undefined,
   };
 }

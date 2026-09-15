@@ -83,7 +83,7 @@ async function seedFixture() {
   // The layout draws the trail through the core snippet, as a theme would.
   await fs.writeFile(
     path.join(projectDir, "layout.liquid"),
-    `<!DOCTYPE html><html><head><title>{{ page.seo.title }}</title></head><body>` +
+    `<!DOCTYPE html><html><head><title>{{ page.seo.title }}</title>{% seo %}</head><body>` +
       `{% render 'breadcrumbs', class_nav: 'bc', class_link: 'crumb' %}` +
       `<main>{{ main_content | raw }}</main></body></html>`,
   );
@@ -194,6 +194,51 @@ describe("export — breadcrumbs, Clean URLs off", () => {
     assert.deepEqual(trailOf(html), ["Home", "Blog", "Alpha Post"]);
     // Depth: an item page sits one directory down, so ancestors need ../
     assert.deepEqual(hrefsOf(html), ["../index.html", "../blog.html"]);
+  });
+});
+
+describe("export — the structured BreadcrumbList matches the visible trail", () => {
+  const SITE = "https://breadcrumbs.example.com";
+  let dir;
+
+  before(async () => {
+    dir = await exportWith(false);
+  });
+
+  async function listOf(...segments) {
+    const html = await fs.readFile(path.join(dir, ...segments), "utf8");
+    const script = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
+    return script ? JSON.parse(script[1])["@graph"].find((node) => node["@type"] === "BreadcrumbList") : undefined;
+  }
+
+  it("names the same crumbs, in order, for a parent chain", async () => {
+    const visible = trailOf(await read(dir, "alice.html"));
+    const list = await listOf("alice.html");
+    assert.deepEqual(
+      list.itemListElement.map((entry) => entry.name),
+      visible,
+    );
+    assert.deepEqual(
+      list.itemListElement.map((entry) => entry.item),
+      [`${SITE}/`, `${SITE}/about.html`, `${SITE}/team.html`, `${SITE}/alice.html`],
+    );
+  });
+
+  it("names the same crumbs for an item hung under its listing page", async () => {
+    const visible = trailOf(await read(dir, "news", "alpha.html"));
+    const list = await listOf("news", "alpha.html");
+    assert.deepEqual(
+      list.itemListElement.map((entry) => entry.name),
+      visible,
+    );
+    assert.deepEqual(
+      list.itemListElement.map((entry) => entry.item),
+      [`${SITE}/`, `${SITE}/blog.html`, `${SITE}/news/alpha.html`],
+    );
+  });
+
+  it("gives the homepage no BreadcrumbList", async () => {
+    assert.equal(await listOf("index.html"), undefined);
   });
 });
 
