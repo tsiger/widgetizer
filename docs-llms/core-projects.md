@@ -29,7 +29,7 @@ The application uses `react-router-dom` to handle navigation between these pages
 - `/`: Redirects to `/pages` when an active project exists, otherwise `/projects`
 - `/projects`: Renders the `Projects.jsx` page, showing the list of all projects.
 - `/projects/add`: Renders the `ProjectsAdd.jsx` page.
-- `/projects/edit/:id`: Renders the `ProjectsEdit.jsx` page, where `:id` is the unique ID of the project being edited.
+- `/projects/edit/:id`: Renders the `ProjectsEdit.jsx` page, where `:id` is the unique ID of the project being edited. Only the active project's details open: any other id redirects to `/projects`, and the Projects list has no link to this page (it opens from the admin menu).
 
 ### Admin vs Workspace Flow
 

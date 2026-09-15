@@ -326,8 +326,8 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - [ ] PROJ-070 - From the Logo picker, open an image's details, change its alt text and save the drawer.
   Expected: Only the image details are saved; Project details is not submitted.
 
-- [ ] PROJ-071 - Open Project details for an inactive project that has a logo.
-  Expected: There is no image picker, but the current logo file name, a "Remove logo" button and a note to switch to the project are shown.
+- [ ] PROJ-071 - Open the ⋮ menu of a project in the Projects list, then paste the Project details address of a project that isn't active into the address bar.
+  Expected: The menu has no "Project details" item, and the pasted address goes back to the Projects list.
 
 - [ ] PROJ-072 - Open the logo image in the Media library and check where it is used.
   Expected: It is listed as used by "Business Details (Global)", so it can't be removed as unused.

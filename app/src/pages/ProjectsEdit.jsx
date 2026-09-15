@@ -35,13 +35,19 @@ export default function ProjectsEdit() {
   const showToast = useToastStore((state) => state.showToast);
   const setActiveProject = useProjectStore((state) => state.setActiveProject);
   const activeProject = useProjectStore((state) => state.activeProject);
+  const activeProjectLoading = useProjectStore((state) => state.loading);
+  const isActiveProject = activeProject?.id === id;
 
   const { navigateSafely, getDirtyTitle } = useGuardedFormPage(isDirty);
 
   useEffect(() => {
-    loadProject();
+    if (!activeProjectLoading && !isActiveProject) navigate("/projects", { replace: true });
+  }, [activeProjectLoading, isActiveProject, navigate]);
+
+  useEffect(() => {
+    if (isActiveProject) loadProject();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, isActiveProject]);
 
   const loadProject = async () => {
     try {
@@ -130,7 +136,7 @@ export default function ProjectsEdit() {
     }
   };
 
-  if (loading)
+  if (loading || !isActiveProject)
     return (
       <PageLayout title={t("projectsEdit.title")}>
         <LoadingSpinner message={t("projectsEdit.loading")} />
