@@ -21,6 +21,8 @@ Theme development relies on a shared set of data objects. Some are available eve
 - `theme`
 - `widget`
 - `block` (inside block loops)
+- `page` (the page being rendered, the same object the layout gets)
+- `project`
 - `pagination` (only in the widget that splits its page into pages)
 
 ### Available in collection item templates
@@ -28,8 +30,10 @@ Theme development relies on a shared set of data objects. Some are available eve
 - `theme`
 - `item`
 - `collection`
+- `page`
+- `project`
 
-> **Note:** `page` and `project` are only available in `layout.liquid`. The `item` and `collection` objects exist only in a collection type's `template.liquid`; see [Collections](theme-dev-collections.html).
+> **Note:** Header and footer see `page` and `project` too, so a footer can show the site's business details. The `item` and `collection` objects exist only in a collection type's `template.liquid`; see [Collections](theme-dev-collections.html).
 
 # Theme Object
 
@@ -103,7 +107,7 @@ All links are already correct for the page's depth and the Clean URLs setting. S
 
 # Page Object
 
-Available in `layout.liquid`:
+Available in `layout.liquid`, widget templates and collection item templates:
 
 - `page.id`
 - `page.uuid`
@@ -132,7 +136,7 @@ Available in `layout.liquid`:
 
 # Project Object
 
-Available in `layout.liquid`:
+Available in `layout.liquid`, widget templates and collection item templates:
 
 - `project.id`
 - `project.name`
@@ -140,8 +144,45 @@ Available in `layout.liquid`:
 - `project.description`
 - `project.theme`
 - `project.siteUrl`
+- `project.cleanUrls`
 - `project.created`
 - `project.updated`
+- `project.identity` — the site identity and business details the site owner entered in Project details (see below)
+
+### `project.identity`
+
+Every field is always present, and empty values are blank strings.
+
+- `project.identity.kind`: `organization`, `person` or `localBusiness`
+- `project.identity.category`: the chosen category, e.g. `restaurant`
+- `project.identity.name`: the public name, or the Site Title when none is set
+- `project.identity.description`: short description
+- `project.identity.logo`: the logo's media path. Render it with `{% image src: project.identity.logo %}`
+- `project.identity.email`
+- `project.identity.telephone`
+- `project.identity.telephoneHref`: a ready `tel:` link
+- `project.identity.priceRange`
+- `project.identity.profiles`: social profile URLs keyed by network (`facebook`, `instagram`, `twitter`, `linkedin`, `youtube`, `tiktok`, `pinterest`, `github`, `mastodon`, `bluesky`, `discord`, `reddit`, `telegram`, `threads`, `whatsapp`); only the ones set
+- `project.identity.hasProfiles`: `true` when at least one profile is set
+- `project.identity.address`: `null`, or `streetAddress`, `addressLocality`, `addressRegion`, `postalCode`, `addressCountry` (two letters) and `label`
+- `project.identity.openingHours`: the week as runs of consecutive days with the same hours. Each run has `firstDay`, `lastDay` (`monday` … `sunday`), `days`, `closed` and `ranges` (each with `opens` and `closes`, `HH:MM`). Days the owner left unstated are skipped.
+
+```liquid
+{% if project.identity.hasProfiles %}
+  {% for profile in project.identity.profiles %}
+    <a href="{{ profile[1] | safe_url }}">{{ profile[0] }}</a>
+  {% endfor %}
+{% endif %}
+
+{% for run in project.identity.openingHours %}
+  <p>
+    {{ run.firstDay | capitalize }}{% if run.lastDay != run.firstDay %}–{{ run.lastDay | capitalize }}{% endif %}:
+    {% if run.closed %}Closed{% else %}{% for range in run.ranges %}{{ range.opens }}–{{ range.closes }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endif %}
+  </p>
+{% endfor %}
+```
+
+Widgetizer also publishes these details to search engines on its own, so a theme only uses `project.identity` to show them to visitors. When your theme has its own social link settings, prefer `project.identity.profiles` when `hasProfiles` is true and fall back to your settings otherwise.
 
 # Item and Collection Objects
 
@@ -190,6 +231,6 @@ The following globals are available in all templates, including inside `{% rende
 
 Output CSS variables with `{% theme_settings %}` and use them in `base.css` or widget styles.
 
-### Avoid Page/Project in Widgets
+### Use Page and Project Sparingly in Widgets
 
-Widgets should be reusable across pages, so rely on `theme` and `widget` data inside widget templates.
+Widgets should be reusable across pages, so rely mostly on `theme` and `widget` data inside widget templates. Reach for `project` for site-wide facts, such as `project.identity` in a footer or contact widget, and for `page` only when a widget really depends on the page it sits on.

@@ -67,7 +67,7 @@ Schema defaults used when adding widgets later are a separate path: reproduce a 
 
 ### Step 3. Global widgets render with `page` and `project` in context (§Blocker 2) — *lands in stage 3 (structured data)*
 
-**Why:** the footer's "Use business details" toggle (stage 3) and the header's language switcher (this stage) both read project and page data, but header/footer render through `renderWidget`, which receives none.
+**Why:** the footer's Business details block (stage 3) and the header's language switcher (this stage) both read project and page data, but header/footer render through `renderWidget`, which receives none.
 
 - `packages/render-engine/src/renderEngine.js` — `renderPageLayout` and `renderCollectionItemPage` pass the page object and project data into the two `renderWidget` calls for header/footer (today the last argument is `null`). `createBaseRenderContext` exposes them as `page` / `project` for global widgets the same way page-level widgets already see them.
 - Preview's single-widget path (`renderSingleWidget` in `packages/builder-server/src/controllers/previewController.js`) supplies the current page too, so the canvas and the export agree.

@@ -54,6 +54,7 @@ The folder name is the type's machine id. Here's a complete `schema.json` (the A
 | `hasItemPages` | No | `true` → each item renders its own page (requires `template.liquid`) |
 | `defaultSort` | No | `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc` |
 | `schemaVersion` | No | Bookkeeping value carried onto items for future migrations |
+| `structuredData` | No | Tells search engines which fields hold the headline, date, image and so on (see [Structured Data](#structured-data)) |
 
 ### Item Fields
 
@@ -159,6 +160,40 @@ A few things happen automatically for item pages:
 - **Links are depth-aware.** Item pages live one directory deep, so internal links and assets are prefixed with `../` during export. Use the `{% image %}` tag and `item.url` / menu links and it's handled; don't hand-build `/uploads/...` paths.
 - **Richtext is escaped by default.** Render `richtext` fields with `| raw` (see [Autoescaping](theme-dev-liquid-assets.html#escaping-model)). Embedded images and internal links inside richtext resolve automatically.
 
+# Structured Data
+
+Widgetizer writes search-engine structured data (JSON-LD) into every exported page by itself. For item pages it can also describe the item, but only if the schema says which fields mean what. Add a `structuredData` block that maps each property to one of your setting ids:
+
+```json
+"structuredData": {
+  "type": "BlogPosting",
+  "headline": "title",
+  "datePublished": "date",
+  "description": "excerpt",
+  "image": "featured_image",
+  "articleBody": "body"
+}
+```
+
+`BlogPosting` is the only supported `type`. Its properties and the setting types each one accepts:
+
+| Property | Setting type |
+| :-- | :-- |
+| `headline` (required) | `text` |
+| `datePublished` | `date` |
+| `description` | `text` or `textarea` |
+| `image` | `image` |
+| `articleBody` | `richtext` or `textarea` |
+
+Every property is optional except `headline`. Widgetizer adds the item's address, its last-updated date, the page it belongs to and the site as publisher.
+
+Rules worth knowing:
+
+- **The mapping is checked.** An unknown `type` or property, or a setting id that doesn't exist or has the wrong type, makes the schema invalid. The collection is left out of the editor, and a theme upload containing it fails with the reason.
+- **Values come from the visible fields.** Use the fields the template actually shows, not SEO-only ones: search engines expect the data to match the page. Richtext is converted to plain text.
+- **It needs a site URL.** Without the project's Website Address, no structured data is written.
+- **Existing projects need a theme update.** A project keeps the schema copied when it was created, so ship a new or changed block in a theme update.
+
 # Where Item Data Lives
 
 The theme ships the **schema and template**; the site owner's **item data** lives separately in the project:
@@ -183,6 +218,7 @@ When you export the site, each item page is written to `{slugPrefix}/{slug}.html
 - [ ] `slugPrefix` set (or rely on the default `type`)
 - [ ] If `hasItemPages: true`, a `template.liquid` that renders `item.settings.*`
 - [ ] Richtext fields rendered with `| raw`
+- [ ] For article-like types, a `structuredData` block that maps to visible fields
 - [ ] A widget (or page) that lists items via the `collection` filter
 - [ ] Seed demo items in a [preset](theme-dev-structure.html) so the type looks complete out of the box
 

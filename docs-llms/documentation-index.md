@@ -179,7 +179,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Working with the project store/queries and active-project handling
 - Troubleshooting project state or the scope-first resolver
 
-**Key topics**: Project CRUD, admin-shell pages (`app/src/` ProjectsList/ProjectForm/ProjectImportModal), stores/queries in `packages/editor-ui/src/`, `apiFetch` + `X-Project-Id` from `getActiveProjectId()`, theme-copy + preset application + link enrichment on creation, scope-first resolver (`req.scope` via `req.adapters.scopeResolver`), ZIP import/export, `siteTitle`, `/api/projects` route table
+**Key topics**: Project CRUD, admin-shell pages (`app/src/` ProjectsList/ProjectForm/ProjectImportModal), stores/queries in `packages/editor-ui/src/`, `apiFetch` + `X-Project-Id` from `getActiveProjectId()`, theme-copy + preset application + link enrichment on creation, scope-first resolver (`req.scope` via `req.adapters.scopeResolver`), ZIP import/export, `siteTitle`, site identity & business details (`site_identity`, `normalizeSiteIdentity`, `400 { error, fields }`, active-project logo picker, readiness line, `global:site-identity` media usage), validation before folder rename, `/api/projects` route table
 
 ---
 
@@ -231,7 +231,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Using the `| collection` Liquid filter in templates
 - Understanding item-page depth prefixing, SEO, and export output
 
-**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), Clean URLs link shapes (`internalHref.js` `pageHref`/`itemHref`, `menuDeps.cleanUrls`, `globals.cleanUrls`), reserved `index` item slug, per-item SEO (`robots: index,follow` default), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
+**Key topics**: Collection-type schemas, item record shape & lifecycle, storage keys (`collection-types/`, `collections/`), scope-first service API, routes (`:collectionType`/`:itemSlug`) & isolation, `| collection` filter, item-page depth prefixing (`outputPathPrefix`/`prefixInternalHref`), Clean URLs link shapes (`internalHref.js` `pageHref`/`itemHref`, `menuDeps.cleanUrls`, `globals.cleanUrls`), reserved `index` item slug, per-item SEO (`robots: index,follow` default), `structuredData` block (`BlogPosting` field rules, validation, visible values, `collectionItem` on item page data), `MAX_COLLECTION_ITEMS`/`MAX_COLLECTIONS`, duplicate-uuid recovery, `_archived`/invalid normalization, `mediaBasePaths` richtext-media + richtext-link resolution (stable `data-*-uuid` anchors), item preview
 
 ---
 
@@ -270,7 +270,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Implementing export functionality and history tracking
 - Troubleshooting export issues
 
-**Key topics**: `exportProjectToDir()` core with fail-fast validation-before-write, scope-resolved endpoints (`X-Project-Id`, no `:projectId` in path), versioning/history (`sizeBytes`/`hasIssuesReport`/`developerMode`, `cleanupProjectExports`, failed-export recording), `renderingService` split (render-engine + builder-server), collection item-page export + two-pass validation, Clean URLs (one flag snapshot per export → links, canonicals, sitemap/robots; file names unchanged; viewer `<path>.html` fallback), forms manifest + `manifest.collections`, markdown alternate link, file-asset export (`assets/files/`, `/uploads/files/` rewrite, `filePath` var), `collectionDeps` adapter threading, ZIP downloads, site icons
+**Key topics**: `exportProjectToDir()` core with fail-fast validation-before-write, scope-resolved endpoints (`X-Project-Id`, no `:projectId` in path), versioning/history (`sizeBytes`/`hasIssuesReport`/`developerMode`, `cleanupProjectExports`, failed-export recording), `renderingService` split (render-engine + builder-server), collection item-page export + two-pass validation, Clean URLs (one flag snapshot per export → links, canonicals, sitemap/robots; file names unchanged; viewer `<path>.html` fallback), forms manifest + `manifest.collections`, markdown alternate link, file-asset export (`assets/files/`, `/uploads/files/` rewrite, `filePath` var), `collectionDeps` adapter threading, ZIP downloads, site icons, structured data (JSON-LD graph per page type, Site URL requirement, ids on the page's own address, identity logo shipped via `global:site-identity`, `structuredData.readiness` in the export result)
 
 ---
 
@@ -310,7 +310,7 @@ This document serves as a comprehensive index to all documentation in the Widget
 - Planning changes to repositories or persisted metadata
 - Wiring the DB connection via DI
 
-**Key topics**: Tables and relationships, 4-migration history (`owner_id`, `caption`, backfill, `_migrations` tracking), Connection & DI (`initDb({ getConnection })` vs `getDb()` fallback, pragmas), repository pattern, scope-first/adapter-agnostic framing, DB vs filesystem boundaries (incl. `collections/<type>/<slug>.json`), pointers to core-packages.md and core-export.md
+**Key topics**: Tables and relationships, 6-migration history (`owner_id`, `caption`, backfill, `clean_urls`, `site_identity`, `_migrations` tracking), Connection & DI (`initDb({ getConnection })` vs `getDb()` fallback, pragmas), repository pattern, scope-first/adapter-agnostic framing, DB vs filesystem boundaries (incl. `collections/<type>/<slug>.json`), pointers to core-packages.md and core-export.md
 
 ---
 
@@ -482,13 +482,13 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ### **[future-structured-data-design.md](future-structured-data-design.md)** - Future: Schema.org / JSON-LD
 
-**Purpose**: Locked design for automatic structured data — one safe JSON-LD graph through the existing SEO tag, project-owned site identity and business details that Arch can display in the footer, a closed collection-schema mapping contract (Arch News → `BlogPosting`), breadcrumbs from the shared stage-1 trail, and the stage-3 build steps **When to use**:
+**Purpose**: Design, shipped 2026-09-15, for automatic structured data — what changed during the build, one safe JSON-LD graph through the existing SEO tag, project-owned site identity and business details that Arch displays in a Business details block, a closed collection-schema mapping contract (Arch News → `BlogPosting`), breadcrumbs from the shared stage-1 trail, and the stage-3 build steps **When to use**:
 
 - Implementing or reviewing structured data / JSON-LD output
 - Adding identity or business fields to Project details, or displaying them in a theme
 - Checking what was deliberately left out (About/Contact page types, widget-level schema, custom JSON-LD editors) and why
 
-**Key topics**: Three rules for a non-technical audience (visible data, zero vocabulary, derive don't ask), stable facts vs translatable text, social profiles dual-read, `structuredData` collection-schema block, breadcrumb auto-detection from the widget `collection` declaration, readiness line, cut order, resolved questions
+**Key topics**: Three rules for a non-technical audience (visible data, zero vocabulary, derive don't ask), stable facts vs translatable text (`text` keys), `site_identity` shape and categories, project profiles win over theme social settings, `structuredData` collection-schema block, ids on the page's own address, BreadcrumbList from the visible trail, readiness line, Arch `business_details` block instead of a toggle, `project.identity`, cut order, resolved questions
 
 ---
 

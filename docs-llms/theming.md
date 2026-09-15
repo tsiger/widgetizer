@@ -370,9 +370,14 @@ The `layout.liquid` template has access to additional objects that individual wi
 - `{{ main_content }}`: Rendered main page content
 - `{{ footer }}`: Rendered footer content
 - `{{ body_class }}`: Dynamic CSS classes for the body element (page slugs are prefixed with `page-`, e.g., `page-about`)
+
+The layout also gets these, which every widget (header and footer included) and every collection item template see too:
+
 - `{{ page.* }}`: Current page data
 - `{{ project.* }}`: Project information
 - `{{ theme.* }}`: Global theme settings
+
+A widget's `page` is the same object the layout gets, breadcrumbs and pagination included. It comes from `sharedGlobals.currentPageData`, which preview, export, item pages and the editor's single-widget re-render set once per render. A re-render request that sends no page gives the widget no `page`.
 
 #### Page Object (`{{ page.* }}`)
 
@@ -410,7 +415,38 @@ Contains project metadata resolved from the SQLite-backed project store:
 {{ project.cleanUrls }}   <!-- Clean URLs setting (boolean); {% seo %} reads it for the canonical -->
 {{ project.created }}     <!-- Project creation timestamp -->
 {{ project.updated }}     <!-- Project last updated timestamp -->
+{{ project.identity }}    <!-- Site identity and business details from Project details (below) -->
 ```
+
+#### Site identity (`{{ project.identity }}`)
+
+The project's site identity and business details, resolved for display by `identityForTheme` (`packages/core/src/utils/siteIdentity.js`). Every field is always present; empty values are `""`.
+
+| field | meaning |
+|---|---|
+| `kind` | `organization`, `person` or `localBusiness`, derived from the category (no category = organization) |
+| `category` | category id, e.g. `restaurant` |
+| `name` | public name, else the Site Title |
+| `description` | short description |
+| `logo` | stored `/uploads/images/…` path — pass it to `{% image %}`, it is not an absolute URL |
+| `email`, `telephone`, `priceRange` | as entered |
+| `telephoneHref` | `tel:` link with only digits and `+` kept |
+| `profiles` | set profiles only, keyed by network (`facebook`, `instagram`, …) |
+| `hasProfiles` | `true` when any profile is set |
+| `address` | primary location `{ streetAddress, addressLocality, addressRegion, postalCode, addressCountry, label }`, or `null` when it has no address field |
+| `openingHours` | primary location's week as runs of consecutive days with the same hours: `{ firstDay, lastDay, days, closed, ranges: [{ opens, closes }] }`; days left "not stated" are skipped and break a run |
+
+```liquid
+{% if project.identity.address %}
+  <address>{{ project.identity.address.streetAddress }}, {{ project.identity.address.addressLocality }}</address>
+{% endif %}
+{% for run in project.identity.openingHours %}
+  {{ run.firstDay }}{% if run.lastDay != run.firstDay %}–{{ run.lastDay }}{% endif %}:
+  {% if run.closed %}Closed{% else %}{% for r in run.ranges %}{{ r.opens }}–{{ r.closes }} {% endfor %}{% endif %}
+{% endfor %}
+```
+
+Core never reads theme settings for identity, so a theme that also has its own social settings decides the fallback itself. Arch's `snippets/social-icons.liquid` uses `project.identity.profiles` when `hasProfiles` is true and its Social Media settings otherwise. Its `snippets/business-details.liquid` draws address, contact and hours for the `business_details` block in the footer and Contact Details.
 
 The same setting is on the render globals as `globals.cleanUrls`, next to `globals.outputPathPrefix`. Menu, link and richtext links are resolved for you in the right shape; a theme that hand-writes an internal href uses the `page_url` / `item_url` filters, which read both globals and emit the correct shape at the current depth — see §Link filters below. Reading the globals directly is the escape hatch for a link neither filter can build.
 
@@ -1894,6 +1930,7 @@ The `{% seo %}` tag automatically handles:
 - Open Graph tags
 - Twitter Card meta tags
 - Canonical URLs
+- Structured data (JSON-LD) — website, identity, web page, breadcrumbs, and item nodes for collection types with a `structuredData` block; needs the project's Site URL. See [Site Exporting](core-export.md#structured-data-json-ld) and [Collections §5c](core-collections.md).
 
 ### Font Management
 

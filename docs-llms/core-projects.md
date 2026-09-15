@@ -14,7 +14,7 @@ The project management UI is primarily handled by three OSS-shell pages (`app/sr
 
 These pages rely on shared components in `app/src/components/projects/`:
 
-- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address, Clean URLs)
+- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address, Clean URLs; on edit only, the Site identity and Business details sections — see [Site Identity](#6-site-identity-and-business-details))
   - Built on **react-hook-form** for validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
@@ -111,7 +111,7 @@ Projects can be exported as ZIP files for backup or transfer to another installa
 2.  **Loading Feedback**: A persistent toast notification immediately appears showing "Exporting project..." and remains visible throughout the export process.
 3.  **Backend Processing**: The `exportProject(id)` function sends a `POST` request to `/api/projects/:projectId/export`.
 4.  **ZIP Creation**: The backend creates a ZIP archive containing:
-    - **`project-export.json`**: A manifest file with `formatVersion: "1.1"`, `exportedAt`, `widgetizerVersion`, and a nested `project` object. That nested object includes project metadata such as `name`, `description`, `siteTitle`, `theme`, `themeVersion`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `created`, and `updated`.
+    - **`project-export.json`**: A manifest file with `formatVersion: "1.1"`, `exportedAt`, `widgetizerVersion`, and a nested `project` object. That nested object includes project metadata such as `name`, `description`, `siteTitle`, `theme`, `themeVersion`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity`, `created`, and `updated`.
     - **All project files**: Pages, menus, widgets, uploads, theme.json, collections, and other project assets.
 5.  **Download**: The ZIP file is streamed to the browser and automatically downloaded with a timestamped filename (e.g., `my-project-export-2024-01-15T10-30-00.zip`).
 6.  **Completion**: The loading toast is dismissed and replaced with a success toast.
@@ -135,7 +135,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
     - Project metadata is written to SQLite only after successful file copy
-    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl` and `cleanUrls` in addition to the core project fields
+    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls` and `siteIdentity` in addition to the core project fields. An imported identity is never refused: only its valid part is kept.
 7.  **Cleanup**: Temporary files are removed on both success and failure.
 8.  **Feedback + Navigation**: A success toast is shown, the modal closes, and the imported project is immediately opened as the active project inside the site workspace.
 
@@ -160,7 +160,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
     - **Localized Validation**: All error messages and help text are fully localized
 6.  **Submission**: The user modifies the form and clicks "Save Changes":
-    - **Folder Renaming**: If the folder name changes, the system renames the project directory accordingly.
+    - **Folder Renaming**: If the folder name changes, the system renames the project directory accordingly. Every check that can reject the request (string types, Website Address, site identity, booleans) runs first, because the directory moves before the row is written and a failure after the move would strand the project.
     - **URL Persistence**: Since the project ID is stable, the user is **not** redirected; the API and frontend routes remain valid.
     - **State Synchronization**: Active project state is properly maintained as the ID remains constant.
 7.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
@@ -169,6 +169,55 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - **Windows Compatibility**: Project directory renaming uses a copy + remove approach for better Windows file system compatibility
 9.  **Theme Update Apply Sync**: When the user applies a theme update from this screen, `applyThemeUpdate(id)` invalidates the cached projects list before `loadProject()` re-reads it. That keeps `themeVersion` and update-status metadata in sync immediately after the update.
 10. **Feedback**: Localized success toast notifications show the completion status, and navigation buttons allow returning to the project list.
+
+### 6. Site Identity and Business Details
+
+A project stores who is behind the site — the facts core publishes as structured data ([Site Exporting](core-export.md#structured-data-json-ld)) and themes read as `project.identity` ([Theming](theming.md)). It lives in the `site_identity` JSON column (migration v6, [Database](core-database.md)) and reaches controllers as `project.siteIdentity`.
+
+**Shape.** Owned, validated and resolved by `packages/core/src/utils/siteIdentity.js`. Values that will need translation sit under a `text` key; everything else never will.
+
+```json
+{
+  "category": "restaurant",
+  "logo": "/uploads/images/logo.png",
+  "email": "hello@example.com",
+  "telephone": "+30 210 123 4567",
+  "priceRange": "€€",
+  "profiles": { "instagram": "https://instagram.com/example" },
+  "locations": [
+    {
+      "streetAddress": "1 Main St", "addressLocality": "Athens", "addressRegion": "Attica",
+      "postalCode": "10558", "addressCountry": "GR",
+      "openingHours": { "monday": [{ "opens": "09:00", "closes": "17:00" }], "sunday": [] },
+      "text": { "label": "Plaka branch" }
+    }
+  ],
+  "text": { "publicName": "Example Taverna", "description": "Home cooking since 1980." }
+}
+```
+
+- **`category`** — an id from `SITE_IDENTITY_CATEGORIES`. Each row declares its schema.org type and its kind (`organization`, `person`, `localBusiness`); the kind is derived, never stored, and no category means organization. The list is Arch's preset business types plus Organization, Person and a generic local business. ProfessionalService is deliberately unused (deprecated) — businesses with no exact type map to `LocalBusiness`. Add a row when a new theme or preset brings a business type.
+- **`logo`** — an `/uploads/images/…` path, not a media id: duplicate and import give media files new ids.
+- **`profiles`** — one http(s) URL per network in `PROFILE_NETWORKS` (facebook, instagram, twitter, linkedin, youtube, tiktok, pinterest, github, mastodon, bluesky, discord, reddit, telegram, threads, whatsapp).
+- **`locations[]`** — up to 20; the first is the primary and the only one the UI edits. `addressCountry` is two letters, stored upper-case. `openingHours` is keyed by weekday: `[]` = closed, a list of `{ opens, closes }` (`HH:MM`, opens ≠ closes, at most 4, a range may cross midnight) = open, a missing day = not stated.
+- Text limits: 200 for names and street, 500 for the description (the rest are in `LIMITS`).
+
+**Validation.** `normalizeSiteIdentity(input)` returns `{ value, errors }`. `value` keeps only valid, non-empty fields; `errors` is one `{ field, code }` per rejected field, with dotted paths (`locations.0.openingHours.monday.1`) and code `invalid`, `tooLong`, `tooMany` or `unknown`. The form (`siteIdentityForm.js`) and the controller run the same function.
+
+**Controller** (`projectController.js`):
+
+- `createProject` accepts `siteIdentity` from the API (the UI only offers it on edit), and `updateProject` validates it whenever it is sent. Any error → `400 { error: "Invalid business details.", fields }`, and nothing is written.
+- Before validation, `readSiteIdentity` tag-strips only human-readable text (public name, description, price range, street, locality, region, postcode, location label) with `stripHtmlToText`, which returns plain text with `&` kept as typed. URLs, email, telephone and the logo path are validated exactly as sent — `stripHtmlTags` re-serialises through DOMPurify and would rewrite a query string.
+- A save that sends the identity refreshes its media usage (`updateSiteIdentityMediaUsage`, source `global:site-identity`), so the library won't delete the logo and exports copy it. The full rescan includes it too.
+- Project ZIP export writes `siteIdentity` into the manifest; import keeps only the valid part (`normalizeSiteIdentity(...).value`) and never refuses a project for it; duplicate copies it with the rest of the row.
+
+**UI** (edit page only; `app/src/components/projects/SiteIdentityFields.jsx`, `OpeningHoursEditor.jsx`, `siteIdentityForm.js`, strings under `forms.project.identity` / `forms.project.business` in `packages/core/src/locales/en.json`):
+
+- **Readiness line** at the top of *Site identity* — `identityReadiness` over the unsaved form values: website address, name, logo (not for a person), address (local business: street, city, country). Each missing item is a button that scrolls to the field; *website address* opens More settings and focuses the Website Address.
+- **Site identity** — category (grouped General / Local business), public name (Site Title as placeholder), logo, email, short description, the 15 profiles.
+- **Business details** — shown for a local-business category, or whenever one of its fields has an error so a switched category can't hide one: phone, price range, location name, address, and the opening-hours editor (per day Not stated / Closed / Open, up to four ranges, "Add hours" for split shifts).
+- **Logo only for the active project.** Media and theme requests are scoped to the active project on the server, so the image picker and "Use the Site Icon" (offered when a Site Icon exists and no logo is set) render only when the edited project is active. Otherwise the field shows the current file name, a Remove button and a note to switch projects.
+- Submit runs `formToIdentity`, which also refuses emptying the primary location while other locations exist (`primaryRequired`): the pruned primary would otherwise be replaced by the next, uneditable location. Any error blocks the save with a toast and per-field messages. The form is `noValidate` so core's rules own the errors, and `MediaDrawer` stops its own submit event, which React would otherwise bubble through the portal into the project form.
 
 ---
 

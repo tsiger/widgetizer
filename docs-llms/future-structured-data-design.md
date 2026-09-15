@@ -1,8 +1,36 @@
 # Future: Schema.org / JSON-LD
 
-> **Status: direction locked 2026-08-06; sharpened 2026-09-09 — open questions resolved, scope trimmed, placed as stage 3 of the series.** The series (groundwork → breadcrumbs → pagination → **structured data** → multilang) and its cross-stage build order live in `future-roadmap.md`. Nothing is built yet.
+> **Status: shipped 2026-09-15 on branch `0.9.10` (commits `a303661b`…`3017c436`); direction locked 2026-08-06, sharpened 2026-09-09.** All nine build steps are in: steps 1–8 in those commits, step 9 (export and developer-mode reporting of missing details) in the commit that follows them. Where the build departs from the design below, §What changed wins. The series (groundwork → breadcrumbs → pagination → **structured data** → multilang) and its cross-stage build order live in `future-roadmap.md`.
 >
 > One answer per question below. The 2026-08 open questions are resolved in §Resolved questions, not re-argued in the body.
+
+---
+
+## What changed during the build and review (2026-09-15)
+
+- **Every widget gets `page` and `project`, not just header and footer.** `renderWidget` reads the page from `sharedGlobals.currentPageData`, which preview, export, item pages and the canvas morph set once per render; `page` is shaped like the layout's (breadcrumbs and pagination included). A morph request without a page gets no `page`, and the morph plans pagination from the whole posted page so a morphed header keeps `page.pagination`.
+- **The logo is stored as its `/uploads/images/…` path, not a media id** — duplicate and import give every media file a new id. It is tracked as media usage source `global:site-identity` so exports copy it and the library won't delete it.
+- **Categories are declared rows** (`id`, schema.org type, kind) in `SITE_IDENTITY_CATEGORIES`: Arch's preset business types plus Organization, Person and a generic LocalBusiness. **ProfessionalService is not used** (schema.org deprecates it); businesses without an exact type get `LocalBusiness`. **VeterinaryCare is emitted as `["VeterinaryCare", "LocalBusiness"]`**, since schema.org files it outside LocalBusiness. When a new theme or preset brings a business type, add a row.
+- **Profiles are one URL per named network** (`PROFILE_NETWORKS`: facebook instagram twitter linkedin youtube tiktok pinterest github mastodon bluesky discord reddit telegram threads whatsapp); an unknown network is refused.
+- **Every translatable value sits under a `text` key** — `text.publicName`, `text.description`, `locations[].text.label`.
+- **Validation** (`normalizeSiteIdentity`) returns the pruned value plus one `{ field, code }` per rejected field. Opening hours: `HH:MM`, opens ≠ closes, at most 4 ranges a day, `[]` = closed, a missing day = not stated, ranges may cross midnight. Country is two letters, stored upper-case; up to 20 locations. Create and update answer `400 { error, fields }`.
+- **Only human-readable text is tag-stripped**, with the new `stripHtmlToText` (plain text, `&` kept as typed). URLs, email, phone and the logo path are validated exactly as sent: `stripHtmlTags` re-serialises through DOMPurify, which would rewrite a query string and store `&amp;`.
+- **Project update validates everything before the folder rename.** Before, a request rejected after the rename could strand the project. Import keeps only the valid part of an imported identity.
+- **Node ids anchor on the page's own published address** (`pageSelfUrl` in `packages/core/src/utils/publishedUrls.js`, shared with `SeoTag`), never on an explicit canonical override — for pages, numbered copies and items alike. `urlNodeId` refuses addresses the URL parser would silently repair.
+- **The serializer escapes `<`, `>`, `&`, U+2028 and U+2029**, not just `</script`. Each builder is isolated (one that throws is skipped), and `{% seo %}` appends the script in its own `try`, so a structured-data failure never costs the page its meta tags.
+- **WebSite is always on the homepage; the identity node only when a name resolves** (public name, else Site Title), and `publisher` / `about` references follow it. A person gets `image`, an organization `logo`, a local business both. A closed day is written as opens and closes `00:00`, which Google reads as closed.
+- **BreadcrumbList appears on every page whose trail has two or more entries**, so ordinary pages (Home → page), items and numbered copies carry one, not only News items (§Automatic graph table updated).
+- **BlogPosting reads richtext through `htmlToText`**: block boundaries become line breaks, inline markup joins its neighbours, quoted attributes are respected, script/style content is dropped. Item page data carries `collectionItem { type, structuredData, settingTypes, settings }` from the prepared (visible) settings.
+- **A numbered copy's last crumb is named "Page N"** — the breadcrumbs snippet's default `page_label`. A theme passing its own `page_label` or `home_label` draws different words than the JSON-LD says. Known limitation; multilang will have to revisit it.
+- **The readiness line sits at the top of the Site identity section**, not under Website. Items: website address, name, logo (not for a person), address (local business: street, city and country).
+- **Site identity and Business details appear on the project edit page only.** Business details shows for local-business categories, or whenever one of its fields has an error. Emptying the primary location while other locations exist is refused (`primaryRequired`): pruning would promote the next, uneditable location. The form is `noValidate`, and `MediaDrawer` stops its submit event from reaching an enclosing form.
+- **The logo picker and "Use the Site Icon" only appear while the edited project is the active one**, because media and theme requests are scoped to the active project on the server. Otherwise the form shows the current file name, a Remove button and a note.
+- **No "Use business details" toggle.** Arch has a `business_details` block in the footer and in Contact Details (title, show address, show phone and email, show hours) rendered by `themes/arch/snippets/business-details.liquid`. It publishes nothing when empty and shows a hint in preview.
+- **Project profiles win everywhere Arch draws social icons** — footer, Contact Details, Social Icons, Accordion, Map and Schedule Table pass `identity: project.identity` to `snippets/social-icons.liquid`. The theme's Social Media settings are the fallback when the project has no profiles, and the mail icon uses the project email first. The fallback is Arch's; core never reads theme settings.
+- **`project.identity` carries the logo path, not an absolute URL** (so it works with `{% image %}`), plus `telephoneHref`, `hasProfiles`, the primary `address` (or `null`) and `openingHours` grouped into runs of consecutive days.
+- **Existing projects get site, page and breadcrumb data with no theme update.** News `BlogPosting` and the Business details block need the Arch 0.9.10 theme update (`themes/arch/updates/0.9.10`).
+- **The export result carries `structuredData: { readiness, warnings }`.** `readiness` is `identityReadiness`; `warnings` lists `emptyArticleFields` (an item leaves mapped article fields empty, from core `emptyArticleFields`) `noListingPage` (no page lists the collection) and `ambiguousListingPage` (several do and none is the anchor); in both the item's trail is Home → item. A homepage listing counts as resolved. The export screen shows them in a plain-language note after a successful export, and developer mode adds them to `__export__issues.html`. There is no separate preview report: Project details' readiness line covers the site-wide items.
+- **A guard test (`themeUpdateCopies.test.js`) fails when any file in Arch's newest update folder differs from the base theme file**, since forgetting the update copy leaves existing projects on stale files.
 
 ---
 
@@ -18,7 +46,7 @@ Structured data is not a theme setting, but it is not ignorant of the theme eith
 
 These decide most of the design below. When in doubt, apply them in order.
 
-1. **Make identity data visible on the site, not just in the head.** Business details live in Project details and Arch's footer and contact widget can display them with one toggle. People fill in an address when it appears in their footer; nobody fills in an SEO form. This single decision does more for adoption than anything else here.
+1. **Make identity data visible on the site, not just in the head.** Business details live in Project details and Arch's footer and contact widget can display them with one Business details block. People fill in an address when it appears in their footer; nobody fills in an SEO form. This single decision does more for adoption than anything else here.
 2. **Zero new vocabulary in the UI.** "Schema", "JSON-LD" and "structured data" appear only in one status line — *"Google can read your business details: name ✓, address ✓, logo missing"*. A readiness line with plain actions replaces a validator screen.
 3. **Derive, don't ask.** Public name defaults from Site Title. The logo is offered from the Site Icon with one confirmation, never silently reused. The identity kind (organization / person / local business) is derived from the chosen category, not stored separately.
 
@@ -82,7 +110,7 @@ Arch stores social URLs in its theme settings today and existing footers depend 
 
 - Project details gains the profile fields (project-owned, canonical).
 - Core builds `sameAs` from project profiles when any are set, and never reads theme settings — structured data works the same under a theme with no social settings at all.
-- Arch's footer and social widgets read project profiles first and fall back to their own theme settings when the project has none. Presets and theme updates are untouched.
+- Every Arch social icon set (footer, Contact Details, Social Icons, Accordion, Map, Schedule Table) reads project profiles first and falls back to the theme settings when the project has none. The 0.9.10 theme update ships the change; presets are untouched.
 - A later cleanup can retire the theme fields once projects have migrated; not this release.
 
 No existing footer loses a link at any point.
@@ -91,9 +119,9 @@ No existing footer loses a link at any point.
 
 ## Theme use of identity data
 
-- Project identity is exposed to Liquid as `project.identity` (resolved: derived kind, absolute logo URL, profiles with the dual-read fallback applied).
-- Arch's footer and its contact-details widget gain a **"Use business details"** toggle: on, they render name, address, phone, email, hours and profiles from the project; off, they behave exactly as today. This is what makes rule 1 real.
-- Global widgets (header / footer) need `project` in their render context. Today `renderWidget` does not receive it — that contract change is multilang plan step 3 and **lands in this stage**.
+- Project identity is exposed to Liquid as `project.identity` (resolved: derived kind, name falling back to Site Title, the stored logo path, the project's own profiles, primary address, opening hours grouped into runs). The theme applies any social-settings fallback itself; core never reads theme settings.
+- As built, Arch's footer and its contact-details widget gain a **Business details block** (title, show address, show phone and email, show hours) instead of a "Use business details" toggle. It renders address, phone, email and hours from the project, and existing blocks behave exactly as before. This is what makes rule 1 real.
+- Global widgets (header / footer) need `page` and `project` in their render context. That contract change is multilang plan step 3; it **landed in this stage** for every widget.
 
 ---
 
@@ -101,11 +129,11 @@ No existing footer loses a link at any point.
 
 | Page | Structured data |
 |---|---|
-| Homepage | `WebSite`, the identity node (`Organization` / `Person` / `LocalBusiness` subtype from the category), `WebPage` |
-| Ordinary page | `WebPage` |
-| Paginated copy (`blog/page/2`) | `WebPage` — its own canonical id, nothing else |
+| Homepage | `WebSite`, the identity node (`Organization` / `Person` / `LocalBusiness` subtype from the category; only when a name resolves), `WebPage` |
+| Ordinary page | `WebPage`, `BreadcrumbList` (Home → page) |
+| Paginated copy (`blog/page/2`) | `WebPage` on its own address, `BreadcrumbList` ending "Page 2" |
 | Arch News item | `WebPage`, `BlogPosting`, `BreadcrumbList` |
-| Arch Project / Service item | `WebPage` only, until a matching builder exists |
+| Arch Project / Service item | `WebPage` and `BreadcrumbList`, until a matching builder exists |
 
 There is **no page-purpose selector**. About and Contact page types are dropped: Google produces no rich result for either, and they cost a persisted page field, a control, and a default on every existing page for nothing a user can see.
 
@@ -153,7 +181,7 @@ Doing these properly means first adding the missing fields to those widgets, the
 
 Sections, not one long form:
 
-- **Website** — Site title, Website Address, Clean URLs, and the **readiness line** (*"Google can read your business details: name ✓, address ✓, logo missing"* — each missing item is a link to the field). Computed by one core function shared with the export warnings.
+- **Website** — Site title, Website Address, Clean URLs. As built, the **readiness line** sits at the top of Site identity instead (*"Google can read your business details: name ✓, address ✓, logo missing"* — each missing item is a link to the field). Computed by one core function shared with the export warnings.
 - **Site identity** — category (drives the derived kind), public name (pre-filled from Site Title), identity logo (offer the Site Icon with a confirm), email, description, profiles.
 - **Business details** — shown when the category derives a local business: phone, price range, primary location and address, opening hours with closed days and split shifts. The hours editor is the single largest UI piece; budget it on its own.
 
@@ -187,6 +215,8 @@ Everything else is the feature.
 ---
 
 ## Build steps (stage 3 of the series)
+
+Steps 1–8 shipped 2026-09-15 (`a303661b`, `95acac2e`, `e3ae2f42`, `e4873122`, `24861cb9`, `013ef1ec`, `538594ec`, `3017c436`); step 9's export and developer-mode reporting landed in the commit after them. The steps below are the plan as written — §What changed records where the build departed (notably step 3's escaping, step 7's readiness placement and step 8's block instead of a toggle).
 
 Prerequisites already landed by earlier stages: the Site URL base helper and `page_url` filter (stage 0); the breadcrumb trail, the widget `collection` declaration and the listing anchor (stage 1); derived output depth and the addressing module (stage 2). Multilang plan step 3 (global widgets get `page` and `project` in context) lands **here**, as step 1.
 

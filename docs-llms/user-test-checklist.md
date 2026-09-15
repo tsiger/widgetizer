@@ -50,6 +50,9 @@ Before testing starts, the test owner should provide these. If something is not 
 - A project with at least one collection item marked "Needs attention."
 - A project with leftover collection content from an older schema, if available.
 - A project with a page containing a Core Form widget, or time to create one during testing.
+- An Arch project with a Website Address, at least one News item with date, excerpt, featured image and body, and a News grid split into pages, for the structured-data tasks.
+- An Arch project still on a theme version before 0.9.10, if available.
+- Internet access to Google's Rich Results Test (its "Code" option accepts pasted page source).
 - An older Electron desktop build for auto-update testing, if desktop update testing is in scope.
 
 ## Test Waves
@@ -75,6 +78,8 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - **Site preview** - a live preview of the site without editor controls.
 - **Export** - a static website ZIP for deployment.
 - **Backup** - a Widgetizer project ZIP that can be imported back into Widgetizer.
+- **Site identity / Business details** - who is behind the site (name, logo, contact details, social profiles, address, opening hours), entered in Project details.
+- **Structured data** - a hidden block in each exported page's source (`<script type="application/ld+json">`) that describes the page to search engines.
 
 ---
 
@@ -279,6 +284,56 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [ ] PROJ-057 - Make unsaved editor changes, then switch active project.
   Expected: No changes are saved to the wrong project. If no warning appears, record the possible data-loss risk.
+
+### Site Identity and Business Details
+
+- [ ] PROJ-058 - Open Project details for an existing project, then open the New project form.
+  Expected: Project details has a "Site identity" section starting with a line such as "Google can read your details: …". The New project form has no such section.
+
+- [ ] PROJ-059 - With Website Address empty, click "website address missing" in that line.
+  Expected: More settings opens and the Website Address field is focused.
+
+- [ ] PROJ-060 - Leave Public name empty with a Site Title set.
+  Expected: The Site Title shows as the field's placeholder, and the line shows the name as ready.
+
+- [ ] PROJ-061 - Under "What best describes you?", choose Person.
+  Expected: Logo is no longer listed in the line, and no Business details section appears.
+
+- [ ] PROJ-062 - Choose Organization.
+  Expected: Logo is listed in the line; still no Business details section.
+
+- [ ] PROJ-063 - Choose Restaurant.
+  Expected: A Business details section appears with phone, price range, location name, address and opening hours, and the line now lists the address.
+
+- [ ] PROJ-064 - Fill in Business details, switch to Organization, save, reopen Project details and switch back to Restaurant.
+  Expected: The save succeeds and the business details you entered are still there.
+
+- [ ] PROJ-065 - Set opening hours: Monday Open 09:00–17:00; Tuesday Open with "Add hours" for 09:00–13:00 and 17:00–21:00; Sunday Closed; Saturday left Not stated. Save and reopen.
+  Expected: Every day shows exactly what you set.
+
+- [ ] PROJ-066 - Keep clicking "Add hours" on one day.
+  Expected: The button disappears after four ranges.
+
+- [ ] PROJ-067 - Enter an email without `@`, a profile address without `https://` and the country "Greece", then save.
+  Expected: The save is refused with a message, and each of those fields shows its own error.
+
+- [ ] PROJ-068 - Enter the public name `Tom & Jerry <b>Cafe</b>`, save and reopen.
+  Expected: It shows `Tom & Jerry Cafe`: the tags are gone and `&` is kept.
+
+- [ ] PROJ-069 - On the active project, pick a logo from the media library. Then remove it and, with a Site Icon set, click "Use the Site Icon".
+  Expected: The picked image becomes the logo, and "Use the Site Icon" fills in the Site Icon. The button only appears while no logo is set.
+
+- [ ] PROJ-070 - From the Logo picker, open an image's details, change its alt text and save the drawer.
+  Expected: Only the image details are saved; Project details is not submitted.
+
+- [ ] PROJ-071 - Open Project details for an inactive project that has a logo.
+  Expected: There is no image picker, but the current logo file name, a "Remove logo" button and a note to switch to the project are shown.
+
+- [ ] PROJ-072 - Open the logo image in the Media library and check where it is used.
+  Expected: It is listed as used by "Business Details (Global)", so it can't be removed as unused.
+
+- [ ] PROJ-073 - Duplicate, back up and re-import a project that has business details and a logo.
+  Expected: The copy and the imported project show the same details and logo.
 
 ---
 
@@ -1444,6 +1499,91 @@ Test each control type wherever it appears: widget settings, collection forms, S
 
 - [ ] EXPZIP-024 - Export with markdown output enabled and open a page's HTML.
   Expected: The markdown alternate link is a full address under the Site URL, folder included.
+
+### Structured Data and Business Details on the Site
+
+Use the structured-data project from the test pack, with a local-business category (e.g. Restaurant), a public name, logo, address, opening hours and at least one social profile filled in Project details.
+
+- [ ] SDATA-001 - Export, open `index.html` in a text editor and find `application/ld+json`.
+  Expected: One such script in the head. It holds a WebSite, a Restaurant with the name, logo, address, opening hours and profile links, and a WebPage, all with full addresses under the Website Address.
+
+- [ ] SDATA-002 - Same export: open an ordinary page such as `about.html`.
+  Expected: A WebPage with that page's own full address and a BreadcrumbList Home → page. No Restaurant entry on this page.
+
+- [ ] SDATA-003 - Same export: open a News item page.
+  Expected: WebPage, BlogPosting and BreadcrumbList. The headline is the title, the date matches, the description is the excerpt, the image is a full address, and the body is plain text without HTML tags.
+
+- [ ] SDATA-004 - Same export: open page 2 of the split News grid page (`news/page/2.html`).
+  Expected: The WebPage address is page 2's own address and the breadcrumb ends with "Page 2".
+
+- [ ] SDATA-005 - Give a page its own canonical address by hand, export, and open that page.
+  Expected: The canonical tag shows what you typed; the structured data still uses the page's real address.
+
+- [ ] SDATA-006 - Clear the Website Address and export.
+  Expected: The export succeeds and no page contains `application/ld+json`.
+
+- [ ] SDATA-007 - Turn on Clean URLs and export again.
+  Expected: Structured-data addresses drop `.html` (`…/about#webpage`); the homepage address is the site root.
+
+- [ ] SDATA-008 - Change the category to Person and export.
+  Expected: The homepage has a Person with an image and no address or opening hours.
+
+- [ ] SDATA-009 - Clear both the public name and the Site Title, then export.
+  Expected: The homepage has WebSite and WebPage only, with no Organization, Person or business entry.
+
+- [ ] SDATA-010 - Give a News item a title with `&`, `<` and quotes, then export.
+  Expected: The page head is intact and the article headline shows the title as typed.
+
+- [ ] SDATA-011 - Export with no logo (and, for a local business, no address).
+  Expected: The export succeeds. Below the success message, a yellow note says search engines can't read everything yet and lists the missing details ("Add in Project details: logo, address."). Exporting after filling them in shows no note.
+
+- [ ] SDATA-012 - Paste the exported homepage source into Google's Rich Results Test (Code).
+  Expected: The business or organization is detected with no errors. Warnings about optional fields are acceptable.
+
+- [ ] SDATA-013 - Paste a News item page's source into the Rich Results Test.
+  Expected: An article is detected with no errors.
+
+- [ ] SDATA-014 - On an Arch project on 0.9.10, add a Business Details block to the Footer and preview.
+  Expected: The address, phone and email links, and opening hours appear. Consecutive days with the same hours are grouped (e.g. "Mon–Fri 09:00–17:00"), a closed day says "Closed", and a split shift shows both ranges.
+
+- [ ] SDATA-015 - Untick Show address, Show phone and email, and Show hours one at a time.
+  Expected: Only that part disappears. With all three off, the preview shows a hint and the export shows nothing.
+
+- [ ] SDATA-016 - Add the Business Details block to a Contact Details widget.
+  Expected: It shows the same details as the footer block.
+
+- [ ] SDATA-017 - In a project with no business details, preview a Business Details block, then export.
+  Expected: Preview shows "Add your business details in Project details"; the exported page shows nothing for it.
+
+- [ ] SDATA-018 - Set only Facebook in Theme Settings › Social Media and only Instagram in Project details, then preview the footer, Contact Details and Social Icons widgets.
+  Expected: Every social icon set shows Instagram only.
+
+- [ ] SDATA-019 - Clear the Instagram profile in Project details and preview again.
+  Expected: The Facebook icon from Theme Settings comes back everywhere.
+
+- [ ] SDATA-020 - With a project profile and project email set, and a different mail address in Theme Settings, check the mail icon.
+  Expected: The mail icon uses the project email.
+
+- [ ] SDATA-021 - On an Arch project from before 0.9.10, export and open a News item page.
+  Expected: WebPage and BreadcrumbList are present but no BlogPosting, and the Footer offers no Business Details block.
+
+- [ ] SDATA-022 - Apply the Arch 0.9.10 theme update to that project, reload the editor tab, and export again.
+  Expected: The News item now has a BlogPosting, and the Footer and Contact Details offer a Business Details block.
+
+- [ ] SDATA-023 - Leave one News item's excerpt and featured image empty, then export.
+  Expected: The export succeeds. The yellow note says one article page is missing some of its details and names that item's page (e.g. `news/my-post.html`).
+
+- [ ] SDATA-024 - Remove every News listing widget from the site's pages, then export.
+  Expected: The note says collection pages aren't listed on any page, and those items' breadcrumbs go Home → item.
+
+- [ ] SDATA-025 - Put a News listing widget on two pages without turning on "Main News page" on either, then export.
+  Expected: The note says those pages are listed on several pages but none is set as the main page (not that they are listed nowhere).
+
+- [ ] SDATA-026 - Keep the News listing only on the homepage, export; then add a second listing elsewhere, turn on "Main News page" on the homepage one and export again.
+  Expected: Neither export mentions listing pages.
+
+- [ ] SDATA-027 - Turn on Developer Mode and repeat SDATA-011 and SDATA-023 in one export, then open `__export__issues.html`.
+  Expected: A "Structured data (whole site)" entry lists the missing details, and the News item has its own warning naming the empty fields. These entries show no line or column.
 
 ---
 

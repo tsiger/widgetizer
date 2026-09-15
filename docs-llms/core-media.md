@@ -149,6 +149,7 @@ Usage is keyed by a **source string** per `media_usage` row:
 - **Pages** — source = page slug. Scans every widget/block setting plus the SEO social image (`seo.og_image`).
 - **Global widgets** (header/footer) — source = `global:{id}`. Scans settings + blocks.
 - **Theme settings** — source = `global:theme-settings`. Scans `settings.global` items (live `value`, falling back to schema `default`), e.g. favicon and any image/gallery setting.
+- **Site identity** — source = `global:site-identity`. The project's identity logo (`siteIdentity.logo`), which lives on the project row, not in a project file. It is updated when a project save changes the identity (`updateSiteIdentityMediaUsage`) and included in the full rescan, so exports ship the logo. The Media page labels it "Business Details (Global)".
 - **Collection items** — source = `collection:{type}/{slug}`. Scans item settings plus the item's `seo.og_image`. See [Collections](core-collections.md).
 
 ### Path Matching

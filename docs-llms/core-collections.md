@@ -22,6 +22,7 @@ A collection type is defined by `collection-types/{type}/schema.json` in the the
 | `hasItemPages` | `true` → each item renders a standalone page (requires a `template.liquid`). |
 | `defaultSort` | One of `manual`, `created_desc`, `created_asc`, `title_asc`, `title_desc`, `date_desc`, `date_asc`. |
 | `schemaVersion` | Carried onto items as-is (used for migration bookkeeping). |
+| `structuredData` | Optional mapping of item fields to a schema.org type core can build (§5c). |
 
 **Field rules:**
 
@@ -195,6 +196,46 @@ The widget keeps calling `'news' | collection: limit: …`; the engine sets `glo
 **Preview** — page 2+ opens at `/preview/paged/:pageId/:pageNumber` (`app/src/previewRoutes.jsx`), and the page number travels to `/preview/token` as `pageNumber`. `getStandalonePreviewTarget` maps `…/page/<n>` links there, except a root `page/<n>` when a collection publishes under `page/`; the preview runtime receives those prefixes as `data-collection-prefixes`.
 
 **Consistent reads** — `createCollectionReader({ storage, scope, snapshot })` memoises each collection's read and sorted lists on a `snapshot` Map. One snapshot spans a whole export (validation, sitemap inputs, item links, item pages, listings, page counts) or one page or widget preview request, so an item edited mid-render can neither land on two copies nor be linked without its page being written. Sorts are total: ties fall back to newest `created`, then `uuid`. The collection item preview (`createCollectionPreviewToken`) does not use a snapshot yet: two differently sorted lists in an item preview can read the collection twice.
+
+---
+
+## 5c. Structured data (`structuredData` block)
+
+A collection type can tell core which of its fields carry the meaning of a schema.org type, and core then writes that node into the item page's JSON-LD (through `{% seo %}`, next to the site and page nodes — see [Site Exporting](core-export.md#structured-data-json-ld)). Themes never build JSON-LD in Liquid; they only declare the mapping. Arch's News type:
+
+```json
+"structuredData": {
+  "type": "BlogPosting",
+  "headline": "title",
+  "datePublished": "date",
+  "description": "excerpt",
+  "image": "featured_image",
+  "articleBody": "body"
+}
+```
+
+Each property names a setting id. The rules live in `packages/core/src/structuredData/collectionTypes.js` (`FIELD_RULES`):
+
+| type | property | setting types accepted |
+|---|---|---|
+| `BlogPosting` | `headline` (required) | `text` |
+| | `datePublished` | `date` |
+| | `description` | `text`, `textarea` |
+| | `image` | `image` |
+| | `articleBody` | `richtext`, `textarea` |
+
+**Validation.** `validateCollectionSchema` runs `validateCollectionStructuredData(block, settings)` whenever the key is present. The block must be an object, `type` must be a supported string, every other key must be a property of that type, and each value must name an existing non-`header` setting of an accepted type. A required property can't be missing. Errors make the schema invalid, with the usual consequences: `listCollectionSchemas` skips the collection with a warning, and a theme upload fails through `validateThemeCollectionSchemas`. A mapping can never point at a missing field.
+
+**Visible values only.** `buildCollectionItemPageData` puts `collectionItem { type, structuredData, settingTypes, settings }` on the item's page data. The settings are the prepared ones the template renders (links resolved, sanitized), so the markup matches what the visitor sees. `articleNode` (`packages/core/src/structuredData/articleNode.js`) builds the node from them, and never from `seo.description` or `seo.og_image`:
+
+- text values have whitespace collapsed; a `richtext` value goes through `htmlToText` (`htmlText.js`) — block boundaries and `<br>` become line breaks, inline markup joins its neighbours, comments and script/style content are dropped, entities are decoded;
+- `image` becomes an absolute published URL by the og:image rules (`publishedImageUrl`);
+- core adds `@id` (`<item address>#article`, on the item's own published address), `url`, `dateModified` from the item's `updated`, `isPartOf` the page's `#webpage` node, and `publisher` → the site's `#identity` node when a name resolves;
+- no headline (or no Site URL) → no node.
+
+**Reporting.** Export lists every item that leaves some of its mapped article fields empty as a `structuredData.warnings` entry `{ path, code: "emptyArticleFields", fields }` (core `emptyArticleFields` reads the fields the same way `articleNode` does), and every item whose collection no page lists (`noListingPage`) or several pages list without an anchor (`ambiguousListingPage`), by core `listingParentStatus`. Neither blocks the export; see `core-export.md` for how they are shown.
+
+**Adding a type** means a `FIELD_RULES` entry, a builder registered in `GRAPH_BUILDERS` (`builders.js`), and a content model that can actually supply the type's required fields. Existing projects keep their copied schema until they apply a theme update, so a new mapping ships to them through the theme's `updates/<version>/` folder, as Arch's News block does in `updates/0.9.10`.
 
 ---
 

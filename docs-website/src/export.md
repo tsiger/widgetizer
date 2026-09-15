@@ -65,6 +65,12 @@ If your project has a Site URL configured, Widgetizer generates:
 - `sitemap.xml`: Lists all indexed pages for search engines
 - `robots.txt`: Search engine instructions, including pages marked as `noindex`
 
+### Details for Search Engines
+
+When a Website Address is set, every exported page also describes itself to search engines in a way they can read directly: your site's name, logo, address and opening hours on the homepage (from [Site identity and Business details](projects.html#site-identity-and-business-details)), the path from the homepage to each page, and for news articles the headline, date, image and text. Nothing needs to be turned on, and nothing changes in how your pages look.
+
+Without a Website Address, these details are left out. Exports also tell you when details search engines look for are missing, such as your logo or address.
+
 # Export Versioning
 
 Widgetizer keeps a history of your exports:
@@ -114,6 +120,7 @@ If validation finds any issues, an `__export__issues.html` file is created in th
 - Issues grouped by page
 - For each issue: line number, severity (error/warning), description, and the relevant source code
 - Links to documentation for each validation rule
+- Details search engines look for that are missing, such as your logo, or news articles with empty fields
 
 > **Note:** The issues report is only generated when Developer Mode is enabled. When disabled, validation is skipped entirely for faster exports.
 

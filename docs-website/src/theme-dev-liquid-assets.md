@@ -496,6 +496,14 @@ Open Graph image behavior:
 
 All SEO text is escaped before output. Collection item pages use the same `page.seo` contract after Widgetizer shapes the collection item into a page-like render context.
 
+Structured data behavior:
+
+- The tag also writes one `<script type="application/ld+json">` describing the page to search engines, so a theme that already has `{% seo %}` needs nothing else.
+- The homepage describes the website and, when a name is set (public name or Site Title), the organization, person or local business from Project details. Every page gets a web page entry, plus its breadcrumb trail when the trail has two or more entries.
+- Item pages of a collection type with a [`structuredData` block](theme-dev-collections.html#structured-data) also describe the item.
+- Addresses are the page's own published address, even when `seo.canonical_url` is set.
+- If `project.siteUrl` is missing or invalid, no structured data is written.
+
 ## `{% fonts %}`
 
 `fonts` outputs font preconnect links and a stylesheet link for selected web fonts.
