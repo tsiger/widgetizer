@@ -367,7 +367,7 @@ function createWindow() {
     dialog
       .showMessageBox(mainWindow, {
         type: "warning",
-        title: "Widgetizer is not responding",
+        title: "Widgetizer Desktop is not responding",
         message: "The application is not responding. Would you like to reload it?",
         buttons: ["Wait", "Reload"],
         defaultId: 1,
@@ -512,7 +512,7 @@ function showLoadingScreen() {
     <html>
     <head>
       <meta charset="UTF-8">
-      <title>Widgetizer</title>
+      <title>Widgetizer Desktop</title>
       <style>
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -544,7 +544,7 @@ function showLoadingScreen() {
     <body>
       <div class="card">
         <div class="spinner"></div>
-        <div>Starting Widgetizer...</div>
+        <div>Starting Widgetizer Desktop...</div>
       </div>
     </body>
     </html>
@@ -580,7 +580,7 @@ async function loadContent() {
     } catch (err) {
       log(`Failed to load production content: ${err.message}`);
       showError(
-        `Failed to start the Widgetizer server.\n\n` +
+        `Failed to start the Widgetizer Desktop server.\n\n` +
           `Error: ${err.message}\n\n` +
           `Check the log file at:\n${path.join(logsDir, "widgetizer.log")}`,
       );
@@ -596,7 +596,7 @@ function showError(message) {
     <html>
     <head>
       <meta charset="UTF-8">
-      <title>Widgetizer - Error</title>
+      <title>Widgetizer Desktop - Error</title>
       <style>
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -642,8 +642,8 @@ function showAboutDialog() {
 
   dialog.showMessageBox({
     type: "info",
-    title: "About Widgetizer",
-    message: "Widgetizer",
+    title: "About Widgetizer Desktop",
+    message: "Widgetizer Desktop",
     detail: `Version ${version}`,
     buttons: ["OK"],
   });
@@ -745,7 +745,7 @@ function createAppMenu() {
           },
         },
         {
-          label: "About Widgetizer",
+          label: "About Widgetizer Desktop",
           click: () => {
             showAboutDialog();
           },
@@ -888,7 +888,7 @@ app.whenReady().then(async () => {
     if (mainWindow) {
       showError(`Fatal error: ${err.message}`);
     } else {
-      dialog.showErrorBox("Widgetizer Error", `Failed to start: ${err.message}`);
+      dialog.showErrorBox("Widgetizer Desktop Error", `Failed to start: ${err.message}`);
       app.quit();
     }
   }
@@ -921,7 +921,7 @@ let isQuitting = false;
 process.on("uncaughtException", (err) => {
   log(`Uncaught exception: ${err.message}\n${err.stack}`);
   if (!isQuitting) {
-    dialog.showErrorBox("Widgetizer Error", `Uncaught exception: ${err.message}`);
+    dialog.showErrorBox("Widgetizer Desktop Error", `Uncaught exception: ${err.message}`);
   }
 });
 

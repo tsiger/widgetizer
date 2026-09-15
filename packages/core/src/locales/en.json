@@ -503,7 +503,7 @@
     "import": "Import Backup",
     "importModal": {
       "title": "Import Backup",
-      "description": "Upload a project backup ZIP file previously downloaded from Widgetizer. The project will be imported with a new ID and can be used immediately.",
+      "description": "Upload a project backup ZIP file you downloaded earlier. The project will be imported with a new ID and can be used immediately.",
       "uploadTitle": "Drop backup ZIP file here",
       "uploadDescription": "Select a project backup ZIP file to import",
       "maxSize": "Maximum file size: {{max}}MB",

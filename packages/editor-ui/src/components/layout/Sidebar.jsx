@@ -5,6 +5,7 @@ import useProjectStore from "../../stores/projectStore";
 import usePageListStore from "../../stores/pageListStore";
 import { getAllPages } from "../../queries/pageManager";
 import SidebarMeta from "./SidebarMeta";
+import { APP_NAME } from "../../lib/appName";
 import { useNavItems } from "../../extension/PluginProvider.jsx";
 import { groupNavItems } from "../../extension/builtinNav.js";
 import useCollections from "../../hooks/useCollections";
@@ -192,9 +193,9 @@ export default function Sidebar() {
       <div className="grow px-2 pb-2 md:px-[var(--shell-inset)]">
         <div className="mb-4 py-0 pb-2 md:pb-4 md:pt-[var(--shell-inset)]">
           <div className="hidden pt-1 md:block">
-            <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="h-auto w-[var(--sidebar-logo-width)]" />
+            <img src="/widgetizer_logo.svg" alt={APP_NAME} className="h-auto w-[var(--sidebar-logo-width)]" />
           </div>
-          <img src="/widgetizer_symbol.svg" alt={t("common.appTitle")} className="mx-auto h-12 w-12 md:hidden" />
+          <img src="/widgetizer_symbol.svg" alt={APP_NAME} className="mx-auto h-12 w-12 md:hidden" />
         </div>
 
         {sections.map(renderSection)}

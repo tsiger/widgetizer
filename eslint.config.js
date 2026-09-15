@@ -61,6 +61,7 @@ export default [
         ...globals.browser,
         ...globals.node,
         __APP_VERSION__: "readonly",
+        __APP_NAME__: "readonly",
       },
       parserOptions: {
         ecmaVersion: "latest",
@@ -110,6 +111,7 @@ export default [
       globals: {
         ...globals.browser,
         __APP_VERSION__: "readonly",
+        __APP_NAME__: "readonly",
       },
       parserOptions: {
         ecmaVersion: "latest",

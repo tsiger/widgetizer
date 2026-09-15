@@ -8,6 +8,7 @@
     ".": "./src/index.js",
     "./tailwind-preset": "./src/styles/preset.css",
     "./lib/config": "./src/lib/config.js",
+    "./lib/appName": "./src/lib/appName.js",
     "./lib/apiBase": "./src/lib/apiBase.js",
     "./lib/apiFetch": "./src/lib/apiFetch.js",
     "./lib/activeProjectId": "./src/lib/activeProjectId.js",

@@ -25,6 +25,7 @@ export default defineConfig({
   },
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
+    __APP_NAME__: JSON.stringify("Widgetizer Desktop"),
   },
   server: {
     port: 3000,

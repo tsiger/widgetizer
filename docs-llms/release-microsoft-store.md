@@ -87,8 +87,8 @@ Problems with this specific free-onboarding flow: email **storesupport@service.m
 ## Part 2 — Reserve the name and get identity values
 
 1. [ ] Partner Center → **Apps and games** → **+ New product** → **MSIX/PWA app**.
-2. [ ] Product name: **`Widgetizer`**. Click **Reserve product name**.
-3. [ ] If taken, try `Widgetizer — Website Builder` and adjust your listing copy accordingly.
+2. [ ] Product name: **`Widgetizer Desktop`**. Click **Reserve product name**.
+3. [ ] If taken, try `Widgetizer Desktop — Website Builder` and adjust your listing copy accordingly.
 4. [ ] Go to **Product management → Product identity**.
 5. [ ] Copy these three values verbatim (case- and whitespace-sensitive):
    - `Package/Identity/Name`
@@ -116,7 +116,7 @@ Insert as a **top-level key** (sibling of `win`, not nested inside it). Keeping 
     publisher: "<Package/Identity/Publisher from Partner Center>",
     publisherDisplayName: "<Package/Properties/PublisherDisplayName>",
     applicationId: "Widgetizer",
-    displayName: "Widgetizer",
+    displayName: "Widgetizer Desktop",
     backgroundColor: "#464646",
     languages: ["en-US"],
     showNameOnTiles: false,
@@ -296,7 +296,7 @@ This removes only the packaged build. The NSIS install and `%APPDATA%\widgetizer
 
 ### 5.3 Copy
 
-- [ ] **Description** (required, 10k chars) — what Widgetizer is, the Create → Build → Export flow, themes and presets, everything stays local. The first two lines are what shows before "read more".
+- [ ] **Description** (required, 10k chars) — what Widgetizer Desktop is, the Create → Build → Export flow, themes and presets, everything stays local. The first two lines are what shows before "read more".
 - [ ] **Applicable license terms** (required, 10k chars) — your EULA, as text or a URL. Not a placeholder; users legally accept this.
 - [ ] Short description (1k), What's new (1.5k), App features (20 × 200 chars), Keywords (7 terms), Copyright — all optional, all cheap wins.
 
@@ -319,7 +319,7 @@ Open the reserved product → **Start submission**. Sections can be done in any 
 
 **Product declarations** — no non-Microsoft drivers/services · don't claim accessibility testing unless you did it · **Notes for certification** (2k chars, strongly recommended):
 
-> Widgetizer is an Electron-based offline website builder. No account or login is required — launch the app and click "New project" to start. The app runs a local Express server on an ephemeral loopback port (127.0.0.1) to serve the editor UI and render page previews; no data leaves the machine.
+> Widgetizer Desktop is an Electron-based offline website builder. No account or login is required — launch the app and click "New project" to start. The app runs a local Express server on an ephemeral loopback port (127.0.0.1) to serve the editor UI and render page previews; no data leaves the machine.
 
 **Age ratings** — all questions required (IARC). For a productivity tool this is a run of "No" answers → 3+/Everyone. Read them; a careless "yes" on user-generated content changes your rating and market availability.
 
@@ -347,14 +347,14 @@ Then re-read the description for typos and confirm the privacy URL loads in a pr
 
 Because both builds share `%APPDATA%\widgetizer`, an existing user's projects appear immediately in the Store version — but they shouldn't keep both. Put this in the listing description or release notes:
 
-> Already using Widgetizer? Install this version, confirm your projects are there, then uninstall the previous one.
+> Already using Widgetizer Desktop? Install this version, confirm your projects are there, then uninstall the previous one.
 
 In Settings → Apps → Installed apps they'll see two entries:
 
 | Entry | Which |
 |---|---|
 | **Widgetizer 1.0.0** | installer version (electron-builder puts the version in the display name) |
-| **Widgetizer** | Store version |
+| **Widgetizer Desktop** | Store version |
 
 So: *uninstall the one with the version number in its name.* It leaves their data intact.
 

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import AdminMenu from "./AdminMenu";
 import useProjectStore from "@widgetizer/editor-ui/stores/projectStore";
+import { APP_NAME } from "@widgetizer/editor-ui/lib/appName";
 import DebugStatePanel from "../dev/DebugStatePanel";
 
 export default function ProjectPickerLayout() {
@@ -16,7 +17,7 @@ export default function ProjectPickerLayout() {
         <header className="flex items-start justify-between px-[18px] pb-0 pt-[18px] text-white">
           <div className="flex min-w-0 items-start gap-3 md:gap-4">
             <Link to={activeProject ? "/pages" : "/projects"} className="flex shrink-0 items-center pt-1">
-              <img src="/widgetizer_logo.svg" alt={t("common.appTitle")} className="h-auto w-[var(--sidebar-logo-width)]" />
+              <img src="/widgetizer_logo.svg" alt={APP_NAME} className="h-auto w-[var(--sidebar-logo-width)]" />
             </Link>
 
             {activeProject && (
