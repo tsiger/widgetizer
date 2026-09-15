@@ -734,6 +734,15 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - [ ] EDIT-045 - Make two changes, undo back to the original visible state.
   Expected: Undo becomes disabled and Save becomes disabled with no unsaved dot.
 
+- [ ] EDIT-045B - Type a sentence into a text setting without pausing, then press Undo once.
+  Expected: The whole sentence goes away in one step, not one letter at a time.
+
+- [ ] EDIT-045C - Change a setting, save (or wait for autosave), then press Undo.
+  Expected: The change reverts, the unsaved dot comes back, and saving (or autosave) stores the reverted value. Redo brings the change back.
+
+- [ ] EDIT-045D - Change a theme setting from the editor, save, then press Undo.
+  Expected: The theme setting reverts in the preview and in Theme Settings, and the editor shows unsaved changes.
+
 - [ ] EDIT-046 - Save with the button.
   Expected: Save shows a loading state, then becomes disabled and the unsaved dot disappears.
 

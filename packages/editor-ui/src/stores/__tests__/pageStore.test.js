@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 // Mock the async query modules BEFORE importing the store
 vi.mock("../../queries/pageManager", () => ({
@@ -592,6 +592,120 @@ describe("pageStore", () => {
 
       globalWidgets.header.settings.logo = "mutated.png";
       expect(usePageStore.getState().originalGlobalWidgets.header.settings.logo).toBe("logo.png");
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // undo history
+  // --------------------------------------------------------------------------
+
+  describe("undo history", () => {
+    let now;
+    let nowSpy;
+
+    const temporal = () => usePageStore.temporal.getState();
+    const textOf = () => usePageStore.getState().page.widgets["w-1"].settings.text;
+    const editSettings = (changes) => {
+      const page = usePageStore.getState().page;
+      const widget = page.widgets["w-1"];
+      usePageStore.getState().setPage({
+        ...page,
+        widgets: { ...page.widgets, "w-1": { ...widget, settings: { ...widget.settings, ...changes } } },
+      });
+    };
+    const typeText = (text) => editSettings({ text });
+
+    beforeEach(() => {
+      now = 1_000_000;
+      nowSpy = vi.spyOn(Date, "now").mockImplementation(() => now);
+      seedPage();
+      temporal().clear();
+    });
+
+    afterEach(() => {
+      nowSpy.mockRestore();
+    });
+
+    it("turns quick edits to one setting into one undo step", () => {
+      for (const text of ["H", "Hi", "Hi t", "Hi there"]) {
+        typeText(text);
+        now += 200;
+      }
+
+      expect(temporal().pastStates).toHaveLength(1);
+      temporal().undo();
+      expect(textOf()).toBe("Hello");
+    });
+
+    it("starts a new step after a pause", () => {
+      typeText("A");
+      now += 600;
+      typeText("AB");
+
+      expect(temporal().pastStates).toHaveLength(2);
+      temporal().undo();
+      expect(textOf()).toBe("A");
+    });
+
+    it("keeps quick edits to different settings as separate steps", () => {
+      typeText("A");
+      now += 100;
+      editSettings({ color: "red" });
+
+      expect(temporal().pastStates).toHaveLength(2);
+    });
+
+    it("does not group a change that touches several values at once", () => {
+      editSettings({ text: "A", color: "red" });
+      now += 100;
+      editSettings({ text: "B", color: "blue" });
+
+      expect(temporal().pastStates).toHaveLength(2);
+    });
+
+    it("starts a new step for an edit made right after an undo or redo", () => {
+      typeText("A");
+      now += 600;
+      typeText("AB");
+      temporal().undo();
+      now += 100;
+      typeText("AC");
+
+      expect(temporal().pastStates).toHaveLength(2);
+      expect(temporal().futureStates).toHaveLength(0);
+
+      temporal().undo();
+      now += 100;
+      temporal().redo();
+      now += 100;
+      typeText("ACD");
+      expect(temporal().pastStates).toHaveLength(3);
+    });
+
+    it("groups quick edits to one theme setting", () => {
+      seedThemeSettings();
+      temporal().clear();
+
+      for (const value of ["#111111", "#222222", "#333333"]) {
+        const next = JSON.parse(JSON.stringify(mockThemeStoreState.settings));
+        next.settings.global.colors[0].value = value;
+        mockThemeStoreState.settings = next;
+        usePageStore.getState().updateThemeSetting("colors", "primary_color", value);
+        now += 100;
+      }
+
+      expect(temporal().pastStates).toHaveLength(1);
+      temporal().undo();
+      expect(usePageStore.getState().themeSettingsSnapshot.settings.global.colors[0].value).toBe("#ff0000");
+    });
+
+    it("keeps up to 150 steps", () => {
+      for (let step = 0; step < 160; step++) {
+        typeText(`step ${step}`);
+        now += 1000;
+      }
+
+      expect(temporal().pastStates).toHaveLength(150);
     });
   });
 });

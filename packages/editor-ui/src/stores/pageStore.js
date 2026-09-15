@@ -21,6 +21,34 @@ const selectTemporalState = (state) => ({
   themeSettingsSnapshot: state.themeSettingsSnapshot,
 });
 
+const HISTORY_LIMIT = 150;
+const COALESCE_WINDOW_MS = 500;
+
+function changedLeafPaths(before, after, limit = Infinity, path = [], found = []) {
+  if (found.length >= limit || Object.is(before, after)) return found;
+  const comparable =
+    before !== null &&
+    after !== null &&
+    typeof before === "object" &&
+    typeof after === "object" &&
+    Array.isArray(before) === Array.isArray(after) &&
+    (!Array.isArray(before) || before.length === after.length);
+  if (!comparable) {
+    found.push(path);
+    return found;
+  }
+
+  for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    changedLeafPaths(before[key], after[key], limit, [...path, key], found);
+    if (found.length >= limit) break;
+  }
+  return found;
+}
+
+const valueAt = (source, path) => path.reduce((node, key) => node?.[key], source);
+
+let lastEdit = null;
+
 const usePageStore = create(
   temporal(
     (set, get) => ({
@@ -251,21 +279,80 @@ const usePageStore = create(
       setOriginalGlobalWidgets: (globalWidgets) => {
         set({ originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)) });
       },
+
+      /**
+       * After the server corrected theme values on save, swap each rejected value
+       * for its correction in every history entry that still holds it, so undoing
+       * an unrelated edit can't restore it. Entries holding an older, valid value
+       * keep it. The live snapshot is resynced from themeStore without a history step.
+       */
+      applyThemeCorrections: (sentSettings, savedSettings) => {
+        const corrections = changedLeafPaths(sentSettings, savedSettings).filter((path) => path.length > 0);
+        if (!corrections.length) return;
+
+        const correct = (snapshot) => {
+          let corrected = snapshot;
+          for (const path of corrections) {
+            if (!snapshot) break;
+            if (JSON.stringify(valueAt(corrected, path)) !== JSON.stringify(valueAt(sentSettings, path))) continue;
+            if (corrected === snapshot) corrected = JSON.parse(JSON.stringify(snapshot));
+            const parent = valueAt(corrected, path.slice(0, -1));
+            if (!parent || typeof parent !== "object") continue;
+            const next = valueAt(savedSettings, path);
+            if (next === undefined) delete parent[path.at(-1)];
+            else parent[path.at(-1)] = JSON.parse(JSON.stringify(next));
+          }
+          return corrected;
+        };
+        const rewrite = (entries) =>
+          entries.map((entry) => {
+            const themeSettingsSnapshot = correct(entry.themeSettingsSnapshot);
+            return themeSettingsSnapshot === entry.themeSettingsSnapshot ? entry : { ...entry, themeSettingsSnapshot };
+          });
+
+        const history = usePageStore.temporal.getState();
+        usePageStore.temporal.setState({
+          pastStates: rewrite(history.pastStates),
+          futureStates: rewrite(history.futureStates),
+        });
+
+        const liveSettings = useThemeStore.getState().settings;
+        history.pause();
+        set({ themeSettingsSnapshot: liveSettings ? JSON.parse(JSON.stringify(liveSettings)) : null });
+        history.resume();
+      },
     }),
     {
       // zundo options
-      limit: 50,
+      limit: HISTORY_LIMIT,
       partialize: selectTemporalState,
-      handleSet: (handleSet) => (state) => {
-        const currentState = usePageStore.getState();
-        if (currentState.page === null) return;
+      handleSet:
+        (handleSet) =>
+        (pastState, ...rest) => {
+          const currentState = usePageStore.getState();
+          if (currentState.page === null) return;
 
-        const currentSnapshot = selectTemporalState(currentState);
-        const nextSnapshot = selectTemporalState(state);
-        if (JSON.stringify(currentSnapshot) === JSON.stringify(nextSnapshot)) return;
+          const currentSnapshot = selectTemporalState(currentState);
+          if (JSON.stringify(currentSnapshot) === JSON.stringify(pastState)) return;
 
-        handleSet(state);
-      },
+          const changed = changedLeafPaths(pastState, currentSnapshot, 2);
+          const path = changed.length === 1 ? JSON.stringify(changed[0]) : null;
+          const now = Date.now();
+          // Undo, redo and clear all change the last history entry, so an edit after any of them starts a new step.
+          const lastEntry = usePageStore.temporal.getState().pastStates.at(-1);
+          if (
+            path &&
+            lastEdit?.path === path &&
+            lastEdit.entry === lastEntry &&
+            now - lastEdit.at < COALESCE_WINDOW_MS
+          ) {
+            lastEdit.at = now;
+            return;
+          }
+
+          handleSet(pastState, ...rest);
+          lastEdit = path ? { path, at: now, entry: usePageStore.temporal.getState().pastStates.at(-1) } : null;
+        },
     },
   ),
 );

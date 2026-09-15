@@ -116,8 +116,9 @@ The Page Editor features a comprehensive undo/redo system powered by `zundo` (Zu
   - `Ctrl+Shift+Z` (or `Cmd+Shift+Z`) / `Ctrl+Y`: Redo
   - `Ctrl+S` (or `Cmd+S`): Save Changes
 - **History Management**:
-  - The history is cleared whenever a new page is loaded to prevent cross-page undoing.
-  - The system tracks up to 50 states by default.
+  - The history is cleared whenever a new page is loaded to prevent cross-page undoing. Saving (manual or autosave) keeps it: undoing past a save makes the page dirty again, and autosave re-saves it. When the server corrects theme values on save, `pageStore.applyThemeCorrections` swaps the rejected values for the corrected ones in every history entry that still holds them, so undoing an unrelated edit can't bring them back.
+  - Quick edits to one value — typing into a field, dragging a color or range — are one step. `pageStore`'s `handleSet` extends the last step instead of adding one when the change touches the same single value within 500 ms and nothing was undone, redone or cleared in between.
+  - The system tracks up to 150 steps.
   - It intelligently handles state snapshots to ensure that only relevant data changes (and not loading/error states) are recorded.
 
 ### Navigation Protection (`useNavigationGuard`)

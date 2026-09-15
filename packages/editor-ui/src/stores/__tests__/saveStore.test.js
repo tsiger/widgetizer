@@ -781,7 +781,7 @@ describe("saveStore (useAutoSave)", () => {
         expect(manualResult).toEqual({ status: "success" });
         expect(autoResult).toEqual({ status: "clean" });
         expect(savePageContent).toHaveBeenCalledTimes(1);
-        expect(clearSpy).toHaveBeenCalledTimes(1);
+        expect(clearSpy).not.toHaveBeenCalled();
       } finally {
         clearSpy.mockRestore();
       }
@@ -807,7 +807,7 @@ describe("saveStore (useAutoSave)", () => {
         expect(autoResult).toEqual({ status: "success" });
         expect(manualResult).toEqual({ status: "clean" });
         expect(savePageContent).toHaveBeenCalledTimes(1);
-        expect(clearSpy).toHaveBeenCalledTimes(1);
+        expect(clearSpy).not.toHaveBeenCalled();
       } finally {
         clearSpy.mockRestore();
       }
@@ -1199,18 +1199,35 @@ describe("saveStore (useAutoSave)", () => {
       expect(mockThemeStoreState.saveSettings).toHaveBeenCalledWith("test-project");
     });
 
-    it("clears undo history after a successful save (EDIT-045)", async () => {
+    it("keeps undo history after a successful save", async () => {
       seedPageStore();
       useAutoSave.getState().markWidgetModified("w-1");
-      // Simulate accumulated undo/redo history before the save.
       usePageStore.temporal.setState({ pastStates: [{}, {}], futureStates: [{}] });
-      expect(usePageStore.temporal.getState().pastStates.length).toBeGreaterThan(0);
 
       await useAutoSave.getState().save();
 
-      // Save rebaselines history so Undo can't step past the saved state.
-      expect(usePageStore.temporal.getState().pastStates).toHaveLength(0);
-      expect(usePageStore.temporal.getState().futureStates).toHaveLength(0);
+      expect(usePageStore.temporal.getState().pastStates).toHaveLength(2);
+      expect(usePageStore.temporal.getState().futureStates).toHaveLength(1);
+    });
+
+    it("lets Undo step back past a save, leaving the page dirty so it saves again", async () => {
+      const page = seedPageStore();
+      usePageStore.temporal.getState().clear();
+      usePageStore.getState().setPage({
+        ...page,
+        widgets: { ...page.widgets, "w-1": { ...page.widgets["w-1"], settings: { text: "Changed" } } },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      await useAutoSave.getState().save();
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+
+      usePageStore.temporal.getState().undo();
+      useAutoSave.getState().reconcileModifiedWidgets();
+
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Hi");
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
     });
 
     it("aborts before saving when the loaded page belongs to another project", async () => {

@@ -21,7 +21,7 @@
 
 ## Stage 5 — Undo history (independent)
 
-Decided 2026-09-09. Small enough to live here instead of its own doc; touches only `packages/editor-ui/src/stores/pageStore.js`, `saveStore.js` and their tests.
+Decided 2026-09-09. Built 2026-09-15, ahead of multilang: stages 5–7 and the open minor fixes go first so multilang starts from a clean slate. As built, the history limit is 150 and the grouping window 500 ms; the page-editor doc (`core-page-editor.md`, Undo/Redo System) describes the result. Small enough to live here instead of its own doc; touches only `packages/editor-ui/src/stores/pageStore.js`, `saveStore.js` and their tests.
 
 - **Undo survives saves.** Today every successful save — manual or the 60-second autosave — wipes the 50-step history. The wipe was added 2026-06-27 (user-test item EDIT-045) because Undo after a save "re-dirtied" the page. That is undo working, not a bug: undoing past a save makes the page dirty and autosave re-saves it, which is what every editor does. Remove the `temporal.clear()` call at the end of `saveStore.save()`; keep the one in `pageStore.loadPage`. Nothing else changes — dirtiness is value-based against the last-saved copy, and undo/redo already reconciles the dirty ledger and re-arms autosave. Flip the `saveStore.test.js` case that asserts the wipe.
 - **Coalesce keystrokes.** There is no grouping: each character typed into a setting is one history entry (`SettingsPanel.handleSettingChange` → `updateWidgetSettings` → zundo `handleSet`). Group consecutive edits to the same widget + setting within a short idle window (~500 ms) into one entry — replace the last entry instead of pushing — in the `handleSet` wrapper in `pageStore.js`. A step then means an action, not a keystroke.

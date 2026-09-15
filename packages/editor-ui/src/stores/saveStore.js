@@ -275,8 +275,13 @@ const useAutoSave = create((set, get) => ({
         // Phase 2: theme settings via themeStore's canonical save path.
         // This handles warning/correction reloads from the server automatically.
         const hasThemeDrift = themeStore.hasUnsavedThemeChanges();
+        let themeCorrection = null;
         if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
-          await useThemeStore.getState().saveSettings(activeProject.id);
+          const sentTheme = useThemeStore.getState().settings;
+          const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
+          if (themeResult?.warnings?.length && useThemeStore.getState().loadedProjectId === activeProject.id) {
+            themeCorrection = { sent: sentTheme, saved: useThemeStore.getState().originalSettings };
+          }
         }
 
         // Invalidate media cache since page saves update media usage tracking
@@ -326,10 +331,10 @@ const useAutoSave = create((set, get) => ({
         // hasUnsavedChanges() check correctly sees a fresh diff instead of
         // wrongly reading clean.
         pageStore.setOriginalGlobalWidgets(globalWidgets);
-
-        // Rebaseline undo history to the just-saved state (like page load does), so
-        // Undo can't step past the save into stale pre-save values and re-dirty the UI.
-        usePageStore.temporal.getState().clear();
+        // Undo history still holds the theme values the server just rejected.
+        if (themeCorrection) {
+          pageStore.applyThemeCorrections(themeCorrection.sent, themeCorrection.saved);
+        }
 
         return { status: "success" };
       } catch (err) {
