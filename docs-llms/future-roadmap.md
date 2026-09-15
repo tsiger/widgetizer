@@ -1,6 +1,6 @@
 # Future: Roadmap — eight items, built in series
 
-> **Status: order decided 2026-09-09. Stages 0–3 shipped on branch `0.9.10` (groundwork and breadcrumbs 2026-09-12, pagination 2026-09-14, structured data 2026-09-15).** Nothing is urgent; each stage is finished and shipped before the next starts, and each lands groundwork the later ones use instead of rewriting. This page is the entry point — start here, then open the stage's own doc.
+> **Status: order decided 2026-09-09, revised 2026-09-15. Stages 0–3, 5 and 6 shipped on branch `0.9.10` (groundwork and breadcrumbs 2026-09-12, pagination 2026-09-14, structured data, undo history `e4379a50` and the "Widgetizer Desktop" rename `8fae65c5` 2026-09-15).** Revised order: stages 5 → 6 → 7 first, then the open minor fixes and hands-on testing, then multilang (stage 4) from a clean slate. **Next: stage 7, upload file names** — settle its open questions (§Stage 7) before writing code. Nothing is urgent; each stage is finished and shipped before the next starts, and each lands groundwork the later ones use instead of rewriting. This page is the entry point — start here, then open the stage's own doc.
 
 | stage | what ships | design doc | what it lands for later stages |
 |---|---|---|---|
