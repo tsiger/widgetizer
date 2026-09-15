@@ -127,7 +127,15 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
           </button>
         </div>
 
-        <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="p-6 space-y-6">
+        {/* React bubbles events through portals along the component tree, so without
+            this a drawer opened from inside another form would submit that form too. */}
+        <form
+          onSubmit={(event) => {
+            event.stopPropagation();
+            return rhfHandleSubmit(onSubmitHandler)(event);
+          }}
+          className="p-6 space-y-6"
+        >
           {/* Preview section */}
           {fileUrl && (
             <div className="mb-4 p-2 border border-slate-200 rounded-sm bg-slate-50 flex flex-col items-center justify-center gap-2">

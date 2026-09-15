@@ -9,6 +9,8 @@ import { formatSlug } from "@widgetizer/editor-ui/utils/slugUtils";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "@widgetizer/editor-ui/queries/themeManager";
+import SiteIdentityFields from "./SiteIdentityFields.jsx";
+import { identityToForm, formToIdentity } from "./siteIdentityForm.js";
 
 export default function ProjectForm({
   initialData = { name: "", description: "", siteTitle: "", theme: "", siteUrl: "", cleanUrls: false },
@@ -25,6 +27,7 @@ export default function ProjectForm({
   const [loading, setLoading] = useState(true);
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const showToast = useToastStore((state) => state.showToast);
+  const [identityErrors, setIdentityErrors] = useState([]);
 
   // Preset state
   const [presets, setPresets] = useState({ default: null, presets: [] });
@@ -49,6 +52,7 @@ export default function ProjectForm({
       cleanUrls: initialData.cleanUrls || false,
       receiveThemeUpdates: initialData.receiveThemeUpdates || false,
       preset: "",
+      siteIdentity: identityToForm(initialData.siteIdentity),
     },
   });
 
@@ -116,6 +120,7 @@ export default function ProjectForm({
         cleanUrls: initialData.cleanUrls || false,
         receiveThemeUpdates: initialData.receiveThemeUpdates || false,
         preset: "",
+        siteIdentity: identityToForm(initialData.siteIdentity),
       });
       prevInitialDataRef.current = currentInitialDataStr;
     }
@@ -185,14 +190,34 @@ export default function ProjectForm({
     }
   };
 
+  const goToSiteUrl = () => {
+    setShowMoreSettings(true);
+    setTimeout(() => {
+      const field = document.getElementById("siteUrl");
+      field?.scrollIntoView({ behavior: "smooth", block: "center" });
+      field?.focus();
+    });
+  };
+
   const onSubmitHandler = async (data) => {
     try {
+      const { siteIdentity: identityForm, ...fields } = data;
       // Normalize siteUrl: trim and convert empty/whitespace to empty string
       const normalizedData = {
-        ...data,
+        ...fields,
         siteTitle: data.siteTitle && data.siteTitle.trim() !== "" ? data.siteTitle.trim() : "",
         siteUrl: data.siteUrl && data.siteUrl.trim() !== "" ? data.siteUrl.trim() : "",
       };
+
+      if (!isNew) {
+        const { value, errors: identityProblems } = formToIdentity(identityForm);
+        setIdentityErrors(identityProblems);
+        if (identityProblems.length) {
+          showToast(t("forms.project.identity.errors.fixErrors"), "error");
+          return false;
+        }
+        normalizedData.siteIdentity = value;
+      }
 
       const result = await onSubmit(normalizedData);
 
@@ -208,6 +233,7 @@ export default function ProjectForm({
           cleanUrls: false,
           receiveThemeUpdates: false,
           preset: "",
+          siteIdentity: identityToForm({}),
         });
         setPresets({ default: null, presets: [] });
         setSelectedPreset(null);
@@ -222,7 +248,7 @@ export default function ProjectForm({
   if (loading) return <LoadingSpinner message={t("forms.project.loadingThemes")} />;
 
   return (
-    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} className="space-y-6">
+    <form onSubmit={rhfHandleSubmit(onSubmitHandler)} noValidate className="space-y-6">
       <input type="hidden" {...register("preset")} />
       <div className="form-section">
         <div className="max-w-xl space-y-4">
@@ -455,6 +481,19 @@ export default function ProjectForm({
           )}
         </div>
       </div>
+
+      {!isNew && (
+        <SiteIdentityFields
+          register={register}
+          watch={watch}
+          setValue={setValue}
+          identityErrors={identityErrors}
+          project={initialData}
+          siteUrl={watch("siteUrl")}
+          siteTitle={watch("siteTitle")}
+          onGoToSiteUrl={goToSiteUrl}
+        />
+      )}
 
       <div
         className={`sticky bottom-0 -mx-4 -mb-4 flex justify-end gap-2 border-t bg-white px-4 py-4 rounded-b-md z-10 transition-shadow duration-200 ${

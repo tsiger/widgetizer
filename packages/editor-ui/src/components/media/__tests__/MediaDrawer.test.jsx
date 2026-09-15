@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import MediaDrawer from "../MediaDrawer.jsx";
 
 // The drawer has two load-bearing behaviors:
@@ -62,5 +62,28 @@ describe("MediaDrawer", () => {
     // Portaled: the dialog is a child of document.body, NOT of the render container.
     expect(container.querySelector('[role="dialog"]')).toBeNull();
     expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+  });
+
+  it("does not submit a form it was opened from inside", async () => {
+    const outerSubmit = vi.fn((event) => event.preventDefault());
+    const onSave = vi.fn();
+    render(
+      <form onSubmit={outerSubmit}>
+        <MediaDrawer
+          visible
+          onClose={vi.fn()}
+          selectedFile={SELECTED_FILE}
+          onSave={onSave}
+          loading={false}
+          activeProject={ACTIVE_PROJECT}
+        />
+      </form>,
+    );
+
+    await waitFor(() => expect(document.getElementById("alt").value).toBe("Sunset over the bay"));
+    fireEvent.click(screen.getByRole("button", { name: "forms.media.save" }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(outerSubmit).not.toHaveBeenCalled();
   });
 });
