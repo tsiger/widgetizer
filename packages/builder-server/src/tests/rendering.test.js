@@ -613,6 +613,63 @@ describe("renderWidget — shared globals", () => {
   });
 });
 
+describe("renderWidget — global widgets see page and project", () => {
+  const FOOTER = { type: "footer", settings: {} };
+
+  before(async () => {
+    const footerDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "footer");
+    await fs.outputFile(path.join(footerDir, "schema.json"), JSON.stringify({ type: "footer", settings: [] }));
+    await fs.outputFile(
+      path.join(footerDir, "widget.liquid"),
+      `<footer data-slug="{{ page.slug }}" data-name="{{ page.name }}" data-site="{{ project.siteUrl }}" data-clean="{{ project.cleanUrls }}"></footer>`,
+    );
+  });
+
+  const globalsFor = (extra = {}) => ({
+    projectId: PROJECT_ID,
+    apiUrl: "",
+    renderMode: "publish",
+    themeSettingsRaw: RAW_THEME_SETTINGS,
+    enqueuedStyles: new Map(),
+    enqueuedScripts: new Map(),
+    ...extra,
+  });
+
+  it("reads page.slug and project.siteUrl", async () => {
+    const html = await renderWidget(
+      PROJECT_ID,
+      "footer",
+      FOOTER,
+      RAW_THEME_SETTINGS,
+      "publish",
+      globalsFor({ currentPageData: { slug: "about-us", name: "About Us" } }),
+      null,
+    );
+    assert.ok(html.includes('data-slug="about-us"'), html);
+    assert.ok(html.includes('data-name="About Us"'), html);
+    assert.ok(html.includes('data-site="https://example.com"'), html);
+  });
+
+  it("gives project.cleanUrls the render's stamped flag, not the row", async () => {
+    const html = await renderWidget(
+      PROJECT_ID,
+      "footer",
+      FOOTER,
+      RAW_THEME_SETTINGS,
+      "publish",
+      globalsFor({ cleanUrls: true, currentPageData: { slug: "about-us" } }),
+      null,
+    );
+    assert.ok(html.includes('data-clean="true"'), html);
+  });
+
+  it("leaves page empty when the caller supplies none", async () => {
+    const html = await renderWidget(PROJECT_ID, "footer", FOOTER, RAW_THEME_SETTINGS, "publish", globalsFor(), null);
+    assert.ok(html.includes('data-slug=""'), html);
+    assert.ok(html.includes('data-site="https://example.com"'), html);
+  });
+});
+
 // ============================================================================
 // renderPageLayout
 // ============================================================================

@@ -125,6 +125,29 @@ function getProjectData(deps) {
   }
 }
 
+function paginationContextFor(sharedGlobals) {
+  return sharedGlobals?.paginationPlan
+    ? buildPaginationContext(sharedGlobals.paginationPlan, {
+        cleanUrls: sharedGlobals.cleanUrls === true,
+        outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+      })
+    : null;
+}
+
+function pageContextFor(pageData, breadcrumbs, pagination) {
+  return pageData ? { ...pageData, breadcrumbs, ...(pagination ? { pagination } : {}) } : pageData;
+}
+
+// `{% seo %}` reads the canonical's shape from `project.cleanUrls`, so it must
+// carry the flag this render's links were emitted with (a caller-seeded or
+// first-use stamp on sharedGlobals), not the row just loaded: a toggle landing
+// between the two reads must not split a page's canonical from its links.
+function projectContextFor(projectData, sharedGlobals) {
+  return projectData && sharedGlobals && sharedGlobals.cleanUrls !== undefined
+    ? { ...projectData, cleanUrls: sharedGlobals.cleanUrls === true }
+    : projectData;
+}
+
 function buildPageTitle(pageData, projectData, pageNumber = 1) {
   const baseTitle =
     pageData?.seo?.title && typeof pageData.seo.title === "string" && pageData.seo.title.trim()
@@ -431,6 +454,7 @@ async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPa
   const order = Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? widgetsOrder : Object.keys(widgets || {});
 
   for (const widgetId of order) {
+    if (typeof widgetId !== "string") continue;
     const widget = widgets?.[widgetId];
     if (widget?.settings?.paginate !== true || typeof widget.type !== "string") continue;
 
@@ -893,7 +917,7 @@ async function renderWidget(
     // AFTER the Clean URLs stamp above: the trail is cached on the first widget
     // that asks for it, and every crumb href is shaped by that flag. Export
     // callers pre-seed it, so getting this order wrong only shows up in preview.
-    await ensureBreadcrumbs(deps, sharedGlobals);
+    const breadcrumbs = await ensureBreadcrumbs(deps, sharedGlobals);
 
     // Whether the widget (or its blocks) declares any `menu` or `link` setting.
     // Both setting types can target a collection item (collectionItemUuid), so
@@ -989,8 +1013,16 @@ async function renderWidget(
 
     // Merge with widget-specific context
     const paginationPlan = sharedGlobals?.paginationPlan?.widgetId === widgetId ? sharedGlobals.paginationPlan : null;
+    // `page` and `project` match what the layout sees, so a header or footer can
+    // read them. The page comes from `sharedGlobals.currentPageData`, set once per
+    // render by the caller (a morph without it gets no `page`).
+    const currentPageData = sharedGlobals?.currentPageData;
     const renderContext = {
       ...baseContext,
+      ...(sharedGlobals ? { project: projectContextFor(getProjectData(deps), sharedGlobals) } : {}),
+      ...(currentPageData
+        ? { page: pageContextFor(currentPageData, breadcrumbs, paginationContextFor(sharedGlobals)) }
+        : {}),
       widget: widgetContext,
       ...(paginationPlan ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) } : {}),
     };
@@ -1083,15 +1115,6 @@ async function renderPageLayout(
     // links (`| collection`) runs without any widget having stamped the flag.
     // A caller-set value still wins, as it does in renderWidget.
     if (sharedGlobals && sharedGlobals.cleanUrls === undefined) sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
-    // The layout's `project` context is what `{% seo %}` reads the canonical's
-    // shape from. It carries the flag this render's links were emitted with
-    // (a caller-seeded or first-use stamp on sharedGlobals), not the row just
-    // loaded: a toggle landing between the two reads must not split a page's
-    // canonical from its links.
-    const layoutProjectData =
-      projectData && sharedGlobals && sharedGlobals.cleanUrls !== undefined
-        ? { ...projectData, cleanUrls: sharedGlobals.cleanUrls === true }
-        : projectData;
 
     // 4. Add page-specific context with separated content sections
     const pageSlugClass = pageData?.slug ? `page-${pageData.slug}` : "";
@@ -1101,20 +1124,15 @@ async function renderPageLayout(
     const baseBodyClass = contentSections.bodyClass !== undefined ? contentSections.bodyClass : pageSlugClass;
     const bodyClasses = [baseBodyClass, contentSections.extraBodyClasses || ""].filter(Boolean).join(" ");
     const breadcrumbs = await ensureBreadcrumbs(deps, sharedGlobals);
-    const pagination = sharedGlobals?.paginationPlan
-      ? buildPaginationContext(sharedGlobals.paginationPlan, {
-          cleanUrls: sharedGlobals.cleanUrls === true,
-          outputPathPrefix: sharedGlobals.outputPathPrefix || "",
-        })
-      : null;
+    const pagination = paginationContextFor(sharedGlobals);
 
     const renderContext = {
       ...baseContext,
       header: contentSections.headerContent || "",
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
-      page: pageData ? { ...pageData, breadcrumbs, ...(pagination ? { pagination } : {}) } : pageData,
-      project: layoutProjectData,
+      page: pageContextFor(pageData, breadcrumbs, pagination),
+      project: projectContextFor(projectData, sharedGlobals),
       page_title: buildPageTitle(pageData, projectData, pagination?.current),
       body_class: bodyClasses,
     };
@@ -1233,6 +1251,11 @@ async function renderCollectionItemPage(
     });
   }
 
+  // Page-shaped object drives the layout title/SEO/body class, and is the `page`
+  // the header, footer and item template all see.
+  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl, sharedGlobals.cleanUrls === true);
+  sharedGlobals.currentPageData = itemPageData;
+
   // Render header/footer with the item's globals so their enqueued assets are
   // captured before the layout emits them.
   let headerContent = "";
@@ -1243,11 +1266,6 @@ async function renderCollectionItemPage(
   if (footerData) {
     footerContent = await renderWidget(deps, "footer", footerData, rawThemeSettings, renderMode, sharedGlobals, null);
   }
-
-  // Page-shaped object drives the layout title/SEO/body class. Built BEFORE the
-  // template render so the item template receives the page/collection/project
-  // context, not just item.
-  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl, sharedGlobals.cleanUrls === true);
 
   // Render the collection type's template.liquid against the item context.
   const themeSnippetsDir = path.join(deps.projectDir, "snippets");

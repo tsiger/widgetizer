@@ -455,6 +455,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         enqueuedScripts: new Map(),
         assetVersion, // For cache busting
         currentCanonicalPath: `${pageData.slug || ""}.html`,
+        currentPageData: pageData,
         // The flag snapshotted above, so a toggle landing mid-export cannot
         // split this page's links/canonical from the sitemap or other pages.
         cleanUrls,

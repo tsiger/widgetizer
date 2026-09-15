@@ -94,6 +94,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     enqueuedStyles: new Map(),
     enqueuedScripts: new Map(),
     currentCanonicalPath: `${pageData.slug || ""}.html`,
+    currentPageData: pageData,
   };
 
   const pagination = await planPagination(
@@ -456,8 +457,10 @@ export async function createCollectionPreviewToken(req, res) {
  */
 export async function renderSingleWidget(req, res) {
   try {
-    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath } = req.body; // Expect themeSettings too
+    const { widgetId, widget, themeSettings: rawThemeSettings, currentCanonicalPath, page } = req.body; // Expect themeSettings too
     const activeProjectId = req.activeProject.id;
+    const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
+    const currentPage = isPlainObject(page) ? page : null;
 
     // Provide sharedGlobals so we can read back enqueued assets after render.
     // currentCanonicalPath flows from the morph request so a menu-bearing widget
@@ -467,13 +470,19 @@ export async function renderSingleWidget(req, res) {
       enqueuedStyles: new Map(),
       enqueuedScripts: new Map(),
       currentCanonicalPath: typeof currentCanonicalPath === "string" ? currentCanonicalPath : "",
+      ...(currentPage ? { currentPageData: currentPage } : {}),
     };
 
     const collectionDeps = collectionDepsFromReq(req);
     const renderDeps = collectionDeps && { ...collectionDeps, snapshot: new Map() };
     const pageSlug = sharedGlobals.currentCanonicalPath.replace(/\.html$/, "");
     if (pageSlug && !pageSlug.includes("/")) {
-      const pagination = await planPagination(activeProjectId, { [widgetId]: widget }, [widgetId], { pageSlug }, renderDeps);
+      // Plan from the whole page, not just this widget: a morphed header or
+      // footer would otherwise lose the `page.pagination` the full render gave it.
+      const pageWidgets = isPlainObject(currentPage?.widgets) ? currentPage.widgets : {};
+      const widgets = { ...pageWidgets, [widgetId]: widget };
+      const widgetsOrder = currentPage ? currentPage.widgetsOrder : [widgetId];
+      const pagination = await planPagination(activeProjectId, widgets, widgetsOrder, { pageSlug }, renderDeps);
       if (pagination) sharedGlobals.paginationPlan = pagination;
     }
 

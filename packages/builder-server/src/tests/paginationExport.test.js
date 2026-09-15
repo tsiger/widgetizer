@@ -243,6 +243,61 @@ describe("export — paginated listing, Clean URLs on", () => {
   });
 });
 
+describe("preview morph — a widget re-rendered alone on a paginated page", () => {
+  const HEADER = { type: "header", settings: {} };
+  let blog;
+
+  before(async () => {
+    const headerDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "global", "header");
+    await fs.outputFile(path.join(headerDir, "schema.json"), JSON.stringify({ type: "header", settings: [] }));
+    await fs.outputFile(
+      path.join(headerDir, "widget.liquid"),
+      `<header>{% if page.pagination %}<i class="pg">{{ page.pagination.current }}/{{ page.pagination.total }}</i>{% endif %}</header>`,
+    );
+    blog = await fs.readJson(path.join(getProjectPagesDir(PROJECT_FOLDER), "blog.json"));
+  });
+
+  const morph = async (widgetId, widget, page) => {
+    const { renderSingleWidget } = await import("../controllers/previewController.js");
+    let html = "";
+    const res = {
+      send(body) { html = body; return res; },
+      status() { return res; },
+      json(body) { html = JSON.stringify(body); return res; },
+    };
+    await renderSingleWidget(
+      {
+        body: { widgetId, widget, themeSettings: {}, currentCanonicalPath: "blog.html", ...(page ? { page } : {}) },
+        activeProject: { id: PROJECT_ID },
+        adapters: { storage },
+        scope,
+      },
+      res,
+    );
+    return compact(html);
+  };
+
+  it("keeps page.pagination on a morphed header", async () => {
+    assert.ok((await morph("header", HEADER, blog)).includes('<i class="pg">1/3</i>'));
+  });
+
+  it("skips widget order entries that are not ids", async () => {
+    const page = { ...blog, widgetsOrder: [{ toString: null }, 42, "w1"] };
+    assert.ok((await morph("header", HEADER, page)).includes('<i class="pg">1/3</i>'));
+  });
+
+  it("has no pagination without the page", async () => {
+    assert.ok(!(await morph("header", HEADER)).includes('class="pg"'));
+  });
+
+  it("uses the edited listing widget over the page's copy of it", async () => {
+    const edited = { ...blog.widgets.w1, settings: { ...blog.widgets.w1.settings, limit: 5 } };
+    const html = await morph("w1", edited, blog);
+    assert.deepEqual(itemsOf(html), TITLES);
+    assert.ok(!html.includes('class="pager"'), html);
+  });
+});
+
 describe("export — homepage pagination", () => {
   let dir;
   before(async () => {

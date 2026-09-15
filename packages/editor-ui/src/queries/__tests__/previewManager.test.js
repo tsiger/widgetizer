@@ -40,4 +40,13 @@ describe("fetchRenderedWidget — currentCanonicalPath forwarding (D3)", () => {
     const body = JSON.parse(editorFetch.mock.calls[0][1].body);
     expect(body.currentCanonicalPath).toBe("");
   });
+
+  it("forwards the page being previewed", async () => {
+    editorFetch.mockResolvedValue({ ok: true, text: async () => "<div>ok</div>" });
+
+    await fetchRenderedWidget("footer", { type: "x" }, {}, "about.html", { slug: "about", name: "About" });
+
+    const body = JSON.parse(editorFetch.mock.calls[0][1].body);
+    expect(body.page).toEqual({ slug: "about", name: "About" });
+  });
 });
