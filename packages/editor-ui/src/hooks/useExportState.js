@@ -12,6 +12,8 @@ import useToastStore from "../stores/toastStore";
  *   activeProject: Object|null,
  *   lastExport: Object|null,
  *   setLastExport: Function,
+ *   structuredDataSummary: Object|null,
+ *   setStructuredDataSummary: Function,
  *   exportHistory: Array,
  *   setExportHistory: Function,
  *   loadingHistory: boolean,
@@ -22,6 +24,7 @@ import useToastStore from "../stores/toastStore";
  */
 export default function useExportState() {
   const [lastExport, setLastExport] = useState(null);
+  const [structuredDataSummary, setStructuredDataSummary] = useState(null);
   const [exportHistory, setExportHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [maxVersionsToKeep, setMaxVersionsToKeep] = useState(10);
@@ -63,6 +66,7 @@ export default function useExportState() {
     if (!activeProject?.id) {
       setExportHistory([]);
       setLastExport(null);
+      setStructuredDataSummary(null);
       setLoadingHistory(false);
       return;
     }
@@ -97,6 +101,8 @@ export default function useExportState() {
     activeProject,
     lastExport,
     setLastExport,
+    structuredDataSummary,
+    setStructuredDataSummary,
     exportHistory,
     setExportHistory,
     loadingHistory,

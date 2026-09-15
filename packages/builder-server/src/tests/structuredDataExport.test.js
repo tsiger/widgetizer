@@ -152,6 +152,20 @@ before(async () => {
     }),
   );
 
+  await storage.write(
+    scope,
+    "collections/news/beta.json",
+    JSON.stringify({
+      id: "beta",
+      uuid: "u-beta",
+      slug: "beta",
+      schemaVersion: 1,
+      created: "2026-01-03T00:00:00.000Z",
+      updated: "2026-01-03T00:00:00.000Z",
+      settings: { title: "Beta", date: "2026-01-03", excerpt: "", body: "<p>Some text</p>" },
+    }),
+  );
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>`;
   await fs.outputFile(path.join(projectDir, "uploads", "images", "logo.svg"), svg);
   await fs.outputFile(path.join(projectDir, "uploads", "images", "loaf.svg"), svg);
@@ -267,6 +281,15 @@ describe("export — structured data with a Site URL", () => {
       { item: "address", ok: true },
     ]);
   });
+
+  it("reports items with empty article fields and items no page lists", () => {
+    const byPathThenCode = (a, b) => a.path.localeCompare(b.path) || a.code.localeCompare(b.code);
+    assert.deepEqual([...result.structuredData.warnings].sort(byPathThenCode), [
+      { path: "news/alpha.html", code: "noListingPage" },
+      { path: "news/beta.html", code: "emptyArticleFields", fields: ["description", "image"] },
+      { path: "news/beta.html", code: "noListingPage" },
+    ]);
+  });
 });
 
 describe("export — structured data with Clean URLs", () => {
@@ -279,6 +302,64 @@ describe("export — structured data with Clean URLs", () => {
     assert.equal(article["@id"], `${SITE}/news/alpha#article`);
     assert.deepEqual(article.isPartOf, { "@id": `${SITE}/news/alpha#webpage` });
     assert.equal(article.image, `${SITE}/assets/images/loaf.svg`);
+  });
+});
+
+describe("export — listing page reporting", () => {
+  let originalIndex;
+  let originalAbout;
+
+  const pagePath = (slug) => path.join(getProjectPagesDir(PROJECT_FOLDER), `${slug}.json`);
+  const writePage = (slug, name, widgets) =>
+    fs.writeFile(
+      pagePath(slug),
+      JSON.stringify({ name, slug, uuid: `p-${slug}`, seo: { title: name }, widgets, widgetsOrder: Object.keys(widgets) }),
+    );
+  const grid = (anchor) => ({ w1: { type: "news-grid", settings: anchor ? { listing_anchor: true } : {} } });
+
+  const listingWarnings = async () => {
+    const { result } = await exportWith({ cleanUrls: false, siteUrl: SITE });
+    return result.structuredData.warnings
+      .filter((warning) => warning.code !== "emptyArticleFields")
+      .sort((a, b) => a.path.localeCompare(b.path));
+  };
+
+  before(async () => {
+    const widgetDir = path.join(getProjectDir(PROJECT_FOLDER), "widgets", "news-grid");
+    await fs.outputFile(
+      path.join(widgetDir, "schema.json"),
+      JSON.stringify({ type: "news-grid", collection: { type: "news" }, settings: [] }),
+    );
+    await fs.outputFile(path.join(widgetDir, "widget.liquid"), `<div class="grid"></div>`);
+    originalIndex = await fs.readFile(pagePath("index"), "utf8");
+    originalAbout = await fs.readFile(pagePath("about"), "utf8");
+  });
+
+  after(async () => {
+    await fs.writeFile(pagePath("index"), originalIndex);
+    await fs.writeFile(pagePath("about"), originalAbout);
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "widgets", "news-grid"));
+  });
+
+  it("accepts a homepage listing flagged as the collection's anchor", async () => {
+    await writePage("index", "Home", grid(true));
+    await writePage("about", "About", grid(false));
+    assert.deepEqual(await listingWarnings(), []);
+  });
+
+  it("accepts the homepage as the only page listing the collection", async () => {
+    await writePage("index", "Home", grid(false));
+    await fs.writeFile(pagePath("about"), originalAbout);
+    assert.deepEqual(await listingWarnings(), []);
+  });
+
+  it("reports two unanchored listing pages as ambiguous, not as missing", async () => {
+    await writePage("index", "Home", grid(false));
+    await writePage("about", "About", grid(false));
+    assert.deepEqual(await listingWarnings(), [
+      { path: "news/alpha.html", code: "ambiguousListingPage" },
+      { path: "news/beta.html", code: "ambiguousListingPage" },
+    ]);
   });
 });
 

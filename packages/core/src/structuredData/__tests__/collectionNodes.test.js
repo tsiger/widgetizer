@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildGraph, validateCollectionStructuredData, COLLECTION_STRUCTURED_DATA_TYPES } from "../index.js";
+import { buildGraph, validateCollectionStructuredData, COLLECTION_STRUCTURED_DATA_TYPES, emptyArticleFields } from "../index.js";
 
 const SITE = "https://crumbly.example";
 
@@ -164,6 +164,18 @@ describe("articleNode", () => {
       isPartOf: { "@id": `${SITE}/news/alpha.html#webpage` },
       publisher: undefined,
     });
+  });
+
+  it("lists the mapped properties an item leaves empty", () => {
+    expect(emptyArticleFields(itemPage().collectionItem)).toEqual([]);
+    expect(
+      emptyArticleFields(itemPage({ settings: { title: "T", date: "", excerpt: "  ", featured_image: "", body: "<p> </p>" } }).collectionItem),
+    ).toEqual(["datePublished", "description", "image", "articleBody"]);
+    expect(emptyArticleFields(itemPage({ structuredData: { type: "BlogPosting", headline: "title" }, settings: {} }).collectionItem)).toEqual([
+      "headline",
+    ]);
+    expect(emptyArticleFields(itemPage({ structuredData: undefined }).collectionItem)).toEqual([]);
+    expect(emptyArticleFields(undefined)).toEqual([]);
   });
 
   it("emits no article without a headline, a block, or a supported type", () => {

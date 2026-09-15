@@ -5,11 +5,14 @@ import { exportProjectAPI } from "../../queries/exportManager";
 import useProjectStore from "../../stores/projectStore";
 import useToastStore from "../../stores/toastStore";
 import { Loader2, Package } from "lucide-react";
+import { summarizeStructuredData } from "../../utils/structuredDataSummary";
 
 export default function ExportCreator({
   activeProject,
   lastExport,
   setLastExport,
+  structuredDataSummary: summaryFromParent,
+  setStructuredDataSummary: setSummaryFromParent,
   loadExportHistory,
   variant = "default",
   title,
@@ -18,6 +21,9 @@ export default function ExportCreator({
   const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [exportMarkdown, setExportMarkdown] = useState(false);
+  const [localSummary, setLocalSummary] = useState(null);
+  const structuredDataSummary = setSummaryFromParent ? summaryFromParent : localSummary;
+  const setStructuredDataSummary = setSummaryFromParent || setLocalSummary;
   const showToast = useToastStore((state) => state.showToast);
   const isEmptyState = variant === "empty";
 
@@ -39,6 +45,7 @@ export default function ExportCreator({
     const projectIdAtStart = activeProject.id;
     setIsExporting(true);
     setLastExport(null);
+    setStructuredDataSummary(null);
 
     try {
       const result = await exportProjectAPI(projectIdAtStart, { exportMarkdown });
@@ -49,6 +56,7 @@ export default function ExportCreator({
       if (result.success) {
         showToast(result.message || t("exportSite.toasts.exportSuccess"), "success");
         setLastExport(result.exportRecord);
+        setStructuredDataSummary(summarizeStructuredData(result.structuredData));
         // Reload export history to show the new export
         loadExportHistory(projectIdAtStart);
       } else {
@@ -104,6 +112,33 @@ export default function ExportCreator({
           <p className="mt-1 text-sm text-green-700">
             {t("exportSite.creator.successCreated", { date: formatDate(lastExport.timestamp) })}
           </p>
+        </div>
+      )}
+
+      {lastExport && structuredDataSummary?.hasProblems && (
+        <div
+          className={`mt-3 rounded-sm border border-amber-200 bg-amber-50 p-4 ${isEmptyState ? "w-full max-w-md text-left" : ""}`}
+          role="status"
+        >
+          <p className="text-sm font-medium text-amber-900">{t("exportSite.structuredData.title")}</p>
+          <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-amber-800">
+            {structuredDataSummary.missing.length > 0 && (
+              <li>
+                {t("exportSite.structuredData.missing", {
+                  items: structuredDataSummary.missing.map((item) => t(`exportSite.structuredData.items.${item}`)).join(", "),
+                })}
+              </li>
+            )}
+            {structuredDataSummary.emptyArticleFields && (
+              <li>{t("exportSite.structuredData.emptyArticleFields", structuredDataSummary.emptyArticleFields)}</li>
+            )}
+            {structuredDataSummary.noListingPage && (
+              <li>{t("exportSite.structuredData.noListingPage", structuredDataSummary.noListingPage)}</li>
+            )}
+            {structuredDataSummary.ambiguousListingPage && (
+              <li>{t("exportSite.structuredData.ambiguousListingPage", structuredDataSummary.ambiguousListingPage)}</li>
+            )}
+          </ul>
         </div>
       )}
     </section>

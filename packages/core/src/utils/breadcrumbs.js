@@ -80,6 +80,22 @@ function listingParent(entry, pagesByUuid) {
   return uuids.length === 1 ? pagesByUuid.get(uuids[0]) || null : null;
 }
 
+/**
+ * Whether a collection's items find the page they hang under, for export
+ * reporting: "resolved" (the anchor, or the only listing page — the homepage
+ * included), "ambiguous" (several pages list it and none is the anchor), or
+ * "missing" (no existing page lists it).
+ *
+ * @param {{anchorPageUuid?: string|null, pageUuids?: string[]}|undefined} entry
+ * @param {Map<string, object>} pagesByUuid
+ * @returns {"resolved"|"ambiguous"|"missing"}
+ */
+export function listingParentStatus(entry, pagesByUuid) {
+  if (listingParent(entry, pagesByUuid)) return "resolved";
+  const listed = (entry?.pageUuids || []).filter((uuid) => pagesByUuid.has(uuid));
+  return listed.length > 1 ? "ambiguous" : "missing";
+}
+
 function crumb(label, href, canonicalPath, flags = {}) {
   return { label: label || "", href, canonicalPath, current: false, home: false, ...flags };
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildBreadcrumbs, indexListingPages } from "../breadcrumbs.js";
+import { buildBreadcrumbs, indexListingPages, listingParentStatus } from "../breadcrumbs.js";
 
 const page = (slug, name, extra = {}) => ({ uuid: `u-${slug}`, slug, name, ...extra });
 
@@ -206,6 +206,26 @@ describe("buildBreadcrumbs — collection items", () => {
     });
     expect(hrefs(trail)).toEqual(["../", "../blog", "../news/hello-world"]);
     expect(trail.map((c) => c.canonicalPath)).toEqual(["index.html", "blog.html", "news/hello-world.html"]);
+  });
+});
+
+describe("listingParentStatus", () => {
+  const pages = pagesByUuid(HOME, BLOG);
+
+  it("resolves an anchor or a single listing page, the homepage included", () => {
+    expect(listingParentStatus({ anchorPageUuid: BLOG.uuid, pageUuids: [BLOG.uuid] }, pages)).toBe("resolved");
+    expect(listingParentStatus({ anchorPageUuid: HOME.uuid, pageUuids: [HOME.uuid, BLOG.uuid] }, pages)).toBe("resolved");
+    expect(listingParentStatus({ anchorPageUuid: null, pageUuids: [HOME.uuid] }, pages)).toBe("resolved");
+  });
+
+  it("calls two unanchored listing pages ambiguous", () => {
+    expect(listingParentStatus({ anchorPageUuid: null, pageUuids: [HOME.uuid, BLOG.uuid] }, pages)).toBe("ambiguous");
+  });
+
+  it("calls a collection nothing lists missing, including a stale anchor with no page left", () => {
+    expect(listingParentStatus(undefined, pages)).toBe("missing");
+    expect(listingParentStatus({ anchorPageUuid: null, pageUuids: [] }, pages)).toBe("missing");
+    expect(listingParentStatus({ anchorPageUuid: "u-gone", pageUuids: ["u-gone"] }, pages)).toBe("missing");
   });
 });
 

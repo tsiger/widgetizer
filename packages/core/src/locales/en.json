@@ -790,6 +790,22 @@
       "successTitle": "Export version {{version}} created successfully!",
       "successCreated": "Created: {{date}}"
     },
+    "structuredData": {
+      "title": "Search engines can't read everything about this site yet",
+      "missing": "Add in Project details: {{items}}.",
+      "items": {
+        "siteUrl": "website address",
+        "name": "name",
+        "logo": "logo",
+        "address": "address"
+      },
+      "emptyArticleFields": "{{count}} article page is missing some of its details, e.g. {{path}}.",
+      "emptyArticleFields_other": "{{count}} article pages are missing some of their details, e.g. {{path}}.",
+      "noListingPage": "{{count}} collection page isn't listed on any page, so its breadcrumb goes straight to Home, e.g. {{path}}.",
+      "noListingPage_other": "{{count}} collection pages aren't listed on any page, so their breadcrumbs go straight to Home, e.g. {{path}}.",
+      "ambiguousListingPage": "{{count}} collection page is listed on several pages but none is set as the main page, so its breadcrumb goes straight to Home, e.g. {{path}}.",
+      "ambiguousListingPage_other": "{{count}} collection pages are listed on several pages but none is set as the main page, so their breadcrumbs go straight to Home, e.g. {{path}}."
+    },
     "history": {
       "title": "Export History",
       "keepingVersions": "Keeping latest {{count}} version",

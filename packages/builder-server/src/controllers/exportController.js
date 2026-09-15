@@ -33,6 +33,18 @@ import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/inter
 import { outputPathPrefixFor } from "@widgetizer/core/linkPrefixer";
 import { pageOutputPath } from "@widgetizer/core/contentAddress";
 import { identityReadiness } from "@widgetizer/core/siteIdentity";
+import { emptyArticleFields } from "@widgetizer/core/structuredData";
+import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
+
+function structuredDataIssueMessage(warning) {
+  if (warning.code === "emptyArticleFields") {
+    return `Article structured data is missing ${warning.fields.join(", ")}: the fields the collection maps are empty on this item.`;
+  }
+  if (warning.code === "ambiguousListingPage") {
+    return "Several pages list this collection and none is set as its main page (listing anchor), so this item's breadcrumb trail is Home → item. Turn on \"Main page\" on one of those listing widgets.";
+  }
+  return "No page lists this collection, so this item's breadcrumb trail is Home → item. Add a listing widget for the collection to a page.";
+}
 import * as exportRepo from "../db/repositories/exportRepository.js";
 
 function rewriteStoragePaths(html, outputPathPrefix) {
@@ -239,7 +251,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
   const projectDir = getProjectDir(projectFolderName);
   const siteUrl = projectData.siteUrl || "";
   const cleanUrls = !!projectData.cleanUrls;
-  const structuredData = { readiness: identityReadiness(projectData.siteIdentity, projectData) };
+  const structuredData = { readiness: identityReadiness(projectData.siteIdentity, projectData), warnings: [] };
 
   const version = exportRepo.getNextVersion(projectId);
   const appVersion = await getAppVersion();
@@ -705,6 +717,23 @@ Per aspera ad astra
           collectEnqueuedAssets(sharedGlobals);
           let itemHtml = itemHtmlRendered;
 
+          const emptyFields = emptyArticleFields(itemPageData.collectionItem);
+          if (emptyFields.length) {
+            structuredData.warnings.push({ path: itemOutputPath, code: "emptyArticleFields", fields: emptyFields });
+          }
+          if (sharedGlobals.listingPages) {
+            const listing = listingParentStatus(
+              sharedGlobals.listingPages.get(schema.type),
+              sharedGlobals.pagesByUuid || new Map(),
+            );
+            if (listing !== "resolved") {
+              structuredData.warnings.push({
+                path: itemOutputPath,
+                code: listing === "ambiguous" ? "ambiguousListingPage" : "noListingPage",
+              });
+            }
+          }
+
           const itemFormat = await formatHtml(itemHtml);
           itemHtml = itemFormat.html;
           if (!itemFormat.success) {
@@ -772,6 +801,35 @@ Per aspera ad astra
             }
           }
         }
+      }
+    }
+
+    if (devModeEnabled) {
+      const missing = structuredData.readiness.filter((entry) => !entry.ok).map((entry) => entry.item);
+      if (missing.length) {
+        validationIssues.push({
+          page: "structured-data",
+          filename: "Structured data (whole site)",
+          issues: [
+            {
+              severity: "warning",
+              message: `Search engines cannot read: ${missing.join(", ")}. Fill these in under Project details.`,
+              ruleId: "structured-data/readiness",
+            },
+          ],
+        });
+      }
+      const issuesByPath = new Map();
+      for (const warning of structuredData.warnings) {
+        if (!issuesByPath.has(warning.path)) issuesByPath.set(warning.path, []);
+        issuesByPath.get(warning.path).push({
+          severity: "warning",
+          message: structuredDataIssueMessage(warning),
+          ruleId: `structured-data/${warning.code}`,
+        });
+      }
+      for (const [itemPath, issues] of issuesByPath) {
+        validationIssues.push({ page: itemPath, filename: itemPath, issues });
       }
     }
 

@@ -10,6 +10,8 @@ export default function ExportSite() {
     activeProject,
     lastExport,
     setLastExport,
+    structuredDataSummary,
+    setStructuredDataSummary,
     exportHistory,
     setExportHistory,
     loadingHistory,
@@ -19,16 +21,22 @@ export default function ExportSite() {
   } = useExportState();
   const hasExports = exportHistory.length > 0;
 
+  // The first export flips the page from the empty-state branch to the history
+  // branch, remounting ExportCreator, so its results live here rather than in it.
+  const creatorProps = {
+    activeProject,
+    lastExport,
+    setLastExport,
+    structuredDataSummary,
+    setStructuredDataSummary,
+    loadExportHistory,
+  };
+
   return (
     <PageLayout title={hasExports ? t("exportSite.title", { name: activeProject?.name || "..." }) : undefined}>
       {hasExports ? (
         <div className="space-y-6">
-          <ExportCreator
-            activeProject={activeProject}
-            lastExport={lastExport}
-            setLastExport={setLastExport}
-            loadExportHistory={loadExportHistory}
-          />
+          <ExportCreator {...creatorProps} />
 
           <ExportHistoryTable
             exportHistory={exportHistory}
@@ -41,10 +49,7 @@ export default function ExportSite() {
         </div>
       ) : (
         <ExportCreator
-          activeProject={activeProject}
-          lastExport={lastExport}
-          setLastExport={setLastExport}
-          loadExportHistory={loadExportHistory}
+          {...creatorProps}
           variant="empty"
           title={t("exportSite.history.noExportsTitle")}
           description={t("exportSite.history.noExportsDesc")}

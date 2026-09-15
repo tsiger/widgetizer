@@ -356,7 +356,7 @@ function generateIssueBlock(issue) {
     <div class="issue ${issue.severity}">
       <div class="issue-header">
         <span class="severity ${issue.severity}">${issue.severity}</span>
-        <span class="issue-location">Line ${issue.line}, Column ${issue.column}</span>
+        ${issue.line != null ? `<span class="issue-location">Line ${issue.line}, Column ${issue.column}</span>` : ""}
       </div>
       <div class="issue-message">${escapeHtml(issue.message)}</div>
       <div class="issue-rule">${ruleLink}</div>

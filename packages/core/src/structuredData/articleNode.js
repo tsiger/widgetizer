@@ -10,6 +10,28 @@ function fieldText(source, fieldId) {
   return text || undefined;
 }
 
+const ARTICLE_PROPERTIES = ["headline", "datePublished", "description", "image", "articleBody"];
+
+/**
+ * The article properties a collection item's schema maps but the item leaves
+ * empty, for export reporting. An empty headline means no article is emitted.
+ * @param {object} collectionItem - The item page's `collectionItem`
+ * @returns {string[]}
+ */
+export function emptyArticleFields(collectionItem) {
+  const block = collectionItem?.structuredData;
+  if (block?.type !== "BlogPosting") return [];
+  return ARTICLE_PROPERTIES.filter((property) => {
+    const fieldId = block[property];
+    if (!fieldId) return false;
+    if (property === "image") {
+      const path = collectionItem.settings?.[fieldId];
+      return !(typeof path === "string" && path);
+    }
+    return !fieldText(collectionItem, fieldId);
+  });
+}
+
 /**
  * The BlogPosting node of a collection item page whose schema declares one.
  * Every value comes from the visible fields the schema maps, never from the
