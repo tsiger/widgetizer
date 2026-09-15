@@ -792,7 +792,7 @@ describe("createProject", () => {
       body: { name: "Bad URL Project", description: "", theme: TEST_THEME_ID, siteUrl: "not a url" },
     });
     assert.equal(res._status, 400);
-    assert.match(res._json.error, /website address|valid url/i);
+    assert.match(res._json.error, /site address|valid url/i);
   });
 
   it("accepts an empty siteUrl (optional field)", async () => {

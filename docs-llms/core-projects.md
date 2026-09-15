@@ -14,7 +14,7 @@ The project management UI is primarily handled by three OSS-shell pages (`app/sr
 
 These pages rely on shared components in `app/src/components/projects/`:
 
-- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, website address, Clean URLs; on edit only, the Site identity and Business details sections — see [Site Identity](#6-site-identity-and-business-details))
+- **`ProjectForm.jsx`**: A reusable form for both creating and editing project details (title, theme, folder name, description, site title, site address, Clean URLs). Both pages use the same General, Site, Identity and Business Details tabs; creating adds the theme picker and presets to General — see [Site Identity](#6-site-identity-and-business-details))
   - Built on **react-hook-form** for validation and state management
   - Fully **localized** using `react-i18next` for all labels, errors, and help text
   - Exposes `isDirty` state to parent components for navigation guard integration
@@ -69,7 +69,7 @@ This file contains functions that make API calls to the backend:
 2.  **Rendering**: The `ProjectsAdd.jsx` page is rendered. It contains the `ProjectForm.jsx` component.
 3.  **Navigation Guard**: The page integrates `useFormNavigationGuard` to prevent accidental navigation with unsaved changes.
 4.  **Theme Loading**: `ProjectForm.jsx` makes an API call via `/api/themes` to fetch the list of available themes and populates the "Theme" dropdown.
-5.  **User Input**: The user fills in the title and selects a theme. Additional fields (folder name, description, site title, website address, the Clean URLs checkbox) are available under "More settings". The "Theme" dropdown is only enabled during project creation.
+5.  **User Input**: The user fills in the title and selects a theme. The other tabs (Site, Identity, Business Details) are optional; folder name follows the title and may be left empty, in which case the server picks one. The "Theme" dropdown is only offered during project creation, and a logo chosen here is uploaded right after the project is created (see Site Identity).
 5b. **Preset Selection**: If the selected theme has presets, a visual card grid appears below the theme dropdown showing available presets (screenshot, name, description). The default preset is pre-selected. The user can click a different preset card to switch. Presets are fetched from `GET /api/themes/{themeId}/presets` via `getThemePresets()` in `themeManager.js`.
 6.  **Form Validation**: react-hook-form provides real-time validation with localized error messages.
 7.  **Submission**: The user clicks the "Create Project" button. `ProjectForm` automatically generates a URL-friendly folder name (slug) from the title and calls the `onSubmit` handler provided by `ProjectsAdd.jsx`.
@@ -151,16 +151,16 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - **Project Folder Name**: Editable field for the project's folder name, independent of the project title
     - **Description Field**: Optional field for project description
     - **Site Title Field**: Optional field used for exported browser-tab titles and related site-level metadata
-    - **Website Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags, SEO, and exported site metadata
+    - **Site Address Field**: Optional field for setting the base URL for the project, used for generating absolute URLs in social media meta tags, SEO, and exported site metadata
     - **Clean URLs Checkbox**: Off by default. When on, rendered internal links, canonical tags, the sitemap and robots.txt address pages without the `.html` extension (`about`, `rooms/suite`, home `./`); exported file names are unchanged, so the host must serve `about.html` at `/about`
     - **Theme Update Banner**: If `checkThemeUpdates(id)` reports an available update, `ProjectsEdit.jsx` shows an inline banner with an "Apply Update" action
 5.  **Form Features**:
     - **Independent Fields**: Project title and folder name can be edited independently
-    - **URL Validation**: The website address field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)
+    - **URL Validation**: The site address field is optional, but if provided, includes validation to ensure proper URL format (via react-hook-form)
     - **Conditional Fields**: Theme selection only appears when creating new projects, not when editing existing ones
     - **Localized Validation**: All error messages and help text are fully localized
 6.  **Submission**: The user modifies the form and clicks "Save Changes":
-    - **Folder Renaming**: If the folder name changes, the system renames the project directory accordingly. Every check that can reject the request (string types, Website Address, site identity, booleans) runs first, because the directory moves before the row is written and a failure after the move would strand the project.
+    - **Folder Renaming**: If the folder name changes, the system renames the project directory accordingly. Every check that can reject the request (string types, Site Address, site identity, booleans) runs first, because the directory moves before the row is written and a failure after the move would strand the project.
     - **URL Persistence**: Since the project ID is stable, the user is **not** redirected; the API and frontend routes remain valid.
     - **State Synchronization**: Active project state is properly maintained as the ID remains constant.
 7.  **API Call**: The `handleSubmit` function calls `updateProject(id, formData)` using the `projectManager.js` utility functions for consistent API handling.
@@ -206,17 +206,18 @@ A project stores who is behind the site — the facts core publishes as structur
 
 **Controller** (`projectController.js`):
 
-- `createProject` accepts `siteIdentity` from the API (the UI only offers it on edit), and `updateProject` validates it whenever it is sent. Any error → `400 { error: "Invalid business details.", fields }`, and nothing is written.
+- `createProject` accepts `siteIdentity` (the form sends it on create too, without the logo, which follows once the project exists), and `updateProject` validates it whenever it is sent. Any error → `400 { error: "Invalid business details.", fields }`, and nothing is written.
 - Before validation, `readSiteIdentity` tag-strips only human-readable text (public name, description, price range, street, locality, region, postcode, location label) with `stripHtmlToText`, which returns plain text with `&` kept as typed. URLs, email, telephone and the logo path are validated exactly as sent — `stripHtmlTags` re-serialises through DOMPurify and would rewrite a query string.
 - A save that sends the identity refreshes its media usage (`updateSiteIdentityMediaUsage`, source `global:site-identity`), so the library won't delete the logo and exports copy it. The full rescan includes it too.
 - Project ZIP export writes `siteIdentity` into the manifest; import keeps only the valid part (`normalizeSiteIdentity(...).value`) and never refuses a project for it; duplicate copies it with the rest of the row.
 
-**UI** (edit page only; `app/src/components/projects/SiteIdentityFields.jsx`, `OpeningHoursEditor.jsx`, `siteIdentityForm.js`, strings under `forms.project.identity` / `forms.project.business` in `packages/core/src/locales/en.json`):
+**UI** (create and edit; `app/src/components/projects/SiteIdentityFields.jsx`, `OpeningHoursEditor.jsx`, `siteIdentityForm.js`, strings under `forms.project.identity` / `forms.project.business` in `packages/core/src/locales/en.json`):
 
-- **Readiness line** at the top of *Site identity* — `identityReadiness` over the unsaved form values: website address, name, logo (not for a person), address (local business: street, city, country). Each missing item is a button that scrolls to the field; *website address* opens More settings and focuses the Website Address.
-- **Site identity** — category (grouped General / Local business), public name (Site Title as placeholder), logo, email, short description, the 15 profiles.
-- **Business details** — shown for a local-business category, or whenever one of its fields has an error so a switched category can't hide one: phone, price range, location name, address, and the opening-hours editor (per day Not stated / Closed / Open, up to four ranges, "Add hours" for split shifts).
-- **Logo only for the active project.** Media and theme requests are scoped to the active project on the server, so the image picker and "Use the Site Icon" (offered when a Site Icon exists and no logo is set) render only when the edited project is active. Otherwise the field shows the current file name, a Remove button and a note to switch projects.
+- **Tabs.** General (title, theme, folder name, notes, theme updates), Site (Site Title, Site Address, Clean URLs), Identity, Business details. One Save covers all tabs; a blocked save opens the first tab with a problem, and tabs with errors carry a dot.
+- **Readiness line** at the top of *Identity*, only while something is missing — `identityReadiness` over the unsaved form values: site address, name, logo (not for a person), address (local business: street, city, country). Each missing item is a button that opens its tab and focuses the field.
+- **Identity** — category (grouped General / Local business), public name (Site Title as placeholder), logo, email, short description, profiles (only filled ones, plus an "Add a profile…" picker over the 15 networks).
+- **Business details** — a tab shown for a local-business category, or whenever one of its fields has an error so a switched category can't hide one: phone, price range, location name, address, and the opening-hours editor (per day Not stated / Closed / Open, up to four ranges, "Add hours" for split shifts).
+- **Logo.** Media and theme requests are scoped to the active project on the server. Editing is always the active project, so the field is the usual image picker plus "Use the Site Icon" (offered when a Site Icon exists and no logo is set). A new project has no media library yet, so the field (`LogoFileInput.jsx`) holds a local image file with a preview, checked against the image types and the media size limit. `ProjectsAdd` creates the project, makes it active, uploads the file with `uploadProjectMedia`, then saves the returned path with `updateProject(id, { name, siteIdentity: { …, logo } })`. If the upload or that save fails, the project is kept and a warning says the logo can be added in Project details.
 - Submit runs `formToIdentity`, which also refuses emptying the primary location while other locations exist (`primaryRequired`): the pruned primary would otherwise be replaced by the next, uneditable location. Any error blocks the save with a toast and per-field messages. The form is `noValidate` so core's rules own the errors, and `MediaDrawer` stops its own submit event, which React would otherwise bubble through the portal into the project form.
 
 ---

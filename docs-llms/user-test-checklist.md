@@ -50,7 +50,7 @@ Before testing starts, the test owner should provide these. If something is not 
 - A project with at least one collection item marked "Needs attention."
 - A project with leftover collection content from an older schema, if available.
 - A project with a page containing a Core Form widget, or time to create one during testing.
-- An Arch project with a Website Address, at least one News item with date, excerpt, featured image and body, and a News grid split into pages, for the structured-data tasks.
+- An Arch project with a Site Address, at least one News item with date, excerpt, featured image and body, and a News grid split into pages, for the structured-data tasks.
 - An Arch project still on a theme version before 0.9.10, if available.
 - Internet access to Google's Rich Results Test (its "Code" option accepts pasted page source).
 - An older Electron desktop build for auto-update testing, if desktop update testing is in scope.
@@ -104,7 +104,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 ### Create Projects
 
 - [ ] PROJ-001 - From the empty Projects state, click "New project."
-  Expected: The New project form opens with Title and Theme fields.
+  Expected: The New project form opens on General with Project Title and Theme fields.
 
 - [ ] PROJ-002 - Open the Theme dropdown.
   Expected: Installed themes are listed with their versions.
@@ -135,7 +135,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 ### Project Folder and Optional Details
 
-- [ ] PROJ-011 - Type a project title with spaces and capital letters, then expand "More settings."
+- [ ] PROJ-011 - Type a project title with spaces and capital letters, then look at Folder Name under General.
   Expected: Folder Name is auto-filled with a lowercase hyphenated value.
 
 - [ ] PROJ-012 - Change Folder Name to a valid value using lowercase letters, numbers, and hyphens.
@@ -156,10 +156,10 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - [ ] PROJ-017 - Clear Theme back to "Select a theme" and submit, if the UI allows it.
   Expected: An inline theme-required error appears and the project is not created.
 
-- [ ] PROJ-018 - Fill Notes, Site Title, and Website Address, create the project, then reopen Project details.
+- [ ] PROJ-018 - Fill Notes, Site Title, and Site Address, create the project, then reopen Project details.
   Expected: All entered values are still present.
 
-- [ ] PROJ-019 - Enter an invalid Website Address such as `not a url` and submit.
+- [ ] PROJ-019 - Enter an invalid Site Address such as `not a url` and submit.
   Expected: An inline URL validation error appears and the project is not created.
 
 - [ ] PROJ-020 - Enter a very long project title and notes.
@@ -217,7 +217,7 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 - [ ] PROJ-035 - Change the project Title and save.
   Expected: A success toast appears and the new title is shown.
 
-- [ ] PROJ-036 - Toggle "Receive theme updates" and save.
+- [ ] PROJ-036 - Toggle "Receive Theme Updates" and save.
   Expected: The setting persists after reopening Project details.
 
 - [ ] PROJ-037 - Make an unsaved Project details change, then click Cancel.
@@ -288,22 +288,22 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 ### Site Identity and Business Details
 
 - [ ] PROJ-058 - Open Project details for an existing project, then open the New project form.
-  Expected: Project details has a "Site identity" section starting with a line such as "Google can read your details: …". The New project form has no such section.
+  Expected: Project details has General, Site and Identity tabs. With something missing, Identity starts with a line such as "Search engines can't see these details yet: …". The New project form has the same tabs, with the theme and presets under General, and its logo field lets you choose an image file.
 
-- [ ] PROJ-059 - With Website Address empty, click "website address missing" in that line.
-  Expected: More settings opens and the Website Address field is focused.
+- [ ] PROJ-059 - With Site Address empty, click "site address" in that line.
+  Expected: The Site tab opens and the Site Address field is focused.
 
-- [ ] PROJ-060 - Leave Public name empty with a Site Title set.
-  Expected: The Site Title shows as the field's placeholder, and the line shows the name as ready.
+- [ ] PROJ-060 - Leave Public Name empty with a Site Title set.
+  Expected: The Site Title shows as the field's placeholder, and the line doesn't list the name.
 
 - [ ] PROJ-061 - Under "What best describes you?", choose Person.
-  Expected: Logo is no longer listed in the line, and no Business details section appears.
+  Expected: Logo is no longer listed in the line, and there is no Business Details tab.
 
 - [ ] PROJ-062 - Choose Organization.
-  Expected: Logo is listed in the line; still no Business details section.
+  Expected: Logo is listed in the line; still no Business Details tab.
 
 - [ ] PROJ-063 - Choose Restaurant.
-  Expected: A Business details section appears with phone, price range, location name, address and opening hours, and the line now lists the address.
+  Expected: A Business Details tab appears with phone, price range, location name, address and opening hours, and the line now lists the address.
 
 - [ ] PROJ-064 - Fill in Business details, switch to Organization, save, reopen Project details and switch back to Restaurant.
   Expected: The save succeeds and the business details you entered are still there.
@@ -328,6 +328,9 @@ Run the checklist in waves. Do not try to complete the whole thing in one sittin
 
 - [ ] PROJ-071 - Open the ⋮ menu of a project in the Projects list, then paste the Project details address of a project that isn't active into the address bar.
   Expected: The menu has no "Project details" item, and the pasted address goes back to the Projects list.
+
+- [ ] PROJ-071B - Create a project with a logo chosen on the Identity tab (try a PNG, then an SVG), then open its Project details and Media library.
+  Expected: The logo shows a preview before creating. After creating, Identity shows that logo and the Media library lists it as used. A PDF or an image over the size limit is refused before creating.
 
 - [ ] PROJ-072 - Open the logo image in the Media library and check where it is used.
   Expected: It is listed as used by "Business Details (Global)", so it can't be removed as unused.
@@ -1431,7 +1434,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] EXPZIP-003A - With the project's Clean URLs setting off (default), open an exported page's source.
   Expected: Menu, button and text links to other pages end in `.html` (`about.html`, `news/alpha.html`, home `index.html`); the canonical tag and `sitemap.xml` use `.html` too.
 
-- [ ] EXPZIP-003B - Turn on Clean URLs (Project settings › More settings), export again, open the same page's source.
+- [ ] EXPZIP-003B - Turn on Clean URLs (Project details › Site), export again, open the same page's source.
   Expected: Those links are extensionless (`about`, `news/alpha`, home `./`; from a collection item page `../about`, `../`); canonical tag and `sitemap.xml` drop `.html`; the exported file names are still `about.html` / `news/alpha.html`. A link you typed by hand (e.g. `contact.html`) is unchanged.
 
 - [ ] EXPZIP-003C - View the Clean URLs export in the built-in export viewer and click an extensionless link.
@@ -1446,8 +1449,8 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] EXPZIP-006 - Check for `manifest.json`.
   Expected: It is present at the export root.
 
-- [ ] EXPZIP-007 - If Website Address is set, check for `sitemap.xml` and `robots.txt`.
-  Expected: Files exist and use the configured Website Address.
+- [ ] EXPZIP-007 - If Site Address is set, check for `sitemap.xml` and `robots.txt`.
+  Expected: Files exist and use the configured Site Address.
 
 - [ ] EXPZIP-008 - If any page/item is noindex, inspect robots behavior.
   Expected: Noindex pages/items are reflected in exported SEO output.
@@ -1505,7 +1508,7 @@ Test each control type wherever it appears: widget settings, collection forms, S
 Use the structured-data project from the test pack, with a local-business category (e.g. Restaurant), a public name, logo, address, opening hours and at least one social profile filled in Project details.
 
 - [ ] SDATA-001 - Export, open `index.html` in a text editor and find `application/ld+json`.
-  Expected: One such script in the head. It holds a WebSite, a Restaurant with the name, logo, address, opening hours and profile links, and a WebPage, all with full addresses under the Website Address.
+  Expected: One such script in the head. It holds a WebSite, a Restaurant with the name, logo, address, opening hours and profile links, and a WebPage, all with full addresses under the Site Address.
 
 - [ ] SDATA-002 - Same export: open an ordinary page such as `about.html`.
   Expected: A WebPage with that page's own full address and a BreadcrumbList Home → page. No Restaurant entry on this page.
@@ -1519,7 +1522,7 @@ Use the structured-data project from the test pack, with a local-business catego
 - [ ] SDATA-005 - Give a page its own canonical address by hand, export, and open that page.
   Expected: The canonical tag shows what you typed; the structured data still uses the page's real address.
 
-- [ ] SDATA-006 - Clear the Website Address and export.
+- [ ] SDATA-006 - Clear the Site Address and export.
   Expected: The export succeeds and no page contains `application/ld+json`.
 
 - [ ] SDATA-007 - Turn on Clean URLs and export again.

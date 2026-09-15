@@ -81,6 +81,16 @@ export function formToIdentity(form = {}) {
   return result;
 }
 
+const BUSINESS_PATHS = ["telephone", "priceRange", "locations"];
+
+/**
+ * Whether an identity error belongs to a Business details field.
+ * @param {{ field: string }} error
+ */
+export function isBusinessIdentityError(error) {
+  return BUSINESS_PATHS.some((path) => error.field === path || error.field.startsWith(`${path}.`));
+}
+
 /**
  * The first error at or under a path, for showing it next to its field.
  * @param {Array<{ field: string, code: string }>} errors

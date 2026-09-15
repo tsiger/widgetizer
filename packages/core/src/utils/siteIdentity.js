@@ -350,7 +350,7 @@ export function identityForTheme(identity, project) {
 }
 
 /**
- * What Google can read from the project today, one `{ item, ok }` per fact the
+ * What search engines can read from the project today, one `{ item, ok }` per fact the
  * identity's kind needs. Shared by the Project details readiness line and the
  * export warnings.
  * @param {object} identity

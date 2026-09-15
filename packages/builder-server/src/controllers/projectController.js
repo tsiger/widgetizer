@@ -59,8 +59,8 @@ function sanitizeOptionalText(value) {
  */
 function siteUrlRejection(value) {
   return siteUrlHasQueryOrFragment(value)
-    ? "Invalid Website Address. Remove the ? query or # part — this is the address your site lives at, and page paths are added onto it (e.g., https://mysite.com or https://mysite.com/blog/)."
-    : "Invalid Website Address. Please enter a valid URL (e.g., https://mysite.com).";
+    ? "Invalid Site Address. Remove the ? query or # part — this is the address your site lives at, and page paths are added onto it (e.g., https://mysite.com or https://mysite.com/blog/)."
+    : "Invalid Site Address. Please enter a valid URL (e.g., https://mysite.com).";
 }
 
 function stripTextFields(group, keys) {

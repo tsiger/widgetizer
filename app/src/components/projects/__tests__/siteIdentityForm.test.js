@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { identityToForm, formToIdentity, identityErrorAt } from "../siteIdentityForm.js";
+import { identityToForm, formToIdentity, identityErrorAt, isBusinessIdentityError } from "../siteIdentityForm.js";
 
 const STORED = {
   category: "bakery",
@@ -122,6 +122,17 @@ describe("formToIdentity — clearing the primary location", () => {
     form.location = { streetAddress: "", addressLocality: "", addressRegion: "", postalCode: "", addressCountry: "", label: "" };
     const { errors } = formToIdentity(form);
     expect(errors).toEqual([]);
+  });
+});
+
+describe("isBusinessIdentityError", () => {
+  it("claims phone, price range and location fields only", () => {
+    expect(isBusinessIdentityError({ field: "telephone" })).toBe(true);
+    expect(isBusinessIdentityError({ field: "priceRange" })).toBe(true);
+    expect(isBusinessIdentityError({ field: "locations.0.openingHours.friday.0" })).toBe(true);
+    expect(isBusinessIdentityError({ field: "email" })).toBe(false);
+    expect(isBusinessIdentityError({ field: "profiles.facebook" })).toBe(false);
+    expect(isBusinessIdentityError({ field: "telephoneExtra" })).toBe(false);
   });
 });
 
