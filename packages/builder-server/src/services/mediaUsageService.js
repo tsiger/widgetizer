@@ -3,9 +3,11 @@ import path from "path";
 import { getProjectDir } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 const THEME_SETTINGS_USAGE_ID = "global:theme-settings";
+const SITE_IDENTITY_USAGE_ID = "global:site-identity";
 
 /** Upload path prefixes recognised as tracked media assets. */
 const UPLOAD_PREFIXES = ["/uploads/images/", "/uploads/files/"];
@@ -198,6 +200,29 @@ export async function updateThemeSettingsMediaUsage(projectId, themeData) {
     return { success: true, mediaPaths };
   } catch (error) {
     console.error(`Error updating theme settings media usage (projectId: ${projectId}):`, error);
+    throw error;
+  }
+}
+
+function extractMediaPathsFromSiteIdentity(identity) {
+  const logo = normalizeMediaPath(identity?.logo);
+  return logo ? [logo] : [];
+}
+
+/**
+ * Update media usage tracking for the project's business details (the identity logo).
+ * @param {string} projectId - The project's UUID
+ * @param {object} identity - The stored site identity
+ * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
+ */
+export async function updateSiteIdentityMediaUsage(projectId, identity) {
+  try {
+    const mediaPaths = extractMediaPathsFromSiteIdentity(identity);
+    const mediaData = await readMediaFile(projectId);
+    mediaRepo.updateMediaUsageForSource(projectId, SITE_IDENTITY_USAGE_ID, findFileIdsByPaths(mediaData.files, mediaPaths));
+    return { success: true, mediaPaths };
+  } catch (error) {
+    console.error(`Error updating business details media usage (projectId: ${projectId}):`, error);
     throw error;
   }
 }
@@ -496,6 +521,16 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
       } catch (error) {
         console.warn("Error processing theme settings for media usage:", error.message);
       }
+    }
+
+    // Business details live on the project row, not under projectDir.
+    try {
+      addUsageForPaths(
+        extractMediaPathsFromSiteIdentity(projectRepo.getProjectById(projectId)?.siteIdentity),
+        SITE_IDENTITY_USAGE_ID,
+      );
+    } catch (error) {
+      console.warn("Error processing business details for media usage:", error.message);
     }
 
     // Also scan collection items (collections/<type>/<slug>.json). This is the

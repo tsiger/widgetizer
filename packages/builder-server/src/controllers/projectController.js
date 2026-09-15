@@ -18,7 +18,7 @@ import { stripHtmlTags, stripHtmlToText } from "../services/sanitizationService.
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { normalizeSiteIdentity } from "@widgetizer/core/siteIdentity";
-import { refreshMediaUsageAfterStructuralChange } from "../services/mediaUsageService.js";
+import { refreshMediaUsageAfterStructuralChange, updateSiteIdentityMediaUsage } from "../services/mediaUsageService.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -605,6 +605,14 @@ export async function updateProject(req, res) {
       siteIdentity,
       receiveThemeUpdates: updates.receiveThemeUpdates,
     });
+
+    if (siteIdentity !== undefined) {
+      try {
+        await updateSiteIdentityMediaUsage(id, updatedProject.siteIdentity);
+      } catch (error) {
+        console.warn(`[ProjectController] Failed to update business details media usage: ${error.message}`);
+      }
+    }
 
     res.json(updatedProject);
   } catch (error) {

@@ -8,6 +8,7 @@ import {
   serializeJsonLd,
   jsonLdScript,
 } from "../index.js";
+import { websiteNode, identityNode, webPageNode } from "../siteNodes.js";
 
 const LINE_SEPARATOR = String.fromCharCode(0x2028);
 const PARAGRAPH_SEPARATOR = String.fromCharCode(0x2029);
@@ -129,9 +130,9 @@ describe("buildGraph", () => {
   const page = { slug: "about", name: "About" };
   const withSite = { page, project: { siteUrl: "https://example.com/site" } };
 
-  it("has no builders registered yet, so pages emit nothing", () => {
-    expect(GRAPH_BUILDERS).toEqual([]);
-    expect(buildGraph(withSite)).toEqual([]);
+  it("registers the site nodes in output order", () => {
+    expect(GRAPH_BUILDERS).toEqual([websiteNode, identityNode, webPageNode]);
+    expect(buildGraph(withSite).map((node) => node["@type"])).toEqual(["WebPage"]);
   });
 
   it("hands builders the normalised Site URL and collects single nodes and lists", () => {

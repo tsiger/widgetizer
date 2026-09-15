@@ -1,7 +1,6 @@
 // Purpose: Liquid tag to output SEO meta tags
 
-import { isHomeSlug, absoluteSiteUrl } from "../utils/internalHref.js";
-import { pageOutputPath, publicPath } from "../utils/contentAddress.js";
+import { pageUrlAt, publishedImageUrl } from "../utils/publishedUrls.js";
 import { structuredDataScript } from "../structuredData/index.js";
 
 export const SeoTag = {
@@ -42,14 +41,11 @@ export const SeoTag = {
       const robots = seo.robots || "index,follow";
       metaTags.push(`<meta name="robots" content="${escapeHtml(robots)}">`);
 
-      // Canonical URL: explicit page-level value wins; otherwise auto-generate
-      // from siteUrl + slug (homepage canonicalizes to the bare root).
-      const pagedUrl = (number) =>
-        number > 1
-          ? absoluteSiteUrl(project?.siteUrl, publicPath(pageOutputPath(page.slug, number), { cleanUrls: project?.cleanUrls }))
-          : resolveCanonicalUrl("", project?.siteUrl, page.slug, project?.cleanUrls);
-      const canonicalUrl =
-        pageNumber > 1 ? pagedUrl(pageNumber) : resolveCanonicalUrl(seo.canonical_url, project?.siteUrl, page.slug, project?.cleanUrls);
+      // Canonical URL: explicit page-level value wins on page 1; otherwise the
+      // page's own published address (homepage canonicalizes to the bare root).
+      const pagedUrl = (number) => pageUrlAt(page.slug, number, project);
+      const explicitCanonical = seo.canonical_url && seo.canonical_url.trim() ? seo.canonical_url.trim() : "";
+      const canonicalUrl = pageNumber > 1 ? pagedUrl(pageNumber) : explicitCanonical || pagedUrl(1);
       if (canonicalUrl) {
         metaTags.push(`<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
       }
@@ -77,7 +73,7 @@ export const SeoTag = {
       // siteUrl-based published URL). Without siteUrl it is omitted entirely
       // rather than emitting a useless relative path.
       const ogImageUrl =
-        seo.og_image && seo.og_image.trim() ? resolveImageUrl(seo.og_image, project?.siteUrl, mediaFiles) : "";
+        seo.og_image && seo.og_image.trim() ? publishedImageUrl(seo.og_image, project?.siteUrl, mediaFiles) : "";
       if (ogImageUrl) {
         metaTags.push(`<meta property="og:image" content="${escapeHtml(ogImageUrl)}">`);
       }
@@ -115,54 +111,6 @@ export const SeoTag = {
     }
   },
 };
-
-/**
- * Resolve an og_image value to an ABSOLUTE URL suitable for social crawlers.
- * Fully-qualified URLs (http/https) pass through unchanged. Otherwise the
- * filename is resolved to its published variant and combined with the project's
- * siteUrl and the published `assets/images/` location. Returns "" when no
- * absolute URL can be built (no siteUrl), so the caller omits the tag — a
- * relative og:image is meaningless to crawlers, and og:image must be
- * depth-independent (always absolute), so no outputPathPrefix is involved.
- */
-function resolveImageUrl(rawValue, siteUrl, mediaFiles = {}) {
-  if (!rawValue) return "";
-
-  // Already an absolute URL — use as-is.
-  if (rawValue.startsWith("http")) {
-    return rawValue;
-  }
-
-  // Extract the filename from the stored path: "/uploads/images/hero.jpg" → "hero.jpg".
-  const filename = rawValue.split("/").pop();
-  const publicFilename = getPublicImageFilename(filename, mediaFiles);
-  // "" when there is no usable base, so the caller omits the tag.
-  return absoluteSiteUrl(siteUrl, `assets/images/${publicFilename}`);
-}
-
-function getPublicImageFilename(filename, mediaFiles) {
-  const mediaFile = mediaFiles?.[filename];
-  const isSvg = mediaFile?.type === "image/svg+xml" || filename?.toLowerCase().endsWith(".svg");
-  const largePath = mediaFile?.sizes?.large?.path;
-
-  if (!isSvg && largePath) {
-    return largePath.split("/").pop();
-  }
-
-  return filename;
-}
-
-// With cleanUrls the canonical drops the .html extension, matching hosts that
-// publish pages at extensionless paths (Netlify/Cloudflare Pages/Vercel style).
-function resolveCanonicalUrl(explicitUrl, siteUrl, slug, cleanUrls = false) {
-  if (explicitUrl && explicitUrl.trim()) return explicitUrl.trim();
-
-  // The homepage canonicalizes to the base itself (its trailing slash included);
-  // every other page is the base plus its path. A subfolder Site URL is kept by
-  // the shared helper rather than re-derived here.
-  if (isHomeSlug(slug)) return absoluteSiteUrl(siteUrl, "");
-  return absoluteSiteUrl(siteUrl, cleanUrls ? slug : `${slug}.html`);
-}
 
 // Helper function to escape HTML entities
 function escapeHtml(text) {

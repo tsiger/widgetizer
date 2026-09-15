@@ -46,6 +46,7 @@ const {
   updatePageMediaUsage,
   updateGlobalWidgetMediaUsage,
   updateThemeSettingsMediaUsage,
+  updateSiteIdentityMediaUsage,
   removePageFromMediaUsage,
   getMediaUsage,
   refreshAllMediaUsage,
@@ -469,6 +470,35 @@ describe("updateThemeSettingsMediaUsage", () => {
     const result = await updateThemeSettingsMediaUsage(PROJECT_ID, {});
     assert.equal(result.success, true);
     assert.deepEqual(result.mediaPaths, []);
+  });
+});
+
+// ============================================================================
+// updateSiteIdentityMediaUsage
+// ============================================================================
+
+describe("business details media usage", () => {
+  beforeEach(async () => {
+    await seedMediaJson(defaultMediaFiles());
+  });
+
+  afterEach(() => {
+    projectRepo.updateProject(PROJECT_ID, { siteIdentity: {} });
+  });
+
+  it("tracks the identity logo and clears it when the logo is removed", async () => {
+    const result = await updateSiteIdentityMediaUsage(PROJECT_ID, { logo: "/uploads/images/logo.png" });
+    assert.deepEqual(result.mediaPaths, ["/uploads/images/logo.png"]);
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG2).usedIn, ["global:site-identity"]);
+
+    await updateSiteIdentityMediaUsage(PROJECT_ID, {});
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG2).usedIn, []);
+  });
+
+  it("is rebuilt from the project row by a full refresh", async () => {
+    projectRepo.updateProject(PROJECT_ID, { siteIdentity: { logo: "/uploads/images/banner.jpg" } });
+    await refreshAllMediaUsage(PROJECT_ID);
+    assert.ok((await readMediaJson()).files.find((f) => f.id === IMG3).usedIn.includes("global:site-identity"));
   });
 });
 

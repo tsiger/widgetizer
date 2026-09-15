@@ -116,6 +116,7 @@ describe("buildUsageTitleMap", () => {
       "global:header": "Header (Global)",
       "global:footer": "Footer (Global)",
       "global:theme-settings": "Theme Settings (Global)",
+      "global:site-identity": "Business Details (Global)",
     });
   });
 });

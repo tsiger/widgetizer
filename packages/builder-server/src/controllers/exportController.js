@@ -32,6 +32,7 @@ import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
 import { outputPathPrefixFor } from "@widgetizer/core/linkPrefixer";
 import { pageOutputPath } from "@widgetizer/core/contentAddress";
+import { identityReadiness } from "@widgetizer/core/siteIdentity";
 import * as exportRepo from "../db/repositories/exportRepository.js";
 
 function rewriteStoragePaths(html, outputPathPrefix) {
@@ -238,6 +239,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
   const projectDir = getProjectDir(projectFolderName);
   const siteUrl = projectData.siteUrl || "";
   const cleanUrls = !!projectData.cleanUrls;
+  const structuredData = { readiness: identityReadiness(projectData.siteIdentity, projectData) };
 
   const version = exportRepo.getNextVersion(projectId);
   const appVersion = await getAppVersion();
@@ -1025,7 +1027,7 @@ Per aspera ad astra
     const exportDirName = `${projectFolderName}-v${version}`;
     const exportRecord = await recordExport(projectId, version, exportDirName, "success");
 
-    return { outputDir, version, exportDirName, exportRecord };
+    return { outputDir, version, exportDirName, exportRecord, structuredData };
 }
 
 /**
@@ -1079,6 +1081,7 @@ export async function exportProject(req, res) {
       outputDir: result.outputDir,
       version: result.version,
       exportRecord: result.exportRecord,
+      structuredData: result.structuredData,
     });
   } catch (error) {
     // Handle errors with explicit status codes (e.g., no index page)
