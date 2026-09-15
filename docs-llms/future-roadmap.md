@@ -1,4 +1,4 @@
-# Future: Roadmap — seven items, built in series
+# Future: Roadmap — eight items, built in series
 
 > **Status: order decided 2026-09-09. Stages 0–3 shipped on branch `0.9.10` (groundwork and breadcrumbs 2026-09-12, pagination 2026-09-14, structured data 2026-09-15).** Nothing is urgent; each stage is finished and shipped before the next starts, and each lands groundwork the later ones use instead of rewriting. This page is the entry point — start here, then open the stage's own doc.
 
@@ -11,6 +11,7 @@
 | **4. Multilang** | Per-language pages in one project, language folders, translation groups, hreflang, switcher. | `future-multilang-design.md` (decisions) + `future-multilang-implementation-plan.md` (steps) | — |
 | **5. Undo history** | Undo survives saves (manual and autosave); rapid edits to one setting coalesce into one step; the step limit goes up. Bug-fix sized, editor stores only. | §Stage 5 on this page | — (independent of the other stages; last only because nothing waits on it) |
 | **6. Rename to "Widgetizer Desktop"** | Every user-visible name of the OSS app becomes "Widgetizer Desktop" — installer, window and dialog titles, sidebar brand, About box, README, store listing. Code identifiers, package names, ids and folder names stay `widgetizer`. | §Stage 6 on this page | — (independent; can be done at any point, ideally with a release) |
+| **7. Upload file names** | Uploaded media get better file names than today's cleaned-up original name. What "better" means is not decided yet. | §Stage 7 on this page | — (independent; overlaps with image optimization, which changes extensions) |
 
 ## Reading order when picking this up
 
@@ -41,6 +42,22 @@ Where the name is visible today (surveyed 2026-09-09):
 - **Public docs** — `README.md` ("Desktop App" section and title), the Microsoft Store listing in `docs-llms/release-microsoft-store.md`, GitHub release titles going forward.
 
 Done when: a fresh install shows "Widgetizer Desktop" everywhere a user can see a name; **an existing 0.9.x install auto-updates into the renamed build without leaving a second app behind** (the macOS bundle name and the Windows install folder change with `productName` — test the update path on both before shipping); the hosted product still shows "Widgetizer" in the shared editor UI; `grep -rn "Widgetizer Desktop"` hits no code identifier.
+
+## Stage 7 — Upload file names (independent)
+
+Added 2026-09-15; the goal is agreed, the approach is not. Uploaded media keep a mechanical version of whatever name the file had on the user's computer, and that name ends up in the published image URL.
+
+How it works today — `uniqueName` in `packages/builder-server/src/controllers/mediaController.js`:
+
+- The original name is slugified (lower-case, `strict`), so anything that isn't a Latin letter or digit is dropped. A name with no Latin characters (`東京.png`) becomes `file.png`.
+- It is cut at 100 characters, and a clash gets `-1`, `-2`, … before the extension.
+- Camera and AI-tool names survive as noise: `IMG_4032.jpg` → `img_4032.jpg`, `ChatGPT Image Sep 9, 2026, 10_22_31 AM.png` → `chatgpt-image-sep-9-2026-10_22_31-am.png`.
+
+Questions to settle before building:
+
+- What a good name is (transliterated original, alt text, page or project name, something else) and whether users can rename a file afterwards.
+- What renaming does to files already in use — every stored `/uploads/images/…` path (page and global widget settings, collection items, the site identity logo) and media usage tracking would have to follow.
+- How it interacts with image optimization (`future-image-optimization.md`), which would convert uploads to WebP and so change the extension anyway.
 
 ## Rules that hold across all stages
 

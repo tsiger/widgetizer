@@ -1,6 +1,6 @@
 # Future: Breadcrumbs — one trail per page, computed by core, drawn by the theme
 
-> **Status: decided 2026-09-09; menus dropped from v1 on 2026-09-12. Stage 1 of the series in `future-roadmap.md`** (groundwork → **breadcrumbs** → pagination → structured data → multilang → undo fix → rename). First consumer: the Widgetizer marketing-site theme (`themes/widgetizer`). Pagination and structured data build on what this stage lands (the widget `collection` declaration, the listing anchor, the trail itself).
+> **Status: decided 2026-09-09; menus dropped from v1 on 2026-09-12. Stage 1 of the series in `future-roadmap.md`** (groundwork → **breadcrumbs** → pagination → structured data → multilang → undo fix → rename → upload file names). First consumer: the Widgetizer marketing-site theme (`themes/widgetizer`). Pagination and structured data build on what this stage lands (the widget `collection` declaration, the listing anchor, the trail itself).
 
 ---
 

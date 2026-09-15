@@ -420,11 +420,11 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ---
 
-### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (seven items in series)
+### **[future-roadmap.md](future-roadmap.md)** - Future: Roadmap (eight items in series)
 
-**Purpose**: Entry point for the planned series — groundwork (page-link filter, Site URL helper) → breadcrumbs → collection pagination → structured data → multilang → undo-history fix → rename to "Widgetizer Desktop" — with what each stage ships, which doc holds its design, what it lands for later stages, and the reading order when picking the work up; the undo-history and rename stages are specified inline **When to use**:
+**Purpose**: Entry point for the planned series — groundwork (page-link filter, Site URL helper) → breadcrumbs → collection pagination → structured data → multilang → undo-history fix → rename to "Widgetizer Desktop" → upload file names — with what each stage ships, which doc holds its design, what it lands for later stages, and the reading order when picking the work up; the undo-history, rename and upload-file-names stages are specified inline **When to use**:
 
-- Starting or resuming any of the seven items
+- Starting or resuming any of the eight items
 - Deciding what must be finished before a given feature can begin
 - Finding which `future-*` doc to open
 
