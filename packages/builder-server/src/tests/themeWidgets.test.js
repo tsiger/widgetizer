@@ -125,6 +125,130 @@ before(async () => {
 });
 
 // ============================================================================
+// Footer — business details block and social profiles
+// ============================================================================
+
+describe("footer business details and social profiles", () => {
+  const WEEKDAY_HOURS = [{ opens: "09:00", closes: "17:00" }];
+  const IDENTITY = {
+    category: "bakery",
+    telephone: "+30 210 123 4567",
+    email: "hello@crumbly.example",
+    profiles: { instagram: "https://instagram.com/crumbly" },
+    locations: [
+      {
+        streetAddress: "1 Baker St",
+        addressLocality: "Athens",
+        postalCode: "10558",
+        addressCountry: "GR",
+        openingHours: {
+          monday: WEEKDAY_HOURS,
+          tuesday: WEEKDAY_HOURS,
+          wednesday: WEEKDAY_HOURS,
+          thursday: WEEKDAY_HOURS,
+          friday: WEEKDAY_HOURS,
+          sunday: [],
+        },
+      },
+    ],
+  };
+  const THEME_WITH_SOCIAL = {
+    settings: {
+      global: {
+        social: [
+          { id: "facebook_url", value: "https://facebook.com/theme-page" },
+          { id: "mail_url", value: "" },
+        ],
+      },
+    },
+  };
+
+  before(async () => {
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.copy(path.resolve("themes", "arch", "widgets", "global", "footer"), path.join(projectDir, "widgets", "global", "footer"));
+    await fs.copy(path.resolve("themes", "arch", "snippets"), path.join(projectDir, "snippets"));
+  });
+
+  after(() => {
+    projectRepo.updateProject(PROJECT_ID, { siteIdentity: {} });
+  });
+
+  const renderFooter = (block, { renderMode = "publish", identity = IDENTITY } = {}) => {
+    projectRepo.updateProject(PROJECT_ID, { siteIdentity: identity });
+    return renderWidget(
+      PROJECT_ID,
+      "footer",
+      { type: "footer", settings: { copyright: "" }, blocks: { b1: block }, blocksOrder: ["b1"] },
+      THEME_WITH_SOCIAL,
+      renderMode,
+      {
+        projectId: PROJECT_ID,
+        apiUrl: "",
+        renderMode,
+        themeSettingsRaw: THEME_WITH_SOCIAL,
+        enqueuedStyles: new Map(),
+        enqueuedScripts: new Map(),
+      },
+      null,
+    );
+  };
+
+  const compact = (html) => stripStyleAndScript(html).replace(/\s+/g, " ").replace(/>\s+</g, "><");
+
+  it("draws the address, phone, email and grouped opening hours from Project details", async () => {
+    const html = compact(
+      await renderFooter({
+        type: "business_details",
+        settings: { title: "Visit Us", show_address: true, show_contact: true, show_hours: true },
+      }),
+    );
+    assert.ok(html.includes('data-setting="title">Visit Us</h3>'), html);
+    assert.match(html, /<address class="business-details-address">1 Baker St<br>10558 Athens<br> ?GR ?<\/address>/);
+    assert.ok(html.includes('<a href="tel:+302101234567">+30 210 123 4567</a>'), html);
+    assert.ok(html.includes('<a href="mailto:hello@crumbly.example">hello@crumbly.example</a>'), html);
+    assert.ok(html.includes("<dt>Mon–Fri</dt><dd>09:00–17:00</dd>"), html);
+    assert.ok(html.includes("<dt>Sun</dt><dd>Closed</dd>"), html);
+  });
+
+  it("leaves out the parts that are switched off", async () => {
+    const html = compact(
+      await renderFooter({
+        type: "business_details",
+        settings: { title: "", show_address: true, show_contact: false, show_hours: false },
+      }),
+    );
+    assert.ok(html.includes("business-details-address"), html);
+    assert.ok(!html.includes("business-details-contact"), html);
+    assert.ok(!html.includes("business-details-hours"), html);
+  });
+
+  it("publishes nothing without details, but hints in the editor preview", async () => {
+    const block = { type: "business_details", settings: { title: "", show_address: true, show_contact: true, show_hours: true } };
+    const published = compact(await renderFooter(block, { identity: {} }));
+    assert.ok(!published.includes("business-details"), published);
+
+    const preview = compact(await renderFooter(block, { identity: {}, renderMode: "preview" }));
+    assert.ok(preview.includes("business-details-empty-hint"), preview);
+  });
+
+  it("prefers the project's social profiles when any are set", async () => {
+    const html = compact(await renderFooter({ type: "social_block", settings: { title: "" } }));
+    assert.ok(html.includes('href="https://instagram.com/crumbly"'), html);
+    assert.ok(html.includes('href="mailto:hello@crumbly.example"'), html);
+    assert.ok(!html.includes("facebook.com/theme-page"), html);
+  });
+
+  it("falls back to the theme's social settings when the project has none", async () => {
+    const html = compact(
+      await renderFooter({ type: "social_block", settings: { title: "" } }, { identity: { email: "hello@crumbly.example" } }),
+    );
+    assert.ok(html.includes('href="https://facebook.com/theme-page"'), html);
+    assert.ok(!html.includes("instagram.com/crumbly"), html);
+    assert.ok(!html.includes("mailto:hello@crumbly.example"), html);
+  });
+});
+
+// ============================================================================
 // Slideshow
 // ============================================================================
 

@@ -7,6 +7,7 @@ import {
   identityKind,
   resolveSiteIdentity,
   identityReadiness,
+  identityForTheme,
 } from "../siteIdentity.js";
 
 const fields = (errors) => errors.map((error) => `${error.field}:${error.code}`);
@@ -208,6 +209,91 @@ describe("resolveSiteIdentity", () => {
 
   it("never falls back to the internal project name", () => {
     expect(resolveSiteIdentity({}, { name: "My project" }).name).toBe("");
+  });
+});
+
+describe("identityForTheme", () => {
+  const hours = (opens, closes) => [{ opens, closes }];
+
+  it("collapses consecutive days with the same hours and keeps closed runs apart", () => {
+    const theme = identityForTheme(
+      {
+        category: "bakery",
+        locations: [
+          {
+            addressLocality: "Athens",
+            openingHours: {
+              monday: hours("09:00", "17:00"),
+              tuesday: hours("09:00", "17:00"),
+              wednesday: hours("09:00", "17:00"),
+              thursday: [{ opens: "09:00", closes: "13:00" }, { opens: "17:00", closes: "21:00" }],
+              saturday: [],
+              sunday: [],
+            },
+          },
+        ],
+      },
+      { siteTitle: "Crumbly" },
+    );
+    expect(theme.openingHours).toEqual([
+      { firstDay: "monday", lastDay: "wednesday", days: ["monday", "tuesday", "wednesday"], closed: false, ranges: hours("09:00", "17:00") },
+      {
+        firstDay: "thursday",
+        lastDay: "thursday",
+        days: ["thursday"],
+        closed: false,
+        ranges: [{ opens: "09:00", closes: "13:00" }, { opens: "17:00", closes: "21:00" }],
+      },
+      { firstDay: "saturday", lastDay: "sunday", days: ["saturday", "sunday"], closed: true, ranges: [] },
+    ]);
+  });
+
+  it("does not join two runs across a day that is not stated", () => {
+    const theme = identityForTheme({
+      locations: [{ openingHours: { monday: hours("09:00", "17:00"), wednesday: hours("09:00", "17:00") } }],
+    });
+    expect(theme.openingHours.map((run) => [run.firstDay, run.lastDay])).toEqual([
+      ["monday", "monday"],
+      ["wednesday", "wednesday"],
+    ]);
+  });
+
+  it("exposes the resolved name, a dialable phone link, the address and the set profiles", () => {
+    const theme = identityForTheme(FULL, { siteTitle: "Site" });
+    expect(theme).toMatchObject({
+      kind: "localBusiness",
+      name: "Crumbly",
+      logo: "/uploads/images/logo.png",
+      telephone: "+30 210 123 4567",
+      telephoneHref: "tel:+302101234567",
+      hasProfiles: true,
+      address: {
+        streetAddress: "1 Baker St",
+        addressLocality: "Athens",
+        addressRegion: "Attica",
+        postalCode: "10558",
+        addressCountry: "gr",
+        label: "Main shop",
+      },
+    });
+  });
+
+  it("gives an empty project safe blanks", () => {
+    expect(identityForTheme({}, { siteTitle: "Site" })).toEqual({
+      kind: "organization",
+      category: "organization",
+      name: "Site",
+      description: "",
+      logo: "",
+      email: "",
+      telephone: "",
+      telephoneHref: "",
+      priceRange: "",
+      profiles: {},
+      hasProfiles: false,
+      address: null,
+      openingHours: [],
+    });
   });
 });
 

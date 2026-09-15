@@ -621,7 +621,7 @@ describe("renderWidget — global widgets see page and project", () => {
     await fs.outputFile(path.join(footerDir, "schema.json"), JSON.stringify({ type: "footer", settings: [] }));
     await fs.outputFile(
       path.join(footerDir, "widget.liquid"),
-      `<footer data-slug="{{ page.slug }}" data-name="{{ page.name }}" data-site="{{ project.siteUrl }}" data-clean="{{ project.cleanUrls }}"></footer>`,
+      `<footer data-slug="{{ page.slug }}" data-name="{{ page.name }}" data-site="{{ project.siteUrl }}" data-clean="{{ project.cleanUrls }}" data-identity="{{ project.identity.name }}" data-tel="{{ project.identity.telephoneHref }}"></footer>`,
     );
   });
 
@@ -661,6 +661,19 @@ describe("renderWidget — global widgets see page and project", () => {
       null,
     );
     assert.ok(html.includes('data-clean="true"'), html);
+  });
+
+  it("gives themes the business details as project.identity", async () => {
+    projectRepo.updateProject(PROJECT_ID, {
+      siteIdentity: { category: "bakery", telephone: "+30 210 123", text: { publicName: "Crumbly" } },
+    });
+    try {
+      const html = await renderWidget(PROJECT_ID, "footer", FOOTER, RAW_THEME_SETTINGS, "publish", globalsFor(), null);
+      assert.ok(html.includes('data-identity="Crumbly"'), html);
+      assert.ok(html.includes('data-tel="tel:+30210123"'), html);
+    } finally {
+      projectRepo.updateProject(PROJECT_ID, { siteIdentity: {} });
+    }
   });
 
   it("leaves page empty when the caller supplies none", async () => {

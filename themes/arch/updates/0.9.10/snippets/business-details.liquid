@@ -1,0 +1,81 @@
+{% comment %}
+  Business details from Project details: address, phone, email and opening hours.
+  Usage: {% render 'business-details', identity: project.identity, show_address: true, show_contact: true, show_hours: true %}
+{% endcomment %}
+
+{%- assign has_address = false -%}
+{%- if show_address and identity.address -%}
+  {%- assign has_address = true -%}
+{%- endif -%}
+
+{%- assign has_contact = false -%}
+{%- if show_contact -%}
+  {%- if identity.telephone != blank or identity.email != blank -%}
+    {%- assign has_contact = true -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- assign has_hours = false -%}
+{%- if show_hours and identity.openingHours.size > 0 -%}
+  {%- assign has_hours = true -%}
+{%- endif -%}
+
+{%- if has_address or has_contact or has_hours -%}
+  <div class="business-details w-body t-sm">
+    {%- if has_address -%}
+      {%- assign address = identity.address -%}
+      <address class="business-details-address">
+        {%- if address.label != blank -%}
+          <span class="business-details-label">{{ address.label }}</span><br>
+        {%- endif -%}
+        {%- if address.streetAddress != blank -%}
+          {{ address.streetAddress }}<br>
+        {%- endif -%}
+        {%- if address.postalCode != blank or address.addressLocality != blank -%}
+          {{ address.postalCode }}{% if address.postalCode != blank and address.addressLocality != blank %} {% endif %}{{ address.addressLocality }}<br>
+        {%- endif -%}
+        {%- if address.addressRegion != blank -%}
+          {{ address.addressRegion }}{% if address.addressCountry != blank %}, {% endif %}
+        {%- endif -%}
+        {{ address.addressCountry }}
+      </address>
+    {%- endif -%}
+
+    {%- if has_contact -%}
+      <p class="business-details-contact">
+        {%- if identity.telephone != blank -%}
+          <a href="{{ identity.telephoneHref | safe_url }}">{{ identity.telephone }}</a>
+        {%- endif -%}
+        {%- if identity.telephone != blank and identity.email != blank -%}<br>{%- endif -%}
+        {%- if identity.email != blank -%}
+          {%- assign email_href = 'mailto:' | append: identity.email -%}
+          <a href="{{ email_href | safe_url }}">{{ identity.email }}</a>
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+
+    {%- if has_hours -%}
+      <dl class="business-details-hours">
+        {%- for run in identity.openingHours -%}
+          <div class="business-details-hours-row">
+            <dt>
+              {{- run.firstDay | slice: 0, 3 | capitalize -}}
+              {%- if run.lastDay != run.firstDay %}–{{ run.lastDay | slice: 0, 3 | capitalize }}{% endif -%}
+            </dt>
+            <dd>
+              {%- if run.closed -%}
+                Closed
+              {%- else -%}
+                {%- for range in run.ranges -%}
+                  {{ range.opens }}–{{ range.closes }}{% unless forloop.last %}, {% endunless %}
+                {%- endfor -%}
+              {%- endif -%}
+            </dd>
+          </div>
+        {%- endfor -%}
+      </dl>
+    {%- endif -%}
+  </div>
+{%- elsif renderMode == 'preview' -%}
+  <p class="business-details-empty-hint w-meta t-sm t-muted">Add your business details in Project details</p>
+{%- endif -%}

@@ -678,6 +678,24 @@
             }
           }
         },
+        "business_details": {
+          "name": "Business Details",
+          "settings": {
+            "title": {
+              "label": "Title",
+              "description": "The address, phone, email and opening hours come from Project details."
+            },
+            "show_address": {
+              "label": "Show address"
+            },
+            "show_contact": {
+              "label": "Show phone and email"
+            },
+            "show_hours": {
+              "label": "Show opening hours"
+            }
+          }
+        },
         "features": {
           "name": "Features",
           "settings": {

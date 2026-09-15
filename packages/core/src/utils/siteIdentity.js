@@ -292,6 +292,63 @@ export function resolveSiteIdentity(identity, project) {
   };
 }
 
+const ADDRESS_FIELDS = ["streetAddress", "addressLocality", "addressRegion", "postalCode", "addressCountry"];
+
+/**
+ * The identity as themes read it (`project.identity`): resolved name and kind,
+ * the stored logo path for the image tag, the set profiles, the primary
+ * location's address, and its opening hours as runs of consecutive days with
+ * the same hours (`{ firstDay, lastDay, days, closed, ranges }`). Days not
+ * stated are left out and break a run.
+ * @param {object} identity
+ * @param {object} project
+ */
+export function identityForTheme(identity, project) {
+  const resolved = resolveSiteIdentity(identity, project);
+  const primary = Array.isArray(resolved.locations) ? resolved.locations[0] : undefined;
+  const profiles = isPlainObject(resolved.profiles) ? resolved.profiles : {};
+
+  const address =
+    primary && ADDRESS_FIELDS.some((field) => primary[field])
+      ? {
+          ...Object.fromEntries(ADDRESS_FIELDS.map((field) => [field, primary[field] || ""])),
+          label: primary.text?.label || "",
+        }
+      : null;
+
+  const openingHours = [];
+  WEEKDAYS.forEach((day, index) => {
+    const ranges = primary?.openingHours?.[day];
+    if (!Array.isArray(ranges)) return;
+    const closed = ranges.length === 0;
+    const hours = ranges.map(({ opens, closes }) => ({ opens, closes }));
+    const run = openingHours[openingHours.length - 1];
+    if (run && run.lastDay === WEEKDAYS[index - 1] && run.closed === closed && JSON.stringify(run.ranges) === JSON.stringify(hours)) {
+      run.lastDay = day;
+      run.days.push(day);
+    } else {
+      openingHours.push({ firstDay: day, lastDay: day, days: [day], closed, ranges: hours });
+    }
+  });
+
+  const telephone = resolved.telephone || "";
+  return {
+    kind: resolved.kind,
+    category: resolved.category,
+    name: resolved.name,
+    description: resolved.description,
+    logo: resolved.logo || "",
+    email: resolved.email || "",
+    telephone,
+    telephoneHref: telephone ? `tel:${telephone.replace(/[^\d+]/g, "")}` : "",
+    priceRange: resolved.priceRange || "",
+    profiles,
+    hasProfiles: Object.keys(profiles).length > 0,
+    address,
+    openingHours,
+  };
+}
+
 /**
  * What Google can read from the project today, one `{ item, ok }` per fact the
  * identity's kind needs. Shared by the Project details readiness line and the

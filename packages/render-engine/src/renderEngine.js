@@ -34,6 +34,7 @@ import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
 import { pagedHref } from "@widgetizer/core/contentAddress";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
+import { identityForTheme } from "@widgetizer/core/siteIdentity";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
 
 /**
@@ -143,9 +144,12 @@ function pageContextFor(pageData, breadcrumbs, pagination) {
 // first-use stamp on sharedGlobals), not the row just loaded: a toggle landing
 // between the two reads must not split a page's canonical from its links.
 function projectContextFor(projectData, sharedGlobals) {
-  return projectData && sharedGlobals && sharedGlobals.cleanUrls !== undefined
-    ? { ...projectData, cleanUrls: sharedGlobals.cleanUrls === true }
-    : projectData;
+  if (!projectData) return projectData;
+  return {
+    ...projectData,
+    ...(sharedGlobals && sharedGlobals.cleanUrls !== undefined ? { cleanUrls: sharedGlobals.cleanUrls === true } : {}),
+    identity: identityForTheme(projectData.siteIdentity, projectData),
+  };
 }
 
 function buildPageTitle(pageData, projectData, pageNumber = 1) {
@@ -1275,7 +1279,7 @@ async function renderCollectionItemPage(
     item: resolvedItem,
     collection: schema,
     page: itemPageData,
-    project: projectData,
+    project: projectContextFor(projectData, sharedGlobals),
   };
   const mainContentHtml = await engine.parseAndRender(template, itemRenderContext, {
     globals: itemRenderContext.globals,
