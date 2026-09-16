@@ -30,7 +30,7 @@ permission. The working branch is decided per task — do not assume one.
 
 ### High priority
 
-_None open._
+- [⬜ 74. Page-render prep is assembled per call site — an embedding shell's own export loop silently drops pagination and `page` (`builder-server` / `render-engine`) — high (hosted-readiness / correctness)](#-74-page-render-prep-is-assembled-per-call-site--an-embedding-shells-own-export-loop-silently-drops-pagination-and-page-builder-server--render-engine--high-hosted-readiness--correctness)
 
 ### Medium priority
 
@@ -1181,6 +1181,30 @@ fixed-base workflow correct but left this shape unsupported. Author-facing rules
 **Priority:** Low
 
 `{% seo %}` (`packages/core/src/tags/SeoTag.js`) joins the page title, the page number on a paginated copy and the site title with a hardcoded ` - ` (`News - 2 - Site`), and `buildPageTitle` in `packages/render-engine/src/renderEngine.js` builds the layout's `page_title` the same way. A theme cannot choose `–`, `|` or `·`. Collection pagination kept the hyphen for consistency rather than add a contract mid-stage. Fix: an optional separator param on the tag (e.g. `{% seo separator: ' | ' %}`), escaped like the rest of the tag's output and applied in both places so `<title>` and `page_title` never disagree. Raised 2026-09-14.
+
+## ⬜ 74. Page-render prep is assembled per call site — an embedding shell's own export loop silently drops pagination and `page` (`builder-server` / `render-engine`) — high (hosted-readiness / correctness)
+
+**Priority:** High
+
+Rendering a page for output needs more than `renderPage`: the caller must also plan pagination
+(`planPagination`) and set `sharedGlobals.currentPageData` so widgets get the `page` object.
+Both are wired **by hand at every call site** — `exportController` (`:353`, `:472`) and
+`previewController` (`:97`, `:100`, `:473`, `:485`) — and nothing enforces the pairing.
+
+A shell that assembles its own output loop over the package's exports (the packages refactor exists
+precisely so a host can) therefore gets a build that looks fine and is quietly wrong: no numbered
+copies (`blog/page/2.html`), and structured data missing everything that reads `page` — the
+`WebPage` node, `BreadcrumbList`, article fields. Both shipped in stages 2 and 3 assuming the
+prep runs.
+
+Fix: extract the prep into one exported helper — "render this page for output" — that plans
+pagination, sets `currentPageData`, and returns the pages to write, then have `exportController`
+and `previewController` call it instead of repeating the steps. Then an embedder cannot get a
+partial pipeline by omission, and the next stage that adds a per-page global (multilang's
+`page.translations`) lands in one place rather than in every loop.
+
+Raised 2026-09-16, after stage 3; noticed because the same two steps had to be remembered twice
+while building pagination and structured data.
 
 ## Completed — reference table
 
