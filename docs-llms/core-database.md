@@ -92,6 +92,7 @@ SQLite does **not** replace project content files. Most small project-content fi
 - `data/projects/<folderName>/pages/global/footer.json`
 - `data/projects/<folderName>/menus/*.json`
 - `data/projects/<folderName>/collections/<type>/<slug>.json` (one file per collection item — see `core-collections.md`)
+- the same four shapes under a language folder for a non-default site language: `pages/<lang>/*.json`, `pages/<lang>/global/`, `menus/<lang>/`, `collections/<type>/<lang>/` (see `core-pages.md`)
 - `data/projects/<folderName>/theme.json` (and theme assets/templates/widgets)
 - `data/projects/<folderName>/uploads/images/*`
 

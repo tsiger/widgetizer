@@ -178,7 +178,8 @@ async function buildRenderDeps(projectId, collectionDeps = null) {
     coreSnippetsDir: CORE_SNIPPETS_DIR,
     getProjectData: () => projectRepo.getProjectById(projectId) || null,
     getMediaFiles: () => readMediaFile(projectId),
-    listPages: () => listPagesFromDir(getProjectDir(folderName)),
+    listPages: () =>
+      listPagesFromDir(getProjectDir(folderName), { defaultLanguage: projectRepo.getProjectById(projectId)?.defaultLanguage }),
     sanitizeWidgetData,
     preprocessThemeSettings,
     buildRuntimeSiteIcons,

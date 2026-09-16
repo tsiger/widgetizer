@@ -30,8 +30,8 @@ import TurndownService from "turndown";
 import { buildAssetVersionToken, splitAssetRef } from "@widgetizer/core/assetUrl";
 import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
-import { outputPathPrefixFor } from "@widgetizer/core/linkPrefixer";
-import { pageOutputPath } from "@widgetizer/core/contentAddress";
+import { outputPathPrefixFor, prefixInternalHref } from "@widgetizer/core/linkPrefixer";
+import { languageFolder, pageOutputPath } from "@widgetizer/core/contentAddress";
 import { identityReadiness } from "@widgetizer/core/siteIdentity";
 import { emptyArticleFields } from "@widgetizer/core/structuredData";
 import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
@@ -287,11 +287,19 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     const processedThemeSettings = preprocessThemeSettings(rawThemeSettings);
 
     // Fetch list of page data using the helper function
-    const pagesDataArray = await listPagesFromDir(projectDir);
+    const defaultLanguage = projectData.defaultLanguage;
+    const pageLang = (pageData) => ({ language: pageData.language, defaultLanguage });
+    // A slug is unique per language, so anything keyed by page must key by the
+    // language-qualified output path rather than the id alone.
+    const pageIdentity = (pageData) => pageOutputPath(pageData.id, 1, pageLang(pageData));
+    const pagesDataArray = await listPagesFromDir(projectDir, { defaultLanguage });
+    // Sitemap, robots and the forms manifest describe the root language until
+    // export learns per-language SEO artifacts.
+    const rootPages = pagesDataArray.filter((pageData) => !languageFolder(pageLang(pageData)));
 
     // Validate that at least one page has the "index" slug (required for homepage)
     // Note: page.id is derived from filename, which is the authoritative slug
-    const hasIndexPage = pagesDataArray.some((page) => page.id === "index");
+    const hasIndexPage = rootPages.some((page) => page.id === "index");
     if (!hasIndexPage) {
       const err = new Error('Your project must have a page with the slug "index" to serve as the homepage. Please create or rename a page to have the slug "index" before exporting.');
       err.statusCode = 400;
@@ -357,12 +365,18 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
           { pageSlug: pageData.id },
           renderCollectionDeps,
         );
-        if (plan) paginationPlans.set(pageData.id, plan);
+        if (plan) paginationPlans.set(pageIdentity(pageData), plan);
       }
     }
-    const pageCounts = new Map([...paginationPlans].map(([pageId, plan]) => [pageId, plan.total]));
+    const pageCounts = new Map(
+      rootPages
+        .filter((pageData) => paginationPlans.has(pageIdentity(pageData)))
+        .map((pageData) => [pageData.id, paginationPlans.get(pageIdentity(pageData)).total]),
+    );
 
-    const homepagePaginates = [...paginationPlans.keys()].some((pageId) => isHomeSlug(pageId));
+    const homepagePaginates = rootPages.some(
+      (pageData) => isHomeSlug(pageData.id) && paginationPlans.has(pageIdentity(pageData)),
+    );
     const clashingCollection = homepagePaginates
       ? collectionSchemas.find((schema) => schema.hasItemPages && schema.slugPrefix === "page")
       : null;
@@ -394,11 +408,11 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // item pages included via itemPagesForSeo) ---
     if (siteUrl && siteUrl.trim() !== "") {
       try {
-        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
+        const sitemapXml = await buildSitemap(rootPages, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
         if (sitemapXml) {
           await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapXml);
         }
-        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
+        const robotsTxt = buildRobotsTxt(rootPages, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
         if (robotsTxt) {
           await fs.writeFile(path.join(outputDir, "robots.txt"), robotsTxt);
         }
@@ -452,12 +466,12 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     };
 
     const pageRenders = pagesDataArray.flatMap((pageData) => {
-      const plan = paginationPlans.get(pageData.id) || null;
+      const plan = paginationPlans.get(pageIdentity(pageData)) || null;
       return Array.from({ length: plan ? plan.total : 1 }, (_, index) => ({ pageData, plan, pageNumber: index + 1 }));
     });
 
     for (const { pageData, plan, pageNumber } of pageRenders) {
-      const outputFilename = pageOutputPath(pageData.id, pageNumber);
+      const outputFilename = pageOutputPath(pageData.id, pageNumber, pageLang(pageData));
       // Create shared globals for this page (each page gets fresh enqueue Maps)
       const sharedGlobals = {
         projectId,
@@ -582,9 +596,13 @@ Per aspera ad astra
       const outputFilePath = path.join(outputDir, outputFilename);
 
       // Inject markdown alternate link into <head> when markdown export is enabled
+      // The markdown twin sits beside its page, language folder included; a
+      // relative alternate link is depth-prefixed like every other internal link.
+      const mdFilename = outputFilename.replace(/\.html$/, ".md");
       if (exportMarkdown && pageNumber === 1) {
-        const mdFilename = pageData.id === "index" || pageData.id === "home" ? "index.md" : `${pageData.id}.md`;
-        const mdHref = mdBase ? absoluteSiteUrl(siteUrl, mdFilename) : mdFilename;
+        const mdHref = mdBase
+          ? absoluteSiteUrl(siteUrl, mdFilename)
+          : prefixInternalHref(mdFilename, sharedGlobals.outputPathPrefix);
         processedHtml = processedHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
       }
 
@@ -608,7 +626,6 @@ Per aspera ad astra
             .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
             .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
           const markdownContent = turndown.turndown(cleanHtml);
-          const mdFilename = pageData.id === "index" || pageData.id === "home" ? "index.md" : `${pageData.id}.md`;
 
           // Add YAML frontmatter
           const frontmatter = [
@@ -1066,7 +1083,7 @@ Per aspera ad astra
     const formsCap = await collectionDeps?.limits?.getLimit?.(collectionScope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
     const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
     const { manifest: formsManifest, warnings: formsWarnings } = buildFormsManifest(
-      pagesDataArray,
+      rootPages,
       appVersion,
       maxForms,
     );

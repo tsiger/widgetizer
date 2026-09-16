@@ -3,6 +3,16 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_MENU_ITEMS, MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
+import { menuKey, menusDir } from "@widgetizer/core/contentAddress";
+import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
+
+async function listMenuIds(storage, scope, lang) {
+  const files = await storage.list(scope, menusDir(lang));
+  return files.filter((file) => file.endsWith(".json")).map((file) => file.replace(/\.json$/, ""));
+}
+
+const writeMenu = (storage, scope, menu, lang) =>
+  storage.write(scope, menuKey(menu.id, lang), JSON.stringify(withoutLanguage(menu), null, 2));
 
 /**
  * Bound an attacker-controlled menu-item tree BEFORE the recursive
@@ -80,24 +90,25 @@ export async function getAllMenus(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
 
-    const menuFiles = (await storage.list(scope, "menus")).filter((file) => file.endsWith(".json"));
-    const menus = (
-      await Promise.all(
-        menuFiles.map(async (file) => {
-          const buf = await storage.read(scope, `menus/${file}`);
+    const menus = [];
+    for (const lang of projectLanguageContexts(req.activeProject)) {
+      const loaded = await Promise.all(
+        (await listMenuIds(storage, scope, lang)).map(async (id) => {
+          const buf = await storage.read(scope, menuKey(id, lang));
           if (buf == null) return null;
           const menu = JSON.parse(buf.toString("utf8"));
 
           // Lazy backfill: add uuid to existing menus that don't have one
           if (!menu.uuid) {
             menu.uuid = randomUUID();
-            await storage.write(scope, `menus/${file}`, JSON.stringify(menu, null, 2));
+            await writeMenu(storage, scope, { ...menu, id }, lang);
           }
 
-          return menu;
+          return { ...menu, language: lang.language };
         }),
-      )
-    ).filter((menu) => menu !== null);
+      );
+      menus.push(...loaded.filter((menu) => menu !== null));
+    }
 
     res.json(menus);
   } catch (error) {
@@ -126,13 +137,16 @@ export async function createMenu(req, res) {
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Generate unique ID from the sanitized name (server-side only)
-    const menuId = await generateUniqueSlug(name, (slug) => storage.exists(scope, `menus/${slug}.json`));
+    const menuId = await generateUniqueSlug(name, (slug) => storage.exists(scope, menuKey(slug, lang)));
 
     const newMenu = {
       id: menuId,
       uuid: randomUUID(),
+      language: lang.language,
       name,
       description: safeDescription,
       items: [],
@@ -140,7 +154,7 @@ export async function createMenu(req, res) {
       updated: new Date().toISOString(),
     };
 
-    await storage.write(scope, `menus/${menuId}.json`, JSON.stringify(newMenu, null, 2));
+    await writeMenu(storage, scope, newMenu, lang);
 
     res.status(201).json(newMenu);
   } catch (error) {
@@ -160,8 +174,10 @@ export async function deleteMenu(req, res) {
     const { id } = req.params;
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
-    await storage.delete(scope, `menus/${id}.json`);
+    await storage.delete(scope, menuKey(id, lang));
     res.json({ success: true });
   } catch (error) {
     console.error("Error deleting menu:", error);
@@ -180,13 +196,15 @@ export async function getMenu(req, res) {
     const { id } = req.params;
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
-    const buf = await storage.read(scope, `menus/${id}.json`);
+    const buf = await storage.read(scope, menuKey(id, lang));
     if (buf == null) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
-    res.json(JSON.parse(buf.toString("utf8")));
+    res.json({ ...JSON.parse(buf.toString("utf8")), language: lang.language });
   } catch (error) {
     console.error("Error getting menu:", error);
     res.status(500).json({ error: "Failed to get menu" });
@@ -221,9 +239,11 @@ export async function updateMenu(req, res) {
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Read existing menu to preserve uuid (also serves as the existence check)
-    const existingBuf = await storage.read(scope, `menus/${menuId}.json`);
+    const existingBuf = await storage.read(scope, menuKey(menuId, lang));
     if (existingBuf == null) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -257,10 +277,11 @@ export async function updateMenu(req, res) {
       ...menuData,
       id: menuId,
       uuid: existingMenu.uuid || randomUUID(),
+      language: lang.language,
       updated: new Date().toISOString(),
     };
 
-    await storage.write(scope, `menus/${menuId}.json`, JSON.stringify(dataToSave, null, 2));
+    await writeMenu(storage, scope, dataToSave, lang);
 
     res.json(dataToSave);
   } catch (error) {
@@ -300,9 +321,11 @@ export async function duplicateMenu(req, res) {
     const { id } = req.params;
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Read the original menu (also the existence check)
-    const originalBuf = await storage.read(scope, `menus/${id}.json`);
+    const originalBuf = await storage.read(scope, menuKey(id, lang));
     if (originalBuf == null) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -321,23 +344,23 @@ export async function duplicateMenu(req, res) {
     }
 
     // Gather existing menu names for copy-number logic
-    const menuFiles = (await storage.list(scope, "menus")).filter((f) => f.endsWith(".json"));
     const existingMenuNames = (
       await Promise.all(
-        menuFiles.map(async (f) => {
-          const buf = await storage.read(scope, `menus/${f}`);
+        (await listMenuIds(storage, scope, lang)).map(async (menuId) => {
+          const buf = await storage.read(scope, menuKey(menuId, lang));
           return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
         }),
       )
     ).filter((name) => name != null);
     const newName = generateCopyName(originalMenu.name, existingMenuNames);
-    const newMenuId = await generateUniqueSlug(newName, (slug) => storage.exists(scope, `menus/${slug}.json`));
+    const newMenuId = await generateUniqueSlug(newName, (slug) => storage.exists(scope, menuKey(slug, lang)));
 
     // Create the duplicated menu with new data
     const duplicatedMenu = {
       ...JSON.parse(JSON.stringify(originalMenu)), // Deep clone
       id: newMenuId,
       uuid: randomUUID(),
+      language: lang.language,
       name: newName,
       items: generateNewMenuItemIds(originalMenu.items), // Generate new IDs for all items
       created: new Date().toISOString(),
@@ -345,7 +368,7 @@ export async function duplicateMenu(req, res) {
     };
 
     // Save the new menu
-    await storage.write(scope, `menus/${newMenuId}.json`, JSON.stringify(duplicatedMenu, null, 2));
+    await writeMenu(storage, scope, duplicatedMenu, lang);
 
     res.status(201).json(duplicatedMenu);
   } catch (error) {

@@ -20,6 +20,8 @@ import {
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
 import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
+import { globalKey } from "@widgetizer/core/contentAddress";
+import { requestLanguage, withoutLanguage } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
@@ -376,7 +378,7 @@ export async function createCollectionPreviewToken(req, res) {
     // uuid -> page map so pageUuid links inside the item resolve to slugs.
     // listPagesFromDir reads <projectDir>/pages — projectDir is the working dir
     // resolved from the FOLDER name (not the UUID), matching the export path.
-    const pages = await listPagesFromDir(projectDir);
+    const pages = await listPagesFromDir(projectDir, { defaultLanguage: projectData.defaultLanguage });
     const pagesByUuid = new Map();
     for (const page of pages || []) {
       if (page.uuid) pagesByUuid.set(page.uuid, page);
@@ -516,12 +518,14 @@ export async function getGlobalWidgets(req, res) {
   try {
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
     // Global widgets *data* is stored in pages/global, not widgets/global
 
     // Read header.json and footer.json
     const globalWidgets = {};
 
-    const headerBuf = await storage.read(scope, "pages/global/header.json");
+    const headerBuf = await storage.read(scope, globalKey("header", lang));
     if (headerBuf != null) {
       try {
         globalWidgets.header = JSON.parse(headerBuf.toString("utf8"));
@@ -534,7 +538,7 @@ export async function getGlobalWidgets(req, res) {
       globalWidgets.header = null;
     }
 
-    const footerBuf = await storage.read(scope, "pages/global/footer.json");
+    const footerBuf = await storage.read(scope, globalKey("footer", lang));
     if (footerBuf != null) {
       try {
         globalWidgets.footer = JSON.parse(footerBuf.toString("utf8"));
@@ -579,13 +583,15 @@ export async function saveGlobalWidget(req, res) {
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Save the widget — storage.write creates parent directories as needed.
-    await storage.write(scope, `pages/global/${type}.json`, JSON.stringify(widgetData, null, 2));
+    await storage.write(scope, globalKey(type, lang), JSON.stringify(withoutLanguage(widgetData), null, 2));
 
     // Update media usage
     try {
-      await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData);
+      await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData, lang);
     } catch (usageError) {
       console.error("Error updating media usage for global widget:", usageError);
       // Don't fail the save if usage update fails, but log it

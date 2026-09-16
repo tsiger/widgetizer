@@ -51,9 +51,11 @@ eslint-rules/           # local ESLint rules (e.g. require-scope-arg)
 data/                   # Runtime data (gitignored)
   widgetizer.db         # SQLite database (metadata)
   projects/<folder>/    # Per-project content
-    pages/*.json        # Page content
+    pages/*.json        # Page content (default language)
     pages/global/       # header.json, footer.json (global widgets)
-    collections/<type>/ # Collection item data (one JSON per item)
+    pages/<lang>/       # Another language's pages + its own global/ (languages are folders, never a stored field)
+    menus/              # Menus; menus/<lang>/ for another language
+    collections/<type>/ # Collection item data (one JSON per item); <type>/<lang>/ for another language
     uploads/            # Media binaries (images/, files/)
 ```
 
@@ -64,7 +66,7 @@ For the detailed file-by-file map (and the admin-shell vs site-workspace routing
 ### Content Model
 
 - **SQLite metadata**: projects, media metadata/usage, app settings, export history (`data/widgetizer.db`).
-- **Filesystem content**: pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, collection items (`collections/<type>/<slug>.json`), and theme files through the storage adapter; uploaded binaries through the asset storage adapter.
+- **Filesystem content**: pages (`data/projects/<folder>/pages/<slug>.json`), global widgets (`pages/global/header.json`, `footer.json`), menus, collection items (`collections/<type>/<slug>.json`), and theme files through the storage adapter; uploaded binaries through the asset storage adapter. Content in a non-default language lives in a folder named by its code (`pages/el/`, `pages/el/global/`, `menus/el/`, `collections/<type>/el/`); every key is built by `packages/core/src/utils/contentAddress.js`, and a request picks the language with `?language=` or `body.language`.
 - Repository layer in `packages/builder-server/src/db/repositories/` (project, media, settings, export).
 
 ### Rendering Pipeline

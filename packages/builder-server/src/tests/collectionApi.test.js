@@ -293,3 +293,50 @@ describe("item mutations", () => {
     assert.deepEqual(res._json.deleted, ["bulk-cleanup-boom"]);
   });
 });
+
+describe("items in another language (API)", () => {
+  before(() => {
+    activeProject.defaultLanguage = "en";
+    activeProject.languages = ["el"];
+  });
+
+  after(() => {
+    delete activeProject.defaultLanguage;
+    delete activeProject.languages;
+  });
+
+  it("creates, lists and reads Greek items in their folder", async () => {
+    const en = await createNews({ slug: "story", settings: { title: "Story" } });
+    const el = await createNews({ slug: "story", settings: { title: "Istoria" }, language: "el" });
+    assert.equal(el._status, 201, JSON.stringify(el._json));
+    assert.equal(el._json.language, "el");
+    assert.equal(el._json.translationGroupId, el._json.uuid);
+    assert.notEqual(el._json.uuid, en._json.uuid);
+    assert.equal(await fs.pathExists(path.join(projectBase, "collections", "news", "el", "story.json")), true);
+
+    const list = await call(collectionController.getAllItems, {
+      params: { collectionType: "news" },
+      query: { language: "el" },
+    });
+    assert.deepEqual(list._json.map((i) => [i.slug, i.title, i.language]), [["story", "Istoria", "el"]]);
+
+    const read = await call(collectionController.getItem, {
+      params: { collectionType: "news", itemSlug: "story" },
+      query: { language: "el" },
+    });
+    assert.equal(read._json.uuid, el._json.uuid);
+  });
+
+  it("refuses a language the project has not enabled", async () => {
+    const res = await createNews({ settings: { title: "Bonjour" }, language: "fr" });
+    assert.equal(res._status, 400);
+  });
+
+  it("counts the item cap across every language of the collection", async () => {
+    itemLimit = 1;
+    const en = await createNews({ slug: "only", settings: { title: "Only" } });
+    assert.equal(en._status, 201);
+    const el = await createNews({ slug: "mono", settings: { title: "Mono" }, language: "el" });
+    assert.equal(el._status, 422, "the Greek item is the second item of the collection, not the first of a folder");
+  });
+});

@@ -76,11 +76,18 @@ after(async () => {
 // Mock helpers
 // ============================================================================
 
-function mockReq({ params = {}, body = {}, headers = {}, activeProject = { id: PROJECT_ID, folderName: PROJECT_FOLDER } } = {}) {
+function mockReq({
+  params = {},
+  body = {},
+  headers = {},
+  query = {},
+  activeProject = { id: PROJECT_ID, folderName: PROJECT_FOLDER },
+} = {}) {
   return {
     params,
     body,
     headers,
+    query,
     activeProject,
     scope: {
       actor: { id: "default", kind: "local" },
@@ -122,8 +129,8 @@ function mockRes() {
   return res;
 }
 
-async function callController(fn, { params, body, headers } = {}) {
-  const req = mockReq({ params, body, headers });
+async function callController(fn, { params, body, headers, query, activeProject } = {}) {
+  const req = mockReq({ params, body, headers, query, activeProject });
   const res = mockRes();
   await fn(req, res);
   return res;
@@ -557,5 +564,46 @@ describe("createCollectionPreviewToken — guards", () => {
     assert.equal(res._status, 400);
     assert.equal(res._json.error, "Preview unavailable");
     assert.match(res._json.message, /no template\.liquid/);
+  });
+});
+
+describe("global widgets in another language", () => {
+  const multilang = { id: PROJECT_ID, folderName: PROJECT_FOLDER, defaultLanguage: "en", languages: ["el"] };
+  const greekGlobalDir = () => path.join(getProjectDir(PROJECT_FOLDER), "pages", "el", "global");
+
+  beforeEach(async () => {
+    await fs.remove(greekGlobalDir());
+    await fs.outputJson(path.join(getProjectDir(PROJECT_FOLDER), "pages", "global", "header.json"), {
+      type: "theme-header",
+      settings: { title: "English" },
+    });
+  });
+
+  it("saves and reads the language's own header, leaving the root one alone", async () => {
+    const saved = await callController(saveGlobalWidget, {
+      params: { type: "header" },
+      body: { type: "theme-header", settings: { title: "Greek" }, language: "el" },
+      activeProject: multilang,
+    });
+    assert.equal(saved._status, 200, JSON.stringify(saved._json));
+    const onDisk = await fs.readJson(path.join(greekGlobalDir(), "header.json"));
+    assert.equal(onDisk.settings.title, "Greek");
+    assert.equal("language" in onDisk, false);
+
+    const greek = await callController(getGlobalWidgets, { query: { language: "el" }, activeProject: multilang });
+    assert.equal(greek._json.header.settings.title, "Greek");
+    assert.equal(greek._json.footer, null);
+    const root = await callController(getGlobalWidgets, { activeProject: multilang });
+    assert.equal(root._json.header.settings.title, "English");
+  });
+
+  it("refuses a language the project has not enabled", async () => {
+    const res = await callController(saveGlobalWidget, {
+      params: { type: "header" },
+      body: { settings: {}, language: "fr" },
+      activeProject: multilang,
+    });
+    assert.equal(res._status, 400);
+    assert.equal(await fs.pathExists(path.join(getProjectDir(PROJECT_FOLDER), "pages", "fr")), false);
   });
 });

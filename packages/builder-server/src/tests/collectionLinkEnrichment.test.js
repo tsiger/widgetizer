@@ -231,6 +231,101 @@ describe("richtext stable links — integrity wiring", () => {
     assert.ok(page.widgets.w1.settings.body.includes(`data-page-uuid="${page.uuid}"`));
     assert.ok(!page.widgets.w1.settings.body.includes("OLD-PAGE"));
   });
+
+  it("remaps references inside language folders and keeps translation groups together", async () => {
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    const menusDir = getProjectMenusDir(PROJECT_FOLDER);
+    await writePage("home", "OLD-HOME");
+    await fs.outputJSON(path.join(pagesDir, "el", "arxiki.json"), {
+      slug: "arxiki",
+      uuid: "OLD-EL",
+      translationGroupId: "OLD-HOME",
+      widgets: { w1: { type: "cta", settings: { link: { href: "home.html", pageUuid: "OLD-HOME" } } } },
+    });
+    await fs.outputJSON(path.join(menusDir, "el", "main.json"), {
+      id: "main",
+      uuid: "OLD-MENU-EL",
+      items: [{ id: "i1", label: "Home", link: "home.html", pageUuid: "OLD-HOME" }],
+    });
+    await writeItem("rooms", "suite", {}, { uuid: "OLD-SUITE" });
+    await fs.outputJSON(path.join(getProjectDir(PROJECT_FOLDER), "collections", "rooms", "el", "suite.json"), {
+      slug: "suite",
+      uuid: "OLD-SUITE-EL",
+      translationGroupId: "OLD-SUITE",
+      settings: {},
+    });
+
+    await remapDuplicatedProjectUuids(PROJECT_FOLDER);
+
+    const home = await readPage("home");
+    const greek = await fs.readJSON(path.join(pagesDir, "el", "arxiki.json"));
+    const greekMenu = await fs.readJSON(path.join(menusDir, "el", "main.json"));
+    assert.notEqual(home.uuid, "OLD-HOME");
+    assert.notEqual(greek.uuid, "OLD-EL");
+    assert.equal(greek.translationGroupId, home.uuid, "the group follows the English page's new uuid");
+    assert.equal(greek.widgets.w1.settings.link.pageUuid, home.uuid);
+    assert.equal(greekMenu.items[0].pageUuid, home.uuid);
+    assert.notEqual(greekMenu.uuid, "OLD-MENU-EL");
+
+    const suite = await readItem("rooms", "suite");
+    const greekSuite = await fs.readJSON(
+      path.join(getProjectDir(PROJECT_FOLDER), "collections", "rooms", "el", "suite.json"),
+    );
+    assert.notEqual(suite.uuid, "OLD-SUITE");
+    assert.notEqual(greekSuite.uuid, "OLD-SUITE-EL");
+    assert.equal(greekSuite.translationGroupId, suite.uuid);
+
+    await fs.remove(path.join(pagesDir, "el"));
+    await fs.remove(path.join(menusDir, "el"));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections", "rooms", "el"));
+  });
+
+  it("keeps survivors of a group together when the member it was named after is gone", async () => {
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    const roomsDir = path.join(getProjectDir(PROJECT_FOLDER), "collections", "rooms");
+    await fs.outputJSON(path.join(pagesDir, "el", "epaf.json"), {
+      slug: "epaf",
+      uuid: "OLD-EL",
+      translationGroupId: "GONE-EN",
+      widgets: {},
+    });
+    await fs.outputJSON(path.join(pagesDir, "it", "contatti.json"), {
+      slug: "contatti",
+      uuid: "OLD-IT",
+      translationGroupId: "GONE-EN",
+      widgets: {},
+    });
+    await fs.outputJSON(path.join(roomsDir, "el", "suite.json"), {
+      slug: "suite",
+      uuid: "OLD-SUITE-EL",
+      translationGroupId: "GONE-SUITE",
+      settings: {},
+    });
+    await fs.outputJSON(path.join(roomsDir, "it", "suite.json"), {
+      slug: "suite",
+      uuid: "OLD-SUITE-IT",
+      translationGroupId: "GONE-SUITE",
+      settings: {},
+    });
+
+    await remapDuplicatedProjectUuids(PROJECT_FOLDER);
+
+    const greek = await fs.readJSON(path.join(pagesDir, "el", "epaf.json"));
+    const italian = await fs.readJSON(path.join(pagesDir, "it", "contatti.json"));
+    assert.notEqual(greek.uuid, "OLD-EL");
+    assert.equal(greek.translationGroupId, "GONE-EN");
+    assert.equal(italian.translationGroupId, greek.translationGroupId, "the two translations stay one group");
+
+    const greekSuite = await fs.readJSON(path.join(roomsDir, "el", "suite.json"));
+    const italianSuite = await fs.readJSON(path.join(roomsDir, "it", "suite.json"));
+    assert.equal(greekSuite.translationGroupId, "GONE-SUITE");
+    assert.equal(italianSuite.translationGroupId, greekSuite.translationGroupId);
+
+    await fs.remove(path.join(pagesDir, "el"));
+    await fs.remove(path.join(pagesDir, "it"));
+    await fs.remove(path.join(roomsDir, "el"));
+    await fs.remove(path.join(roomsDir, "it"));
+  });
 });
 
 // ============================================================================

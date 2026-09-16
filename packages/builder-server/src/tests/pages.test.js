@@ -80,10 +80,11 @@ const PROJECT_FOLDER = "page-test-project";
 let activeProject;
 
 /** Build a mock Express req */
-function mockReq({ params = {}, body = {} } = {}) {
+function mockReq({ params = {}, body = {}, query = {} } = {}) {
   return {
     params,
     body,
+    query,
     activeProject,
     scope: {
       actor: { id: "default", kind: "local" },
@@ -115,8 +116,8 @@ function mockRes() {
   return res;
 }
 
-async function callController(controllerFn, { params, body } = {}) {
-  const req = mockReq({ params, body });
+async function callController(controllerFn, { params, body, query } = {}) {
+  const req = mockReq({ params, body, query });
   const res = mockRes();
   await controllerFn(req, res);
   return res;
@@ -1274,5 +1275,157 @@ describe("listing anchor (one page per collection)", () => {
     assert.equal(read._json.widgets.w1.settings.paginate, false);
     assert.equal(read._json.widgets.w2.settings.paginate, true);
     assert.equal(read._json.widgets.w2.settings.listing_anchor, true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Languages: every page key goes through the addressing layer
+// ---------------------------------------------------------------------------
+
+describe("pages in another language", () => {
+  const EL = { language: "el" };
+  const projectDir = () => getProjectDir(activeProject.folderName);
+  const greekPagePath = (slug) => path.join(getProjectPagesDir(activeProject.folderName), "el", `${slug}.json`);
+
+  before(() => {
+    activeProject.defaultLanguage = "en";
+    activeProject.languages = ["el"];
+  });
+
+  after(() => {
+    delete activeProject.defaultLanguage;
+    delete activeProject.languages;
+  });
+
+  beforeEach(async () => {
+    await resetPages();
+    await fs.remove(path.join(getProjectPagesDir(activeProject.folderName), "el"));
+    await fs.remove(path.join(projectDir(), "menus"));
+  });
+
+  it("writes a Greek page in its folder, without a language field, in its own translation group", async () => {
+    const page = await createTestPage("Epikoinonia", EL);
+    assert.equal(page.language, "el");
+    assert.equal(page.translationGroupId, page.uuid);
+    const onDisk = await fs.readJson(greekPagePath("epikoinonia"));
+    assert.equal(onDisk.uuid, page.uuid);
+    assert.equal("language" in onDisk, false, "the folder says the language, the file never does");
+    assert.equal(onDisk.translationGroupId, page.uuid);
+  });
+
+  it("keeps the default language at the root and strips a language echoed back by the client", async () => {
+    const page = await createTestPage("Contact", { language: "en" });
+    assert.equal(page.language, "en");
+    const rootPath = getPagePath(activeProject.folderName, "contact");
+    assert.equal("language" in (await fs.readJson(rootPath)), false);
+
+    const saved = await callController(savePageContent, {
+      params: { id: "contact" },
+      body: { ...page, widgets: {} },
+    });
+    assert.equal(saved._status, 200, JSON.stringify(saved._json));
+    assert.equal("language" in (await fs.readJson(rootPath)), false);
+  });
+
+  it("lets the same slug exist once per language, and lists both with their language", async () => {
+    const en = await createTestPage("Gallery");
+    const el = await createTestPage("Gallery", EL);
+    assert.equal(en.slug, "gallery");
+    assert.equal(el.slug, "gallery", "no -1 suffix: uniqueness is per language folder");
+
+    const list = await callController(getAllPages);
+    const galleries = list._json.filter((p) => p.slug === "gallery").map((p) => p.language).sort();
+    assert.deepEqual(galleries, ["el", "en"]);
+
+    const read = await callController(getPage, { params: { id: "gallery" }, query: EL });
+    assert.equal(read._json.uuid, el.uuid);
+    assert.equal(read._json.language, "el");
+  });
+
+  it("refuses a root page slugged like an enabled language, but not the same slug inside a language", async () => {
+    const root = await callController(createPage, { body: { name: "Greek", slug: "el" } });
+    assert.equal(root._status, 201);
+    assert.equal(root._json.slug, "el-1", "the reserved slug is skipped, not taken");
+
+    const renamed = await callController(updatePage, { params: { id: "el-1" }, body: { name: "Greek", slug: "el" } });
+    assert.equal(renamed._status, 400);
+
+    const inside = await callController(createPage, { body: { name: "Italian", slug: "it", ...EL } });
+    assert.equal(inside._status, 201);
+    assert.equal(inside._json.slug, "it");
+  });
+
+  it("refuses a language the project has not enabled", async () => {
+    const created = await callController(createPage, { body: { name: "Bonjour", language: "fr" } });
+    assert.equal(created._status, 400);
+    assert.match(created._json.message, /"fr"/);
+    const read = await callController(getPage, { params: { id: "anything" }, query: { language: "fr" } });
+    assert.equal(read._status, 400);
+    const malformed = await callController(createPage, { body: { name: "Odd", language: "not-a-language" } });
+    assert.equal(malformed._status, 400, "a malformed code is refused, never handed to the path builder");
+    assert.equal(await fs.pathExists(path.join(getProjectPagesDir(activeProject.folderName), "not-a-language")), false);
+  });
+
+  it("updates, saves, duplicates and deletes inside the language folder", async () => {
+    const page = await createTestPage("Nea", EL);
+
+    const renamed = await callController(updatePage, {
+      params: { id: "nea" },
+      body: { name: "Nea", slug: "ta-nea", ...EL },
+    });
+    assert.equal(renamed._status, 200, JSON.stringify(renamed._json));
+    assert.equal(renamed._json.data.language, "el");
+    assert.equal(renamed._json.data.translationGroupId, page.uuid);
+    assert.equal(await fs.pathExists(greekPagePath("nea")), false);
+    assert.equal(await fs.pathExists(greekPagePath("ta-nea")), true);
+
+    const saved = await callController(savePageContent, {
+      params: { id: "ta-nea" },
+      body: { name: "Nea", slug: "ta-nea", widgets: { w1: { type: "text", settings: {} } }, ...EL },
+    });
+    assert.equal(saved._status, 200);
+    assert.equal((await fs.readJson(greekPagePath("ta-nea"))).translationGroupId, page.uuid);
+
+    const copy = await callController(duplicatePage, { params: { id: "ta-nea" }, query: EL });
+    assert.equal(copy._status, 201);
+    assert.equal(copy._json.language, "el");
+    assert.equal(copy._json.translationGroupId, copy._json.uuid, "a copy starts its own group");
+    assert.equal(await fs.pathExists(greekPagePath(copy._json.slug)), true);
+
+    const deleted = await callController(deletePage, { params: { id: "ta-nea" }, query: EL });
+    assert.equal(deleted._status, 200);
+    assert.equal(await fs.pathExists(greekPagePath("ta-nea")), false);
+
+    const bulk = await callController(bulkDeletePages, { body: { pageIds: [copy._json.slug], ...EL } });
+    assert.equal(bulk._status, 200);
+    assert.equal(await fs.pathExists(greekPagePath(copy._json.slug)), false);
+  });
+
+  it("clears references to a deleted page in every language's pages and menus", async () => {
+    const target = await createTestPage("Target");
+    const greek = await createTestPage("Greek Linker", EL);
+    await callController(savePageContent, {
+      params: { id: "greek-linker" },
+      body: {
+        ...greek,
+        widgets: { w1: { type: "cta", settings: { link: { href: "target.html", pageUuid: target.uuid } } } },
+      },
+    });
+    const menuPath = path.join(projectDir(), "menus", "el", "main.json");
+    await fs.outputJson(menuPath, {
+      id: "main",
+      uuid: "menu-el",
+      items: [{ id: "i1", label: "Target", link: "target.html", pageUuid: target.uuid }],
+    });
+
+    const deleted = await callController(deletePage, { params: { id: "target" } });
+    assert.equal(deleted._status, 200);
+
+    const linker = await fs.readJson(greekPagePath("greek-linker"));
+    assert.equal(linker.widgets.w1.settings.link.pageUuid, undefined);
+    assert.equal(linker.widgets.w1.settings.link.href, "");
+    const menu = await fs.readJson(menuPath);
+    assert.equal(menu.items[0].pageUuid, undefined);
+    assert.equal(menu.items[0].link, "");
   });
 });

@@ -8,7 +8,7 @@ This document covers the menu-management subsystem end to end: per-project menu 
 
 Each menu is stored as an individual JSON file under the active project's `menus/` directory. This isolates menu data and keeps it organized per-project.
 
-- **Location**: `data/projects/<folderName>/menus/`
+- **Location**: `data/projects/<folderName>/menus/` for the default language, `menus/<lang>/` for another site language. The language is derived from the folder, never stored in the file; ids are unique per folder.
 - **Filename**: the slugified menu name (e.g. `main-menu.json`). The slug is also the menu's stable `id`.
 
 > **Adapter note.** All CRUD-path menu I/O routes through the `StorageAdapter` (`storage.list/read/write/delete/exists`) over the request's `scope` (`{ actor, projectId, folderName }`) — the controller never builds absolute paths from request input. `menuController` also depth/count-caps menu trees before any recursive walk: a hard `MAX_MENU_DEPTH = 32` and a `MAX_MENU_ITEMS` ceiling from the `LimitsAdapter` (over-cap → `422`; OSS = unbounded, hosted = finite). Both caps are defined in `packages/core/src/adapters.js`. See [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
@@ -144,9 +144,9 @@ The router applies `resolveActiveProject` (which populates `req.scope`) and a JS
 
 ### Controller Logic (`packages/builder-server/src/controllers/menuController.js`)
 
-The controller is adapter-agnostic and scope-first — every storage call takes `req.scope` and a project-relative path under `menus/`.
+The controller is adapter-agnostic and scope-first — every storage call takes `req.scope` and a key from `menuKey(id, lang)` / `menusDir(lang)` (`@widgetizer/core/contentAddress`), where `lang` is what `requestLanguage(req, res)` resolved from `?language=` / `body.language` (the default when absent; `400` for a code the project has not enabled).
 
-- **Storage operations**: `storage.list(scope, "menus")` to enumerate, `storage.read` / `storage.write` / `storage.delete` for individual files, and `storage.exists` for uniqueness checks. No `fs` and no absolute paths on this path.
+- **Storage operations**: `storage.list(scope, menusDir(lang))` to enumerate, `storage.read` / `storage.write` / `storage.delete` for individual files, and `storage.exists` for uniqueness checks. No `fs` and no absolute paths on this path. `getAllMenus` merges the root folder and every enabled language's folder and stamps each menu's resolved `language`; writes strip the field, the folder being the record.
 - **ID generation**: a new menu's `id` is a unique, URL-friendly slug from its name (`generateUniqueSlug`, checking `storage.exists`); this slug is the filename. A `uuid` (`crypto.randomUUID()`) is minted at creation.
 - **Defensive sanitization**: even though the route validator strips HTML, the controller re-strips `name` / `description` and rejects empty names with `400`.
 - **Lazy uuid backfill**: `getAllMenus` adds a `uuid` to any legacy menu that lacks one and writes it back, so older projects converge to the current shape.
@@ -157,7 +157,7 @@ The controller is adapter-agnostic and scope-first — every storage call takes 
 - `getMenu` — reads one menu; `404` when the file is absent.
 - `updateMenu` — overwrites the file in place; `id` / filename stay stable even if `name` changes, and the existing `uuid` is preserved (minted if missing). Reads the existing file first as the existence check (`404` if absent). Before persisting an `items` tree it runs `validateMenuTree` (see Section 4), then `sanitizeMenuItems` (strips HTML from labels/links) and rejects any item with an empty label (`400`).
 - `duplicateMenu` — deep-clones the source menu with a fresh `uuid`, a copy-suffixed `name` (`{name} (Copy)`, `(Copy 2)`, … via `generateCopyName`), a new unique slug `id`, regenerated per-item IDs (`item_<uuid>` via `generateNewMenuItemIds`), and fresh timestamps. Returns `201`. It also runs `validateMenuTree` against the loaded tree first, to defend against duplicating a menu that was persisted oversized before the save-time guard existed.
-- `deleteMenu` — `storage.delete(scope, "menus/<id>.json")`.
+- `deleteMenu` — `storage.delete(scope, menuKey(id, lang))`.
 
 ## 4. Tree Caps (MAX_MENU_DEPTH / MAX_MENU_ITEMS)
 

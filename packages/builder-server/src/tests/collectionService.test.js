@@ -554,3 +554,71 @@ describe("tenant isolation (SLUG_RE guards + adapter confinement)", () => {
     );
   });
 });
+
+describe("items in another language", () => {
+  const EL = { language: "el", defaultLanguage: "en" };
+  const elDir = path.join(projectBase, "collections", "news", "el");
+
+  async function createIn(lang, input) {
+    const schema = await svc.getCollectionSchema(storage, scope, "news");
+    const { item, previousSlug } = svc.buildCollectionItemData(schema, input, null);
+    await svc.writeCollectionItem(storage, scope, "news", item, previousSlug, lang);
+    return item;
+  }
+
+  it("nests the language under the type, with its own order file, and the same slug per language", async () => {
+    const en = await createIn(undefined, { slug: "story", settings: { title: "Story" } });
+    const el = await createIn(EL, { slug: "story", settings: { title: "Istoria" } });
+    assert.notEqual(en.uuid, el.uuid);
+    assert.equal(await fs.pathExists(path.join(elDir, "story.json")), true);
+    assert.equal("language" in (await fs.readJson(path.join(elDir, "story.json"))), false);
+
+    await svc.reorderCollectionItems(storage, scope, "news", ["story"], EL);
+    assert.deepEqual((await fs.readJson(path.join(elDir, "_order.json"))).order, ["story"]);
+    assert.equal(await fs.pathExists(path.join(projectBase, "collections", "news", "_order.json")), false);
+  });
+
+  it("lists and reads per language, stamping the resolved language and translation group", async () => {
+    await createIn(undefined, { slug: "a", settings: { title: "A" } });
+    const el = await createIn(EL, { slug: "b", settings: { title: "B" } });
+
+    const root = await svc.listCollectionItems(storage, scope, "news");
+    assert.deepEqual(root.map((i) => [i.slug, i.language]), [["a", "en"]]);
+    const greek = await svc.listCollectionItems(storage, scope, "news", {}, EL);
+    assert.deepEqual(greek.map((i) => [i.slug, i.language]), [["b", "el"]]);
+    assert.equal(greek[0].translationGroupId, el.uuid);
+
+    assert.equal(await svc.readCollectionItem(storage, scope, "news", "b"), null);
+    const read = await svc.readCollectionItem(storage, scope, "news", "b", EL);
+    assert.equal(read.language, "el");
+    assert.equal((await svc.readRawCollectionItem(storage, scope, "news", "b", EL)).uuid, el.uuid);
+  });
+
+  it("renames, duplicates and deletes inside the language folder", async () => {
+    const el = await createIn(EL, { slug: "b", settings: { title: "B" } });
+    const schema = await svc.getCollectionSchema(storage, scope, "news");
+    const raw = await svc.readRawCollectionItem(storage, scope, "news", "b", EL);
+    const { item, previousSlug } = svc.buildCollectionItemData(schema, { slug: "c", settings: { title: "C" } }, raw);
+    await svc.writeCollectionItem(storage, scope, "news", item, previousSlug, EL);
+    assert.equal(item.translationGroupId, el.uuid);
+    assert.equal(await fs.pathExists(path.join(elDir, "b.json")), false);
+    assert.equal(await fs.pathExists(path.join(elDir, "c.json")), true);
+
+    const copy = await svc.duplicateCollectionItem(storage, scope, "news", "c", EL);
+    assert.equal(copy.translationGroupId, copy.uuid);
+    assert.equal(await fs.pathExists(path.join(elDir, `${copy.slug}.json`)), true);
+    assert.deepEqual((await fs.readJson(path.join(elDir, "_order.json"))).order, [copy.slug]);
+
+    const res = await svc.bulkDeleteCollectionItems(storage, scope, "news", ["c", copy.slug], EL);
+    assert.deepEqual(res.deleted, ["c", copy.slug]);
+    assert.deepEqual((await fs.readJson(path.join(elDir, "_order.json"))).order, []);
+  });
+
+  it("reads each language separately through the collection reader", async () => {
+    await createIn(undefined, { slug: "a", settings: { title: "A" } });
+    await createIn(EL, { slug: "b", settings: { title: "B" } });
+    const reader = svc.createCollectionReader({ storage, scope, snapshot: new Map() });
+    assert.deepEqual((await reader.sorted("news")).map((i) => i.slug), ["a"]);
+    assert.deepEqual((await reader.sorted("news", {}, EL)).map((i) => i.slug), ["b"]);
+  });
+});

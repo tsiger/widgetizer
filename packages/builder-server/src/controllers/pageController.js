@@ -5,10 +5,15 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
-import { isReservedPageSlug } from "@widgetizer/core/contentAddress";
+import { isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
+import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
 
-const pageSlugTaken = (storage, scope) => (slug) =>
-  isReservedPageSlug(slug) || storage.exists(scope, `pages/${slug}.json`);
+const pageSlugTaken = (storage, scope, lang) => (slug) =>
+  isReservedPageSlug(slug, lang) || storage.exists(scope, pageKey(slug, lang));
+
+async function listPageFiles(storage, scope, lang) {
+  return (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
+}
 
 function reservedPageSlug(res, slug) {
   return res.status(400).json({
@@ -55,13 +60,13 @@ async function enforcePaginationRules({ scope, storage, widgets }) {
 // the request boundary (getAllPages below, getPage, etc.) reads through the
 // scope-aware storage adapter. No folderName-based fs readers live here anymore.
 
-async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, previousPageId = null }) {
-  await storage.write(scope, `pages/${pageId}.json`, JSON.stringify(pageData, null, 2));
+async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, previousPageId = null, lang }) {
+  await storage.write(scope, pageKey(pageId, lang), JSON.stringify(withoutLanguage(pageData), null, 2));
 
   if (previousPageId && previousPageId !== pageId) {
     try {
-      if (await storage.exists(scope, `pages/${previousPageId}.json`)) {
-        await storage.delete(scope, `pages/${previousPageId}.json`);
+      if (await storage.exists(scope, pageKey(previousPageId, lang))) {
+        await storage.delete(scope, pageKey(previousPageId, lang));
       }
     } catch (unlinkError) {
       console.warn(`Failed to delete old page file ${previousPageId} after slug change: ${unlinkError.message}`);
@@ -69,27 +74,27 @@ async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, 
   }
 
   try {
-    await syncPageMediaUsageOnWrite(scope.projectId, pageData);
+    await syncPageMediaUsageOnWrite(scope.projectId, pageData, lang);
   } catch (usageError) {
     console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
   }
 }
 
-async function deletePageWithMediaTracking({ scope, storage, pageId }) {
+async function deletePageWithMediaTracking({ scope, storage, pageId, lang }) {
   // Usage rows are keyed by uuid, so read it while the file still exists. A page with
   // no uuid was recorded under its slug, which the service resolves from the slug below.
   let pageUuid = null;
   try {
-    const buf = await storage.read(scope, `pages/${pageId}.json`);
+    const buf = await storage.read(scope, pageKey(pageId, lang));
     if (buf != null) pageUuid = JSON.parse(buf.toString("utf8"))?.uuid ?? null;
   } catch (readError) {
     console.warn(`Could not read page ${pageId} before delete for media usage: ${readError.message}`);
   }
 
-  await storage.delete(scope, `pages/${pageId}.json`);
+  await storage.delete(scope, pageKey(pageId, lang));
 
   try {
-    await syncPageMediaUsageOnDelete(scope.projectId, { uuid: pageUuid, slug: pageId });
+    await syncPageMediaUsageOnDelete(scope.projectId, { uuid: pageUuid, slug: pageId }, lang);
   } catch (usageError) {
     console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
   }
@@ -106,14 +111,14 @@ export async function getPage(req, res) {
     const { id } = req.params; // This is the slug
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
-    // Try to find the page in the project's pages directory
-    const pageData = await storage.read(scope, `pages/${id}.json`);
-    // Check if page exists
+    const pageData = await storage.read(scope, pageKey(id, lang));
     if (pageData == null) {
       return res.status(404).json({ error: "Page not found" });
     }
-    return res.json(JSON.parse(pageData.toString("utf8")));
+    return res.json({ ...JSON.parse(pageData.toString("utf8")), language: lang.language });
   } catch (error) {
     console.error("Error getting page:", error);
     res.status(500).json({ error: "Failed to get page" });
@@ -141,6 +146,8 @@ export async function updatePage(req, res) {
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Fallback: If slug is missing/empty, generate from name
     if (!desiredNewSlug || typeof desiredNewSlug !== "string" || desiredNewSlug.trim() === "") {
@@ -151,10 +158,7 @@ export async function updatePage(req, res) {
       console.warn(
         `Missing/empty slug in update request for oldSlug '${oldSlug}', generating from name: '${pageData.name}'`,
       );
-      desiredNewSlug = await generateUniqueSlug(
-        pageData.name,
-        pageSlugTaken(storage, scope),
-      );
+      desiredNewSlug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang));
     } else {
       // Sanitize the provided slug through the shared helper
       desiredNewSlug = sanitizeSlug(desiredNewSlug);
@@ -171,8 +175,8 @@ export async function updatePage(req, res) {
     if (oldSlug !== desiredNewSlug) {
       // For explicit slug changes, check if the new slug already exists (conflict)
       if (pageData.slug && typeof pageData.slug === "string" && pageData.slug.trim() !== "") {
-        if (isReservedPageSlug(desiredNewSlug)) return reservedPageSlug(res, desiredNewSlug);
-        if (await storage.exists(scope, `pages/${desiredNewSlug}.json`)) {
+        if (isReservedPageSlug(desiredNewSlug, lang)) return reservedPageSlug(res, desiredNewSlug);
+        if (await storage.exists(scope, pageKey(desiredNewSlug, lang))) {
           return res.status(409).json({
             error: "Slug already exists",
             message: `A page with the slug "${desiredNewSlug}" already exists. Please choose a different slug.`,
@@ -195,13 +199,15 @@ export async function updatePage(req, res) {
     // Read old file first to preserve original creation date and uuid
     let originalCreationDate = new Date().toISOString();
     let existingUuid = null;
+    let existingGroupId = null;
     let existingWidgets = {};
     try {
-      const oldBuf = await storage.read(scope, `pages/${oldSlug}.json`);
+      const oldBuf = await storage.read(scope, pageKey(oldSlug, lang));
       if (oldBuf != null) {
         const oldData = JSON.parse(oldBuf.toString("utf8"));
         originalCreationDate = oldData.created || originalCreationDate;
         existingUuid = oldData.uuid || null; // Preserve stable uuid across renames
+        existingGroupId = oldData.translationGroupId || null;
         existingWidgets = oldData.widgets || {}; // Preserve widgets if not included in request
       }
       // If old file doesn't exist (e.g. first save after create error, or manual rename), allow creation
@@ -225,6 +231,8 @@ export async function updatePage(req, res) {
       ...pageData, // Start with submitted data
       parentPageUuid, // undefined drops the key entirely when cleared
       uuid: resolvedUuid, // Preserve existing uuid or generate new one if missing
+      translationGroupId: existingGroupId || resolvedUuid,
+      language: lang.language,
       id: finalNewSlug, // Use the final unique slug as ID
       slug: finalNewSlug, // Use the final unique slug
       name: pageData.name || `Page ${finalNewSlug}`, // Ensure name exists
@@ -239,6 +247,7 @@ export async function updatePage(req, res) {
       pageId: finalNewSlug,
       pageData: finalUpdatedPageData,
       previousPageId: oldSlug,
+      lang,
     });
 
     const movedFrom = pageData.widgets
@@ -247,6 +256,7 @@ export async function updatePage(req, res) {
           storage,
           keepPageId: finalNewSlug,
           widgets: finalUpdatedPageData.widgets,
+          lang,
         })
       : [];
 
@@ -283,21 +293,23 @@ export async function getAllPages(req, res) {
     // `global/` subdir is skipped because it isn't a `.json` entry. (The render
     // path reads the same files via the dir-explicit listPagesFromDir, which runs
     // without req.adapters against the project working directory.)
-    const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
-    const pages = (
-      await Promise.all(
+    const pages = [];
+    for (const lang of projectLanguageContexts(req.activeProject)) {
+      const pageFiles = await listPageFiles(storage, scope, lang);
+      const loaded = await Promise.all(
         pageFiles.map(async (name) => {
           const pageId = name.replace(/\.json$/, "");
           try {
-            const buf = await storage.read(scope, `pages/${name}`);
-            return buf == null ? null : { ...JSON.parse(buf.toString("utf8")), id: pageId };
+            const buf = await storage.read(scope, pageKey(pageId, lang));
+            return buf == null ? null : { ...JSON.parse(buf.toString("utf8")), id: pageId, language: lang.language };
           } catch (readError) {
             console.error(`Error reading or parsing page file ${name}:`, readError);
             return null;
           }
         }),
-      )
-    ).filter((page) => page !== null);
+      );
+      pages.push(...loaded.filter((page) => page !== null));
+    }
 
     res.json(pages);
   } catch (error) {
@@ -319,9 +331,11 @@ export async function deletePage(req, res) {
     const { storage } = req.adapters;
 
     const pageId = req.params.id;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Read the page (existence + UUID for reference cleanup) before deleting
-    const pageBuf = await storage.read(scope, `pages/${pageId}.json`);
+    const pageBuf = await storage.read(scope, pageKey(pageId, lang));
     if (pageBuf == null) {
       return res.status(404).json({ error: "Page not found" });
     }
@@ -333,18 +347,14 @@ export async function deletePage(req, res) {
       console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
     }
 
-    await deletePageWithMediaTracking({
-      scope,
-      storage,
-      pageId,
-    });
+    await deletePageWithMediaTracking({ scope, storage, pageId, lang });
 
     // Clean up orphaned references in menus and widget links, via the scope-aware
     // storage adapter so this runs against the correct per-tenant tree in hosted
     // (Cloud) and DATA_DIR in OSS (Local).
     if (deletedPageUuid) {
       try {
-        await cleanupDeletedPageReferences(storage, scope, { deletedPageUuid });
+        await cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, defaultLanguage: lang.defaultLanguage });
       } catch (cleanupError) {
         console.warn(`Failed to clean up references for deleted page ${pageId}:`, cleanupError.message);
       }
@@ -368,6 +378,8 @@ export async function bulkDeletePages(req, res) {
   const { pageIds } = req.body;
   const { scope } = req;
   const { storage } = req.adapters;
+  const lang = requestLanguage(req, res);
+  if (!lang) return;
 
   const results = {
     deleted: [],
@@ -381,7 +393,7 @@ export async function bulkDeletePages(req, res) {
   for (const pageId of pageIds) {
     try {
       // Read the page (existence + UUID for reference cleanup) before deleting
-      const pageBuf = await storage.read(scope, `pages/${pageId}.json`);
+      const pageBuf = await storage.read(scope, pageKey(pageId, lang));
       if (pageBuf == null) {
         results.notFound.push(pageId);
         continue;
@@ -394,11 +406,7 @@ export async function bulkDeletePages(req, res) {
         console.warn(`Could not read page UUID before deletion for ${pageId}:`, readError.message);
       }
 
-      await deletePageWithMediaTracking({
-        scope,
-        storage,
-        pageId,
-      });
+      await deletePageWithMediaTracking({ scope, storage, pageId, lang });
 
       results.deleted.push(pageId);
     } catch (error) {
@@ -410,7 +418,10 @@ export async function bulkDeletePages(req, res) {
   // Clean up orphaned references for all deleted pages (per-tenant dir via the adapter).
   for (const uuid of deletedUuids) {
     try {
-      await cleanupDeletedPageReferences(storage, scope, { deletedPageUuid: uuid });
+      await cleanupDeletedPageReferences(storage, scope, {
+        deletedPageUuid: uuid,
+        defaultLanguage: lang.defaultLanguage,
+      });
     } catch (cleanupError) {
       console.warn(`Failed to clean up references for deleted page UUID ${uuid}:`, cleanupError.message);
     }
@@ -455,6 +466,8 @@ export async function createPage(req, res) {
     const pageData = req.body; // Get all data including SEO
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
@@ -472,15 +485,18 @@ export async function createPage(req, res) {
     let slug;
     if (pageData.slug && pageData.slug.trim()) {
       // User provided a slug, ensure it's unique
-      slug = await generateUniqueSlug(pageData.slug, pageSlugTaken(storage, scope), { fallback: "page" });
+      slug = await generateUniqueSlug(pageData.slug, pageSlugTaken(storage, scope, lang), { fallback: "page" });
     } else {
       // No slug provided, generate from name
-      slug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope));
+      slug = await generateUniqueSlug(pageData.name, pageSlugTaken(storage, scope, lang));
     }
 
+    const uuid = randomUUID();
     const newPage = {
       ...pageData, // Include all submitted data (name, seo, etc.)
-      uuid: randomUUID(), // Stable identifier that persists across renames
+      uuid, // Stable identifier that persists across renames
+      translationGroupId: uuid,
+      language: lang.language,
       id: slug,
       slug,
       widgets: {},
@@ -494,6 +510,7 @@ export async function createPage(req, res) {
       storage,
       pageId: slug,
       pageData: newPage,
+      lang,
     });
 
     res.status(201).json(newPage);
@@ -515,7 +532,6 @@ export async function savePageContent(req, res) {
   try {
     const pageData = req.body; // Get all data including SEO
 
-
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
       if (pageData.seo.description != null) pageData.seo.description = stripHtmlToText(pageData.seo.description);
@@ -525,12 +541,14 @@ export async function savePageContent(req, res) {
 
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Validate essential data
     if (!pageData.slug || !pageData.name || !pageData.widgets) {
       return res.status(400).json({ error: "Missing required page data (slug, name, widgets)." });
     }
-    if (pageData.slug !== id && isReservedPageSlug(pageData.slug)) return reservedPageSlug(res, pageData.slug);
+    if (pageData.slug !== id && isReservedPageSlug(pageData.slug, lang)) return reservedPageSlug(res, pageData.slug);
 
     // Cap the per-page widget count before persisting. Without this an
     // authenticated owner could store tens of thousands of widgets in one page,
@@ -557,7 +575,7 @@ export async function savePageContent(req, res) {
     let existingData = {};
     let loadedExisting = false;
     try {
-      const buf = await storage.read(scope, `pages/${id}.json`);
+      const buf = await storage.read(scope, pageKey(id, lang));
       if (buf != null) {
         existingData = JSON.parse(buf.toString("utf8"));
         loadedExisting = true;
@@ -580,6 +598,7 @@ export async function savePageContent(req, res) {
       created: existingData.created, // Always preserve original creation date
       updated: new Date().toISOString(), // Set new update timestamp
     };
+    updatedPageData.translationGroupId = existingData.translationGroupId || updatedPageData.uuid;
 
     await persistPageWithMediaTracking({
       scope,
@@ -587,6 +606,7 @@ export async function savePageContent(req, res) {
       pageId: pageData.slug,
       pageData: updatedPageData,
       previousPageId: id,
+      lang,
     });
 
     // One listing anchor per collection. Swept on save rather than when the
@@ -599,6 +619,7 @@ export async function savePageContent(req, res) {
       storage,
       keepPageId: pageData.slug,
       widgets: updatedPageData.widgets,
+      lang,
     });
 
     res.json({
@@ -618,9 +639,10 @@ export async function savePageContent(req, res) {
  * pages it cleared, for the editor to report.
  *
  * Which collection a widget lists comes from its schema's `collection.type`, so
- * a widget whose schema does not declare one can never hold an anchor.
+ * a widget whose schema does not declare one can never hold an anchor. Each
+ * language has its own listing pages, so the sweep stays inside the language.
  */
-async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets }) {
+async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widgets, lang }) {
   const claimed = new Set();
   for (const widget of Object.values(widgets || {})) {
     if (widget?.settings?.listing_anchor && widget.type) claimed.add(widget.type);
@@ -644,12 +666,12 @@ async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widget
   };
 
   const cleared = [];
-  const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
+  const pageFiles = await listPageFiles(storage, scope, lang);
   for (const pageFile of pageFiles) {
     const pageId = pageFile.replace(/\.json$/, "");
     if (pageId === keepPageId) continue;
 
-    const buf = await storage.read(scope, `pages/${pageFile}`);
+    const buf = await storage.read(scope, pageKey(pageId, lang));
     if (buf == null) continue;
     const page = JSON.parse(buf.toString("utf8"));
 
@@ -664,7 +686,7 @@ async function clearListingAnchorsElsewhere({ scope, storage, keepPageId, widget
     }
 
     if (modified) {
-      await storage.write(scope, `pages/${pageFile}`, JSON.stringify(page, null, 2));
+      await storage.write(scope, pageKey(pageId, lang), JSON.stringify(page, null, 2));
       cleared.push(page.name || pageId);
     }
   }
@@ -683,23 +705,25 @@ export async function duplicatePage(req, res) {
     const originalPageId = req.params.id;
     const { scope } = req;
     const { storage } = req.adapters;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     // Read the original page data (missing original propagates to the 500 handler,
     // matching the pre-storage behavior of a failed filesystem read).
-    const originalBuf = await storage.read(scope, `pages/${originalPageId}.json`);
+    const originalBuf = await storage.read(scope, pageKey(originalPageId, lang));
     if (originalBuf == null) {
       throw new Error(`Original page not found: ${originalPageId}`);
     }
     const originalPageData = JSON.parse(originalBuf.toString("utf8"));
 
     // Read all existing page files to find existing copy names
-    const pageJsonFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
+    const pageJsonFiles = await listPageFiles(storage, scope, lang);
 
     const existingPageNames = (
       await Promise.all(
         pageJsonFiles.map(async (name) => {
           try {
-            const buf = await storage.read(scope, `pages/${name}`);
+            const buf = await storage.read(scope, pageKey(name.replace(/\.json$/, ""), lang));
             return buf == null ? null : JSON.parse(buf.toString("utf8")).name;
           } catch {
             // Skip unreadable entries rather than failing the whole duplicate:
@@ -712,7 +736,7 @@ export async function duplicatePage(req, res) {
     ).filter(Boolean);
 
     const newName = generateCopyName(originalPageData.name, existingPageNames);
-    const newSlug = await generateUniqueSlug(newName, pageSlugTaken(storage, scope));
+    const newSlug = await generateUniqueSlug(newName, pageSlugTaken(storage, scope, lang));
 
     // A listing anchor belongs to one page per collection. Copying it would
     // leave two pages claiming the same collection, which the save-time sweep
@@ -726,11 +750,14 @@ export async function duplicatePage(req, res) {
           : widget;
     }
 
-    // Create the new page data
+    // A copy is a new page in its own translation group, not a translation of the original.
+    const uuid = randomUUID();
     const newPage = {
       ...originalPageData,
       widgets: duplicatedWidgets,
-      uuid: randomUUID(), // Generate new uuid for the copy (don't inherit from original)
+      uuid,
+      translationGroupId: uuid,
+      language: lang.language,
       id: newSlug,
       name: newName,
       slug: newSlug,
@@ -743,6 +770,7 @@ export async function duplicatePage(req, res) {
       storage,
       pageId: newSlug,
       pageData: newPage,
+      lang,
     });
 
     res.status(201).json(newPage);

@@ -41,11 +41,13 @@ The service never builds absolute paths. It computes **relative keys** and hands
 ```js
 collection-types/{type}/schema.json      // type definition (theme-seeded)
 collection-types/{type}/template.liquid  // item-page template (when hasItemPages)
-collections/{type}/{slug}.json           // one file per item
+collections/{type}/{slug}.json           // one file per item (default language)
 collections/{type}/_order.json           // manual ordering (defaultSort: "manual")
+collections/{type}/{lang}/{slug}.json    // the same, for another site language
+collections/{type}/{lang}/_order.json    // each language folder keeps its own order
 ```
 
-Schemas and templates live on the **collection-type** path (seeded from the theme); authored item data lives on the **collections** path.
+Schemas and templates live on the **collection-type** path (seeded from the theme); authored item data lives on the **collections** path. The keys come from `itemKey` / `itemsDir` in `@widgetizer/core/contentAddress`, given `lang = { language, defaultLanguage }`: storage nests the language *under* the type so a type's items stay together, while output puts it first (`el/news/story.html`). Every item read/write in the service takes `lang` last (`readCollectionItem(storage, scope, type, slug, lang)`, `writeCollectionItem(…, previousSlug, lang)`, `listCollectionItems(…, options, lang)`, the reader's `sorted(type, options, lang)`); the controller resolves it with `requestLanguage(req, res)` from `?language=` / `body.language`. Slugs are unique per folder. The folder is the language's only record: a normalized item carries the resolved `language` (and `translationGroupId`, its own `uuid` on create and duplicate), neither of which is written to disk.
 
 **Item record shape** (`collections/{type}/{slug}.json`):
 

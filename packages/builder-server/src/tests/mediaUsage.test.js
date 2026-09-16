@@ -49,6 +49,8 @@ const {
   updateThemeSettingsMediaUsage,
   updateSiteIdentityMediaUsage,
   removePageFromMediaUsage,
+  updateCollectionItemMediaUsage,
+  removeCollectionItemFromMediaUsage,
   getMediaUsage,
   refreshAllMediaUsage,
   refreshAllMediaUsageFromDir,
@@ -375,6 +377,15 @@ describe("updateGlobalWidgetMediaUsage", () => {
     assert.deepEqual(banner.usedIn, ["global:root:footer"]);
   });
 
+  it("keys a language's global by its folder, and the default by root", async () => {
+    const data = { settings: { logo: "/uploads/images/logo.png" } };
+    await updateGlobalWidgetMediaUsage(PROJECT_ID, "header", data, { language: "el", defaultLanguage: "en" });
+    await updateGlobalWidgetMediaUsage(PROJECT_ID, "footer", data, { language: "en", defaultLanguage: "en" });
+    const media = await readMediaJson();
+    const logo = media.files.find((f) => f.id === IMG2);
+    assert.deepEqual(logo.usedIn.sort(), ["global:el:header", "global:root:footer"]);
+  });
+
   it("normalises globalId — does not double-prefix 'global:'", async () => {
     const headerData = {
       settings: { logo: "/uploads/images/logo.png" },
@@ -596,6 +607,49 @@ describe("ensureUsageSourceFormat", () => {
     const media = await readMediaJson();
     assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["about"], "rows are left alone");
   });
+
+  it("counts a language's global row as migrated, so the rebuild runs once", async () => {
+    // Its own project: the check remembers a project for the whole process.
+    const RESCAN_ID = "media-usage-rescan-uuid";
+    const RESCAN_FOLDER = "media-usage-rescan";
+    projectRepo.createProject({
+      id: RESCAN_ID,
+      folderName: RESCAN_FOLDER,
+      name: "Rescan Project",
+      theme: "__test_theme__",
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+    });
+    const projectDir = getProjectDir(RESCAN_FOLDER);
+    await fs.outputJSON(path.join(projectDir, "pages", "about.json"), {
+      uuid: "page-uuid-1",
+      slug: "about",
+      widgets: { w1: { type: "image", settings: { image: "/uploads/images/hero.jpg" } } },
+    });
+    await fs.outputJSON(path.join(projectDir, "pages", "el", "global", "header.json"), {
+      settings: { logo: "/uploads/images/logo.png" },
+    });
+    // Media ids are unique across projects, so this project gets its own.
+    const own = (id) => `rescan-${id}`;
+    await writeMediaFile(RESCAN_ID, { files: defaultMediaFiles().map((file) => ({ ...file, id: own(file.id) })) });
+    // An old row forces the rebuild; afterwards every row is identity-keyed.
+    mediaRepo.updateMediaUsageForSource(RESCAN_ID, "about", [own(IMG1)]);
+    await ensureUsageSourceFormat({ projectId: RESCAN_ID, projectDir });
+    const rebuilt = await readMediaFile(RESCAN_ID);
+    assert.deepEqual(rebuilt.files.find((f) => f.id === own(IMG2)).usedIn, ["global:el:header"]);
+
+    // Content that appears afterwards is not picked up by a second check.
+    await fs.outputJSON(path.join(projectDir, "pages", "legacy.json"), {
+      uuid: "page-uuid-2",
+      slug: "legacy",
+      widgets: { w1: { type: "image", settings: { image: "/uploads/images/banner.jpg" } } },
+    });
+    await ensureUsageSourceFormat({ projectId: RESCAN_ID, projectDir });
+    const again = await readMediaFile(RESCAN_ID);
+    assert.deepEqual(again.files.find((f) => f.id === own(IMG3)).usedIn, [], "no second scan");
+
+    await fs.remove(projectDir);
+  });
 });
 
 // ============================================================================
@@ -635,6 +689,36 @@ describe("usage identity", () => {
 
     const media = await readMediaJson();
     assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, [`page:${PAGE_A}`]);
+  });
+
+  it("keys a uuid-less page by its folder too, so same-slug translations stay apart", async () => {
+    const EL = { language: "el", defaultLanguage: "en" };
+    await updatePageMediaUsage(PROJECT_ID, null, { slug: "about", ...pageWith("/uploads/images/hero.jpg") });
+    await updatePageMediaUsage(PROJECT_ID, null, { slug: "about", ...pageWith("/uploads/images/hero.jpg") }, EL);
+    assert.deepEqual([...(await readMediaJson()).files.find((f) => f.id === IMG1).usedIn].sort(), [
+      "page:slug:about",
+      "page:slug:el/about",
+    ]);
+
+    await removePageFromMediaUsage(PROJECT_ID, { slug: "about" });
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG1).usedIn, ["page:slug:el/about"]);
+
+    // Saving the Greek page with a uuid retires its own pending row only.
+    await updatePageMediaUsage(PROJECT_ID, PAGE_A, { slug: "about", ...pageWith("/uploads/images/hero.jpg") }, EL);
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG1).usedIn, [`page:${PAGE_A}`]);
+  });
+
+  it("keys a uuid-less collection item by its folder", async () => {
+    const EL = { language: "el", defaultLanguage: "en" };
+    const item = { slug: "a", settings: { hero: "/uploads/images/hero.jpg" } };
+    await updateCollectionItemMediaUsage(PROJECT_ID, item, "news");
+    await updateCollectionItemMediaUsage(PROJECT_ID, item, "news", EL);
+    assert.deepEqual([...(await readMediaJson()).files.find((f) => f.id === IMG1).usedIn].sort(), [
+      "collection:slug:news/a",
+      "collection:slug:news/el/a",
+    ]);
+    await removeCollectionItemFromMediaUsage(PROJECT_ID, { slug: "a" }, "news", EL);
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG1).usedIn, ["collection:slug:news/a"]);
   });
 
   it("namespaces a global so it cannot collide with a page of the same name", async () => {
@@ -800,6 +884,41 @@ describe("refreshAllMediaUsage", () => {
         },
       }),
     );
+  });
+
+  it("scans every language folder: pages, globals and collection items", async () => {
+    const pagesDir = getProjectPagesDir(PROJECT_FOLDER);
+    await fs.outputJson(path.join(pagesDir, "el", "epikoinonia.json"), {
+      uuid: "uuid-el-contact",
+      widgets: { w1: { settings: { bg: "/uploads/images/banner.jpg" } } },
+    });
+    await fs.outputJson(path.join(pagesDir, "el", "global", "header.json"), {
+      settings: { logo: "/uploads/images/hero.jpg" },
+    });
+    await fs.outputJson(path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "el", "nea.json"), {
+      uuid: "uuid-el-item",
+      settings: { hero: "/uploads/images/banner.jpg" },
+    });
+    await fs.outputJson(path.join(getProjectDir(PROJECT_FOLDER), "collection-types", "news", "schema.json"), {
+      type: "news",
+      schemaVersion: 1,
+      settings: [
+        { id: "title", type: "text", usedAsTitle: true },
+        { id: "hero", type: "image" },
+      ],
+    });
+
+    await refreshAllMediaUsage(PROJECT_ID);
+    const media = await readMediaJson();
+    const banner = media.files.find((f) => f.id === IMG3);
+    assert.deepEqual(banner.usedIn.sort(), ["collection:uuid-el-item", "page:uuid-about", "page:uuid-el-contact"]);
+    const hero = media.files.find((f) => f.id === IMG1);
+    assert.ok(hero.usedIn.includes("global:el:header"));
+    assert.ok(hero.usedIn.includes("global:root:footer"));
+
+    await fs.remove(path.join(pagesDir, "el"));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections"));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collection-types"));
   });
 
   it("rebuilds all usedIn arrays from disk", async () => {

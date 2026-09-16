@@ -21,6 +21,7 @@ import {
   removeCollectionItemFromMediaUsage,
 } from "../services/mediaUsageService.js";
 import { cleanupDeletedCollectionItemReferences } from "../utils/linkEnrichment.js";
+import { requestLanguage, projectLanguageContexts } from "../utils/contentLanguage.js";
 
 /** Map a service error to an HTTP response, or 500 for the unexpected. */
 function respondError(res, err) {
@@ -76,12 +77,14 @@ export async function getAllItems(req, res) {
     const schema = await collectionService.getCollectionSchema(storage, scope, collectionType);
     if (!schema) return res.status(404).json({ error: "Collection type not found" });
 
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
     const options = {};
     if (req.query.sort) options.sort = req.query.sort;
     if (req.query.limit != null) options.limit = Number(req.query.limit);
     if (req.query.offset != null) options.offset = Number(req.query.offset);
 
-    let items = await collectionService.listCollectionItems(storage, scope, collectionType, options);
+    let items = await collectionService.listCollectionItems(storage, scope, collectionType, options, lang);
     if (req.query.invalid === "true") items = items.filter((i) => i.invalid);
     res.json(items);
   } catch (err) {
@@ -94,7 +97,9 @@ export async function getItem(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
     const { collectionType, itemSlug } = req.params;
-    const item = await collectionService.readCollectionItem(storage, scope, collectionType, itemSlug);
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+    const item = await collectionService.readCollectionItem(storage, scope, collectionType, itemSlug, lang);
     if (!item) return res.status(404).json({ error: "Item not found" });
     res.json(item);
   } catch (err) {
@@ -116,19 +121,25 @@ export async function createItem(req, res) {
     // ceiling; OSS → Infinity, so the count is skipped and create pays no extra
     // I/O). Without this an authenticated owner could persist unbounded items
     // that the export-time enumeration then re-reads on every publish.
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
     const cap = await req.adapters?.limits?.getLimit?.(scope, LIMIT_KEYS.MAX_COLLECTION_ITEMS);
     const maxItems = typeof cap === "number" && cap > 0 ? cap : Infinity;
     if (Number.isFinite(maxItems)) {
-      const existing = await collectionService.listCollectionItems(storage, scope, collectionType);
-      if (existing.length >= maxItems) {
+      // Items count physically across every language of the collection.
+      let existing = 0;
+      for (const each of projectLanguageContexts(req.activeProject)) {
+        existing += (await collectionService.listCollectionItems(storage, scope, collectionType, {}, each)).length;
+      }
+      if (existing >= maxItems) {
         return res.status(422).json({ error: `This collection has reached its item limit (${maxItems}).` });
       }
     }
 
     const { item } = collectionService.buildCollectionItemData(schema, req.body, null);
-    await collectionService.writeCollectionItem(storage, scope, collectionType, item, null);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType);
-    noStore(res).status(201).json(collectionService.normalizeCollectionItem(item, schema));
+    await collectionService.writeCollectionItem(storage, scope, collectionType, item, null, lang);
+    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
+    noStore(res).status(201).json(collectionService.normalizeCollectionItem(item, schema, lang));
   } catch (err) {
     respondError(res, err);
   }
@@ -142,13 +153,15 @@ export async function updateItem(req, res) {
     const schema = await collectionService.getCollectionSchema(storage, scope, collectionType);
     if (!schema) return res.status(404).json({ error: "Collection type not found" });
 
-    const existing = await collectionService.readRawCollectionItem(storage, scope, collectionType, itemSlug);
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+    const existing = await collectionService.readRawCollectionItem(storage, scope, collectionType, itemSlug, lang);
     if (!existing) return res.status(404).json({ error: "Item not found" });
 
     const { item, previousSlug } = collectionService.buildCollectionItemData(schema, req.body, existing);
-    await collectionService.writeCollectionItem(storage, scope, collectionType, item, previousSlug);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType);
-    noStore(res).json(collectionService.normalizeCollectionItem(item, schema));
+    await collectionService.writeCollectionItem(storage, scope, collectionType, item, previousSlug, lang);
+    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
+    noStore(res).json(collectionService.normalizeCollectionItem(item, schema, lang));
   } catch (err) {
     respondError(res, err);
   }
@@ -159,20 +172,25 @@ export async function deleteItem(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
     const { collectionType, itemSlug } = req.params;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
     // Capture the uuid before deleting so menu references to it can be scrubbed (#11).
     // Best-effort: a corrupt/unreadable item must never block its own deletion.
     let existing = null;
     try {
-      existing = await collectionService.readRawCollectionItem(storage, scope, collectionType, itemSlug);
+      existing = await collectionService.readRawCollectionItem(storage, scope, collectionType, itemSlug, lang);
     } catch {
       existing = null;
     }
-    const result = await collectionService.deleteCollectionItem(storage, scope, collectionType, itemSlug);
+    const result = await collectionService.deleteCollectionItem(storage, scope, collectionType, itemSlug, lang);
     if (!result.deleted) return noStore(res).status(404).json({ error: "Item not found" });
-    await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: existing?.uuid, slug: itemSlug }, collectionType);
+    await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: existing?.uuid, slug: itemSlug }, collectionType, lang);
     if (existing?.uuid) {
       try {
-        await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: existing.uuid });
+        await cleanupDeletedCollectionItemReferences(storage, scope, {
+          deletedItemUuids: existing.uuid,
+          defaultLanguage: lang.defaultLanguage,
+        });
       } catch (cleanupError) {
         console.warn(`Failed to clean up references for deleted item ${itemSlug} (${existing.uuid}):`, cleanupError.message);
       }
@@ -188,12 +206,14 @@ export async function bulkDeleteItems(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
     const { collectionType } = req.params;
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
     // Capture uuids before deletion so menu references can be scrubbed (#11).
     // Best-effort per item: an unreadable item is skipped, not fatal to the bulk.
     const uuidBySlug = new Map();
     for (const slug of req.body.itemSlugs || []) {
       try {
-        const raw = await collectionService.readRawCollectionItem(storage, scope, collectionType, slug);
+        const raw = await collectionService.readRawCollectionItem(storage, scope, collectionType, slug, lang);
         if (raw?.uuid) uuidBySlug.set(slug, raw.uuid);
       } catch {
         // skip cleanup for this slug; deletion still proceeds below
@@ -204,14 +224,18 @@ export async function bulkDeleteItems(req, res) {
       scope,
       collectionType,
       req.body.itemSlugs,
+      lang,
     );
     for (const slug of result.deleted) {
-      await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: uuidBySlug.get(slug), slug }, collectionType);
+      await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: uuidBySlug.get(slug), slug }, collectionType, lang);
     }
     const deletedUuids = result.deleted.map((slug) => uuidBySlug.get(slug)).filter(Boolean);
     if (deletedUuids.length > 0) {
       try {
-        await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: deletedUuids });
+        await cleanupDeletedCollectionItemReferences(storage, scope, {
+          deletedItemUuids: deletedUuids,
+          defaultLanguage: lang.defaultLanguage,
+        });
       } catch (cleanupError) {
         console.warn(`Failed to clean up references for deleted items ${deletedUuids.join(", ")}:`, cleanupError.message);
       }
@@ -233,10 +257,12 @@ export async function duplicateItem(req, res) {
     const schema = await collectionService.getCollectionSchema(storage, scope, collectionType);
     if (!schema) return res.status(404).json({ error: "Collection type not found" });
 
-    const dup = await collectionService.duplicateCollectionItem(storage, scope, collectionType, itemSlug);
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+    const dup = await collectionService.duplicateCollectionItem(storage, scope, collectionType, itemSlug, lang);
     if (!dup) return res.status(404).json({ error: "Item not found" });
-    await updateCollectionItemMediaUsage(scope.projectId, dup, collectionType);
-    noStore(res).status(201).json(collectionService.normalizeCollectionItem(dup, schema));
+    await updateCollectionItemMediaUsage(scope.projectId, dup, collectionType, lang);
+    noStore(res).status(201).json(collectionService.normalizeCollectionItem(dup, schema, lang));
   } catch (err) {
     respondError(res, err);
   }
@@ -250,10 +276,12 @@ export async function discardArchivedItem(req, res) {
     const schema = await collectionService.getCollectionSchema(storage, scope, collectionType);
     if (!schema) return res.status(404).json({ error: "Collection type not found" });
 
-    const item = await collectionService.discardArchivedCollectionItem(storage, scope, collectionType, itemSlug);
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+    const item = await collectionService.discardArchivedCollectionItem(storage, scope, collectionType, itemSlug, lang);
     if (!item) return res.status(404).json({ error: "Item not found" });
     // Media usage may shrink if an archived field held a media reference.
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType);
+    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType, lang);
     noStore(res).json(item);
   } catch (err) {
     respondError(res, err);
@@ -265,7 +293,9 @@ export async function reorderItems(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
     const { collectionType } = req.params;
-    const result = await collectionService.reorderCollectionItems(storage, scope, collectionType, req.body.order);
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+    const result = await collectionService.reorderCollectionItems(storage, scope, collectionType, req.body.order, lang);
     noStore(res).json({ success: true, ...result });
   } catch (err) {
     respondError(res, err);

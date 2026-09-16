@@ -426,3 +426,67 @@ describe("export — a collection that fits on one page", () => {
     assert.ok(!blog.includes('rel="next"'), blog);
   });
 });
+
+describe("export — the same slug paginating in two languages", () => {
+  const greekPagePath = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "blog.json");
+
+  before(async () => {
+    // Greek "blog" lists three per page where the English one lists two; the
+    // plans must not share a key.
+    await writePage("blog", "Blog", grid({ limit: 2, paginate: true }));
+    await fs.outputFile(
+      greekPagePath(),
+      JSON.stringify({
+        name: "Nea",
+        slug: "blog",
+        uuid: "p-el-blog",
+        seo: { title: "Nea" },
+        widgets: grid({ limit: 3, paginate: true }),
+        widgetsOrder: ["w1"],
+      }),
+    );
+  });
+
+  after(async () => {
+    await fs.remove(path.dirname(greekPagePath()));
+    projectRepo.updateProject(PROJECT_ID, { siteUrl: SITE });
+  });
+
+  it("keeps each language's own plan and writes the copies under the language folder", async () => {
+    const dir = await exportWith(false);
+    assert.equal(await fs.pathExists(path.join(dir, "blog", "page", "3.html")), true, "English: 5 items, 2 per page");
+    assert.equal(await fs.pathExists(path.join(dir, "el", "blog.html")), true);
+    assert.equal(await fs.pathExists(path.join(dir, "el", "blog", "page", "2.html")), true, "Greek: 3 per page");
+    assert.equal(await fs.pathExists(path.join(dir, "el", "blog", "page", "3.html")), false);
+    assert.deepEqual(itemsOf(await read(dir, "el/blog.html")), ["Alpha", "Beta", "Gamma"]);
+    assert.deepEqual(itemsOf(await read(dir, "blog.html")), ["Alpha", "Beta"]);
+  });
+
+  it("describes only the root language in the sitemap for now", async () => {
+    const dir = await exportWith(false);
+    const sitemap = await fs.readFile(path.join(dir, "sitemap.xml"), "utf8");
+    assert.ok(sitemap.includes(`${SITE}/blog/page/3.html`));
+    assert.ok(!sitemap.includes("/el/"), "no Greek entries until export learns per-language SEO");
+  });
+
+  it("writes each language's markdown twin beside its page, linked at the page's depth", async () => {
+    await resetExports();
+    projectRepo.updateProject(PROJECT_ID, { cleanUrls: false, siteUrl: "" });
+    const res = await runExport({ exportMarkdown: true });
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    const dir = latestExportDir();
+
+    assert.equal(await fs.pathExists(path.join(dir, "el", "blog.md")), true);
+    const englishMd = await fs.readFile(path.join(dir, "blog.md"), "utf8");
+    assert.ok(englishMd.includes("title: Blog"), "the root file is the English page's");
+    const greekMd = await fs.readFile(path.join(dir, "el", "blog.md"), "utf8");
+    assert.ok(greekMd.includes("title: Nea"));
+    assert.ok(greekMd.includes("html: 'el/blog.html'"));
+    assert.ok(greekMd.includes("md: 'el/blog.md'"));
+
+    const greekHtml = await read(dir, "el/blog.html");
+    assert.ok(greekHtml.includes(`href="../el/blog.md"`), "the alternate link is depth-prefixed");
+    const englishHtml = await read(dir, "blog.html");
+    assert.ok(englishHtml.includes(`href="blog.md"`));
+  });
+});

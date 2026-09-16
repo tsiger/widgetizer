@@ -77,10 +77,11 @@ function mockRes() {
 let activeProject;
 
 /** Build a mock Express req */
-function mockReq({ params = {}, body = {} } = {}) {
+function mockReq({ params = {}, body = {}, query = {} } = {}) {
   return {
     params,
     body,
+    query,
     activeProject,
     scope: {
       actor: { id: "default", kind: "local" },
@@ -94,8 +95,8 @@ function mockReq({ params = {}, body = {} } = {}) {
 }
 
 /** Shortcut: call a controller and return the mock res */
-async function callController(controllerFn, { params, body } = {}) {
-  const req = mockReq({ params, body });
+async function callController(controllerFn, { params, body, query } = {}) {
+  const req = mockReq({ params, body, query });
   const res = mockRes();
   await controllerFn(req, res);
   return res;
@@ -796,5 +797,73 @@ describe("UUID backward compatibility", () => {
     // Verify it was persisted to disk
     const onDisk = JSON.parse(await fs.readFile(menuPath, "utf8"));
     assert.equal(onDisk.uuid, menu.uuid);
+  });
+});
+
+describe("menus in another language", () => {
+  const EL = { language: "el" };
+  const greekMenuPath = (id) => path.join(getProjectMenusDir(activeProject.folderName), "el", `${id}.json`);
+
+  before(() => {
+    activeProject.defaultLanguage = "en";
+    activeProject.languages = ["el"];
+  });
+
+  after(() => {
+    delete activeProject.defaultLanguage;
+    delete activeProject.languages;
+  });
+
+  beforeEach(resetMenus);
+
+  it("stores a Greek menu in its folder without a language field, and lists every language", async () => {
+    const en = await createTestMenu("Main");
+    const el = await callController(createMenu, { body: { name: "Main", ...EL } });
+    assert.equal(el._status, 201);
+    assert.equal(el._json.id, "main", "ids are unique per language folder");
+    assert.equal(el._json.language, "el");
+    const onDisk = await fs.readJson(greekMenuPath("main"));
+    assert.equal("language" in onDisk, false);
+    assert.equal(onDisk.uuid, el._json.uuid);
+
+    const list = await callController(getAllMenus);
+    assert.deepEqual(
+      list._json.map((m) => [m.id, m.language]),
+      [
+        ["main", "en"],
+        ["main", "el"],
+      ],
+    );
+    assert.equal(list._json[0].uuid, en._json.uuid);
+  });
+
+  it("reads, updates, duplicates and deletes by language", async () => {
+    await callController(createMenu, { body: { name: "Footer", ...EL } });
+    const missingAtRoot = await callController(getMenu, { params: { id: "footer" } });
+    assert.equal(missingAtRoot._status, 404);
+    const read = await callController(getMenu, { params: { id: "footer" }, query: EL });
+    assert.equal(read._status, 200);
+    assert.equal(read._json.language, "el");
+
+    const updated = await callController(updateMenu, {
+      params: { id: "footer" },
+      body: { name: "Footer", items: [{ id: "i1", label: "Home", link: "index.html" }], ...EL },
+    });
+    assert.equal(updated._status, 200);
+    assert.equal((await fs.readJson(greekMenuPath("footer"))).items.length, 1);
+    assert.equal("language" in (await fs.readJson(greekMenuPath("footer"))), false);
+
+    const copy = await callController(duplicateMenu, { params: { id: "footer" }, query: EL });
+    assert.equal(copy._status, 201);
+    assert.equal(await fs.pathExists(greekMenuPath(copy._json.id)), true);
+
+    const deleted = await callController(deleteMenu, { params: { id: "footer" }, query: EL });
+    assert.equal(deleted._status, 200);
+    assert.equal(await fs.pathExists(greekMenuPath("footer")), false);
+  });
+
+  it("refuses a language the project has not enabled", async () => {
+    const res = await callController(createMenu, { body: { name: "Menu", language: "fr" } });
+    assert.equal(res._status, 400);
   });
 });

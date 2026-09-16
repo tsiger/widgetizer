@@ -3,15 +3,22 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { getProjectPagesDir, getProjectMenusDir, getProjectDir } from "../config.js";
 import { syncCollectionItemMediaUsageOnWrite } from "../services/mediaUsageService.js";
-import {
-  cleanupRichtextLinkRefs,
-  remapRichtextLinkRefs,
-  enrichRichtextLinkRefs,
-} from "@widgetizer/core/richtextLinks";
+import { cleanupRichtextLinkRefs, remapRichtextLinkRefs, enrichRichtextLinkRefs } from "@widgetizer/core/richtextLinks";
+import { pagesDir, pageKey, globalKey, menusDir, menuKey, itemsDir, itemKey } from "@widgetizer/core/contentAddress";
+import { languageFoldersIn } from "./contentLanguage.js";
+import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
 
 /** The per-tenant collections root, a sibling of pages/ under the project dir. */
 function collectionsDirFor(projectFolderName) {
   return path.join(getProjectDir(projectFolderName), "collections");
+}
+
+/** A content directory and every language folder inside it, for the raw-fs walkers. */
+async function withLanguageDirs(dir) {
+  if (!(await fs.pathExists(dir))) return [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const languageDirs = entries.filter((entry) => entry.isDirectory() && LANGUAGE_CODE_RE.test(entry.name));
+  return [dir, ...languageDirs.map((entry) => path.join(dir, entry.name))];
 }
 
 // ---------------------------------------------------------------------------
@@ -59,52 +66,56 @@ function transformWidgetSettings(widgetData, valueTransformer) {
  * write back pages that were modified. Skips header/footer types.
  */
 async function updatePageWidgets(pagesDir, widgetProcessor) {
-  if (!(await fs.pathExists(pagesDir))) return;
-  const pageFiles = await fs.readdir(pagesDir);
-  for (const pageFile of pageFiles) {
-    if (!pageFile.endsWith(".json")) continue;
+  for (const dir of await withLanguageDirs(pagesDir)) {
+    const pageFiles = await fs.readdir(dir);
+    for (const pageFile of pageFiles) {
+      if (!pageFile.endsWith(".json")) continue;
 
-    const pagePath = path.join(pagesDir, pageFile);
-    const content = await fs.readFile(pagePath, "utf8");
-    const page = JSON.parse(content);
+      const pagePath = path.join(dir, pageFile);
+      const content = await fs.readFile(pagePath, "utf8");
+      const page = JSON.parse(content);
 
-    if (page.type === "header" || page.type === "footer") continue;
+      if (page.type === "header" || page.type === "footer") continue;
 
-    let modified = false;
-    const processedWidgets = {};
+      let modified = false;
+      const processedWidgets = {};
 
-    for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
-      const processed = widgetProcessor(widget);
-      processedWidgets[widgetId] = processed;
-      if (JSON.stringify(processed) !== JSON.stringify(widget)) {
-        modified = true;
+      for (const [widgetId, widget] of Object.entries(page.widgets || {})) {
+        const processed = widgetProcessor(widget);
+        processedWidgets[widgetId] = processed;
+        if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+          modified = true;
+        }
       }
-    }
 
-    if (modified) {
-      page.widgets = processedWidgets;
-      await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+      if (modified) {
+        page.widgets = processedWidgets;
+        await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
+      }
     }
   }
 }
 
 /**
- * Apply widgetProcessor to global widgets (header.json, footer.json).
+ * Apply widgetProcessor to global widgets (header.json, footer.json), in the
+ * root and in every language folder.
  */
 async function updateGlobalWidgets(pagesDir, widgetProcessor) {
-  const globalDir = path.join(pagesDir, "global");
-  if (!(await fs.pathExists(globalDir))) return;
+  for (const dir of await withLanguageDirs(pagesDir)) {
+    const globalDir = path.join(dir, "global");
+    if (!(await fs.pathExists(globalDir))) continue;
 
-  for (const widgetType of ["header", "footer"]) {
-    const widgetPath = path.join(globalDir, `${widgetType}.json`);
-    if (!(await fs.pathExists(widgetPath))) continue;
+    for (const widgetType of ["header", "footer"]) {
+      const widgetPath = path.join(globalDir, `${widgetType}.json`);
+      if (!(await fs.pathExists(widgetPath))) continue;
 
-    const content = await fs.readFile(widgetPath, "utf8");
-    const widget = JSON.parse(content);
-    const processed = widgetProcessor(widget);
+      const content = await fs.readFile(widgetPath, "utf8");
+      const widget = JSON.parse(content);
+      const processed = widgetProcessor(widget);
 
-    if (JSON.stringify(processed) !== JSON.stringify(widget)) {
-      await fs.outputFile(widgetPath, JSON.stringify(processed, null, 2));
+      if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+        await fs.outputFile(widgetPath, JSON.stringify(processed, null, 2));
+      }
     }
   }
 }
@@ -156,16 +167,18 @@ async function updateCollectionItems(collectionsDir, itemTransformer) {
     if (!typeEntry.isDirectory()) continue;
     const type = typeEntry.name;
     const typeDir = path.join(collectionsDir, type);
-    let names;
+    const files = [];
     try {
-      names = await fs.readdir(typeDir);
+      for (const dir of await withLanguageDirs(typeDir)) {
+        files.push(...(await fs.readdir(dir)).map((name) => ({ dir, name })));
+      }
     } catch {
       continue;
     }
-    for (const name of names) {
+    for (const { dir, name } of files) {
       if (!name.endsWith(".json") || name === "_order.json") continue;
       const slug = name.replace(/\.json$/, "");
-      const itemPath = path.join(typeDir, name);
+      const itemPath = path.join(dir, name);
       try {
         const item = JSON.parse(await fs.readFile(itemPath, "utf8"));
         const { item: nextItem, changed } = itemTransformer(item, type, slug);
@@ -188,10 +201,23 @@ async function updateCollectionItems(collectionsDir, itemTransformer) {
 // create/duplicate/import-time enrichment helpers above keep the raw-fs
 // walkers — they run before a project is editable/publishable.
 
-async function updatePageWidgetsViaStorage(storage, scope, widgetProcessor) {
-  const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
-  for (const pageFile of pageFiles) {
-    const buf = await storage.read(scope, `pages/${pageFile}`);
+// The walkers below take the language from the folder a file sits in, so they
+// need the project's default to key a folder correctly whatever it is called.
+
+/** Every page key across the root and each language folder present. */
+async function listAllPageKeys(storage, scope, defaultLanguage) {
+  const keys = [];
+  for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
+    const lang = { language, defaultLanguage };
+    const names = (await storage.list(scope, pagesDir(lang))).filter((name) => name.endsWith(".json"));
+    keys.push(...names.map((name) => pageKey(name.replace(/\.json$/, ""), lang)));
+  }
+  return keys;
+}
+
+async function updatePageWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage) {
+  for (const key of await listAllPageKeys(storage, scope, defaultLanguage)) {
+    const buf = await storage.read(scope, key);
     if (buf == null) continue;
     const page = JSON.parse(buf.toString("utf8"));
     if (page.type === "header" || page.type === "footer") continue;
@@ -205,38 +231,39 @@ async function updatePageWidgetsViaStorage(storage, scope, widgetProcessor) {
     }
     if (modified) {
       page.widgets = processedWidgets;
-      await storage.write(scope, `pages/${pageFile}`, JSON.stringify(page, null, 2));
+      await storage.write(scope, key, JSON.stringify(page, null, 2));
     }
   }
 }
 
 /** Drop `parentPageUuid` from any page whose parent was just deleted. */
-async function clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid) {
-  const pageFiles = (await storage.list(scope, "pages")).filter((name) => name.endsWith(".json"));
-  for (const pageFile of pageFiles) {
-    const buf = await storage.read(scope, `pages/${pageFile}`);
+async function clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid, defaultLanguage) {
+  for (const key of await listAllPageKeys(storage, scope, defaultLanguage)) {
+    const buf = await storage.read(scope, key);
     if (buf == null) continue;
     const page = JSON.parse(buf.toString("utf8"));
     if (page.parentPageUuid !== deletedPageUuid) continue;
     delete page.parentPageUuid;
-    await storage.write(scope, `pages/${pageFile}`, JSON.stringify(page, null, 2));
+    await storage.write(scope, key, JSON.stringify(page, null, 2));
   }
 }
 
-async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor) {
-  for (const widgetType of ["header", "footer"]) {
-    const key = `pages/global/${widgetType}.json`;
-    const buf = await storage.read(scope, key);
-    if (buf == null) continue;
-    const widget = JSON.parse(buf.toString("utf8"));
-    const processed = widgetProcessor(widget);
-    if (JSON.stringify(processed) !== JSON.stringify(widget)) {
-      await storage.write(scope, key, JSON.stringify(processed, null, 2));
+async function updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage) {
+  for (const language of ["", ...(await languageFoldersIn(storage, scope, "pages"))]) {
+    for (const widgetType of ["header", "footer"]) {
+      const key = globalKey(widgetType, { language, defaultLanguage });
+      const buf = await storage.read(scope, key);
+      if (buf == null) continue;
+      const widget = JSON.parse(buf.toString("utf8"));
+      const processed = widgetProcessor(widget);
+      if (JSON.stringify(processed) !== JSON.stringify(widget)) {
+        await storage.write(scope, key, JSON.stringify(processed, null, 2));
+      }
     }
   }
 }
 
-async function updateCollectionItemsViaStorage(storage, scope, itemTransformer) {
+async function updateCollectionItemsViaStorage(storage, scope, itemTransformer, defaultLanguage) {
   const touched = [];
   // storage.list returns flat entry names with no file/dir discrimination;
   // collection type directories are the extensionless entries. Listing a
@@ -244,17 +271,21 @@ async function updateCollectionItemsViaStorage(storage, scope, itemTransformer) 
   // tolerates an unreadable type dir: skip it.
   const typeEntries = (await storage.list(scope, "collections")).filter((name) => !name.includes("."));
   for (const type of typeEntries) {
-    let names;
+    const files = [];
     try {
-      names = (await storage.list(scope, `collections/${type}`)).filter(
-        (name) => name.endsWith(".json") && name !== "_order.json",
-      );
+      for (const language of ["", ...(await languageFoldersIn(storage, scope, itemsDir(type)))]) {
+        const lang = { language, defaultLanguage };
+        const names = (await storage.list(scope, itemsDir(type, lang))).filter(
+          (name) => name.endsWith(".json") && name !== "_order.json",
+        );
+        files.push(...names.map((name) => ({ name, lang })));
+      }
     } catch {
       continue;
     }
-    for (const name of names) {
+    for (const { name, lang } of files) {
       const slug = name.replace(/\.json$/, "");
-      const key = `collections/${type}/${name}`;
+      const key = itemKey(type, slug, lang);
       try {
         const buf = await storage.read(scope, key);
         if (buf == null) continue;
@@ -262,7 +293,7 @@ async function updateCollectionItemsViaStorage(storage, scope, itemTransformer) 
         const { item: nextItem, changed } = itemTransformer(item, type, slug);
         if (changed) {
           await storage.write(scope, key, JSON.stringify(nextItem, null, 2));
-          touched.push({ type, slug, item: nextItem });
+          touched.push({ type, slug, item: nextItem, lang });
         }
       } catch (error) {
         console.warn(`[linkEnrichment] Failed to process collection item ${type}/${name}: ${error.message}`);
@@ -272,10 +303,14 @@ async function updateCollectionItemsViaStorage(storage, scope, itemTransformer) 
   return touched;
 }
 
-async function cleanupMenusViaStorage(storage, scope, itemTransformer) {
-  const menuFiles = (await storage.list(scope, "menus")).filter((name) => name.endsWith(".json"));
-  for (const menuFile of menuFiles) {
-    const key = `menus/${menuFile}`;
+async function cleanupMenusViaStorage(storage, scope, itemTransformer, defaultLanguage) {
+  const keys = [];
+  for (const language of ["", ...(await languageFoldersIn(storage, scope, "menus"))]) {
+    const lang = { language, defaultLanguage };
+    const names = (await storage.list(scope, menusDir(lang))).filter((name) => name.endsWith(".json"));
+    keys.push(...names.map((name) => menuKey(name.replace(/\.json$/, ""), lang)));
+  }
+  for (const key of keys) {
     const buf = await storage.read(scope, key);
     if (buf == null) continue;
     const menu = JSON.parse(buf.toString("utf8"));
@@ -450,12 +485,14 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     return { item: { ...item, uuid: newUuid }, changed: true };
   });
 
-  // Step 2: Regenerate page UUIDs and build mapping
-  const pageFiles = await fs.readdir(pagesDir);
-  for (const pageFile of pageFiles) {
-    if (!pageFile.endsWith(".json")) continue;
-
-    const pagePath = path.join(pagesDir, pageFile);
+  // Step 2: Regenerate page UUIDs and build mapping, in the root and every language folder
+  const pagePaths = [];
+  for (const dir of await withLanguageDirs(pagesDir)) {
+    for (const pageFile of await fs.readdir(dir)) {
+      if (pageFile.endsWith(".json")) pagePaths.push(path.join(dir, pageFile));
+    }
+  }
+  for (const pagePath of pagePaths) {
     const content = await fs.readFile(pagePath, "utf8");
     const page = JSON.parse(content);
 
@@ -470,12 +507,14 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
   }
 
   // Step 2: Regenerate menu UUIDs and update menu item pageUuids
-  if (await fs.pathExists(menusDir)) {
-    const menuFiles = await fs.readdir(menusDir);
-    for (const menuFile of menuFiles) {
-      if (!menuFile.endsWith(".json")) continue;
-
-      const menuPath = path.join(menusDir, menuFile);
+  const menuPaths = [];
+  for (const dir of await withLanguageDirs(menusDir)) {
+    for (const menuFile of await fs.readdir(dir)) {
+      if (menuFile.endsWith(".json")) menuPaths.push(path.join(dir, menuFile));
+    }
+  }
+  {
+    for (const menuPath of menuPaths) {
       const content = await fs.readFile(menuPath, "utf8");
       const menu = JSON.parse(content);
 
@@ -504,19 +543,26 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
     }
   }
 
-  // Step 3b: Point each page's parent at the duplicate's new uuid. A separate
-  // pass because Step 1 rewrites pages one at a time, before the uuid map is
-  // complete — a parent later in the walk would not yet be in it.
-  for (const pageFile of pageFiles) {
-    if (!pageFile.endsWith(".json")) continue;
-    const pagePath = path.join(pagesDir, pageFile);
+  // Step 3b: Point each page's parent and translation group at the duplicate's
+  // new uuids. A separate pass because Step 1 rewrites pages one at a time,
+  // before the uuid map is complete — a sibling later in the walk would not yet
+  // be in it.
+  for (const pagePath of pagePaths) {
     const page = JSON.parse(await fs.readFile(pagePath, "utf8"));
-    if (!page.parentPageUuid) continue;
-    const newParentUuid = oldToNewUuid.get(page.parentPageUuid);
-    // An unknown parent belonged to another project; drop it rather than leave
-    // the duplicate pointing into the original.
-    if (newParentUuid) page.parentPageUuid = newParentUuid;
-    else delete page.parentPageUuid;
+    if (page.type === "header" || page.type === "footer") continue;
+    if (!page.parentPageUuid && !page.translationGroupId) continue;
+    if (page.parentPageUuid) {
+      const newParentUuid = oldToNewUuid.get(page.parentPageUuid);
+      // An unknown parent belonged to another project; drop it rather than leave
+      // the duplicate pointing into the original.
+      if (newParentUuid) page.parentPageUuid = newParentUuid;
+      else delete page.parentPageUuid;
+    }
+    // A group is named by a member's uuid, but survives that member's deletion:
+    // an unknown name is kept as is, so the survivors stay together.
+    if (page.translationGroupId) {
+      page.translationGroupId = oldToNewUuid.get(page.translationGroupId) ?? page.translationGroupId;
+    }
     await fs.outputFile(pagePath, JSON.stringify(page, null, 2));
   }
 
@@ -548,10 +594,15 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
   await updateGlobalWidgets(pagesDir, widgetProcessor);
 
   // Step 5: Remap link references inside collection item settings (item uuids
-  // were already regenerated in Step 1; this only fixes pageUuid/menu/item refs).
-  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
-    transformItemSettings(item, remapValue),
-  );
+  // were already regenerated in Step 1; this only fixes pageUuid/menu/item refs)
+  // and point each item's translation group at the regenerated uuids.
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => {
+    const result = transformItemSettings(item, remapValue);
+    if (!item.translationGroupId) return result;
+    const translationGroupId = oldToNewItemUuid.get(item.translationGroupId) ?? item.translationGroupId;
+    if (translationGroupId === item.translationGroupId) return result;
+    return { item: { ...result.item, translationGroupId }, changed: true };
+  });
 }
 
 /**
@@ -560,7 +611,7 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
  * items. All IO goes through the storage adapter so an embedding shell
  * observes each write.
  */
-export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid }) {
+export async function cleanupDeletedPageReferences(storage, scope, { deletedPageUuid, defaultLanguage }) {
   const deletedPageUuids = new Set([deletedPageUuid]);
   const cleanValue = (value) => {
     if (isLinkObject(value) && value.pageUuid === deletedPageUuid) {
@@ -573,26 +624,34 @@ export async function cleanupDeletedPageReferences(storage, scope, { deletedPage
   };
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
 
-  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor);
-  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor);
+  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
+  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
   // A child left pointing at a deleted parent still renders (the breadcrumb
   // builder falls back), but the page picker would show a dangling selection.
-  await clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid);
-  await cleanupMenusViaStorage(storage, scope, (item) => {
-    if (item.pageUuid === deletedPageUuid) {
-      item.link = "";
-      delete item.pageUuid;
-    }
-    return item;
-  });
+  await clearDeletedParentRefsViaStorage(storage, scope, deletedPageUuid, defaultLanguage);
+  await cleanupMenusViaStorage(
+    storage,
+    scope,
+    (item) => {
+      if (item.pageUuid === deletedPageUuid) {
+        item.link = "";
+        delete item.pageUuid;
+      }
+      return item;
+    },
+    defaultLanguage,
+  );
 
-  const touched = await updateCollectionItemsViaStorage(storage, scope, (item) =>
-    transformItemSettings(item, cleanValue),
+  const touched = await updateCollectionItemsViaStorage(
+    storage,
+    scope,
+    (item) => transformItemSettings(item, cleanValue),
+    defaultLanguage,
   );
   if (scope.projectId) {
-    for (const { type, slug, item } of touched) {
+    for (const { type, slug, item, lang } of touched) {
       try {
-        await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, type);
+        await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, type, lang);
       } catch (error) {
         console.warn(`[linkEnrichment] Failed to sync media usage for ${type}/${slug}: ${error.message}`);
       }
@@ -605,7 +664,7 @@ export async function cleanupDeletedPageReferences(storage, scope, { deletedPage
  * widgets, collection items and menus. Accepts a Set, array, or single uuid.
  * Adapter-only IO, same as cleanupDeletedPageReferences.
  */
-export async function cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids }) {
+export async function cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids, defaultLanguage }) {
   const uuids =
     deletedItemUuids instanceof Set
       ? deletedItemUuids
@@ -623,17 +682,27 @@ export async function cleanupDeletedCollectionItemReferences(storage, scope, { d
   };
   const widgetProcessor = (widget) => transformWidgetSettings(widget, cleanValue);
 
-  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor);
-  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor);
-  await updateCollectionItemsViaStorage(storage, scope, (item) => transformItemSettings(item, cleanValue));
-  await cleanupMenusViaStorage(storage, scope, (item) => {
-    if (item.collectionItemUuid && uuids.has(item.collectionItemUuid)) {
-      item.link = "";
-      delete item.collectionItemUuid;
-      delete item.collectionType;
-    }
-    return item;
-  });
+  await updatePageWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
+  await updateGlobalWidgetsViaStorage(storage, scope, widgetProcessor, defaultLanguage);
+  await updateCollectionItemsViaStorage(
+    storage,
+    scope,
+    (item) => transformItemSettings(item, cleanValue),
+    defaultLanguage,
+  );
+  await cleanupMenusViaStorage(
+    storage,
+    scope,
+    (item) => {
+      if (item.collectionItemUuid && uuids.has(item.collectionItemUuid)) {
+        item.link = "";
+        delete item.collectionItemUuid;
+        delete item.collectionType;
+      }
+      return item;
+    },
+    defaultLanguage,
+  );
 }
 
 /**
@@ -696,9 +765,7 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
   const widgetProcessor = (widget) => transformWidgetSettings(widget, remapValue);
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
-  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) =>
-    transformItemSettings(item, remapValue),
-  );
+  await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => transformItemSettings(item, remapValue));
 }
 
 /**

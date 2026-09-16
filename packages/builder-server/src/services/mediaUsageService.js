@@ -2,12 +2,26 @@ import fs from "fs-extra";
 import path from "path";
 import { randomUUID } from "crypto";
 import { getProjectDir } from "../config.js";
+import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
+import { languageFolder, usageId } from "@widgetizer/core/contentAddress";
+
+/** A slug qualified by its language folder, the way its file is: `about` at the root, `el/about` in Greek. */
+const inFolder = (slug, lang) => {
+  const folder = languageFolder(lang);
+  return folder ? `${folder}/${slug}` : slug;
+};
 import { readMediaFile } from "./mediaService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 const THEME_SETTINGS_USAGE_ID = "global:theme-settings";
+
+/** The language folders directly under a content directory. */
+async function languageSubdirs(dir) {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  return entries.filter((entry) => entry.isDirectory() && LANGUAGE_CODE_RE.test(entry.name)).map((entry) => entry.name);
+}
 const SITE_IDENTITY_USAGE_ID = "global:site-identity";
 
 /**
@@ -16,14 +30,14 @@ const SITE_IDENTITY_USAGE_ID = "global:site-identity";
  * Globals are keyed by the folder they live in — `root` today, a language code later.
  */
 export const usageSource = {
-  page: (uuid) => `page:${uuid}`,
-  item: (uuid) => `collection:${uuid}`,
-  global: (type) => `global:root:${String(type).replace(/^global:(root:)?/, "")}`,
+  page: usageId.page,
+  item: usageId.item,
+  global: (type, lang) => usageId.global(String(type).replace(/^global:(root:)?/, ""), lang),
   // Used only when a uuid could not be written to the file (read-only working dir).
   // The `slug:` marker keeps it distinguishable, so the migration can be retried and
   // the row retired once the content does get a uuid.
-  pendingPage: (slug) => `page:slug:${slug}`,
-  pendingItem: (collectionType, slug) => `collection:slug:${collectionType}/${slug}`,
+  pendingPage: (slug, lang) => `page:slug:${inFolder(slug, lang)}`,
+  pendingItem: (collectionType, slug, lang) => `collection:slug:${collectionType}/${inFolder(slug, lang)}`,
 };
 
 /**
@@ -32,10 +46,10 @@ export const usageSource = {
  * @param {string|{uuid?: string, slug?: string}} page
  * @returns {string|null} null when there is nothing to key a row by
  */
-export function pageUsageSource(page) {
+export function pageUsageSource(page, lang) {
   if (typeof page === "string") return page ? usageSource.page(page) : null;
   if (page?.uuid) return usageSource.page(page.uuid);
-  return page?.slug ? usageSource.pendingPage(page.slug) : null;
+  return page?.slug ? usageSource.pendingPage(page.slug, lang) : null;
 }
 
 /**
@@ -45,10 +59,10 @@ export function pageUsageSource(page) {
  * @param {string|null} [collectionType]
  * @returns {string|null} null when there is nothing to key a row by
  */
-export function itemUsageSource(item, collectionType = null) {
+export function itemUsageSource(item, collectionType = null, lang) {
   if (typeof item === "string") return item ? usageSource.item(item) : null;
   if (item?.uuid) return usageSource.item(item.uuid);
-  return collectionType && item?.slug ? usageSource.pendingItem(collectionType, item.slug) : null;
+  return collectionType && item?.slug ? usageSource.pendingItem(collectionType, item.slug, lang) : null;
 }
 
 /**
@@ -62,7 +76,8 @@ function isLegacyUsageSource(source) {
   if (source.startsWith("page:slug:") || source.startsWith("collection:slug:")) return true;
   if (source.startsWith("page:")) return false;
   if (source.startsWith("collection:")) return source.includes("/");
-  return !source.startsWith("global:root:");
+  // `global:root:header` or `global:el:header`; the old form had no position.
+  return !/^global:[a-z0-9-]+:/.test(source);
 }
 
 /** Upload path prefixes recognised as tracked media assets. */
@@ -293,13 +308,13 @@ export async function updateSiteIdentityMediaUsage(projectId, identity) {
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updatePageMediaUsage(projectId, pageUuid, pageData) {
+export async function updatePageMediaUsage(projectId, pageUuid, pageData, lang) {
   try {
     const mediaPaths = extractMediaPathsFromPage(pageData);
     const mediaData = await readMediaFile(projectId);
 
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
-    const source = pageUsageSource(pageUuid || pageData);
+    const source = pageUsageSource(pageUuid || pageData, lang);
     if (!source) {
       console.warn(`Page has neither uuid nor slug; media usage not recorded (project ${projectId})`);
       return { success: false, mediaPaths };
@@ -307,7 +322,7 @@ export async function updatePageMediaUsage(projectId, pageUuid, pageData) {
     mediaRepo.updateMediaUsageForSource(projectId, source, matchedFileIds);
     // A real uuid supersedes any row a read-only rebuild left under the slug.
     if (pageUuid && pageData?.slug) {
-      mediaRepo.updateMediaUsageForSource(projectId, usageSource.pendingPage(pageData.slug), []);
+      mediaRepo.updateMediaUsageForSource(projectId, usageSource.pendingPage(pageData.slug, lang), []);
     }
 
     return { success: true, mediaPaths };
@@ -327,14 +342,14 @@ export async function updatePageMediaUsage(projectId, pageUuid, pageData) {
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
+export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData, lang) {
   try {
     const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
-    const usageId = usageSource.global(globalId);
+    const source = usageSource.global(globalId, lang);
     const mediaData = await readMediaFile(projectId);
 
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
-    mediaRepo.updateMediaUsageForSource(projectId, usageId, matchedFileIds);
+    mediaRepo.updateMediaUsageForSource(projectId, source, matchedFileIds);
 
     return { success: true, mediaPaths };
   } catch (error) {
@@ -352,11 +367,11 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
  * @returns {Promise<{success: boolean}>} Success result
  * @throws {Error} If media file read/write fails
  */
-export async function removePageFromMediaUsage(projectId, page) {
+export async function removePageFromMediaUsage(projectId, page, lang) {
   try {
     // Remove all usage rows for this page (no fileIds = nothing to re-add). A page with
     // no uuid was recorded under its pending slug id, so clear that row instead.
-    const source = pageUsageSource(page);
+    const source = pageUsageSource(page, lang);
     if (source) mediaRepo.updateMediaUsageForSource(projectId, source, []);
 
     return { success: true };
@@ -373,8 +388,8 @@ export async function removePageFromMediaUsage(projectId, page) {
  * @param {object} pageData - Page data object containing widgets (and its uuid)
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
  */
-export async function syncPageMediaUsageOnWrite(projectId, pageData) {
-  return updatePageMediaUsage(projectId, pageData?.uuid, pageData);
+export async function syncPageMediaUsageOnWrite(projectId, pageData, lang) {
+  return updatePageMediaUsage(projectId, pageData?.uuid, pageData, lang);
 }
 
 /**
@@ -383,8 +398,8 @@ export async function syncPageMediaUsageOnWrite(projectId, pageData) {
  * @param {string|{uuid?: string, slug?: string}} page - The deleted page's uuid, or the page
  * @returns {Promise<{success: boolean}>}
  */
-export async function syncPageMediaUsageOnDelete(projectId, page) {
-  return removePageFromMediaUsage(projectId, page);
+export async function syncPageMediaUsageOnDelete(projectId, page, lang) {
+  return removePageFromMediaUsage(projectId, page, lang);
 }
 
 // ============================================================================
@@ -417,13 +432,13 @@ export function extractMediaPathsFromCollectionItem(itemData) {
  * Full usage refresh for one collection item under `collection:{uuid}`, or — while the
  * item has no uuid — under its pending slug id, which needs `collectionType`.
  */
-export async function updateCollectionItemMediaUsage(projectId, itemData, collectionType = null) {
+export async function updateCollectionItemMediaUsage(projectId, itemData, collectionType = null, lang) {
   const itemUuid = itemData?.uuid;
   try {
     const mediaPaths = extractMediaPathsFromCollectionItem(itemData);
     const mediaData = await readMediaFile(projectId);
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
-    const source = itemUsageSource(itemData, collectionType);
+    const source = itemUsageSource(itemData, collectionType, lang);
     if (!source) {
       console.warn(`Collection item has no uuid and no known type; media usage not recorded (${itemData?.slug})`);
       return { success: false, mediaPaths };
@@ -431,7 +446,7 @@ export async function updateCollectionItemMediaUsage(projectId, itemData, collec
     mediaRepo.updateMediaUsageForSource(projectId, source, matchedFileIds);
     // A real uuid supersedes any row a read-only rebuild left under the slug.
     if (itemUuid && collectionType && itemData?.slug) {
-      mediaRepo.updateMediaUsageForSource(projectId, usageSource.pendingItem(collectionType, itemData.slug), []);
+      mediaRepo.updateMediaUsageForSource(projectId, usageSource.pendingItem(collectionType, itemData.slug, lang), []);
     }
     return { success: true, mediaPaths };
   } catch (error) {
@@ -446,9 +461,9 @@ export async function updateCollectionItemMediaUsage(projectId, itemData, collec
  * @param {string|{uuid?: string, slug?: string}} item - the item's uuid, or the item
  * @param {string|null} [collectionType] - needed to clear a pending (slug-keyed) row
  */
-export async function removeCollectionItemFromMediaUsage(projectId, item, collectionType = null) {
+export async function removeCollectionItemFromMediaUsage(projectId, item, collectionType = null, lang) {
   try {
-    const source = itemUsageSource(item, collectionType);
+    const source = itemUsageSource(item, collectionType, lang);
     if (source) mediaRepo.updateMediaUsageForSource(projectId, source, []);
     return { success: true };
   } catch (error) {
@@ -461,8 +476,8 @@ export async function removeCollectionItemFromMediaUsage(projectId, item, collec
  * Keep collection-item media usage in sync after a write. A rename keeps the item's
  * uuid, so there is no previous source left behind to clean up.
  */
-export async function syncCollectionItemMediaUsageOnWrite(projectId, itemData, collectionType = null) {
-  return updateCollectionItemMediaUsage(projectId, itemData, collectionType);
+export async function syncCollectionItemMediaUsageOnWrite(projectId, itemData, collectionType = null, lang) {
+  return updateCollectionItemMediaUsage(projectId, itemData, collectionType, lang);
 }
 
 /**
@@ -558,43 +573,49 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
     }
 
     // Process each page (skipped when pages/ is absent — globals/theme/collections
-    // below still run).
+    // below still run). The root folder and every language folder beside it.
     let pageCount = 0;
+    const languageFolders = pagesExist ? await languageSubdirs(pagesDir) : [];
+    const defaultLanguage = projectRepo.getProjectById(projectId)?.defaultLanguage;
     if (pagesExist) {
-      const allEntries = await fs.readdir(pagesDir, { withFileTypes: true });
-      const pageFiles = allEntries.filter(
-        (entry) => entry.isFile() && entry.name.endsWith(".json") && entry.name !== "global",
-      );
-      pageCount = pageFiles.length;
+      for (const language of ["", ...languageFolders]) {
+        const lang = { language, defaultLanguage };
+        const dir = path.join(pagesDir, language);
+        const allEntries = await fs.readdir(dir, { withFileTypes: true });
+        const pageFiles = allEntries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
+        pageCount += pageFiles.length;
 
-      for (const fileEntry of pageFiles) {
-        const pageId = fileEntry.name.replace(".json", "");
-        const pagePath = path.join(pagesDir, fileEntry.name);
+        for (const fileEntry of pageFiles) {
+          const pageId = fileEntry.name.replace(".json", "");
+          const pagePath = path.join(dir, fileEntry.name);
 
-        try {
-          const pageContent = await fs.readFile(pagePath, "utf8");
-          const pageData = JSON.parse(pageContent);
-          const identity = await identityOf(pagePath, pageData, null);
-          addUsageForPaths(
-            extractMediaPathsFromPage(pageData),
-            identity ? usageSource.page(identity) : usageSource.pendingPage(pageId),
-          );
-        } catch (error) {
-          console.warn(`Error processing page ${pageId} for media usage:`, error.message);
+          try {
+            const pageContent = await fs.readFile(pagePath, "utf8");
+            const pageData = JSON.parse(pageContent);
+            const identity = await identityOf(pagePath, pageData, null);
+            addUsageForPaths(
+              extractMediaPathsFromPage(pageData),
+              identity ? usageSource.page(identity) : usageSource.pendingPage(pageId, lang),
+            );
+          } catch (error) {
+            console.warn(`Error processing page ${pageId} for media usage:`, error.message);
+          }
         }
       }
     }
 
-    // Also scan global widgets (header and footer)
-    const globalWidgetsDir = path.join(pagesDir, "global");
-    if (await fs.pathExists(globalWidgetsDir)) {
+    // Also scan global widgets (header and footer), per language folder.
+    for (const language of ["", ...languageFolders]) {
+      const lang = { language, defaultLanguage };
+      const globalWidgetsDir = path.join(pagesDir, language, "global");
+      if (!(await fs.pathExists(globalWidgetsDir))) continue;
       for (const fileName of ["header.json", "footer.json"]) {
         const globalFilePath = path.join(globalWidgetsDir, fileName);
         if (await fs.pathExists(globalFilePath)) {
           try {
             const globalContent = await fs.readFile(globalFilePath, "utf8");
             const globalData = JSON.parse(globalContent);
-            const globalId = usageSource.global(fileName.replace(".json", ""));
+            const globalId = usageSource.global(fileName.replace(".json", ""), lang);
             addUsageForPaths(extractMediaPathsFromGlobalWidget(globalData), globalId);
           } catch (error) {
             console.warn(`Error processing global widget ${fileName} for media usage:`, error.message);
@@ -638,17 +659,23 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
         if (!typeEntry.isDirectory()) continue;
         const collectionType = typeEntry.name;
         const typeDir = path.join(collectionsDir, collectionType);
-        const itemNames = (await fs.readdir(typeDir)).filter((n) => n.endsWith(".json") && n !== "_order.json");
-        for (const itemName of itemNames) {
+        const itemFiles = [];
+        for (const language of ["", ...(await languageSubdirs(typeDir))]) {
+          const dir = path.join(typeDir, language);
+          const lang = { language, defaultLanguage };
+          const names = (await fs.readdir(dir)).filter((n) => n.endsWith(".json") && n !== "_order.json");
+          itemFiles.push(...names.map((itemName) => ({ dir, itemName, lang })));
+        }
+        for (const { dir, itemName, lang } of itemFiles) {
           const itemSlug = itemName.replace(".json", "");
           try {
-            const itemPath = path.join(typeDir, itemName);
+            const itemPath = path.join(dir, itemName);
             const itemData = JSON.parse(await fs.readFile(itemPath, "utf8"));
             const identity = await identityOf(itemPath, itemData, null);
             addUsageForPaths(
               extractMediaPathsFromCollectionItem(itemData),
               // The pending id keeps the collection type: two types can hold the same slug.
-              identity ? usageSource.item(identity) : usageSource.pendingItem(collectionType, itemSlug),
+              identity ? usageSource.item(identity) : usageSource.pendingItem(collectionType, itemSlug, lang),
             );
             collectionItemCount++;
           } catch (error) {
