@@ -107,7 +107,7 @@ Two deviations:
 - The §1a lock reads the **current** state, not the resulting one: while a project is single-language, one call may set a new default *and* add languages, exactly as two calls would. Once other languages exist the default is locked.
 - The §8a reserved-name check (a language code equal to a root page slug or a collection `slugPrefix`) is **not** here. It needs the project's content, and project routes are actor-scoped — there is no `req.scope` for the project being updated, and fabricating one in the backend is exactly what the adapter contract forbids. It lands with the add-language service in step 9, whose routes are project-scoped, before any UI can enable a language (Phase 2 precedes Phase 3).
 
-### Step 6. The addressing layer (§Implementation Contracts) — *started in stage 2, extended here*
+### Step 6. The addressing layer (§Implementation Contracts) — *done 2026-09-16*
 
 One module, pure functions, no I/O. Everything after this step calls it. Pagination creates `contentAddress.js` with output paths, public paths, preview mapping and reserved-name checks for pages, items and paged copies (see `future-pagination-design.md`, §Implementation contracts). This step adds the **language dimension** to every builder below — the shape of the module does not change, only its inputs.
 
@@ -125,6 +125,15 @@ One module, pure functions, no I/O. Everything after this step calls it. Paginat
 - `packages/core/src/utils/internalHref.js` — `pageHref` / `itemHref` gain a `language` argument (the target's) and compute the cross-language relative path from the rendering page's depth.
 
 **Done when:** a Vitest suite pins every builder and its inverse for default and non-default languages, both Clean URLs values, and depths 0–2.
+
+**As built.** Every builder in `contentAddress.js` takes a trailing `{ language, defaultLanguage }`; `languageFolder` is the one place the comparison happens (`""` for the default, the code otherwise, a `TypeError` for anything that is not a language code, and a missing `defaultLanguage` reads as `DEFAULT_LANGUAGE`). Storage keys come with their directories (`pagesDir`, `globalsDir`, `menusDir`, `itemsDir`) so a listing never spells a folder either, and `parseContentKey` is the full inverse (`languageFromKey` is its language column). `pageHref` / `itemHref` / `pagedHref` / `pageUrlAt` / `pageSelfUrl` take the target's language; a non-default homepage is its folder (`el/`) under Clean URLs and in the canonical, `el/index.html` otherwise. No caller passes a language yet, so output is byte-identical.
+
+Four deviations from the list above:
+
+- `previewRoute.item` is keyed by **`slugPrefix`**, not collection type — the existing `/preview/collection/:prefix/:slug` route already resolves prefix → type, and the in-preview link mapper only ever sees the prefix. Routes always carry the resolved language (`/preview/page/en/contact`), and a paged copy is `/preview/page/<lang>/<slug>/page/<n>`; `parsePreviewRoute` is the inverse.
+- `parsePagedPath` needs the project's additional codes: `el/page/2` is the Greek homepage's copy only when `el` is one, else a root page slugged `el`. The same ambiguity is why preview routes are namespaced.
+- `isReservedPageSlug` / `isReservedSlugPrefix` take `{ languages }` (§8a) — the reservation is computed here, and root-only for pages, so step 7 passes the list rather than comparing codes itself.
+- `isHomeSlug` moved into `contentAddress.js` (still exported from `internalHref.js`) so `internalHref` can build on the layer without an import cycle; `outputHref(outputPath, opts)` is the shared "link to this output path from this depth" step under `pagedHref`, and `homeHref(opts)` the one place a homepage becomes its directory under Clean URLs — `publicPath` collapses only the root `index.html`, because `news/index.html` may be a legacy item that must keep its address.
 
 ### Step 7. Storage and API readers/writers go through the addressing layer (§5, §8, §8a)
 

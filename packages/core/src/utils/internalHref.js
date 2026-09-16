@@ -14,30 +14,39 @@
  * going through `prefixInternalHref` exactly as authored.
  */
 import { prefixInternalHref } from "./linkPrefixer.js";
+import { isHomeSlug, languageFolder, homeHref } from "./contentAddress.js";
 
-/** The two slugs that render as the site root (`index.html`). */
-export function isHomeSlug(slug) {
-  return slug === "index" || slug === "home";
-}
+export { isHomeSlug };
 
 /**
+ * `language` is the target's. `outputPathPrefix` is the rendering page's depth,
+ * language folder included, so a cross-language link is plain prefixing.
+ *
  * @param {string} slug
- * @param {{ cleanUrls?: boolean, outputPathPrefix?: string }} [opts]
+ * @param {{ cleanUrls?: boolean, outputPathPrefix?: string, language?: string, defaultLanguage?: string }} [opts]
  * @returns {string}
  */
-export function pageHref(slug, { cleanUrls = false, outputPathPrefix = "" } = {}) {
-  if (cleanUrls && isHomeSlug(slug)) return outputPathPrefix || "./";
-  return prefixInternalHref(`${slug}${cleanUrls ? "" : ".html"}`, outputPathPrefix);
+export function pageHref(slug, { cleanUrls = false, outputPathPrefix = "", language, defaultLanguage } = {}) {
+  if (cleanUrls && isHomeSlug(slug)) return homeHref({ cleanUrls, outputPathPrefix, language, defaultLanguage });
+  const folder = languageFolder({ language, defaultLanguage });
+  const file = `${slug}${cleanUrls ? "" : ".html"}`;
+  return prefixInternalHref(folder ? `${folder}/${file}` : file, outputPathPrefix);
 }
 
 /**
  * @param {string} slugPrefix
  * @param {string} slug
- * @param {{ cleanUrls?: boolean, outputPathPrefix?: string }} [opts]
+ * @param {{ cleanUrls?: boolean, outputPathPrefix?: string, language?: string, defaultLanguage?: string }} [opts]
  * @returns {string}
  */
-export function itemHref(slugPrefix, slug, { cleanUrls = false, outputPathPrefix = "" } = {}) {
-  return prefixInternalHref(`${slugPrefix}/${slug}${cleanUrls ? "" : ".html"}`, outputPathPrefix);
+export function itemHref(
+  slugPrefix,
+  slug,
+  { cleanUrls = false, outputPathPrefix = "", language, defaultLanguage } = {},
+) {
+  const folder = languageFolder({ language, defaultLanguage });
+  const file = `${slugPrefix}/${slug}${cleanUrls ? "" : ".html"}`;
+  return prefixInternalHref(folder ? `${folder}/${file}` : file, outputPathPrefix);
 }
 
 /**

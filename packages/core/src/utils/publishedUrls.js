@@ -1,5 +1,5 @@
-import { isHomeSlug, absoluteSiteUrl } from "./internalHref.js";
-import { pageOutputPath, publicPath } from "./contentAddress.js";
+import { absoluteSiteUrl } from "./internalHref.js";
+import { isHomeSlug, languageFolder, pageOutputPath, publicPath } from "./contentAddress.js";
 
 /**
  * The number of the copy being rendered: 1 unless the page is split into
@@ -12,18 +12,20 @@ export function currentPageNumber(page) {
 
 /**
  * The published absolute address of a page (or collection item path) at a copy
- * number, following the project's Site URL and Clean URLs. The homepage is the
- * Site URL itself. "" without a usable Site URL.
+ * number, following the project's Site URL and Clean URLs. A homepage is its
+ * directory whatever the Clean URLs value: the Site URL itself, or `el/` under
+ * it. "" without a usable Site URL.
  * @param {string} slug
  * @param {number} pageNumber
- * @param {{ siteUrl?: string, cleanUrls?: boolean }} project
+ * @param {{ siteUrl?: string, cleanUrls?: boolean, defaultLanguage?: string }} project
+ * @param {{ language?: string }} [opts] - the page's language; the default when omitted
  */
-export function pageUrlAt(slug, pageNumber, project) {
-  const siteUrl = project?.siteUrl;
-  const cleanUrls = project?.cleanUrls;
-  if (pageNumber > 1) return absoluteSiteUrl(siteUrl, publicPath(pageOutputPath(slug, pageNumber), { cleanUrls }));
-  if (isHomeSlug(slug)) return absoluteSiteUrl(siteUrl, "");
-  return absoluteSiteUrl(siteUrl, cleanUrls ? slug : `${slug}.html`);
+export function pageUrlAt(slug, pageNumber, project, { language } = {}) {
+  const lang = { language, defaultLanguage: project?.defaultLanguage };
+  const folder = languageFolder(lang);
+  if (!(pageNumber > 1) && isHomeSlug(slug)) return absoluteSiteUrl(project?.siteUrl, folder ? `${folder}/` : "");
+  const path = publicPath(pageOutputPath(slug, pageNumber, lang), { cleanUrls: project?.cleanUrls });
+  return absoluteSiteUrl(project?.siteUrl, path);
 }
 
 /**
@@ -33,7 +35,7 @@ export function pageUrlAt(slug, pageNumber, project) {
  * @param {object} project
  */
 export function pageSelfUrl(page, project) {
-  return page?.slug ? pageUrlAt(page.slug, currentPageNumber(page), project) : "";
+  return page?.slug ? pageUrlAt(page.slug, currentPageNumber(page), project, { language: page.language }) : "";
 }
 
 /**

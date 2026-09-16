@@ -50,6 +50,53 @@ describe("itemHref", () => {
   });
 });
 
+// The target's language. `outputPathPrefix` is the rendering page's depth with
+// its own language folder included, so a cross-language link is plain prefixing:
+// from `el/contact.html` (`../`) the English about page is `../about.html` and
+// the Greek one `../el/about.html`.
+describe("pageHref / itemHref — target language", () => {
+  const EL = { language: "el", defaultLanguage: "en" };
+  const depths = ["", "../", "../../"];
+
+  it("leaves the default language at the root, however it is spelled", () => {
+    for (const lang of [
+      {},
+      { language: "" },
+      { language: "en", defaultLanguage: "en" },
+      { language: "el", defaultLanguage: "el" },
+    ]) {
+      expect(pageHref("about", { ...lang })).toBe("about.html");
+      expect(pageHref("index", { cleanUrls: true, outputPathPrefix: "../", ...lang })).toBe("../");
+      expect(itemHref("rooms", "suite", { cleanUrls: true, ...lang })).toBe("rooms/suite");
+    }
+  });
+
+  it.each(depths)("folders another language's pages and items from depth '%s'", (outputPathPrefix) => {
+    expect(pageHref("about", { outputPathPrefix, ...EL })).toBe(`${outputPathPrefix}el/about.html`);
+    expect(pageHref("about", { cleanUrls: true, outputPathPrefix, ...EL })).toBe(`${outputPathPrefix}el/about`);
+    expect(itemHref("rooms", "suite", { outputPathPrefix, ...EL })).toBe(`${outputPathPrefix}el/rooms/suite.html`);
+    expect(itemHref("rooms", "suite", { cleanUrls: true, outputPathPrefix, ...EL })).toBe(
+      `${outputPathPrefix}el/rooms/suite`,
+    );
+  });
+
+  it("links another language's home as its folder, a directory under Clean URLs", () => {
+    expect(pageHref("index", { ...EL })).toBe("el/index.html");
+    expect(pageHref("index", { outputPathPrefix: "../", ...EL })).toBe("../el/index.html");
+    expect(pageHref("index", { cleanUrls: true, ...EL })).toBe("el/");
+    expect(pageHref("home", { cleanUrls: true, ...EL })).toBe("el/");
+    expect(pageHref("index", { cleanUrls: true, outputPathPrefix: "../", ...EL })).toBe("../el/");
+    expect(pageHref("index", { cleanUrls: true, outputPathPrefix: "../../", ...EL })).toBe("../../el/");
+  });
+
+  it("links the default language from a non-default page by depth alone", () => {
+    const fromGreekContact = { outputPathPrefix: "../", language: "en", defaultLanguage: "en" };
+    expect(pageHref("about", fromGreekContact)).toBe("../about.html");
+    expect(pageHref("index", { ...fromGreekContact, cleanUrls: true })).toBe("../");
+    expect(itemHref("rooms", "suite", fromGreekContact)).toBe("../rooms/suite.html");
+  });
+});
+
 // One Site URL base for every generated absolute address — canonical, og:image,
 // sitemap <loc>, robots Sitemap: — so they cannot disagree. The cases that used
 // to differ per call site are the subfolder Site URL (a GitHub-Pages-style
