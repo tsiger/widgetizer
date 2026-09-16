@@ -595,7 +595,8 @@ describe("applyThemeUpdate", () => {
     const banner = media.files.find((file) => file.filename === "banner.png");
 
     assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
-    assert.deepEqual(banner.usedIn, ["gallery"]);
+    const galleryPage = await fs.readJSON(path.join(getProjectDir(PROJECT_FOLDER), "pages", "gallery.json"));
+    assert.deepEqual(banner.usedIn, [`page:${galleryPage.uuid}`]);
   });
 
   it("updates project metadata in the projects table", async () => {

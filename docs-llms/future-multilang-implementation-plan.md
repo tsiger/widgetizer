@@ -55,7 +55,7 @@ Schema defaults used when adding widgets later are a separate path: reproduce a 
 
 **Done when:** `seoArtifacts.test.js` and SEO-tag/collection-item coverage exercise root and subfolder Site URLs, with and without a trailing slash, under both Clean URLs values. Every automatically generated absolute URL (canonical, og:image, sitemap `<loc>`, robots `Sitemap:`) shares one base, including the homepage; robots page/item paths retain the base pathname. Cover empty and invalid bases, query/hash rejection, and preservation of explicit overrides. Export diffs contain only the intended URL corrections.
 
-### Step 2. Collision-proof media-usage identities (§Blocker 1)
+### Step 2. Collision-proof media-usage identities (§Blocker 1) — *done 2026-09-16*
 
 **Why:** usage rows are keyed by human-readable strings that collide once the same slug exists per language; deleting a Greek page could strip media its English sibling still uses.
 
@@ -64,6 +64,8 @@ Schema defaults used when adding widgets later are a separate path: reproduce a 
 - Existing rows: `refreshAllMediaUsage` already rebuilds from content; run it once per project on first open after upgrade (a `media_usage_schema` app setting in `settingsRepository.js` marks the rebuild done) rather than writing a row-rewrite migration.
 
 **Done when:** `mediaUsage.test.js` and `collectionMediaUsage.test.js` prove two pages with the same slug in different folders keep independent usage, and deleting one leaves the other's media marked in-use.
+
+**As built (2026-09-16):** `usageSource` in `mediaUsageService.js` mints `page:{uuid}`, `collection:{uuid}` and `global:root:{type}`; `THEME_SETTINGS_USAGE_ID` and `global:site-identity` are unchanged (both are project-wide, not per language). The writers take the content object or its uuid, so a rename no longer has a previous source to clean up — the `previousPageId` / `previousItemSlug` arguments are gone. Page deletion reads the uuid before the file is removed. Language folders do not exist yet, so the same-slug guarantee is proven with two identities rather than two folders. Deviation from the plan: instead of a `media_usage_schema` app setting, old rows are detected and rebuilt per project on first media list (`ensureUsageSourceFormat`, given the caller's working dir) — a global setting cannot record "done" for each project, and this also catches projects opened long after the upgrade. The rebuild stamps a uuid on any page or item file that lacks one, so no row is left keyed by a slug that a later save would orphan.
 
 ### Step 3. Global widgets render with `page` and `project` in context (§Blocker 2) — *lands in stage 3 (structured data)*
 

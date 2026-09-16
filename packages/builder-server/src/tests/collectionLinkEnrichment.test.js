@@ -184,8 +184,8 @@ describe("cleanupDeletedPageReferences — collection items", () => {
       doc: { pageUuid: "DELETED", href: "/uploads/files/x.pdf", text: "Doc", target: "_self" },
     });
     // seed usage to reflect the link's upload reference
-    await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", await readItem("portfolio", "alpha"));
-    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, ["collection:portfolio/alpha"]);
+    await updateCollectionItemMediaUsage(PROJECT_ID, await readItem("portfolio", "alpha"));
+    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, ["collection:item-alpha"]);
 
     await cleanupDeletedPageReferences(storage, SCOPE_WITH_PROJECT, { deletedPageUuid: "DELETED" });
     assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);

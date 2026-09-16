@@ -47,7 +47,9 @@ const projectRepo = await import("../db/repositories/projectRepository.js");
 const { closeDb, getDb } = await import("../db/index.js");
 const { LocalStorageAdapter, LocalScopeResolver } = await import("@widgetizer/adapters-local");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
-const { updateCollectionItemMediaUsage, getMediaUsage } = await import("../services/mediaUsageService.js");
+const { updateCollectionItemMediaUsage, syncPageMediaUsageOnWrite, getMediaUsage } = await import(
+  "../services/mediaUsageService.js"
+);
 
 // The page handlers operate on req.adapters.storage over req.scope. Use the real
 // OSS storage adapter against the isolated test data root, matching production.
@@ -895,7 +897,7 @@ describe("duplicatePage", () => {
 // off scope.projectId. We make the re-sync
 // observable with a collection-item link that carries BOTH the deleted page's
 // uuid AND a media href: clearing the link drops the media reference, so a
-// re-synced usage index goes from ["collection:portfolio/alpha"] -> []. The
+// re-synced usage index goes from ["collection:item-alpha"] -> []. The
 // link is cleared on disk regardless, but the usage INDEX only updates when
 // projectId is passed — so this asserts the caller-threading, not just the
 // function-level behaviour (which collectionLinkEnrichment.test.js covers).
@@ -928,13 +930,57 @@ async function seedItemLinkingToPage(pageUuid) {
     title: "Alpha",
     doc: { pageUuid, href: "/uploads/files/x.pdf", text: "Doc", target: "_self" },
   });
-  await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", await readCollectionItem("portfolio", "alpha"));
+  await updateCollectionItemMediaUsage(PROJECT_ID, await readCollectionItem("portfolio", "alpha"));
   assert.deepEqual(
     (await getMediaUsage(PROJECT_ID, "f1")).usedIn,
-    ["collection:portfolio/alpha"],
+    ["collection:item-alpha"],
     "precondition: the media file is seeded as used by the collection item",
   );
 }
+
+describe("deletePage — a page with no uuid", () => {
+  beforeEach(async () => {
+    await resetPages();
+  });
+
+  /** Seed a page file written before uuids existed, plus its slug-keyed usage row. */
+  async function seedUuidlessPage(slug) {
+    await writeMediaFile(PROJECT_ID, {
+      files: [{ id: "f1", filename: "x.pdf", path: "/uploads/files/x.pdf", type: "application/pdf", usedIn: [] }],
+    });
+    const pageData = {
+      id: slug,
+      slug,
+      title: "Legacy",
+      widgets: { w1: { type: "text", settings: { doc: { href: "/uploads/files/x.pdf", text: "Doc", target: "_self" } } } },
+    };
+    await fs.outputJSON(path.join(getProjectPagesDir(activeProject.folderName), `${slug}.json`), pageData);
+    await syncPageMediaUsageOnWrite(PROJECT_ID, pageData);
+    assert.deepEqual(
+      (await getMediaUsage(PROJECT_ID, "f1")).usedIn,
+      [`page:slug:${slug}`],
+      "precondition: usage is keyed by the pending slug id",
+    );
+  }
+
+  it("clears the row recorded under its slug", async () => {
+    await seedUuidlessPage("legacy");
+
+    const res = await callController(deletePage, { params: { id: "legacy" } });
+    assert.equal(res._status, 200);
+
+    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, [], "no orphaned usage row survives the delete");
+  });
+
+  it("clears it via bulkDeletePages too", async () => {
+    await seedUuidlessPage("legacy-bulk");
+
+    const res = await callController(bulkDeletePages, { body: { pageIds: ["legacy-bulk"] } });
+    assert.ok(res._json.results.deleted.includes("legacy-bulk"));
+
+    assert.deepEqual((await getMediaUsage(PROJECT_ID, "f1")).usedIn, []);
+  });
+});
 
 describe("deletePage — re-syncs collection-item media usage", () => {
   beforeEach(async () => {

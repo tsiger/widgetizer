@@ -9,7 +9,7 @@ import { getThemeJsonPath } from "../config.js";
 import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
-import { getMediaUsage, refreshAllMediaUsageFromDir } from "../services/mediaUsageService.js";
+import { getMediaUsage, refreshAllMediaUsageFromDir, ensureUsageSourceFormat } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
@@ -218,6 +218,10 @@ export async function getProjectMedia(req, res) {
     // Validate the project exists + is owned (throws -> mapped below). Media
     // metadata comes from the DB and is keyed by projectId.
     await getProjectFolderName(projectId);
+
+    // Rows written by an older build are keyed by slug; rebuild them once per project,
+    // reading content from the adapter's working dir (see refreshMediaUsage below).
+    await ensureUsageSourceFormat({ projectId, projectDir: req.adapters.storage.getProjectBase(req.scope) });
 
     const mediaData = await readMediaFile(projectId);
     res.json(mediaData);

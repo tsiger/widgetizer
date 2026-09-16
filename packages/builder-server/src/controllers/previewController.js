@@ -585,7 +585,7 @@ export async function saveGlobalWidget(req, res) {
 
     // Update media usage
     try {
-      await updateGlobalWidgetMediaUsage(scope.projectId, `global:${type}`, widgetData);
+      await updateGlobalWidgetMediaUsage(scope.projectId, type, widgetData);
     } catch (usageError) {
       console.error("Error updating media usage for global widget:", usageError);
       // Don't fail the save if usage update fails, but log it

@@ -592,7 +592,7 @@ export async function cleanupDeletedPageReferences(storage, scope, { deletedPage
   if (scope.projectId) {
     for (const { type, slug, item } of touched) {
       try {
-        await syncCollectionItemMediaUsageOnWrite(scope.projectId, type, slug, item, null);
+        await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, type);
       } catch (error) {
         console.warn(`[linkEnrichment] Failed to sync media usage for ${type}/${slug}: ${error.message}`);
       }

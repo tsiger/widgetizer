@@ -356,7 +356,7 @@ describe("atomicUpdateMediaFile", () => {
       {
         files: [
           { id: "atomic-1", filename: "a.jpg", usedIn: [] },
-          { id: "atomic-2", filename: "b.jpg", usedIn: ["index"] },
+          { id: "atomic-2", filename: "b.jpg", usedIn: ["page:index"] },
         ],
       },
     );
@@ -383,13 +383,13 @@ describe("atomicUpdateMediaFile", () => {
       PROJECT_ID,
       (data) => {
         const file = data.files.find((f) => f.id === "atomic-1");
-        file.usedIn = ["about", "contact"];
+        file.usedIn = ["page:about", "page:contact"];
       },
     );
 
     const saved = await readMediaFile(PROJECT_ID);
     const file = saved.files.find((f) => f.id === "atomic-1");
-    assert.deepEqual(file.usedIn, ["about", "contact"]);
+    assert.deepEqual(file.usedIn, ["page:about", "page:contact"]);
   });
 
   it("works when no media exists yet", async () => {
@@ -421,7 +421,7 @@ describe("getProjectMedia", () => {
             filename: "hero.jpg",
             type: "image/jpeg",
             path: "/uploads/images/hero.jpg",
-            usedIn: ["index"],
+            usedIn: ["page:index"],
           },
           { id: "get-2", filename: "logo.png", type: "image/png", path: "/uploads/images/logo.png", usedIn: [] },
         ],
@@ -445,7 +445,7 @@ describe("getProjectMedia", () => {
     const hero = res._json.files.find((f) => f.id === "get-1");
     assert.equal(hero.filename, "hero.jpg");
     assert.equal(hero.type, "image/jpeg");
-    assert.deepEqual(hero.usedIn, ["index"]);
+    assert.deepEqual(hero.usedIn, ["page:index"]);
   });
 
   it("returns 404 for nonexistent project", async () => {
@@ -1036,7 +1036,7 @@ describe("deleteProjectMedia", () => {
             filename: "in-use.jpg",
             type: "image/jpeg",
             path: "/uploads/images/in-use.jpg",
-            usedIn: ["index", "about"],
+            usedIn: ["page:index", "page:about"],
           },
         ],
       },
@@ -1073,7 +1073,7 @@ describe("deleteProjectMedia", () => {
     });
     assert.equal(res._status, 400);
     assert.ok(res._json.error.toLowerCase().includes("in use"));
-    assert.deepEqual([...res._json.usedIn].sort(), ["about", "index"]);
+    assert.deepEqual([...res._json.usedIn].sort(), ["page:about", "page:index"]);
   });
 
   it("returns 404 for nonexistent file", async () => {
@@ -1111,7 +1111,7 @@ describe("bulkDeleteProjectMedia", () => {
             filename: "bulk-b.jpg",
             type: "image/jpeg",
             path: "/uploads/images/bulk-b.jpg",
-            usedIn: ["index"],
+            usedIn: ["page:index"],
           },
           {
             id: "bulk-3",
@@ -1272,7 +1272,7 @@ describe("getMediaFileUsage", () => {
             filename: "tracked.jpg",
             type: "image/jpeg",
             path: "/uploads/images/tracked.jpg",
-            usedIn: ["index"],
+            usedIn: ["page:index"],
           },
         ],
       },
@@ -1329,7 +1329,7 @@ describe("refreshMediaUsage", () => {
             filename: "tracked.jpg",
             type: "image/jpeg",
             path: "/uploads/images/tracked.jpg",
-            usedIn: [], // <-- stale: should be ["index"] after refresh
+            usedIn: [], // <-- stale: should be ["page:index"] after refresh
           },
         ],
       },
@@ -1346,6 +1346,9 @@ describe("refreshMediaUsage", () => {
     // merely that the handler returned a non-500.
     const media = await readMediaFile(PROJECT_ID);
     const tracked = media.files.find((f) => f.id === "refresh-1");
-    assert.ok(tracked.usedIn.includes("index"), "refreshed usage must record the index page");
+    // The rebuild stamps a uuid on a page file that has none, and keys usage by it.
+    const indexPage = await fs.readJSON(path.join(getProjectPagesDir(PROJECT_FOLDER), "index.json"));
+    assert.ok(indexPage.uuid, "the rebuild stamps a uuid on the page file");
+    assert.deepEqual(tracked.usedIn, [`page:${indexPage.uuid}`], "refreshed usage must record the index page");
   });
 });

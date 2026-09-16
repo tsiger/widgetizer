@@ -81,7 +81,7 @@ API responses assemble a `files` array from these rows:
       "metadata": { "alt": "An awesome sunset", "title": "Sunset", "caption": "Summit at dawn" },
       "width": 1920,
       "height": 1080,
-      "usedIn": ["about-us", "home"],
+      "usedIn": ["page:7f1c…", "page:2b90…"],
       "sizes": {
         "thumb":  { "path": "/uploads/images/my-awesome-picture-thumb.jpg",  "width": 150,  "height": 113 },
         "small":  { "path": "/uploads/images/my-awesome-picture-small.jpg",  "width": 480,  "height": 360 },
@@ -99,7 +99,7 @@ API responses assemble a `files` array from these rows:
       "metadata": { "alt": "", "title": "", "caption": "" },
       "width": null,
       "height": null,
-      "usedIn": ["home"],
+      "usedIn": ["page:2b90…"],
       "sizes": {}
     }
   ]
@@ -144,13 +144,19 @@ The library tracks which content references each media file so in-use assets are
 
 ### Sources Tracked
 
-Usage is keyed by a **source string** per `media_usage` row:
+Usage is keyed by a **source string** per `media_usage` row, built by `usageSource` in the service. The identity in a source is stable, never a slug: a rename must not orphan a row or hand one page's media to another, and multilang will put the same slug in two language folders (`future-multilang-implementation-plan.md`, step 2).
 
-- **Pages** — source = page slug. Scans every widget/block setting plus the SEO social image (`seo.og_image`).
-- **Global widgets** (header/footer) — source = `global:{id}`. Scans settings + blocks.
+- **Pages** — source = `page:{uuid}`. Scans every widget/block setting plus the SEO social image (`seo.og_image`).
+- **Global widgets** (header/footer) — source = `global:root:{type}`, where `root` is the folder the widget lives in (a language code later). Scans settings + blocks.
 - **Theme settings** — source = `global:theme-settings`. Scans `settings.global` items (live `value`, falling back to schema `default`), e.g. favicon and any image/gallery setting.
 - **Site identity** — source = `global:site-identity`. The project's identity logo (`siteIdentity.logo`), which lives on the project row, not in a project file. It is updated when a project save changes the identity (`updateSiteIdentityMediaUsage`) and included in the full rescan, so exports ship the logo. The Media page labels it "Business Details (Global)".
-- **Collection items** — source = `collection:{type}/{slug}`. Scans item settings plus the item's `seo.og_image`. See [Collections](core-collections.md).
+- **Collection items** — source = `collection:{uuid}`. Scans item settings plus the item's `seo.og_image`. See [Collections](core-collections.md).
+
+Rows written by an older build (bare slugs, `collection:{type}/{slug}`, `global:{type}`) are rebuilt from content the first time a project's media is listed (`ensureUsageSourceFormat`, once per project per process). Usage is derived data, so rebuilding beats a migration that would have to guess which uuid an old row meant. Both that check and `refreshMediaUsage` read content from the caller's working dir (`storage.getProjectBase(scope)`), never an OSS-global path — under a shell that namespaces content per actor, the global path is the wrong (empty) directory and a rescan there would wipe every row.
+
+A page or item file written before uuids existed is **stamped with one during the rebuild**, so its identity is the same before and after its next save. The stamp goes through a temp file and a rename, so a failed write (a full disk) cannot truncate the content file.
+
+If the stamp fails anyway (a read-only working dir), the scan records a **pending** id instead — `page:slug:{slug}` or `collection:slug:{type}/{slug}`, the collection type included so two collections holding the same slug stay apart. A pending id counts as not-yet-migrated: the project is left unmarked so the next rebuild retries it, and saving the content once it has a uuid clears the pending row (`updatePageMediaUsage` / `updateCollectionItemMediaUsage`, which takes the collection type for exactly this).
 
 ### Path Matching
 

@@ -304,7 +304,7 @@ function createTestMediaData() {
         sizes: {
           thumb: { path: "/uploads/images/photo-thumb.jpg", width: 150, height: 112 },
         },
-        usedIn: ["index"],
+        usedIn: ["page:index"],
       },
       {
         id: "test-media-2",
@@ -1473,7 +1473,13 @@ describe("duplicateProject", () => {
     const banner = duplicateMedia.files.find((file) => file.filename === "banner.png");
 
     assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
-    assert.deepEqual(banner.usedIn, ["index"]);
+    // The rebuild stamps a uuid on a page file that has none and keys the row by it,
+    // so read the persisted uuid and assert the exact source.
+    const copiedIndex = await fs.readJson(
+      path.join(getProjectDir(res._json.folderName), "pages", "index.json"),
+    );
+    assert.ok(copiedIndex.uuid, "the rebuild stamps a uuid on the copied page");
+    assert.deepEqual(banner.usedIn, [`page:${copiedIndex.uuid}`]);
   });
 });
 
@@ -1553,7 +1559,7 @@ describe("exportProject", () => {
     assert.equal(exported.files.length, 2);
     assert.equal(exported.files[0].filename, "photo.jpg");
     assert.equal(exported.files[0].type, "image/jpeg");
-    assert.deepEqual(exported.files[0].usedIn, ["index"]);
+    assert.deepEqual(exported.files[0].usedIn, ["page:index"]);
     assert.ok(exported.files[0].sizes.thumb, "Should include size variants");
     assert.equal(exported.files[1].filename, "banner.png");
   });
@@ -1912,7 +1918,13 @@ describe("importProject", () => {
     const banner = importedMedia.files.find((file) => file.filename === "banner.png");
 
     assert.deepEqual(photo.usedIn, ["global:theme-settings"]);
-    assert.deepEqual(banner.usedIn, ["index"]);
+    // The rebuild stamps a uuid on a page file that has none and keys the row by it,
+    // so read the persisted uuid and assert the exact source.
+    const copiedIndex = await fs.readJson(
+      path.join(getProjectDir(res._json.folderName), "pages", "index.json"),
+    );
+    assert.ok(copiedIndex.uuid, "the rebuild stamps a uuid on the copied page");
+    assert.deepEqual(banner.usedIn, [`page:${copiedIndex.uuid}`]);
   });
 });
 

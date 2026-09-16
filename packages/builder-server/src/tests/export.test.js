@@ -470,7 +470,7 @@ before(async () => {
         type: "image/jpeg",
         width: 1920,
         height: 1080,
-        usedIn: ["index"],
+        usedIn: ["page:index"],
         sizes: {
           thumb: {
             path: "/uploads/images/hero-thumb.jpg",
@@ -496,7 +496,7 @@ before(async () => {
         type: "image/jpeg",
         width: 1200,
         height: 800,
-        usedIn: ["index"],
+        usedIn: ["page:index"],
         sizes: {
           medium: {
             path: "/uploads/images/inline-medium.jpg",
@@ -528,7 +528,7 @@ before(async () => {
         filename: "brochure.pdf",
         path: "/uploads/files/brochure.pdf",
         type: "application/pdf",
-        usedIn: ["index"], // used on the homepage
+        usedIn: ["page:index"], // used on the homepage
       },
       {
         id: "file-2",

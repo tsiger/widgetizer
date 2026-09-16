@@ -127,7 +127,7 @@ export async function createItem(req, res) {
 
     const { item } = collectionService.buildCollectionItemData(schema, req.body, null);
     await collectionService.writeCollectionItem(storage, scope, collectionType, item, null);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, collectionType, item.slug, item, null);
+    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType);
     noStore(res).status(201).json(collectionService.normalizeCollectionItem(item, schema));
   } catch (err) {
     respondError(res, err);
@@ -147,7 +147,7 @@ export async function updateItem(req, res) {
 
     const { item, previousSlug } = collectionService.buildCollectionItemData(schema, req.body, existing);
     await collectionService.writeCollectionItem(storage, scope, collectionType, item, previousSlug);
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, collectionType, item.slug, item, previousSlug);
+    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType);
     noStore(res).json(collectionService.normalizeCollectionItem(item, schema));
   } catch (err) {
     respondError(res, err);
@@ -169,7 +169,7 @@ export async function deleteItem(req, res) {
     }
     const result = await collectionService.deleteCollectionItem(storage, scope, collectionType, itemSlug);
     if (!result.deleted) return noStore(res).status(404).json({ error: "Item not found" });
-    await removeCollectionItemFromMediaUsage(scope.projectId, collectionType, itemSlug);
+    await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: existing?.uuid, slug: itemSlug }, collectionType);
     if (existing?.uuid) {
       try {
         await cleanupDeletedCollectionItemReferences(storage, scope, { deletedItemUuids: existing.uuid });
@@ -206,7 +206,7 @@ export async function bulkDeleteItems(req, res) {
       req.body.itemSlugs,
     );
     for (const slug of result.deleted) {
-      await removeCollectionItemFromMediaUsage(scope.projectId, collectionType, slug);
+      await removeCollectionItemFromMediaUsage(scope.projectId, { uuid: uuidBySlug.get(slug), slug }, collectionType);
     }
     const deletedUuids = result.deleted.map((slug) => uuidBySlug.get(slug)).filter(Boolean);
     if (deletedUuids.length > 0) {
@@ -235,7 +235,7 @@ export async function duplicateItem(req, res) {
 
     const dup = await collectionService.duplicateCollectionItem(storage, scope, collectionType, itemSlug);
     if (!dup) return res.status(404).json({ error: "Item not found" });
-    await updateCollectionItemMediaUsage(scope.projectId, collectionType, dup.slug, dup);
+    await updateCollectionItemMediaUsage(scope.projectId, dup, collectionType);
     noStore(res).status(201).json(collectionService.normalizeCollectionItem(dup, schema));
   } catch (err) {
     respondError(res, err);
@@ -253,7 +253,7 @@ export async function discardArchivedItem(req, res) {
     const item = await collectionService.discardArchivedCollectionItem(storage, scope, collectionType, itemSlug);
     if (!item) return res.status(404).json({ error: "Item not found" });
     // Media usage may shrink if an archived field held a media reference.
-    await syncCollectionItemMediaUsageOnWrite(scope.projectId, collectionType, item.slug, item, null);
+    await syncCollectionItemMediaUsageOnWrite(scope.projectId, item, collectionType);
     noStore(res).json(item);
   } catch (err) {
     respondError(res, err);

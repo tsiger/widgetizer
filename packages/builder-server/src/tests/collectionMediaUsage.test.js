@@ -141,43 +141,66 @@ describe("extractMediaPathsFromCollectionItem", () => {
 });
 
 // ============================================================================
-// updateCollectionItemMediaUsage — records collection:{type}/{slug} source
+// updateCollectionItemMediaUsage — records the collection:{uuid} source
 // ============================================================================
 
+const ALPHA_UUID = "11111111-1111-4111-8111-111111111111";
+const BETA_UUID = "22222222-2222-4222-8222-222222222222";
+const JANE_UUID = "33333333-3333-4333-8333-333333333333";
+
+const item = (uuid, slug, settings) => ({ uuid, slug, settings });
+
 describe("updateCollectionItemMediaUsage", () => {
-  it("records the collection:{type}/{slug} source for referenced files", async () => {
-    await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", {
-      settings: { featured_image: "/uploads/images/hero.jpg" },
-    });
-    assert.deepEqual(await usedIn(IMG), ["collection:portfolio/alpha"]);
+  it("records the collection:{uuid} source for referenced files", async () => {
+    await updateCollectionItemMediaUsage(
+      PROJECT_ID,
+      item(ALPHA_UUID, "alpha", { featured_image: "/uploads/images/hero.jpg" }),
+    );
+    assert.deepEqual(await usedIn(IMG), [`collection:${ALPHA_UUID}`]);
     assert.deepEqual(await usedIn(FILE), []);
   });
 
   it("records a file referenced through a nested link-href", async () => {
-    await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", {
-      settings: { doc: { href: "/uploads/files/spec.pdf", text: "Spec", target: "_blank" } },
-    });
-    assert.deepEqual(await usedIn(FILE), ["collection:portfolio/alpha"]);
+    await updateCollectionItemMediaUsage(
+      PROJECT_ID,
+      item(ALPHA_UUID, "alpha", { doc: { href: "/uploads/files/spec.pdf", text: "Spec", target: "_blank" } }),
+    );
+    assert.deepEqual(await usedIn(FILE), [`collection:${ALPHA_UUID}`]);
+  });
+
+  // The identity is the point: two items may carry the same slug (one per language
+  // once folders exist), and their usage must not merge or overwrite.
+  it("keeps two items with the same slug independent", async () => {
+    await updateCollectionItemMediaUsage(
+      PROJECT_ID,
+      item(ALPHA_UUID, "alpha", { featured_image: "/uploads/images/hero.jpg" }),
+    );
+    await updateCollectionItemMediaUsage(PROJECT_ID, item(BETA_UUID, "alpha", { doc: "/uploads/files/spec.pdf" }));
+
+    assert.deepEqual(await usedIn(IMG), [`collection:${ALPHA_UUID}`]);
+    assert.deepEqual(await usedIn(FILE), [`collection:${BETA_UUID}`]);
+
+    await removeCollectionItemFromMediaUsage(PROJECT_ID, BETA_UUID);
+    assert.deepEqual(await usedIn(IMG), [`collection:${ALPHA_UUID}`], "the sibling's media stays in use");
+    assert.deepEqual(await usedIn(FILE), []);
   });
 });
 
 // ============================================================================
-// syncCollectionItemMediaUsageOnWrite — rename handling
+// syncCollectionItemMediaUsageOnWrite — a rename keeps the uuid
 // ============================================================================
 
 describe("syncCollectionItemMediaUsageOnWrite", () => {
-  it("on rename, removes the previous source and adds the current one", async () => {
-    await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", {
-      settings: { featured_image: "/uploads/images/hero.jpg" },
-    });
+  it("keeps one source across a rename", async () => {
+    await updateCollectionItemMediaUsage(
+      PROJECT_ID,
+      item(ALPHA_UUID, "alpha", { featured_image: "/uploads/images/hero.jpg" }),
+    );
     await syncCollectionItemMediaUsageOnWrite(
       PROJECT_ID,
-      "portfolio",
-      "renamed",
-      { settings: { featured_image: "/uploads/images/hero.jpg" } },
-      "alpha",
+      item(ALPHA_UUID, "renamed", { featured_image: "/uploads/images/hero.jpg" }),
     );
-    assert.deepEqual(await usedIn(IMG), ["collection:portfolio/renamed"]);
+    assert.deepEqual(await usedIn(IMG), [`collection:${ALPHA_UUID}`]);
   });
 });
 
@@ -187,10 +210,11 @@ describe("syncCollectionItemMediaUsageOnWrite", () => {
 
 describe("removeCollectionItemFromMediaUsage", () => {
   it("clears the source entirely", async () => {
-    await updateCollectionItemMediaUsage(PROJECT_ID, "portfolio", "alpha", {
-      settings: { featured_image: "/uploads/images/hero.jpg" },
-    });
-    await removeCollectionItemFromMediaUsage(PROJECT_ID, "portfolio", "alpha");
+    await updateCollectionItemMediaUsage(
+      PROJECT_ID,
+      item(ALPHA_UUID, "alpha", { featured_image: "/uploads/images/hero.jpg" }),
+    );
+    await removeCollectionItemFromMediaUsage(PROJECT_ID, ALPHA_UUID);
     assert.deepEqual(await usedIn(IMG), []);
   });
 });
@@ -202,8 +226,11 @@ describe("removeCollectionItemFromMediaUsage", () => {
 describe("refreshAllMediaUsage — collections", () => {
   it("rebuilds collection sources from disk (simulated import)", async () => {
     // Two collection item files placed directly on disk (as an import would).
-    await writeItemFile("portfolio", "alpha", { settings: { featured_image: "/uploads/images/hero.jpg" } });
-    await writeItemFile("team", "jane", { settings: { resume: "/uploads/files/spec.pdf" } });
+    await writeItemFile("portfolio", "alpha", {
+      uuid: ALPHA_UUID,
+      settings: { featured_image: "/uploads/images/hero.jpg" },
+    });
+    await writeItemFile("team", "jane", { uuid: JANE_UUID, settings: { resume: "/uploads/files/spec.pdf" } });
     // a stray _order.json must be ignored
     await fs.outputJSON(
       path.join(getProjectDir(PROJECT_FOLDER), "collections", "portfolio", "_order.json"),
@@ -211,7 +238,113 @@ describe("refreshAllMediaUsage — collections", () => {
     );
 
     await refreshAllMediaUsage(PROJECT_ID);
-    assert.deepEqual(await usedIn(IMG), ["collection:portfolio/alpha"]);
-    assert.deepEqual(await usedIn(FILE), ["collection:team/jane"]);
+    assert.deepEqual(await usedIn(IMG), [`collection:${ALPHA_UUID}`]);
+    assert.deepEqual(await usedIn(FILE), [`collection:${JANE_UUID}`]);
+  });
+
+  // A file written before uuids existed gets one stamped during the rebuild, so its
+  // identity is the same before and after its next save (no stale row left behind).
+  it("stamps a uuid on an item written before uuids existed", async () => {
+    await writeItemFile("portfolio", "legacy", { settings: { featured_image: "/uploads/images/hero.jpg" } });
+
+    await refreshAllMediaUsage(PROJECT_ID);
+
+    const stamped = await fs.readJSON(
+      path.join(getProjectDir(PROJECT_FOLDER), "collections", "portfolio", "legacy.json"),
+    );
+    assert.ok(stamped.uuid, "the rebuild writes a uuid into the file");
+    assert.deepEqual(await usedIn(IMG), [`collection:${stamped.uuid}`]);
+
+    // Saving it again keeps the same identity — no second row.
+    await syncCollectionItemMediaUsageOnWrite(PROJECT_ID, stamped);
+    assert.deepEqual(await usedIn(IMG), [`collection:${stamped.uuid}`]);
+  });
+
+  // Everything below is the can't-write case: a read-only working dir, a full disk.
+  describe("when a uuid cannot be stamped", () => {
+    /** Run fn with fs.writeFile failing the way a full disk would — after truncating. */
+    async function withFailingWrite(fn, { truncate = false } = {}) {
+      const realWriteFile = fs.writeFile;
+      fs.writeFile = async (target, contents) => {
+        if (truncate) await realWriteFile(target, String(contents).slice(0, 12));
+        throw new Error("ENOSPC: no space left on device");
+      };
+      try {
+        return await fn();
+      } finally {
+        fs.writeFile = realWriteFile;
+      }
+    }
+
+    it("leaves the original file byte-for-byte intact", async () => {
+      await writeItemFile("news", "alpha", { settings: { featured_image: "/uploads/images/hero.jpg" } });
+      const itemPath = path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "alpha.json");
+      const before = await fs.readFile(itemPath);
+
+      // The stamp writes a temp file first, so even a truncating failure cannot damage this one.
+      await withFailingWrite(() => refreshAllMediaUsage(PROJECT_ID), { truncate: true });
+
+      assert.deepEqual(await fs.readFile(itemPath), before, "the item file must be untouched");
+      assert.deepEqual(JSON.parse(await fs.readFile(itemPath, "utf8")).settings.featured_image, "/uploads/images/hero.jpg");
+      const leftovers = (await fs.readdir(path.join(getProjectDir(PROJECT_FOLDER), "collections", "news"))).filter((n) =>
+        n.endsWith(".tmp"),
+      );
+      assert.deepEqual(leftovers, [], "no temp file left behind");
+    });
+
+    it("keeps two uuid-less items in different collections apart", async () => {
+      await writeItemFile("news", "alpha", { settings: { featured_image: "/uploads/images/hero.jpg" } });
+      await writeItemFile("portfolio", "alpha", { settings: { featured_image: "/uploads/images/hero.jpg" } });
+
+      await withFailingWrite(() => refreshAllMediaUsage(PROJECT_ID));
+
+      assert.deepEqual(
+        [...(await usedIn(IMG))].sort(),
+        ["collection:slug:news/alpha", "collection:slug:portfolio/alpha"],
+      );
+
+      // Deleting one must leave the other's media in use — the bug this step exists to prevent.
+      await removeCollectionItemFromMediaUsage(PROJECT_ID, { slug: "alpha" }, "news");
+      assert.deepEqual(await usedIn(IMG), ["collection:slug:portfolio/alpha"]);
+    });
+
+    it("retries the migration and retires the pending row once writing works", async () => {
+      await writeItemFile("news", "alpha", { settings: { featured_image: "/uploads/images/hero.jpg" } });
+      await withFailingWrite(() => refreshAllMediaUsage(PROJECT_ID));
+      assert.deepEqual(await usedIn(IMG), ["collection:slug:news/alpha"]);
+
+      // A pending row is not "migrated": the next rebuild stamps the uuid and replaces it.
+      await refreshAllMediaUsage(PROJECT_ID);
+      const stamped = await fs.readJSON(path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "alpha.json"));
+      assert.ok(stamped.uuid);
+      assert.deepEqual(await usedIn(IMG), [`collection:${stamped.uuid}`]);
+    });
+
+    it("writes back to the pending row when a link cleanup re-syncs a uuid-less item", async () => {
+      await writeItemFile("news", "alpha", {
+        settings: { featured_image: "/uploads/images/hero.jpg", doc: { href: "/uploads/files/spec.pdf", text: "Doc" } },
+      });
+      await withFailingWrite(() => refreshAllMediaUsage(PROJECT_ID));
+      assert.deepEqual(await usedIn(IMG), ["collection:slug:news/alpha"]);
+
+      // A page delete clears the item's link and re-syncs it — still with no uuid to use.
+      const item = { slug: "alpha", settings: { featured_image: "/uploads/images/hero.jpg" } };
+      await syncCollectionItemMediaUsageOnWrite(PROJECT_ID, item, "news");
+
+      assert.deepEqual(await usedIn(IMG), ["collection:slug:news/alpha"], "the pending row is updated, not orphaned");
+      assert.deepEqual(await usedIn(FILE), [], "the dropped link's file is released");
+    });
+
+    it("retires the pending row when the item is saved with a uuid", async () => {
+      await writeItemFile("news", "alpha", { settings: { featured_image: "/uploads/images/hero.jpg" } });
+      await withFailingWrite(() => refreshAllMediaUsage(PROJECT_ID));
+      assert.deepEqual(await usedIn(IMG), ["collection:slug:news/alpha"]);
+
+      // The editor saves the item; it now carries a uuid.
+      const saved = { uuid: ALPHA_UUID, slug: "alpha", settings: { featured_image: "/uploads/images/hero.jpg" } };
+      await syncCollectionItemMediaUsageOnWrite(PROJECT_ID, saved, "news");
+
+      assert.deepEqual(await usedIn(IMG), [`collection:${ALPHA_UUID}`], "no stale slug row left behind");
+    });
   });
 });

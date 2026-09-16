@@ -69,17 +69,27 @@ async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, 
   }
 
   try {
-    await syncPageMediaUsageOnWrite(scope.projectId, pageId, pageData, previousPageId);
+    await syncPageMediaUsageOnWrite(scope.projectId, pageData);
   } catch (usageError) {
     console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
   }
 }
 
 async function deletePageWithMediaTracking({ scope, storage, pageId }) {
+  // Usage rows are keyed by uuid, so read it while the file still exists. A page with
+  // no uuid was recorded under its slug, which the service resolves from the slug below.
+  let pageUuid = null;
+  try {
+    const buf = await storage.read(scope, `pages/${pageId}.json`);
+    if (buf != null) pageUuid = JSON.parse(buf.toString("utf8"))?.uuid ?? null;
+  } catch (readError) {
+    console.warn(`Could not read page ${pageId} before delete for media usage: ${readError.message}`);
+  }
+
   await storage.delete(scope, `pages/${pageId}.json`);
 
   try {
-    await syncPageMediaUsageOnDelete(scope.projectId, pageId);
+    await syncPageMediaUsageOnDelete(scope.projectId, { uuid: pageUuid, slug: pageId });
   } catch (usageError) {
     console.warn(`Failed to update media usage tracking for deleted page ${pageId}:`, usageError);
   }

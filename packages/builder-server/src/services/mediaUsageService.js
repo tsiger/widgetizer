@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { randomUUID } from "crypto";
 import { getProjectDir } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
@@ -8,6 +9,61 @@ import { getProjectFolderName } from "../utils/projectHelpers.js";
 
 const THEME_SETTINGS_USAGE_ID = "global:theme-settings";
 const SITE_IDENTITY_USAGE_ID = "global:site-identity";
+
+/**
+ * Usage rows are keyed by stable identity, never by a slug: the same slug will exist
+ * once per language, and a rename must not orphan a row or steal another page's.
+ * Globals are keyed by the folder they live in — `root` today, a language code later.
+ */
+export const usageSource = {
+  page: (uuid) => `page:${uuid}`,
+  item: (uuid) => `collection:${uuid}`,
+  global: (type) => `global:root:${String(type).replace(/^global:(root:)?/, "")}`,
+  // Used only when a uuid could not be written to the file (read-only working dir).
+  // The `slug:` marker keeps it distinguishable, so the migration can be retried and
+  // the row retired once the content does get a uuid.
+  pendingPage: (slug) => `page:slug:${slug}`,
+  pendingItem: (collectionType, slug) => `collection:slug:${collectionType}/${slug}`,
+};
+
+/**
+ * The row a page is keyed by: its uuid when it has one, else its pending slug id.
+ * Takes a bare uuid (what most callers hold) or the page itself.
+ * @param {string|{uuid?: string, slug?: string}} page
+ * @returns {string|null} null when there is nothing to key a row by
+ */
+export function pageUsageSource(page) {
+  if (typeof page === "string") return page ? usageSource.page(page) : null;
+  if (page?.uuid) return usageSource.page(page.uuid);
+  return page?.slug ? usageSource.pendingPage(page.slug) : null;
+}
+
+/**
+ * Same for a collection item; the pending id needs the collection type, since two
+ * collections can hold the same slug.
+ * @param {string|{uuid?: string, slug?: string}} item
+ * @param {string|null} [collectionType]
+ * @returns {string|null} null when there is nothing to key a row by
+ */
+export function itemUsageSource(item, collectionType = null) {
+  if (typeof item === "string") return item ? usageSource.item(item) : null;
+  if (item?.uuid) return usageSource.item(item.uuid);
+  return collectionType && item?.slug ? usageSource.pendingItem(collectionType, item.slug) : null;
+}
+
+/**
+ * Rows that are not (yet) identity-based: written before the change (bare slug,
+ * `collection:type/slug`, `global:header`), or a pending fallback from a rebuild that
+ * could not stamp a uuid. Both mean "rebuild me again when you get the chance".
+ */
+function isLegacyUsageSource(source) {
+  if (typeof source !== "string") return true;
+  if (source === THEME_SETTINGS_USAGE_ID || source === SITE_IDENTITY_USAGE_ID) return false;
+  if (source.startsWith("page:slug:") || source.startsWith("collection:slug:")) return true;
+  if (source.startsWith("page:")) return false;
+  if (source.startsWith("collection:")) return source.includes("/");
+  return !source.startsWith("global:root:");
+}
 
 /** Upload path prefixes recognised as tracked media assets. */
 const UPLOAD_PREFIXES = ["/uploads/images/", "/uploads/files/"];
@@ -232,22 +288,31 @@ export async function updateSiteIdentityMediaUsage(projectId, identity) {
  * Removes the page from all media files' usedIn arrays, then re-adds it
  * only to files that are actually referenced in the page content.
  * @param {string} projectId - The project's UUID
- * @param {string} pageId - The page's slug/identifier
+ * @param {string|null} pageUuid - The page's stable uuid, or null/undefined if it has none yet
  * @param {object} pageData - Page data object containing widgets
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>} Result with extracted media paths
  * @throws {Error} If media file read/write fails
  */
-export async function updatePageMediaUsage(projectId, pageId, pageData) {
+export async function updatePageMediaUsage(projectId, pageUuid, pageData) {
   try {
     const mediaPaths = extractMediaPathsFromPage(pageData);
     const mediaData = await readMediaFile(projectId);
 
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
-    mediaRepo.updateMediaUsageForSource(projectId, pageId, matchedFileIds);
+    const source = pageUsageSource(pageUuid || pageData);
+    if (!source) {
+      console.warn(`Page has neither uuid nor slug; media usage not recorded (project ${projectId})`);
+      return { success: false, mediaPaths };
+    }
+    mediaRepo.updateMediaUsageForSource(projectId, source, matchedFileIds);
+    // A real uuid supersedes any row a read-only rebuild left under the slug.
+    if (pageUuid && pageData?.slug) {
+      mediaRepo.updateMediaUsageForSource(projectId, usageSource.pendingPage(pageData.slug), []);
+    }
 
     return { success: true, mediaPaths };
   } catch (error) {
-    console.error(`Error updating page media usage (projectId: ${projectId}, pageId: ${pageId}):`, error);
+    console.error(`Error updating page media usage (projectId: ${projectId}, page: ${pageUuid}):`, error);
     console.error("Error stack:", error.stack);
     throw error;
   }
@@ -265,7 +330,7 @@ export async function updatePageMediaUsage(projectId, pageId, pageData) {
 export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetData) {
   try {
     const mediaPaths = extractMediaPathsFromGlobalWidget(widgetData);
-    const usageId = globalId.startsWith("global:") ? globalId : `global:${globalId}`;
+    const usageId = usageSource.global(globalId);
     const mediaData = await readMediaFile(projectId);
 
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
@@ -283,14 +348,16 @@ export async function updateGlobalWidgetMediaUsage(projectId, globalId, widgetDa
  * Remove a page from all media usage tracking.
  * Called when a page is deleted to clean up usage references.
  * @param {string} projectId - The project's UUID
- * @param {string} pageId - The page's slug/identifier to remove
+ * @param {string|{uuid?: string, slug?: string}} page - The deleted page's uuid, or the page
  * @returns {Promise<{success: boolean}>} Success result
  * @throws {Error} If media file read/write fails
  */
-export async function removePageFromMediaUsage(projectId, pageId) {
+export async function removePageFromMediaUsage(projectId, page) {
   try {
-    // Remove all usage rows for this page (no fileIds = nothing to re-add)
-    mediaRepo.updateMediaUsageForSource(projectId, pageId, []);
+    // Remove all usage rows for this page (no fileIds = nothing to re-add). A page with
+    // no uuid was recorded under its pending slug id, so clear that row instead.
+    const source = pageUsageSource(page);
+    if (source) mediaRepo.updateMediaUsageForSource(projectId, source, []);
 
     return { success: true };
   } catch (error) {
@@ -300,41 +367,31 @@ export async function removePageFromMediaUsage(projectId, pageId) {
 }
 
 /**
- * Keep page media usage in sync after a page write or rename.
+ * Keep page media usage in sync after a page write. A rename keeps the page's uuid,
+ * so there is no previous source left behind to clean up.
  * @param {string} projectId - The project's UUID
- * @param {string} pageId - The current page slug/identifier
- * @param {object} pageData - Page data object containing widgets
- * @param {string|null} [previousPageId=null] - Prior slug when the page was renamed
+ * @param {object} pageData - Page data object containing widgets (and its uuid)
  * @returns {Promise<{success: boolean, mediaPaths: string[]}>}
  */
-export async function syncPageMediaUsageOnWrite(projectId, pageId, pageData, previousPageId = null) {
-  if (previousPageId && previousPageId !== pageId) {
-    await removePageFromMediaUsage(projectId, previousPageId);
-  }
-
-  return updatePageMediaUsage(projectId, pageId, pageData);
+export async function syncPageMediaUsageOnWrite(projectId, pageData) {
+  return updatePageMediaUsage(projectId, pageData?.uuid, pageData);
 }
 
 /**
  * Keep page media usage in sync after a page delete.
  * @param {string} projectId - The project's UUID
- * @param {string} pageId - The deleted page slug/identifier
+ * @param {string|{uuid?: string, slug?: string}} page - The deleted page's uuid, or the page
  * @returns {Promise<{success: boolean}>}
  */
-export async function syncPageMediaUsageOnDelete(projectId, pageId) {
-  return removePageFromMediaUsage(projectId, pageId);
+export async function syncPageMediaUsageOnDelete(projectId, page) {
+  return removePageFromMediaUsage(projectId, page);
 }
 
 // ============================================================================
-// Collection items — source string `collection:{type}/{slug}`.
+// Collection items — source string `collection:{uuid}`.
 // Media usage is SQLite metadata keyed by projectId (mediaRepo), exactly like
 // pages/globals — NOT scope/storage. Callers pass scope.projectId.
 // ============================================================================
-
-/** Build the media-usage source string for a collection item. */
-function collectionSource(collectionType, itemSlug) {
-  return `collection:${collectionType}/${itemSlug}`;
-}
 
 /**
  * Extract tracked upload paths from a collection item's settings (recurses into
@@ -356,46 +413,56 @@ export function extractMediaPathsFromCollectionItem(itemData) {
   return Array.from(mediaPaths);
 }
 
-/** Full usage refresh for one collection item under `collection:{type}/{slug}`. */
-export async function updateCollectionItemMediaUsage(projectId, collectionType, itemSlug, itemData) {
+/**
+ * Full usage refresh for one collection item under `collection:{uuid}`, or — while the
+ * item has no uuid — under its pending slug id, which needs `collectionType`.
+ */
+export async function updateCollectionItemMediaUsage(projectId, itemData, collectionType = null) {
+  const itemUuid = itemData?.uuid;
   try {
     const mediaPaths = extractMediaPathsFromCollectionItem(itemData);
     const mediaData = await readMediaFile(projectId);
     const matchedFileIds = findFileIdsByPaths(mediaData.files, mediaPaths);
-    mediaRepo.updateMediaUsageForSource(projectId, collectionSource(collectionType, itemSlug), matchedFileIds);
+    const source = itemUsageSource(itemData, collectionType);
+    if (!source) {
+      console.warn(`Collection item has no uuid and no known type; media usage not recorded (${itemData?.slug})`);
+      return { success: false, mediaPaths };
+    }
+    mediaRepo.updateMediaUsageForSource(projectId, source, matchedFileIds);
+    // A real uuid supersedes any row a read-only rebuild left under the slug.
+    if (itemUuid && collectionType && itemData?.slug) {
+      mediaRepo.updateMediaUsageForSource(projectId, usageSource.pendingItem(collectionType, itemData.slug), []);
+    }
     return { success: true, mediaPaths };
   } catch (error) {
-    console.error(`Error updating collection item media usage (${collectionType}/${itemSlug}):`, error);
-    throw error;
-  }
-}
-
-/** Remove one collection item's source from media usage entirely. */
-export async function removeCollectionItemFromMediaUsage(projectId, collectionType, itemSlug) {
-  try {
-    mediaRepo.updateMediaUsageForSource(projectId, collectionSource(collectionType, itemSlug), []);
-    return { success: true };
-  } catch (error) {
-    console.error(`Error removing collection item from media usage (${collectionType}/${itemSlug}):`, error);
+    console.error(`Error updating collection item media usage (${itemUuid}):`, error);
     throw error;
   }
 }
 
 /**
- * Keep collection-item media usage in sync after a write. On rename
- * (previousItemSlug !== itemSlug) the previous source is removed first.
+ * Remove one collection item's source from media usage entirely.
+ * @param {string} projectId
+ * @param {string|{uuid?: string, slug?: string}} item - the item's uuid, or the item
+ * @param {string|null} [collectionType] - needed to clear a pending (slug-keyed) row
  */
-export async function syncCollectionItemMediaUsageOnWrite(
-  projectId,
-  collectionType,
-  itemSlug,
-  itemData,
-  previousItemSlug = null,
-) {
-  if (previousItemSlug && previousItemSlug !== itemSlug) {
-    await removeCollectionItemFromMediaUsage(projectId, collectionType, previousItemSlug);
+export async function removeCollectionItemFromMediaUsage(projectId, item, collectionType = null) {
+  try {
+    const source = itemUsageSource(item, collectionType);
+    if (source) mediaRepo.updateMediaUsageForSource(projectId, source, []);
+    return { success: true };
+  } catch (error) {
+    console.error(`Error removing collection item from media usage (${item?.slug ?? item}):`, error);
+    throw error;
   }
-  return updateCollectionItemMediaUsage(projectId, collectionType, itemSlug, itemData);
+}
+
+/**
+ * Keep collection-item media usage in sync after a write. A rename keeps the item's
+ * uuid, so there is no previous source left behind to clean up.
+ */
+export async function syncCollectionItemMediaUsageOnWrite(projectId, itemData, collectionType = null) {
+  return updateCollectionItemMediaUsage(projectId, itemData, collectionType);
 }
 
 /**
@@ -459,6 +526,27 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
       usageMap.set(file.id, new Set());
     }
 
+    // A file written before uuids existed gets one now, so its usage identity is the
+    // same before and after its next save. Without this the rebuild would have to invent
+    // a fallback id that a later save would leave behind as a stale "in use" row.
+    async function identityOf(filePath, data, fallback) {
+      if (data?.uuid) return data.uuid;
+      const uuid = randomUUID();
+      // Write a sibling temp file and rename over the original: a partial write (a full
+      // disk, say) then leaves the content file untouched instead of truncating it.
+      const tempPath = `${filePath}.${randomUUID()}.tmp`;
+      try {
+        await fs.writeFile(tempPath, JSON.stringify({ ...data, uuid }, null, 2));
+        await fs.rename(tempPath, filePath);
+        return uuid;
+      } catch (error) {
+        await fs.remove(tempPath).catch(() => {});
+        // Read-only working dir: keep a pending id so the migration is retried later.
+        console.warn(`Could not stamp a uuid on ${filePath}: ${error.message}`);
+        return fallback;
+      }
+    }
+
     // Helper to add usage entries by matching media paths to file IDs
     function addUsageForPaths(mediaPaths, usageId) {
       for (const mediaPath of mediaPaths) {
@@ -486,7 +574,11 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
         try {
           const pageContent = await fs.readFile(pagePath, "utf8");
           const pageData = JSON.parse(pageContent);
-          addUsageForPaths(extractMediaPathsFromPage(pageData), pageId);
+          const identity = await identityOf(pagePath, pageData, null);
+          addUsageForPaths(
+            extractMediaPathsFromPage(pageData),
+            identity ? usageSource.page(identity) : usageSource.pendingPage(pageId),
+          );
         } catch (error) {
           console.warn(`Error processing page ${pageId} for media usage:`, error.message);
         }
@@ -502,7 +594,7 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
           try {
             const globalContent = await fs.readFile(globalFilePath, "utf8");
             const globalData = JSON.parse(globalContent);
-            const globalId = `global:${fileName.replace(".json", "")}`;
+            const globalId = usageSource.global(fileName.replace(".json", ""));
             addUsageForPaths(extractMediaPathsFromGlobalWidget(globalData), globalId);
           } catch (error) {
             console.warn(`Error processing global widget ${fileName} for media usage:`, error.message);
@@ -550,10 +642,13 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
         for (const itemName of itemNames) {
           const itemSlug = itemName.replace(".json", "");
           try {
-            const itemData = JSON.parse(await fs.readFile(path.join(typeDir, itemName), "utf8"));
+            const itemPath = path.join(typeDir, itemName);
+            const itemData = JSON.parse(await fs.readFile(itemPath, "utf8"));
+            const identity = await identityOf(itemPath, itemData, null);
             addUsageForPaths(
               extractMediaPathsFromCollectionItem(itemData),
-              collectionSource(collectionType, itemSlug),
+              // The pending id keeps the collection type: two types can hold the same slug.
+              identity ? usageSource.item(identity) : usageSource.pendingItem(collectionType, itemSlug),
             );
             collectionItemCount++;
           } catch (error) {
@@ -595,6 +690,40 @@ export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {
 export async function refreshAllMediaUsage(projectId) {
   const projectFolderName = await getProjectFolderName(projectId);
   return refreshAllMediaUsageFromDir({ projectId, projectDir: getProjectDir(projectFolderName) });
+}
+
+// One check per project per process: the rebuild is only ever needed once.
+const usageFormatChecked = new Set();
+
+/**
+ * Rebuild a project's usage rows once if any still carry the old slug-based ids.
+ * Usage is derived data, so rebuilding it from content is safer than a migration that
+ * would have to guess which uuid an old `about` or `collection:news/story` row meant.
+ * Takes the caller's working dir for the same reason `refreshMediaUsage` does: under a
+ * shell that namespaces content per actor, the OSS-global path is the wrong (empty)
+ * directory, and a rescan there would wipe every usage row instead of rebuilding it.
+ * @param {{ projectId: string, projectDir: string }} args
+ * @returns {Promise<void>}
+ */
+export async function ensureUsageSourceFormat({ projectId, projectDir }) {
+  if (!projectId || !projectDir || usageFormatChecked.has(projectId)) return;
+  usageFormatChecked.add(projectId);
+  try {
+    const mediaData = await readMediaFile(projectId);
+    if (mediaData.files.some((file) => (file.usedIn || []).some(isLegacyUsageSource))) {
+      await refreshAllMediaUsageFromDir({ projectId, projectDir });
+
+      // Pending rows mean the rebuild could not write uuids (read-only dir). Leave the
+      // project unmarked so the next attempt retries instead of settling for them.
+      const rebuilt = await readMediaFile(projectId);
+      if (rebuilt.files.some((file) => (file.usedIn || []).some(isLegacyUsageSource))) {
+        usageFormatChecked.delete(projectId);
+      }
+    }
+  } catch (error) {
+    usageFormatChecked.delete(projectId);
+    console.warn(`[mediaUsage] Could not rebuild legacy usage rows: ${error.message}`);
+  }
 }
 
 /**

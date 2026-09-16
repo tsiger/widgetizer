@@ -39,6 +39,7 @@ process.env.NODE_ENV = "test";
 const { getProjectDir, getProjectPagesDir, getProjectThemeJsonPath } = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
+const mediaRepo = await import("../db/repositories/mediaRepository.js");
 const { readMediaFile } = await import("../services/mediaService.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 
@@ -51,6 +52,7 @@ const {
   getMediaUsage,
   refreshAllMediaUsage,
   refreshAllMediaUsageFromDir,
+  ensureUsageSourceFormat,
 } = await import("../services/mediaUsageService.js");
 const { closeDb } = await import("../db/index.js");
 
@@ -164,7 +166,7 @@ describe("updatePageMediaUsage", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.deepEqual(hero.usedIn, ["home"]);
+    assert.deepEqual(hero.usedIn, ["page:home"]);
   });
 
   it("tracks image from block settings", async () => {
@@ -184,7 +186,7 @@ describe("updatePageMediaUsage", () => {
 
     const media = await readMediaJson();
     const banner = media.files.find((f) => f.id === IMG3);
-    assert.deepEqual(banner.usedIn, ["about"]);
+    assert.deepEqual(banner.usedIn, ["page:about"]);
   });
 
   it("tracks SEO og_image", async () => {
@@ -196,7 +198,7 @@ describe("updatePageMediaUsage", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.deepEqual(hero.usedIn, ["home"]);
+    assert.deepEqual(hero.usedIn, ["page:home"]);
   });
 
   it("normalises og_image without leading slash", async () => {
@@ -208,7 +210,7 @@ describe("updatePageMediaUsage", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.deepEqual(hero.usedIn, ["home"]);
+    assert.deepEqual(hero.usedIn, ["page:home"]);
   });
 
   it("tracks multiple media files from one page", async () => {
@@ -229,9 +231,9 @@ describe("updatePageMediaUsage", () => {
     assert.equal(result.mediaPaths.length, 3);
 
     const media = await readMediaJson();
-    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["home"]);
-    assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, ["home"]);
-    assert.deepEqual(media.files.find((f) => f.id === IMG3).usedIn, ["home"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["page:home"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, ["page:home"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG3).usedIn, ["page:home"]);
   });
 
   it("deduplicates — same file used twice on same page", async () => {
@@ -246,7 +248,7 @@ describe("updatePageMediaUsage", () => {
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
     // Should appear once, not twice
-    assert.deepEqual(hero.usedIn, ["home"]);
+    assert.deepEqual(hero.usedIn, ["page:home"]);
   });
 
   it("removes stale usage when media is no longer referenced", async () => {
@@ -268,7 +270,7 @@ describe("updatePageMediaUsage", () => {
 
     const media = await readMediaJson();
     assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, []);
-    assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, ["home"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, ["page:home"]);
   });
 
   it("handles page with no widgets", async () => {
@@ -330,8 +332,8 @@ describe("updatePageMediaUsage", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.ok(hero.usedIn.includes("home"));
-    assert.ok(hero.usedIn.includes("about"));
+    assert.ok(hero.usedIn.includes("page:home"));
+    assert.ok(hero.usedIn.includes("page:about"));
     assert.equal(hero.usedIn.length, 2);
   });
 });
@@ -354,7 +356,7 @@ describe("updateGlobalWidgetMediaUsage", () => {
 
     const media = await readMediaJson();
     const logo = media.files.find((f) => f.id === IMG2);
-    assert.deepEqual(logo.usedIn, ["global:header"]);
+    assert.deepEqual(logo.usedIn, ["global:root:header"]);
   });
 
   it("tracks media used in footer widget blocks", async () => {
@@ -370,7 +372,7 @@ describe("updateGlobalWidgetMediaUsage", () => {
 
     const media = await readMediaJson();
     const banner = media.files.find((f) => f.id === IMG3);
-    assert.deepEqual(banner.usedIn, ["global:footer"]);
+    assert.deepEqual(banner.usedIn, ["global:root:footer"]);
   });
 
   it("normalises globalId — does not double-prefix 'global:'", async () => {
@@ -382,7 +384,7 @@ describe("updateGlobalWidgetMediaUsage", () => {
     const media = await readMediaJson();
     const logo = media.files.find((f) => f.id === IMG2);
     // Should be "global:header" not "global:global:header"
-    assert.deepEqual(logo.usedIn, ["global:header"]);
+    assert.deepEqual(logo.usedIn, ["global:root:header"]);
   });
 
   it("removes stale global widget usage on re-save", async () => {
@@ -397,7 +399,7 @@ describe("updateGlobalWidgetMediaUsage", () => {
 
     const media = await readMediaJson();
     assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, []);
-    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["global:header"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["global:root:header"]);
   });
 
   it("page and global widget usage are independent", async () => {
@@ -412,8 +414,8 @@ describe("updateGlobalWidgetMediaUsage", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.ok(hero.usedIn.includes("home"));
-    assert.ok(hero.usedIn.includes("global:header"));
+    assert.ok(hero.usedIn.includes("page:home"));
+    assert.ok(hero.usedIn.includes("global:root:header"));
     assert.equal(hero.usedIn.length, 2);
   });
 
@@ -503,6 +505,151 @@ describe("business details media usage", () => {
 });
 
 // ============================================================================
+// ensureUsageSourceFormat — the one-time rebuild of old rows
+// ============================================================================
+
+describe("ensureUsageSourceFormat", () => {
+  beforeEach(async () => {
+    await seedMediaJson(defaultMediaFiles());
+  });
+
+  // These tests write their own page files; later suites count the pages dir.
+  afterEach(async () => {
+    const pagesDir = path.join(getProjectDir(PROJECT_FOLDER), "pages");
+    await Promise.all(["about.json", "legacy.json"].map((name) => fs.remove(path.join(pagesDir, name))));
+  });
+
+  it("rebuilds rows written with the old slug ids, reading the directory it is given", async () => {
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    await fs.outputJSON(path.join(projectDir, "pages", "about.json"), {
+      uuid: "page-uuid-1",
+      slug: "about",
+      widgets: { w1: { type: "image", settings: { image: "/uploads/images/hero.jpg" } } },
+    });
+    // An old row: keyed by slug, and pointing at a file that IS still referenced.
+    mediaRepo.updateMediaUsageForSource(PROJECT_ID, "about", [IMG1]);
+
+    await ensureUsageSourceFormat({ projectId: PROJECT_ID, projectDir });
+
+    const media = await readMediaJson();
+    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["page:page-uuid-1"]);
+  });
+
+  it("stamps a uuid on a page that has none, and keeps the row across its next save", async () => {
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    const pagePath = path.join(projectDir, "pages", "legacy.json");
+    await fs.outputJSON(pagePath, {
+      slug: "legacy",
+      widgets: { w1: { type: "image", settings: { image: "/uploads/images/hero.jpg" } } },
+    });
+    mediaRepo.updateMediaUsageForSource(PROJECT_ID, "legacy", [IMG1]);
+
+    await refreshAllMediaUsageFromDir({ projectId: PROJECT_ID, projectDir });
+
+    const stamped = await fs.readJSON(pagePath);
+    assert.ok(stamped.uuid, "the rebuild stamps a uuid on the page file");
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG1).usedIn, [`page:${stamped.uuid}`]);
+
+    // Saving that page again must not add a second row.
+    await updatePageMediaUsage(PROJECT_ID, stamped.uuid, stamped);
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG1).usedIn, [`page:${stamped.uuid}`]);
+
+  });
+
+  it("retires a pending page row when the page is later saved with a uuid", async () => {
+    const projectDir = getProjectDir(PROJECT_FOLDER);
+    const pagePath = path.join(projectDir, "pages", "legacy.json");
+    const pageData = {
+      slug: "legacy",
+      widgets: { w1: { type: "image", settings: { image: "/uploads/images/hero.jpg" } } },
+    };
+    await fs.outputJSON(pagePath, pageData);
+    mediaRepo.updateMediaUsageForSource(PROJECT_ID, "legacy", [IMG1]);
+
+    // The working dir is read-only, so the rebuild can only record a pending id.
+    const realWriteFile = fs.writeFile;
+    fs.writeFile = async () => {
+      throw new Error("EROFS: read-only file system");
+    };
+    try {
+      await refreshAllMediaUsageFromDir({ projectId: PROJECT_ID, projectDir });
+    } finally {
+      fs.writeFile = realWriteFile;
+    }
+    assert.deepEqual((await readMediaJson()).files.find((f) => f.id === IMG1).usedIn, ["page:slug:legacy"]);
+
+    // The editor saves the page; it now carries a uuid, so the pending row goes.
+    await updatePageMediaUsage(PROJECT_ID, "page-uuid-legacy", { ...pageData, uuid: "page-uuid-legacy" });
+    assert.deepEqual(
+      (await readMediaJson()).files.find((f) => f.id === IMG1).usedIn,
+      ["page:page-uuid-legacy"],
+      "no stale slug row left behind",
+    );
+
+  });
+
+  it("does nothing without a working dir, rather than wiping usage", async () => {
+    mediaRepo.updateMediaUsageForSource(PROJECT_ID, "about", [IMG1]);
+
+    await ensureUsageSourceFormat({ projectId: PROJECT_ID, projectDir: undefined });
+
+    const media = await readMediaJson();
+    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["about"], "rows are left alone");
+  });
+});
+
+// ============================================================================
+// Identity, not slug — what multilang needs from usage rows
+// ============================================================================
+
+describe("usage identity", () => {
+  const PAGE_A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const PAGE_B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+  const syncPageWrite = (projectId, pageData) => updatePageMediaUsage(projectId, pageData.uuid, pageData);
+  const pageWith = (image) => ({ widgets: { w1: { type: "image", settings: { image } } } });
+
+  beforeEach(async () => {
+    await seedMediaJson(defaultMediaFiles());
+  });
+
+  // Two pages will share a slug once they live in different language folders.
+  it("keeps two same-slug pages independent, and deleting one leaves the other's media in use", async () => {
+    await updatePageMediaUsage(PROJECT_ID, PAGE_A, pageWith("/uploads/images/hero.jpg"));
+    await updatePageMediaUsage(PROJECT_ID, PAGE_B, pageWith("/uploads/images/hero.jpg"));
+
+    const both = await readMediaJson();
+    assert.deepEqual(
+      [...both.files.find((f) => f.id === IMG1).usedIn].sort(),
+      [`page:${PAGE_A}`, `page:${PAGE_B}`],
+    );
+
+    await removePageFromMediaUsage(PROJECT_ID, PAGE_A);
+
+    const after = await readMediaJson();
+    assert.deepEqual(after.files.find((f) => f.id === IMG1).usedIn, [`page:${PAGE_B}`], "the sibling still uses it");
+  });
+
+  it("keeps one source across a rename (the uuid does not change)", async () => {
+    await syncPageWrite(PROJECT_ID, { uuid: PAGE_A, slug: "about", ...pageWith("/uploads/images/hero.jpg") });
+    await syncPageWrite(PROJECT_ID, { uuid: PAGE_A, slug: "about-us", ...pageWith("/uploads/images/hero.jpg") });
+
+    const media = await readMediaJson();
+    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, [`page:${PAGE_A}`]);
+  });
+
+  it("namespaces a global so it cannot collide with a page of the same name", async () => {
+    await updatePageMediaUsage(PROJECT_ID, "header", pageWith("/uploads/images/hero.jpg"));
+    await updateGlobalWidgetMediaUsage(PROJECT_ID, "header", {
+      settings: { logo: "/uploads/images/logo.png" },
+    });
+
+    const media = await readMediaJson();
+    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["page:header"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, ["global:root:header"]);
+  });
+});
+
+// ============================================================================
 // removePageFromMediaUsage
 // ============================================================================
 
@@ -510,9 +657,9 @@ describe("removePageFromMediaUsage", () => {
   beforeEach(async () => {
     // Seed with some pre-existing usage
     const files = defaultMediaFiles();
-    files[0].usedIn = ["home", "about"]; // hero used on two pages
-    files[1].usedIn = ["home"]; // logo used on home
-    files[2].usedIn = ["about"]; // banner used on about
+    files[0].usedIn = ["page:home", "page:about"]; // hero used on two pages
+    files[1].usedIn = ["page:home"]; // logo used on home
+    files[2].usedIn = ["page:about"]; // banner used on about
     await seedMediaJson(files);
   });
 
@@ -521,9 +668,9 @@ describe("removePageFromMediaUsage", () => {
     assert.equal(result.success, true);
 
     const media = await readMediaJson();
-    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["about"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG1).usedIn, ["page:about"]);
     assert.deepEqual(media.files.find((f) => f.id === IMG2).usedIn, []);
-    assert.deepEqual(media.files.find((f) => f.id === IMG3).usedIn, ["about"]);
+    assert.deepEqual(media.files.find((f) => f.id === IMG3).usedIn, ["page:about"]);
   });
 
   it("does not affect other pages' usage", async () => {
@@ -531,7 +678,7 @@ describe("removePageFromMediaUsage", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.ok(hero.usedIn.includes("about"));
+    assert.ok(hero.usedIn.includes("page:about"));
   });
 
   it("is a no-op if page has no usage", async () => {
@@ -540,7 +687,7 @@ describe("removePageFromMediaUsage", () => {
 
     // Nothing should change
     const media = await readMediaJson();
-    assert.deepEqual([...media.files.find((f) => f.id === IMG1).usedIn].sort(), ["about", "home"]);
+    assert.deepEqual([...media.files.find((f) => f.id === IMG1).usedIn].sort(), ["page:about", "page:home"]);
   });
 });
 
@@ -551,7 +698,7 @@ describe("removePageFromMediaUsage", () => {
 describe("getMediaUsage", () => {
   before(async () => {
     const files = defaultMediaFiles();
-    files[0].usedIn = ["home", "about", "global:header"];
+    files[0].usedIn = ["page:home", "page:about", "global:root:header"];
     files[1].usedIn = [];
     await seedMediaJson(files);
   });
@@ -560,7 +707,7 @@ describe("getMediaUsage", () => {
     const usage = await getMediaUsage(PROJECT_ID, IMG1);
     assert.equal(usage.fileId, IMG1);
     assert.equal(usage.filename, "hero.jpg");
-    assert.deepEqual([...usage.usedIn].sort(), ["about", "global:header", "home"]);
+    assert.deepEqual([...usage.usedIn].sort(), ["global:root:header", "page:about", "page:home"]);
     assert.equal(usage.isInUse, true);
   });
 
@@ -589,8 +736,8 @@ describe("refreshAllMediaUsage", () => {
   beforeEach(async () => {
     // Seed media.json with stale/wrong usage data
     const files = defaultMediaFiles();
-    files[0].usedIn = ["deleted-page", "ghost"]; // stale
-    files[1].usedIn = ["home"]; // will be verified
+    files[0].usedIn = ["page:deleted-page", "page:ghost"]; // stale
+    files[1].usedIn = ["page:home"]; // will be verified
     await seedMediaJson(files);
 
     // Create actual page files on disk
@@ -601,6 +748,7 @@ describe("refreshAllMediaUsage", () => {
     await fs.writeFile(
       path.join(pagesDir, "home.json"),
       JSON.stringify({
+        uuid: "uuid-home",
         seo: { og_image: "/uploads/images/hero.jpg" },
         widgets: {
           w1: { settings: { image: "/uploads/images/logo.png" } },
@@ -612,6 +760,7 @@ describe("refreshAllMediaUsage", () => {
     await fs.writeFile(
       path.join(pagesDir, "about.json"),
       JSON.stringify({
+        uuid: "uuid-about",
         widgets: {
           w1: { settings: { bg: "/uploads/images/banner.jpg" } },
         },
@@ -661,20 +810,20 @@ describe("refreshAllMediaUsage", () => {
 
     // hero: home (seo) + global:footer
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.ok(hero.usedIn.includes("home"), "hero should be used on home");
-    assert.ok(hero.usedIn.includes("global:footer"), "hero should be used in footer");
-    assert.ok(!hero.usedIn.includes("deleted-page"), "stale usage should be removed");
-    assert.ok(!hero.usedIn.includes("ghost"), "stale usage should be removed");
+    assert.ok(hero.usedIn.includes("page:uuid-home"), "hero should be used on home");
+    assert.ok(hero.usedIn.includes("global:root:footer"), "hero should be used in footer");
+    assert.ok(!hero.usedIn.includes("page:deleted-page"), "stale usage should be removed");
+    assert.ok(!hero.usedIn.includes("page:ghost"), "stale usage should be removed");
 
     // logo: home (widget) + global:header + global:theme-settings (favicon)
     const logo = media.files.find((f) => f.id === IMG2);
-    assert.ok(logo.usedIn.includes("home"));
-    assert.ok(logo.usedIn.includes("global:header"));
+    assert.ok(logo.usedIn.includes("page:uuid-home"));
+    assert.ok(logo.usedIn.includes("global:root:header"));
     assert.ok(logo.usedIn.includes("global:theme-settings"), "favicon in theme settings should be tracked");
 
     // banner: about
     const banner = media.files.find((f) => f.id === IMG3);
-    assert.deepEqual(banner.usedIn, ["about"]);
+    assert.deepEqual(banner.usedIn, ["page:uuid-about"]);
 
   });
 
@@ -684,8 +833,8 @@ describe("refreshAllMediaUsage", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.ok(!hero.usedIn.includes("deleted-page"));
-    assert.ok(!hero.usedIn.includes("ghost"));
+    assert.ok(!hero.usedIn.includes("page:deleted-page"));
+    assert.ok(!hero.usedIn.includes("page:ghost"));
   });
 
   it("returns message with page count", async () => {
@@ -735,7 +884,7 @@ describe("refreshAllMediaUsage — collections-only project", () => {
     await fs.remove(getProjectPagesDir(PROJECT_FOLDER));
     const itemPath = path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "hello.json");
     await fs.ensureDir(path.dirname(itemPath));
-    await fs.writeFile(itemPath, JSON.stringify({ settings: { cover: "/uploads/images/cover.jpg" } }));
+    await fs.writeFile(itemPath, JSON.stringify({ uuid: "uuid-hello", settings: { cover: "/uploads/images/cover.jpg" } }));
   });
 
   afterEach(async () => {
@@ -750,7 +899,7 @@ describe("refreshAllMediaUsage — collections-only project", () => {
 
     const media = await readMediaJson();
     // Collections are still scanned even when the project has no pages dir.
-    assert.deepEqual(media.files.find((f) => f.id === COLL_IMG).usedIn, ["collection:news/hello"]);
+    assert.deepEqual(media.files.find((f) => f.id === COLL_IMG).usedIn, ["collection:uuid-hello"]);
     assert.match(result.message, /1 collection items/);
   });
 });
@@ -811,7 +960,7 @@ describe("richtext-embedded media", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === RICH);
-    assert.deepEqual(hero.usedIn, ["article"], "the variant path should match the record via recordMediaPaths");
+    assert.deepEqual(hero.usedIn, ["page:article"], "the variant path should match the record via recordMediaPaths");
   });
 
   it("refreshAllMediaUsage tracks a richtext-only image (variant path) from a page on disk", async () => {
@@ -820,6 +969,7 @@ describe("richtext-embedded media", () => {
     await fs.writeFile(
       path.join(pagesDir, "news.json"),
       JSON.stringify({
+        uuid: "uuid-news",
         widgets: {
           w1: { settings: { body: '<p><img src="/uploads/images/hero-large.jpg"></p>' } },
         },
@@ -832,7 +982,7 @@ describe("richtext-embedded media", () => {
 
       const media = await readMediaJson();
       const hero = media.files.find((f) => f.id === RICH);
-      assert.ok(hero.usedIn.includes("news"), "refresh should mark the richtext-only image as used");
+      assert.ok(hero.usedIn.includes("page:uuid-news"), "refresh should mark the richtext-only image as used");
     } finally {
       await fs.remove(path.join(pagesDir, "news.json"));
     }
@@ -863,7 +1013,7 @@ describe("richtext-embedded media", () => {
     // record (hero-large does too), so the image is tracked.
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === RICH);
-    assert.deepEqual(hero.usedIn, ["multi"]);
+    assert.deepEqual(hero.usedIn, ["page:multi"]);
   });
 });
 
@@ -894,8 +1044,8 @@ describe("Concurrent updates (race-condition safety)", () => {
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
     // Both pages should be tracked — neither should be lost
-    assert.ok(hero.usedIn.includes("home"), "home should be tracked");
-    assert.ok(hero.usedIn.includes("about"), "about should be tracked");
+    assert.ok(hero.usedIn.includes("page:home"), "home should be tracked");
+    assert.ok(hero.usedIn.includes("page:about"), "about should be tracked");
     assert.equal(hero.usedIn.length, 2);
   });
 
@@ -914,8 +1064,8 @@ describe("Concurrent updates (race-condition safety)", () => {
 
     const media = await readMediaJson();
     const logo = media.files.find((f) => f.id === IMG2);
-    assert.ok(logo.usedIn.includes("home"), "page usage should be tracked");
-    assert.ok(logo.usedIn.includes("global:header"), "global usage should be tracked");
+    assert.ok(logo.usedIn.includes("page:home"), "page usage should be tracked");
+    assert.ok(logo.usedIn.includes("global:root:header"), "global usage should be tracked");
     assert.equal(logo.usedIn.length, 2);
   });
 });
@@ -957,7 +1107,7 @@ describe("File asset usage tracking", () => {
 
     const media = await readMediaJson();
     const pdf = media.files.find((f) => f.id === FILE1);
-    assert.deepEqual(pdf.usedIn, ["home"]);
+    assert.deepEqual(pdf.usedIn, ["page:home"]);
   });
 
   it("tracks file asset inside a link object (copy-URL-to-link workflow)", async () => {
@@ -979,7 +1129,7 @@ describe("File asset usage tracking", () => {
 
     const media = await readMediaJson();
     const pdf = media.files.find((f) => f.id === FILE1);
-    assert.deepEqual(pdf.usedIn, ["resources"]);
+    assert.deepEqual(pdf.usedIn, ["page:resources"]);
   });
 
   it("tracks image inside a link object href", async () => {
@@ -1001,7 +1151,7 @@ describe("File asset usage tracking", () => {
 
     const media = await readMediaJson();
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.deepEqual(hero.usedIn, ["gallery"]);
+    assert.deepEqual(hero.usedIn, ["page:gallery"]);
   });
 
   it("tracks file asset inside a block-level link object", async () => {
@@ -1027,7 +1177,7 @@ describe("File asset usage tracking", () => {
 
     const media = await readMediaJson();
     const pdf = media.files.find((f) => f.id === FILE1);
-    assert.deepEqual(pdf.usedIn, ["docs"]);
+    assert.deepEqual(pdf.usedIn, ["page:docs"]);
   });
 
   it("tracks file asset in global widget link object", async () => {
@@ -1044,7 +1194,7 @@ describe("File asset usage tracking", () => {
 
     const media = await readMediaJson();
     const pdf = media.files.find((f) => f.id === FILE1);
-    assert.deepEqual(pdf.usedIn, ["global:header"]);
+    assert.deepEqual(pdf.usedIn, ["global:root:header"]);
   });
 
   it("ignores non-media strings inside link objects", async () => {
@@ -1078,7 +1228,7 @@ describe("File asset usage tracking", () => {
     });
 
     const media1 = await readMediaJson();
-    assert.deepEqual(media1.files.find((f) => f.id === FILE1).usedIn, ["home"]);
+    assert.deepEqual(media1.files.find((f) => f.id === FILE1).usedIn, ["page:home"]);
 
     // Second save — link changed to external URL
     await updatePageMediaUsage(PROJECT_ID, "home", {
@@ -1113,7 +1263,7 @@ describe("refreshAllMediaUsageFromDir (dir-explicit core)", () => {
     await fs.ensureDir(explicitPagesDir);
     await fs.writeFile(
       path.join(explicitPagesDir, "scratch-page.json"),
-      JSON.stringify({ widgets: { w1: { settings: { image: "/uploads/images/hero.jpg" } } } }),
+      JSON.stringify({ uuid: "uuid-scratch", widgets: { w1: { settings: { image: "/uploads/images/hero.jpg" } } } }),
     );
 
     const result = await refreshAllMediaUsageFromDir({
@@ -1126,7 +1276,7 @@ describe("refreshAllMediaUsageFromDir (dir-explicit core)", () => {
     // scratch-page lives ONLY under the explicit dir, so this exact match fails if the
     // core ignored projectDir and read the folderName path (getProjectDir) instead.
     const hero = media.files.find((f) => f.id === IMG1);
-    assert.deepEqual(hero.usedIn, ["scratch-page"]);
+    assert.deepEqual(hero.usedIn, ["page:uuid-scratch"]);
     const logo = media.files.find((f) => f.id === IMG2);
     assert.deepEqual(logo.usedIn, []);
   });

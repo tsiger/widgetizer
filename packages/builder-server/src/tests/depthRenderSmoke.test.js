@@ -216,8 +216,8 @@ async function seedProjectScaffold() {
   // Media metadata: hero (no `sizes` → image tag falls back to path basename) + favicon.
   await writeMediaFile(PROJECT_ID, {
     files: [
-      { id: "hero", filename: "hero.jpg", type: "image/jpeg", path: "/uploads/images/hero.jpg", width: 200, height: 150, usedIn: ["news/alpha"] },
-      { id: "fav", filename: "favicon.svg", type: "image/svg+xml", path: "/uploads/images/favicon.svg", usedIn: ["theme"] },
+      { id: "hero", filename: "hero.jpg", type: "image/jpeg", path: "/uploads/images/hero.jpg", width: 200, height: 150, usedIn: ["page:news/alpha"] },
+      { id: "fav", filename: "favicon.svg", type: "image/svg+xml", path: "/uploads/images/favicon.svg", usedIn: ["page:theme"] },
     ],
   });
 }
