@@ -1159,6 +1159,12 @@ Test each control type wherever it appears: widget settings, collection forms, S
 - [ ] MEDIA-004 - Upload several supported files together.
   Expected: Batch/progress feedback appears.
 
+- [ ] MEDIA-004B - Upload images named `filename_like_that.jpg`, `My Photo 01.JPG`, `logo (final)_v2.png`, `Café déjà vu.png` and `東京.png`.
+  Expected: They are stored as `filename-like-that.jpg`, `my-photo-01.jpg`, `logo-final-v2.png`, `cafe-deja-vu.png` and `image.png` — words kept, one hyphen between them, everything lower case. The Media library still shows each file's own name as uploaded, accents included.
+
+- [ ] MEDIA-004C - Upload an image with a very long sentence as its name, then use it in a widget and export.
+  Expected: The stored name is cut at about 60 characters on a word boundary, the image renders in preview and the exported page, and the file is in the export's `assets/images`.
+
 - [ ] MEDIA-005 - Upload an unsupported `.txt` or `.exe` file.
   Expected: Upload is rejected with a clear reason.
 

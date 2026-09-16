@@ -501,6 +501,32 @@ describe("uploadProjectMedia", () => {
     assert.ok(processed.uploaded, "Should have uploaded timestamp");
   });
 
+  it("does not hand out a name that would overwrite a legacy upper-case extension", async () => {
+    // Stored names are lower case now, but older uploads kept the name's own case —
+    // and on Windows/macOS `photo.JPG` and `photo.jpg` are the same file.
+    const imgDir = getProjectImagesDir(PROJECT_FOLDER);
+    const legacyPath = path.join(imgDir, "photo.JPG");
+    const legacyBuffer = await createTestJpeg(120, 90);
+    await fs.writeFile(legacyPath, legacyBuffer);
+
+    const uploadBuffer = await createTestJpeg(300, 200);
+    const res = await callController(uploadProjectMedia, {
+      params: { projectId: PROJECT_ID },
+      files: [
+        {
+          originalname: "PHOTO.JPG",
+          mimetype: "image/jpeg",
+          size: uploadBuffer.length,
+          buffer: uploadBuffer,
+        },
+      ],
+    });
+
+    assert.equal(res._status, 201);
+    assert.equal(res._json.processedFiles[0].path, "/uploads/images/photo-1.jpg");
+    assert.deepEqual(await fs.readFile(legacyPath), legacyBuffer, "the existing file must be untouched");
+  });
+
   it("generates resized versions for images larger than size thresholds", async () => {
     // Create a large image (2000x1500) that should generate multiple sizes
     const largeBuffer = await createTestJpeg(2000, 1500);

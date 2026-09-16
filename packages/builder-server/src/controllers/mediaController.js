@@ -3,7 +3,7 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import sharp from "sharp";
-import slugify from "slugify";
+import { normalizeUploadName } from "../utils/uploadFileName.js";
 import DOMPurify from "isomorphic-dompurify";
 import { getThemeJsonPath } from "../config.js";
 import { LIMIT_KEYS } from "@widgetizer/core/adapters";
@@ -265,32 +265,36 @@ export async function uploadProjectMedia(req, res) {
     // dedup against the adapter's existing keys (+ names assigned this request).
     // Tests pass file.filename directly, bypassing this.
     const listedNames = {};
-    async function uniqueName(subdir, originalname) {
+    async function uniqueName(subdir, originalName) {
       if (!listedNames[subdir]) {
         const keys = await Promise.resolve(assetStorage.list(scope, `${subdir}/`)).catch(() => []);
-        listedNames[subdir] = new Set(keys.map((k) => path.basename(k)));
+        listedNames[subdir] = new Set(keys.map((k) => path.basename(k).toLowerCase()));
       }
       const taken = listedNames[subdir];
-      const decoded = decodeFileName(originalname);
-      const ext = path.extname(decoded);
-      let base = slugify(path.basename(decoded, ext), { lower: true, strict: true, trim: true }) || "file";
-      if (base.length > 100) base = base.slice(0, 100);
+      const normalized = normalizeUploadName(originalName, { fallback: subdir === "files" ? "file" : "image" });
+      const ext = path.extname(normalized);
+      const base = path.basename(normalized, ext);
       let name = `${base}${ext}`;
       let counter = 1;
-      while (taken.has(name)) name = `${base}-${counter++}${ext}`;
-      taken.add(name);
+      // Case-insensitively: on Windows/macOS a legacy `photo.JPG` IS `photo.jpg`, so a
+      // case-sensitive check would hand out a name that overwrites the existing file.
+      while (taken.has(name.toLowerCase())) name = `${base}-${counter++}${ext}`;
+      taken.add(name.toLowerCase());
       return name;
     }
 
     const prepared = [];
     for (const file of files) {
       const subdir = getMediaCategory(file.mimetype) === "file" ? "files" : "images";
-      const filename = file.filename || (await uniqueName(subdir, file.originalname));
-      prepared.push({ file, subdir, filename });
+      // Multer hands the name over as latin1 bytes; decode once so the stored
+      // "original name" is the real one, not mojibake.
+      const originalName = decodeFileName(file.originalname);
+      const filename = file.filename || (await uniqueName(subdir, originalName));
+      prepared.push({ file, subdir, filename, originalName });
     }
 
     // Process files in parallel instead of sequentially
-    const filePromises = prepared.map(async ({ file, subdir, filename }) => {
+    const filePromises = prepared.map(async ({ file, subdir, filename, originalName }) => {
       try {
         // Check file size against limit
         const maxSizeMB = maxImageSizeMB || 5;
@@ -300,7 +304,7 @@ export async function uploadProjectMedia(req, res) {
           return {
             success: false,
             file: {
-              originalName: file.originalname,
+              originalName,
               reason: `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds limit of ${maxSizeMB}MB.`,
               sizeBytes: file.size,
             },
@@ -319,7 +323,7 @@ export async function uploadProjectMedia(req, res) {
         const fileInfo = {
           id: fileId,
           filename,
-          originalName: file.originalname,
+          originalName,
           type: file.mimetype,
           size: file.size,
           uploaded: new Date().toISOString(),
@@ -342,7 +346,7 @@ export async function uploadProjectMedia(req, res) {
             return {
               success: false,
               file: {
-                originalName: file.originalname,
+                originalName,
                 reason: `Image dimensions (${metadata.width}x${metadata.height}) exceed maximum of ${10_000}px.`,
                 sizeBytes: file.size,
               },
@@ -427,11 +431,11 @@ export async function uploadProjectMedia(req, res) {
           file: fileInfo,
         };
       } catch (error) {
-        console.error(`Failed to process file ${file.originalname}:`, error);
+        console.error(`Failed to process file ${originalName}:`, error);
         return {
           success: false,
           file: {
-            originalName: file.originalname,
+            originalName,
             reason: `Processing failed: ${error.message}`,
           },
         };

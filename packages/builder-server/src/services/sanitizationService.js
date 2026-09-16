@@ -97,8 +97,8 @@ function sanitizeLink(linkObj) {
 // `<img src="...">` with the value's basename UNescaped (src/core/tags/imageTag.js), so any
 // quote, `<`, `>`, whitespace, backslash, `:` or control char must never survive — otherwise a
 // value like `/uploads/images/x" onerror="alert(1).jpg` breaks out of the src attribute (XSS).
-// Upload filenames are `slugify(strict)` → `[a-z0-9-]` + extension, so this never blanks a real
-// upload; it also covers theme asset paths like `/assets/logo.svg`.
+// Upload filenames go through `normalizeUploadName` → `[a-z0-9-]` + a lower-case extension, so
+// this never blanks a real upload; it also covers theme asset paths like `/assets/logo.svg`.
 const SAFE_IMAGE_PATH_RE = /^\/[A-Za-z0-9._/-]+$/;
 
 /**

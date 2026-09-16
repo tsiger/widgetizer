@@ -1,6 +1,6 @@
 # Future: Roadmap — eight items, built in series
 
-> **Status: order decided 2026-09-09, revised 2026-09-15. Stages 0–3, 5 and 6 shipped on branch `0.9.10` (groundwork and breadcrumbs 2026-09-12, pagination 2026-09-14, structured data, undo history `e4379a50` and the "Widgetizer Desktop" rename `8fae65c5` 2026-09-15).** Revised order: stages 5 → 6 → 7 first, then the open minor fixes and hands-on testing, then multilang (stage 4) from a clean slate. **Next: stage 7, upload file names** — settle its open questions (§Stage 7) before writing code. Nothing is urgent; each stage is finished and shipped before the next starts, and each lands groundwork the later ones use instead of rewriting. This page is the entry point — start here, then open the stage's own doc.
+> **Status: order decided 2026-09-09, revised 2026-09-15. Stages 0–3 and 5–7 shipped on branch `0.9.10` (groundwork and breadcrumbs 2026-09-12, pagination 2026-09-14, structured data, undo history `e4379a50` and the "Widgetizer Desktop" rename `8fae65c5` 2026-09-15).** Revised order: stages 5 → 6 → 7 first, then the open minor fixes and hands-on testing, then multilang (stage 4) from a clean slate. Stage 7 (upload file names) was built 2026-09-16. **Next: the open minor fixes and hands-on testing, then multilang.** Nothing is urgent; each stage is finished and shipped before the next starts, and each lands groundwork the later ones use instead of rewriting. This page is the entry point — start here, then open the stage's own doc.
 
 | stage | what ships | design doc | what it lands for later stages |
 |---|---|---|---|
@@ -11,7 +11,7 @@
 | **4. Multilang** | Per-language pages in one project, language folders, translation groups, hreflang, switcher. | `future-multilang-design.md` (decisions) + `future-multilang-implementation-plan.md` (steps) | — |
 | **5. Undo history** | Undo survives saves (manual and autosave); rapid edits to one setting coalesce into one step; the step limit goes up. Bug-fix sized, editor stores only. | §Stage 5 on this page | — (independent of the other stages; last only because nothing waits on it) |
 | **6. Rename to "Widgetizer Desktop"** | The names people read in the OSS app become "Widgetizer Desktop" — window and dialog titles, loading and error screens, About box, sidebar footer, README, store listing. Anything that affects how the app works (`productName`, installer file name, `appId`, data and install folders) stays `Widgetizer`. | §Stage 6 on this page | — (independent; can be done at any point, ideally with a release) |
-| **7. Upload file names** | Uploaded media get better file names than today's cleaned-up original name. What "better" means is not decided yet. | §Stage 7 on this page | — (independent; overlaps with image optimization, which changes extensions) |
+| **7. Upload file names** | Uploaded media keep their words: one hyphen between them, lower case, transliterated, cut at 60 characters. | §Stage 7 on this page | — (independent; overlaps with image optimization, which changes extensions) |
 
 ## Reading order when picking this up
 
@@ -47,19 +47,21 @@ Done when: a fresh install shows "Widgetizer Desktop" everywhere a user can see 
 
 ## Stage 7 — Upload file names (independent)
 
-Added 2026-09-15; the goal is agreed, the approach is not. Uploaded media keep a mechanical version of whatever name the file had on the user's computer, and that name ends up in the published image URL.
+Added 2026-09-15, built 2026-09-16. Uploaded media used to lose the words in their names: the old step slugified with `strict`, which DELETES anything that is not a letter or digit rather than separating on it, so `filename_like_that.jpg` became `filenamelikethat.jpg` and `IMG_4032.jpg` became `img4032.jpg`.
 
-How it works today — `uniqueName` in `packages/builder-server/src/controllers/mediaController.js`:
+**As built** — `normalizeUploadName` (`packages/builder-server/src/utils/uploadFileName.js`), used by the upload pre-pass in `mediaController`:
 
-- The original name is slugified (lower-case, `strict`), so anything that isn't a Latin letter or digit is dropped. A name with no Latin characters (`東京.png`) becomes `file.png`.
-- It is cut at 100 characters, and a clash gets `-1`, `-2`, … before the extension.
-- Camera and AI-tool names survive as noise: `IMG_4032.jpg` → `img_4032.jpg`, `ChatGPT Image Sep 9, 2026, 10_22_31 AM.png` → `chatgpt-image-sep-9-2026-10_22_31-am.png`.
+- Every non-letter, non-digit becomes one hyphen, collapsed, with no hyphen left at either end: `logo (final)_v2.svg` → `logo-final-v2.svg`, `hero.v2.png` → `hero-v2.png`, `invoice_2026_09_15_client#4412.pdf` → `invoice-2026-09-15-client-4412.pdf`.
+- Name and extension are lower-cased; accents and other scripts are transliterated by `slugify`: `Café déjà vu.png` → `cafe-deja-vu.png`, `Привет мир.png` → `privet-mir.png`.
+- A name left empty (a script `slugify` cannot transliterate, e.g. CJK, or emoji only) falls back to `image` in `images/` and `file` in `files/`, then the existing `-1`, `-2` dedupe applies.
+- Cut at 60 characters on a hyphen boundary (mid-word only when there is no boundary past 60%). Windows' 260-character path limit leaves room for ~155, so 60 is a readability choice, not a technical one.
+- Input is normalized to NFC first, so a decomposed accent (macOS filenames) is part of its letter rather than a separator: both forms of `Müller.png` give `muller.png`.
+- Resized copies are unchanged (`hero-thumb.jpg`) and existing uploads are never renamed; the `-1`, `-2` dedupe now compares case-insensitively, so a legacy `photo.JPG` makes the next upload `photo-1.jpg` instead of a `photo.jpg` that would overwrite it on Windows and macOS.
+- Separately fixed: the uploaded name is now decoded from multer's latin1 bytes before being stored as `originalName`, which used to save mojibake (`東京.png` → `æ±äº¬.png`).
 
-Questions to settle before building:
+**Why the stored name stays ASCII.** Tested 2026-09-16 by bypassing the normalizer and uploading `東京.png` and a Greek-named file: upload, thumbnails, the media route (percent-encoded) and the site-identity logo all worked, and the JSON-LD URL was correctly encoded. But a widget image with such a name renders the placeholder and never reaches the export — `sanitizationService`'s `SAFE_IMAGE_PATH_RE` allows `[A-Za-z0-9._/-]` only, because `{% image %}` writes `src` unescaped and an unfiltered name is an XSS sink. Allowing non-ASCII stored names therefore means moving that boundary from an allowlist to escaping at every output — a security change, not a naming one. Not done.
 
-- What a good name is (transliterated original, alt text, page or project name, something else) and whether users can rename a file afterwards.
-- What renaming does to files already in use — every stored `/uploads/images/…` path (page and global widget settings, collection items, the site identity logo) and media usage tracking would have to follow.
-- How it interacts with image optimization (`future-image-optimization.md`), which would convert uploads to WebP and so change the extension anyway.
+**Open, if it ever comes up:** renaming a file after upload (every reference — pages, collection items, the identity logo, theme settings — would have to move with it; media usage tracking already knows where each file is used), and whether tool/camera prefixes (`ChatGPT Image …`, `Screenshot … at …`) should be stripped rather than kept verbatim.
 
 ## Rules that hold across all stages
 
