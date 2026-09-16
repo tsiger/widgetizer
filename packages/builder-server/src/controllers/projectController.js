@@ -14,7 +14,7 @@ import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
-import { stripHtmlTags, stripHtmlToText } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { normalizeSiteIdentity } from "@widgetizer/core/siteIdentity";
@@ -48,7 +48,7 @@ function isOptionalString(value) {
 
 function sanitizeOptionalText(value) {
   if (value === undefined) return undefined;
-  return value && value.trim() !== "" ? stripHtmlTags(value.trim()) : "";
+  return value && value.trim() !== "" ? stripHtmlToText(value.trim()) : "";
 }
 
 /**
@@ -423,12 +423,12 @@ export async function createProject(req, res) {
       folderName, // Folder identifier
       name: resolvedName,
       description,
-      siteTitle: siteTitle && siteTitle.trim() !== "" ? stripHtmlTags(siteTitle.trim()) : "",
+      siteTitle: siteTitle && siteTitle.trim() !== "" ? stripHtmlToText(siteTitle.trim()) : "",
       theme,
       themeVersion, // Version that was installed
       preset: preset || null, // Track which preset was used
       receiveThemeUpdates: receiveThemeUpdates ?? false, // Opt-in flag (default: off)
-      siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlTags(siteUrl.trim()) : "",
+      siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlToText(siteUrl.trim()) : "",
       cleanUrls: cleanUrls ?? false, // internal links + SEO URLs without .html (extensionless hosts)
       siteIdentity,
       created: new Date().toISOString(),

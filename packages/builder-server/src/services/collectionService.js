@@ -34,7 +34,7 @@ import {
   sanitizeCollectionItemData,
   sanitizeDateValue,
   sanitizeImagePath,
-  stripHtmlTags,
+  stripHtmlToText,
 } from "./sanitizationService.js";
 
 const SLUG_RE = /^[a-z0-9-]+$/;
@@ -433,7 +433,7 @@ export async function getCollectionSchema(storage, scope, collectionType) {
  * canonical_url, robots); `og_type`/`twitter_card` are non-UI defaults (items
  * are content, so `og_type` defaults to "article"). With `sanitize`, the
  * author-editable text fields are stripped of HTML — parity with the page SEO
- * save path (pageController runs the same `stripHtmlTags`).
+ * save path (pageController runs the same `stripHtmlToText`).
  *
  * @param {object} rawSeo - partial/raw seo object (may be undefined)
  * @param {{ sanitize?: boolean }} [opts]
@@ -443,7 +443,7 @@ export function shapeItemSeo(rawSeo, { sanitize = false } = {}) {
   const seo = rawSeo && typeof rawSeo === "object" ? rawSeo : {};
   const text = (v) => {
     const s = typeof v === "string" ? v : "";
-    return sanitize ? stripHtmlTags(s) : s;
+    return sanitize ? stripHtmlToText(s) : s;
   };
   const str = (v, fallback) => (typeof v === "string" && v ? v : fallback);
   return {

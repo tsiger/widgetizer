@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { syncPageMediaUsageOnDelete, syncPageMediaUsageOnWrite } from "../services/mediaUsageService.js";
 import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
 import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -124,9 +124,9 @@ export async function updatePage(req, res) {
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
-      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
-      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
-      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlToText(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlToText(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlToText(pageData.seo.canonical_url);
     }
 
     const { scope } = req;
@@ -448,9 +448,9 @@ export async function createPage(req, res) {
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
-      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
-      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
-      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlToText(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlToText(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlToText(pageData.seo.canonical_url);
     }
 
     // Defensive check: ensure name is not empty after sanitization
@@ -508,9 +508,9 @@ export async function savePageContent(req, res) {
 
     // Defensive sanitization for SEO fields
     if (pageData.seo) {
-      if (pageData.seo.description != null) pageData.seo.description = stripHtmlTags(pageData.seo.description);
-      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlTags(pageData.seo.og_title);
-      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlTags(pageData.seo.canonical_url);
+      if (pageData.seo.description != null) pageData.seo.description = stripHtmlToText(pageData.seo.description);
+      if (pageData.seo.og_title != null) pageData.seo.og_title = stripHtmlToText(pageData.seo.og_title);
+      if (pageData.seo.canonical_url != null) pageData.seo.canonical_url = stripHtmlToText(pageData.seo.canonical_url);
     }
 
     const { scope } = req;

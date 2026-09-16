@@ -15,7 +15,7 @@ import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getDb } from "../db/index.js";
 
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { readMediaFile } from "../services/mediaService.js";
 
 
@@ -507,9 +507,9 @@ export async function updateMediaMetadata(req, res) {
     if (req.scope && projectId !== req.scope.projectId) {
       return res.status(403).json({ error: "Project mismatch" });
     }
-    const alt = stripHtmlTags(req.body.alt);
-    const title = stripHtmlTags(req.body.title);
-    const caption = stripHtmlTags(req.body.caption);
+    const alt = stripHtmlToText(req.body.alt);
+    const title = stripHtmlToText(req.body.title);
+    const caption = stripHtmlToText(req.body.caption);
     // Validate project ownership
     await getProjectFolderName(projectId);
 

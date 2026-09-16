@@ -1,28 +1,39 @@
 import DOMPurify from "isomorphic-dompurify";
 import { sanitizeHref } from "@widgetizer/core/urlSafety";
 
-/**
- * Strip all HTML tags from a string, keeping only the text content.
- * Used for plain-text fields (names, descriptions) to prevent stored XSS
- * without encoding special characters like & or ".
- * @param {string} value - The input string
- * @returns {string} Text with all HTML tags removed
- */
-export function stripHtmlTags(value) {
-  if (typeof value !== "string") return value;
-  return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+// Two passes settle every case seen so far; the cap only bounds crafted input.
+const MAX_STRIP_PASSES = 5;
+
+function stripHtmlOnce(value) {
+  // Escaping `&` first is what keeps this faithful: the parser decodes entities, so
+  // without it `?a=1&copy=2` would come back as `?a=1©=2` and a typed `&lt;b&gt;`
+  // would turn into a real `<b>`. Escaped first, entities in the input survive as the
+  // literal text they were, while actual tags are still parsed and stripped.
+  return DOMPurify.sanitize(value.replaceAll("&", "&amp;"), { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true })
+    .textContent;
 }
 
 /**
- * Strip all HTML tags and return the plain text, with `&`, `<` and `>` kept as
- * typed. stripHtmlTags returns re-serialised HTML instead, so once a tag is
- * present it stores `&amp;` for `&`.
+ * Strip all HTML tags and return the plain text, with `&`, `<` and `>` kept as typed.
+ * Every plain-text field (names, descriptions, SEO text, menu labels, canonical URLs) goes
+ * through this, on the route validator and again in the controller — so the result must be
+ * one that sanitizing again cannot change.
  * @param {string} value - The input string
- * @returns {string} Plain text with all HTML tags removed
+ * @returns {string} Plain text with all HTML tags removed, stable under repeated passes
  */
 export function stripHtmlToText(value) {
   if (typeof value !== "string") return value;
-  return DOMPurify.sanitize(value, { ALLOWED_TAGS: [], RETURN_DOM_FRAGMENT: true }).textContent;
+  // Sanitize to a fixed point. Removing a tag can splice its neighbours into NEW markup
+  // (`Use <<b>name</b>> here` -> `Use <name> here`), so one pass is not stable — and every
+  // field here is sanitized twice (route validator, then controller) and again on each save.
+  let text = value;
+  for (let pass = 0; pass < MAX_STRIP_PASSES; pass++) {
+    const next = stripHtmlOnce(text);
+    if (next === text) return text;
+    text = next;
+  }
+  // Pathological input that never settles: drop the angle brackets so no tag can form.
+  return text.replaceAll("<", "").replaceAll(">", "");
 }
 
 // Safe inline formatting tags/attrs produced by the Tiptap editor. Headings and `<img>`

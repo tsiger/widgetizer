@@ -207,7 +207,7 @@ A project stores who is behind the site — the facts core publishes as structur
 **Controller** (`projectController.js`):
 
 - `createProject` accepts `siteIdentity` (the form sends it on create too, without the logo, which follows once the project exists), and `updateProject` validates it whenever it is sent. Any error → `400 { error: "Invalid business details.", fields }`, and nothing is written.
-- Before validation, `readSiteIdentity` tag-strips only human-readable text (public name, description, price range, street, locality, region, postcode, location label) with `stripHtmlToText`, which returns plain text with `&` kept as typed. URLs, email, telephone and the logo path are validated exactly as sent — `stripHtmlTags` re-serialises through DOMPurify and would rewrite a query string.
+- Before validation, `readSiteIdentity` tag-strips only human-readable text (public name, description, price range, street, locality, region, postcode, location label) with `stripHtmlToText`, which returns plain text with `&` kept as typed. URLs, email, telephone and the logo path are validated exactly as sent — a re-serialising sanitizer would rewrite a query string.
 - A save that sends the identity refreshes its media usage (`updateSiteIdentityMediaUsage`, source `global:site-identity`), so the library won't delete the logo and exports copy it. The full rescan includes it too.
 - Project ZIP export writes `siteIdentity` into the manifest; import keeps only the valid part (`normalizeSiteIdentity(...).value`) and never refuses a project for it; duplicate copies it with the rest of the row.
 

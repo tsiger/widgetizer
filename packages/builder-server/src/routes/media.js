@@ -1,6 +1,6 @@
 import express from "express";
 import { param, body } from "express-validator";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 import {
   getProjectMedia,
@@ -55,9 +55,9 @@ router.put(
   [
     param("projectId").notEmpty(),
     param("fileId").notEmpty(),
-    body("alt").optional().trim().customSanitizer(stripHtmlTags),
-    body("title").optional().trim().customSanitizer(stripHtmlTags),
-    body("caption").optional().trim().customSanitizer(stripHtmlTags),
+    body("alt").optional().trim().customSanitizer(stripHtmlToText),
+    body("title").optional().trim().customSanitizer(stripHtmlToText),
+    body("caption").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   updateMediaMetadata,

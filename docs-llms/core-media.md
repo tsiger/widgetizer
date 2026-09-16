@@ -218,7 +218,7 @@ Browser-native loads (`<img src>`, downloads) and the metadata editor cannot car
 
 ### Metadata Update (`updateMediaMetadata`)
 
-Strips HTML from `alt`/`title`/`caption` (`stripHtmlTags`, also applied as an express-validator sanitizer on the route). **Caption is image-only**: a caption sent for a non-image (e.g. a PDF via the direct API) is stored as `""`, not text (`file.type` must start with `image/`). Persists to the `alt`/`title`/`caption` columns.
+Strips HTML from `alt`/`title`/`caption` (`stripHtmlToText`, also applied as an express-validator sanitizer on the route). **Caption is image-only**: a caption sent for a non-image (e.g. a PDF via the direct API) is stored as `""`, not text (`file.type` must start with `image/`). Persists to the `alt`/`title`/`caption` columns.
 
 ### Deletion (`deleteProjectMedia` / `bulkDeleteProjectMedia`)
 

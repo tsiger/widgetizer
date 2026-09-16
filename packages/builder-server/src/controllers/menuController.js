@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_MENU_ITEMS, MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -51,8 +51,8 @@ function sanitizeMenuItems(items) {
   if (!Array.isArray(items)) return [];
   return items.map((item) => ({
     ...item,
-    label: typeof item.label === "string" ? stripHtmlTags(item.label) : "",
-    link: typeof item.link === "string" ? stripHtmlTags(item.link) : "",
+    label: typeof item.label === "string" ? stripHtmlToText(item.label) : "",
+    link: typeof item.link === "string" ? stripHtmlToText(item.link) : "",
     items: sanitizeMenuItems(item.items),
   }));
 }
@@ -116,8 +116,8 @@ export async function createMenu(req, res) {
   try {
     // Defensive sanitization: strip HTML (route validator also does this,
     // but the controller must be safe even when called directly)
-    const name = stripHtmlTags(req.body.name);
-    const safeDescription = stripHtmlTags(req.body.description) || "";
+    const name = stripHtmlToText(req.body.name);
+    const safeDescription = stripHtmlToText(req.body.description) || "";
 
     // Defensive check: ensure name is not empty after sanitization
     if (!name || typeof name !== "string" || name.trim() === "") {
@@ -208,10 +208,10 @@ export async function updateMenu(req, res) {
     // Defensive sanitization: strip HTML (route validator also does this,
     // but the controller must be safe even when called directly)
     if (menuData.name != null) {
-      menuData.name = stripHtmlTags(menuData.name);
+      menuData.name = stripHtmlToText(menuData.name);
     }
     if (menuData.description != null) {
-      menuData.description = stripHtmlTags(menuData.description) || "";
+      menuData.description = stripHtmlToText(menuData.description) || "";
     }
 
     // Defensive check: ensure name is not empty after sanitization

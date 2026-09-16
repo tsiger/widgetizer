@@ -1,7 +1,7 @@
 import express from "express";
 import { body, param } from "express-validator";
 import * as projectController from "../controllers/projectController.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 
 import { standardJsonParser } from "../middleware/jsonParser.js";
@@ -30,9 +30,9 @@ router.get("/active", projectController.getActiveProject);
 router.post(
   "/",
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
-    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
-    body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
+    body("description").trim().customSanitizer(stripHtmlToText).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
+    body("siteUrl").optional().trim().customSanitizer(stripHtmlToText),
     body("theme").notEmpty().withMessage("A theme is required to create a project."),
     body("preset").optional().isString().trim(),
     optionalBooleanField("receiveThemeUpdates"),
@@ -54,9 +54,9 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Project ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
-    body("description").trim().customSanitizer(stripHtmlTags).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
-    body("siteUrl").optional().trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Project name is required.").isLength({ max: 200 }).withMessage(`Project name must be at most ${200} characters.`),
+    body("description").trim().customSanitizer(stripHtmlToText).isLength({ max: 1000 }).withMessage(`Description must be at most ${1000} characters.`),
+    body("siteUrl").optional().trim().customSanitizer(stripHtmlToText),
     optionalBooleanField("receiveThemeUpdates"),
   ],
   validateRequest,

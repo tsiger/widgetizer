@@ -14,7 +14,7 @@ All incoming data is validated and sanitized before reaching controllers.
 
 - `express-validator` rules on every API route that accepts input
 - `validateRequest` middleware (`packages/builder-server/src/middleware/validateRequest.js`) centralizes the validation-result check (one place, all routes)
-- Plain-text fields (project/page/menu names, descriptions) use `stripHtmlTags()` (`packages/builder-server/src/services/sanitizationService.js`) — a DOMPurify-based sanitizer that strips all HTML while preserving `&`, `"`, `'`
+- Plain-text fields (project/page/menu names, descriptions, SEO text, menu labels and canonical URLs) use `stripHtmlToText()` (`packages/builder-server/src/services/sanitizationService.js`) — DOMPurify with `RETURN_DOM_FRAGMENT` + `textContent`, so all HTML is stripped and `&`, `<`, `>`, `"`, `'` are kept exactly as typed. Sanitizing to a string instead re-serialises, which stored `&amp;` whenever the value also contained a tag (fixed 2026-09-16). Sanitizing runs to a fixed point, so a value survives the route validator, the controller and every later save unchanged — which also means rows saved BEFORE the fix keep their `&amp;` as literal text: re-saving cannot tell old encoding apart from an ampersand entity the user typed, so only retyping the text clears it
 - Widget/block settings and collection-item settings use schema-aware sanitization via `sanitizationService.js` (DOMPurify for richtext, protocol blocking for links, allowlists for image/gallery/table) — see §2
 - Text/textarea fields rely on LiquidJS autoescape (`outputEscape: "escape"`) at render time
 

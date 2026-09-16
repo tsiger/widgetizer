@@ -1,7 +1,7 @@
 import express from "express";
 import { body, param } from "express-validator";
 import * as pageController from "../controllers/pageController.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 
@@ -24,10 +24,10 @@ router.post(
   "/",
   standardJsonParser,
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
-    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   pageController.createPage,
@@ -39,10 +39,10 @@ router.put(
   standardJsonParser,
   [
     param("id").notEmpty().withMessage("Page ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
-    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Page name is required.").isLength({ max: 200 }).withMessage(`Page name must be at most ${200} characters.`),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   pageController.updatePage,
@@ -75,9 +75,9 @@ router.post(
   editorJsonParser,
   [
     param("id").notEmpty().withMessage("Page ID is required."),
-    body("seo.description").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.og_title").optional().trim().customSanitizer(stripHtmlTags),
-    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlTags),
+    body("seo.description").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.og_title").optional().trim().customSanitizer(stripHtmlToText),
+    body("seo.canonical_url").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   pageController.savePageContent,

@@ -1,7 +1,7 @@
 import express from "express";
 import { body, param } from "express-validator";
 import * as menuController from "../controllers/menuController.js";
-import { stripHtmlTags } from "../services/sanitizationService.js";
+import { stripHtmlToText } from "../services/sanitizationService.js";
 import { resolveActiveProject } from "../middleware/resolveActiveProject.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 
@@ -21,8 +21,8 @@ router.get("/:id", [param("id").notEmpty().withMessage("Menu ID is required.")],
 router.post(
   "/",
   [
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu title is required. HTML tags are not allowed.").isLength({ max: 200 }).withMessage(`Menu title must be at most ${200} characters.`),
-    body("description").optional().trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Menu title is required. HTML tags are not allowed.").isLength({ max: 200 }).withMessage(`Menu title must be at most ${200} characters.`),
+    body("description").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   menuController.createMenu,
@@ -33,8 +33,8 @@ router.put(
   "/:id",
   [
     param("id").notEmpty().withMessage("Menu ID is required."),
-    body("name").trim().customSanitizer(stripHtmlTags).notEmpty().withMessage("Menu title is required. HTML tags are not allowed.").isLength({ max: 200 }).withMessage(`Menu title must be at most ${200} characters.`),
-    body("description").optional().trim().customSanitizer(stripHtmlTags),
+    body("name").trim().customSanitizer(stripHtmlToText).notEmpty().withMessage("Menu title is required. HTML tags are not allowed.").isLength({ max: 200 }).withMessage(`Menu title must be at most ${200} characters.`),
+    body("description").optional().trim().customSanitizer(stripHtmlToText),
   ],
   validateRequest,
   menuController.updateMenu,
