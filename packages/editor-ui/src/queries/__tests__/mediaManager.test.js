@@ -50,7 +50,7 @@ describe("mediaManager", () => {
     );
   });
 
-  it("updates cached media after a successful upload", async () => {
+  it("puts freshly uploaded files at the top of the cached list (newest first, as the server returns them)", async () => {
     const existingData = { files: [{ id: "1", originalName: "existing.jpg" }] };
     const uploadedFile = { id: "2", originalName: "new.jpg" };
 
@@ -70,7 +70,7 @@ describe("mediaManager", () => {
     const cachedAfterUpload = await getProjectMedia("project-1");
 
     expect(uploadResult.processedFiles).toEqual([uploadedFile]);
-    expect(cachedAfterUpload.files).toEqual([...existingData.files, uploadedFile]);
+    expect(cachedAfterUpload.files).toEqual([uploadedFile, ...existingData.files]);
     expect(editorFetchJson).toHaveBeenCalledTimes(1);
     expect(uploadFormData).toHaveBeenCalledTimes(1);
     expect(uploadFormData).toHaveBeenCalledWith("/api/media", expect.anything(), expect.anything());

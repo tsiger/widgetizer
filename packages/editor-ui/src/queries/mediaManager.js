@@ -122,7 +122,7 @@ function updateMediaCache(projectId, newFiles) {
   if (cached && cached.data) {
     const updatedData = {
       ...cached.data,
-      files: [...cached.data.files, ...newFiles],
+      files: [...newFiles, ...cached.data.files],
     };
     mediaCache.set(projectId, {
       data: updatedData,

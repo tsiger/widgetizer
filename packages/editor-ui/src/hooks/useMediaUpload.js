@@ -126,7 +126,9 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
         const processed = result.processedFiles || [];
         const rejected = result.rejectedFiles || [];
 
-        allProcessedFiles.push(...processed);
+        // Newest chunk first, mirroring what the cache (and a reload) will show:
+        // later chunks were uploaded later, so they sort ahead of earlier ones.
+        allProcessedFiles.unshift(...processed);
         allRejectedFiles.push(...rejected);
 
         const processedNames = new Set(processed.map((file) => file.originalName));
@@ -153,7 +155,9 @@ export default function useMediaUpload({ activeProject, showToast, setFiles }) {
           ...file,
           metadata: file.metadata || { alt: "", title: "" },
         }));
-        setFiles((prevFiles) => [...prevFiles, ...newFilesWithMetadata]);
+        // Newest first, the order the server returns — so a fresh upload sits where
+        // it will still be after a reload, not at the bottom of the list.
+        setFiles((prevFiles) => [...newFilesWithMetadata, ...prevFiles]);
       }
 
       const chunkInfo = chunks.length > 1 ? " (processed in batches)" : "";
