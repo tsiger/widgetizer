@@ -18,6 +18,13 @@ import { stripHtmlToText } from "../services/sanitizationService.js";
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { normalizeSiteIdentity } from "@widgetizer/core/siteIdentity";
+import {
+  DEFAULT_LANGUAGE,
+  hasNumericRegion,
+  isRtlLanguage,
+  isValidLanguageCode,
+  normalizeLanguageCode,
+} from "@widgetizer/core/languages";
 import { refreshMediaUsageAfterStructuralChange, updateSiteIdentityMediaUsage } from "../services/mediaUsageService.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
@@ -91,6 +98,63 @@ function readSiteIdentity(raw) {
 
 function siteIdentityRejection(errors) {
   return { error: "Invalid business details.", fields: errors };
+}
+
+function languageRejection(raw) {
+  const code = normalizeLanguageCode(raw);
+  if (isRtlLanguage(code)) {
+    return `Right-to-left languages are not supported yet, so "${code}" cannot be used.`;
+  }
+  if (hasNumericRegion(code)) {
+    return `"${code}" names its country as a number. Use a country code instead, such as "pt-br".`;
+  }
+  const shown = typeof raw === "string" ? raw.trim() : JSON.stringify(raw);
+  return `${shown} is not a valid language code. Use a code like "en" or "pt-br".`;
+}
+
+/**
+ * Read and check the site's languages. `languages` holds only the ADDITIONAL
+ * codes, so an empty array means single-language. Pass `current` on update: the
+ * default language is editable only while the site has one language, because
+ * changing it later moves every page and rewrites every public URL — which a
+ * static export cannot redirect.
+ * @returns {{value?: {defaultLanguage?: string, languages?: string[]}, error?: string}}
+ */
+function readLanguages(updates, current = null) {
+  let defaultLanguage;
+  if (updates.defaultLanguage !== undefined) {
+    defaultLanguage = normalizeLanguageCode(updates.defaultLanguage);
+    if (!defaultLanguage) return { error: "A default language is required." };
+    if (!isValidLanguageCode(defaultLanguage)) return { error: languageRejection(updates.defaultLanguage) };
+  }
+
+  let languages;
+  if (updates.languages !== undefined) {
+    if (!Array.isArray(updates.languages)) return { error: "languages must be an array of language codes." };
+    languages = [];
+    for (const raw of updates.languages) {
+      const code = normalizeLanguageCode(raw);
+      if (!isValidLanguageCode(code)) return { error: languageRejection(raw) };
+      if (!languages.includes(code)) languages.push(code);
+    }
+  }
+
+  const nextDefault = defaultLanguage ?? current?.defaultLanguage ?? DEFAULT_LANGUAGE;
+  const nextLanguages = languages ?? current?.languages ?? [];
+
+  if (nextLanguages.includes(nextDefault)) {
+    return { error: `"${nextDefault}" is already the site's default language.` };
+  }
+
+  // Read against the CURRENT state, not the resulting one: while a project is
+  // single-language, one call may set a new default and add languages at once.
+  if (current && defaultLanguage && defaultLanguage !== current.defaultLanguage && (current.languages?.length ?? 0) > 0) {
+    return {
+      error: "The default language can only be changed while the site has one language. Remove the other languages first.",
+    };
+  }
+
+  return { value: { defaultLanguage, languages } };
 }
 
 /**
@@ -378,6 +442,9 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: "cleanUrls must be a boolean." });
     }
 
+    const { value: languageFields, error: languageError } = readLanguages(req.body);
+    if (languageError) return res.status(400).json({ error: languageError });
+
     // If a folder name is explicitly provided, validate its format. Collisions on
     // either name or folder are no longer hard errors — resolveProjectIdentity
     // disambiguates them with suffixes, matching the import flow.
@@ -431,6 +498,8 @@ export async function createProject(req, res) {
       siteUrl: siteUrl && siteUrl.trim() !== "" ? stripHtmlToText(siteUrl.trim()) : "",
       cleanUrls: cleanUrls ?? false, // internal links + SEO URLs without .html (extensionless hosts)
       siteIdentity,
+      defaultLanguage: languageFields.defaultLanguage ?? DEFAULT_LANGUAGE,
+      languages: languageFields.languages ?? [],
       created: new Date().toISOString(),
       updated: new Date().toISOString(),
     };
@@ -552,6 +621,9 @@ export async function updateProject(req, res) {
       return res.status(400).json({ error: "cleanUrls must be a boolean." });
     }
 
+    const { value: languageFields, error: languageError } = readLanguages(updates, currentProject);
+    if (languageError) return res.status(400).json({ error: languageError });
+
     const sanitizedSiteTitle = sanitizeOptionalText(updates.siteTitle);
     const sanitizedSiteUrl = sanitizeOptionalText(updates.siteUrl);
 
@@ -603,6 +675,8 @@ export async function updateProject(req, res) {
       siteUrl: sanitizedSiteUrl,
       cleanUrls: updates.cleanUrls,
       siteIdentity,
+      defaultLanguage: languageFields.defaultLanguage,
+      languages: languageFields.languages,
       receiveThemeUpdates: updates.receiveThemeUpdates,
     });
 
@@ -915,6 +989,8 @@ export async function exportProject(req, res) {
         siteUrl: project.siteUrl || "",
         cleanUrls: project.cleanUrls || false,
         siteIdentity: project.siteIdentity || {},
+        defaultLanguage: project.defaultLanguage || DEFAULT_LANGUAGE,
+        languages: project.languages || [],
         created: project.created,
         updated: project.updated,
       },
@@ -1156,6 +1232,8 @@ export async function importProject(req, res) {
         }
       }
 
+      const importedLanguages = readLanguages(manifest.project).value ?? {};
+
       // Create new project object (DB insert happens later, after directory setup)
       newProject = {
         id: randomUUID(),
@@ -1170,6 +1248,10 @@ export async function importProject(req, res) {
         siteUrl: manifest.project.siteUrl || "",
         cleanUrls: manifest.project.cleanUrls || false,
         siteIdentity: readSiteIdentity(manifest.project.siteIdentity).value,
+        // An export from another install can carry anything; fall back to a
+        // single-language project rather than importing an unusable code.
+        defaultLanguage: importedLanguages.defaultLanguage ?? DEFAULT_LANGUAGE,
+        languages: importedLanguages.languages ?? [],
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       };

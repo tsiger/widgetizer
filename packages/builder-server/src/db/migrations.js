@@ -149,6 +149,21 @@ const migrations = [
       }
     },
   },
+  {
+    version: 7,
+    description: "Add site languages to projects",
+    up(db) {
+      // The site's own language, separate from the editor's UI language. Every
+      // project has a default; `languages` holds the ADDITIONAL codes, so an
+      // empty array means single-language and existing rows need no backfill.
+      if (!columnExists(db, "projects", "default_language")) {
+        db.exec("ALTER TABLE projects ADD COLUMN default_language TEXT NOT NULL DEFAULT 'en'");
+      }
+      if (!columnExists(db, "projects", "languages")) {
+        db.exec("ALTER TABLE projects ADD COLUMN languages TEXT NOT NULL DEFAULT '[]'");
+      }
+    },
+  },
 ];
 
 export const DEFAULT_TRACKING_TABLE = "_migrations";

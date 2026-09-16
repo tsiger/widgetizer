@@ -111,7 +111,7 @@ Projects can be exported as ZIP files for backup or transfer to another installa
 2.  **Loading Feedback**: A persistent toast notification immediately appears showing "Exporting project..." and remains visible throughout the export process.
 3.  **Backend Processing**: The `exportProject(id)` function sends a `POST` request to `/api/projects/:projectId/export`.
 4.  **ZIP Creation**: The backend creates a ZIP archive containing:
-    - **`project-export.json`**: A manifest file with `formatVersion: "1.1"`, `exportedAt`, `widgetizerVersion`, and a nested `project` object. That nested object includes project metadata such as `name`, `description`, `siteTitle`, `theme`, `themeVersion`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity`, `created`, and `updated`.
+    - **`project-export.json`**: A manifest file with `formatVersion: "1.1"`, `exportedAt`, `widgetizerVersion`, and a nested `project` object. That nested object includes project metadata such as `name`, `description`, `siteTitle`, `theme`, `themeVersion`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity`, `defaultLanguage`, `languages`, `created`, and `updated`.
     - **All project files**: Pages, menus, widgets, uploads, theme.json, collections, and other project assets.
 5.  **Download**: The ZIP file is streamed to the browser and automatically downloaded with a timestamped filename (e.g., `my-project-export-2024-01-15T10-30-00.zip`).
 6.  **Completion**: The loading toast is dismissed and replaced with a success toast.
@@ -135,7 +135,7 @@ Projects can be imported from ZIP files previously exported from Widgetizer.
     - A unique `folderName` is generated (checking existing project metadata in SQLite and existing directories)
     - Files are copied from the temp directory to the new project directory
     - Project metadata is written to SQLite only after successful file copy
-    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls` and `siteIdentity` in addition to the core project fields. An imported identity is never refused: only its valid part is kept.
+    - The imported manifest restores `siteTitle`, `receiveThemeUpdates`, `preset`, `siteUrl`, `cleanUrls`, `siteIdentity` and the site languages in addition to the core project fields. An imported identity is never refused: only its valid part is kept, and a language code this version cannot use falls back to a single English site.
 7.  **Cleanup**: Temporary files are removed on both success and failure.
 8.  **Feedback + Navigation**: A success toast is shown, the modal closes, and the imported project is immediately opened as the active project inside the site workspace.
 
@@ -219,6 +219,25 @@ A project stores who is behind the site — the facts core publishes as structur
 - **Business details** — a tab shown for a local-business category, or whenever one of its fields has an error so a switched category can't hide one: phone, price range, location name, address, and the opening-hours editor (per day Not stated / Closed / Open, up to four ranges, "Add hours" for split shifts).
 - **Logo.** Media and theme requests are scoped to the active project on the server. Editing is always the active project, so the field is the usual image picker plus "Use the Site Icon" (offered when a Site Icon exists and no logo is set). A new project has no media library yet, so the field (`LogoFileInput.jsx`) holds a local image file with a preview, checked against the image types and the media size limit. `ProjectsAdd` creates the project, makes it active, uploads the file with `uploadProjectMedia`, then saves the returned path with `updateProject(id, { name, siteIdentity: { …, logo } })`. If the upload or that save fails, the project is kept and a warning says the logo can be added in Project details.
 - Submit runs `formToIdentity`, which also refuses emptying the primary location while other locations exist (`primaryRequired`): the pruned primary would otherwise be replaced by the next, uneditable location. Any error blocks the save with a toast and per-field messages. The form is `noValidate` so core's rules own the errors, and `MediaDrawer` stops its own submit event, which React would otherwise bubble through the portal into the project form.
+
+---
+
+## 7. Site Languages
+
+A project stores the language its **site** is published in. This is unrelated to the language of the editor interface — setting a site to Greek never switches the admin UI. Two columns hold it (migration v7, [Database](core-database.md)):
+
+- `default_language` — the site's own language, `en` for existing and new projects. Reaches controllers as `project.defaultLanguage`.
+- `languages` — a JSON array of the **additional** codes, `[]` by default, read back as `project.languages`. Empty means single-language, so no existing project needed a backfill.
+
+**Rules** (`packages/core/src/utils/languages.js`, shared by the API and the form the way `urlSafety` is):
+
+- Codes are simple ISO 639-1 in the UI (`en`, `el`), but `LANGUAGE_CODE_RE` (`^[a-z]{2}(-[a-z0-9]{2,8})?$`) accepts a wider BCP 47 subset, so a regional code like `pt-br` needs no migration later. Stored lowercase; `hreflangCase` emits the canonical `pt-BR` for `lang` / `hreflang` output.
+- Right-to-left languages are refused by the API, not merely hidden from the picker — they need `dir="rtl"` plumbing and theme work that is not in this version. The *effective* script decides, so `pa` and `pa-in` are accepted while `pa-arab` and `pa-pk` are not — a region can imply a script the language does not default to (and the reverse: `sd` is refused, `sd-in` is not). A region written as a UN M.49 number (`pa-586`) is refused rather than guessed at.
+- The additional list is deduplicated and may not contain the default language.
+- **The default language can only be changed while the project has no additional languages.** Changing it later would move every page between the root and its language folder and change every public URL, which a static export cannot redirect.
+- `SUPPORTED_LANGUAGES` is the picker's list, each language in its own name (`nativeLanguageName`).
+
+**Where it applies.** `createProject` and `updateProject` validate and store both fields (any rejection → `400 { error }`, nothing written); the export manifest carries them and import keeps them only when valid, falling back to a single English site; duplicate copies them with the rest of the row. In the editor, `projectStore` exposes `useDefaultLanguage()`, `useExtraLanguages()` and `useIsMultilang()` so language-aware UI gates on one selector.
 
 ---
 

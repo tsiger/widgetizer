@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { getDb } from "../index.js";
 
 /**
@@ -39,8 +40,8 @@ export function getProjectFolderName(projectId) {
 export function createProject(project) {
   const db = getDb();
   db.prepare(`
-    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, last_theme_update_at, last_theme_update_version, created, updated)
-    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+    INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, default_language, languages, last_theme_update_at, last_theme_update_version, created, updated)
+    VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @defaultLanguage, @languages, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
   `).run({
     id: project.id,
     folderName: project.folderName,
@@ -54,6 +55,8 @@ export function createProject(project) {
     siteUrl: project.siteUrl || "",
     cleanUrls: project.cleanUrls ? 1 : 0,
     siteIdentity: JSON.stringify(project.siteIdentity || {}),
+    defaultLanguage: project.defaultLanguage || DEFAULT_LANGUAGE,
+    languages: JSON.stringify(project.languages || []),
     lastThemeUpdateAt: project.lastThemeUpdateAt || null,
     lastThemeUpdateVersion: project.lastThemeUpdateVersion || null,
     created: project.created,
@@ -98,6 +101,12 @@ function updateProjectStatements(db, id, updates) {
     siteIdentity: updates.siteIdentity !== undefined
       ? JSON.stringify(updates.siteIdentity || {})
       : (current.site_identity ?? "{}"),
+    defaultLanguage: updates.defaultLanguage !== undefined
+      ? (updates.defaultLanguage || DEFAULT_LANGUAGE)
+      : (current.default_language ?? DEFAULT_LANGUAGE),
+    languages: updates.languages !== undefined
+      ? JSON.stringify(updates.languages || [])
+      : (current.languages ?? "[]"),
     lastThemeUpdateAt: updates.lastThemeUpdateAt !== undefined ? updates.lastThemeUpdateAt : current.last_theme_update_at,
     lastThemeUpdateVersion: updates.lastThemeUpdateVersion !== undefined ? updates.lastThemeUpdateVersion : current.last_theme_update_version,
     updated: updates.updated || new Date().toISOString(),
@@ -117,6 +126,8 @@ function updateProjectStatements(db, id, updates) {
       site_url = @siteUrl,
       clean_urls = @cleanUrls,
       site_identity = @siteIdentity,
+      default_language = @defaultLanguage,
+      languages = @languages,
       last_theme_update_at = @lastThemeUpdateAt,
       last_theme_update_version = @lastThemeUpdateVersion,
       updated = @updated
@@ -322,6 +333,17 @@ function parseSiteIdentity(raw) {
 /**
  * Convert a database row to the project shape controllers expect.
  */
+/** Stored as a JSON array of the ADDITIONAL codes; anything unreadable means none. */
+function parseLanguages(raw) {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((code) => typeof code === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
 function rowToProject(row) {
   const project = {
     id: row.id,
@@ -336,6 +358,8 @@ function rowToProject(row) {
     siteUrl: row.site_url,
     cleanUrls: !!row.clean_urls,
     siteIdentity: parseSiteIdentity(row.site_identity),
+    defaultLanguage: row.default_language || DEFAULT_LANGUAGE,
+    languages: parseLanguages(row.languages),
     created: row.created,
     updated: row.updated,
   };

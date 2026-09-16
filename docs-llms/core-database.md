@@ -63,6 +63,7 @@ Migrations live in `db/migrations.js` as an ordered list, each wrapped in a tran
 - **v3 — Add `caption` to `media_files`.** Guarded `ALTER` (`columnExists` check), so it is a no-op on databases that already have the column.
 - **v4 — Backfill `projects.owner_id`.** Forward-only, idempotent: ensures `owner_id` (and its index, via `CREATE INDEX IF NOT EXISTS`) is present on every database.
 - **v5 — Add `clean_urls` to `projects`.** Guarded `ALTER TABLE projects ADD COLUMN clean_urls INTEGER DEFAULT 0`: the project's Clean URLs setting (extensionless internal links, canonicals, sitemap and robots).
+- **v7 — Add site languages to `projects`.** Guarded `ALTER TABLE`s adding `default_language TEXT NOT NULL DEFAULT 'en'` and `languages TEXT NOT NULL DEFAULT '[]'`: the site's own language and the JSON array of additional codes. `projectRepository` reads them back as `defaultLanguage` / `languages`, and unreadable JSON reads as `[]`. Rules in [Project Management](core-projects.md#7-site-languages).
 - **v6 — Add `site_identity` to `projects`.** Guarded `ALTER TABLE projects ADD COLUMN site_identity TEXT NOT NULL DEFAULT '{}'`: the project's site identity and business details as JSON, validated by `normalizeSiteIdentity` before every write. `projectRepository` parses it back to `siteIdentity`, and unreadable JSON reads as `{}`. Shape in [Project Management](core-projects.md#6-site-identity-and-business-details).
 
 > The guarded `ALTER`s and the v4 backfill keep databases from different histories convergent on the same final schema.

@@ -455,6 +455,8 @@ describe("readProjectsData / writeProjectsData", () => {
         siteUrl: "",
         cleanUrls: false,
         siteIdentity: { category: "bakery", text: { publicName: "Crumbly" } },
+        defaultLanguage: "en",
+        languages: [],
         created: now,
         updated: now,
       }],
@@ -1925,6 +1927,183 @@ describe("importProject", () => {
     );
     assert.ok(copiedIndex.uuid, "the rebuild stamps a uuid on the copied page");
     assert.deepEqual(banner.usedIn, [`page:${copiedIndex.uuid}`]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Site languages
+// ---------------------------------------------------------------------------
+
+describe("site languages", () => {
+  beforeEach(async () => {
+    await resetProjects();
+  });
+
+  /** Update a project, asserting only on the language fields. */
+  const update = (project, body) =>
+    callController(updateProject, { params: { id: project.id }, body: { name: project.name, ...body } });
+
+  it("defaults a new project to English with no other languages", async () => {
+    const project = await createTestProject("Default Language");
+    assert.equal(project.defaultLanguage, "en");
+    assert.deepEqual(project.languages, []);
+  });
+
+  it("stores a default language, lowercased", async () => {
+    const project = await createTestProject("Greek Site", { defaultLanguage: "EL" });
+    assert.equal(project.defaultLanguage, "el");
+    assert.equal(projectRepo.getProjectById(project.id).defaultLanguage, "el");
+  });
+
+  it("accepts a regional code", async () => {
+    const project = await createTestProject("Brazil", { defaultLanguage: "pt-br" });
+    assert.equal(project.defaultLanguage, "pt-br");
+  });
+
+  it("rejects a malformed code", async () => {
+    for (const code of ["eng", "e", "en_US", "", 42]) {
+      const res = await callController(createProject, {
+        body: { name: `Bad ${code}`, description: "", theme: TEST_THEME_ID, defaultLanguage: code },
+      });
+      assert.equal(res._status, 400, `expected a rejection for ${JSON.stringify(code)}`);
+    }
+    assert.equal(projectRepo.getAllProjects().length, 0);
+  });
+
+  it("rejects a right-to-left language, naming it", async () => {
+    const res = await callController(createProject, {
+      body: { name: "Arabic", description: "", theme: TEST_THEME_ID, defaultLanguage: "ar" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /right-to-left/i);
+  });
+
+  it("rejects a right-to-left language among the additional ones", async () => {
+    const project = await createTestProject("No RTL Here");
+    // pa-pk carries no script subtag, but Punjabi is written in Arabic there.
+    for (const code of ["ks", "pa-arab", "pa-pk"]) {
+      const res = await update(project, { languages: [code] });
+      assert.equal(res._status, 400, `expected ${code} to be refused`);
+      assert.match(res._json.error, /right-to-left/i);
+    }
+    assert.deepEqual(projectRepo.getProjectById(project.id).languages, []);
+
+    const accepted = await update(project, { languages: ["pa-in"] });
+    assert.equal(accepted._status, 200, "the same language stays available where it is left-to-right");
+    assert.deepEqual(accepted._json.languages, ["pa-in"]);
+  });
+
+  it("rejects a code whose shape hides its direction", async () => {
+    const project = await createTestProject("Odd Subtags");
+
+    // A four-character VARIANT is not a script, so Arabic stays right-to-left.
+    const variant = await update(project, { languages: ["ar-1994"] });
+    assert.equal(variant._status, 400);
+    assert.match(variant._json.error, /right-to-left/i);
+
+    // 586 is Pakistan, where Punjabi is right-to-left — refused rather than guessed at.
+    const numeric = await update(project, { languages: ["pa-586"] });
+    assert.equal(numeric._status, 400);
+    assert.match(numeric._json.error, /country code/i);
+
+    assert.deepEqual(projectRepo.getProjectById(project.id).languages, []);
+  });
+
+  it("rejects languages that are not an array", async () => {
+    const res = await callController(createProject, {
+      body: { name: "Bad Languages", description: "", theme: TEST_THEME_ID, languages: "el" },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /array/i);
+  });
+
+  it("rejects the default language among the additional ones", async () => {
+    const project = await createTestProject("Duplicate Language");
+    const res = await update(project, { languages: ["el", "en"] });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /already the site's default/i);
+  });
+
+  it("stores additional languages, lowercased and deduplicated", async () => {
+    const project = await createTestProject("Multi");
+    const res = await update(project, { languages: ["EL", "el", "it"] });
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.languages, ["el", "it"]);
+    assert.deepEqual(projectRepo.getProjectById(project.id).languages, ["el", "it"]);
+  });
+
+  it("leaves the languages alone on an update that does not mention them", async () => {
+    const project = await createTestProject("Untouched");
+    await update(project, { defaultLanguage: "el", languages: ["it"] });
+
+    const res = await update(project, { siteTitle: "Renamed" });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.defaultLanguage, "el");
+    assert.deepEqual(res._json.languages, ["it"]);
+  });
+
+  it("lets the default language change while the site has one language", async () => {
+    const project = await createTestProject("Single Language");
+    const res = await update(project, { defaultLanguage: "el" });
+    assert.equal(res._status, 200);
+    assert.equal(res._json.defaultLanguage, "el");
+  });
+
+  it("locks the default language once another language exists", async () => {
+    const project = await createTestProject("Locked");
+    assert.equal((await update(project, { languages: ["el"] }))._status, 200);
+
+    const res = await update(project, { defaultLanguage: "it" });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /one language/i);
+    assert.equal(projectRepo.getProjectById(project.id).defaultLanguage, "en");
+  });
+
+  it("accepts the unchanged default language while multilang", async () => {
+    const project = await createTestProject("Unchanged Default");
+    await update(project, { languages: ["el"] });
+
+    const res = await update(project, { defaultLanguage: "en", languages: ["el", "it"] });
+    assert.equal(res._status, 200);
+    assert.deepEqual(res._json.languages, ["el", "it"]);
+  });
+
+  it("carries both fields through a duplicate", async () => {
+    const project = await createTestProject("Duplicate Me", { defaultLanguage: "el" });
+    await update(project, { languages: ["it"] });
+
+    const res = await callController(duplicateProject, { params: { id: project.id } });
+    assert.equal(res._status, 201);
+    assert.equal(res._json.defaultLanguage, "el");
+    assert.deepEqual(res._json.languages, ["it"]);
+  });
+
+  it("carries both fields through export and import", async () => {
+    const original = await createTestProject("Travelling Site", { defaultLanguage: "el" });
+    await update(original, { languages: ["it"] });
+
+    const { res: exportRes } = await exportTestProject(original.id);
+    assert.equal(exportRes._status, 200);
+    const importRes = await callController(importProject, { file: zipBufferToTempFile(exportRes.getBuffer()) });
+
+    assert.equal(importRes._status, 201);
+    assert.equal(importRes._json.defaultLanguage, "el");
+    assert.deepEqual(importRes._json.languages, ["it"]);
+  });
+
+  it("falls back to a single English site when an import carries an unusable code", async () => {
+    const zipFile = buildImportZip(
+      {
+        formatVersion: "1.1",
+        project: { name: "Foreign Export", theme: TEST_THEME_ID, defaultLanguage: "ar", languages: ["nonsense"] },
+      },
+      { "theme.json": { name: "Test Theme", version: "1.0.0" }, "pages/index.json": { name: "Home", slug: "index", widgets: {} } },
+    );
+
+    const res = await callController(importProject, { file: zipFile });
+    assert.equal(res._status, 201, JSON.stringify(res._json));
+    assert.equal(res._json.defaultLanguage, "en");
+    assert.deepEqual(res._json.languages, []);
   });
 });
 

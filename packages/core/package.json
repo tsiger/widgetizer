@@ -28,6 +28,7 @@
     "./breadcrumbs": "./src/utils/breadcrumbs.js",
     "./contentAddress": "./src/utils/contentAddress.js",
     "./siteIdentity": "./src/utils/siteIdentity.js",
+    "./languages": "./src/utils/languages.js",
     "./structuredData": "./src/structuredData/index.js",
     "./dateFormat": "./src/utils/dateFormat.js",
     "./config/settingTypes": "./src/config/settingTypes.js",

@@ -90,7 +90,7 @@ Schema defaults used when adding widgets later are a separate path: reproduce a 
 
 ## Phase 1 — Foundation (data model, still invisible)
 
-### Step 5. Project languages setting (§1, §1a, §1b, §8a)
+### Step 5. Project languages setting (§1, §1a, §1b, §8a) — *done 2026-09-16*
 
 - `packages/builder-server/src/db/migrations.js` — the next migration version adds `default_language TEXT NOT NULL DEFAULT 'en'` and `languages TEXT NOT NULL DEFAULT '[]'` (JSON array of *additional* codes) to `projects`. Existing rows get `en` / `[]` (§1b). (Version numbers are not pinned here: stage 3 adds its own migration first.)
 - `packages/builder-server/src/db/repositories/projectRepository.js` — `rowToProject` maps `defaultLanguage` / `languages`; `createProject` / `updateProject` write them.
@@ -99,6 +99,13 @@ Schema defaults used when adding widgets later are a separate path: reproduce a 
 - `packages/editor-ui/src/stores/projectStore.js` — nothing field-specific today; add `defaultLanguage`, `languages`, and a derived `isMultilang` (`languages.length > 0`) so every UI step gates on one selector.
 
 **Done when:** project API tests cover every rejection above; a single-language project round-trips export/import/duplicate with `en` / `[]`.
+
+**As built.** Migration v7 adds both columns; `packages/core/src/utils/languages.js` owns the shape, the RTL refusal, canonical casing and the picker list; `projectController` validates on create, update and import (duplicate inherits the row); `projectStore` exposes `useDefaultLanguage` / `useExtraLanguages` / `useIsMultilang`.
+
+Two deviations:
+
+- The §1a lock reads the **current** state, not the resulting one: while a project is single-language, one call may set a new default *and* add languages, exactly as two calls would. Once other languages exist the default is locked.
+- The §8a reserved-name check (a language code equal to a root page slug or a collection `slugPrefix`) is **not** here. It needs the project's content, and project routes are actor-scoped — there is no `req.scope` for the project being updated, and fabricating one in the backend is exactly what the adapter contract forbids. It lands with the add-language service in step 9, whose routes are project-scoped, before any UI can enable a language (Phase 2 precedes Phase 3).
 
 ### Step 6. The addressing layer (§Implementation Contracts) — *started in stage 2, extended here*
 

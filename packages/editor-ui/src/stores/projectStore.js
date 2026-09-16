@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { LOCAL_ACTOR } from "@widgetizer/core/adapters";
+import { DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 import { getActiveProject } from "../queries/projectManager";
 
 /**
@@ -101,6 +102,25 @@ const useProjectStore = create((set) => ({
   seedProject: (project, scope = null) =>
     set({ activeProject: project, scope: scope ?? deriveScope(project), loading: false, error: null }),
 }));
+
+// A stable reference, so a project with no extra languages does not hand the
+// selector a fresh array on every render.
+const NO_EXTRA_LANGUAGES = Object.freeze([]);
+
+/** The site's default language — always a real code, never empty. */
+export const useDefaultLanguage = () =>
+  useProjectStore((state) => state.activeProject?.defaultLanguage || DEFAULT_LANGUAGE);
+
+/** The additional languages, without the default. Empty means single-language. */
+export const useExtraLanguages = () =>
+  useProjectStore((state) => state.activeProject?.languages ?? NO_EXTRA_LANGUAGES);
+
+/**
+ * Whether the multilang UI shows at all. One language keeps every language
+ * control invisible, so each step gates on this one selector.
+ */
+export const useIsMultilang = () =>
+  useProjectStore((state) => (state.activeProject?.languages?.length ?? 0) > 0);
 
 // NOTE: Do NOT call fetchActiveProject() here at module load time.
 // Instead, the fetch (OSS) or seedProject (DI shells) is triggered by the shell.
