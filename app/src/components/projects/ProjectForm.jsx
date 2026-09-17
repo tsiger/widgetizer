@@ -8,9 +8,11 @@ import Button from "@widgetizer/editor-ui/components/ui/Button.jsx";
 import { formatSlug } from "@widgetizer/editor-ui/utils/slugUtils";
 import { isValidSiteUrl, siteUrlHasQueryOrFragment } from "@widgetizer/core/urlSafety";
 import { identityKind } from "@widgetizer/core/siteIdentity";
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, nativeLanguageName } from "@widgetizer/core/languages";
 import useToastStore from "@widgetizer/editor-ui/stores/toastStore";
 import { getThemePresets, getPresetScreenshotUrl } from "@widgetizer/editor-ui/queries/themeManager";
 import SiteIdentityFields from "./SiteIdentityFields.jsx";
+import LanguagesSection from "./LanguagesSection.jsx";
 import { identityToForm, formToIdentity, isBusinessIdentityError } from "./siteIdentityForm.js";
 
 const READINESS_TARGETS = {
@@ -36,6 +38,15 @@ export default function ProjectForm({
   const [activeTab, setActiveTab] = useState("general");
   const showToast = useToastStore((state) => state.showToast);
   const [identityErrors, setIdentityErrors] = useState([]);
+  // Not a form field: adding or removing a language writes content on the
+  // server the moment it is done, so it can neither wait for Save nor be
+  // undone by Cancel. Held here only to keep the section and the default
+  // language's lock in step with each other.
+  const [languages, setLanguages] = useState(initialData.languages || []);
+  // A language request in flight will decide whether the default is locked, and
+  // it answers about the language the SERVER holds — so the select stays put
+  // until it settles, or a change made in the meantime would be locked in.
+  const [languageBusy, setLanguageBusy] = useState(false);
 
   // Preset state
   const [presets, setPresets] = useState({ default: null, presets: [] });
@@ -58,6 +69,7 @@ export default function ProjectForm({
       theme: initialData.theme || "",
       siteUrl: initialData.siteUrl || "",
       cleanUrls: initialData.cleanUrls || false,
+      defaultLanguage: initialData.defaultLanguage || DEFAULT_LANGUAGE,
       receiveThemeUpdates: initialData.receiveThemeUpdates || false,
       preset: "",
       siteIdentity: identityToForm(initialData.siteIdentity),
@@ -264,6 +276,7 @@ export default function ProjectForm({
           theme: "",
           siteUrl: "",
           cleanUrls: false,
+          defaultLanguage: DEFAULT_LANGUAGE,
           receiveThemeUpdates: false,
           preset: "",
           siteIdentity: identityToForm({}),
@@ -380,6 +393,39 @@ export default function ProjectForm({
       />
       {errors.siteUrl && <p className="form-error">{errors.siteUrl.message}</p>}
       <p className="form-description">{t("forms.project.siteUrlHelp")}</p>
+    </div>
+  );
+
+  const isMultilang = languages.length > 0;
+  const savedDefaultLanguage = initialData.defaultLanguage || DEFAULT_LANGUAGE;
+  // A stored regional code (pt-br) is valid but is not one of the offered base
+  // codes, and an option-less select would render blank.
+  const languageOptions = SUPPORTED_LANGUAGES.some(({ code }) => code === savedDefaultLanguage)
+    ? SUPPORTED_LANGUAGES
+    : [{ code: savedDefaultLanguage }, ...SUPPORTED_LANGUAGES];
+
+  const defaultLanguageField = () => (
+    <div className="form-field">
+      <label htmlFor="defaultLanguage" className="form-label">
+        {t("forms.project.languages.defaultLabel")}
+      </label>
+      <select
+        id="defaultLanguage"
+        {...register("defaultLanguage")}
+        className="form-select"
+        disabled={isMultilang || languageBusy}
+      >
+        {languageOptions.map(({ code }) => (
+          <option key={code} value={code}>
+            {nativeLanguageName(code)} ({code})
+          </option>
+        ))}
+      </select>
+      <p className="form-description">
+        {isMultilang
+          ? t("forms.project.languages.defaultLockedHelp")
+          : t("forms.project.languages.defaultHelp")}
+      </p>
     </div>
   );
 
@@ -592,6 +638,26 @@ export default function ProjectForm({
         {siteTitleField()}
         {siteUrlField()}
         {checkboxField("cleanUrls", "forms.project.cleanUrlsLabel", "forms.project.cleanUrlsHelp")}
+
+        <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
+          <h3 className="form-label">{t("forms.project.languages.title")}</h3>
+          <p className="form-description mb-4">{t("forms.project.languages.help")}</p>
+          {defaultLanguageField()}
+          {/* A project has to exist before content can be copied into a new
+              language, so the list only appears once it does. */}
+          {!isNew && (
+            <LanguagesSection
+              defaultLanguage={savedDefaultLanguage}
+              languages={languages}
+              onChange={setLanguages}
+              // Adding a language locks the default on the SERVER, which still
+              // holds the saved one: acting now would lock a value the form is
+              // not showing and make the next Save fail.
+              blocked={watch("defaultLanguage") !== savedDefaultLanguage}
+              onBusyChange={setLanguageBusy}
+            />
+          )}
+        </div>
       </div>
 
       <div

@@ -232,10 +232,21 @@ Three deviations, the first significant:
 
 Every component below renders nothing new while `projectStore.isMultilang` is false (§1). New strings go in `packages/core/src/locales/en.json`.
 
-### Step 12. Project form: Languages section (§1, §1a, §1c, §1d)
+### Step 12. Project form: Languages section (§1, §1a, §1c, §1d) — *done 2026-09-17*
 
 - `app/src/components/projects/ProjectForm.jsx` — default-language select (disabled with an explanatory message once `languages` is non-empty), add-language picker (codes/native names, no flags, no RTL), remove-language action opening `ConfirmationModal` (`packages/editor-ui/src/components/ui/ConfirmationModal.jsx`, `variant: "danger"`) that shows the counts from step 10.
 - Do not touch editor i18n; site language never changes the admin language (§1d).
+
+**As built.** The Languages block sits at the foot of the **Site** tab, beside the other site-wide publishing settings, rather than in a tab of its own. `app/src/components/projects/LanguagesSection.jsx` holds the list, the add picker (native names and codes, no flags, RTL never offered because `SUPPORTED_LANGUAGES` excludes it) and the removal confirmation, which reads the step 10 summary first so it can name what will be deleted instead of warning in the abstract.
+
+- **The default language is a form field; the list is not.** Adding or removing copies or deletes content the moment it happens, so neither can wait for Save nor be undone by Cancel — the section says so in as many words. The form holds `languages` in state only to know whether the default is still editable, and never submits it, so `updateProject`'s refusal from step 9 is never tripped.
+- **The list appears only once the project exists.** A new project has no content to copy into a second language, and `createProject` refuses one anyway.
+- **The default select is disabled once another language exists**, with the help text switching to the reason (§1a).
+- **The three calls go through `editorFetchJson`**, which prepends the shell's api base, parses the body and throws the server's own message. `apiFetch` with a bare path returns a raw `Response` that never throws, and in the dev shell a missing `/api` is answered by the SPA with a 200 and an HTML body — so Add reported success on a 404 and cleared the list, and a removal's counts were never read. Verified against the running backend: the bare path answers 200 text/html, the prefixed one 404 with `{"message":"…"}`.
+- **A successful add or remove drops the projects-list cache and refreshes the store's active project**, or reopening Project details inside the 30-second window would restore the old list and the old lock.
+- **The default language and the language actions are held apart in both directions.** Adding or removing is blocked while the default has been changed but not saved, because the server would lock the language it still holds rather than the one on screen and the next Save would be refused; and the default select is frozen while a request is in flight, because the response decides whether it locks and a change made meanwhile would be locked in against the language the server actually has. The section reports its busy state to the form for the second half.
+- **A stored regional default (`pt-br`) is added to the select's options** when it is not one of the offered base codes, since an option-less select renders blank and, while multilang, a disabled blank.
+- `LanguagesSection.test.jsx` initialises **real translations** rather than echoing keys: the confirmation's whole job is to state counts, and a key-echoing test would not notice if those counts never reached the sentence. It pins the singular too ("1 page", not "1 pages").
 
 ### Step 13. Pages list: language tabs + status chips (§3)
 

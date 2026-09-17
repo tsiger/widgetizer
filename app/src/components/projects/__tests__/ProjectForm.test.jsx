@@ -19,6 +19,15 @@ vi.mock("@widgetizer/editor-ui/stores/toastStore", () => {
   hook.getState = () => state;
   return { default: hook };
 });
+let languagesFetchJson;
+vi.mock("@widgetizer/editor-ui/lib/apiFetch", async (importOriginal) => ({
+  ...(await importOriginal()),
+  editorFetchJson: (...args) => languagesFetchJson(...args),
+}));
+vi.mock("@widgetizer/editor-ui/queries/projectManager", () => ({
+  invalidateProjectsListCache: vi.fn(),
+  getAllProjects: async () => [],
+}));
 vi.mock("@widgetizer/editor-ui/queries/themeManager", () => ({
   getThemePresets: async () => ({ default: null, presets: [] }),
   getPresetScreenshotUrl: () => "",
@@ -66,7 +75,8 @@ beforeEach(() => {
   Element.prototype.scrollIntoView = () => {};
   URL.createObjectURL = vi.fn(() => "blob:preview");
   URL.revokeObjectURL = vi.fn();
-  projectState = { activeProject: { id: "project-1" } };
+  projectState = { activeProject: { id: "project-1" }, setActiveProject: vi.fn() };
+  languagesFetchJson = vi.fn(async () => ({}));
 });
 
 describe("ProjectForm — edit page tabs", () => {
@@ -197,5 +207,101 @@ describe("ProjectForm — new project", () => {
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     expect(onSubmit.mock.calls[0][0].siteIdentity).toEqual({ text: { publicName: "Crumbly Bakery" } });
+  });
+});
+
+describe("site languages", () => {
+  const defaultSelect = () => document.getElementById("defaultLanguage");
+
+  it("offers the default language on the Site tab, with the list once the project exists", async () => {
+    renderForm();
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+
+    expect(defaultSelect()).toBeTruthy();
+    expect(panel("site").textContent).toContain("forms.project.languages.title");
+    expect(screen.getByLabelText("forms.project.languages.addLabel")).toBeTruthy();
+  });
+
+  it("keeps the list out of a new project, which has no content to copy yet", async () => {
+    render(<ProjectForm onSubmit={vi.fn(async () => false)} isSubmitting={false} isDirty submitLabel="Create" />);
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+
+    expect(defaultSelect()).toBeTruthy();
+    expect(screen.queryByLabelText("forms.project.languages.addLabel")).toBeNull();
+  });
+
+  it("locks the default language once the site has another, and says why", async () => {
+    renderForm({ defaultLanguage: "en", languages: ["el"] });
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+
+    expect(defaultSelect().disabled).toBe(true);
+    expect(panel("site").textContent).toContain("forms.project.languages.defaultLockedHelp");
+  });
+
+  it("leaves it editable while the site has one language", async () => {
+    renderForm({ defaultLanguage: "en", languages: [] });
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+
+    expect(defaultSelect().disabled).toBe(false);
+    expect(panel("site").textContent).toContain("forms.project.languages.defaultHelp");
+  });
+
+  it("keeps a stored regional default selected rather than blank", async () => {
+    renderForm({ defaultLanguage: "pt-br" });
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+
+    expect(defaultSelect().value).toBe("pt-br");
+    expect([...defaultSelect().options].some((option) => option.value === "pt-br")).toBe(true);
+  });
+
+  it("stops the language actions when the default is edited before saving", async () => {
+    renderForm({ defaultLanguage: "en", languages: [] });
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+
+    fireEvent.change(defaultSelect(), { target: { value: "el" } });
+    expect(screen.getByLabelText("forms.project.languages.addLabel").disabled).toBe(true);
+    expect(panel("site").textContent).toContain("forms.project.languages.saveDefaultFirst");
+  });
+
+  it("holds the default still while a language request is in flight", async () => {
+    // The response decides whether the default is locked, and it answers about
+    // the language the server holds — so a change made meanwhile must not stick.
+    let release;
+    languagesFetchJson = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          release = () => resolve({ id: "project-1", languages: ["it"] });
+        }),
+    );
+    renderForm({ defaultLanguage: "en", languages: [] });
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+
+    fireEvent.change(screen.getByLabelText("forms.project.languages.addLabel"), { target: { value: "it" } });
+    fireEvent.click(screen.getByRole("button", { name: /forms\.project\.languages\.addButton/ }));
+
+    await waitFor(() => expect(defaultSelect().disabled).toBe(true));
+
+    release();
+    await waitFor(() => expect(defaultSelect().value).toBe("en"));
+    expect(defaultSelect().disabled).toBe(true);
+  });
+
+  it("saves the default language with the rest of the form", async () => {
+    const onSubmit = renderForm({ defaultLanguage: "en" });
+    await screen.findByRole("tablist");
+    fireEvent.click(tab("site"));
+    fireEvent.change(defaultSelect(), { target: { value: "el" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({ defaultLanguage: "el" });
+    expect(onSubmit.mock.calls[0][0].languages).toBeUndefined();
   });
 });
