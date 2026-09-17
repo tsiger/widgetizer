@@ -52,6 +52,11 @@
       "messageBulk_other": "Are you sure you want to delete {{count}} items? This action cannot be undone.",
       "confirmBulk": "Delete {{count}} item",
       "confirmBulk_other": "Delete {{count}} items"
+    },
+    "languages": {
+      "tabsLabel": "Filter items by language",
+      "header": "Languages",
+      "menuLabel": "This item's language"
     }
   },
   "collectionsForm": {
@@ -423,6 +428,13 @@
     "aria": {
       "dismiss": "Dismiss",
       "close": "Close"
+    },
+    "languages": {
+      "open": "Open the {{name}} version",
+      "create": "Create the {{name}} version",
+      "creating": "Creating the {{name}} version…",
+      "created": "{{name}} version created.",
+      "createError": "The version could not be created."
     }
   },
   "components": {
@@ -594,12 +606,7 @@
     },
     "languages": {
       "tabsLabel": "Filter pages by language",
-      "header": "Languages",
-      "open": "Open the {{name}} version",
-      "create": "Create the {{name}} version",
-      "creating": "Creating the {{name}} version…",
-      "created": "{{name}} version created.",
-      "createError": "The version could not be created."
+      "header": "Languages"
     },
     "noPagesFound": "No pages found",
     "noPagesMatch": "No pages match \"{{term}}\". Try a different search term.",

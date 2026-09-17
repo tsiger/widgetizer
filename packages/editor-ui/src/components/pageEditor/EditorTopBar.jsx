@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus, Plus } from "lucide-react";
+import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAllPages, createPageLanguageVersion } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
-import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
 import useTranslationVersions from "../../hooks/useTranslationVersions";
+import LanguageMenu from "../content/LanguageMenu";
 import { pageEditorHref, pageAddHref } from "../../lib/contentRoutes";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
@@ -35,7 +35,6 @@ export default function EditorTopBar({
 
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
-  const extraLanguages = useExtraLanguages();
   const currentPage = usePageStore((state) => state.page);
   const currentLanguage = pageLanguage || defaultLanguage;
 
@@ -187,63 +186,16 @@ export default function EditorTopBar({
     setIsDropdownOpen(false);
   };
 
-  const siblings = siblingsOf(currentPage);
-  const languageMenu = isMultilang && (
-    <div className="relative" ref={languageMenuRef}>
-      <button
-        onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-        title={t("pageEditor.languages.menuLabel")}
-        aria-label={t("pageEditor.languages.menuLabel")}
-        className="font-medium px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2 text-sm uppercase"
-      >
-        {currentLanguage}
-        <ChevronDown size={16} className={`transform transition-transform ${isLanguageMenuOpen ? "rotate-180" : ""}`} />
-      </button>
-      {isLanguageMenuOpen && (
-        <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg z-50">
-          {[defaultLanguage, ...extraLanguages].map((code) => {
-            const sibling = siblings.get(code);
-            const name = nativeLanguageName(code);
-            if (sibling) {
-              return (
-                <button
-                  key={code}
-                  onClick={() => openPage(sibling)}
-                  aria-label={t("pages.languages.open", { name })}
-                  aria-current={code === currentLanguage ? "true" : undefined}
-                  className={`w-full px-4 py-2 text-left flex items-center justify-between ${
-                    code === currentLanguage
-                      ? "bg-pink-600 text-white hover:bg-pink-700"
-                      : "text-slate-800 hover:bg-slate-100"
-                  }`}
-                >
-                  <span>{name}</span>
-                  <span className="text-xs uppercase opacity-70">{code}</span>
-                </button>
-              );
-            }
-            return (
-              <button
-                key={code}
-                disabled={!currentPage || pendingKey !== null}
-                onClick={() => createIn(currentPage, code)}
-                aria-label={
-                  pendingKey === `${currentPage?.id}:${code}`
-                    ? t("pages.languages.creating", { name })
-                    : t("pages.languages.create", { name })
-                }
-                className="w-full px-4 py-2 text-left flex items-center justify-between text-slate-500 hover:bg-slate-100 disabled:opacity-50"
-              >
-                <span className="flex items-center gap-2">
-                  <Plus size={14} /> {name}
-                </span>
-                <span className="text-xs uppercase opacity-70">{code}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
+  const languageMenu = (
+    <LanguageMenu
+      entry={currentPage}
+      language={currentLanguage}
+      siblings={siblingsOf(currentPage)}
+      onOpen={openPage}
+      onCreate={createIn}
+      pendingKey={pendingKey}
+      label={t("pageEditor.languages.menuLabel")}
+    />
   );
 
   return (

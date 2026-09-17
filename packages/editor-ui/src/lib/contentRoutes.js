@@ -30,3 +30,13 @@ export function menuSettingsHref(menu, isMultilang) {
 export function menuAddHref(language) {
   return language ? `/menus/add?language=${language}` : "/menus/add";
 }
+
+export function itemEditHref(type, item, isMultilang) {
+  const base = `/collections/${type}/${item.slug}/edit`;
+  return isMultilang ? `${base}?language=${item.language}` : base;
+}
+
+export function itemAddHref(type, language) {
+  const base = `/collections/${type}/add`;
+  return language ? `${base}?language=${language}` : base;
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
 
@@ -13,11 +13,17 @@ import { getCollectionSchema, getCollectionItem, updateCollectionItem } from "..
 import { invalidateMediaCache } from "../queries/mediaManager";
 import { invalidateLinkTargetsCache } from "../hooks/useLinkTargets";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
+import { itemEditHref } from "../lib/contentRoutes";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
 export default function CollectionItemEdit() {
   const { t } = useTranslation();
   const { type, slug } = useParams();
+  const [searchParams] = useSearchParams();
+  // A slug is unique per language, so which item is open travels in the URL —
+  // and back out on save. Unlike a page, the form submits its own fields rather
+  // than the whole item, so the language has to be put back on the way out.
+  const language = searchParams.get("language") || undefined;
   const navigate = useNavigate();
 
   const [schema, setSchema] = useState(null);
@@ -35,7 +41,7 @@ export default function CollectionItemEdit() {
     let cancelled = false;
     setItem(null);
     setLoading(true);
-    Promise.all([getCollectionSchema(type), getCollectionItem(type, slug)])
+    Promise.all([getCollectionSchema(type), getCollectionItem(type, slug, language)])
       .then(([schemaData, itemData]) => {
         if (cancelled) return;
         setSchema(schemaData);
@@ -51,12 +57,16 @@ export default function CollectionItemEdit() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, slug]);
+  }, [type, slug, language]);
 
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
     try {
-      const updated = await updateCollectionItem(type, slug, formData);
+      const itemLanguage = item?.language || language;
+      const updated = await updateCollectionItem(type, slug, {
+        ...formData,
+        ...(itemLanguage ? { language: itemLanguage } : {}),
+      });
 
       const savedName = updated?.title || schema?.displayName || type;
       const activeProject = useProjectStore.getState().activeProject;
@@ -64,7 +74,7 @@ export default function CollectionItemEdit() {
       invalidateLinkTargetsCache(activeProject?.id);
 
       if (updated.slug !== slug) {
-        navigateSafely(editorPath(`/collections/${type}/${updated.slug}/edit`), { replace: true });
+        navigateSafely(editorPath(itemEditHref(type, updated, !!language)), { replace: true });
         showToast(t("collectionsForm.toasts.updateSuccessUrlChanged", { name: savedName }), "success");
       } else {
         showToast(t("collectionsForm.toasts.updateSuccess", { name: savedName }), "success");

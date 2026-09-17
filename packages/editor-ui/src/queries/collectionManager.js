@@ -30,6 +30,9 @@ import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
  * @property {string} updated
  */
 
+/** A slug is unique per language, so reading or removing one has to name it. */
+const languageQuery = (language) => (language ? `?language=${encodeURIComponent(language)}` : "");
+
 /**
  * Fetch all collection schemas for the active project.
  * @returns {Promise<CollectionSchema[]>}
@@ -86,9 +89,13 @@ export async function getCollectionItems(type, params) {
  * @param {string} slug - Item slug
  * @returns {Promise<CollectionItem>}
  */
-export async function getCollectionItem(type, slug) {
+export async function getCollectionItem(type, slug, language) {
   try {
-    return await editorFetchJson(`/collections/${type}/${slug}`, {}, { fallbackMessage: "Failed to get item" });
+    return await editorFetchJson(
+      `/collections/${type}/${slug}${languageQuery(language)}`,
+      {},
+      { fallbackMessage: "Failed to get item" },
+    );
   } catch (error) {
     rethrowQueryError(error, "Failed to get item");
   }
@@ -145,10 +152,10 @@ export async function updateCollectionItem(type, slug, itemData) {
  * @param {string} slug - Item slug
  * @returns {Promise<{success: boolean, slug: string}>}
  */
-export async function deleteCollectionItem(type, slug) {
+export async function deleteCollectionItem(type, slug, language) {
   try {
     return await editorFetchJson(
-      `/collections/${type}/${slug}`,
+      `/collections/${type}/${slug}${languageQuery(language)}`,
       { method: "DELETE" },
       { fallbackMessage: "Failed to delete item" },
     );
@@ -163,14 +170,14 @@ export async function deleteCollectionItem(type, slug) {
  * @param {string[]} itemSlugs - Slugs to delete
  * @returns {Promise<{deleted: string[], notFound: string[], errors: Array}>}
  */
-export async function bulkDeleteCollectionItems(type, itemSlugs) {
+export async function bulkDeleteCollectionItems(type, itemSlugs, language) {
   try {
     return await editorFetchJson(
       `/collections/${type}/bulk-delete`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemSlugs }),
+        body: JSON.stringify({ itemSlugs, ...(language ? { language } : {}) }),
       },
       { fallbackMessage: "Failed to delete items" },
     );
@@ -185,10 +192,10 @@ export async function bulkDeleteCollectionItems(type, itemSlugs) {
  * @param {string} slug - Item slug to duplicate
  * @returns {Promise<CollectionItem>}
  */
-export async function duplicateCollectionItem(type, slug) {
+export async function duplicateCollectionItem(type, slug, language) {
   try {
     return await editorFetchJson(
-      `/collections/${type}/${slug}/duplicate`,
+      `/collections/${type}/${slug}/duplicate${languageQuery(language)}`,
       { method: "POST" },
       { fallbackMessage: "Failed to duplicate item" },
     );
@@ -205,10 +212,10 @@ export async function duplicateCollectionItem(type, slug) {
  * @param {string} slug - Item slug
  * @returns {Promise<CollectionItem>}
  */
-export async function discardArchivedCollectionItem(type, slug) {
+export async function discardArchivedCollectionItem(type, slug, language) {
   try {
     return await editorFetchJson(
-      `/collections/${type}/${slug}/discard-archived`,
+      `/collections/${type}/${slug}/discard-archived${languageQuery(language)}`,
       { method: "POST" },
       { fallbackMessage: "Failed to discard archived data" },
     );
@@ -223,14 +230,14 @@ export async function discardArchivedCollectionItem(type, slug) {
  * @param {string[]} order - Slugs in the desired order
  * @returns {Promise<{success: boolean, order: string[]}>}
  */
-export async function reorderCollectionItems(type, order) {
+export async function reorderCollectionItems(type, order, language) {
   try {
     return await editorFetchJson(
       `/collections/${type}/reorder`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order }),
+        body: JSON.stringify({ order, ...(language ? { language } : {}) }),
       },
       { fallbackMessage: "Failed to reorder items" },
     );
@@ -259,5 +266,44 @@ export async function previewCollectionItem(item) {
     );
   } catch (error) {
     rethrowQueryError(error, "Failed to build preview");
+  }
+}
+
+/**
+ * Create this item's version in another language, joined to the same translation
+ * group. `sourceLanguage` addresses the item being copied; `targetLanguage` is
+ * where the copy goes — they cannot share one name on the wire.
+ * @param {string} type - Collection type slug
+ * @param {string} slug - Source item slug
+ * @param {{targetLanguage: string, sourceLanguage?: string, slug?: string}} options
+ * @returns {Promise<CollectionItem>} the created version
+ */
+export async function createItemLanguageVersion(type, slug, { targetLanguage, sourceLanguage, slug: newSlug } = {}) {
+  try {
+    return await editorFetchJson(
+      `/collections/${type}/${slug}/translations${languageQuery(sourceLanguage)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetLanguage, ...(newSlug ? { slug: newSlug } : {}) }),
+      },
+      { fallbackMessage: "Failed to create the version" },
+    );
+  } catch (error) {
+    rethrowQueryError(error, "Failed to create the version");
+  }
+}
+
+/**
+ * Read a translation group's members across every language — what the item
+ * editor's language menu needs without loading each language's list.
+ * @param {string} groupId
+ * @returns {Promise<{groupId: string, members: object[]}>}
+ */
+export async function getTranslationGroup(groupId) {
+  try {
+    return await editorFetchJson(`/translations/${groupId}`, {}, { fallbackMessage: "Failed to read the group" });
+  } catch (error) {
+    rethrowQueryError(error, "Failed to read the group");
   }
 }

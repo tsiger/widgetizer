@@ -182,7 +182,7 @@ describe("EditorTopBar language menu", () => {
     renderFor(EN_ALONE);
     openMenu();
 
-    fireEvent.click(await screen.findByRole("button", { name: "pages.languages.create" }));
+    fireEvent.click(await screen.findByRole("button", { name: "common.languages.create" }));
 
     await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith("/page-editor?pageId=kariera&language=el"));
     expect(createPageLanguageVersion).toHaveBeenCalledWith("careers", {
@@ -196,7 +196,7 @@ describe("EditorTopBar language menu", () => {
     renderFor(EN_ALONE);
     openMenu();
 
-    fireEvent.click(await screen.findByRole("button", { name: "pages.languages.create" }));
+    fireEvent.click(await screen.findByRole("button", { name: "common.languages.create" }));
     await vi.waitFor(() => expect(createPageLanguageVersion).toHaveBeenCalled());
     expect(navigate).not.toHaveBeenCalled();
   });
@@ -210,15 +210,15 @@ describe("EditorTopBar language menu", () => {
     renderFor(EN_ALONE);
     openMenu();
 
-    fireEvent.click(await screen.findByRole("button", { name: "pages.languages.create" }));
+    fireEvent.click(await screen.findByRole("button", { name: "common.languages.create" }));
     // Wait for the whole create to settle: the attempt to leave is what closes
     // the menu, so re-opening before it lands would just close it again.
     await vi.waitFor(() => expect(navigate).toHaveBeenCalled());
 
     openMenu();
     const greek = (await screen.findByText("Ελληνικά")).closest("button");
-    expect(greek.getAttribute("aria-label")).toBe("pages.languages.open");
-    expect(screen.queryByRole("button", { name: "pages.languages.create" })).toBeNull();
+    expect(greek.getAttribute("aria-label")).toBe("common.languages.open");
+    expect(screen.queryByRole("button", { name: "common.languages.create" })).toBeNull();
   });
 
   it("is not there at all while the site has one language", () => {

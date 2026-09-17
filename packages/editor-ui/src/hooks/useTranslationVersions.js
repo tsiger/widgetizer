@@ -20,7 +20,7 @@ export default function useTranslationVersions({
   defaultLanguage,
   createVersion,
   onCreated,
-  keys = { created: "pages.languages.created", error: "pages.languages.createError" },
+  keys = { created: "common.languages.created", error: "common.languages.createError" },
 }) {
   const { t } = useTranslation();
   const showToast = useToastStore((state) => state.showToast);

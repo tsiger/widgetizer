@@ -1,17 +1,26 @@
 /* eslint-disable react-hooks/incompatible-library */
 import { Fragment, useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useThemeLocale } from "../../hooks/useThemeLocale";
 import { useForm } from "react-hook-form";
 import { ChevronDown, ChevronUp, Eye, Info } from "lucide-react";
 import { formatSlug } from "../../utils/slugUtils";
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
-import { discardArchivedCollectionItem } from "../../queries/collectionManager";
+import {
+  discardArchivedCollectionItem,
+  createItemLanguageVersion,
+  getTranslationGroup,
+} from "../../queries/collectionManager";
 import { invalidateMediaCache } from "../../queries/mediaManager";
 import useConfirmationAction from "../../hooks/useConfirmationAction";
 import useStickyActionBar from "../../hooks/useStickyActionBar";
 import useToastStore from "../../stores/toastStore";
-import useProjectStore from "../../stores/projectStore";
+import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
+import useTranslationVersions from "../../hooks/useTranslationVersions";
+import LanguageMenu from "../content/LanguageMenu";
+import { itemEditHref } from "../../lib/contentRoutes";
+import { useEditorPath } from "../../lib/routeBase.jsx";
 import Button from "../ui/Button";
 import SettingsRenderer from "../settings/SettingsRenderer";
 import { EditingLanguageProvider } from "../../lib/editingLanguage.jsx";
@@ -101,7 +110,46 @@ export default function CollectionItemForm({
   const { t } = useTranslation();
   const { tTheme } = useThemeLocale();
   const showToast = useToastStore((state) => state.showToast);
+  const navigate = useNavigate();
+  const editorPath = useEditorPath();
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
   const isNew = !initialData.id && !initialData.slug;
+
+  // The group's members come from the one endpoint built for it, rather than
+  // loading every language's list to answer a question about one item. An item
+  // that has never been saved has no group to read.
+  const groupId = initialData.translationGroupId || initialData.uuid || null;
+  const [groupMembers, setGroupMembers] = useState([]);
+  useEffect(() => {
+    if (!isMultilang || !groupId) return undefined;
+    let cancelled = false;
+    getTranslationGroup(groupId)
+      .then(({ members }) => {
+        if (cancelled) return;
+        setGroupMembers(
+          (members || [])
+            .filter((member) => member.kind === "item" && member.collectionType === schema?.type)
+            .map((member) => ({ ...member, translationGroupId: groupId, id: member.slug })),
+        );
+      })
+      .catch(() => {
+        // The menu simply offers to create what it cannot see; a failed read
+        // must not block editing the item that is already open.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isMultilang, groupId, schema?.type]);
+
+  const itemEntry = { ...initialData, id: initialData.slug };
+  const { siblingsOf, createIn, pendingKey } = useTranslationVersions({
+    entries: [...groupMembers, ...(groupId ? [itemEntry] : [])],
+    defaultLanguage,
+    createVersion: (item, targetLanguage) =>
+      createItemLanguageVersion(schema.type, item.slug, { targetLanguage, sourceLanguage: item.language }),
+    onCreated: (created) => navigate(editorPath(itemEditHref(schema.type, created, true))),
+  });
   // Item-page collections get the same SEO editor as pages.
   const hasItemPages = !!schema?.hasItemPages;
 
@@ -112,7 +160,7 @@ export default function CollectionItemForm({
 
   const { confirm: confirmDiscardArchived, confirmationModal } = useConfirmationAction(async () => {
     try {
-      await discardArchivedCollectionItem(schema.type, initialData.slug);
+      await discardArchivedCollectionItem(schema.type, initialData.slug, initialData.language);
       // Mirror the save path: discarding can shrink media usage if an archived
       // field held an upload, so refresh the media cache (else stale usedIn /
       // delete state lingers in the media library until expiry).
@@ -276,6 +324,17 @@ export default function CollectionItemForm({
       onSubmit={rhfHandleSubmit(onSubmitHandler, (formErrors) => formErrors.slug && setShowMore(true))}
       className="space-y-6"
     >
+      {!isNew && (
+        <LanguageMenu
+          entry={itemEntry}
+          language={initialData.language}
+          siblings={siblingsOf(itemEntry)}
+          onOpen={(sibling) => navigate(editorPath(itemEditHref(schema.type, sibling, true)))}
+          onCreate={createIn}
+          pendingKey={pendingKey}
+          label={t("collections.languages.menuLabel")}
+        />
+      )}
       {/* Doubled setting-type rhythm: space-y-8 (32px) in place of .form-section's
           space-y-4, so schema fields breathe in the collection-item editor. */}
       <div className="max-w-xl space-y-8">

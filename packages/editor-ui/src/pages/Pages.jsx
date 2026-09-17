@@ -15,9 +15,10 @@ import { usePageSelection } from "../hooks/usePageSelection";
 import useConfirmationAction from "../hooks/useConfirmationAction";
 import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
-import useProjectStore, { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../stores/projectStore";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
 import useTranslationVersions from "../hooks/useTranslationVersions";
+import LanguageTabs from "../components/content/LanguageTabs";
+import TranslationChips from "../components/content/TranslationChips";
 import { pageEditorHref, pageSettingsHref, pageAddHref } from "../lib/contentRoutes";
 import usePageListStore from "../stores/pageListStore";
 import PageLayout from "../components/layout/PageLayout";
@@ -50,8 +51,6 @@ export default function Pages() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
-  const extraLanguages = useExtraLanguages();
-  const siteLanguages = [defaultLanguage, ...extraLanguages];
   const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
 
   // Handle page deletion with confirmation
@@ -212,75 +211,16 @@ export default function Pages() {
     ),
   );
 
-  const languageTabs = isMultilang && (
-    <div role="tablist" aria-label={t("pages.languages.tabsLabel")} className="mb-4 flex gap-1 border-b border-slate-200">
-      {siteLanguages.map((code) => (
-        <button
-          key={code}
-          type="button"
-          role="tab"
-          aria-selected={activeLanguage === code}
-          onClick={() => {
-            setActiveLanguage(code);
-            clearSelection();
-          }}
-          className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
-            activeLanguage === code
-              ? "border-pink-500 text-pink-600"
-              : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
-          }`}
-        >
-          {nativeLanguageName(code)}
-          <span className="ml-1 text-xs text-slate-400">({code})</span>
-        </button>
-      ))}
-    </div>
+  const languageTabs = (
+    <LanguageTabs
+      value={activeLanguage}
+      label={t("pages.languages.tabsLabel")}
+      onChange={(code) => {
+        setActiveLanguage(code);
+        clearSelection();
+      }}
+    />
   );
-
-  const languageChips = (page) => {
-    const siblings = siblingsOf(page);
-    return (
-      <div className="flex items-center gap-1">
-        {siteLanguages
-          .filter((code) => code !== (page.language || defaultLanguage))
-          .map((code) => {
-            const sibling = siblings.get(code);
-            const name = nativeLanguageName(code);
-            const chipKey = `${page.id}:${code}`;
-            if (sibling) {
-              return (
-                <Link
-                  key={code}
-                  to={pageEditorPath(sibling)}
-                  title={t("pages.languages.open", { name })}
-                  aria-label={t("pages.languages.open", { name })}
-                  className="rounded border border-pink-500 bg-pink-500 px-1.5 py-0.5 text-xs font-medium text-white transition-colors hover:bg-pink-600"
-                >
-                  {code}
-                </Link>
-              );
-            }
-            return (
-              <button
-                key={code}
-                type="button"
-                disabled={pendingKey !== null}
-                onClick={() => createIn(page, code)}
-                title={t("pages.languages.create", { name })}
-                aria-label={
-                  pendingKey === chipKey
-                    ? t("pages.languages.creating", { name })
-                    : t("pages.languages.create", { name })
-                }
-                className="rounded border border-dashed border-slate-300 px-1.5 py-0.5 text-xs font-medium text-slate-400 transition-colors hover:border-pink-400 hover:text-pink-600 disabled:opacity-50"
-              >
-                {code}
-              </button>
-            );
-          })}
-      </div>
-    );
-  };
 
   if (loading) {
     return (
@@ -414,7 +354,13 @@ export default function Pages() {
                   </td>
                   {isMultilang && (
                     <td className={`py-3 px-4 whitespace-nowrap ${isSelected ? "bg-pink-50" : ""}`}>
-                      {languageChips(page)}
+                      <TranslationChips
+                        entry={page}
+                        siblings={siblingsOf(page)}
+                        hrefOf={pageEditorPath}
+                        onCreate={createIn}
+                        pendingKey={pendingKey}
+                      />
                     </td>
                   )}
                   <td className={`py-3 px-4 text-right ${isSelected ? "bg-pink-50" : ""}`}>

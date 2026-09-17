@@ -153,7 +153,7 @@ describe("translation chips", () => {
     renderList();
     await screen.findByRole("tablist");
 
-    const chip = screen.getByRole("link", { name: "pages.languages.open" });
+    const chip = screen.getByRole("link", { name: "common.languages.open" });
     expect(chip.textContent).toBe("el");
     expect(chip.getAttribute("href")).toBe("/page-editor?pageId=sxetika&language=el");
   });
@@ -162,7 +162,7 @@ describe("translation chips", () => {
     renderList();
     await screen.findByRole("tablist");
 
-    const missing = screen.getAllByRole("button", { name: "pages.languages.create" });
+    const missing = screen.getAllByRole("button", { name: "common.languages.create" });
     expect(missing).toHaveLength(1);
     expect(missing[0].textContent).toBe("el");
   });
@@ -173,14 +173,14 @@ describe("translation chips", () => {
     renderList();
     await screen.findByRole("tablist");
 
-    fireEvent.click(screen.getByRole("button", { name: "pages.languages.create" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.languages.create" }));
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith("/page-editor?pageId=kariera&language=el"));
     expect(createPageLanguageVersion).toHaveBeenCalledWith("careers", {
       targetLanguage: "el",
       sourceLanguage: "en",
     });
-    expect(showToast).toHaveBeenCalledWith("pages.languages.created", "success");
+    expect(showToast).toHaveBeenCalledWith("common.languages.created", "success");
   });
 
   it("reports the server's reason and stays put", async () => {
@@ -188,7 +188,7 @@ describe("translation chips", () => {
     renderList();
     await screen.findByRole("tablist");
 
-    fireEvent.click(screen.getByRole("button", { name: "pages.languages.create" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.languages.create" }));
 
     await waitFor(() =>
       expect(showToast).toHaveBeenCalledWith('A page in "el" already exists for this group.', "error"),
@@ -201,7 +201,7 @@ describe("translation chips", () => {
     await screen.findByRole("tablist");
     fireEvent.click(tab("Ελληνικά"));
 
-    const chip = screen.getByRole("link", { name: "pages.languages.open" });
+    const chip = screen.getByRole("link", { name: "common.languages.open" });
     expect(chip.textContent).toBe("en");
     expect(chip.getAttribute("href")).toBe("/page-editor?pageId=about&language=en");
   });

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -16,6 +16,9 @@ import { useEditorPath } from "../lib/routeBase.jsx";
 export default function CollectionItemAdd() {
   const { t } = useTranslation();
   const { type } = useParams();
+  const [searchParams] = useSearchParams();
+  // A new item belongs to the language tab it was started from.
+  const language = searchParams.get("language") || undefined;
   const [schema, setSchema] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,7 +50,7 @@ export default function CollectionItemAdd() {
   const handleSubmit = async (formData) => {
     setIsSubmitting(true);
     try {
-      await createCollectionItem(type, formData);
+      await createCollectionItem(type, { ...formData, ...(language ? { language } : {}) });
       showToast(t("collectionsForm.toasts.createSuccess", { name: schema?.displayName || type }), "success");
 
       const activeProject = useProjectStore.getState().activeProject;
@@ -79,6 +82,9 @@ export default function CollectionItemAdd() {
       {schema && (
         <CollectionItemForm
           schema={schema}
+          // Not saved yet, so the form has nothing to read its language from —
+          // without this its link pickers would open in the default language.
+          initialData={{ slug: "", settings: {}, language }}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitLabel={t("collectionsForm.create")}

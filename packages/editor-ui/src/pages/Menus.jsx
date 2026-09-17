@@ -14,8 +14,8 @@ import { getAllMenus, deleteMenu, duplicateMenu } from "../queries/menuManager";
 import { sortItemsByCopyName } from "../utils/copyNameSort";
 
 import useToastStore from "../stores/toastStore";
-import useProjectStore, { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../stores/projectStore";
-import { nativeLanguageName } from "@widgetizer/core/languages";
+import useProjectStore, { useDefaultLanguage, useIsMultilang } from "../stores/projectStore";
+import LanguageTabs from "../components/content/LanguageTabs";
 import { menuStructureHref, menuSettingsHref, menuAddHref } from "../lib/contentRoutes";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
@@ -33,8 +33,6 @@ export default function Menus() {
   const activeProject = useProjectStore((state) => state.activeProject);
   const isMultilang = useIsMultilang();
   const defaultLanguage = useDefaultLanguage();
-  const extraLanguages = useExtraLanguages();
-  const siteLanguages = [defaultLanguage, ...extraLanguages];
   const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
 
   // Reload menus when navigating to this page or when active project changes
@@ -136,26 +134,8 @@ export default function Menus() {
   // whose menus were all deleted can still take a new one.
   const hasMenus = menus.length > 0;
 
-  const languageTabs = isMultilang && (
-    <div role="tablist" aria-label={t("menus.languages.tabsLabel")} className="mb-4 flex gap-1 border-b border-slate-200">
-      {siteLanguages.map((code) => (
-        <button
-          key={code}
-          type="button"
-          role="tab"
-          aria-selected={activeLanguage === code}
-          onClick={() => setActiveLanguage(code)}
-          className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
-            activeLanguage === code
-              ? "border-pink-500 text-pink-600"
-              : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
-          }`}
-        >
-          {nativeLanguageName(code)}
-          <span className="ml-1 text-xs text-slate-400">({code})</span>
-        </button>
-      ))}
-    </div>
+  const languageTabs = (
+    <LanguageTabs value={activeLanguage} onChange={setActiveLanguage} label={t("menus.languages.tabsLabel")} />
   );
 
   return (

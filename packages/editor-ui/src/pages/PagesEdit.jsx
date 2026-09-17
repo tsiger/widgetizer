@@ -39,7 +39,7 @@ export default function PagesEdit() {
     setLoading(true);
     loadPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, language]);
 
   const loadPage = async () => {
     try {
