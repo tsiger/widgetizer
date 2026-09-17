@@ -248,9 +248,16 @@ Every component below renders nothing new while `projectStore.isMultilang` is fa
 - **A stored regional default (`pt-br`) is added to the select's options** when it is not one of the offered base codes, since an option-less select renders blank and, while multilang, a disabled blank.
 - `LanguagesSection.test.jsx` initialises **real translations** rather than echoing keys: the confirmation's whole job is to state counts, and a key-echoing test would not notice if those counts never reached the sentence. It pins the singular too ("1 page", not "1 pages").
 
-### Step 13. Pages list: language tabs + status chips (§3)
+### Step 13. Pages list: language tabs + status chips (§3) — *done 2026-09-17*
 
 - `packages/editor-ui/src/pages/Pages.jsx` — tabs above the table filter by language; "New page" inherits the active tab's language. Per row, one chip per *other* language: filled (open the sibling) or hollow ("Create <lang> version" → step 11's endpoint, then navigate).
+
+**As built.** `getAllPages` already returns every language, so the tabs, the count and the chips are all derived from that one response — no request per row, and the chips are correct again the moment the list reloads. A row's siblings are found by `translationGroupIdOf`, so the untranslated source, which records no group of its own, is still matched by its uuid.
+
+- **Which language a page is opened in travels in the URL** (`?language=` on the editor and on the settings form), because a slug is no longer unique. Saving needed nothing: the loaded page carries its own `language` and both save paths send the page back, so the server resolves the same folder it was read from. Only the **load** was language-blind, so `getPage(id, language)` and `pageStore.loadPage(pageId, language)` gained the argument. That is a small piece of step 14's plumbing, taken early because the alternative was a filled chip that opens a different language's page.
+- **A new page inherits the active tab's language** (`/pages/add?language=…`), which `PagesAdd` puts in the create body.
+- Everything is gated on `isMultilang`: with one language the list has no tabs, no chips column, and the same links it always had.
+- **Review turned up one omission repeated in four places: a slug names a page only once you also say which language.** Delete, bulk delete and Duplicate sent the slug alone and so acted on the default language's page; renaming dropped the language from the redirect and reopened the wrong one; the empty-state "New page" bypassed the active tab because the tabs were nested inside `hasPages`; and the editor's own page switcher listed every language's pages under one set of slugs. All four now carry the language — the row's for a row action, the tab's for a new page, the edited page's for the switcher. Pinned by `packages/editor-ui/src/pages/__tests__/PagesLanguages.test.jsx` and the switcher tests in `EditorTopBar.test.jsx`.
 
 ### Step 14. Page editor: language menu, context follows the page (§4)
 

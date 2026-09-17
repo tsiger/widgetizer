@@ -7,7 +7,13 @@ import EditorTopBar from "../EditorTopBar.jsx";
 import useAutoSave from "../../../stores/saveStore.js";
 import usePageStore from "../../../stores/pageStore.js";
 
-vi.mock("../../../queries/pageManager", () => ({ getAllPages: vi.fn().mockResolvedValue([]) }));
+const getAllPages = vi.fn().mockResolvedValue([]);
+const navigate = vi.fn();
+vi.mock("../../../queries/pageManager", () => ({ getAllPages: (...args) => getAllPages(...args) }));
+vi.mock("react-router-dom", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNavigate: () => navigate,
+}));
 
 function renderTopBar() {
   return render(
@@ -64,5 +70,54 @@ describe("EditorTopBar manual-save failure handling", () => {
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
     await vi.waitFor(() => expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to save:", error));
     consoleErrorSpy.mockRestore();
+  });
+});
+
+// A slug is unique per language, so the switcher would otherwise list the same
+// name twice and open whichever the default language holds.
+describe("EditorTopBar page switcher across languages", () => {
+  const PAGES = [
+    { id: "about", slug: "about", name: "About", language: "en" },
+    { id: "careers", slug: "careers", name: "Careers", language: "en" },
+    { id: "sxetika", slug: "sxetika", name: "Sxetika", language: "el" },
+    { id: "kariera", slug: "kariera", name: "Kariera", language: "el" },
+  ];
+
+  // The switcher only appears once its list holds more than one page, and the
+  // list arrives after mount.
+  const openSwitcher = async () => fireEvent.click(await screen.findByRole("button", { name: /Sxetika/ }));
+
+  const renderFor = (pageLanguage) =>
+    render(
+      <MemoryRouter>
+        <PluginProvider>
+          <EditorTopBar pageName="Sxetika" pageId="sxetika" pageLanguage={pageLanguage} />
+        </PluginProvider>
+      </MemoryRouter>,
+    );
+
+  it("lists only the pages of the language being edited, and opens them in it", async () => {
+    getAllPages.mockResolvedValue(PAGES);
+    navigate.mockReset();
+    renderFor("el");
+    await openSwitcher();
+
+    expect(screen.getByText("Kariera")).toBeTruthy();
+    expect(screen.queryByText("About")).toBeNull();
+    expect(screen.queryByText("Careers")).toBeNull();
+
+    fireEvent.click(screen.getByText("Kariera"));
+    expect(navigate).toHaveBeenCalledWith("/page-editor?pageId=kariera&language=el");
+  });
+
+  it("keeps every page, and adds no language, when the site has one", async () => {
+    getAllPages.mockResolvedValue(PAGES.filter((page) => page.language === "en"));
+    navigate.mockReset();
+    renderFor(undefined);
+    await openSwitcher();
+
+    expect(screen.getByText("About")).toBeTruthy();
+    fireEvent.click(screen.getByText("Careers"));
+    expect(navigate).toHaveBeenCalledWith("/page-editor?pageId=careers");
   });
 });

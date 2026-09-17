@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
@@ -15,6 +16,9 @@ export default function PagesAdd() {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [searchParams] = useSearchParams();
+  // A new page belongs to the language tab it was started from.
+  const language = searchParams.get("language") || undefined;
 
   const showToast = useToastStore((state) => state.showToast);
   const editorPath = useEditorPath();
@@ -25,7 +29,7 @@ export default function PagesAdd() {
     setIsSubmitting(true);
 
     try {
-      const newPage = await createPage(formData);
+      const newPage = await createPage({ ...formData, ...(language ? { language } : {}) });
       showToast(t("pagesAdd.toasts.createSuccess", { name: newPage.name }), "success");
 
       // Invalidate media cache since SEO images may have been set

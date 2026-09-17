@@ -50,7 +50,10 @@ export default function PageEditor() {
   // remounts this component on project switch, so no manual reset is needed.
   useEffect(() => {
     const pageId = searchParams.get("pageId");
-    usePageStore.getState().loadPage(pageId);
+    // A slug is unique per language, so which language is being edited travels
+    // in the URL. Saving already targets it: the loaded page carries its own
+    // language and every save sends the page back.
+    usePageStore.getState().loadPage(pageId, searchParams.get("language") || undefined);
     if (activeProject?.id) {
       useWidgetStore.getState().loadSchemas();
     }
@@ -114,7 +117,7 @@ export default function PageEditor() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-900">
-      <EditorTopBar pageName={page.name} pageId={page.id} onPreviewModeChange={setPreviewMode}>
+      <EditorTopBar pageName={page.name} pageId={page.id} pageLanguage={page.language} onPreviewModeChange={setPreviewMode}>
         <ThemeSelector />
       </EditorTopBar>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
 
@@ -19,6 +19,9 @@ import { useEditorPath } from "../lib/routeBase.jsx";
 export default function PagesEdit() {
   const { t } = useTranslation();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  // A slug is unique per language, so the URL says which one is being edited.
+  const language = searchParams.get("language") || undefined;
   const navigate = useNavigate();
   const editorPath = useEditorPath();
   const [page, setPage] = useState(null);
@@ -40,7 +43,7 @@ export default function PagesEdit() {
 
   const loadPage = async () => {
     try {
-      const pageData = await getPage(id);
+      const pageData = await getPage(id, language);
       setPage(pageData);
       setLoading(false);
     } catch (err) {
@@ -63,7 +66,10 @@ export default function PagesEdit() {
         const savedName = result.data?.name || formData.name;
         // Navigate with guard bypass if the slug changed
         if (formData.slug !== id) {
-          navigateSafely(editorPath(`/pages/${formData.slug}/edit`), { replace: true });
+          navigateSafely(
+            editorPath(`/pages/${formData.slug}/edit${language ? `?language=${language}` : ""}`),
+            { replace: true },
+          );
           showToast(t("pagesEdit.toasts.updateSuccessUrlChanged", { name: savedName }), "success");
         } else {
           showToast(t("pagesEdit.toasts.updateSuccess", { name: savedName }), "success");

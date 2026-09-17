@@ -592,6 +592,15 @@
       "updated": "Updated",
       "actions": "Actions"
     },
+    "languages": {
+      "tabsLabel": "Filter pages by language",
+      "header": "Languages",
+      "open": "Open the {{name}} version",
+      "create": "Create the {{name}} version",
+      "creating": "Creating the {{name}} version…",
+      "created": "{{name}} version created.",
+      "createError": "The version could not be created."
+    },
     "noPagesFound": "No pages found",
     "noPagesMatch": "No pages match \"{{term}}\". Try a different search term.",
     "noPagesAvailable": "No pages available",

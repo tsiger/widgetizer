@@ -73,7 +73,7 @@ const usePageStore = create(
       error: null,
 
       // Actions
-      loadPage: async (pageId) => {
+      loadPage: async (pageId, language) => {
         const projectId = getActiveProjectId();
         const nextLoadId = get().activeLoadId + 1;
         set({ activeLoadId: nextLoadId });
@@ -105,7 +105,7 @@ const usePageStore = create(
 
         try {
           // Load page data (clean, no global widgets mixed in)
-          const pageData = await getPage(pageId);
+          const pageData = await getPage(pageId, language);
 
           // Filter out any header/footer widgets that might exist in page data
           const cleanWidgets = {};

@@ -12,6 +12,7 @@ import { SlotOutlet } from "../../extension/PluginProvider.jsx";
 export default function EditorTopBar({
   pageName,
   pageId,
+  pageLanguage,
   onPreviewModeChange, // Callback to notify parent of preview mode changes
   children,
 }) {
@@ -65,13 +66,15 @@ export default function EditorTopBar({
     const loadPages = async () => {
       try {
         const allPages = await getAllPages();
-        setPages(allPages);
+        // A slug is unique per language, so switching pages stays inside the
+        // one being edited — the other languages are reached from their chips.
+        setPages(pageLanguage ? allPages.filter((page) => page.language === pageLanguage) : allPages);
       } catch (error) {
         console.error("Failed to load pages:", error);
       }
     };
     loadPages();
-  }, []);
+  }, [pageLanguage]);
 
   // Cleanup auto-save timer when component unmounts
   useEffect(() => {
@@ -133,7 +136,8 @@ export default function EditorTopBar({
   }, [isDropdownOpen]);
 
   const handlePageChange = (pageId) => {
-    navigate(editorPath(`/page-editor?pageId=${pageId}`));
+    const query = pageLanguage ? `&language=${pageLanguage}` : "";
+    navigate(editorPath(`/page-editor?pageId=${pageId}${query}`));
     setIsDropdownOpen(false);
   };
 
@@ -155,7 +159,7 @@ export default function EditorTopBar({
   const hasMultiplePages = pages.length > 1;
   
   const handleNewPage = () => {
-    navigate(editorPath("/pages/add"));
+    navigate(editorPath(pageLanguage ? `/pages/add?language=${pageLanguage}` : "/pages/add"));
     setIsDropdownOpen(false);
   };
 
