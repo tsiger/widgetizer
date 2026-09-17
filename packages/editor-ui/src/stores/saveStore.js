@@ -249,11 +249,11 @@ const useAutoSave = create((set, get) => ({
             : false;
 
         if (globalWidgets.header && (modifiedWidgets.has("header") || hasHeaderDiff)) {
-          guardedPromises.push(saveGlobalWidget("header", globalWidgets.header));
+          guardedPromises.push(saveGlobalWidget("header", globalWidgets.header, page?.language));
         }
 
         if (globalWidgets.footer && (modifiedWidgets.has("footer") || hasFooterDiff)) {
-          guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer));
+          guardedPromises.push(saveGlobalWidget("footer", globalWidgets.footer, page?.language));
         }
 
         const hasPageWidgetChanges = [...modifiedWidgets].some((id) => id !== "header" && id !== "footer");

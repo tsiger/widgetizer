@@ -432,12 +432,14 @@ let customCodeTimer = null;
 
 /**
  * Fetch global widgets (header and footer) for the active project.
+ * @param {string} [language] - which language's header/footer; each language has its own
  * @returns {Promise<{header: Object|null, footer: Object|null}>} Global widget data
  * @throws {Error} If the request fails
  */
-export async function getGlobalWidgets() {
+export async function getGlobalWidgets(language) {
+  const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson("/preview/global-widgets", {}, {
+    return await editorFetchJson(`/preview/global-widgets${query}`, {}, {
       fallbackMessage: "Failed to fetch global widgets",
     });
   } catch (error) {
@@ -450,12 +452,14 @@ export async function getGlobalWidgets() {
  * Save a global widget (header or footer) for the active project.
  * @param {string} type - Widget type: "header" or "footer"
  * @param {Object} widget - Widget data to save
+ * @param {string} [language] - which language's header/footer; each language has its own
  * @returns {Promise<{success: boolean}>} Save confirmation
  * @throws {Error} If save fails
  */
-export async function saveGlobalWidget(type, widget) {
+export async function saveGlobalWidget(type, widget, language) {
+  const query = language ? `?language=${encodeURIComponent(language)}` : "";
   try {
-    return await editorFetchJson(`/preview/global-widgets/${type}`, {
+    return await editorFetchJson(`/preview/global-widgets/${type}${query}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

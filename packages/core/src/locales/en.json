@@ -742,6 +742,9 @@
       "header": "Header",
       "footer": "Footer",
       "widgetSettings": "Widget Settings"
+    },
+    "languages": {
+      "menuLabel": "This page's language"
     }
   },
   "breadcrumb": {

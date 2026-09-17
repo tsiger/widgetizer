@@ -1137,9 +1137,25 @@ describe("saveStore (useAutoSave)", () => {
       saveGlobalWidget.mockClear();
       await useAutoSave.getState().save();
 
-      expect(saveGlobalWidget).toHaveBeenCalledWith("header", reEditedHeader);
+      expect(saveGlobalWidget).toHaveBeenCalledWith("header", reEditedHeader, undefined);
       expect(usePageStore.getState().originalGlobalWidgets.header).toEqual(reEditedHeader);
       expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    // Each language has its own header/footer; without the page's language the
+    // edit would land on the default language's file.
+    it("saves the globals into the language of the page being edited", async () => {
+      seedPageStore();
+      usePageStore.setState((state) => ({
+        page: { ...state.page, language: "el" },
+        globalWidgets: { header: { type: "header", settings: {}, blocks: {}, blocksOrder: [] }, footer: null },
+        originalGlobalWidgets: { header: null, footer: null },
+      }));
+      useAutoSave.getState().markWidgetModified("header");
+
+      await useAutoSave.getState().save();
+
+      expect(saveGlobalWidget).toHaveBeenCalledWith("header", expect.anything(), "el");
     });
 
     it("updates lastSaved timestamp", async () => {

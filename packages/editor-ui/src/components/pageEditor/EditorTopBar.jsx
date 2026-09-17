@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus } from "lucide-react";
+import { Save, ChevronDown, Monitor, Smartphone, Eye, ArrowLeft, Undo2, Redo2, CirclePlus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getAllPages } from "../../queries/pageManager";
+import { getAllPages, createPageLanguageVersion } from "../../queries/pageManager";
 import useAutoSave from "../../stores/saveStore";
 import usePageStore from "../../stores/pageStore";
+import { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../../stores/projectStore";
+import { nativeLanguageName } from "@widgetizer/core/languages";
+import useTranslationVersions from "../../hooks/useTranslationVersions";
+import { pageEditorHref, pageAddHref } from "../../lib/contentRoutes";
 import { useEditorPath } from "../../lib/routeBase.jsx";
 import { openPagePreview } from "../../lib/openSitePreview.js";
 import { SlotOutlet } from "../../extension/PluginProvider.jsx";
@@ -18,14 +22,22 @@ export default function EditorTopBar({
 }) {
   const { t } = useTranslation();
   const { hasUnsavedChanges, isSaving, save, stopAutoSave } = useAutoSave();
-  const [pages, setPages] = useState([]);
+  const [allPages, setAllPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(() => {
     return localStorage.getItem("editorPreviewMode") || "desktop";
   });
   const dropdownRef = useRef(null);
+  const languageMenuRef = useRef(null);
   const navigate = useNavigate();
   const editorPath = useEditorPath();
+
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
+  const extraLanguages = useExtraLanguages();
+  const currentPage = usePageStore((state) => state.page);
+  const currentLanguage = pageLanguage || defaultLanguage;
 
   // Force re-render when undo/redo happens
   const [, forceUpdate] = useState(0);
@@ -65,16 +77,13 @@ export default function EditorTopBar({
   useEffect(() => {
     const loadPages = async () => {
       try {
-        const allPages = await getAllPages();
-        // A slug is unique per language, so switching pages stays inside the
-        // one being edited — the other languages are reached from their chips.
-        setPages(pageLanguage ? allPages.filter((page) => page.language === pageLanguage) : allPages);
+        setAllPages(await getAllPages());
       } catch (error) {
         console.error("Failed to load pages:", error);
       }
     };
     loadPages();
-  }, [pageLanguage]);
+  }, []);
 
   // Cleanup auto-save timer when component unmounts
   useEffect(() => {
@@ -124,22 +133,37 @@ export default function EditorTopBar({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
+      if (languageMenuRef.current && !languageMenuRef.current.contains(event.target)) {
+        setIsLanguageMenuOpen(false);
+      }
     };
 
-    if (isDropdownOpen) {
+    if (isDropdownOpen || isLanguageMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, isLanguageMenuOpen]);
 
-  const handlePageChange = (pageId) => {
-    const query = pageLanguage ? `&language=${pageLanguage}` : "";
-    navigate(editorPath(`/page-editor?pageId=${pageId}${query}`));
+  // A slug is unique per language, so switching pages stays inside the one being
+  // edited — the other languages are reached from the language menu.
+  const pages = pageLanguage ? allPages.filter((page) => page.language === pageLanguage) : allPages;
+
+  const openPage = (page) => {
+    navigate(editorPath(pageEditorHref(page, isMultilang)));
     setIsDropdownOpen(false);
+    setIsLanguageMenuOpen(false);
   };
+
+  const { siblingsOf, createIn, pendingKey } = useTranslationVersions({
+    entries: allPages,
+    defaultLanguage,
+    createVersion: (page, targetLanguage) =>
+      createPageLanguageVersion(page.id, { targetLanguage, sourceLanguage: page.language }),
+    onCreated: openPage,
+  });
 
   const handlePreviewModeChange = (mode) => {
     setPreviewMode(mode);
@@ -157,11 +181,70 @@ export default function EditorTopBar({
   }, [pageId]);
 
   const hasMultiplePages = pages.length > 1;
-  
+
   const handleNewPage = () => {
-    navigate(editorPath(pageLanguage ? `/pages/add?language=${pageLanguage}` : "/pages/add"));
+    navigate(editorPath(pageAddHref(isMultilang ? currentLanguage : undefined)));
     setIsDropdownOpen(false);
   };
+
+  const siblings = siblingsOf(currentPage);
+  const languageMenu = isMultilang && (
+    <div className="relative" ref={languageMenuRef}>
+      <button
+        onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+        title={t("pageEditor.languages.menuLabel")}
+        aria-label={t("pageEditor.languages.menuLabel")}
+        className="font-medium px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2 text-sm uppercase"
+      >
+        {currentLanguage}
+        <ChevronDown size={16} className={`transform transition-transform ${isLanguageMenuOpen ? "rotate-180" : ""}`} />
+      </button>
+      {isLanguageMenuOpen && (
+        <div className="absolute top-full left-0 mt-1 w-64 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg z-50">
+          {[defaultLanguage, ...extraLanguages].map((code) => {
+            const sibling = siblings.get(code);
+            const name = nativeLanguageName(code);
+            if (sibling) {
+              return (
+                <button
+                  key={code}
+                  onClick={() => openPage(sibling)}
+                  aria-label={t("pages.languages.open", { name })}
+                  aria-current={code === currentLanguage ? "true" : undefined}
+                  className={`w-full px-4 py-2 text-left flex items-center justify-between ${
+                    code === currentLanguage
+                      ? "bg-pink-600 text-white hover:bg-pink-700"
+                      : "text-slate-800 hover:bg-slate-100"
+                  }`}
+                >
+                  <span>{name}</span>
+                  <span className="text-xs uppercase opacity-70">{code}</span>
+                </button>
+              );
+            }
+            return (
+              <button
+                key={code}
+                disabled={!currentPage || pendingKey !== null}
+                onClick={() => createIn(currentPage, code)}
+                aria-label={
+                  pendingKey === `${currentPage?.id}:${code}`
+                    ? t("pages.languages.creating", { name })
+                    : t("pages.languages.create", { name })
+                }
+                className="w-full px-4 py-2 text-left flex items-center justify-between text-slate-500 hover:bg-slate-100 disabled:opacity-50"
+              >
+                <span className="flex items-center gap-2">
+                  <Plus size={14} /> {name}
+                </span>
+                <span className="text-xs uppercase opacity-70">{code}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="bg-white text-slate-900 border-b border-slate-200 p-2 flex justify-between items-center">
@@ -200,7 +283,7 @@ export default function EditorTopBar({
               {pages.map((page) => (
                 <button
                   key={page.id}
-                  onClick={() => handlePageChange(page.id)}
+                  onClick={() => openPage(page)}
                   className={`w-full px-4 py-2 text-left flex items-center justify-between ${
                     page.id === pageId
                       ? "bg-pink-600 text-white hover:bg-pink-700"
@@ -221,6 +304,7 @@ export default function EditorTopBar({
             </div>
           )}
         </div>
+        {languageMenu}
       </div>
 
       <div className="flex items-center gap-3">

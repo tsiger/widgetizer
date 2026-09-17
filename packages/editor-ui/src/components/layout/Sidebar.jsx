@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import useProjectStore from "../../stores/projectStore";
+import useProjectStore, { useDefaultLanguage } from "../../stores/projectStore";
 import usePageListStore from "../../stores/pageListStore";
 import { getAllPages } from "../../queries/pageManager";
 import SidebarMeta from "./SidebarMeta";
@@ -17,6 +17,7 @@ export default function Sidebar() {
   const location = useLocation();
   const activeProject = useProjectStore((state) => state.activeProject);
   const hasActiveProject = !!activeProject;
+  const defaultLanguage = useDefaultLanguage();
   const [hasPages, setHasPages] = useState(false);
   const pagesVersion = usePageListStore((state) => state.version);
   const { schemas: collectionSchemas } = useCollections();
@@ -104,7 +105,10 @@ export default function Sidebar() {
   const openSitePreview = async () => {
     try {
       const pages = await getAllPages();
-      const homepage = pages.find((p) => p.slug === "index") || pages[0];
+      // Every language has an "index"; the standalone preview is the default
+      // language's site, so pick that one's homepage (step 18 namespaces the rest).
+      const inDefault = pages.filter((p) => (p.language || defaultLanguage) === defaultLanguage);
+      const homepage = inDefault.find((p) => p.slug === "index") || inDefault[0];
       if (!homepage) return;
       // Resolve the homepage's standalone preview route and dispatch it (Electron
       // preview window in the desktop app, shared browser tab on the web). The route

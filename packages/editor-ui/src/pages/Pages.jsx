@@ -17,7 +17,8 @@ import useFormatDate from "../hooks/useFormatDate";
 import useToastStore from "../stores/toastStore";
 import useProjectStore, { useDefaultLanguage, useExtraLanguages, useIsMultilang } from "../stores/projectStore";
 import { nativeLanguageName } from "@widgetizer/core/languages";
-import { translationGroupIdOf } from "@widgetizer/core/contentAddress";
+import useTranslationVersions from "../hooks/useTranslationVersions";
+import { pageEditorHref, pageSettingsHref, pageAddHref } from "../lib/contentRoutes";
 import usePageListStore from "../stores/pageListStore";
 import PageLayout from "../components/layout/PageLayout";
 import Button, { IconButton } from "../components/ui/Button";
@@ -52,7 +53,6 @@ export default function Pages() {
   const extraLanguages = useExtraLanguages();
   const siteLanguages = [defaultLanguage, ...extraLanguages];
   const [activeLanguage, setActiveLanguage] = useState(defaultLanguage);
-  const [creatingVersion, setCreatingVersion] = useState(null);
 
   // Handle page deletion with confirmation
   const handleDelete = async (data) => {
@@ -81,41 +81,20 @@ export default function Pages() {
 
   const handleNewPage = () => {
     // A new page belongs to the language being looked at.
-    navigate(editorPath(isMultilang ? `/pages/add?language=${activeLanguage}` : "/pages/add"));
+    navigate(editorPath(pageAddHref(isMultilang ? activeLanguage : undefined)));
   };
 
-  const pageEditorPath = (page) =>
-    editorPath(
-      isMultilang
-        ? `/page-editor?pageId=${page.slug}&language=${page.language}`
-        : `/page-editor?pageId=${page.id}`,
-    );
+  const pageEditorPath = (page) => editorPath(pageEditorHref(page, isMultilang));
 
   // Every language comes back in one request, so a row's siblings are already
   // in hand: no lookup per row, and the chips stay right after any change.
-  const siblingsByGroup = new Map();
-  for (const page of pages) {
-    const groupId = translationGroupIdOf(page);
-    if (!groupId) continue;
-    if (!siblingsByGroup.has(groupId)) siblingsByGroup.set(groupId, new Map());
-    siblingsByGroup.get(groupId).set(page.language || defaultLanguage, page);
-  }
-
-  const handleCreateVersion = async (page, targetLanguage) => {
-    setCreatingVersion(`${page.id}:${targetLanguage}`);
-    try {
-      const created = await createPageLanguageVersion(page.id, {
-        targetLanguage,
-        sourceLanguage: page.language,
-      });
-      showToast(t("pages.languages.created", { name: nativeLanguageName(targetLanguage) }), "success");
-      navigate(pageEditorPath(created));
-    } catch (error) {
-      showToast(error.message || t("pages.languages.createError"), "error");
-    } finally {
-      setCreatingVersion(null);
-    }
-  };
+  const { siblingsOf, createIn, pendingKey } = useTranslationVersions({
+    entries: pages,
+    defaultLanguage,
+    createVersion: (page, targetLanguage) =>
+      createPageLanguageVersion(page.id, { targetLanguage, sourceLanguage: page.language }),
+    onCreated: (created) => navigate(pageEditorPath(created)),
+  });
 
   const { confirm, confirmationModal } = useConfirmationAction(handleDelete);
 
@@ -259,7 +238,7 @@ export default function Pages() {
   );
 
   const languageChips = (page) => {
-    const siblings = siblingsByGroup.get(translationGroupIdOf(page)) || new Map();
+    const siblings = siblingsOf(page);
     return (
       <div className="flex items-center gap-1">
         {siteLanguages
@@ -267,7 +246,7 @@ export default function Pages() {
           .map((code) => {
             const sibling = siblings.get(code);
             const name = nativeLanguageName(code);
-            const pendingKey = `${page.id}:${code}`;
+            const chipKey = `${page.id}:${code}`;
             if (sibling) {
               return (
                 <Link
@@ -285,11 +264,11 @@ export default function Pages() {
               <button
                 key={code}
                 type="button"
-                disabled={creatingVersion !== null}
-                onClick={() => handleCreateVersion(page, code)}
+                disabled={pendingKey !== null}
+                onClick={() => createIn(page, code)}
                 title={t("pages.languages.create", { name })}
                 aria-label={
-                  creatingVersion === pendingKey
+                  pendingKey === chipKey
                     ? t("pages.languages.creating", { name })
                     : t("pages.languages.create", { name })
                 }
@@ -467,11 +446,7 @@ export default function Pages() {
                             {t("pages.actions.design")}
                           </Link>
                           <Link
-                            to={editorPath(
-                              isMultilang
-                                ? `/pages/${page.id}/edit?language=${page.language}`
-                                : `/pages/${page.id}/edit`,
-                            )}
+                            to={editorPath(pageSettingsHref(page, isMultilang))}
                             onClick={() => setOpenMenuId(null)}
                             className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
                           >

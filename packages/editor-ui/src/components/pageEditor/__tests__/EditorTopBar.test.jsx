@@ -1,15 +1,25 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { PluginProvider } from "../../../extension/PluginProvider.jsx";
 import EditorTopBar from "../EditorTopBar.jsx";
 import useAutoSave from "../../../stores/saveStore.js";
 import usePageStore from "../../../stores/pageStore.js";
+import useProjectStore from "../../../stores/projectStore.js";
 
 const getAllPages = vi.fn().mockResolvedValue([]);
+const createPageLanguageVersion = vi.fn();
 const navigate = vi.fn();
-vi.mock("../../../queries/pageManager", () => ({ getAllPages: (...args) => getAllPages(...args) }));
+vi.mock("../../../queries/pageManager", () => ({
+  getAllPages: (...args) => getAllPages(...args),
+  createPageLanguageVersion: (...args) => createPageLanguageVersion(...args),
+}));
+
+// The language controls read the real project store, so each test says what
+// kind of site it is rather than leaning on whatever ran before it.
+const setSiteLanguages = (languages) =>
+  useProjectStore.setState({ activeProject: { id: "p1", defaultLanguage: "en", languages } });
 vi.mock("react-router-dom", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => navigate,
@@ -97,6 +107,7 @@ describe("EditorTopBar page switcher across languages", () => {
     );
 
   it("lists only the pages of the language being edited, and opens them in it", async () => {
+    setSiteLanguages(["el"]);
     getAllPages.mockResolvedValue(PAGES);
     navigate.mockReset();
     renderFor("el");
@@ -111,6 +122,7 @@ describe("EditorTopBar page switcher across languages", () => {
   });
 
   it("keeps every page, and adds no language, when the site has one", async () => {
+    setSiteLanguages([]);
     getAllPages.mockResolvedValue(PAGES.filter((page) => page.language === "en"));
     navigate.mockReset();
     renderFor(undefined);
@@ -119,5 +131,99 @@ describe("EditorTopBar page switcher across languages", () => {
     expect(screen.getByText("About")).toBeTruthy();
     fireEvent.click(screen.getByText("Careers"));
     expect(navigate).toHaveBeenCalledWith("/page-editor?pageId=careers");
+  });
+});
+
+// The whole translation workflow from inside the editor: jump to a sibling, or
+// create the one that is missing. Siblings are found by translation group, so a
+// source that records none of its own is matched by its uuid.
+describe("EditorTopBar language menu", () => {
+  const EN_ABOUT = { id: "about", slug: "about", uuid: "u-about", name: "About", language: "en" };
+  const EL_ABOUT = {
+    id: "sxetika",
+    slug: "sxetika",
+    uuid: "u-el-about",
+    translationGroupId: "u-about",
+    name: "Sxetika",
+    language: "el",
+  };
+  const EN_ALONE = { id: "careers", slug: "careers", uuid: "u-careers", name: "Careers", language: "en" };
+
+  const renderFor = (page) => {
+    usePageStore.setState({ page });
+    return render(
+      <MemoryRouter>
+        <PluginProvider>
+          <EditorTopBar pageName={page.name} pageId={page.id} pageLanguage={page.language} />
+        </PluginProvider>
+      </MemoryRouter>,
+    );
+  };
+
+  const openMenu = () => fireEvent.click(screen.getByRole("button", { name: "pageEditor.languages.menuLabel" }));
+
+  beforeEach(() => {
+    getAllPages.mockReset().mockResolvedValue([EN_ABOUT, EL_ABOUT, EN_ALONE]);
+    createPageLanguageVersion.mockReset();
+    navigate.mockReset();
+    setSiteLanguages(["el"]);
+  });
+
+  it("opens the sibling that exists, by its own slug and language", async () => {
+    renderFor(EN_ABOUT);
+    openMenu();
+
+    fireEvent.click((await screen.findByText("Ελληνικά")).closest("button"));
+    expect(navigate).toHaveBeenCalledWith("/page-editor?pageId=sxetika&language=el");
+  });
+
+  it("creates the missing one from the page being edited, then opens it", async () => {
+    createPageLanguageVersion.mockResolvedValue({ id: "kariera", slug: "kariera", language: "el" });
+    renderFor(EN_ALONE);
+    openMenu();
+
+    fireEvent.click(await screen.findByRole("button", { name: "pages.languages.create" }));
+
+    await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith("/page-editor?pageId=kariera&language=el"));
+    expect(createPageLanguageVersion).toHaveBeenCalledWith("careers", {
+      targetLanguage: "el",
+      sourceLanguage: "en",
+    });
+  });
+
+  it("stays put when the server refuses", async () => {
+    createPageLanguageVersion.mockRejectedValue(new Error("nope"));
+    renderFor(EN_ALONE);
+    openMenu();
+
+    fireEvent.click(await screen.findByRole("button", { name: "pages.languages.create" }));
+    await vi.waitFor(() => expect(createPageLanguageVersion).toHaveBeenCalled());
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  // Creating a version normally navigates away; a navigation guard can cancel
+  // that, and the menu would otherwise still offer to create it (a 409).
+  it("counts a version it just created even when nothing navigated", async () => {
+    const version = { id: "kariera", slug: "kariera", uuid: "u-new", translationGroupId: "u-careers", language: "el" };
+    createPageLanguageVersion.mockResolvedValue(version);
+    navigate.mockImplementation(() => {}); // a guard that refuses to leave
+    renderFor(EN_ALONE);
+    openMenu();
+
+    fireEvent.click(await screen.findByRole("button", { name: "pages.languages.create" }));
+    // Wait for the whole create to settle: the attempt to leave is what closes
+    // the menu, so re-opening before it lands would just close it again.
+    await vi.waitFor(() => expect(navigate).toHaveBeenCalled());
+
+    openMenu();
+    const greek = (await screen.findByText("Ελληνικά")).closest("button");
+    expect(greek.getAttribute("aria-label")).toBe("pages.languages.open");
+    expect(screen.queryByRole("button", { name: "pages.languages.create" })).toBeNull();
+  });
+
+  it("is not there at all while the site has one language", () => {
+    setSiteLanguages([]);
+    renderFor(EN_ABOUT);
+    expect(screen.queryByRole("button", { name: "pageEditor.languages.menuLabel" })).toBeNull();
   });
 });

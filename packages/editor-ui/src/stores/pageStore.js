@@ -49,6 +49,29 @@ const valueAt = (source, path) => path.reduce((node, key) => node?.[key], source
 
 let lastEdit = null;
 
+/**
+ * Read a language's header/footer. Returns them rather than storing them: the
+ * caller decides whether its load is still the current one before committing.
+ */
+async function readGlobalWidgets(language) {
+  try {
+    const data = await getGlobalWidgets(language);
+    const shape = (type) =>
+      data[type]
+        ? {
+            type,
+            settings: data[type].settings || {},
+            blocks: data[type].blocks || {},
+            blocksOrder: data[type].blocksOrder || [],
+          }
+        : null;
+    return { header: shape("header"), footer: shape("footer") };
+  } catch (err) {
+    console.error("Failed to load global widgets:", err);
+    return { header: null, footer: null };
+  }
+}
+
 const usePageStore = create(
   temporal(
     (set, get) => ({
@@ -120,8 +143,10 @@ const usePageStore = create(
             widgets: cleanWidgets,
           };
 
-          // Load global widgets separately
-          await get().loadGlobalWidgets();
+          // In the language the page came back in — a default-language load passes
+          // no argument but still has a folder. Held until the guard below, so a
+          // superseded load cannot drop its header/footer on a newer page.
+          const globalWidgets = await readGlobalWidgets(pageData.language);
 
           // Load theme settings into themeStore (canonical owner).
           // Skip refetch only if themeStore already holds *valid* data for this
@@ -143,6 +168,8 @@ const usePageStore = create(
           set({
             page: cleanPageData,
             originalPage: JSON.parse(JSON.stringify(cleanPageData)),
+            globalWidgets,
+            originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)),
             themeSettingsSnapshot: themeSnapshot ? JSON.parse(JSON.stringify(themeSnapshot)) : null,
             loading: false,
             error: null,
@@ -192,37 +219,6 @@ const usePageStore = create(
         const { themeSettingsSnapshot } = get();
         if (themeSettingsSnapshot) {
           useThemeStore.getState().setSettings(JSON.parse(JSON.stringify(themeSettingsSnapshot)));
-        }
-      },
-
-      // Load global widgets separately
-      loadGlobalWidgets: async () => {
-        try {
-          const globalWidgetsData = await getGlobalWidgets();
-
-          const globalWidgets = {
-            header: globalWidgetsData.header
-              ? {
-                  type: "header",
-                  settings: globalWidgetsData.header.settings || {},
-                  blocks: globalWidgetsData.header.blocks || {},
-                  blocksOrder: globalWidgetsData.header.blocksOrder || [],
-                }
-              : null,
-            footer: globalWidgetsData.footer
-              ? {
-                  type: "footer",
-                  settings: globalWidgetsData.footer.settings || {},
-                  blocks: globalWidgetsData.footer.blocks || {},
-                  blocksOrder: globalWidgetsData.footer.blocksOrder || [],
-                }
-              : null,
-          };
-
-          set({ globalWidgets, originalGlobalWidgets: JSON.parse(JSON.stringify(globalWidgets)) });
-        } catch (err) {
-          console.error("Failed to load global widgets:", err);
-          set({ globalWidgets: { header: null, footer: null }, originalGlobalWidgets: { header: null, footer: null } });
         }
       },
 

@@ -376,6 +376,49 @@ describe("pageStore", () => {
       expect(state.themeSettingsSnapshot).toEqual(themeData);
     });
 
+    // Each language has its own header/footer, so the canvas would otherwise show
+    // the default language's chrome around a translated page.
+    it("fetches the globals of the language the page came back in", async () => {
+      getPage.mockResolvedValue({ id: "sxetika", language: "el", widgets: {}, widgetsOrder: [] });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+
+      await usePageStore.getState().loadPage("sxetika", "el");
+      expect(getGlobalWidgets).toHaveBeenCalledWith("el");
+    });
+
+    it("asks for the default language's globals by the language the page reports, not the argument", async () => {
+      getPage.mockResolvedValue({ id: "about", language: "en", widgets: {}, widgetsOrder: [] });
+      getGlobalWidgets.mockResolvedValue({ header: null, footer: null });
+
+      await usePageStore.getState().loadPage("about");
+      expect(getGlobalWidgets).toHaveBeenCalledWith("en");
+    });
+
+    // The globals used to be written the moment they arrived, so a load that had
+    // already been superseded could leave one language's header on another
+    // language's page — and the next save would write it into that page's file.
+    it("does not let a superseded load's globals land on the page that replaced it", async () => {
+      let releaseEnglish;
+      getPage
+        .mockImplementationOnce(async () => ({ id: "about", language: "en", widgets: {}, widgetsOrder: [] }))
+        .mockImplementationOnce(async () => ({ id: "sxetika", language: "el", widgets: {}, widgetsOrder: [] }));
+      getGlobalWidgets
+        .mockImplementationOnce(
+          () => new Promise((resolve) => { releaseEnglish = () => resolve({ header: { settings: { text: "EN" } }, footer: null }); }),
+        )
+        .mockImplementationOnce(async () => ({ header: { settings: { text: "EL" } }, footer: null }));
+
+      const english = usePageStore.getState().loadPage("about", "en");
+      await usePageStore.getState().loadPage("sxetika", "el");
+      releaseEnglish();
+      await english;
+
+      const state = usePageStore.getState();
+      expect(state.page.id).toBe("sxetika");
+      expect(state.globalWidgets.header.settings.text).toBe("EL");
+      expect(state.originalGlobalWidgets.header.settings.text).toBe("EL");
+    });
+
     it("clears stale state when the load fails", async () => {
       seedPage();
       seedGlobalWidgets();
