@@ -14,6 +14,7 @@ import useToastStore from "../../stores/toastStore";
 import useProjectStore from "../../stores/projectStore";
 import Button from "../ui/Button";
 import SettingsRenderer from "../settings/SettingsRenderer";
+import { EditingLanguageProvider } from "../../lib/editingLanguage.jsx";
 import SeoFields from "../settings/SeoFields";
 import { openCollectionItemPreview } from "../../lib/openSitePreview";
 
@@ -270,7 +271,7 @@ export default function CollectionItemForm({
   };
 
   return (
-    <>
+    <EditingLanguageProvider language={initialData.language}>
     <form
       onSubmit={rhfHandleSubmit(onSubmitHandler, (formErrors) => formErrors.slug && setShowMore(true))}
       className="space-y-6"
@@ -421,6 +422,6 @@ export default function CollectionItemForm({
     </form>
 
     {confirmationModal}
-    </>
+    </EditingLanguageProvider>
   );
 }

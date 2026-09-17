@@ -16,6 +16,7 @@ import useWidgetStore from "../stores/widgetStore";
 import useAutoSave from "../stores/saveStore";
 import useToastStore from "../stores/toastStore";
 import useNavigationGuard from "../hooks/useNavigationGuard";
+import { EditingLanguageProvider } from "../lib/editingLanguage.jsx";
 import useDeleteKeyShortcut from "../hooks/useDeleteKeyShortcut";
 
 export default function PageEditor() {
@@ -116,6 +117,7 @@ export default function PageEditor() {
   }
 
   return (
+    <EditingLanguageProvider language={page.language}>
     <div className="flex flex-col h-full overflow-hidden bg-slate-900">
       <EditorTopBar pageName={page.name} pageId={page.id} pageLanguage={page.language} onPreviewModeChange={setPreviewMode}>
         <ThemeSelector />
@@ -164,5 +166,6 @@ export default function PageEditor() {
         />
       </div>
     </div>
+    </EditingLanguageProvider>
   );
 }

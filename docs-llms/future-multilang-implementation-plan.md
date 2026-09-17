@@ -272,9 +272,28 @@ Every component below renders nothing new while `projectStore.isMultilang` is fa
 - **The sidebar's "Preview site" picks the default language's homepage**, since every language now has an `index`. The standalone preview window itself is still default-language-only — it resolves `/preview/:pageId`, which step 18 replaces with a namespaced route.
 - **Review, both about state written outside the moment that owns it.** (1) The globals were stored the instant they arrived, before `loadPage` re-checked `activeLoadId` — so an English load overtaken by a Greek one still dropped the English header onto the Greek page, and the next save wrote it into the Greek file. Reading them now *returns* the pair (`readGlobalWidgets`, no longer a store action) and the page and its globals are committed together, under the one guard. (2) A version created from the menu was only visible once the caller reloaded its list, which the navigation away usually did — but a navigation guard can cancel that, leaving the menu offering to create it again for a 409. The hook keeps what it created and patches it in until the caller's list carries it.
 
-### Step 15. Pickers: all languages, grouped and filterable (§4a)
+### Step 15. Pickers: all languages, grouped and filterable (§4a) — *done 2026-09-17*
 
 - `packages/editor-ui/src/components/settings/inputs/LinkInput.jsx`, `RichTextInput.jsx` and `packages/editor-ui/src/components/MenuEditor/index.jsx` — group options by language, filter defaulting to the current page's language, and show a small language tag on any item whose target is in another language. Seeded cross-language menu targets (§2a) need no special case.
+
+**As built.** Neither LinkInput nor MenuEditor needed touching: both render `ui/ComboboxOptionList`, which is where the filter, the headers and the tag now live — one place, so a fourth picker would inherit them. `useLinkTargets` supplies the raw material: every option carries its `language`, and the list is built language-major (the default first) so an unfiltered view reads as one block per language.
+
+- **"Which language am I editing" is a context, not a store read.** `lib/editingLanguage.jsx` is provided by the page editor (the page's language), the collection item form (the item's) and the menu structure page (the menu's). The pickers sit deep inside those forms and have no other way to know; reading a store would have been wrong the moment two kinds of content share one input, which is exactly what `SettingsRenderer` is.
+- **The filter opens on that language and resets to it every time the list opens** — it is a detour, not a setting. "All" is the escape hatch, and only then does the language join the group header (`Pages · Ελληνικά`). An option carrying no `language` at all is never filtered out, so a non-link picker built on the same list still works.
+- **The collection listing is per language**, unlike `getAllPages`, so `useLinkTargets` asks once per language rather than changing what every other caller of that endpoint receives — step 16 can decide that separately. A single-language project makes exactly the same one call it always did. One language failing to load does not lose the others.
+- **Richtext's picker is a native `<select>`** and cannot carry a filter row, so the language being edited simply leads and the rest follow, each option tagged `(el)`. That grouping is `lib/linkTargetGroups.js` — extracted so it is testable without mounting the editor.
+- Copy in these pickers stays hardcoded English, matching every other string in the same components (`"Link URL"`, `"No matching pages found…"`); none of them are wired to i18n yet.
+- **Review: the target cache is keyed by the languages as well as the project.** Adding or removing a language, or changing the default, keeps the same project id, so the old key kept serving options built for the previous set — a new language's pages missing, a removed one's still selectable, for the whole TTL. The key is now `projectId\nen,el` and the effect depends on that string; `invalidateLinkTargetsCache(projectId)` drops every language entry the project holds.
+
+### Step 15a. Menus list and editor per language (§5) — *not built; gap found during step 15*
+
+The server has been language-aware since step 7 (`GET /menus` merges every folder and stamps `language`; get/update/delete/duplicate all take `?language=`), but `packages/editor-ui/src/queries/menuManager.js` never sends one. So the Menus list shows every language's menus with nothing to tell them apart, and opening one always edits the default language's file — the same bug class step 13 fixed for pages.
+
+- `menuManager.js` — `getMenu`/`updateMenu`/`deleteMenu`/`duplicateMenu` take a language; `createMenu` sends the one being looked at.
+- `pages/Menus.jsx` — language tabs (no chips: menus are seeded copies with fresh uuids, not a translation group).
+- `pages/MenusAdd.jsx`, `MenusEdit.jsx`, `MenuStructure.jsx` — carry `?language=` the way the page routes do, through `lib/contentRoutes.js`.
+
+Step 15's picker already reads the menu's language from `menu.language`, so it follows this for free once the menu being edited can be a non-default one.
 
 ### Step 16. Collections: the same three controls (§9a)
 

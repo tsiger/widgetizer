@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuEditor from "../components/menus/MenuEditor";
+import { EditingLanguageProvider } from "../lib/editingLanguage.jsx";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 
@@ -173,7 +174,9 @@ export default function MenuStructure() {
         variant: isDirty ? "dark" : "primary",
       }}
     >
-      <MenuEditor initialItems={menu.items || []} onChange={handleMenuItemsChange} onDeleteItem={handleDeleteItem} />
+      <EditingLanguageProvider language={menu.language}>
+        <MenuEditor initialItems={menu.items || []} onChange={handleMenuItemsChange} onDeleteItem={handleDeleteItem} />
+      </EditingLanguageProvider>
     </PageLayout>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAllPages } from "../queries/pageManager";
 import { getCollectionSchemas, getCollectionItems } from "../queries/collectionManager";
-import useProjectStore from "../stores/projectStore";
+import useProjectStore, { useDefaultLanguage, useExtraLanguages } from "../stores/projectStore";
 
 /**
  * Loads the link-target options for the active project — all pages plus the items
@@ -19,8 +19,14 @@ import useProjectStore from "../stores/projectStore";
  */
 
 const CACHE_DURATION = 60000; // 1 minute
-const cache = new Map(); // projectId -> { data, time }
-const inflight = new Map(); // projectId -> Promise
+const cache = new Map(); // cacheKey -> { data, time }
+const inflight = new Map(); // cacheKey -> Promise
+
+// The languages are part of the identity, not just the project: adding or removing
+// one, or changing the default, keeps the same project id while changing every
+// answer this hook gives.
+const KEY_SEPARATOR = "\n";
+const cacheKey = (projectId, languageKey) => `${projectId}${KEY_SEPARATOR}${languageKey}`;
 
 /**
  * Drop cached link targets so the next load refetches. Call after creating,
@@ -30,8 +36,12 @@ const inflight = new Map(); // projectId -> Promise
  */
 export function invalidateLinkTargetsCache(projectId) {
   if (projectId) {
-    cache.delete(projectId);
-    inflight.delete(projectId);
+    const prefix = `${projectId}${KEY_SEPARATOR}`;
+    for (const map of [cache, inflight]) {
+      for (const key of map.keys()) {
+        if (key.startsWith(prefix)) map.delete(key);
+      }
+    }
   } else {
     cache.clear();
     inflight.clear();
@@ -43,37 +53,57 @@ const byLabel = (a, b) => String(a.label).localeCompare(String(b.label), undefin
 
 const groupLabel = (schema) => schema.displayNamePlural || schema.displayName || schema.type;
 
-async function loadTargets() {
-  // Pages group, A–Z. The picker order is independent of any collection's own
-  // `defaultSort` — link targets read best alphabetically.
+async function loadTargets(languages, defaultLanguage) {
+  // Every language, because a page may exist in only one of them (§4a) — grouped
+  // language-major so a picker showing them all reads as one block per language.
   const pages = await getAllPages();
-  const options = pages
-    .map((p) => ({ value: p.uuid, label: p.name, slug: p.slug, isPage: true, group: "Pages" }))
-    .sort(byLabel);
 
+  let schemas = [];
   try {
     // Collection groups by display name A–Z, items A–Z within each group.
-    const schemas = (await getCollectionSchemas()).filter((s) => s.hasItemPages);
+    schemas = (await getCollectionSchemas()).filter((s) => s.hasItemPages);
     schemas.sort((a, b) => byLabel({ label: groupLabel(a) }, { label: groupLabel(b) }));
+  } catch (err) {
+    console.error("Failed to load collection schemas for link targets:", err);
+  }
+
+  const options = [];
+  for (const language of languages) {
+    // Pages group, A–Z. The picker order is independent of any collection's own
+    // `defaultSort` — link targets read best alphabetically.
+    options.push(
+      ...pages
+        .filter((p) => (p.language || defaultLanguage) === language)
+        .map((p) => ({ value: p.uuid, label: p.name, slug: p.slug, isPage: true, group: "Pages", language }))
+        .sort(byLabel),
+    );
 
     for (const schema of schemas) {
-      const items = await getCollectionItems(schema.type);
-      const itemOptions = items
-        .filter((it) => it.uuid)
-        .map((it) => ({
-          value: it.uuid,
-          label: it.title || it.slug,
-          isCollectionItem: true,
-          collectionType: schema.type,
-          slugPrefix: schema.slugPrefix,
-          slug: it.slug,
-          group: groupLabel(schema),
-        }))
-        .sort(byLabel);
-      options.push(...itemOptions);
+      try {
+        // The listing is per language, so ask once per language rather than
+        // changing what every other caller of it receives.
+        const items = await getCollectionItems(schema.type, {
+          language: language === defaultLanguage ? undefined : language,
+        });
+        options.push(
+          ...items
+            .filter((it) => it.uuid)
+            .map((it) => ({
+              value: it.uuid,
+              label: it.title || it.slug,
+              isCollectionItem: true,
+              collectionType: schema.type,
+              slugPrefix: schema.slugPrefix,
+              slug: it.slug,
+              group: groupLabel(schema),
+              language,
+            }))
+            .sort(byLabel),
+        );
+      } catch (err) {
+        console.error(`Failed to load ${schema.type} items for link targets:`, err);
+      }
     }
-  } catch (err) {
-    console.error("Failed to load collection items for link targets:", err);
   }
 
   return options;
@@ -81,6 +111,12 @@ async function loadTargets() {
 
 export default function useLinkTargets() {
   const activeProjectId = useProjectStore((state) => state.activeProject?.id);
+  const defaultLanguage = useDefaultLanguage();
+  const extraLanguages = useExtraLanguages();
+  // A string, so the effect re-runs on a language change without depending on the
+  // identity of the array the store happens to hold.
+  const languageKey = [defaultLanguage, ...extraLanguages].join(",");
+
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -93,7 +129,8 @@ export default function useLinkTargets() {
       return undefined;
     }
 
-    const cached = cache.get(activeProjectId);
+    const key = cacheKey(activeProjectId, languageKey);
+    const cached = cache.get(key);
     if (cached && Date.now() - cached.time < CACHE_DURATION) {
       setOptions(cached.data);
       setLoading(false);
@@ -101,18 +138,19 @@ export default function useLinkTargets() {
     }
 
     setLoading(true);
-    let promise = inflight.get(activeProjectId);
+    let promise = inflight.get(key);
     if (!promise) {
       promise = (async () => {
         try {
-          const data = await loadTargets();
-          cache.set(activeProjectId, { data, time: Date.now() });
+          const languages = languageKey.split(",");
+          const data = await loadTargets(languages, languages[0]);
+          cache.set(key, { data, time: Date.now() });
           return data;
         } finally {
-          inflight.delete(activeProjectId);
+          inflight.delete(key);
         }
       })();
-      inflight.set(activeProjectId, promise);
+      inflight.set(key, promise);
     }
 
     promise
@@ -129,7 +167,7 @@ export default function useLinkTargets() {
     return () => {
       cancelled = true;
     };
-  }, [activeProjectId]);
+  }, [activeProjectId, languageKey]);
 
   return { options, loading };
 }

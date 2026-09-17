@@ -28,6 +28,9 @@ import ResolvedImage from "./ResolvedImage";
 import MediaSelectorDrawer from "../../media/MediaSelectorDrawer";
 import useProjectStore from "../../../stores/projectStore";
 import useLinkTargets from "../../../hooks/useLinkTargets";
+import { useIsMultilang } from "../../../stores/projectStore";
+import { useEditingLanguage } from "../../../lib/editingLanguage.jsx";
+import { groupLinkTargets } from "../../../lib/linkTargetGroups";
 import { resolveRichtextLinkRefs } from "@widgetizer/core/richtextLinks";
 import { StableLink } from "./stableLink";
 import { API_URL } from "../../../lib/config";
@@ -37,15 +40,9 @@ import "./RichTextInput.css";
  *  useLinkTargets fetches lazily. Selecting a page/item applies a stable internal link. */
 function InternalLinkPicker({ onPick }) {
   const { options, loading } = useLinkTargets();
-  const groups = [];
-  for (const opt of options) {
-    let group = groups.find((g) => g.label === opt.group);
-    if (!group) {
-      group = { label: opt.group, items: [] };
-      groups.push(group);
-    }
-    group.items.push(opt);
-  }
+  const isMultilang = useIsMultilang();
+  const editingLanguage = useEditingLanguage();
+  const groups = groupLinkTargets(options, { isMultilang, editingLanguage });
   return (
     <select
       className="richtext-link-input richtext-link-picker"
@@ -62,7 +59,7 @@ function InternalLinkPicker({ onPick }) {
         {loading ? "Loading…" : "Link to page/item…"}
       </option>
       {groups.map((g) => (
-        <optgroup key={g.label} label={g.label}>
+        <optgroup key={g.key} label={g.label}>
           {g.items.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
