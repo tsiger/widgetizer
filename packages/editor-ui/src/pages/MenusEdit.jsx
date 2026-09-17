@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
 
@@ -16,6 +16,9 @@ import { useEditorPath } from "../lib/routeBase.jsx";
 export default function MenusEdit() {
   const { t } = useTranslation();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  // An id is unique per language, so which menu is open travels in the URL.
+  const language = searchParams.get("language") || undefined;
   const navigate = useNavigate();
   const editorPath = useEditorPath();
   const [menu, setMenu] = useState(null);
@@ -33,11 +36,11 @@ export default function MenusEdit() {
     setLoading(true);
     loadMenu();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, language]);
 
   const loadMenu = async () => {
     try {
-      const menuData = await getMenu(id);
+      const menuData = await getMenu(id, language);
       setMenu(menuData);
       setLoading(false);
     } catch (err) {

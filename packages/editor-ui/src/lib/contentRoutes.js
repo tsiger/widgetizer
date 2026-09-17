@@ -16,3 +16,17 @@ export function pageSettingsHref(page, isMultilang) {
 export function pageAddHref(language) {
   return language ? `/pages/add?language=${language}` : "/pages/add";
 }
+
+export function menuStructureHref(menu, isMultilang) {
+  const base = `/menus/${menu.id}/structure`;
+  return isMultilang ? `${base}?language=${menu.language}` : base;
+}
+
+export function menuSettingsHref(menu, isMultilang) {
+  const base = `/menus/edit/${menu.id}`;
+  return isMultilang ? `${base}?language=${menu.language}` : base;
+}
+
+export function menuAddHref(language) {
+  return language ? `/menus/add?language=${language}` : "/menus/add";
+}

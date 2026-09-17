@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import PageLayout from "../components/layout/PageLayout";
 import MenuForm from "../components/menus/MenuForm";
 import useToastStore from "../stores/toastStore";
 import { createMenu } from "../queries/menuManager";
+import { menuStructureHref } from "../lib/contentRoutes";
 import useGuardedFormPage from "../hooks/useGuardedFormPage";
 import { useEditorPath } from "../lib/routeBase.jsx";
 
@@ -12,6 +14,9 @@ export default function MenusAdd() {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [searchParams] = useSearchParams();
+  // A new menu belongs to the language tab it was started from.
+  const language = searchParams.get("language") || undefined;
 
   const showToast = useToastStore((state) => state.showToast);
   const editorPath = useEditorPath();
@@ -22,10 +27,10 @@ export default function MenusAdd() {
     setIsSubmitting(true);
 
     try {
-      const newMenu = await createMenu(formData);
+      const newMenu = await createMenu({ ...formData, ...(language ? { language } : {}) });
       showToast(t("menusAdd.toasts.createSuccess", { name: newMenu.name }), "success");
 
-      navigateSafely(editorPath(`/menus/${newMenu.id}/structure`));
+      navigateSafely(editorPath(menuStructureHref(newMenu, !!language)));
       return true;
     } catch (err) {
       showToast(err.message || t("menusAdd.toasts.createError"), "error");

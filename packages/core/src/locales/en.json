@@ -663,6 +663,9 @@
       "message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
       "confirm": "Delete",
       "cancel": "Cancel"
+    },
+    "languages": {
+      "tabsLabel": "Filter menus by language"
     }
   },
   "menuStructure": {

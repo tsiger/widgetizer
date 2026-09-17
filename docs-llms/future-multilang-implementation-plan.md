@@ -285,15 +285,18 @@ Every component below renders nothing new while `projectStore.isMultilang` is fa
 - Copy in these pickers stays hardcoded English, matching every other string in the same components (`"Link URL"`, `"No matching pages found…"`); none of them are wired to i18n yet.
 - **Review: the target cache is keyed by the languages as well as the project.** Adding or removing a language, or changing the default, keeps the same project id, so the old key kept serving options built for the previous set — a new language's pages missing, a removed one's still selectable, for the whole TTL. The key is now `projectId\nen,el` and the effect depends on that string; `invalidateLinkTargetsCache(projectId)` drops every language entry the project holds.
 
-### Step 15a. Menus list and editor per language (§5) — *not built; gap found during step 15*
+### Step 15a. Menus list and editor per language (§5) — *done 2026-09-17; gap found during step 15*
 
-The server has been language-aware since step 7 (`GET /menus` merges every folder and stamps `language`; get/update/delete/duplicate all take `?language=`), but `packages/editor-ui/src/queries/menuManager.js` never sends one. So the Menus list shows every language's menus with nothing to tell them apart, and opening one always edits the default language's file — the same bug class step 13 fixed for pages.
+The server has been language-aware since step 7 (`GET /menus` merges every folder and stamps `language`; get/update/delete/duplicate all take `?language=`), but `packages/editor-ui/src/queries/menuManager.js` never sent one. So the Menus list showed every language's menus with nothing to tell them apart, and opening one always edited the default language's file — the same bug class step 13 fixed for pages.
 
 - `menuManager.js` — `getMenu`/`updateMenu`/`deleteMenu`/`duplicateMenu` take a language; `createMenu` sends the one being looked at.
 - `pages/Menus.jsx` — language tabs (no chips: menus are seeded copies with fresh uuids, not a translation group).
 - `pages/MenusAdd.jsx`, `MenusEdit.jsx`, `MenuStructure.jsx` — carry `?language=` the way the page routes do, through `lib/contentRoutes.js`.
 
-Step 15's picker already reads the menu's language from `menu.language`, so it follows this for free once the menu being edited can be a non-default one.
+**As built.** Exactly the shape of step 13, minus the chips. Reads and removals name the language in the query (`getMenu`, `deleteMenu`, `duplicateMenu`); **create and update carry it in the body**, as pages do — a menu object holds its own `language` and the whole object goes back, so a save cannot address another language and there is no second source of truth to disagree with. The tabs sit outside the has-any-menus branch, so a language whose menus were all deleted can still take a new one. `menuStructureHref` / `menuSettingsHref` / `menuAddHref` join the page builders in `lib/contentRoutes.js`.
+
+- **The audit turned up a fourth call site the write-up had missed: `MenuSelectInput`**, the menu setting on a header or footer. It lists `getAllMenus()`, which has returned every language since step 7 — so a Greek header offered two identically-named menus and picking the wrong one silently rendered English labels. It now stays inside the language being edited. **This is deliberately not §4a's rule**: a page may exist in only one language, so hiding link targets would make it unlinkable, but menus are seeded as a per-language set and every language has its own. A value that already points elsewhere is still listed (tagged `Main (en)`) so it reads as what it is instead of as "none".
+- **Review, both mine to own.** (1) The tabs were still inside the has-any-menus branch although the note claimed otherwise, so an empty project could not choose a language before creating its first menu; they now sit above it, as on the pages list. (2) A **legacy slug** value resolves to the DEFAULT language's menu, not the edited language's. `loadMenuMaps` builds `bySlug` from the root folder alone, so that is the menu which actually renders; resolving it to the Greek menu would have shown one thing and rendered another. The option is labelled `Main (en)` so the mismatch is visible, and picking any menu stores a uuid and ends the ambiguity for good. **Carried into the render phase, unresolved:** `loadMenuMaps`'s own comment says a bare slug means "the menu of the language being rendered", which is not what it does — see the note on step 19.
 
 ### Step 16. Collections: the same three controls (§9a)
 
@@ -320,6 +323,8 @@ Step 15's picker already reads the menu's language from `menu.language`, so it f
 **Done when:** clicking a Greek menu link in the canvas opens the Greek page; a cross-language link opens the other language's page.
 
 ### Step 19. `page.translations`, `<html lang>`, hreflang (§7, §7c, §7d)
+
+> **Carried from step 15a:** `loadMenuMaps` in `packages/render-engine/src/renderEngine.js` builds `bySlug` from the root `menus/` folder only, so a menu setting holding a **legacy slug** (not a uuid) renders the default language's menu on every language's page — English labels inside a Greek header. Its own comment claims the opposite ("a bare slug means the menu of the language being rendered"). Fixing it means a per-language slug map plus the language being rendered reaching `resolveMenuSettings`, which is render-phase plumbing; the editor picker was aligned to today's behaviour in the meantime and makes the mismatch visible.
 
 - `packages/builder-server/src/services/renderingService.js` (`buildRenderDeps`) — build `translations` for the page or item being rendered: one entry per *exportable* language (§7b), each with `language`, `hreflang`, `label`, `href` (relative, via `pageHref` / `itemHref`), `seoUrl` (absolute, via step 1's helper), `active`, `fallback`, `dir`. Attach as `page.translations`; empty array for single-language projects.
 - `packages/render-engine/src/renderEngine.js` — `page.language` / `project.languages` / `project.defaultLanguage` in the base context.

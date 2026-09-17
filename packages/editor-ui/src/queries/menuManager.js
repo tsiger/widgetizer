@@ -19,6 +19,9 @@ import { editorFetchJson, rethrowQueryError } from "../lib/apiFetch";
  * @property {string} updatedAt - ISO timestamp of last update
  */
 
+/** An id is unique per language, so reading or removing one has to name it. */
+const languageQuery = (language) => (language ? `?language=${encodeURIComponent(language)}` : "");
+
 /**
  * Fetch all menus for the active project.
  * @returns {Promise<Menu[]>} Array of menu objects
@@ -43,6 +46,8 @@ export async function getAllMenus() {
  * @throws {Error} If menu creation fails
  */
 export async function createMenu(menuData) {
+  // Create and update carry the language in the BODY, the way pages do: a menu
+  // object holds its own `language`, so sending it back cannot address another.
   try {
     return await editorFetchJson("/menus", {
       method: "POST",
@@ -59,12 +64,13 @@ export async function createMenu(menuData) {
 /**
  * Permanently delete a menu by its ID.
  * @param {string} id - The ID of the menu to delete
+ * @param {string} [language] - which language's menu
  * @returns {Promise<{success: boolean, message: string}>} Deletion confirmation
  * @throws {Error} If the menu cannot be deleted
  */
-export async function deleteMenu(id) {
+export async function deleteMenu(id, language) {
   try {
-    return await editorFetchJson(`/menus/${id}`, {
+    return await editorFetchJson(`/menus/${id}${languageQuery(language)}`, {
       method: "DELETE",
     }, { fallbackMessage: "Failed to delete menu" });
   } catch (error) {
@@ -76,12 +82,13 @@ export async function deleteMenu(id) {
 /**
  * Fetch a specific menu by its ID.
  * @param {string} id - The ID of the menu to retrieve
+ * @param {string} [language] - which language's menu
  * @returns {Promise<Menu>} The menu object with all items
  * @throws {Error} If the menu is not found or request fails
  */
-export async function getMenu(id) {
+export async function getMenu(id, language) {
   try {
-    return await editorFetchJson(`/menus/${id}`, {}, { fallbackMessage: "Failed to get menu" });
+    return await editorFetchJson(`/menus/${id}${languageQuery(language)}`, {}, { fallbackMessage: "Failed to get menu" });
   } catch (error) {
     console.error("Error getting menu:", error);
     rethrowQueryError(error, "Failed to get menu");
@@ -115,12 +122,13 @@ export async function updateMenu(id, menuData) {
 /**
  * Create a duplicate copy of an existing menu including all items.
  * @param {string} id - The ID of the menu to duplicate
+ * @param {string} [language] - which language's menu; the copy stays in it
  * @returns {Promise<Menu>} The newly created duplicate menu
  * @throws {Error} If duplication fails
  */
-export async function duplicateMenu(id) {
+export async function duplicateMenu(id, language) {
   try {
-    return await editorFetchJson(`/menus/${id}/duplicate`, {
+    return await editorFetchJson(`/menus/${id}/duplicate${languageQuery(language)}`, {
       method: "POST",
     }, { fallbackMessage: "Failed to duplicate menu" });
   } catch (error) {
