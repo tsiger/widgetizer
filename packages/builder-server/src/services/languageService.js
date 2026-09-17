@@ -1,9 +1,26 @@
 import { randomUUID } from "crypto";
 import { isValidLanguageCode, normalizeLanguageCode } from "@widgetizer/core/languages";
-import { globalKey, menuKey, menusDir, pageKey, isReservedSlugPrefix } from "@widgetizer/core/contentAddress";
+import {
+  globalKey,
+  globalsDir,
+  itemKey,
+  itemsDir,
+  menuKey,
+  menusDir,
+  pageKey,
+  pagesDir,
+  isReservedSlugPrefix,
+} from "@widgetizer/core/contentAddress";
 import { projectLanguages } from "../utils/contentLanguage.js";
 import { listCollectionSchemas } from "./collectionService.js";
-import { updateGlobalWidgetMediaUsage } from "./mediaUsageService.js";
+import {
+  updateGlobalWidgetMediaUsage,
+  removeGlobalWidgetFromMediaUsage,
+  removePageFromMediaUsage,
+  removeCollectionItemFromMediaUsage,
+  syncPageMediaUsageOnWrite,
+  updateCollectionItemMediaUsage,
+} from "./mediaUsageService.js";
 
 const GLOBAL_TYPES = ["header", "footer"];
 
@@ -18,6 +35,21 @@ export class LanguageError extends Error {
 async function readJson(storage, scope, key) {
   const buf = await storage.read(scope, key);
   return buf == null ? null : JSON.parse(buf.toString("utf8"));
+}
+
+/**
+ * The identity a content file's media-usage row is keyed by. A file that cannot
+ * be read is refused rather than assumed to have no uuid: that assumption would
+ * clear the wrong row and strand the real one.
+ */
+async function readIdentity(storage, scope, key) {
+  let content;
+  try {
+    content = await readJson(storage, scope, key);
+  } catch (error) {
+    throw new LanguageError(`"${key}" could not be read, so its media usage cannot be cleared: ${error.message}`, 500);
+  }
+  return { uuid: content?.uuid };
 }
 
 /**
@@ -151,4 +183,164 @@ export async function addLanguage({ storage, scope, project, code }) {
   await seedGlobals(storage, scope, lang, menuRefs);
 
   return { languages: [...languages, language] };
+}
+
+/** The `.json` entries directly inside a directory, `[]` when it does not exist. */
+async function jsonNames(storage, scope, dir) {
+  return (await storage.list(scope, dir)).filter((name) => name.endsWith(".json"));
+}
+
+const slugsIn = (names) => names.filter((name) => name !== "_order.json").map((name) => name.replace(/\.json$/, ""));
+
+/**
+ * Every collection type, with the item slugs it holds in this language. A type
+ * whose folder holds only `_order.json` is still listed, with no slugs, so that
+ * leftover is deleted too.
+ */
+async function itemSlugsByType(storage, scope, lang) {
+  const byType = new Map();
+  const types = (await storage.list(scope, "collections")).filter((name) => !name.includes("."));
+  for (const type of types) {
+    const names = await jsonNames(storage, scope, itemsDir(type, lang));
+    if (names.length) byType.set(type, slugsIn(names));
+  }
+  return byType;
+}
+
+function assertRemovable(project, code) {
+  const { defaultLanguage, languages } = projectLanguages(project);
+  const language = normalizeLanguageCode(code);
+  if (!language) throw new LanguageError("A language code is required.");
+  if (language === defaultLanguage) {
+    throw new LanguageError(
+      "The site's default language cannot be removed. Remove the other languages first, then change it.",
+    );
+  }
+  if (!languages.includes(language)) {
+    throw new LanguageError(`"${language}" is not one of the site's languages.`, 404);
+  }
+  return { language, defaultLanguage, languages };
+}
+
+/**
+ * What removing this language would delete, for the confirmation modal to state
+ * before anything is touched.
+ * @returns {Promise<{ pages: number, items: number, menus: number }>}
+ */
+export async function countLanguageContent({ storage, scope, project, code }) {
+  const { language, defaultLanguage } = assertRemovable(project, code);
+  const lang = { language, defaultLanguage };
+
+  const pages = (await jsonNames(storage, scope, pagesDir(lang))).length;
+  const menus = (await jsonNames(storage, scope, menusDir(lang))).length;
+  let items = 0;
+  for (const slugs of (await itemSlugsByType(storage, scope, lang)).values()) items += slugs.length;
+
+  return { pages, items, menus };
+}
+
+/**
+ * Rebuild the media-usage rows of every file the removal did not manage to
+ * delete. Only the failure path calls this: a successful removal has nothing
+ * left to account for. A file that is gone is skipped, and a failure to rebuild
+ * one row is logged rather than replacing the error that brought us here.
+ */
+async function restoreUsageOfSurvivors(storage, scope, lang, { items, pages, globalTypes }) {
+  const restore = async (key, sync) => {
+    try {
+      const content = await readJson(storage, scope, key);
+      if (content) await sync(content);
+    } catch (error) {
+      console.warn(`[languages] Could not restore media usage for ${key}: ${error.message}`);
+    }
+  };
+
+  for (const { type, key } of items) {
+    await restore(key, (item) => updateCollectionItemMediaUsage(scope.projectId, item, type, lang));
+  }
+  for (const { key } of pages) {
+    await restore(key, (page) => syncPageMediaUsageOnWrite(scope.projectId, page, lang));
+  }
+  for (const type of globalTypes) {
+    await restore(globalKey(type, lang), (widget) =>
+      updateGlobalWidgetMediaUsage(scope.projectId, type, widget, lang),
+    );
+  }
+}
+
+/**
+ * Delete a language and everything written in it: its pages and globals, its
+ * menus, its collection items, and the media-usage rows of all of them. Uploaded
+ * binaries are shared across languages and are never touched.
+ *
+ * Returns the project's remaining additional codes; the caller persists them, so
+ * a failed delete never leaves a language unlisted with content still on disk.
+ *
+ * @param {{ storage: object, scope: object, project: object, code: string }} args
+ * @returns {Promise<{ languages: string[], deleted: { pages: number, items: number, menus: number } }>}
+ */
+export async function removeLanguage({ storage, scope, project, code }) {
+  const { language, defaultLanguage, languages } = assertRemovable(project, code);
+  const lang = { language, defaultLanguage };
+
+  // Read every identity BEFORE deleting anything: a usage row is keyed by the
+  // uuid inside its file, so a file deleted before its row is cleared can never
+  // be matched again. An unreadable file aborts here, with nothing touched,
+  // rather than being treated as one that simply has no uuid.
+  const items = [];
+  const itemFolders = await itemSlugsByType(storage, scope, lang);
+  for (const [type, slugs] of itemFolders) {
+    for (const slug of slugs) {
+      const key = itemKey(type, slug, lang);
+      items.push({ type, slug, key, uuid: (await readIdentity(storage, scope, key)).uuid });
+    }
+  }
+
+  const pages = [];
+  for (const slug of slugsIn(await jsonNames(storage, scope, pagesDir(lang)))) {
+    const key = pageKey(slug, lang);
+    pages.push({ slug, key, uuid: (await readIdentity(storage, scope, key)).uuid });
+  }
+
+  const globalTypes = (await jsonNames(storage, scope, globalsDir(lang))).map((name) =>
+    name.replace(/\.json$/, ""),
+  );
+  const menuIds = slugsIn(await jsonNames(storage, scope, menusDir(lang)));
+
+  // Clear the row, then delete the file. The other order cannot be retried: a
+  // failure between the two would leave a row no later pass can find its way
+  // back to. If a delete does fail, the rows of whatever survived are rebuilt
+  // before the error leaves here, so nothing is ever reported unused while it
+  // is still on disk and still showing its images.
+  try {
+    for (const { type, slug, key, uuid } of items) {
+      await removeCollectionItemFromMediaUsage(scope.projectId, { uuid, slug }, type, lang);
+      await storage.delete(scope, key);
+    }
+    for (const type of itemFolders.keys()) {
+      await storage.delete(scope, `${itemsDir(type, lang)}/_order.json`);
+    }
+
+    for (const { slug, key, uuid } of pages) {
+      await removePageFromMediaUsage(scope.projectId, { uuid, slug }, lang);
+      await storage.delete(scope, key);
+    }
+
+    for (const type of globalTypes) {
+      await removeGlobalWidgetFromMediaUsage(scope.projectId, type, lang);
+      await storage.delete(scope, globalKey(type, lang));
+    }
+
+    for (const id of menuIds) {
+      await storage.delete(scope, menuKey(id, lang));
+    }
+  } catch (error) {
+    await restoreUsageOfSurvivors(storage, scope, lang, { items, pages, globalTypes });
+    throw error;
+  }
+
+  return {
+    languages: languages.filter((other) => other !== language),
+    deleted: { pages: pages.length, items: items.length, menus: menuIds.length },
+  };
 }

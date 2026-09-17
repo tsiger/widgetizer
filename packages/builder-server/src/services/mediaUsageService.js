@@ -473,6 +473,17 @@ export async function removeCollectionItemFromMediaUsage(projectId, item, collec
 }
 
 /**
+ * Drop a global widget's usage rows entirely — the language it belonged to is gone.
+ * @param {string} projectId
+ * @param {'header'|'footer'} type
+ * @param {{ language?: string, defaultLanguage?: string }} [lang]
+ */
+export async function removeGlobalWidgetFromMediaUsage(projectId, type, lang) {
+  mediaRepo.updateMediaUsageForSource(projectId, usageSource.global(type, lang), []);
+  return { success: true };
+}
+
+/**
  * Keep collection-item media usage in sync after a write. A rename keeps the item's
  * uuid, so there is no previous source left behind to clean up.
  */

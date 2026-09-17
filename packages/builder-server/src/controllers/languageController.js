@@ -8,13 +8,22 @@
  * points here.
  */
 import * as projectRepo from "../db/repositories/projectRepository.js";
-import { addLanguage } from "../services/languageService.js";
+import { addLanguage, removeLanguage, countLanguageContent } from "../services/languageService.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
 
-// Check, seed and record are one operation per project: two adds in flight would
-// otherwise both read the pre-seed list and the second would drop the first's
-// language, and two adds of the SAME code would seed over each other's files.
+// Check, change and record are one operation per project: two calls in flight
+// would otherwise both read the same list and the second would drop the first's
+// change, and two adds of the SAME code would seed over each other's files.
+// Adds and removes share the chain, so neither can run inside the other.
 const serializeLanguageOps = createKeyedSerializer();
+
+function respondError(res, error, fallback) {
+  if (error?.name === "LanguageError") {
+    return res.status(error.status).json({ error: fallback, message: error.message });
+  }
+  console.error(`${fallback}:`, error);
+  return res.status(500).json({ error: fallback });
+}
 
 export async function createLanguage(req, res) {
   try {
@@ -33,10 +42,47 @@ export async function createLanguage(req, res) {
 
     res.status(201).json(project);
   } catch (error) {
-    if (error?.name === "LanguageError") {
-      return res.status(error.status).json({ error: "Language not added", message: error.message });
-    }
-    console.error("Error adding language:", error);
-    res.status(500).json({ error: "Failed to add language" });
+    respondError(res, error, "Failed to add language");
+  }
+}
+
+/** What removing this language would delete — the confirmation modal states it first. */
+export async function getLanguageSummary(req, res) {
+  try {
+    const { scope, activeProject } = req;
+    const { storage } = req.adapters;
+    const counts = await countLanguageContent({
+      storage,
+      scope,
+      project: activeProject,
+      code: req.params.code,
+    });
+    res.json({ code: req.params.code, ...counts });
+  } catch (error) {
+    respondError(res, error, "Failed to read the language summary");
+  }
+}
+
+export async function deleteLanguage(req, res) {
+  try {
+    const { scope } = req;
+    const { storage } = req.adapters;
+
+    const result = await serializeLanguageOps(scope.projectId, async () => {
+      const current = projectRepo.getProjectById(scope.projectId);
+      const { languages, deleted } = await removeLanguage({
+        storage,
+        scope,
+        project: current,
+        code: req.params.code,
+      });
+      // Recorded only after the content is gone, so a failure never leaves a
+      // language unlisted with its files still on disk.
+      return { project: projectRepo.updateProject(scope.projectId, { languages }), deleted };
+    });
+
+    res.json({ ...result.project, deleted: result.deleted });
+  } catch (error) {
+    respondError(res, error, "Failed to remove language");
   }
 }
