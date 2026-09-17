@@ -206,7 +206,7 @@ Three deviations, the first significant:
 - **Deletion goes through the storage adapter, file by file, enumerated by the addressing layer** — the adapter contract has no recursive delete, and a directory is not a thing a cloud adapter has. On the local filesystem this leaves the language's now-empty folders behind; nothing reads them (the row no longer lists the language, and every scan finds no files), and a re-add writes straight back into them.
 - Per-language media **translation rows** are step 17's; there is nothing to delete yet.
 
-### Step 11. "Create <lang> version" for pages and items (§Core Model, §3, §9a)
+### Step 11. "Create <lang> version" for pages and items (§Core Model, §3, §9a) — *done 2026-09-17*
 
 - `pageController.createLanguageVersion` and `collectionService.createItemLanguageVersion` — copy the source into the target language folder, **join the source's `translationGroupId`**, refuse if the group already has that language (the one-per-language invariant). Slug defaults to the source slug (per-language uniqueness makes that fine); the caller may pass another.
 - `duplicatePage` / `duplicateCollectionItem` — explicitly assign a **fresh** group (the new uuid), so an ordinary duplicate is never a translation.
@@ -214,6 +214,17 @@ Three deviations, the first significant:
 - `LIMIT_KEYS.MAX_COLLECTION_ITEMS` keeps counting physically until hosted decides otherwise (§Hosted product questions).
 
 **Done when:** tests cover join, invariant refusal, duplicate-gets-fresh-group, and that deleting any member leaves the rest of the group intact.
+
+**As built.** `packages/builder-server/src/services/translationService.js` owns the group: `groupIdOf` (the id joined, else the content's own uuid), `findPageInGroup` / `findItemInGroup` (one language folder — that is all the invariant needs), `findGroupMembers` (every language, pages and items, for the chips and the editor's language menu) and `resolveTargetLanguage`. `POST /api/pages/:id/translations` and `POST /api/collections/:type/:slug/translations` create the version; `GET /api/translations/:groupId` reads the group.
+
+- **The source language comes from `?language=`, the target from `body.targetLanguage`.** They cannot share the name `language`, because `requestLanguage` already reads that as the language of the content being addressed. Translating a translation works the same way, so a group grows from whichever member is open.
+- **A source is never rewritten.** `translationGroupIdOf` in `@widgetizer/core/contentAddress` falls back to the content's own uuid, so a source that stood alone already answers to the id its versions carry — the earlier write-back was both unnecessary and unsafe, since it saved a snapshot read before the new version was written and would undo an edit made in between. Everything that resolves a group uses that one helper, the breadcrumb builder's cross-language parent lookup included; reading only the stored field there would lose the sibling of a page that has never been rewritten.
+- **Content with neither a uuid nor a group is refused** (`assertHasIdentity`), because an id named after it would differ on every request: the versions could not find each other and the one-per-language rule could not hold. An ordinary save stamps the uuid, and the message says so.
+- **The check, the slug and the write are one operation per project** (`serializeTranslationOps`, shared by the page and item paths, with fresh reads inside). Run concurrently they would both find the language free and create a second member of the same group, which the one-per-language lookups would then hide. A file that cannot be read during the check aborts the creation: "absent" would be a guess, and a wrong one lets a second member in.
+- **A translated item counts against `MAX_COLLECTION_ITEMS`** like any other, across every language folder, and its slug goes through the same reserved-name rule (`index`, `page`) as an ordinary item.
+- **The slug defaults to the source's** (`contact` in every language), takes an explicit one when given, and is made unique inside the target folder either way.
+- **A listing anchor is kept**, unlike a duplicate: a duplicate is a second page in the SAME language and would fight the original for the anchor, while a translation is that language's own listing page, which step 8's per-language anchors expect. If the target language already had an anchor for that collection the project ends up with two, which the save-time sweep resolves; the trail meanwhile picks the first in slug order.
+- Duplication already assigned a fresh group in step 7; the test here pins it so a copy can never be mistaken for a translation.
 
 ---
 

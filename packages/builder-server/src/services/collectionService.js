@@ -1064,6 +1064,54 @@ export async function duplicateCollectionItem(storage, scope, collectionType, so
 }
 
 /**
+ * Create an item's version in another language: the same settings in the target
+ * language's folder under the same collection type, joined to the source's
+ * translation group, and appended to that folder's own order.
+ *
+ * @returns {Promise<{ item: object, groupId: string }|null>} null when the source is absent
+ */
+export async function createItemLanguageVersion(storage, scope, collectionType, sourceSlug, { fromLang, toLang, slug }) {
+  const schema = await getCollectionSchema(storage, scope, collectionType);
+  if (!schema) throw new Error(`Unknown collection type "${collectionType}"`);
+  if (!SLUG_RE.test(sourceSlug)) return null;
+
+  const source = await readJson(storage, scope, itemKey(collectionType, sourceSlug, fromLang));
+  if (source == null) return null;
+
+  // The caller refuses a source with no identity, so this never invents one: an
+  // invented group would differ on every request and join nothing.
+  const groupId = source.translationGroupId || source.uuid;
+  const desired = sanitizeSlug(slug || "") || source.slug || sourceSlug;
+  const newSlug = await generateUniqueSlug(
+    desired,
+    // `index` and `page` are addresses of their own, in every language folder.
+    (candidate) => isReservedItemSlug(candidate) || storage.exists(scope, itemKey(collectionType, candidate, toLang)),
+    { fallback: desired },
+  );
+
+  const now = nowIso();
+  const item = {
+    id: newSlug,
+    uuid: randomUUID(),
+    translationGroupId: groupId,
+    slug: newSlug,
+    schemaVersion: schema.schemaVersion,
+    created: now,
+    updated: now,
+    ...(schema.hasItemPages ? { seo: shapeItemSeo(source.seo) } : {}),
+    settings: { ...(source.settings || {}) },
+  };
+
+  await storage.write(scope, itemKey(collectionType, newSlug, toLang), JSON.stringify(item, null, 2));
+  await rewriteOrder(storage, scope, collectionType, (order) => [...order, newSlug], toLang);
+
+  // The source is not rewritten to record the group: it already answers to its
+  // own uuid, and writing back a snapshot read earlier would undo an edit made
+  // while this version was being created.
+  return { item, groupId };
+}
+
+/**
  * Persist a manual ordering for a collection (the reorder endpoint). The desired
  * order is written verbatim, with stale slugs (whose item file no longer exists)
  * pruned.

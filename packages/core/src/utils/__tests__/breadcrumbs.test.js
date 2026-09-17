@@ -337,6 +337,34 @@ describe("buildBreadcrumbs — languages", () => {
     expect(hrefs(trail)).toEqual(["el/index.html", "el/sxetika.html", "el/epafi.html"]);
   });
 
+  it("finds the sibling of a parent that was never rewritten to record its group", () => {
+    // Translating does not rewrite the source, so an untranslated-until-now page
+    // carries no translationGroupId: it answers to its own uuid instead.
+    const unstamped = { uuid: "u-en-plain", slug: "about", name: "About", language: "en" };
+    const greekSibling = {
+      uuid: "u-el-plain",
+      slug: "sxetika",
+      name: "Sxetika",
+      language: "el",
+      translationGroupId: unstamped.uuid,
+    };
+    const child = {
+      uuid: "u-el-kid",
+      slug: "omada",
+      name: "Omada",
+      language: "el",
+      parentPageUuid: unstamped.uuid,
+    };
+    const trail = buildBreadcrumbs({
+      page: child,
+      pagesByUuid: pagesByUuid(EN_HOME, EL_HOME, unstamped, greekSibling, child),
+      defaultLanguage: "en",
+      language: "el",
+    });
+    expect(labels(trail)).toEqual(["Arxiki", "Sxetika", "Omada"]);
+    expect(hrefs(trail)).toEqual(["el/index.html", "el/sxetika.html", "el/omada.html"]);
+  });
+
   it("ignores a parent that exists only in another language", () => {
     const orphanParent = { uuid: "u-en-only", slug: "careers", name: "Careers", language: "en" };
     const child = { uuid: "u-el-c", slug: "kariera", name: "Kariera", language: "el", parentPageUuid: "u-en-only" };

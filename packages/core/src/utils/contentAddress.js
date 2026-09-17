@@ -17,6 +17,15 @@ export function isHomeSlug(slug) {
   return slug === "index" || slug === "home";
 }
 
+/**
+ * The translation group a page or item belongs to: the id it joined, else its
+ * own uuid. Content that has never been translated is not rewritten to record a
+ * group, so the fallback is what makes it findable as a member of its own.
+ */
+export function translationGroupIdOf(content) {
+  return content?.translationGroupId || content?.uuid || null;
+}
+
 /** Persisted default-language content carries no language; a loaded model always does. */
 export function resolveLanguage(persisted, defaultLanguage) {
   return normalizeLanguageCode(persisted) || normalizeLanguageCode(defaultLanguage) || DEFAULT_LANGUAGE;

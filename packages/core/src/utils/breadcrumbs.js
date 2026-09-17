@@ -11,7 +11,7 @@
  * the `breadcrumbs` snippet.
  */
 import { pageHref, itemHref } from "./internalHref.js";
-import { isHomeSlug, pagedHref, pageOutputPath, itemOutputPath } from "./contentAddress.js";
+import { isHomeSlug, pagedHref, pageOutputPath, itemOutputPath, translationGroupIdOf } from "./contentAddress.js";
 
 /** A parent chain longer than this is treated as broken data, not walked. */
 const MAX_DEPTH = 10;
@@ -52,10 +52,10 @@ function sameLanguage(page, language) {
 function parentInLanguage(parentUuid, pagesByUuid, language) {
   const parent = pagesByUuid.get(parentUuid);
   if (!parent || sameLanguage(parent, language)) return parent || null;
-  const group = parent.translationGroupId;
+  const group = translationGroupIdOf(parent);
   if (!group) return null;
   for (const candidate of pagesByUuid.values()) {
-    if (candidate?.translationGroupId === group && sameLanguage(candidate, language)) return candidate;
+    if (translationGroupIdOf(candidate) === group && sameLanguage(candidate, language)) return candidate;
   }
   return null;
 }

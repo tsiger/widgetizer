@@ -22,9 +22,20 @@ import {
 } from "../services/mediaUsageService.js";
 import { cleanupDeletedCollectionItemReferences } from "../utils/linkEnrichment.js";
 import { requestLanguage, projectLanguageContexts } from "../utils/contentLanguage.js";
+import {
+  assertHasIdentity,
+  assertLanguageFree,
+  findItemInGroup,
+  groupIdOf,
+  resolveTargetLanguage,
+  serializeTranslationOps,
+} from "../services/translationService.js";
 
 /** Map a service error to an HTTP response, or 500 for the unexpected. */
 function respondError(res, err) {
+  if (err?.name === "TranslationError") {
+    return res.status(err.status).json({ error: "Version not created", message: err.message });
+  }
   if (err?.code === "VALIDATION") {
     return res.status(400).json({ error: "Validation failed", validationErrors: err.validationErrors });
   }
@@ -297,6 +308,68 @@ export async function reorderItems(req, res) {
     if (!lang) return;
     const result = await collectionService.reorderCollectionItems(storage, scope, collectionType, req.body.order, lang);
     noStore(res).json({ success: true, ...result });
+  } catch (err) {
+    respondError(res, err);
+  }
+}
+
+/** Create this item's version in another language, joined to its translation group. */
+export async function createItemLanguageVersion(req, res) {
+  try {
+    const { scope } = req;
+    const { storage } = req.adapters;
+    const { collectionType, itemSlug } = req.params;
+    const schema = await collectionService.getCollectionSchema(storage, scope, collectionType);
+    if (!schema) return res.status(404).json({ error: "Collection type not found" });
+
+    const sourceLang = requestLanguage(req, res);
+    if (!sourceLang) return;
+    const target = resolveTargetLanguage(req.activeProject, req.body?.targetLanguage);
+    if (target.language === sourceLang.language) {
+      return res.status(400).json({
+        error: "Same language",
+        message: "An item cannot be its own translation. Choose a different language.",
+      });
+    }
+
+    const cap = await req.adapters?.limits?.getLimit?.(scope, LIMIT_KEYS.MAX_COLLECTION_ITEMS);
+    const maxItems = typeof cap === "number" && cap > 0 ? cap : Infinity;
+
+    const outcome = await serializeTranslationOps(scope.projectId, async () => {
+      const source = await collectionService.readRawCollectionItem(storage, scope, collectionType, itemSlug, sourceLang);
+      if (!source) return { notFound: true };
+
+      assertHasIdentity(source, "item");
+      assertLanguageFree(
+        await findItemInGroup({ storage, scope, collectionType, lang: target, groupId: groupIdOf(source) }),
+        target.language,
+        "version",
+      );
+
+      // A translation is another item, counted physically like every other one.
+      if (Number.isFinite(maxItems)) {
+        let existing = 0;
+        for (const each of projectLanguageContexts(req.activeProject)) {
+          existing += (await collectionService.listCollectionItems(storage, scope, collectionType, {}, each)).length;
+        }
+        if (existing >= maxItems) return { overLimit: maxItems };
+      }
+
+      const created = await collectionService.createItemLanguageVersion(storage, scope, collectionType, itemSlug, {
+        fromLang: sourceLang,
+        toLang: target,
+        slug: req.body?.slug,
+      });
+      if (!created) return { notFound: true };
+      await syncCollectionItemMediaUsageOnWrite(scope.projectId, created.item, collectionType, target);
+      return { item: created.item };
+    });
+
+    if (outcome.notFound) return res.status(404).json({ error: "Item not found" });
+    if (outcome.overLimit) {
+      return res.status(422).json({ error: `This collection has reached its item limit (${outcome.overLimit}).` });
+    }
+    noStore(res).status(201).json(collectionService.normalizeCollectionItem(outcome.item, schema, target));
   } catch (err) {
     respondError(res, err);
   }

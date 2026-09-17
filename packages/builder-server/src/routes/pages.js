@@ -69,6 +69,18 @@ router.post(
   pageController.duplicatePage,
 );
 
+// Create this page's version in another language
+router.post(
+  "/:id/translations",
+  standardJsonParser,
+  [
+    param("id").notEmpty().withMessage("Page ID is required."),
+    body("targetLanguage").isString().withMessage("A target language is required."),
+  ],
+  validateRequest,
+  pageController.createPageLanguageVersion,
+);
+
 // Page editor content saving — uses higher body limit for large widget JSON
 router.post(
   "/:id/content",

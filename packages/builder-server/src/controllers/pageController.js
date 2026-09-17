@@ -7,6 +7,14 @@ import { sanitizeSlug, generateUniqueSlug } from "../utils/slugHelpers.js";
 import { generateCopyName } from "../utils/namingHelpers.js";
 import { isReservedPageSlug, pageKey, pagesDir } from "@widgetizer/core/contentAddress";
 import { requestLanguage, projectLanguageContexts, withoutLanguage } from "../utils/contentLanguage.js";
+import {
+  assertHasIdentity,
+  assertLanguageFree,
+  findPageInGroup,
+  groupIdOf,
+  resolveTargetLanguage,
+  serializeTranslationOps,
+} from "../services/translationService.js";
 
 const pageSlugTaken = (storage, scope, lang) => (slug) =>
   isReservedPageSlug(slug, lang) || storage.exists(scope, pageKey(slug, lang));
@@ -777,5 +785,69 @@ export async function duplicatePage(req, res) {
   } catch (error) {
     console.error("Error duplicating page:", error);
     res.status(500).json({ error: "Failed to duplicate page" });
+  }
+}
+
+/**
+ * Create this page's version in another language: the same content in the
+ * target language's folder, joined to the source's translation group. The slug
+ * is the source's unless one is given — slugs are unique per language folder,
+ * so `contact` can be the address in every language.
+ *
+ * Unlike a duplicate, a listing anchor is kept: a duplicate is a second page in
+ * the SAME language and would fight the original for the anchor, while this is
+ * that language's own listing page.
+ */
+export async function createPageLanguageVersion(req, res) {
+  try {
+    const { scope } = req;
+    const { storage } = req.adapters;
+    const sourceLang = requestLanguage(req, res);
+    if (!sourceLang) return;
+    const target = resolveTargetLanguage(req.activeProject, req.body?.targetLanguage);
+    if (target.language === sourceLang.language) {
+      return res.status(400).json({
+        error: "Same language",
+        message: "A page cannot be its own translation. Choose a different language.",
+      });
+    }
+
+    const version = await serializeTranslationOps(scope.projectId, async () => {
+      // Read inside the section: the check, the slug and the copied content must
+      // all see the same state, and a version created while this one waited has
+      // already taken the language.
+      const buf = await storage.read(scope, pageKey(req.params.id, sourceLang));
+      if (buf == null) return null;
+      const source = JSON.parse(buf.toString("utf8"));
+
+      assertHasIdentity(source, "page");
+      const groupId = groupIdOf(source);
+      assertLanguageFree(await findPageInGroup({ storage, scope, lang: target, groupId }), target.language, "page");
+
+      const desiredSlug = sanitizeSlug(req.body?.slug || "") || source.slug || req.params.id;
+      const slug = await generateUniqueSlug(desiredSlug, pageSlugTaken(storage, scope, target), { fallback: "page" });
+
+      const created = {
+        ...source,
+        uuid: randomUUID(),
+        translationGroupId: groupId,
+        language: target.language,
+        id: slug,
+        slug,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+      };
+      await persistPageWithMediaTracking({ scope, storage, pageId: slug, pageData: created, lang: target });
+      return created;
+    });
+
+    if (!version) return res.status(404).json({ error: "Page not found" });
+    res.status(201).json(version);
+  } catch (error) {
+    if (error?.name === "TranslationError") {
+      return res.status(error.status).json({ error: "Version not created", message: error.message });
+    }
+    console.error("Error creating a page language version:", error);
+    res.status(500).json({ error: "Failed to create the page version" });
   }
 }

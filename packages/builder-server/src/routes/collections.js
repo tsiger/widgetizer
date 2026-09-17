@@ -83,6 +83,16 @@ router.post(
   collectionController.discardArchivedItem,
 );
 router.post(
+  "/:collectionType/:itemSlug/translations",
+  [
+    slugParam("collectionType"),
+    slugParam("itemSlug"),
+    body("targetLanguage").isString().withMessage("A target language is required."),
+  ],
+  validateRequest,
+  collectionController.createItemLanguageVersion,
+);
+router.post(
   "/:collectionType/reorder",
   [slugParam("collectionType"), body("order").isArray(), slugBody("order.*")],
   validateRequest,
