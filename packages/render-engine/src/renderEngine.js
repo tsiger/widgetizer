@@ -33,6 +33,7 @@ import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefix
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
 import { pagedHref, pageOutputPath, resolveLanguage } from "@widgetizer/core/contentAddress";
+import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { identityForTheme } from "@widgetizer/core/siteIdentity";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
@@ -601,6 +602,29 @@ async function loadMenuMaps(deps) {
         bySlug.set(slugId, menu);
       } catch {
         // Skip unreadable menu files
+      }
+    }
+
+    // Another language's menus, by uuid only: uuids are globally unique, while a
+    // bare slug means the menu of the language being rendered.
+    for (const entry of files) {
+      if (!LANGUAGE_CODE_RE.test(entry)) continue;
+      let languageFiles;
+      try {
+        languageFiles = await fs.readdir(path.join(menusDir, entry));
+      } catch {
+        continue;
+      }
+      for (const file of languageFiles) {
+        if (!file.endsWith(".json")) continue;
+        try {
+          const menuPath = await resolveInside(deps.projectDir, "menus", entry, file);
+          if (!menuPath) continue;
+          const menu = JSON.parse(await fs.readFile(menuPath, "utf8"));
+          if (menu.uuid) byUuid.set(menu.uuid, menu);
+        } catch {
+          // Skip unreadable menu files
+        }
       }
     }
   } catch (error) {

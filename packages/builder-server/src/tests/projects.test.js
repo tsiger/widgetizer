@@ -1940,6 +1940,10 @@ describe("site languages", () => {
   });
 
   /** Update a project, asserting only on the language fields. */
+  // Languages are added and removed through the project-scoped endpoint, which
+  // seeds and cleans up content. These tests only need the row in a given state.
+  const setLanguages = (project, languages) => projectRepo.updateProject(project.id, { languages });
+
   const update = (project, body) =>
     callController(updateProject, { params: { id: project.id }, body: { name: project.name, ...body } });
 
@@ -1978,19 +1982,33 @@ describe("site languages", () => {
     assert.match(res._json.error, /right-to-left/i);
   });
 
-  it("rejects a right-to-left language among the additional ones", async () => {
-    const project = await createTestProject("No RTL Here");
-    // pa-pk carries no script subtag, but Punjabi is written in Arabic there.
-    for (const code of ["ks", "pa-arab", "pa-pk"]) {
-      const res = await update(project, { languages: [code] });
-      assert.equal(res._status, 400, `expected ${code} to be refused`);
-      assert.match(res._json.error, /right-to-left/i);
-    }
+  it("refuses to add or remove a language, because that moves content", async () => {
+    const project = await createTestProject("No Raw Adds");
+    const added = await update(project, { languages: ["el"] });
+    assert.equal(added._status, 400);
+    assert.match(added._json.error, /one at a time/i);
     assert.deepEqual(projectRepo.getProjectById(project.id).languages, []);
 
-    const accepted = await update(project, { languages: ["pa-in"] });
-    assert.equal(accepted._status, 200, "the same language stays available where it is left-to-right");
-    assert.deepEqual(accepted._json.languages, ["pa-in"]);
+    setLanguages(project, ["el"]);
+    const removed = await update(project, { languages: [] });
+    assert.equal(removed._status, 400);
+    assert.deepEqual(projectRepo.getProjectById(project.id).languages, ["el"]);
+  });
+
+  it("refuses a new project that asks for more than one language", async () => {
+    const res = await callController(createProject, {
+      body: { name: "Born Multilingual", description: "", theme: TEST_THEME_ID, languages: ["el"] },
+    });
+    assert.equal(res._status, 400);
+    assert.match(res._json.error, /once it exists/i);
+  });
+
+  it("accepts the unchanged list, so saving the form is never blocked by it", async () => {
+    const project = await createTestProject("Resend");
+    setLanguages(project, ["el", "it"]);
+    const res = await update(project, { siteTitle: "Renamed", languages: ["it", "el"] });
+    assert.equal(res._status, 200);
+    assert.deepEqual([...res._json.languages].sort(), ["el", "it"]);
   });
 
   it("rejects a code whose shape hides its direction", async () => {
@@ -2017,24 +2035,18 @@ describe("site languages", () => {
     assert.match(res._json.error, /array/i);
   });
 
-  it("rejects the default language among the additional ones", async () => {
+  it("rejects a resent list that still contains the default language", async () => {
     const project = await createTestProject("Duplicate Language");
-    const res = await update(project, { languages: ["el", "en"] });
+    setLanguages(project, ["en"]);
+    const res = await update(project, { languages: ["en"] });
     assert.equal(res._status, 400);
     assert.match(res._json.error, /already the site's default/i);
   });
 
-  it("stores additional languages, lowercased and deduplicated", async () => {
-    const project = await createTestProject("Multi");
-    const res = await update(project, { languages: ["EL", "el", "it"] });
-    assert.equal(res._status, 200);
-    assert.deepEqual(res._json.languages, ["el", "it"]);
-    assert.deepEqual(projectRepo.getProjectById(project.id).languages, ["el", "it"]);
-  });
-
   it("leaves the languages alone on an update that does not mention them", async () => {
     const project = await createTestProject("Untouched");
-    await update(project, { defaultLanguage: "el", languages: ["it"] });
+    await update(project, { defaultLanguage: "el" });
+    setLanguages(project, ["it"]);
 
     const res = await update(project, { siteTitle: "Renamed" });
     assert.equal(res._status, 200);
@@ -2051,7 +2063,7 @@ describe("site languages", () => {
 
   it("locks the default language once another language exists", async () => {
     const project = await createTestProject("Locked");
-    assert.equal((await update(project, { languages: ["el"] }))._status, 200);
+    setLanguages(project, ["el"]);
 
     const res = await update(project, { defaultLanguage: "it" });
     assert.equal(res._status, 400);
@@ -2061,16 +2073,16 @@ describe("site languages", () => {
 
   it("accepts the unchanged default language while multilang", async () => {
     const project = await createTestProject("Unchanged Default");
-    await update(project, { languages: ["el"] });
+    setLanguages(project, ["el"]);
 
-    const res = await update(project, { defaultLanguage: "en", languages: ["el", "it"] });
+    const res = await update(project, { defaultLanguage: "en" });
     assert.equal(res._status, 200);
-    assert.deepEqual(res._json.languages, ["el", "it"]);
+    assert.deepEqual(res._json.languages, ["el"]);
   });
 
   it("carries both fields through a duplicate", async () => {
     const project = await createTestProject("Duplicate Me", { defaultLanguage: "el" });
-    await update(project, { languages: ["it"] });
+    setLanguages(project, ["it"]);
 
     const res = await callController(duplicateProject, { params: { id: project.id } });
     assert.equal(res._status, 201);
@@ -2080,7 +2092,7 @@ describe("site languages", () => {
 
   it("carries both fields through export and import", async () => {
     const original = await createTestProject("Travelling Site", { defaultLanguage: "el" });
-    await update(original, { languages: ["it"] });
+    setLanguages(original, ["it"]);
 
     const { res: exportRes } = await exportTestProject(original.id);
     assert.equal(exportRes._status, 200);

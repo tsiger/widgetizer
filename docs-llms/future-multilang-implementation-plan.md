@@ -177,12 +177,21 @@ Three things the list above did not spell out:
 
 ## Phase 2 — Language lifecycle (server)
 
-### Step 9. Add a language: seed the skeleton (§2, §2a, §5a)
+### Step 9. Add a language: seed the skeleton (§2, §2a, §5a) — *done 2026-09-17*
 
 - `packages/builder-server/src/services/languageService.js` (new) — `addLanguage(scope, code)`: validate (step 5 rules), then in order: copy default menus into `menus/<code>/` with fresh uuids keeping an old→new map; copy header/footer into `pages/<code>/global/` rewriting only their **menu references** through the map (`resolveMenuSettings` / `schemaHasMenuSetting` in `menuResolver.js` know which settings hold menu ids). Page links inside menu items are **not** rewritten. No pages are copied.
 - Wire from `projectController.updateProject` so the project form's "add" is the only entry point.
 
 **Done when:** a test adds `el` to a fixture and asserts: Greek header points at Greek menu uuids, Greek menu items still point at English page uuids, `pages/el/` holds only `global/`.
+
+**As built.** `languageService.addLanguage({ storage, scope, project, code })` validates, then seeds menus (fresh uuids, same ids, an old→new map) and copies the globals with only their **menu** settings repointed through that map — top-level and block settings alike, read from `widgets/global/<type>/schema.json`. A setting the schema does not declare is copied verbatim. The service returns the new list of codes; the controller writes the row **after** the seed succeeds, so a failure never records a language with nothing behind it. Seeding overwrites, so a retry after a partial seed converges (new uuids, and the globals follow them).
+
+Three deviations, the first significant:
+
+- **The entry point is a project-scoped `POST /api/languages`, not `updateProject`.** The plan's bullet said to wire it from `updateProject`, but step 5 had already found why that cannot work: project routes are actor-scoped, so there is no `req.scope` for the project being edited, and adding a language reads and writes that project's content. `updateProject` now **refuses a change to the `languages` set** (resending the current list is fine, so saving the form is never blocked) and `createProject` refuses a new project asking for more than one language. An **import is exempt** — its zip carries the language folders, so the manifest's list is already seeded. The validation rules that used to be exercised through `updateProject` (right-to-left refusal, lowercasing, the default-language clash) moved with the behaviour and are asserted in `languageService.test.js`.
+- **§8a's reserved-name check lands here**, as step 5 predicted: a code equal to a root page slug, to a collection's `slugPrefix`, or to the reserved `assets` prefix is refused, naming the conflict, and nothing is seeded.
+- **A copied global gets its own media-usage rows** (`global:<lang>:<type>`), so clearing the source's image never marks one the copy still shows as unused. **A menu setting is repointed whether it names the menu by uuid or by slug** — the renderer accepts both, but only the uuid identifies the copy, so a slug left alone would keep rendering the source language's menu. **Adding a language is serialized per project** (`createKeyedSerializer`) with the row read inside the section: two adds in flight would otherwise both extend the pre-seed list, and two adds of the same code would seed over each other's files.
+- **`loadMenuMaps` now indexes every language's menus by uuid** (`bySlug` stays root-only, since a bare slug means the menu of the language being rendered). Without it the uuids this step writes into a translated header would resolve to nothing the moment step 19/20 render that header.
 
 ### Step 10. Remove a language: destructive with counts (§1c)
 

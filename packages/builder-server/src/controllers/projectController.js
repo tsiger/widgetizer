@@ -118,9 +118,12 @@ function languageRejection(raw) {
  * default language is editable only while the site has one language, because
  * changing it later moves every page and rewrites every public URL — which a
  * static export cannot redirect.
+ * `seeded` is for content that already exists — an import carries its language
+ * folders in the zip — and so may name a set the API would otherwise refuse to
+ * change here.
  * @returns {{value?: {defaultLanguage?: string, languages?: string[]}, error?: string}}
  */
-function readLanguages(updates, current = null) {
+function readLanguages(updates, current = null, { seeded = false } = {}) {
   let defaultLanguage;
   if (updates.defaultLanguage !== undefined) {
     defaultLanguage = normalizeLanguageCode(updates.defaultLanguage);
@@ -136,6 +139,17 @@ function readLanguages(updates, current = null) {
       const code = normalizeLanguageCode(raw);
       if (!isValidLanguageCode(code)) return { error: languageRejection(raw) };
       if (!languages.includes(code)) languages.push(code);
+    }
+    // Adding or removing a language copies or deletes content, which needs the
+    // project's scope — these routes are actor-scoped. Resending the current
+    // list is fine, so saving the form never trips on it.
+    const before = [...(current?.languages ?? [])].sort().join();
+    if (!seeded && before !== [...languages].sort().join()) {
+      return {
+        error: current
+          ? "Languages are added and removed one at a time, so the site's content can be seeded or cleaned up. Use the site languages endpoint."
+          : "A new project starts with one language. Add the others once it exists.",
+      };
     }
   }
 
@@ -1232,7 +1246,7 @@ export async function importProject(req, res) {
         }
       }
 
-      const importedLanguages = readLanguages(manifest.project).value ?? {};
+      const importedLanguages = readLanguages(manifest.project, null, { seeded: true }).value ?? {};
 
       // Create new project object (DB insert happens later, after directory setup)
       newProject = {

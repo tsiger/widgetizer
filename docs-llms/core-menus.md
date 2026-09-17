@@ -8,7 +8,7 @@ This document covers the menu-management subsystem end to end: per-project menu 
 
 Each menu is stored as an individual JSON file under the active project's `menus/` directory. This isolates menu data and keeps it organized per-project.
 
-- **Location**: `data/projects/<folderName>/menus/` for the default language, `menus/<lang>/` for another site language. The language is derived from the folder, never stored in the file; ids are unique per folder.
+- **Location**: `data/projects/<folderName>/menus/` for the default language, `menus/<lang>/` for another site language, seeded from the default's menus when the language is added (`languageService.addLanguage`, each copy with a fresh uuid). The language is derived from the folder, never stored in the file; ids are unique per folder.
 - **Filename**: the slugified menu name (e.g. `main-menu.json`). The slug is also the menu's stable `id`.
 
 > **Adapter note.** All CRUD-path menu I/O routes through the `StorageAdapter` (`storage.list/read/write/delete/exists`) over the request's `scope` (`{ actor, projectId, folderName }`) — the controller never builds absolute paths from request input. `menuController` also depth/count-caps menu trees before any recursive walk: a hard `MAX_MENU_DEPTH = 32` and a `MAX_MENU_ITEMS` ceiling from the `LimitsAdapter` (over-cap → `422`; OSS = unbounded, hosted = finite). Both caps are defined in `packages/core/src/adapters.js`. See [Platform Security](core-security.md#11-cross-tenant-safety-multi-tenant-host-contract).
