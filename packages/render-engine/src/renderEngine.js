@@ -32,7 +32,7 @@ import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@wid
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
-import { pagedHref } from "@widgetizer/core/contentAddress";
+import { pagedHref, pageOutputPath, resolveLanguage } from "@widgetizer/core/contentAddress";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { identityForTheme } from "@widgetizer/core/siteIdentity";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
@@ -187,9 +187,17 @@ function schemaHasLinkSetting(schema) {
  * @param {string} [outputPathPrefix] - "" at root, "../" for nested item pages
  * @param {Map} [collectionItemsByUuid] - Map of item uuid -> { slugPrefix, slug }
  * @param {boolean} [cleanUrls] - The project's Clean URLs setting; picks the href shape
+ * @param {string} [defaultLanguage] - the project's default; the target's own language decides its folder
  * @returns {object} Resolved link object
  */
-function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null, cleanUrls = false) {
+function resolveLinkValue(
+  linkValue,
+  pagesByUuid,
+  outputPathPrefix = "",
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   if (!linkValue || typeof linkValue !== "object") {
     return linkValue;
   }
@@ -201,10 +209,8 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
   if (collectionItemUuid) {
     const entry = collectionItemsByUuid && collectionItemsByUuid.get(collectionItemUuid);
     if (entry) {
-      return {
-        ...linkValue,
-        href: itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix }),
-      };
+      const opts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
+      return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, opts) };
     }
     // Collection item was deleted - clear the link
     return { href: "", text: "", target: "_self" };
@@ -220,10 +226,8 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
 
   if (page) {
     // Page exists - update href to current slug, depth-aware for nested pages
-    return {
-      ...linkValue,
-      href: pageHref(page.slug, { cleanUrls, outputPathPrefix }),
-    };
+    const opts = { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage };
+    return { ...linkValue, href: pageHref(page.slug, opts) };
   } else {
     // Page was deleted - clear the link
     return {
@@ -242,7 +246,14 @@ function resolveLinkValue(linkValue, pagesByUuid, outputPathPrefix = "", collect
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {object} Widget data with resolved links
  */
-function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = null, cleanUrls = false) {
+function resolveWidgetPageLinks(
+  widgetData,
+  pagesByUuid,
+  outputPathPrefix = "",
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   const pagesEmpty = !pagesByUuid || pagesByUuid.size === 0;
   const itemsEmpty = !collectionItemsByUuid || collectionItemsByUuid.size === 0;
   if (!widgetData || (pagesEmpty && itemsEmpty)) {
@@ -256,7 +267,14 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", 
   if (resolved.settings && typeof resolved.settings === "object") {
     for (const [key, value] of Object.entries(resolved.settings)) {
       if (isLinkObject(value)) {
-        resolved.settings[key] = resolveLinkValue(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid, cleanUrls);
+        resolved.settings[key] = resolveLinkValue(
+          value,
+          pagesByUuid,
+          outputPathPrefix,
+          collectionItemsByUuid,
+          cleanUrls,
+          defaultLanguage,
+        );
       }
     }
   }
@@ -273,6 +291,7 @@ function resolveWidgetPageLinks(widgetData, pagesByUuid, outputPathPrefix = "", 
               outputPathPrefix,
               collectionItemsByUuid,
               cleanUrls,
+              defaultLanguage,
             );
           }
         }
@@ -308,6 +327,22 @@ async function loadPagesByUuid(deps) {
     console.warn(`Could not load pages for link resolution: ${error.message}`);
     return new Map();
   }
+}
+
+/**
+ * The project's language settings, cached per render beside the Clean URLs flag.
+ * @param {RenderDeps} deps
+ * @param {object|null} sharedGlobals
+ */
+async function languageSettings(deps, sharedGlobals) {
+  if (sharedGlobals?.languageSettings) return sharedGlobals.languageSettings;
+  const projectData = await getProjectData(deps);
+  const settings = {
+    defaultLanguage: resolveLanguage("", projectData?.defaultLanguage),
+    languages: Array.isArray(projectData?.languages) ? projectData.languages : [],
+  };
+  if (sharedGlobals) sharedGlobals.languageSettings = settings;
+  return settings;
 }
 
 /**
@@ -360,44 +395,67 @@ async function ensureBreadcrumbs(deps, sharedGlobals) {
   if (sharedGlobals.breadcrumbs) return sharedGlobals.breadcrumbs;
 
   const canonicalPath = sharedGlobals.currentCanonicalPath || "";
-  const target = canonicalPath.endsWith(".html") ? canonicalPath.slice(0, -5) : canonicalPath;
-  if (!target) {
+  if (!canonicalPath) {
     sharedGlobals.breadcrumbs = [];
     return sharedGlobals.breadcrumbs;
   }
 
   if (!sharedGlobals.pagesByUuid) sharedGlobals.pagesByUuid = await loadPagesByUuid(deps);
   const pagesByUuid = sharedGlobals.pagesByUuid;
+  const { defaultLanguage, languages } = await languageSettings(deps, sharedGlobals);
+
+  // The canonical path is the file path, so it names the language folder too; a
+  // page is found by rebuilding that path rather than by matching a slug, which
+  // is no longer unique across languages.
+  const page =
+    [...pagesByUuid.values()].find(
+      (candidate) =>
+        candidate?.slug &&
+        pageOutputPath(candidate.slug, 1, { language: candidate.language, defaultLanguage }) === canonicalPath,
+    ) || null;
+
   const shape = {
     pagesByUuid,
     cleanUrls: sharedGlobals.cleanUrls === true,
     outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+    defaultLanguage,
   };
 
-  // A nested path is a collection item. Item pages normally seed the trail
-  // themselves in renderCollectionItemPage; this resolves the preview's
-  // single-widget morph, which re-renders a header in isolation and knows only
-  // the path — without it, editing a header while previewing an item would
-  // blank its breadcrumb.
-  if (target.includes("/")) {
-    const resolved = await resolveItemFromPath(deps, target);
-    if (!sharedGlobals.listingPages) {
-      sharedGlobals.listingPages = await loadListingIndex(deps, pagesByUuid);
-    }
-    sharedGlobals.breadcrumbs = resolved
-      ? buildBreadcrumbs({
-          ...shape,
-          item: resolved.item,
-          collectionType: resolved.collectionType,
-          listingPages: sharedGlobals.listingPages,
-        })
-      : [];
+  if (page) {
+    sharedGlobals.breadcrumbs = buildBreadcrumbs({
+      ...shape,
+      page,
+      language: page.language,
+      pageNumber: sharedGlobals.paginationPlan?.current || 1,
+    });
     return sharedGlobals.breadcrumbs;
   }
 
-  const page = [...pagesByUuid.values()].find((candidate) => candidate?.slug === target) || null;
-  sharedGlobals.breadcrumbs = page
-    ? buildBreadcrumbs({ ...shape, page, pageNumber: sharedGlobals.paginationPlan?.current || 1 })
+  // Not a page: a collection item, whose path carries its language folder ahead
+  // of the collection prefix. Item pages normally seed the trail themselves in
+  // renderCollectionItemPage; this resolves the preview's single-widget morph,
+  // which re-renders a header in isolation and knows only the path.
+  const withoutExt = canonicalPath.endsWith(".html") ? canonicalPath.slice(0, -5) : canonicalPath;
+  const [maybeLanguage, ...rest] = withoutExt.split("/");
+  const itemLanguage = languages.includes(maybeLanguage) ? maybeLanguage : "";
+  const target = itemLanguage ? rest.join("/") : withoutExt;
+  if (!target.includes("/")) {
+    sharedGlobals.breadcrumbs = [];
+    return sharedGlobals.breadcrumbs;
+  }
+
+  const resolved = await resolveItemFromPath(deps, target);
+  if (!sharedGlobals.listingPages) {
+    sharedGlobals.listingPages = await loadListingIndex(deps, pagesByUuid);
+  }
+  sharedGlobals.breadcrumbs = resolved
+    ? buildBreadcrumbs({
+        ...shape,
+        item: { ...resolved.item, language: resolveLanguage(itemLanguage, defaultLanguage) },
+        collectionType: resolved.collectionType,
+        language: resolveLanguage(itemLanguage, defaultLanguage),
+        listingPages: sharedGlobals.listingPages,
+      })
     : [];
   return sharedGlobals.breadcrumbs;
 }
@@ -915,6 +973,7 @@ async function renderWidget(
       }
       cleanUrls = sharedGlobals.cleanUrls === true;
     }
+    const { defaultLanguage } = await languageSettings(deps, sharedGlobals);
 
     // Breadcrumbs reach header/footer through the globals bag, so a theme can
     // draw the trail inside the header widget as well as in the layout. Built
@@ -965,6 +1024,7 @@ async function renderWidget(
       collectionItemsByUuid: collectionItemsByUuid || new Map(),
       outputPathPrefix,
       cleanUrls,
+      defaultLanguage,
     };
     resolveMenuSettings(enhancedSettings, schema.settings, menuDeps);
     for (const block of Object.values(enhancedBlocks)) {
@@ -981,6 +1041,7 @@ async function renderWidget(
       outputPathPrefix,
       collectionItemsByUuid,
       cleanUrls,
+      defaultLanguage,
     );
 
     // Sanitize settings based on schema types (text, richtext, link, etc.)
@@ -1003,6 +1064,7 @@ async function renderWidget(
       collectionItemsByUuid,
       outputPathPrefix,
       cleanUrls,
+      defaultLanguage,
     });
 
     // Create widget context for template
@@ -1214,12 +1276,14 @@ async function renderCollectionItemPage(
   // Item pages have the project row in hand, so the flag is stamped here rather
   // than lazily as renderWidget does; a caller-set value still wins.
   if (sharedGlobals.cleanUrls === undefined) sharedGlobals.cleanUrls = !!projectData?.cleanUrls;
+  const { defaultLanguage: itemDefaultLanguage } = await languageSettings(deps, sharedGlobals);
   const menuDeps =
     sharedGlobals.menuMaps || sharedGlobals.collectionItemsByUuid
       ? {
           menuMaps: sharedGlobals.menuMaps,
           collectionItemsByUuid: sharedGlobals.collectionItemsByUuid,
           cleanUrls: sharedGlobals.cleanUrls === true,
+          defaultLanguage: itemDefaultLanguage,
         }
       : null;
 
@@ -1241,17 +1305,21 @@ async function renderCollectionItemPage(
       sharedGlobals.listingPages = await loadListingIndex(deps, sharedGlobals.pagesByUuid);
     }
     const titleField = (schema.settings || []).find((setting) => setting.usedAsTitle);
+    const itemLanguage = resolveLanguage(resolvedItem.language, itemDefaultLanguage);
     sharedGlobals.breadcrumbs = buildBreadcrumbs({
       item: {
         slug: resolvedItem.slug,
         name: (titleField && resolvedItem.settings?.[titleField.id]) || resolvedItem.slug,
         slugPrefix: schema.slugPrefix,
+        language: itemLanguage,
       },
       collectionType: schema.type,
       pagesByUuid: sharedGlobals.pagesByUuid,
       listingPages: sharedGlobals.listingPages,
       cleanUrls: sharedGlobals.cleanUrls === true,
       outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+      language: itemLanguage,
+      defaultLanguage: itemDefaultLanguage,
     });
   }
 

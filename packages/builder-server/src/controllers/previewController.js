@@ -21,7 +21,7 @@ import {
 } from "../services/collectionService.js";
 import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
 import { globalKey } from "@widgetizer/core/contentAddress";
-import { requestLanguage, withoutLanguage } from "../utils/contentLanguage.js";
+import { requestLanguage, withoutLanguage, projectLanguageContexts } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
@@ -385,7 +385,12 @@ export async function createCollectionPreviewToken(req, res) {
     }
     // Stable collection-item refs for resolving `menu`/`link`-type item settings
     // that target another item. Menu maps are loaded lazily inside the render.
-    const collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope);
+    const collectionItemsByUuid = await loadCollectionItemsByUuid(
+      storage,
+      scope,
+      null,
+      projectLanguageContexts(projectData),
+    );
 
     // Assemble the item to render from the posted settings (the navigable preview
     // passes the saved item's settings).

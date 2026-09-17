@@ -47,13 +47,13 @@ function stripAttrs(openTag, ...res) {
  *   - uuid found → rewrite `href`.
  * External anchors (no data-uuid) pass through untouched.
  * @param {*} html
- * @param {{ pagesByUuid?: Map, collectionItemsByUuid?: Map, outputPathPrefix?: string, cleanUrls?: boolean }} deps
+ * @param {{ pagesByUuid?: Map, collectionItemsByUuid?: Map, outputPathPrefix?: string, cleanUrls?: boolean, defaultLanguage?: string }} deps
  * `cleanUrls` (the project's Clean URLs setting) picks the emitted shape — `.html` file name, or extensionless address.
  * @returns {*} rewritten string (or input unchanged when not a non-empty string / no refs)
  */
 export function resolveRichtextLinkRefs(
   html,
-  { pagesByUuid, collectionItemsByUuid, outputPathPrefix = "", cleanUrls = false } = {},
+  { pagesByUuid, collectionItemsByUuid, outputPathPrefix = "", cleanUrls = false, defaultLanguage = "" } = {},
 ) {
   if (typeof html !== "string" || html === "" || !html.includes("data-")) return html;
   return html.replace(ANCHOR_OPEN_TAG_RE, (openTag) => {
@@ -61,14 +61,19 @@ export function resolveRichtextLinkRefs(
     if (itemMatch) {
       if (!collectionItemsByUuid) return openTag; // map unavailable → fallback to stored href
       const entry = collectionItemsByUuid.get(itemMatch[1]);
-      if (entry) return setHref(openTag, itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix }));
+      if (entry) {
+        const opts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
+        return setHref(openTag, itemHref(entry.slugPrefix, entry.slug, opts));
+      }
       return stripAttrs(openTag, HREF_ATTR_RE, ITEM_UUID_ATTR_RE); // deleted → neutralize
     }
     const pageMatch = openTag.match(PAGE_UUID_ATTR_RE);
     if (pageMatch) {
       if (!pagesByUuid) return openTag;
       const page = pagesByUuid.get(pageMatch[1]);
-      if (page) return setHref(openTag, pageHref(page.slug, { cleanUrls, outputPathPrefix }));
+      if (page) {
+        return setHref(openTag, pageHref(page.slug, { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage }));
+      }
       return stripAttrs(openTag, HREF_ATTR_RE, PAGE_UUID_ATTR_RE);
     }
     return openTag;

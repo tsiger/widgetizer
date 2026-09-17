@@ -36,6 +36,7 @@ import { listPagesFromDir } from "../utils/projectContentFs.js";
 import { preprocessThemeSettings } from "../utils/themeHelpers.js";
 import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
+import { projectLanguages, projectLanguageContexts } from "../utils/contentLanguage.js";
 import { sanitizeWidgetData } from "./sanitizationService.js";
 import {
   listCollectionSchemas,
@@ -58,7 +59,7 @@ function schemaHasLinkSetting(schema) {
  * context). Results are cached per (type, options) on `globals.collectionCache`.
  * @param {{ storage: object, scope: object, reader: { read: Function, sorted: Function } }} collectionDeps
  */
-function makeCollectionItemsLoaderFactory({ storage, scope, reader }) {
+function makeCollectionItemsLoaderFactory({ storage, scope, reader, languageContexts, defaultLanguage }) {
   return ({ globals, imageBasePath, fileBasePath }) =>
     async (collectionType, options = {}) => {
       const cacheKey = `${collectionType}:${JSON.stringify(options ?? {})}`;
@@ -86,12 +87,13 @@ function makeCollectionItemsLoaderFactory({ storage, scope, reader }) {
       // richtext-only item must load the item map too, not just menu/link items.
       if (schemaHasMenuSetting(schema) || schemaHasLinkSetting(schema) || schemaHasRichtextSetting(schema)) {
         if (!globals.collectionItemsByUuid) {
-          globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope, reader);
+          globals.collectionItemsByUuid = await loadCollectionItemsByUuid(storage, scope, reader, languageContexts);
         }
         menuDeps = {
           menuMaps: globals.menuMaps || { byUuid: new Map(), bySlug: new Map() },
           collectionItemsByUuid: globals.collectionItemsByUuid,
           cleanUrls: globals.cleanUrls === true,
+          defaultLanguage,
         };
       }
 
@@ -114,7 +116,12 @@ function makeCollectionItemsLoaderFactory({ storage, scope, reader }) {
           filePath: fileBasePath,
         });
         const url = schema?.hasItemPages
-          ? itemHref(schema.slugPrefix, resolved.slug, { cleanUrls: globals.cleanUrls === true, outputPathPrefix })
+          ? itemHref(schema.slugPrefix, resolved.slug, {
+              cleanUrls: globals.cleanUrls === true,
+              outputPathPrefix,
+              language: resolved.language,
+              defaultLanguage,
+            })
           : null;
         return {
           id: resolved.id,
@@ -144,9 +151,19 @@ function makeCollectionItemsLoaderFactory({ storage, scope, reader }) {
  * @returns {{ buildCollectionItemsLoader: Function, getCollectionSchemas: Function, loadCollectionItemsByUuid: Function }}
  */
 function buildCollectionRenderDeps({ storage, scope, snapshot = null }) {
-  const reader = createCollectionReader({ storage, scope, snapshot });
+  // A link may target an item in any language, so the uuid map spans them all.
+  const project = projectRepo.getProjectById(scope.projectId);
+  const { defaultLanguage } = projectLanguages(project);
+  const languageContexts = projectLanguageContexts(project);
+  const reader = createCollectionReader({ storage, scope, snapshot, defaultLanguage });
   return {
-    buildCollectionItemsLoader: makeCollectionItemsLoaderFactory({ storage, scope, reader }),
+    buildCollectionItemsLoader: makeCollectionItemsLoaderFactory({
+      storage,
+      scope,
+      reader,
+      languageContexts,
+      defaultLanguage,
+    }),
     // Schema enumeration for the export item-page pass (and any caller that needs
     // to know which collections declare item pages). Scope-aware, adapter-backed.
     getCollectionSchemas: () => listCollectionSchemas(storage, scope),
@@ -154,7 +171,7 @@ function buildCollectionRenderDeps({ storage, scope, snapshot = null }) {
     // target a collection item (collectionItemUuid) resolve to its current page
     // URL at render time (#11 parity with pageUuid). The engine calls this lazily
     // and caches the result per render; non-collection callers leave it unset.
-    loadCollectionItemsByUuid: () => loadCollectionItemsByUuid(storage, scope, reader),
+    loadCollectionItemsByUuid: () => loadCollectionItemsByUuid(storage, scope, reader, languageContexts),
     countCollectionItems: async (collectionType) =>
       ((await reader.read(collectionType))?.items || []).filter((item) => !item.invalid).length,
   };

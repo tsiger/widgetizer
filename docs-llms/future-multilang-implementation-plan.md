@@ -155,7 +155,7 @@ Two things deliberately left for later steps:
 - The `slugPrefix` half of §8a ("vice versa": enabling a language whose code equals a collection prefix or a root page slug) is the add-language service's check (step 9); `isReservedSlugPrefix(prefix, { languages })` is ready for it, but theme schema validation runs without a project, so nothing enforces it there.
 - The uuid loaders (`loadPagesByUuid`, `loadCollectionItemsByUuid`) and the `| collection` filter still read the root only; step 8 and step 21 own those.
 
-### Step 8. Language-aware link resolution (§4a, §7a)
+### Step 8. Language-aware link resolution (§4a, §7a) — *done 2026-09-17*
 
 - `loadPagesByUuid` in `packages/render-engine/src/renderEngine.js` and `loadCollectionItemsByUuid` in `collectionService.js` load every language, and each entry carries its resolved `language`.
 - `packages/render-engine/src/menuResolver.js` (`resolveMenuItemLinks`, `resolveMenuPageLinks`), the richtext resolution inside `renderWidget`, and the link-setting resolution pass the target's language into `pageHref` / `itemHref` so a cross-language link renders as `../el/contact` from an English page (§4a). Author-typed strings stay untouched (§2a).
@@ -163,6 +163,15 @@ Two things deliberately left for later steps:
 - Breadcrumb trails (stage 1, `future-breadcrumbs-design.md`) are per language automatically because menus are; a `parentPageUuid` that points at another language's page resolves to that page's translation sibling in the current language, else is ignored. Listing anchors live on per-language pages and need nothing.
 
 **Done when:** `collectionLinkResolution.test.js` and a menu-resolver test cover same-language, cross-language and cross-depth targets under both Clean URLs values.
+
+**As built.** The target's language rides on the loaded entry and the project's default rides beside `cleanUrls`, so every resolver answers "which folder" from the two together. `loadCollectionItemsByUuid` takes language contexts and its entries gained `language`; pages already carried theirs from step 7. `defaultLanguage` joins `cleanUrls` as a trailing argument on the positional resolvers (`resolveMenuItemLinks`, `resolveMenuPageLinks`, `resolveCollectionItemLinks`, and the engine's private link resolvers) and as a field in the bags that already existed (`resolveMenuSettings`, `menuDeps`, the richtext deps, `buildBreadcrumbs`). The engine caches the project's language settings per render beside the Clean URLs stamp.
+
+Three things the list above did not spell out:
+
+- **`canonicalPath` is now the language-qualified file path** (`el/about.html`), built by `pageOutputPath` / `itemOutputPath` rather than string concatenation, and the exporter's `currentCanonicalPath` matches. Active-state matching therefore compares like with like. Preview still addresses pages by slug alone, which is fine while it is default-language only; step 18 gives it the namespace.
+- **`ensureBreadcrumbs` finds a page by rebuilding its output path**, not by matching a slug — a slug is no longer unique across languages. When no page matches, the path is an item's, and a leading enabled-language segment is stripped before the collection prefix is resolved.
+- **A trail stays inside its language**: `findHomePage` picks the home of the trail's language, and a `parentPageUuid` (or a listing anchor) pointing at another language is swapped for its `translationGroupId` sibling in this one, else dropped. `listingParentStatus` takes the language for the same reason. Listing pages are deduplicated by uuid once resolved, since a translated pair collapses to one page and one page is not an ambiguous choice, and `indexListingPages` keeps an anchor **per language** (`anchorByLanguage`, with `anchorPageUuid` as the cross-language fallback) so each language's own choice survives.
+- **The collection reader carries the project's default language**, so omitting `lang` reads the root folder *and* stamps its items with the language that folder actually is. Without it a Greek-default project would treat its own root items as English and give them an `en/` folder.
 
 ---
 

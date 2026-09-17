@@ -279,3 +279,178 @@ describe("indexListingPages", () => {
     expect(index.get("news").pageUuids).toEqual([blog.uuid]);
   });
 });
+
+// A trail stays inside its own language: its home crumb, its ancestors and its
+// own href all come from the language being rendered.
+describe("buildBreadcrumbs — languages", () => {
+  const EN_HOME = { uuid: "u-en-home", slug: "index", name: "Home", language: "en", translationGroupId: "g-home" };
+  const EL_HOME = { uuid: "u-el-home", slug: "index", name: "Arxiki", language: "el", translationGroupId: "g-home" };
+  const EN_ABOUT = {
+    uuid: "u-en-about",
+    slug: "about",
+    name: "About",
+    language: "en",
+    translationGroupId: "g-about",
+  };
+  const EL_ABOUT = {
+    uuid: "u-el-about",
+    slug: "sxetika",
+    name: "Sxetika",
+    language: "el",
+    translationGroupId: "g-about",
+  };
+  const EL_TEAM = {
+    uuid: "u-el-team",
+    slug: "omada",
+    name: "Omada",
+    language: "el",
+    parentPageUuid: EL_ABOUT.uuid,
+  };
+  // Authored in Greek but pointing at the English About — what a seeded menu leaves behind.
+  const EL_CROSS = {
+    uuid: "u-el-cross",
+    slug: "epafi",
+    name: "Epafi",
+    language: "el",
+    parentPageUuid: EN_ABOUT.uuid,
+  };
+  const all = pagesByUuid(EN_HOME, EL_HOME, EN_ABOUT, EL_ABOUT, EL_TEAM, EL_CROSS);
+  const build = (page, extra = {}) =>
+    buildBreadcrumbs({ page, pagesByUuid: all, defaultLanguage: "en", language: page.language, ...extra });
+
+  it("draws the home crumb of the page's own language", () => {
+    expect(hrefs(build(EL_ABOUT))).toEqual(["el/index.html", "el/sxetika.html"]);
+    expect(labels(build(EL_ABOUT))).toEqual(["Arxiki", "Sxetika"]);
+    expect(hrefs(build(EN_ABOUT))).toEqual(["index.html", "about.html"]);
+  });
+
+  it("walks a parent chain inside the language", () => {
+    const trail = build(EL_TEAM);
+    expect(labels(trail)).toEqual(["Arxiki", "Sxetika", "Omada"]);
+    expect(hrefs(trail)).toEqual(["el/index.html", "el/sxetika.html", "el/omada.html"]);
+    expect(trail.map((c) => c.canonicalPath)).toEqual(["el/index.html", "el/sxetika.html", "el/omada.html"]);
+  });
+
+  it("swaps a parent in another language for its sibling in this one", () => {
+    const trail = build(EL_CROSS);
+    expect(labels(trail)).toEqual(["Arxiki", "Sxetika", "Epafi"]);
+    expect(hrefs(trail)).toEqual(["el/index.html", "el/sxetika.html", "el/epafi.html"]);
+  });
+
+  it("ignores a parent that exists only in another language", () => {
+    const orphanParent = { uuid: "u-en-only", slug: "careers", name: "Careers", language: "en" };
+    const child = { uuid: "u-el-c", slug: "kariera", name: "Kariera", language: "el", parentPageUuid: "u-en-only" };
+    const trail = buildBreadcrumbs({
+      page: child,
+      pagesByUuid: pagesByUuid(EN_HOME, EL_HOME, orphanParent, child),
+      defaultLanguage: "en",
+      language: "el",
+    });
+    expect(labels(trail)).toEqual(["Arxiki", "Kariera"]);
+  });
+
+  it("follows Clean URLs and depth per language", () => {
+    const trail = build(EL_TEAM, { cleanUrls: true, outputPathPrefix: "../" });
+    expect(hrefs(trail)).toEqual(["../el/", "../el/sxetika", "../el/omada"]);
+    expect(trail.map((c) => c.canonicalPath)).toEqual(["el/index.html", "el/sxetika.html", "el/omada.html"]);
+  });
+
+  it("puts a Greek item under its Greek listing page", () => {
+    const listing = { uuid: "u-el-news", slug: "nea", name: "Nea", language: "el" };
+    const enListing = { uuid: "u-en-news", slug: "news", name: "News", language: "en" };
+    const trail = buildBreadcrumbs({
+      item: { slug: "istoria", name: "Istoria", slugPrefix: "news", language: "el" },
+      collectionType: "news",
+      pagesByUuid: pagesByUuid(EN_HOME, EL_HOME, listing, enListing),
+      listingPages: new Map([["news", { pageUuids: [enListing.uuid, listing.uuid] }]]),
+      defaultLanguage: "en",
+      language: "el",
+    });
+    expect(labels(trail)).toEqual(["Arxiki", "Nea", "Istoria"]);
+    expect(hrefs(trail)).toEqual(["el/index.html", "el/nea.html", "el/news/istoria.html"]);
+  });
+
+  it("numbers a paginated Greek copy under its own folder", () => {
+    const blog = { uuid: "u-el-blog", slug: "blog", name: "Nea", language: "el" };
+    const trail = buildBreadcrumbs({
+      page: blog,
+      pagesByUuid: pagesByUuid(EN_HOME, EL_HOME, blog),
+      defaultLanguage: "en",
+      language: "el",
+      pageNumber: 2,
+      outputPathPrefix: "../../../",
+    });
+    expect(labels(trail)).toEqual(["Arxiki", "Nea", "2"]);
+    expect(hrefs(trail)).toEqual(["../../../el/index.html", "../../../el/blog.html", "../../../el/blog/page/2.html"]);
+    expect(trail[2].canonicalPath).toBe("el/blog/page/2.html");
+  });
+});
+
+describe("listing pages across languages", () => {
+  const EN_HOME = { uuid: "u-en-home", slug: "index", name: "Home", language: "en" };
+  const EL_HOME = { uuid: "u-el-home", slug: "index", name: "Arxiki", language: "el" };
+  const EN_NEWS = { uuid: "u-en-news", slug: "news", name: "News", language: "en", translationGroupId: "g-news" };
+  const EL_NEWS = { uuid: "u-el-news", slug: "nea", name: "Nea", language: "el", translationGroupId: "g-news" };
+  const EL_OTHER = { uuid: "u-el-other", slug: "arxeio", name: "Arxeio", language: "el" };
+  const item = { slug: "istoria", name: "Istoria", slugPrefix: "news", language: "el" };
+
+  const trailFor = (pages, listingPages) =>
+    buildBreadcrumbs({
+      item,
+      collectionType: "news",
+      pagesByUuid: pagesByUuid(...pages),
+      listingPages: new Map([["news", listingPages]]),
+      defaultLanguage: "en",
+      language: "el",
+    });
+
+  it("treats a translated pair of listings as one parent, not an ambiguous choice", () => {
+    const entry = { anchorPageUuid: null, anchorByLanguage: {}, pageUuids: [EN_NEWS.uuid, EL_NEWS.uuid] };
+    const pages = pagesByUuid(EN_HOME, EL_HOME, EN_NEWS, EL_NEWS);
+    expect(labels(trailFor([EN_HOME, EL_HOME, EN_NEWS, EL_NEWS], entry))).toEqual(["Arxiki", "Nea", "Istoria"]);
+    expect(listingParentStatus(entry, pages, "el")).toBe("resolved");
+  });
+
+  it("uses the anchor this language chose, not the one another language chose", () => {
+    const EN_ONLY = { uuid: "u-en-only", slug: "press", name: "Press", language: "en" };
+    const entry = {
+      anchorPageUuid: EN_ONLY.uuid,
+      anchorByLanguage: { en: EN_ONLY.uuid, el: EL_OTHER.uuid },
+      pageUuids: [EN_ONLY.uuid, EL_OTHER.uuid, EL_NEWS.uuid],
+    };
+    const trail = trailFor([EN_HOME, EL_HOME, EN_ONLY, EL_OTHER, EL_NEWS], entry);
+    expect(labels(trail)).toEqual(["Arxiki", "Arxeio", "Istoria"]);
+  });
+
+  it("indexes an anchor per language and keeps the first as the cross-language fallback", () => {
+    const schemas = { "news-grid": { collection: { type: "news" } } };
+    const anchored = (uuid, slug, language) => ({
+      uuid,
+      slug,
+      language,
+      widgets: { w1: { type: "news-grid", settings: { listing_anchor: true } } },
+    });
+    const index = indexListingPages(
+      [anchored("u-en", "news", "en"), anchored("u-el", "nea", "el"), { uuid: "u-el2", slug: "arxeio", language: "el", widgets: { w1: { type: "news-grid", settings: {} } } }],
+      schemas,
+    );
+    const entry = index.get("news");
+    expect(entry.anchorByLanguage).toEqual({ en: "u-en", el: "u-el" });
+    // The fallback is the first anchor in slug order ("nea" precedes "news").
+    expect(entry.anchorPageUuid).toBe("u-el");
+    expect(entry.pageUuids.sort()).toEqual(["u-el", "u-el2", "u-en"]);
+  });
+
+  it("still indexes one anchor when no page carries a language", () => {
+    const schemas = { "news-grid": { collection: { type: "news" } } };
+    const index = indexListingPages(
+      [
+        { uuid: "u-a", slug: "news", widgets: { w1: { type: "news-grid", settings: { listing_anchor: true } } } },
+        { uuid: "u-b", slug: "archive", widgets: { w1: { type: "news-grid", settings: {} } } },
+      ],
+      schemas,
+    );
+    expect(index.get("news").anchorPageUuid).toBe("u-a");
+    expect(listingParentStatus(index.get("news"), pagesByUuid({ uuid: "u-a", slug: "news" }))).toBe("resolved");
+  });
+});

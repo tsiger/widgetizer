@@ -673,17 +673,20 @@ export async function sortCollectionItems(storage, scope, collectionType, { sche
   return sorted;
 }
 
-export function createCollectionReader({ storage, scope, snapshot = null }) {
+export function createCollectionReader({ storage, scope, snapshot = null, defaultLanguage = "" }) {
+  // Omitting `lang` reads the root folder, and the root folder IS the project's
+  // default language — so its items must be stamped with that code, not with `en`.
+  const rootLang = { language: defaultLanguage, defaultLanguage };
   const remember = (key, load) => {
     if (!snapshot) return load();
     if (!snapshot.has(key)) snapshot.set(key, load());
     return snapshot.get(key);
   };
-  const read = (collectionType, lang) =>
+  const read = (collectionType, lang = rootLang) =>
     remember(`read:${collectionDirKey(collectionType, lang)}`, () =>
       readCollectionItems(storage, scope, collectionType, lang),
     );
-  const sorted = (collectionType, sortOptions = {}, lang) =>
+  const sorted = (collectionType, sortOptions = {}, lang = rootLang) =>
     remember(`sorted:${collectionDirKey(collectionType, lang)}:${JSON.stringify(sortOptions)}`, async () => {
       const loaded = await read(collectionType, lang);
       return loaded ? sortCollectionItems(storage, scope, collectionType, loaded, sortOptions, lang) : [];
@@ -1080,7 +1083,14 @@ function isLinkObject(value) {
   return value && typeof value === "object" && !Array.isArray(value) && "href" in value;
 }
 
-function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null, cleanUrls = false) {
+function resolveLink(
+  linkValue,
+  pagesByUuid,
+  outputPathPrefix,
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   const { pageUuid, collectionItemUuid } = linkValue;
   // Stable reference to a collection item page (#11 parity): resolve its current
   // slug so renames follow and deletes clear the link.
@@ -1089,7 +1099,8 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
     if (!entry) {
       return { href: "", text: "", target: "_self" }; // item deleted — clear the link
     }
-    return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix }) };
+    const itemOpts = { cleanUrls, outputPathPrefix, language: entry.language, defaultLanguage };
+    return { ...linkValue, href: itemHref(entry.slugPrefix, entry.slug, itemOpts) };
   }
   if (!pageUuid) {
     // Custom URL — depth-prefix internal-looking hrefs, leave the rest as-is.
@@ -1099,7 +1110,10 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
   if (!page) {
     return { href: "", text: "", target: "_self" }; // page deleted — clear the link
   }
-  return { ...linkValue, href: pageHref(page.slug, { cleanUrls, outputPathPrefix }) };
+  return {
+    ...linkValue,
+    href: pageHref(page.slug, { cleanUrls, outputPathPrefix, language: page.language, defaultLanguage }),
+  };
 }
 
 /**
@@ -1117,12 +1131,26 @@ function resolveLink(linkValue, pagesByUuid, outputPathPrefix, collectionItemsBy
  * @param {boolean} [cleanUrls] - the project's Clean URLs setting; picks the href shape
  * @returns {object} resolved clone
  */
-export function resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, collectionItemsByUuid = null, cleanUrls = false) {
+export function resolveCollectionItemLinks(
+  item,
+  pagesByUuid,
+  outputPathPrefix,
+  collectionItemsByUuid = null,
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   if (!item?.settings) return item;
   const resolved = JSON.parse(JSON.stringify(item));
   for (const [key, value] of Object.entries(resolved.settings)) {
     if (isLinkObject(value)) {
-      resolved.settings[key] = resolveLink(value, pagesByUuid, outputPathPrefix, collectionItemsByUuid, cleanUrls);
+      resolved.settings[key] = resolveLink(
+        value,
+        pagesByUuid,
+        outputPathPrefix,
+        collectionItemsByUuid,
+        cleanUrls,
+        defaultLanguage,
+      );
     }
   }
   return resolved;
@@ -1161,9 +1189,17 @@ export function prepareCollectionItemForRender(
   // The project's Clean URLs setting travels with the render deps: the caller
   // (the `| collection` filter, the item-page render) reads it off globals.
   const cleanUrls = menuDeps?.cleanUrls === true;
+  const defaultLanguage = menuDeps?.defaultLanguage || "";
   // Forward the collection-item map so `link` settings that target another
   // collection item resolve (and clear on delete), parity with pageUuid (#11).
-  const resolved = resolveCollectionItemLinks(item, pagesByUuid, outputPathPrefix, menuDeps?.collectionItemsByUuid || null, cleanUrls);
+  const resolved = resolveCollectionItemLinks(
+    item,
+    pagesByUuid,
+    outputPathPrefix,
+    menuDeps?.collectionItemsByUuid || null,
+    cleanUrls,
+    defaultLanguage,
+  );
   // Resolve menu-type settings the same way widgets do (shared menuResolver), so
   // an item template gets a full menu object instead of a raw UUID string.
   if (menuDeps && menuDeps.menuMaps && resolved && resolved.settings) {
@@ -1173,6 +1209,7 @@ export function prepareCollectionItemForRender(
       collectionItemsByUuid: menuDeps.collectionItemsByUuid || new Map(),
       outputPathPrefix,
       cleanUrls,
+      defaultLanguage,
     });
   }
   sanitizeCollectionItemData(resolved, schema);
@@ -1191,6 +1228,7 @@ export function prepareCollectionItemForRender(
       collectionItemsByUuid: menuDeps?.collectionItemsByUuid || null,
       outputPathPrefix,
       cleanUrls,
+      defaultLanguage,
     });
   }
   return resolved;
@@ -1198,19 +1236,25 @@ export function prepareCollectionItemForRender(
 
 /**
  * Load every `hasItemPages` collection item and return a map of
- * item uuid -> { slugPrefix, slug }, for resolving stable collection-item menu
- * references (#11) to their current page URL. Cached per render by the caller.
- * @returns {Promise<Map>} Map of uuid -> { slugPrefix, slug }
+ * item uuid -> { slugPrefix, slug, language }, for resolving stable collection-item
+ * menu references (#11) to their current page URL. A link may target an item in
+ * any language, so every language folder is loaded. Cached per render by the caller.
+ * @param {Array<{ language?: string, defaultLanguage?: string }>} [languageContexts]
+ * @returns {Promise<Map>} Map of uuid -> { slugPrefix, slug, language }
  */
-export async function loadCollectionItemsByUuid(storage, scope, reader = null) {
+export async function loadCollectionItemsByUuid(storage, scope, reader = null, languageContexts = [undefined]) {
   const map = new Map();
   try {
     const schemas = await listCollectionSchemas(storage, scope);
     for (const schema of schemas) {
       if (!schema.hasItemPages) continue;
-      const items = reader ? await reader.sorted(schema.type) : await listCollectionItems(storage, scope, schema.type);
-      for (const item of items) {
-        if (item.uuid) map.set(item.uuid, { slugPrefix: schema.slugPrefix, slug: item.slug });
+      for (const lang of languageContexts.length ? languageContexts : [undefined]) {
+        const items = reader
+          ? await reader.sorted(schema.type, {}, lang)
+          : await listCollectionItems(storage, scope, schema.type, {}, lang);
+        for (const item of items) {
+          if (item.uuid) map.set(item.uuid, { slugPrefix: schema.slugPrefix, slug: item.slug, language: item.language });
+        }
       }
     }
   } catch (error) {

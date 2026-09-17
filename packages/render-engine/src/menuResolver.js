@@ -12,6 +12,7 @@ import { MAX_MENU_DEPTH } from "@widgetizer/core/adapters";
 import { prefixInternalHref, normalize } from "@widgetizer/core/linkPrefixer";
 import { sanitizeHref } from "@widgetizer/core/urlSafety";
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
 
 /**
  * Recursively resolve links in menu items. Each item resolves to an emitted
@@ -30,6 +31,7 @@ export function resolveMenuItemLinks(
   collectionItemsByUuid = new Map(),
   depth = 1,
   cleanUrls = false,
+  defaultLanguage = "",
 ) {
   if (!menuItems || !Array.isArray(menuItems)) {
     return menuItems;
@@ -54,9 +56,9 @@ export function resolveMenuItemLinks(
       // slug, mirroring pageUuid so renames follow and deletes clear the link.
       const entry = collectionItemsByUuid && collectionItemsByUuid.get(item.collectionItemUuid);
       if (entry) {
-        const filePath = `${entry.slugPrefix}/${entry.slug}.html`;
-        resolved.link = itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix });
-        resolved.canonicalPath = normalize(filePath);
+        const lang = { language: entry.language, defaultLanguage };
+        resolved.link = itemHref(entry.slugPrefix, entry.slug, { cleanUrls, outputPathPrefix, ...lang });
+        resolved.canonicalPath = normalize(itemOutputPath(entry.slugPrefix, entry.slug, lang));
       } else {
         // Collection item was deleted - clear the link
         resolved.link = "";
@@ -67,9 +69,9 @@ export function resolveMenuItemLinks(
     } else if (item.pageUuid) {
       const page = pagesByUuid && pagesByUuid.get(item.pageUuid);
       if (page) {
-        const filePath = `${page.slug}.html`;
-        resolved.link = pageHref(page.slug, { cleanUrls, outputPathPrefix });
-        resolved.canonicalPath = normalize(filePath);
+        const lang = { language: page.language, defaultLanguage };
+        resolved.link = pageHref(page.slug, { cleanUrls, outputPathPrefix, ...lang });
+        resolved.canonicalPath = normalize(pageOutputPath(page.slug, 1, lang));
       } else {
         // Page was deleted - clear the link
         resolved.link = "";
@@ -99,6 +101,7 @@ export function resolveMenuItemLinks(
         collectionItemsByUuid,
         depth + 1,
         cleanUrls,
+        defaultLanguage,
       );
     }
 
@@ -112,14 +115,29 @@ export function resolveMenuItemLinks(
  * @param {Map} pagesByUuid - Map of uuid -> page data
  * @returns {object} Menu data with resolved links
  */
-export function resolveMenuPageLinks(menuData, pagesByUuid, outputPathPrefix = "", collectionItemsByUuid = new Map(), cleanUrls = false) {
+export function resolveMenuPageLinks(
+  menuData,
+  pagesByUuid,
+  outputPathPrefix = "",
+  collectionItemsByUuid = new Map(),
+  cleanUrls = false,
+  defaultLanguage = "",
+) {
   if (!menuData || !menuData.items) {
     return menuData;
   }
 
   return {
     ...menuData,
-    items: resolveMenuItemLinks(menuData.items, pagesByUuid, outputPathPrefix, collectionItemsByUuid, 1, cleanUrls),
+    items: resolveMenuItemLinks(
+      menuData.items,
+      pagesByUuid,
+      outputPathPrefix,
+      collectionItemsByUuid,
+      1,
+      cleanUrls,
+      defaultLanguage,
+    ),
   };
 }
 
@@ -144,7 +162,14 @@ export function schemaHasMenuSetting(schema) {
 export function resolveMenuSettings(
   settings,
   schemaSettings,
-  { menuMaps, pagesByUuid, collectionItemsByUuid = new Map(), outputPathPrefix = "", cleanUrls = false } = {},
+  {
+    menuMaps,
+    pagesByUuid,
+    collectionItemsByUuid = new Map(),
+    outputPathPrefix = "",
+    cleanUrls = false,
+    defaultLanguage = "",
+  } = {},
 ) {
   if (!settings || !Array.isArray(schemaSettings) || !menuMaps) return settings;
 
@@ -155,9 +180,14 @@ export function resolveMenuSettings(
       const value = settings[key];
       if (value) {
         const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
-        settings[key] = resolveMenuPageLinks(menuData, pagesByUuid, outputPathPrefix, collectionItemsByUuid, cleanUrls) || {
-          items: [],
-        };
+        settings[key] = resolveMenuPageLinks(
+          menuData,
+          pagesByUuid,
+          outputPathPrefix,
+          collectionItemsByUuid,
+          cleanUrls,
+          defaultLanguage,
+        ) || { items: [] };
       } else {
         settings[key] = { items: [] };
       }

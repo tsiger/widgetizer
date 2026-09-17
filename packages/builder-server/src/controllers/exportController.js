@@ -32,6 +32,7 @@ import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
 import { outputPathPrefixFor, prefixInternalHref } from "@widgetizer/core/linkPrefixer";
 import { languageFolder, pageOutputPath } from "@widgetizer/core/contentAddress";
+import { projectLanguageContexts } from "../utils/contentLanguage.js";
 import { identityReadiness } from "@widgetizer/core/siteIdentity";
 import { emptyArticleFields } from "@widgetizer/core/structuredData";
 import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
@@ -275,7 +276,12 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // One read per collection for the whole export, so every consumer below sees the same items.
     const collectionSnapshot = new Map();
     const collectionReader = collectionsEnabled
-      ? createCollectionReader({ storage: collectionStorage, scope: collectionScope, snapshot: collectionSnapshot })
+      ? createCollectionReader({
+          storage: collectionStorage,
+          scope: collectionScope,
+          snapshot: collectionSnapshot,
+          defaultLanguage: projectData.defaultLanguage,
+        })
       : null;
     const renderCollectionDeps = collectionsEnabled ? { ...collectionDeps, snapshot: collectionSnapshot } : collectionDeps;
 
@@ -482,7 +488,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
         enqueuedStyles: new Map(),
         enqueuedScripts: new Map(),
         assetVersion, // For cache busting
-        currentCanonicalPath: `${pageData.slug || ""}.html`,
+        currentCanonicalPath: pageOutputPath(pageData.id, 1, pageLang(pageData)),
         currentPageData: pageData,
         // The flag snapshotted above, so a toggle landing mid-export cannot
         // split this page's links/canonical from the sitemap or other pages.
@@ -662,7 +668,12 @@ Per aspera ad astra
       // Stable collection-item refs for resolving `menu`/`link`-type item settings
       // that target another item — loaded once, shared across every item. (Menu
       // maps are loaded lazily inside renderCollectionItemPage.)
-      const collectionItemsByUuidForItems = await loadCollectionItemsByUuid(collectionStorage, collectionScope, collectionReader);
+      const collectionItemsByUuidForItems = await loadCollectionItemsByUuid(
+        collectionStorage,
+        collectionScope,
+        collectionReader,
+        projectLanguageContexts(projectData),
+      );
       const itemAppVersion = await getAppVersion();
       const itemEasterEgg = `<!--\nMade with Widgetizer v${itemAppVersion}\nPer aspera ad astra\n-->\n`;
 
@@ -742,6 +753,7 @@ Per aspera ad astra
             const listing = listingParentStatus(
               sharedGlobals.listingPages.get(schema.type),
               sharedGlobals.pagesByUuid || new Map(),
+              item.language,
             );
             if (listing !== "resolved") {
               structuredData.warnings.push({

@@ -190,3 +190,40 @@ describe("schemaHasRichtextSetting", () => {
     expect(schemaHasRichtextSetting({ settings: [{ id: "t", type: "text" }], blocks: [] })).toBe(false);
   });
 });
+
+describe("resolveRichtextLinkRefs — the target's language", () => {
+  const pages = new Map([
+    ["p-en", { slug: "about", language: "en" }],
+    ["p-el", { slug: "sxetika", language: "el" }],
+  ]);
+  const itemsByUuid = new Map([
+    ["i-en", { slugPrefix: "news", slug: "story", language: "en" }],
+    ["i-el", { slugPrefix: "news", slug: "istoria", language: "el" }],
+  ]);
+  const html =
+    '<a data-page-uuid="p-en" href="x.html">A</a><a data-page-uuid="p-el" href="x.html">B</a>' +
+    '<a data-collection-item-uuid="i-en" href="x.html">C</a><a data-collection-item-uuid="i-el" href="x.html">D</a>';
+
+  it("folders only the non-default language, at depth and under both shapes", () => {
+    const off = resolveRichtextLinkRefs(html, {
+      pagesByUuid: pages,
+      collectionItemsByUuid: itemsByUuid,
+      outputPathPrefix: "../",
+      defaultLanguage: "en",
+    });
+    expect(off).toContain('href="../about.html"');
+    expect(off).toContain('href="../el/sxetika.html"');
+    expect(off).toContain('href="../news/story.html"');
+    expect(off).toContain('href="../el/news/istoria.html"');
+
+    const on = resolveRichtextLinkRefs(html, {
+      pagesByUuid: pages,
+      collectionItemsByUuid: itemsByUuid,
+      cleanUrls: true,
+      defaultLanguage: "en",
+    });
+    expect(on).toContain('href="about"');
+    expect(on).toContain('href="el/sxetika"');
+    expect(on).toContain('href="el/news/istoria"');
+  });
+});
