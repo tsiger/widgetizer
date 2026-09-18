@@ -1345,6 +1345,9 @@ export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = f
     id: `${schema.slugPrefix}-${item.slug}`,
     slug: `${schema.slugPrefix}/${item.slug}`,
     uuid: item.uuid,
+    // An item page is a page: what reads `page.language` — media metadata,
+    // breadcrumbs, the theme — must get the same answer here as on a page.
+    language: item.language,
     name: titleValue,
     created: item.created,
     updated: item.updated,

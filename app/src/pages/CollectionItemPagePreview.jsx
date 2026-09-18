@@ -15,7 +15,7 @@ import { buildPreviewUrl } from "@widgetizer/editor-ui/lib/previewBase";
  * reports the iframe src up to the layout. All chrome lives in the layout.
  */
 export default function CollectionItemPagePreview() {
-  const { prefix, slug } = useParams();
+  const { prefix, slug, lang } = useParams();
   const { setPreview } = useOutletContext();
   const { schemas, loading: schemasLoading } = useCollections();
 
@@ -40,11 +40,14 @@ export default function CollectionItemPagePreview() {
     setPreview({ src: null, loading: true, notFound: false });
     (async () => {
       try {
-        const item = await getCollectionItem(schema.type, slug);
+        const item = await getCollectionItem(schema.type, slug, lang);
         const { token } = await previewCollectionItem({
           collectionType: schema.type,
           slug: item.slug,
           settings: item.settings || {},
+          // The render needs it too: it decides which globals and menus the item
+          // page is wrapped in, and where its own links point.
+          ...(item.language ? { language: item.language } : {}),
         });
         if (!cancelled) setPreview({ src: buildPreviewUrl(token), loading: false, notFound: false });
       } catch {
@@ -54,7 +57,7 @@ export default function CollectionItemPagePreview() {
     return () => {
       cancelled = true;
     };
-  }, [schema, schemasLoading, slug, setPreview]);
+  }, [schema, schemasLoading, slug, lang, setPreview]);
 
   return null;
 }

@@ -250,8 +250,8 @@ export function writeProjectsData(data) {
 
     // Upsert each project
     const upsert = db.prepare(`
-      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, last_theme_update_at, last_theme_update_version, created, updated)
-      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
+      INSERT INTO projects (id, folder_name, name, description, site_title, theme, theme_version, preset, receive_theme_updates, site_url, clean_urls, site_identity, default_language, languages, last_theme_update_at, last_theme_update_version, created, updated)
+      VALUES (@id, @folderName, @name, @description, @siteTitle, @theme, @themeVersion, @preset, @receiveThemeUpdates, @siteUrl, @cleanUrls, @siteIdentity, @defaultLanguage, @languages, @lastThemeUpdateAt, @lastThemeUpdateVersion, @created, @updated)
       ON CONFLICT(id) DO UPDATE SET
         folder_name = @folderName,
         name = @name,
@@ -264,6 +264,8 @@ export function writeProjectsData(data) {
         site_url = @siteUrl,
         clean_urls = @cleanUrls,
         site_identity = @siteIdentity,
+        default_language = @defaultLanguage,
+        languages = @languages,
         last_theme_update_at = @lastThemeUpdateAt,
         last_theme_update_version = @lastThemeUpdateVersion,
         updated = @updated
@@ -283,6 +285,8 @@ export function writeProjectsData(data) {
         siteUrl: p.siteUrl || "",
         cleanUrls: p.cleanUrls ? 1 : 0,
         siteIdentity: JSON.stringify(p.siteIdentity || {}),
+        defaultLanguage: p.defaultLanguage || DEFAULT_LANGUAGE,
+        languages: JSON.stringify(p.languages || []),
         lastThemeUpdateAt: p.lastThemeUpdateAt || null,
         lastThemeUpdateVersion: p.lastThemeUpdateVersion || null,
         created: p.created,

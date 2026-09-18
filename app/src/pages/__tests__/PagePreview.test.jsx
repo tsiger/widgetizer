@@ -81,7 +81,7 @@ describe("PagePreview — boot-race gate", () => {
   it("loads the page once the active project is seeded", () => {
     projectState = { activeProject: { id: "p1" } };
     renderPreview();
-    expect(loadPage).toHaveBeenCalledWith("contact");
+    expect(loadPage).toHaveBeenCalledWith("contact", undefined);
   });
 
   it("reports a loading state (no notFound) while the project is unseeded", () => {
@@ -132,7 +132,7 @@ describe("PagePreview — one-shot token resolve", () => {
     );
 
     await waitFor(() => expect(fetchPreviewToken).toHaveBeenCalled());
-    expect(loadPage).toHaveBeenCalledWith("blog");
+    expect(loadPage).toHaveBeenCalledWith("blog", undefined);
     expect(fetchPreviewToken.mock.calls.at(-1)[3]).toBe(2);
   });
 

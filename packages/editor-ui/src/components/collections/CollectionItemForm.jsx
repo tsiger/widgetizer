@@ -315,7 +315,7 @@ export default function CollectionItemForm({
   // page on disk to render before then.
   const openPreview = () => {
     if (!initialData.slug || !schema.slugPrefix) return;
-    openCollectionItemPreview(schema.slugPrefix, initialData.slug);
+    openCollectionItemPreview(schema.slugPrefix, initialData.slug, isMultilang ? initialData.language : undefined);
   };
 
   return (

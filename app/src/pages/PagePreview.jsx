@@ -18,7 +18,7 @@ import { buildPreviewUrl } from "@widgetizer/editor-ui/lib/previewBase";
  * machinery; it just resolves the saved page to a render token once.
  */
 export default function PagePreview() {
-  const { pageId, pageNumber } = useParams();
+  const { pageId, pageNumber, lang } = useParams();
   const { setPreview } = useOutletContext();
   const activeProjectId = useProjectStore((state) => state.activeProject?.id);
   const loadPage = usePageStore((state) => state.loadPage);
@@ -33,8 +33,10 @@ export default function PagePreview() {
   // loads once it is seeded.
   useEffect(() => {
     if (!activeProjectId) return;
-    loadPage(pageId);
-  }, [pageId, activeProjectId, loadPage]);
+    // A slug is unique per language, so the route says which one. Without it the
+    // flat route still means the default language.
+    loadPage(pageId, lang);
+  }, [pageId, lang, activeProjectId, loadPage]);
 
   useEffect(() => {
     // Hold the layout at its loader until the project is seeded and the page

@@ -334,12 +334,22 @@ The server has been language-aware since step 7 (`GET /menus` merges every folde
 
 ## Phase 4 — Rendering, preview, export
 
-### Step 18. Preview routes with an explicit namespace (§Assumptions)
+### Step 18. Preview routes with an explicit namespace (§Assumptions) — *done 2026-09-18*
 
 - `packages/builder-server/src/routes/preview.js` + `previewController.js` — `/preview/page/:lang/:slug` and `/preview/collection/:lang/:type/:slug` alongside the existing routes (which keep meaning "default language"). `createPreviewToken` / `createCollectionPreviewToken` carry the language.
 - `packages/editor-ui/src/lib/previewBase.js`, `packages/editor-ui/src/utils/previewLinkUtils.js` and `packages/core/src/runtime/previewRuntime.js` — map a rendered internal link (either Clean URLs shape, any depth) back to the namespaced preview route using `contentAddress.previewRoute`.
 
 **Done when:** clicking a Greek menu link in the canvas opens the Greek page; a cross-language link opens the other language's page.
+
+**As built.** `/preview/page/:lang/:slug`, `/preview/page/:lang/:slug/page/:n` and `/preview/collection/:lang/:type/:slug` sit beside the flat routes, which keep meaning the default language. Both the route matcher and the href mapper insist the language slot holds an actual language code, so `/preview/collection/a/b/c` stays nonsense rather than becoming an item in language "a".
+
+- **A preview renders at the site root**, whatever page it is showing (`outputPathPrefix` is `""`), so its links are already root-relative: `el/contact.html` is the Greek page and `contact.html` the default language's. Reading that needs only the enabled codes, which now travel to the iframe on the injected script tag (`data-languages`, `data-default-language`, both filtered through `LANGUAGE_CODE_RE` so nothing else can ride along). `getStandalonePreviewTarget` still resolves against an `outputPath` and handles `../` properly, because an author-typed href can climb.
+- **`currentCanonicalPath` is language-qualified in the preview too** (`pageOutputPath` / `itemOutputPath`). Step 8 made breadcrumbs find a page by rebuilding its output path; without the language folder a translated preview found nothing and its menu active-state matched the wrong page.
+- **The Preview buttons name the language** — the page editor's, the item form's and the items list's. The sidebar's "Preview site" stays on the flat route, which is the default language, which is what it already picks.
+- `getStandalonePreviewTarget` cannot import `contentAddress` (only the two runtime files are served to the iframe), so the route shapes are spelled in both places; a test asserts the mapper's output equals what `previewRoute.*` builds for the same input.
+- **Review, three, and the third went wider than the preview.** (1) `pageOutputPath(slug, pageNumber, lang)` — I passed the language options into the **page-number** slot, so the canonical path came out unqualified and the fix did nothing. (2) The item preview read `pages/global/` for its header and footer whatever language it was showing. (3) `previewItem` never carried its language — and chasing that turned up the real cause: **`buildCollectionItemPageData` never set `language` at all**, so `page.language` is empty on every item page, in export as much as in preview. Step 17's media metadata reads exactly that, so translated alt text could never have reached an item page. An item page is a page; it answers the same way now.
+- **Round two: the arity fix overcorrected.** Passing the real page number made `currentCanonicalPath` `blog/page/2.html`, and `ensureBreadcrumbs` matches pages by their FIRST copy's path — so a numbered preview found no page and rendered no trail. It asks for page one now, as export does; the numbered crumb comes from `paginationPlan.current`, not from this path.
+- **`writeProjectsData` silently dropped `default_language` and `languages`** — the same full-replacement writer that lost the media translations in step 17. Only tests call it today, so nothing shipped was wrong, but a test seeding a translated project got a single-language one back. It carries both columns now.
 
 ### Step 19. `page.translations`, `<html lang>`, hreflang (§7, §7c, §7d)
 

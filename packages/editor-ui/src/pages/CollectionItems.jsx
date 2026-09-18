@@ -291,7 +291,7 @@ export default function CollectionItems() {
                 type="button"
                 onClick={() => {
                   setOpenMenuId(null);
-                  openCollectionItemPreview(schema.slugPrefix, item.slug);
+                  openCollectionItemPreview(schema.slugPrefix, item.slug, isMultilang ? item.language : undefined);
                 }}
                 className={`${menuButtonClass} text-slate-700 hover:bg-slate-50`}
               >

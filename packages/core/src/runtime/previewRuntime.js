@@ -48,6 +48,17 @@ const COLLECTION_PREFIXES = (document.querySelector("script[data-preview-mode]")
   .split(",")
   .filter(Boolean);
 
+// A preview renders at the site root whatever page it is showing, so its links
+// are root-relative: `el/contact.html` is the Greek page, `contact.html` the
+// default language's. Reading that needs the site's languages, nothing more.
+const PREVIEW_SITE = (() => {
+  const data = document.querySelector("script[data-preview-mode]")?.dataset || {};
+  return {
+    languages: (data.languages || "").split(",").filter(Boolean),
+    defaultLanguage: data.defaultLanguage || "en",
+  };
+})();
+
 // ── CSS Variables + Fonts ───────────────────────────────────────────────────
 
 function updateCssVariables(variables) {
@@ -572,7 +583,7 @@ function setupInteractionHandler() {
       if (linkElement) {
         if (PREVIEW_MODE === "standalone") {
           const href = linkElement.getAttribute("href");
-          const targetUrl = getStandalonePreviewTarget(href, { collectionPrefixes: COLLECTION_PREFIXES });
+          const targetUrl = getStandalonePreviewTarget(href, { collectionPrefixes: COLLECTION_PREFIXES, ...PREVIEW_SITE });
           event.preventDefault();
           event.stopPropagation();
 

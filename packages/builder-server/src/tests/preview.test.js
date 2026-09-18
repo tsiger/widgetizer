@@ -44,7 +44,7 @@ const { getProjectDir, getProjectPagesDir, CORE_WIDGETS_DIR } = await import("..
 const projectRepo = await import("../db/repositories/projectRepository.js");
 const { writeMediaFile } = await import("../controllers/mediaController.js");
 
-const { getGlobalWidgets, saveGlobalWidget, serveAsset, createCollectionPreviewToken, injectBaseTag } = await import(
+const { getGlobalWidgets, saveGlobalWidget, serveAsset, createCollectionPreviewToken, injectBaseTag, injectRuntimeScript } = await import(
   "../controllers/previewController.js"
 );
 const { closeDb } = await import("../db/index.js");
@@ -605,5 +605,34 @@ describe("global widgets in another language", () => {
     });
     assert.equal(res._status, 400);
     assert.equal(await fs.pathExists(path.join(getProjectDir(PROJECT_FOLDER), "pages", "fr")), false);
+  });
+});
+
+// The preview runtime maps a clicked link back to a preview route, and a link
+// reads as `el/contact.html` only if it knows `el` is a language rather than a
+// collection prefix. That list travels on the injected script tag.
+describe("injectRuntimeScript — the site's languages", () => {
+  const html = "<html><head></head><body></body></html>";
+
+  it("carries the enabled languages and the default one", () => {
+    const out = injectRuntimeScript(html, "standalone", ["news"], { defaultLanguage: "en", languages: ["el", "de"] });
+    assert.match(out, /data-languages="el,de"/);
+    assert.match(out, /data-default-language="en"/);
+  });
+
+  it("says a single-language site has no extra languages", () => {
+    const out = injectRuntimeScript(html, "editor", [], { defaultLanguage: "en", languages: [] });
+    assert.match(out, /data-languages=""/);
+    assert.match(out, /data-default-language="en"/);
+  });
+
+  it("refuses anything that is not a language code, so nothing can be smuggled into the tag", () => {
+    const out = injectRuntimeScript(html, "editor", [], {
+      defaultLanguage: '"><script>x</script>',
+      languages: ["el", '"><img>', "NOTALANG"],
+    });
+    assert.match(out, /data-languages="el"/);
+    assert.match(out, /data-default-language="en"/);
+    assert.doesNotMatch(out, /<img>/);
   });
 });

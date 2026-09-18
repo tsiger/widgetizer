@@ -20,18 +20,25 @@ import {
   loadCollectionItemsByUuid,
 } from "../services/collectionService.js";
 import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
-import { globalKey } from "@widgetizer/core/contentAddress";
-import { requestLanguage, withoutLanguage, projectLanguageContexts } from "../utils/contentLanguage.js";
+import { globalKey, pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
+import { requestLanguage, withoutLanguage, projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage } from "../services/mediaUsageService.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
+import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
 
-// Inject the runtime script and base tag into rendered HTML
-function injectRuntimeScript(html, previewMode = "editor", collectionPrefixes = []) {
+// Inject the runtime script and base tag into rendered HTML. The site's
+// languages travel with it: a preview renders at the root, so a link reads as
+// `el/contact.html`, and only the enabled codes tell that apart from a
+// collection whose prefix happens to look like one.
+export function injectRuntimeScript(html, previewMode = "editor", collectionPrefixes = [], site = {}) {
   const safeMode = previewMode === "standalone" ? "standalone" : "editor";
   const prefixes = collectionPrefixes.filter((prefix) => /^[a-z0-9-]+$/.test(prefix)).join(",");
-  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}" data-collection-prefixes="${prefixes}"></script>`;
+  const codes = (code) => LANGUAGE_CODE_RE.test(code || "");
+  const languages = (site.languages || []).filter(codes).join(",");
+  const defaultLanguage = codes(site.defaultLanguage) ? site.defaultLanguage : DEFAULT_LANGUAGE;
+  const script = `<script src="/runtime/previewRuntime.js" type="module" data-preview-mode="${safeMode}" data-collection-prefixes="${prefixes}" data-languages="${languages}" data-default-language="${defaultLanguage}"></script>`;
   html = html.replace(/<\/body>/i, `${script}\n</body>`);
 
   // Editor mode: inject designMode flag in <head> so it's available before
@@ -88,6 +95,8 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   // Origin-relative asset/media URLs (see injectBaseTag). The serving origin is
   // the render document's own; no SERVER_URL/port dependency.
   const apiUrl = "";
+  const project = projectRepo.getProjectById(activeProjectId);
+  const { defaultLanguage } = projectLanguages(project);
   const sharedGlobals = {
     projectId: activeProjectId,
     apiUrl,
@@ -95,7 +104,15 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     themeSettingsRaw: rawThemeSettings,
     enqueuedStyles: new Map(),
     enqueuedScripts: new Map(),
-    currentCanonicalPath: `${pageData.slug || ""}.html`,
+    // The file path of the page being previewed, language folder included:
+    // breadcrumbs find a page by rebuilding it, and a slug alone is no longer
+    // unique across languages. Always page ONE, as export does — a page is
+    // listed under its first copy's path, and the numbered crumb comes from
+    // `paginationPlan.current`.
+    currentCanonicalPath: pageOutputPath(pageData.slug || "", 1, {
+      language: pageData.language,
+      defaultLanguage,
+    }),
     currentPageData: pageData,
   };
 
@@ -243,7 +260,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
   );
 
   renderedHtml = injectBaseTag(renderedHtml);
-  renderedHtml = injectRuntimeScript(renderedHtml, previewMode, await itemPagePrefixes(collectionDeps));
+  renderedHtml = injectRuntimeScript(renderedHtml, previewMode, await itemPagePrefixes(collectionDeps), projectLanguages(project));
 
   return renderedHtml;
 }
@@ -350,6 +367,11 @@ export async function createCollectionPreviewToken(req, res) {
       return res.status(400).json({ error: "collectionType is required" });
     }
 
+    // Which language's item page this is — it names the folder the rendered
+    // page would live in, which is what its links are resolved against.
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
+
     // Schema must exist; template is required to render an item page.
     const schema = await getCollectionSchema(storage, scope, collectionType);
     if (!schema) {
@@ -372,8 +394,8 @@ export async function createCollectionPreviewToken(req, res) {
 
     const projectDir = getProjectDir(folder);
     const rawThemeSettings = await readThemeDataFromDir(projectDir);
-    const headerData = await readGlobalWidgetFromDir(projectDir, "header");
-    const footerData = await readGlobalWidgetFromDir(projectDir, "footer");
+    const headerData = await readGlobalWidgetFromDir(projectDir, "header", lang);
+    const footerData = await readGlobalWidgetFromDir(projectDir, "footer", lang);
 
     // uuid -> page map so pageUuid links inside the item resolve to slugs.
     // listPagesFromDir reads <projectDir>/pages — projectDir is the working dir
@@ -400,6 +422,9 @@ export async function createCollectionPreviewToken(req, res) {
       id: safeSlug,
       uuid: "preview",
       slug: safeSlug,
+      // What the item page is rendered AS: its own links, its media metadata and
+      // its breadcrumbs are all resolved from it.
+      language: lang.language,
       schemaVersion: schema.schemaVersion,
       created: now,
       updated: now,
@@ -420,7 +445,10 @@ export async function createCollectionPreviewToken(req, res) {
       pagesByUuid,
       collectionItemsByUuid,
       outputPathPrefix: "",
-      currentCanonicalPath: `${schema.slugPrefix}/${safeSlug}.html`,
+      currentCanonicalPath: itemOutputPath(schema.slugPrefix, safeSlug, {
+        language: lang.language,
+        defaultLanguage: lang.defaultLanguage,
+      }),
     };
 
     // One shared pipeline renders the item page — header/footer + resolved item +
@@ -443,7 +471,7 @@ export async function createCollectionPreviewToken(req, res) {
     );
 
     html = injectBaseTag(html);
-    html = injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps));
+    html = injectRuntimeScript(html, "standalone", await itemPagePrefixes(collectionDeps), projectLanguages(req.activeProject));
 
     const token = generateToken(html);
     res.json({ token });

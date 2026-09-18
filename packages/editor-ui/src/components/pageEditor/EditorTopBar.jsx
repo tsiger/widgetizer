@@ -176,8 +176,8 @@ export default function EditorTopBar({
     // window in the desktop app, shared browser tab on the web; an embedding host can
     // override the route via setStandalonePreviewPath). That page hosts PreviewPanel
     // in an iframe and handles in-preview link navigation (NAVIGATE_PREVIEW).
-    openPagePreview(pageId);
-  }, [pageId]);
+    openPagePreview(pageId, isMultilang ? currentLanguage : undefined);
+  }, [pageId, isMultilang, currentLanguage]);
 
   const hasMultiplePages = pages.length > 1;
 
