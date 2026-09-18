@@ -39,6 +39,8 @@ permission. The working branch is decided per task — do not assume one.
 - [⬜ 41. Richtext sanitize CPU degrades over process lifetime — DOMPurify + jsdom accumulation (`builder-server`) — low (OSS-standalone) / moderate (hosted, long-lived process) — investigate (perf)](#-41-richtext-sanitize-cpu-degrades-over-process-lifetime--dompurify--jsdom-accumulation-builder-server--low-oss-standalone--moderate-hosted-long-lived-process--investigate-perf)
 - [⬜ 44. Extract the published-media selection rules into `@widgetizer/core` + finish `seedPresetMedia`'s scope-first conversion (`builder-server` / `core`) — not started](#-44-extract-the-published-media-selection-rules-into-widgetizercore--finish-seedpresetmedias-scope-first-conversion-builder-server--core--not-started)
 - [✅ 62. Export lifecycle races — version reservation and fs/DB cleanup aren't coordinated (`builder-server`) — fixed, pending reference-table move](#-62-export-lifecycle-races--version-reservation-and-fsdb-cleanup-arent-coordinated-builder-server--fixed-pending-reference-table-move)
+- [⬜ 75. Mine the domain docs for simplification candidates, multilang first (`docs-llms` / cross-cutting) — medium — investigate](#-75-mine-the-domain-docs-for-simplification-candidates-multilang-first-docs-llms--cross-cutting--medium--investigate)
+- [⬜ 76. The default language is locked once a site has a second one — decide whether that is the right rule (`builder-server` / `editor-ui`) — medium — needs a decision](#-76-the-default-language-is-locked-once-a-site-has-a-second-one--decide-whether-that-is-the-right-rule-builder-server--editor-ui--medium--needs-a-decision)
 - [⬜ 66. Editor surfaces raw server error strings — `Slug "suite" already exists`, `Validation failed` — instead of field-anchored, localized messages (`editor-ui` / `builder-server`) — medium (UX) — sweep all error paths](#-66-editor-surfaces-raw-server-error-strings--slug-suite-already-exists-validation-failed--instead-of-field-anchored-localized-messages-editor-ui--builder-server--medium-ux--sweep-all-error-paths)
 
 ### Low priority
@@ -1205,6 +1207,49 @@ partial pipeline by omission, and the next stage that adds a per-page global (mu
 
 Raised 2026-09-16, after stage 3; noticed because the same two steps had to be remembered twice
 while building pagination and structured data.
+
+## ⬜ 75. Mine the domain docs for simplification candidates, multilang first (`docs-llms` / cross-cutting) — medium — investigate
+
+**Priority:** Medium
+
+`docs-llms/domain/` describes what the app *does* rather than how it is built — entities,
+operation walkthroughs, what is shared and what varies per language, and a coverage map of which
+expectations have test evidence. It already carries its own `review-questions.md`
+("simplification candidates"), and `multilingual.md` states the language rules in one place.
+
+That is a different view of the system from the one the code gives, which makes it the right
+place to look for a model that is more complicated than the product needs. Read it end to end
+with multilang in mind and write up what could be simpler or better — concepts that could
+collapse into one, rules that exist only because of how something was built, workflows that ask
+the user to understand an implementation detail. Land findings as their own items here rather
+than changing anything during the read.
+
+Multilang first because it is the newest and largest surface and the one still open: steps 22–25
+are unbuilt, so a simplification found now is cheaper than one found after the theme work ships
+against the current contracts.
+
+Raised 2026-09-18.
+
+## ⬜ 76. The default language is locked once a site has a second one — decide whether that is the right rule (`builder-server` / `editor-ui`) — medium — needs a decision
+
+**Priority:** Medium
+
+Today the project form disables the Default Language select as soon as the site has any other
+language, and the server refuses the change. The reasoning is real: the default language owns the
+site root, so changing it moves every page and rewrites every address — `about.html` becomes
+`en/about.html` while `el/about.html` becomes `about.html` — along with every menu, canonical,
+hreflang, sitemap entry and media-usage row. The escape hatch is to remove the other languages
+first, which deletes their content.
+
+That is a defensible v1 rule but it has not been argued properly, and it is the kind of thing a
+user hits once and cannot get past: a site started in English that becomes Greek-first has no
+path that keeps its Greek content. Worth deciding deliberately — keep the lock and explain it
+better, allow the swap as a real operation (rename both folders, rewrite the addresses, rebuild
+usage rows, under the same per-project serializer language add/remove uses), or something in
+between. The copy that explained the lock in the form was removed on 2026-09-18 pending this
+decision, so the select is currently disabled with nothing saying why.
+
+Raised 2026-09-18, during hands-on testing of the two-language project.
 
 ## Completed — reference table
 
