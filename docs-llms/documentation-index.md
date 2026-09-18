@@ -8,6 +8,18 @@ This document serves as a comprehensive index to all documentation in the Widget
 
 ## 🗺️ Authoritative Maps
 
+### **[Domain and behavior handbook](domain/README.md)** - Entities, Operations, and Coverage
+
+**Purpose**: A navigable map of what the app owns, how entities relate, what each user operation changes, and which expectations have test evidence. This complements the code/package maps below.
+
+- Start with the entity directory and ownership diagram.
+- Every entity and workflow page begins with a plain-language guide covering everyday examples, available actions, shared effects, languages and saving; implementation references follow under Technical details.
+- Follow operation walkthroughs for project creation/import, content editing, language lifecycle, media, themes, preview, and export.
+- Use the multilingual shared-versus-local matrix, coverage evidence levels, and review questions to audit behavior without assuming that existing tests cover every combination.
+- Reviewed through `1775a245` (multilingual step 21), including multilingual export and collection listings. The handbook records its baseline, focused test results and remaining phase-5 checks.
+
+---
+
 ### **[core-architecture.md](core-architecture.md)** - Application Architecture
 
 **Purpose**: Authoritative orientation map (#1 of 2) — a thin index of how the package codebase fits together and where each subsystem lives, deferring all per-subsystem detail to the dedicated docs **When to use**:
