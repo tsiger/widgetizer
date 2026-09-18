@@ -31,7 +31,18 @@ describe("planPagination", () => {
   it("plans the copies and keeps the current page in range", async () => {
     const widgets = { w1: paginating({ limit: 3 }) };
     const plan = await planPagination(deps(), widgets, ["w1"], { pageSlug: "blog", currentPage: 2 });
-    expect(plan).toEqual({ widgetId: "w1", collectionType: "news", perPage: 3, totalItems: 7, total: 3, current: 2, pageSlug: "blog" });
+    expect(plan).toEqual({
+      widgetId: "w1",
+      collectionType: "news",
+      perPage: 3,
+      totalItems: 7,
+      total: 3,
+      current: 2,
+      pageSlug: "blog",
+      // Every pager URL is built from the plan, so it carries the language.
+      language: "",
+      defaultLanguage: "en",
+    });
 
     expect((await planPagination(deps(), widgets, ["w1"], { pageSlug: "blog", currentPage: 9 })).current).toBe(3);
     expect((await planPagination(deps(), widgets, ["w1"], { pageSlug: "blog", currentPage: "x" })).current).toBe(1);

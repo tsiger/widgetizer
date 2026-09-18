@@ -62,7 +62,12 @@ function schemaHasLinkSetting(schema) {
 function makeCollectionItemsLoaderFactory({ storage, scope, reader, languageContexts, defaultLanguage }) {
   return ({ globals, imageBasePath, fileBasePath }) =>
     async (collectionType, options = {}) => {
-      const cacheKey = `${collectionType}:${JSON.stringify(options ?? {})}`;
+      // A listing shows its own language's items (§9). The page being rendered
+      // is the only thing that knows which that is, and the cache key carries it
+      // because one render can outlive one language (an export reuses the bag
+      // for a page's globals).
+      const lang = { language: globals.currentPageData?.language || "", defaultLanguage };
+      const cacheKey = `${collectionType}:${lang.language}:${JSON.stringify(options ?? {})}`;
       if (globals.collectionCache && globals.collectionCache.has(cacheKey)) {
         return globals.collectionCache.get(cacheKey);
       }
@@ -71,7 +76,10 @@ function makeCollectionItemsLoaderFactory({ storage, scope, reader, languageCont
       // invalid items — so `limit` counts valid items (an invalid item must not
       // consume a slot in the returned window).
       const { limit, offset, ...sortOptions } = options ?? {};
-      const [items, loaded] = await Promise.all([reader.sorted(collectionType, sortOptions), reader.read(collectionType)]);
+      const [items, loaded] = await Promise.all([
+        reader.sorted(collectionType, sortOptions, lang),
+        reader.read(collectionType, lang),
+      ]);
       const schema = loaded?.schema || null;
 
       const outputPathPrefix = globals.outputPathPrefix || "";
@@ -94,6 +102,9 @@ function makeCollectionItemsLoaderFactory({ storage, scope, reader, languageCont
           collectionItemsByUuid: globals.collectionItemsByUuid,
           cleanUrls: globals.cleanUrls === true,
           defaultLanguage,
+          // A bare menu slug on a listed item means the menu of the language the
+          // listing is being rendered in, as it does everywhere else.
+          language: lang.language,
         };
       }
 
@@ -172,8 +183,11 @@ function buildCollectionRenderDeps({ storage, scope, snapshot = null }) {
     // URL at render time (#11 parity with pageUuid). The engine calls this lazily
     // and caches the result per render; non-collection callers leave it unset.
     loadCollectionItemsByUuid: () => loadCollectionItemsByUuid(storage, scope, reader, languageContexts),
-    countCollectionItems: async (collectionType) =>
-      ((await reader.read(collectionType))?.items || []).filter((item) => !item.invalid).length,
+    // Counted in the language the listing is being rendered in, or the page
+    // count would come from another language's items.
+    countCollectionItems: async (collectionType, language = "") =>
+      ((await reader.read(collectionType, { language, defaultLanguage }))?.items || []).filter((item) => !item.invalid)
+        .length,
   };
 }
 

@@ -31,7 +31,9 @@ console.error = () => {};
 
 const { getProjectDir, getProjectPagesDir, getProjectThemeJsonPath } = await import("../config.js");
 const projectRepo = await import("../db/repositories/projectRepository.js");
-const { createCollectionPreviewToken, createPreviewToken } = await import("../controllers/previewController.js");
+const { createCollectionPreviewToken, createPreviewToken, renderSingleWidget } = await import(
+  "../controllers/previewController.js"
+);
 const { getToken } = await import("../services/previewTokenStore.js");
 const { closeDb } = await import("../db/index.js");
 const { LocalStorageAdapter } = await import("@widgetizer/adapters-local");
@@ -59,6 +61,8 @@ const NEWS_SCHEMA = {
 // visible in the output rather than only in what it breaks downstream.
 const NEWS_TEMPLATE =
   `<article data-language="{{ page.language }}"><h1>{{ item.settings.title }}</h1>` +
+  `<ul class="more">{% assign siblings = 'news' | collection %}` +
+  `{% for i in siblings %}<li>{{ i.settings.title }}</li>{% endfor %}</ul>` +
   `<nav class="langs">{% for t in page.translations %}` +
   `<a href="{{ t.href }}" data-lang="{{ t.language }}" data-fallback="{{ t.fallback }}">{{ t.label }}</a>` +
   `{% endfor %}</nav></article>`;
@@ -123,6 +127,15 @@ async function seed() {
       JSON.stringify({ name: type, settings: [{ type: "text", id: "text", label: "Text" }] }, null, 2),
     );
   }
+
+  await fs.outputFile(
+    path.join(projectDir, "widgets", "crumbs", "widget.liquid"),
+    `<nav class="bc">{% for crumb in page.breadcrumbs %}<span>{{ crumb.label }}</span>{% endfor %}</nav>`,
+  );
+  await fs.outputFile(
+    path.join(projectDir, "widgets", "crumbs", "schema.json"),
+    JSON.stringify({ name: "crumbs", settings: [] }),
+  );
 
   // A home page and a listing page, so there is a trail to lose.
   await storage.write(
@@ -256,6 +269,18 @@ describe("a collection item preview in another language", () => {
   it("renders the item AS that language, so everything downstream resolves in it", async () => {
     const html = await previewItemHtml({ language: "el" });
     assert.match(html, /data-language="el"/);
+  });
+
+  // An item page carries a listing like any other page, and it lists the
+  // language the item is in.
+  it("lists its own language's items in a collection widget on the item template", async () => {
+    const greek = await previewItemHtml({ language: "el" });
+    assert.match(greek, /<li>Istoria<\/li>/);
+    assert.doesNotMatch(greek, /<li>Story<\/li>/);
+
+    const english = await previewItemHtml({});
+    assert.match(english, /<li>Story<\/li>/);
+    assert.doesNotMatch(english, /<li>Istoria<\/li>/);
   });
 
   it("tells the runtime which codes are languages", async () => {
@@ -426,5 +451,53 @@ describe("a collection item's own switcher", () => {
     const html = await itemHtml({}, "alone");
     assert.match(html, /<a href="el\/index.html" data-lang="el" data-fallback="true"/);
     assert.doesNotMatch(html, /hreflang="el"/);
+  });
+});
+
+// A morph re-renders one widget with no page around it. The editor sends the
+// bare slug, so the language has to come from the page data — otherwise a
+// translated page is looked up at the default language's address and finds
+// nothing there.
+describe("a morphed widget on a translated page", () => {
+  const morph = async (page, currentCanonicalPath) => {
+    let html = "";
+    const res = {
+      send(body) {
+        html = body;
+        return res;
+      },
+      status() {
+        return res;
+      },
+      json(body) {
+        html = JSON.stringify(body);
+        return res;
+      },
+    };
+    await renderSingleWidget(
+      mockReq({
+        widgetId: "crumbs",
+        widget: { type: "crumbs", settings: {} },
+        themeSettings: RAW_THEME_SETTINGS,
+        currentCanonicalPath,
+        page,
+      }),
+      res,
+    );
+    return html;
+  };
+
+  const labels = (html) => [...html.matchAll(/<span>([^<]*)<\/span>/g)].map((match) => match[1]);
+
+  it("draws the trail of the page it is on, not the one at that slug in the default language", async () => {
+    const greek = JSON.parse(await storage.read(scope, "pages/el/sxetika.json"));
+    const html = await morph({ ...greek, language: "el" }, "sxetika.html");
+    assert.deepEqual(labels(html), ["Arxiki", "Sxetika"]);
+  });
+
+  it("leaves the default language exactly where it was", async () => {
+    const about = JSON.parse(await storage.read(scope, "pages/about.json"));
+    const html = await morph({ ...about, language: "en" }, "about.html");
+    assert.deepEqual(labels(html), ["Home", "About"]);
   });
 });

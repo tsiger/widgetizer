@@ -51,17 +51,27 @@ const PORTFOLIO_SCHEMA = {
   hasItemPages: true,
   slugPrefix: "portfolio",
   defaultSort: "manual",
-  settings: [{ type: "text", id: "title", label: "Title", required: true, usedAsTitle: true }],
+  settings: [
+    { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+    { type: "menu", id: "nav", label: "Nav" },
+  ],
 };
+
+const menu = (label) => ({
+  id: "main",
+  uuid: `menu-main-${label}`,
+  name: "Main",
+  items: [{ id: "i1", label, link: "about.html" }],
+});
 
 const item = (slug, title, created) => ({
   id: slug,
   uuid: `u-${slug}`,
   slug,
+  settings: { title, nav: "main" },
   schemaVersion: 1,
   created,
   updated: created,
-  settings: { title },
 });
 
 // Render a widget whose template uses the `| collection` filter, passing the
@@ -86,7 +96,15 @@ async function renderListWidget(template, sharedGlobals = null) {
 before(async () => {
   await projectRepo.writeProjectsData({
     projects: [
-      { id: PROJECT_ID, folderName: PROJECT_FOLDER, name: "Coll Filter", theme: "__t__", created: new Date().toISOString() },
+      {
+        id: PROJECT_ID,
+        folderName: PROJECT_FOLDER,
+        name: "Coll Filter",
+        theme: "__t__",
+        created: new Date().toISOString(),
+        defaultLanguage: "en",
+        languages: ["el"],
+      },
     ],
     activeProjectId: PROJECT_ID,
   });
@@ -104,6 +122,24 @@ before(async () => {
   ]) {
     await storage.write(scope, `collections/portfolio/${it.slug}.json`, JSON.stringify(it, null, 2));
   }
+  // The same collection in Greek: one item, deliberately a different set.
+  await storage.write(
+    scope,
+    "collections/portfolio/el/alfa.json",
+    JSON.stringify(item("alfa", "Alfa", "2026-01-05T00:00:00.000Z"), null, 2),
+  );
+  // Two menus of the same NAME, one per language: a bare slug on an item must
+  // mean the menu of the language the listing is being rendered in.
+  await storage.write(scope, "menus/main.json", JSON.stringify(menu("English menu")));
+  await storage.write(scope, "menus/el/main.json", JSON.stringify(menu("Greek menu")));
+
+  // A second collection nobody has translated yet.
+  await storage.write(
+    scope,
+    "collection-types/notes/schema.json",
+    JSON.stringify({ ...PORTFOLIO_SCHEMA, type: "notes", slugPrefix: "notes", hasItemPages: false }, null, 2),
+  );
+  await storage.write(scope, "collections/notes/one.json", JSON.stringify(item("one", "One", "2026-01-02T00:00:00.000Z")));
 });
 
 after(async () => {
@@ -174,6 +210,49 @@ describe("| collection filter", () => {
     // both passes resolve identically (cache returns the same shape)
     assert.ok(html.includes("Aalpha") && html.includes("Balpha"), html);
     assert.ok(html.includes("Abravo") && html.includes("Bbravo"), html);
+  });
+
+  // §9: a listing shows the language of the page it is on. Nothing else in the
+  // render knows which that is, so the page being rendered carries it.
+  it("lists the language of the page being rendered", async () => {
+    const template = `{% assign items = 'portfolio' | collection %}{% for i in items %}[{{ i.settings.title }}]{% endfor %}`;
+    const greek = await renderListWidget(template, { currentPageData: { slug: "work", language: "el" } });
+    assert.ok(greek.includes("[Alfa]"), greek);
+    assert.ok(!greek.includes("[Alpha]"), greek);
+
+    const english = await renderListWidget(template, { currentPageData: { slug: "work", language: "en" } });
+    assert.ok(english.includes("[Alpha]") && english.includes("[Bravo]"), english);
+    assert.ok(!english.includes("[Alfa]"), english);
+  });
+
+  it("links a translated item at its own address", async () => {
+    const html = await renderListWidget(
+      `{% assign items = 'portfolio' | collection %}{% for i in items %}<a href="{{ i.url }}"></a>{% endfor %}`,
+      { currentPageData: { slug: "work", language: "el" } },
+    );
+    assert.ok(html.includes('href="el/portfolio/alfa.html"'), html);
+  });
+
+  // No fallback: an untranslated collection is empty in that language, not a
+  // silent copy of the default one's items under translated page furniture.
+  it("lists nothing where the collection has no items in that language", async () => {
+    const html = await renderListWidget(`{% assign items = 'notes' | collection %}<n>{{ items.size }}</n>`, {
+      currentPageData: { slug: "work", language: "el" },
+    });
+    assert.ok(html.includes("<n>0</n>"), html);
+  });
+
+  it("resolves an item's bare menu slug in the language it is listed in", async () => {
+    const template =
+      `{% assign items = 'portfolio' | collection %}` +
+      `{% for i in items %}{% for l in i.settings.nav.items %}[{{ l.label }}]{% endfor %}{% endfor %}`;
+    const greek = await renderListWidget(template, { currentPageData: { slug: "work", language: "el" } });
+    assert.ok(greek.includes("[Greek menu]"), greek);
+    assert.ok(!greek.includes("[English menu]"), greek);
+
+    const english = await renderListWidget(template, { currentPageData: { slug: "work", language: "en" } });
+    assert.ok(english.includes("[English menu]"), english);
+    assert.ok(!english.includes("[Greek menu]"), english);
   });
 
   it("returns [] when no collectionDeps are wired (non-render context)", async () => {

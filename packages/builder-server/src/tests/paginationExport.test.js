@@ -63,6 +63,7 @@ const TEASER_TEMPLATE =
   `{% if pagination %}<nav class="teaser-pager"></nav>{% endif %}`;
 
 const TITLES = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"];
+const GREEK_TITLES = ["Alfa", "Vita", "Gama", "Delta", "Epsilonas"];
 
 const grid = (settings) => ({ w1: { type: "news-grid", settings } });
 
@@ -434,8 +435,27 @@ describe("export — the same slug paginating in two languages", () => {
   before(async () => {
     // Greek "blog" lists three per page where the English one lists two; the
     // plans must not share a key. Greek also needs a homepage, or the export
-    // leaves the language out entirely (§7b).
+    // leaves the language out entirely (§7b). Its own five items too: a listing
+    // shows its own language, so borrowing the English ones would only prove
+    // that nothing filters.
     await writePage("blog", "Blog", grid({ limit: 2, paginate: true }));
+    for (const [index, title] of GREEK_TITLES.entries()) {
+      const slug = title.toLowerCase();
+      const created = `2026-01-0${9 - index}T00:00:00.000Z`;
+      await storage.write(
+        scope,
+        `collections/news/el/${slug}.json`,
+        JSON.stringify({
+          id: slug,
+          uuid: `u-el-${slug}`,
+          slug,
+          schemaVersion: 1,
+          created,
+          updated: created,
+          settings: { title },
+        }),
+      );
+    }
     // The export publishes the languages the PROJECT has enabled; a folder on
     // disk for a language nobody enabled is stale content, not a language.
     projectRepo.updateProject(PROJECT_ID, { languages: ["el"] }, { seeded: true });
@@ -458,6 +478,7 @@ describe("export — the same slug paginating in two languages", () => {
 
   after(async () => {
     await fs.remove(path.dirname(greekPagePath()));
+    await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "el"));
     projectRepo.updateProject(PROJECT_ID, { languages: [] }, { seeded: true });
     projectRepo.updateProject(PROJECT_ID, { siteUrl: SITE });
   });
@@ -468,8 +489,97 @@ describe("export — the same slug paginating in two languages", () => {
     assert.equal(await fs.pathExists(path.join(dir, "el", "blog.html")), true);
     assert.equal(await fs.pathExists(path.join(dir, "el", "blog", "page", "2.html")), true, "Greek: 3 per page");
     assert.equal(await fs.pathExists(path.join(dir, "el", "blog", "page", "3.html")), false);
-    assert.deepEqual(itemsOf(await read(dir, "el/blog.html")), ["Alpha", "Beta", "Gamma"]);
+    // A pager that left the language would walk the reader out of the Greek site
+    // on the second page.
+    assert.deepEqual(hrefsOf(await read(dir, "el/blog.html"), "num"), [
+      "../el/blog.html",
+      "../el/blog/page/2.html",
+    ]);
+    assert.deepEqual(hrefsOf(await read(dir, "blog.html"), "num"), [
+      "blog.html",
+      "blog/page/2.html",
+      "blog/page/3.html",
+    ]);
+    assert.deepEqual(itemsOf(await read(dir, "el/blog.html")), ["Alfa", "Vita", "Gama"]);
+    assert.deepEqual(itemsOf(await read(dir, "el/blog/page/2.html")), ["Delta", "Epsilonas"]);
     assert.deepEqual(itemsOf(await read(dir, "blog.html")), ["Alpha", "Beta"]);
+  });
+
+  // Two more Greek items, so Greek's total (7 @ 3 = 3 pages) can only come from
+  // Greek — with five each, a count taken from the wrong language looks right.
+  async function withSevenGreekItems(run) {
+    const extras = ["zita", "ita"];
+    for (const slug of extras) {
+      await storage.write(
+        scope,
+        `collections/news/el/${slug}.json`,
+        JSON.stringify({
+          id: slug,
+          uuid: `u-el-${slug}`,
+          slug,
+          schemaVersion: 1,
+          created: "2026-01-03T00:00:00.000Z",
+          updated: "2026-01-03T00:00:00.000Z",
+          settings: { title: slug },
+        }),
+      );
+    }
+    try {
+      await run();
+    } finally {
+      for (const slug of extras) {
+        await fs.remove(path.join(getProjectDir(PROJECT_FOLDER), "collections", "news", "el", `${slug}.json`));
+      }
+    }
+  }
+
+  // The count behind the pager is the same count the listing draws from, or a
+  // language pages over a total it never shows.
+  it("pages over its own language's total, not the default one's", async () => {
+    await withSevenGreekItems(async () => {
+      const dir = await exportWith(false);
+      assert.equal(await fs.pathExists(path.join(dir, "el", "blog", "page", "3.html")), true, "Greek: 7 items, 3 per page");
+      assert.equal(await fs.pathExists(path.join(dir, "blog", "page", "4.html")), false, "English still has five");
+    });
+  });
+
+  // A morph re-renders one widget with no page around it, so the language has to
+  // reach it from the page data the editor sent.
+  it("plans a morphed widget in the page's own language", async () => {
+    await withSevenGreekItems(async () => {
+      const greek = await fs.readJson(greekPagePath());
+      const { renderSingleWidget } = await import("../controllers/previewController.js");
+      let html = "";
+      const res = {
+        send(body) {
+          html = body;
+          return res;
+        },
+        status() {
+          return res;
+        },
+        json(body) {
+          html = JSON.stringify(body);
+          return res;
+        },
+      };
+      await renderSingleWidget(
+        {
+          body: {
+            widgetId: "header",
+            widget: { type: "header", settings: {} },
+            themeSettings: {},
+            currentCanonicalPath: "blog.html",
+            page: { ...greek, language: "el" },
+          },
+          activeProject: { id: PROJECT_ID },
+          adapters: { storage },
+          scope,
+        },
+        res,
+      );
+      assert.ok(compact(html).includes('<i class="pg">1/3</i>'), html);
+    });
   });
 
   it("describes every published language in the sitemap, each with its own paging", async () => {

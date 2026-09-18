@@ -559,8 +559,11 @@ async function resolveItemFromPath(deps, target) {
   return null;
 }
 
-async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPage = 1 } = {}) {
+async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPage = 1, language = "" } = {}) {
   if (typeof deps.countCollectionItems !== "function") return null;
+  // The plan carries the language because it outlives this call: every pager URL
+  // is built from it later, and a copy of a Greek page lives beside the Greek one.
+  const { defaultLanguage } = await languageSettings(deps, null);
   const order = Array.isArray(widgetsOrder) && widgetsOrder.length > 0 ? widgetsOrder : Object.keys(widgets || {});
 
   for (const widgetId of order) {
@@ -585,18 +588,24 @@ async function planPagination(deps, widgets, widgetsOrder, { pageSlug, currentPa
     const perPage = Number(widget.settings[perPageSetting] ?? declared?.default);
     if (!Number.isInteger(perPage) || perPage < 1) continue;
 
-    const totalItems = await deps.countCollectionItems(collectionType);
+    const totalItems = await deps.countCollectionItems(collectionType, language);
     const total = Math.ceil(totalItems / perPage);
     if (total < 2) return null;
 
     const current = Math.min(Math.max(Math.floor(Number(currentPage)) || 1, 1), total);
-    return { widgetId, collectionType, perPage, totalItems, total, current, pageSlug };
+    return { widgetId, collectionType, perPage, totalItems, total, current, pageSlug, language, defaultLanguage };
   }
   return null;
 }
 
 function buildPaginationContext(plan, { cleanUrls = false, outputPathPrefix = "" } = {}) {
-  const href = (pageNumber) => pagedHref(plan.pageSlug, pageNumber, { cleanUrls, outputPathPrefix });
+  const href = (pageNumber) =>
+    pagedHref(plan.pageSlug, pageNumber, {
+      cleanUrls,
+      outputPathPrefix,
+      language: plan.language || "",
+      defaultLanguage: plan.defaultLanguage,
+    });
   const pages = [];
   for (let number = 1; number <= plan.total; number += 1) {
     pages.push({ number, href: href(number), current: number === plan.current });

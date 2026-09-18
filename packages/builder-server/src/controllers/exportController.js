@@ -408,7 +408,7 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
           projectId,
           pageData.widgets,
           pageData.widgetsOrder,
-          { pageSlug: pageData.id },
+          { pageSlug: pageData.id, language: pageData.language },
           renderCollectionDeps,
         );
         if (plan) paginationPlans.set(pageIdentity(pageData), plan);

@@ -387,13 +387,20 @@ The server has been language-aware since step 7 (`GET /menus` merges every folde
 - **A page's canonical is the address it was written to.** Both remaining hand-built addresses now go through `publishedUrls.js` — `pageUrlAt` carries `page.language` (which also fixes the `rel=prev`/`rel=next` pair on numbered copies) and a new `itemUrlAt` gives the item pages theirs. A translated page that canonicalized to the root address was telling crawlers to index the English page, or nothing, instead of itself; an explicit `canonical_url` still wins over both.
 - `pageCounts` is keyed by the language-qualified path of page one, the key the plans already use, so two languages of one slug keep their own totals.
 
-### Step 21. Collections render per language (§9)
+### Step 21. Collections render per language (§9) — *done 2026-09-18*
 
 - The `| collection` filter (registered in `renderWidget`, `renderEngine.js`) filters items to the rendering page's language; the shell's loader in `renderingService.js` lists per language.
 - `renderCollectionItemPage` receives `translations` (step 19) so the switcher works on item pages.
 - Listing links and item links follow §8's output order (`/el/news/story`).
 
 **Done when:** `collectionFilter.test.js` and `renderCollectionItemPage.test.js` run under `el` and show only Greek items on a Greek page.
+
+**As built.** The renderer already knew the language of the page it was drawing (`page.language`, in scope since step 7); the collection reader simply was not being told. `makeCollectionItemsLoaderFactory` now reads `globals.currentPageData?.language` and passes it to `reader.sorted` / `reader.read`, with the language in the per-render cache key.
+
+- **No fallback.** A collection with no items in a language lists nothing there, rather than the default language's items under translated page furniture — the same rule §7b applies to pages.
+- **The pager counts what the listing draws.** `countCollectionItems` and `planPagination` take the language too. Two languages of one slug can paginate over different totals, which is the whole point of keying the plans by output path in step 20.
+- **Every pager URL comes off the plan, so the plan carries the language.** `planPagination` stamps `language` + `defaultLanguage` on it and `buildPaginationContext` passes both to `pagedHref` — otherwise page two of a Greek listing walks the reader out of the Greek site. A listed item's bare menu slug resolves in the listing's language too, the same rule step 19 gave the rest of the render.
+- **A morph resolves its own address.** The editor sends a bare slug, so `renderSingleWidget` rebuilds `currentCanonicalPath` from the page it was given (`pageOutputPath(slug, 1, lang)`) and derives the listing's page slug from `page.slug` rather than from that path — the "no slash" test there exists to exclude ITEM pages, and a language folder was making every translated page look like one. Without this a morphed header on a Greek page drew the trail, and the active state, of whatever sat at that slug in the default language.
 
 ---
 

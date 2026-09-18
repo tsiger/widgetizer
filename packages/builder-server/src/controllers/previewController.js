@@ -121,7 +121,7 @@ async function generatePreviewHtml(pageData, rawThemeSettings, previewMode, coll
     activeProjectId,
     pageData.widgets,
     pageData.widgetsOrder,
-    { pageSlug: pageData.slug, currentPage: pageNumber },
+    { pageSlug: pageData.slug, currentPage: pageNumber, language: pageData.language },
     collectionDeps,
   );
   if (pagination) sharedGlobals.paginationPlan = pagination;
@@ -504,27 +504,44 @@ export async function renderSingleWidget(req, res) {
     const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
     const currentPage = isPlainObject(page) ? page : null;
 
+    const morphLanguage = currentPage?.language || "";
+    const { defaultLanguage } = projectLanguages(req.activeProject);
+
     // Provide sharedGlobals so we can read back enqueued assets after render.
     // currentCanonicalPath flows from the morph request so a menu-bearing widget
-    // (header/footer) keeps its active-state on live edits (D3).
+    // (header/footer) keeps its active-state on live edits (D3) — rebuilt here
+    // when the page is known, because the client sends a bare slug and a menu
+    // matches a page by the path it is PUBLISHED at, language folder included.
     const sharedGlobals = {
       renderMode: "preview",
       enqueuedStyles: new Map(),
       enqueuedScripts: new Map(),
-      currentCanonicalPath: typeof currentCanonicalPath === "string" ? currentCanonicalPath : "",
+      currentCanonicalPath: currentPage?.slug
+        ? pageOutputPath(currentPage.slug, 1, { language: morphLanguage, defaultLanguage })
+        : typeof currentCanonicalPath === "string"
+          ? currentCanonicalPath
+          : "",
       ...(currentPage ? { currentPageData: currentPage } : {}),
     };
 
     const collectionDeps = collectionDepsFromReq(req);
     const renderDeps = collectionDeps && { ...collectionDeps, snapshot: new Map() };
-    const pageSlug = sharedGlobals.currentCanonicalPath.replace(/\.html$/, "");
+    // The slug, not the published path: the path now carries a language folder,
+    // and the "no slash" test below is here to exclude ITEM pages.
+    const pageSlug = currentPage?.slug || sharedGlobals.currentCanonicalPath.replace(/\.html$/, "");
     if (pageSlug && !pageSlug.includes("/")) {
       // Plan from the whole page, not just this widget: a morphed header or
       // footer would otherwise lose the `page.pagination` the full render gave it.
       const pageWidgets = isPlainObject(currentPage?.widgets) ? currentPage.widgets : {};
       const widgets = { ...pageWidgets, [widgetId]: widget };
       const widgetsOrder = currentPage ? currentPage.widgetsOrder : [widgetId];
-      const pagination = await planPagination(activeProjectId, widgets, widgetsOrder, { pageSlug }, renderDeps);
+      const pagination = await planPagination(
+        activeProjectId,
+        widgets,
+        widgetsOrder,
+        { pageSlug, language: morphLanguage },
+        renderDeps,
+      );
       if (pagination) sharedGlobals.paginationPlan = pagination;
     }
 
