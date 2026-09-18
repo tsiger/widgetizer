@@ -1424,7 +1424,13 @@ async function renderCollectionItemPage(
 
   // Page-shaped object drives the layout title/SEO/body class, and is the `page`
   // the header, footer and item template all see.
-  const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl, sharedGlobals.cleanUrls === true);
+  const itemPageData = buildItemPageData(
+    schema,
+    resolvedItem,
+    siteUrl,
+    sharedGlobals.cleanUrls === true,
+    itemDefaultLanguage,
+  );
   // An item page gets the same switcher contract a page does (§9a), keyed by the
   // item's own translation group rather than the page's.
   itemPageData.translations = await ensureTranslations(deps, sharedGlobals, {

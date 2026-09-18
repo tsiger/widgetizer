@@ -14,6 +14,10 @@
 {% assign form_key = form_name | handleize %}
 {% if form_key == blank %}{% assign form_key = 'contact' %}{% endif %}
 {% assign form_key = form_key | truncate: 64, '' %}
+{%- comment -%} Must match the key widgetizer.forms.json declares, or the submission lands under a key nothing describes. {%- endcomment -%}
+{% if page.language and project.defaultLanguage and page.language != project.defaultLanguage %}
+  {%- assign form_key = page.language | append: ':' | append: form_key -%}
+{% endif %}
 
 {% assign submit_label = widget.settings.submit_label %}
 {% if submit_label == blank %}{% assign submit_label = 'Send message' %}{% endif %}

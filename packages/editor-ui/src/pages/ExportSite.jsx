@@ -12,6 +12,8 @@ export default function ExportSite() {
     setLastExport,
     structuredDataSummary,
     setStructuredDataSummary,
+    skippedLanguages,
+    setSkippedLanguages,
     exportHistory,
     setExportHistory,
     loadingHistory,
@@ -29,6 +31,8 @@ export default function ExportSite() {
     setLastExport,
     structuredDataSummary,
     setStructuredDataSummary,
+    skippedLanguages,
+    setSkippedLanguages,
     loadExportHistory,
   };
 

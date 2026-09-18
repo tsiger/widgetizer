@@ -30,9 +30,11 @@ import TurndownService from "turndown";
 import { buildAssetVersionToken, splitAssetRef } from "@widgetizer/core/assetUrl";
 import { LIMIT_KEYS, MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl } from "@widgetizer/core/internalHref";
+import { resolveLanguage } from "@widgetizer/core/contentAddress";
+import { buildTranslations } from "@widgetizer/core/translations";
 import { outputPathPrefixFor, prefixInternalHref } from "@widgetizer/core/linkPrefixer";
-import { languageFolder, pageOutputPath } from "@widgetizer/core/contentAddress";
-import { projectLanguageContexts } from "../utils/contentLanguage.js";
+import { languageFolder, pageOutputPath, itemOutputPath as itemOutputPathFor } from "@widgetizer/core/contentAddress";
+import { projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
 import { identityReadiness } from "@widgetizer/core/siteIdentity";
 import { emptyArticleFields } from "@widgetizer/core/structuredData";
 import { listingParentStatus } from "@widgetizer/core/breadcrumbs";
@@ -298,10 +300,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // A slug is unique per language, so anything keyed by page must key by the
     // language-qualified output path rather than the id alone.
     const pageIdentity = (pageData) => pageOutputPath(pageData.id, 1, pageLang(pageData));
-    const pagesDataArray = await listPagesFromDir(projectDir, { defaultLanguage });
-    // Sitemap, robots and the forms manifest describe the root language until
-    // export learns per-language SEO artifacts.
-    const rootPages = pagesDataArray.filter((pageData) => !languageFolder(pageLang(pageData)));
+    const allPages = await listPagesFromDir(projectDir, { defaultLanguage });
+    const rootPages = allPages.filter((pageData) => !languageFolder(pageLang(pageData)));
 
     // Validate that at least one page has the "index" slug (required for homepage)
     // Note: page.id is derived from filename, which is the authoritative slug
@@ -313,34 +313,74 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       throw err;
     }
 
+    // An enabled language is not an exportable one (§7b). A non-default language
+    // with no homepage is left out of the export entirely and named in the
+    // result: a site with `/el/contact` but no `/el/` sends visitors nowhere.
+    // The DEFAULT language is not subject to this — a missing root homepage
+    // failed the whole export above, because skipping it would publish a site
+    // with no `/` at all. One rule, no readiness state machine.
+    const languageWarnings = [];
+    const exportLanguages = [resolveLanguage("", defaultLanguage)];
+    for (const language of projectLanguages(projectData).languages) {
+      const hasHome = allPages.some(
+        (pageData) => pageData.language === language && isHomeSlug(pageData.id),
+      );
+      if (hasHome) exportLanguages.push(language);
+      else languageWarnings.push({ code: "LANGUAGE_SKIPPED", language });
+    }
+
+    const exported = new Set(exportLanguages);
+    const pagesDataArray = allPages.filter((pageData) =>
+      exported.has(resolveLanguage(pageData.language, defaultLanguage)),
+    );
+
     // Two-pass collection validation (fail-fast): gather every invalid item across
     // all collections up front and refuse the export with a full per-item-per-field
     // error list. Also preflight templates. No HTML is written when this trips.
-    // `manifestCollections` (every collection) feeds manifest.json; `itemPagesForSeo`
+    // `manifestCollections` (every collection) feeds manifest.json; `seoItemsByPrefix`
     // (valid items of hasItemPages collections, in listing order) feeds sitemap/robots
     // and the item-page render loop.
     const collectionSchemas = collectionsEnabled ? await listCollectionSchemas(collectionStorage, collectionScope) : [];
     const manifestCollections = [];
-    const itemPagesForSeo = [];
+    const seoItemsByPrefix = new Map();
     const invalidCollectionItems = [];
     const missingTemplates = [];
     for (const schema of collectionSchemas) {
-      const items = await collectionReader.sorted(schema.type);
-      manifestCollections.push({ type: schema.type, itemPages: !!schema.hasItemPages, itemCount: items.length });
-      for (const item of items) {
-        if (item.invalid) {
-          invalidCollectionItems.push({ collection: schema.type, slug: item.slug, errors: item.validationErrors });
+      // Every language the export is about to write is validated, not just the
+      // default one: an untranslated required field is a broken page whichever
+      // language it is in, and silently dropping the item would publish a site
+      // with a hole and no word about it.
+      let renderableInAnyLanguage = 0;
+      for (const language of exportLanguages) {
+        const lang = { language, defaultLanguage };
+        const items = await collectionReader.sorted(schema.type, {}, lang);
+        if (language === resolveLanguage("", defaultLanguage)) {
+          manifestCollections.push({ type: schema.type, itemPages: !!schema.hasItemPages, itemCount: items.length });
+        }
+        for (const item of items) {
+          if (item.invalid) {
+            invalidCollectionItems.push({
+              collection: schema.type,
+              slug: item.slug,
+              language,
+              errors: item.validationErrors,
+            });
+          }
+        }
+        if (!schema.hasItemPages) continue;
+
+        const validItems = items.filter((item) => !item.invalid);
+        renderableInAnyLanguage += validItems.length;
+        if (validItems.length) {
+          if (!seoItemsByPrefix.has(schema.slugPrefix)) seoItemsByPrefix.set(schema.slugPrefix, []);
+          seoItemsByPrefix.get(schema.slugPrefix).push(...validItems);
         }
       }
-      if (schema.hasItemPages) {
-        const validItems = items.filter((item) => !item.invalid);
-        itemPagesForSeo.push({ slugPrefix: schema.slugPrefix, items: validItems });
-        // A hasItemPages collection with renderable items but no template.liquid
-        // must fail BEFORE any disk write, not midway with partial artifacts.
-        if (validItems.length > 0) {
-          const template = await loadCollectionTemplate(collectionStorage, collectionScope, schema.type);
-          if (template === null) missingTemplates.push(schema.type);
-        }
+      // A hasItemPages collection with renderable items but no template.liquid
+      // must fail BEFORE any disk write, not midway with partial artifacts.
+      if (schema.hasItemPages && renderableInAnyLanguage > 0) {
+        const template = await loadCollectionTemplate(collectionStorage, collectionScope, schema.type);
+        if (template === null) missingTemplates.push(schema.type);
       }
     }
     if (invalidCollectionItems.length > 0) {
@@ -375,9 +415,9 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       }
     }
     const pageCounts = new Map(
-      rootPages
+      pagesDataArray
         .filter((pageData) => paginationPlans.has(pageIdentity(pageData)))
-        .map((pageData) => [pageData.id, paginationPlans.get(pageIdentity(pageData)).total]),
+        .map((pageData) => [pageIdentity(pageData), paginationPlans.get(pageIdentity(pageData)).total]),
     );
 
     const homepagePaginates = rootPages.some(
@@ -402,6 +442,25 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     await fs.emptyDir(outputDir);
     await fs.ensureDir(outputAssetsDir);
     await fs.ensureDir(outputImagesDir);
+    // Sitemap and robots describe every language the export publishes, and the
+    // alternates come from the same `translations` a page's own hreflang does.
+    const seoItemPages = [...seoItemsByPrefix].map(([slugPrefix, items]) => ({ slugPrefix, items }));
+    const seoOptions = {
+      defaultLanguage,
+      translationsOf: (current, kind, slugPrefix) =>
+        buildTranslations({
+          current,
+          kind,
+          slugPrefix,
+          pages: pagesDataArray,
+          items: seoItemsByPrefix.get(slugPrefix) || [],
+          languages: exportLanguages,
+          defaultLanguage,
+          cleanUrls,
+          siteUrl,
+        }),
+    };
+
     const generatedSiteIcons = await generateExportSiteIcons({
       outputDir,
       projectDir,
@@ -411,14 +470,14 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     });
 
     // --- Generate sitemap.xml and robots.txt (shared pure builders; collection
-    // item pages included via itemPagesForSeo) ---
+    // item pages included via seoItemPages) ---
     if (siteUrl && siteUrl.trim() !== "") {
       try {
-        const sitemapXml = await buildSitemap(rootPages, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
+        const sitemapXml = await buildSitemap(pagesDataArray, siteUrl, seoItemPages, cleanUrls, pageCounts, seoOptions);
         if (sitemapXml) {
           await fs.writeFile(path.join(outputDir, "sitemap.xml"), sitemapXml);
         }
-        const robotsTxt = buildRobotsTxt(rootPages, siteUrl, itemPagesForSeo, cleanUrls, pageCounts);
+        const robotsTxt = buildRobotsTxt(pagesDataArray, siteUrl, seoItemPages, cleanUrls, pageCounts, seoOptions);
         if (robotsTxt) {
           await fs.writeFile(path.join(outputDir, "robots.txt"), robotsTxt);
         }
@@ -436,17 +495,24 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
     // others not.
     const mdBase = siteUrlBase(siteUrl);
 
-    const headerData = await readGlobalWidgetFromDir(projectDir, "header");
-    const footerData = await readGlobalWidgetFromDir(projectDir, "footer");
+    // A language's pages wear that language's header and footer — they are
+    // per-language singletons (§5), not one set for the whole site.
+    const globalsByLanguage = new Map();
+    for (const language of exportLanguages) {
+      const lang = { language, defaultLanguage };
+      globalsByLanguage.set(language, {
+        header: await readGlobalWidgetFromDir(projectDir, "header", lang),
+        footer: await readGlobalWidgetFromDir(projectDir, "footer", lang),
+      });
+    }
+    const globalsFor = (language) =>
+      globalsByLanguage.get(resolveLanguage(language, defaultLanguage)) || { header: null, footer: null };
 
     // Handle case where no pages are found (except for theme files etc)
     if (pagesDataArray.length === 0) {
       console.warn(`No exportable pages found for project ${projectId}. Only copying assets/images.`); // Updated log message
       // Proceed to asset copying, but maybe indicate this in the response?
     }
-
-    let headerHtml = "";
-    let footerHtml = "";
 
     // Check if developer mode is enabled for HTML validation
     let devModeEnabled = false;
@@ -478,6 +544,12 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
 
     for (const { pageData, plan, pageNumber } of pageRenders) {
       const outputFilename = pageOutputPath(pageData.id, pageNumber, pageLang(pageData));
+      const { header: pageHeaderData, footer: pageFooterData } = globalsFor(pageData.language);
+      // Per page, not per export: a language with no header of its own must
+      // render none, not the last page's — whose links were built for that
+      // page's depth and language.
+      let headerHtml = "";
+      let footerHtml = "";
       // Create shared globals for this page (each page gets fresh enqueue Maps)
       const sharedGlobals = {
         projectId,
@@ -498,8 +570,8 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       };
 
       // Render header if exists (for each page to capture enqueued assets)
-      if (headerData) {
-        headerHtml = await renderWidget(projectId, "header", headerData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
+      if (pageHeaderData) {
+        headerHtml = await renderWidget(projectId, "header", pageHeaderData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
       }
 
       // Render page-specific widgets sequentially
@@ -531,13 +603,13 @@ export async function exportProjectToDir(projectId, options = {}, collectionDeps
       }
 
       // Render footer if exists
-      if (footerData) {
-        footerHtml = await renderWidget(projectId, "footer", footerData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
+      if (pageFooterData) {
+        footerHtml = await renderWidget(projectId, "footer", pageFooterData, rawThemeSettings, "publish", sharedGlobals, null, renderCollectionDeps);
       }
 
       // Determine if transparent header should be active for this page
       let extraBodyClasses = "";
-      if (headerData?.settings?.transparent_on_hero) {
+      if (pageHeaderData?.settings?.transparent_on_hero) {
         const widgetOrder = pageData.widgetsOrder || Object.keys(pageData.widgets || {});
         const firstWidgetId = widgetOrder[0];
         const firstWidget = firstWidgetId && pageData.widgets?.[firstWidgetId];
@@ -680,9 +752,18 @@ Per aspera ad astra
       for (const schema of collectionSchemas) {
         if (!schema.hasItemPages) continue;
 
-        const items = await collectionReader.sorted(schema.type);
-        const validItems = items.filter((item) => !item.invalid);
-        if (validItems.length === 0) continue;
+        // Renderable in ANY exported language: a template is required because
+        // something will be written, and a collection empty in every language
+        // needs none.
+        const itemsByLanguage = new Map();
+        let renderable = 0;
+        for (const language of exportLanguages) {
+          const langItems = await collectionReader.sorted(schema.type, {}, { language, defaultLanguage });
+          const valid = langItems.filter((item) => !item.invalid);
+          itemsByLanguage.set(language, valid);
+          renderable += valid.length;
+        }
+        if (renderable === 0) continue;
 
         // Template existence was preflighted in the two-pass validation; re-check
         // defensively so a race can never write partial output.
@@ -696,137 +777,146 @@ Per aspera ad astra
           throw err;
         }
 
-        const collectionOutputDir = path.join(outputDir, schema.slugPrefix);
-        await fs.ensureDir(collectionOutputDir);
+        // A collection's items are per language exactly as pages are, and each
+        // language's item pages wear that language's header and footer.
+        for (const language of exportLanguages) {
+          const lang = { language, defaultLanguage };
+          const { header: itemHeaderData, footer: itemFooterData } = globalsFor(language);
+          const validItems = itemsByLanguage.get(language) || [];
+          if (validItems.length === 0) continue;
 
-        for (const item of validItems) {
-          const itemOutputPath = `${schema.slugPrefix}/${item.slug}.html`;
-          // Fresh globals per item so enqueued assets never bleed between items.
-          const sharedGlobals = {
-            projectId,
-            apiUrl: "",
-            renderMode: "publish",
-            themeSettingsRaw: rawThemeSettings,
-            siteIcons: generatedSiteIcons,
-            enqueuedStyles: new Map(),
-            enqueuedScripts: new Map(),
-            collectionCache: new Map(),
-            pagesByUuid: pagesByUuidForItems,
-            collectionItemsByUuid: collectionItemsByUuidForItems,
-            assetVersion,
-            outputPathPrefix: outputPathPrefixFor(itemOutputPath),
-            currentCanonicalPath: itemOutputPath,
-            cleanUrls,
-          };
+          const collectionOutputDir = path.join(outputDir, languageFolder(lang), schema.slugPrefix);
+          await fs.ensureDir(collectionOutputDir);
 
-          // One shared pipeline renders the item page — header/footer + resolved
-          // item + template + layout — identical to the page path. Everything
-          // below (format, storage-path rewrite, markdown) stays export-specific.
-          const {
-            html: itemHtmlRendered,
-            mainContentHtml: itemContentHtml,
-            itemPageData,
-          } = await renderCollectionItemPage(
-            projectId,
-            {
-              schema,
-              item,
-              template,
-              rawThemeSettings,
+          for (const item of validItems) {
+            const itemOutputPath = itemOutputPathFor(schema.slugPrefix, item.slug, lang);
+            // Fresh globals per item so enqueued assets never bleed between items.
+            const sharedGlobals = {
+              projectId,
+              apiUrl: "",
               renderMode: "publish",
-              sharedGlobals,
-              headerData,
-              footerData,
-              projectData,
-              siteUrl,
-            },
-            renderCollectionDeps,
-          );
-          collectEnqueuedAssets(sharedGlobals);
-          let itemHtml = itemHtmlRendered;
+              themeSettingsRaw: rawThemeSettings,
+              siteIcons: generatedSiteIcons,
+              enqueuedStyles: new Map(),
+              enqueuedScripts: new Map(),
+              collectionCache: new Map(),
+              pagesByUuid: pagesByUuidForItems,
+              collectionItemsByUuid: collectionItemsByUuidForItems,
+              assetVersion,
+              outputPathPrefix: outputPathPrefixFor(itemOutputPath),
+              currentCanonicalPath: itemOutputPath,
+              cleanUrls,
+            };
 
-          const emptyFields = emptyArticleFields(itemPageData.collectionItem);
-          if (emptyFields.length) {
-            structuredData.warnings.push({ path: itemOutputPath, code: "emptyArticleFields", fields: emptyFields });
-          }
-          if (sharedGlobals.listingPages) {
-            const listing = listingParentStatus(
-              sharedGlobals.listingPages.get(schema.type),
-              sharedGlobals.pagesByUuid || new Map(),
-              item.language,
+            // One shared pipeline renders the item page — header/footer + resolved
+            // item + template + layout — identical to the page path. Everything
+            // below (format, storage-path rewrite, markdown) stays export-specific.
+            const {
+              html: itemHtmlRendered,
+              mainContentHtml: itemContentHtml,
+              itemPageData,
+            } = await renderCollectionItemPage(
+              projectId,
+              {
+                schema,
+                item,
+                template,
+                rawThemeSettings,
+                renderMode: "publish",
+                sharedGlobals,
+                headerData: itemHeaderData,
+                footerData: itemFooterData,
+                projectData,
+                siteUrl,
+              },
+              renderCollectionDeps,
             );
-            if (listing !== "resolved") {
-              structuredData.warnings.push({
-                path: itemOutputPath,
-                code: listing === "ambiguous" ? "ambiguousListingPage" : "noListingPage",
-              });
+            collectEnqueuedAssets(sharedGlobals);
+            let itemHtml = itemHtmlRendered;
+
+            const emptyFields = emptyArticleFields(itemPageData.collectionItem);
+            if (emptyFields.length) {
+              structuredData.warnings.push({ path: itemOutputPath, code: "emptyArticleFields", fields: emptyFields });
             }
-          }
-
-          const itemFormat = await formatHtml(itemHtml);
-          itemHtml = itemFormat.html;
-          if (!itemFormat.success) {
-            console.warn(`Could not format HTML for ${schema.slugPrefix}/${item.slug}.html: ${itemFormat.error}.`);
-          }
-
-          itemHtml = rewriteStoragePaths(itemHtml, sharedGlobals.outputPathPrefix);
-
-          if (devModeEnabled) {
-            const validation = await validateHtml(itemHtml, `${schema.slugPrefix}/${item.slug}`);
-            if (validation.issues.length > 0) {
-              validationIssues.push({
-                page: `${schema.slugPrefix}/${item.slug}`,
-                filename: `${schema.slugPrefix}/${item.slug}.html`,
-                issues: validation.issues,
-              });
+            if (sharedGlobals.listingPages) {
+              const listing = listingParentStatus(
+                sharedGlobals.listingPages.get(schema.type),
+                sharedGlobals.pagesByUuid || new Map(),
+                item.language,
+              );
+              if (listing !== "resolved") {
+                structuredData.warnings.push({
+                  path: itemOutputPath,
+                  code: listing === "ambiguous" ? "ambiguousListingPage" : "noListingPage",
+                });
+              }
             }
-          }
 
-          itemHtml = itemEasterEgg + itemHtml;
+            const itemFormat = await formatHtml(itemHtml);
+            itemHtml = itemFormat.html;
+            if (!itemFormat.success) {
+              console.warn(`Could not format HTML for ${schema.slugPrefix}/${item.slug}.html: ${itemFormat.error}.`);
+            }
 
-          // Markdown alternate link → the item's .md (same dir; absolute when siteUrl valid).
-          if (exportMarkdown) {
-            // Relative fallback stays same-dir (the item's own folder); the
-            // absolute form carries the collection prefix.
-            const mdHref = mdBase
-              ? absoluteSiteUrl(siteUrl, `${schema.slugPrefix}/${item.slug}.md`)
-              : `${item.slug}.md`;
-            itemHtml = itemHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
-          }
+            itemHtml = rewriteStoragePaths(itemHtml, sharedGlobals.outputPathPrefix);
 
-          await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.html`), itemHtml);
+            if (devModeEnabled) {
+              const validation = await validateHtml(itemHtml, `${schema.slugPrefix}/${item.slug}`);
+              if (validation.issues.length > 0) {
+                validationIssues.push({
+                  page: `${schema.slugPrefix}/${item.slug}`,
+                  filename: `${schema.slugPrefix}/${item.slug}.html`,
+                  issues: validation.issues,
+                });
+              }
+            }
 
-          // Markdown parity: content-only .md alongside the item HTML.
-          if (exportMarkdown) {
-            try {
-              const turndown = new TurndownService({
-                headingStyle: "atx",
-                codeBlockStyle: "fenced",
-                bulletListMarker: "-",
-              });
-              turndown.remove(["style", "script", "noscript", "form", "input", "button", "select", "textarea"]);
-              const cleanHtml = itemContentHtml
-                .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-                .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-                .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
-                .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
-              const itemMarkdown = turndown.turndown(cleanHtml);
-              const frontmatter = [
-                "---",
-                `title: ${itemPageData.name || item.slug}`,
-                `description: ${itemPageData.seo?.description || ""}`,
-                `collection: ${schema.type}`,
-                `slug: ${item.slug}`,
-                "source_url:",
-                `  html: '${item.slug}.html'`,
-                `  md: '${item.slug}.md'`,
-                "---",
-                "",
-                "",
-              ].join("\n");
-              await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.md`), frontmatter + itemMarkdown);
-            } catch (mdError) {
-              console.warn(`Could not generate markdown for ${schema.slugPrefix}/${item.slug}: ${mdError.message}`);
+            itemHtml = itemEasterEgg + itemHtml;
+
+            // Markdown alternate link → the item's .md (same dir; absolute when siteUrl valid).
+            if (exportMarkdown) {
+              // Relative fallback stays same-dir (the item's own folder); the
+              // absolute form carries the collection prefix.
+              const mdHref = mdBase
+                ? absoluteSiteUrl(siteUrl, itemOutputPath.replace(/\.html$/, ".md"))
+                : `${item.slug}.md`;
+              itemHtml = itemHtml.replace("</head>", `  <link rel="alternate" type="text/markdown" href="${mdHref}">\n</head>`);
+            }
+
+            await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.html`), itemHtml);
+
+            // Markdown parity: content-only .md alongside the item HTML.
+            if (exportMarkdown) {
+              try {
+                const turndown = new TurndownService({
+                  headingStyle: "atx",
+                  codeBlockStyle: "fenced",
+                  bulletListMarker: "-",
+                });
+                turndown.remove(["style", "script", "noscript", "form", "input", "button", "select", "textarea"]);
+                const cleanHtml = itemContentHtml
+                  .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+                  .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+                  .replace(/<form[^>]*>[\s\S]*?<\/form>/gi, "")
+                  .replace(/<img[^>]*src=["'][^"']*placeholder[^"']*["'][^>]*>/gi, "");
+                const itemMarkdown = turndown.turndown(cleanHtml);
+                const frontmatter = [
+                  "---",
+                  `title: ${itemPageData.name || item.slug}`,
+                  `description: ${itemPageData.seo?.description || ""}`,
+                  `collection: ${schema.type}`,
+                  `slug: ${item.slug}`,
+                  "source_url:",
+                  `  html: '${item.slug}.html'`,
+                  `  md: '${item.slug}.md'`,
+                  "---",
+                  "",
+                  "",
+                ].join("\n");
+                await fs.outputFile(path.join(collectionOutputDir, `${item.slug}.md`), frontmatter + itemMarkdown);
+              } catch (mdError) {
+                console.warn(`Could not generate markdown for ${schema.slugPrefix}/${item.slug}: ${mdError.message}`);
+              }
             }
           }
         }
@@ -1095,9 +1185,10 @@ Per aspera ad astra
     const formsCap = await collectionDeps?.limits?.getLimit?.(collectionScope, LIMIT_KEYS.MAX_FORMS_PER_SITE);
     const maxForms = typeof formsCap === "number" && formsCap > 0 ? formsCap : MAX_FORMS_PER_SITE;
     const { manifest: formsManifest, warnings: formsWarnings } = buildFormsManifest(
-      rootPages,
+      pagesDataArray,
       appVersion,
       maxForms,
+      { defaultLanguage },
     );
     for (const warning of formsWarnings) {
       console.warn(`[forms manifest] ${warning}`);
@@ -1114,7 +1205,9 @@ Per aspera ad astra
     const exportDirName = `${projectFolderName}-v${version}`;
     const exportRecord = await recordExport(projectId, version, exportDirName, "success");
 
-    return { outputDir, version, exportDirName, exportRecord, structuredData };
+    // A language left out of the export is named in the result, not only in a
+    // server log: a partially published site is far too easy to miss otherwise.
+    return { outputDir, version, exportDirName, exportRecord, structuredData, warnings: languageWarnings };
 }
 
 /**
@@ -1169,6 +1262,7 @@ export async function exportProject(req, res) {
       version: result.version,
       exportRecord: result.exportRecord,
       structuredData: result.structuredData,
+      warnings: result.warnings || [],
     });
   } catch (error) {
     // Handle errors with explicit status codes (e.g., no index page)

@@ -4,14 +4,44 @@
 
 import { formatXml } from "../utils/htmlProcessor.js";
 import { isHomeSlug, siteUrlBase, absoluteSiteUrl, siteUrlPathname } from "@widgetizer/core/internalHref";
-import { pageOutputPath, publicPath } from "@widgetizer/core/contentAddress";
+import { pageOutputPath, publicPath, itemOutputPath, languageFolder } from "@widgetizer/core/contentAddress";
+import { itemUrlAt } from "@widgetizer/core/publishedUrls";
 
-const pagedSitePaths = (pageId, pageCounts, cleanUrls) => {
+// Pagination plans are keyed by the language-qualified path of page one, because
+// a slug is not unique across languages.
+const pagedSitePaths = (pageId, pageCounts, cleanUrls, lang) => {
   const paths = [];
-  for (let number = 2; number <= (pageCounts.get(pageId) || 1); number += 1) {
-    paths.push(publicPath(pageOutputPath(pageId, number), { cleanUrls }));
+  const key = pageOutputPath(pageId, 1, lang);
+  for (let number = 2; number <= (pageCounts.get(key) || pageCounts.get(pageId) || 1); number += 1) {
+    paths.push(publicPath(pageOutputPath(pageId, number, lang), { cleanUrls }));
   }
   return paths;
+};
+
+// A page's own address, and the addresses of its translations. The homepage is
+// the base itself (or the language's folder): `new URL("/", base)` would resolve
+// to the HOST root and silently drop a subfolder Site URL's own path.
+const addressOf = (slug, siteUrl, cleanUrls, lang) => {
+  const folder = languageFolder(lang);
+  if (isHomeSlug(slug)) return absoluteSiteUrl(siteUrl, folder ? `${folder}/` : "");
+  return absoluteSiteUrl(siteUrl, publicPath(pageOutputPath(slug, 1, lang), { cleanUrls }));
+};
+
+// The alternates a sitemap entry carries, in the same shape and by the same
+// rules as the hreflang link tags (§7d): every non-fallback entry, plus
+// x-default at the default language. Nothing at all for one language.
+const alternateLinks = (translations, defaultLanguage) => {
+  if (!Array.isArray(translations) || translations.length < 2) return "";
+  const links = translations
+    .filter((entry) => !entry.fallback && entry.seoUrl)
+    .map((entry) => `
+    <xhtml:link rel="alternate" hreflang="${entry.hreflang}" href="${entry.seoUrl}"/>`);
+  const fallbackEntry = translations.find((entry) => entry.language === defaultLanguage);
+  if (fallbackEntry?.seoUrl) {
+    links.push(`
+    <xhtml:link rel="alternate" hreflang="x-default" href="${fallbackEntry.seoUrl}"/>`);
+  }
+  return links.join("");
 };
 
 /**
@@ -29,47 +59,62 @@ const pagedSitePaths = (pageId, pageCounts, cleanUrls) => {
  * @param {Map<string, number>} [pageCounts] - page id -> number of paginated copies; 2+ adds `page/<n>` entries
  * @returns {Promise<string|null>}
  */
-export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false, pageCounts = new Map()) {
+export async function buildSitemap(
+  pagesDataArray,
+  siteUrl,
+  itemPagesForSeo = [],
+  cleanUrls = false,
+  pageCounts = new Map(),
+  { defaultLanguage = "", translationsOf = () => [] } = {},
+) {
   // No usable base means no absolute <loc> can be built, so there is no sitemap
   // to write. `siteUrlBase` is the single gate the canonicals use too.
   if (!siteUrlBase(siteUrl)) return null;
 
-  const ext = cleanUrls ? "" : ".html";
+  const langOf = (entry) => ({ language: entry.language, defaultLanguage });
+  let multilingual = false;
+
   const sitemapUrls = pagesDataArray
     .filter((page) => !page.seo?.robots?.includes("noindex"))
     .flatMap((page) => {
-      const isHomepage = isHomeSlug(page.slug);
-      // The homepage is the base itself. `new URL("/", base)` would resolve to
-      // the HOST root and silently drop a subfolder Site URL's own path.
-      const pageUrl = isHomepage ? absoluteSiteUrl(siteUrl, "") : absoluteSiteUrl(siteUrl, `${page.slug}${ext}`);
+      const lang = langOf(page);
       const lastMod = page.updated || page.gcreated || new Date().toISOString();
-      const entry = (loc) => `
+      const alternates = alternateLinks(translationsOf(page, "page"), defaultLanguage);
+      if (alternates) multilingual = true;
+      const entry = (loc, links = "") => `
   <url>
     <loc>${loc}</loc>
-    <lastmod>${lastMod.split("T")[0]}</lastmod>
+    <lastmod>${lastMod.split("T")[0]}</lastmod>${links}
   </url>`;
-      const copies = pagedSitePaths(page.id || page.slug, pageCounts, cleanUrls).map((sitePath) =>
+      // A paginated copy is its own URL but not its own translation: page 2 of
+      // the Greek blog is not the alternate of page 2 of the English one.
+      const copies = pagedSitePaths(page.id || page.slug, pageCounts, cleanUrls, lang).map((sitePath) =>
         entry(absoluteSiteUrl(siteUrl, sitePath)),
       );
-      return [entry(pageUrl), ...copies];
+      return [entry(addressOf(page.slug, siteUrl, cleanUrls, lang), alternates), ...copies];
     });
 
   const collectionSitemapUrls = [];
   for (const { slugPrefix, items } of itemPagesForSeo || []) {
     for (const item of items) {
       if (item.seo?.robots?.includes("noindex")) continue;
-      const loc = absoluteSiteUrl(siteUrl, `${slugPrefix}/${item.slug}${ext}`);
+      const loc = itemUrlAt(slugPrefix, item.slug, { siteUrl, cleanUrls, defaultLanguage }, { language: item.language });
       const lastMod = item.updated || new Date().toISOString();
+      const alternates = alternateLinks(translationsOf(item, "item", slugPrefix), defaultLanguage);
+      if (alternates) multilingual = true;
       collectionSitemapUrls.push(`
   <url>
     <loc>${loc}</loc>
-    <lastmod>${lastMod.split("T")[0]}</lastmod>
+    <lastmod>${lastMod.split("T")[0]}</lastmod>${alternates}
   </url>`);
     }
   }
 
+  // The xhtml namespace is declared only when something uses it, so a
+  // single-language sitemap is byte-identical to the one before languages.
+  const xhtmlNs = multilingual ? ' xmlns:xhtml="http://www.w3.org/1999/xhtml"' : "";
   const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapUrls.join("")}${collectionSitemapUrls.join("")}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${xhtmlNs}>${sitemapUrls.join("")}${collectionSitemapUrls.join("")}
 </urlset>`;
 
   const sitemapResult = await formatXml(sitemapContent);
@@ -88,10 +133,16 @@ export async function buildSitemap(pagesDataArray, siteUrl, itemPagesForSeo = []
  * @param {Map<string, number>} [pageCounts] - page id -> number of paginated copies
  * @returns {string|null}
  */
-export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cleanUrls = false, pageCounts = new Map()) {
+export function buildRobotsTxt(
+  pagesDataArray,
+  siteUrl,
+  itemPagesForSeo = [],
+  cleanUrls = false,
+  pageCounts = new Map(),
+  { defaultLanguage = "" } = {},
+) {
   if (!siteUrlBase(siteUrl)) return null;
 
-  const ext = cleanUrls ? "" : ".html";
   const sitemapUrl = absoluteSiteUrl(siteUrl, "sitemap.xml");
   // Single Set so a page and an item never emit duplicate Disallow lines.
   const disallowSet = new Set();
@@ -99,19 +150,28 @@ export function buildRobotsTxt(pagesDataArray, siteUrl, itemPagesForSeo = [], cl
     if (!page.seo?.robots?.includes("noindex")) continue;
     const pageId = page.id || page.slug;
     if (!pageId) continue;
-    const filename = isHomeSlug(pageId) ? `index${ext || ".html"}` : `${pageId}${ext}`;
+    const lang = { language: page.language, defaultLanguage };
+    // A blocked page is blocked at the address it is published under, language
+    // folder included — a bare /private does not protect /el/private.
+    const filename = isHomeSlug(pageId)
+      ? pageOutputPath(pageId, 1, lang)
+      : publicPath(pageOutputPath(pageId, 1, lang), { cleanUrls });
     // Robots paths resolve against the HOST root, not the site's base, so a site
     // under /bakery/ must disallow /bakery/private — a bare /private protects
     // nothing.
     disallowSet.add(siteUrlPathname(siteUrl, filename));
-    for (const sitePath of pagedSitePaths(pageId, pageCounts, cleanUrls)) {
+    for (const sitePath of pagedSitePaths(pageId, pageCounts, cleanUrls, lang)) {
       disallowSet.add(siteUrlPathname(siteUrl, sitePath));
     }
   }
   for (const { slugPrefix, items } of itemPagesForSeo || []) {
     for (const item of items) {
-      if (item.seo?.robots?.includes("noindex"))
-        disallowSet.add(siteUrlPathname(siteUrl, `${slugPrefix}/${item.slug}${ext}`));
+      if (item.seo?.robots?.includes("noindex")) {
+        const lang = { language: item.language, defaultLanguage };
+        disallowSet.add(
+          siteUrlPathname(siteUrl, publicPath(itemOutputPath(slugPrefix, item.slug, lang), { cleanUrls })),
+        );
+      }
     }
   }
   const disallowPaths = Array.from(disallowSet);

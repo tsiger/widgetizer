@@ -43,7 +43,7 @@ export const SeoTag = {
 
       // Canonical URL: explicit page-level value wins on page 1; otherwise the
       // page's own published address (homepage canonicalizes to the bare root).
-      const pagedUrl = (number) => pageUrlAt(page.slug, number, project);
+      const pagedUrl = (number) => pageUrlAt(page.slug, number, project, { language: page.language });
       const explicitCanonical = seo.canonical_url && seo.canonical_url.trim() ? seo.canonical_url.trim() : "";
       const canonicalUrl = pageNumber > 1 ? pagedUrl(pageNumber) : explicitCanonical || pagedUrl(1);
       if (canonicalUrl) {

@@ -23,7 +23,8 @@ import { randomUUID } from "node:crypto";
 
 import { isSupportedSettingType } from "@widgetizer/core/config/settingTypes";
 import { prefixInternalHref } from "@widgetizer/core/linkPrefixer";
-import { pageHref, itemHref, absoluteSiteUrl } from "@widgetizer/core/internalHref";
+import { pageHref, itemHref } from "@widgetizer/core/internalHref";
+import { itemUrlAt } from "@widgetizer/core/publishedUrls";
 import { resolveRichtextMediaInSettings } from "@widgetizer/core/richtextMedia";
 import { resolveRichtextLinksInSettings } from "@widgetizer/core/richtextLinks";
 import { resolveMenuSettings } from "@widgetizer/render-engine";
@@ -1337,9 +1338,11 @@ export async function loadCollectionItemsByUuid(storage, scope, reader = null, l
  * @param {object} item - normalized (and link-resolved) collection item
  * @param {string} siteUrl - project siteUrl ("" when unset)
  * @param {boolean} [cleanUrls=false] - drop the .html extension from the canonical
+ * @param {string} [defaultLanguage] - the project's default language, so a translated
+ *   item canonicalizes to its own folder rather than the root one's address
  * @returns {object} page-shaped object
  */
-export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = false) {
+export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = false, defaultLanguage = "") {
   const fieldSettings = (schema.settings || []).filter((s) => s.type !== HEADER_TYPE);
   const titleField = fieldSettings.find((s) => s.usedAsTitle);
   const settings = item.settings || {};
@@ -1351,7 +1354,7 @@ export function buildCollectionItemPageData(schema, item, siteUrl, cleanUrls = f
   const canonical_url =
     seo.canonical_url && seo.canonical_url.trim()
       ? seo.canonical_url.trim()
-      : absoluteSiteUrl(siteUrl, `${schema.slugPrefix}/${item.slug}${cleanUrls ? "" : ".html"}`);
+      : itemUrlAt(schema.slugPrefix, item.slug, { siteUrl, cleanUrls, defaultLanguage }, { language: item.language });
 
   return {
     id: `${schema.slugPrefix}-${item.slug}`,

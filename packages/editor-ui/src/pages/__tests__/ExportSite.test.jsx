@@ -55,6 +55,25 @@ describe("ExportSite — search-engine note", () => {
     expect(screen.getByText("exportSite.creator.successTitle")).toBeInTheDocument();
   });
 
+  // The warning names a language the visitor will never see published, so it
+  // must outlive the remount that the first export triggers.
+  it("keeps the skipped-language warning through that same switch", async () => {
+    getExportHistory.mockResolvedValueOnce({ exports: [] }).mockResolvedValue({ exports: [RECORD] });
+    exportProjectAPI.mockResolvedValue({
+      success: true,
+      exportRecord: RECORD,
+      structuredData: { readiness: [{ item: "logo", ok: true }], warnings: [] },
+      warnings: [{ code: "LANGUAGE_SKIPPED", language: "de" }],
+    });
+
+    render(<ExportSite />);
+    fireEvent.click(await screen.findByRole("button", { name: "exportSite.creator.exportButton" }));
+
+    await waitFor(() => expect(screen.getByTestId("export-history")).toBeInTheDocument());
+    expect(screen.getByText("exportSite.languages.skippedTitle")).toBeInTheDocument();
+    expect(screen.getByText("exportSite.creator.successTitle")).toBeInTheDocument();
+  });
+
   it("shows no note when nothing is missing", async () => {
     getExportHistory.mockResolvedValueOnce({ exports: [] }).mockResolvedValue({ exports: [RECORD] });
     exportProjectAPI.mockResolvedValue({

@@ -1,5 +1,6 @@
 import { handleize } from "@widgetizer/core";
 import { MAX_FORMS_PER_SITE } from "@widgetizer/core/adapters";
+import { languageFolder, pageOutputPath } from "@widgetizer/core/contentAddress";
 
 const FORM_WIDGET_TYPE = "core-form";
 const MANIFEST_SCHEMA_VERSION = 1;
@@ -179,7 +180,7 @@ function buildField(block, widgetId, pageId, fieldIndex, errors) {
   return field;
 }
 
-function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
+function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, langFolder = "") {
   const settings = widget.settings || {};
   const formName = (settings.form_name || "").trim() || "Contact";
   const path = `page "${pageId}" → widget "${widgetId}"`;
@@ -189,8 +190,9 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
     return null;
   }
 
-  const formKey = handleizeKey(formName) || "contact";
-  if (!KEY_PATTERN.test(formKey)) {
+  const handle = handleizeKey(formName) || "contact";
+  const formKey = langFolder ? `${langFolder}:${handle}` : handle;
+  if (!KEY_PATTERN.test(handle)) {
     errors.push(`${path}: generated form key "${formKey}" is not valid (use letters and numbers in the form name)`);
     return null;
   }
@@ -258,7 +260,12 @@ function buildFormFromWidget(widget, widgetId, pageId, pagePath, errors) {
  * @throws {Error} If any validation against the hosted contract fails. The error carries
  *                 a `formsErrors` array listing every problem (collected, not bailing on first).
  */
-export function buildFormsManifest(pagesDataArray, generatorVersion, maxForms = MAX_FORMS_PER_SITE) {
+export function buildFormsManifest(
+  pagesDataArray,
+  generatorVersion,
+  maxForms = MAX_FORMS_PER_SITE,
+  { defaultLanguage = "" } = {},
+) {
   const errors = [];
   const warnings = [];
   const formsByKey = new Map();
@@ -267,8 +274,14 @@ export function buildFormsManifest(pagesDataArray, generatorVersion, maxForms = 
     const pageId = pageData.id;
     if (!pageId) continue;
 
-    const outputFilename = pageId === "index" || pageId === "home" ? "index.html" : `${pageId}.html`;
-    const pagePath = `/${outputFilename}`;
+    // A translated copy of a form is its OWN form: the same widget copied into
+    // Greek collects Greek submissions, and merging the two streams would mean a
+    // partially translated site either mixes them or fails the export when the
+    // translated fields drift. The language qualifies the key, and the path is
+    // where the page is actually published.
+    const lang = { language: pageData.language, defaultLanguage };
+    const folder = languageFolder(lang);
+    const pagePath = `/${pageOutputPath(pageId, 1, lang)}`;
 
     const widgets = pageData.widgets || {};
     const order = Array.isArray(pageData.widgetsOrder) ? pageData.widgetsOrder : Object.keys(widgets);
@@ -277,7 +290,7 @@ export function buildFormsManifest(pagesDataArray, generatorVersion, maxForms = 
       const widget = widgets[widgetId];
       if (!widget || widget.type !== FORM_WIDGET_TYPE) continue;
 
-      const form = buildFormFromWidget(widget, widgetId, pageId, pagePath, errors);
+      const form = buildFormFromWidget(widget, widgetId, pageId, pagePath, errors, folder);
       if (!form) continue;
 
       const existing = formsByKey.get(form.key);

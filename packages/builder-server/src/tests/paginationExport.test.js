@@ -429,11 +429,20 @@ describe("export — a collection that fits on one page", () => {
 
 describe("export — the same slug paginating in two languages", () => {
   const greekPagePath = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "blog.json");
+  const greekHomePath = () => path.join(getProjectPagesDir(PROJECT_FOLDER), "el", "index.json");
 
   before(async () => {
     // Greek "blog" lists three per page where the English one lists two; the
-    // plans must not share a key.
+    // plans must not share a key. Greek also needs a homepage, or the export
+    // leaves the language out entirely (§7b).
     await writePage("blog", "Blog", grid({ limit: 2, paginate: true }));
+    // The export publishes the languages the PROJECT has enabled; a folder on
+    // disk for a language nobody enabled is stale content, not a language.
+    projectRepo.updateProject(PROJECT_ID, { languages: ["el"] }, { seeded: true });
+    await fs.outputFile(
+      greekHomePath(),
+      JSON.stringify({ name: "Arxiki", slug: "index", uuid: "p-el-home", widgets: {}, widgetsOrder: [] }),
+    );
     await fs.outputFile(
       greekPagePath(),
       JSON.stringify({
@@ -449,6 +458,7 @@ describe("export — the same slug paginating in two languages", () => {
 
   after(async () => {
     await fs.remove(path.dirname(greekPagePath()));
+    projectRepo.updateProject(PROJECT_ID, { languages: [] }, { seeded: true });
     projectRepo.updateProject(PROJECT_ID, { siteUrl: SITE });
   });
 
@@ -462,11 +472,13 @@ describe("export — the same slug paginating in two languages", () => {
     assert.deepEqual(itemsOf(await read(dir, "blog.html")), ["Alpha", "Beta"]);
   });
 
-  it("describes only the root language in the sitemap for now", async () => {
+  it("describes every published language in the sitemap, each with its own paging", async () => {
     const dir = await exportWith(false);
     const sitemap = await fs.readFile(path.join(dir, "sitemap.xml"), "utf8");
-    assert.ok(sitemap.includes(`${SITE}/blog/page/3.html`));
-    assert.ok(!sitemap.includes("/el/"), "no Greek entries until export learns per-language SEO");
+    assert.ok(sitemap.includes(`${SITE}/blog/page/3.html`), "English: 5 items, 2 per page");
+    assert.ok(sitemap.includes(`${SITE}/el/blog.html`));
+    assert.ok(sitemap.includes(`${SITE}/el/blog/page/2.html`), "Greek: 3 per page");
+    assert.ok(!sitemap.includes(`${SITE}/el/blog/page/3.html`), "each language keeps its own total");
   });
 
   it("writes each language's markdown twin beside its page, linked at the page's depth", async () => {

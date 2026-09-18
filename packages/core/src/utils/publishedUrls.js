@@ -1,5 +1,5 @@
 import { absoluteSiteUrl } from "./internalHref.js";
-import { isHomeSlug, languageFolder, pageOutputPath, publicPath } from "./contentAddress.js";
+import { isHomeSlug, itemOutputPath, languageFolder, pageOutputPath, publicPath } from "./contentAddress.js";
 
 /**
  * The number of the copy being rendered: 1 unless the page is split into
@@ -26,6 +26,21 @@ export function pageUrlAt(slug, pageNumber, project, { language } = {}) {
   if (!(pageNumber > 1) && isHomeSlug(slug)) return absoluteSiteUrl(project?.siteUrl, folder ? `${folder}/` : "");
   const path = publicPath(pageOutputPath(slug, pageNumber, lang), { cleanUrls: project?.cleanUrls });
   return absoluteSiteUrl(project?.siteUrl, path);
+}
+
+/**
+ * The published absolute address of a collection item page, the item-page
+ * counterpart of `pageUrlAt`. "" without a usable Site URL.
+ * @param {string} slugPrefix
+ * @param {string} slug
+ * @param {{ siteUrl?: string, cleanUrls?: boolean, defaultLanguage?: string }} project
+ * @param {{ language?: string }} [opts] - the item's language; the default when omitted
+ */
+export function itemUrlAt(slugPrefix, slug, project, { language } = {}) {
+  const lang = { language, defaultLanguage: project?.defaultLanguage };
+  return absoluteSiteUrl(project?.siteUrl, publicPath(itemOutputPath(slugPrefix, slug, lang), {
+    cleanUrls: project?.cleanUrls,
+  }));
 }
 
 /**

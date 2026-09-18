@@ -25,6 +25,7 @@
     "./richtextLinks": "./src/utils/richtextLinks.js",
     "./linkPrefixer": "./src/utils/linkPrefixer.js",
     "./internalHref": "./src/utils/internalHref.js",
+    "./publishedUrls": "./src/utils/publishedUrls.js",
     "./breadcrumbs": "./src/utils/breadcrumbs.js",
     "./contentAddress": "./src/utils/contentAddress.js",
     "./siteIdentity": "./src/utils/siteIdentity.js",

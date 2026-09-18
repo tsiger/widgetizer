@@ -1,13 +1,6 @@
-import { absoluteSiteUrl, pageHref, itemHref } from "./internalHref.js";
-import { pageUrlAt } from "./publishedUrls.js";
-import {
-  homeHref,
-  isHomeSlug,
-  publicPath,
-  itemOutputPath,
-  translationGroupIdOf,
-  resolveLanguage,
-} from "./contentAddress.js";
+import { pageHref, itemHref } from "./internalHref.js";
+import { itemUrlAt, pageUrlAt } from "./publishedUrls.js";
+import { homeHref, isHomeSlug, translationGroupIdOf, resolveLanguage } from "./contentAddress.js";
 import { hreflangCase, languageDir, nativeLanguageName } from "./languages.js";
 
 /**
@@ -83,12 +76,7 @@ export function buildTranslations({
         seoUrl = pageUrlAt("index", 1, urlProject, { language });
       } else if (kind === "item") {
         href = itemHref(slugPrefix, sibling.slug, linkOptions);
-        seoUrl = absoluteSiteUrl(
-          siteUrl,
-          publicPath(itemOutputPath(slugPrefix, sibling.slug, { language, defaultLanguage: resolvedDefault }), {
-            cleanUrls,
-          }),
-        );
+        seoUrl = itemUrlAt(slugPrefix, sibling.slug, urlProject, { language });
       } else {
         href = pageHref(sibling.slug, linkOptions);
         seoUrl = pageUrlAt(sibling.slug, 1, urlProject, { language });

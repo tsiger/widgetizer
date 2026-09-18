@@ -6,6 +6,7 @@ import useProjectStore from "../../stores/projectStore";
 import useToastStore from "../../stores/toastStore";
 import { Loader2, Package } from "lucide-react";
 import { summarizeStructuredData } from "../../utils/structuredDataSummary";
+import { nativeLanguageName } from "@widgetizer/core/languages";
 
 export default function ExportCreator({
   activeProject,
@@ -13,6 +14,8 @@ export default function ExportCreator({
   setLastExport,
   structuredDataSummary: summaryFromParent,
   setStructuredDataSummary: setSummaryFromParent,
+  skippedLanguages: skippedFromParent,
+  setSkippedLanguages: setSkippedFromParent,
   loadExportHistory,
   variant = "default",
   title,
@@ -24,6 +27,11 @@ export default function ExportCreator({
   const [localSummary, setLocalSummary] = useState(null);
   const structuredDataSummary = setSummaryFromParent ? summaryFromParent : localSummary;
   const setStructuredDataSummary = setSummaryFromParent || setLocalSummary;
+  // A language the export left out is named where the export result is read,
+  // not only in a server log — a half-published site is too easy to miss.
+  const [localSkipped, setLocalSkipped] = useState([]);
+  const skippedLanguages = setSkippedFromParent ? skippedFromParent || [] : localSkipped;
+  const setSkippedLanguages = setSkippedFromParent || setLocalSkipped;
   const showToast = useToastStore((state) => state.showToast);
   const isEmptyState = variant === "empty";
 
@@ -46,6 +54,7 @@ export default function ExportCreator({
     setIsExporting(true);
     setLastExport(null);
     setStructuredDataSummary(null);
+    setSkippedLanguages([]);
 
     try {
       const result = await exportProjectAPI(projectIdAtStart, { exportMarkdown });
@@ -57,6 +66,7 @@ export default function ExportCreator({
         showToast(result.message || t("exportSite.toasts.exportSuccess"), "success");
         setLastExport(result.exportRecord);
         setStructuredDataSummary(summarizeStructuredData(result.structuredData));
+        setSkippedLanguages((result.warnings || []).filter((w) => w.code === "LANGUAGE_SKIPPED"));
         // Reload export history to show the new export
         loadExportHistory(projectIdAtStart);
       } else {
@@ -111,6 +121,21 @@ export default function ExportCreator({
           </p>
           <p className="mt-1 text-sm text-green-700">
             {t("exportSite.creator.successCreated", { date: formatDate(lastExport.timestamp) })}
+          </p>
+        </div>
+      )}
+
+      {lastExport && skippedLanguages.length > 0 && (
+        <div
+          className={`mt-3 rounded-sm border border-amber-200 bg-amber-50 p-4 ${isEmptyState ? "w-full max-w-md text-left" : ""}`}
+          role="status"
+        >
+          <p className="text-sm font-medium text-amber-900">{t("exportSite.languages.skippedTitle")}</p>
+          <p className="mt-1 text-sm text-amber-800">
+            {t("exportSite.languages.skipped", {
+              languages: skippedLanguages.map((w) => nativeLanguageName(w.language)).join(", "),
+              count: skippedLanguages.length,
+            })}
           </p>
         </div>
       )}

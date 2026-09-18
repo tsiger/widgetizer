@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { pageUrlAt, pageSelfUrl } from "../publishedUrls.js";
+import { pageUrlAt, pageSelfUrl, itemUrlAt } from "../publishedUrls.js";
 
 const SITE = "https://e.com/repo";
 
@@ -43,6 +43,20 @@ describe("pageUrlAt", () => {
 
   it("gives nothing without a usable Site URL", () => {
     expect(pageUrlAt("about", 1, { siteUrl: "" }, { language: "el" })).toBe("");
+  });
+});
+
+describe("itemUrlAt", () => {
+  it.each([false, true])("puts a translated item under its own folder, Clean URLs %s", (cleanUrls) => {
+    const project = { siteUrl: SITE, cleanUrls, defaultLanguage: "en" };
+    const ext = cleanUrls ? "" : ".html";
+    expect(itemUrlAt("news", "alpha", project)).toBe(`https://e.com/repo/news/alpha${ext}`);
+    expect(itemUrlAt("news", "alpha", project, { language: "en" })).toBe(`https://e.com/repo/news/alpha${ext}`);
+    expect(itemUrlAt("news", "alpha", project, { language: "el" })).toBe(`https://e.com/repo/el/news/alpha${ext}`);
+  });
+
+  it("gives nothing without a usable Site URL", () => {
+    expect(itemUrlAt("news", "alpha", { siteUrl: "" }, { language: "el" })).toBe("");
   });
 });
 
