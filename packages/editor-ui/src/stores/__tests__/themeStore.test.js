@@ -231,6 +231,89 @@ describe("themeStore", () => {
   });
 
   // --------------------------------------------------------------------------
+  // reconcileFromServer
+  // --------------------------------------------------------------------------
+
+  describe("reconcileFromServer", () => {
+    const serverCopy = () => ({
+      settings: { global: { colors: [{ id: "primary_color", type: "color", value: "#server" }] } },
+    });
+
+    it("takes the server's copy as both the baseline and the draft when nothing has moved", async () => {
+      seedSettings();
+      getThemeSettings.mockResolvedValue(serverCopy());
+      const expected = useThemeStore.getState().settings;
+
+      const fresh = await useThemeStore.getState().reconcileFromServer("project-a", expected);
+
+      expect(fresh).toEqual(serverCopy());
+      expect(useThemeStore.getState().settings).toEqual(serverCopy());
+      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(false);
+    });
+
+    // The editor stays editable while this request is in flight, and the
+    // newest thing the user typed outranks what the server just told us.
+    it("keeps a draft that moved while the request was in flight, and still rebaselines", async () => {
+      seedSettings();
+      const expected = useThemeStore.getState().settings;
+      getThemeSettings.mockImplementation(async () => {
+        useThemeStore.getState().updateThemeSetting("colors", "primary_color", "#typed");
+        return serverCopy();
+      });
+
+      await useThemeStore.getState().reconcileFromServer("project-a", expected);
+
+      expect(useThemeStore.getState().settings.settings.global.colors[0].value).toBe("#typed");
+      expect(useThemeStore.getState().originalSettings).toEqual(serverCopy());
+      // A newer edit against the server's copy is exactly what dirty means.
+      expect(useThemeStore.getState().hasUnsavedThemeChanges()).toBe(true);
+    });
+
+    it("writes nothing once the store has moved to another project", async () => {
+      seedSettings();
+      const expected = useThemeStore.getState().settings;
+      getThemeSettings.mockImplementation(async () => {
+        useThemeStore.setState({ loadedProjectId: "project-b" });
+        return serverCopy();
+      });
+
+      const fresh = await useThemeStore.getState().reconcileFromServer("project-a", expected);
+
+      expect(fresh).toBeNull();
+      expect(useThemeStore.getState().settings).toEqual(expected);
+      expect(useThemeStore.getState().originalSettings).toEqual(expected);
+    });
+
+    it("writes nothing when a newer load started while the request was in flight", async () => {
+      seedSettings();
+      const expected = useThemeStore.getState().settings;
+      getThemeSettings.mockImplementation(async () => {
+        useThemeStore.setState((prev) => ({ activeLoadId: prev.activeLoadId + 1 }));
+        return serverCopy();
+      });
+
+      const fresh = await useThemeStore.getState().reconcileFromServer("project-a", expected);
+
+      expect(fresh).toBeNull();
+      expect(useThemeStore.getState().originalSettings).toEqual(expected);
+    });
+
+    it("leaves the store untouched when the read fails", async () => {
+      seedSettings();
+      const expected = useThemeStore.getState().settings;
+      getThemeSettings.mockRejectedValue(new Error("offline"));
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const fresh = await useThemeStore.getState().reconcileFromServer("project-a", expected);
+
+      expect(fresh).toBeNull();
+      expect(useThemeStore.getState().settings).toEqual(expected);
+      expect(useThemeStore.getState().originalSettings).toEqual(expected);
+      errorSpy.mockRestore();
+    });
+  });
+
+  // --------------------------------------------------------------------------
   // resetThemeSettings
   // --------------------------------------------------------------------------
 

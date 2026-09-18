@@ -37,13 +37,20 @@ const useAutoSave = create((set, get) => ({
   queuedFollowUp: null,
   saveGeneration: 0,
   autoSaveFailureCount: 0,
+  // The theme draft a discard left in place, by identity. An in-flight save
+  // landing afterwards uses it to tell "nothing has touched the theme since"
+  // from "someone owns this state now" — see reset() and save().
+  discardedThemeDraft: null,
 
   // Computed
-  hasUnsavedChanges: () => {
-    const { modifiedWidgets, structureModified, themeSettingsModified } = get();
+  // The PAGE's own dirtiness — its widgets, its structure, its header and
+  // footer. Theme settings are the site's, not this page's, so the marker
+  // beside a page name must not light up for them.
+  hasUnsavedPageChanges: () => {
+    const { modifiedWidgets, structureModified } = get();
 
     // Check explicit modification flags first (fast path)
-    if (modifiedWidgets.size > 0 || structureModified || themeSettingsModified) {
+    if (modifiedWidgets.size > 0 || structureModified) {
       return true;
     }
 
@@ -75,12 +82,15 @@ const useAutoSave = create((set, get) => ({
       return true;
     }
 
-    // Check theme settings via themeStore (canonical owner)
-    if (useThemeStore.getState().hasUnsavedThemeChanges()) {
-      return true;
-    }
-
     return false;
+  },
+
+  // Anything unsaved at all: what the Save button, auto-save and the
+  // leave-the-page guard ask about.
+  hasUnsavedChanges: () => {
+    if (get().hasUnsavedPageChanges() || get().themeSettingsModified) return true;
+    // Theme settings via themeStore (canonical owner)
+    return useThemeStore.getState().hasUnsavedThemeChanges();
   },
 
   // Actions
@@ -279,7 +289,27 @@ const useAutoSave = create((set, get) => ({
         if ((themeSettingsModified || hasThemeDrift) && themeSettings && activeProject) {
           const sentTheme = useThemeStore.getState().settings;
           const themeResult = await useThemeStore.getState().saveSettings(activeProject.id);
-          if (themeResult?.warnings?.length && useThemeStore.getState().loadedProjectId === activeProject.id) {
+          if (get().saveGeneration !== myGeneration) {
+            // Discarded mid-flight. The submitted values DID reach the server,
+            // and no local state can undo that — anything written from here
+            // would only make this store agree with itself while disagreeing
+            // with the site. So read the server back, as the page path gets
+            // for free by being refetched. This is the same shape as a save
+            // the server corrected, so it ends the same way: the theme store
+            // reconciles, then the editor's undo history is rewritten to match
+            // without adding a step.
+            //
+            // The check here only avoids a pointless request — the decision
+            // that matters is made against the draft in force when the
+            // response lands, because the editor the user is now looking at
+            // stays editable throughout.
+            const themeNow = useThemeStore.getState();
+            if (themeNow.loadedProjectId === activeProject.id && themeNow.settings === get().discardedThemeDraft) {
+              const discardedDraft = themeNow.settings;
+              const serverTheme = await useThemeStore.getState().reconcileFromServer(activeProject.id, discardedDraft);
+              if (serverTheme) usePageStore.getState().applyThemeCorrections(discardedDraft, serverTheme);
+            }
+          } else if (themeResult?.warnings?.length && useThemeStore.getState().loadedProjectId === activeProject.id) {
             themeCorrection = { sent: sentTheme, saved: useThemeStore.getState().originalSettings };
           }
         }
@@ -479,6 +509,12 @@ const useAutoSave = create((set, get) => ({
   reset: () => {
     const { stopAutoSave, saveGeneration } = get();
     stopAutoSave();
+    // Put the theme draft back. Clearing the flags alone left the edited
+    // settings in the store, and a page load deliberately keeps a theme draft
+    // alive across navigations — so a discarded change came straight back the
+    // next time the editor opened. The page and its globals are refetched by
+    // the load itself, so this is the only draft that outlives the discard.
+    useThemeStore.getState().resetThemeSettings();
     // isSaving/isAutoSaving/runningSave/queuedFollowUp are deliberately NOT
     // force-cleared here. An in-flight save (if any) owns its own bookkeeping
     // cleanup in its finally block regardless of generation — forcing them
@@ -494,6 +530,9 @@ const useAutoSave = create((set, get) => ({
       structureModified: false,
       themeSettingsModified: false,
       autoSaveFailureCount: 0,
+      // By identity: anything that replaces this draft — an edit, a load, a
+      // project switch — makes a still-running save's cleanup stand down.
+      discardedThemeDraft: useThemeStore.getState().settings,
     });
   },
 }));

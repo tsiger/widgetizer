@@ -26,9 +26,40 @@ const mockThemeStoreState = {
   hasUnsavedThemeChanges: vi.fn(() => false),
   loadSettings: vi.fn().mockResolvedValue(undefined),
   saveSettings: vi.fn().mockResolvedValue({}),
+  reconcileFromServer: vi.fn().mockResolvedValue(null),
   updateThemeSetting: vi.fn(),
+  resetThemeSettings: vi.fn(),
   resetForProjectChange: vi.fn(),
 };
+
+// The real themeStore rebaselines inside `saveSettings` and reverts the draft
+// inside `resetThemeSettings` — both invisible to a call-count assertion, and
+// both are what this interaction is about. Wiring the mock to do the same makes
+// the dirty state at the end of a discard readable.
+let mockServerTheme = null;
+
+function makeThemeStoreLive(saved, draft) {
+  const clone = (value) => (value ? JSON.parse(JSON.stringify(value)) : null);
+  mockThemeStoreState.originalSettings = clone(saved);
+  mockThemeStoreState.settings = clone(draft);
+  mockThemeStoreState.loadedProjectId = "test-project";
+  mockThemeStoreState.hasUnsavedThemeChanges.mockImplementation(
+    () => JSON.stringify(mockThemeStoreState.settings) !== JSON.stringify(mockThemeStoreState.originalSettings),
+  );
+  mockThemeStoreState.resetThemeSettings.mockImplementation(() => {
+    mockThemeStoreState.settings = clone(mockThemeStoreState.originalSettings);
+  });
+  // The real reconcileFromServer: the baseline always follows the server, the
+  // draft only while nothing has touched it since it was captured.
+  mockThemeStoreState.reconcileFromServer.mockImplementation(async (projectId, expectedDraft) => {
+    if (mockThemeStoreState.loadedProjectId !== projectId) return null;
+    mockThemeStoreState.originalSettings = clone(mockServerTheme);
+    if (mockThemeStoreState.settings === expectedDraft) {
+      mockThemeStoreState.settings = clone(mockServerTheme);
+    }
+    return clone(mockServerTheme);
+  });
+}
 
 vi.mock("../themeStore", () => ({
   default: {
@@ -92,7 +123,10 @@ function resetStores() {
   mockThemeStoreState.setSettings.mockReset();
   mockThemeStoreState.markThemeSettingsSaved.mockReset();
   mockThemeStoreState.hasUnsavedThemeChanges.mockReset().mockReturnValue(false);
+  mockThemeStoreState.resetThemeSettings.mockReset();
   mockThemeStoreState.saveSettings.mockReset().mockResolvedValue({});
+  mockThemeStoreState.reconcileFromServer.mockReset().mockResolvedValue(null);
+  mockServerTheme = null;
 }
 
 function seedPageStore() {
@@ -611,6 +645,25 @@ describe("saveStore (useAutoSave)", () => {
   // reset
   // --------------------------------------------------------------------------
 
+  // The marker beside a page name answers "is THIS page unsaved", so a site
+  // setting must not light it.
+  describe("hasUnsavedPageChanges", () => {
+    it("ignores theme settings that hasUnsavedChanges counts", () => {
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+
+      expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+
+    it("reports a modified widget, as hasUnsavedChanges does", () => {
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      expect(useAutoSave.getState().hasUnsavedPageChanges()).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+    });
+  });
+
   describe("reset", () => {
     it("clears all modification flags", () => {
       useAutoSave.getState().markWidgetModified("w-1");
@@ -622,6 +675,165 @@ describe("saveStore (useAutoSave)", () => {
       expect(useAutoSave.getState().modifiedWidgets.size).toBe(0);
       expect(useAutoSave.getState().structureModified).toBe(false);
       expect(useAutoSave.getState().themeSettingsModified).toBe(false);
+    });
+
+    // Discard has to discard. Clearing the flags alone left the edited theme
+    // in the store, and a page load keeps a theme draft alive on purpose, so
+    // the change came straight back the next time the editor opened.
+    it("puts the theme draft back", () => {
+      useAutoSave.getState().setThemeSettingsModified(true);
+      mockThemeStoreState.hasUnsavedThemeChanges.mockReturnValue(true);
+
+      useAutoSave.getState().reset();
+
+      expect(mockThemeStoreState.resetThemeSettings).toHaveBeenCalledTimes(1);
+    });
+
+    // The generation guard covers saveStore's own write-backs, but themeStore
+    // writes its baseline from inside `saveSettings`, before that guard runs —
+    // so the discarded values became the thing everything else was compared to.
+    // A theme save that is already on its way cannot be recalled, so the
+    // discard cannot make the site match the screen. Inventing a local
+    // baseline would only make this store agree with itself.
+    function startDiscardedThemeSave() {
+      const SAVED = { settings: { global: { typography: [{ id: "font", value: "Inter" }] } } };
+      const EDITED = { settings: { global: { typography: [{ id: "font", value: "Georgia" }] } } };
+      makeThemeStoreLive(SAVED, EDITED);
+
+      seedPageStore();
+      useAutoSave.getState().setThemeSettingsModified(true);
+
+      let resolveTheme;
+      mockThemeStoreState.saveSettings.mockImplementationOnce(() => {
+        // The real saveSettings captures the draft it submits BEFORE awaiting,
+        // then makes THAT the baseline — which is the whole problem: by the
+        // time it lands, the draft on screen may be the reverted one.
+        const submitted = JSON.parse(JSON.stringify(mockThemeStoreState.settings));
+        return new Promise((resolve) => {
+          resolveTheme = () => {
+            mockThemeStoreState.originalSettings = submitted;
+            resolve({});
+          };
+        });
+      });
+
+      const saving = useAutoSave.getState().save();
+      return { SAVED, EDITED, saving, land: () => resolveTheme() };
+    }
+
+    it("reads the server back when a discarded save lands, and leaves nothing empty", async () => {
+      const { EDITED, saving, land } = startDiscardedThemeSave();
+      // The discarded values are what actually reached the server.
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.reconcileFromServer).toHaveBeenCalledTimes(1);
+      // The editor the user landed on is already mounted and nothing else
+      // reloads the theme, so it must be left holding the server's copy.
+      expect(mockThemeStoreState.settings).toEqual(EDITED);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+
+    // An editor stays editable while the reconciling request is in flight, and
+    // the newest thing the user typed outranks anything this save knows.
+    it("keeps an edit made while the reconciling request was in flight", async () => {
+      const { EDITED, saving, land } = startDiscardedThemeSave();
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+
+      const LATER = { settings: { global: { typography: [{ id: "font", value: "Futura" }] } } };
+      mockThemeStoreState.reconcileFromServer.mockImplementationOnce(async (projectId, expectedDraft) => {
+        // The edit lands mid-request, exactly as a keystroke would.
+        mockThemeStoreState.settings = LATER;
+        mockThemeStoreState.originalSettings = JSON.parse(JSON.stringify(mockServerTheme));
+        return mockThemeStoreState.settings === expectedDraft ? null : JSON.parse(JSON.stringify(mockServerTheme));
+      });
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.settings).toBe(LATER);
+    });
+
+    // Undo must not resurrect the theme the destination page happened to load
+    // with — the history follows the reconciliation, without a step of its own.
+    it("rewrites the editor's undo history to match", async () => {
+      const { SAVED, EDITED, saving, land } = startDiscardedThemeSave();
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      const corrections = vi.spyOn(usePageStore.getState(), "applyThemeCorrections");
+      useAutoSave.getState().reset();
+      const discardedDraft = mockThemeStoreState.settings;
+      expect(discardedDraft).toEqual(SAVED);
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      // The draft the destination editor was showing, and what the server
+      // actually holds — which is what a server-corrected save passes too.
+      expect(corrections).toHaveBeenCalledWith(discardedDraft, EDITED);
+      corrections.mockRestore();
+    });
+
+    it("leaves the theme in place when the user has already landed on another page", async () => {
+      const { EDITED, saving, land } = startDiscardedThemeSave();
+      mockServerTheme = EDITED;
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      // Another page of the SAME project: loadPage keeps a valid theme cache
+      // rather than refetching, so the settings object survives the navigation
+      // and the identity guard still passes.
+      seedPageStore();
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.settings).not.toBeNull();
+      expect(mockThemeStoreState.settings).toEqual(EDITED);
+    });
+
+    it("leaves another project's theme alone", async () => {
+      const { saving, land } = startDiscardedThemeSave();
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      // The editor moved on: another project's theme is loaded now.
+      const OTHER = { settings: { global: { typography: [{ id: "font", value: "Futura" }] } } };
+      mockThemeStoreState.settings = OTHER;
+      mockThemeStoreState.originalSettings = OTHER;
+      mockThemeStoreState.loadedProjectId = "other-project";
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.loadSettings).not.toHaveBeenCalled();
+      expect(mockThemeStoreState.settings).toBe(OTHER);
+    });
+
+    it("leaves a theme edit made after the discard alone", async () => {
+      const { saving, land } = startDiscardedThemeSave();
+      await vi.advanceTimersByTimeAsync(0);
+
+      useAutoSave.getState().reset();
+      // A fresh edit after discarding: a new object, as updateThemeSetting makes.
+      const FRESH = { settings: { global: { typography: [{ id: "font", value: "Futura" }] } } };
+      mockThemeStoreState.settings = FRESH;
+
+      land();
+      expect(await saving).toEqual({ status: "abandoned" });
+
+      expect(mockThemeStoreState.loadSettings).not.toHaveBeenCalled();
+      expect(mockThemeStoreState.settings).toBe(FRESH);
     });
 
     it("does not force-clear isSaving/isAutoSaving — an in-flight save's own completion does that, not reset()", () => {

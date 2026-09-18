@@ -21,7 +21,7 @@ export default function EditorTopBar({
   children,
 }) {
   const { t } = useTranslation();
-  const { hasUnsavedChanges, isSaving, save, stopAutoSave } = useAutoSave();
+  const { hasUnsavedChanges, hasUnsavedPageChanges, isSaving, save, stopAutoSave } = useAutoSave();
   const [allPages, setAllPages] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -219,7 +219,7 @@ export default function EditorTopBar({
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="font-medium px-4 py-2 rounded-md border border-slate-200 hover:bg-slate-100 flex items-center gap-2"
             >
-              {pageName} {hasUnsavedChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
+              {pageName} {hasUnsavedPageChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
               <ChevronDown
                 size={16}
                 className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
@@ -227,7 +227,7 @@ export default function EditorTopBar({
             </button>
           ) : (
             <div className="font-medium px-4 py-2 flex items-center gap-2">
-              {pageName} {hasUnsavedChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
+              {pageName} {hasUnsavedPageChanges() && <div className="w-2 h-2 bg-pink-500 rounded-full"></div>}
             </div>
           )}
           {isDropdownOpen && hasMultiplePages && (
@@ -243,7 +243,7 @@ export default function EditorTopBar({
                   }`}
                 >
                   <span>{page.name}</span>
-                  {page.id === pageId && hasUnsavedChanges() && (
+                  {page.id === pageId && hasUnsavedPageChanges() && (
                     <div className="w-2 h-2 bg-pink-500 rounded-full border border-white"></div>
                   )}
                 </button>

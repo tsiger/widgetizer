@@ -165,6 +165,39 @@ const useThemeStore = create((set, get) => ({
   },
 
   /**
+   * Re-read the server and reconcile with it, for when this store's copy is
+   * known to be out of step and only the server can say what the theme is.
+   *
+   * The BASELINE always becomes what the server holds. The DRAFT follows only
+   * while nothing has touched it since `expectedDraft` was captured — an edit
+   * made while this request was in flight is the user's newest word, and it
+   * then reads dirty against the fresh baseline, which is exactly true.
+   *
+   * Returns the server's copy, or null when the read failed or the store moved
+   * on to another project or another load.
+   */
+  reconcileFromServer: async (projectId, expectedDraft) => {
+    const nextLoadId = get().activeLoadId + 1;
+    set({ activeLoadId: nextLoadId });
+
+    let fresh;
+    try {
+      fresh = await getThemeSettings(projectId);
+    } catch (err) {
+      console.error("Failed to reconcile theme settings:", err);
+      return null;
+    }
+
+    if (get().activeLoadId !== nextLoadId || get().loadedProjectId !== projectId) return null;
+
+    set({
+      originalSettings: JSON.parse(JSON.stringify(fresh)),
+      ...(get().settings === expectedDraft ? { settings: fresh } : {}),
+    });
+    return fresh;
+  },
+
+  /**
    * After a successful external save, snapshot the current settings as
    * the new "original" baseline so dirty detection resets.
    */
