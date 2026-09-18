@@ -1,5 +1,6 @@
 import path from "path";
 import { Hash } from "liquidjs";
+import { resolveMediaMetadata } from "../utils/mediaMetadata.js";
 
 export const ImageTag = {
   parse(tagToken) {
@@ -71,11 +72,16 @@ export const ImageTag = {
     const attrs = [];
     attrs.push(`src="${imageBasePath}/${path.basename(imageSize.path)}"`);
 
-    const finalAlt = alt || mediaFile.metadata?.alt || "";
+    // The library is shared across languages; only alt/title/caption vary, and
+    // only where someone translated them. An untranslated field inherits the
+    // default language, a deliberately empty one stays empty.
+    const metadata = resolveMediaMetadata(mediaFile, context.get(["page", "language"]));
+
+    const finalAlt = alt || metadata.alt || "";
     attrs.push(`alt="${finalAlt.replace(/"/g, "&quot;")}"`);
 
-    if (title || mediaFile.metadata?.title) {
-      const finalTitle = title || mediaFile.metadata?.title;
+    if (title || metadata.title) {
+      const finalTitle = title || metadata.title;
       attrs.push(`title="${finalTitle.replace(/"/g, "&quot;")}"`);
     }
 

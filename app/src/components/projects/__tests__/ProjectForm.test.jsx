@@ -5,13 +5,16 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 let projectState;
 const showToast = vi.fn();
 
-vi.mock("@widgetizer/editor-ui/lib/apiFetch", () => ({
-  apiFetch: async () => ({ ok: true, json: async () => [{ id: "arch", name: "Arch", version: "0.9.10" }] }),
-}));
 vi.mock("@widgetizer/editor-ui/stores/projectStore", () => {
   const hook = (selector) => (selector ? selector(projectState) : projectState);
   hook.getState = () => projectState;
-  return { default: hook };
+  // The logo picker reaches MediaDrawer, which reads the site's languages.
+  return {
+    default: hook,
+    useDefaultLanguage: () => projectState.activeProject?.defaultLanguage || "en",
+    useExtraLanguages: () => projectState.activeProject?.languages || [],
+    useIsMultilang: () => (projectState.activeProject?.languages?.length ?? 0) > 0,
+  };
 });
 vi.mock("@widgetizer/editor-ui/stores/toastStore", () => {
   const state = { showToast: (...args) => showToast(...args) };
@@ -20,8 +23,11 @@ vi.mock("@widgetizer/editor-ui/stores/toastStore", () => {
   return { default: hook };
 });
 let languagesFetchJson;
+// One mock for the module: a second vi.mock of the same path replaces the first,
+// which is how the theme-list stub below went missing and left the picker empty.
 vi.mock("@widgetizer/editor-ui/lib/apiFetch", async (importOriginal) => ({
   ...(await importOriginal()),
+  apiFetch: async () => ({ ok: true, json: async () => [{ id: "arch", name: "Arch", version: "0.9.10" }] }),
   editorFetchJson: (...args) => languagesFetchJson(...args),
 }));
 vi.mock("@widgetizer/editor-ui/queries/projectManager", () => ({

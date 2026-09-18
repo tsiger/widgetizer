@@ -43,7 +43,7 @@ function columnExists(db, table, column) {
 }
 
 // Every version this branch's runner should converge a database to.
-const ALL_VERSIONS = [1, 2, 3, 4, 5, 6, 7];
+const ALL_VERSIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 describe("runMigrations", () => {
   it("creates the full initial schema on a fresh database", () => {

@@ -21,6 +21,7 @@ import {
   syncPageMediaUsageOnWrite,
   updateCollectionItemMediaUsage,
 } from "./mediaUsageService.js";
+import { deleteMediaTranslationsForLanguage } from "../db/repositories/mediaRepository.js";
 
 const GLOBAL_TYPES = ["header", "footer"];
 
@@ -334,6 +335,11 @@ export async function removeLanguage({ storage, scope, project, code }) {
     for (const id of menuIds) {
       await storage.delete(scope, menuKey(id, lang));
     }
+
+    // The shared library keeps its binaries and its default-language metadata;
+    // only this language's alt/title/caption go. Last, so a failure above
+    // leaves them for the retry to find.
+    deleteMediaTranslationsForLanguage(scope.projectId, language);
   } catch (error) {
     await restoreUsageOfSurvivors(storage, scope, lang, { items, pages, globalTypes });
     throw error;

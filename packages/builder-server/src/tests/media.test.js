@@ -47,6 +47,7 @@ const {
 } = await import("../config.js");
 
 const projectRepo = await import("../db/repositories/projectRepository.js");
+const mediaRepo = await import("../db/repositories/mediaRepository.js");
 
 const { readMediaFile } = await import("../services/mediaService.js");
 
@@ -63,6 +64,7 @@ const {
   refreshMediaUsage,
 } = await import("../controllers/mediaController.js");
 const { closeDb } = await import("../db/index.js");
+const { metadataValidators } = await import("../routes/media.js");
 const { LocalAssetStorageAdapter } = await import("@widgetizer/adapters-local");
 
 // Real local asset adapter, rooted at the test data dir — so the byte-I/O the
@@ -93,10 +95,14 @@ after(async () => {
 // Mock helpers
 // ============================================================================
 
-function mockReq({ params = {}, body = {}, files = null, file = null, scope } = {}) {
+function mockReq({ params = {}, body = {}, files = null, file = null, scope, query = {}, activeProject } = {}) {
   return {
     params,
     body,
+    query,
+    // resolveActiveProject supplies this in real routes; the language helpers
+    // resolve a request's `?language=` against it.
+    activeProject,
     files,
     file,
     // Migrated management handlers read the active project from req.scope (set by
@@ -158,8 +164,8 @@ function mockRes() {
   return res;
 }
 
-async function callController(fn, { params, body, files, file } = {}) {
-  const req = mockReq({ params, body, files, file });
+async function callController(fn, { params, body, files, file, query, activeProject } = {}) {
+  const req = mockReq({ params, body, files, file, query, activeProject });
   const res = mockRes();
   await fn(req, res);
   return res;
@@ -1350,5 +1356,161 @@ describe("refreshMediaUsage", () => {
     const indexPage = await fs.readJSON(path.join(getProjectPagesDir(PROJECT_FOLDER), "index.json"));
     assert.ok(indexPage.uuid, "the rebuild stamps a uuid on the page file");
     assert.deepEqual(tracked.usedIn, [`page:${indexPage.uuid}`], "refreshed usage must record the index page");
+  });
+});
+
+// ============================================================================
+// Per-language media metadata (multilang step 17)
+// ============================================================================
+
+// The library is shared across languages — same binaries, same grid. Only
+// alt/title/caption vary, and only where someone wrote them: NULL (no row, or a
+// null column) inherits the default language, "" is a deliberate blank.
+describe("updateMediaMetadata across languages", () => {
+  const multilang = { id: PROJECT_ID, defaultLanguage: "en", languages: ["el"] };
+
+  before(async () => {
+    await writeMediaFile(PROJECT_ID, {
+      files: [
+        {
+          id: "lang-img",
+          filename: "lang.jpg",
+          type: "image/jpeg",
+          metadata: { alt: "A dog", title: "Our dog", caption: "Summer" },
+        },
+      ],
+    });
+  });
+
+  it("writes a translation without touching the default language", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "lang-img" },
+      query: { language: "el" },
+      activeProject: multilang,
+      body: { alt: "Enas skylos" },
+    });
+
+    assert.equal(res._status, 200);
+    assert.equal(res._json.file.metadata.alt, "A dog");
+    assert.equal(res._json.file.translations.el.alt, "Enas skylos");
+    // Nothing was written for the other two, so they inherit.
+    assert.equal(res._json.file.translations.el.title, null);
+    assert.equal(res._json.file.translations.el.caption, null);
+  });
+
+  it("does not require alt in a translated language — leaving it out means inherit", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "lang-img" },
+      query: { language: "el" },
+      activeProject: multilang,
+      body: { title: "O skylos mas" },
+    });
+
+    assert.equal(res._status, 200);
+    assert.equal(res._json.file.translations.el.alt, null);
+    assert.equal(res._json.file.translations.el.title, "O skylos mas");
+  });
+
+  it("keeps a deliberately empty alt apart from an absent one", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "lang-img" },
+      query: { language: "el" },
+      activeProject: multilang,
+      body: { alt: "" },
+    });
+
+    assert.equal(res._status, 200);
+    assert.equal(res._json.file.translations.el.alt, "");
+  });
+
+  it("drops the row once every field is inherited again", async () => {
+    await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "lang-img" },
+      query: { language: "el" },
+      activeProject: multilang,
+      body: {},
+    });
+
+    const file = mediaRepo.getMediaFileById(PROJECT_ID, "lang-img");
+    assert.deepEqual(file.translations, {});
+    assert.equal(file.metadata.alt, "A dog");
+  });
+
+  it("still writes the default language into media_files itself", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "lang-img" },
+      query: { language: "en" },
+      activeProject: multilang,
+      body: { alt: "A dog on a beach", title: "Our dog", caption: "Summer" },
+    });
+
+    assert.equal(res._status, 200);
+    assert.equal(res._json.file.metadata.alt, "A dog on a beach");
+    assert.deepEqual(mediaRepo.getMediaFileById(PROJECT_ID, "lang-img").translations, {});
+  });
+
+  // Project duplication and ZIP import both go through writeMediaData, which
+  // re-inserts every file under a new id. A translation lost there is lost for
+  // good, and a deliberate blank would come back as "inherit".
+  it("survives the full rewrite that duplication and import use", async () => {
+    await writeMediaFile(PROJECT_ID, {
+      files: [
+        {
+          id: "copied-img",
+          filename: "copied.jpg",
+          type: "image/jpeg",
+          metadata: { alt: "A dog", title: "Our dog", caption: "Summer" },
+          translations: {
+            el: { alt: "Enas skylos", title: null, caption: null },
+            de: { alt: "", title: null, caption: null },
+          },
+        },
+      ],
+    });
+
+    const file = mediaRepo.getMediaFileById(PROJECT_ID, "copied-img");
+    assert.equal(file.translations.el.alt, "Enas skylos");
+    assert.equal(file.translations.el.title, null);
+    // The deliberate blank stays a blank, not an inherit.
+    assert.equal(file.translations.de.alt, "");
+  });
+
+  it("refuses a language the project has not enabled", async () => {
+    const res = await callController(updateMediaMetadata, {
+      params: { projectId: PROJECT_ID, fileId: "lang-img" },
+      query: { language: "fr" },
+      activeProject: multilang,
+      body: { alt: "Un chien" },
+    });
+
+    assert.equal(res._status, 400);
+  });
+});
+
+// The controller reads req.body AFTER the route's sanitizers have run, so the
+// inherit/blank distinction has to survive them: a controller-only test cannot
+// see a `null` that was turned into `""` on the way in.
+describe("the metadata route's sanitizers", () => {
+  async function sanitize(body) {
+    const req = { body, params: { projectId: PROJECT_ID, fileId: "lang-img" }, query: {}, cookies: {}, headers: {} };
+    for (const validator of metadataValidators) await validator.run(req);
+    return req.body;
+  }
+
+  it("leaves an explicit null alone, so it still means inherit", async () => {
+    const body = await sanitize({ alt: null, title: null, caption: null });
+    assert.equal(body.alt, null);
+    assert.equal(body.title, null);
+    assert.equal(body.caption, null);
+  });
+
+  it("keeps an empty string an empty string, so a deliberate blank stays one", async () => {
+    const body = await sanitize({ alt: "" });
+    assert.equal(body.alt, "");
+  });
+
+  it("still trims and strips real text", async () => {
+    const body = await sanitize({ alt: "  <b>A dog</b>  " });
+    assert.equal(body.alt, "A dog");
   });
 });

@@ -1,26 +1,46 @@
-import { useEffect, useRef } from "react";
+/* eslint-disable react-hooks/incompatible-library */
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { X, FileText } from "lucide-react";
+import { nativeLanguageName } from "@widgetizer/core/languages";
 import Button from "../ui/Button";
+import LanguageTabs from "../content/LanguageTabs";
+import { useDefaultLanguage, useIsMultilang } from "../../stores/projectStore";
 import { API_URL } from "../../lib/config";
 
 export default function MediaDrawer({ visible, onClose, selectedFile, onSave, loading, activeProject }) {
   const { t } = useTranslation();
+  const isMultilang = useIsMultilang();
+  const defaultLanguage = useDefaultLanguage();
+  // The binaries and the grid are shared; only these three fields are per
+  // language, and only where someone has written them. The drawer stays mounted
+  // between openings, so the chosen language is tied to the file it was chosen
+  // for — a different file opens on the default language again.
+  const [chosen, setChosen] = useState({ fileId: null, language: defaultLanguage });
+  const language = chosen.fileId === (selectedFile?.id ?? null) ? chosen.language : defaultLanguage;
+  const setLanguage = (code) => setChosen({ fileId: selectedFile?.id ?? null, language: code });
+  const isTranslation = isMultilang && language !== defaultLanguage;
+  const inherited = selectedFile?.metadata || {};
+  const defaultName = nativeLanguageName(defaultLanguage);
 
   const {
     register,
     handleSubmit: rhfHandleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm({
     defaultValues: {
       alt: "",
       title: "",
       caption: "",
+      altBlank: false,
     },
   });
+
+  const altBlank = watch("altBlank");
 
   // Track previous selectedFile so the populate-form effect only resets on a real file
   // change (not every render). Initialize to a sentinel — NOT the initial selectedFile —
@@ -29,26 +49,28 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
   // below see "no change" and skip the reset, showing blank alt/title/caption.
   const prevSelectedFileRef = useRef(JSON.stringify(null));
 
-  // Update form data when selectedFile or visibility changes
+  // Update form data when selectedFile, language or visibility changes
   useEffect(() => {
-    const currentSelectedFileStr = JSON.stringify(selectedFile);
+    const currentSelectedFileStr = JSON.stringify([selectedFile, language]);
 
     if (visible && selectedFile) {
-      // Only reset if the file actually changed
+      // Only reset if the file (or the language being written) actually changed
       if (prevSelectedFileRef.current !== currentSelectedFileStr) {
+        const source = language === defaultLanguage ? selectedFile.metadata || {} : selectedFile.translations?.[language];
         reset({
-          alt: selectedFile.metadata?.alt || "",
-          title: selectedFile.metadata?.title || "",
-          caption: selectedFile.metadata?.caption || "",
+          alt: source?.alt || "",
+          title: source?.title || "",
+          caption: source?.caption || "",
+          altBlank: source?.alt === "",
         });
         prevSelectedFileRef.current = currentSelectedFileStr;
       }
     } else if (!visible) {
       // Reset form when drawer is closed
-      reset({ alt: "", title: "", caption: "" });
+      reset({ alt: "", title: "", caption: "", altBlank: false });
       prevSelectedFileRef.current = JSON.stringify(null);
     }
-  }, [visible, selectedFile, reset]);
+  }, [visible, selectedFile, language, defaultLanguage, reset]);
 
   // Prevent background scroll when drawer is open
   useEffect(() => {
@@ -64,11 +86,23 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
   }, [visible]);
 
   const onSubmitHandler = (data) => {
-    if (selectedFile) {
+    if (!selectedFile) return;
+    if (!isTranslation) {
       // caption is image-only (the field renders for images only; the backend also
       // gates on type), so a non-image save sends an empty caption harmlessly.
       onSave(selectedFile.id, { alt: data.alt, title: data.title, caption: data.caption });
+      return;
     }
+
+    // A field left out is stored as "inherit"; only an explicit blank is sent as
+    // "". Alt is the one that needs saying out loud — a decorative image wants
+    // no description at all, not the default language's.
+    const written = {};
+    if (data.altBlank) written.alt = "";
+    else if (data.alt.trim()) written.alt = data.alt;
+    if (data.title.trim()) written.title = data.title;
+    if (data.caption.trim()) written.caption = data.caption;
+    onSave(selectedFile.id, written, language);
   };
 
   // Handle Escape key press to close the drawer
@@ -154,33 +188,59 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
             </div>
           )}
 
+          <LanguageTabs value={language} onChange={setLanguage} label={t("forms.media.languagesLabel")} />
+
           {/* Alt Text (required) + Title */}
           <div className="form-field">
-            <label htmlFor="alt" className="form-label">
+            <label htmlFor="alt" className={isTranslation ? "form-label-optional" : "form-label"}>
               {t("forms.media.altLabel")}
             </label>
             <input
               type="text"
               id="alt"
               {...register("alt", {
-                required: t("forms.media.altRequired"),
-                validate: (value) => value.trim() !== "" || t("forms.media.altNotEmpty"),
+                required: isTranslation ? false : t("forms.media.altRequired"),
+                validate: (value) =>
+                  isTranslation || value.trim() !== "" || t("forms.media.altNotEmpty"),
               })}
               className="form-input"
-              aria-required="true"
+              placeholder={isTranslation ? inherited.alt || "" : undefined}
+              disabled={isTranslation && altBlank}
+              aria-required={isTranslation ? undefined : "true"}
             />
             {errors.alt && <p className="form-error">{errors.alt.message}</p>}
             <p className="form-description">
-              {t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
+              {isTranslation
+                ? t("forms.media.inheritsHelp", { name: defaultName })
+                : t("forms.media.altHelp", { type: t("forms.media.types.image").toLowerCase() })}
             </p>
+            {isTranslation && (
+              <label htmlFor="altBlank" className="mt-2 flex items-start gap-2 text-sm text-slate-700">
+                <input type="checkbox" id="altBlank" {...register("altBlank")} className="mt-0.5" />
+                <span>
+                  {t("forms.media.altEmptyOnPurpose")}
+                  <span className="block text-xs text-slate-500">
+                    {t("forms.media.altEmptyOnPurposeHelp", { name: defaultName })}
+                  </span>
+                </span>
+              </label>
+            )}
           </div>
 
           <div className="form-field">
             <label htmlFor="title" className="form-label-optional">
               {t("forms.media.titleLabel")}
             </label>
-            <input type="text" id="title" {...register("title")} className="form-input" />
-            <p className="form-description">{t("forms.media.titleHelp")}</p>
+            <input
+              type="text"
+              id="title"
+              {...register("title")}
+              className="form-input"
+              placeholder={isTranslation ? inherited.title || "" : undefined}
+            />
+            <p className="form-description">
+              {isTranslation ? t("forms.media.inheritsHelp", { name: defaultName }) : t("forms.media.titleHelp")}
+            </p>
           </div>
 
           {/* Caption — images only (a caption is an image concept; the backend also gates on type) */}
@@ -189,8 +249,16 @@ export default function MediaDrawer({ visible, onClose, selectedFile, onSave, lo
               <label htmlFor="caption" className="form-label-optional">
                 {t("forms.media.captionLabel")}
               </label>
-              <input type="text" id="caption" {...register("caption")} className="form-input" />
-              <p className="form-description">{t("forms.media.captionHelp")}</p>
+              <input
+                type="text"
+                id="caption"
+                {...register("caption")}
+                className="form-input"
+                placeholder={isTranslation ? inherited.caption || "" : undefined}
+              />
+              <p className="form-description">
+                {isTranslation ? t("forms.media.inheritsHelp", { name: defaultName }) : t("forms.media.captionHelp")}
+              </p>
             </div>
           )}
 

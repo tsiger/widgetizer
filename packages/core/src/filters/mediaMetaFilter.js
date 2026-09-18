@@ -3,7 +3,11 @@
  *
  * Usage: {{ 'path/to/file.jpg' | media_meta }} -> returns metadata object { alt, title, ... }
  * Usage: {{ 'path/to/file.jpg' | media_meta: 'alt' }} -> returns "Alt text"
+ *
+ * Reads the language of the page being rendered, exactly as `{% image %}` does:
+ * the library is shared, only alt/title/caption vary.
  */
+import { resolveMediaMetadata } from "../utils/mediaMetadata.js";
 
 export function registerMediaMetaFilter(engine) {
   engine.registerFilter("media_meta", function (path, property) {
@@ -43,10 +47,18 @@ export function registerMediaMetaFilter(engine) {
 
     if (!file || !file.metadata) return "";
 
+    let language;
+    try {
+      language = context.get(["page", "language"]);
+    } catch {
+      // No page in scope (a standalone render) — the default language it is.
+    }
+    const metadata = resolveMediaMetadata(file, language);
+
     if (property) {
-      return file.metadata[property] || "";
+      return metadata[property] || "";
     }
 
-    return file.metadata;
+    return metadata;
   });
 }

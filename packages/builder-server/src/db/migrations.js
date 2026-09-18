@@ -164,6 +164,28 @@ const migrations = [
       }
     },
   },
+  {
+    version: 8,
+    description: "Add per-language media metadata",
+    up(db) {
+      // The existing media_files columns stay the default language, so nothing is
+      // backfilled. A column here is NULLABLE ON PURPOSE: NULL (or no row) means
+      // inherit the default language, while "" means deliberately blank — without
+      // that difference a decorative image could not have empty alt text in a
+      // translated language.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS media_file_translations (
+          media_file_id TEXT NOT NULL,
+          language TEXT NOT NULL,
+          alt TEXT,
+          title TEXT,
+          caption TEXT,
+          FOREIGN KEY (media_file_id) REFERENCES media_files(id) ON DELETE CASCADE,
+          PRIMARY KEY (media_file_id, language)
+        );
+      `);
+    },
+  },
 ];
 
 export const DEFAULT_TRACKING_TABLE = "_migrations";

@@ -107,10 +107,11 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
   const handleEditMetadata = () => setMetadataDrawerVisible(true);
   const handleOpenMediaSelector = () => setSelectorDrawerVisible(true);
 
-  const handleSaveMetadata = async (fileId, metadata) => {
+  const handleSaveMetadata = async (fileId, metadata, language) => {
     setIsSavingMetadata(true);
     try {
-      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata`, {
+      const query = language ? `?language=${encodeURIComponent(language)}` : "";
+      const response = await apiFetch(`/api/media/projects/${activeProject.id}/media/${fileId}/metadata${query}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(metadata),
@@ -119,7 +120,11 @@ export default function ImageInput({ id, value = "", onChange, size = "full", la
       if (!response.ok) throw new Error("Failed to update metadata");
 
       const updatedFileData = await response.json();
-      setCurrentImageFile((prev) => ({ ...prev, metadata: updatedFileData.file.metadata }));
+      setCurrentImageFile((prev) => ({
+        ...prev,
+        metadata: updatedFileData.file.metadata,
+        translations: updatedFileData.file.translations,
+      }));
       // Drop the shared 30s media cache so the Media page (and other image inputs)
       // re-fetch fresh metadata on their next load instead of serving stale data.
       invalidateMediaCache(activeProject.id);

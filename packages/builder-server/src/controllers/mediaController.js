@@ -12,6 +12,7 @@ import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsageFromDir, ensureUsageSourceFormat } from "../services/mediaUsageService.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
+import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { getDb } from "../db/index.js";
 
@@ -499,6 +500,8 @@ export async function uploadProjectMedia(req, res) {
  */
 export async function updateMediaMetadata(req, res) {
   try {
+    const lang = requestLanguage(req, res);
+    if (!lang) return;
 
     const { projectId, fileId } = req.params;
     // Bind the inner :projectId to the owner-resolved scope. This route is
@@ -523,6 +526,24 @@ export async function updateMediaMetadata(req, res) {
       return res.status(404).json({ error: "File not found" });
     }
 
+    const isImage = file.type?.startsWith("image/");
+    // A translated language is edited against the default, so a field left out
+    // means "inherit" and is stored as NULL — only "" is a deliberate blank.
+    // The default language keeps its own rule: alt is required, and absent is
+    // not a thing it can express.
+    if (lang.language !== lang.defaultLanguage) {
+      const inheritable = (value) => (typeof value === "undefined" || value === null ? null : value);
+      mediaRepo.updateFileTranslation(projectId, fileId, lang.language, {
+        alt: inheritable(alt),
+        title: inheritable(title),
+        caption: isImage ? inheritable(caption) : null,
+      });
+      return res.json({
+        message: "Metadata updated successfully",
+        file: mediaRepo.getMediaFileById(projectId, fileId),
+      });
+    }
+
     // Validate input
     if (typeof alt === "undefined") {
       return res.status(400).json({ error: "Alt text is required for images" });
@@ -530,7 +551,7 @@ export async function updateMediaMetadata(req, res) {
 
     // Captions are an image-only concept; a caption sent for a non-image (e.g. a
     // PDF, via direct API) is stored as "" rather than text.
-    const captionForType = file.type?.startsWith("image/") ? caption || "" : "";
+    const captionForType = isImage ? caption || "" : "";
 
     // Update metadata in DB (alt, title, caption columns, scoped to project)
     mediaRepo.updateFileMetadata(projectId, fileId, { alt: alt || "", title: title || "", caption: captionForType });
