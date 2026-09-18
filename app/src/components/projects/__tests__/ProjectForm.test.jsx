@@ -225,7 +225,6 @@ describe("site languages", () => {
     fireEvent.click(tab("site"));
 
     expect(defaultSelect()).toBeTruthy();
-    expect(panel("site").textContent).toContain("forms.project.languages.title");
     expect(screen.getByLabelText("forms.project.languages.addLabel")).toBeTruthy();
   });
 
@@ -238,13 +237,12 @@ describe("site languages", () => {
     expect(screen.queryByLabelText("forms.project.languages.addLabel")).toBeNull();
   });
 
-  it("locks the default language once the site has another, and says why", async () => {
+  it("locks the default language once the site has another", async () => {
     renderForm({ defaultLanguage: "en", languages: ["el"] });
     await screen.findByRole("tablist");
     fireEvent.click(tab("site"));
 
     expect(defaultSelect().disabled).toBe(true);
-    expect(panel("site").textContent).toContain("forms.project.languages.defaultLockedHelp");
   });
 
   it("leaves it editable while the site has one language", async () => {
@@ -253,7 +251,6 @@ describe("site languages", () => {
     fireEvent.click(tab("site"));
 
     expect(defaultSelect().disabled).toBe(false);
-    expect(panel("site").textContent).toContain("forms.project.languages.defaultHelp");
   });
 
   it("keeps a stored regional default selected rather than blank", async () => {

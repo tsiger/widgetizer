@@ -187,12 +187,10 @@ export default function LanguagesSection({
         </Button>
       </div>
 
-      {blocked ? (
+      {blocked && (
         <p className="form-description text-pink-600 dark:text-pink-400">
           {t("forms.project.languages.saveDefaultFirst")}
         </p>
-      ) : (
-        <p className="form-description">{t("forms.project.languages.addHelp")}</p>
       )}
       <p className="form-description">{t("forms.project.languages.immediateNote")}</p>
 

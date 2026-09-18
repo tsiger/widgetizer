@@ -421,11 +421,6 @@ export default function ProjectForm({
           </option>
         ))}
       </select>
-      <p className="form-description">
-        {isMultilang
-          ? t("forms.project.languages.defaultLockedHelp")
-          : t("forms.project.languages.defaultHelp")}
-      </p>
     </div>
   );
 
@@ -640,8 +635,6 @@ export default function ProjectForm({
         {checkboxField("cleanUrls", "forms.project.cleanUrlsLabel", "forms.project.cleanUrlsHelp")}
 
         <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
-          <h3 className="form-label">{t("forms.project.languages.title")}</h3>
-          <p className="form-description mb-4">{t("forms.project.languages.help")}</p>
           {defaultLanguageField()}
           {/* A project has to exist before content can be copied into a new
               language, so the list only appears once it does. */}
