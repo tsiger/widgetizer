@@ -57,7 +57,11 @@ const NEWS_SCHEMA = {
 
 // The template prints the language it was rendered as, so a dropped language is
 // visible in the output rather than only in what it breaks downstream.
-const NEWS_TEMPLATE = `<article data-language="{{ page.language }}"><h1>{{ item.settings.title }}</h1></article>`;
+const NEWS_TEMPLATE =
+  `<article data-language="{{ page.language }}"><h1>{{ item.settings.title }}</h1>` +
+  `<nav class="langs">{% for t in page.translations %}` +
+  `<a href="{{ t.href }}" data-lang="{{ t.language }}" data-fallback="{{ t.fallback }}">{{ t.label }}</a>` +
+  `{% endfor %}</nav></article>`;
 
 const headerWidget = (text) => ({
   type: "header",
@@ -76,7 +80,7 @@ async function seed() {
         siteTitle: "Preview Languages",
         theme: "__preview_lang_theme__",
         themeVersion: "1.0.0",
-        siteUrl: "",
+        siteUrl: "https://example.com/",
         defaultLanguage: "en",
         languages: ["el"],
         created: new Date().toISOString(),
@@ -93,8 +97,11 @@ async function seed() {
 
   await fs.writeFile(
     path.join(projectDir, "layout.liquid"),
-    `<!DOCTYPE html><html><head><title>{{ page.seo.title }}</title></head>` +
+    `<!DOCTYPE html><html lang="{{ page.language }}" dir="{{ page.dir }}"><head>{% seo %}<title>{{ page.seo.title }}</title></head>` +
       `<body>{{ header | raw }}` +
+      `<nav class="langs">{% for t in page.translations %}` +
+      `<a href="{{ t.href }}" data-lang="{{ t.language }}" data-fallback="{{ t.fallback }}"{% if t.active %} aria-current="true"{% endif %}>{{ t.label }}</a>` +
+      `{% endfor %}</nav>` +
       `<nav class="crumbs">{% for crumb in page.breadcrumbs %}<span>{{ crumb.label }}</span>{% endfor %}</nav>` +
       `<main>{{ main_content | raw }}</main>{{ footer | raw }}</body></html>`,
   );
@@ -127,6 +134,63 @@ async function seed() {
     scope,
     "pages/blog.json",
     JSON.stringify({ id: "blog", uuid: "u-blog", slug: "blog", name: "Blog", widgets: {}, widgetsOrder: [] }),
+  );
+  // An English page with a Greek sibling, one without, and a Greek homepage so
+  // Greek counts as a published language at all.
+  await storage.write(
+    scope,
+    "pages/about.json",
+    JSON.stringify({ id: "about", uuid: "u-about", slug: "about", name: "About", widgets: {}, widgetsOrder: [] }),
+  );
+  await storage.write(
+    scope,
+    "pages/careers.json",
+    JSON.stringify({ id: "careers", uuid: "u-careers", slug: "careers", name: "Careers", widgets: {}, widgetsOrder: [] }),
+  );
+  await storage.write(
+    scope,
+    "pages/el/index.json",
+    JSON.stringify({ id: "index", uuid: "u-el-home", slug: "index", name: "Arxiki", widgets: {}, widgetsOrder: [] }),
+  );
+  await storage.write(
+    scope,
+    "pages/el/sxetika.json",
+    JSON.stringify({
+      id: "sxetika",
+      uuid: "u-el-about",
+      translationGroupId: "u-about",
+      slug: "sxetika",
+      name: "Sxetika",
+      widgets: {},
+      widgetsOrder: [],
+    }),
+  );
+
+  await storage.write(
+    scope,
+    "collections/news/story.json",
+    JSON.stringify({
+      id: "story",
+      uuid: "u-story",
+      translationGroupId: "u-story",
+      slug: "story",
+      created: "2026-01-01T00:00:00.000Z",
+      updated: "2026-01-01T00:00:00.000Z",
+      settings: { title: "Story" },
+    }),
+  );
+  await storage.write(
+    scope,
+    "collections/news/el/istoria.json",
+    JSON.stringify({
+      id: "istoria",
+      uuid: "u-el-story",
+      translationGroupId: "u-story",
+      slug: "istoria",
+      created: "2026-01-01T00:00:00.000Z",
+      updated: "2026-01-01T00:00:00.000Z",
+      settings: { title: "Istoria" },
+    }),
   );
 
   await storage.write(scope, "collection-types/news/schema.json", JSON.stringify(NEWS_SCHEMA, null, 2));
@@ -240,5 +304,127 @@ describe("a numbered page preview", () => {
   it("keeps the same trail on a later page", async () => {
     const html = await pageHtml(2);
     assert.match(html, /<nav class="crumbs">.*Blog.*<\/nav>/s);
+  });
+});
+
+// §7c/§7d end to end: what a theme is handed, and what a crawler is handed.
+describe("a page rendered in a translated site", () => {
+  async function pageHtml(pageData) {
+    const req = mockReq({
+      pageData,
+      themeSettings: RAW_THEME_SETTINGS,
+      previewMode: "standalone",
+      pageNumber: 1,
+    });
+    const res = mockRes();
+    await createPreviewToken(req, res);
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    return getToken(res._json.token);
+  }
+
+  const ABOUT_EN = {
+    id: "about",
+    uuid: "u-about",
+    slug: "about",
+    name: "About",
+    language: "en",
+    widgets: {},
+    widgetsOrder: [],
+  };
+
+  it("says which language it is, and which way it reads", async () => {
+    const html = await pageHtml(ABOUT_EN);
+    assert.match(html, /<html lang="en" dir="ltr">/);
+
+    const greek = await pageHtml({ ...ABOUT_EN, id: "sxetika", uuid: "u-el-about", slug: "sxetika", language: "el" });
+    assert.match(greek, /<html lang="el" dir="ltr">/);
+  });
+
+  it("hands the theme one entry per language, the page itself marked", async () => {
+    const html = await pageHtml(ABOUT_EN);
+    assert.match(html, /data-lang="en"[^>]*aria-current="true"/);
+    assert.match(html, /<a href="el\/sxetika.html" data-lang="el" data-fallback="false"/);
+    assert.match(html, />\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac</);
+  });
+
+  it("falls a language with no sibling back to its homepage, and says it is a fallback", async () => {
+    const html = await pageHtml({
+      id: "careers",
+      uuid: "u-careers",
+      slug: "careers",
+      name: "Careers",
+      language: "en",
+      widgets: {},
+      widgetsOrder: [],
+    });
+    assert.match(html, /<a href="el\/index.html" data-lang="el" data-fallback="true"/);
+  });
+
+  it("declares the alternates, itself, and x-default", async () => {
+    const html = await pageHtml(ABOUT_EN);
+    assert.match(html, /<link rel="alternate" hreflang="en" href="https:\/\/example.com\/about.html">/);
+    assert.match(html, /<link rel="alternate" hreflang="el" href="https:\/\/example.com\/el\/sxetika.html">/);
+    assert.match(html, /<link rel="alternate" hreflang="x-default" href="https:\/\/example.com\/about.html">/);
+  });
+
+  it("never declares a fallback as a language's alternate", async () => {
+    const html = await pageHtml({
+      id: "careers",
+      uuid: "u-careers",
+      slug: "careers",
+      name: "Careers",
+      language: "en",
+      widgets: {},
+      widgetsOrder: [],
+    });
+    assert.doesNotMatch(html, /hreflang="el"/);
+    assert.match(html, /hreflang="x-default"/);
+  });
+});
+
+// An item preview renders POSTED settings, but it is still some saved item: its
+// identity is what puts it in a translation group, and without one the switcher
+// falls every language back to a homepage.
+describe("a collection item's own switcher", () => {
+  async function itemHtml(query, slug = "story") {
+    const req = mockReq({ collectionType: "news", slug, settings: { title: "Story" } }, query);
+    const res = mockRes();
+    await createCollectionPreviewToken(req, res);
+    assert.equal(res._status, 200, JSON.stringify(res._json));
+    return getToken(res._json.token);
+  }
+
+  it("links to the item's sibling, not to a homepage", async () => {
+    const html = await itemHtml({});
+    assert.match(html, /<a href="el\/news\/istoria.html" data-lang="el" data-fallback="false"/);
+  });
+
+  it("reads the same group from the other side", async () => {
+    const html = await itemHtml({ language: "el" }, "istoria");
+    assert.match(html, /<a href="news\/story.html" data-lang="en" data-fallback="false"/);
+  });
+
+  it("declares the sibling as an alternate, not just x-default", async () => {
+    const html = await itemHtml({});
+    assert.match(html, /hreflang="el" href="https:\/\/example.com\/el\/news\/istoria.html"/);
+  });
+
+  it("falls back to the homepage for an item that has no sibling", async () => {
+    await storage.write(
+      scope,
+      "collections/news/alone.json",
+      JSON.stringify({
+        id: "alone",
+        uuid: "u-alone",
+        translationGroupId: "u-alone",
+        slug: "alone",
+        created: "2026-01-01T00:00:00.000Z",
+        updated: "2026-01-01T00:00:00.000Z",
+        settings: { title: "Alone" },
+      }),
+    );
+    const html = await itemHtml({}, "alone");
+    assert.match(html, /<a href="el\/index.html" data-lang="el" data-fallback="true"/);
+    assert.doesNotMatch(html, /hreflang="el"/);
   });
 });

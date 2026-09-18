@@ -1258,6 +1258,7 @@ export function prepareCollectionItemForRender(
       outputPathPrefix,
       cleanUrls,
       defaultLanguage,
+      language: menuDeps.language || "",
     });
   }
   sanitizeCollectionItemData(resolved, schema);
@@ -1301,7 +1302,18 @@ export async function loadCollectionItemsByUuid(storage, scope, reader = null, l
           ? await reader.sorted(schema.type, {}, lang)
           : await listCollectionItems(storage, scope, schema.type, {}, lang);
         for (const item of items) {
-          if (item.uuid) map.set(item.uuid, { slugPrefix: schema.slugPrefix, slug: item.slug, language: item.language });
+          if (!item.uuid) continue;
+          // uuid and group id come along because this map is also how a render
+          // finds an item's siblings — matching a translation group needs the
+          // identity, not just where the item ended up.
+          map.set(item.uuid, {
+            uuid: item.uuid,
+            translationGroupId: item.translationGroupId,
+            collectionType: schema.type,
+            slugPrefix: schema.slugPrefix,
+            slug: item.slug,
+            language: item.language,
+          });
         }
       }
     }

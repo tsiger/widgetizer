@@ -151,3 +151,48 @@ describe("resolveMenuItemLinks — the target's language", () => {
     expect(settings.nav.items[0].items[0].canonicalPath).toBe("el/about.html");
   });
 });
+
+// A uuid names one menu anywhere. A bare SLUG is a legacy value that means
+// "this language's menu of that name" — resolving it to the root menu on every
+// language's page renders the default language's labels inside a translated
+// header, which is what `bySlug` being root-only used to do.
+describe("resolveMenuSettings resolves a bare slug within the language being rendered", () => {
+  const rootMenu = { items: [{ id: "a", label: "English nav", link: "about.html" }] };
+  const greekMenu = { items: [{ id: "a", label: "Greek nav", link: "sxetika.html" }] };
+  const menuMaps = {
+    byUuid: new Map([["u-el-main", greekMenu]]),
+    bySlug: new Map([
+      ["", new Map([["main", rootMenu]])],
+      ["el", new Map([["main", greekMenu]])],
+    ]),
+  };
+  const resolve = (value, language) => {
+    const settings = { nav: value };
+    resolveMenuSettings(settings, [{ type: "menu", id: "nav" }], {
+      menuMaps,
+      pagesByUuid,
+      collectionItemsByUuid,
+      outputPathPrefix: "",
+      defaultLanguage: "en",
+      language,
+    });
+    return settings.nav.items[0]?.label;
+  };
+
+  it("finds the language's own menu", () => {
+    expect(resolve("main", "el")).toBe("Greek nav");
+  });
+
+  it("finds the root menu for the default language", () => {
+    expect(resolve("main", "en")).toBe("English nav");
+    expect(resolve("main", "")).toBe("English nav");
+  });
+
+  it("falls back to the root menu when the language has none of that name", () => {
+    expect(resolve("main", "de")).toBe("English nav");
+  });
+
+  it("still lets a uuid name one menu from anywhere", () => {
+    expect(resolve("u-el-main", "en")).toBe("Greek nav");
+  });
+});

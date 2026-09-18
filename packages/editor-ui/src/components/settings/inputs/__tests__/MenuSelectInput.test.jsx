@@ -42,26 +42,22 @@ describe("MenuSelectInput across languages", () => {
     expect(optionLabels()).toEqual(["Select a menu...", "Kyrio"]);
   });
 
-  // The renderer's slug map is built from the root folder alone, so a bare slug
-  // is the default language's menu wherever it is used. The picker has to agree
-  // with that or it shows one menu and renders another.
-  it("resolves a legacy slug the way the renderer does, and says which language that is", async () => {
+  // A bare slug means THIS language's menu of that name, falling back to the
+  // root one when the language has none. The picker has to follow the renderer
+  // exactly, or it shows one menu while the page renders another.
+  it("resolves a legacy slug to this language's own menu", async () => {
+    renderFor("el", "main");
+    await waitFor(() => expect(screen.queryByRole("combobox")).toBeTruthy());
+    expect(screen.getByRole("combobox").value).toBe("u-el-main");
+    expect(optionLabels()).toEqual(["Select a menu...", "Kyrio"]);
+  });
+
+  it("falls a legacy slug back to the root menu when this language has none of that name", async () => {
+    getAllMenus.mockResolvedValue([EN_MAIN, { ...EL_MAIN, id: "kyrio", uuid: "u-el-other" }]);
     renderFor("el", "main");
     await waitFor(() => expect(screen.queryByRole("combobox")).toBeTruthy());
     expect(screen.getByRole("combobox").value).toBe("u-en-main");
     expect(optionLabels()).toEqual(["Select a menu...", "Kyrio", "Main (en)"]);
-  });
-
-  it("lets that legacy value be replaced by this language's menu in one pick", async () => {
-    const onChange = vi.fn();
-    render(
-      <EditingLanguageProvider language="el">
-        <MenuSelectInput id="menu" value="main" onChange={onChange} />
-      </EditingLanguageProvider>,
-    );
-    await waitFor(() => expect(screen.queryByRole("combobox")).toBeTruthy());
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "u-el-main" } });
-    expect(onChange).toHaveBeenCalledWith("u-el-main");
   });
 
   it("keeps showing a value that already points at another language", async () => {

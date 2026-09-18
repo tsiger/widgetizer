@@ -49,6 +49,26 @@ export const SeoTag = {
       if (canonicalUrl) {
         metaTags.push(`<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
       }
+      // hreflang (§7d). A set without a self-reference is invalid and ignored,
+      // so the page lists itself. `x-default` is the one place a fallback entry
+      // is legitimate — an ordinary alternate pointing at a homepage would
+      // claim it is the translation of this page, which it is not. A
+      // single-language project emits none of this, because `translations` is
+      // empty for one language.
+      const translations = Array.isArray(page.translations) ? page.translations : [];
+      if (translations.length > 1) {
+        for (const entry of translations) {
+          if (entry.fallback || !entry.seoUrl) continue;
+          metaTags.push(
+            `<link rel="alternate" hreflang="${escapeHtml(entry.hreflang)}" href="${escapeHtml(entry.seoUrl)}">`,
+          );
+        }
+        const defaultEntry = translations.find((entry) => entry.language === project?.defaultLanguage);
+        if (defaultEntry?.seoUrl) {
+          metaTags.push(`<link rel="alternate" hreflang="x-default" href="${escapeHtml(defaultEntry.seoUrl)}">`);
+        }
+      }
+
       if (pagination) {
         const prevUrl = pageNumber > 1 ? pagedUrl(pageNumber - 1) : "";
         const nextUrl = pageNumber < pagination.total ? pagedUrl(pageNumber + 1) : "";

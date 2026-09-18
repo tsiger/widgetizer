@@ -13,6 +13,7 @@ import { prefixInternalHref, normalize } from "@widgetizer/core/linkPrefixer";
 import { sanitizeHref } from "@widgetizer/core/urlSafety";
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
+import { languageFolder } from "@widgetizer/core/contentAddress";
 
 /**
  * Recursively resolve links in menu items. Each item resolves to an emitted
@@ -169,6 +170,7 @@ export function resolveMenuSettings(
     outputPathPrefix = "",
     cleanUrls = false,
     defaultLanguage = "",
+    language = "",
   } = {},
 ) {
   if (!settings || !Array.isArray(schemaSettings) || !menuMaps) return settings;
@@ -179,7 +181,14 @@ export function resolveMenuSettings(
     try {
       const value = settings[key];
       if (value) {
-        const menuData = menuMaps.byUuid.get(value) || menuMaps.bySlug.get(value);
+        // A uuid names one menu anywhere; a bare SLUG names this language's
+        // menu of that name, and only falls back to the root when the language
+        // has none of its own.
+        const folder = languageFolder({ language, defaultLanguage });
+        const menuData =
+          menuMaps.byUuid.get(value) ||
+          menuMaps.bySlug.get(folder)?.get(value) ||
+          menuMaps.bySlug.get("")?.get(value);
         settings[key] = resolveMenuPageLinks(
           menuData,
           pagesByUuid,

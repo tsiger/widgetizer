@@ -51,17 +51,18 @@ export default function MenuSelectInput({ id, value = "", onChange }) {
     // If the value matches a menu UUID, it's already correct
     if (menus.some((m) => m.uuid === value)) return value;
 
-    // Legacy fallback: value might be a slug-based ID (e.g., "main-menu"). The
-    // renderer builds its slug map from the root folder alone, so a bare slug is
-    // the DEFAULT language's menu wherever it is used. Resolving it to this
-    // language's menu would show one thing and render another; the option below
-    // names the language instead, and picking any menu stores a uuid and ends it.
-    const matchBySlug = menus.find((m) => m.id === value && (m.language || defaultLanguage) === defaultLanguage);
+    // Legacy fallback: value might be a slug-based ID (e.g., "main-menu"). A
+    // bare slug means THIS language's menu of that name, falling back to the
+    // root one when the language has none — the same rule `resolveMenuSettings`
+    // follows, so the picker never shows one menu while the page renders another.
+    const matchBySlug =
+      inLanguage.find((m) => m.id === value) ||
+      menus.find((m) => m.id === value && (m.language || defaultLanguage) === defaultLanguage);
     if (matchBySlug) return matchBySlug.uuid;
 
     // No match — could be a deleted menu, return empty
     return "";
-  }, [value, menus, defaultLanguage]);
+  }, [value, menus, inLanguage, defaultLanguage]);
 
   if (loading) {
     return <div className="form-input text-slate-500">Loading menus...</div>;

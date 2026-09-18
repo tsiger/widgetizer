@@ -33,10 +33,11 @@ import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefix
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
 import { pagedHref, pageOutputPath, resolveLanguage } from "@widgetizer/core/contentAddress";
-import { LANGUAGE_CODE_RE } from "@widgetizer/core/languages";
+import { LANGUAGE_CODE_RE, languageDir } from "@widgetizer/core/languages";
 import { buildAssetUrl } from "@widgetizer/core/assetUrl";
 import { identityForTheme } from "@widgetizer/core/siteIdentity";
 import { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
+import { buildTranslations } from "@widgetizer/core/translations";
 
 /**
  * @typedef {object} RenderDeps
@@ -136,8 +137,54 @@ function paginationContextFor(sharedGlobals) {
     : null;
 }
 
-function pageContextFor(pageData, breadcrumbs, pagination) {
-  return pageData ? { ...pageData, breadcrumbs, ...(pagination ? { pagination } : {}) } : pageData;
+function pageContextFor(pageData, breadcrumbs, pagination, translations = []) {
+  if (!pageData) return pageData;
+  return {
+    ...pageData,
+    breadcrumbs,
+    // The switcher contract (§7c). `dir` is here from day one so adding an RTL
+    // language never changes a shipped theme.
+    translations,
+    dir: languageDir(pageData.language),
+    ...(pagination ? { pagination } : {}),
+  };
+}
+
+/**
+ * The languages this page or item can be switched to, computed once per render
+ * and cached beside the breadcrumbs — header, footer, the layout and every
+ * widget must see the same array.
+ *
+ * @param {RenderDeps} deps
+ * @param {object|null} sharedGlobals
+ * @param {{current: object, kind?: string, slugPrefix?: string}} what
+ */
+async function ensureTranslations(deps, sharedGlobals, what) {
+  if (!sharedGlobals) return [];
+  if (sharedGlobals.translations) return sharedGlobals.translations;
+
+  const { defaultLanguage, languages } = await languageSettings(deps, sharedGlobals);
+  if (!languages.length || !what?.current) {
+    sharedGlobals.translations = [];
+    return sharedGlobals.translations;
+  }
+
+  if (!sharedGlobals.pagesByUuid) sharedGlobals.pagesByUuid = await loadPagesByUuid(deps);
+  const projectData = await getProjectData(deps);
+
+  sharedGlobals.translations = buildTranslations({
+    current: what.current,
+    kind: what.kind || "page",
+    slugPrefix: what.slugPrefix || "",
+    pages: [...sharedGlobals.pagesByUuid.values()],
+    items: sharedGlobals.collectionItemsByUuid ? [...sharedGlobals.collectionItemsByUuid.values()] : [],
+    languages: [defaultLanguage, ...languages],
+    defaultLanguage,
+    cleanUrls: sharedGlobals.cleanUrls === true,
+    outputPathPrefix: sharedGlobals.outputPathPrefix || "",
+    siteUrl: projectData?.siteUrl || "",
+  });
+  return sharedGlobals.translations;
 }
 
 // `{% seo %}` reads the canonical's shape from `project.cleanUrls`, so it must
@@ -567,12 +614,23 @@ function buildPaginationContext(plan, { cleanUrls = false, outputPathPrefix = ""
 
 /**
  * Load all menus for a project and return maps for UUID and slug-based lookup.
+ *
+ * A uuid is globally unique, so `byUuid` spans every language. A bare SLUG is
+ * not: it means "this language's menu of that name", so the slug lookup is kept
+ * per language and the caller says which one it is rendering.
+ *
  * @param {RenderDeps} deps
- * @returns {Promise<{byUuid: Map, bySlug: Map}>} Maps for UUID and slug-based lookup
+ * @returns {Promise<{byUuid: Map, bySlug: Map<string, Map>}>}
  */
 async function loadMenuMaps(deps) {
   const byUuid = new Map();
   const bySlug = new Map();
+  // "" is the default language, which owns the root folder.
+  const slugsFor = (language) => {
+    if (!bySlug.has(language)) bySlug.set(language, new Map());
+    return bySlug.get(language);
+  };
+  slugsFor("");
 
   try {
     const menusDir = path.join(deps.projectDir, "menus");
@@ -599,14 +657,15 @@ async function loadMenuMaps(deps) {
           byUuid.set(menu.uuid, menu);
         }
         const slugId = file.replace(".json", "");
-        bySlug.set(slugId, menu);
+        slugsFor("").set(slugId, menu);
       } catch {
         // Skip unreadable menu files
       }
     }
 
-    // Another language's menus, by uuid only: uuids are globally unique, while a
-    // bare slug means the menu of the language being rendered.
+    // Another language's menus: by uuid globally, and by slug under their own
+    // language, so a bare slug resolves to the menu of the language being
+    // rendered rather than always to the root one.
     for (const entry of files) {
       if (!LANGUAGE_CODE_RE.test(entry)) continue;
       let languageFiles;
@@ -622,6 +681,7 @@ async function loadMenuMaps(deps) {
           if (!menuPath) continue;
           const menu = JSON.parse(await fs.readFile(menuPath, "utf8"));
           if (menu.uuid) byUuid.set(menu.uuid, menu);
+          slugsFor(entry).set(file.replace(".json", ""), menu);
         } catch {
           // Skip unreadable menu files
         }
@@ -1049,6 +1109,8 @@ async function renderWidget(
       outputPathPrefix,
       cleanUrls,
       defaultLanguage,
+      // A menu setting holding a bare slug means THIS language's menu.
+      language: sharedGlobals?.currentPageData?.language || "",
     };
     resolveMenuSettings(enhancedSettings, schema.settings, menuDeps);
     for (const block of Object.values(enhancedBlocks)) {
@@ -1111,7 +1173,14 @@ async function renderWidget(
       ...baseContext,
       ...(sharedGlobals ? { project: projectContextFor(getProjectData(deps), sharedGlobals) } : {}),
       ...(currentPageData
-        ? { page: pageContextFor(currentPageData, breadcrumbs, paginationContextFor(sharedGlobals)) }
+        ? {
+            page: pageContextFor(
+              currentPageData,
+              breadcrumbs,
+              paginationContextFor(sharedGlobals),
+              await ensureTranslations(deps, sharedGlobals, { current: currentPageData }),
+            ),
+          }
         : {}),
       widget: widgetContext,
       ...(paginationPlan ? { pagination: buildPaginationContext(paginationPlan, { cleanUrls, outputPathPrefix }) } : {}),
@@ -1221,7 +1290,12 @@ async function renderPageLayout(
       header: contentSections.headerContent || "",
       main_content: contentSections.mainContent || "",
       footer: contentSections.footerContent || "",
-      page: pageContextFor(pageData, breadcrumbs, pagination),
+      page: pageContextFor(
+        pageData,
+        breadcrumbs,
+        pagination,
+        await ensureTranslations(deps, sharedGlobals, { current: pageData }),
+      ),
       project: projectContextFor(projectData, sharedGlobals),
       page_title: buildPageTitle(pageData, projectData, pagination?.current),
       body_class: bodyClasses,
@@ -1308,6 +1382,7 @@ async function renderCollectionItemPage(
           collectionItemsByUuid: sharedGlobals.collectionItemsByUuid,
           cleanUrls: sharedGlobals.cleanUrls === true,
           defaultLanguage: itemDefaultLanguage,
+          language: item?.language || "",
         }
       : null;
 
@@ -1350,6 +1425,14 @@ async function renderCollectionItemPage(
   // Page-shaped object drives the layout title/SEO/body class, and is the `page`
   // the header, footer and item template all see.
   const itemPageData = buildItemPageData(schema, resolvedItem, siteUrl, sharedGlobals.cleanUrls === true);
+  // An item page gets the same switcher contract a page does (§9a), keyed by the
+  // item's own translation group rather than the page's.
+  itemPageData.translations = await ensureTranslations(deps, sharedGlobals, {
+    current: item,
+    kind: "item",
+    slugPrefix: schema.slugPrefix,
+  });
+  itemPageData.dir = languageDir(itemPageData.language);
   sharedGlobals.currentPageData = itemPageData;
 
   // Render header/footer with the item's globals so their enqueued assets are

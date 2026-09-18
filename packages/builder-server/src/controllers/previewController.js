@@ -18,6 +18,7 @@ import {
   listCollectionSchemas,
   loadCollectionTemplate,
   loadCollectionItemsByUuid,
+  readCollectionItem,
 } from "../services/collectionService.js";
 import { listPagesFromDir, readGlobalWidgetFromDir, readThemeDataFromDir } from "../utils/projectContentFs.js";
 import { globalKey, pageOutputPath, itemOutputPath } from "@widgetizer/core/contentAddress";
@@ -418,9 +419,15 @@ export async function createCollectionPreviewToken(req, res) {
     // passes the saved item's settings).
     const safeSlug = (slug && String(slug)) || "preview";
     const now = new Date().toISOString();
+    // The posted settings are what gets rendered, but the identity comes from
+    // the saved item: without it the item is in no translation group, and the
+    // switcher falls every language back to a homepage. An item that has never
+    // been saved simply has none.
+    const saved = await readCollectionItem(storage, scope, collectionType, safeSlug, lang).catch(() => null);
     const previewItem = {
       id: safeSlug,
-      uuid: "preview",
+      uuid: saved?.uuid || "preview",
+      ...(saved?.translationGroupId ? { translationGroupId: saved.translationGroupId } : {}),
       slug: safeSlug,
       // What the item page is rendered AS: its own links, its media metadata and
       // its breadcrumbs are all resolved from it.
