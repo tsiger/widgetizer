@@ -29,6 +29,8 @@ import {
 
 import { schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
 import { itemHref } from "@widgetizer/core/internalHref";
+import fs from "fs-extra";
+import path from "path";
 import { getProjectDir, CORE_WIDGETS_DIR, CORE_SNIPPETS_DIR } from "../config.js";
 import { readMediaFile } from "./mediaService.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
@@ -38,6 +40,7 @@ import { buildRuntimeSiteIcons } from "../utils/siteIconHelpers.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { projectLanguages, projectLanguageContexts } from "../utils/contentLanguage.js";
 import { sanitizeWidgetData } from "./sanitizationService.js";
+import { loadSiteStrings, readerFor } from "./siteStringsService.js";
 import {
   listCollectionSchemas,
   createCollectionReader,
@@ -209,6 +212,18 @@ async function buildRenderDeps(projectId, collectionDeps = null) {
     coreSnippetsDir: CORE_SNIPPETS_DIR,
     getProjectData: () => projectRepo.getProjectById(projectId) || null,
     getMediaFiles: () => readMediaFile(projectId),
+    // The theme's visitor-facing strings, every language the project publishes.
+    // Read through the caller's adapter when there is one, so the words come
+    // from the same project directory its other content does.
+    loadSiteStrings: () => {
+      const project = projectRepo.getProjectById(projectId);
+      const { defaultLanguage, languages } = projectLanguages(project);
+      const read =
+        collectionDeps?.storage && collectionDeps?.scope
+          ? readerFor(collectionDeps.storage, collectionDeps.scope)
+          : (relPath) => fs.readFile(path.join(getProjectDir(folderName), relPath), "utf-8").catch(() => null);
+      return loadSiteStrings(read, [defaultLanguage, ...languages]);
+    },
     listPages: () =>
       listPagesFromDir(getProjectDir(folderName), { defaultLanguage: projectRepo.getProjectById(projectId)?.defaultLanguage }),
     sanitizeWidgetData,

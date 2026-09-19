@@ -68,7 +68,12 @@ export default function SettingsRenderer({
     );
   }
 
-  const currentValue = value !== undefined ? value : setting.default;
+  // A setting whose default is one of the theme's own words carries it as
+  // `resolvedDefault` — shown here, never stored, so it stays a default rather
+  // than becoming the owner's content in whichever language they happened to
+  // add the widget in.
+  const effectiveDefault = setting.default !== undefined ? setting.default : setting.resolvedDefault;
+  const currentValue = value !== undefined ? value : effectiveDefault;
 
   const inputProps = {
     id,
@@ -144,7 +149,7 @@ export default function SettingsRenderer({
             {...inputProps}
             options={setting.options} // Pass explicit options if any
             allow_patterns={setting.allow_patterns} // Pass patterns if any
-            defaultValue={setting.default} // Pass default to compare
+            defaultValue={effectiveDefault} // Pass default to compare
           />
         );
       default:

@@ -80,8 +80,14 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
   const schemaKeySet = new Set(uniqueSchemaKeys);
   const en = JSON.parse(readFileSync(enPath, "utf-8"));
   const allEnKeys = flattenKeys(en);
-  const ownedEnKeys = allEnKeys.filter((k) => !ignoredExtraKeys.has(k));
+  // `site.*` is what a VISITOR reads on the published page. No schema points at
+  // it — a template asks for it by key — so it is counted on its own rather
+  // than reported as orphaned editor labels.
+  const isSiteKey = (k) => k === "site" || k.startsWith("site.");
+  const ownedEnKeys = allEnKeys.filter((k) => !ignoredExtraKeys.has(k) && !isSiteKey(k));
   const ownedEnKeySet = new Set(ownedEnKeys);
+  const siteEnKeys = allEnKeys.filter(isSiteKey);
+  const siteEnKeySet = new Set(siteEnKeys);
 
   let hasErrors = false;
 
@@ -109,6 +115,10 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
     );
   }
 
+  if (siteEnKeys.length > 0) {
+    console.log(`  ✓ ${siteEnKeys.length} site string(s) for visitors`);
+  }
+
   const extraInEn = ownedEnKeys.filter((k) => !schemaKeySet.has(k));
   if (extraInEn.length > 0) {
     console.warn(
@@ -128,27 +138,33 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
   for (const file of localeFiles) {
     const lang = basename(file, ".json");
     const data = JSON.parse(readFileSync(join(localesDir, file), "utf-8"));
-    const langKeys = new Set(flattenKeys(data).filter((k) => !ignoredExtraKeys.has(k)));
+    const allLangKeys = flattenKeys(data).filter((k) => !ignoredExtraKeys.has(k));
+    const langKeys = new Set(allLangKeys.filter((k) => !isSiteKey(k)));
+    const langSiteKeys = new Set(allLangKeys.filter(isSiteKey));
 
-    const missing = [...ownedEnKeySet].filter((k) => !langKeys.has(k));
+    // Editor labels are only expected in another language when that file
+    // carries any; a translation of the visitor strings alone is the normal
+    // shape, because the editor stays English.
+    const missing = langKeys.size > 0 ? [...ownedEnKeySet].filter((k) => !langKeys.has(k)) : [];
     const extra = [...langKeys].filter((k) => !ownedEnKeySet.has(k));
+    const missingSite = [...siteEnKeySet].filter((k) => !langSiteKeys.has(k));
+    const extraSite = [...langSiteKeys].filter((k) => !siteEnKeySet.has(k));
 
-    if (missing.length > 0) {
-      console.warn(`  ⚠ [${lang}] Missing ${missing.length} key(s):`);
-      for (const k of missing) {
-        console.warn(`    - ${k}`);
+    for (const [what, keys, sign] of [
+      ["Missing", missing, "-"],
+      ["Extra", extra, "+"],
+      ["Missing site string", missingSite, "-"],
+      ["Extra site string", extraSite, "+"],
+    ]) {
+      if (keys.length === 0) continue;
+      console.warn(`  ⚠ [${lang}] ${what} ${keys.length} key(s):`);
+      for (const k of keys) {
+        console.warn(`    ${sign} ${k}`);
       }
     }
 
-    if (extra.length > 0) {
-      console.warn(`  ⚠ [${lang}] Extra ${extra.length} key(s):`);
-      for (const k of extra) {
-        console.warn(`    + ${k}`);
-      }
-    }
-
-    if (missing.length === 0 && extra.length === 0) {
-      console.log(`  ✓ [${lang}] OK — all ${ownedEnKeySet.size} keys present`);
+    if (missing.length === 0 && extra.length === 0 && missingSite.length === 0 && extraSite.length === 0) {
+      console.log(`  ✓ [${lang}] OK — ${langSiteKeys.size} site string(s), ${langKeys.size} editor key(s)`);
     }
   }
 

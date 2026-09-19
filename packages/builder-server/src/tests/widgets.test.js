@@ -34,9 +34,11 @@ const PROJECT_ID = "widgets-test-project-uuid";
 const PROJECT_FOLDER = "widgets-test-project";
 const projectDir = path.join(TEST_DATA_DIR, "projects", PROJECT_FOLDER);
 
-function mockReq() {
+function mockReq(query = {}) {
   return {
+    query,
     scope: { actor: { id: "default", kind: "local" }, projectId: PROJECT_ID, folderName: PROJECT_FOLDER },
+    activeProject: { id: PROJECT_ID, defaultLanguage: "en", languages: ["el"] },
     adapters: { storage },
   };
 }
@@ -168,5 +170,64 @@ describe("getProjectWidgets", () => {
       (w) => w.includes("Failed to parse schema") && w.includes("broken-widget"),
     );
     assert.ok(brokenWarning, "a real broken schema.json must still warn");
+  });
+});
+
+// A setting whose default is one of the theme's own words has to arrive filled
+// in, or the editor shows an empty field while the page shows the text.
+describe("getProjectWidgets — defaults that come from the theme's words", () => {
+  before(async () => {
+    await fs.ensureDir(path.join(projectDir, "widgets", "talky"));
+    await fs.writeJson(path.join(projectDir, "widgets", "talky", "schema.json"), {
+      type: "talky",
+      settings: [{ type: "text", id: "empty_text", defaultKey: "site.talky.empty" }],
+      blocks: [{ type: "row", settings: [{ type: "text", id: "label", defaultKey: "site.common.next" }] }],
+    });
+    await fs.ensureDir(path.join(projectDir, "locales"));
+    await fs.writeJson(path.join(projectDir, "locales", "en.json"), {
+      site: { talky: { empty: "Nothing here" }, common: { next: "Next" } },
+    });
+    await fs.writeJson(path.join(projectDir, "locales", "el.json"), {
+      site: { talky: { empty: "Τίποτα εδώ" }, common: { next: "Επόμενο" } },
+    });
+  });
+
+  after(async () => {
+    await fs.remove(path.join(projectDir, "widgets", "talky"));
+    await fs.remove(path.join(projectDir, "locales"));
+  });
+
+  const talky = async (query) => {
+    const res = mockRes();
+    await getProjectWidgets(mockReq(query), res);
+    assert.equal(res._status, 200);
+    return res._json.find((schema) => schema.type === "talky");
+  };
+
+  it("fills the default in the language being edited, blocks included", async () => {
+    const greek = await talky({ language: "el" });
+    assert.equal(greek.settings[0].resolvedDefault, "Τίποτα εδώ");
+    assert.equal(greek.blocks[0].settings[0].resolvedDefault, "Επόμενο");
+  });
+
+  it("falls back to the default language when none is asked for", async () => {
+    const plain = await talky({});
+    assert.equal(plain.settings[0].resolvedDefault, "Nothing here");
+  });
+
+  // A `default` is copied into a new widget's settings and saved; this must not
+  // be, or one language's wording becomes content and follows a page into its
+  // translations.
+  it("never sends it as a `default`, which the editor would store as content", async () => {
+    const greek = await talky({ language: "el" });
+    assert.equal(greek.settings[0].default, undefined);
+    assert.equal(greek.blocks[0].settings[0].default, undefined);
+  });
+
+  it("leaves a schema that names none of them exactly as it is", async () => {
+    const res = mockRes();
+    await getProjectWidgets(mockReq({ language: "el" }), res);
+    const hero = res._json.find((schema) => schema.type === "hero");
+    assert.deepEqual(hero.settings, []);
   });
 });

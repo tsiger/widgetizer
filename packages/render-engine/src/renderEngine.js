@@ -25,6 +25,8 @@ import {
   registerDateFilter,
   registerCollectionFilter,
   registerPageUrlFilters,
+  registerSiteStringFilter,
+  resolveSiteString,
 } from "@widgetizer/core";
 import { escapeHtml } from "@widgetizer/core/escapeHtml";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
@@ -113,6 +115,7 @@ function configureLiquidEngine(engine) {
   registerDateFilter(engine);
   registerCollectionFilter(engine);
   registerPageUrlFilters(engine);
+  registerSiteStringFilter(engine);
 }
 
 /**
@@ -382,6 +385,37 @@ async function loadPagesByUuid(deps) {
  * @param {RenderDeps} deps
  * @param {object|null} sharedGlobals
  */
+/**
+ * The words the theme puts on the page, every language at once — the same shape
+ * `mediaFiles` uses, and for the same reason: whoever loads them does not know
+ * which page is coming, while the `t` filter reading them does. Cached on the
+ * render's globals beside the menu maps and the breadcrumbs.
+ */
+async function ensureSiteStrings(deps, globals) {
+  if (!globals) return null;
+  if (globals.siteStrings === undefined) {
+    globals.siteStrings = typeof deps.loadSiteStrings === "function" ? await deps.loadSiteStrings() : null;
+  }
+  if (globals.defaultLanguage === undefined) {
+    globals.defaultLanguage = (await languageSettings(deps, globals)).defaultLanguage;
+  }
+  return globals.siteStrings;
+}
+
+/**
+ * A setting's starting value. `defaultKey` names a site string, so the default
+ * arrives in the language of the page rather than in the theme author's — which
+ * is what lets a site in one language read correctly with nothing filled in,
+ * while a value the owner types still wins over it.
+ */
+function settingDefault(setting, strings, language, defaultLanguage) {
+  if (typeof setting?.defaultKey === "string" && setting.defaultKey) {
+    const found = resolveSiteString(strings, setting.defaultKey, language, defaultLanguage);
+    if (found !== undefined) return found;
+  }
+  return setting?.default;
+}
+
 async function languageSettings(deps, sharedGlobals) {
   if (sharedGlobals?.languageSettings) return sharedGlobals.languageSettings;
   const projectData = await getProjectData(deps);
@@ -862,6 +896,8 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
     globals.iconPrefix = projectIcons.prefix || "";
   }
 
+  await ensureSiteStrings(deps, globals);
+
   // Expose depth-aware path globals (defaults keep pages at the export root).
   // `outputPathPrefix` prefixes relative asset/link URLs; `currentCanonicalPath`
   // is the un-prefixed path of the page being rendered, used for menu
@@ -990,10 +1026,18 @@ async function renderWidget(
     let templateForRender = template;
 
     // Create settings with defaults (using the extracted schema)
+    const namesSiteString = (list) => Array.isArray(list) && list.some((setting) => setting?.defaultKey);
+    const wantsSiteStrings =
+      namesSiteString(schema.settings) || (Array.isArray(schema.blocks) && schema.blocks.some((b) => namesSiteString(b?.settings)));
+    // Only loaded when a schema actually asks, so a theme using none pays nothing.
+    const siteStrings = wantsSiteStrings ? await ensureSiteStrings(deps, sharedGlobals) : null;
+    const settingLanguage = sharedGlobals?.currentPageData?.language;
+    const settingDefaultLanguage = sharedGlobals?.defaultLanguage;
+
     const enhancedSettings = {};
     if (Array.isArray(schema.settings)) {
       schema.settings.forEach((setting) => {
-        enhancedSettings[setting.id] = setting.default;
+        enhancedSettings[setting.id] = settingDefault(setting, siteStrings, settingLanguage, settingDefaultLanguage);
       });
     }
     Object.assign(enhancedSettings, settings); // Override with provided settings
@@ -1013,7 +1057,7 @@ async function renderWidget(
         const currentBlockSchema = blockInstance && blockInstance.type ? blockSchemas[blockInstance.type] || [] : [];
         if (Array.isArray(currentBlockSchema)) {
           currentBlockSchema.forEach((setting) => {
-            blockDefaults[setting.id] = setting.default;
+            blockDefaults[setting.id] = settingDefault(setting, siteStrings, settingLanguage, settingDefaultLanguage);
           });
         }
         enhancedBlocks[blockId] = {

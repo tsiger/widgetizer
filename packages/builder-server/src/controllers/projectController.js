@@ -13,6 +13,9 @@ import { randomUUID } from "crypto";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import * as projectRepo from "../db/repositories/projectRepository.js";
+import { resolveSiteString } from "@widgetizer/core";
+import { loadSiteStrings, readerFor } from "../services/siteStringsService.js";
+import { requestLanguage } from "../utils/contentLanguage.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { isReservedItemSlug } from "@widgetizer/core/contentAddress";
@@ -827,6 +830,46 @@ export async function duplicateProject(req, res) {
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<void>}
  */
+/**
+ * Fill in every `defaultKey` with the theme's word for it, in the language the
+ * editor is showing. Nothing is stored: this is a default like any other, and
+ * an owner's own value still overrides it.
+ */
+async function withResolvedDefaults(schemas, req, res) {
+  const names = (list) => Array.isArray(list) && list.some((setting) => setting?.defaultKey);
+  const wanted = schemas.some((s) => names(s?.settings) || (Array.isArray(s?.blocks) && s.blocks.some((b) => names(b?.settings))));
+  if (!wanted) return schemas;
+
+  const lang = requestLanguage(req, res);
+  if (!lang) return null;
+
+  const { defaultLanguage, languages } = lang;
+  // Through the same adapter the schemas above came from, so both describe the
+  // same project whatever root that adapter is rooted at.
+  const strings = await loadSiteStrings(readerFor(req.adapters.storage, req.scope), [defaultLanguage, ...languages]);
+
+  // As `resolvedDefault`, NOT as `default`: a `default` is copied into a new
+  // widget's settings and saved, which would freeze one language's wording into
+  // content and follow a page into its translations. The editor shows this and
+  // stores nothing until the owner types.
+  const fill = (list) =>
+    !Array.isArray(list)
+      ? list
+      : list.map((setting) => {
+          if (!setting?.defaultKey) return setting;
+          const found = resolveSiteString(strings, setting.defaultKey, lang.language, defaultLanguage);
+          return found === undefined ? setting : { ...setting, resolvedDefault: found };
+        });
+
+  return schemas.map((schema) => ({
+    ...schema,
+    settings: fill(schema.settings),
+    ...(Array.isArray(schema.blocks)
+      ? { blocks: schema.blocks.map((block) => ({ ...block, settings: fill(block?.settings) })) }
+      : {}),
+  }));
+}
+
 export async function getProjectWidgets(req, res) {
   try {
     const { scope } = req;
@@ -919,7 +962,14 @@ export async function getProjectWidgets(req, res) {
     // Filter out nulls (files without schemas or errors)
     const validSchemas = allSchemas.filter((schema) => schema !== null);
 
-    res.json(validSchemas);
+    // A `defaultKey` names one of the theme's own words, which only the render
+    // knows how to read. The editor shows settings, not pages, so the value is
+    // resolved here in the language being edited — otherwise a field whose
+    // default comes from the theme looks empty while the canvas shows its text.
+    const resolved = await withResolvedDefaults(validSchemas, req, res);
+    // `requestLanguage` has already answered a bad language code.
+    if (resolved === null) return;
+    res.json(resolved);
   } catch (error) {
     // Broader catch for unexpected errors
     res.status(500).json({ error: `Failed to get project widgets: ${error.message}` });

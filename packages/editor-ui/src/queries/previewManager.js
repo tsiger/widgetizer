@@ -479,7 +479,7 @@ export async function saveGlobalWidget(type, widget, language) {
  * @returns {Promise<Array<Object>>} Array of widget schema definitions
  * @throws {Error} If no active project or request fails
  */
-export async function getProjectWidgets() {
+export async function getProjectWidgets(language) {
   const activeProject = useProjectStore.getState().activeProject;
 
   if (!activeProject) {
@@ -487,7 +487,10 @@ export async function getProjectWidgets() {
   }
 
   try {
-    return await editorFetchJson("/widgets", {}, {
+    // A setting's default can be one of the theme's own words, which differs per
+    // language, so the schemas are fetched for the language being edited.
+    const query = language ? `?language=${encodeURIComponent(language)}` : "";
+    return await editorFetchJson(`/widgets${query}`, {}, {
       fallbackMessage: "Failed to get project widgets",
     });
   } catch (error) {

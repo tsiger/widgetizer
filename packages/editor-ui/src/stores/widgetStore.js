@@ -126,23 +126,33 @@ const useWidgetStore = create((set, get) => ({
   hoveredWidgetId: null,
   hoveredBlockId: null,
   loadedProjectId: null,
+  loadedLanguage: "",
+  activeLoadId: 0,
   loading: false,
   error: null,
   widgetClipboard: null,
 
   // Actions
-  loadSchemas: async () => {
+  // Keyed by language as well as project: a schema's defaults can differ
+  // between them, and adding or removing a language keeps the same project id.
+  // A load that is overtaken writes nothing back — neither its schemas nor its
+  // failure — or a slow request for the language just left would replace the
+  // one the editor is now showing.
+  loadSchemas: async (language = "") => {
     const projectId = getActiveProjectId();
-    set({ loading: true, error: null, loadedProjectId: projectId, schemas: {} });
+    const loadId = get().activeLoadId + 1;
+    set({ activeLoadId: loadId, loading: true, error: null, loadedProjectId: projectId, loadedLanguage: language, schemas: {} });
     try {
-      const schemas = await getProjectWidgets();
+      const schemas = await getProjectWidgets(language);
+      if (get().activeLoadId !== loadId) return;
       const schemasMap = {};
       schemas.forEach((schema) => {
         schemasMap[schema.type] = schema;
       });
-      set({ schemas: schemasMap, loading: false, loadedProjectId: projectId });
+      set({ schemas: schemasMap, loading: false, loadedProjectId: projectId, loadedLanguage: language });
     } catch (err) {
-      set({ schemas: {}, error: err.message, loading: false, loadedProjectId: projectId });
+      if (get().activeLoadId !== loadId) return;
+      set({ schemas: {}, error: err.message, loading: false, loadedProjectId: projectId, loadedLanguage: language });
       console.error("Failed to load widget schemas:", err);
     }
   },

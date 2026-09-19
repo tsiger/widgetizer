@@ -3,6 +3,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 vi.mock("../../lib/activeProjectId", () => ({
   getActiveProjectId: vi.fn(() => "project-a"),
 }));
+const getProjectWidgets = vi.fn();
+vi.mock("../../queries/previewManager", () => ({
+  getProjectWidgets: (...args) => getProjectWidgets(...args),
+}));
 
 const { default: useWidgetStore } = await import("../widgetStore");
 const { default: usePageStore } = await import("../pageStore");
@@ -702,5 +706,51 @@ describe("updateBlockSettings", () => {
     const before = JSON.stringify(usePageStore.getState().page);
     useWidgetStore.getState().updateBlockSettings("w-1", "nope", "label", "x");
     expect(JSON.stringify(usePageStore.getState().page)).toBe(before);
+  });
+});
+
+// The editor can leave a language while its schemas are still in flight, and
+// those schemas carry defaults that differ per language.
+describe("loadSchemas — a load that gets overtaken", () => {
+  beforeEach(() => {
+    getProjectWidgets.mockReset();
+    useWidgetStore.setState({ schemas: {}, activeLoadId: 0, loadedLanguage: "", error: null });
+  });
+
+  const schemaFor = (language) => [{ type: "talky", settings: [{ id: "t", resolvedDefault: language }] }];
+
+  it("writes nothing back once a newer language has been asked for", async () => {
+    let releaseEnglish;
+    getProjectWidgets
+      .mockImplementationOnce(() => new Promise((resolve) => { releaseEnglish = () => resolve(schemaFor("en")); }))
+      .mockImplementationOnce(async () => schemaFor("el"));
+
+    const english = useWidgetStore.getState().loadSchemas("");
+    await useWidgetStore.getState().loadSchemas("el");
+    expect(useWidgetStore.getState().schemas.talky.settings[0].resolvedDefault).toBe("el");
+
+    releaseEnglish();
+    await english;
+
+    expect(useWidgetStore.getState().schemas.talky.settings[0].resolvedDefault).toBe("el");
+    expect(useWidgetStore.getState().loadedLanguage).toBe("el");
+  });
+
+  it("does not let a late failure clear the schemas in front of the user", async () => {
+    let failEnglish;
+    getProjectWidgets
+      .mockImplementationOnce(() => new Promise((_resolve, reject) => { failEnglish = () => reject(new Error("down")); }))
+      .mockImplementationOnce(async () => schemaFor("el"));
+
+    const english = useWidgetStore.getState().loadSchemas("");
+    await useWidgetStore.getState().loadSchemas("el");
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    failEnglish();
+    await english;
+    errorSpy.mockRestore();
+
+    expect(useWidgetStore.getState().schemas.talky).toBeTruthy();
+    expect(useWidgetStore.getState().error).toBeNull();
   });
 });

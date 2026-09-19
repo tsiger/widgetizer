@@ -56,7 +56,7 @@ export default function PageEditor() {
     // language and every save sends the page back.
     usePageStore.getState().loadPage(pageId, searchParams.get("language") || undefined);
     if (activeProject?.id) {
-      useWidgetStore.getState().loadSchemas();
+      useWidgetStore.getState().loadSchemas(searchParams.get("language") || "");
     }
   }, [searchParams, activeProject?.id]);
 
