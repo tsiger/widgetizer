@@ -133,7 +133,9 @@ A follow-on change lifted the last inconsistency: the editor withheld the richte
 
 ## R2–R8 — Review queue
 
-These priorities are initial triage, not completed investigations. None of these items has been reviewed in this pass. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
+These priorities are initial triage, not completed investigations. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
+
+**Suggested next: R7.** It is High priority and it is the item that gates calling multilingual export release-ready, which is where the project sits — multilang is at step 25 of 25 with only documentation left. It is also partly a testing question, so it pairs with resuming the hands-on two-language testing that has been paused while R1, R2, R3 and R5 were worked through. R4, R6 and R8 gate releases that are not imminent.
 
 | Item | OSS status | Review priority | When to check | Hosted follow-up |
 | --- | --- | --- | --- | --- |
