@@ -13,9 +13,13 @@ import { formatDateOnly, DEFAULT_DATE_FORMAT } from "../utils/dateFormat.js";
 
 export function registerDateFilter(engine) {
   engine.registerFilter("format_date", function (value, overrideFormat) {
-    const globals = this.context.get(["globals"]);
+    // Two sources, as `page_url` has: `{% render %}` isolates the environment
+    // scope, so inside a snippet `context.get(["globals"])` is undefined.
+    const globals = this.context.get(["globals"]) || this.context.globals;
     const format =
       (typeof overrideFormat === "string" && overrideFormat) || globals?.dateFormat || DEFAULT_DATE_FORMAT;
-    return formatDateOnly(value, format);
+    // A date on a Greek page reads in Greek. The format itself is the site's
+    // choice and does not change with it.
+    return formatDateOnly(value, format, globals?.currentPageData?.language || globals?.defaultLanguage);
   });
 }

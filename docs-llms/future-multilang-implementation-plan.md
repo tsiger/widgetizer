@@ -424,12 +424,19 @@ The server has been language-aware since step 7 (`GET /menus` merges every folde
 
 **Done when:** `archLanguageSwitcher.test.js` drives the real Arch header through an export and pins the §7c contract: every published language by its native name at that page's address, the active one marked, a fallback to a language's homepage, nothing at all on a single-language site, and the labels reading whatever the settings say.
 
-### Step 23. Localized month names (§Localized month names)
+### Step 23. Localized month names (§Localized month names) — *done 2026-09-19*
 
 - `packages/core/src/utils/dateFormat.js` — replace `MONTHS_SHORT` / `MONTHS_FULL` lookups with `Intl.DateTimeFormat(locale, { month, timeZone: "UTC" })`, keeping the `YYYY-MM-DD` split so no local `Date` is constructed. Format tokens and the app-level `dateFormat` setting are unchanged — only the month's language moves.
 - `packages/core/src/filters/dateFilter.js` — pass `page.language` as the locale.
 
 **Done when:** the date-format tests run for `en` and `el` and the numeric parts of every format are byte-identical to today.
+
+**As built.** `formatDateOnly(value, format, locale)` takes a third argument, defaulting to `en`. Only the MONTH comes from `Intl`; the day, year and separators are still assembled by hand, so which format a site uses never changes with its language — that is the site owner's choice, and `MM/DD/YYYY` stays `03/04/2026` in every language.
+
+- **Greek needs the genitive in a date** — `4 Μαρτίου`, not the standalone `Μάρτιος`. Asking `Intl` for `{ month }` already gives the in-a-date form, so nothing extra was needed; the test guards it in case a future change reaches for a standalone API.
+- **The timezone-safe contract survives.** The value is still split as a string, and the formatter is given a UTC date at day 15 — far from any month boundary, so no calendar or rounding can land it on a neighbour.
+- **The editor stays English**, because its caller passes no locale. The filter passes `page.language`.
+- `MMMM D, YYYY` in Greek reads `Μαρτίου 4, 2026`, which is an English order with a Greek month. That is correct by the design's rule: a Greek site picks `D MMMM YYYY`, and localizing must not silently re-order a format the owner chose.
 
 ### Step 24. Upgrade path for existing projects
 

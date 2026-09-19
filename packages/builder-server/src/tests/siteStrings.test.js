@@ -129,6 +129,54 @@ describe("a setting whose default is one of those words", () => {
   });
 });
 
+// A date is not a theme string — it comes from core — but it is read on the
+// page in the same language, and the news grid puts one under every item.
+describe("a date on the page", () => {
+  before(async () => {
+    const item = (slug, title) => ({
+      id: slug,
+      uuid: `n-${slug}`,
+      slug,
+      schemaVersion: 1,
+      created: "2026-03-04T00:00:00.000Z",
+      updated: "2026-03-04T00:00:00.000Z",
+      settings: { title, date: "2026-03-04" },
+    });
+    const dir = getProjectDir(PROJECT_FOLDER);
+    await fs.outputFile(
+      path.join(dir, "collection-types", "news", "schema.json"),
+      JSON.stringify({
+        type: "news",
+        schemaVersion: 1,
+        displayName: "News",
+        displayNamePlural: "News",
+        hasItemPages: false,
+        slugPrefix: "news",
+        defaultSort: "date_desc",
+        settings: [
+          { type: "text", id: "title", label: "Title", required: true, usedAsTitle: true },
+          { type: "date", id: "date", label: "Date", usedAsDate: true },
+        ],
+      }),
+    );
+    await fs.outputFile(path.join(dir, "collections", "news", "story.json"), JSON.stringify(item("story", "Story")));
+    await fs.outputFile(path.join(dir, "collections", "news", "el", "istoria.json"), JSON.stringify(item("istoria", "Istoria")));
+  });
+
+  after(async () => {
+    const dir = getProjectDir(PROJECT_FOLDER);
+    await fs.remove(path.join(dir, "collections"));
+    await fs.remove(path.join(dir, "collection-types"));
+  });
+
+  it("reads its month in the language of the page it is on", async () => {
+    const dir = await exportSite();
+
+    assert.ok((await read(dir, "index.html")).includes("March 4, 2026"));
+    assert.ok((await read(dir, "el", "index.html")).includes("Μαρτίου 4, 2026"));
+  });
+});
+
 // What a visitor reads and what the person building the site reads are two
 // different messages, and only one of them belongs on a published page.
 describe("an empty widget", () => {
