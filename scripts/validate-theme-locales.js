@@ -12,7 +12,7 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { join, basename } from "node:path";
+import { join, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   flattenKeys,
@@ -64,7 +64,58 @@ function collectSchemaKeysFromDir(dir) {
   return schemaKeys;
 }
 
-function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new Set()) {
+/**
+ * Every `site.*` key a theme actually asks for: `| t` in its templates, and
+ * `defaultKey` in its schemas. A key nobody wrote renders its own last segment
+ * — `site.nope.not.here` reads as "here" — which looks like copy rather than
+ * like a mistake, so it has to be caught before it ships rather than spotted
+ * on a page.
+ */
+function collectSiteKeyUses(dir) {
+  const uses = new Map(); // key -> where it was seen
+  if (!existsSync(dir)) return uses;
+
+  const note = (key, where) => {
+    // `site.` is how a template reads, and what is stored IS the site block, so
+    // the filter accepts either; normalize the same way it does.
+    const normalized = key.startsWith("site.") ? key : `site.${key}`;
+    if (!uses.has(normalized)) uses.set(normalized, where);
+  };
+
+  const walk = (current) => {
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const full = join(current, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === "updates" || entry.name === "node_modules") continue;
+        walk(full);
+        continue;
+      }
+      if (entry.name.endsWith(".liquid")) {
+        const source = readFileSync(full, "utf-8");
+        for (const [, key] of source.matchAll(/['"]([a-zA-Z0-9_.]+)['"]\s*\|\s*t\b/g)) {
+          note(key, relative(dir, full));
+        }
+      } else if (entry.name === "schema.json") {
+        try {
+          const schema = JSON.parse(readFileSync(full, "utf-8"));
+          const fromList = (list) => {
+            if (!Array.isArray(list)) return;
+            for (const setting of list) if (setting?.defaultKey) note(setting.defaultKey, relative(dir, full));
+          };
+          fromList(schema.settings);
+          if (Array.isArray(schema.blocks)) for (const block of schema.blocks) fromList(block?.settings);
+        } catch {
+          // A malformed schema is already reported by the key collection above.
+        }
+      }
+    }
+  };
+
+  walk(dir);
+  return uses;
+}
+
+function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new Set(), siteKeyUses = new Map()) {
   if (!existsSync(localesDir)) {
     console.error(`  No locales/ directory found.`);
     return false;
@@ -117,6 +168,23 @@ function validateLocaleSet(label, localesDir, schemaKeys, ignoredExtraKeys = new
 
   if (siteEnKeys.length > 0) {
     console.log(`  ✓ ${siteEnKeys.length} site string(s) for visitors`);
+  }
+
+  const askedForNothing = [...siteKeyUses].filter(([key]) => getNested(en, key) === undefined);
+  if (askedForNothing.length > 0) {
+    hasErrors = true;
+    console.error(`  ✗ ${askedForNothing.length} site string(s) asked for but never written:`);
+    for (const [key, where] of askedForNothing) {
+      console.error(`    - ${key}  (${where})`);
+    }
+  }
+
+  const neverAsked = siteEnKeys.filter((key) => !siteKeyUses.has(key));
+  if (neverAsked.length > 0) {
+    console.warn(`  ⚠ ${neverAsked.length} site string(s) nothing asks for:`);
+    for (const key of neverAsked) {
+      console.warn(`    + ${key}`);
+    }
   }
 
   const extraInEn = ownedEnKeys.filter((k) => !schemaKeySet.has(k));
@@ -205,6 +273,7 @@ function validateTheme(themeName, coreKeySet) {
     join(dir, "locales"),
     schemaKeys,
     coreKeySet,
+    collectSiteKeyUses(dir),
   );
 }
 
@@ -221,8 +290,11 @@ if (requestedTheme) {
   process.exit(allOk ? 0 : 1);
 } else {
   const themesDir = join(rootDir, "themes");
-  const themes = readdirSync(themesDir).filter((d) =>
-    existsSync(join(themesDir, d, "theme.json")),
+  // A `__`-prefixed theme is a local scratch one — gitignored, often broken on
+  // purpose. Validate it by name when you want to; never as part of the sweep
+  // that runs before the dev server starts.
+  const themes = readdirSync(themesDir).filter(
+    (d) => !d.startsWith("__") && existsSync(join(themesDir, d, "theme.json")),
   );
 
   if (themes.length === 0) {
