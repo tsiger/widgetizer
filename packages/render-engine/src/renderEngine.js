@@ -30,7 +30,11 @@ import {
 } from "@widgetizer/core";
 import { escapeHtml } from "@widgetizer/core/escapeHtml";
 import { resolveRichtextMediaInWidgetData } from "@widgetizer/core/richtextMedia";
-import { resolveRichtextLinksInWidgetData, schemaHasRichtextSetting } from "@widgetizer/core/richtextLinks";
+import {
+  resolveRichtextLinksInWidgetData,
+  resolveRichtextLinksInSettings,
+  schemaHasRichtextSetting,
+} from "@widgetizer/core/richtextLinks";
 import { prefixInternalHref, prefixSiteIcons } from "@widgetizer/core/linkPrefixer";
 import { pageHref, itemHref } from "@widgetizer/core/internalHref";
 import { buildBreadcrumbs, indexListingPages } from "@widgetizer/core/breadcrumbs";
@@ -738,6 +742,129 @@ async function loadMenuMaps(deps) {
 }
 
 /**
+ * Resolve the `link` and `menu` selections a theme declares in its site-wide
+ * settings, exactly as widget settings are resolved.
+ *
+ * Theme settings are edited with the same inputs widgets use, so a theme author can
+ * point a site-wide setting at a page, a collection item or a menu. Those selections
+ * used to store fine and then never resolve: the picker worked, the output did not.
+ *
+ * Gated on the schema, like the widget path — a theme declaring neither type pays
+ * nothing, which is every theme that has not adopted this.
+ *
+ * Mutates `processed` in place (the contract resolveMenuSettings already has).
+ *
+ * @param {object} processed preprocessed theme settings: { group: { id: value } }
+ * @param {object} rawThemeSettings theme.json, whose settings.global holds the schema
+ */
+export async function resolveThemeSettingReferences(processed, rawThemeSettings, deps, sharedGlobals, context) {
+  const groups = rawThemeSettings?.settings?.global;
+  if (!groups || !processed) return;
+
+  const groupEntries = Object.entries(groups).filter(([, items]) => Array.isArray(items));
+  const declares = (type) => groupEntries.some(([, items]) => items.some((item) => item?.type === type));
+  const hasMenu = declares("menu");
+  const hasLink = declares("link");
+  // Richtext too: seeding stamps stable refs into a theme's richtext anchors, and a
+  // reference that is never resolved is worse than none — the anchor keeps the
+  // address the theme shipped and silently stops following renames.
+  const hasRichtext = declares("richtext");
+  if (!hasMenu && !hasLink && !hasRichtext) return;
+
+  const globals = sharedGlobals || {};
+  if (!globals.pagesByUuid) globals.pagesByUuid = await loadPagesByUuid(deps);
+  const pagesByUuid = globals.pagesByUuid;
+
+  let collectionItemsByUuid = globals.collectionItemsByUuid || null;
+  if (!collectionItemsByUuid && typeof deps.loadCollectionItemsByUuid === "function") {
+    try {
+      collectionItemsByUuid = await deps.loadCollectionItemsByUuid();
+      globals.collectionItemsByUuid = collectionItemsByUuid;
+    } catch (err) {
+      console.warn(`Could not load collection items for theme setting resolution: ${err.message}`);
+    }
+  }
+  collectionItemsByUuid = collectionItemsByUuid || new Map();
+
+  // Clean URLs and the default language decide the SHAPE of every href resolved
+  // below — whether it ends in .html, and whether it carries a language folder.
+  // Reading them off sharedGlobals raw was wrong twice over: on a first render
+  // neither is stamped yet, and the default language never lived under that key at
+  // all. A Greek-default site got `el/about.html` for its own default language, and
+  // a layout-only render ignored Clean URLs entirely.
+  //
+  // So they are derived here the way the widget path derives them — stamped on
+  // first use and cached — while an explicit value from the caller still wins.
+  const ctx = context || {};
+  const outputPathPrefix = ctx.outputPathPrefix || "";
+  const language = ctx.language ?? sharedGlobals?.currentPageData?.language ?? "";
+
+  let cleanUrls;
+  if (ctx.cleanUrls !== undefined) {
+    cleanUrls = ctx.cleanUrls === true;
+  } else if (globals.cleanUrls !== undefined) {
+    cleanUrls = globals.cleanUrls === true;
+  } else {
+    const projectData = await getProjectData(deps);
+    cleanUrls = !!projectData?.cleanUrls;
+    if (sharedGlobals) globals.cleanUrls = cleanUrls;
+  }
+
+  const defaultLanguage =
+    ctx.defaultLanguage ?? (await languageSettings(deps, sharedGlobals)).defaultLanguage ?? "";
+
+  if (hasMenu) {
+    if (!globals.menuMaps) globals.menuMaps = await loadMenuMaps(deps);
+    const menuDeps = {
+      menuMaps: globals.menuMaps,
+      pagesByUuid,
+      collectionItemsByUuid,
+      outputPathPrefix,
+      cleanUrls,
+      defaultLanguage,
+      language,
+    };
+    for (const [group, items] of groupEntries) {
+      if (processed[group]) resolveMenuSettings(processed[group], items, menuDeps);
+    }
+  }
+
+  if (hasRichtext) {
+    // The same resolver widget richtext goes through, given this group's schema.
+    for (const [group, items] of groupEntries) {
+      if (!processed[group]) continue;
+      resolveRichtextLinksInSettings(processed[group], items, {
+        pagesByUuid,
+        collectionItemsByUuid,
+        outputPathPrefix,
+        cleanUrls,
+        defaultLanguage,
+      });
+    }
+  }
+
+  if (hasLink) {
+    for (const [group, items] of groupEntries) {
+      const values = processed[group];
+      if (!values) continue;
+      for (const item of items) {
+        if (item?.type !== "link" || !item.id) continue;
+        const value = values[item.id];
+        if (!isLinkObject(value)) continue;
+        values[item.id] = resolveLinkValue(
+          value,
+          pagesByUuid,
+          outputPathPrefix,
+          collectionItemsByUuid,
+          cleanUrls,
+          defaultLanguage,
+        );
+      }
+    }
+  }
+}
+
+/**
  * Creates base render context with common properties
  * @param {RenderDeps} deps
  * @param {object} rawThemeSettings
@@ -778,6 +905,14 @@ async function createBaseRenderContext(deps, rawThemeSettings, renderMode = "pre
   // Determine file base path based on render mode (for PDF and other file assets)
   const fileBasePath =
     renderMode === "publish" ? `${outputPathPrefix}assets/files` : `${apiUrl}/api/media/projects/${projectId}/uploads/files`;
+
+  // A theme may point a site-wide setting at a page, item or menu using the same
+  // inputs widgets use. Resolve those here, once, before anything reads them.
+  // Only the depth prefix is passed: Clean URLs and the default language are
+  // derived inside, because at this point in the render neither is stamped yet.
+  await resolveThemeSettingReferences(processedThemeSettings, rawThemeSettings, deps, sharedGlobals, {
+    outputPathPrefix,
+  });
 
   const siteIconSrc = processedThemeSettings?.general?.favicon || "";
 

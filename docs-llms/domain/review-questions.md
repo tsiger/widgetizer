@@ -12,7 +12,7 @@ These are places where we should check whether the app's rules are complete, con
 | [R2: Does deleting related content have consistent consequences?](#r2-one-deletion-policy-for-references) *(implemented; follow-ups tracked)* | Deleting a page by itself and deleting its whole language should have a clear policy for links left behind. |
 | [R3: What if a language is removed while another window is editing it?](#r3-language-lifecycle-and-content-writes) *(implemented; follow-ups tracked)* | A late save should not unexpectedly bring back content from a removed language. |
 | [R4: Do different ways of creating content obey the right rules?](#r4-shared-write-rules-without-forcing-one-workflow) | Create, Duplicate and Create language version should differ intentionally, not accidentally bypass limits or checks. |
-| [R5: Do we find every place that uses an image or link?](#r5-one-description-of-reference-bearing-values) | A link inside formatted text matters just as much as one in a button or menu. |
+| [R5: Do we find every place that uses an image or link?](#r5-one-description-of-reference-bearing-values) *(implemented; one item deferred)* | A link inside formatted text matters just as much as one in a button or menu. |
 | [R6: Can we explain an operation that only partly finished?](#r6-structural-operations-and-partial-success) | You should be able to tell what was kept, what failed and what to do next. |
 | [R7: Does the generated website include the right language content?](#r7-multilingual-output-completion) | Pages, articles, navigation and search information should agree about which versions exist. |
 | [R8: Does a backup or copy preserve everything important?](#r8-backup-and-clone-completeness) | A restored website should retain translations, relationships, image descriptions and ordering. |
@@ -101,13 +101,25 @@ Evidence: [pageController](../../packages/builder-server/src/controllers/pageCon
 
 ## R5 One description of reference-bearing values
 
-**Observed:** seeding, project cloning, deletion cleanup, rendering and media usage all walk content for different kinds of references. New setting types or nested shapes must be represented in each applicable walk.
+**Status:** OSS implementation reviewed; one sub-item deferred with an explicit trigger — see [priorities and checkpoints](review-status.md#r5--one-description-of-reference-bearing-values).
+
+**Original observation:** seeding, project cloning, deletion cleanup, rendering and media usage all walk content for different kinds of references. New setting types or nested shapes must be represented in each applicable walk.
 
 **Question:** are links/media in widgets, global blocks, collection settings, richtext and structured settings all discovered consistently?
 
-**Simplification candidate:** reusable traversal primitives and an explicit reference-kind catalog. Keep transformations separate: rendering hrefs, remapping UUIDs and collecting media usage have different outputs and error policies.
+**Answered: no, and the gap was a container rather than a kind.** Built the matrix of five walks against six containers. Pages, globals, menus and collection items were consistent across all five. **Theme settings were reached by exactly one walk** — media usage — while the other four and the renderer skipped them.
 
-Evidence: [linkEnrichment](../../packages/builder-server/src/utils/linkEnrichment.js), [mediaUsageService](../../packages/builder-server/src/services/mediaUsageService.js), [menuResolver](../../packages/render-engine/src/menuResolver.js), [setting types](../../packages/core/src/config/settingTypes.js). Coverage: M3/M5, P4/P5.
+That was coherent only while theme settings carried nothing but media. They are edited through the same `SettingsRenderer` against the same shared type catalog, so a theme author could declare a `link` or `menu` among the site-wide settings, get a fully working picker, save a value — and have it never render, never survive a duplication, and never be cleared when its target was deleted. Nothing warned at any layer.
+
+The decision was to **support** rather than forbid: theme authors can use the existing inputs, and those selections are now maintained by every walk. Details and the template contract are in [setting types](../theming-setting-types.md#link).
+
+Four rounds of review found the ways a half-supported reference still misbehaves, and they are worth keeping as the shape of this class of bug: resolution that runs before the settings governing href shape are initialised (a site's own default language was given a language folder); a later seeding pass that regenerates identities and was not included, so a preset's article link kept the preset's identity; and a transformer applied by value shape rather than by **declared type**, which rewrote ordinary prose — first a `text` setting reading "main-menu", then, once text was excluded, a richtext default merely containing those words. The last is the general lesson: dispatch on the declared type, never on what the value looks like.
+
+**Simplification candidate (partly taken):** the "explicit reference-kind catalog" exists now as `REFERENCE_BEARING_SETTING_TYPES` plus per-type handlers, so a walk states which kinds it handles instead of inferring them. The "reusable traversal primitives" half is not done — see the deferred item below.
+
+**Deferred: nested references.** The walks disagree about depth. The media collector recurses into arrays and objects; the reference transformers visit only top-level setting values and block settings. Demonstrated with a setting holding a list of rows: the image inside was tracked, the link inside was not cleared. Left alone because nothing can currently produce that shape — `table`, the one structured type, holds text-only cells in v1. **Revisit when a setting type is introduced that contains structured, nested references**, at which point the two traversals need to become one.
+
+Evidence: [linkEnrichment](../../packages/builder-server/src/utils/linkEnrichment.js), [renderEngine](../../packages/render-engine/src/renderEngine.js), [mediaUsageService](../../packages/builder-server/src/services/mediaUsageService.js), [setting types](../../packages/core/src/config/settingTypes.js). Coverage: M3/M5, P4/P5.
 
 ## R6 Structural operations and partial success
 

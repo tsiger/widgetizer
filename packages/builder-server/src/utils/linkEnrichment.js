@@ -358,6 +358,81 @@ async function cleanupMenusViaStorage(storage, scope, itemTransformer, defaultLa
 // Public API
 // ---------------------------------------------------------------------------
 
+
+/**
+ * Apply per-type handlers to every reference-bearing theme setting in a project's
+ * own theme.json.
+ *
+ * Dispatch by the DECLARED type, never by the shape of the value. These handlers
+ * recognise a menu selection by its bare string, so a single generic transformer
+ * applied to everything rewrote prose: a text setting reading "main-menu" became
+ * that menu's uuid, and then — once text was excluded but richtext was not — a
+ * richtext default merely CONTAINING those words was replaced wholesale by it.
+ * A menu setting gets menu handling, a link setting gets link handling, and
+ * richtext gets HTML-anchor handling. Nothing else is touched.
+ *
+ * Theme settings are `settings.global.<group>` — an array of `{ type, id, default,
+ * value? }`. The project's copy is its own file, so BOTH the chosen `value` and the
+ * `default` it started from are transformed: after a duplication, a default still
+ * holding the source project's page uuid would be a reference into another project,
+ * which is exactly what the rest of that pass exists to prevent.
+ *
+ * @param {object} themeData parsed theme.json, mutated in place
+ * @param {{ link?: Function, menu?: Function, richtext?: Function }} handlers
+ * @returns {boolean} whether anything changed
+ */
+function transformThemeSettings(themeData, handlers) {
+  const groups = themeData?.settings?.global;
+  if (!groups || typeof groups !== "object") return false;
+
+  let changed = false;
+  for (const items of Object.values(groups)) {
+    if (!Array.isArray(items)) continue;
+    for (const item of items) {
+      if (!item || typeof item !== "object") continue;
+      const handler = handlers?.[item.type];
+      if (typeof handler !== "function") continue;
+      for (const key of ["value", "default"]) {
+        if (item[key] === undefined) continue;
+        const next = handler(item[key]);
+        if (JSON.stringify(next) !== JSON.stringify(item[key])) {
+          item[key] = next;
+          changed = true;
+        }
+      }
+    }
+  }
+  return changed;
+}
+
+/** fs variant, for the seeding and duplication passes. */
+async function updateThemeSettingsFile(themeJsonPath, handlers) {
+  if (!(await fs.pathExists(themeJsonPath))) return;
+  try {
+    const themeData = JSON.parse(await fs.readFile(themeJsonPath, "utf8"));
+    if (transformThemeSettings(themeData, handlers)) {
+      await fs.outputFile(themeJsonPath, JSON.stringify(themeData, null, 2));
+    }
+  } catch (error) {
+    console.warn(`[linkEnrichment] Failed to process theme settings at ${themeJsonPath}: ${error.message}`);
+  }
+}
+
+/** Adapter variant, for the deletion sweep. Records its own failure like the rest. */
+async function updateThemeSettingsViaStorage(storage, scope, handlers, failed) {
+  const key = "theme.json";
+  try {
+    const buf = await storage.read(scope, key);
+    if (buf == null) return;
+    const themeData = JSON.parse(buf.toString("utf8"));
+    if (transformThemeSettings(themeData, handlers)) {
+      await storage.write(scope, key, JSON.stringify(themeData, null, 2));
+    }
+  } catch (error) {
+    if (failed) failed.push({ key, reason: error.message });
+  }
+}
+
 /**
  * Enrich a newly created project's references.
  * - Adds pageUuid to menu items based on slug-to-UUID mapping
@@ -480,6 +555,14 @@ export async function enrichNewProjectReferences(pagesDir, menusDir) {
   try {
     await updatePageWidgets(pagesDir, widgetProcessor);
     await updateGlobalWidgets(pagesDir, widgetProcessor);
+    // A theme may ship a site-wide link or menu selection in its defaults; give it
+    // the same stable references the widget settings just got.
+    await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+      link: (value) => (isLinkObject(value) ? enrichValue(value) : value),
+      menu: (value) => (typeof value === "string" && menuSlugToUuid.has(value) ? menuSlugToUuid.get(value) : value),
+      richtext: (value) =>
+        typeof value === "string" ? enrichRichtextLinkRefs(value, { pageSlugToUuid }) : value,
+    });
   } catch (error) {
     console.warn(`[linkEnrichment] Failed to enrich widget links: ${error.message}`);
   }
@@ -624,6 +707,16 @@ export async function remapDuplicatedProjectUuids(projectFolderName) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Theme settings too: a duplicate whose site-wide link still names the source
+  // project's page uuid is a reference into another project.
+  await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+    link: (value) => (isLinkObject(value) ? remapValue(value) : value),
+    menu: (value) => (typeof value === "string" && oldToNewMenuUuid.has(value) ? oldToNewMenuUuid.get(value) : value),
+    richtext: (value) =>
+      typeof value === "string"
+        ? remapRichtextLinkRefs(value, { pageMap: oldToNewUuid, itemMap: oldToNewItemUuid })
+        : value,
+  });
 
   // Step 5: Remap link references inside collection item settings (item uuids
   // were already regenerated in Step 1; this only fixes pageUuid/menu/item refs)
@@ -735,6 +828,19 @@ export async function clearDeletedReferencesInSection(storage, scope, { pageUuid
       return item;
     },
     defaultLanguage,
+    failed,
+  );
+
+  // Theme settings carry the same link and menu references widget settings do.
+  await updateThemeSettingsViaStorage(
+    storage,
+    scope,
+    {
+      link: (value) => (isLinkObject(value) ? cleanValue(value) : value),
+      menu: (value) => (typeof value === "string" && menus.has(value) ? "" : value),
+      richtext: (value) =>
+        typeof value === "string" ? cleanupRichtextLinkRefs(value, { pageUuids: pages, itemUuids: items }) : value,
+    },
     failed,
   );
 
@@ -854,6 +960,14 @@ export async function remapCollectionItemLinkRefs(projectFolderName, oldToNewIte
   const widgetProcessor = (widget) => transformWidgetSettings(widget, remapValue);
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Items get fresh identities on seed, so a site-wide link to one has to follow
+  // them exactly as a widget link does. Missing this left a theme setting pointing
+  // at the preset's original article.
+  await updateThemeSettingsFile(path.join(pagesDir, "..", "theme.json"), {
+    link: (value) => (isLinkObject(value) ? remapValue(value) : value),
+    richtext: (value) =>
+      typeof value === "string" ? remapRichtextLinkRefs(value, { itemMap: oldToNewItemUuid }) : value,
+  });
   await updateCollectionItems(collectionsDirFor(projectFolderName), (item) => transformItemSettings(item, remapValue));
 }
 
@@ -927,6 +1041,11 @@ export async function enrichSeededRichtextLinksFromDir({ projectDir }) {
 
   await updatePageWidgets(pagesDir, widgetProcessor);
   await updateGlobalWidgets(pagesDir, widgetProcessor);
+  // Theme richtext runs the same pass. This is the step that stamps ITEM refs,
+  // which cannot happen during the main seed because the collection items do not
+  // exist yet — so a theme's shipped article link would otherwise be the one
+  // reference in the project that never became stable.
+  await updateThemeSettingsFile(path.join(projectDir, "theme.json"), { richtext: enrichString });
   await updateCollectionItems(collectionsDir, (item) => transformItemSettings(item, enrichString));
 }
 

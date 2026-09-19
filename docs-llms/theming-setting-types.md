@@ -622,9 +622,13 @@ The UUID system ensures links remain valid even when the target is renamed or de
 
 3. **Rendering/Export**: The system resolves the stable reference to the current slug and emits it in the shape the project's Clean URLs setting picks (`about.html` / `rooms/suite.html`, or `about` / `rooms/suite` with home as `./`). If the target was renamed, links automatically follow the new slug.
 
-4. **Deletion Cleanup**: When a page is deleted, all widget link settings referencing its `pageUuid` are automatically cleaned up — the link is cleared (`href: ""`) and the reference is removed from the JSON file. This applies to page widgets, global widgets (header/footer), and menu items.
+4. **Deletion Cleanup**: When a page is deleted, all link settings referencing its `pageUuid` are automatically cleaned up — the destination is cleared (`href: ""`) and the reference removed, while the link's `text` and `target` are kept. This applies to page widgets, global widgets (header/footer), menu items, collection items and theme settings.
 
-5. **Project Cloning**: When a project is cloned, all UUIDs are regenerated and all widget/menu references are updated to point to the new UUIDs.
+5. **Project Cloning**: When a project is cloned, all UUIDs are regenerated and every reference — widget, menu, collection item and theme setting — is updated to point to the new UUIDs.
+
+**These work the same way in `theme.json` as in a widget schema.** A `link`, `menu` or `richtext` setting declared among a theme's site-wide settings carries exactly the same references and gets exactly the same maintenance: resolved at render (including depth prefixes, Clean URLs and the site's default language), enriched at project creation, re-pointed when a project is duplicated, given the new identities when preset collection items are seeded, and cleared when a target is deleted. Read a resolved site-wide setting in a template as `{{ theme.<group>.<id> }}` — a link exposes the same `href`/`text`/`target`, a menu resolves to the menu object, and richtext needs `| raw` like any other.
+
+Only the reference-bearing types are ever rewritten. A `text`, `select` or any other setting is left exactly as authored, even when its value happens to read like a menu name.
 
 The UI for this setting type provides a choice between selecting from a list of existing pages/collection items or entering a custom URL, along with inputs for the link text and a toggle for the target.
 

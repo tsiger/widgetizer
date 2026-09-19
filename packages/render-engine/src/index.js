@@ -16,3 +16,9 @@ export {
 
 // Pure `menu`-type setting resolver shared by widget and collection-item rendering.
 export { resolveMenuSettings, schemaHasMenuSetting } from "./menuResolver.js";
+
+// Resolves the `link` and `menu` selections a theme declares in its SITE-WIDE
+// settings, which are edited with the same inputs widgets use and so carry the same
+// references. Exported for the shells that assemble their own render context, and
+// so the behaviour can be tested without standing up a full render.
+export { resolveThemeSettingReferences } from "./renderEngine.js";

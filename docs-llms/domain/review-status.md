@@ -2,7 +2,7 @@
 
 [Review questions](review-questions.md) · [Map](README.md) · [Coverage](coverage.md)
 
-Updated 2026-09-19 (R1, R2 and R3 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
+Updated 2026-09-19 (R1, R2, R3 and R5 reviewed). This is the handoff summary; the review questions retain the reasoning and evidence. Update an item's status when it is reviewed, and replace an uncommitted status with the fix commit when available.
 
 **Priority describes the next action, not proof of a bug.** High means check before the stated release or deployment milestone; Medium means planned follow-up; Low means revisit when its trigger occurs. “Before launch” below applies when that feature is included in the launch. Future scaling work does not block a single-process MVP.
 
@@ -100,6 +100,35 @@ These are requirements for any application embedding the public packages, not a 
 
 **Closure:** the reviewed OSS change is implemented; follow-ups above remain separate. Automatic draft recovery is a future improvement, not part of this fix.
 
+## R5 — One description of reference-bearing values
+
+**OSS status:** Implemented and reviewed. A `link`, `menu` or `richtext` setting declared in a theme's site-wide settings is now maintained by every walk that maintains a widget's, and resolved at render. Changes are not yet committed.
+
+Confirmed defects, each reproduced before fixing and covered by a regression verified to fail without its fix: theme settings were reached by only one of five walks, so a site-wide selection never rendered, never survived a duplication and was never cleared on deletion; resolution ran before Clean URLs and the default language were initialised, giving a site's own default language a language folder and ignoring Clean URLs on a layout-only render; the pass that gives preset collection items fresh identities skipped theme settings, so a shipped article link kept the preset's identity; a transformer applied by value shape rather than declared type rewrote ordinary prose — a `text` setting reading "main-menu", then a richtext default containing those words; and theme richtext was enriched with stable references that nothing resolved, so the anchor silently stopped following renames.
+
+**Verification:** 1,866 backend and 1,560 frontend tests pass, plus targeted lint and locale validation. Full lint still has the pre-existing theme-deletion-marker parsing errors. Regression tests live in [themeSettingReferences.test.js](../../packages/builder-server/src/tests/themeSettingReferences.test.js), which drives real `renderPageLayout` / `renderWidget` renders rather than the resolver helper alone.
+
+### Deferred
+
+| Item | Why it stands | Revisit when |
+| --- | --- | --- |
+| Nested references inside a setting's value | The media collector recurses into arrays and objects; the reference transformers visit only top-level setting values and block settings. Demonstrated with a list of rows: the image inside was tracked, the link inside was not cleared. Nothing can currently produce that shape — `table`, the only structured type, has text-only cells in v1 — so unifying the two traversals now would be speculative work against an interface that does not exist. | **A setting type is introduced that contains structured, nested references.** At that point the two traversals have to become one, rather than the new type being added to each separately. |
+
+### OSS follow-ups
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Reference kinds are listed in one place, traversal is not | Medium | Alongside the deferred item above | `REFERENCE_BEARING_SETTING_TYPES` plus per-type handlers is the catalog half of R5's candidate. The shared traversal primitive is the other half and is what the deferred item needs. |
+| Theme settings and media | Low | If a theme declares a media-bearing site-wide setting beyond the favicon | Media in theme settings is tracked by usage rather than rewritten by these walks, which is correct — but it is the one container where the two systems differ by design rather than by oversight. |
+
+### Hosted follow-ups — generic integration checklist
+
+| Point | Priority | When to check | Next action |
+| --- | --- | --- | --- |
+| Hosts assembling their own render context | Medium | Before shipping a theme that uses site-wide references | `resolveThemeSettingReferences` is exported from `@widgetizer/render-engine` for exactly this. A host that builds its context without calling it gets settings that store and never resolve — the same silent failure this fixed. |
+
+**Closure:** the reviewed OSS change is implemented; the nested-settings item is deferred with the trigger recorded above.
+
 ## R2–R8 — Review queue
 
 These priorities are initial triage, not completed investigations. None of these items has been reviewed in this pass. Hosted follow-ups should be added after the corresponding shared behavior is assessed, rather than guessed in advance.
@@ -109,7 +138,7 @@ These priorities are initial triage, not completed investigations. None of these
 | [R2 — Deletion consequences](review-questions.md#r2-one-deletion-policy-for-references) | Reviewed and implemented — see [above](#r2--one-policy-for-references-to-deleted-content) | — | — | Listed above |
 | [R3 — Removing a language during editing](review-questions.md#r3-language-lifecycle-and-content-writes) | Reviewed and implemented — see [above](#r3--removing-a-language-while-someone-is-editing-it) | — | — | Listed above |
 | [R4 — Rules across create, duplicate and translate](review-questions.md#r4-shared-write-rules-without-forcing-one-workflow) | Not reviewed | Medium | Before releasing these workflows under enforced quotas; include R1's copy-path checks | To assess |
-| [R5 — Finding every image and link reference](review-questions.md#r5-one-description-of-reference-bearing-values) | Not reviewed | Medium | During the reference-safety review, and whenever a new reference-bearing setting type is added | To assess |
+| [R5 — Finding every image and link reference](review-questions.md#r5-one-description-of-reference-bearing-values) | Reviewed and implemented — see [above](#r5--one-description-of-reference-bearing-values) | — | — | Listed above |
 | [R6 — Operations that partly finish](review-questions.md#r6-structural-operations-and-partial-success) | Not reviewed | Medium | Before the next release changing import, clone, theme update or project deletion | To assess |
 | [R7 — Multilingual website output](review-questions.md#r7-multilingual-output-completion) | Not reviewed | High | Before declaring multilingual export release-ready | To assess |
 | [R8 — Backup and clone completeness](review-questions.md#r8-backup-and-clone-completeness) | Not reviewed | High | Before releasing multilingual backup/restore as a supported recovery path | To assess |
