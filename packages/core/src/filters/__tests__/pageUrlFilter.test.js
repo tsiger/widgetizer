@@ -150,3 +150,47 @@ describe("escaping", () => {
     expect(render("{{ 'index' | page_url }}", { ...ON, outputPathPrefix: "../../" })).toBe("../../");
   });
 });
+
+// A theme that writes the obvious thing must not walk the visitor out of the
+// language they were reading: Arch's header logo did exactly that.
+describe("page_url / item_url and the page's language", () => {
+  const GREEK = { cleanUrls: false, defaultLanguage: "en", currentPageData: { language: "el" } };
+  const ENGLISH = { cleanUrls: false, defaultLanguage: "en", currentPageData: { language: "en" } };
+
+  it("links within the language of the page being rendered", () => {
+    expect(render("{{ 'contact' | page_url }}", GREEK)).toBe("el/contact.html");
+    expect(render("{{ 'index' | page_url }}", GREEK)).toBe("el/index.html");
+    expect(render("{{ 'story' | item_url: 'news' }}", GREEK)).toBe("el/news/story.html");
+  });
+
+  it("leaves the default language at the root, as before", () => {
+    expect(render("{{ 'contact' | page_url }}", ENGLISH)).toBe("contact.html");
+    expect(render("{{ 'story' | item_url: 'news' }}", ENGLISH)).toBe("news/story.html");
+  });
+
+  it("knows nothing of language when the render has none, as a plain theme's does", () => {
+    expect(render("{{ 'contact' | page_url }}", { cleanUrls: false })).toBe("contact.html");
+  });
+
+  it("carries the render depth with it", () => {
+    expect(render("{{ 'index' | page_url }}", { ...GREEK, outputPathPrefix: "../" })).toBe("../el/index.html");
+  });
+
+  it("follows Clean URLs, home included", () => {
+    expect(render("{{ 'index' | page_url }}", { ...GREEK, cleanUrls: true })).toBe("el/");
+    expect(render("{{ 'contact' | page_url }}", { ...GREEK, cleanUrls: true })).toBe("el/contact");
+  });
+
+  // A deliberate cross-language link says so.
+  it("takes an explicit language over the page's own", () => {
+    expect(render("{{ 'contact' | page_url: lang: 'en' }}", GREEK)).toBe("contact.html");
+    expect(render("{{ 'contact' | page_url: lang: 'de' }}", ENGLISH)).toBe("de/contact.html");
+    expect(render("{{ 'story' | item_url: 'news', lang: 'de' }}", ENGLISH)).toBe("de/news/story.html");
+  });
+
+  it("reaches a snippet too, where the environment scope does not", () => {
+    expect(
+      renderWithSnippet("{{ 'contact' | page_url }}", "{% render 'snippet' %}", GREEK),
+    ).toBe("el/contact.html");
+  });
+});

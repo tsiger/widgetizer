@@ -106,6 +106,16 @@ describe("the Arch header's language switcher", () => {
     ]);
   });
 
+  // The most clicked thing on the page. It linked to the DEFAULT language's
+  // homepage from every translated page until `page_url` learned the language.
+  it("sends the logo home within the language being read", async () => {
+    const dir = await exportSite();
+    const logo = (html) => (html.match(/<a href="([^"]*)" class="header-logo"/) || [])[1];
+
+    assert.equal(logo(await read(dir, "about.html")), "index.html");
+    assert.equal(logo(await read(dir, "el", "sxetika.html")), "../el/index.html");
+  });
+
   it("marks the language being read, and tags each link with its own", async () => {
     const dir = await exportSite();
     const greek = await read(dir, "el", "sxetika.html");

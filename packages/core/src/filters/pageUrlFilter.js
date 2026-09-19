@@ -15,11 +15,13 @@
  * `safe_url` / `prefixInternalHref` as before — these filters are for links a
  * theme builds itself from a known slug.
  *
- * A target language will become a keyword argument (`page_url: lang: 'de'`,
- * `item_url: 'news', lang: 'de'`) rather than a positional one: the positional
- * slot is #1 for `page_url` but #2 for `item_url`, and the `collection` filter
- * already sets the keyword precedent. Extra arguments are ignored today, so
- * adding it breaks no existing call.
+ * Both link WITHIN the page's own language by default: on a Greek page,
+ * `'index' | page_url` is the Greek homepage. A theme that wrote the obvious
+ * thing would otherwise walk the visitor out of the language they were reading
+ * — Arch's header logo did exactly that. A deliberate cross-language link says
+ * so with a keyword argument (`page_url: lang: 'de'`, `item_url: 'news',
+ * lang: 'de'`), keyword rather than positional because the positional slot is
+ * #1 for `page_url` but #2 for `item_url`.
  */
 import { pageHref, itemHref } from "../utils/internalHref.js";
 
@@ -32,24 +34,35 @@ import { pageHref, itemHref } from "../utils/internalHref.js";
  * option too, and `context.globals` survives that isolation. Reading only the
  * environment would make a snippet silently emit a root-depth, non-clean href.
  */
-function hrefOptions(context) {
+function hrefOptions(context, args = []) {
   const bag = context?.get(["globals"]) || context?.globals || {};
   const prefix = bag.outputPathPrefix;
   return {
     cleanUrls: bag.cleanUrls === true,
     outputPathPrefix: typeof prefix === "string" ? prefix : "",
+    language: targetLanguage(args) ?? bag.currentPageData?.language,
+    defaultLanguage: bag.defaultLanguage,
   };
 }
 
+/** `lang:` from the call, if it is there. Keyword args arrive as plain objects. */
+function targetLanguage(args) {
+  for (const arg of args) {
+    if (Array.isArray(arg) && arg.length === 2 && arg[0] === "lang") return arg[1];
+    if (arg && typeof arg === "object" && !Array.isArray(arg) && typeof arg.lang === "string") return arg.lang;
+  }
+  return undefined;
+}
+
 export function registerPageUrlFilters(engine) {
-  engine.registerFilter("page_url", function (slug) {
+  engine.registerFilter("page_url", function (slug, ...args) {
     if (typeof slug !== "string" || !slug) return "";
-    return pageHref(slug, hrefOptions(this.context));
+    return pageHref(slug, hrefOptions(this.context, args));
   });
 
-  engine.registerFilter("item_url", function (slug, slugPrefix) {
+  engine.registerFilter("item_url", function (slug, slugPrefix, ...args) {
     if (typeof slug !== "string" || !slug) return "";
     if (typeof slugPrefix !== "string" || !slugPrefix) return "";
-    return itemHref(slugPrefix, slug, hrefOptions(this.context));
+    return itemHref(slugPrefix, slug, hrefOptions(this.context, args));
   });
 }
