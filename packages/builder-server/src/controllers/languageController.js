@@ -10,6 +10,7 @@
 import * as projectRepo from "../db/repositories/projectRepository.js";
 import { addLanguage, removeLanguage, countLanguageContent } from "../services/languageService.js";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
+import { withContentWriteLock } from "../services/contentCoordination.js";
 
 // Check, change and record are one operation per project: two calls in flight
 // would otherwise both read the same list and the second would drop the first's
@@ -30,15 +31,20 @@ export async function createLanguage(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
 
-    const project = await serializeLanguageOps(scope.projectId, async () => {
-      // Read inside the section: an add that finished while this one waited has
-      // already changed the list this one must extend.
-      const current = projectRepo.getProjectById(scope.projectId);
-      const { languages } = await addLanguage({ storage, scope, project: current, code: req.body?.code });
-      // Recorded only after the seed succeeds, so a failure never leaves a
-      // language listed with no content behind it.
-      return projectRepo.updateProject(scope.projectId, { languages });
-    });
+    // Language ops outside, the content-write section inside — the one permitted
+    // order (see contentCoordination). Seeding and removal ARE content writes, so
+    // they must not interleave with ordinary saves or with media deletion.
+    const project = await serializeLanguageOps(scope.projectId, async () =>
+      withContentWriteLock(scope.projectId, async () => {
+        // Read inside the section: an add that finished while this one waited has
+        // already changed the list this one must extend.
+        const current = projectRepo.getProjectById(scope.projectId);
+        const { languages } = await addLanguage({ storage, scope, project: current, code: req.body?.code });
+        // Recorded only after the seed succeeds, so a failure never leaves a
+        // language listed with no content behind it.
+        return projectRepo.updateProject(scope.projectId, { languages });
+      }),
+    );
 
     res.status(201).json(project);
   } catch (error) {
@@ -68,18 +74,24 @@ export async function deleteLanguage(req, res) {
     const { scope } = req;
     const { storage } = req.adapters;
 
-    const result = await serializeLanguageOps(scope.projectId, async () => {
-      const current = projectRepo.getProjectById(scope.projectId);
-      const { languages, deleted } = await removeLanguage({
-        storage,
-        scope,
-        project: current,
-        code: req.params.code,
-      });
-      // Recorded only after the content is gone, so a failure never leaves a
-      // language unlisted with its files still on disk.
-      return { project: projectRepo.updateProject(scope.projectId, { languages }), deleted };
-    });
+    // Deleting the content and rewriting the row happen in the content-write
+    // section, so a save addressed to this language cannot land between them and
+    // recreate what was just removed. A save that was already waiting runs after,
+    // re-reads the row, and is refused.
+    const result = await serializeLanguageOps(scope.projectId, async () =>
+      withContentWriteLock(scope.projectId, async () => {
+        const current = projectRepo.getProjectById(scope.projectId);
+        const { languages, deleted } = await removeLanguage({
+          storage,
+          scope,
+          project: current,
+          code: req.params.code,
+        });
+        // Recorded only after the content is gone, so a failure never leaves a
+        // language unlisted with its files still on disk.
+        return { project: projectRepo.updateProject(scope.projectId, { languages }), deleted };
+      }),
+    );
 
     res.json({ ...result.project, deleted: result.deleted });
   } catch (error) {

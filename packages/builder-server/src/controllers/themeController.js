@@ -20,7 +20,7 @@ import { sortVersions, getLatestVersion, isValidVersion, isNewerVersion } from "
 import { hasAvailableUpdate } from "../utils/updateStatus.js";
 import { ZIP_MIME_TYPES } from "../utils/mimeTypes.js";
 import { updateThemeSettingsMediaUsage, extractMediaPathsFromThemeSettings } from "../services/mediaUsageService.js";
-import { withMediaLock, assertIntroducedMediaExists } from "../services/mediaCoordination.js";
+import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
 import { sanitizeThemeSettings } from "../services/sanitizationService.js";
 import { validateThemeCollectionSchemas } from "../services/collectionService.js";
 import { readAppSettingsFile } from "./appSettingsController.js";
@@ -1797,8 +1797,8 @@ export async function saveProjectThemeSettings(req, res) {
     const { data: sanitizedThemeData, warnings } = sanitizeThemeSettings(req.body);
 
     // The write and its usage sync are one media section, so media deletion cannot
-    // verify between them. See services/mediaCoordination.
-    const usageStale = await withMediaLock(scope.projectId, async () => {
+    // verify between them. See services/contentCoordination.
+    const usageStale = await withContentWriteLock(scope.projectId, async () => {
       // A favicon picked from the library just before it was deleted must not be
       // written in; references the settings already carried are left alone.
       let previousPaths = [];

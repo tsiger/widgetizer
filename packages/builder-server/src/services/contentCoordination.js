@@ -1,6 +1,23 @@
 /**
- * mediaCoordination — what keeps deleting an image from losing it out from under
- * content that still needs it.
+ * contentCoordination — the one per-project section that project content writes,
+ * media deletion and language removal all pass through.
+ *
+ * Everything here exists because two operations can each be correct alone and wrong
+ * together. The section (`withContentWriteLock`) is the shared ordering primitive;
+ * the rest are the freshness checks that ordering alone cannot replace, because a
+ * request that WAITED for the section may have validated against a world that has
+ * since changed. Two such checks live here:
+ *
+ *   - `assertIntroducedMediaExists` — the file a write is about to reference was
+ *     deleted while the write was queued.
+ *   - `assertLanguageStillEnabled` — the language a write is addressed to was
+ *     removed while the write was queued.
+ *
+ * Both have the same shape, and it is the shape to copy for any future one: re-read
+ * the authority INSIDE the section, compare, refuse with a stable code. A check that
+ * reads its baseline before the section is not a check.
+ *
+ * ## Media: what keeps deleting an image from losing it out from under content
  *
  * Media deletion used to trust the recorded `usedIn` rows. Those rows are derived
  * data kept up to date by a best-effort sync after each content write, and a sync
@@ -22,7 +39,7 @@
  *   1. VERIFY (verifyFileUnused). Deletion stops trusting the stored rows and
  *      re-derives them from content. An incomplete scan is NOT "no usage found":
  *      it returns `verified: false` and deletion refuses.
- *   2. EXCLUDE (withMediaLock). Verification and the delete run in one section that
+ *   2. EXCLUDE (withContentWriteLock). Verification and the delete run in one section that
  *      content writes cannot interleave with, so a save cannot land a reference in
  *      the window between the two.
  *   3. VALIDATE (assertIntroducedMediaExists). Locking alone does not help the save
@@ -30,16 +47,20 @@
  *      happily introduce a reference to a file that is now gone. So a write section
  *      also checks that the references it is introducing still exist.
  *
- * ## Lock ordering
+ * ## Lock ordering — the rule that keeps four per-project locks from deadlocking
  *
- * The media lock is ALWAYS INNERMOST. Never acquire another per-project lock
- * (serializeTranslationOps, serializeLanguageOps, serializeExportOps) while holding
- * it. Those may be held while taking this one — a translation or language op that
- * writes content does exactly that — which is why the order has to run one way only.
- * Separate serializer instances do not rule out a cycle; a consistent order does.
- * `createKeyedSerializer` is also not reentrant, so a media-locked section must not
- * call another media-locked helper: take the lock at the controller edge and pass the
- * unlocked helpers inward.
+ * The content-write section is ALWAYS INNERMOST. Never acquire another per-project
+ * lock (serializeTranslationOps, serializeLanguageOps, serializeExportOps) while
+ * holding it. Those may be held while taking this one — a translation op writing a
+ * page, a language op seeding or removing content — which is exactly why the order
+ * has to run one way only. Separate serializer instances do not rule out a cycle;
+ * a consistent order does.
+ *
+ * `createKeyedSerializer` is also NOT REENTRANT, so a section must not call another
+ * function that takes the same section — that self-deadlocks. Take the section at
+ * the controller edge and pass unlocked helpers inward. The helpers meant to be
+ * called from inside a section are named `…InSection`/`assert…`; the ones that take
+ * it themselves say so.
  *
  * ## What a write is allowed to reference
  *
@@ -63,19 +84,23 @@
  * **An image is not deleted while saved content references it — for PARTICIPATING
  * OPERATIONS, WITHIN ONE BACKEND PROCESS.** Both qualifiers are load-bearing.
  *
- * *Participating* means the operation takes the section above. Today that is media
- * delete and bulk delete, and these writes: page content save, page delete, global
- * widget save, collection item create and update, theme settings save, site identity
- * save — the paths where someone picks a file from the library.
+ * *Participating* means the operation takes the section above. Today:
  *
- * These do NOT participate, and can introduce a media reference without the section:
- * collection item duplicate / discard-archived / language version, language seeding,
- * link enrichment, and the structural flows (project create, duplicate, import, theme
- * update) that rebuild usage wholesale afterwards. Each of them COPIES content that
- * already exists in the project, so the reference it introduces is normally also held
- * by the source a verification scan reads — but that is a reason to expect no harm,
- * not a proof of exclusion. Wiring them in is the obvious extension if that stops
- * being good enough.
+ *   - media delete and bulk delete
+ *   - pages: content save, details save, create, duplicate, delete, language version
+ *   - globals: header/footer save
+ *   - menus: create, update, duplicate
+ *   - collection items: create, update, duplicate, discard-archived, reorder,
+ *     language version
+ *   - theme settings, site identity
+ *   - language add and remove
+ *
+ * These do NOT participate, and can still write content or a media reference outside
+ * the section: link enrichment, and the structural flows (project create, duplicate,
+ * import, theme update) that rebuild usage wholesale afterwards. Each of them COPIES
+ * content that already exists in the project, so the reference it introduces is
+ * normally also held by the source a verification scan reads — but that is a reason
+ * to expect no harm, not a proof of exclusion. They are the obvious next extension.
  *
  * *Within one process* is not softened by verification reading shared storage. Two
  * backend processes against one project can BOTH scan concurrently and both conclude
@@ -105,19 +130,71 @@ import { ConflictError } from "@widgetizer/core/errors";
 import { createKeyedSerializer } from "../utils/serializeByKey.js";
 import { refreshAllMediaUsageFromDir } from "./mediaUsageService.js";
 import * as mediaRepo from "../db/repositories/mediaRepository.js";
+import * as projectRepo from "../db/repositories/projectRepository.js";
+import { projectLanguages } from "../utils/contentLanguage.js";
+import { languageFolder } from "@widgetizer/core/contentAddress";
 
-const serializeMediaOps = createKeyedSerializer();
+const serializeContentWrites = createKeyedSerializer();
 
 /**
- * Run `fn` in this project's media section. Content writes that can introduce a
- * media reference and media deletion both take it, so they never interleave.
+ * Run `fn` in this project's content-write section.
+ *
+ * Taken by: media deletion, language add/remove, and every write that can create
+ * content or a media reference — pages, globals, menus, collection items and their
+ * order, theme settings, site identity. They never interleave with each other, which
+ * is what lets a check made at the top of a section still be true at its write.
+ *
+ * Always innermost (see the ordering rule above), and not reentrant.
+ *
  * @param {string} projectId
  * @param {() => Promise<T>} fn
  * @returns {Promise<T>}
  * @template T
  */
-export function withMediaLock(projectId, fn) {
-  return serializeMediaOps(projectId, fn);
+export function withContentWriteLock(projectId, fn) {
+  return serializeContentWrites(projectId, fn);
+}
+
+/**
+ * Refuse a write addressed to a language the project no longer has.
+ *
+ * A request validates its language in `requestLanguage`, against the project row the
+ * middleware loaded when the request arrived. Removing a language deletes its content
+ * and then rewrites that row — so a request that validated first and writes second
+ * recreates a page, menu or item in a language that is gone. The orphan is invisible
+ * to the editor and to export (both read the row) but very much visible to the media
+ * usage rebuild (which scans the folders on disk), where it can hold an image
+ * hostage: undeletable, blamed on content the user cannot reach.
+ *
+ * So the row is re-read HERE, inside the section that removal also takes. Call it
+ * before writing, in every section whose target is language-addressed.
+ *
+ * The default language is not checked: it always exists, cannot be removed while the
+ * site has others, and content at the root is not a language folder.
+ *
+ * `isLanguageStillEnabled` is the same question without the throw, for a READ path
+ * that merely wants to skip an optional write (the menu uuid backfill) rather than
+ * fail the read it is part of.
+ *
+ * @param {string} projectId
+ * @param {{ language?: string, defaultLanguage?: string }} lang
+ * @throws {ConflictError} code LANGUAGE_REMOVED
+ */
+export function isLanguageStillEnabled(projectId, lang) {
+  if (!languageFolder(lang)) return true;
+  const { languages } = projectLanguages(projectRepo.getProjectById(projectId));
+  return languages.includes(lang.language);
+}
+
+export function assertLanguageStillEnabled(projectId, lang) {
+  if (isLanguageStillEnabled(projectId, lang)) return;
+  const error = new ConflictError(
+    `The language "${lang.language}" was removed from this site, so this change cannot be saved.`,
+    { code: "LANGUAGE_REMOVED" },
+  );
+  // Carried as a field so the editor can name the language without parsing prose.
+  error.language = lang.language;
+  throw error;
 }
 
 /** The adapter key for a tracked upload path: `/uploads/images/a.jpg` -> `images/a.jpg`. */
@@ -186,7 +263,7 @@ export function clearDeletedMediaPaths(projectId = null) {
 /**
  * Re-derive usage from content and report whether the given files are unused.
  *
- * Call inside withMediaLock. The rebuild is the same traversal the Refresh Usage
+ * Call inside withContentWriteLock. The rebuild is the same traversal the Refresh Usage
  * button runs, so there is one description of where a reference can live (pages in
  * every language, headers/footers, collection items, theme settings, the identity
  * logo) rather than a second one that drifts from it. It also repairs the stored

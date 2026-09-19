@@ -571,6 +571,11 @@ describe("global widgets in another language", () => {
   const multilang = { id: PROJECT_ID, folderName: PROJECT_FOLDER, defaultLanguage: "en", languages: ["el"] };
   const greekGlobalDir = () => path.join(getProjectDir(PROJECT_FOLDER), "pages", "el", "global");
 
+  // Persisted as well as passed on the request: saving a global re-reads the project
+  // row to confirm the language still exists, which is what a removal updates.
+  before(() => projectRepo.updateProject(PROJECT_ID, { defaultLanguage: "en", languages: ["el"] }));
+  after(() => projectRepo.updateProject(PROJECT_ID, { defaultLanguage: "en", languages: [] }));
+
   beforeEach(async () => {
     await fs.remove(greekGlobalDir());
     await fs.outputJson(path.join(getProjectDir(PROJECT_FOLDER), "pages", "global", "header.json"), {

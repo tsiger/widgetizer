@@ -807,11 +807,15 @@ describe("menus in another language", () => {
   before(() => {
     activeProject.defaultLanguage = "en";
     activeProject.languages = ["el"];
+    // Persisted too, not just on the in-memory request object: the language check
+    // at each write re-reads the project row, which is what a real removal updates.
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: ["el"] });
   });
 
   after(() => {
     delete activeProject.defaultLanguage;
     delete activeProject.languages;
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
   });
 
   beforeEach(resetMenus);

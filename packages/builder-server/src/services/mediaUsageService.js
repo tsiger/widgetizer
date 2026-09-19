@@ -530,7 +530,7 @@ export async function getMediaUsage(projectId, fileId) {
  *   `skipped` lists content this pass could not read. The rebuilt rows are then
  *   INCOMPLETE — a file referenced only by skipped content looks unused. Callers
  *   that merely repair rows may ignore it; a caller about to act on "unused"
- *   (media deletion) must refuse instead. See verifyFileUnused in mediaCoordination.
+ *   (media deletion) must refuse instead. See verifyFileUnused in contentCoordination.
  * @throws {Error} If media file read/write fails
  */
 export async function refreshAllMediaUsageFromDir({ projectId, projectDir }) {

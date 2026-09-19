@@ -30,6 +30,8 @@ Other languages remain. Shared uploaded photographs and documents remain too, ev
 
 If removal stops partway through, some content may already be gone. The language remains listed so cleanup can be retried. This is different from hiding a language tab.
 
+If someone is editing that language in another window when you remove it, their unsaved work is neither lost nor silently saved. Their editor stops trying to save, keeps everything on screen, and shows a notice naming the language — it does not cover the page, so they can still read and copy what they want to keep. Leaving the page discards those unsaved changes; nothing keeps them automatically. Adding the language back does not restore the pages that were deleted with it.
+
 ### Changing the default language
 
 While the project has only one language, you can change its default language designation. This says which language the existing content is written in; it does not translate the words. Once other languages have been added, that change is restricted.
@@ -83,6 +85,45 @@ The summary counts pages, items and menus first so the UI can describe the delet
 5. Record the remaining language list only after removal succeeds.
 
 On partial failure, the service attempts to rebuild usage for surviving files, keeps the language listed, and allows retry. Already deleted content is not restored: this is retryable cleanup, not rollback. Sibling translation-group membership survives.
+
+### Coordination with content writes
+
+Removal deletes content and then rewrites the project row, while an ordinary write validates its language against the row the middleware loaded when its request arrived. A request that validated first and wrote second therefore used to recreate a page, menu or item in a language the site no longer had — invisible to the editor and to export, which read the row, but visible to the media usage rebuild, which scans the folders on disk, where it could hold an image hostage: undeletable, blamed on content nobody could reach.
+
+Two mechanisms close this, and both are needed:
+
+- Removal, addition and every language-addressed write take the same per-project [content-write section](media.md#delete-or-bulk-delete), so they cannot interleave. Language operations take it *inside* their own serializer — the content section is always innermost, which is what keeps four per-project locks from deadlocking.
+- Inside that section, each write re-reads the project row and refuses with `LANGUAGE_REMOVED` if its language has gone. Ordering alone is not enough: a write that *waited* for the section validated against the world as it was before waiting.
+
+**A section has to span every write the request makes, not just its main one.** A page save also sweeps the listing anchor off other pages; while that sweep sat outside the section, a removal could land between the two and the sweep wrote a page straight back into the deleted language. The lock is therefore taken at the controller edge and the write helpers below it run unlocked (`persistPageInSection`), rather than each helper taking it for itself.
+
+**Check and write must be the same section, not two steps.** The menu listing lazily back-fills a missing uuid, which is a write on a read path. Checking the language and then writing is not a check: a removal landing in the gap deleted the menu and the write restored it. That backfill now does both inside one section, and its check is the non-throwing `isLanguageStillEnabled` — an obsolete backfill is skipped, and the listing still answers rather than failing over content the reader did not ask about.
+
+Covered writes: page content and details save, page create/duplicate/delete, page language version, global widget save, menu create/update/duplicate, collection item create/update/duplicate/discard-archived/delete/bulk-delete/reorder, and collection item language version. Deletes are included because pruning a collection's order file is itself a write. The refusal writes nothing.
+
+Not covered: link enrichment and the structural flows (project create, duplicate, import, theme update), which copy content that already exists.
+
+### Both orderings, and what the editor does about them
+
+A request can be refused at either of two points, and both answer with the same `LANGUAGE_REMOVED` code so the editor behaves identically:
+
+| Ordering | Where it is caught | Status |
+| --- | --- | --- |
+| The request arrived **before** the removal and writes after it | the re-read inside the content-write section | `409` |
+| The request arrived **after** the removal, so its project row is already correct | `requestLanguage`, at the request boundary | `400` |
+
+The second is the common one. It used to answer a bare 400 with no machine-readable code, so the editor could not tell it from an ordinary failure: no explanation, and autosave kept retrying. A *malformed* language code still answers a plain 400 with no code — a typo is a client error, not a language that went away.
+
+On either, the editor:
+
+- **keeps every edit.** Nothing was written, and no dirty state is cleared. The work is still on screen.
+- **stops saving, and stays stopped.** Stopping the timer once is not enough, because the autosave tick reschedules itself and every edit re-arms it. Saving is suspended for the rest of the editing session, and lifts when the editor loads a page or the session is discarded.
+- **explains, without blocking.** A banner, not an overlay: the draft cannot be saved anywhere and reloading discards it, so the editor underneath is the only place it still exists and covering it would make the one available recovery impossible. The banner names the language the way a person would ("Greek", not `el`) and labels its exit for what it does — *Discard changes and return to Pages*.
+- **clears the banner when that session ends**, together with the suspension, so a page that saves perfectly well never inherits the warning. A project-mismatch warning is deliberately left alone: that one is about the tab, not the session.
+
+**What recovery does and does not mean.** The draft is reachable, not rescued: someone who wants to keep it copies it out before leaving. Nothing preserves it automatically, and the banner does not pretend otherwise — earlier wording suggested re-adding the language and reloading, which is wrong twice over, since reloading discards the draft and re-adding a language does not bring back the pages deleted with it. Automatic draft recovery (stashing it locally and offering it back, or exporting it) is a possible future improvement, not part of this behaviour.
+
+### Reference cleanup
 
 The language-removal service is distinct from individual page/item deletion and does not call their reference-scrubbing helpers. Whether surviving content should be rewritten or rely on missing-target rendering needs an explicit [review](../review-questions.md#r2-one-deletion-policy-for-references).
 

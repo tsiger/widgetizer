@@ -209,6 +209,177 @@ describe("saveStore (useAutoSave)", () => {
   });
 
   // --------------------------------------------------------------------------
+  // The language being edited was removed
+  // --------------------------------------------------------------------------
+
+  describe("a save refused because the language was removed", () => {
+    function rejectWithLanguageRemoved(code = "el") {
+      const err = new Error(`The language "${code}" was removed from this site`);
+      err.code = "LANGUAGE_REMOVED";
+      err.status = 409;
+      err.data = { code: "LANGUAGE_REMOVED", language: code };
+      savePageContent.mockRejectedValueOnce(err);
+    }
+
+    it("stops autosave and raises the curtain, without throwing at the caller", async () => {
+      // Same handling as PROJECT_MISMATCH and for the same reason: retrying cannot
+      // succeed, so hammering the server helps nobody, and an exception thrown at a
+      // manual save would surface as a generic failure toast instead of the
+      // explanation the curtain gives.
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
+      rejectWithLanguageRemoved();
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "language-removed" });
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useStaleProjectStore.getState().reason).toBe("language");
+      expect(useStaleProjectStore.getState().removedLanguage).toBe("el");
+    });
+
+    it("keeps every edit and stays dirty, because reloading is the only way out", async () => {
+      // The curtain tells the user that reloading discards this work. That is only
+      // honest if the work is in fact still here until they choose to.
+      seedPageStore();
+      usePageStore.setState({
+        page: {
+          ...usePageStore.getState().page,
+          widgets: { "w-1": { type: "rich-text", settings: { text: "Written in Greek" } } },
+        },
+      });
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithLanguageRemoved();
+
+      await useAutoSave.getState().save(false);
+
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(usePageStore.getState().page.widgets["w-1"].settings.text).toBe("Written in Greek");
+      expect(useAutoSave.getState().lastSaved).toBe(null);
+    });
+  });
+
+  describe("after a language-removal refusal, saving stays off", () => {
+    function rejectWithLanguageRemoved(code = "el") {
+      const err = new Error(`The language "${code}" was removed from this site`);
+      err.code = "LANGUAGE_REMOVED";
+      err.status = 409;
+      err.data = { code: "LANGUAGE_REMOVED", language: code };
+      savePageContent.mockRejectedValueOnce(err);
+    }
+
+    async function refuseOnce() {
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+      rejectWithLanguageRemoved();
+      await useAutoSave.getState().save(false);
+    }
+
+    it("does not re-arm the timer when the retained draft is edited further", async () => {
+      // Stopping the timer once was not enough: every edit runs through
+      // resetAutoSaveTimer, so typing into the draft the user was told to keep
+      // restarted the doomed saves immediately.
+      await refuseOnce();
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+
+      useAutoSave.getState().markWidgetModified("w-2");
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+
+      useAutoSave.getState().setStructureModified(true);
+      useAutoSave.getState().setThemeSettingsModified(true);
+      expect(useAutoSave.getState().autoSaveInterval).toBe(null);
+    });
+
+    it("refuses further saves outright instead of re-issuing a doomed request", async () => {
+      await refuseOnce();
+      savePageContent.mockClear();
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "suspended" });
+      expect(savePageContent).not.toHaveBeenCalled();
+    });
+
+    it("keeps the draft while suspended", async () => {
+      await refuseOnce();
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(true);
+      expect(useAutoSave.getState().modifiedWidgets.has("w-1")).toBe(true);
+    });
+
+    it("saves again once the editor starts a new session", async () => {
+      // A suspension that outlived its session would silently stop saving a page
+      // that is perfectly fine. PageEditor calls this when it loads a page.
+      await refuseOnce();
+      useAutoSave.getState().resumeSaving();
+
+      useAutoSave.getState().markWidgetModified("w-1");
+      expect(useAutoSave.getState().autoSaveInterval).not.toBe(null);
+
+      const result = await useAutoSave.getState().save(false);
+      expect(result).toEqual({ status: "success" });
+    });
+
+    it("also lifts on reset, the discard-and-leave path", async () => {
+      await refuseOnce();
+      useAutoSave.getState().reset();
+      expect(useAutoSave.getState().savingSuspended).toBe(false);
+    });
+
+    it("takes the banner down with it, so a fresh page does not inherit the warning", async () => {
+      // Saving resuming and the banner saying it cannot are one fact. Leaving the
+      // banner up over a page that saves perfectly well is its own bug.
+      await refuseOnce();
+      expect(useStaleProjectStore.getState().reason).toBe("language");
+
+      useAutoSave.getState().resumeSaving();
+
+      expect(useStaleProjectStore.getState().isStale).toBe(false);
+      expect(useStaleProjectStore.getState().reason).toBe(null);
+      expect(useStaleProjectStore.getState().removedLanguage).toBe(null);
+    });
+
+    it("leaves a project-mismatch warning alone, which is about the tab, not the session", async () => {
+      // Clearing it here would drop a warning nothing re-raises until the next focus
+      // probe, leaving the tab quietly editing the wrong project.
+      useStaleProjectStore.getState().markStale("Marketing Site");
+
+      useAutoSave.getState().resumeSaving();
+      useAutoSave.getState().reset();
+
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useStaleProjectStore.getState().reason).toBe("project");
+      expect(useStaleProjectStore.getState().incomingName).toBe("Marketing Site");
+    });
+
+    it("refusal → discard and navigate away → open a valid page → saves, with no old banner", async () => {
+      // The whole lifecycle in one, because each step restored something the
+      // previous one had switched off and any of them could regress alone.
+      await refuseOnce();
+      expect(useStaleProjectStore.getState().isStale).toBe(true);
+      expect(useAutoSave.getState().savingSuspended).toBe(true);
+
+      // Discarding through ordinary navigation: the guard calls reset(), then lets
+      // the route change through.
+      useAutoSave.getState().reset();
+
+      // The editor opens a page in a language that is fine.
+      useAutoSave.getState().resumeSaving();
+      seedPageStore();
+      useAutoSave.getState().markWidgetModified("w-1");
+
+      const result = await useAutoSave.getState().save(false);
+
+      expect(result).toEqual({ status: "success" });
+      expect(useStaleProjectStore.getState().isStale).toBe(false);
+      expect(useAutoSave.getState().savingSuspended).toBe(false);
+      expect(useAutoSave.getState().hasUnsavedChanges()).toBe(false);
+    });
+  });
+
+  // --------------------------------------------------------------------------
   // A save the server refused
   // --------------------------------------------------------------------------
 

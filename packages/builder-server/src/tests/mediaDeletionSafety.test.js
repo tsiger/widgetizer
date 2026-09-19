@@ -44,8 +44,8 @@ const { deleteProjectMedia, bulkDeleteProjectMedia, refreshMediaUsage } = await 
 const { savePageContent, updatePage } = await import("../controllers/pageController.js");
 const { updateProject } = await import("../controllers/projectController.js");
 const collectionController = await import("../controllers/collectionController.js");
-const { clearDeletedMediaPaths, recordDeletedMediaPaths, withMediaLock } = await import(
-  "../services/mediaCoordination.js"
+const { clearDeletedMediaPaths, recordDeletedMediaPaths, withContentWriteLock } = await import(
+  "../services/contentCoordination.js"
 );
 const { closeDb } = await import("../db/index.js");
 const { LocalAssetStorageAdapter, LocalStorageAdapter } = await import("@widgetizer/adapters-local");
@@ -443,17 +443,28 @@ describe("a collection save whose baseline went stale", () => {
     });
     let paused = false;
     const itemKey = `collections/news/${slug}.json`;
-    const pausingStorage = Object.create(storage);
+    // A Proxy with bound methods, NOT Object.create(storage): the local adapter uses
+    // private class fields, so an inherited method called on a derived object throws
+    // "Receiver must be an instance of class". Callers that swallow read errors would
+    // then take a quiet early exit and the test would pass while proving nothing.
     // Parameter named `scope` deliberately: it IS the scope being threaded, and the
     // repo's scope-first lint rule reads the argument's name.
-    pausingStorage.read = async (scope, key) => {
-      const data = await storage.read(scope, key);
-      if (key === itemKey && !paused) {
-        paused = true;
-        await gate;
-      }
-      return data;
-    };
+    const pausingStorage = new Proxy(storage, {
+      get(target, prop) {
+        if (prop === "read") {
+          return async (scope, key) => {
+            const data = await target.read(scope, key);
+            if (key === itemKey && !paused) {
+              paused = true;
+              await gate;
+            }
+            return data;
+          };
+        }
+        const value = Reflect.get(target, prop);
+        return typeof value === "function" ? value.bind(target) : value;
+      },
+    });
 
     const inFlight = call(collectionController.updateItem, {
       params: { collectionType: "news", itemSlug: slug },
@@ -533,7 +544,7 @@ describe("a project save whose baseline went stale", () => {
     let raceStaged = false;
 
     // Occupy the section so the save below has to queue behind it.
-    const blocker = withMediaLock(PROJECT_ID, async () => {
+    const blocker = withContentWriteLock(PROJECT_ID, async () => {
       await gate;
       // What a delete that ran while the save waited leaves behind: the logo
       // removed from the row, the bytes gone, the path remembered.

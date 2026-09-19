@@ -25,7 +25,11 @@ import { globalKey, pageOutputPath, itemOutputPath } from "@widgetizer/core/cont
 import { requestLanguage, withoutLanguage, projectLanguageContexts, projectLanguages } from "../utils/contentLanguage.js";
 import { getProjectFolderName } from "../utils/projectHelpers.js";
 import { updateGlobalWidgetMediaUsage, extractMediaPathsFromGlobalWidget } from "../services/mediaUsageService.js";
-import { withMediaLock, assertIntroducedMediaExists } from "../services/mediaCoordination.js";
+import {
+  withContentWriteLock,
+  assertIntroducedMediaExists,
+  assertLanguageStillEnabled,
+} from "../services/contentCoordination.js";
 import { isProjectResolutionError } from "../utils/projectErrors.js";
 import { generateToken, getToken } from "../services/previewTokenStore.js";
 import { LANGUAGE_CODE_RE, DEFAULT_LANGUAGE } from "@widgetizer/core/languages";
@@ -646,8 +650,12 @@ export async function saveGlobalWidget(req, res) {
 
     // The write and its usage sync are one media section, so media deletion — which
     // verifies and deletes in the same section — cannot run between them and read
-    // this header as not yet using an image it is about to. See mediaCoordination.
-    const { usageStale } = await withMediaLock(scope.projectId, async () => {
+    // this header as not yet using an image it is about to. See contentCoordination.
+    const { usageStale } = await withContentWriteLock(scope.projectId, async () => {
+      // A header or footer belongs to one language's folder, so a removed language
+      // must not get its globals back from a save that was already queued.
+      assertLanguageStillEnabled(scope.projectId, lang);
+
       // Don't let a save queued behind a delete introduce a reference to the file
       // that delete just removed. Only newly added paths are checked.
       let previousPaths = [];
@@ -685,6 +693,9 @@ export async function saveGlobalWidget(req, res) {
       ...(usageStale ? { warnings: [{ code: "MEDIA_USAGE_STALE", path: `global:${type}` }] } : {}),
     });
   } catch (error) {
+    if (error?.code === "LANGUAGE_REMOVED") {
+      return res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    }
     if (error?.code === "MEDIA_REFERENCE_MISSING") {
       return res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
     }

@@ -4,7 +4,11 @@ import {
   syncPageMediaUsageOnWrite,
   extractMediaPathsFromPage,
 } from "../services/mediaUsageService.js";
-import { withMediaLock, assertIntroducedMediaExists } from "../services/mediaCoordination.js";
+import {
+  withContentWriteLock,
+  assertIntroducedMediaExists,
+  assertLanguageStillEnabled,
+} from "../services/contentCoordination.js";
 import { cleanupDeletedPageReferences } from "../utils/linkEnrichment.js";
 import { stripHtmlToText } from "../services/sanitizationService.js";
 import { LIMIT_KEYS, MAX_WIDGETS_PER_PAGE } from "@widgetizer/core/adapters";
@@ -81,6 +85,12 @@ async function enforcePaginationRules({ scope, storage, widgets }) {
  * @returns {boolean} true when it answered
  */
 function respondMissingMedia(res, error) {
+  if (error?.code === "LANGUAGE_REMOVED") {
+    // Nothing was written. The editor keeps the work and stops retrying; it cannot
+    // be saved anywhere, because the language it belongs to is gone.
+    res.status(error.statusCode).json({ error: "Language removed", message: error.message, code: error.code, language: error.language });
+    return true;
+  }
   if (error?.code !== "MEDIA_REFERENCE_MISSING") return false;
   res.status(error.statusCode).json({ error: "Missing media", message: error.message, code: error.code });
   return true;
@@ -88,17 +98,32 @@ function respondMissingMedia(res, error) {
 
 // The write and its usage sync are one media section: media deletion verifies and
 // deletes inside the same section, so it cannot see this page between the two and
-// conclude an image it just started using is unused. See services/mediaCoordination.
-async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, previousPageId = null, lang, assetStorage }) {
+// conclude an image it just started using is unused. See services/contentCoordination.
+/**
+ * The body of a page write, WITHOUT taking the section — the caller holds it.
+ *
+ * Split out because a save is rarely one write: `savePageContent` also sweeps the
+ * listing anchor off other pages, and that sweep used to run after this function had
+ * released the section. A removal landing in between then deleted the language while
+ * the sweep was still going, and the sweep wrote a Greek page straight back. Related
+ * writes have to share one section, so the lock belongs at the controller edge.
+ */
+async function persistPageInSection({ scope, storage, pageId, pageData, previousPageId = null, lang, assetStorage }) {
   // Required, not optional. It used to default to null and skip the check, which
   // meant a caller that simply forgot to pass it lost the protection silently —
   // the page-details save did exactly that, and could store a deleted image as the
   // page's social-sharing image. Failing loudly is the only way a missing
   // dependency stays visible.
   if (!assetStorage) {
-    throw new Error("persistPageWithMediaTracking requires assetStorage: media validation must not be skipped");
+    throw new Error("persistPageInSection requires assetStorage: media validation must not be skipped");
   }
-  return withMediaLock(scope.projectId, async () => {
+  {
+    // The language this page is addressed to may have been removed while this write
+    // waited for the section. Writing anyway recreates a page in a language the
+    // project no longer has — invisible to the editor and to export, but visible to
+    // the media usage rebuild, where it can hold an image hostage.
+    assertLanguageStillEnabled(scope.projectId, lang);
+
     // Refuse to introduce a reference to a file that is gone — the save queued
     // behind a delete, which the lock orders but cannot make safe on its own.
     // References the page already carried are left alone: a dangling path is
@@ -143,13 +168,18 @@ async function persistPageWithMediaTracking({ scope, storage, pageId, pageData, 
       console.warn(`Failed to update media usage tracking for page ${pageId}:`, usageError);
       return { usageStale: true };
     }
-  });
+  }
+}
+
+/** Take the section and do one page write in it. For callers with nothing else to do. */
+async function persistPageWithMediaTracking(args) {
+  return withContentWriteLock(args.scope.projectId, () => persistPageInSection(args));
 }
 
 async function deletePageWithMediaTracking({ scope, storage, pageId, lang }) {
   // Same section as the writes and as media deletion: a verification scan must not
   // read a half-removed page and mistake its images for unreferenced ones.
-  return withMediaLock(scope.projectId, async () => {
+  return withContentWriteLock(scope.projectId, async () => {
     // Usage rows are keyed by uuid, so read it while the file still exists. A page with
     // no uuid was recorded under its slug, which the service resolves from the slug below.
     let pageUuid = null;
@@ -311,25 +341,30 @@ export async function updatePage(req, res) {
       updated: new Date().toISOString(), // Set new update timestamp
     };
 
-    await persistPageWithMediaTracking({
-      scope,
-      storage,
-      pageId: finalNewSlug,
-      pageData: finalUpdatedPageData,
-      previousPageId: oldSlug,
-      lang,
-      assetStorage: req.adapters.assetStorage,
-    });
+    // Both writes in one section, for the same reason as savePageContent below:
+    // the sweep writes other pages in this language and must not outlive the
+    // section that checked the language still exists.
+    const movedFrom = await withContentWriteLock(scope.projectId, async () => {
+      await persistPageInSection({
+        scope,
+        storage,
+        pageId: finalNewSlug,
+        pageData: finalUpdatedPageData,
+        previousPageId: oldSlug,
+        lang,
+        assetStorage: req.adapters.assetStorage,
+      });
 
-    const movedFrom = pageData.widgets
-      ? await clearListingAnchorsElsewhere({
-          scope,
-          storage,
-          keepPageId: finalNewSlug,
-          widgets: finalUpdatedPageData.widgets,
-          lang,
-        })
-      : [];
+      return pageData.widgets
+        ? clearListingAnchorsElsewhere({
+            scope,
+            storage,
+            keepPageId: finalNewSlug,
+            widgets: finalUpdatedPageData.widgets,
+            lang,
+          })
+        : [];
+    });
 
     res.json({
       success: true,
@@ -674,27 +709,33 @@ export async function savePageContent(req, res) {
     };
     updatedPageData.translationGroupId = existingData.translationGroupId || updatedPageData.uuid;
 
-    const { usageStale } = await persistPageWithMediaTracking({
-      scope,
-      storage,
-      pageId: pageData.slug,
-      pageData: updatedPageData,
-      previousPageId: id,
-      lang,
-      assetStorage: req.adapters.assetStorage,
-    });
+    // ONE section for both writes. The anchor sweep writes other pages in this
+    // language, so leaving it outside let a language removal land between the two
+    // and the sweep then recreated a page in the language that had just gone.
+    const { usageStale, movedFrom } = await withContentWriteLock(scope.projectId, async () => {
+      const persisted = await persistPageInSection({
+        scope,
+        storage,
+        pageId: pageData.slug,
+        pageData: updatedPageData,
+        previousPageId: id,
+        lang,
+        assetStorage: req.adapters.assetStorage,
+      });
 
-    // One listing anchor per collection. Swept on save rather than when the
-    // checkbox is ticked: the editor holds the change until save, so clearing
-    // other pages earlier would strip an anchor for an edit the user then
-    // discarded. Runs after the write so the page that claimed the anchor is
-    // the one that keeps it.
-    const movedFrom = await clearListingAnchorsElsewhere({
-      scope,
-      storage,
-      keepPageId: pageData.slug,
-      widgets: updatedPageData.widgets,
-      lang,
+      // One listing anchor per collection. Swept on save rather than when the
+      // checkbox is ticked: the editor holds the change until save, so clearing
+      // other pages earlier would strip an anchor for an edit the user then
+      // discarded. Runs after the write so the page that claimed the anchor is
+      // the one that keeps it.
+      const moved = await clearListingAnchorsElsewhere({
+        scope,
+        storage,
+        keepPageId: pageData.slug,
+        widgets: updatedPageData.widgets,
+        lang,
+      });
+      return { ...persisted, movedFrom: moved };
     });
 
     res.json({

@@ -54,6 +54,11 @@ export default function PageEditor() {
     // A slug is unique per language, so which language is being edited travels
     // in the URL. Saving already targets it: the loaded page carries its own
     // language and every save sends the page back.
+    // A page load is a new editing session. If the previous one ended with its
+    // language removed, saving was suspended on purpose and has to be re-enabled
+    // here — a suspension that outlived its session would silently stop saving a
+    // page that is perfectly fine.
+    useAutoSave.getState().resumeSaving();
     usePageStore.getState().loadPage(pageId, searchParams.get("language") || undefined);
     if (activeProject?.id) {
       useWidgetStore.getState().loadSchemas(searchParams.get("language") || "");

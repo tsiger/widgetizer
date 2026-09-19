@@ -10,7 +10,7 @@ import { LIMIT_KEYS } from "@widgetizer/core/adapters";
 import { ALLOWED_MIME_TYPES, ALLOWED_UPLOAD_EXTENSIONS, getContentType, getMediaCategory } from "../utils/mimeTypes.js";
 import { getSetting } from "./appSettingsController.js";
 import { getMediaUsage, refreshAllMediaUsageFromDir, ensureUsageSourceFormat } from "../services/mediaUsageService.js";
-import { withMediaLock, verifyFileUnused, recordDeletedMediaPaths } from "../services/mediaCoordination.js";
+import { withContentWriteLock, verifyFileUnused, recordDeletedMediaPaths } from "../services/contentCoordination.js";
 import { getProjectFolderName, getProjectDetails } from "../utils/projectHelpers.js";
 import { handleProjectResolutionError } from "../utils/projectErrors.js";
 import { requestLanguage } from "../utils/contentLanguage.js";
@@ -605,7 +605,7 @@ export async function deleteProjectMedia(req, res) {
     // Verify and delete in one section no content write can interleave with: the
     // stored usage rows are best-effort, so they are re-derived here rather than
     // trusted, and a save must not slip a new reference in between the two steps.
-    const outcome = await withMediaLock(projectId, async () => {
+    const outcome = await withContentWriteLock(projectId, async () => {
       const fileToDelete = mediaRepo.getMediaFileById(projectId, fileId);
       if (!fileToDelete) return { notFound: true };
 
@@ -776,7 +776,7 @@ export async function bulkDeleteProjectMedia(req, res) {
     // One verification scan for the whole batch, then delete — all inside the media
     // section, so no save can introduce a reference to any of these between the
     // scan and the deletes it authorises.
-    const outcome = await withMediaLock(projectId, async () => {
+    const outcome = await withContentWriteLock(projectId, async () => {
       const mediaData = mediaRepo.getMediaFiles(projectId);
       const requested = mediaData.files.filter((file) => fileIds.includes(file.id));
       if (requested.length === 0) return { noneFound: true };

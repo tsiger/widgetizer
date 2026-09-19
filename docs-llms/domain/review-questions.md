@@ -10,7 +10,7 @@ These are places where we should check whether the app's rules are complete, con
 | --- | --- |
 | [R1: Is image usage still accurate after a save problem?](#r1-content-persistence-and-media-usage) *(implemented; follow-ups tracked)* | An image should not appear safe to delete while saved content still needs it. |
 | [R2: Does deleting related content have consistent consequences?](#r2-one-deletion-policy-for-references) | Deleting a page by itself and deleting its whole language should have a clear policy for links left behind. |
-| [R3: What if a language is removed while another window is editing it?](#r3-language-lifecycle-and-content-writes) | A late save should not unexpectedly bring back content from a removed language. |
+| [R3: What if a language is removed while another window is editing it?](#r3-language-lifecycle-and-content-writes) *(implemented; follow-ups tracked)* | A late save should not unexpectedly bring back content from a removed language. |
 | [R4: Do different ways of creating content obey the right rules?](#r4-shared-write-rules-without-forcing-one-workflow) | Create, Duplicate and Create language version should differ intentionally, not accidentally bypass limits or checks. |
 | [R5: Do we find every place that uses an image or link?](#r5-one-description-of-reference-bearing-values) | A link inside formatted text matters just as much as one in a button or menu. |
 | [R6: Can we explain an operation that only partly finished?](#r6-structural-operations-and-partial-success) | You should be able to tell what was kept, what failed and what to do next. |
@@ -39,7 +39,7 @@ Two promises were deliberately separated rather than conflated: deletion is safe
 
 **Embedding-host follow-up:** custom writes that introduce media references must use the same coordination as shared deletion, even within one process. Cross-process coordination is a separate, deferred requirement: check it before allowing more than one backend process to write the same project. It does not block a single-process MVP. See the [integration checklist](review-status.md#hosted-follow-ups--generic-integration-checklist) for priorities and checkpoints.
 
-See [delete or bulk delete](operations/media.md#delete-or-bulk-delete) for the rule and its limits, and [mediaCoordination](../../packages/builder-server/src/services/mediaCoordination.js) for why each of the three parts is needed on its own.
+See [delete or bulk delete](operations/media.md#delete-or-bulk-delete) for the rule and its limits, and [contentCoordination](../../packages/builder-server/src/services/contentCoordination.js) for why each of the three parts is needed on its own.
 
 **Simplification candidate (still open):** one explicit contract for content-write results and usage reconciliation, reused by callers while keeping their individual lifecycle rules. Deliberately NOT taken as part of the above: the hazard did not require it, and collapsing the write paths is a much wider change than closing the deletion hole. The `warnings: [{code, path}]` channel the saves now use (shared with theme sanitization and `LANGUAGE_SKIPPED`) is the natural shape for it if it is ever done.
 
@@ -57,13 +57,25 @@ Evidence: [languageService](../../packages/builder-server/src/services/languageS
 
 ## R3 Language lifecycle and content writes
 
-**Observed:** language add/remove has a keyed serializer; translation creation has another. Ordinary page/menu/item writes resolve language using request project context. Serialization within one workflow does not coordinate all the others.
+**Status:** OSS implementation reviewed; remaining work has [priorities and checkpoints](review-status.md#r3--removing-a-language-while-someone-is-editing-it).
+
+**Original observation:** language add/remove has a keyed serializer; translation creation has another. Ordinary page/menu/item writes resolve language using request project context. Serialization within one workflow does not coordinate all the others.
 
 **Question:** what happens when language removal overlaps version creation, autosave, item reorder, or global save? Can a request validated before removal write content after cleanup?
 
-**Simplification candidate:** define the language lifecycle consistency boundary, then choose a shared coordinator or freshness check only where needed. Avoid spreading independent locks whose ordering is difficult to reason about.
+**Answered: yes, it could.** Reproduced against a page content save and a page language version — both returned success and wrote into a language the project no longer listed. A menu save happened to 404 instead, but incidentally (it reads before writing), not by design.
 
-Evidence: [languageController](../../packages/builder-server/src/controllers/languageController.js), [translationService](../../packages/builder-server/src/services/translationService.js), [contentLanguage](../../packages/builder-server/src/utils/contentLanguage.js). Coverage: L2/L4/L6.
+The orphan was worse than a stray file. Export and the editor read the project row, so neither could see it; the media usage rebuild scans the folders on disk, so it could. An image referenced only by that unreachable content became permanently undeletable, blamed on a page nobody could open. R1's verify-from-content did not cause this, but it made it durable rather than transient.
+
+**What settled it** is that ordering and freshness are two different requirements, and each is useless alone. R1's per-project section was generalised from media into one **content-write section** (`contentCoordination`) that content writes, media deletion and language add/remove all take — rather than adding a fourth independent per-project lock, which R3's own simplification candidate warns against. Inside it, each write re-reads the project row and refuses with `LANGUAGE_REMOVED`. A write that *waited* for the section validated against a world that had already changed, so the section alone would not have been enough; equally, a check outside the section is not a check.
+
+Two boundaries turned out to matter more than expected, and both are recorded in [coordination with content writes](operations/languages.md#coordination-with-content-writes): a section has to span **every** write a request makes (a page save also sweeps the listing anchor off other pages, and that sweep sat outside it), and a check and its write must be **the same** section, not two steps (the menu listing's uuid backfill checked, then wrote, with a gap).
+
+**The editor's half** reuses the existing stale-editor pattern rather than inventing one: the refusal keeps every edit, suspends saving for the rest of the session — durably, since the autosave tick reschedules itself and every edit re-arms it — and explains in a banner rather than an overlay, because the draft cannot be saved anywhere and the editor underneath is the only place it still exists. Recovery means copying the work out; nothing preserves it automatically, and the wording no longer implies otherwise. Automatic draft recovery is [a possible future improvement](review-status.md#r3--removing-a-language-while-someone-is-editing-it), not part of this fix.
+
+**Simplification candidate (taken):** the "define the language lifecycle consistency boundary, then choose a shared coordinator or freshness check only where needed" candidate is what was built. The boundary is the content-write section; the freshness checks are `assertLanguageStillEnabled` and R1's `assertIntroducedMediaExists`, which share one shape — re-read the authority inside the section, compare, refuse with a stable code.
+
+Evidence: [languageController](../../packages/builder-server/src/controllers/languageController.js), [contentCoordination](../../packages/builder-server/src/services/contentCoordination.js), [contentLanguage](../../packages/builder-server/src/utils/contentLanguage.js). Coverage: L2/L4/L6/L7.
 
 ## R4 Shared write rules without forcing one workflow
 

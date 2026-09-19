@@ -34,6 +34,12 @@ const useAutoSave = create((set, get) => ({
   // one; it only means the media library may label a file wrongly until a refresh.
   // Announced by a mounted component, same as listingAnchorMoved.
   mediaUsageStale: null,
+  // Saving is off until this editing session ends, because retrying cannot work:
+  // the language this editor is in no longer exists. Stopping the timer once is not
+  // enough — the autosave tick reschedules itself, and every edit re-arms it, so a
+  // stopped timer came straight back and hammered the server with doomed saves.
+  // Cleared when the editor loads a page (a new session) or on reset().
+  savingSuspended: false,
   modifiedWidgets: new Set(),
   structureModified: false,
   themeSettingsModified: false,
@@ -212,6 +218,11 @@ const useAutoSave = create((set, get) => ({
       set({ queuedFollowUp: followUp });
       return followUp.promise;
     }
+
+    // Nothing can be saved in a language that is gone; the curtain has already
+    // explained that. Refusing here keeps a retry from re-issuing a doomed request
+    // and keeps the failure counter and backoff out of it entirely.
+    if (get().savingSuspended) return { status: "suspended" };
 
     if (!get().hasUnsavedChanges()) return { status: "clean" };
 
@@ -420,6 +431,18 @@ const useAutoSave = create((set, get) => ({
           get().stopAutoSave();
           return { status: "mismatch" };
         }
+        if (err.code === "LANGUAGE_REMOVED") {
+          // The language this editor is working in was removed from the site, so
+          // the server refused and wrote nothing. Same handling as the mismatch
+          // above and for the same reason: retrying cannot succeed, and the edits
+          // must not be discarded — nothing below this branch clears them. The
+          // curtain explains the one thing that differs, which is that there is
+          // nowhere left to save this work.
+          useStaleProjectStore.getState().markLanguageRemoved(err.data?.language ?? null);
+          set({ savingSuspended: true });
+          get().stopAutoSave();
+          return { status: "language-removed" };
+        }
         // Manual saves rethrow so the caller can react to the failure —
         // EditorTopBar's two manual-save callsites `.catch` the rejection and
         // `console.error` it; autosave failures stay silent —
@@ -480,6 +503,11 @@ const useAutoSave = create((set, get) => ({
   },
 
   resetAutoSaveTimer: () => {
+    // One gate for all of them: markWidgetModified, setStructureModified,
+    // setThemeSettingsModified and the tick's own reschedule all arrive here, and
+    // each of them used to restart a timer that had deliberately been stopped.
+    if (get().savingSuspended) return;
+
     const { autoSaveInterval, autoSaveFailureCount } = get();
 
     if (autoSaveInterval) {
@@ -511,7 +539,12 @@ const useAutoSave = create((set, get) => ({
           set((s) => ({ autoSaveFailureCount: s.autoSaveFailureCount + 1 }));
         } else if (result.status === "success") {
           set({ autoSaveFailureCount: 0 });
-        } else if (result.status === "mismatch" || result.status === "abandoned") {
+        } else if (
+          result.status === "mismatch" ||
+          result.status === "abandoned" ||
+          result.status === "language-removed" ||
+          result.status === "suspended"
+        ) {
           // An intentional stop happened during this attempt (PROJECT_MISMATCH's
           // own stopAutoSave(), or a reset() from discard-and-leave) — do not
           // reschedule, that would defeat it.
@@ -541,9 +574,23 @@ const useAutoSave = create((set, get) => ({
 
   clearMediaUsageStale: () => set({ mediaUsageStale: null }),
 
+  /**
+   * A new editing session: the editor has loaded a page, so saving applies again —
+   * and the banner saying it does not must go with it. The two are one fact, so
+   * they are cleared together; leaving the banner up over a page that saves fine is
+   * its own bug. A project-mismatch warning is deliberately untouched: that is about
+   * the tab, not this session.
+   */
+  resumeSaving: () => {
+    if (get().savingSuspended) set({ savingSuspended: false });
+    useStaleProjectStore.getState().clearLanguageRemoved();
+  },
+
   reset: () => {
     const { stopAutoSave, saveGeneration } = get();
     stopAutoSave();
+    // Discard-and-leave ends the session too, so the language banner goes with it.
+    useStaleProjectStore.getState().clearLanguageRemoved();
     // Put the theme draft back. Clearing the flags alone left the edited
     // settings in the store, and a page load deliberately keeps a theme draft
     // alive across navigations — so a discarded change came straight back the
@@ -562,6 +609,7 @@ const useAutoSave = create((set, get) => ({
       lastSaved: null,
       listingAnchorMoved: null,
       mediaUsageStale: null,
+      savingSuspended: false,
       modifiedWidgets: new Set(),
       structureModified: false,
       themeSettingsModified: false,

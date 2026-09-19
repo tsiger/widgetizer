@@ -298,11 +298,15 @@ describe("items in another language (API)", () => {
   before(() => {
     activeProject.defaultLanguage = "en";
     activeProject.languages = ["el"];
+    // Persisted too, not just on the in-memory request object: the language check
+    // at each write re-reads the project row, which is what a real removal updates.
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: ["el"] });
   });
 
   after(() => {
     delete activeProject.defaultLanguage;
     delete activeProject.languages;
+    projectRepo.updateProject(activeProject.id, { defaultLanguage: "en", languages: [] });
   });
 
   it("creates, lists and reads Greek items in their folder", async () => {

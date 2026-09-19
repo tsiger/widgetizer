@@ -33,7 +33,7 @@ import {
   updateSiteIdentityMediaUsage,
   extractMediaPathsFromSiteIdentity,
 } from "../services/mediaUsageService.js";
-import { withMediaLock, assertIntroducedMediaExists } from "../services/mediaCoordination.js";
+import { withContentWriteLock, assertIntroducedMediaExists } from "../services/contentCoordination.js";
 import { generateUniqueSlug, sanitizeSlug } from "../utils/slugHelpers.js";
 
 import { generateCopyName } from "../utils/namingHelpers.js";
@@ -681,7 +681,7 @@ export async function updateProject(req, res) {
     // before it: a rejected logo used to leave the directory already moved while the
     // row still named the old one, which strands the project. Everything that can
     // refuse this request now refuses before anything on disk has moved.
-    const { updatedProject, usageStale } = await withMediaLock(id, async () => {
+    const { updatedProject, usageStale } = await withContentWriteLock(id, async () => {
       if (siteIdentity !== undefined) {
         // Re-read the row HERE rather than comparing against the copy loaded before
         // the lock. A baseline read earlier can still show a logo that another save
