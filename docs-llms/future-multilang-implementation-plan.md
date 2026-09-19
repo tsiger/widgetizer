@@ -438,9 +438,19 @@ The server has been language-aware since step 7 (`GET /menus` merges every folde
 - **The editor stays English**, because its caller passes no locale. The filter passes `page.language`.
 - `MMMM D, YYYY` in Greek reads `Μαρτίου 4, 2026`, which is an English order with a Greek month. That is correct by the design's rule: a Greek site picks `D MMMM YYYY`, and localizing must not silently re-order a format the owner chose.
 
-### Step 24. Upgrade path for existing projects
+### Step 24. Upgrade path for existing projects — *verified 2026-09-19, nothing to build*
 
 - Nothing moves on disk: root content *is* the default language (§1a-i). Migration v6 sets `en` / `[]`. Usage ids were rebuilt in step 2. Group ids default to the page uuid (step 7). Existing exports are unaffected until a second language is added.
+
+**As verified.** The claim was measured rather than argued: a worktree at `269ea9ec` — the last commit before multilang began — exported an ordinary single-language project, HEAD exported the same one, and the two bundles were compared file by file. Nine files each, and the ONLY difference in any of them was `manifest.json`'s own timestamp. Every page, the sitemap and robots are byte-identical.
+
+Checked alongside it, against the real `data/` on this machine:
+
+- Every project row carries `default_language = 'en'` and `languages = '[]'`; none is missing them.
+- No content moved: the only language folder under any project's `pages/` belongs to the two-language test project.
+- A single-language export has no `hreflang`, no `dir` and no language folder, and its `<html>` has no `lang` — because step 19's layout reaches a project only when it takes the theme update. So even the one deliberate change waits for that.
+
+**A first attempt that did not work, recorded so nobody repeats it.** Re-exporting real projects whose content had not changed since their last export, and diffing against those older bundles, proves nothing: every pre-multilang export also predates breadcrumbs, pagination and structured data, so the differences are dominated by stages that are not this one. Isolating multilang needs the two-checkout comparison above.
 
 ### Step 25. Documentation
 
