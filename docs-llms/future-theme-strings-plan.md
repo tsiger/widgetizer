@@ -1,7 +1,12 @@
 # Future: Theme Strings a Visitor Reads
 
-> **Status: plan, not built.** Written 2026-09-19 while finishing multilang step 22, which fixed
-> this for the Arch header and left the rest of the theme as it was.
+> **Status: built 2026-09-19.** Steps 1–6 shipped in `b0878759` (the mechanism) and `79b4086c`
+> (the Arch sweep and Greek), with `949d4de3` adding the validator check. Step 7's docs are in
+> `theming.md`; its second half — giving Beacon the same treatment — was dropped deliberately,
+> see that step.
+>
+> Written while finishing multilang step 22, which fixed this for the Arch header and left the
+> rest of the theme as it was.
 
 ---
 
@@ -192,11 +197,35 @@ without the owner typing anything.
 **As built.** Greek only, as the one that can actually be checked against a real site. The rest
 should follow the same shape: the `site` block, nothing else in the file.
 
-### Step 7. Docs and the second theme — *docs done 2026-09-19; Beacon not started*
+### Step 7. Docs and the second theme — *docs done 2026-09-19; the second theme dropped*
 
 - `theming.md` — the rule, the `site` namespace, the `t` filter, and how a setting names a default.
 - Beacon gets the same treatment, which is the real test of whether the mechanism is a theme
   contract or an Arch convention.
+
+**As built, and why the second theme was dropped.** Counted first: Beacon has 5 visitor-facing
+strings, the `widgetizer` theme 11, and `widgetizer-saas-theme`'s 292 are that site's own content
+typed into templates rather than theme chrome. Five strings exercise nothing Arch's 49 across 22
+groups did not already — the placeholders, the per-widget scripts, the settings with `defaultKey`,
+the numeric-month fallback.
+
+What the second theme was *supposed* to prove was tested directly instead, with two scratch themes
+under `themes/__*` (gitignored; the locale validator skips `__`-prefixed themes, so validate one by
+name):
+
+- `__scratch` — a `site` block full of traps: missing keys, an empty value, a value holding an
+  object, placeholders supplied and unsupplied, values full of quotes and markup, a key named
+  `site`, and half a translation. Everything resolved or fell back sensibly, and markup was
+  escaped. It found the missing-key blind spot that became the validator check.
+- `__plain` — **no `locales/` directory at all**, no `t`, no `defaultKey`, words typed into the
+  markup, then grown to one of every entity: a collection with item pages, a listing widget with
+  pagination, blocks, menus, link and richtext and date settings, global header and footer, and a
+  breadcrumb trail. Built as a real two-language project through the API and exported. It renders
+  correctly in both languages, which answers the question a theme author actually asks: **the
+  whole mechanism is optional, and ignoring it costs nothing.**
+
+Writing the naive link in `__plain` is what exposed `page_url` always building at the default
+language (`d0442659`) — a bug no amount of converting Beacon would have found.
 
 ---
 

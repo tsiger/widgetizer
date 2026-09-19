@@ -4,7 +4,9 @@
 >
 > Written 2026-09-09 against the code as it stands on `0.9.10`. File and function names were verified at that date; re-verify before relying on a line.
 >
-> **Progress — 2026-09-18.** Steps 0–21 are built and committed (phases 0–4 complete; step 21 is `1775a245`). Each done step carries an **As built** note describing what it actually landed, which is the live record — read those before the prose above them. Phase 5 remains: steps 22–25.
+> **Progress — 2026-09-19.** Steps 0–24 are built and committed; only step 25 (docs) remains. Each done step carries an **As built** note describing what it actually landed, which is the live record — read those before the prose above them.
+>
+> Two things came out of phase 5 that are not steps of it. Step 22 grew into its own stage — `future-theme-strings-plan.md`, built the same day — because Arch turned out to hardcode about seventy visitor-facing strings, not the handful the step named. And `page_url`/`item_url` always built links at the default language, so a theme's own link walked the visitor out of the language they were reading; fixed in `d0442659`, found by a scratch theme written the naive way.
 >
 > Hands-on testing started 2026-09-18 against a two-language project. Two things it found so far were **not** multilang bugs and are fixed or noted elsewhere: the runtime theme copy under `data/themes/` can be stale, so a project seeded before a `npm run theme:sync` misses recent theme changes (step 19's dynamic `<html lang>` among them); and the editor's unsaved-changes state was wrong in two ways, fixed in `90d1c6ef`.
 
