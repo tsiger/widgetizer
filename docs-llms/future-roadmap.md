@@ -12,6 +12,7 @@
 | **5. Undo history** | Undo survives saves (manual and autosave); rapid edits to one setting coalesce into one step; the step limit goes up. Bug-fix sized, editor stores only. | §Stage 5 on this page | — (independent of the other stages; last only because nothing waits on it) |
 | **6. Rename to "Widgetizer Desktop"** | The names people read in the OSS app become "Widgetizer Desktop" — window and dialog titles, loading and error screens, About box, sidebar footer, README, store listing. Anything that affects how the app works (`productName`, installer file name, `appId`, data and install folders) stays `Widgetizer`. | §Stage 6 on this page | — (independent; can be done at any point, ideally with a release) |
 | **7. Upload file names** | Uploaded media keep their words: one hyphen between them, lower case, transliterated, cut at 60 characters. | §Stage 7 on this page | — (independent; overlaps with image optimization, which changes extensions) |
+| **8. Theme strings a visitor reads** | The words a theme puts on the published page — `Next`, `Pause`, `Closed`, every screen-reader label — stop being typed into the theme. Authors ship translations; site owners can override them per language. | `future-theme-strings-plan.md` | — (follows multilang; multilang step 22 did the Arch header and left the rest) |
 
 ## Reading order when picking this up
 
